@@ -1,10 +1,10 @@
 package com.netflix.vms.transformer.testutil.repro;
 
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.INPUT_VERSION_KEY_PREFIX;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig.getNamespaces;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig.getNamespacesforEnv;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig.lookupDatasetForNamespace;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.INPUT_VERSION_KEY_PREFIX;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig.getNamespaces;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig.getNamespacesforEnv;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig.lookupDatasetForNamespace;
 
 import com.netflix.cinder.consumer.CinderConsumerBuilder;
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -17,11 +17,11 @@ import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.http.HttpHelper;
-import com.netflix.vms.transformer.input.CycleInputs;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
 import java.io.File;
@@ -46,7 +46,7 @@ public class TransformerScenario {
     private final long outputDataVersion;
     private final int[] topNodesToProcess;
 
-    private Map<UpstreamDatasetHolder.Dataset, Long> inputVersions;
+    private Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> inputVersions;
     private long processTimestamp;
 
     private static final String PROXY_URL = IS_PROD ? VMSInputDataConsumer.PROD_PROXY_URL : VMSInputDataConsumer.TEST_PROXY_URL;
@@ -60,20 +60,20 @@ public class TransformerScenario {
     }
 
     public VMSTransformerWriteStateEngine repro() throws Throwable {
-        Map<UpstreamDatasetHolder.Dataset, File> scenarioInputFiles = scenarioInputDataFiles();
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, File> scenarioInputFiles = scenarioInputDataFiles();
 
-        Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
-        for (Map.Entry<UpstreamDatasetHolder.Dataset, File> entry : scenarioInputFiles.entrySet()) {
-            UpstreamDatasetHolder.Dataset dataset = entry.getKey();
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> inputs = new HashMap<>();
+        for (Map.Entry<UpstreamDatasetDefinition.DatasetIdentifier, File> entry : scenarioInputFiles.entrySet()) {
+            UpstreamDatasetDefinition.DatasetIdentifier datasetIdentifier = entry.getKey();
             File file = entry.getValue();
 
             HollowReadStateEngine inputStateEngineSlice;
             if(file.exists()) {
                 inputStateEngineSlice = readStateEngineSlice(file);
             } else {
-                inputStateEngineSlice = createStateEngineSlice(file, dataset);
+                inputStateEngineSlice = createStateEngineSlice(file, datasetIdentifier);
             }
-            inputs.put(dataset, new InputState(inputStateEngineSlice, 1l));
+            inputs.put(datasetIdentifier, new InputState(inputStateEngineSlice, 1l));
         }
         CycleInputs cycleInputs = new CycleInputs(inputs, outputDataVersion);
 
@@ -88,19 +88,20 @@ public class TransformerScenario {
         return outputStateEngine;
     }
 
-    private HollowReadStateEngine createStateEngineSlice(File scenarioInputFile, UpstreamDatasetHolder.Dataset dataset) throws Exception {
+    private HollowReadStateEngine createStateEngineSlice(File scenarioInputFile, UpstreamDatasetDefinition.DatasetIdentifier datasetIdentifier) throws Exception {
         determineInputParameters();
 
-        HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder, getNamespacesforEnv(IS_PROD).get(dataset),
-                localBlobStore, IS_PROD, dataset.getAPI());
+        HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder, getNamespacesforEnv(IS_PROD).get(
+                datasetIdentifier),
+                localBlobStore, IS_PROD, datasetIdentifier.getAPI());
 
-        inputConsumer.triggerRefreshTo(inputVersions.get(dataset));
+        inputConsumer.triggerRefreshTo(inputVersions.get(datasetIdentifier));
 
-        if (dataset.getSlicer() == null) {
-            throw new UnsupportedOperationException("Input data slicer missing for dataset= " + dataset);
+        if (datasetIdentifier.getSlicer() == null) {
+            throw new UnsupportedOperationException("Input data slicer missing for datasetIdentifier= " + datasetIdentifier);
         }
 
-        InputDataSlicer inputDataSlicer = new SlicerFactory().getInputDataSlicer(dataset, topNodesToProcess);
+        InputDataSlicer inputDataSlicer = new SlicerFactory().getInputDataSlicer(datasetIdentifier, topNodesToProcess);
         HollowWriteStateEngine slicedStateEngine = inputDataSlicer.sliceInputBlob(inputConsumer.getStateEngine());
 
         slicedStateEngine.addHeaderTag("publishCycleDataTS", String.valueOf(processTimestamp));
@@ -121,8 +122,8 @@ public class TransformerScenario {
         this.processTimestamp = Long.parseLong(dataProps.getProperty("publishCycleDataTS"));
     }
 
-    private Map<UpstreamDatasetHolder.Dataset, Long> getInputVersionsFromProps(Properties dataProps) {
-        Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = new HashMap<>();
+    private Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> getInputVersionsFromProps(Properties dataProps) {
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> inputVersions = new HashMap<>();
         dataProps.forEach((k,v) -> {
             if (k.toString().startsWith(INPUT_VERSION_KEY_PREFIX) && k.toString().length() != INPUT_VERSION_KEY_PREFIX.length()) {
                 String namespace = k.toString().substring(INPUT_VERSION_KEY_PREFIX.length());
@@ -138,11 +139,11 @@ public class TransformerScenario {
         return inputVersions;
     }
 
-    private Map<UpstreamDatasetHolder.Dataset, File> scenarioInputDataFiles() {
-        Map<UpstreamDatasetHolder.Dataset, File> files = new HashMap<>();
-        for (UpstreamDatasetHolder.Dataset dataset: UpstreamDatasetConfig.getNamespacesforEnv(IS_PROD).keySet()) {
-            String namespace = UpstreamDatasetConfig.getNamespacesforEnv(IS_PROD).get(dataset);
-            files.put(dataset, new File(localBlobStore, "scenario-" + transformerVip + "-" + outputDataVersion
+    private Map<UpstreamDatasetDefinition.DatasetIdentifier, File> scenarioInputDataFiles() {
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, File> files = new HashMap<>();
+        for (UpstreamDatasetDefinition.DatasetIdentifier datasetIdentifier : UpstreamDatasetConfig.getNamespacesforEnv(IS_PROD).keySet()) {
+            String namespace = UpstreamDatasetConfig.getNamespacesforEnv(IS_PROD).get(datasetIdentifier);
+            files.put(datasetIdentifier, new File(localBlobStore, "scenario-" + transformerVip + "-" + outputDataVersion
                     + "-" + namespace + "-" + Integer.toHexString(inputVideosHashCode())));
         }
         return files;

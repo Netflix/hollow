@@ -16,7 +16,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformRestore;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import com.netflix.aws.file.FileStore;
@@ -49,13 +49,13 @@ import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.consumer.VMSOutputDataConsumer;
 import com.netflix.vms.transformer.health.TransformerTimeSinceLastPublishGauge;
-import com.netflix.vms.transformer.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.input.FollowVipPin;
 import com.netflix.vms.transformer.input.FollowVipPinExtractor;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
 import com.netflix.vms.transformer.override.PinTitleHelper;
 import com.netflix.vms.transformer.override.PinTitleHollowCombiner;
@@ -104,7 +104,7 @@ public class TransformCycle {
     private final PinTitleManager pinTitleMgr;
     private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
     private final CycleMonkey cycleMonkey;
-    private final Map<UpstreamDatasetHolder.Dataset, HollowConsumer> inputConsumers;
+    private final Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
@@ -120,7 +120,7 @@ public class TransformCycle {
     private final HollowProducer producer;
     private final ExecutorService produceExecutor;
 
-    public TransformCycle(TransformerContext ctx, Map<UpstreamDatasetHolder.Dataset, HollowConsumer> inputConsumers,
+    public TransformCycle(TransformerContext ctx, Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers,
             FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, PublishWorkflowStager publishStager,
             String transformerVip,
             Supplier<CinderProducerBuilder> cinderProducerBuilder,
@@ -703,8 +703,8 @@ public class TransformCycle {
     // and upon completion these tasks update the passed {@code updatedInputs} map with latest {@code InputState} for the datasets.
     // Does not block on completion of triggered tasks.
     private static void triggerAsyncLoadInputs(Executor executor,
-            TransformerContext ctx, Map<UpstreamDatasetHolder.Dataset, HollowConsumer> inputConsumers,
-            FollowVipPin followVipPin, Map<UpstreamDatasetHolder.Dataset, InputState> updatedInputs) {
+            TransformerContext ctx, Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers,
+            FollowVipPin followVipPin, Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> updatedInputs) {
         // Spot to trigger Cycle Monkey if enabled
         ctx.getCycleMonkey().doMonkeyBusiness("loadInput");
 
@@ -716,11 +716,11 @@ public class TransformCycle {
         });
     }
 
-    private static void loadInput(TransformerContext ctx, UpstreamDatasetHolder.Dataset dataset, HollowConsumer consumer, FollowVipPin followVipPin) {
+    private static void loadInput(TransformerContext ctx, UpstreamDatasetDefinition.DatasetIdentifier datasetIdentifier, HollowConsumer consumer, FollowVipPin followVipPin) {
         try {
             Long followVipInputVersion = null;
             if (followVipPin != null)   // followVip configured
-                followVipInputVersion = followVipPin.getInputVersions().get(dataset);
+                followVipInputVersion = followVipPin.getInputVersions().get(datasetIdentifier);
 
             if (followVipInputVersion == null) {
                 consumer.triggerRefresh();
@@ -728,14 +728,14 @@ public class TransformCycle {
                 consumer.triggerRefreshTo(followVipInputVersion);
                 if (!followVipInputVersion.equals(consumer.getCurrentVersionId())) {
                     throw new IllegalStateException(
-                            "Failed to pin input " + dataset + " to version :" + followVipInputVersion);
+                            "Failed to pin input " + datasetIdentifier + " to version :" + followVipInputVersion);
                 }
             }
             ctx.getLogger().info(BlobState, "Loaded input={} to version={}, header={}",
-                    dataset, consumer.getCurrentVersionId(), consumer.getStateEngine().getHeaderTags());
+                    datasetIdentifier, consumer.getCurrentVersionId(), consumer.getStateEngine().getHeaderTags());
         } catch (Exception ex) {
             ctx.getLogger().error(BlobState,
-                    "Failed to Load Input {}", dataset, ex);
+                    "Failed to Load Input {}", datasetIdentifier, ex);
 
             // If the consumer transitioning failed in Gutenberg via Cinder's NFHollowBlobRetriever to obtain a blob
             // then clear the transitions so it is free to try again (since it anyway will).
@@ -750,7 +750,7 @@ public class TransformCycle {
 
                 ctx.getLogger().info(BlobState,
                         "Resetting input={} with failed transitions: snapshots={}, deltas={}",
-                        dataset, consumer.getNumFailedSnapshotTransitions(), consumer.getNumFailedDeltaTransitions());
+                        datasetIdentifier, consumer.getNumFailedSnapshotTransitions(), consumer.getNumFailedDeltaTransitions());
             }
             throw ex;
         }
@@ -758,7 +758,7 @@ public class TransformCycle {
 
     private CycleInputs loadInputAndRestoreOutputs() {
         ctx.getMetricRecorder().startTimer(P1_ReadInputDataDuration);
-        Map<UpstreamDatasetHolder.Dataset, InputState> updatedInputs = new ConcurrentHashMap<>();
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> updatedInputs = new ConcurrentHashMap<>();
         try {
             FollowVipPin followVipPin;
             if (!ctx.getConfig().getStaticInputVersions().equals(StringUtils.EMPTY))

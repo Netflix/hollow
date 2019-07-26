@@ -38,8 +38,8 @@ import com.netflix.vms.transformer.context.TransformerServerContext;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 import com.netflix.vms.transformer.fastlane.FastlaneIdRetriever;
 import com.netflix.vms.transformer.health.TransformerServerHealthIndicator;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig;
 import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
 import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
@@ -60,7 +60,8 @@ import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 @Singleton
 public class TransformerCycleKickoff {
 
-    private Map<UpstreamDatasetHolder.Dataset, HollowConsumer> inputConsumers = new EnumMap<>(UpstreamDatasetHolder.Dataset.class);
+    private Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers = new EnumMap<>(
+            UpstreamDatasetDefinition.DatasetIdentifier.class);
 
     @Inject
     public TransformerCycleKickoff(
@@ -159,8 +160,8 @@ public class TransformerCycleKickoff {
         //      √ [desirable] replace HollowClient with HollowConsumer thereby also removing FileStore usage.
         //
 
-        Map<UpstreamDatasetHolder.Dataset, String> namespaces = UpstreamDatasetConfig.getNamespaces();
-        for (UpstreamDatasetHolder.Dataset dataSet: namespaces.keySet()) {
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, String> namespaces = UpstreamDatasetConfig.getNamespaces();
+        for (UpstreamDatasetDefinition.DatasetIdentifier dataSet: namespaces.keySet()) {
             inputConsumers.put(dataSet, VMSInputDataConsumer.getNewConsumer(
                     cinderConsumerBuilder, namespaces.get(dataSet), dataSet.getAPI()));
         }

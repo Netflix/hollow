@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer;
 
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.contract.ContractAsset;

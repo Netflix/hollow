@@ -1,21 +1,24 @@
 dependencies {
-    compile project(':vmstransformer-hollowoutput-model')
+
     compile project(':vmstransformer-common-interfaces')
+    implementation project(':vmstransformer-hollowoutput-api-notemplate')
+    compile project(':vmstransformer-hollowoutput-model')
+    compile 'netflix:vmsconverter-hollow-api:latest.release'
+    compile 'com.netflix.vms.logging:vmslogging-core:latest.release'
+
+    testCompile 'netflix:vmsconverter-hollow-pojos:latest.release'
+    testCompile 'com.netflix.hollow:hollow-test:latest.release'
+
     compile 'javax.validation:validation-api'
     compile 'com.netflix.archaius:archaius2-core'
-    compile 'com.netflix.vms.logging:vmslogging-core:latest.release'
     compile 'com.google.guava:guava'
     compile 'netflix:nfi18n-core'
     compile 'commons-codec:commons-codec'
     compile 'org.mockito:mockito-all:1.3'
-    compile 'netflix:vmsconverter-hollow-api:latest.release'
-    implementation project(':vmstransformer-hollowoutput-api-notemplate')
 
     testCompile 'junit:junit'
-    testCompile 'com.netflix.hollow:hollow-test:latest.release'
     testCompile 'org.assertj:assertj-core'
     testCompile 'org.reflections:reflections'
-    testCompile 'netflix:vmsconverter-hollow-pojos:latest.release'
 }
 
 configurations.all {

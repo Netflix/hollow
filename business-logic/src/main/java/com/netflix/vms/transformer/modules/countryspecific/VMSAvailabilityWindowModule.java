@@ -5,7 +5,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_C
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_NoWindows;
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 //TODO: enable me once we can turn on the new data set including follow vip functionality
-//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.DatasetIdentifier.OSCAR;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
@@ -32,7 +32,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Rights;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsContractAsset;
@@ -40,8 +40,6 @@ import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsContractPacka
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindow;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindowContract;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
-import com.netflix.vms.transformer.input.datasets.OscarDataset;
-import com.netflix.vms.transformer.modules.ModuleDataSourceTransitionUtil;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
@@ -88,7 +86,7 @@ public class VMSAvailabilityWindowModule {
 
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants,
             VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator,
-            CupTokenFetcher cupTokenFetcher, UpstreamDatasetHolder upstream) {
+            CupTokenFetcher cupTokenFetcher, UpstreamDatasetDefinition upstream) {
         this.api = api;
         this.ctx = ctx;
         this.indexer = indexer;

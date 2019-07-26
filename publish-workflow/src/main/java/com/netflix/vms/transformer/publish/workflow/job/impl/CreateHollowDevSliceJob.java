@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.DEV_SLICE_TOPNODE_IDS;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CreateDevSlice;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.aws.db.ItemAttribute;
@@ -12,9 +12,9 @@ import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.common.slice.OutputDataSlicer;
-import com.netflix.vms.transformer.input.CycleInputs;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
@@ -150,7 +150,7 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
 
         // input version attributes for all inputs
         cycleInputs.getInputs().forEach(
-                (k, v) -> BlobMetaDataUtil.addAttribute(att, UpstreamDatasetHolder.UpstreamDatasetConfig.getInputVersionAttribute(k),
+                (k, v) -> BlobMetaDataUtil.addAttribute(att, UpstreamDatasetDefinition.UpstreamDatasetConfig.getInputVersionAttribute(k),
                         String.valueOf(v.getVersion())));
 
         BlobMetaDataUtil.addAttribute(att, "publishCycleDataTS", String.valueOf(ctx.getNowMillis()));

@@ -11,8 +11,8 @@ import static com.netflix.vms.transformer.data.gen.gatekeeper2.StatusTestData.St
 import static com.netflix.vms.transformer.data.gen.gatekeeper2.StatusTestData.StatusField.flags;
 import static com.netflix.vms.transformer.data.gen.gatekeeper2.StatusTestData.StatusField.movieId;
 import static com.netflix.vms.transformer.data.gen.gatekeeper2.StatusTestData.StatusField.rights;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -23,6 +23,7 @@ import com.netflix.type.NFCountry;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.converterpojos.Episode;
 import com.netflix.vms.transformer.converterpojos.Flags;
 import com.netflix.vms.transformer.converterpojos.IndividualSupplemental;
@@ -39,7 +40,6 @@ import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -168,10 +168,10 @@ public class VideoHierarchyTest {
     private VideoHierarchy getVideoHierarchy(HollowReadStateEngine readStateEngine) throws Exception {
         VMSTransformerIndexer indexer = new VMSTransformerIndexer(readStateEngine, mockContext);
 
-        Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> inputs = new HashMap<>();
         inputs.put(CONVERTER, new InputState(readStateEngine, 1l));
         inputs.put(GATEKEEPER2, new InputState(createGatekeeper2ReadStateEngine(), 1l));
-        UpstreamDatasetHolder upstream = UpstreamDatasetHolder.getNewDatasetHolder(inputs);
+        UpstreamDatasetDefinition upstream = UpstreamDatasetHolder.getNewDatasetHolder(inputs);
 
         VideoHierarchyInitializer initializer = new VideoHierarchyInitializer(upstream, indexer, mockContext);
         int ordinal = indexer.getHashIndex(IndexSpec.SHOW_SEASON_EPISODE).findMatches(

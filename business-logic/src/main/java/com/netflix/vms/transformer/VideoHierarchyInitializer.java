@@ -1,9 +1,9 @@
 package com.netflix.vms.transformer;
 
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
 //TODO: enable me once we can turn on the new data set including follow vip functionality
-//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.DatasetIdentifier.OSCAR;
 
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -12,6 +12,7 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
@@ -27,14 +28,10 @@ import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeHollow;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.ListOfRightsWindow;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
-import com.netflix.vms.transformer.input.api.gen.oscar.Movie;
 import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
-import com.netflix.vms.transformer.input.datasets.OscarDataset;
-import com.netflix.vms.transformer.modules.ModuleDataSourceTransitionUtil;
 import com.netflix.vms.transformer.util.DVDCatalogUtil;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,7 +56,7 @@ public class VideoHierarchyInitializer {
     //private final OscarDataset oscarDataset;
 
 
-    public VideoHierarchyInitializer(UpstreamDatasetHolder upstream, VMSTransformerIndexer indexer, TransformerContext ctx) {
+    public VideoHierarchyInitializer(UpstreamDatasetDefinition upstream, VMSTransformerIndexer indexer, TransformerContext ctx) {
         ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
         this.converterApi = converterDataset.getAPI();
         this.gk2Dataset = upstream.getDataset(GATEKEEPER2);

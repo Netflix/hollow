@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
 //TODO: enable me once we can turn on the new data set including follow vip functionality
-//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.DatasetIdentifier.OSCAR;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
@@ -17,9 +17,7 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
-import com.netflix.vms.transformer.input.datasets.OscarDataset;
-import com.netflix.vms.transformer.modules.ModuleDataSourceTransitionUtil;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.modules.mpl.AudioChannelsDescriptorCache;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +41,7 @@ public class EncodeSummaryDescriptorModule {
 //    private final OscarDataset oscarDataset;
 
 
-    public EncodeSummaryDescriptorModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer, UpstreamDatasetHolder upstream) {
+    public EncodeSummaryDescriptorModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer, UpstreamDatasetDefinition upstream) {
         this.api = api;
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);

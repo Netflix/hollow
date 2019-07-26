@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.testutil.slice;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
 
 import com.google.inject.Inject;
 import com.netflix.cinder.consumer.CinderConsumerBuilder;
@@ -23,8 +23,8 @@ import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.input.InputState;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
-import com.netflix.vms.transformer.input.CycleInputs;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.input.datasets.slicers.ConverterDataSlicerImpl;
 import com.netflix.vms.transformer.override.PinTitleHelper;
 import com.netflix.vms.transformer.override.PinTitleHollowCombiner;
@@ -157,7 +157,7 @@ public class TitleLevelPinningPOC {
                     LOCAL_BLOB_STORE, false, ctx);
             mgr.submitJobsToProcessASync(overrideTitleSpecs);
 
-            Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
+            Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> inputs = new HashMap<>();
             inputs.put(CONVERTER, new InputState(inputStateEngine, 1l));   // TODO: Add all Cinder inputs
             CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
 

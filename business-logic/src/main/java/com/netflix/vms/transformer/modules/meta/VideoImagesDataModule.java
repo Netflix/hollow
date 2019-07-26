@@ -4,7 +4,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.ArtworkFal
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -46,7 +46,7 @@ import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.ListOfRightsWindow;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindow;
@@ -81,7 +81,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     private final static String MERCH_STILL_TYPE = "MERCH_STILL";
     private final int MIN_ROLLUP_SIZE = 4; // 3
 
-    public VideoImagesDataModule(VMSHollowInputAPI api, UpstreamDatasetHolder upstream, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
+    public VideoImagesDataModule(VMSHollowInputAPI api, UpstreamDatasetDefinition upstream, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         super("Video", api, ctx, mapper, cycleConstants, indexer);
 
         this.videoArtworkIndex = indexer.getHashIndex(IndexSpec.VIDEO_ARTWORK_SOURCE_BY_VIDEO_ID);

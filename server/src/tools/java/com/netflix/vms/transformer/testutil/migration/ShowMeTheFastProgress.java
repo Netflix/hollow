@@ -1,10 +1,10 @@
 package com.netflix.vms.transformer.testutil.migration;
 
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.INPUT_VERSION_KEY_PREFIX;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig.getNamespacesforEnv;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig.lookupDatasetForNamespace;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.INPUT_VERSION_KEY_PREFIX;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig.getNamespacesforEnv;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig.lookupDatasetForNamespace;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -25,11 +25,10 @@ import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.http.HttpHelper;
-import com.netflix.vms.transformer.input.CycleInputs;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.input.datasets.slicers.GlobalVideoBasedSelector;
-import com.netflix.vms.transformer.input.datasets.slicers.TransformerOutputDataSlicer;
 import com.netflix.vms.transformer.override.InputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.OutputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.PinTitleHelper;
@@ -126,7 +125,7 @@ public class ShowMeTheFastProgress {
 
         String value = expectedOutputStateEngine.getHeaderTag(PUBLISH_CYCLE_DATATS_HEADER);
         long publishCycleDataTS = value != null ? Long.parseLong(value) : System.currentTimeMillis();
-        Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = getInputVersionsFromStateEngine(expectedOutputStateEngine);
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> inputVersions = getInputVersionsFromStateEngine(expectedOutputStateEngine);
 
         CycleInputs cycleInputs = getCycleInputs(inputVersions, ctx,
                                                  videoIDs.stream().mapToInt(Integer::intValue).toArray());
@@ -158,7 +157,7 @@ public class ShowMeTheFastProgress {
         int[] topNodeIDs = { 80104350 };
 
         // NOTE: This map might not be up to date. There should be entries for all Cinder inputs
-        Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = new HashMap<>();
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> inputVersions = new HashMap<>();
         inputVersions.put(CONVERTER, 20190619233752482l);
         inputVersions.put(GATEKEEPER2, 20190619233729375l);
 
@@ -178,9 +177,9 @@ public class ShowMeTheFastProgress {
         System.out.println(actualOutputReadStateEngine.getHeaderTags());
     }
 
-    private Map<UpstreamDatasetHolder.Dataset, Long> getInputVersionsFromStateEngine(HollowReadStateEngine stateEngine) {
-        Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = new HashMap<>();
-        final BiMap<UpstreamDatasetHolder.Dataset, String> namespaces = HashBiMap.create(getNamespacesforEnv(isProd));
+    private Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> getInputVersionsFromStateEngine(HollowReadStateEngine stateEngine) {
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> inputVersions = new HashMap<>();
+        final BiMap<UpstreamDatasetDefinition.DatasetIdentifier, String> namespaces = HashBiMap.create(getNamespacesforEnv(isProd));
         stateEngine.getHeaderTags().forEach((k,v) -> {
             if (k.startsWith(INPUT_VERSION_KEY_PREFIX) && k.length() != INPUT_VERSION_KEY_PREFIX.length()) {
                 String namespace = k.substring(INPUT_VERSION_KEY_PREFIX.length());
@@ -197,17 +196,18 @@ public class ShowMeTheFastProgress {
     }
 
     // Load Transformer inputs based on input versions
-    private CycleInputs getCycleInputs(Map<UpstreamDatasetHolder.Dataset, Long> inputVersions, SimpleTransformerContext ctx, int... videoIDs)
+    private CycleInputs getCycleInputs(Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> inputVersions, SimpleTransformerContext ctx, int... videoIDs)
             throws Throwable{
 
-        Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new ConcurrentHashMap<>();
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> inputs = new ConcurrentHashMap<>();
         SimultaneousExecutor executor = new SimultaneousExecutor(5, ShowMeTheFastProgress.class.getName());
-        for (UpstreamDatasetHolder.Dataset dataset : inputVersions.keySet()) {
+        for (UpstreamDatasetDefinition.DatasetIdentifier datasetIdentifier : inputVersions.keySet()) {
             executor.execute(() -> {
                 try {
-                    HollowReadStateEngine stateEngine = loadInputState(ctx, getNamespacesforEnv(isProd).get(dataset),
-                            inputVersions.get(dataset), videoIDs);
-                    inputs.put(dataset, new InputState(stateEngine, inputVersions.get(dataset)));
+                    HollowReadStateEngine stateEngine = loadInputState(ctx, getNamespacesforEnv(isProd).get(
+                            datasetIdentifier),
+                            inputVersions.get(datasetIdentifier), videoIDs);
+                    inputs.put(datasetIdentifier, new InputState(stateEngine, inputVersions.get(datasetIdentifier)));
                 } catch (Throwable t) {}
             });
         }

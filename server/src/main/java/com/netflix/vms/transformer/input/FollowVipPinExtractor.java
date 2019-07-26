@@ -5,7 +5,8 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.FollowVip;
 import com.netflix.aws.file.FileAccessItem;
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
 import java.util.EnumMap;
 import java.util.Map;
@@ -26,7 +27,8 @@ public class FollowVipPinExtractor {
      * FP "vms.staticInputVersions" to something like "vmsconverter-muon:20190712163036178;gatekeeper2_status_test:201907121634046"
      */
     public FollowVipPin getStaticInputVersions(TransformerContext ctx) {
-        Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = new EnumMap<>(UpstreamDatasetHolder.Dataset.class);
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> inputVersions = new EnumMap<>(
+                UpstreamDatasetDefinition.DatasetIdentifier.class);
         String staticInputVerions = ctx.getConfig().getStaticInputVersions();
         for (String inputPair : staticInputVerions.split(";")) {
             if (inputPair.trim().equals(StringUtils.EMPTY))
@@ -38,14 +40,14 @@ public class FollowVipPinExtractor {
                 throw new RuntimeException(msg);
             }
 
-            UpstreamDatasetHolder.Dataset dataset = UpstreamDatasetConfig.lookupDatasetForNamespaceInCurrentEnv(parts[0]);
-            if (dataset == null) {
+            UpstreamDatasetDefinition.DatasetIdentifier datasetIdentifier = UpstreamDatasetConfig.lookupDatasetForNamespaceInCurrentEnv(parts[0]);
+            if (datasetIdentifier == null) {
                 String msg = "Transformer is missing implementation to consume feed: %s" + parts[0];
                 ctx.getLogger().error(FollowVip, msg);
                 throw new RuntimeException(msg);
             }
 
-            inputVersions.put(dataset, Long.valueOf(parts[1]));
+            inputVersions.put(datasetIdentifier, Long.valueOf(parts[1]));
         }
 
         if (inputVersions.size() != UpstreamDatasetConfig.getNamespaces().size()) {
@@ -75,7 +77,8 @@ public class FollowVipPinExtractor {
             long dataVersion = snapshotVersion > deltaVersion ? snapshotVersion : deltaVersion;
             
             if(latestItem != null) {
-                Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = new EnumMap<>(UpstreamDatasetHolder.Dataset.class);
+                Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> inputVersions = new EnumMap<>(
+                        UpstreamDatasetDefinition.DatasetIdentifier.class);
                 UpstreamDatasetConfig.getNamespaces().keySet().forEach(dataset -> {
                     Optional<Long> inputVersion = FileStoreUtil.getInputVersion(latestItem, dataset);
                     if (inputVersion.isPresent())

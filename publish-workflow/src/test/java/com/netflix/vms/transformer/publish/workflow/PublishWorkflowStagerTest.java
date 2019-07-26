@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow;
 
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -14,8 +14,8 @@ import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.input.InputState;
 import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
-import com.netflix.vms.transformer.input.CycleInputs;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.publish.status.PublishWorkflowStatusIndicator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.TestDefaultHollowPublishJobCreator;
 import java.io.File;
@@ -76,7 +76,7 @@ public class PublishWorkflowStagerTest {
         when(transformerContext.getPublicationHistoryConsumer()).thenReturn(c -> {});
         when(transformerContext.getCassandraHelper()).thenReturn(cassandraHelper);
 
-        Map<UpstreamDatasetHolder.Dataset, InputState> testInputs = new HashMap<>();
+        Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> testInputs = new HashMap<>();
         testInputs.put(CONVERTER, new InputState(mockConsumerMuon));
         testInputs.put(GATEKEEPER2, new InputState(mockConsumerGk2));
         testCycleInputs = new CycleInputs(testInputs, 1l);

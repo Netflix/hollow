@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.modules.packages.contracts;
 
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
 
 import com.netflix.config.utils.Pair;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
@@ -17,7 +17,7 @@ import com.netflix.vms.transformer.hollowoutput.LanguageRights;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Gk2StatusAPI;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Rights;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindow;
@@ -39,7 +39,7 @@ public class LanguageRightsModule extends AbstractTransformModule {
     private final Gk2StatusAPI gk2StatusAPI;
     private final VMSTransformerIndexer indexer;
 
-    public LanguageRightsModule(UpstreamDatasetHolder upstream, VMSHollowInputAPI converterAPI, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+    public LanguageRightsModule(UpstreamDatasetDefinition upstream, VMSHollowInputAPI converterAPI, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(converterAPI, ctx, cycleConstants, mapper);
         this.converterAPI = converterAPI;
         this.gk2StatusAPI = ((Gatekeeper2Dataset) upstream.getDataset(GATEKEEPER2)).getAPI();

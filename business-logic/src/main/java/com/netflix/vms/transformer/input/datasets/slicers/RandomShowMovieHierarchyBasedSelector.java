@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.input.datasets.slicers;
 
 //TODO: enable me once we can turn on the new data set including follow vip functionality
-//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.DatasetIdentifier.OSCAR;
 
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;

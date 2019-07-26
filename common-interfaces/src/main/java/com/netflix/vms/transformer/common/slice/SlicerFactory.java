@@ -2,15 +2,12 @@ package com.netflix.vms.transformer.input.datasets.slicers;
 
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 import com.netflix.vms.transformer.common.slice.OutputDataSlicer;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import java.lang.reflect.Constructor;
 
 public class SlicerFactory {
 
-    public InputDataSlicer getInputDataSlicer(UpstreamDatasetHolder.Dataset dataset, int... specificTopNodeIdsToInclude)
+    public InputDataSlicer getInputDataSlicer(Class<? extends InputDataSlicer> slicerClasz, int... specificTopNodeIdsToInclude)
             throws Exception {
-
-        Class slicerClasz =  dataset.getSlicer();
         Constructor slicerConstructor = slicerClasz.getConstructor(int[].class);
         return (InputDataSlicer) slicerConstructor.newInstance(specificTopNodeIdsToInclude);
     }

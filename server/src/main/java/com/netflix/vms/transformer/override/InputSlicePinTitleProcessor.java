@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.override;
 
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig.lookupDatasetForNamespace;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig.lookupDatasetForNamespace;
 
 import com.netflix.cinder.consumer.CinderConsumerBuilder;
 import com.netflix.gutenberg.s3access.S3Direct;
@@ -11,7 +11,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
 import java.io.File;
 import java.util.Arrays;
@@ -24,18 +24,19 @@ import java.util.function.Supplier;
 public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
 
     private final HollowConsumer inputConsumer;
-    private final UpstreamDatasetHolder.Dataset dataset;
+    private final UpstreamDatasetDefinition.DatasetIdentifier datasetIdentifier;
 
     public InputSlicePinTitleProcessor(Supplier<CinderConsumerBuilder> builder, S3Direct s3Direct,
             String namespace, String localBlobStore, boolean isProd, TransformerContext ctx) {
         super(builder, s3Direct, namespace, localBlobStore, Optional.of(isProd), ctx);
 
-        this.dataset = lookupDatasetForNamespace(namespace, isProd);
+        this.datasetIdentifier = lookupDatasetForNamespace(namespace, isProd);
         ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles,
-                "Created InputSlicePinTitleProcessor instance for dataset={} api={}", dataset, dataset.getAPI());
+                "Created InputSlicePinTitleProcessor instance for datasetIdentifier={} api={}", datasetIdentifier, datasetIdentifier
+                        .getAPI());
 
         inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(builder, namespace, localBlobStore,
-                isProd, this.dataset.getAPI());
+                isProd, this.datasetIdentifier.getAPI());
     }
 
     @Override
@@ -65,11 +66,11 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
             long start = System.currentTimeMillis();
             HollowReadStateEngine inputStateEngine = readInputData(inputDataVersion);
 
-            if (dataset.getSlicer() == null) {
+            if (datasetIdentifier.getSlicer() == null) {
                 throw new UnsupportedOperationException("Input slicer missing for namespace= " + namespace);
             }
 
-            InputDataSlicer inputDataSlicer = new SlicerFactory().getInputDataSlicer(dataset, topNodes);
+            InputDataSlicer inputDataSlicer = new SlicerFactory().getInputDataSlicer(datasetIdentifier, topNodes);
             HollowWriteStateEngine slicedStateEngine = inputDataSlicer.sliceInputBlob(inputStateEngine);
 
             String blobID = PinTitleHelper.createBlobID("sliced_input_" + namespace, inputDataVersion, topNodes);

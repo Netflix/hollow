@@ -6,7 +6,8 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataV
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.TimeZone;
 public class VMSInputDataVersionLogger {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
 
-    public static void logInputVersions(Map<UpstreamDatasetHolder.Dataset, HollowConsumer> inputConsumers, TransformerContext ctx) {
+    public static void logInputVersions(Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers, TransformerContext ctx) {
         inputConsumers.forEach((k, v) -> {
             // These log msgs are rendered in the "Inputs" widget on dashboard
             ctx.getLogger().info(CinderInputDataVersions, "Input={} Version={}",

@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.publish.workflow;
 
 import com.netflix.cinder.producer.CinderProducerBuilder;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.vms.transformer.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import java.util.Map;
 import java.util.function.LongSupplier;

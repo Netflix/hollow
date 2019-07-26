@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.rest;
 
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
