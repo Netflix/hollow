@@ -36,6 +36,8 @@ public interface TransformerConfig {
     @DefaultValue("defaultTransformerVip")
     String getTransformerVip();
 
+    String getOverrideDynamicLogicJarNamespace();
+
     String getNetflixEnvironment();
 
     String getAwsRegion();

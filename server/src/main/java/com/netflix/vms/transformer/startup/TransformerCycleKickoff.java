@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.startup;
 
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P5_WaitForNextCycleDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleSuccess;
@@ -24,8 +25,10 @@ import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
+import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric;
@@ -33,14 +36,13 @@ import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.cup.CupLibrary;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig;
+import com.netflix.vms.transformer.common.slice.SlicerFactory;
 import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.context.TransformerServerContext;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 import com.netflix.vms.transformer.fastlane.FastlaneIdRetriever;
 import com.netflix.vms.transformer.health.TransformerServerHealthIndicator;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig;
-import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
 import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
@@ -53,6 +55,7 @@ import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.util.OutputUtil;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
@@ -60,8 +63,7 @@ import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 @Singleton
 public class TransformerCycleKickoff {
 
-    private Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers = new EnumMap<>(
-            UpstreamDatasetDefinition.DatasetIdentifier.class);
+    private Map<DatasetIdentifier, HollowConsumer> inputConsumers = new EnumMap<>(DatasetIdentifier.class);
 
     @Inject
     public TransformerCycleKickoff(
@@ -81,7 +83,8 @@ public class TransformerCycleKickoff {
             OctoberSkyData octoberSkyData,
             CupLibrary cupLibrary,
             FastlaneIdRetriever fastlaneIdRetriever,
-            TransformerServerHealthIndicator healthIndicator) {
+            TransformerServerHealthIndicator healthIndicator,
+            DynamicBusinessLogic dynamicLogic) {
         FileStore.useMultipartUploadWhenApplicable(true);
 
         String outputNamespace = "vms-" + transformerConfig.getTransformerVip();
@@ -129,41 +132,21 @@ public class TransformerCycleKickoff {
         TransformerContext ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary,
                 cassandraHelper, healthIndicator);
         boolean isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
-        PublishWorkflowStager publishStager = publishStager(ctx, isFastlane, fileStore,
+
+        DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
+        BusinessLogic businessLogic = logicAndMetadata.getLogic();
+
+        Function<BusinessLogic, PublishWorkflowStager> publishStagerFactory = publishStager(ctx, isFastlane, fileStore,
                 publisher, nostreamsPublisher,
                 announcer, nostreamsAnnouncer,
                 canaryAnnouncer,
                 devSlicePublisher, devSliceAnnouncer,
                 hermesBlobAnnouncer);
 
-        //
-        // [n Cinder inputs]
-        //  • indicates TODO
-        //  √ indicates done
-        //
-        // - Onboard n inputs in transformer cycle
-        //      √ Load/refresh data from n consumers concurrently.
-        //      √ Apply output blob header tags consistently.
-        //      √ Switch from custom FP-based input-pinning to Gutenberg pinning.
-        //      √ Consumer-specific APIs (instead of VMSHollowInputAPI for all consumers)
-        //      √ Store blob headers in Gutenberg as metadata
-        //      • Use Gutenberg metadata for followVip
-        //      √ Update "Inputs" widget on hosted dashboard to present input versions in table
-        //
-        // - Follow VIP
-        //      √ Get FollowVIP transform cycle working for n inputs.
-        //      • Get "/vms/followvipsameversion" working for n inputs.
-        //      • [desirable] replace FileStore metadata with Gutenberg metadata.
-        //
-        // - Input slicing
-        //      √ Get input slicing working for n inputs.
-        //      √ [desirable] replace HollowClient with HollowConsumer thereby also removing FileStore usage.
-        //
-
-        Map<UpstreamDatasetDefinition.DatasetIdentifier, String> namespaces = UpstreamDatasetConfig.getNamespaces();
-        for (UpstreamDatasetDefinition.DatasetIdentifier dataSet: namespaces.keySet()) {
+        Map<DatasetIdentifier, String> namespaces = UpstreamDatasetConfig.getNamespaces();
+        for (DatasetIdentifier dataSet: namespaces.keySet()) {
             inputConsumers.put(dataSet, VMSInputDataConsumer.getNewConsumer(
-                    cinderConsumerBuilder, namespaces.get(dataSet), dataSet.getAPI()));
+                    cinderConsumerBuilder, namespaces.get(dataSet), businessLogic.getAPI(dataSet)));
         }
 
         TransformCycle cycle = new TransformCycle(
@@ -171,11 +154,11 @@ public class TransformerCycleKickoff {
             inputConsumers,
             fileStore,
             hermesBlobAnnouncer,
-            publishStager,
+            publishStagerFactory,
             transformerConfig.getTransformerVip(),
             cinderProducerBuilder,
             cinderConsumerBuilder,
-            s3Direct);
+            s3Direct, dynamicLogic);
 
         Thread t = new Thread(new Runnable() {
             private long cycleStartTime = 0;
@@ -287,24 +270,28 @@ public class TransformerCycleKickoff {
                 history -> VMSPublishWorkflowHistoryAdmin.history = history);
     }
 
-    private static PublishWorkflowStager publishStager(TransformerContext ctx, boolean isFastlane,
+    private static Function<BusinessLogic, PublishWorkflowStager> publishStager(TransformerContext ctx, boolean isFastlane,
             FileStore fileStore,
             Publisher publisher, Publisher nostreamsPublisher,
             Announcer announcer, Announcer nostreamsAnnouncer,
             Announcer canaryAnnouncer,
             Publisher devSlicePublisher, Announcer devSliceAnnouncer,
             HermesBlobAnnouncer hermesBlobAnnouncer) {
-        Supplier<ServerUploadStatus> uploadStatus = VMSServerUploadStatus::get;
-        if (isFastlane)
-            return new HollowFastlanePublishWorkflowStager(ctx, fileStore,
-                    publisher, announcer, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
+        return (logic) -> {
+            Supplier<ServerUploadStatus> uploadStatus = VMSServerUploadStatus::get;
+            if (isFastlane)
+                return new HollowFastlanePublishWorkflowStager(ctx, fileStore,
+                        publisher, announcer, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
 
-        return new HollowPublishWorkflowStager(ctx, fileStore,
-                publisher, nostreamsPublisher,
-                announcer, nostreamsAnnouncer,
-                canaryAnnouncer,
-                devSlicePublisher, devSliceAnnouncer,
-                hermesBlobAnnouncer,
-                new SlicerFactory(), uploadStatus, ctx.getConfig().getTransformerVip());
+            return new HollowPublishWorkflowStager(ctx, fileStore,
+                    publisher, nostreamsPublisher,
+                    announcer, nostreamsAnnouncer,
+                    canaryAnnouncer,
+                    devSlicePublisher, devSliceAnnouncer,
+                    hermesBlobAnnouncer,
+                    new SlicerFactory(), uploadStatus, ctx.getConfig().getTransformerVip(),
+                    logic);
+        };
     }
+
 }

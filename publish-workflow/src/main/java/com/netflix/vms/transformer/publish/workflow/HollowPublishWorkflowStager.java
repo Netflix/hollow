@@ -11,11 +11,12 @@ import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.common.input.CycleInputs;
-import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
+import com.netflix.vms.transformer.common.slice.SlicerFactory;
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import com.netflix.vms.transformer.publish.status.WorkflowCycleStatusFuture;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
@@ -54,6 +55,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private PublishRegionProvider regionProvider;
     private final DefaultHollowPublishJobCreator jobCreator;
     private HollowBlobDataProvider circuitBreakerDataProvider;
+    private final BusinessLogic businessLogic;
 
     /* fields */
     private final String vip;
@@ -65,14 +67,16 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             Announcer canaryAnnouncer,
             Publisher devSlicePublisher, Announcer devSliceAnnouncer,
             HermesBlobAnnouncer hermesBlobAnnouncer,
-            SlicerFactory slicerFactory, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+            SlicerFactory slicerFactory, Supplier<ServerUploadStatus> uploadStatus, String vip,
+            BusinessLogic businessLogic) {
         this(ctx, fileStore,
                 publisher, nostreamsPublisher,
                 announcer, nostreamsAnnouncer,
                 canaryAnnouncer,
                 devSlicePublisher, devSliceAnnouncer,
                 hermesBlobAnnouncer,
-                new HollowBlobDataProvider(ctx), slicerFactory, uploadStatus, vip);
+                new HollowBlobDataProvider(ctx), slicerFactory, uploadStatus, vip,
+                businessLogic);
     }
 
     private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore,
@@ -82,7 +86,8 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             Publisher devSlicePublisher, Announcer devSliceAnnouncer,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider circuitBreakerDataProvider,
-            SlicerFactory slicerFactory, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+            SlicerFactory slicerFactory, Supplier<ServerUploadStatus> uploadStatus, String vip,
+            BusinessLogic businessLogic) {
         this(ctx,
                 new DefaultHollowPublishJobCreator(ctx, fileStore,
                         publisher, nostreamsPublisher,
@@ -94,11 +99,12 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
                         new PlaybackMonkeyTester(),
                         new ValuableVideoHolder(),
                         slicerFactory, uploadStatus, vip),
-                vip);
+                vip,
+                businessLogic);
         this.circuitBreakerDataProvider = circuitBreakerDataProvider;
     }
 
-    HollowPublishWorkflowStager(TransformerContext ctx, DefaultHollowPublishJobCreator jobCreator, String vip) {
+    HollowPublishWorkflowStager(TransformerContext ctx, DefaultHollowPublishJobCreator jobCreator, String vip, BusinessLogic businessLogic) {
         this.ctx = ctx;
         this.scheduler = new PublicationJobScheduler();
         this.fileNamer = new HollowBlobFileNamer(vip);
@@ -106,6 +112,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         this.regionProvider = new PublishRegionProvider(ctx.getLogger());
         this.priorAnnouncedJobs = new HashMap<>();
         this.jobCreator = jobCreator;
+        this.businessLogic = businessLogic;
 
         exposePublicationHistory();
     }
@@ -125,6 +132,13 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     public HollowReadStateEngine getCurrentReadStateEngine() {
         if(circuitBreakerDataProvider != null)
             return circuitBreakerDataProvider.getStateEngine();
+        throw new IllegalStateException("No HollowReadStateEngine is available");
+    }
+
+    @Override
+    public HollowReadStateEngine getCurrentNostreamsReadStateEngine() {
+        if(circuitBreakerDataProvider != null)
+            return circuitBreakerDataProvider.getNostreamsStateEngine();
         throw new IllegalStateException("No HollowReadStateEngine is available");
     }
 
@@ -152,7 +166,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         addDeleteJob(previousVersion, newVersion, circuitBreakerJob, publishJobs);
 
         if(ctx.getConfig().isCreateDevSlicedBlob())
-            scheduler.submitJob(jobCreator.createDevSliceJob(ctx, primaryRegionAnnounceJob, cycleInputs, newVersion));
+            scheduler.submitJob(jobCreator.createDevSliceJob(ctx, primaryRegionAnnounceJob, cycleInputs, newVersion, businessLogic));
 
         return new WorkflowCycleStatusFuture(ctx.getStatusIndicator(), newVersion);
     }

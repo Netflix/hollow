@@ -5,6 +5,8 @@ import com.netflix.cinder.consumer.CinderConsumerBuilder;
 import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.vms.transformer.DynamicBusinessLogic;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.publish.workflow.util.VipNameUtil;
@@ -32,23 +34,26 @@ public class PinTitleManager {
     private final String localBlobStore;
     private final Optional<Boolean> isProd;
     private final TransformerContext ctx;
+    private final DynamicBusinessLogic dynamicLogic;
 
     private final SimultaneousExecutor mainExecutor = new SimultaneousExecutor(getClass(), "pin-title-jobs");
     private Map<PinTitleJobSpec, PinTitleProcessorJob> completedJobs = new HashMap<>();
     private Map<PinTitleJobSpec, PinTitleProcessorJob> failedJobs = new HashMap<>();
     private Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = new HashMap<>();
 
-    public PinTitleManager(Supplier<CinderConsumerBuilder> cinderConsumerBuilder, S3Direct s3Direct, TransformerContext ctx) {
+    public PinTitleManager(Supplier<CinderConsumerBuilder> cinderConsumerBuilder, S3Direct s3Direct, TransformerContext ctx,
+            DynamicBusinessLogic dynamicLogic) {
         this.cinderConsumerBuilder = cinderConsumerBuilder;
         this.s3Direct = s3Direct;
         this.localBlobStore = null;
         this.isProd = null;
         this.ctx = ctx;
         this.proxySet = false;
+        this.dynamicLogic = dynamicLogic;
     }
 
     public PinTitleManager(Supplier<CinderConsumerBuilder> cinderConsumerBuilder, S3Direct s3Direct, String outputNamespace,
-            String localBlobStore, boolean isProd, TransformerContext ctx) {
+            String localBlobStore, boolean isProd, TransformerContext ctx, DynamicBusinessLogic dynamicLogic) {
         this.cinderConsumerBuilder = cinderConsumerBuilder;
         this.s3Direct = s3Direct;
         this.localBlobStore = localBlobStore;
@@ -56,6 +61,7 @@ public class PinTitleManager {
         this.ctx = ctx;
         this.proxySet = true;
         this.outputNamespace = outputNamespace;
+        this.dynamicLogic = dynamicLogic;
     }
 
     public synchronized void prepareForNextCycle() {
@@ -257,11 +263,13 @@ public class PinTitleManager {
     // Create Output Based Processor
     @VisibleForTesting
     PinTitleProcessor createOutputBasedProcessor() {
+        DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
+        BusinessLogic businessLogic = logicAndMetadata.getLogic();
         String namespace = outputNamespace != null ? outputNamespace : ("vms-" + VipNameUtil.getPinTitleDataTransformerVip(ctx.getConfig()));
         if (proxySet == false) { // Used in transformer deployments
-            return new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, ctx);
+            return new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, ctx, businessLogic);
         } else {    // Used in tooling run by devs
-            return new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, localBlobStore, isProd.get(), ctx);
+            return new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, localBlobStore, isProd.get(), ctx, businessLogic);
         }
     }
 

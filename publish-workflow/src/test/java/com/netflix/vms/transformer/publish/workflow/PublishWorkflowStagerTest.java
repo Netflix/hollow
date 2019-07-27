@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.vms.logging.TaggingLogger;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
@@ -49,6 +50,7 @@ public class PublishWorkflowStagerTest {
 
     @Mock private HollowConsumer mockConsumerMuon;
     @Mock private HollowConsumer mockConsumerGk2;
+    @Mock private BusinessLogic mockBusinessLogic;
 
     @Before
     public void setUp() {
@@ -85,7 +87,7 @@ public class PublishWorkflowStagerTest {
 
         jobCreator = new TestDefaultHollowPublishJobCreator(publishContext, transformerContext, VIP);
         tempFilesCreated = createTempFiles();
-        stager = new HollowPublishWorkflowStager(transformerContext, jobCreator, VIP);
+        stager = new HollowPublishWorkflowStager(transformerContext, jobCreator, VIP, mockBusinessLogic);
         stager.injectPublishRegionProvider(regionProvider);
     }
 

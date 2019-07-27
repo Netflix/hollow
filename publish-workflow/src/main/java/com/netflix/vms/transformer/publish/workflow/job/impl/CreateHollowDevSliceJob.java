@@ -11,11 +11,12 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.common.slice.OutputDataSlicer;
 import com.netflix.vms.transformer.common.input.CycleInputs;
-import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
+import com.netflix.vms.transformer.common.slice.SlicerFactory;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
@@ -44,9 +45,11 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
     CycleInputs cycleInputs;
     private final HollowProducer.Publisher publisher;
     private final HollowProducer.Announcer announcer;
+    private final BusinessLogic businessLogic;
     
     public CreateHollowDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, HollowBlobDataProvider dataProvider,
-            SlicerFactory slicerFactory, CycleInputs cycleInputs, long currentCycleId) {
+            SlicerFactory slicerFactory, CycleInputs cycleInputs, long currentCycleId,
+            BusinessLogic businessLogic) {
         super(ctx, dependency, currentCycleId);
         this.dataProvider = dataProvider;
         this.slicerFactory = slicerFactory;
@@ -54,6 +57,7 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
         this.sliceVip = HermesTopicProvider.getDevSliceTopic(ctx.getVip());
         this.publisher = ctx.getDevSlicePublisher();
         this.announcer = ctx.getDevSliceAnnouncer();
+        this.businessLogic = businessLogic;
     }
 
     @Override public boolean executeJob() {
@@ -79,8 +83,8 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
         }
     }
 
-    private HollowWriteStateEngine createSlice() throws ConnectionException {
-        OutputDataSlicer dataSlicer = slicerFactory.getOutputDataSlicer(0, getTopNodeIdsToInclude());
+    private HollowWriteStateEngine createSlice() throws Exception {
+        OutputDataSlicer dataSlicer = slicerFactory.getOutputDataSlicer(businessLogic.getOutputSlicer(), 0, getTopNodeIdsToInclude());
         HollowWriteStateEngine sliceOutputBlob = dataSlicer.sliceOutputBlob(dataProvider.getStateEngine());
         return sliceOutputBlob;
     }

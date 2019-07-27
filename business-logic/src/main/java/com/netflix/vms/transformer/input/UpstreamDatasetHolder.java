@@ -1,12 +1,12 @@
 package com.netflix.vms.transformer.input;
 
 import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig;
 
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.common.input.InputState;
 import com.netflix.vms.transformer.common.input.UpstreamDataset;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Gk2StatusAPI;
@@ -81,7 +81,7 @@ public class UpstreamDatasetHolder {
                 } catch (Exception ex) {
                     throw new RuntimeException(String.format("Unable to instantiate upstream data holder for input "
                             + "dataset=%s with namespace=%s", datasetIdentifier,
-                            UpstreamDatasetDefinition.UpstreamDatasetConfig.getNamespaces().get(datasetIdentifier)));
+                            UpstreamDatasetConfig.getNamespaces().get(datasetIdentifier)));
                 }
             });
         }

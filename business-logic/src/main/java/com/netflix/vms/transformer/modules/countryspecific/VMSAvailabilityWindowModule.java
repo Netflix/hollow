@@ -4,8 +4,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.Interactiv
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_Catalog_Title_Availability;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_NoWindows;
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
-//TODO: enable me once we can turn on the new data set including follow vip functionality
-//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.DatasetIdentifier.OSCAR;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
@@ -32,7 +30,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Rights;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsContractAsset;
@@ -57,6 +55,9 @@ import java.util.stream.Collectors;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
+
+//TODO: enable me once we can turn on the new data set including follow vip functionality
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.DatasetIdentifier.OSCAR;
 
 public class VMSAvailabilityWindowModule {
 
@@ -86,7 +87,7 @@ public class VMSAvailabilityWindowModule {
 
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants,
             VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator,
-            CupTokenFetcher cupTokenFetcher, UpstreamDatasetDefinition upstream) {
+            CupTokenFetcher cupTokenFetcher, UpstreamDatasetHolder upstream) {
         this.api = api;
         this.ctx = ctx;
         this.indexer = indexer;

@@ -1,9 +1,10 @@
 package com.netflix.vms.transformer.testutil.slice;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier;
 import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
 import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
 import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig.getNamespacesforEnv;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 
 import com.google.inject.Inject;
 import com.netflix.cinder.consumer.CinderConsumerBuilder;
@@ -20,17 +21,18 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.generated.notemplate.GlobalVideoHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.common.input.InputState;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
+import com.netflix.vms.transformer.common.slice.SlicerFactory;
 import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.common.input.CycleInputs;
-import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
 import com.netflix.vms.transformer.override.PinTitleHelper;
 import com.netflix.vms.transformer.override.PinTitleHollowCombiner;
 import com.netflix.vms.transformer.override.PinTitleManager;
@@ -74,6 +76,9 @@ public class PinTitleTest {
     @Inject
     private S3Direct s3Direct;
 
+    @Inject
+    private DynamicBusinessLogic dynamicLogic;
+
 
     @Test
     public void testTitlePinning() throws Throwable {
@@ -88,21 +93,24 @@ public class PinTitleTest {
         ctx.setFastlaneIds(toSet(fastlaneIds));
         ctx.setPinTitleSpecs(pinTitleSpecs);
 
-        Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> inputVersions = new HashMap<>();
+        Map<DatasetIdentifier, Long> inputVersions = new HashMap<>();
         inputVersions.put(CONVERTER, 20190628000703051L);
         inputVersions.put(GATEKEEPER2, 20190620023818465L);
 
         {
             PinTitleManager mgr = new PinTitleManager(cinderConsumerBuilder, s3Direct, OUTPUT_NAMESPACE,
-                    LOCAL_BLOB_STORE, isProd, ctx);
+                    LOCAL_BLOB_STORE, isProd, ctx, dynamicLogic);
             mgr.submitJobsToProcessASync(pinTitleSpecs);
 
             final VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
 
-            Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> inputs = new HashMap<>();
-            for (UpstreamDatasetDefinition.DatasetIdentifier datasetIdentifier : getNamespacesforEnv(isProd).keySet()) {
+            DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
+            BusinessLogic businessLogic = logicAndMetadata.getLogic();
+
+            Map<DatasetIdentifier, InputState> inputs = new HashMap<>();
+            for (DatasetIdentifier datasetIdentifier : getNamespacesforEnv(isProd).keySet()) {
                 // Fetch Input State Engine
-                HollowReadStateEngine inputStateEngine = fetchInputStateEngine(
+                HollowReadStateEngine inputStateEngine = fetchInputStateEngine(businessLogic,
                         datasetIdentifier, inputVersions.get(datasetIdentifier), FASTLANE_ID, PINTITLE_ID);
                 inputs.put(datasetIdentifier, new InputState(inputStateEngine, inputVersions.get(datasetIdentifier)));
             }
@@ -152,21 +160,24 @@ public class PinTitleTest {
         return readEngine;
     }
 
-    private HollowReadStateEngine fetchInputStateEngine(UpstreamDatasetDefinition.DatasetIdentifier datasetIdentifier, long version, int... specificTopNodeIdsToInclude) throws Exception {
+    private HollowReadStateEngine fetchInputStateEngine(BusinessLogic businessLogic, DatasetIdentifier datasetIdentifier,
+            long version, int... specificTopNodeIdsToInclude) throws Exception {
         boolean isSlicing = specificTopNodeIdsToInclude != null && specificTopNodeIdsToInclude.length > 0;
 
-        String filename = createFileName("input", getNamespacesforEnv(isProd).get(datasetIdentifier), version, specificTopNodeIdsToInclude);
+        String filename = createFileName("input", getNamespacesforEnv(isProd).get(datasetIdentifier), version,
+                specificTopNodeIdsToInclude);
         File blobFile = localBlobStore(isProd).resolve(filename).toFile();
         if (blobFile.exists() && !reuseSliceFiles) blobFile.delete();
         if (blobFile.exists()) return readStateEngine(blobFile);
 
         HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder, getNamespacesforEnv(isProd).get(
                 datasetIdentifier),
-                localBlobStore(isProd).toString(), isProd, datasetIdentifier.getAPI());
+                localBlobStore(isProd).toString(), isProd, businessLogic.getAPI(datasetIdentifier));
         inputConsumer.triggerRefreshTo(version);
         HollowWriteStateEngine writeStateEngine = null;
         if (isSlicing) {
-            InputDataSlicer slicer = new SlicerFactory().getInputDataSlicer(datasetIdentifier, specificTopNodeIdsToInclude);
+            InputDataSlicer slicer = new SlicerFactory().getInputDataSlicer(
+                    businessLogic.getInputSlicer(datasetIdentifier), specificTopNodeIdsToInclude);
             writeStateEngine = slicer.sliceInputBlob(inputConsumer.getStateEngine());
         } else {
             writeStateEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(inputConsumer.getStateEngine());
@@ -193,7 +204,7 @@ public class PinTitleTest {
         File blobFile = localBlobStore(isProd).resolve(filename).toFile();
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
-        Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> inputs = new HashMap<>();
+        Map<DatasetIdentifier, InputState> inputs = new HashMap<>();
         inputs.put(CONVERTER, new InputState((HollowReadStateEngine) api.getDataAccess(), version));   // TODO: Add all Cinder inputs
         CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
 

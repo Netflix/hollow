@@ -7,6 +7,7 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Durat
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobState;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleFastlaneIds;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.DynamicLogicLoading;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.ProcessNowMillis;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackStateEngine;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleBegin;
@@ -36,6 +37,9 @@ import com.netflix.hollow.api.producer.listener.RestoreListener;
 import com.netflix.hollow.api.producer.listener.VetoableListener;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
+import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -43,11 +47,14 @@ import com.netflix.hollow.tools.combine.HollowCombiner;
 import com.netflix.hollow.tools.filter.FilteredHollowBlobWriter;
 import com.netflix.servo.monitor.Monitors;
 import com.netflix.vms.logging.TaggingLogger.LogTag;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.common.CycleMonkey;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.common.hashcode.ProxyHollowObjectHashCodeFinder;
 import com.netflix.vms.transformer.common.input.InputState;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
@@ -75,6 +82,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -86,17 +94,15 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import org.apache.commons.lang.StringUtils;
 
 public class TransformCycle {
     private final String transformerVip;
-    private final VMSTransformerWriteStateEngine outputStateEngine;
-    private final VMSTransformerWriteStateEngine fastlaneOutputStateEngine;
     private final TransformerContext ctx;
     private final TransformerOutputBlobHeaderPopulator headerPopulator;
-    private final PublishWorkflowStager publishWorkflowStager;
     private final VersionMinter versionMinter;
     private final FollowVipPinExtractor followVipPinExtractor;
     private final Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
@@ -105,6 +111,7 @@ public class TransformCycle {
     private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
     private final CycleMonkey cycleMonkey;
     private final Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers;
+    private final Function<BusinessLogic, PublishWorkflowStager> publishStagerFactory;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
@@ -120,12 +127,23 @@ public class TransformCycle {
     private final HollowProducer producer;
     private final ExecutorService produceExecutor;
 
+    private HollowReadStateEngine stateToRestore;
+    private HollowReadStateEngine nostreamsStateToRestore;
+
+    private final DynamicBusinessLogic dynamicBusinessLogic;
+    private BusinessLogic currentBusinessLogic;
+    private HollowWriteStateEngine outputStateEngine;
+    private HollowWriteStateEngine fastlaneOutputStateEngine;
+    private PublishWorkflowStager publishWorkflowStager;
+    private Map<String, String> currentBusinessLogicMetadata;
+
     public TransformCycle(TransformerContext ctx, Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers,
-            FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, PublishWorkflowStager publishStager,
+            FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer,
+            Function<BusinessLogic, PublishWorkflowStager> publishStagerFactory,
             String transformerVip,
             Supplier<CinderProducerBuilder> cinderProducerBuilder,
             Supplier<CinderConsumerBuilder> cinderConsumerBuilder,
-            S3Direct s3Direct) {
+            S3Direct s3Direct, DynamicBusinessLogic dynamicBusinessLogic) {
         this.ctx = ctx;
         this.versionMinter = new SequenceVersionMinter();
         currentCycleNumber = initCycleNumber(ctx, versionMinter); // Init first cycle here so logs can be grouped properly
@@ -133,12 +151,10 @@ public class TransformCycle {
         this.transformerVip = transformerVip;
         this.cinderConsumerBuilder = cinderConsumerBuilder;
         this.hermesBlobAnnouncer = hermesBlobAnnouncer;
-        this.outputStateEngine = new VMSTransformerWriteStateEngine();
-        this.fastlaneOutputStateEngine = new VMSTransformerWriteStateEngine();
         this.headerPopulator = new TransformerOutputBlobHeaderPopulator(ctx);
-        this.publishWorkflowStager = publishStager;
+        this.publishStagerFactory = publishStagerFactory;
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
-        this.pinTitleMgr = new PinTitleManager(cinderConsumerBuilder, s3Direct, ctx);
+        this.pinTitleMgr = new PinTitleManager(cinderConsumerBuilder, s3Direct, ctx, dynamicBusinessLogic);
         this.timeSinceLastPublishGauge = new TransformerTimeSinceLastPublishGauge();
         this.cycleMonkey = ctx.getCycleMonkey();
 
@@ -146,6 +162,7 @@ public class TransformCycle {
         this.isNoStreamsBlobEnabled = isNoStreamsBlobEnabled(isFastlane);
 
         this.inputConsumers = inputConsumers;
+        this.dynamicBusinessLogic = dynamicBusinessLogic;
 
         Monitors.registerObject(timeSinceLastPublishGauge);
 
@@ -203,6 +220,7 @@ public class TransformCycle {
                     .forNamespace(cinderOutputNamespace)
                     .withVersionMinter(mainVersion::getAsLong)
                     .withRestore();
+            PublishWorkflowStager publishStager = publishStagerFactory.apply(currentBusinessLogic); // SNAP: for reals?
             publishStager.initProducer(
                     mainCycleInputs,
                     producerBuilder,
@@ -425,20 +443,17 @@ public class TransformCycle {
         return !isFastlane; // Fastlane does not deal with NoStreams blob
     }
 
-    private void restoreOutputs(HollowConsumer restoreFrom, HollowConsumer nostreamsRestoreFrom, boolean isNoStreamsBlobEnabled) {
-        HollowReadStateEngine restoreStateEngine = restoreFrom.getStateEngine();
-        HollowReadStateEngine restoreNoStreamStateEngine = isNoStreamsBlobEnabled ? nostreamsRestoreFrom.getStateEngine() : null;
+    private void restoreOutputs(HollowReadStateEngine restoreStateEngine, HollowReadStateEngine restoreNoStreamStateEngine,
+            boolean isNoStreamsBlobEnabled) {
 
-        {
-            previousStateHeader = new HashMap<>(restoreStateEngine.getHeaderTags());
-            outputStateEngine.addHeaderTags(restoreStateEngine.getHeaderTags());
-            outputStateEngine.restoreFrom(restoreStateEngine);
-        }
+        previousStateHeader = new HashMap<>(restoreStateEngine.getHeaderTags());
+        outputStateEngine.addHeaderTags(restoreStateEngine.getHeaderTags());
+        outputStateEngine.restoreFrom(restoreStateEngine);
+
         ctx.getLogger().info(BlobState, "restore : input({}), output({}),)",
                 BlobMetaDataUtil.fetchCoreHeaders(restoreStateEngine), BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
-        previousCycleNumber = restoreFrom.getCurrentVersionId();
 
-        publishWorkflowStager.notifyRestoredStateEngine(restoreStateEngine, restoreNoStreamStateEngine);
+        publishWorkflowStager.notifyRestoredStateEngine(restoreStateEngine, isNoStreamsBlobEnabled ? restoreNoStreamStateEngine : null);
         setRestoreNeeded(false);
     }
 
@@ -449,6 +464,10 @@ public class TransformCycle {
     public void cycle() throws Throwable {
         if (producer == null) {
             try {
+                DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicBusinessLogic.getLogicAndMetadata();
+                currentBusinessLogic = logicAndMetadata.getLogic();
+                currentBusinessLogicMetadata = logicAndMetadata.getMetadata();
+
                 beginCycle();
                 CycleInputs cycleInputs = loadInputAndRestoreOutputs();
                 transformTheData(cycleInputs);
@@ -539,6 +558,34 @@ public class TransformCycle {
         // First cycle already initialized in Constructor
         if (!isFirstCycle) currentCycleNumber = initCycleNumber(ctx, versionMinter);
 
+        List<HollowSchema> schemas = currentBusinessLogic.getSchema();
+
+        if(outputStateEngine == null || schemasAreDifferent(outputStateEngine.getSchemas(), schemas)) { // SNAP: Add to Cinder mode
+            /// need new output state engines.
+            ctx.getLogger().info(DynamicLogicLoading, "Dynamic logic update requires new output schemas");
+
+            outputStateEngine = createNewWriteState(schemas);
+            fastlaneOutputStateEngine = createNewWriteState(schemas);
+            try {
+                if(publishWorkflowStager != null) {
+                    stateToRestore = publishWorkflowStager.getCurrentReadStateEngine();
+                    nostreamsStateToRestore = publishWorkflowStager.getCurrentNostreamsReadStateEngine();
+                }
+            } catch(IllegalStateException | UnsupportedOperationException ex) {
+                ctx.getLogger().warn(DynamicLogicLoading, "Unable to find in-memory state for restore, will download instead");
+            }
+
+            publishWorkflowStager = publishStagerFactory.apply(currentBusinessLogic);
+            setRestoreNeeded(true);
+        } else {
+            // @@@ This should only be required if there was a new deployment?
+
+            /// reusing the same state engines, need to swap the hash code finders since they retain the class definitions created from the TransformerBusinessLogic
+            HollowObjectHashCodeFinder newHashCodeFinder = currentBusinessLogic.getHashCodeFinder();
+            ((ProxyHollowObjectHashCodeFinder)outputStateEngine.getHashCodeFinder()).swap(newHashCodeFinder);
+            ((ProxyHollowObjectHashCodeFinder)fastlaneOutputStateEngine.getHashCodeFinder()).swap(newHashCodeFinder);
+        }
+
         // Track cycle begin
         previousStateHeader = new HashMap<>(outputStateEngine.getHeaderTags());
         ctx.getLogger().info(BlobState,
@@ -547,6 +594,11 @@ public class TransformCycle {
         ctx.getLogger().info(TransformCycleBegin,
                 "Beginning cycle={} jarVersion={}",
                 currentCycleNumber, BlobMetaDataUtil.getJarVersion());
+
+        // Track dynamic business logic metadata
+        for(Map.Entry<String, String> entry : currentBusinessLogicMetadata.entrySet()) {
+            ctx.getLogger().info(DynamicLogicLoading, "Metadata: {}={}", entry.getKey(), entry.getValue());
+        }
 
         // Check whether to Pause Cycle (before any logic)
         checkPauseCycle();
@@ -567,6 +619,31 @@ public class TransformCycle {
         outputStateEngine.prepareForNextCycle();
         fastlaneOutputStateEngine.prepareForNextCycle();
         pinTitleMgr.prepareForNextCycle();
+    }
+
+    private boolean schemasAreDifferent(List<HollowSchema> schemas1, List<HollowSchema> schemas2) {
+        schemas1.sort(Comparator.comparing(HollowSchema::getName));
+        schemas2.sort(Comparator.comparing(HollowSchema::getName));
+
+        // @@@ This check might be too brittle
+        if (!schemas1.equals(schemas2)) {
+            ctx.getLogger().info(DynamicLogicLoading, "Current Dynamic Business Logic has new schemas");
+            return true;
+        }
+
+        return false;
+    }
+
+    private HollowWriteStateEngine createNewWriteState(List<HollowSchema> schemas) {
+        assert currentBusinessLogic.getSchema().equals(schemas);
+
+        HollowObjectHashCodeFinder hashCodeFinder = currentBusinessLogic.getHashCodeFinder();
+        HollowWriteStateEngine hollowWriteStateEngine = new HollowWriteStateEngine(hashCodeFinder);
+
+        HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(hollowWriteStateEngine, schemas);
+        hollowWriteStateEngine.setTargetMaxTypeShardSize(currentBusinessLogic.getTargetMaxTypeShardSize());
+
+        return hollowWriteStateEngine;
     }
 
     private void beginCycleCinder() {
@@ -677,11 +754,23 @@ public class TransformCycle {
                             this.cinderConsumerBuilder, "vms-" + VipNameUtil.getNoStreamsVip(cfg.getTransformerVip()));
 
                     boolean isNoStreamsBlobEnabled = isNoStreamsBlobEnabled(isFastlane);
-                    restoreOutputsInParallel(executor, ctx, restoreVersion, outputConsumer, nostreamsOutputConsumers,
-                            isNoStreamsBlobEnabled);
 
-                    // Let TransformCycle complete the restore process
-                    cycle.restoreOutputs(outputConsumer, nostreamsOutputConsumers, isNoStreamsBlobEnabled);
+                    if(restoreVersion == previousCycleNumber && stateToRestore != null) {
+                        // Restoring from in-memory data.
+                        cycle.restoreOutputs(stateToRestore, nostreamsStateToRestore, isNoStreamsBlobEnabled);
+
+                    } else {
+                        // Load data to restore in parallel
+                        restoreOutputsInParallel(executor, ctx, restoreVersion, outputConsumer, nostreamsOutputConsumers,
+                                isNoStreamsBlobEnabled);
+
+                        // Let TransformCycle complete the restore process
+                        cycle.restoreOutputs(outputConsumer.getStateEngine(), nostreamsOutputConsumers.getStateEngine(),
+                                isNoStreamsBlobEnabled);
+
+                        previousCycleNumber = outputConsumer.getCurrentVersionId();
+                    }
+
                 } else if (cfg.isFailIfRestoreNotAvailable()) {
                     // @TODO: Wonder if restoreVersion==Long.MIN_VALUE is sufficient to detect new namespace,
                     //  if so this exception is not needed
@@ -696,6 +785,9 @@ public class TransformCycle {
             ctx.getLogger().error(Arrays.asList(TransformRestore, BlobState),
                     "Failed to restore data", ex);
             throw new IllegalStateException("Failed to restore data", ex);
+        } finally {
+            stateToRestore = null;
+            nostreamsStateToRestore = null;
         }
     }
 
@@ -929,7 +1021,7 @@ public class TransformCycle {
         return true;
     }
 
-    private static void transformInputData(CycleInputs cycleInputs, VMSTransformerWriteStateEngine outputStateEngine,
+    private static void transformInputData(CycleInputs cycleInputs, HollowWriteStateEngine outputStateEngine,
             TransformerContext ctx) throws Throwable {
 
         SimpleTransformer transformer = new SimpleTransformer(cycleInputs, outputStateEngine, ctx);
@@ -1007,7 +1099,7 @@ public class TransformCycle {
 
     private void createNostreamsFilteredFile(String unfilteredFilename, String filteredFilename, boolean isSnapshot)
             throws IOException {
-        HollowFilterConfig filterConfig = VMSTransformerWriteStateEngine.getNoStreamsFilterConfig();
+        HollowFilterConfig filterConfig = getStreamsFilter(currentBusinessLogic.getStreamHollowTypes());
         FilteredHollowBlobWriter writer = new FilteredHollowBlobWriter(filterConfig);
 
         Collection<LogTag> blobStateTags = Arrays.asList(WroteBlob, BlobState);

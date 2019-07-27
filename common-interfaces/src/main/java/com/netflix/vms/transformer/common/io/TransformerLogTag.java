@@ -10,6 +10,7 @@ public enum TransformerLogTag implements LogTag {
     TransformCycleSuccess,
     TransformCycleMonkey,
     TransformCycleFailed,
+    DynamicLogicLoading,
     TransformRestore,
     TransformDuration,
     FreezeConfig,

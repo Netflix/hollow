@@ -1,8 +1,6 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
-//TODO: enable me once we can turn on the new data set including follow vip functionality
-//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.DatasetIdentifier.OSCAR;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
@@ -14,7 +12,6 @@ import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.CycleDataAggregator;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
@@ -40,6 +37,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.MapKey;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.MapOfFlagsFirstDisplayDates;
@@ -54,6 +52,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+//TODO: enable me once we can turn on the new data set including follow vip functionality
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.DatasetIdentifier.OSCAR;
 
 public class CountrySpecificDataModule {
 
@@ -76,7 +77,7 @@ public class CountrySpecificDataModule {
 
     private VideoDataCollection videoDataCollection;
 
-    public CountrySpecificDataModule(VMSHollowInputAPI api, UpstreamDatasetDefinition upstream,
+    public CountrySpecificDataModule(VMSHollowInputAPI api, UpstreamDatasetHolder upstream,
             TransformerContext ctx, HollowObjectMapper mapper,
             CycleConstants constants, VMSTransformerIndexer indexer,
             CycleDataAggregator cycleDataAggregator, CupTokenFetcher cupTokenFetcher) {

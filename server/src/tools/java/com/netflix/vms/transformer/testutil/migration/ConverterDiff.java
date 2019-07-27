@@ -16,6 +16,8 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
+import com.netflix.vms.transformer.DynamicBusinessLogic;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.input.datasets.slicers.ConverterDataSlicerImpl;
@@ -46,9 +48,13 @@ public class ConverterDiff {
 
     private boolean isProd;
     private InputDataSlicer slicer;
+    private BusinessLogic businessLogic;
 
     @Inject
     private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
+
+    @Inject
+    private DynamicBusinessLogic dynamicLogic;
 
     @BeforeClass
     public static void createServer() throws Exception {
@@ -61,6 +67,8 @@ public class ConverterDiff {
     public void setUp() {
         isProd = false;
         slicer = new ConverterDataSlicerImpl();
+        DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
+        businessLogic = logicAndMetadata.getLogic();
     }
 
     @AfterClass
@@ -82,7 +90,7 @@ public class ConverterDiff {
         if(sliceFile.exists() && !reuseSliceFiles) sliceFile.delete();
         if(!sliceFile.exists()) {
             HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder,
-                    converterNamespace, localBlobStore(isProd).toString(), isProd, CONVERTER.getAPI());
+                    converterNamespace, localBlobStore(isProd).toString(), isProd, businessLogic.getAPI(CONVERTER));
             inputConsumer.triggerRefreshTo(version);
 
             HollowWriteStateEngine slicedStateEngine = slicer.sliceInputBlob(inputConsumer.getStateEngine());

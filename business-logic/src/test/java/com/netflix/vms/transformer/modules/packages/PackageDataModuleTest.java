@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
 import static com.netflix.vms.transformer.data.gen.gatekeeper2.FlagsTestData.FlagsField.alternateLanguage;
 import static com.netflix.vms.transformer.data.gen.gatekeeper2.FlagsTestData.FlagsField.goLive;
 import static com.netflix.vms.transformer.data.gen.gatekeeper2.FlagsTestData.FlagsField.liveOnSite;
@@ -20,8 +22,6 @@ import static com.netflix.vms.transformer.data.gen.gatekeeper2.StatusTestData.St
 import static com.netflix.vms.transformer.data.gen.gatekeeper2.StatusTestData.StatusField.flags;
 import static com.netflix.vms.transformer.data.gen.gatekeeper2.StatusTestData.StatusField.movieId;
 import static com.netflix.vms.transformer.data.gen.gatekeeper2.StatusTestData.StatusField.rights;
-import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
-import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
@@ -44,6 +44,7 @@ import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Gk2StatusAPI;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.StatusDelegate;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
@@ -160,7 +161,7 @@ public class PackageDataModuleTest {
         Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> inputs = new HashMap<>();
         inputs.put(CONVERTER, new InputState(readStateEngine, 1l));
         inputs.put(GATEKEEPER2, new InputState(createGatekeeper2ReadStateEngine(), 1l));
-        UpstreamDatasetDefinition upstream = UpstreamDatasetHolder.getNewDatasetHolder(inputs);
+        UpstreamDatasetHolder upstream = UpstreamDatasetHolder.getNewDatasetHolder(inputs);
 
         return new PackageDataModule(upstream, mockContext, mock(HollowObjectMapper.class),
                 new CycleConstants(upstream),  indexer, null);

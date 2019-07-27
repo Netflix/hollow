@@ -18,6 +18,7 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.generated.notemplate.GlobalVideoHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
@@ -65,6 +66,9 @@ public class TitleLevelPinningPOC {
 
     @Inject
     private S3Direct s3Direct;
+
+    @Inject
+    private DynamicBusinessLogic dynamicLogic;
 
     @Test
     public void debug() throws Exception {
@@ -154,7 +158,7 @@ public class TitleLevelPinningPOC {
         {
             // Use PinTitleManager
             PinTitleManager mgr = new PinTitleManager(cinderConsumerBuilder, s3Direct, "vms-berlin",
-                    LOCAL_BLOB_STORE, false, ctx);
+                    LOCAL_BLOB_STORE, false, ctx, dynamicLogic);
             mgr.submitJobsToProcessASync(overrideTitleSpecs);
 
             Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> inputs = new HashMap<>();

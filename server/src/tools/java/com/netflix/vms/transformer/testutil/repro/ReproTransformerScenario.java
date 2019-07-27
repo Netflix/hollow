@@ -9,6 +9,7 @@ import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import java.util.function.Supplier;
 import org.junit.Test;
@@ -24,9 +25,13 @@ public class ReproTransformerScenario {
     @Inject
     private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
 
+    @Inject
+    private DynamicBusinessLogic dynamicLogic;
+
     @Test
     public void run() throws Throwable {
-        TransformerScenario scenario = new TransformerScenario(cinderConsumerBuilder, "vmsdev_sunjeetsn", LOCAL_BLOB_STORE, 20190628191123181L, 80152826, 80152831);
+        TransformerScenario scenario = new TransformerScenario(cinderConsumerBuilder, dynamicLogic,
+                "vmsdev_sunjeetsn", LOCAL_BLOB_STORE, 20190628191123181L, 80152826, 80152831);
 
         VMSTransformerWriteStateEngine transformedStateEngine = scenario.repro();
 

@@ -20,9 +20,11 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
+import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.input.InputState;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
@@ -72,6 +74,9 @@ public class ShowMeTheFastProgress {
 
     @Inject
     private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
+
+    @Inject
+    private DynamicBusinessLogic dynamicLogic;
 
     @Inject
     private S3Direct s3Direct;
@@ -237,8 +242,10 @@ public class ShowMeTheFastProgress {
         System.out.println("loadTransformerEngine: Loading version=" + version);
         long start = System.currentTimeMillis();
         try {
+            DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
+            BusinessLogic businessLogic = logicAndMetadata.getLogic();
             OutputSlicePinTitleProcessor processor = new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct,
-                    outputNamespace, WORKING_DIR, isProd, ctx);
+                    outputNamespace, WORKING_DIR, isProd, ctx, businessLogic);
             File slicedFile = processor.getFile(outputNamespace, TYPE.OUTPUT, version, topNodes);
             if (isUseRemotePinTitleSlicer && !slicedFile.exists()) {
                 try {
@@ -261,8 +268,10 @@ public class ShowMeTheFastProgress {
         long start = System.currentTimeMillis();
         try {
             HollowReadStateEngine stateEngine;
+            DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
+            BusinessLogic businessLogic = logicAndMetadata.getLogic();
             InputSlicePinTitleProcessor processor = new InputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct,
-                    inputNamespace, WORKING_DIR, isProd, ctx);
+                    inputNamespace, WORKING_DIR, isProd, ctx, businessLogic);
             File slicedFile = processor.getFile(inputNamespace, TYPE.INPUT, inputDataVersion, videoIDs);
             if (isUseRemotePinTitleSlicer && !slicedFile.exists()) {
                 try {

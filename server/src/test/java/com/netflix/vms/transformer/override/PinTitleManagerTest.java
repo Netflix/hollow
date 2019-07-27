@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.override;
 
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
+
 import com.google.inject.Inject;
 import com.netflix.cinder.consumer.CinderConsumerBuilder;
 import com.netflix.cinder.lifecycle.CinderConsumerModule;
@@ -8,7 +11,9 @@ import com.netflix.governator.guice.test.junit4.GovernatorJunit4ClassRunner;
 import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
+import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.SimpleTransformerContext;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.override.PinTitleManager.PinTitleProcessorJob;
 import java.io.File;
 import java.util.Arrays;
@@ -20,8 +25,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-
+import org.mockito.MockitoAnnotations;
 
 @RunWith(GovernatorJunit4ClassRunner.class)
 @ModulesForTesting({CinderConsumerModule.class, RuntimeCoreModule.class})
@@ -31,20 +37,30 @@ public class PinTitleManagerTest {
     private SimpleTransformerContext ctx;
     private PinTitleManager mgr;
 
-    @Inject
-    private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
+    @Inject private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
 
-    @Inject
+    @Mock private DynamicBusinessLogic mockDynamicLogic;
+
+    @Mock DynamicBusinessLogic.CurrentBusinessLogicHolder mockLogicAndMetadata;
+
+    @Mock BusinessLogic businessLogic;
+
+    @Mock
     private S3Direct s3Direct;
 
     @Before
     public void setup() {
         ctx = new SimpleTransformerContext();
+        MockitoAnnotations.initMocks(this);
+
         mgr = createNewMgr();
+        when(mockDynamicLogic.getLogicAndMetadata()).thenReturn(mockLogicAndMetadata);
+        when(mockLogicAndMetadata.getLogic()).thenReturn(businessLogic);
     }
 
     private PinTitleManager createNewMgr() {
-        return Mockito.spy(new PinTitleManager(cinderConsumerBuilder, s3Direct, "vms-berlin", LOCAL_BLOB_STORE, false, ctx));
+        return Mockito.spy(new PinTitleManager(
+                cinderConsumerBuilder, s3Direct, "vms-berlin", LOCAL_BLOB_STORE, false, ctx, mockDynamicLogic));
     }
 
     @Test
@@ -102,7 +118,7 @@ public class PinTitleManagerTest {
         Assert.assertEquals(2, jSpec1.topNodes.length);
         Assert.assertEquals(2, jSpec2.topNodes.length);
         Assert.assertEquals(3, expectedMergedJobSpec.topNodes.length);
-        Mockito.when(mgr.createOutputBasedProcessor()).thenReturn(new DummyProcessor());
+        doReturn(new DummyProcessor()).when(mgr).createOutputBasedProcessor();
 
         { // cycle 1
             mgr.submitJobsToProcessASync(new HashSet<>(Arrays.asList(spec1)));
@@ -159,7 +175,7 @@ public class PinTitleManagerTest {
         // Processor that will fail
         DummyProcessor processor = new DummyProcessor();
         processor.isThrowException = true;
-        Mockito.when(mgr.createOutputBasedProcessor()).thenReturn(processor);
+        doReturn(processor).when(mgr).createOutputBasedProcessor();
 
         { // cycle 1 - fail
             try {

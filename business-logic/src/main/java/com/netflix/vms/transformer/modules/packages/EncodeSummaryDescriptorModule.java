@@ -17,7 +17,7 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.modules.mpl.AudioChannelsDescriptorCache;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,7 +41,7 @@ public class EncodeSummaryDescriptorModule {
 //    private final OscarDataset oscarDataset;
 
 
-    public EncodeSummaryDescriptorModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer, UpstreamDatasetDefinition upstream) {
+    public EncodeSummaryDescriptorModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer, UpstreamDatasetHolder upstream) {
         this.api = api;
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);

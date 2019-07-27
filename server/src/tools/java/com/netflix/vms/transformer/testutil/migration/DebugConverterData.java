@@ -29,6 +29,8 @@ import com.netflix.hollow.tools.combine.HollowCombinerIncludeOrdinalsCopyDirecto
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
+import com.netflix.vms.transformer.DynamicBusinessLogic;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
@@ -82,8 +84,13 @@ public class DebugConverterData {
     private static final Path REPRO_PATH = Paths.get(REPRO_DIR);
     private static final String WORKING_DIR_FOR_INPUTCONSUMER = "/space/converter-data/inputclient";
 
+    private BusinessLogic businessLogic;
+
     @Inject
     private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
+
+    @Inject
+    private DynamicBusinessLogic dynamicLogic;
 
     @Before
     public void setup() {
@@ -92,13 +99,15 @@ public class DebugConverterData {
             File workingDir = new File(folder);
             if (!workingDir.exists()) workingDir.mkdirs();
         }
+        DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
+        businessLogic = logicAndMetadata.getLogic();
     }
 
     @Test
     public void show_DABorDOB_ConverterData() {
         long version = 20180131173015308L;
         HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder,
-                CONVERTER_NAMESPACE, WORKING_DIR_FOR_INPUTCONSUMER, false, CONVERTER.getAPI());
+                CONVERTER_NAMESPACE, WORKING_DIR_FOR_INPUTCONSUMER, false, businessLogic.getAPI(CONVERTER));
         inputConsumer.triggerRefreshTo(version);
 
         Set<Long> newHasRollingEpisodes = new HashSet<>();
@@ -124,7 +133,7 @@ public class DebugConverterData {
     public void debugStreamDeploymentS3PathToStreamIds() {
         long version = 20170824034503068L;
         HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder,
-                CONVERTER_NAMESPACE, WORKING_DIR_FOR_INPUTCONSUMER, true, CONVERTER.getAPI());
+                CONVERTER_NAMESPACE, WORKING_DIR_FOR_INPUTCONSUMER, true, businessLogic.getAPI(CONVERTER));
         inputConsumer.triggerRefreshTo(version);
 
         Map<String, Set<Long>> map = new TreeMap<>();
@@ -162,7 +171,7 @@ public class DebugConverterData {
         int i = 1;
         long badDownloadableId = 572674263L; // long badDownloadableId2 = 572672107L;
         HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder,
-                CONVERTER_NAMESPACE, WORKING_DIR_FOR_INPUTCONSUMER, true, CONVERTER.getAPI());
+                CONVERTER_NAMESPACE, WORKING_DIR_FOR_INPUTCONSUMER, true, businessLogic.getAPI(CONVERTER));
 
         for (long version : versions) {
             inputConsumer.triggerRefreshTo(version);

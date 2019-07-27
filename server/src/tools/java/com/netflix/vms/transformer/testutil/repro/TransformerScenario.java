@@ -13,16 +13,18 @@ import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.common.input.InputState;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.http.HttpHelper;
 import com.netflix.vms.transformer.common.input.CycleInputs;
-import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
+import com.netflix.vms.transformer.common.slice.SlicerFactory;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +44,7 @@ public class TransformerScenario {
     private static final boolean IS_PROD = false;
 
     private final Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
+    private final BusinessLogic businessLogic;
     private final String transformerVip;
     private final long outputDataVersion;
     private final int[] topNodesToProcess;
@@ -51,12 +54,17 @@ public class TransformerScenario {
 
     private static final String PROXY_URL = IS_PROD ? VMSInputDataConsumer.PROD_PROXY_URL : VMSInputDataConsumer.TEST_PROXY_URL;
 
-    public TransformerScenario(Supplier<CinderConsumerBuilder> cinderConsumerBuilder, String transformerVip, String localBlobStore, long outputDataVersion, int... topNodesToProcess) {
+    public TransformerScenario(Supplier<CinderConsumerBuilder> cinderConsumerBuilder, DynamicBusinessLogic dynamicLogic,
+            String transformerVip, String localBlobStore, long outputDataVersion, int... topNodesToProcess) {
+
         this.cinderConsumerBuilder = cinderConsumerBuilder;
         this.transformerVip = transformerVip;
         this.localBlobStore = localBlobStore;
         this.outputDataVersion = outputDataVersion;
         this.topNodesToProcess = topNodesToProcess;
+
+        DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
+        businessLogic = logicAndMetadata.getLogic();
     }
 
     public VMSTransformerWriteStateEngine repro() throws Throwable {
@@ -93,15 +101,16 @@ public class TransformerScenario {
 
         HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder, getNamespacesforEnv(IS_PROD).get(
                 datasetIdentifier),
-                localBlobStore, IS_PROD, datasetIdentifier.getAPI());
+                localBlobStore, IS_PROD, businessLogic.getAPI(datasetIdentifier));
 
         inputConsumer.triggerRefreshTo(inputVersions.get(datasetIdentifier));
 
-        if (datasetIdentifier.getSlicer() == null) {
+        if (businessLogic.getInputSlicer(datasetIdentifier) == null) {
             throw new UnsupportedOperationException("Input data slicer missing for datasetIdentifier= " + datasetIdentifier);
         }
 
-        InputDataSlicer inputDataSlicer = new SlicerFactory().getInputDataSlicer(datasetIdentifier, topNodesToProcess);
+        InputDataSlicer inputDataSlicer = new SlicerFactory().getInputDataSlicer(
+                businessLogic.getInputSlicer(datasetIdentifier), topNodesToProcess);
         HollowWriteStateEngine slicedStateEngine = inputDataSlicer.sliceInputBlob(inputConsumer.getStateEngine());
 
         slicedStateEngine.addHeaderTag("publishCycleDataTS", String.valueOf(processTimestamp));

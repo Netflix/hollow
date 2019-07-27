@@ -40,6 +40,10 @@ public class HollowBlobDataProvider {
         this.nostreamsStateEngine = restoredNostreamsState;
     }
 
+    public HollowReadStateEngine getNostreamsStateEngine() {
+        return nostreamsStateEngine;
+    }
+
     public synchronized void revertToPriorVersion() {
         Collection<LogTag> blobStateTags = Arrays.asList(RollbackStateEngine, BlobState);
         if (revertableStateEngine != null && revertableNostreamsStateEngine != null) {

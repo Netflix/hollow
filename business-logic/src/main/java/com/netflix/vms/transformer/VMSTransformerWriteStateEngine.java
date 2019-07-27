@@ -6,6 +6,7 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.tools.combine.HollowCombiner;
+import com.netflix.vms.transformer.common.hashcode.ProxyHollowObjectHashCodeFinder;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageRecipe;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
@@ -107,7 +108,7 @@ public class VMSTransformerWriteStateEngine extends HollowWriteStateEngine {
     };
 
     public VMSTransformerWriteStateEngine() {
-        super(new VMSTransformerHashCodeFinder());
+        super(new ProxyHollowObjectHashCodeFinder(new VMSTransformerHashCodeFinder()));
         setTargetMaxTypeShardSize(16 * 1024 * 1024);
         initializeTopLevelTypeStates();
     }

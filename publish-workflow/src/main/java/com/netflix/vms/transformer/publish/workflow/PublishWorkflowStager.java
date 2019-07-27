@@ -16,6 +16,8 @@ public interface PublishWorkflowStager {
     
     HollowReadStateEngine getCurrentReadStateEngine();
 
+    HollowReadStateEngine getCurrentNostreamsReadStateEngine();
+
     PublishWorkflowContext getContext();
 
     default void initProducer(

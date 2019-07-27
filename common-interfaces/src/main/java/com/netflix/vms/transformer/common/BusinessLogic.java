@@ -1,9 +1,13 @@
 package com.netflix.vms.transformer.common;
 
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier;
+
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 import com.netflix.vms.transformer.common.slice.OutputDataSlicer;
 import java.util.List;
 
@@ -20,7 +24,11 @@ public interface BusinessLogic {
 
     long getTargetMaxTypeShardSize();
 
-    OutputDataSlicer getDataSlicer();   // SNAP: what about input slicing?
+    Class<? extends HollowAPI> getAPI(DatasetIdentifier dataset);
+
+    Class<? extends OutputDataSlicer> getOutputSlicer();    // SNAP: use suppliers?
+
+    Class<? extends InputDataSlicer> getInputSlicer(DatasetIdentifier dataset);
 
     String[] getStreamHollowTypes();
 }

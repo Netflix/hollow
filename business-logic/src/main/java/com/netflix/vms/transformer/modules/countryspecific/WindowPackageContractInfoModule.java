@@ -1,12 +1,9 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-//TODO: enable me once we can turn on the new data set including follow vip functionality
-//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.DatasetIdentifier.OSCAR;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -20,10 +17,14 @@ import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindowContract;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import java.util.Collections;
 import java.util.stream.Collectors;
+
+//TODO: enable me once we can turn on the new data set including follow vip functionality
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.DatasetIdentifier.OSCAR;
 
 public class WindowPackageContractInfoModule {
 
@@ -39,7 +40,7 @@ public class WindowPackageContractInfoModule {
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
     WindowPackageContractInfoModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer,
-            CupTokenFetcher cupTokenFetcher, TransformerContext ctx, UpstreamDatasetDefinition upstream) {
+            CupTokenFetcher cupTokenFetcher, TransformerContext ctx, UpstreamDatasetHolder upstream) {
         this.api = api;
         this.ctx = ctx;
         this.cupTokenFetcher = cupTokenFetcher;

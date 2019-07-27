@@ -6,12 +6,12 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.hollowinput.TopNAttributeHollow;
 import com.netflix.vms.transformer.hollowinput.TopNAttributesSetHollow;
 import com.netflix.vms.transformer.hollowinput.TopNHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.TopNVideoData;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.api.gen.topn.SetOfTopNAttribute;
 import com.netflix.vms.transformer.input.api.gen.topn.TopN;
 import com.netflix.vms.transformer.input.api.gen.topn.TopNAPI;
@@ -23,9 +23,9 @@ import java.util.Map;
 
 public class TopNVideoDataModule extends AbstractTransformModule{
 
-    private final UpstreamDatasetDefinition upstream;
+    private final UpstreamDatasetHolder upstream;
 
-    public TopNVideoDataModule(VMSHollowInputAPI api, UpstreamDatasetDefinition upstream, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper) {
+    public TopNVideoDataModule(VMSHollowInputAPI api, UpstreamDatasetHolder upstream, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper) {
         super(api, ctx, cycleConstants, mapper);
         this.upstream = upstream;
     }

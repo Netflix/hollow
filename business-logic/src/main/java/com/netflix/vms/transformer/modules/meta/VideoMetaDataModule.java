@@ -1,16 +1,14 @@
 package com.netflix.vms.transformer.modules.meta;
 
 import static com.netflix.hollow.core.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
 import static com.netflix.vms.transformer.index.IndexSpec.L10N_STORIES_SYNOPSES;
 import static com.netflix.vms.transformer.index.IndexSpec.PERSONS_BY_VIDEO_ID;
 import static com.netflix.vms.transformer.index.IndexSpec.PERSON_ROLES_BY_VIDEO_ID;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
-import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.CONVERTER;
-import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier.GATEKEEPER2;
-//TODO: enable me once we can turn on the new data set including follow vip functionality
-//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.DatasetIdentifier.OSCAR;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.netflix.hollow.core.index.HollowHashIndex;
@@ -48,7 +46,7 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.ListOfRightsWindow;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindow;
@@ -59,7 +57,6 @@ import com.netflix.vms.transformer.util.DeprecationUtil;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -67,6 +64,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+//TODO: enable me once we can turn on the new data set including follow vip functionality
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.DatasetIdentifier.OSCAR;
 
 
 public class VideoMetaDataModule {
@@ -99,7 +99,7 @@ public class VideoMetaDataModule {
 
     private final Map<String, HookType> hookTypeMap = new HashMap<>();
 
-    public VideoMetaDataModule(UpstreamDatasetDefinition upstream, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer) {
+    public VideoMetaDataModule(UpstreamDatasetHolder upstream, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer) {
         ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
         this.api = converterDataset.getAPI();
         this.gk2Dataset = upstream.getDataset(GATEKEEPER2);

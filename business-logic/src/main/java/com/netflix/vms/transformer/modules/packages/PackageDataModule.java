@@ -13,7 +13,6 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
@@ -58,6 +57,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.modules.packages.contracts.ContractRestrictionModule;
@@ -95,7 +95,7 @@ public class PackageDataModule {
     private final TransformerContext ctx;
 
     public PackageDataModule(
-            UpstreamDatasetDefinition upstream, TransformerContext ctx,
+            UpstreamDatasetHolder upstream, TransformerContext ctx,
             HollowObjectMapper objectMapper, CycleConstants cycleConstants,
             VMSTransformerIndexer indexer, CupTokenFetcher cupTokenFetcher) {
         ConverterDataset converterDataset = upstream.getDataset(CONVERTER);

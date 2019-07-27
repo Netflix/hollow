@@ -133,4 +133,9 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     public HollowReadStateEngine getCurrentReadStateEngine() {
         throw new UnsupportedOperationException("The FastTrack doesn't require a HollowReadStateEngine");
     }
+
+    @Override
+    public HollowReadStateEngine getCurrentNostreamsReadStateEngine() {
+        throw new UnsupportedOperationException("The FastTrack doesn't require a HollowReadStateEngine");
+    }
 }

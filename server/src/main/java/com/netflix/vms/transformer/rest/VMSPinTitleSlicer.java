@@ -6,7 +6,9 @@ import com.netflix.cinder.consumer.CinderConsumerBuilder;
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.gutenberg.s3access.S3Direct;
+import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.SimpleTransformerContext;
+import com.netflix.vms.transformer.common.BusinessLogic;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.override.InputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.OutputSlicePinTitleProcessor;
@@ -47,12 +49,16 @@ public class VMSPinTitleSlicer {
     private final Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
     private final S3Direct s3Direct;
     private final TransformerContext ctx;
+    private final DynamicBusinessLogic dynamicLogic;
 
     @Inject
-    public VMSPinTitleSlicer(Supplier<CinderConsumerBuilder> cinderConsumerBuilder, S3Direct s3Direct) {
+    public VMSPinTitleSlicer(Supplier<CinderConsumerBuilder> cinderConsumerBuilder, S3Direct s3Direct,
+            DynamicBusinessLogic dynamicLogic) {
+
         this.cinderConsumerBuilder = cinderConsumerBuilder;
         this.s3Direct = s3Direct;
         ctx = new SimpleTransformerContext();
+        this.dynamicLogic = dynamicLogic;
 
         localBlobStore = new File(System.getProperty("java.io.tmpdir"), "VMSPinTitleSlicer");
         if (!localBlobStore.exists()) localBlobStore.mkdirs();
@@ -79,6 +85,9 @@ public class VMSPinTitleSlicer {
                     .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
 
+        DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
+        BusinessLogic businessLogic = logicAndMetadata.getLogic();
+
         try {
             // cleanup files older than 7 days or oldest files to keep the max temp files to 20
             long version = Long.parseLong(versionStr);
@@ -87,8 +96,8 @@ public class VMSPinTitleSlicer {
             // Determine whether to process input or output data slicing
             TYPE type = isOutput ? TYPE.OUTPUT : TYPE.INPUT;
             PinTitleProcessor processor = isOutput ?
-                    new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, localBlobStore.getPath(), isProd, ctx)
-                    : new InputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, localBlobStore.getPath(), isProd, ctx);
+                    new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, localBlobStore.getPath(), isProd, ctx, businessLogic)
+                    : new InputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, localBlobStore.getPath(), isProd, ctx, businessLogic);
             File slicedFile = processor.getFile(namespace, type, version, topNodes);
 
             if (!slicedFile.exists()) { // Perform slicing if it does not exists
