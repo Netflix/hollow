@@ -17,11 +17,10 @@ public class VMSInputDataConsumer {
      * Create a HollowConsumer for consuming input data. This is used to update data from converter at the
      * start of {@code TransformCycle}
      */
-    public static HollowConsumer getNewConsumer(Supplier<CinderConsumerBuilder> builder, String namespace, Class<? extends HollowAPI> apiClass) {
+    public static HollowConsumer getNewConsumer(Supplier<CinderConsumerBuilder> builder, String namespace) {
 
         return builder.get()
                 .forNamespace(namespace)
-                .withGeneratedAPIClass(apiClass)
                 .noAnnouncementWatcher()
                 .build();
     }

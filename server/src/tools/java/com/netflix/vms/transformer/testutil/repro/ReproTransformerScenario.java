@@ -25,7 +25,7 @@ public class ReproTransformerScenario {
     @Inject
     private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
 
-    @Inject
+    @Inject // SNAP: Might not be injectable
     private DynamicBusinessLogic dynamicLogic;
 
     @Test

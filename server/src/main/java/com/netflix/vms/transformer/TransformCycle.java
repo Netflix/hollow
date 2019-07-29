@@ -807,7 +807,7 @@ public class TransformCycle {
         });
     }
 
-    private static void loadInput(TransformerContext ctx, UpstreamDatasetDefinition.DatasetIdentifier datasetIdentifier, HollowConsumer consumer, FollowVipPin followVipPin) {
+    private static void loadInput(TransformerContext ctx, UpstreamDatasetDefinition.x datasetIdentifier, HollowConsumer consumer, FollowVipPin followVipPin) {
         try {
             Long followVipInputVersion = null;
             if (followVipPin != null)   // followVip configured

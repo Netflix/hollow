@@ -4,10 +4,12 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Durat
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
 import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.DynamicLogicLoading;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleSuccess;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WaitForNextCycle;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.netflix.archaius.api.Config;
@@ -37,6 +39,7 @@ import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.cup.CupLibrary;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.UpstreamDatasetConfig;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.common.slice.SlicerFactory;
 import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.context.TransformerServerContext;
@@ -55,6 +58,7 @@ import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.util.OutputUtil;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
@@ -133,9 +137,6 @@ public class TransformerCycleKickoff {
                 cassandraHelper, healthIndicator);
         boolean isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
 
-        DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
-        BusinessLogicAPI businessLogic = logicAndMetadata.getLogic();
-
         Function<BusinessLogicAPI, PublishWorkflowStager> publishStagerFactory = publishStager(ctx, isFastlane, fileStore,
                 publisher, nostreamsPublisher,
                 announcer, nostreamsAnnouncer,
@@ -146,7 +147,7 @@ public class TransformerCycleKickoff {
         Map<DatasetIdentifier, String> namespaces = UpstreamDatasetConfig.getNamespaces();
         for (DatasetIdentifier dataSet: namespaces.keySet()) {
             inputConsumers.put(dataSet, VMSInputDataConsumer.getNewConsumer(
-                    cinderConsumerBuilder, namespaces.get(dataSet), businessLogic.getAPI(dataSet)));
+                    cinderConsumerBuilder, namespaces.get(dataSet)));
         }
 
         TransformCycle cycle = new TransformCycle(
