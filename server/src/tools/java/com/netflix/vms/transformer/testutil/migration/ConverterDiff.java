@@ -17,7 +17,7 @@ import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.transformer.DynamicBusinessLogic;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.input.datasets.slicers.ConverterDataSlicerImpl;
@@ -48,7 +48,7 @@ public class ConverterDiff {
 
     private boolean isProd;
     private InputDataSlicer slicer;
-    private BusinessLogic businessLogic;
+    private BusinessLogicAPI businessLogic;
 
     @Inject
     private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;

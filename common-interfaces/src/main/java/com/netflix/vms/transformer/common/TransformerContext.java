@@ -37,7 +37,7 @@ public interface TransformerContext {
 
     TransformerCassandraHelper getCassandraHelper();
 
-    TransformerCycleInterrupter getCycleInterrupter();
+    TransformCycleInterrupter getCycleInterrupter();
 
     TransformerFiles files();
 

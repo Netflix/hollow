@@ -17,7 +17,7 @@ import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.input.InputState;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
@@ -44,7 +44,7 @@ public class TransformerScenario {
     private static final boolean IS_PROD = false;
 
     private final Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
-    private final BusinessLogic businessLogic;
+    private final BusinessLogicAPI businessLogic;
     private final String transformerVip;
     private final long outputDataVersion;
     private final int[] topNodesToProcess;
@@ -91,7 +91,7 @@ public class TransformerScenario {
 
 
 
-        new SimpleTransformer(cycleInputs, outputStateEngine, ctx).transform();
+        new SimpleTransformer().transform(cycleInputs, outputStateEngine, ctx);
 
         return outputStateEngine;
     }

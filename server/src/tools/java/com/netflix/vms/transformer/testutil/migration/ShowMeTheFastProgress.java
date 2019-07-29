@@ -24,7 +24,7 @@ import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.input.InputState;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
@@ -143,9 +143,9 @@ public class ShowMeTheFastProgress {
         outputStateEngine.addHeaderTag(PUBLISH_CYCLE_DATATS_HEADER, String.valueOf(publishCycleDataTS));
 
         // Run Transformer
-        SimpleTransformer transformer = new SimpleTransformer(cycleInputs, outputStateEngine, ctx);
-        transformer.setPublishCycleDataTS(publishCycleDataTS);
-        transformer.transform();
+        SimpleTransformer transformer = new SimpleTransformer();
+        ctx.setNowMillis(publishCycleDataTS);
+        transformer.transform(cycleInputs, outputStateEngine, ctx);
         HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
         trackDuration(start, "Done transformerVersion=%s, topNodes=%s", transformerVersion, toString(topNodes));
 
@@ -176,8 +176,7 @@ public class ShowMeTheFastProgress {
         ctx.setFastlaneIds(new HashSet<>(fastlaneIds));
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
 
-        SimpleTransformer transformer = new SimpleTransformer(cycleInputs, outputStateEngine, ctx);
-        transformer.transform();
+        new SimpleTransformer().transform(cycleInputs, outputStateEngine, ctx);
         HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
         System.out.println(actualOutputReadStateEngine.getHeaderTags());
     }
@@ -243,7 +242,7 @@ public class ShowMeTheFastProgress {
         long start = System.currentTimeMillis();
         try {
             DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
-            BusinessLogic businessLogic = logicAndMetadata.getLogic();
+            BusinessLogicAPI businessLogic = logicAndMetadata.getLogic();
             OutputSlicePinTitleProcessor processor = new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct,
                     outputNamespace, WORKING_DIR, isProd, ctx, businessLogic);
             File slicedFile = processor.getFile(outputNamespace, TYPE.OUTPUT, version, topNodes);
@@ -269,7 +268,7 @@ public class ShowMeTheFastProgress {
         try {
             HollowReadStateEngine stateEngine;
             DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
-            BusinessLogic businessLogic = logicAndMetadata.getLogic();
+            BusinessLogicAPI businessLogic = logicAndMetadata.getLogic();
             InputSlicePinTitleProcessor processor = new InputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct,
                     inputNamespace, WORKING_DIR, isProd, ctx, businessLogic);
             File slicedFile = processor.getFile(inputNamespace, TYPE.INPUT, inputDataVersion, videoIDs);

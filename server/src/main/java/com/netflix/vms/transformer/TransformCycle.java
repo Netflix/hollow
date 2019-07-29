@@ -47,10 +47,9 @@ import com.netflix.hollow.tools.combine.HollowCombiner;
 import com.netflix.hollow.tools.filter.FilteredHollowBlobWriter;
 import com.netflix.servo.monitor.Monitors;
 import com.netflix.vms.logging.TaggingLogger.LogTag;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.CycleMonkey;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
@@ -111,7 +110,7 @@ public class TransformCycle {
     private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
     private final CycleMonkey cycleMonkey;
     private final Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers;
-    private final Function<BusinessLogic, PublishWorkflowStager> publishStagerFactory;
+    private final Function<BusinessLogicAPI, PublishWorkflowStager> publishStagerFactory;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
@@ -131,7 +130,7 @@ public class TransformCycle {
     private HollowReadStateEngine nostreamsStateToRestore;
 
     private final DynamicBusinessLogic dynamicBusinessLogic;
-    private BusinessLogic currentBusinessLogic;
+    private BusinessLogicAPI currentBusinessLogic;
     private HollowWriteStateEngine outputStateEngine;
     private HollowWriteStateEngine fastlaneOutputStateEngine;
     private PublishWorkflowStager publishWorkflowStager;
@@ -139,7 +138,7 @@ public class TransformCycle {
 
     public TransformCycle(TransformerContext ctx, Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers,
             FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer,
-            Function<BusinessLogic, PublishWorkflowStager> publishStagerFactory,
+            Function<BusinessLogicAPI, PublishWorkflowStager> publishStagerFactory,
             String transformerVip,
             Supplier<CinderProducerBuilder> cinderProducerBuilder,
             Supplier<CinderConsumerBuilder> cinderConsumerBuilder,
@@ -179,7 +178,7 @@ public class TransformCycle {
          * - The VMS dashboard mostly works but is not reporting published blobs and announcements
          *
          * - Likely not possible to interrupt a cycle
-         *   See usages of the method TransformerCycleInterrupter.triggerInterruptIfNeeded
+         *   See usages of the method TransformCycleInterrupter.triggerInterruptIfNeeded
          *
          * - No integration with the cycle monkey (see also listener veto support)
          *   See usages of the method CycleMonkey.doMonkeyBusiness
@@ -905,9 +904,8 @@ public class TransformCycle {
             output.getHeaderTags().clear();
             headerPopulator.addHeaders(cycleInputsCinder, output, previousVersion, newState.getVersion());
 
-            SimpleTransformer transformer = new SimpleTransformer(cycleInputsCinder, output, ctx);
             try {
-                transformer.transform();
+                new SimpleTransformer().transform(cycleInputsCinder, output, ctx);
             } catch (Error | RuntimeException e) {
                 throw e;
             } catch (Throwable t) {
@@ -1024,8 +1022,7 @@ public class TransformCycle {
     private static void transformInputData(CycleInputs cycleInputs, HollowWriteStateEngine outputStateEngine,
             TransformerContext ctx) throws Throwable {
 
-        SimpleTransformer transformer = new SimpleTransformer(cycleInputs, outputStateEngine, ctx);
-        transformer.transform();
+        new SimpleTransformer().transform(cycleInputs, outputStateEngine, ctx);
 
         String BLOB_ID = VipNameUtil.isOverrideVip(ctx.getConfig()) ? "FASTLANE" : "BASEBLOB";
         PinTitleHelper.addBlobID(outputStateEngine, BLOB_ID);

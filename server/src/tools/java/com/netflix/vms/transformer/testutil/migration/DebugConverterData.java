@@ -30,7 +30,7 @@ import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.transformer.DynamicBusinessLogic;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
@@ -84,7 +84,7 @@ public class DebugConverterData {
     private static final Path REPRO_PATH = Paths.get(REPRO_DIR);
     private static final String WORKING_DIR_FOR_INPUTCONSUMER = "/space/converter-data/inputclient";
 
-    private BusinessLogic businessLogic;
+    private BusinessLogicAPI businessLogic;
 
     @Inject
     private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;

@@ -5,13 +5,13 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInter
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.netflix.vms.logging.TaggingLogger;
-import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
+import com.netflix.vms.transformer.common.TransformCycleInterrupter;
 import java.util.Map;
 import java.util.TreeMap;
 
 @Singleton
-public class SimpleTransformerCycleInterrupter implements TransformerCycleInterrupter {
-    public static TransformerCycleInterrupter INSTANCE = new SimpleTransformerCycleInterrupter();
+public class SimpleTransformCycleInterrupter implements TransformCycleInterrupter {
+    public static TransformCycleInterrupter INSTANCE = new SimpleTransformCycleInterrupter();
     private static final int HISTORY_LIMIT = 10;
 
     private Long cycleId;
@@ -22,7 +22,7 @@ public class SimpleTransformerCycleInterrupter implements TransformerCycleInterr
     private TreeMap<Long, CycleInterruptEntry> historyMap = new TreeMap<>();
 
     @Inject
-    public SimpleTransformerCycleInterrupter() {
+    public SimpleTransformCycleInterrupter() {
     }
 
     @Override

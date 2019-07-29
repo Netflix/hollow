@@ -25,7 +25,7 @@ import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.common.input.InputState;
@@ -105,7 +105,7 @@ public class PinTitleTest {
             final VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
 
             DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
-            BusinessLogic businessLogic = logicAndMetadata.getLogic();
+            BusinessLogicAPI businessLogic = logicAndMetadata.getLogic();
 
             Map<DatasetIdentifier, InputState> inputs = new HashMap<>();
             for (DatasetIdentifier datasetIdentifier : getNamespacesforEnv(isProd).keySet()) {
@@ -116,8 +116,7 @@ public class PinTitleTest {
             }
             CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
 
-            SimpleTransformer transformer = new SimpleTransformer(cycleInputs, fastlaneOutput, ctx);
-            transformer.transform();
+            new SimpleTransformer().transform(cycleInputs, fastlaneOutput, ctx);
             PinTitleHelper.addBlobID(fastlaneOutput, "FASTLANE");
 
             List<HollowReadStateEngine> overrideTitleOutputs = mgr.getResults(true);
@@ -160,7 +159,8 @@ public class PinTitleTest {
         return readEngine;
     }
 
-    private HollowReadStateEngine fetchInputStateEngine(BusinessLogic businessLogic, DatasetIdentifier datasetIdentifier,
+    private HollowReadStateEngine fetchInputStateEngine(
+            BusinessLogicAPI businessLogic, DatasetIdentifier datasetIdentifier,
             long version, int... specificTopNodeIdsToInclude) throws Exception {
         boolean isSlicing = specificTopNodeIdsToInclude != null && specificTopNodeIdsToInclude.length > 0;
 
@@ -209,8 +209,7 @@ public class PinTitleTest {
         CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
 
 
-        SimpleTransformer transformer = new SimpleTransformer(cycleInputs, outputStateEngine, ctx);
-        transformer.transform();
+        new SimpleTransformer().transform(cycleInputs, outputStateEngine, ctx);
         PinTitleHelper.addBlobID(outputStateEngine, name);
 
         writeStateEngine(outputStateEngine, blobFile);

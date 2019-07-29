@@ -64,7 +64,7 @@ dependencies {
     // VMS Transformer
     compile project(':vmstransformer-common-interfaces')
     compile project(':vmstransformer-io')
-    compile project(':vmstransformer-business-logic')
+    // compile project(':vmstransformer-business-logic')   // SNAP: Might need to downgrade to testCompile
     compile project(':vmstransformer-publish-workflow')
     compile 'com.netflix.vms.logging:vmslogging-slf4j:latest.release'
     compile 'netflix:vms-hollow-generated-notemplate:latest.release'

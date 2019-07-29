@@ -8,7 +8,7 @@ import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.SimpleTransformerContext;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.override.InputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.OutputSlicePinTitleProcessor;
@@ -86,7 +86,7 @@ public class VMSPinTitleSlicer {
         }
 
         DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
-        BusinessLogic businessLogic = logicAndMetadata.getLogic();
+        BusinessLogicAPI businessLogic = logicAndMetadata.getLogic();
 
         try {
             // cleanup files older than 7 days or oldest files to keep the max temp files to 20

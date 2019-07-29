@@ -4,7 +4,7 @@ import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.common.input.CycleInputs;
@@ -163,7 +163,7 @@ public class DefaultHollowPublishJobCreator {
     }
 
     public CreateDevSliceJob createDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency,
-            CycleInputs cycleInputs, long cycleVersion, BusinessLogic businessLogic) {
+            CycleInputs cycleInputs, long cycleVersion, BusinessLogicAPI businessLogic) {
         return new CreateHollowDevSliceJob(ctx, dependency, hollowBlobDataProvider, slicerFactory,
                 cycleInputs, cycleVersion, businessLogic);
     }

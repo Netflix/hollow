@@ -167,8 +167,7 @@ public class TitleLevelPinningPOC {
 
             // run fastlane on inputs
             VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
-            SimpleTransformer transformer = new SimpleTransformer(cycleInputs, fastlaneOutput, ctx);
-            transformer.transform();
+            new SimpleTransformer().transform(cycleInputs, fastlaneOutput, ctx);
             PinTitleHelper.addBlobID(fastlaneOutput, "FASTLANE");
             writeStateEngine(fastlaneOutput, new File(FASTLANE_FILE));
 

@@ -13,7 +13,7 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.SimpleTransformerContext;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.override.PinTitleManager.PinTitleProcessorJob;
 import java.io.File;
 import java.util.Arrays;
@@ -43,7 +43,7 @@ public class PinTitleManagerTest {
 
     @Mock DynamicBusinessLogic.CurrentBusinessLogicHolder mockLogicAndMetadata;
 
-    @Mock BusinessLogic businessLogic;
+    @Mock BusinessLogicAPI businessLogic;
 
     @Mock
     private S3Direct s3Direct;

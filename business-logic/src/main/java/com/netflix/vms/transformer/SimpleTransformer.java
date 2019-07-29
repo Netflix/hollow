@@ -9,15 +9,22 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSp
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
 
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
+import com.netflix.vms.transformer.common.slice.InputDataSlicer;
+import com.netflix.vms.transformer.common.slice.OutputDataSlicer;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
@@ -42,6 +49,7 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.datasets.ConverterDataset;
+import com.netflix.vms.transformer.input.datasets.slicers.TransformerOutputDataSlicer;
 import com.netflix.vms.transformer.logmessage.ProgressMessage;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
 import com.netflix.vms.transformer.modules.TransformModule;
@@ -72,6 +80,7 @@ import com.netflix.vms.transformer.namedlist.NamedListCompletionModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
 import com.netflix.vms.transformer.util.DeprecationUtil;
+import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -85,437 +94,475 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SimpleTransformer {
+public class SimpleTransformer implements BusinessLogicAPI {
 
-    private VideoNamedListModule videoNamedListModule;
-    private final VMSHollowInputAPI converterAPI;
-    private final HollowWriteStateEngine writeStateEngine;
-    private final TransformerContext ctx;
-    private final CycleConstants cycleConstants;
-    private final VMSTransformerIndexer indexer;
-    private final UpstreamDatasetHolder upstream;
-
-    public SimpleTransformer(CycleInputs cycleInputs,
-                             HollowWriteStateEngine outputStateEngine, 
-                             TransformerContext ctx) throws Exception {
-
-        this.writeStateEngine = outputStateEngine;
-        this.ctx = ctx;
-
-        // See {@Code UpstreamDatasetHolder} and {@Code GenerateCinderInputArtifacts} for onboarding new Cinder inputs
-        this.upstream = UpstreamDatasetHolder.getNewDatasetHolder(cycleInputs.getInputs());
-
-        ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
-        this.converterAPI = converterDataset.getAPI();
-        HollowReadStateEngine converterInputStateEngine = converterDataset.getInputState().getStateEngine();
-
-        this.cycleConstants = new CycleConstants(upstream);
-        long startTime = System.currentTimeMillis();
-        this.indexer = new VMSTransformerIndexer(converterInputStateEngine, ctx);   // indexes converter data
-        long endTime = System.currentTimeMillis();
-        
-        System.out.println("INDEXED IN " + (endTime - startTime) + "ms");
+    public void transform(CycleInputs cycleInputs,
+            HollowWriteStateEngine outputStateEngine,
+            TransformerContext ctx) throws Throwable {
+        new TransformerImpl(cycleInputs, outputStateEngine, ctx).transform();
     }
 
-    public void setPublishCycleDataTS(long time) {
-        ctx.setNowMillis(time);
+    @Override public List<HollowSchema> getSchema() {
+        // @@@ figure out a better way to obtain the schema (perhaps from a schema file?)
+        return new VMSTransformerWriteStateEngine().getSchemas();
     }
 
-    public HollowWriteStateEngine transform() throws Throwable {
-        StreamDataModule.clearVideoFormatDiffs();
+    @Override public HollowObjectHashCodeFinder getHashCodeFinder() {
+        return new VMSTransformerHashCodeFinder();
+    }
 
-        // hierarchy initializer, HollowObjectMapper and namedListModule
-        final VideoHierarchyInitializer hierarchyInitializer = new VideoHierarchyInitializer(upstream, indexer, ctx);
-        final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
-        objectMapper.doNotUseDefaultHashKeys();
-        this.videoNamedListModule = new VideoNamedListModule(ctx, cycleConstants, objectMapper);
+    @Override public long getTargetMaxTypeShardSize() {
+        return 16 * 1024 * 1024;
+    }
 
-        // print multiLanguageCatalog countries
-        OctoberSkyData octoberSkyData = ctx.getOctoberSkyData();
-        Set<String> multiLanguageCatalogCountries = octoberSkyData.getMultiLanguageCatalogCountries();
-        if (!ctx.getConfig().getOctoberSkyNamespace().isEmpty()) {
-            ctx.getLogger().info(MultiLocaleCountries, "Using October sky namespace {}", ctx.getConfig().getOctoberSkyNamespace());
+    @Override
+    public Class<? extends OutputDataSlicer> getOutputSlicer() {
+        return TransformerOutputDataSlicer.class;
+    }
+
+    @Override
+    public String[] getStreamHollowTypes() {
+        return new String[] { "StreamData", "StreamDownloadLocationFilename", "SetOfStreamData", "FileEncodingData",
+                "MapOfDownloadableIdToDrmInfo", "DrmHeader", "DrmKeyString", "ChunkDurationsString", "StreamDataDescriptor",
+                "StreamAdditionalData", "DownloadLocationSet", "MapOfIntegerToDrmHeader", "DrmKey", "StreamDrmData",
+                "WmDrmKey", "DrmInfo", "StreamMostlyConstantData", "ImageSubtitleIndexByteRange", "DrmInfoData", "QoEInfo",
+                "DeploymentIntent", "CodecPrivateDataString" };
+    }
+
+    @Override
+    public Class<? extends HollowAPI> getAPI(UpstreamDatasetDefinition.DatasetIdentifier dataset) {
+        return UpstreamDatasetHolder.Dataset.valueOf(dataset.name()).getAPI();      // SNAP: static access?
+    }
+
+    @Override
+    public Class<? extends InputDataSlicer> getInputSlicer(UpstreamDatasetDefinition.DatasetIdentifier dataset) {
+        return UpstreamDatasetHolder.Dataset.valueOf(dataset.name()).getSlicer();   // SNAP: static access?
+    }
+
+    static class TransformerImpl {
+        private VideoNamedListModule videoNamedListModule;
+        private final VMSHollowInputAPI converterAPI;
+        private final HollowWriteStateEngine writeStateEngine;
+        private final TransformerContext ctx;
+        private final CycleConstants cycleConstants;
+        private final VMSTransformerIndexer indexer;
+        private final UpstreamDatasetHolder upstream;
+
+        TransformerImpl(CycleInputs cycleInputs, HollowWriteStateEngine outputStateEngine, TransformerContext ctx)
+                throws Exception {
+
+            this.writeStateEngine = outputStateEngine;
+            this.ctx = ctx;
+
+            // See {@Code UpstreamDatasetHolder} and {@Code GenerateCinderInputArtifacts} for onboarding new Cinder inputs
+            this.upstream = UpstreamDatasetHolder.getNewDatasetHolder(cycleInputs.getInputs());
+
+            ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
+            this.converterAPI = converterDataset.getAPI();
+            HollowReadStateEngine converterInputStateEngine = converterDataset.getInputState().getStateEngine();
+
+            this.cycleConstants = new CycleConstants(upstream);
+            long startTime = System.currentTimeMillis();
+            this.indexer = new VMSTransformerIndexer(converterInputStateEngine, ctx);   // indexes converter data
+            long endTime = System.currentTimeMillis();
+
+            System.out.println("INDEXED IN " + (endTime - startTime) + "ms");
         }
-        ctx.getLogger().info(MultiLocaleCountries, "Countries that will support multi-language catalogs are {} out of all supported countries {}", multiLanguageCatalogCountries, octoberSkyData.getSupportedCountries());
-        for (String country : multiLanguageCatalogCountries) {
-            Set<String> supportedLanguageCatalogs = octoberSkyData.getCatalogLanguages(country);
-            ctx.getLogger().info(MultiLocaleCountries, "Country : {} supported language catalogs : {}", country, supportedLanguageCatalogs);
-            for (String language : supportedLanguageCatalogs) {
-                ctx.getLogger().info(MultiLocaleCountries, "Catalog {}:{} languageVariants:{}", country, language, octoberSkyData.getLanguageVariants(country, language));
+
+        public void transform() throws Throwable {
+            StreamDataModule.clearVideoFormatDiffs();
+
+            // hierarchy initializer, HollowObjectMapper and namedListModule
+            final VideoHierarchyInitializer hierarchyInitializer = new VideoHierarchyInitializer(upstream, indexer, ctx);
+            final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
+            objectMapper.doNotUseDefaultHashKeys();
+            this.videoNamedListModule = new VideoNamedListModule(ctx, cycleConstants, objectMapper);
+
+            // print multiLanguageCatalog countries
+            OctoberSkyData octoberSkyData = ctx.getOctoberSkyData();
+            Set<String> multiLanguageCatalogCountries = octoberSkyData.getMultiLanguageCatalogCountries();
+            if (!ctx.getConfig().getOctoberSkyNamespace().isEmpty()) {
+                ctx.getLogger().info(MultiLocaleCountries, "Using October sky namespace {}", ctx.getConfig().getOctoberSkyNamespace());
             }
+            ctx.getLogger().info(MultiLocaleCountries, "Countries that will support multi-language catalogs are {} out of all supported countries {}", multiLanguageCatalogCountries, octoberSkyData.getSupportedCountries());
+            for (String country : multiLanguageCatalogCountries) {
+                Set<String> supportedLanguageCatalogs = octoberSkyData.getCatalogLanguages(country);
+                ctx.getLogger().info(MultiLocaleCountries, "Country : {} supported language catalogs : {}", country, supportedLanguageCatalogs);
+                for (String language : supportedLanguageCatalogs) {
+                    ctx.getLogger().info(MultiLocaleCountries, "Catalog {}:{} languageVariants:{}", country, language, octoberSkyData.getLanguageVariants(country, language));
+                }
+            }
+
+            long startTime = System.currentTimeMillis();
+
+            // this module can be removed in the future when we have fully migrated to cup tokens from cinder
+            CupTokenFetcher cupTokenFetcher = new CupTokenFetcher(indexer, converterAPI, ctx.getConfig());
+
+            // Grouper to group by hierarchy.
+            VideoHierarchyGrouper showGrouper = new VideoHierarchyGrouper(converterAPI, ctx);
+            final List<Set<VideoHierarchyGroup>> processGroups = showGrouper.getProcessGroups();
+            ctx.getLogger().info(TransformInfo, "topNodes={}", processGroups.size());
+
+            // counters
+            AtomicInteger processedCount = new AtomicInteger();
+            AtomicInteger failedIndividualTransforms = new AtomicInteger(0);
+            int progressDivisor = getProgressDivisor(processGroups.size());
+
+            // cycle data aggregator
+            CycleDataAggregator cycleDataAggregator = new CycleDataAggregator(ctx);
+            CycleDataAggregatorHelper.configureLogsTagsForVMSWindowModule(cycleDataAggregator);
+
+
+            SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "transform");
+            for (int i = 0; i < executor.getCorePoolSize(); i++) {
+                executor.execute(() -> {
+
+                    // create new modules for each executor thread
+                    PackageDataModule packageDataModule = new PackageDataModule(upstream, ctx, objectMapper, cycleConstants, indexer, cupTokenFetcher);
+                    VideoCollectionsModule collectionsModule = new VideoCollectionsModule(converterAPI, ctx, cycleConstants, indexer);
+                    VideoMetaDataModule metadataModule = new VideoMetaDataModule(upstream, ctx, cycleConstants, indexer);
+                    VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(upstream, indexer);
+                    VideoMiscDataModule miscDataModule = new VideoMiscDataModule(upstream, indexer);
+                    VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(converterAPI, upstream, ctx, objectMapper, cycleConstants, indexer);
+                    CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(converterAPI, upstream, ctx,
+                            objectMapper, cycleConstants, indexer, cycleDataAggregator, cupTokenFetcher);
+                    L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer);
+
+                    int idx = processedCount.getAndIncrement();
+                    while (idx < processGroups.size()) {
+                        Set<VideoHierarchyGroup> processGroup = processGroups.get(idx);
+                        try {
+                            TransformedVideoData transformedVideoData = new TransformedVideoData();
+
+                            // NOTE: Legacy pipeline seems to propagate data for video that is not considered valid or not valid yet
+                            // so need to keep track of them and allow those use cases to be in parity
+                            Set<Integer> droppedVideoIds = new HashSet<>();
+                            Map<String, Set<VideoHierarchy>> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(processGroup, droppedVideoIds);
+                            packageDataModule.transform(showHierarchiesByCountry, droppedVideoIds, transformedVideoData);
+                            l10nVideoResourcesModule.transform(showHierarchiesByCountry, droppedVideoIds);
+
+                            // Spot to trigger Cycle Monkey if enabled
+                            ctx.getCycleMonkey().doMonkeyBusiness("transform");
+
+                            if (showHierarchiesByCountry != null) {
+                                // get all transformed data for show hierarchies using all the modules.
+                                collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry, transformedVideoData);
+                                metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry, transformedVideoData);
+                                mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry, transformedVideoData);
+                                imagesDataModule.buildVideoImagesByCountry(showHierarchiesByCountry, transformedVideoData);
+                                miscDataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry, transformedVideoData);
+                                countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedVideoData);
+
+                                // process the transformed video data
+                                if (transformedVideoData.getVideoDataCollectionMap() != null && !transformedVideoData
+                                        .getVideoDataCollectionMap().isEmpty()) {
+                                    processCurrentData(transformedVideoData, objectMapper);
+                                }
+                            }
+                        } catch (Throwable th) {
+                            ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node(s) " + getTopNodeIdentifierString(processGroup) + " stacktrace= " + Arrays.toString(th.getStackTrace()), th);
+                            failedIndividualTransforms.incrementAndGet();
+                        }
+
+                        if (idx % progressDivisor == 0) {
+                            ctx.getLogger().info(TransformProgress, new ProgressMessage(idx, progressDivisor));
+                        }
+
+                        idx = processedCount.getAndIncrement();
+
+                        // Interrupt if needed
+                        if (ctx.getCycleInterrupter().isCycleInterrupted()) {
+                            ctx.getLogger().error(CycleInterrupted, "Interrupted while processing video : {} ", new ProgressMessage(idx, progressDivisor));
+                            break;
+                        }
+                    }
+                });
+            }
+
+            // @formatter:off
+            // Register Transform Modules
+            List<TransformModule> moduleList = Arrays.asList(
+                    new DrmSystemModule(converterAPI, ctx, cycleConstants, objectMapper),
+                    new OriginServerModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                    new EncodingProfileModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                    new CacheDeploymentIntentModule(converterAPI, ctx, cycleConstants, objectMapper),
+                    new ArtworkTypeModule(converterAPI, ctx, cycleConstants, objectMapper),
+                    new ArtworkImageRecipeModule(converterAPI, ctx, cycleConstants, objectMapper),
+                    new EncodingProfileGroupModule(converterAPI, ctx, cycleConstants, objectMapper),
+
+                    new L10NMiscResourcesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                    new LanguageRightsModule(upstream, converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                    new TopNVideoDataModule(converterAPI, upstream, ctx, cycleConstants, objectMapper),
+                    new RolloutVideoModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                    new PersonImagesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                    new CharacterImagesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                    new GlobalPersonModule(converterAPI, ctx, cycleConstants, objectMapper, indexer)
+            );
+
+            // @formatter:on
+            // Execute Transform Modules
+            for (TransformModule m : moduleList) {
+                // Interrupt if needed
+                if (ctx.getCycleInterrupter().isCycleInterrupted()) {
+                    ctx.getLogger().error(CycleInterrupted, "Interrupted while processing module={} ", m.getName());
+                    break;
+                }
+
+                long tStart = System.currentTimeMillis();
+                m.transform();
+                long tDuration = System.currentTimeMillis() - tStart;
+                ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", m.getName(), tDuration);
+            }
+
+            executor.awaitSuccessfulCompletion();
+            if (!ctx.getCycleInterrupter().isCycleInterrupted()) {
+                //// NamedListCompletionModule happens after all hierarchies are already processed -- now we have built the ThreadSafeBitSets corresponding
+                //// to the NamedLists, and we can build the POJOs using those.
+                long tStart = System.currentTimeMillis();
+                NamedListCompletionModule namedListCompleter = new NamedListCompletionModule(videoNamedListModule, cycleConstants, objectMapper);
+                namedListCompleter.transform();
+                long tDuration = System.currentTimeMillis() - tStart;
+                ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", namedListCompleter.getName(), tDuration);
+
+                StreamDataModule.logVideoFormatDiffs(ctx);
+                ctx.getLogger().info(TransformProgress, new ProgressMessage(processedCount.get()));
+            }
+
+            ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
+            if (failedIndividualTransforms.get() > ctx.getConfig().getMaxTolerableFailedTransformerHierarchies())
+                throw new RuntimeException("More than " + ctx.getConfig().getMaxTolerableFailedTransformerHierarchies() + " individual hierarchies failed transformation -- not publishing data");
+
+            // log all aggregated data
+            cycleDataAggregator.logAllAggregatedData();
+
+            long endTime = System.currentTimeMillis();
+            System.out.println("Processed all videos in " + (endTime - startTime) + "ms");
+
+
+            // Check to determine whether to abort cycle due to interrupt
+            ctx.getCycleInterrupter().triggerInterruptIfNeeded(ctx.getCurrentCycleId(), ctx.getLogger(), "Stopped at transform");
         }
 
-        long startTime = System.currentTimeMillis();
+        private int getProgressDivisor(int numProcessGroups) {
+            int totalCount = numProcessGroups;
+            totalCount = (totalCount / 100) * 100 + 100;
+            return totalCount / 100;
+        }
 
-        // this module can be removed in the future when we have fully migrated to cup tokens from cinder
-        CupTokenFetcher cupTokenFetcher = new CupTokenFetcher(indexer, converterAPI, ctx.getConfig());
+        private void processCurrentData(TransformedVideoData transformedVideoData, HollowObjectMapper objectMapper) {
+            Map<String, VideoDataCollection> videoCountryDataMap = transformedVideoData.getVideoDataCollectionMap();
+            VideoNamedListPopulator namedListPopulator = videoNamedListModule.getPopulator();
+            Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap = new HashMap<>();
 
-        // Grouper to group by hierarchy.
-        VideoHierarchyGrouper showGrouper = new VideoHierarchyGrouper(converterAPI, ctx);
-        final List<Set<VideoHierarchyGroup>> processGroups = showGrouper.getProcessGroups();
-        ctx.getLogger().info(TransformInfo, "topNodes={}", processGroups.size());
+            // Process Complete Video
+            for (Map.Entry<String, VideoDataCollection> countryHierarchyEntry : videoCountryDataMap.entrySet()) {
+                String countryId = countryHierarchyEntry.getKey();
+                ISOCountry country = cycleConstants.getISOCountry(countryId);
+                VideoDataCollection videoDataCollection = countryHierarchyEntry.getValue();
 
-        // counters
-        AtomicInteger processedCount = new AtomicInteger();
-        AtomicInteger failedIndividualTransforms = new AtomicInteger(0);
-        int progressDivisor = getProgressDivisor(processGroups.size());
+                // if no videos in video collection hierarchies then continue to next.
+                if (videoDataCollection.getVideoCollectionsDataHierarchies() == null) continue;
 
-        // cycle data aggregator
-        CycleDataAggregator cycleDataAggregator = new CycleDataAggregator(ctx);
-        CycleDataAggregatorHelper.configureLogsTagsForVMSWindowModule(cycleDataAggregator);
+                for (VideoCollectionsDataHierarchy hierarchy : videoDataCollection.getVideoCollectionsDataHierarchies()) {
 
+                    int topNodeVideoId = hierarchy.getTopNodeId().value;
+                    VideoCollectionsData videoCollectionsData = hierarchy.getTopNode();
+                    namedListPopulator.setCountry(countryId);
 
-        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "transform");
-        for (int i = 0; i < executor.getCorePoolSize(); i++) {
-            executor.execute(() -> {
+                    // Process TopNode
+                    VideoMiscData miscData = transformedVideoData.getVideoData(topNodeVideoId).getVideoMiscData();
+                    CompleteVideo topNodeCompleteVideo = getCompleteVideo(topNodeVideoId, country, videoDataCollection, videoCollectionsData, miscData);
+                    processCompleteVideo(objectMapper, namedListPopulator, topNodeCompleteVideo, true, country, globalVideoMap);
 
-                // create new modules for each executor thread
-                PackageDataModule packageDataModule = new PackageDataModule(upstream, ctx, objectMapper, cycleConstants, indexer, cupTokenFetcher);
-                VideoCollectionsModule collectionsModule = new VideoCollectionsModule(converterAPI, ctx, cycleConstants, indexer);
-                VideoMetaDataModule metadataModule = new VideoMetaDataModule(upstream, ctx, cycleConstants, indexer);
-                VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(upstream, indexer);
-                VideoMiscDataModule miscDataModule = new VideoMiscDataModule(upstream, indexer);
-                VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(converterAPI, upstream, ctx, objectMapper, cycleConstants, indexer);
-                CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(converterAPI, upstream, ctx,
-                        objectMapper, cycleConstants, indexer, cycleDataAggregator, cupTokenFetcher);
-                L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer);
+                    // Process Show children
+                    if (topNodeCompleteVideo.data.facetData.videoCollectionsData.nodeType == cycleConstants.SHOW) {
+                        int sequenceNumber = 0;
+                        // Process Seasons
+                        for (Map.Entry<Integer, VideoCollectionsData> seasonEntry : hierarchy.getOrderedSeasons().entrySet()) {
 
-                int idx = processedCount.getAndIncrement();
-                while (idx < processGroups.size()) {
-                    Set<VideoHierarchyGroup> processGroup = processGroups.get(idx);
-                    try {
-                        TransformedVideoData transformedVideoData = new TransformedVideoData();
+                            int seasonId = seasonEntry.getKey().intValue();
+                            miscData = transformedVideoData.getVideoData(seasonId).getVideoMiscData();
+                            CompleteVideo season = getCompleteVideo(seasonId, country, videoDataCollection, seasonEntry.getValue(), miscData);
+                            processCompleteVideo(objectMapper, namedListPopulator, season, false, country, globalVideoMap);
 
-                        // NOTE: Legacy pipeline seems to propagate data for video that is not considered valid or not valid yet
-                        // so need to keep track of them and allow those use cases to be in parity
-                        Set<Integer> droppedVideoIds = new HashSet<>();
-                        Map<String, Set<VideoHierarchy>> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(processGroup, droppedVideoIds);
-                        packageDataModule.transform(showHierarchiesByCountry, droppedVideoIds, transformedVideoData);
-                        l10nVideoResourcesModule.transform(showHierarchiesByCountry, droppedVideoIds);
-
-                        // Spot to trigger Cycle Monkey if enabled
-                        ctx.getCycleMonkey().doMonkeyBusiness("transform");
-
-                        if (showHierarchiesByCountry != null) {
-                            // get all transformed data for show hierarchies using all the modules.
-                            collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry, transformedVideoData);
-                            metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry, transformedVideoData);
-                            mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry, transformedVideoData);
-                            imagesDataModule.buildVideoImagesByCountry(showHierarchiesByCountry, transformedVideoData);
-                            miscDataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry, transformedVideoData);
-                            countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedVideoData);
-
-                            // process the transformed video data
-                            if (transformedVideoData.getVideoDataCollectionMap() != null && !transformedVideoData
-                                    .getVideoDataCollectionMap().isEmpty()) {
-                                processCurrentData(transformedVideoData, objectMapper);
+                            // Process Episodes
+                            for (Map.Entry<Integer, VideoCollectionsData> episodeEntry : hierarchy.getOrderedSeasonEpisodes(++sequenceNumber).entrySet()) {
+                                int episodeId = episodeEntry.getKey().intValue();
+                                miscData = transformedVideoData.getVideoData(episodeId).getVideoMiscData();
+                                CompleteVideo episode = getCompleteVideo(episodeId, country, videoDataCollection, episodeEntry.getValue(), miscData);
+                                processCompleteVideo(objectMapper, namedListPopulator, episode, false, country, globalVideoMap);
                             }
                         }
-                    } catch (Throwable th) {
-                        ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node(s) " + getTopNodeIdentifierString(processGroup) + " stacktrace= " + Arrays.toString(th.getStackTrace()), th);
-                        failedIndividualTransforms.incrementAndGet();
                     }
 
-                    if (idx % progressDivisor == 0) {
-                        ctx.getLogger().info(TransformProgress, new ProgressMessage(idx, progressDivisor));
-                    }
-
-                    idx = processedCount.getAndIncrement();
-
-                    // Interrupt if needed
-                    if (ctx.getCycleInterrupter().isCycleInterrupted()) {
-                        ctx.getLogger().error(CycleInterrupted, "Interrupted while processing video : {} ", new ProgressMessage(idx, progressDivisor));
-                        break;
+                    // Process Supplemental
+                    for (Map.Entry<Integer, VideoCollectionsData> supplementalEntry : hierarchy.getSupplementalVideosCollectionsData().entrySet()) {
+                        int supplementalId = supplementalEntry.getKey().intValue();
+                        miscData = transformedVideoData.getVideoData(supplementalId).getVideoMiscData();
+                        CompleteVideo supplemental = getCompleteVideo(supplementalId, country, videoDataCollection, supplementalEntry.getValue(), miscData);
+                        processCompleteVideo(objectMapper, namedListPopulator, supplemental, false, country, globalVideoMap);
                     }
                 }
-            });
-        }
-
-        // @formatter:off
-        // Register Transform Modules
-        List<TransformModule> moduleList = Arrays.asList(
-                new DrmSystemModule(converterAPI, ctx, cycleConstants, objectMapper),
-                new OriginServerModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
-                new EncodingProfileModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
-                new CacheDeploymentIntentModule(converterAPI, ctx, cycleConstants, objectMapper),
-                new ArtworkTypeModule(converterAPI, ctx, cycleConstants, objectMapper),
-                new ArtworkImageRecipeModule(converterAPI, ctx, cycleConstants, objectMapper),
-                new EncodingProfileGroupModule(converterAPI, ctx, cycleConstants, objectMapper),
-
-                new L10NMiscResourcesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
-                new LanguageRightsModule(upstream, converterAPI, ctx, cycleConstants, objectMapper, indexer),
-                new TopNVideoDataModule(converterAPI, upstream, ctx, cycleConstants, objectMapper),
-                new RolloutVideoModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
-                new PersonImagesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
-                new CharacterImagesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
-                new GlobalPersonModule(converterAPI, ctx, cycleConstants, objectMapper, indexer)
-        );
-
-        // @formatter:on
-        // Execute Transform Modules
-        for (TransformModule m : moduleList) {
-            // Interrupt if needed
-            if (ctx.getCycleInterrupter().isCycleInterrupted()) {
-                ctx.getLogger().error(CycleInterrupted, "Interrupted while processing module={} ", m.getName());
-                break;
             }
 
-            long tStart = System.currentTimeMillis();
-            m.transform();
-            long tDuration = System.currentTimeMillis() - tStart;
-            ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", m.getName(), tDuration);
+            // Process Global Video
+            processGlobalVideo(globalVideoMap, objectMapper);
+            // Process FallbackUSArtwork
+            VideoDataCollection usData = videoCountryDataMap.get("US");
+            if (usData != null)
+                processUSFallbackArtworks(usData, objectMapper);
         }
 
-        executor.awaitSuccessfulCompletion();
-        if (!ctx.getCycleInterrupter().isCycleInterrupted()) {
-            //// NamedListCompletionModule happens after all hierarchies are already processed -- now we have built the ThreadSafeBitSets corresponding
-            //// to the NamedLists, and we can build the POJOs using those.
-            long tStart = System.currentTimeMillis();
-            NamedListCompletionModule namedListCompleter = new NamedListCompletionModule(videoNamedListModule, cycleConstants, objectMapper);
-            namedListCompleter.transform();
-            long tDuration = System.currentTimeMillis() - tStart;
-            ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", namedListCompleter.getName(), tDuration);
-
-            StreamDataModule.logVideoFormatDiffs(ctx);
-            ctx.getLogger().info(TransformProgress, new ProgressMessage(processedCount.get()));
+        private void processCompleteVideo(HollowObjectMapper mapper, VideoNamedListPopulator namedListPopulator, CompleteVideo completeVideo, boolean isTopNode, ISOCountry country, Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap) {
+            mapper.addObject(completeVideo);
+            namedListPopulator.addCompleteVideo(completeVideo, isTopNode);
+            Video video = completeVideo.id;
+            globalVideoMap.putIfAbsent(video, new TreeMap<>(countryComparator));
+            globalVideoMap.get(video).put(country, completeVideo);
         }
 
-        ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
-        if (failedIndividualTransforms.get() > ctx.getConfig().getMaxTolerableFailedTransformerHierarchies())
-            throw new RuntimeException("More than " + ctx.getConfig().getMaxTolerableFailedTransformerHierarchies() + " individual hierarchies failed transformation -- not publishing data");
+        private void processGlobalVideo(Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap, HollowObjectMapper mapper) {
 
-        // log all aggregated data
-        cycleDataAggregator.logAllAggregatedData();
+            HollowPrimaryKeyIndex primaryKeyIndex = indexer.getPrimaryKeyIndex(IndexSpec.MOVIE_CHARACTER_PERSON);
+            for (Map.Entry<Video, Map<ISOCountry, CompleteVideo>> globalEntry : globalVideoMap.entrySet()) {
 
-        long endTime = System.currentTimeMillis();
-        System.out.println("Processed all videos in " + (endTime - startTime) + "ms");
-        
+                Set<ISOCountry> availableCountries = new HashSet<>();
+                Set<Strings> aliases = new HashSet<>();
+                CompleteVideo representativeVideo = null;
 
-        // Check to determine whether to abort cycle due to interrupt
-        ctx.getCycleInterrupter().triggerInterruptIfNeeded(ctx.getCurrentCycleId(), ctx.getLogger(), "Stopped at transform");
-        return writeStateEngine;
-    }
+                for (Map.Entry<ISOCountry, CompleteVideo> countryEntry : globalEntry.getValue().entrySet()) {
 
-    private int getProgressDivisor(int numProcessGroups) {
-        int totalCount = numProcessGroups;
-        totalCount = (totalCount / 100) * 100 + 100;
-        return totalCount / 100;
-    }
+                    ISOCountry country = countryEntry.getKey();
+                    CompleteVideo completeVideo = countryEntry.getValue();
 
-    private void processCurrentData(TransformedVideoData transformedVideoData, HollowObjectMapper objectMapper) {
-        Map<String, VideoDataCollection> videoCountryDataMap = transformedVideoData.getVideoDataCollectionMap();
-        VideoNamedListPopulator namedListPopulator = videoNamedListModule.getPopulator();
-        Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap = new HashMap<>();
+                    if (completeVideo != null) {
+                        representativeVideo = preferredCompleteVideo(representativeVideo, completeVideo);
+                        availableCountries.add(country);
 
-        // Process Complete Video
-        for (Map.Entry<String, VideoDataCollection> countryHierarchyEntry : videoCountryDataMap.entrySet()) {
-            String countryId = countryHierarchyEntry.getKey();
-            ISOCountry country = cycleConstants.getISOCountry(countryId);
-            VideoDataCollection videoDataCollection = countryHierarchyEntry.getValue();
-
-            // if no videos in video collection hierarchies then continue to next.
-            if (videoDataCollection.getVideoCollectionsDataHierarchies() == null) continue;
-
-            for (VideoCollectionsDataHierarchy hierarchy : videoDataCollection.getVideoCollectionsDataHierarchies()) {
-
-                int topNodeVideoId = hierarchy.getTopNodeId().value;
-                VideoCollectionsData videoCollectionsData = hierarchy.getTopNode();
-                namedListPopulator.setCountry(countryId);
-
-                // Process TopNode
-                VideoMiscData miscData = transformedVideoData.getVideoData(topNodeVideoId).getVideoMiscData();
-                CompleteVideo topNodeCompleteVideo = getCompleteVideo(topNodeVideoId, country, videoDataCollection, videoCollectionsData, miscData);
-                processCompleteVideo(objectMapper, namedListPopulator, topNodeCompleteVideo, true, country, globalVideoMap);
-
-                // Process Show children
-                if (topNodeCompleteVideo.data.facetData.videoCollectionsData.nodeType == cycleConstants.SHOW) {
-                    int sequenceNumber = 0;
-                    // Process Seasons
-                    for (Map.Entry<Integer, VideoCollectionsData> seasonEntry : hierarchy.getOrderedSeasons().entrySet()) {
-
-                        int seasonId = seasonEntry.getKey().intValue();
-                        miscData = transformedVideoData.getVideoData(seasonId).getVideoMiscData();
-                        CompleteVideo season = getCompleteVideo(seasonId, country, videoDataCollection, seasonEntry.getValue(), miscData);
-                        processCompleteVideo(objectMapper, namedListPopulator, season, false, country, globalVideoMap);
-
-                        // Process Episodes
-                        for (Map.Entry<Integer, VideoCollectionsData> episodeEntry : hierarchy.getOrderedSeasonEpisodes(++sequenceNumber).entrySet()) {
-                            int episodeId = episodeEntry.getKey().intValue();
-                            miscData = transformedVideoData.getVideoData(episodeId).getVideoMiscData();
-                            CompleteVideo episode = getCompleteVideo(episodeId, country, videoDataCollection, episodeEntry.getValue(), miscData);
-                            processCompleteVideo(objectMapper, namedListPopulator, episode, false, country, globalVideoMap);
+                        // marked for removal
+                        if (!DeprecationUtil.disableVideoGeneralAliases()) {
+                            if (completeVideo.data.facetData.videoMetaData.aliases != null)
+                                aliases.addAll(completeVideo.data.facetData.videoMetaData.aliases);
                         }
                     }
                 }
 
-                // Process Supplemental
-                for (Map.Entry<Integer, VideoCollectionsData> supplementalEntry : hierarchy.getSupplementalVideosCollectionsData().entrySet()) {
-                    int supplementalId = supplementalEntry.getKey().intValue();
-                    miscData = transformedVideoData.getVideoData(supplementalId).getVideoMiscData();
-                    CompleteVideo supplemental = getCompleteVideo(supplementalId, country, videoDataCollection, supplementalEntry.getValue(), miscData);
-                    processCompleteVideo(objectMapper, namedListPopulator, supplemental, false, country, globalVideoMap);
+                if (representativeVideo == null) return;
+                // create GlobalVideo
+                GlobalVideo gVideo = new GlobalVideo();
+                gVideo.completeVideo = representativeVideo;
+                gVideo.aliases = aliases;
+                gVideo.availableCountries = availableCountries;
+                gVideo.isSupplementalVideo = (representativeVideo.data.facetData.videoCollectionsData.nodeType == cycleConstants.SUPPLEMENTAL);
+                gVideo.personCharacters = getPersonCharacters(primaryKeyIndex, representativeVideo);
+
+                mapper.addObject(gVideo);
+            }
+        }
+
+        private void processUSFallbackArtworks(VideoDataCollection videoDataCollection, HollowObjectMapper objectMapper) {
+            Set<Integer> videoIds = videoDataCollection.getVideoIdSetForVideoData();
+            for (int videoId : videoIds) {
+                VideoImages images = videoDataCollection.getVideoImages(videoId);
+                if (images != null) {
+                    FallbackUSArtwork artwork = new FallbackUSArtwork();
+                    artwork.id = new Video(videoId);
+                    artwork.artworksByType = images.artworks;
+                    artwork.typeFormatIdx = images.artworkFormatsByType;
+                    objectMapper.addObject(artwork);
                 }
             }
         }
 
-        // Process Global Video
-        processGlobalVideo(globalVideoMap, objectMapper);
-        // Process FallbackUSArtwork
-        VideoDataCollection usData = videoCountryDataMap.get("US");
-        if (usData != null)
-            processUSFallbackArtworks(usData, objectMapper);
-    }
-
-    private void processCompleteVideo(HollowObjectMapper mapper, VideoNamedListPopulator namedListPopulator, CompleteVideo completeVideo, boolean isTopNode, ISOCountry country, Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap) {
-        mapper.addObject(completeVideo);
-        namedListPopulator.addCompleteVideo(completeVideo, isTopNode);
-        Video video = completeVideo.id;
-        globalVideoMap.putIfAbsent(video, new TreeMap<>(countryComparator));
-        globalVideoMap.get(video).put(country, completeVideo);
-    }
-
-    private void processGlobalVideo(Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap, HollowObjectMapper mapper) {
-
-        HollowPrimaryKeyIndex primaryKeyIndex = indexer.getPrimaryKeyIndex(IndexSpec.MOVIE_CHARACTER_PERSON);
-        for (Map.Entry<Video, Map<ISOCountry, CompleteVideo>> globalEntry : globalVideoMap.entrySet()) {
-
-            Set<ISOCountry> availableCountries = new HashSet<>();
-            Set<Strings> aliases = new HashSet<>();
-            CompleteVideo representativeVideo = null;
-
-            for (Map.Entry<ISOCountry, CompleteVideo> countryEntry : globalEntry.getValue().entrySet()) {
-
-                ISOCountry country = countryEntry.getKey();
-                CompleteVideo completeVideo = countryEntry.getValue();
-
-                if (completeVideo != null) {
-                    representativeVideo = preferredCompleteVideo(representativeVideo, completeVideo);
-                    availableCountries.add(country);
-
-                    // marked for removal
-                    if (!DeprecationUtil.disableVideoGeneralAliases()) {
-                        if (completeVideo.data.facetData.videoMetaData.aliases != null)
-                            aliases.addAll(completeVideo.data.facetData.videoMetaData.aliases);
-                    }
+        private List<MoviePersonCharacter> getPersonCharacters(HollowPrimaryKeyIndex primaryKeyIndex, CompleteVideo completeVideo) {
+            List<MoviePersonCharacter> personCharacters = new ArrayList<>();
+            long movieId = completeVideo.id.value;
+            int matchingOrdinal = primaryKeyIndex.getMatchingOrdinal(movieId);
+            if (matchingOrdinal != -1) {
+                MovieCharacterPersonHollow movieCharacterPersonHollow = converterAPI.getMovieCharacterPersonHollow(matchingOrdinal);
+                CharacterListHollow characterList = movieCharacterPersonHollow._getCharacters();
+                Iterator<PersonCharacterHollow> iterator = characterList.iterator();
+                while (iterator.hasNext()) {
+                    PersonCharacterHollow personCharacterHollow = iterator.next();
+                    MoviePersonCharacter moviePersonCharacter = new MoviePersonCharacter();
+                    moviePersonCharacter.movieId = movieId;
+                    moviePersonCharacter.personId = personCharacterHollow._getPersonId();
+                    moviePersonCharacter.characterId = personCharacterHollow._getCharacterId();
+                    personCharacters.add(moviePersonCharacter);
                 }
             }
-
-            if (representativeVideo == null) return;
-            // create GlobalVideo
-            GlobalVideo gVideo = new GlobalVideo();
-            gVideo.completeVideo = representativeVideo;
-            gVideo.aliases = aliases;
-            gVideo.availableCountries = availableCountries;
-            gVideo.isSupplementalVideo = (representativeVideo.data.facetData.videoCollectionsData.nodeType == cycleConstants.SUPPLEMENTAL);
-            gVideo.personCharacters = getPersonCharacters(primaryKeyIndex, representativeVideo);
-
-            mapper.addObject(gVideo);
+            Collections.sort(personCharacters);
+            return personCharacters;
         }
-    }
 
-    private void processUSFallbackArtworks(VideoDataCollection videoDataCollection, HollowObjectMapper objectMapper) {
-        Set<Integer> videoIds = videoDataCollection.getVideoIdSetForVideoData();
-        for (int videoId : videoIds) {
-            VideoImages images = videoDataCollection.getVideoImages(videoId);
-            if (images != null) {
-                FallbackUSArtwork artwork = new FallbackUSArtwork();
-                artwork.id = new Video(videoId);
-                artwork.artworksByType = images.artworks;
-                artwork.typeFormatIdx = images.artworkFormatsByType;
-                objectMapper.addObject(artwork);
+        private CompleteVideo preferredCompleteVideo(CompleteVideo current, CompleteVideo candidate) {
+            if (current == null
+                    || isGoLive(candidate)
+                    || current.data.facetData.videoMetaData.videoSetTypes.contains(VIDEO_SET_TYPE_EXTENDED)) {
+                return candidate;
             }
-        }
-    }
 
-    private List<MoviePersonCharacter> getPersonCharacters(HollowPrimaryKeyIndex primaryKeyIndex, CompleteVideo completeVideo) {
-        List<MoviePersonCharacter> personCharacters = new ArrayList<>();
-        long movieId = completeVideo.id.value;
-        int matchingOrdinal = primaryKeyIndex.getMatchingOrdinal(movieId);
-        if (matchingOrdinal != -1) {
-            MovieCharacterPersonHollow movieCharacterPersonHollow = converterAPI.getMovieCharacterPersonHollow(matchingOrdinal);
-            CharacterListHollow characterList = movieCharacterPersonHollow._getCharacters();
-            Iterator<PersonCharacterHollow> iterator = characterList.iterator();
-            while (iterator.hasNext()) {
-                PersonCharacterHollow personCharacterHollow = iterator.next();
-                MoviePersonCharacter moviePersonCharacter = new MoviePersonCharacter();
-                moviePersonCharacter.movieId = movieId;
-                moviePersonCharacter.personId = personCharacterHollow._getPersonId();
-                moviePersonCharacter.characterId = personCharacterHollow._getCharacterId();
-                personCharacters.add(moviePersonCharacter);
+            return current;
+        }
+
+        private CompleteVideo getCompleteVideo(int videoId, ISOCountry country, VideoDataCollection videoDataCollection, VideoCollectionsData collectionsData, VideoMiscData miscData) {
+            // create complete video
+            CompleteVideo completeVideo = new CompleteVideo();
+            completeVideo.id = new Video(videoId);
+            completeVideo.country = country;
+
+            // create CompleteVideoData
+            completeVideo.data = new CompleteVideoData();
+            // Facet data
+            completeVideo.data.facetData = new CompleteVideoFacetData();
+            completeVideo.data.facetData.videoCollectionsData = collectionsData;
+            completeVideo.data.facetData.videoMetaData = videoDataCollection.getVideoMetaData(videoId);
+            completeVideo.data.facetData.videoMediaData = videoDataCollection.getVideoMediaData(videoId);
+            completeVideo.data.facetData.videoImages = videoDataCollection.getVideoImages(videoId) == null ? cycleConstants.EMPTY_VIDEO_IMAGES : videoDataCollection.getVideoImages(videoId);
+            // CountrySpecificData
+            completeVideo.data.countrySpecificData = videoDataCollection.getCompleteVideoCountrySpecificData(videoId);
+
+            // Misc data
+            if (!isExtended(completeVideo))
+                completeVideo.data.facetData.videoMiscData = miscData;
+
+            return completeVideo;
+        }
+
+        private String getTopNodeIdentifierString(Set<VideoHierarchyGroup> processGroup) {
+            StringBuilder builder = new StringBuilder("(");
+            boolean first = true;
+            for (VideoHierarchyGroup topNodeGroup : processGroup) {
+                if (!first)
+                    builder.append(",");
+                builder.append(topNodeGroup);
+                first = false;
             }
-        }
-        Collections.sort(personCharacters);
-        return personCharacters;
-    }
-
-    private CompleteVideo preferredCompleteVideo(CompleteVideo current, CompleteVideo candidate) {
-        if (current == null
-                || isGoLive(candidate)
-                || current.data.facetData.videoMetaData.videoSetTypes.contains(VIDEO_SET_TYPE_EXTENDED)) {
-            return candidate;
+            builder.append(")");
+            return builder.toString();
         }
 
-        return current;
-    }
+        private static final VideoSetType VIDEO_SET_TYPE_EXTENDED = new VideoSetType("Extended");
 
-    private CompleteVideo getCompleteVideo(int videoId, ISOCountry country, VideoDataCollection videoDataCollection, VideoCollectionsData collectionsData, VideoMiscData miscData) {
-        // create complete video
-        CompleteVideo completeVideo = new CompleteVideo();
-        completeVideo.id = new Video(videoId);
-        completeVideo.country = country;
-
-        // create CompleteVideoData
-        completeVideo.data = new CompleteVideoData();
-        // Facet data
-        completeVideo.data.facetData = new CompleteVideoFacetData();
-        completeVideo.data.facetData.videoCollectionsData = collectionsData;
-        completeVideo.data.facetData.videoMetaData = videoDataCollection.getVideoMetaData(videoId);
-        completeVideo.data.facetData.videoMediaData = videoDataCollection.getVideoMediaData(videoId);
-        completeVideo.data.facetData.videoImages = videoDataCollection.getVideoImages(videoId) == null ? cycleConstants.EMPTY_VIDEO_IMAGES : videoDataCollection.getVideoImages(videoId);
-        // CountrySpecificData
-        completeVideo.data.countrySpecificData = videoDataCollection.getCompleteVideoCountrySpecificData(videoId);
-
-        // Misc data
-        if (!isExtended(completeVideo))
-            completeVideo.data.facetData.videoMiscData = miscData;
-
-        return completeVideo;
-    }
-
-    private String getTopNodeIdentifierString(Set<VideoHierarchyGroup> processGroup) {
-        StringBuilder builder = new StringBuilder("(");
-        boolean first = true;
-        for (VideoHierarchyGroup topNodeGroup : processGroup) {
-            if (!first)
-                builder.append(",");
-            builder.append(topNodeGroup);
-            first = false;
-        }
-        builder.append(")");
-        return builder.toString();
-    }
-
-    private static final VideoSetType VIDEO_SET_TYPE_EXTENDED = new VideoSetType("Extended");
-
-    private static boolean isExtended(CompleteVideo completeVideo) {
-        return completeVideo.data.facetData.videoMetaData.videoSetTypes.contains(VIDEO_SET_TYPE_EXTENDED);
-    }
-
-    private static boolean isGoLive(CompleteVideo completeVideo) {
-        return completeVideo.data.facetData != null && completeVideo.data.facetData.videoMediaData != null && completeVideo.data.facetData.videoMediaData.isGoLive;
-    }
-
-    private static Comparator<ISOCountry> countryComparator = new ISOCountryComparator();
-
-    private static class ISOCountryComparator implements Comparator<ISOCountry> {
-
-        @Override
-        public int compare(ISOCountry o1, ISOCountry o2) {
-            String s1 = new String(o1.id);
-            String s2 = new String(o2.id);
-            return s1.compareTo(s2);
+        private static boolean isExtended(CompleteVideo completeVideo) {
+            return completeVideo.data.facetData.videoMetaData.videoSetTypes.contains(VIDEO_SET_TYPE_EXTENDED);
         }
 
-    }
+        private static boolean isGoLive(CompleteVideo completeVideo) {
+            return completeVideo.data.facetData != null && completeVideo.data.facetData.videoMediaData != null && completeVideo.data.facetData.videoMediaData.isGoLive;
+        }
 
+        private static Comparator<ISOCountry> countryComparator = new ISOCountryComparator();
+
+        private static class ISOCountryComparator implements Comparator<ISOCountry> {
+
+            @Override
+            public int compare(ISOCountry o1, ISOCountry o2) {
+                String s1 = new String(o1.id);
+                String s2 = new String(o2.id);
+                return s1.compareTo(s2);
+            }
+
+        }
+    }
 }

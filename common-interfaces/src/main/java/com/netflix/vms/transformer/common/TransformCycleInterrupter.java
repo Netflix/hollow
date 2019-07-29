@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public interface TransformerCycleInterrupter {
+public interface TransformCycleInterrupter {
     void begin(long cycleId);
 
     void interruptCycle(String msg);

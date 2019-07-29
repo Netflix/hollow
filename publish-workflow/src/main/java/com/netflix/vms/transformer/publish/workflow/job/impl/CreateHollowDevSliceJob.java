@@ -11,7 +11,7 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import com.netflix.vms.transformer.common.slice.OutputDataSlicer;
@@ -45,11 +45,11 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
     CycleInputs cycleInputs;
     private final HollowProducer.Publisher publisher;
     private final HollowProducer.Announcer announcer;
-    private final BusinessLogic businessLogic;
+    private final BusinessLogicAPI businessLogic;
     
     public CreateHollowDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, HollowBlobDataProvider dataProvider,
             SlicerFactory slicerFactory, CycleInputs cycleInputs, long currentCycleId,
-            BusinessLogic businessLogic) {
+            BusinessLogicAPI businessLogic) {
         super(ctx, dependency, currentCycleId);
         this.dataProvider = dataProvider;
         this.slicerFactory = slicerFactory;

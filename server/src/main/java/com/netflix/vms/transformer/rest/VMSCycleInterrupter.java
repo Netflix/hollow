@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.rest;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
+import com.netflix.vms.transformer.common.TransformCycleInterrupter;
 import java.util.Date;
 import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
@@ -21,10 +21,10 @@ public class VMSCycleInterrupter {
     private final static TimeZone tz = TimeZone.getTimeZone("America/Los_Angeles");
     private final static FastDateFormat formatter = FastDateFormat.getInstance("dd-MMM-yyyy HH:mm:ss z", tz);
 
-    private final TransformerCycleInterrupter cycleInterrupter;
+    private final TransformCycleInterrupter cycleInterrupter;
 
     @Inject
-    public VMSCycleInterrupter(TransformerCycleInterrupter cycleInterrupter) {
+    public VMSCycleInterrupter(TransformCycleInterrupter cycleInterrupter) {
         this.cycleInterrupter = cycleInterrupter;
     }
 

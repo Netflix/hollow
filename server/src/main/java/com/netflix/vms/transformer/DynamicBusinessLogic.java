@@ -1,34 +1,41 @@
 package com.netflix.vms.transformer;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.DynamicLogicLoading;
+
 import com.google.inject.Singleton;
 import com.netflix.gutenberg.consumer.GutenbergFileConsumer;
 import com.netflix.gutenberg.consumer.VersionMetadata;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
+import com.netflix.vms.transformer.logger.TransformerServerLogger;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.ServiceConfigurationError;
+import java.util.ServiceLoader;
 import java.util.function.Supplier;
 import javax.inject.Inject;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
-public class DynamicBusinessLogic implements Supplier<BusinessLogic> {
-
-    private static final Logger logger = LoggerFactory.getLogger(DynamicBusinessLogic.class);
+public class DynamicBusinessLogic implements Supplier<BusinessLogicAPI> {
 
     private final GutenbergFileConsumer gutenberg;
+    private final TransformerServerLogger logger;
 
-    private CurrentBusinessLogicClassHolder currentLogicClass;
+    private ServiceLoader<BusinessLogicAPI> loader;
+    private CurrentBusinessLogicHolder currentBusinessLogicHolder;
 
     @Inject
-    public DynamicBusinessLogic(TransformerConfig config, GutenbergFileConsumer gutenberg) {
+    public DynamicBusinessLogic(TransformerConfig config, GutenbergFileConsumer gutenberg,
+            TransformerConfig transformerConfig, ElasticSearchClient esClient) throws Exception {
         this.gutenberg = gutenberg;
+        this.logger = new TransformerServerLogger(transformerConfig, esClient);
 
         String dynamicLogicNamespace = config.getOverrideDynamicLogicJarNamespace();
 
@@ -37,69 +44,62 @@ public class DynamicBusinessLogic implements Supplier<BusinessLogic> {
 
         List<VersionMetadata> versions = gutenberg.getVersions(dynamicLogicNamespace, 1);
 
-        File data = gutenberg.getData(dynamicLogicNamespace, versions.get(0).getVersion());
-        loadLogic(data, versions.get(0).getMetadata());
+        File jarFile = gutenberg.getData(dynamicLogicNamespace, versions.get(0).getVersion());
 
-        gutenberg.subscribe(dynamicLogicNamespace, (jarFile, metadata) -> {
-            loadLogic(jarFile, metadata);
+        loadLogic(jarFile, versions.get(0).getMetadata());
+
+        gutenberg.subscribe(dynamicLogicNamespace, (newJarFile, metadata) -> {
+            try {
+                loadLogic(newJarFile, metadata);
+            } catch (Exception e) {
+                logger.error(DynamicLogicLoading, "Failed to update Business logic dynamically");
+            }
         });
     }
 
     @Override
-    public BusinessLogic get() {
-        return instantiateLogic(currentLogicClass);
+    public BusinessLogicAPI get() {
+        return currentBusinessLogicHolder.getLogic();
     }
 
     public CurrentBusinessLogicHolder getLogicAndMetadata() {
-        CurrentBusinessLogicClassHolder current = currentLogicClass;
-        return new CurrentBusinessLogicHolder(instantiateLogic(current), current.metadata);
+        return currentBusinessLogicHolder;
     }
 
-    private BusinessLogic instantiateLogic(CurrentBusinessLogicClassHolder classHolder) {
+    private void loadLogic(File jarFile, Map<String, String> metadata) throws Exception {
+        BusinessLogicAPI currentBusinessLogic = null;
         try {
-            return (BusinessLogic) currentLogicClass.clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            logger.error("Could not instantiate BusinessLogic", e);
-            throw new RuntimeException(e);
+            ClassLoader jarLoader = new URLClassLoader(new URL[] { jarFile.toURI().toURL() });
+
+            if (loader == null)
+                loader = ServiceLoader.load(BusinessLogicAPI.class, jarLoader);    // gets instance of BusinessLogicAPI
+            else
+                loader.reload();    // discovers newly installed implementations of BusinessLogicAPI
+
+            Iterator<BusinessLogicAPI> iterator = loader.iterator();
+            while (iterator.hasNext()) {
+                currentBusinessLogic = iterator.next();
+                logger.info(DynamicLogicLoading,
+                        "Installed Service Provider: " + iterator.next().toString());
+            }
+        } catch (ServiceConfigurationError | MalformedURLException e) {
+            logger.error(DynamicLogicLoading,
+                    "Failed to install business logic service provider, error is unrecoverable");
+            throw e;
         }
-    }
-
-    private void loadLogic(File jarFile, Map<String, String> metadata) {    // SNAP: Replace with a Service provider interface
-        try {
-            /// copy the file to avoid potential overwrite while in use
-            int random = Math.abs(new Random().nextInt());
-            FileUtils.copyFile(jarFile, new File(jarFile.getParentFile(), "dynamic-logic-" + Integer.toHexString(random) + ".jar"));
-
-            ClassLoader currentLoader = new URLClassLoader(new URL[] { jarFile.toURI().toURL() }, getClass().getClassLoader());
-
-            Class<?> currentBusinessLogicClass = currentLoader.loadClass("com.netflix.vms.transformer.SimpleTransformer");
-
-            this.currentLogicClass = new CurrentBusinessLogicClassHolder(currentBusinessLogicClass, metadata);
-        } catch(Throwable th) {
-            logger.error("Could not load dynamic business logic", th);
-        }
-    }
-
-    private static class CurrentBusinessLogicClassHolder {
-        private final Class<?> clazz;
-        private final Map<String, String> metadata;
-
-        public CurrentBusinessLogicClassHolder(Class<?> currentBusinessLogicClass, Map<String, String> metadata) {
-            this.clazz = currentBusinessLogicClass;
-            this.metadata = metadata;
-        }
+        this.currentBusinessLogicHolder = new CurrentBusinessLogicHolder(currentBusinessLogic, metadata);
     }
 
     public static class CurrentBusinessLogicHolder {
-        private final BusinessLogic logic;
+        private final BusinessLogicAPI logic;
         private final Map<String, String> metadata;
 
-        public CurrentBusinessLogicHolder(BusinessLogic logic, Map<String, String> metadata) {
+        public CurrentBusinessLogicHolder(BusinessLogicAPI logic, Map<String, String> metadata) {
             this.logic = logic;
             this.metadata = metadata;
         }
 
-        public BusinessLogic getLogic() {
+        public BusinessLogicAPI getLogic() {
             return logic;
         }
 

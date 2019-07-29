@@ -7,7 +7,7 @@ import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
@@ -30,7 +30,7 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
 
     public InputSlicePinTitleProcessor(Supplier<CinderConsumerBuilder> builder, S3Direct s3Direct,
             String namespace, String localBlobStore, boolean isProd, TransformerContext ctx,
-            BusinessLogic businessLogic) {
+            BusinessLogicAPI businessLogic) {
         super(builder, s3Direct, namespace, localBlobStore, Optional.of(isProd), ctx, businessLogic);
 
         this.dataset = lookupDatasetForNamespace(namespace, isProd);

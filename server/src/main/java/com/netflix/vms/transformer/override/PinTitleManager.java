@@ -6,7 +6,7 @@ import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.DynamicBusinessLogic;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.publish.workflow.util.VipNameUtil;
@@ -264,7 +264,7 @@ public class PinTitleManager {
     @VisibleForTesting
     PinTitleProcessor createOutputBasedProcessor() {
         DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
-        BusinessLogic businessLogic = logicAndMetadata.getLogic();
+        BusinessLogicAPI businessLogic = logicAndMetadata.getLogic();
         String namespace = outputNamespace != null ? outputNamespace : ("vms-" + VipNameUtil.getPinTitleDataTransformerVip(ctx.getConfig()));
         if (proxySet == false) { // Used in transformer deployments
             return new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, ctx, businessLogic);

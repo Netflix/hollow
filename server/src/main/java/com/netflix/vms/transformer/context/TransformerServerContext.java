@@ -5,8 +5,8 @@ import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.logging.TaggingLoggers;
 import com.netflix.vms.transformer.TransformerCycleMonkey;
 import com.netflix.vms.transformer.common.CycleMonkey;
+import com.netflix.vms.transformer.common.TransformCycleInterrupter;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 public class TransformerServerContext implements TransformerContext {
 
     /* dependencies */
-    private final TransformerCycleInterrupter cycleInterrupter;
+    private final TransformCycleInterrupter cycleInterrupter;
     private final TransformerCassandraHelper cassandraHelper;
     private final TransformerFiles files;
     private final PublicationHistoryConsumer publicationHistoryConsumer;
@@ -49,7 +49,7 @@ public class TransformerServerContext implements TransformerContext {
     private Set<String> pinTitleSpecs;
 
     public TransformerServerContext(
-            TransformerCycleInterrupter cycleInterrupter,
+            TransformCycleInterrupter cycleInterrupter,
             TransformerServerLogger logger,
             Config config,
             OctoberSkyData octoberSkyData,
@@ -163,7 +163,7 @@ public class TransformerServerContext implements TransformerContext {
     }
 
     @Override
-    public TransformerCycleInterrupter getCycleInterrupter() {
+    public TransformCycleInterrupter getCycleInterrupter() {
         return cycleInterrupter;
     }
 

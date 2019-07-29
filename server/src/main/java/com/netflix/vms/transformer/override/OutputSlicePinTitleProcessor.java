@@ -5,7 +5,7 @@ import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
@@ -25,13 +25,13 @@ public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
     private final HollowConsumer outputDataConsumer;
 
     public OutputSlicePinTitleProcessor(Supplier<CinderConsumerBuilder> builder, S3Direct s3Direct,
-            String namespace, TransformerContext ctx, BusinessLogic businessLogic) {
+            String namespace, TransformerContext ctx, BusinessLogicAPI businessLogic) {
         super(builder, s3Direct, namespace, null, null, ctx, businessLogic);
         this.outputDataConsumer = VMSOutputDataConsumer.getNewConsumer(builder, namespace);
     }
 
     public OutputSlicePinTitleProcessor(Supplier<CinderConsumerBuilder> builder, S3Direct s3Direct,
-            String namespace, String localBlobStore, boolean isProd, TransformerContext ctx, BusinessLogic businessLogic) {
+            String namespace, String localBlobStore, boolean isProd, TransformerContext ctx, BusinessLogicAPI businessLogic) {
         super(builder, s3Direct, namespace, localBlobStore, Optional.of(isProd), ctx, businessLogic);
         this.outputDataConsumer = VMSOutputDataConsumer.getNewProxyConsumer(builder, namespace, isProd);
     }

@@ -11,7 +11,7 @@ import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
@@ -55,7 +55,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private PublishRegionProvider regionProvider;
     private final DefaultHollowPublishJobCreator jobCreator;
     private HollowBlobDataProvider circuitBreakerDataProvider;
-    private final BusinessLogic businessLogic;
+    private final BusinessLogicAPI businessLogic;
 
     /* fields */
     private final String vip;
@@ -68,7 +68,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             Publisher devSlicePublisher, Announcer devSliceAnnouncer,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             SlicerFactory slicerFactory, Supplier<ServerUploadStatus> uploadStatus, String vip,
-            BusinessLogic businessLogic) {
+            BusinessLogicAPI businessLogic) {
         this(ctx, fileStore,
                 publisher, nostreamsPublisher,
                 announcer, nostreamsAnnouncer,
@@ -87,7 +87,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider circuitBreakerDataProvider,
             SlicerFactory slicerFactory, Supplier<ServerUploadStatus> uploadStatus, String vip,
-            BusinessLogic businessLogic) {
+            BusinessLogicAPI businessLogic) {
         this(ctx,
                 new DefaultHollowPublishJobCreator(ctx, fileStore,
                         publisher, nostreamsPublisher,
@@ -104,7 +104,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         this.circuitBreakerDataProvider = circuitBreakerDataProvider;
     }
 
-    HollowPublishWorkflowStager(TransformerContext ctx, DefaultHollowPublishJobCreator jobCreator, String vip, BusinessLogic businessLogic) {
+    HollowPublishWorkflowStager(TransformerContext ctx, DefaultHollowPublishJobCreator jobCreator, String vip, BusinessLogicAPI businessLogic) {
         this.ctx = ctx;
         this.scheduler = new PublicationJobScheduler();
         this.fileNamer = new HollowBlobFileNamer(vip);

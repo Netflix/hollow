@@ -28,9 +28,9 @@ import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.vms.transformer.DynamicBusinessLogic;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.TransformCycleInterrupter;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
@@ -67,7 +67,7 @@ public class TransformerCycleKickoff {
 
     @Inject
     public TransformerCycleKickoff(
-            TransformerCycleInterrupter cycleInterrupter,
+            TransformCycleInterrupter cycleInterrupter,
             ElasticSearchClient esClient,
             TransformerCassandraHelper cassandraHelper,
             Supplier<CinderConsumerBuilder> cinderConsumerBuilder,
@@ -134,9 +134,9 @@ public class TransformerCycleKickoff {
         boolean isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
 
         DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
-        BusinessLogic businessLogic = logicAndMetadata.getLogic();
+        BusinessLogicAPI businessLogic = logicAndMetadata.getLogic();
 
-        Function<BusinessLogic, PublishWorkflowStager> publishStagerFactory = publishStager(ctx, isFastlane, fileStore,
+        Function<BusinessLogicAPI, PublishWorkflowStager> publishStagerFactory = publishStager(ctx, isFastlane, fileStore,
                 publisher, nostreamsPublisher,
                 announcer, nostreamsAnnouncer,
                 canaryAnnouncer,
@@ -255,7 +255,8 @@ public class TransformerCycleKickoff {
         t.start();
     }
 
-    private TransformerContext ctx(TransformerCycleInterrupter cycleInterrupter, ElasticSearchClient esClient,
+    private TransformerContext ctx(
+            TransformCycleInterrupter cycleInterrupter, ElasticSearchClient esClient,
             TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, CupLibrary cupLibrary,
             TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
         return new TransformerServerContext(
@@ -270,7 +271,7 @@ public class TransformerCycleKickoff {
                 history -> VMSPublishWorkflowHistoryAdmin.history = history);
     }
 
-    private static Function<BusinessLogic, PublishWorkflowStager> publishStager(TransformerContext ctx, boolean isFastlane,
+    private static Function<BusinessLogicAPI, PublishWorkflowStager> publishStager(TransformerContext ctx, boolean isFastlane,
             FileStore fileStore,
             Publisher publisher, Publisher nostreamsPublisher,
             Announcer announcer, Announcer nostreamsAnnouncer,

@@ -8,7 +8,7 @@ import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.vms.transformer.common.BusinessLogic;
+import com.netflix.vms.transformer.common.api.BusinessLogicAPI;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
@@ -28,11 +28,11 @@ public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
     protected final Optional<Boolean> isProd;
     protected final TransformerContext ctx;
     protected final S3Direct pinTitleS3Access;
-    protected final BusinessLogic businessLogic;
+    protected final BusinessLogicAPI businessLogic;
 
     protected AbstractPinTitleProcessor(Supplier<CinderConsumerBuilder> builder, S3Direct pinTitleS3Access,
             String namespace, String localBlobStore, Optional<Boolean> isProd, TransformerContext ctx,
-            BusinessLogic businessLogic) {
+            BusinessLogicAPI businessLogic) {
         this.namespace = namespace;
         this.builder = builder;
         this.pinTitleS3Access = pinTitleS3Access;

@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.common;
+package com.netflix.vms.transformer.common.api;
 
 import static com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition.DatasetIdentifier;
 
@@ -6,15 +6,16 @@ import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 import com.netflix.vms.transformer.common.slice.OutputDataSlicer;
 import java.util.List;
 
-public interface BusinessLogic {
+public interface BusinessLogicAPI {
 
     void transform(CycleInputs cycleInputs, HollowWriteStateEngine outputStateEngine, TransformerContext ctx)
-            throws Exception;   // SNAP: Should this just be the SimpleTransformer signature?
+            throws Throwable;
 
     // @@@ List may be modified
     List<HollowSchema> getSchema();
@@ -26,7 +27,7 @@ public interface BusinessLogic {
 
     Class<? extends HollowAPI> getAPI(DatasetIdentifier dataset);
 
-    Class<? extends OutputDataSlicer> getOutputSlicer();    // SNAP: use suppliers?
+    Class<? extends OutputDataSlicer> getOutputSlicer();
 
     Class<? extends InputDataSlicer> getInputSlicer(DatasetIdentifier dataset);
 
