@@ -32,8 +32,7 @@ public class VMSInputDataConsumer {
             Supplier<CinderConsumerBuilder> builder,
             String namespace,
             String workingDir,
-            boolean isProd,
-            Class<? extends HollowAPI> apiClass) {
+            boolean isProd) {
 
         GutenbergFileConsumer proxyFileConsumer = isProd ?
                 GutenbergFileConsumer.localProxyForProdEnvironment() : GutenbergFileConsumer.localProxyForTestEnvironment();
@@ -42,7 +41,6 @@ public class VMSInputDataConsumer {
             .forNamespace(namespace)
             .withBlobRetriever(new NFHollowBlobRetriever(proxyFileConsumer, namespace))
             .withLocalBlobStore(new File(workingDir))
-            .withGeneratedAPIClass(apiClass)
             .noAnnouncementWatcher()
             .build();
     }
