@@ -109,7 +109,7 @@ public class TransformCycle {
     private final PinTitleManager pinTitleMgr;
     private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
     private final CycleMonkey cycleMonkey;
-    private final Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers;
+    private final Map<String, HollowConsumer> inputConsumers;
     private final Function<BusinessLogicAPI, PublishWorkflowStager> publishStagerFactory;
 
     private long previousCycleNumber = Long.MIN_VALUE;
@@ -794,24 +794,24 @@ public class TransformCycle {
     // and upon completion these tasks update the passed {@code updatedInputs} map with latest {@code InputState} for the datasets.
     // Does not block on completion of triggered tasks.
     private static void triggerAsyncLoadInputs(Executor executor,
-            TransformerContext ctx, Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers,
-            FollowVipPin followVipPin, Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> updatedInputs) {
+            TransformerContext ctx, Map<String, HollowConsumer> inputConsumers,
+            FollowVipPin followVipPin, Map<String, InputState> updatedInputs) {
         // Spot to trigger Cycle Monkey if enabled
         ctx.getCycleMonkey().doMonkeyBusiness("loadInput");
 
-        inputConsumers.forEach((dataset, consumer) -> {
+        inputConsumers.forEach((inputNamespace, consumer) -> {
             executor.execute(() -> {
-                loadInput(ctx, dataset, consumer, followVipPin);
-                updatedInputs.put(dataset, new InputState(consumer));
+                loadInput(ctx, inputNamespace, consumer, followVipPin);
+                updatedInputs.put(inputNamespace, new InputState(consumer));
             });
         });
     }
 
-    private static void loadInput(TransformerContext ctx, UpstreamDatasetDefinition.x datasetIdentifier, HollowConsumer consumer, FollowVipPin followVipPin) {
+    private static void loadInput(TransformerContext ctx, String inputNamespace, HollowConsumer consumer, FollowVipPin followVipPin) {
         try {
             Long followVipInputVersion = null;
             if (followVipPin != null)   // followVip configured
-                followVipInputVersion = followVipPin.getInputVersions().get(datasetIdentifier);
+                followVipInputVersion = followVipPin.getInputVersions().get(inputNamespace);
 
             if (followVipInputVersion == null) {
                 consumer.triggerRefresh();
@@ -819,14 +819,14 @@ public class TransformCycle {
                 consumer.triggerRefreshTo(followVipInputVersion);
                 if (!followVipInputVersion.equals(consumer.getCurrentVersionId())) {
                     throw new IllegalStateException(
-                            "Failed to pin input " + datasetIdentifier + " to version :" + followVipInputVersion);
+                            "Failed to pin input " + inputNamespace + " to version :" + followVipInputVersion);
                 }
             }
             ctx.getLogger().info(BlobState, "Loaded input={} to version={}, header={}",
-                    datasetIdentifier, consumer.getCurrentVersionId(), consumer.getStateEngine().getHeaderTags());
+                    inputNamespace, consumer.getCurrentVersionId(), consumer.getStateEngine().getHeaderTags());
         } catch (Exception ex) {
             ctx.getLogger().error(BlobState,
-                    "Failed to Load Input {}", datasetIdentifier, ex);
+                    "Failed to Load Input {}", inputNamespace, ex);
 
             // If the consumer transitioning failed in Gutenberg via Cinder's NFHollowBlobRetriever to obtain a blob
             // then clear the transitions so it is free to try again (since it anyway will).
@@ -841,7 +841,7 @@ public class TransformCycle {
 
                 ctx.getLogger().info(BlobState,
                         "Resetting input={} with failed transitions: snapshots={}, deltas={}",
-                        datasetIdentifier, consumer.getNumFailedSnapshotTransitions(), consumer.getNumFailedDeltaTransitions());
+                        inputNamespace, consumer.getNumFailedSnapshotTransitions(), consumer.getNumFailedDeltaTransitions());
             }
             throw ex;
         }
@@ -849,14 +849,14 @@ public class TransformCycle {
 
     private CycleInputs loadInputAndRestoreOutputs() {
         ctx.getMetricRecorder().startTimer(P1_ReadInputDataDuration);
-        Map<UpstreamDatasetDefinition.DatasetIdentifier, InputState> updatedInputs = new ConcurrentHashMap<>();
+        Map<String, InputState> updatedInputs = new ConcurrentHashMap<>();
         try {
             FollowVipPin followVipPin;
             if (!ctx.getConfig().getStaticInputVersions().equals(StringUtils.EMPTY))
                 // FP ""vms.staticInputVersions" is useful for migration of feeds from Converter to Transformer input
                 followVipPin = followVipPinExtractor.getStaticInputVersions(ctx);
             else
-                followVipPin = followVipPinExtractor.retrieveFollowVipPin(ctx);
+                followVipPin = followVipPinExtractor.retrieveFollowVipPin(currentBusinessLogic, ctx);
 
             SimultaneousExecutor executor = new SimultaneousExecutor(12,
                     TransformCycle.class, "vms-restore-and-input-processing");
@@ -885,7 +885,7 @@ public class TransformCycle {
                     "Using transform timestamp of {} ({})", nowMillis, new Date(nowMillis));
 
             VMSInputDataVersionLogger.logConverterInputVersions(
-                    inputConsumers.get(CONVERTER).getStateEngine().getHeaderTags(), ctx.getLogger());
+                    inputConsumers.get("vmsconverter-muon").getStateEngine().getHeaderTags(), ctx.getLogger()); // TODO: needed?
         } catch (Exception ex) {
             ctx.getLogger().error(BlobState, "Failed to process Input or restore Output", ex);
             throw new RuntimeException("Failed to process input or restore output", ex);

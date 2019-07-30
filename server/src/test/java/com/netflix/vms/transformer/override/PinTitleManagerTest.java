@@ -32,8 +32,6 @@ import org.mockito.MockitoAnnotations;
 @RunWith(GovernatorJunit4ClassRunner.class)
 @ModulesForTesting({CinderConsumerModule.class, RuntimeCoreModule.class})
 public class PinTitleManagerTest {
-    private static final String LOCAL_BLOB_STORE = "/space/title-pinning";
-
     private SimpleTransformerContext ctx;
     private PinTitleManager mgr;
 
@@ -60,7 +58,7 @@ public class PinTitleManagerTest {
 
     private PinTitleManager createNewMgr() {
         return Mockito.spy(new PinTitleManager(
-                cinderConsumerBuilder, s3Direct, "vms-berlin", LOCAL_BLOB_STORE, false, ctx, mockDynamicLogic));
+                cinderConsumerBuilder, s3Direct, ctx, mockDynamicLogic));
     }
 
     @Test
@@ -230,7 +228,7 @@ public class PinTitleManagerTest {
         }
     }
 
-    public static class DummyProcessor implements PinTitleProcessor {
+    public static class DummyProcessor {
         boolean isThrowException;
 
         DummyProcessor() {
@@ -241,7 +239,6 @@ public class PinTitleManagerTest {
             this.isThrowException = isThrowException;
         }
 
-        @Override
         public HollowReadStateEngine process(long dataVersion, int... topNodes) throws Throwable {
             if (isThrowException) {
                 throw new Exception("Failed to proceess");
@@ -250,14 +247,12 @@ public class PinTitleManagerTest {
             return null;
         }
 
-        @Override
-        public File getFile(String namespace, TYPE type, long version, int... topNodes) throws Exception {
+        public File getFile(String namespace, long version, int... topNodes) throws Exception {
             // TODO Auto-generated method stub
             return null;
         }
 
-        @Override
-        public File process(TYPE type, long dataVersion, int... topNodes) throws Throwable {
+        public File processToFile(long dataVersion, int... topNodes) throws Throwable {
             // TODO Auto-generated method stub
             return null;
         }

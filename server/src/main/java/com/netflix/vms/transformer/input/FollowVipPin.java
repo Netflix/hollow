@@ -1,25 +1,18 @@
 package com.netflix.vms.transformer.input;
 
-import com.netflix.vms.transformer.common.input.UpstreamDatasetDefinition;
 import java.util.Map;
 
 public class FollowVipPin {
     
-    private final String transformerVip;
-    private final Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> inputVersions;
+    private final Map<String, Long> inputVersions;
     private final long nowMillis;
 
-    public FollowVipPin(String transformerVip, Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> inputVersions, long nowMillis) {
-        this.transformerVip = transformerVip;
+    public FollowVipPin(Map<String, Long> inputVersions, long nowMillis) {
         this.inputVersions = inputVersions;
         this.nowMillis = nowMillis;
     }
     
-    public String getTransformerVip() {
-        return transformerVip;
-    }
-
-    public Map<UpstreamDatasetDefinition.DatasetIdentifier, Long> getInputVersions() {
+    public Map<String, Long> getInputVersions() {
         return inputVersions;
     }
 

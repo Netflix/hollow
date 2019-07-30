@@ -16,11 +16,10 @@ import java.util.TimeZone;
 public class VMSInputDataVersionLogger {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
 
-    public static void logInputVersions(Map<UpstreamDatasetDefinition.DatasetIdentifier, HollowConsumer> inputConsumers, TransformerContext ctx) {
+    public static void logInputVersions(Map<String, HollowConsumer> inputConsumers, TransformerContext ctx) {
         inputConsumers.forEach((k, v) -> {
             // These log msgs are rendered in the "Inputs" widget on dashboard
-            ctx.getLogger().info(CinderInputDataVersions, "Input={} Version={}",
-                    UpstreamDatasetConfig.getNamespaces().get(k), v.getCurrentVersionId());
+            ctx.getLogger().info(CinderInputDataVersions, "Input={} Version={}", k, v.getCurrentVersionId());
         });
     }
 

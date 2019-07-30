@@ -18,6 +18,7 @@ public enum TransformerLogTag implements LogTag {
     TransformProgress,
     TransformInfo,
     InputDataVersionIds,
+    StaticInputs,
     FollowVip,
     CinderInputDataVersions,
     ProcessNowMillis,

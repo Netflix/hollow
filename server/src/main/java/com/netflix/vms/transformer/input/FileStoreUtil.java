@@ -42,17 +42,16 @@ public class FileStoreUtil {
         return getAttribute(fileItem, "converterVip");
     }
 
-    public static Optional<Long> getInputVersion(FileAccessItem fileItem, UpstreamDatasetDefinition.DatasetIdentifier datasetIdentifier) {
+    public static Long getInputVersion(FileAccessItem fileItem, String namespace) {
 
-        String inputVersionStr = getAttribute(fileItem, UpstreamDatasetConfig.getInputVersionAttribute(
-                datasetIdentifier));
-        if (inputVersionStr == null || inputVersionStr.isEmpty()) return Optional.empty();
+        String inputVersionStr = getAttribute(fileItem, UpstreamDatasetConfig.getInputVersionAttribute(namespace));
+        if (inputVersionStr == null || inputVersionStr.isEmpty()) return null;
 
         try {
-            return Optional.of(Long.parseLong(inputVersionStr));
+            return Long.parseLong(inputVersionStr);
         } catch(Throwable th) {
-            LOGGER.error("Failed to parse version for input {} from FileStore: ", datasetIdentifier, th);
-            return Optional.empty();
+            LOGGER.error("Failed to parse version for input namespace {} from FileStore: ", namespace, th);
+            throw th;
         }
     }
 
