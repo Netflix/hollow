@@ -18,22 +18,4 @@ public class VMSOutputDataConsumer {
                 .noAnnouncementWatcher()
                 .build();
     }
-
-    /*
-     * Create a HollowConsumer for consuming output data via the blob proxy. Used in testing.
-     */
-    public static HollowConsumer getNewProxyConsumer(
-            Supplier<CinderConsumerBuilder> builder,
-            String namespace,
-            boolean isProd) {
-
-        GutenbergFileConsumer proxyFileConsumer = isProd ?
-                GutenbergFileConsumer.localProxyForProdEnvironment() : GutenbergFileConsumer.localProxyForTestEnvironment();
-
-        return builder.get()
-                .forNamespace(namespace)
-                .withBlobRetriever(new NFHollowBlobRetriever(proxyFileConsumer, namespace))
-                .noAnnouncementWatcher()
-                .build();
-    }
 }

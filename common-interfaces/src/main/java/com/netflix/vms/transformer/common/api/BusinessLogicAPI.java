@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.common.api;
 
-import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -13,8 +12,7 @@ import java.util.Set;
 
 public interface BusinessLogicAPI {
 
-    void transform(CycleInputs cycleInputs, HollowWriteStateEngine outputStateEngine, TransformerContext ctx)
-            throws Throwable;
+    void transform(CycleInputs cycleInputs, HollowWriteStateEngine outputStateEngine, TransformerContext ctx) throws Throwable;
 
     // @@@ List may be modified
     List<HollowSchema> getSchema();
@@ -24,8 +22,6 @@ public interface BusinessLogicAPI {
 
     long getTargetMaxTypeShardSize();
 
-    Class<? extends HollowAPI> getAPI(String namespace);
-
     Class<? extends OutputDataSlicer> getOutputSlicer();
 
     Class<? extends InputDataSlicer> getInputSlicer(String namespace);
@@ -33,5 +29,4 @@ public interface BusinessLogicAPI {
     String[] getStreamHollowTypes();
 
     Set<String> getInputNamespaces();
-    Set<String> getInputNamespacesForEnv(boolean isProd);
 }

@@ -28,13 +28,10 @@ import java.util.function.Supplier;
 public class PinTitleManager {
     private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
     private S3Direct s3Direct;
-    private final boolean proxySet;
-    private String outputNamespace;
 
-    private final String localBlobStore;
-    private final Optional<Boolean> isProd;
     private final TransformerContext ctx;
     private final DynamicBusinessLogic dynamicLogic;
+    private final String outputNamespace;
 
     private final SimultaneousExecutor mainExecutor = new SimultaneousExecutor(getClass(), "pin-title-jobs");
     private Map<PinTitleJobSpec, PinTitleProcessorJob> completedJobs = new HashMap<>();
@@ -45,23 +42,36 @@ public class PinTitleManager {
             DynamicBusinessLogic dynamicLogic) {
         this.cinderConsumerBuilder = cinderConsumerBuilder;
         this.s3Direct = s3Direct;
-        this.localBlobStore = null;
-        this.isProd = null;
         this.ctx = ctx;
-        this.proxySet = false;
         this.dynamicLogic = dynamicLogic;
+        this.outputNamespace = VipNameUtil.getPinTitleDataTransformerVip(ctx.getConfig());
     }
 
-    public PinTitleManager(Supplier<CinderConsumerBuilder> cinderConsumerBuilder, S3Direct s3Direct, String outputNamespace,
-            String localBlobStore, boolean isProd, TransformerContext ctx, DynamicBusinessLogic dynamicLogic) {
-        this.cinderConsumerBuilder = cinderConsumerBuilder;
-        this.s3Direct = s3Direct;
-        this.localBlobStore = localBlobStore;
-        this.isProd = Optional.of(isProd);
-        this.ctx = ctx;
-        this.proxySet = true;
-        this.outputNamespace = outputNamespace;
-        this.dynamicLogic = dynamicLogic;
+    // Create Output Based Processor
+    @VisibleForTesting
+    PinTitleProcessor createOutputBasedProcessor() {
+        DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
+        BusinessLogicAPI businessLogic = logicAndMetadata.getLogic();
+        return new PinTitleProcessor(cinderConsumerBuilder, s3Direct, outputNamespace, ctx, businessLogic);
+    }
+
+    // Create Job
+    @VisibleForTesting
+    PinTitleProcessorJob createNewProcessJob(PinTitleJobSpec jobSpec) {
+        PinTitleProcessor processor = createOutputBasedProcessor();
+
+        return new PinTitleProcessorJob(processor, jobSpec, ctx, new CompleteJobCallback() {
+            @Override
+            public void completedJob(PinTitleJobSpec jobSpec, PinTitleProcessorJob job, boolean isSuccessfull) {
+                if (isSuccessfull) {
+                    completedJobs.put(jobSpec, job);
+                    failedJobs.remove(jobSpec);
+                } else {
+                    failedJobs.put(jobSpec, job);
+                }
+            }
+
+        });
     }
 
     public synchronized void prepareForNextCycle() {
@@ -71,7 +81,7 @@ public class PinTitleManager {
     }
 
     private static Map<PinTitleJobSpec, PinTitleProcessorJob> cleanupJobs(Map<PinTitleJobSpec, PinTitleProcessorJob> existingJobs, Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs) {
-        Map<PinTitleJobSpec, PinTitleProcessorJob> neededJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
+        Map<PinTitleJobSpec, PinTitleProcessorJob> neededJobs = new HashMap<>();
         for (Map.Entry<PinTitleJobSpec, PinTitleProcessorJob> entry : existingJobs.entrySet()) {
             PinTitleJobSpec spec = entry.getKey();
             if (activeJobs.containsKey(spec)) {
@@ -241,39 +251,7 @@ public class PinTitleManager {
     }
 
 
-    // Create Job
-    @VisibleForTesting
-    PinTitleProcessorJob createNewProcessJob(PinTitleJobSpec jobSpec) {
-        PinTitleProcessor processor = createOutputBasedProcessor();
-
-        return new PinTitleProcessorJob(processor, jobSpec, ctx, new CompleteJobCallback() {
-            @Override
-            public void completedJob(PinTitleJobSpec jobSpec, PinTitleProcessorJob job, boolean isSuccessfull) {
-                if (isSuccessfull) {
-                    completedJobs.put(jobSpec, job);
-                    failedJobs.remove(jobSpec);
-                } else {
-                    failedJobs.put(jobSpec, job);
-                }
-            }
-
-        });
-    }
-
-    // Create Output Based Processor
-    @VisibleForTesting
-    PinTitleProcessor createOutputBasedProcessor() {
-        DynamicBusinessLogic.CurrentBusinessLogicHolder logicAndMetadata = dynamicLogic.getLogicAndMetadata();
-        BusinessLogicAPI businessLogic = logicAndMetadata.getLogic();
-        String namespace = outputNamespace != null ? outputNamespace : ("vms-" + VipNameUtil.getPinTitleDataTransformerVip(ctx.getConfig()));
-        if (proxySet == false) { // Used in transformer deployments
-            return new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, ctx, businessLogic);
-        } else {    // Used in tooling run by devs
-            return new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, localBlobStore, isProd.get(), ctx, businessLogic);
-        }
-    }
-
-    private interface CompleteJobCallback {
+   private interface CompleteJobCallback {
         void completedJob(PinTitleJobSpec jobSpec, PinTitleProcessorJob job, boolean isSuccessfull);
     }
 
