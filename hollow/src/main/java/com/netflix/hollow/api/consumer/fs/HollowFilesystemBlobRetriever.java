@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.api.consumer.fs;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.HollowConstants;
 import java.io.BufferedInputStream;
@@ -26,6 +28,7 @@ import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.UUID;
 
 public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriever {
     
@@ -196,15 +199,17 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         @Override
         public InputStream getInputStream() throws IOException {
 
+            Path tempPath = path.resolveSibling(path.getName(path.getNameCount()-1) + "-" + UUID.randomUUID().toString());
             try(
                     InputStream is = remoteBlob.getInputStream();
-                    OutputStream os = Files.newOutputStream(path)
+                    OutputStream os = Files.newOutputStream(tempPath)
             ) {
                 byte buf[] = new byte[4096];
                 int n;
                 while (-1 != (n = is.read(buf)))
                     os.write(buf, 0, n);
             }
+            Files.move(tempPath, path, REPLACE_EXISTING);
 
             return new BufferedInputStream(Files.newInputStream(path));
         }
