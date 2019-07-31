@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -371,6 +372,64 @@ public class HollowIncrementalProducerTest {
         Assert.assertFalse(idx.containsDuplicates());
 
         assertTypeB(idx, 3, "three");
+    }
+
+    @Test
+    public void canRemoveAndModifyNewTypesFromRestoredState() {
+        HollowProducer genesisProducer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        long originalVersion = genesisProducer.runCycle(new Populator() {
+            public void populate(WriteState state) throws Exception {
+                state.add(new TypeA(1, "one", 1));
+            }
+        });
+
+        /// now at some point in the future, we will start up and create a new classic producer
+        /// to back the HollowIncrementalProducer.
+        HollowProducer backingProducer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .noIntegrityCheck()
+                .build();
+
+        /// adding a new type this time (TypeB).
+        backingProducer.initializeDataModel(TypeA.class, TypeB.class);
+
+        /// now create our HollowIncrementalProducer
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(backingProducer);
+        incrementalProducer.restore(originalVersion, blobStore);
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 2));
+        incrementalProducer.addOrModify(new TypeA(2, "two", 2));
+        incrementalProducer.addOrModify(new TypeB(3, "three"));
+        incrementalProducer.addOrModify(new TypeB(4, "four"));
+
+        incrementalProducer.runCycle();
+        
+        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
+        incrementalProducer.addOrModify(new TypeB(4, "four!"));
+
+        long version2 = incrementalProducer.runCycle();
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(originalVersion);
+        consumer.triggerRefreshTo(version2);
+
+        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 1, "one", 2L);
+        assertTypeA(idx, 2, "two", 2L);
+
+        /// consumers with established data models don't have visibility into new types.
+        consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(version2);
+
+        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeB", "id");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertEquals(-1, idx.getMatchingOrdinal(3));
+        assertTypeB(idx, 4, "four!");
     }
 
     @Test

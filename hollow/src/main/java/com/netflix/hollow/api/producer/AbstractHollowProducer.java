@@ -727,7 +727,8 @@ abstract class AbstractHollowProducer {
     private ReadStateHelper noIntegrityCheck(ReadStateHelper readStates, Artifacts artifacts) throws IOException {
         ReadStateHelper result = readStates;
 
-        if(!readStates.hasCurrent()) {
+        if(!readStates.hasCurrent() || 
+                (!readStates.current().getStateEngine().hasIdenticalSchemas(getWriteEngine()) && artifacts.snapshot != null)) {
             HollowReadStateEngine pending = readStates.pending().getStateEngine();
             readSnapshot(artifacts.snapshot, pending);
         } else {
