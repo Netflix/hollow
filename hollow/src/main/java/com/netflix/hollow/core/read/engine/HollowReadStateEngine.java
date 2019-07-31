@@ -288,6 +288,18 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
         return false;
     }
 
+    public boolean hasIdenticalSchemas(HollowReadStateEngine other) {
+        if (!other.getAllTypes().equals(getAllTypes())) {
+            return false;
+        }
+        for (String type : getAllTypes()) {
+            if (!getSchema(type).equals(other.getNonNullSchema(type))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Set<String> getTypesWithDefinedHashCodes() {
         return typesWithDefinedHashCodes;
     }
