@@ -16,6 +16,30 @@
 
 <p/><hr/>
 
+#if ($codeDiff.getFromValue() != "null" || $codeDiff.getToValue() != "null")
+<h3>Business logic:</h3>
+<table border="1" cellpadding="5">
+  <tr><th>FROM_Blob</th><th>TO_Blob</th></tr>
+    <tr bgcolor="$codeDiff.getBgColor()">
+      <td>
+          #if ($codeDiff.getFromValue() != "null")
+              <a href="$codeDiff.getFromValue()" target="_blank"> $codeDiff.getFromValue() </a>
+          #else
+              unknown
+          #end
+      </td>
+      <td>
+          #if ($codeDiff.getToValue() != "null")
+            <a href="$codeDiff.getToValue()" target="_blank"> $codeDiff.getToValue() </a>
+          #else
+            unknown
+          #end
+      </td>
+    </tr>
+</table>
+#end
+
+
 <h3>Blob Information:</h3>
 
 <table border="1" cellpadding="5">

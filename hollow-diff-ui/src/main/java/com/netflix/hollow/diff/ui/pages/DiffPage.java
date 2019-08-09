@@ -65,12 +65,48 @@ public abstract class DiffPage {
 
         setUpContext(req, session, ctx);
 
-        ctx.put("headerEntries", getHeaderEntries());
+        Map<String, String> fromTags = diffUI.getDiff().getFromStateEngine().getHeaderTags();
+        Map<String, String> toTags = diffUI.getDiff().getToStateEngine().getHeaderTags();
+
+        ctx.put("headerEntries", getHeaderEntries(fromTags, toTags));
+
+        HollowHeaderEntry codeDiffEntry = new HollowHeaderEntry(0, "code", uriFromGitShaTag(fromTags), uriFromGitShaTag(toTags));
+        ctx.put("codeDiff", codeDiffEntry);
 
         headerTemplate.merge(ctx, writer);
         template.merge(ctx, writer);
         footerTemplate.merge(ctx, writer);
 
+    }
+
+    static String uriFromGitShaTag(Map<String, String> blobHeaders) {
+        Map.Entry<String, String> gitShaTag = gitShaTagEntry(blobHeaders);
+        if (gitShaTag == null)
+            return null;
+
+        String gitDetails = gitShaTag.getKey().substring(20);
+        if (gitDetails.length() == 0)
+            return null;
+
+        String[] details = gitDetails.split("\\.");
+        if (details.length != 2)
+            return null;
+
+        String project = details[0];
+        String repo = details[1];
+        String sha = gitShaTag.getValue();
+
+        return "https://stash.corp.netflix.com/projects/" + project + "/repos/" + repo +"/commits/" + sha;
+    }
+
+    private static Map.Entry<String, String> gitShaTagEntry(Map<String, String> blobHeaders) {
+        if (blobHeaders == null) return null;
+
+        for (Map.Entry<String, String> e : blobHeaders.entrySet()) {
+            if(e.getKey().startsWith("businesslogic.stash."))
+                return e;
+        }
+        return null;
     }
 
     private void processCookies(HttpServletRequest request) {
@@ -126,10 +162,7 @@ public abstract class DiffPage {
         return null;
     }
 
-    private List<HollowHeaderEntry> getHeaderEntries() {
-        Map<String, String> fromTags = diffUI.getDiff().getFromStateEngine().getHeaderTags();
-        Map<String, String> toTags = diffUI.getDiff().getToStateEngine().getHeaderTags();
-
+    private List<HollowHeaderEntry> getHeaderEntries(Map<String, String> fromTags, Map<String, String> toTags) {
         Set<String> allKeys = new HashSet<String>();
         allKeys.addAll(fromTags.keySet());
         allKeys.addAll(toTags.keySet());
@@ -144,5 +177,4 @@ public abstract class DiffPage {
 
         return entries;
     }
-
 }
