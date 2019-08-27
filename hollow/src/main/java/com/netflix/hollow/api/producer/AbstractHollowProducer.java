@@ -32,6 +32,7 @@ import com.netflix.hollow.api.producer.validation.ValidationStatus;
 import com.netflix.hollow.api.producer.validation.ValidationStatusException;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
 import com.netflix.hollow.core.HollowConstants;
+import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -366,13 +367,21 @@ abstract class AbstractHollowProducer {
 
             // 3. Produce a new state if there's work to do
             if (writeEngine.hasChangedSinceLastCycle()) {
+                boolean schemaChangedFromPriorVersion = readStates.hasCurrent() &&
+                        !writeEngine.hasIdenticalSchemas(readStates.current().getStateEngine());
+                if (schemaChangedFromPriorVersion) {
+                    writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE, Boolean.TRUE.toString());
+                } else {
+                    writeEngine.getHeaderTags().remove(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE);
+                }
+
                 // 3a. Publish, run checks & validation, then announce new state consumers
                 publish(listeners, toVersion, artifacts);
 
                 ReadStateHelper candidate = readStates.roundtrip(toVersion);
                 cycleStatus.readState(candidate.pending());
                 candidate = doIntegrityCheck ? 
-                        checkIntegrity(listeners, candidate, artifacts) : 
+                        checkIntegrity(listeners, candidate, artifacts, schemaChangedFromPriorVersion) :
                             noIntegrityCheck(candidate, artifacts);
 
                 try {
@@ -666,7 +675,8 @@ abstract class AbstractHollowProducer {
      * @return S(cur) and S(pnd)
      */
     private ReadStateHelper checkIntegrity(
-            ListenerSupport.Listeners listeners, ReadStateHelper readStates, Artifacts artifacts) throws Exception {
+            ListenerSupport.Listeners listeners, ReadStateHelper readStates, Artifacts artifacts,
+            boolean schemaChangedFromPriorVersion) throws Exception {
         Status.StageWithStateBuilder status = listeners.fireIntegrityCheckStart(readStates.pending());
         try {
             ReadStateHelper result = readStates;
@@ -702,7 +712,7 @@ abstract class AbstractHollowProducer {
                     if (!reverseChecksum.equals(currentChecksum)) {
                         throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.REVERSE_DELTA);
                     }
-                    if (current.hasIdenticalSchemas(pending)) {
+                    if (!schemaChangedFromPriorVersion) {
                         // optimization - they have identical schemas, so just swap them
                         log.log(Level.FINE, "current and pending have identical schemas, swapping");
                         result = readStates.swap();

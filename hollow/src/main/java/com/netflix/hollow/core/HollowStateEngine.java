@@ -39,6 +39,14 @@ import java.util.Map;
  */
 public interface HollowStateEngine extends HollowDataset {
 
+    /**
+     * A header tag indicating that the schema has changed from that of the prior version.
+     * <p>
+     * If the header tag is present in the state engine and the value is "true" (ignoring case)
+     * then the schema has changed from that of the the prior version.
+     */
+    String HEADER_TAG_SCHEMA_CHANGE = "hollow.schema.changedFromPriorVersion";
+
     @Override
     List<HollowSchema> getSchemas();
 
