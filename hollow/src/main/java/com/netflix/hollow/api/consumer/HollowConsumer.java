@@ -906,6 +906,7 @@ public class HollowConsumer {
         protected HollowConsumer.ObjectLongevityConfig objectLongevityConfig = ObjectLongevityConfig.DEFAULT_CONFIG;
         protected HollowConsumer.ObjectLongevityDetector objectLongevityDetector = ObjectLongevityDetector.DEFAULT_DETECTOR;
         protected File localBlobStoreDir = null;
+        protected boolean noFallBackForExistingSnapshot;
         protected Executor refreshExecutor = null;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
 
@@ -916,6 +917,12 @@ public class HollowConsumer {
 
         public B withLocalBlobStore(File localBlobStoreDir) {
             this.localBlobStoreDir = localBlobStoreDir;
+            return (B)this;
+        }
+
+        public B withLocalBlobStore(File localBlobStoreDir, boolean noFallBackForExistingSnapshot) {
+            this.localBlobStoreDir = localBlobStoreDir;
+            this.noFallBackForExistingSnapshot = noFallBackForExistingSnapshot;
             return (B)this;
         }
 
@@ -988,17 +995,20 @@ public class HollowConsumer {
         }
 
         protected void checkArguments() {
-
-            if (blobRetriever == null && localBlobStoreDir == null)
-                throw new IllegalArgumentException("A HollowBlobRetriever or local blob store directory must be specified when building a HollowClient");
+            if (blobRetriever == null && localBlobStoreDir == null) {
+                throw new IllegalArgumentException(
+                        "A HollowBlobRetriever or local blob store directory must be specified when building a HollowClient");
+            }
 
             BlobRetriever blobRetriever = this.blobRetriever;
-            if (localBlobStoreDir != null)
-                this.blobRetriever = new HollowFilesystemBlobRetriever(localBlobStoreDir.toPath(), blobRetriever);
+            if (localBlobStoreDir != null) {
+                this.blobRetriever = new HollowFilesystemBlobRetriever(
+                        localBlobStoreDir.toPath(), blobRetriever, noFallBackForExistingSnapshot);
+            }
 
-
-            if (refreshExecutor == null)
+            if (refreshExecutor == null) {
                 refreshExecutor = newSingleThreadExecutor(r -> daemonThread(r, getClass(), "refresh"));
+            }
         }
 
         public HollowConsumer build() {
