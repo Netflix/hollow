@@ -57,7 +57,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     }
 
     @Override
-    public final void refreshStarted(long currentVersion, long requestedVersion) {
+    public void refreshStarted(long currentVersion, long requestedVersion) {
         updatePlanDetails = new ConsumerRefreshMetrics.UpdatePlanDetails();
         refreshStartTimeNano = System.nanoTime();
         refreshMetricsBuilder = new ConsumerRefreshMetrics.Builder();
@@ -77,7 +77,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
      * @param transitionSequence List of transitions comprising the refresh
      */
     @Override
-    public final void transitionsPlanned(long beforeVersion, long desiredVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {
+    public void transitionsPlanned(long beforeVersion, long desiredVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {
         updatePlanDetails.beforeVersion = beforeVersion;
         updatePlanDetails.desiredVersion = desiredVersion;
         updatePlanDetails.transitionSequence = transitionSequence;
@@ -90,7 +90,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     }
 
     @Override
-    public final void blobLoaded(HollowConsumer.Blob transition) {
+    public void blobLoaded(HollowConsumer.Blob transition) {
         updatePlanDetails.numSuccessfulTransitions ++;
     }
 
@@ -111,7 +111,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     }
 
     @Override
-    public final void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+    public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
         long refreshEndTimeNano = System.nanoTime();
 
         long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEndTimeNano - refreshStartTimeNano);
@@ -128,7 +128,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     }
 
     @Override
-    public final void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
+    public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
         long  refreshEndTimeNano = System.nanoTime();
         long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEndTimeNano - refreshStartTimeNano);
         consecutiveFailures ++;
@@ -145,22 +145,22 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     }
 
     @Override
-    public final void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
+    public void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
         // no-op
     }
 
     @Override
-    public final void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
+    public void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
         // no-op
     }
 
     @Override
-    public final void snapshotApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+    public void snapshotApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
         // no-op
     }
 
     @Override
-    public final void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+    public void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
         // no-op
     }
 
