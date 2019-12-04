@@ -98,7 +98,7 @@ public class HollowClientUpdater {
     public synchronized boolean updateTo(long requestedVersion) throws Throwable {
         if (requestedVersion == getCurrentVersionId()) {
             if (requestedVersion == HollowConstants.VERSION_NONE && hollowDataHolderVolatile == null) {
-                LOG.warning("No versions to update to, initializing to empty state");
+                LOG.severe("No versions to update to, initializing to empty state");
                 // attempting to refresh, but no available versions - initialize to empty state
                 hollowDataHolderVolatile = newHollowDataHolder();
                 forceDoubleSnapshotNextUpdate(); // intentionally ignore doubleSnapshotConfig
