@@ -255,6 +255,21 @@ public class HollowProducerTest {
     }
 
     @Test
+    public void testRestoreToNonExact() {
+        HollowProducer producer = createProducer(tmpFolder, schema);
+        long version = testPublishV1(producer, 2, 7);
+
+        producer = createProducer(tmpFolder, schema);
+        producer.restore(version + 1, blobRetriever);
+        Assert.assertNotNull(lastRestoreStatus);
+        Assert.assertEquals(Status.SUCCESS, lastRestoreStatus.getStatus());
+        Assert.assertEquals("Should have reached correct version", version,
+                lastRestoreStatus.getVersionReached());
+        Assert.assertEquals("Should have correct desired version", version + 1,
+                lastRestoreStatus.getDesiredVersion());
+    }
+
+    @Test
     public void testRollsBackStateEngineOnPublishFailure() throws Exception {
         HollowProducer producer = spy(createProducer(tmpFolder, schema));
         Assert.assertEquals("Should have no populated ordinals", 0,
@@ -397,21 +412,34 @@ public class HollowProducerTest {
 
         @Override
         public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion) {
-            final File blobFile = blobFileMap.get(desiredVersion);
-            if (blobFile == null) return null;
+            long blobVersion = desiredVersion;
+            File blobFile = blobFileMap.get(desiredVersion);
+            if (blobFile == null) {
+                // find the closest one
+                blobVersion = blobFileMap.keySet().stream()
+                        .filter(l -> l < desiredVersion)
+                        .reduce(Long.MIN_VALUE, Math::max);
+                if (blobVersion == Long.MIN_VALUE) {
+                    return null;
+                } else {
+                    blobFile = blobFileMap.get(blobVersion);
+                }
+            }
+            final File blobFileFinal = blobFile;
 
             System.out.println("Restored: " + blobFile);
-            return new HollowConsumer.Blob(desiredVersion) {
+            return new HollowConsumer.Blob(blobVersion) {
                 @Override
                 public InputStream getInputStream() throws IOException {
-                    return new FileInputStream(blobFile);
+                    return new FileInputStream(blobFileFinal);
                 }
             };
         }
 
         @Override
         public HollowConsumer.Blob retrieveDeltaBlob(long currentVersion) {
-            throw new UnsupportedOperationException();
+            // no delta available
+            return null;
         }
 
         @Override

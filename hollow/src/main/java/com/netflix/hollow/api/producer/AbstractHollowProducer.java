@@ -264,31 +264,25 @@ abstract class AbstractHollowProducer {
             if (versionDesired != HollowConstants.VERSION_NONE) {
                 HollowConsumer client = HollowConsumer.withBlobRetriever(blobRetriever).build();
                 client.triggerRefreshTo(versionDesired);
-                if (client.getCurrentVersionId() == versionDesired) {
-                    readState = ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
-                    readStates = ReadStateHelper.restored(readState);
+                readState = ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
+                readStates = ReadStateHelper.restored(readState);
 
-                    // Need to restore data to new ObjectMapper since can't restore to non empty Write State Engine
-                    Collection<HollowSchema> schemas = objectMapper.getStateEngine().getSchemas();
-                    HollowWriteStateEngine writeEngine = hashCodeFinder == null
-                            ? new HollowWriteStateEngine()
-                            : new HollowWriteStateEngine(hashCodeFinder);
-                    HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, schemas);
-                    HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);
-                    if (hashCodeFinder != null) {
-                        newObjectMapper.doNotUseDefaultHashKeys();
-                    }
-
-                    restoreAction.accept(readStates.current().getStateEngine(), writeEngine);
-
-                    status.versions(versionDesired, readState.getVersion())
-                            .success();
-                    objectMapper = newObjectMapper; // Restore completed successfully so swap
-                } else {
-                    status.versions(versionDesired, client.getCurrentVersionId());
-                    throw new IllegalStateException(
-                            "Unable to reach requested version to restore from: " + versionDesired);
+                // Need to restore data to new ObjectMapper since can't restore to non empty Write State Engine
+                Collection<HollowSchema> schemas = objectMapper.getStateEngine().getSchemas();
+                HollowWriteStateEngine writeEngine = hashCodeFinder == null
+                        ? new HollowWriteStateEngine()
+                        : new HollowWriteStateEngine(hashCodeFinder);
+                HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, schemas);
+                HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);
+                if (hashCodeFinder != null) {
+                    newObjectMapper.doNotUseDefaultHashKeys();
                 }
+
+                restoreAction.accept(readStates.current().getStateEngine(), writeEngine);
+
+                status.versions(versionDesired, readState.getVersion())
+                        .success();
+                objectMapper = newObjectMapper; // Restore completed successfully so swap
             }
         } catch (Throwable th) {
             status.fail(th);
