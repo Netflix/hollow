@@ -693,7 +693,7 @@ public class HollowProducer extends AbstractHollowProducer {
          * @throws IllegalArgumentException if the listener does not implement a recognized event listener type
          */
         public B withListener(HollowProducerEventListener listener) {
-            if (!ListenerSupport.isValidListener(listener)) {
+            if (!ProducerListenerSupport.isValidListener(listener)) {
                 throw new IllegalArgumentException(
                         "Listener does not implement a recognized event listener type: " + listener);
             }
@@ -711,7 +711,7 @@ public class HollowProducer extends AbstractHollowProducer {
          */
         public B withListeners(HollowProducerEventListener... listeners) {
             for (HollowProducerEventListener listener : listeners) {
-                if (!ListenerSupport.isValidListener(listener)) {
+                if (!ProducerListenerSupport.isValidListener(listener)) {
                     throw new IllegalArgumentException(
                             "Listener does not implement a recognized event listener type: " + listener);
                 }

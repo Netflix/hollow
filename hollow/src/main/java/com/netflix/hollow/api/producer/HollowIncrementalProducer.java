@@ -46,7 +46,7 @@ public class HollowIncrementalProducer {
     private final HollowProducer producer;
     private final ConcurrentHashMap<RecordPrimaryKey, Object> mutations;
     private final HollowProducer.Populator populator;
-    private final ListenerSupport listeners;
+    private final ProducerListenerSupport listeners;
     private final Map<String, Object> cycleMetadata;
     private final Class<?>[] dataModel;
     private final HollowConsumer.AnnouncementWatcher announcementWatcher;
@@ -70,7 +70,7 @@ public class HollowIncrementalProducer {
         this.dataModel = classes;
         this.announcementWatcher = announcementWatcher;
         this.blobRetriever = blobRetriever;
-        this.listeners = new ListenerSupport();
+        this.listeners = new ProducerListenerSupport();
         this.cycleMetadata = new HashMap<String, Object>();
         this.threadsPerCpu = threadsPerCpu;
 

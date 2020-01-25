@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static com.netflix.hollow.api.producer.ProducerListenerSupport.ProducerListeners;
 import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.toList;
 
@@ -69,7 +70,7 @@ abstract class AbstractHollowProducer {
     final HollowProducer.BlobStorageCleaner blobStorageCleaner;
     HollowObjectMapper objectMapper;
     final HollowProducer.VersionMinter versionMinter;
-    final ListenerSupport listeners;
+    final ProducerListenerSupport listeners;
     ReadStateHelper readStates;
     final Executor snapshotPublishExecutor;
     final int numStatesBetweenSnapshots;
@@ -143,7 +144,7 @@ abstract class AbstractHollowProducer {
         this.readStates = ReadStateHelper.newDeltaChain();
         this.blobStorageCleaner = blobStorageCleaner;
 
-        this.listeners = new ListenerSupport(eventListeners.stream().distinct().collect(toList()));
+        this.listeners = new ProducerListenerSupport(eventListeners.stream().distinct().collect(toList()));
 
         this.metrics = new HollowProducerMetrics();
         this.metricsCollector = metricsCollector;
@@ -258,7 +259,7 @@ abstract class AbstractHollowProducer {
         }
 
         HollowProducer.ReadState readState = null;
-        ListenerSupport.Listeners localListeners = listeners.listeners();
+        ProducerListeners localListeners = listeners.listeners();
         Status.RestoreStageBuilder status = localListeners.fireProducerRestoreStart(versionDesired);
         try {
             if (versionDesired != HollowConstants.VERSION_NONE) {
@@ -324,7 +325,7 @@ abstract class AbstractHollowProducer {
     }
 
     long runCycle(HollowProducer.Incremental.IncrementalPopulator incrementalPopulator, HollowProducer.Populator populator) {
-        ListenerSupport.Listeners localListeners = listeners.listeners();
+        ProducerListeners localListeners = listeners.listeners();
 
         if (!singleProducerEnforcer.isPrimary()) {
             // TODO: minimum time spacing between cycles
@@ -352,7 +353,7 @@ abstract class AbstractHollowProducer {
     }
 
     long runCycle(
-            ListenerSupport.Listeners listeners,
+            ProducerListeners listeners,
             HollowProducer.Incremental.IncrementalPopulator incrementalPopulator, HollowProducer.Populator populator,
             Status.StageWithStateBuilder cycleStatus, long toVersion) {
         // 1. Begin a new cycle
@@ -486,7 +487,7 @@ abstract class AbstractHollowProducer {
     }
 
     void populate(
-            ListenerSupport.Listeners listeners,
+            ProducerListeners listeners,
             HollowProducer.Incremental.IncrementalPopulator incrementalPopulator, HollowProducer.Populator populator,
             long toVersion) throws Exception {
         assert incrementalPopulator != null ^ populator != null;
@@ -514,7 +515,7 @@ abstract class AbstractHollowProducer {
     }
 
     HollowProducer.Populator incrementalPopulate(
-            ListenerSupport.Listeners listeners,
+            ProducerListeners listeners,
             HollowProducer.Incremental.IncrementalPopulator incrementalPopulator,
             long toVersion) throws Exception {
         ConcurrentHashMap<RecordPrimaryKey, Object> events = new ConcurrentHashMap<>();
@@ -540,7 +541,7 @@ abstract class AbstractHollowProducer {
     /*
      * Publish the write state, storing the artifacts in the provided object. Visible for testing.
      */
-    void publish(ListenerSupport.Listeners listeners, long toVersion, Artifacts artifacts) throws IOException {
+    void publish(ProducerListeners listeners, long toVersion, Artifacts artifacts) throws IOException {
         Status.StageBuilder psb = listeners.firePublishStart(toVersion);
         try {
             if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
@@ -582,7 +583,7 @@ abstract class AbstractHollowProducer {
         }
     }
 
-    private HollowProducer.Blob stageBlob(ListenerSupport.Listeners listeners, HollowProducer.Blob blob)
+    private HollowProducer.Blob stageBlob(ProducerListeners listeners, HollowProducer.Blob blob)
             throws IOException {
         Status.PublishBuilder builder = new Status.PublishBuilder();
         HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
@@ -599,7 +600,7 @@ abstract class AbstractHollowProducer {
         }
     }
 
-    private void publishBlob(ListenerSupport.Listeners listeners, HollowProducer.Blob blob) {
+    private void publishBlob(ProducerListeners listeners, HollowProducer.Blob blob) {
         Status.PublishBuilder builder = new Status.PublishBuilder();
         try {
             builder.blob(blob);
@@ -617,7 +618,7 @@ abstract class AbstractHollowProducer {
         }
     }
 
-    private void publishSnapshotBlobAsync(ListenerSupport.Listeners listeners, Artifacts artifacts) {
+    private void publishSnapshotBlobAsync(ProducerListeners listeners, Artifacts artifacts) {
         HollowProducer.Blob blob = artifacts.snapshot;
         CompletableFuture<HollowProducer.Blob> cf = new CompletableFuture<>();
         try {
@@ -675,7 +676,7 @@ abstract class AbstractHollowProducer {
      * @return S(cur) and S(pnd)
      */
     private ReadStateHelper checkIntegrity(
-            ListenerSupport.Listeners listeners, ReadStateHelper readStates, Artifacts artifacts,
+            ProducerListeners listeners, ReadStateHelper readStates, Artifacts artifacts,
             boolean schemaChangedFromPriorVersion) throws Exception {
         Status.StageWithStateBuilder status = listeners.fireIntegrityCheckStart(readStates.pending());
         try {
@@ -770,7 +771,7 @@ abstract class AbstractHollowProducer {
         }
     }
 
-    private void validate(ListenerSupport.Listeners listeners, HollowProducer.ReadState readState) {
+    private void validate(ProducerListeners listeners, HollowProducer.ReadState readState) {
         Status.StageWithStateBuilder psb = listeners.fireValidationStart(readState);
 
         ValidationStatus status = null;
@@ -802,7 +803,7 @@ abstract class AbstractHollowProducer {
     }
 
 
-    private void announce(ListenerSupport.Listeners listeners, HollowProducer.ReadState readState) {
+    private void announce(ProducerListeners listeners, HollowProducer.ReadState readState) {
         if (announcer != null) {
             Status.StageWithStateBuilder status = listeners.fireAnnouncementStart(readState);
             try {

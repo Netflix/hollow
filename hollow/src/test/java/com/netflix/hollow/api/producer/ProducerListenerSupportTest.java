@@ -29,12 +29,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-public class ListenerSupportTest {
+public class ProducerListenerSupportTest {
     interface ProducerAndValidationStatusListener
             extends HollowProducerListener, ValidationStatusListener {
     }
 
-    private ListenerSupport listenerSupport;
+    private ProducerListenerSupport listenerSupport;
 
     @Mock
     private HollowProducerListener listener;
@@ -46,7 +46,7 @@ public class ListenerSupportTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        listenerSupport = new ListenerSupport();
+        listenerSupport = new ProducerListenerSupport();
         listenerSupport.addListener(listener);
         listenerSupport.addListener(validationStatusListener);
         listenerSupport.addListener(producerAndValidationStatusListener);
@@ -54,12 +54,12 @@ public class ListenerSupportTest {
 
     @Test
     public void testDuplicates() {
-        ListenerSupport ls = new ListenerSupport();
+        ProducerListenerSupport ls = new ProducerListenerSupport();
         CycleListener l = Mockito.mock(CycleListener.class);
         ls.addListener(l);
         ls.addListener(l);
 
-        ListenerSupport.Listeners s = ls.listeners();
+        ProducerListenerSupport.ProducerListeners s = ls.listeners();
         s.fireCycleStart(1);
 
         Mockito.verify(l, Mockito.times(1)).onCycleStart(1);
@@ -67,7 +67,7 @@ public class ListenerSupportTest {
 
     @Test
     public void testAddDuringCycle() {
-        ListenerSupport ls = new ListenerSupport();
+        ProducerListenerSupport ls = new ProducerListenerSupport();
 
         class SecondCycleListener implements CycleListener {
             int cycleStart;
@@ -100,7 +100,7 @@ public class ListenerSupportTest {
         FirstCycleListener fcl = new FirstCycleListener();
         ls.addListener(fcl);
 
-        ListenerSupport.Listeners s = ls.listeners();
+        ProducerListenerSupport.ProducerListeners s = ls.listeners();
         s.fireCycleStart(1);
         s.fireCycleComplete(new Status.StageWithStateBuilder());
 
@@ -121,7 +121,7 @@ public class ListenerSupportTest {
 
     @Test
     public void testRemoveDuringCycle() {
-        ListenerSupport ls = new ListenerSupport();
+        ProducerListenerSupport ls = new ProducerListenerSupport();
 
         class SecondCycleListener implements CycleListener {
             int cycleStart;
@@ -160,7 +160,7 @@ public class ListenerSupportTest {
         ls.addListener(fcl);
         ls.addListener(scl);
 
-        ListenerSupport.Listeners s = ls.listeners();
+        ProducerListenerSupport.ProducerListeners s = ls.listeners();
         s.fireCycleStart(1);
         s.fireCycleComplete(new Status.StageWithStateBuilder());
 
