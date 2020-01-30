@@ -28,9 +28,12 @@ import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.UUID;
+import java.nio.file.StandardOpenOption;
 
 public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriever {
+
+    public static final String PARTIAL_DOWNLOAD = "partial.";
+
     private final Path blobStorePath;
     private final HollowConsumer.BlobRetriever fallbackBlobRetriever;
     private final boolean noFallBackForExistingSnapshot;
@@ -223,12 +226,17 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         @Override
         public InputStream getInputStream() throws IOException {
 
-            Path tempPath = path.resolveSibling(path.getName(path.getNameCount()-1) + "-" + UUID.randomUUID().toString());
+            Path tempPath = path.resolveSibling(PARTIAL_DOWNLOAD + path.getName(path.getNameCount()-1));
+
             try(
-                    InputStream is = remoteBlob.getInputStream();
-                    OutputStream os = Files.newOutputStream(tempPath)
+                InputStream is = remoteBlob.getInputStream();
+                OutputStream os = Files.newOutputStream(tempPath, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
             ) {
-                byte buf[] = new byte[4096];
+                // resume unfinished downloads
+                File outFile = new File(tempPath.toAbsolutePath().toString());
+                is.skip(outFile.length());
+
+                byte buf[] = new byte[4096];     // Java9 has InputStream::transferTo for this
                 int n;
                 while (-1 != (n = is.read(buf)))
                     os.write(buf, 0, n);
