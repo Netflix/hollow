@@ -202,7 +202,7 @@ public class HollowAPIGenerator {
      * @deprecated construct with a {@code destinationPath} and use {@link #generateSourceFiles()}
      */
     protected HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeAllClassNames, boolean useErgonomicShortcuts) {
-        this(apiClassname, packageName, dataset, parameterizedTypes, false, false, null);
+        this(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassNames, useErgonomicShortcuts, null);
     }
 
     protected HollowAPIGenerator(String apiClassname,

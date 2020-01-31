@@ -418,11 +418,11 @@ public class HollowStateDeltaPatcher {
                 
                 HollowMapEntryOrdinalIterator iter = fromMapState.ordinalIterator(ordinal);
                 while(iter.next())
-                    fromScratch.add((iter.getKey() << 32) | iter.getValue());
+                    fromScratch.add(((long)iter.getKey() << 32) | iter.getValue());
                 
                 iter = toMapState.ordinalIterator(ordinal);
                 while(iter.next())
-                    toScratch.add((iter.getKey() << 32) | iter.getValue());
+                    toScratch.add(((long)iter.getKey() << 32) | iter.getValue());
                 
                 fromScratch.sort();
                 toScratch.sort();
