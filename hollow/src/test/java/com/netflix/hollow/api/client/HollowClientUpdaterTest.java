@@ -19,6 +19,7 @@ package com.netflix.hollow.api.client;
 import static com.netflix.hollow.core.HollowConstants.VERSION_LATEST;
 import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
 import static java.util.Collections.emptyList;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -111,7 +112,9 @@ public class HollowClientUpdaterTest {
         try {
             subject.updateTo(VERSION_LATEST);
             fail("should throw");
-        } catch (Throwable th) {}
+        } catch (Throwable th) {
+            assertEquals("boom", th.getMessage());
+        }
 
         assertFalse(subject.getInitialLoad().isCompletedExceptionally());
     }

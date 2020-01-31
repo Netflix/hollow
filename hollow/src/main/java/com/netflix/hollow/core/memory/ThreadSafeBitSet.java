@@ -18,6 +18,7 @@ package com.netflix.hollow.core.memory;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.concurrent.atomic.AtomicReference;
@@ -411,6 +412,13 @@ public class ThreadSafeBitSet {
         }
 
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = log2SegmentSize;
+        result = 31 * result + Arrays.hashCode(segments.get().segments);
+        return result;
     }
 
     /**

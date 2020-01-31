@@ -22,6 +22,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
 
 /**
  * A schema for a Set record type.
@@ -80,6 +81,15 @@ public class HollowSetSchema extends HollowCollectionSchema {
             return false;
 
         return isNullableObjectEquals(hashKey, otherSchema.getHashKey());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getName().hashCode();
+        result = 31 * result + getSchemaType().hashCode();
+        result = 31 * result + elementType.hashCode();
+        result = 31 * result + Objects.hashCode(hashKey);
+        return result;
     }
 
     @Override

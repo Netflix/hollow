@@ -40,6 +40,7 @@ public class HollowListSchema extends HollowCollectionSchema {
         this.elementType = elementType;
     }
 
+    @Override
     public String getElementType() {
         return elementType;
     }
@@ -48,6 +49,7 @@ public class HollowListSchema extends HollowCollectionSchema {
         this.elementTypeState = typeState;
     }
 
+    @Override
     public HollowTypeReadState getElementTypeState() {
         return elementTypeState;
     }
@@ -69,7 +71,15 @@ public class HollowListSchema extends HollowCollectionSchema {
         
         return getElementType().equals(otherSchema.getElementType());
     }
-    
+
+    @Override
+    public int hashCode() {
+        int result = getName().hashCode();
+        result = 31 * result + getSchemaType().hashCode();
+        result = 31 * result + elementType.hashCode();
+        return result;
+    }
+
     @Override
     public String toString() {
         return getName() + " List<" + getElementType() + ">;";

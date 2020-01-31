@@ -49,10 +49,16 @@ public class HollowChecksum {
         return currentChecksum;
     }
 
+    @Override
     public boolean equals(Object other) {
         if(other instanceof HollowChecksum)
             return ((HollowChecksum) other).currentChecksum == currentChecksum;
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return currentChecksum;
     }
 
     public String toString() {

@@ -25,8 +25,10 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig.ObjectFilterConfig
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A schema for an Object record type.
@@ -273,6 +275,16 @@ public class HollowObjectSchema extends HollowSchema {
         }
 
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getName().hashCode();
+        result = 31 * result + getSchemaType().hashCode();
+        result = 31 * result + Objects.hash(primaryKey);
+        result = 31 * result + Arrays.hashCode(fieldNames);
+        result = 31 * result + Arrays.hashCode(fieldTypes);
+        return result;
     }
 
     @Override

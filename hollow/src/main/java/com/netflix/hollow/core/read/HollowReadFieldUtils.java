@@ -127,7 +127,7 @@ public class HollowReadFieldUtils {
         switch(schema.getFieldType(fieldPosition)) {
             case BOOLEAN:
                 Boolean bool = typeAccess.readBoolean(ordinal, fieldPosition);
-                String.valueOf(bool);
+                return String.valueOf(bool);
             case BYTES:
             case STRING:
                 return typeAccess.readString(ordinal, fieldPosition);
