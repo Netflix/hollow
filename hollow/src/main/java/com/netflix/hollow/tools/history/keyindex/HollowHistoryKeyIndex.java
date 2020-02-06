@@ -84,6 +84,10 @@ public class HollowHistoryKeyIndex {
         indexTypeField(primaryKey, history.getLatestState());
     }
 
+    public void indexTypeFieldInState(HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
+        indexTypeField(primaryKey, stateEngine);
+    }
+
     public void indexTypeField(PrimaryKey primaryKey, HollowDataset dataModel) {
         String type = primaryKey.getType();
         HollowHistoryTypeKeyIndex typeIndex = typeKeyIndexes.get(type);
