@@ -68,8 +68,6 @@ final class ProducerListenerSupport extends ListenerSupport {
     }
 
     ProducerListenerSupport() {
-        super();
-
         // @@@ This is used only by HollowIncrementalProducer, and should be
         // separated out
         incrementalCycleListeners = new CopyOnWriteArraySet<>();
@@ -84,7 +82,7 @@ final class ProducerListenerSupport extends ListenerSupport {
     }
 
     ProducerListenerSupport(ProducerListenerSupport that) {
-        super();
+        super(that);
 
         // @@@ This is used only by HollowIncrementalProducer, and should be
         // separated out
