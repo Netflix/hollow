@@ -16,9 +16,10 @@
  */
 package com.netflix.hollow.api.producer.listener;
 
-/**
- * The top-level type for all producer listeners.
- */
-public interface HollowProducerEventListener {
+import com.netflix.hollow.api.common.EventListener;
 
+/**
+ * The top-level type for all producer-specific listeners.
+ */
+public interface HollowProducerEventListener extends EventListener {
 }

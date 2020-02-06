@@ -19,6 +19,8 @@ package com.netflix.hollow.api.producer;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;
 
+import com.netflix.hollow.api.common.ListenerSupport;
+import com.netflix.hollow.api.common.Listeners;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.IncrementalCycleListener.IncrementalCycleStatus;
 import com.netflix.hollow.api.producer.listener.AnnouncementListener;
@@ -30,27 +32,24 @@ import com.netflix.hollow.api.producer.listener.IntegrityCheckListener;
 import com.netflix.hollow.api.producer.listener.PopulateListener;
 import com.netflix.hollow.api.producer.listener.PublishListener;
 import com.netflix.hollow.api.producer.listener.RestoreListener;
-import com.netflix.hollow.api.producer.listener.VetoableListener;
 import com.netflix.hollow.api.producer.validation.ValidationStatus;
 import com.netflix.hollow.api.producer.validation.ValidationStatusListener;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-final class ListenerSupport {
+final class ProducerListenerSupport extends ListenerSupport {
 
-    private static final Logger LOG = Logger.getLogger(ListenerSupport.class.getName());
+    private static final Logger LOG = Logger.getLogger(ProducerListenerSupport.class.getName());
 
     private static final Collection<Class<? extends HollowProducerEventListener>> LISTENERS =
             Stream.of(DataModelInitializationListener.class,
@@ -68,38 +67,26 @@ final class ListenerSupport {
         return LISTENERS.stream().anyMatch(c -> c.isInstance(l));
     }
 
-    private final CopyOnWriteArrayList<HollowProducerEventListener> eventListeners;
+    ProducerListenerSupport() {
+        // @@@ This is used only by HollowIncrementalProducer, and should be
+        // separated out
+        incrementalCycleListeners = new CopyOnWriteArraySet<>();
+    }
 
-    ListenerSupport() {
-        eventListeners = new CopyOnWriteArrayList<>();
+    ProducerListenerSupport(List<? extends HollowProducerEventListener> listeners) {
+        super(listeners);
 
         // @@@ This is used only by HollowIncrementalProducer, and should be
         // separated out
         incrementalCycleListeners = new CopyOnWriteArraySet<>();
     }
 
-    ListenerSupport(List<? extends HollowProducerEventListener> listeners) {
-        eventListeners = new CopyOnWriteArrayList<>(listeners);
-
-        // @@@ This is used only by HollowIncrementalProducer, and should be
-        // separated out
-        incrementalCycleListeners = new CopyOnWriteArraySet<>();
-    }
-
-    ListenerSupport(ListenerSupport that) {
-        eventListeners = new CopyOnWriteArrayList<>(that.eventListeners);
+    ProducerListenerSupport(ProducerListenerSupport that) {
+        super(that);
 
         // @@@ This is used only by HollowIncrementalProducer, and should be
         // separated out
         incrementalCycleListeners = new CopyOnWriteArraySet<>(that.incrementalCycleListeners);
-    }
-
-    void addListener(HollowProducerEventListener listener) {
-        eventListeners.addIfAbsent(listener);
-    }
-
-    void removeListener(HollowProducerEventListener listener) {
-        eventListeners.remove(listener);
     }
 
     //
@@ -109,40 +96,14 @@ final class ListenerSupport {
      * From the returned copy events may be fired.
      * Any addition or removal of listeners will take effect on the next cycle.
      */
-    Listeners listeners() {
-        return new Listeners(eventListeners.toArray(new HollowProducerEventListener[0]));
+    ProducerListeners listeners() {
+        return new ProducerListeners(eventListeners.toArray(new HollowProducerEventListener[0]));
     }
 
-    static final class Listeners {
-        final HollowProducerEventListener[] listeners;
+    static final class ProducerListeners extends Listeners {
 
-        Listeners(HollowProducerEventListener[] listeners) {
-            this.listeners = listeners;
-        }
-
-        <T extends HollowProducerEventListener> Stream<T> getListeners(Class<T> c) {
-            return Arrays.stream(listeners).filter(c::isInstance).map(c::cast);
-        }
-
-        private <T extends HollowProducerEventListener> void fire(
-                Class<T> c, Consumer<? super T> r) {
-            fireStream(getListeners(c), r);
-        }
-
-        private <T extends HollowProducerEventListener> void fireStream(
-                Stream<T> s, Consumer<? super T> r) {
-            s.forEach(l -> {
-                try {
-                    r.accept(l);
-                } catch (VetoableListener.ListenerVetoException e) {
-                    throw e;
-                } catch (RuntimeException e) {
-                    if (l instanceof VetoableListener) {
-                        throw e;
-                    }
-                    LOG.log(Level.WARNING, "Error executing listener", e);
-                }
-            });
+        ProducerListeners(HollowProducerEventListener[] listeners) {
+            super(listeners);
         }
 
         void fireProducerInit(long elapsedMillis) {
