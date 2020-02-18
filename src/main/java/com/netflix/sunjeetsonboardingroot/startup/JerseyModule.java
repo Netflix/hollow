@@ -26,6 +26,9 @@ import org.slf4j.LoggerFactory;
 public final class JerseyModule extends JerseyServletModule {
 
     public static final String PRODUCE_ONCE_PATH = "produce-once";
+    public static final String CONSUME_PATH = "consume";
+    public static final String CONSUME_AND_GENERATE_PATH = "consume-and-generate-files";
+    public static final String CONSUME_FROM_GENERATED_PATH = "consume-from-generated-files";
 
     private static final Logger logger = LoggerFactory.getLogger(JerseyModule.class);
 
@@ -50,7 +53,10 @@ public final class JerseyModule extends JerseyServletModule {
 
         // Match the hollow resources, but do not consume the path
         // This matching ensures Jersey will not swallow the URLs to static content
-        serveRegex("(/produce-.+)").with(GovernatorServletContainer.class);
+        serveRegex("(/" + PRODUCE_ONCE_PATH + "-.+)").with(GovernatorServletContainer.class);
+        serveRegex("(/" + CONSUME_PATH + ")").with(GovernatorServletContainer.class);
+        serveRegex("(/" + CONSUME_AND_GENERATE_PATH + ")").with(GovernatorServletContainer.class);
+        serveRegex("(/" + CONSUME_FROM_GENERATED_PATH + ")").with(GovernatorServletContainer.class);
     }
 
     @Advises

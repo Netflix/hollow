@@ -1,16 +1,8 @@
 package com.netflix.sunjeetsonboardingroot.startup;
 
-import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.netflix.governator.InjectorBuilder;
 import com.netflix.governator.guice.servlet.WebApplicationInitializer;
-
-import com.netflix.sunjeetsonboardingroot.OnboardingItemsProducer;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,10 +16,11 @@ public class SunjeetsOnboardingRoot implements WebApplicationInitializer {
 
     private static final Logger logger = LoggerFactory.getLogger(SunjeetsOnboardingRoot.class);
 
-
     public static void main(String[] args) throws Exception {
         logger.info("SNAP: Stepped in main");
+
         // publishEndlessly();
+
     }
 
     @Override

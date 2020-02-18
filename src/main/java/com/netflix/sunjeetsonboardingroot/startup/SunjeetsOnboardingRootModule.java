@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 // Common module dependencies
 import com.google.inject.Provides;
 import com.netflix.archaius.ConfigProxyFactory;
+import com.netflix.cinder.lifecycle.CinderConsumerModule;
 import javax.inject.Singleton;
 
 // Server dependencies
@@ -49,6 +50,7 @@ public final class SunjeetsOnboardingRootModule extends AbstractModule {
         install(new JaxrsSwaggerModule());
         install(new GuiceServletSwaggerModule());
         install(new CinderProducerModule());
+        install(new CinderConsumerModule());
 
         // Uncomment to load the Cassandra client
         // install(new CassandraModule());

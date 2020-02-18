@@ -4,3 +4,11 @@ include 'sunjeets-onboarding-model'
 include 'sunjeets-onboarding-core'
 include 'sunjeets-onboarding-client'
 
+/*
+ * load settings.local.gradle
+ * - File is optional and intended for local dev purpose only.
+ * - Not to be commited so already in .gitignore
+ */
+if( file('settings.local.gradle').exists() ) {
+  apply from: 'settings.local.gradle'
+}

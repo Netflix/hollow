@@ -30,7 +30,6 @@ public class ProduceResource {
         this.onboardingItemsProducer.publishData(true);
 
         logger.info("SNAP: Published.");
-
         return Response.ok().build();
     }
 

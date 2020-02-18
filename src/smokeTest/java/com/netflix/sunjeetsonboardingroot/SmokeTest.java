@@ -1,14 +1,10 @@
 package com.netflix.sunjeetsonboardingroot;
 
-import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.*;
-
-import java.io.IOException;
-
-import javax.inject.Named;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static com.netflix.sunjeetsonboardingroot.startup.JerseyModule.CONSUME_AND_GENERATE_PATH;
+import static com.netflix.sunjeetsonboardingroot.startup.JerseyModule.CONSUME_FROM_GENERATED_PATH;
+import static com.netflix.sunjeetsonboardingroot.startup.JerseyModule.CONSUME_PATH;
+import static com.netflix.sunjeetsonboardingroot.startup.JerseyModule.PRODUCE_ONCE_PATH;
+import static io.restassured.RestAssured.given;
 
 import com.google.inject.Inject;
 import com.netflix.archaius.test.TestPropertyOverride;
@@ -16,6 +12,9 @@ import com.netflix.governator.guice.jetty.Archaius2JettyModule;
 import com.netflix.governator.guice.test.ModulesForTesting;
 import com.netflix.governator.guice.test.junit4.GovernatorJunit4ClassRunner;
 import com.netflix.sunjeetsonboardingroot.startup.SunjeetsOnboardingRootModule;
+import javax.inject.Named;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 
 /**
@@ -38,38 +37,48 @@ public class SmokeTest {
     @Named("embeddedJettyPort")
     private int ephemeralPort;
 
-    @Test
-    public void testRestEndpoint() throws IOException {
-        given().port(ephemeralPort).log().ifValidationFails()
-        .when()
-            .get("/REST/v1/hello/n@n.com")
-        .then()
-            .assertThat().statusCode(200)
-        .and()
-            .body("userEmail", equalTo("n@n.com"))
-            ;
-    }
-
-    @Test
-    public void testStaticContent() throws IOException {
-        given().port(ephemeralPort).log().ifValidationFails()
-        .when()
-            .get("/index.html")
-        .then()
-            .assertThat().statusCode(200)
-        .and()
-            .body(containsString("Netflix sunjeets-onboarding-root"))
-            ;
-    }
-
-    @Test
-    public void testPublishOnceContent() throws IOException {
+   // @Test
+    public void testPublishOnceContent() {  // SNAP:
         given().port(ephemeralPort).log().ifValidationFails()
                 .when()
-                .get("/produce-once")
+                .get("/" + PRODUCE_ONCE_PATH)
                 .then()
                 .assertThat().statusCode(200)
         ;
+        System.out.println("Done");
+    }
+
+    // @Test
+    public void testConsumeContent() {  // SNAP:
+        given().port(ephemeralPort).log().ifValidationFails()
+                .when()
+                .get("/" + CONSUME_PATH)
+                .then()
+                .assertThat().statusCode(200)
+        ;
+        System.out.println("Done");
+    }
+
+    // @Test
+    public void testConsumeContentAndGenerateFiles() {  // SNAP:
+        given().port(ephemeralPort).log().ifValidationFails()
+                .when()
+                .get("/" + CONSUME_AND_GENERATE_PATH)
+                .then()
+                .assertThat().statusCode(200)
+        ;
+        System.out.println("Done");
+    }
+
+    @Test
+    public void testConsumeFromGeneratedFiles() {  // SNAP:
+        given().port(ephemeralPort).log().ifValidationFails()
+                .when()
+                .get("/" + CONSUME_FROM_GENERATED_PATH)
+                .then()
+                .assertThat().statusCode(200)
+        ;
+        System.out.println("Done");
     }
 }
 
