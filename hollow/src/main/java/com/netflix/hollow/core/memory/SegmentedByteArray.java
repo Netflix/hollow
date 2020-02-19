@@ -47,6 +47,8 @@ public class SegmentedByteArray implements ByteData {
 
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
 
+    private MappedByteBuffer bufferRef;
+
     private byte[][] segments;
     private final int log2OfSegmentSize;
     private final int bitmask;
@@ -257,7 +259,8 @@ public class SegmentedByteArray implements ByteData {
         int segment = 0;
 
         FileChannel channel = raf.getChannel(); // SNAP: Map MappedByteBuffer once altogether
-        MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, raf.getFilePointer(), raf.length());
+        MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, raf.getFilePointer(), raf.length() - raf.getFilePointer());
+        bufferRef = buffer; // hold the ref so that buffer doesn't get GC'ed
 
         // SNAP: simplification: assume one segment
         segments[0] = buffer.array();

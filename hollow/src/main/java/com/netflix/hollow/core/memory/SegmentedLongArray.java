@@ -23,7 +23,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
+import java.util.Arrays;
 import sun.misc.Unsafe;
 
 /**
@@ -74,7 +76,12 @@ public class SegmentedLongArray {
 
         long[][] segments = new long[numSegments][];
         for(int i=0;i<segments.length;i++) {
-            segments[i] = buffer.asLongBuffer().array();    // segments[i] references buffer.position()
+            // Arrays.copyOfRange
+            // (1 << log2LongArraySize) + 1]
+            LongBuffer lb = buffer.asLongBuffer();
+            long[] la = lb.array(); // SNAP: Doesn't allow getting an array out of this buffer https://stackoverflow.com/questions/8592221/why-doesnt-the-array-method-of-mappedbytebuffer-work
+                                    // SNAP: Might need to convert segment arrays to buffers
+            segments[i] = la;    // segments[i] references buffer.position()
             buffer.position(buffer.position() + (1 << log2OfSegmentSize));  // advance buffer by segment size
             raf.skipBytes(1 << log2OfSegmentSize);
         }
