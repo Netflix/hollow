@@ -64,18 +64,19 @@ public class StateEngineRoundTripper {
      * @throws IOException if the round trip from write to read state failed
      */
     public static void roundTripSnapshot(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine, HollowFilterConfig filter) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
-        writer.writeSnapshot(baos);
-        writeEngine.prepareForNextCycle();
-
-
-        HollowBlobReader reader = new HollowBlobReader(readEngine);
-        InputStream is = new ByteArrayInputStream(baos.toByteArray());
-        if(filter == null)
-            reader.readSnapshot(is);
-        else
-            reader.readSnapshot(is, filter);
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+//        writer.writeSnapshot(baos);
+//        writeEngine.prepareForNextCycle();
+//
+//
+//        HollowBlobReader reader = new HollowBlobReader(readEngine);
+//        InputStream is = new ByteArrayInputStream(baos.toByteArray());
+//        if(filter == null)
+//            reader.readSnapshot(is);
+//        else
+//            reader.readSnapshot(is, filter);
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -88,12 +89,13 @@ public class StateEngineRoundTripper {
      * @throws IOException if the round trip from write to read state failed
      */
     public static void roundTripDelta(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
-        writer.writeDelta(baos);
-        HollowBlobReader reader = new HollowBlobReader(readEngine);
-        reader.applyDelta(new ByteArrayInputStream(baos.toByteArray()));
-        writeEngine.prepareForNextCycle();
+        // ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+        // writer.writeDelta(baos);
+        // HollowBlobReader reader = new HollowBlobReader(readEngine);
+        // reader.applyDelta(new ByteArrayInputStream(baos.toByteArray()));
+        // writeEngine.prepareForNextCycle();
+        throw new UnsupportedOperationException();
     }
 
 }

@@ -24,6 +24,7 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * This class holds the data for a {@link HollowObjectTypeReadState}.
@@ -62,30 +63,30 @@ public class HollowObjectTypeDataElements {
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(DataInputStream dis, HollowObjectSchema unfilteredSchema) throws IOException {
-        readFromStream(dis, false, unfilteredSchema);
+    void readSnapshot(RandomAccessFile raf, HollowObjectSchema unfilteredSchema) throws IOException {
+        readFromStream(raf, false, unfilteredSchema);
     }
 
-    void readDelta(DataInputStream dis) throws IOException {
+    void readDelta(RandomAccessFile raf) throws IOException {
+        // readFromStream(raf, true, schema);
         throw new UnsupportedOperationException();
-        // readFromStream(dis, true, schema);
     }
 
-    void readFromStream(DataInputStream dis, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
-        maxOrdinal = VarInt.readVInt(dis);
+    void readFromStream(RandomAccessFile raf, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
+        maxOrdinal = VarInt.readVInt(raf);
 
         if(isDelta) {
-            throw new UnsupportedOperationException();
-            // encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
-            // encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+            throw new UnsupportedOperationException("Deltas not supported");
+        //    encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+        //    encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
         }
 
-        readFieldStatistics(dis, unfilteredSchema);
+        readFieldStatistics(raf, unfilteredSchema);
 
-        fixedLengthData = FixedLengthElementArray.deserializeFrom(dis, memoryRecycler);
-        removeExcludedFieldsFromFixedLengthData();
+        fixedLengthData = FixedLengthElementArray.deserializeFrom(raf, memoryRecycler);
+        // removeExcludedFieldsFromFixedLengthData();
 
-        readVarLengthData(dis, unfilteredSchema);
+        readVarLengthData(raf, unfilteredSchema);
     }
 
     private void removeExcludedFieldsFromFixedLengthData() {
@@ -116,7 +117,7 @@ public class HollowObjectTypeDataElements {
         }
     }
 
-    private void readFieldStatistics(DataInputStream dis, HollowObjectSchema unfilteredSchema) throws IOException {
+    private void readFieldStatistics(RandomAccessFile raf, HollowObjectSchema unfilteredSchema) throws IOException {
         bitsPerRecord = 0;
 
         bitsPerUnfilteredField = new int[unfilteredSchema.numFields()];
@@ -125,7 +126,7 @@ public class HollowObjectTypeDataElements {
         int filteredFieldIdx = 0;
 
         for(int i=0;i<unfilteredSchema.numFields();i++) {
-            int readBitsPerField = VarInt.readVInt(dis);
+            int readBitsPerField = VarInt.readVInt(raf);
             bitsPerUnfilteredField[i] = readBitsPerField;
             unfilteredFieldIsIncluded[i] = schema.getPosition(unfilteredSchema.getFieldName(i)) != -1;
 
@@ -140,21 +141,24 @@ public class HollowObjectTypeDataElements {
     }
 
 
-    private void readVarLengthData(DataInputStream dis, HollowObjectSchema unfilteredSchema) throws IOException {
+    private void readVarLengthData(RandomAccessFile raf, HollowObjectSchema unfilteredSchema) throws IOException {
         int filteredFieldIdx = 0;
 
         for(int i=0;i<unfilteredSchema.numFields();i++) {
-            long numBytesInVarLengthData = VarInt.readVLong(dis);
+            long numBytesInVarLengthData = VarInt.readVLong(raf);
 
             if(schema.getPosition(unfilteredSchema.getFieldName(i)) != -1) {
                 if(numBytesInVarLengthData != 0) {
                     varLengthData[filteredFieldIdx] = new SegmentedByteArray(memoryRecycler);
-                    varLengthData[filteredFieldIdx].readFrom(dis, numBytesInVarLengthData);
+                    varLengthData[filteredFieldIdx].readFrom(raf, numBytesInVarLengthData);
+
+                    varLengthData[filteredFieldIdx] = new SegmentedByteArray(memoryRecycler);
+                    varLengthData[filteredFieldIdx].readFrom(raf, numBytesInVarLengthData);
                 }
                 filteredFieldIdx++;
             } else {
                 while(numBytesInVarLengthData > 0) {
-                    numBytesInVarLengthData -= dis.skip(numBytesInVarLengthData);
+                    numBytesInVarLengthData -= raf.skipBytes((int) numBytesInVarLengthData);
                 }
             }
         }
@@ -169,9 +173,8 @@ public class HollowObjectTypeDataElements {
 
             if(isDelta) {
                 /// addition/removal ordinals
-                // GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
-                // GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
-                throw new UnsupportedOperationException();
+                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
+                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
             }
     
             /// field statistics
@@ -193,8 +196,8 @@ public class HollowObjectTypeDataElements {
     }
 
     void applyDelta(HollowObjectTypeDataElements fromData, HollowObjectTypeDataElements deltaData) {
-        // new HollowObjectDeltaApplicator(fromData, deltaData, this).applyDelta();
         throw new UnsupportedOperationException();
+        // new HollowObjectDeltaApplicatortaApplicator(fromData, deltaData, this).applyDelta();
     }
 
     public void destroy() {

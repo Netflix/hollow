@@ -755,14 +755,15 @@ abstract class AbstractHollowProducer {
 
     private void readSnapshot(HollowProducer.Blob blob, HollowReadStateEngine stateEngine) throws IOException {
         try (InputStream is = blob.newInputStream()) {
-            new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).readSnapshot(is);
+//            new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).readSnapshot(is);
         }
     }
 
     private void applyDelta(HollowProducer.Blob blob, HollowReadStateEngine stateEngine) throws IOException {
-        try (InputStream is = blob.newInputStream()) {
-            new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).applyDelta(is);
-        }
+        //try (InputStream is = blob.newInputStream()) {
+        //    new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).applyDelta(is);
+        //}
+        throw new UnsupportedOperationException();
     }
 
     private void validate(ProducerListeners listeners, HollowProducer.ReadState readState) {

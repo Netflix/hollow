@@ -34,7 +34,7 @@ import java.util.List;
 
 class HollowObjectTypeReadFileShard {
 
-    private volatile HollowObjectTypeFileElements currentDataVolatile;
+    private volatile HollowObjectTypeDataElements currentDataVolatile;
 
     private final HollowObjectSchema schema;
 
@@ -43,7 +43,7 @@ class HollowObjectTypeReadFileShard {
     }
 
     public boolean isNull(int ordinal, int fieldIndex) {
-        HollowObjectTypeFileElements currentData;
+        HollowObjectTypeDataElements currentData;
         long fixedLengthValue;
 
         do {
@@ -72,7 +72,7 @@ class HollowObjectTypeReadFileShard {
     }
 
     public int readOrdinal(int ordinal, int fieldIndex) {
-        HollowObjectTypeFileElements currentData;
+        HollowObjectTypeDataElements currentData;
         long refOrdinal;
 
         do {
@@ -86,7 +86,7 @@ class HollowObjectTypeReadFileShard {
     }
 
     public int readInt(int ordinal, int fieldIndex) {
-        HollowObjectTypeFileElements currentData;
+        HollowObjectTypeDataElements currentData;
         long value;
 
         do {
@@ -100,7 +100,7 @@ class HollowObjectTypeReadFileShard {
     }
 
     public float readFloat(int ordinal, int fieldIndex) {
-        HollowObjectTypeFileElements currentData;
+        HollowObjectTypeDataElements currentData;
         int value;
 
         do {
@@ -114,7 +114,7 @@ class HollowObjectTypeReadFileShard {
     }
 
     public double readDouble(int ordinal, int fieldIndex) {
-        HollowObjectTypeFileElements currentData;
+        HollowObjectTypeDataElements currentData;
         long value;
 
         do {
@@ -129,7 +129,7 @@ class HollowObjectTypeReadFileShard {
     }
 
     public long readLong(int ordinal, int fieldIndex) {
-        HollowObjectTypeFileElements currentData;
+        HollowObjectTypeDataElements currentData;
         long value;
 
         do {
@@ -145,7 +145,7 @@ class HollowObjectTypeReadFileShard {
     }
 
     public Boolean readBoolean(int ordinal, int fieldIndex) {
-        HollowObjectTypeFileElements currentData;
+        HollowObjectTypeDataElements currentData;
         long value;
 
         do {
@@ -158,7 +158,7 @@ class HollowObjectTypeReadFileShard {
         return value == 1 ? Boolean.TRUE : Boolean.FALSE;
     }
 
-    private long readFixedLengthFieldValue(HollowObjectTypeFileElements currentData, int ordinal, int fieldIndex) {
+    private long readFixedLengthFieldValue(HollowObjectTypeDataElements currentData, int ordinal, int fieldIndex) {
         long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
         int numBitsForField = currentData.bitsPerField[fieldIndex];
 
@@ -168,7 +168,7 @@ class HollowObjectTypeReadFileShard {
     }
 
     public byte[] readBytes(int ordinal, int fieldIndex) {
-        HollowObjectTypeFileElements currentData;
+        HollowObjectTypeDataElements currentData;
         byte[] result;
 
         do {
@@ -201,7 +201,7 @@ class HollowObjectTypeReadFileShard {
     }
 
     public String readString(int ordinal, int fieldIndex) {
-        HollowObjectTypeFileElements currentData;
+        HollowObjectTypeDataElements currentData;
         String result;
 
         do {
@@ -232,7 +232,7 @@ class HollowObjectTypeReadFileShard {
     }
 
     public boolean isStringFieldEqual(int ordinal, int fieldIndex, String testValue) {
-        HollowObjectTypeFileElements currentData;
+        HollowObjectTypeDataElements currentData;
         boolean result;
 
         do {
@@ -266,7 +266,7 @@ class HollowObjectTypeReadFileShard {
     }
 
     public int findVarLengthFieldHashCode(int ordinal, int fieldIndex) {
-        HollowObjectTypeFileElements currentData;
+        HollowObjectTypeDataElements currentData;
         int hashCode;
         do {
             int numBitsForField;
@@ -303,7 +303,7 @@ class HollowObjectTypeReadFileShard {
         return fieldIndex == -1 ? 0 : currentDataVolatile.bitsPerField[fieldIndex];
     }
 
-    private long fieldOffset(HollowObjectTypeFileElements currentData, int ordinal, int fieldIndex) {
+    private long fieldOffset(HollowObjectTypeDataElements currentData, int ordinal, int fieldIndex) {
         return ((long)currentData.bitsPerRecord * ordinal) + currentData.bitOffsetPerField[fieldIndex];
     }
 
@@ -368,11 +368,11 @@ class HollowObjectTypeReadFileShard {
         setCurrentData(null);
     }
 
-    HollowObjectTypeFileElements currentDataElements() {
+    HollowObjectTypeDataElements currentDataElements() {
         return currentDataVolatile;
     }
 
-    private boolean readWasUnsafe(HollowObjectTypeFileElements data) {
+    private boolean readWasUnsafe(HollowObjectTypeDataElements data) {
         // Use a load (acquire) fence to constrain the compiler reordering prior plain loads so
         // that they cannot "float down" below the volatile load of currentDataVolatile.
         // This ensures data is checked against currentData *after* optimistic calculations
@@ -401,7 +401,7 @@ class HollowObjectTypeReadFileShard {
         return data != currentDataVolatile;
     }
 
-    void setCurrentData(HollowObjectTypeFileElements data) {
+    void setCurrentData(HollowObjectTypeDataElements data) {
         this.currentDataVolatile = data;
     }
 
@@ -421,7 +421,7 @@ class HollowObjectTypeReadFileShard {
             fieldIndexes[i] = schema.getPosition(commonFieldNames.get(i));
         }
 
-        HollowObjectTypeFileElements currentData = currentDataVolatile;
+        HollowObjectTypeDataElements currentData = currentDataVolatile;
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
@@ -451,7 +451,7 @@ class HollowObjectTypeReadFileShard {
     }
 
     public long getApproximateHeapFootprintInBytes() {
-        HollowObjectTypeFileElements currentData = currentDataVolatile;
+        HollowObjectTypeDataElements currentData = currentDataVolatile;
         long bitsPerFixedLengthData = (long)currentData.bitsPerRecord * (currentData.maxOrdinal + 1);
         
         long requiredBytes = bitsPerFixedLengthData / 8;
@@ -465,7 +465,7 @@ class HollowObjectTypeReadFileShard {
     }
     
     public long getApproximateHoleCostInBytes(BitSet populatedOrdinals, int shardNumber, int numShards) {
-        HollowObjectTypeFileElements currentData = currentDataVolatile;
+        HollowObjectTypeDataElements currentData = currentDataVolatile;
         long holeBits = 0;
         
         int holeOrdinal = populatedOrdinals.nextClearBit(0);

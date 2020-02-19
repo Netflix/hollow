@@ -18,24 +18,25 @@ package com.netflix.hollow.core.read.engine;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class SnapshotPopulatedOrdinalsReader {
 
     /**
      * Read populated ordinals as a bit set from a stream, and notify a listener for each populated ordinal.
      *
-     * @param dis the data input stream
+     * @param raf the data input stream
      * @param listeners the type state listeners
      * @throws IOException if the ordinals cannot be read
      * @author dkoszewnik
      */
-    public static void readOrdinals(DataInputStream dis, HollowTypeStateListener[] listeners) throws IOException {
-        int numLongs = dis.readInt();
+    public static void readOrdinals(RandomAccessFile raf, HollowTypeStateListener[] listeners) throws IOException {
+        int numLongs = raf.readInt();
 
         int currentOrdinal = 0;
 
         for(int i=0;i<numLongs;i++) {
-            long l = dis.readLong();
+            long l = raf.readLong();
             notifyPopulatedOrdinals(l, currentOrdinal, listeners);
             currentOrdinal += 64;
         }
