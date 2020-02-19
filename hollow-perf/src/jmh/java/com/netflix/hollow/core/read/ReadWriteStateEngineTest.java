@@ -81,25 +81,25 @@ public class ReadWriteStateEngineTest {
 
     // Reads
 
-    @Benchmark
-    public HollowReadStateEngine roundtripPipe() {
-        return roundTripSnapshotPipe(writeEngine);
-    }
+    // @Benchmark
+    // public HollowReadStateEngine roundtripPipe() {
+    //     return roundTripSnapshotPipe(writeEngine);
+    // }
 
-    @Benchmark
-    public HollowReadStateEngine roundtripPipeBuffered() {
-        return roundTripSnapshotPipeBuffered(writeEngine);
-    }
+    // @Benchmark
+    // public HollowReadStateEngine roundtripPipeBuffered() {
+    //     return roundTripSnapshotPipeBuffered(writeEngine);
+    // }
 
-    @Benchmark
-    public HollowReadStateEngine roundtripMemory() throws IOException {
-        return roundTripSnapshotMemory(writeEngine);
-    }
+    // @Benchmark
+    // public HollowReadStateEngine roundtripMemory() throws IOException {
+    //     return roundTripSnapshotMemory(writeEngine);
+    // }
 
-    @Benchmark
-    public HollowReadStateEngine roundtripFile() throws IOException {
-        return roundTripSnapshotFile(writeEngine);
-    }
+    // @Benchmark
+    // public HollowReadStateEngine roundtripFile() throws IOException {
+    //     return roundTripSnapshotFile(writeEngine);
+    // }
 
     private static HollowReadStateEngine roundTripSnapshotPipe(HollowWriteStateEngine writeEngine) {
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
@@ -124,7 +124,8 @@ public class ReadWriteStateEngineTest {
                 }
             });
 
-            reader.readSnapshot(in);
+            throw new UnsupportedOperationException();
+            //reader.readSnapshot(in);
         } catch (Exception e) {
             pipeException = e;
         }
@@ -169,7 +170,8 @@ public class ReadWriteStateEngineTest {
                 }
             });
 
-            reader.readSnapshot(new BufferedInputStream(in));
+            throw new UnsupportedOperationException();
+            // reader.readSnapshot(new BufferedInputStream(in));
         } catch (Exception e) {
             pipeException = e;
         }
@@ -200,9 +202,9 @@ public class ReadWriteStateEngineTest {
         writer.writeSnapshot(baos);
 
         InputStream is = new ByteArrayInputStream(baos.toByteArray());
-        reader.readSnapshot(is);
-
-        return readEngine;
+        throw new UnsupportedOperationException();
+        // reader.readSnapshot(is);
+        // return readEngine;
     }
 
     public static HollowReadStateEngine roundTripSnapshotFile(HollowWriteStateEngine writeEngine) throws IOException {
@@ -217,11 +219,13 @@ public class ReadWriteStateEngineTest {
             out.flush();
         }
 
-        try (InputStream is = new BufferedInputStream(new FileInputStream(f))) {
-            reader.readSnapshot(is);
-        }
-
-        return readEngine;
+        throw new UnsupportedOperationException();
+//        try (InputStream is = new BufferedInputStream(new FileInputStream(f))) {
+//
+//            reader.readSnapshot(is);
+//        }
+//
+//        return readEngine;
     }
 }
 
