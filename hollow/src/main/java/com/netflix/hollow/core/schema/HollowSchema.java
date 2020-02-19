@@ -22,6 +22,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 
 /**
  * A HollowSchema defines the structure of a hollow data model.
@@ -98,6 +99,25 @@ public abstract class HollowSchema {
         throw new IOException();
     }
 
+    public static HollowSchema readFrom(RandomAccessFile raf) throws IOException {
+        int schemaTypeId = raf.read();
+
+        String schemaName = raf.readUTF();
+
+        switch(SchemaType.fromTypeId(schemaTypeId)) {
+            case OBJECT:
+                return readObjectSchemaFrom(raf, schemaName, SchemaType.hasKey(schemaTypeId));
+            case LIST:
+                return readListSchemaFrom(raf, schemaName);
+            case SET:
+                return readSetSchemaFrom(raf, schemaName, SchemaType.hasKey(schemaTypeId));
+            case MAP:
+                return readMapSchemaFrom(raf, schemaName, SchemaType.hasKey(schemaTypeId));
+        }
+
+        throw new IOException();
+    }
+
     private static HollowObjectSchema readObjectSchemaFrom(DataInputStream is, String schemaName, boolean hasPrimaryKey) throws IOException {
         String[] keyFieldPaths = null;
         if (hasPrimaryKey) {
@@ -121,6 +141,29 @@ public abstract class HollowSchema {
         return schema;
     }
 
+    private static HollowObjectSchema readObjectSchemaFrom(RandomAccessFile raf, String schemaName, boolean hasPrimaryKey) throws IOException {
+        String[] keyFieldPaths = null;
+        if (hasPrimaryKey) {
+            int numFields = VarInt.readVInt(raf);
+            keyFieldPaths = new String[numFields];
+            for(int i=0;i<numFields;i++) {
+                keyFieldPaths[i] = raf.readUTF();
+            }
+        }
+
+        int numFields = raf.readShort();
+        HollowObjectSchema schema = new HollowObjectSchema(schemaName, numFields, keyFieldPaths);
+
+        for(int i=0;i<numFields;i++) {
+            String fieldName = raf.readUTF();
+            FieldType fieldType = FieldType.valueOf(raf.readUTF());
+            String referencedType = fieldType == FieldType.REFERENCE ? raf.readUTF() : null;
+            schema.addField(fieldName, fieldType, referencedType);
+        }
+
+        return schema;
+    }
+
     private static HollowSetSchema readSetSchemaFrom(DataInputStream is, String schemaName, boolean hasHashKey) throws IOException {
         String elementType = is.readUTF();
 
@@ -137,8 +180,30 @@ public abstract class HollowSchema {
         return new HollowSetSchema(schemaName, elementType, hashKeyFields);
     }
 
+    private static HollowSetSchema readSetSchemaFrom(RandomAccessFile raf, String schemaName, boolean hasHashKey) throws IOException {
+        String elementType = raf.readUTF();
+
+        String hashKeyFields[] = null;
+
+        if(hasHashKey) {
+            int numFields = VarInt.readVInt(raf);
+            hashKeyFields = new String[numFields];
+            for(int i=0;i<numFields;i++) {
+                hashKeyFields[i] = raf.readUTF();
+            }
+        }
+
+        return new HollowSetSchema(schemaName, elementType, hashKeyFields);
+    }
+
     private static HollowListSchema readListSchemaFrom(DataInputStream is, String schemaName) throws IOException {
         String elementType = is.readUTF();
+
+        return new HollowListSchema(schemaName, elementType);
+    }
+
+    private static HollowListSchema readListSchemaFrom(RandomAccessFile raf, String schemaName) throws IOException {
+        String elementType = raf.readUTF();
 
         return new HollowListSchema(schemaName, elementType);
     }
@@ -154,6 +219,23 @@ public abstract class HollowSchema {
             hashKeyFields = new String[numFields];
             for(int i=0;i<numFields;i++) {
                 hashKeyFields[i] = is.readUTF();
+            }
+        }
+
+        return new HollowMapSchema(schemaName, keyType, valueType, hashKeyFields);
+    }
+
+    private static HollowMapSchema readMapSchemaFrom(RandomAccessFile raf, String schemaName, boolean hasHashKey) throws IOException {
+        String keyType = raf.readUTF();
+        String valueType = raf.readUTF();
+
+        String hashKeyFields[] = null;
+
+        if(hasHashKey) {
+            int numFields = VarInt.readVInt(raf);
+            hashKeyFields = new String[numFields];
+            for(int i=0;i<numFields;i++) {
+                hashKeyFields[i] = raf.readUTF();
             }
         }
 

@@ -21,6 +21,9 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import sun.misc.Unsafe;
 
 /**
@@ -52,6 +55,28 @@ public class SegmentedLongArray {
 
         for(int i=0;i<segments.length;i++) {
             segments[i] = memoryRecycler.getLongArray();
+        }
+
+        /// The following assignment is purposefully placed *after* the population of all segments.
+        /// The final assignment after the initialization of the array guarantees that no thread
+        /// will see any of the array elements before assignment.
+        /// We can't risk the segment values being visible as null to any thread, because
+        /// FixedLengthElementArray uses Unsafe to access these values, which would cause the
+        /// JVM to crash with a segmentation fault.
+        this.segments = segments;
+    }
+
+    public SegmentedLongArray(RandomAccessFile raf, MappedByteBuffer buffer, long numLongs, ArraySegmentRecycler memoryRecycler)
+    throws IOException {
+        this.log2OfSegmentSize = memoryRecycler.getLog2OfLongSegmentSize();
+        int numSegments = (int)((numLongs - 1) >>> log2OfSegmentSize) + 1;
+        this.bitmask = (1 << log2OfSegmentSize) - 1;
+
+        long[][] segments = new long[numSegments][];
+        for(int i=0;i<segments.length;i++) {
+            segments[i] = buffer.asLongBuffer().array();    // segments[i] references buffer.position()
+            buffer.position(buffer.position() + (1 << log2OfSegmentSize));  // advance buffer by segment size
+            raf.skipBytes(1 << log2OfSegmentSize);
         }
 
         /// The following assignment is purposefully placed *after* the population of all segments.
@@ -114,6 +139,7 @@ public class SegmentedLongArray {
                 memoryRecycler.recycleLongArray(segments[i]);
         }
     }
+
 
     public static SegmentedLongArray deserializeFrom(DataInputStream dis, ArraySegmentRecycler memoryRecycler) throws IOException {
         long numLongs = VarInt.readVLong(dis);

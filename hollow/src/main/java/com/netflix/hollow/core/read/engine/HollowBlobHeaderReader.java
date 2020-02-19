@@ -19,10 +19,12 @@ package com.netflix.hollow.core.read.engine;
 import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.schema.HollowSchema;
+import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +37,46 @@ import java.util.Map;
  * 
  */
 public class HollowBlobHeaderReader {
+
+    public HollowBlobHeader readHeader(RandomAccessFile raf) throws IOException {
+        HollowBlobHeader header = new HollowBlobHeader();
+        raf.seek(0);
+
+        int headerVersion = raf.readInt();
+        if(headerVersion != HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER) {
+            throw new IOException("The HollowBlob you are trying to read is incompatible.  "
+                    + "The expected Hollow blob version was " + HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER + " but the actual version was " + headerVersion);
+        }
+
+        header.setBlobFormatVersion(headerVersion);
+
+        header.setOriginRandomizedTag(raf.readLong());
+        header.setDestinationRandomizedTag(raf.readLong());
+
+        int oldBytesToSkip = VarInt.readVInt(raf); /// pre v2.2.0 envelope
+
+        if(oldBytesToSkip != 0) {
+            int numSchemas = VarInt.readVInt(raf);
+
+            List<HollowSchema> schemas = new ArrayList<HollowSchema>();
+            for(int i=0;i<numSchemas;i++)
+                schemas.add(HollowSchema.readFrom(raf));
+            header.setSchemas(schemas);
+
+            int bytesToSkip = VarInt.readVInt(raf); /// forwards-compatibility, new data can be added here.
+            while(bytesToSkip > 0) {
+                int skippedBytes = (int)raf.skipBytes(bytesToSkip);
+                if(skippedBytes < 0)
+                    throw new EOFException();
+                bytesToSkip -= skippedBytes;
+            }
+        }
+
+        Map<String, String> headerTags = readHeaderTags(raf);
+        header.setHeaderTags(headerTags);
+
+        return header;
+    }
 
     public HollowBlobHeader readHeader(InputStream is) throws IOException {
         HollowBlobHeader header = new HollowBlobHeader();
@@ -87,6 +129,14 @@ public class HollowBlobHeaderReader {
         Map<String, String> headerTags = new HashMap<String, String>();
         for (int i = 0; i < numHeaderTags; i++) {
             headerTags.put(dis.readUTF(), dis.readUTF());
+        }
+        return headerTags;
+    }
+    private Map<String, String> readHeaderTags(RandomAccessFile raf) throws IOException {
+        int numHeaderTags = raf.readShort();
+        Map<String, String> headerTags = new HashMap<String, String>();
+        for (int i = 0; i < numHeaderTags; i++) {
+            headerTags.put(raf.readUTF(), raf.readUTF());
         }
         return headerTags;
     }
