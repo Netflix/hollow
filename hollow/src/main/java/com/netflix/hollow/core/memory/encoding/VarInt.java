@@ -21,6 +21,7 @@ import com.netflix.hollow.core.memory.ByteDataBuffer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 
 /**
  * Variable-byte integer encoding and decoding logic
@@ -187,6 +188,22 @@ public class VarInt {
         return value;
     }
 
+    public static int readVInt(RandomAccessFile raf) throws IOException {
+        byte b = (byte)raf.read();
+
+        if(b == (byte) 0x80)
+            throw new RuntimeException("Attempting to read null value as int");
+
+        int value = b & 0x7F;
+        while ((b & 0x80) != 0) {
+            b = (byte)raf.read();
+            value <<= 7;
+            value |= (b & 0x7F);
+        }
+
+        return value;
+    }
+
     /**
      * Read a variable length long from the supplied {@link ByteData} starting at the specified position. 
      * @param arr the byte data to read from
@@ -248,6 +265,22 @@ public class VarInt {
           b = (byte)in.read();
           value <<= 7;
           value |= (b & 0x7F);
+        }
+
+        return value;
+    }
+
+    public static long readVLong(RandomAccessFile raf) throws IOException {
+        byte b = (byte)raf.read();
+
+        if(b == (byte) 0x80)
+            throw new RuntimeException("Attempting to read null value as long");
+
+        long value = b & 0x7F;
+        while ((b & 0x80) != 0) {
+            b = (byte)raf.read();
+            value <<= 7;
+            value |= (b & 0x7F);
         }
 
         return value;

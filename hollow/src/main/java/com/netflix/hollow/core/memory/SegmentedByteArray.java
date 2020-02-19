@@ -20,6 +20,9 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import sun.misc.Unsafe;
 
@@ -249,6 +252,18 @@ public class SegmentedByteArray implements ByteData {
         }
     }
 
+    public void readFrom(RandomAccessFile raf, long length) throws IOException {
+        int segmentSize = 1 << log2OfSegmentSize;
+        int segment = 0;
+
+        FileChannel channel = raf.getChannel(); // SNAP: Map MappedByteBuffer once altogether
+        MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, raf.getFilePointer(), raf.length());
+
+        // SNAP: simplification: assume one segment
+        segments[0] = buffer.array();
+        raf.skipBytes((int) length);
+    }
+
     /**
      * Write a portion of this data to an OutputStream.
      *
@@ -274,6 +289,14 @@ public class SegmentedByteArray implements ByteData {
     }
 
     private void orderedCopy(byte[] src, int srcPos, byte[] dest, int destPos, int length) {
+        int endSrcPos = srcPos + length;
+        destPos += Unsafe.ARRAY_BYTE_BASE_OFFSET;
+
+        while(srcPos < endSrcPos) {
+            unsafe.putByteVolatile(dest, destPos++, src[srcPos++]);
+        }
+    }
+    private void orderedReference(byte[] src, int srcPos, byte[] dest, int destPos, int length) {
         int endSrcPos = srcPos + length;
         destPos += Unsafe.ARRAY_BYTE_BASE_OFFSET;
 

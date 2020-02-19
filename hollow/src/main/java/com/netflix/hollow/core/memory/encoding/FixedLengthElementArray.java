@@ -21,6 +21,9 @@ import com.netflix.hollow.core.memory.SegmentedLongArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import sun.misc.Unsafe;
 
 /**
@@ -67,6 +70,13 @@ public class FixedLengthElementArray extends SegmentedLongArray {
 
     public FixedLengthElementArray(ArraySegmentRecycler memoryRecycler, long numBits) {
         super(memoryRecycler, ((numBits - 1) >>> 6) + 1);
+        this.log2OfSegmentSizeInBytes = log2OfSegmentSize + 3;
+        this.byteBitmask = (1 << log2OfSegmentSizeInBytes) - 1;
+    }
+
+    public FixedLengthElementArray(RandomAccessFile raf, MappedByteBuffer buffer, long numBits, ArraySegmentRecycler memoryRecycler)
+            throws IOException {
+        super(raf, buffer, ((numBits - 1) >>> 6) + 1, memoryRecycler);
         this.log2OfSegmentSizeInBytes = log2OfSegmentSize + 3;
         this.byteBitmask = (1 << log2OfSegmentSizeInBytes) - 1;
     }
@@ -248,6 +258,26 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, numLongs * 64);
 
         arr.readFrom(dis, memoryRecycler, numLongs);
+
+        return arr;
+    }
+
+    //
+    // SNAP: Can I assign an existing memory block to FixedLengthElementArray, instead of
+    //       allocating and copying over each time?
+    //
+    // returns a FixedLengthElementArray that contains deserialized data from given file
+    public static FixedLengthElementArray deserializeFrom(RandomAccessFile raf, ArraySegmentRecycler memoryRecycler) throws IOException {
+        long numLongs = VarInt.readVLong(raf);
+
+        // FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, numLongs * 64);
+        // assign arr to address of that raf and size of numLongs * 64
+        // arr.readFrom(dis, memoryRecycler, numLongs);
+
+        // SNAP: TODO: Map whole file once instead of mapping section at a time for performance and to avoid OutOfMemory exception
+        FileChannel fileChannel = raf.getChannel();
+        MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, raf.getFilePointer(), fileChannel.size());
+        FixedLengthElementArray arr = new FixedLengthElementArray(raf, buffer, numLongs * 64, memoryRecycler);
 
         return arr;
     }
