@@ -22,6 +22,7 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * This class holds the data for a {@link HollowListTypeReadState}.
@@ -49,28 +50,29 @@ public class HollowListTypeDataElements {
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(DataInputStream dis) throws IOException {
-        readFromStream(dis, false);
+    void readSnapshot(RandomAccessFile raf) throws IOException {
+        readFromStream(raf, false);
     }
 
-    void readDelta(DataInputStream dis) throws IOException {
-        readFromStream(dis, true);
+    void readDelta(RandomAccessFile raf) throws IOException {
+        readFromStream(raf, true);
     }
 
-    private void readFromStream(DataInputStream dis, boolean isDelta) throws IOException {
-        maxOrdinal = VarInt.readVInt(dis);
+    private void readFromStream(RandomAccessFile raf, boolean isDelta) throws IOException {
+        maxOrdinal = VarInt.readVInt(raf);
 
         if(isDelta) {
-            encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
-            encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+        //    encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+        //    encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+            throw new UnsupportedOperationException();
         }
 
-        bitsPerListPointer = VarInt.readVInt(dis);
-        bitsPerElement = VarInt.readVInt(dis);
-        totalNumberOfElements = VarInt.readVLong(dis);
+        bitsPerListPointer = VarInt.readVInt(raf);
+        bitsPerElement = VarInt.readVInt(raf);
+        totalNumberOfElements = VarInt.readVLong(raf);
 
-        listPointerArray = FixedLengthElementArray.deserializeFrom(dis, memoryRecycler);
-        elementArray = FixedLengthElementArray.deserializeFrom(dis, memoryRecycler);
+        listPointerArray = FixedLengthElementArray.deserializeFrom(raf, memoryRecycler);
+        elementArray = FixedLengthElementArray.deserializeFrom(raf, memoryRecycler);
     }
 
     static void discardFromStream(DataInputStream dis, int numShards, boolean isDelta) throws IOException {
