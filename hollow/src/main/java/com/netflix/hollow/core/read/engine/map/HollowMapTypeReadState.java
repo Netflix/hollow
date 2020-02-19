@@ -40,6 +40,7 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.BitSet;
 
 /**
@@ -75,42 +76,43 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
 
     @Override
-    public void readSnapshot(DataInputStream dis, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void readSnapshot(RandomAccessFile raf, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
-            maxOrdinal = VarInt.readVInt(dis);
+            maxOrdinal = VarInt.readVInt(raf);
         
         for(int i=0; i<shards.length; i++) {
             HollowMapTypeDataElements snapshotData = new HollowMapTypeDataElements(memoryRecycler);
-            snapshotData.readSnapshot(dis);
+            snapshotData.readSnapshot(raf);
             shards[i].setCurrentData(snapshotData);
         }
         
         if(shards.length == 1)
             maxOrdinal = shards[0].currentDataElements().maxOrdinal;
         
-        SnapshotPopulatedOrdinalsReader.readOrdinals(dis, stateListeners);
+        SnapshotPopulatedOrdinalsReader.readOrdinals(raf, stateListeners);
     }
 
     @Override
     public void applyDelta(DataInputStream dis, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException {
-        if(shards.length > 1)
-            maxOrdinal = VarInt.readVInt(dis);
-
-        for(int i=0; i<shards.length; i++) {
-            HollowMapTypeDataElements deltaData = new HollowMapTypeDataElements(memoryRecycler);
-            HollowMapTypeDataElements nextData = new HollowMapTypeDataElements(memoryRecycler);
-            deltaData.readDelta(dis);
-            HollowMapTypeDataElements oldData = shards[i].currentDataElements();
-            nextData.applyDelta(oldData, deltaData);
-            shards[i].setCurrentData(nextData);
-            notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
-            deltaData.destroy();
-            oldData.destroy();
-            stateEngine.getMemoryRecycler().swap();
-        }
-        
-        if(shards.length == 1)
-            maxOrdinal = shards[0].currentDataElements().maxOrdinal;
+//        if(shards.length > 1)
+//            maxOrdinal = VarInt.readVInt(dis);
+//
+//        for(int i=0; i<shards.length; i++) {
+//            HollowMapTypeDataElements deltaData = new HollowMapTypeDataElements(memoryRecycler);
+//            HollowMapTypeDataElements nextData = new HollowMapTypeDataElements(memoryRecycler);
+//            deltaData.readDelta(dis);
+//            HollowMapTypeDataElements oldData = shards[i].currentDataElements();
+//            nextData.applyDelta(oldData, deltaData);
+//            shards[i].setCurrentData(nextData);
+//            notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+//            deltaData.destroy();
+//            oldData.destroy();
+//            stateEngine.getMemoryRecycler().swap();
+//        }
+//
+//        if(shards.length == 1)
+//            maxOrdinal = shards[0].currentDataElements().maxOrdinal;
+        throw new UnsupportedOperationException();
     }
 
     public static void discardSnapshot(DataInputStream dis, int numShards) throws IOException {

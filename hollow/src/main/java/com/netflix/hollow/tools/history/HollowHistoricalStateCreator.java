@@ -324,47 +324,48 @@ public class HollowHistoricalStateCreator {
     }
 
     private static HollowReadStateEngine roundTripStateEngine(HollowWriteStateEngine writeEngine) {
-        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
-        HollowReadStateEngine removedRecordCopies = new HollowReadStateEngine();
-        HollowBlobReader reader = new HollowBlobReader(removedRecordCopies);
-
-        // Use a pipe to write and read concurrently to avoid writing
-        // to temporary files or allocating memory
-        // @@@ for small states it's more efficient to sequentially write to
-        // and read from a byte array but it is tricky to estimate the size
-        SimultaneousExecutor executor = new SimultaneousExecutor(1, HollowHistoricalStateCreator.class, "round-trip");
-        Exception pipeException = null;
-        // Ensure read-side is closed after completion of read
-        try (PipedInputStream in = new PipedInputStream(1 << 15)) {
-            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(in));
-            executor.execute(() -> {
-                // Ensure write-side is closed after completion of write
-                try (Closeable ac = out) {
-                    writer.writeSnapshot(out);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-
-            reader.readSnapshot(new BufferedInputStream(in));
-        } catch (Exception e) {
-            pipeException = e;
-        }
-
-        // Ensure no underlying writer exception is lost due to broken pipe
-        try {
-            executor.awaitSuccessfulCompletion();
-        } catch (InterruptedException | ExecutionException e) {
-            if (pipeException == null) {
-                throw new RuntimeException(e);
-            }
-
-            pipeException.addSuppressed(e);
-        }
-        if (pipeException != null)
-            throw new RuntimeException(pipeException);
-
-        return removedRecordCopies;
+//        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+//        HollowReadStateEngine removedRecordCopies = new HollowReadStateEngine();
+//        HollowBlobReader reader = new HollowBlobReader(removedRecordCopies);
+//
+//        // Use a pipe to write and read concurrently to avoid writing
+//        // to temporary files or allocating memory
+//        // @@@ for small states it's more efficient to sequentially write to
+//        // and read from a byte array but it is tricky to estimate the size
+//        SimultaneousExecutor executor = new SimultaneousExecutor(1, HollowHistoricalStateCreator.class, "round-trip");
+//        Exception pipeException = null;
+//        // Ensure read-side is closed after completion of read
+//        try (PipedInputStream in = new PipedInputStream(1 << 15)) {
+//            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(in));
+//            executor.execute(() -> {
+//                // Ensure write-side is closed after completion of write
+//                try (Closeable ac = out) {
+//                    writer.writeSnapshot(out);
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            });
+//
+//            reader.readSnapshot(new BufferedInputStream(in));
+//        } catch (Exception e) {
+//            pipeException = e;
+//        }
+//
+//        // Ensure no underlying writer exception is lost due to broken pipe
+//        try {
+//            executor.awaitSuccessfulCompletion();
+//        } catch (InterruptedException | ExecutionException e) {
+//            if (pipeException == null) {
+//                throw new RuntimeException(e);
+//            }
+//
+//            pipeException.addSuppressed(e);
+//        }
+//        if (pipeException != null)
+//            throw new RuntimeException(pipeException);
+//
+//        return removedRecordCopies;
+        throw new UnsupportedOperationException();
     }
 
     private List<HollowSchema> schemasWithoutKeys(List<HollowSchema> schemas) {

@@ -22,6 +22,7 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * This class holds the data for a {@link HollowSetTypeReadState}.
@@ -53,32 +54,33 @@ public class HollowSetTypeDataElements {
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(DataInputStream dis) throws IOException {
-        readFromStream(dis, false);
+    void readSnapshot(RandomAccessFile raf) throws IOException {
+        readFromStream(raf, false);
     }
 
-    void readDelta(DataInputStream dis) throws IOException {
-        readFromStream(dis, true);
+    void readDelta(RandomAccessFile raf) throws IOException {
+        readFromStream(raf, true);
     }
 
-    private void readFromStream(DataInputStream dis, boolean isDelta) throws IOException {
-        maxOrdinal = VarInt.readVInt(dis);
+    private void readFromStream(RandomAccessFile raf, boolean isDelta) throws IOException {
+        maxOrdinal = VarInt.readVInt(raf);
 
         if(isDelta) {
-            encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
-            encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+            //encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+            //encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+            throw new UnsupportedOperationException();
         }
 
-        bitsPerSetPointer = VarInt.readVInt(dis);
-        bitsPerSetSizeValue = VarInt.readVInt(dis);
-        bitsPerElement = VarInt.readVInt(dis);
+        bitsPerSetPointer = VarInt.readVInt(raf);
+        bitsPerSetSizeValue = VarInt.readVInt(raf);
+        bitsPerElement = VarInt.readVInt(raf);
         bitsPerFixedLengthSetPortion = bitsPerSetPointer + bitsPerSetSizeValue;
         emptyBucketValue = (1 << bitsPerElement) - 1;
-        totalNumberOfBuckets = VarInt.readVLong(dis);
+        totalNumberOfBuckets = VarInt.readVLong(raf);
 
-        setPointerAndSizeArray = FixedLengthElementArray.deserializeFrom(dis, memoryRecycler);
+        setPointerAndSizeArray = FixedLengthElementArray.deserializeFrom(raf, memoryRecycler);
 
-        elementArray = FixedLengthElementArray.deserializeFrom(dis, memoryRecycler);
+        elementArray = FixedLengthElementArray.deserializeFrom(raf, memoryRecycler);
     }
 
     static void discardFromStream(DataInputStream dis, int numShards, boolean isDelta) throws IOException {

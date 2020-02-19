@@ -22,6 +22,7 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * This class holds the data for a {@link HollowMapTypeReadState}.
@@ -54,36 +55,37 @@ public class HollowMapTypeDataElements {
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(DataInputStream dis) throws IOException {
-        readFromStream(dis, false);
+    void readSnapshot(RandomAccessFile raf) throws IOException {
+        readFromStream(raf, false);
     }
 
-    void readDelta(DataInputStream dis) throws IOException {
-        readFromStream(dis, true);
+    void readDelta(RandomAccessFile raf) throws IOException {
+        readFromStream(raf, true);
     }
 
-    private void readFromStream(DataInputStream dis, boolean isDelta) throws IOException {
-        maxOrdinal = VarInt.readVInt(dis);
+    private void readFromStream(RandomAccessFile raf, boolean isDelta) throws IOException {
+        maxOrdinal = VarInt.readVInt(raf);
 
         if(isDelta) {
-            encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
-            encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+            //encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+            //encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+            throw new UnsupportedOperationException();
         }
 
-        bitsPerMapPointer = VarInt.readVInt(dis);
-        bitsPerMapSizeValue = VarInt.readVInt(dis);
-        bitsPerKeyElement = VarInt.readVInt(dis);
-        bitsPerValueElement = VarInt.readVInt(dis);
+        bitsPerMapPointer = VarInt.readVInt(raf);
+        bitsPerMapSizeValue = VarInt.readVInt(raf);
+        bitsPerKeyElement = VarInt.readVInt(raf);
+        bitsPerValueElement = VarInt.readVInt(raf);
         bitsPerFixedLengthMapPortion = bitsPerMapPointer + bitsPerMapSizeValue;
         bitsPerMapEntry = bitsPerKeyElement + bitsPerValueElement;
         emptyBucketKeyValue = (1 << bitsPerKeyElement) - 1;
-        totalNumberOfBuckets = VarInt.readVLong(dis);
+        totalNumberOfBuckets = VarInt.readVLong(raf);
 
         /// list pointer array
-        mapPointerAndSizeArray = FixedLengthElementArray.deserializeFrom(dis, memoryRecycler);
+        mapPointerAndSizeArray = FixedLengthElementArray.deserializeFrom(raf, memoryRecycler);
 
         /// element array
-        entryArray = FixedLengthElementArray.deserializeFrom(dis, memoryRecycler);
+        entryArray = FixedLengthElementArray.deserializeFrom(raf, memoryRecycler);
     }
 
     static void discardFromStream(DataInputStream dis, int numShards, boolean isDelta) throws IOException {
