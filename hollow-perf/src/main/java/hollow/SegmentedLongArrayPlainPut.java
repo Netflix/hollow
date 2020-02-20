@@ -68,15 +68,7 @@ public class SegmentedLongArrayPlainPut {
      * Set the byte at the given index to the specified value
      */
     public void set(long index, long value) {
-        int segmentIndex = (int) (index >> log2OfSegmentSize);
-        int longInSegment = (int) (index & bitmask);
-        unsafe.putLong(segments[segmentIndex], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longInSegment), value);
-
-        /// duplicate the longs here so that we can read faster.
-        if (longInSegment == 0 && segmentIndex != 0) {
-            unsafe.putLong(segments[segmentIndex - 1],
-                    (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (1 << log2OfSegmentSize)), value);
-        }
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -88,13 +80,7 @@ public class SegmentedLongArrayPlainPut {
     }
 
     public void fill(long value) {
-        for (int i = 0; i < segments.length; i++) {
-            long offset = Unsafe.ARRAY_LONG_BASE_OFFSET;
-            for (int j = 0; j < segments[i].length; j++) {
-                unsafe.putLong(segments[i], offset, value);
-                offset += 8;
-            }
-        }
+        throw new UnsupportedOperationException();
     }
 
     public void writeTo(DataOutputStream dos, long numLongs) throws IOException {

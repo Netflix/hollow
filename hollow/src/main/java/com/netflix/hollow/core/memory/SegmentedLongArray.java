@@ -138,36 +138,11 @@ public class SegmentedLongArray {
             numLongs -= longsReferenced;
 
         }
+
+        // SNAP: POTENTIAL BUG: last segment isn't padded with zeros
     }
 
     protected void readFrom(DataInputStream dis, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
-        int segmentSize = 1 << memoryRecycler.getLog2OfLongSegmentSize();
-        int segment = 0;
-
-        if(numLongs == 0)
-            return;
-
-        long fencepostLong = dis.readLong();
-
-        while(numLongs > 0) {
-            long longsToCopy = Math.min(segmentSize, numLongs);
-
-            unsafe.putOrderedLong(segments[segment], (long)Unsafe.ARRAY_LONG_BASE_OFFSET, fencepostLong);
-
-            int longsCopied = 1;
-
-            while(longsCopied < longsToCopy) {
-                long l = dis.readLong();
-                unsafe.putOrderedLong(segments[segment], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied++), l);
-            }
-
-            if(numLongs > longsCopied) {
-                unsafe.putOrderedLong(segments[segment], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied), dis.readLong());
-                fencepostLong = segments[segment].get(longsCopied);
-            }
-
-            segment++;
-            numLongs -= longsCopied;
-        }
+        throw new UnsupportedOperationException();
     }
 }

@@ -108,6 +108,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 
                 currentClass = currentClass.getSuperclass();
             }
+            throw new UnsupportedOperationException();
         }
 
         this.schema = new HollowObjectSchema(typeName, mappedFields.size(), getKeyFieldPaths(clazz));
@@ -150,19 +151,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
     @Override
     public int write(Object obj) {
-        if (hasAssignedOrdinalField) {
-            long assignedOrdinal = unsafe.getLong(obj, assignedOrdinalFieldOffset);
-            if((assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
-                return (int)assignedOrdinal & Integer.MAX_VALUE;
-        }
-
-        HollowObjectWriteRecord rec = copyToWriteRecord(obj, null);
-
-        int assignedOrdinal = writeState.add(rec);
-        if (hasAssignedOrdinalField) {
-            unsafe.putLong(obj, assignedOrdinalFieldOffset, (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits());
-        }
-        return assignedOrdinal;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -330,6 +319,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
 
             this.subTypeMapper = subTypeMapper;
+            throw new UnsupportedOperationException();
         }
 
         private MappedField(MappedFieldType specialField) {
@@ -360,183 +350,11 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
         @SuppressWarnings("deprecation")
         public void copy(Object obj, HollowObjectWriteRecord rec, FlatRecordWriter flatRecordWriter) {
-            Object fieldObject;
-            
-            switch(fieldType) {
-                case BOOLEAN:
-                    rec.setBoolean(fieldName, unsafe.getBoolean(obj, fieldOffset));
-                    break;
-                case INT:
-                    rec.setInt(fieldName, unsafe.getInt(obj, fieldOffset));
-                    break;
-                case SHORT:
-                    rec.setInt(fieldName, unsafe.getShort(obj, fieldOffset));
-                    break;
-                case BYTE:
-                    rec.setInt(fieldName, unsafe.getByte(obj, fieldOffset));
-                    break;
-                case CHAR:
-                    rec.setInt(fieldName, unsafe.getChar(obj, fieldOffset));
-                    break;
-                case LONG:
-                    rec.setLong(fieldName, unsafe.getLong(obj, fieldOffset));
-                    break;
-                case DOUBLE:
-                    double d = unsafe.getDouble(obj, fieldOffset);
-                    if(!Double.isNaN(d))
-                        rec.setDouble(fieldName, d);
-                    break;
-                case FLOAT:
-                    float f = unsafe.getFloat(obj, fieldOffset);
-                    if(!Float.isNaN(f))
-                        rec.setFloat(fieldName, f);
-                    break;
-                case STRING:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setString(fieldName, getStringFromField(obj, fieldObject));
-                    break;
-                case BYTES:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setBytes(fieldName, (byte[])fieldObject);
-                    break;
-                case INLINED_BOOLEAN:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setBoolean(fieldName, ((Boolean)fieldObject).booleanValue());
-                    break;
-                case INLINED_INT:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setInt(fieldName, ((Integer)fieldObject).intValue());
-                    break;
-                case INLINED_SHORT:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setInt(fieldName, ((Short)fieldObject).intValue());
-                    break;
-                case INLINED_BYTE:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setInt(fieldName, ((Byte)fieldObject).intValue());
-                    break;
-                case INLINED_CHAR:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setInt(fieldName, (int)((Character)fieldObject).charValue());
-                    break;
-                case INLINED_LONG:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setLong(fieldName, ((Long)fieldObject).longValue());
-                    break;
-                case INLINED_DOUBLE:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setDouble(fieldName, ((Double)fieldObject).doubleValue());
-                    break;
-                case INLINED_FLOAT:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setFloat(fieldName, ((Float)fieldObject).floatValue());
-                    break;
-                case INLINED_STRING:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setString(fieldName, (String)fieldObject);
-                    break;
-                case NULLABLE_PRIMITIVE_BOOLEAN:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setBoolean(fieldName, ((NullablePrimitiveBoolean)fieldObject).getBooleanValue());
-                    break;
-                case DATE_TIME:
-                    rec.setLong(fieldName, ((Date)obj).getTime());
-                    break;
-                case ENUM_NAME:
-                    rec.setString(fieldName, ((Enum<?>)obj).name());
-                    break;
-                case REFERENCE:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null) {
-                    	if(flatRecordWriter == null)
-                    		rec.setReference(fieldName, subTypeMapper.write(fieldObject));
-                    	else
-                    		rec.setReference(fieldName, subTypeMapper.writeFlat(fieldObject, flatRecordWriter));
-                    }
-                    break;
-            }
+            throw new UnsupportedOperationException();
         }
 
         public Object retrieveFieldValue(Object obj, int[] fieldPathIdx, int idx) {
-            Object fieldObject;
-
-            if(idx < fieldPathIdx.length - 1) {
-                if(fieldType != MappedFieldType.REFERENCE)
-                    throw new IllegalArgumentException("Expected REFERENCE mapped field type but found " + fieldType);
-                fieldObject = unsafe.getObject(obj, fieldOffset);
-                if(fieldObject == null)
-                    return null;
-                return ((HollowObjectTypeMapper)subTypeMapper).retrieveFieldValue(fieldObject, fieldPathIdx, idx+1);
-            }
-            
-
-            switch(fieldType) {
-            case BOOLEAN:
-                return unsafe.getBoolean(obj, fieldOffset);
-            case INT:
-                return Integer.valueOf(unsafe.getInt(obj, fieldOffset));
-            case SHORT:
-                return Integer.valueOf(unsafe.getShort(obj, fieldOffset));
-            case BYTE:
-                return Integer.valueOf(unsafe.getByte(obj, fieldOffset));
-            case CHAR:
-                return Integer.valueOf(unsafe.getChar(obj, fieldOffset));
-            case LONG:
-                return Long.valueOf(unsafe.getLong(obj, fieldOffset));
-            case DOUBLE:
-                double d = unsafe.getDouble(obj, fieldOffset);
-                if(Double.isNaN(d))
-                    return null;
-                return Double.valueOf(d);
-            case FLOAT:
-                float f = unsafe.getFloat(obj, fieldOffset);
-                if(Float.isNaN(f))
-                    return null;
-                return Float.valueOf(f);
-            case STRING:
-                fieldObject = unsafe.getObject(obj, fieldOffset);
-                return fieldObject == null ? null : getStringFromField(obj, fieldObject);
-            case BYTES:
-                fieldObject = unsafe.getObject(obj, fieldOffset);
-                return fieldObject == null ? null : (byte[])fieldObject;
-            case INLINED_BOOLEAN:
-            case INLINED_INT:
-            case INLINED_LONG:
-            case INLINED_DOUBLE:
-            case INLINED_FLOAT:
-            case INLINED_STRING:
-                return unsafe.getObject(obj, fieldOffset);
-            case INLINED_SHORT:
-                fieldObject = unsafe.getObject(obj, fieldOffset);
-                return fieldObject == null ? null : Integer.valueOf((Short)fieldObject);
-            case INLINED_BYTE:
-                fieldObject = unsafe.getObject(obj, fieldOffset);
-                return fieldObject == null ? null : Integer.valueOf((Byte)fieldObject);
-            case INLINED_CHAR:
-                fieldObject = unsafe.getObject(obj, fieldOffset);
-                return fieldObject == null ? null : Integer.valueOf((Character)fieldObject);
-            case NULLABLE_PRIMITIVE_BOOLEAN:
-                fieldObject = unsafe.getObject(obj, fieldOffset);
-                return fieldObject == null ? null : Boolean.valueOf(((NullablePrimitiveBoolean)fieldObject).getBooleanValue());
-            case DATE_TIME:
-                return Long.valueOf(((Date)obj).getTime());
-            case ENUM_NAME:
-                return String.valueOf(((Enum<?>)obj).name());
-            default:
-                throw new IllegalArgumentException("Cannot extract POJO primary key from a " + fieldType + " mapped field type");
-            }
+            throw new UnsupportedOperationException();
         }
 
         private String getStringFromField(Object obj, Object fieldObject) {

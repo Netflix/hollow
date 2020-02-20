@@ -16,7 +16,6 @@
  */
 package com.netflix.hollow.core.memory.encoding;
 
-import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.SegmentedLongArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
@@ -25,7 +24,6 @@ import java.io.RandomAccessFile;
 import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import sun.misc.Unsafe;
 
 /**
  * Each record in Hollow begins with a fixed-length number of bits.  At the lowest level, these bits 
@@ -38,9 +36,7 @@ import sun.misc.Unsafe;
  * <p>
  * The value 100100 in binary, or 36 in base 10, would be returned.
  * <p>
- * Note that for performance reasons, this class makes use of {@code sun.misc.Unsafe} to perform
- * unaligned memory reads.  This is designed exclusively for little-endian architectures, and has only been
- * fully battle-tested on x86-64.
+ * // SNAP: TODO: Update doc
  * As a result there two ways to obtain an element value from the bit string at a given bit index.  The first,
  * using {@link #getElementValue(long, int)} or {@link #getElementValue(long, int, long)}, leverages unsafe unaligned
  * (or misaligned) memory reads of {@code long} values from {@code long[]} array segments at byte index offsets within
@@ -63,8 +59,6 @@ import sun.misc.Unsafe;
  */
 @SuppressWarnings("restriction")
 public class FixedLengthElementArray extends SegmentedLongArray {
-
-    private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
 
     private final int log2OfSegmentSizeInBytes;
     private final int byteBitmask;
@@ -136,8 +130,6 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
 
         LongBuffer segment = segments[whichSegment];
-        // long elementByteOffset = (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (whichByte & byteBitmask);
-        // long l = unsafe.getLong(segment, elementByteOffset) >>> whichBit;
         long elementByteOffset = whichByte & byteBitmask;
         long l = segment.get((int) elementByteOffset) >>> whichBit; // SNAP: Casting long to int because MappedByteBuffer
 
@@ -232,22 +224,6 @@ public class FixedLengthElementArray extends SegmentedLongArray {
 
     public void increment(long index, long increment) {
         throw new UnsupportedOperationException();
-//         long whichByte = index >>> 3;
-//         int whichBit = (int) (index & 0x07);
-//
-//         int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
-//
-//         LongBuffer segment = segments[whichSegment];
-//         long elementByteOffset = (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (whichByte & byteBitmask);
-//         long l = unsafe.getLong(segment, elementByteOffset);
-//
-//         unsafe.putOrderedLong(segment, elementByteOffset, l + (increment << whichBit));
-//
-//         /// update the fencepost longs
-//         if((whichByte & byteBitmask) > bitmask * 8 && (whichSegment + 1) < segments.length)
-//             unsafe.putOrderedLong(segments[whichSegment + 1], (long)Unsafe.ARRAY_LONG_BASE_OFFSET, segments[whichSegment].get(bitmask + 1));
-//         if((whichByte & byteBitmask) < 8 && whichSegment > 0)
-//             unsafe.putOrderedLong(segments[whichSegment - 1], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (bitmask + 1)), segments[whichSegment].get(0));
     }
 
 

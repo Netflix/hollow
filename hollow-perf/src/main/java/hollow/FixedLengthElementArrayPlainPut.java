@@ -85,16 +85,7 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
     }
 
     public long getElementValue(long index, int bitsPerElement, long mask) {
-        long whichByte = index >>> 3;
-        int whichBit = (int) (index & 0x07);
-
-        int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
-
-        long[] segment = segments[whichSegment];
-        long elementByteOffset = (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (whichByte & byteBitmask);
-        long l = unsafe.getLong(segment, elementByteOffset) >>> whichBit;
-
-        return l & mask;
+        throw new UnsupportedOperationException();
     }
 
     public long getLargeElementValue(long index, int bitsPerElement) {
@@ -161,26 +152,7 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
     }
 
     public void increment(long index, long increment) {
-        long whichByte = index >>> 3;
-        int whichBit = (int) (index & 0x07);
-
-        int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
-
-        long[] segment = segments[whichSegment];
-        long elementByteOffset = (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (whichByte & byteBitmask);
-        long l = unsafe.getLong(segment, elementByteOffset);
-
-        unsafe.putLong(segment, elementByteOffset, l + (increment << whichBit));
-
-        /// update the fencepost longs
-        if ((whichByte & byteBitmask) > bitmask * 8 && (whichSegment + 1) < segments.length) {
-            unsafe.putLong(segments[whichSegment + 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET,
-                    segments[whichSegment][bitmask + 1]);
-        }
-        if ((whichByte & byteBitmask) < 8 && whichSegment > 0) {
-            unsafe.putLong(segments[whichSegment - 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (bitmask + 1)),
-                    segments[whichSegment][0]);
-        }
+        throw new UnsupportedOperationException();
     }
 
     public static int bitsRequiredToRepresentValue(long value) {
