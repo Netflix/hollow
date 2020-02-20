@@ -136,8 +136,10 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
 
         LongBuffer segment = segments[whichSegment];
-        long elementByteOffset = (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (whichByte & byteBitmask);
-        long l = unsafe.getLong(segment, elementByteOffset) >>> whichBit;
+        // long elementByteOffset = (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (whichByte & byteBitmask);
+        // long l = unsafe.getLong(segment, elementByteOffset) >>> whichBit;
+        long elementByteOffset = whichByte & byteBitmask;
+        long l = segment.get((int) elementByteOffset) >>> whichBit; // SNAP: Casting long to int because MappedByteBuffer
 
         return l & mask;
     }
@@ -229,22 +231,23 @@ public class FixedLengthElementArray extends SegmentedLongArray {
     }
 
     public void increment(long index, long increment) {
-        long whichByte = index >>> 3;
-        int whichBit = (int) (index & 0x07);
-
-        int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
-
-        LongBuffer segment = segments[whichSegment];
-        long elementByteOffset = (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (whichByte & byteBitmask);
-        long l = unsafe.getLong(segment, elementByteOffset);
-
-        unsafe.putOrderedLong(segment, elementByteOffset, l + (increment << whichBit));
-
-        /// update the fencepost longs
-        if((whichByte & byteBitmask) > bitmask * 8 && (whichSegment + 1) < segments.length)
-            unsafe.putOrderedLong(segments[whichSegment + 1], (long)Unsafe.ARRAY_LONG_BASE_OFFSET, segments[whichSegment].get(bitmask + 1));
-        if((whichByte & byteBitmask) < 8 && whichSegment > 0)
-            unsafe.putOrderedLong(segments[whichSegment - 1], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (bitmask + 1)), segments[whichSegment].get(0));
+        throw new UnsupportedOperationException();
+//         long whichByte = index >>> 3;
+//         int whichBit = (int) (index & 0x07);
+//
+//         int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
+//
+//         LongBuffer segment = segments[whichSegment];
+//         long elementByteOffset = (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (whichByte & byteBitmask);
+//         long l = unsafe.getLong(segment, elementByteOffset);
+//
+//         unsafe.putOrderedLong(segment, elementByteOffset, l + (increment << whichBit));
+//
+//         /// update the fencepost longs
+//         if((whichByte & byteBitmask) > bitmask * 8 && (whichSegment + 1) < segments.length)
+//             unsafe.putOrderedLong(segments[whichSegment + 1], (long)Unsafe.ARRAY_LONG_BASE_OFFSET, segments[whichSegment].get(bitmask + 1));
+//         if((whichByte & byteBitmask) < 8 && whichSegment > 0)
+//             unsafe.putOrderedLong(segments[whichSegment - 1], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (bitmask + 1)), segments[whichSegment].get(0));
     }
 
 
