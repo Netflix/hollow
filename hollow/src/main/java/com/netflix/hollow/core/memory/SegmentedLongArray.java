@@ -50,10 +50,6 @@ public class SegmentedLongArray {
     protected final int bitmask;
 
     public SegmentedLongArray(ArraySegmentRecycler memoryRecycler, long numLongs) {
-        throw new UnsupportedOperationException();
-    }
-
-    public SegmentedLongArray(long numLongs, ArraySegmentRecycler memoryRecycler) {
         this.log2OfSegmentSize = memoryRecycler.getLog2OfLongSegmentSize();
         int numSegments = (int)((numLongs - 1) >>> log2OfSegmentSize) + 1;
         this.bitmask = (1 << log2OfSegmentSize) - 1;
@@ -122,6 +118,8 @@ public class SegmentedLongArray {
         if(numLongs == 0)
             return;
 
+        raf.skipBytes((int) numLongs * 8);   // raf has to be advanced independently of buffer
+
         while(numLongs > 0) {
             long longsReferenced = 0;
             long longsToReference = Math.min(segmentSize, numLongs);
@@ -132,15 +130,14 @@ public class SegmentedLongArray {
             buffer.position(buffer.position() + (int) (longsToReference * 8));
             longsReferenced = longsToReference;
 
-            if(numLongs > longsReferenced) {
-                buffer.position(buffer.position() - (1*8));
-            }
+            // if(numLongs > longsReferenced) {
+            //     buffer.position(buffer.position() - (1*8)); // SNAP: don't do this
+            // }
 
             segment++;
             numLongs -= longsReferenced;
 
         }
-        raf.skipBytes((int) numLongs * 8);   // raf has to be advanced independently of buffer
     }
 
     protected void readFrom(DataInputStream dis, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
