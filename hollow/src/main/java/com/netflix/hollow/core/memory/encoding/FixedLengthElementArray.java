@@ -277,7 +277,7 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         FileChannel fileChannel = raf.getChannel();
         MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY,
                 raf.getFilePointer(),   // map starting at current position in file
-                raf.length() - raf.getFilePointer());
+                raf.length() - raf.getFilePointer());   // map whole file, to also include trailing nulls/zeros in last segment
 
         arr.readFrom(raf, buffer, memoryRecycler, numLongs);
 
