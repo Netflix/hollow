@@ -18,14 +18,12 @@ package com.netflix.hollow.core.memory;
 
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
-import sun.misc.Unsafe;
 
 /**
  * A segmented byte array backs the {@link ByteData} interface with array segments, which potentially come from a pool of reusable memory.<p>
@@ -45,8 +43,6 @@ import sun.misc.Unsafe;
  */
 @SuppressWarnings("restriction")
 public class SegmentedByteArray implements ByteData {
-
-    private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
 
     private MappedByteBuffer bufferRef;
 
