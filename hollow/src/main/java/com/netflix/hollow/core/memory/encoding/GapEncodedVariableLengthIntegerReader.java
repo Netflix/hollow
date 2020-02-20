@@ -92,10 +92,11 @@ public class GapEncodedVariableLengthIntegerReader {
     }
 
     public static GapEncodedVariableLengthIntegerReader readEncodedDeltaOrdinals(DataInputStream dis, ArraySegmentRecycler memoryRecycler) throws IOException {
-        SegmentedByteArray arr = new SegmentedByteArray(memoryRecycler);
-        long numBytesEncodedOrdinals = VarInt.readVLong(dis);
-        arr.readFrom(dis, numBytesEncodedOrdinals);
-        return new GapEncodedVariableLengthIntegerReader(arr, (int)numBytesEncodedOrdinals);
+        throw new UnsupportedOperationException();
+        // SegmentedByteArray arr = new SegmentedByteArray(memoryRecycler);
+        // long numBytesEncodedOrdinals = VarInt.readVLong(dis);
+        // arr.readFrom(dis, numBytesEncodedOrdinals);
+        // return new GapEncodedVariableLengthIntegerReader(arr, (int)numBytesEncodedOrdinals);
     }
 
     public static void copyEncodedDeltaOrdinals(DataInputStream is, DataOutputStream... os) throws IOException {

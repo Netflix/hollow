@@ -103,7 +103,7 @@ public class HollowBlobReader {
 
         int numStates = VarInt.readVInt(raf);
 
-        Collection<String> typeNames = new TreeSet<String>();
+        Collection<String> typeNames = new TreeSet<>();
         for(int i=0;i<numStates;i++) {
             String typeName = readTypeFileSnapshot(raf, header, filter);
             typeNames.add(typeName);

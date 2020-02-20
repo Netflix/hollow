@@ -152,15 +152,13 @@ public class HollowObjectTypeDataElements {
                 if(numBytesInVarLengthData != 0) {
                     varLengthData[filteredFieldIdx] = new SegmentedByteArray(memoryRecycler);
                     varLengthData[filteredFieldIdx].readFrom(raf, numBytesInVarLengthData);
-
-                    varLengthData[filteredFieldIdx] = new SegmentedByteArray(memoryRecycler);
-                    varLengthData[filteredFieldIdx].readFrom(raf, numBytesInVarLengthData);
                 }
                 filteredFieldIdx++;
             } else {
-                while(numBytesInVarLengthData > 0) {
-                    numBytesInVarLengthData -= raf.skipBytes((int) numBytesInVarLengthData);
-                }
+                throw new UnsupportedOperationException("Filtering is not yet supported");
+                // while(numBytesInVarLengthData > 0) {
+                //     numBytesInVarLengthData -= raf.skipBytes((int) numBytesInVarLengthData);
+                // }
             }
         }
     }
