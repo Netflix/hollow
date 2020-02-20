@@ -86,6 +86,7 @@ public class HollowObjectTypeDataElements {
         fixedLengthData = FixedLengthElementArray.deserializeFrom(raf, memoryRecycler);
         // removeExcludedFieldsFromFixedLengthData();
 
+        // SNAP: Everything until here is at parity
         readVarLengthData(raf, unfilteredSchema);
     }
 

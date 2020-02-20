@@ -77,13 +77,6 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         this.byteBitmask = (1 << log2OfSegmentSizeInBytes) - 1;
     }
 
-    public FixedLengthElementArray(long numBits, ArraySegmentRecycler memoryRecycler)
-            throws IOException {
-        super(((numBits - 1) >>> 6) + 1, memoryRecycler);
-        this.log2OfSegmentSizeInBytes = log2OfSegmentSize + 3;
-        this.byteBitmask = (1 << log2OfSegmentSizeInBytes) - 1;
-    }
-
     public void clearElementValue(long index, int bitsPerElement) {
         long whichLong = index >>> 6;
         int whichBit = (int) (index & 0x3F);
@@ -279,10 +272,12 @@ public class FixedLengthElementArray extends SegmentedLongArray {
 
         // SNAP: TODO: Map whole file once instead of mapping section at a time for performance and to avoid OutOfMemory exception
 
-        FixedLengthElementArray arr = new FixedLengthElementArray(numLongs * 64, memoryRecycler);
+        FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, numLongs * 64);
 
         FileChannel fileChannel = raf.getChannel();
-        MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, raf.getFilePointer(), fileChannel.size() - raf.getFilePointer());
+        MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY,
+                raf.getFilePointer(),   // map starting at current position in file
+                raf.length() - raf.getFilePointer());
 
         arr.readFrom(raf, buffer, memoryRecycler, numLongs);
 
