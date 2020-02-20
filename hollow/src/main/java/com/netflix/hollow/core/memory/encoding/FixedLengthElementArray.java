@@ -22,6 +22,7 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import sun.misc.Unsafe;
@@ -76,12 +77,11 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         this.byteBitmask = (1 << log2OfSegmentSizeInBytes) - 1;
     }
 
-    public FixedLengthElementArray(RandomAccessFile raf, MappedByteBuffer buffer, long numBits, ArraySegmentRecycler memoryRecycler)
+    public FixedLengthElementArray(long numBits, ArraySegmentRecycler memoryRecycler)
             throws IOException {
-        super(raf, buffer, ((numBits - 1) >>> 6) + 1, memoryRecycler);
+        super(((numBits - 1) >>> 6) + 1, memoryRecycler);
         this.log2OfSegmentSizeInBytes = log2OfSegmentSize + 3;
         this.byteBitmask = (1 << log2OfSegmentSizeInBytes) - 1;
-        bufferRef = buffer; // hold a reference to buffer so that it doesn't get GC'ed
     }
 
     public void clearElementValue(long index, int bitsPerElement) {
@@ -142,7 +142,7 @@ public class FixedLengthElementArray extends SegmentedLongArray {
 
         int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
 
-        long[] segment = segments[whichSegment];
+        LongBuffer segment = segments[whichSegment];
         long elementByteOffset = (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (whichByte & byteBitmask);
         long l = unsafe.getLong(segment, elementByteOffset) >>> whichBit;
 
@@ -241,7 +241,7 @@ public class FixedLengthElementArray extends SegmentedLongArray {
 
         int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
 
-        long[] segment = segments[whichSegment];
+        LongBuffer segment = segments[whichSegment];
         long elementByteOffset = (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (whichByte & byteBitmask);
         long l = unsafe.getLong(segment, elementByteOffset);
 
@@ -249,9 +249,9 @@ public class FixedLengthElementArray extends SegmentedLongArray {
 
         /// update the fencepost longs
         if((whichByte & byteBitmask) > bitmask * 8 && (whichSegment + 1) < segments.length)
-            unsafe.putOrderedLong(segments[whichSegment + 1], (long)Unsafe.ARRAY_LONG_BASE_OFFSET, segments[whichSegment][bitmask + 1]);
+            unsafe.putOrderedLong(segments[whichSegment + 1], (long)Unsafe.ARRAY_LONG_BASE_OFFSET, segments[whichSegment].get(bitmask + 1));
         if((whichByte & byteBitmask) < 8 && whichSegment > 0)
-            unsafe.putOrderedLong(segments[whichSegment - 1], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (bitmask + 1)), segments[whichSegment][0]);
+            unsafe.putOrderedLong(segments[whichSegment - 1], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (bitmask + 1)), segments[whichSegment].get(0));
     }
 
 
@@ -278,9 +278,13 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         // arr.readFrom(dis, memoryRecycler, numLongs);
 
         // SNAP: TODO: Map whole file once instead of mapping section at a time for performance and to avoid OutOfMemory exception
+
+        FixedLengthElementArray arr = new FixedLengthElementArray(numLongs * 64, memoryRecycler);
+
         FileChannel fileChannel = raf.getChannel();
         MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, raf.getFilePointer(), fileChannel.size() - raf.getFilePointer());
-        FixedLengthElementArray arr = new FixedLengthElementArray(raf, buffer, numLongs * 64, memoryRecycler);
+
+        arr.readFrom(raf, buffer, memoryRecycler, numLongs);
 
         return arr;
     }

@@ -265,6 +265,10 @@ public class SegmentedByteArray implements ByteData {
         // SNAP: simplification: assume one segment
         segments[0] = buffer.array();
         raf.skipBytes((int) length);
+
+        throw new UnsupportedOperationException();  // temporarily throwing this until we can support multiple segments
+
+
     }
 
     /**

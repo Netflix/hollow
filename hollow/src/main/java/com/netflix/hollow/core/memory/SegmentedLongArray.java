@@ -45,54 +45,19 @@ public class SegmentedLongArray {
 
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
 
-    protected final long[][] segments;
+    protected final LongBuffer[] segments;
     protected final int log2OfSegmentSize;
     protected final int bitmask;
 
     public SegmentedLongArray(ArraySegmentRecycler memoryRecycler, long numLongs) {
-        this.log2OfSegmentSize = memoryRecycler.getLog2OfLongSegmentSize();
-        int numSegments = (int)((numLongs - 1) >>> log2OfSegmentSize) + 1;
-        long[][] segments = new long[numSegments][];
-        this.bitmask = (1 << log2OfSegmentSize) - 1;
-
-        for(int i=0;i<segments.length;i++) {
-            segments[i] = memoryRecycler.getLongArray();
-        }
-
-        /// The following assignment is purposefully placed *after* the population of all segments.
-        /// The final assignment after the initialization of the array guarantees that no thread
-        /// will see any of the array elements before assignment.
-        /// We can't risk the segment values being visible as null to any thread, because
-        /// FixedLengthElementArray uses Unsafe to access these values, which would cause the
-        /// JVM to crash with a segmentation fault.
-        this.segments = segments;
+        throw new UnsupportedOperationException();
     }
 
-    public SegmentedLongArray(RandomAccessFile raf, MappedByteBuffer buffer, long numLongs, ArraySegmentRecycler memoryRecycler)
-    throws IOException {
+    public SegmentedLongArray(long numLongs, ArraySegmentRecycler memoryRecycler) {
         this.log2OfSegmentSize = memoryRecycler.getLog2OfLongSegmentSize();
         int numSegments = (int)((numLongs - 1) >>> log2OfSegmentSize) + 1;
         this.bitmask = (1 << log2OfSegmentSize) - 1;
-
-        long[][] segments = new long[numSegments][];
-        for(int i=0;i<segments.length;i++) {
-            // Arrays.copyOfRange
-            // (1 << log2LongArraySize) + 1]
-            LongBuffer lb = buffer.asLongBuffer();
-            long[] la = lb.array(); // SNAP: Doesn't allow getting an array out of this buffer https://stackoverflow.com/questions/8592221/why-doesnt-the-array-method-of-mappedbytebuffer-work
-                                    // SNAP: Might need to convert segment arrays to buffers
-            segments[i] = la;    // segments[i] references buffer.position()
-            buffer.position(buffer.position() + (1 << log2OfSegmentSize));  // advance buffer by segment size
-            raf.skipBytes(1 << log2OfSegmentSize);
-        }
-
-        /// The following assignment is purposefully placed *after* the population of all segments.
-        /// The final assignment after the initialization of the array guarantees that no thread
-        /// will see any of the array elements before assignment.
-        /// We can't risk the segment values being visible as null to any thread, because
-        /// FixedLengthElementArray uses Unsafe to access these values, which would cause the
-        /// JVM to crash with a segmentation fault.
-        this.segments = segments;
+        this.segments = new LongBuffer[numSegments];
     }
 
     /**
@@ -104,11 +69,11 @@ public class SegmentedLongArray {
     public void set(long index, long value) {
         int segmentIndex = (int)(index >> log2OfSegmentSize);
         int longInSegment = (int)(index & bitmask);
-        unsafe.putOrderedLong(segments[segmentIndex], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longInSegment), value);
+        segments[segmentIndex].put((8 * longInSegment), value);
 
         /// duplicate the longs here so that we can read faster.
         if(longInSegment == 0 && segmentIndex != 0)
-            unsafe.putOrderedLong(segments[segmentIndex - 1], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (1 << log2OfSegmentSize)), value);
+            segments[segmentIndex - 1].put((8 * (1 << log2OfSegmentSize)), value);
     }
 
     /**
@@ -119,17 +84,11 @@ public class SegmentedLongArray {
      */
     public long get(long index) {
         int segmentIndex = (int)(index >>> log2OfSegmentSize);
-        return segments[segmentIndex][(int)(index & bitmask)];
+        return segments[segmentIndex].get((int)(index & bitmask));
     }
 
     public void fill(long value) {
-        for(int i=0;i<segments.length;i++) {
-            long offset = Unsafe.ARRAY_LONG_BASE_OFFSET;
-            for(int j=0;j<segments[i].length;j++) {
-                unsafe.putOrderedLong(segments[i], offset, value);
-                offset += 8;
-            }
-        }
+        throw new UnsupportedOperationException();
     }
 
     public void writeTo(DataOutputStream dos, long numLongs) throws IOException {
@@ -141,10 +100,7 @@ public class SegmentedLongArray {
     }
 
     public void destroy(ArraySegmentRecycler memoryRecycler) {
-        for(int i=0;i<segments.length;i++) {
-            if(segments[i] != null)
-                memoryRecycler.recycleLongArray(segments[i]);
-        }
+        throw new UnsupportedOperationException();
     }
 
 
@@ -156,6 +112,35 @@ public class SegmentedLongArray {
         arr.readFrom(dis, memoryRecycler, numLongs);
 
         return arr;
+    }
+
+    // SNAP: TODO: verify correctness
+    protected void readFrom(RandomAccessFile raf, MappedByteBuffer buffer, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
+        int segmentSize = 1 << memoryRecycler.getLog2OfLongSegmentSize();
+        int segment = 0;
+
+        if(numLongs == 0)
+            return;
+
+        while(numLongs > 0) {
+            long longsReferenced = 0;
+            long longsToReference = Math.min(segmentSize, numLongs);
+
+            // Can't call put, because that copies over: segments[segment].put(fencepostLong);
+            segments[segment] = buffer.asLongBuffer();
+
+            buffer.position(buffer.position() + (int) (longsToReference * 8));
+            longsReferenced = longsToReference;
+
+            if(numLongs > longsReferenced) {
+                buffer.position(buffer.position() - (1*8));
+            }
+
+            segment++;
+            numLongs -= longsReferenced;
+
+        }
+        raf.skipBytes((int) numLongs * 8);   // raf has to be advanced independently of buffer
     }
 
     protected void readFrom(DataInputStream dis, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
@@ -181,7 +166,7 @@ public class SegmentedLongArray {
 
             if(numLongs > longsCopied) {
                 unsafe.putOrderedLong(segments[segment], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied), dis.readLong());
-                fencepostLong = segments[segment][longsCopied];
+                fencepostLong = segments[segment].get(longsCopied);
             }
 
             segment++;
