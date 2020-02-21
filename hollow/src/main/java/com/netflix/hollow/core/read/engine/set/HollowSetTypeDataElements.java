@@ -20,6 +20,7 @@ import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -55,15 +56,15 @@ public class HollowSetTypeDataElements {
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer) throws IOException {
-        readFromStream(raf, buffer, false);
+    void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug) throws IOException {
+        readFromStream(raf, buffer, debug, false);
     }
 
     void readDelta(RandomAccessFile raf) throws IOException {
         throw new UnsupportedOperationException();
     }
 
-    private void readFromStream(RandomAccessFile raf, MappedByteBuffer buffer, boolean isDelta) throws IOException {
+    private void readFromStream(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug, boolean isDelta) throws IOException {
         maxOrdinal = VarInt.readVInt(raf);
 
         if(isDelta) {
@@ -82,6 +83,12 @@ public class HollowSetTypeDataElements {
         setPointerAndSizeArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
 
         elementArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
+
+        debug.append("HollowSetTypeDataElements setPointerAndSizeArray= \n");
+        setPointerAndSizeArray.pp(debug);
+        debug.append("HollowSetTypeDataElements elementArray= \n");
+        elementArray.pp(debug);
+        debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowSetTypeDataElements\n");
     }
 
     static void discardFromStream(DataInputStream dis, int numShards, boolean isDelta) throws IOException {

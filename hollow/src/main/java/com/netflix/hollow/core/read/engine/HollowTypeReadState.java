@@ -23,6 +23,7 @@ import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -120,7 +121,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      */
     public abstract int maxOrdinal();
 
-    public abstract void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, ArraySegmentRecycler recycler) throws IOException;
+    public abstract void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug, ArraySegmentRecycler recycler) throws IOException;
     public abstract void applyDelta(DataInputStream dis, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException;
 
     public HollowSchema getSchema() {

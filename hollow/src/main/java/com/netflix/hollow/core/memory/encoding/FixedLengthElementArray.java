@@ -18,6 +18,7 @@ package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.SegmentedLongArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -269,4 +270,36 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         return 64 - Long.numberOfLeadingZeros(value);
     }
 
+    public void pp(BufferedWriter debug) throws IOException {
+        StringBuffer pp = new StringBuffer();
+
+        int segmentSize = 1 << log2OfSegmentSize;
+        long maxIndex = segments.length * segmentSize;
+
+
+//        pp.append("\n\n FixedLengthElementArray get()s =>");
+//        for (int g = 0; g < maxIndex; g ++) {
+//            long v = get(g);
+//            pp.append(v + " ");
+//        }
+
+        pp.append("\n");
+        pp.append("\n FixedLengthElementArray raw bytes underneath:\n");
+        for (int i = 0; i < segments.length; i ++) {
+            if (segments[i] == null) {
+                pp.append("- - - - - NULL - - - - ");
+                pp.append("\n");
+                continue;
+            }
+
+            pp.append(String.format("FixedLengthElementArray i= %d/%d => ", i, segments.length-1));
+
+            for (int j = 0; j < segmentSize; j ++ ) {
+                long v = segments[i].get(segments[i].position() + j);
+                pp.append(v + " ");
+            }
+            pp.append("\n");
+        }
+        debug.append(pp.toString());
+    }
 }

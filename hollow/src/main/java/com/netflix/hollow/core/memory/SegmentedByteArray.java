@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.memory;
 
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
@@ -71,6 +72,9 @@ public class SegmentedByteArray implements ByteData {
      */
     public byte get(long index) {
         int segmentNo = (int)(index >>> log2OfSegmentSize);
+        if (segments[segmentNo] == null) {
+            return 0;   // SNAP: deviation from original behavior
+        }
         return segments[segmentNo].get(segments[segmentNo].position() + (int)(index & bitmask));
     }
 
@@ -202,15 +206,43 @@ public class SegmentedByteArray implements ByteData {
 
     public void destroy() {
         throw new UnsupportedOperationException();
-//        for(int i=0;i<segments.length;i++) {
-//            if(segments[i] != null)
-//                segments[i] = null;
-//                throw new UnsupportedOperationException();
-//        }
     }
 
     public long size() {
         throw new UnsupportedOperationException();
+    }
+
+    public void pp(BufferedWriter debug) throws IOException {
+        StringBuffer pp = new StringBuffer();
+
+        int segmentSize = 1 << log2OfSegmentSize;
+        long maxIndex = segments.length * segmentSize;
+
+
+//        pp.append("\n\n SegmentedByteArray get()s => ");
+//        for (int g = 0; g < maxIndex; g ++) {
+//            byte v = get(g);
+//            pp.append(v+ " ");
+//        }
+
+        pp.append("\n");
+        pp.append("\n SegmentedByteArray raw bytes underneath:\n");
+        for (int i = 0; i < segments.length; i ++) {
+            if (segments[i] == null) {
+                pp.append("- - - - - NULL - - - - ");
+                pp.append("\n");
+                continue;
+            }
+
+            pp.append(String.format("SegmentedByteArray i= %d/%d => ", i, segments.length-1));
+
+            for (int j = 0; j < segmentSize; j ++ ) {
+                byte v = segments[i].get(segments[i].position() + j);
+                pp.append(v + " ");
+            }
+            pp.append("\n");
+        }
+        debug.append(pp.toString());
     }
 
 }

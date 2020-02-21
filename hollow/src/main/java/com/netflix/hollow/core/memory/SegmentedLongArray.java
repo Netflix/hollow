@@ -46,7 +46,7 @@ public class SegmentedLongArray {
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
 
     protected final LongBuffer[] segments;
-    protected final int log2OfSegmentSize;
+    public final int log2OfSegmentSize;
     protected final int bitmask;
 
     public SegmentedLongArray(ArraySegmentRecycler memoryRecycler, long numLongs) {
@@ -74,6 +74,9 @@ public class SegmentedLongArray {
      */
     public long get(long index) {
         int segmentIndex = (int)(index >>> log2OfSegmentSize);
+        if (segments[segmentIndex] == null) {
+            return 0;
+        }
         return segments[segmentIndex].get(segments[segmentIndex].position() + (int)(index & bitmask));
     }
 

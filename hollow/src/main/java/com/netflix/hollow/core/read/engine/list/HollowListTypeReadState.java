@@ -34,6 +34,7 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -70,13 +71,13 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     }
 
     @Override
-    public void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(raf);
         
         for(int i=0;i<shards.length;i++) {
             HollowListTypeDataElements snapshotData = new HollowListTypeDataElements(memoryRecycler);
-            snapshotData.readSnapshot(raf, buffer);
+            snapshotData.readSnapshot(raf, buffer, debug);
             shards[i].setCurrentData(snapshotData);
         }
         
