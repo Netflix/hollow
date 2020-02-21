@@ -242,24 +242,15 @@ public class FixedLengthElementArray extends SegmentedLongArray {
     //       allocating and copying over each time?
     //
     // returns a FixedLengthElementArray that contains deserialized data from given file
-    public static FixedLengthElementArray deserializeFrom(RandomAccessFile raf, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public static FixedLengthElementArray deserializeFrom(RandomAccessFile raf, MappedByteBuffer buffer, ArraySegmentRecycler memoryRecycler) throws IOException {
         long numLongs = VarInt.readVLong(raf);
 
         // FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, numLongs * 64);
         // assign arr to address of that raf and size of numLongs * 64
         // arr.readFrom(dis, memoryRecycler, numLongs);
 
-        // SNAP: TODO: Map whole file once instead of mapping section at a time for performance and to avoid OutOfMemory exception
-
         FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, numLongs * 64);
-
-        FileChannel fileChannel = raf.getChannel();
-        MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY,
-                raf.getFilePointer(),   // map starting at current position in file
-                raf.length() - raf.getFilePointer());   // map whole file, to also include trailing nulls/zeros in last segment
-
         arr.readFrom(raf, buffer, memoryRecycler, numLongs);
-
         return arr;
     }
 

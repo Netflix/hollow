@@ -63,13 +63,7 @@ public class SegmentedLongArray {
      * @param value the byte value
      */
     public void set(long index, long value) {
-        int segmentIndex = (int)(index >> log2OfSegmentSize);
-        int longInSegment = (int)(index & bitmask);
-        segments[segmentIndex].put((8 * longInSegment), value);
-
-        /// duplicate the longs here so that we can read faster.
-        if(longInSegment == 0 && segmentIndex != 0)
-            segments[segmentIndex - 1].put((8 * (1 << log2OfSegmentSize)), value);
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -80,7 +74,7 @@ public class SegmentedLongArray {
      */
     public long get(long index) {
         int segmentIndex = (int)(index >>> log2OfSegmentSize);
-        return segments[segmentIndex].get((int)(index & bitmask));
+        return segments[segmentIndex].get(segments[segmentIndex].position() + (int)(index & bitmask));
     }
 
     public void fill(long value) {
@@ -110,7 +104,6 @@ public class SegmentedLongArray {
         return arr;
     }
 
-    // SNAP: TODO: verify correctness
     protected void readFrom(RandomAccessFile raf, MappedByteBuffer buffer, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
         int segmentSize = 1 << memoryRecycler.getLog2OfLongSegmentSize();
         int segment = 0;
@@ -118,26 +111,23 @@ public class SegmentedLongArray {
         if(numLongs == 0)
             return;
 
-        raf.skipBytes((int) numLongs * 8);   // raf has to be advanced independently of buffer
+        long saveNumLongs = numLongs;
+
+        buffer.position((int) raf.getFilePointer());
 
         while(numLongs > 0) {
-            long longsReferenced = 0;
             long longsToReference = Math.min(segmentSize, numLongs);
 
-            // Can't call put, because that copies over: segments[segment].put(fencepostLong);
-            segments[segment] = buffer.asLongBuffer();
+            segments[segment] = buffer.asLongBuffer();  // returns a new direct buffer sharing the same content, with independent position tracking
 
             buffer.position(buffer.position() + (int) (longsToReference * 8));
-            longsReferenced = longsToReference;
-
-            // if(numLongs > longsReferenced) {
-            //     buffer.position(buffer.position() - (1*8)); // SNAP: don't do this
-            // }
 
             segment++;
-            numLongs -= longsReferenced;
+            numLongs -= longsToReference;
 
         }
+
+        raf.skipBytes((int) saveNumLongs * 8);   // raf has to be advanced independently of buffer
 
         // SNAP: POTENTIAL BUG: last segment isn't padded with zeros
     }
