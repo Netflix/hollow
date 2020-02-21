@@ -22,6 +22,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -64,15 +65,15 @@ public class HollowObjectTypeDataElements {
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, HollowObjectSchema unfilteredSchema) throws IOException {
-        readFromStream(raf, buffer, false, unfilteredSchema);
+    void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug, HollowObjectSchema unfilteredSchema) throws IOException {
+        readFromStream(raf, buffer, debug, false, unfilteredSchema);
     }
 
     void readDelta(RandomAccessFile raf) throws IOException {
         throw new UnsupportedOperationException();
     }
 
-    void readFromStream(RandomAccessFile raf, MappedByteBuffer buffer, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
+    void readFromStream(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
         maxOrdinal = VarInt.readVInt(raf);
 
         if(isDelta) {
@@ -84,6 +85,15 @@ public class HollowObjectTypeDataElements {
         fixedLengthData = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
         // removeExcludedFieldsFromFixedLengthData();
         readVarLengthData(raf, buffer, unfilteredSchema);
+
+        debug.append("HollowObjectTypeDataElements for " + schema.toString() + " \n");
+        fixedLengthData.pp(debug);
+        for (int i= 0; i < varLengthData.length; i++) {
+            if (varLengthData[i] != null) {
+                varLengthData[i].pp(debug);
+            }
+        }
+        debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowObjectTypeDataElements for " + schema.toString() + "\n");
     }
 
     private void removeExcludedFieldsFromFixedLengthData() {
@@ -152,9 +162,6 @@ public class HollowObjectTypeDataElements {
                 filteredFieldIdx++;
             } else {
                 throw new UnsupportedOperationException("Filtering is not yet supported");
-                // while(numBytesInVarLengthData > 0) {
-                //     numBytesInVarLengthData -= raf.skipBytes((int) numBytesInVarLengthData);
-                // }
             }
         }
     }
