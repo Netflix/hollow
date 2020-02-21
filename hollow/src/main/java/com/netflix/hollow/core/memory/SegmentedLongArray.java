@@ -48,6 +48,7 @@ public class SegmentedLongArray {
     protected final LongBuffer[] segments;
     public final int log2OfSegmentSize;
     protected final int bitmask;
+    private long maxIndex = -1;
 
     public SegmentedLongArray(ArraySegmentRecycler memoryRecycler, long numLongs) {
         this.log2OfSegmentSize = memoryRecycler.getLog2OfLongSegmentSize();
@@ -73,9 +74,12 @@ public class SegmentedLongArray {
      * @return the byte value
      */
     public long get(long index) {
+        if (index >= this.maxIndex) {
+            return 0;   // SNAP: make up for missing padding at the end of the last segment
+        }
         int segmentIndex = (int)(index >>> log2OfSegmentSize);
         if (segments[segmentIndex] == null) {
-            return 0;
+            return 0;   // SNAP: deviation from original behavior
         }
         return segments[segmentIndex].get(segments[segmentIndex].position() + (int)(index & bitmask));
     }
@@ -110,6 +114,8 @@ public class SegmentedLongArray {
     protected void readFrom(RandomAccessFile raf, MappedByteBuffer buffer, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
         int segmentSize = 1 << memoryRecycler.getLog2OfLongSegmentSize();
         int segment = 0;
+
+        this.maxIndex = numLongs;
 
         if(numLongs == 0)
             return;

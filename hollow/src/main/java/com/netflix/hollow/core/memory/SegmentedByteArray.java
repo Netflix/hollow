@@ -48,12 +48,14 @@ public class SegmentedByteArray implements ByteData {
     private final int log2OfSegmentSize;
     private final int bitmask;
     private final ArraySegmentRecycler memoryRecycler;
+    private long maxIndex;
 
     public SegmentedByteArray(ArraySegmentRecycler memoryRecycler) {
         this.segments = new ByteBuffer[2];
         this.log2OfSegmentSize = memoryRecycler.getLog2OfByteSegmentSize();
         this.bitmask = (1 << log2OfSegmentSize) - 1;
         this.memoryRecycler = memoryRecycler;
+        this.maxIndex = -1;
     }
 
     /**
@@ -71,6 +73,9 @@ public class SegmentedByteArray implements ByteData {
      * @return the byte value
      */
     public byte get(long index) {
+        if (index >= this.maxIndex) {
+            return 0;   // SNAP: make up for missing padding at the end of the last segment
+        }
         int segmentNo = (int)(index >>> log2OfSegmentSize);
         if (segments[segmentNo] == null) {
             return 0;   // SNAP: deviation from original behavior
@@ -154,6 +159,7 @@ public class SegmentedByteArray implements ByteData {
         int segmentSize = 1 << log2OfSegmentSize;
         int segment = 0;
 
+        this.maxIndex = length;
         long initLength = length;
 
         buffer.position((int) raf.getFilePointer());
@@ -219,29 +225,29 @@ public class SegmentedByteArray implements ByteData {
         long maxIndex = segments.length * segmentSize;
 
 
-//        pp.append("\n\n SegmentedByteArray get()s => ");
-//        for (int g = 0; g < maxIndex; g ++) {
-//            byte v = get(g);
-//            pp.append(v+ " ");
-//        }
+        pp.append("\n\n SegmentedByteArray get()s => ");
+        for (int g = 0; g < maxIndex; g ++) {
+            byte v = get(g);
+            pp.append(v+ " ");
+        }
 
         pp.append("\n");
-        pp.append("\n SegmentedByteArray raw bytes underneath:\n");
-        for (int i = 0; i < segments.length; i ++) {
-            if (segments[i] == null) {
-                pp.append("- - - - - NULL - - - - ");
-                pp.append("\n");
-                continue;
-            }
-
-            pp.append(String.format("SegmentedByteArray i= %d/%d => ", i, segments.length-1));
-
-            for (int j = 0; j < segmentSize; j ++ ) {
-                byte v = segments[i].get(segments[i].position() + j);
-                pp.append(v + " ");
-            }
-            pp.append("\n");
-        }
+//        pp.append("\n SegmentedByteArray raw bytes underneath:\n");
+//        for (int i = 0; i < segments.length; i ++) {
+//            if (segments[i] == null) {
+//                pp.append("- - - - - NULL - - - - ");
+//                pp.append("\n");
+//                continue;
+//            }
+//
+//            pp.append(String.format("SegmentedByteArray i= %d/%d => ", i, segments.length-1));
+//
+//            for (int j = 0; j < segmentSize; j ++ ) {
+//                byte v = segments[i].get(segments[i].position() + j);
+//                pp.append(v + " ");
+//            }
+//            pp.append("\n");
+//        }
         debug.append(pp.toString());
     }
 
