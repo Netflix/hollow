@@ -34,6 +34,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 import java.util.Collection;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -63,8 +64,8 @@ public class HollowBlobReader {
      * @param f the RandomAccessFile to read the snapshot from
      * @throws IOException if the snapshot could not be read
      */
-    public void readSnapshot(RandomAccessFile f) throws IOException {
-        readSnapshot(f, new HollowFilterConfig(true));
+    public void readSnapshot(RandomAccessFile f, MappedByteBuffer buffer) throws IOException {
+        readSnapshot(f, buffer, new HollowFilterConfig(true));
     }
 
     /**
@@ -105,7 +106,7 @@ public class HollowBlobReader {
 
         Collection<String> typeNames = new TreeSet<>();
         for(int i=0;i<numStates;i++) {
-            String typeName = readTypeFileSnapshot(raf, header, filter);
+            String typeName = readTypeFileSnapshot(raf, buffer, header, filter);
             typeNames.add(typeName);
         }
 
@@ -219,9 +220,9 @@ public class HollowBlobReader {
         return typeName;
     }
 
-    private void populateTypeStateSnapshot(RandomAccessFile raf, HollowTypeReadState typeState) throws IOException {
+    private void populateTypeStateSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, HollowTypeReadState typeState) throws IOException {
         stateEngine.addTypeState(typeState);
-        typeState.readSnapshot(raf, stateEngine.getMemoryRecycler());
+        typeState.readSnapshot(raf, buffer, stateEngine.getMemoryRecycler());
     }
 
     private String readTypeStateDelta(DataInputStream is, HollowBlobHeader header) throws IOException {

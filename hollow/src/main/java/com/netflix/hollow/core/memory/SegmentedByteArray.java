@@ -22,7 +22,6 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
 /**
@@ -44,8 +43,6 @@ import java.util.Arrays;
 @SuppressWarnings("restriction")
 public class SegmentedByteArray implements ByteData {
 
-    private MappedByteBuffer bufferRef;
-
     private ByteBuffer[] segments;
     private final int log2OfSegmentSize;
     private final int bitmask;
@@ -64,9 +61,7 @@ public class SegmentedByteArray implements ByteData {
      * @param value the byte value
      */
     public void set(long index, byte value) {
-        int segmentIndex = (int)(index >> log2OfSegmentSize);
-        ensureCapacity(segmentIndex);
-        segments[segmentIndex].put((int)(index & bitmask), value);
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -75,7 +70,8 @@ public class SegmentedByteArray implements ByteData {
      * @return the byte value
      */
     public byte get(long index) {
-        return segments[(int)(index >>> log2OfSegmentSize)].get((int)(index & bitmask));
+        int segmentNo = (int)(index >>> log2OfSegmentSize);
+        return segments[segmentNo].get(segments[segmentNo].position() + (int)(index & bitmask));
     }
 
     /**
@@ -126,10 +122,7 @@ public class SegmentedByteArray implements ByteData {
      * @return
      */
     public boolean rangeEquals(long rangeStart, SegmentedByteArray compareTo, long cmpStart, int length) {
-    	for(int i=0;i<length;i++)
-    		if(get(rangeStart + i) != compareTo.get(cmpStart + i))
-    			return false;
-    	return true;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -153,25 +146,29 @@ public class SegmentedByteArray implements ByteData {
      * @param length the length of the data to copy
      * @throws IOException if the copy could not be performed
      */
-    public void readFrom(RandomAccessFile raf, long length) throws IOException {
+    public void readFrom(RandomAccessFile raf, MappedByteBuffer buffer, long length) throws IOException {
         int segmentSize = 1 << log2OfSegmentSize;
         int segment = 0;
 
-        FileChannel channel = raf.getChannel(); // SNAP: Map MappedByteBuffer once altogether
-        MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, raf.getFilePointer(), raf.length() - raf.getFilePointer());
-        this.bufferRef = buffer; // hold ref so that buffer doesn't get GC'ed
-        raf.skipBytes((int) length); // SNAP: long to int cast; RandomAccessFile skipBytes takes int, although seek can take long
+        long initLength = length;
+
+        buffer.position((int) raf.getFilePointer());
 
         while(length > 0) {
             ensureCapacity(segment);
             long thisSegmentSize = Math.min(segmentSize, length);
 
-            segments[segment] = buffer;
+            segments[segment] = buffer.duplicate(); // returns a new direct buffer sharing
+                                                    // the same content but with different
+                                                    // trackers for position etc.
             buffer.position(buffer.position() + (int) thisSegmentSize); // SNAP: long to int cast due to MappedByteBuffer constraints
 
             segment++;
             length -= thisSegmentSize;
         }
+
+        raf.skipBytes((int) initLength); // SNAP: long to int cast; RandomAccessFile skipBytes takes int, although seek can take long
+
         // SNAP: TODO: Do I need to zero-out remaining bytes in the last segment?
     }
 
@@ -201,20 +198,15 @@ public class SegmentedByteArray implements ByteData {
         while(segmentIndex >= segments.length) {
             segments = Arrays.copyOf(segments, segments.length * 3 / 2);
         }
-
-        if(segments[segmentIndex] == null) {
-            // This should never be the case
-            // segments[segmentIndex] = memoryRecycler.getByteArray();
-            System.out.println("SNAP: This shouldn't have happened");
-        }
     }
 
     public void destroy() {
-        for(int i=0;i<segments.length;i++) {
-            if(segments[i] != null)
-                segments[i] = null;
-                throw new UnsupportedOperationException();
-        }
+        throw new UnsupportedOperationException();
+//        for(int i=0;i<segments.length;i++) {
+//            if(segments[i] != null)
+//                segments[i] = null;
+//                throw new UnsupportedOperationException();
+//        }
     }
 
     public long size() {

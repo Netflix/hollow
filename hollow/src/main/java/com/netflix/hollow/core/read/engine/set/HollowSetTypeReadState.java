@@ -42,6 +42,7 @@ import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 import java.util.BitSet;
 
 /**
@@ -77,13 +78,13 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
     }
 
     @Override
-    public void readSnapshot(RandomAccessFile raf, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(raf);
         
         for(int i=0;i<shards.length;i++) {
             HollowSetTypeDataElements snapshotData = new HollowSetTypeDataElements(memoryRecycler);
-            snapshotData.readSnapshot(raf);
+            snapshotData.readSnapshot(raf, buffer);
             shards[i].setCurrentData(snapshotData);
         }
         

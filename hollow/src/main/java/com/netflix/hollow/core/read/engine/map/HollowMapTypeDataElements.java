@@ -23,6 +23,7 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 
 /**
  * This class holds the data for a {@link HollowMapTypeReadState}.
@@ -55,15 +56,15 @@ public class HollowMapTypeDataElements {
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(RandomAccessFile raf) throws IOException {
-        readFromStream(raf, false);
+    void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer) throws IOException {
+        readFromStream(raf, buffer, false);
     }
 
     void readDelta(RandomAccessFile raf) throws IOException {
-        readFromStream(raf, true);
+        throw new UnsupportedOperationException();
     }
 
-    private void readFromStream(RandomAccessFile raf, boolean isDelta) throws IOException {
+    private void readFromStream(RandomAccessFile raf, MappedByteBuffer buffer, boolean isDelta) throws IOException {
         maxOrdinal = VarInt.readVInt(raf);
 
         if(isDelta) {
@@ -82,10 +83,10 @@ public class HollowMapTypeDataElements {
         totalNumberOfBuckets = VarInt.readVLong(raf);
 
         /// list pointer array
-        mapPointerAndSizeArray = FixedLengthElementArray.deserializeFrom(raf, memoryRecycler);
+        mapPointerAndSizeArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
 
         /// element array
-        entryArray = FixedLengthElementArray.deserializeFrom(raf, memoryRecycler);
+        entryArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
     }
 
     static void discardFromStream(DataInputStream dis, int numShards, boolean isDelta) throws IOException {
