@@ -26,7 +26,8 @@ public class HashCodes {
     private static final int MURMURHASH_SEED = 0xeab524b9;
 
     public static int hashCode(ByteDataBuffer data) {
-        return hashCode(data.getUnderlyingArray(), 0, (int) data.length());
+        throw new UnsupportedOperationException();  // is the bug that hash codes changed when we switched from backing byte array to buffer?
+        // return hashCode(data.getUnderlyingArray(), 0, (int) data.length());
     }
 
     public static int hashCode(final String data) {

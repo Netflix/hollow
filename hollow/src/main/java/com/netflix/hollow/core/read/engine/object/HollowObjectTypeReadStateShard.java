@@ -27,12 +27,17 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 
 class HollowObjectTypeReadStateShard {
+
+    int count = 0;
 
     private volatile HollowObjectTypeDataElements currentDataVolatile;
 
@@ -51,6 +56,14 @@ class HollowObjectTypeReadStateShard {
 
             long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
             int numBitsForField = currentData.bitsPerField[fieldIndex];
+
+            try {
+                BufferedWriter diag = new BufferedWriter(new FileWriter("/tmp/diag-obj-" + schema.getName() + "-" + count++));
+                currentData.fixedLengthData.pp(diag);
+                diag.flush();
+            } catch (IOException e) {
+                throw new UnsupportedOperationException();
+            }
 
             fixedLengthValue = numBitsForField <= 56 ?
                     currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField)
@@ -161,6 +174,14 @@ class HollowObjectTypeReadStateShard {
     private long readFixedLengthFieldValue(HollowObjectTypeDataElements currentData, int ordinal, int fieldIndex) {
         long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
         int numBitsForField = currentData.bitsPerField[fieldIndex];
+
+        try {
+            BufferedWriter diag = new BufferedWriter(new FileWriter("/tmp/diag-obj-" + schema.getName() + "-" + count++));
+            currentData.fixedLengthData.pp(diag);
+            diag.flush();
+        } catch (IOException e) {
+            throw new UnsupportedOperationException();
+        }
 
         long value = currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField);
 

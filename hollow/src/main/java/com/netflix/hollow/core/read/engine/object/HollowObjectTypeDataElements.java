@@ -96,34 +96,6 @@ public class HollowObjectTypeDataElements {
         debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowObjectTypeDataElements for " + schema.toString() + "\n");
     }
 
-    private void removeExcludedFieldsFromFixedLengthData() {
-        if(bitsPerField.length < bitsPerUnfilteredField.length) {
-            long numBitsRequired = (long)bitsPerRecord * (maxOrdinal + 1);
-            FixedLengthElementArray filteredData = new FixedLengthElementArray(memoryRecycler, numBitsRequired);
-
-            long currentReadBit = 0;
-            long currentWriteBit = 0;
-
-            for(int i=0;i<=maxOrdinal;i++) {
-                for(int j=0;j<bitsPerUnfilteredField.length;j++) {
-                    if(unfilteredFieldIsIncluded[j]) {
-                        long value = bitsPerUnfilteredField[j] < 56 ?
-                                fixedLengthData.getElementValue(currentReadBit, bitsPerUnfilteredField[j]) :
-                                    fixedLengthData.getLargeElementValue(currentReadBit, bitsPerUnfilteredField[j]);
-                        filteredData.setElementValue(currentWriteBit, bitsPerUnfilteredField[j], value);
-                        currentWriteBit += bitsPerUnfilteredField[j];
-                    }
-
-                    currentReadBit += bitsPerUnfilteredField[j];
-                }
-            }
-
-            fixedLengthData.destroy(memoryRecycler);
-            memoryRecycler.swap();
-            fixedLengthData = filteredData;
-        }
-    }
-
     private void readFieldStatistics(RandomAccessFile raf, HollowObjectSchema unfilteredSchema) throws IOException {
         bitsPerRecord = 0;
 
@@ -167,47 +139,15 @@ public class HollowObjectTypeDataElements {
     }
 
     static void discardFromStream(DataInputStream dis, HollowObjectSchema schema, int numShards, boolean isDelta) throws IOException {
-        if(numShards > 1)
-            VarInt.readVInt(dis); // max ordinal
-        
-        for(int i=0;i<numShards;i++) {
-            VarInt.readVInt(dis); // max ordinal
-
-            if(isDelta) {
-                /// addition/removal ordinals
-                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
-                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
-            }
-    
-            /// field statistics
-            for(int j=0;j<schema.numFields();j++) {
-                VarInt.readVInt(dis);
-            }
-    
-            /// fixed length data
-            FixedLengthElementArray.discardFrom(dis);
-    
-            /// variable length data
-            for(int j=0;j<schema.numFields();j++) {
-                long numBytesInVarLengthData = VarInt.readVLong(dis);
-                while(numBytesInVarLengthData > 0) {
-                    numBytesInVarLengthData -= dis.skip(numBytesInVarLengthData);
-                }
-            }
-        }
+        throw new UnsupportedOperationException();
     }
 
     void applyDelta(HollowObjectTypeDataElements fromData, HollowObjectTypeDataElements deltaData) {
         throw new UnsupportedOperationException();
-        // new HollowObjectDeltaApplicatortaApplicator(fromData, deltaData, this).applyDelta();
     }
 
     public void destroy() {
-        fixedLengthData.destroy(memoryRecycler);
-        for(int i=0;i<varLengthData.length;i++) {
-            if(varLengthData[i] != null)
-                varLengthData[i].destroy();
-        }
+        throw new UnsupportedOperationException();
     }
 
 }

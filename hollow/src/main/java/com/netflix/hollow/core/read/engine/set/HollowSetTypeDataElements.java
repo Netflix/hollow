@@ -68,8 +68,6 @@ public class HollowSetTypeDataElements {
         maxOrdinal = VarInt.readVInt(raf);
 
         if(isDelta) {
-            //encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
-            //encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
             throw new UnsupportedOperationException();
         }
 
@@ -81,7 +79,6 @@ public class HollowSetTypeDataElements {
         totalNumberOfBuckets = VarInt.readVLong(raf);
 
         setPointerAndSizeArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
-
         elementArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
 
         debug.append("HollowSetTypeDataElements setPointerAndSizeArray= \n");
@@ -92,32 +89,11 @@ public class HollowSetTypeDataElements {
     }
 
     static void discardFromStream(DataInputStream dis, int numShards, boolean isDelta) throws IOException {
-        if(numShards > 1)
-            VarInt.readVInt(dis); // max ordinal
-        
-        for(int i=0;i<numShards;i++) {
-            VarInt.readVInt(dis); // max ordinal
-    
-            if(isDelta) {
-                /// addition/removal ordinals
-                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
-                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
-            }
-    
-            /// statistics
-            VarInt.readVInt(dis);
-            VarInt.readVInt(dis);
-            VarInt.readVInt(dis);
-            VarInt.readVLong(dis);
-    
-            /// fixed-length data
-            FixedLengthElementArray.discardFrom(dis);
-            FixedLengthElementArray.discardFrom(dis);
-        }
+        throw new UnsupportedOperationException();
     }
 
     public void applyDelta(HollowSetTypeDataElements fromData, HollowSetTypeDataElements deltaData) {
-        new HollowSetDeltaApplicator(fromData, deltaData, this).applyDelta();
+        throw new UnsupportedOperationException();
     }
 
     public void destroy() {
