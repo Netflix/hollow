@@ -101,24 +101,6 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     
     @Override
     public void applyDelta(DataInputStream dis, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler) throws IOException {
-//        if(shards.length > 1)
-//            maxOrdinal = VarInt.readVInt(dis);
-//
-//        for(int i=0;i<shards.length;i++) {
-//            HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryRecycler);
-//            HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryRecycler);
-//            deltaData.readDelta(dis);
-//            HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
-//            nextData.applyDelta(oldData, deltaData);
-//            shards[i].setCurrentData(nextData);
-//            notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
-//            deltaData.destroy();
-//            oldData.destroy();
-//            stateEngine.getMemoryRecycler().swap();
-//        }
-//
-//        if(shards.length == 1)
-//            maxOrdinal = shards[0].currentDataElements().maxOrdinal;
         throw new UnsupportedOperationException();
     }
 

@@ -53,31 +53,11 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
     }
 
     public void clearElementValue(long index, int bitsPerElement) {
-        long whichLong = index >>> 6;
-        int whichBit = (int) (index & 0x3F);
-
-        long mask = ((1L << bitsPerElement) - 1);
-
-        set(whichLong, get(whichLong) & ~(mask << whichBit));
-
-        int bitsRemaining = 64 - whichBit;
-
-        if (bitsRemaining < bitsPerElement) {
-            set(whichLong + 1, get(whichLong + 1) & ~(mask >>> bitsRemaining));
-        }
+        throw new UnsupportedOperationException();
     }
 
     public void setElementValue(long index, int bitsPerElement, long value) {
-        long whichLong = index >>> 6;
-        int whichBit = (int) (index & 0x3F);
-
-        set(whichLong, get(whichLong) | (value << whichBit));
-
-        int bitsRemaining = 64 - whichBit;
-
-        if (bitsRemaining < bitsPerElement) {
-            set(whichLong + 1, get(whichLong + 1) | (value >>> bitsRemaining));
-        }
+        throw new UnsupportedOperationException();
     }
 
     public long getElementValue(long index, int bitsPerElement) {
@@ -94,61 +74,17 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
     }
 
     public long getLargeElementValue(long index, int bitsPerElement, long mask) {
-        long whichLong = index >>> 6;
-        int whichBit = (int) (index & 0x3F);
-
-        long l = get(whichLong) >>> whichBit;
-
-        int bitsRemaining = 64 - whichBit;
-
-        if (bitsRemaining < bitsPerElement) {
-            whichLong++;
-            l |= get(whichLong) << bitsRemaining;
-        }
-
-        return l & mask;
+        throw new UnsupportedOperationException();
     }
 
     public void copyBits(
             com.netflix.hollow.core.memory.encoding.FixedLengthElementArray copyFrom, long sourceStartBit,
             long destStartBit, long numBits) {
-        if (numBits == 0) {
-            return;
-        }
-
-        if ((destStartBit & 63) != 0) {
-            int fillBits = (int) Math.min(64 - (destStartBit & 63), numBits);
-            long fillValue = copyFrom.getLargeElementValue(sourceStartBit, fillBits);
-            setElementValue(destStartBit, fillBits, fillValue);
-
-            destStartBit += fillBits;
-            sourceStartBit += fillBits;
-            numBits -= fillBits;
-        }
-
-        long currentWriteLong = destStartBit >>> 6;
-
-        while (numBits >= 64) {
-            long l = copyFrom.getLargeElementValue(sourceStartBit, 64, -1);
-            set(currentWriteLong, l);
-            numBits -= 64;
-            sourceStartBit += 64;
-            currentWriteLong++;
-        }
-
-        if (numBits != 0) {
-            destStartBit = currentWriteLong << 6;
-
-            long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) numBits);
-            setElementValue(destStartBit, (int) numBits, fillValue);
-        }
+        throw new UnsupportedOperationException();
     }
 
     public void incrementMany(long startBit, long increment, long bitsBetweenIncrements, int numIncrements) {
-        long endBit = startBit + (bitsBetweenIncrements * numIncrements);
-        for (; startBit < endBit; startBit += bitsBetweenIncrements) {
-            increment(startBit, increment);
-        }
+        throw new UnsupportedOperationException();
     }
 
     public void increment(long index, long increment) {
@@ -156,10 +92,7 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
     }
 
     public static int bitsRequiredToRepresentValue(long value) {
-        if (value == 0) {
-            return 1;
-        }
-        return 64 - Long.numberOfLeadingZeros(value);
+        throw new UnsupportedOperationException();
     }
 
 }

@@ -104,7 +104,6 @@ public class SegmentedByteArray implements ByteData {
      * @param length the length of the data to copy
      */
     public void copy(SegmentedByteArray src, long srcPos, long destPos, long length) {
-
         throw new UnsupportedOperationException();
     }
 

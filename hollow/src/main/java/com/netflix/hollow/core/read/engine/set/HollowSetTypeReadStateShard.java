@@ -23,6 +23,9 @@ import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.engine.SetMapKeyHasher;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.BitSet;
 
 class HollowSetTypeReadStateShard {
@@ -31,9 +34,19 @@ class HollowSetTypeReadStateShard {
 
     private HollowPrimaryKeyValueDeriver keyDeriver;
 
+    private int count = 0;
+
     public int size(int ordinal) {
         HollowSetTypeDataElements currentData;
         int size;
+
+        try {
+            BufferedWriter diag = new BufferedWriter(new FileWriter("/tmp/diag-set-" + count++));
+            this.currentDataVolatile.setPointerAndSizeArray.pp(diag);
+            diag.flush();
+        } catch (IOException e) {
+            throw new UnsupportedOperationException();
+        }
 
         do {
             currentData = this.currentDataVolatile;

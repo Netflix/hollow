@@ -97,24 +97,6 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     @Override
     public void applyDelta(DataInputStream dis, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException {
-//        if(shards.length > 1)
-//            maxOrdinal = VarInt.readVInt(dis);
-//
-//        for(int i=0;i<shards.length;i++) {
-//            HollowSetTypeDataElements deltaData = new HollowSetTypeDataElements(memoryRecycler);
-//            HollowSetTypeDataElements nextData = new HollowSetTypeDataElements(memoryRecycler);
-//            deltaData.readDelta(dis);
-//            HollowSetTypeDataElements oldData = shards[i].currentDataElements();
-//            nextData.applyDelta(oldData, deltaData);
-//            shards[i].setCurrentData(nextData);
-//            notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
-//            deltaData.destroy();
-//            oldData.destroy();
-//            stateEngine.getMemoryRecycler().swap();
-//        }
-//
-//        if(shards.length == 1)
-//            maxOrdinal = shards[0].currentDataElements().maxOrdinal;
         throw new UnsupportedOperationException();
     }
 
@@ -127,9 +109,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
     }
 
     public static void discardType(DataInputStream dis, int numShards, boolean delta) throws IOException {
-        HollowSetTypeDataElements.discardFromStream(dis, numShards, delta);
-        if(!delta)
-            SnapshotPopulatedOrdinalsReader.discardOrdinals(dis);
+        throw new UnsupportedOperationException();
     }
 
     @Override

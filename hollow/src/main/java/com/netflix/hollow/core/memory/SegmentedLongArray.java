@@ -46,15 +46,21 @@ public class SegmentedLongArray {
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
 
     protected final LongBuffer[] segments;
+    protected final ByteBuffer[] byteSegments;
     public final int log2OfSegmentSize;
+    public final int log2OfByteSegments;
     protected final int bitmask;
-    private long maxIndex = -1;
+    protected long maxIndex = -1;
 
     public SegmentedLongArray(ArraySegmentRecycler memoryRecycler, long numLongs) {
         this.log2OfSegmentSize = memoryRecycler.getLog2OfLongSegmentSize();
+        this.log2OfByteSegments = 8 * this.log2OfSegmentSize;
+
         int numSegments = (int)((numLongs - 1) >>> log2OfSegmentSize) + 1;
+
         this.bitmask = (1 << log2OfSegmentSize) - 1;
         this.segments = new LongBuffer[numSegments];
+        this.byteSegments = new ByteBuffer[numSegments];
     }
 
     /**
@@ -81,7 +87,7 @@ public class SegmentedLongArray {
         if (segments[segmentIndex] == null) {
             return 0;   // SNAP: deviation from original behavior
         }
-        return segments[segmentIndex].get(segments[segmentIndex].position() + (int)(index & bitmask));
+        return segments[segmentIndex].get(segments[segmentIndex].position() + (int)(index & bitmask));  // SNAP: segments[segmentIndex].position() is always zero since a new LongBuffer is allocated
     }
 
     public void fill(long value) {
@@ -98,17 +104,6 @@ public class SegmentedLongArray {
 
     public void destroy(ArraySegmentRecycler memoryRecycler) {
         throw new UnsupportedOperationException();
-    }
-
-
-    public static SegmentedLongArray deserializeFrom(DataInputStream dis, ArraySegmentRecycler memoryRecycler) throws IOException {
-        long numLongs = VarInt.readVLong(dis);
-
-        SegmentedLongArray arr = new SegmentedLongArray(memoryRecycler, numLongs);
-
-        arr.readFrom(dis, memoryRecycler, numLongs);
-
-        return arr;
     }
 
     protected void readFrom(RandomAccessFile raf, MappedByteBuffer buffer, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
@@ -128,6 +123,7 @@ public class SegmentedLongArray {
             long longsToReference = Math.min(segmentSize, numLongs);
 
             segments[segment] = buffer.asLongBuffer();  // returns a new direct buffer sharing the same content, with independent position tracking
+            byteSegments[segment] = buffer.duplicate(); // returns a new direct buffer sharing the same content, with independent position tracking
 
             buffer.position(buffer.position() + (int) (longsToReference * 8));
 
@@ -138,7 +134,7 @@ public class SegmentedLongArray {
 
         raf.skipBytes((int) saveNumLongs * 8);   // raf has to be advanced independently of buffer
 
-        // SNAP: POTENTIAL BUG: last segment isn't padded with zeros
+        // SNAP: POTENTIAL BUG: last segment isn't padded with zeros, although get() has been modified accordingly
     }
 
     protected void readFrom(DataInputStream dis, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
