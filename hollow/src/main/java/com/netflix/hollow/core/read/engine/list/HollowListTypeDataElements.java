@@ -76,11 +76,11 @@ public class HollowListTypeDataElements {
         listPointerArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
         elementArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
 
-        debug.append("HollowListTypeDataElements listPointerArray= \n");
-        listPointerArray.pp(debug);
-        debug.append("HollowListTypeDataElements elementArray= \n");
-        elementArray.pp(debug);
-        debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowListTypeDataElements\n");
+        // debug.append("HollowListTypeDataElements listPointerArray= \n");
+        // listPointerArray.pp(debug);
+        // debug.append("HollowListTypeDataElements elementArray= \n");
+        // elementArray.pp(debug);
+        // debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowListTypeDataElements\n");
     }
 
     static void discardFromStream(DataInputStream dis, int numShards, boolean isDelta) throws IOException {

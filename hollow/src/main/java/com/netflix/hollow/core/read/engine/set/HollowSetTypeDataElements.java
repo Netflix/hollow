@@ -81,11 +81,11 @@ public class HollowSetTypeDataElements {
         setPointerAndSizeArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
         elementArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
 
-        debug.append("HollowSetTypeDataElements setPointerAndSizeArray= \n");
-        setPointerAndSizeArray.pp(debug);
-        debug.append("HollowSetTypeDataElements elementArray= \n");
-        elementArray.pp(debug);
-        debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowSetTypeDataElements\n");
+        // debug.append("HollowSetTypeDataElements setPointerAndSizeArray= \n");
+        // setPointerAndSizeArray.pp(debug);
+        // debug.append("HollowSetTypeDataElements elementArray= \n");
+        // elementArray.pp(debug);
+        // debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowSetTypeDataElements\n");
     }
 
     static void discardFromStream(DataInputStream dis, int numShards, boolean isDelta) throws IOException {
