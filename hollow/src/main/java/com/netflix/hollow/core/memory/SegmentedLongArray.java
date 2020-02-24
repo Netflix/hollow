@@ -25,7 +25,6 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
-import java.util.Arrays;
 import sun.misc.Unsafe;
 
 /**
@@ -50,7 +49,8 @@ public class SegmentedLongArray {
     public final int log2OfSegmentSize;
     public final int log2OfByteSegments;
     protected final int bitmask;
-    protected long maxIndex = -1;
+    protected long maxLongs = -1;
+    protected long maxByteIndex = -1;
 
     public SegmentedLongArray(ArraySegmentRecycler memoryRecycler, long numLongs) {
         this.log2OfSegmentSize = memoryRecycler.getLog2OfLongSegmentSize();
@@ -80,14 +80,16 @@ public class SegmentedLongArray {
      * @return the byte value
      */
     public long get(long index) {
-        if (index >= this.maxIndex) {
-            return 0;   // SNAP: make up for missing padding at the end of the last segment
+        if (index > this.maxByteIndex) {  // can't read a byte starting past the last byte boundary of data
+            throw new UnsupportedOperationException(); // see if this ever happens
+            // return 0;   // SNAP: make up for missing padding at the end of the last segment
         }
         int segmentIndex = (int)(index >>> log2OfSegmentSize);
         if (segments[segmentIndex] == null) {
             return 0;   // SNAP: deviation from original behavior
         }
-        return segments[segmentIndex].get(segments[segmentIndex].position() + (int)(index & bitmask));  // SNAP: segments[segmentIndex].position() is always zero since a new LongBuffer is allocated
+        long retVal = segments[segmentIndex].get(segments[segmentIndex].position() + (int)(index & bitmask));
+        return retVal;  // SNAP: segments[segmentIndex].position() is always zero since a new LongBuffer is allocated
     }
 
     public void fill(long value) {
@@ -110,7 +112,8 @@ public class SegmentedLongArray {
         int segmentSize = 1 << memoryRecycler.getLog2OfLongSegmentSize();
         int segment = 0;
 
-        this.maxIndex = numLongs;
+        this.maxLongs = numLongs;
+        this.maxByteIndex = this.maxLongs * 64 - 8;
 
         if(numLongs == 0)
             return;

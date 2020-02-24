@@ -28,8 +28,6 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import sun.misc.Unsafe;
 
 /**
@@ -68,7 +66,6 @@ import sun.misc.Unsafe;
 public class FixedLengthElementArray extends SegmentedLongArray {
 
     private static int debug_count = 0;
-    private static Lock snapLock = new ReentrantLock();
 
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
 
@@ -116,8 +113,12 @@ public class FixedLengthElementArray extends SegmentedLongArray {
      * @return the masked element value
      */
     public long getElementValue(long index, int bitsPerElement, long mask) {
+
         long whichByte = index >>> 3;
         int whichBit = (int) (index & 0x07);
+
+        if (index == 3020 && mask == 1023)
+            System.out.println("break here");
 
         int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
         if (whichSegment >= segments.length) {
@@ -149,20 +150,32 @@ public class FixedLengthElementArray extends SegmentedLongArray {
             l = segment.get((int) elementOffset) >>> whichBit;
 
         } else {
+
+            System.out.println("SNAP: byteSegments[0].position()= " + byteSegments[0].position());
+            System.out.println("SNAP: get byte at byteSegments[0].position()= " + byteSegments[0].get(byteSegments[0].position()));
+
             ByteBuffer byteSegment = byteSegments[whichSegment];
             // aligned reads like byteSegment.getLong[byteSegment.position()], byteSegment.getLong[byteSegment.position()+8] etc. yield matching longs with old impl
             int savePos = byteSegment.position();
+            int longBoundary = (int) elementOffset >>> 3;
+            byteSegment.position(byteSegment.position() + (8 * longBoundary)); // advance byteSegment to read in long and nextLong
 
             byte[] whichLongBytes = new byte[8];
             byte[] whichLongNextBytes = new byte[8];
+
 
             byteSegment.get(whichLongBytes, 0, 8);  // NOTE: Not thread safe, because it advances position
 
             // we don't have to check with ByteBuffers whether this read is at the segment boundary
             // because the next segment is a continuation of the current segment (memory maps confirm this)
 
-            if (index + 8 <= maxIndex) {    // if we're trying to read 8 bytes starting after (maxIndex - 8)th byte
+            if (!(index > this.maxByteIndex)) {
                 byteSegment.get(whichLongNextBytes, 0, 8);
+            } else {    // if we're trying to read past the last byte
+                // SNAP: THIs might be whats leading to corruption
+                System.out.println("Trying to read 8 bytes past the end of the segmentindex= " + index);
+                throw new UnsupportedOperationException();
+                // do i need custom padding etc?
             }
 
             byteSegment.position(savePos);
@@ -230,7 +243,8 @@ public class FixedLengthElementArray extends SegmentedLongArray {
 
 
             // long longVal = byteSegment.getLong(byteSegment.position() + elementOffset);   // tHIs reads the wrong set of bytes
-            long longVal = unsafe.getLong(bothLongBytesRev, Unsafe.ARRAY_BYTE_BASE_OFFSET + elementOffset);
+            long newElementOffset = elementOffset % 8;  // new element offset is within the byte
+            long longVal = unsafe.getLong(bothLongBytesRev, Unsafe.ARRAY_BYTE_BASE_OFFSET + newElementOffset);
             l = longVal >>> whichBit;
 
             byte[] nativeLongBytes;
@@ -294,6 +308,7 @@ public class FixedLengthElementArray extends SegmentedLongArray {
      * @return the masked large element value
      */
     public long getLargeElementValue(long index, int bitsPerElement, long mask) {
+
         long whichLong = index >>> 6;
         int whichBit = (int) (index & 0x3F);
 

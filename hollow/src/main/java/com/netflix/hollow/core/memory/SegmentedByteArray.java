@@ -24,6 +24,8 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.util.Arrays;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A segmented byte array backs the {@link ByteData} interface with array segments, which potentially come from a pool of reusable memory.<p>
@@ -80,7 +82,9 @@ public class SegmentedByteArray implements ByteData {
         if (segments[segmentNo] == null) {
             return 0;   // SNAP: deviation from original behavior
         }
-        return segments[segmentNo].get(segments[segmentNo].position() + (int)(index & bitmask));
+
+        byte retVal = segments[segmentNo].get(segments[segmentNo].position() + (int)(index & bitmask));
+        return retVal;
     }
 
     /**
@@ -177,7 +181,6 @@ public class SegmentedByteArray implements ByteData {
         }
 
         raf.skipBytes((int) initLength); // SNAP: long to int cast; RandomAccessFile skipBytes takes int, although seek can take long
-
         // SNAP: TODO: Do I need to zero-out remaining bytes in the last segment?
     }
 
