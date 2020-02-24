@@ -20,9 +20,7 @@ import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.SegmentedLongArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -117,9 +115,6 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         long whichByte = index >>> 3;
         int whichBit = (int) (index & 0x07);
 
-        if (index == 3020 && mask == 1023)
-            System.out.println("break here");
-
         int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
         if (whichSegment >= segments.length) {
             return 0;   // SNAP: Hack to disguise race condition!!!
@@ -151,9 +146,6 @@ public class FixedLengthElementArray extends SegmentedLongArray {
 
         } else {
 
-            System.out.println("SNAP: byteSegments[0].position()= " + byteSegments[0].position());
-            System.out.println("SNAP: get byte at byteSegments[0].position()= " + byteSegments[0].get(byteSegments[0].position()));
-
             ByteBuffer byteSegment = byteSegments[whichSegment];
             // aligned reads like byteSegment.getLong[byteSegment.position()], byteSegment.getLong[byteSegment.position()+8] etc. yield matching longs with old impl
             int savePos = byteSegment.position();
@@ -168,14 +160,13 @@ public class FixedLengthElementArray extends SegmentedLongArray {
 
             // we don't have to check with ByteBuffers whether this read is at the segment boundary
             // because the next segment is a continuation of the current segment (memory maps confirm this)
-
             if (!(index > this.maxByteIndex)) {
                 byteSegment.get(whichLongNextBytes, 0, 8);
             } else {    // if we're trying to read past the last byte
-                // SNAP: THIs might be whats leading to corruption
-                System.out.println("Trying to read 8 bytes past the end of the segmentindex= " + index);
-                throw new UnsupportedOperationException();
                 // do i need custom padding etc?
+                System.out.println("Trying to read 8 bytes past the end of the segmentindex= " + index);
+                throw new IllegalStateException();
+
             }
 
             byteSegment.position(savePos);
@@ -185,6 +176,10 @@ public class FixedLengthElementArray extends SegmentedLongArray {
                 bothLongBytesRev[8-i] = whichLongBytes[i-1];
                 bothLongBytesRev[16-i] = whichLongNextBytes[i-1];
             }
+
+            long newElementOffset = elementOffset % 8;  // new element offset is within the byte
+            long longVal = unsafe.getLong(bothLongBytesRev, Unsafe.ARRAY_BYTE_BASE_OFFSET + newElementOffset);
+            l = longVal >>> whichBit;
 
             // byte[] shortcutLongBytes = new byte[] {
             //         whichLongBytes[5],
@@ -198,79 +193,73 @@ public class FixedLengthElementArray extends SegmentedLongArray {
             // };
             // long shortcutL = unsafe.getLong(shortcutLongBytes, Unsafe.ARRAY_BYTE_BASE_OFFSET);
 
-            String whichLong = String.format("%d %d %d %d %d %d %d %d ",
-                    whichLongBytes[0],
-                    whichLongBytes[1],
-                    whichLongBytes[2],
-                    whichLongBytes[3],
-                    whichLongBytes[4],
-                    whichLongBytes[5],
-                    whichLongBytes[6],
-                    whichLongBytes[7]);
+            // String whichLong = String.format("%d %d %d %d %d %d %d %d ",
+            //         whichLongBytes[0],
+            //         whichLongBytes[1],
+            //         whichLongBytes[2],
+            //         whichLongBytes[3],
+            //         whichLongBytes[4],
+            //         whichLongBytes[5],
+            //         whichLongBytes[6],
+            //         whichLongBytes[7]);
+            //
+            // String whichLongNext = String.format("%d %d %d %d %d %d %d %d ",
+            //         whichLongNextBytes[0],
+            //         whichLongNextBytes[1],
+            //         whichLongNextBytes[2],
+            //         whichLongNextBytes[3],
+            //         whichLongNextBytes[4],
+            //         whichLongNextBytes[5],
+            //         whichLongNextBytes[6],
+            //         whichLongNextBytes[7]);
+            //
+            // String bothLongRev = String.format("%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+            //         bothLongBytesRev[0],
+            //         bothLongBytesRev[1],
+            //         bothLongBytesRev[2],
+            //         bothLongBytesRev[3],
+            //         bothLongBytesRev[4],
+            //         bothLongBytesRev[5],
+            //         bothLongBytesRev[6],
+            //         bothLongBytesRev[7],
+            //         bothLongBytesRev[8],
+            //         bothLongBytesRev[9],
+            //         bothLongBytesRev[10],
+            //         bothLongBytesRev[11],
+            //         bothLongBytesRev[12],
+            //         bothLongBytesRev[13],
+            //         bothLongBytesRev[14],
+            //         bothLongBytesRev[15]);
 
-            String whichLongNext = String.format("%d %d %d %d %d %d %d %d ",
-                    whichLongNextBytes[0],
-                    whichLongNextBytes[1],
-                    whichLongNextBytes[2],
-                    whichLongNextBytes[3],
-                    whichLongNextBytes[4],
-                    whichLongNextBytes[5],
-                    whichLongNextBytes[6],
-                    whichLongNextBytes[7]);
-
-            String bothLongRev = String.format("%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
-                    bothLongBytesRev[0],
-                    bothLongBytesRev[1],
-                    bothLongBytesRev[2],
-                    bothLongBytesRev[3],
-                    bothLongBytesRev[4],
-                    bothLongBytesRev[5],
-                    bothLongBytesRev[6],
-                    bothLongBytesRev[7],
-                    bothLongBytesRev[8],
-                    bothLongBytesRev[9],
-                    bothLongBytesRev[10],
-                    bothLongBytesRev[11],
-                    bothLongBytesRev[12],
-                    bothLongBytesRev[13],
-                    bothLongBytesRev[14],
-                    bothLongBytesRev[15]);
-
-            System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
-            System.out.println("whichLong bytes= " + whichLong);
-            System.out.println("whichLongNext bytes= " + whichLongNext);
-            System.out.println("bothLongRev bytes= " + bothLongRev);
-
-
-            // long longVal = byteSegment.getLong(byteSegment.position() + elementOffset);   // tHIs reads the wrong set of bytes
-            long newElementOffset = elementOffset % 8;  // new element offset is within the byte
-            long longVal = unsafe.getLong(bothLongBytesRev, Unsafe.ARRAY_BYTE_BASE_OFFSET + newElementOffset);
-            l = longVal >>> whichBit;
-
-            byte[] nativeLongBytes;
-            try {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                DataOutputStream dos = new DataOutputStream(bos);
-                dos.writeLong(longVal);
-                dos.flush();
-                nativeLongBytes = bos.toByteArray();
-                // System.out.println("Bits chosen:");
-                String bytesChosenForUnalignedRead = "";
-                for (byte b : nativeLongBytes) {
-                    bytesChosenForUnalignedRead += b + " ";
-                    // String s = String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
-                    // System.out.print(s);
-                }
-                System.out.println("bytesChosenForUnalignedRead bytes= " + bytesChosenForUnalignedRead);
-                System.out.println();
-                // System.out.println("Num set bits = " + Long.bitCount(longVal));
-                // System.out.println();
-
-            } catch (Exception e) {
-
-            }
+            // System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
+            // System.out.println("whichLong bytes= " + whichLong);
+            // System.out.println("whichLongNext bytes= " + whichLongNext);
+            // System.out.println("bothLongRev bytes= " + bothLongRev);
 
 
+            // long longVal = byteSegment.getLong(byteSegment.position() + elementOffset);   // thIs reads wrong byte- endianness
+            // byte[] nativeLongBytes;
+            // try {
+            //     ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            //     DataOutputStream dos = new DataOutputStream(bos);
+            //     dos.writeLong(longVal);
+            //     dos.flush();
+            //     nativeLongBytes = bos.toByteArray();
+            //     // System.out.println("Bits chosen:");
+            //     String bytesChosenForUnalignedRead = "";
+            //     for (byte b : nativeLongBytes) {
+            //         bytesChosenForUnalignedRead += b + " ";
+            //         // String s = String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
+            //         // System.out.print(s);
+            //     }
+            //     System.out.println("bytesChosenForUnalignedRead bytes= " + bytesChosenForUnalignedRead);
+            //     System.out.println();
+            //     // System.out.println("Num set bits = " + Long.bitCount(longVal));
+            //     // System.out.println();
+            //
+            // } catch (Exception e) {
+            //
+            // }
         }
 
         return l & mask;
@@ -401,6 +390,8 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         return 64 - Long.numberOfLeadingZeros(value);
     }
 
+
+    // debug utility: pretty print
     public void pp(BufferedWriter debug) throws IOException {
         StringBuffer pp = new StringBuffer();
 

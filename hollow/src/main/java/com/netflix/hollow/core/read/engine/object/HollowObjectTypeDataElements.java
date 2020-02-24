@@ -82,14 +82,14 @@ public class HollowObjectTypeDataElements {
         // removeExcludedFieldsFromFixedLengthData();
         readVarLengthData(raf, buffer, unfilteredSchema);
 
-        debug.append("HollowObjectTypeDataElements for " + schema.toString() + " \n");
-        fixedLengthData.pp(debug);
-        for (int i= 0; i < varLengthData.length; i++) {
-            if (varLengthData[i] != null) {
-                varLengthData[i].pp(debug);
-            }
-        }
-        debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowObjectTypeDataElements for " + schema.toString() + "\n");
+        // debug.append("HollowObjectTypeDataElements for " + schema.toString() + " \n");
+        // fixedLengthData.pp(debug);
+        // for (int i= 0; i < varLengthData.length; i++) {
+        //     if (varLengthData[i] != null) {
+        //         varLengthData[i].pp(debug);
+        //     }
+        // }
+        // debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowObjectTypeDataElements for " + schema.toString() + "\n");
     }
 
     private void readFieldStatistics(RandomAccessFile raf, HollowObjectSchema unfilteredSchema) throws IOException {

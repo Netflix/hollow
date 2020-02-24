@@ -40,13 +40,13 @@ class HollowSetTypeReadStateShard {
         HollowSetTypeDataElements currentData;
         int size;
 
-        try {
-            BufferedWriter diag = new BufferedWriter(new FileWriter("/tmp/diag-set-" + count++));
-            this.currentDataVolatile.setPointerAndSizeArray.pp(diag);
-            diag.flush();
-        } catch (IOException e) {
-            throw new UnsupportedOperationException();
-        }
+        // try {
+        //     BufferedWriter diag = new BufferedWriter(new FileWriter("/tmp/diag-set-" + count++));
+        //     this.currentDataVolatile.setPointerAndSizeArray.pp(diag);
+        //     diag.flush();
+        // } catch (IOException e) {
+        //     throw new UnsupportedOperationException();
+        // }
 
         do {
             currentData = this.currentDataVolatile;

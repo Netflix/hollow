@@ -89,11 +89,11 @@ public class HollowMapTypeDataElements {
         /// element array
         entryArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
 
-        debug.append("HollowMapTypeDataElements mapPointerAndSizeArray= \n");
-        mapPointerAndSizeArray.pp(debug);
-        debug.append("HollowMapTypeDataElements entryArray= \n");
-        entryArray.pp(debug);
-        debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowMapTypeDataElements\n");
+        // debug.append("HollowMapTypeDataElements mapPointerAndSizeArray= \n");
+        // mapPointerAndSizeArray.pp(debug);
+        // debug.append("HollowMapTypeDataElements entryArray= \n");
+        // entryArray.pp(debug);
+        // debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowMapTypeDataElements\n");
     }
 
     static void discardFromStream(DataInputStream dis, int numShards, boolean isDelta) throws IOException {
