@@ -69,10 +69,6 @@ public class HollowObjectTypeDataElements {
         readFromStream(raf, buffer, debug, false, unfilteredSchema);
     }
 
-    void readDelta(RandomAccessFile raf) throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
     void readFromStream(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
         maxOrdinal = VarInt.readVInt(raf);
 
