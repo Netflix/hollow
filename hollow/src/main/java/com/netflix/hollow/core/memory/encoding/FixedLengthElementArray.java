@@ -127,7 +127,7 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         long elementOffset = whichByte & byteBitmask;
         boolean aligned = whichByte % 8 == 0;
         LongBuffer segment = segments[whichSegment];
-
+        
         long l;
         if (aligned) {
             elementOffset = elementOffset >>> 3;

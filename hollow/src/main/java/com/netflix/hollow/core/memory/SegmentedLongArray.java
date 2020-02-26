@@ -45,7 +45,6 @@ public class SegmentedLongArray {
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
 
     protected final LongBuffer[] segments;
-    protected final ByteBuffer[] byteSegments;
     public final int log2OfSegmentSize;
     public final int log2OfByteSegments;
     protected final int bitmask;
@@ -60,7 +59,6 @@ public class SegmentedLongArray {
 
         this.bitmask = (1 << log2OfSegmentSize) - 1;
         this.segments = new LongBuffer[numSegments];
-        this.byteSegments = new ByteBuffer[numSegments];
     }
 
     /**
@@ -125,7 +123,6 @@ public class SegmentedLongArray {
             long longsToReference = Math.min(segmentSize, numLongs);
 
             segments[segment] = buffer.asLongBuffer();  // returns a new direct buffer sharing the same content, with independent position tracking
-            byteSegments[segment] = buffer.duplicate(); // returns a new direct buffer sharing the same content, with independent position tracking
 
             buffer.position(buffer.position() + (int) (longsToReference * 8));
 
