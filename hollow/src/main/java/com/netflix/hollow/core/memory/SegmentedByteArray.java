@@ -76,11 +76,12 @@ public class SegmentedByteArray implements ByteData {
      */
     public byte get(long index) {
         if (index >= this.maxIndex) {
-            return 0;   // SNAP: make up for missing padding at the end of the last segment
+            throw new IllegalStateException();
+            // return 0;   // SNAP: do we need to make up for missing padding at the end of the last segment?
         }
         int segmentNo = (int)(index >>> log2OfSegmentSize);
         if (segments[segmentNo] == null) {
-            return 0;   // SNAP: deviation from original behavior
+            throw new IllegalStateException();
         }
 
         byte retVal = segments[segmentNo].get(segments[segmentNo].position() + (int)(index & bitmask));
@@ -181,7 +182,7 @@ public class SegmentedByteArray implements ByteData {
         }
 
         raf.skipBytes((int) initLength); // SNAP: long to int cast; RandomAccessFile skipBytes takes int, although seek can take long
-        // SNAP: TODO: Do I need to zero-out remaining bytes in the last segment?
+        // SNAP: TODO: Do I need pad with zeros in the segment for backwards compatibility?
     }
 
     /**
