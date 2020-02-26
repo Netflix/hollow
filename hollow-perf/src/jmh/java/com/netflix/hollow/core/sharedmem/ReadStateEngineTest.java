@@ -46,6 +46,8 @@ public class ReadStateEngineTest {
     private int n;
 
     private static final String TEST_FILE_TOPN = "/Users/sunjeets/workspace/onboarding/topN";
+    public static final String TEST_FILE_FEATHER_OVERRIDE = "/Users/sunjeets/workspace/onboarding/vms-feather_override";
+
 
     private HollowReadStateEngine readState;
 
@@ -103,5 +105,5 @@ public class ReadStateEngineTest {
 }
 
 /***
- * averaging 400 ms / op as opposed to 150ms ms /op with vanilla implementation
+ * now averaging 235 ms / op as opposed to 150ms ms /op with vanilla implementation
  */

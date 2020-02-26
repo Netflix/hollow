@@ -20,7 +20,9 @@ import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.SegmentedLongArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -117,27 +119,14 @@ public class FixedLengthElementArray extends SegmentedLongArray {
 
         int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
         if (whichSegment >= segments.length) {
-            return 0;   // SNAP: Hack to disguise race condition!!!
+            throw new IllegalStateException();
         }
 
         debug_count ++;
 
         long elementOffset = whichByte & byteBitmask;
         boolean aligned = whichByte % 8 == 0;
-        LongBuffer segment = segments[whichSegment];    // SNAP: OutOfBounds exception
-
-        // Algorithm:
-        // √ Read in the aligned bytes containing whichByte and whichByte + 8, called whichLong and whichLongNext using byteSegment.get(byteSegment.position() + byteIndex)
-        // √ Reverse the endianness in both long-s individually
-        // √ Store the byte sequences in one byte[] array (or if necessary long[] array)
-        // √ performance unaligned read using into byte array unsafe.getLong at Unsafe.ARRAY_BYTE_BASE_OFFSET + unaligned read pos;
-        //
-        // Could be simplified to a math expression for eg. for offset byte 2 in long something like (example is not accurate)
-        //      whichLongNext[6][7] whichLong[0][1][2][3][4][5]
-        //
-        // edge condition: when whichLong is at the end of a segment, whichLongNext will be in the next Segment
-        // edge condition: reading from last long
-        //
+        LongBuffer segment = segments[whichSegment];
 
         long l;
         if (aligned) {
@@ -145,121 +134,17 @@ public class FixedLengthElementArray extends SegmentedLongArray {
             l = segment.get((int) elementOffset) >>> whichBit;
 
         } else {
+            // sun.misc.unsafe doesn't work as expected for unaligned reads into off heap LongBuffer, so instead we make
+            // aligned reads into the LongBuffer to copy over 2 long values to an on-heap long array and use sun.misc.unsafe
+            // on the long array. This can be optimized with platform specific bitwise operations to avoid the copy.
+            int aligedOffset = (int) elementOffset >>> 3;
+            long[] alignedLongs = new long[2];                // SNAP: may want to make this thread local instead of allocating for each request
+            alignedLongs[0] = segment.get(aligedOffset);      // segment.position() should be 0 for LongBuffer
+            alignedLongs[1] = segment.get(aligedOffset + 1);  // segment.position() should be 0 for LongBuffer
 
-            ByteBuffer byteSegment = byteSegments[whichSegment];
-            // aligned reads like byteSegment.getLong[byteSegment.position()], byteSegment.getLong[byteSegment.position()+8] etc. yield matching longs with old impl
-            int savePos = byteSegment.position();
-            int longBoundary = (int) elementOffset >>> 3;
-            byteSegment.position(byteSegment.position() + (8 * longBoundary)); // advance byteSegment to read in long and nextLong
-
-            byte[] whichLongBytes = new byte[8];
-            byte[] whichLongNextBytes = new byte[8];
-
-
-            byteSegment.get(whichLongBytes, 0, 8);  // NOTE: Not thread safe, because it advances position
-
-            // we don't have to check with ByteBuffers whether this read is at the segment boundary
-            // because the next segment is a continuation of the current segment (memory maps confirm this)
-            if (!(index > this.maxByteIndex)) {
-                byteSegment.get(whichLongNextBytes, 0, 8);
-            } else {    // if we're trying to read past the last byte
-                // do i need custom padding etc?
-                System.out.println("Trying to read 8 bytes past the end of the segmentindex= " + index);
-                throw new IllegalStateException();
-
-            }
-
-            byteSegment.position(savePos);
-
-            byte[] bothLongBytesRev = new byte[16];
-            for (int i=8; i>0; i--) {
-                bothLongBytesRev[8-i] = whichLongBytes[i-1];
-                bothLongBytesRev[16-i] = whichLongNextBytes[i-1];
-            }
-
-            long newElementOffset = elementOffset % 8;  // new element offset is within the byte
-            long longVal = unsafe.getLong(bothLongBytesRev, Unsafe.ARRAY_BYTE_BASE_OFFSET + newElementOffset);
-            l = longVal >>> whichBit;
-
-            // byte[] shortcutLongBytes = new byte[] {
-            //         whichLongBytes[5],
-            //         whichLongBytes[4],
-            //         whichLongBytes[3],
-            //         whichLongBytes[2],
-            //         whichLongBytes[1],
-            //         whichLongBytes[0],
-            //         whichLongNextBytes[7],
-            //         whichLongNextBytes[6]
-            // };
-            // long shortcutL = unsafe.getLong(shortcutLongBytes, Unsafe.ARRAY_BYTE_BASE_OFFSET);
-
-            // String whichLong = String.format("%d %d %d %d %d %d %d %d ",
-            //         whichLongBytes[0],
-            //         whichLongBytes[1],
-            //         whichLongBytes[2],
-            //         whichLongBytes[3],
-            //         whichLongBytes[4],
-            //         whichLongBytes[5],
-            //         whichLongBytes[6],
-            //         whichLongBytes[7]);
-            //
-            // String whichLongNext = String.format("%d %d %d %d %d %d %d %d ",
-            //         whichLongNextBytes[0],
-            //         whichLongNextBytes[1],
-            //         whichLongNextBytes[2],
-            //         whichLongNextBytes[3],
-            //         whichLongNextBytes[4],
-            //         whichLongNextBytes[5],
-            //         whichLongNextBytes[6],
-            //         whichLongNextBytes[7]);
-            //
-            // String bothLongRev = String.format("%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
-            //         bothLongBytesRev[0],
-            //         bothLongBytesRev[1],
-            //         bothLongBytesRev[2],
-            //         bothLongBytesRev[3],
-            //         bothLongBytesRev[4],
-            //         bothLongBytesRev[5],
-            //         bothLongBytesRev[6],
-            //         bothLongBytesRev[7],
-            //         bothLongBytesRev[8],
-            //         bothLongBytesRev[9],
-            //         bothLongBytesRev[10],
-            //         bothLongBytesRev[11],
-            //         bothLongBytesRev[12],
-            //         bothLongBytesRev[13],
-            //         bothLongBytesRev[14],
-            //         bothLongBytesRev[15]);
-
-            // System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
-            // System.out.println("whichLong bytes= " + whichLong);
-            // System.out.println("whichLongNext bytes= " + whichLongNext);
-            // System.out.println("bothLongRev bytes= " + bothLongRev);
-
-
-            // long longVal = byteSegment.getLong(byteSegment.position() + elementOffset);   // thIs reads wrong byte- endianness
-            // byte[] nativeLongBytes;
-            // try {
-            //     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            //     DataOutputStream dos = new DataOutputStream(bos);
-            //     dos.writeLong(longVal);
-            //     dos.flush();
-            //     nativeLongBytes = bos.toByteArray();
-            //     // System.out.println("Bits chosen:");
-            //     String bytesChosenForUnalignedRead = "";
-            //     for (byte b : nativeLongBytes) {
-            //         bytesChosenForUnalignedRead += b + " ";
-            //         // String s = String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
-            //         // System.out.print(s);
-            //     }
-            //     System.out.println("bytesChosenForUnalignedRead bytes= " + bytesChosenForUnalignedRead);
-            //     System.out.println();
-            //     // System.out.println("Num set bits = " + Long.bitCount(longVal));
-            //     // System.out.println();
-            //
-            // } catch (Exception e) {
-            //
-            // }
+            long offsetIntoLongArray = elementOffset & 0x07;
+            long unalignedLongVal = unsafe.getLong(alignedLongs, (long)Unsafe.ARRAY_LONG_BASE_OFFSET + offsetIntoLongArray);
+            l = unalignedLongVal >>> whichBit;
         }
 
         return l & mask;

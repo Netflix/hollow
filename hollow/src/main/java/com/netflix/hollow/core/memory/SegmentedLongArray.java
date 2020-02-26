@@ -80,16 +80,15 @@ public class SegmentedLongArray {
      * @return the byte value
      */
     public long get(long index) {
-        if (index > this.maxByteIndex) {  // can't read a byte starting past the last byte boundary of data
-            throw new UnsupportedOperationException(); // see if this ever happens
-            // return 0;   // SNAP: make up for missing padding at the end of the last segment
+        if (index > this.maxByteIndex) {  // it's illegal to read a byte starting past the last byte boundary of data
+            throw new IllegalStateException();
         }
+
         int segmentIndex = (int)(index >>> log2OfSegmentSize);
         if (segments[segmentIndex] == null) {
-            return 0;   // SNAP: deviation from original behavior
+            throw new IllegalStateException();
         }
-        long retVal = segments[segmentIndex].get(segments[segmentIndex].position() + (int)(index & bitmask));
-        return retVal;  // SNAP: segments[segmentIndex].position() is always zero since a new LongBuffer is allocated
+        return segments[segmentIndex].get(segments[segmentIndex].position() + (int)(index & bitmask));
     }
 
     public void fill(long value) {
@@ -136,8 +135,6 @@ public class SegmentedLongArray {
         }
 
         raf.skipBytes((int) saveNumLongs * 8);   // raf has to be advanced independently of buffer
-
-        // SNAP: POTENTIAL BUG: last segment isn't padded with zeros, although get() has been modified accordingly
     }
 
     protected void readFrom(DataInputStream dis, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
