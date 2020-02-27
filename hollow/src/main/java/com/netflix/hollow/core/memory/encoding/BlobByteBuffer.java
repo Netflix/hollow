@@ -1,7 +1,5 @@
 package com.netflix.hollow.core.memory.encoding;
 
-import static java.lang.Integer.highestOneBit;
-import static java.lang.Long.numberOfLeadingZeros;
 import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
 
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
@@ -34,14 +32,14 @@ public final class BlobByteBuffer {
         // divide into N buffers with an int capacity that is a power of 2
         final int bufferCapacity = size > (long) MAX_BUFFER_CAPACITY
                 ? MAX_BUFFER_CAPACITY
-                : highestOneBit((int) size);
+                : Integer.highestOneBit((int) size);
         long bufferCount = size % bufferCapacity == 0
                 ? size / (long)bufferCapacity
                 : (size / (long)bufferCapacity) + 1;
         if (bufferCount > Integer.MAX_VALUE)
             throw new IllegalArgumentException("file too large; size=" + size);
 
-        int shift = 31 - numberOfLeadingZeros(bufferCapacity); // log2
+        int shift = 31 - Integer.numberOfLeadingZeros(bufferCapacity); // log2
         int mask = (1 << shift) - 1;
         ByteBuffer[] spine = new MappedByteBuffer[(int)bufferCount];
         for (int i = 0; i < bufferCount; i++) {
@@ -103,48 +101,43 @@ public final class BlobByteBuffer {
     }
 
     // @param position in bytes from offset 0 in the backing BlobByteBuffer
-    public byte getByte(long position) throws BufferUnderflowException {
-        int spineIndex = (int)(position >>> shift);
-        int bufferPosition = (int)(position & mask);
-        return spine[spineIndex].get(bufferPosition);
+    public byte getByte(long index) throws BufferUnderflowException {
+        int spineIndex = (int)(index >>> (shift));
+        int bufferIndex = (int)(index & mask);
+        return spine[spineIndex].get(bufferIndex);
     }
 
-    // @param position byte position from offset 0 in the backing BlobByteBuffer
-    public long getLong(long position) throws BufferUnderflowException {
-        int spineIndex = (int)(position >>> shift);
-        int bufferPosition = (int)(position & mask);
+    // Return long starting at given byte index
+    // @param startByteIndex long position from offset 0 in the backing BlobByteBuffer
+    public long getLong(long startByteIndex) throws BufferUnderflowException {
+        int spineIndex = (int)(startByteIndex >>> (shift));
+        int bufferByteIndex = (int)(startByteIndex & mask);
+        int alignmentOffset = (int)(startByteIndex - this.position()) % 8;
 
-        if (!(bufferPosition + 8 < this.capacity))
+        if (!(bufferByteIndex + 8 < this.capacity))
             throw new IllegalStateException();
 
-        boolean aligned = position % 8 == 0;
-        if (aligned) {
-            return spine[spineIndex].getLong(bufferPosition);
+        long longVal;
+        if (alignmentOffset == 0) {
+            longVal = spine[spineIndex].getLong(bufferByteIndex);
+        } else {
+            // SNAP: Below logic can be optimized with bitwise operations
+            long[] longs = new long[2];
+            int firstBufferOffset = bufferByteIndex - alignmentOffset;
+            int secondBufferOffset = firstBufferOffset + 8;
+            longs[0] = spine[spineIndex].getLong(firstBufferOffset);
+            if ((secondBufferOffset & mask) == secondBufferOffset) {    // if next aligned long is in the same spine bucket
+                longs[1] = spine[spineIndex].getLong(secondBufferOffset);
+            } else {
+                if (!(spineIndex+1 < spine.length)) {
+                    longs[1] = spine[spineIndex+1].getLong(spine[spineIndex+1].position()); // read in the first long in the next spine bucket
+                } else {
+                    throw new IllegalStateException("Attempting to read unaligned long starting in the last 8 bytes of data");
+                }
+            }
+            longVal = unsafe.getLong(longs, Unsafe.ARRAY_LONG_BASE_OFFSET + alignmentOffset);
         }
-        else {
-            long snapRead = 0l;
-            int alignedLongByte = bufferPosition & 0xFFFFFFF8;
-            int nextAlignedLongByte = alignedLongByte + 8;
-            long[] alignedLongs = new long[2];
-            alignedLongs[0] = spine[spineIndex].getLong(alignedLongByte);   // this aligned long is definitely in current spine bucket
-            alignedLongs[1] = getLong(nextAlignedLongByte); // this aligned long may be in next spine bucket
-
-            System.out.println("SNAP: alignedLongs[0] bytes= " + ppBytesInLong(alignedLongs[0]));
-            System.out.println("SNAP: alignedLongs[1] bytes= " + ppBytesInLong(alignedLongs[1]));
-
-
-            long offsetIntoLongArray = bufferPosition & 0x07;
-            long unalignedLongVal = unsafe.getLong(alignedLongs, (long) Unsafe.ARRAY_LONG_BASE_OFFSET + offsetIntoLongArray);
-
-            // if (bufferPosition < MAX_BUFFER_CAPACITY - 8) {      // SNAP: Test this too
-            //     snapRead = spine[spineIndex].getLong(bufferPosition);
-            //     if (snapRead == unalignedLongVal) {
-            //         System.out.println("Simplify !!!");
-            //     }
-            // }
-
-            return unalignedLongVal;
-        }
+        return longVal;
     }
 
     public static String ppBytesInLong(long l) {
@@ -167,7 +160,6 @@ public final class BlobByteBuffer {
     public BlobByteBuffer duplicate() {
         return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position);
     }
-
 
 //     public void get(byte[] dst, int offset, int length) {
 //         if ((offset | length | (offset + length) | (dst.length - (offset + length))) < 0)

@@ -117,16 +117,9 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         long whichByte = index >>> 3;
         int whichBit = (int) (index & 0x07);
 
-        int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
-        if (whichSegment >= segments.length) {
-            throw new IllegalStateException();
-        }
         debug_count ++;
 
-        BlobByteBuffer segment = segments[whichSegment];
-        long elementOffset = whichByte & byteBitmask;   // which byte in the current segment
-
-        long longVal = segment.getLong(segment.position() + elementOffset);
+        long longVal = this.bufferView.getLong(this.bufferView.position() + whichByte);
         long l =  longVal >>> whichBit;
         return l & mask;
     }
@@ -258,20 +251,20 @@ public class FixedLengthElementArray extends SegmentedLongArray {
 
 
     // debug utility: pretty print
-    public void pp(BufferedWriter debug) throws IOException {
-        StringBuffer pp = new StringBuffer();
-
-        int segmentSize = 1 << log2OfSegmentSize;
-        long maxIndex = segments.length * segmentSize;
-
-
-        pp.append("\n\n FixedLengthElementArray get()s =>");
-        for (int g = 0; g < maxIndex; g ++) {
-            long v = get(g);
-            pp.append(v + " ");
-        }
-
-        pp.append("\n");
+//    public void pp(BufferedWriter debug) throws IOException {
+//        StringBuffer pp = new StringBuffer();
+//
+//        int segmentSize = 1 << log2OfSegmentSize;
+//        long maxIndex = segments.length * segmentSize;
+//
+//
+//        pp.append("\n\n FixedLengthElementArray get()s =>");
+//        for (int g = 0; g < maxIndex; g ++) {
+//            long v = get(g);
+//            pp.append(v + " ");
+//        }
+//
+//        pp.append("\n");
 //        pp.append("\n FixedLengthElementArray raw bytes underneath:\n");
 //        for (int i = 0; i < segments.length; i ++) {
 //            if (segments[i] == null) {
@@ -288,6 +281,6 @@ public class FixedLengthElementArray extends SegmentedLongArray {
 //            }
 //            pp.append("\n");
 //        }
-        debug.append(pp.toString());
-    }
+//        debug.append(pp.toString());
+//    }
 }

@@ -102,9 +102,8 @@ public class ReadStateEngineTest {
     public void scan() {
         referenceReadState(readState);
     }
-
 }
 
 /***
- * now averaging 235 ms / op as opposed to 150ms ms /op with vanilla implementation
+ * Flattening SegmentedLong and SegmentedByte arrays to BlobByteBuffers, averaging 235 ms / op as opposed to 150ms ms /op with vanilla implementation
  */

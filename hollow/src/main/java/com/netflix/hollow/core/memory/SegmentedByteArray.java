@@ -42,16 +42,15 @@ import java.util.Arrays;
  *
  */
 @SuppressWarnings("restriction")
-public class SegmentedByteArray implements ByteData {
+public class SegmentedByteArray implements ByteData {   // SNAP: Rename to EncodedByteBuffer
 
-    private BlobByteBuffer[] segments;
+    private BlobByteBuffer bufferView;
     private final int log2OfSegmentSize;
     private final int bitmask;
     private final ArraySegmentRecycler memoryRecycler;
     private long maxIndex;
 
     public SegmentedByteArray(ArraySegmentRecycler memoryRecycler) {
-        this.segments = new BlobByteBuffer[2];
         this.log2OfSegmentSize = memoryRecycler.getLog2OfByteSegmentSize();
         this.bitmask = (1 << log2OfSegmentSize) - 1;
         this.memoryRecycler = memoryRecycler;
@@ -69,22 +68,15 @@ public class SegmentedByteArray implements ByteData {
 
     /**
      * Get the value of the byte at the specified index.
-     * @param index the index
+     * @param index the index (in multiples of 1 byte)
      * @return the byte value
      */
     public byte get(long index) {
         if (index >= this.maxIndex) {
             throw new IllegalStateException();
-            // return 0;   // SNAP: do we need to make up for missing padding at the end of the last segment?
-        }
-        int segmentNo = (int)(index >>> log2OfSegmentSize);
-        if (segments[segmentNo] == null) {
-            throw new IllegalStateException();
         }
 
-        long byteOffsetInSegment = (index & bitmask);
-        BlobByteBuffer segment = segments[segmentNo];
-        byte retVal = segment.getByte(segment.position() + byteOffsetInSegment);
+        byte retVal = this.bufferView.getByte(this.bufferView.position() + index);
         return retVal;
     }
 
@@ -160,29 +152,11 @@ public class SegmentedByteArray implements ByteData {
      * @throws IOException if the copy could not be performed
      */
     public void readFrom(RandomAccessFile raf, BlobByteBuffer buffer, long length) throws IOException {
-        int segmentSize = 1 << log2OfSegmentSize;
-        int segment = 0;
-
-        this.maxIndex = length;
-        long initLength = length;
-
-        buffer.position((int) raf.getFilePointer());
-
-        while(length > 0) {
-            ensureCapacity(segment);
-            long thisSegmentSize = Math.min(segmentSize, length);
-
-            segments[segment] = buffer.duplicate(); // returns a new direct buffer sharing
-                                                    // the same content but with different
-                                                    // trackers for position etc.
-            buffer.position(buffer.position() + thisSegmentSize);
-
-            segment++;
-            length -= thisSegmentSize;
-        }
-
-        raf.skipBytes((int) initLength); // SNAP: long to int cast; RandomAccessFile skipBytes takes int, although seek can take long
-        // SNAP: TODO: Do I need pad with zeros in the segment for backwards compatibility?
+        this.maxIndex = length; // SNAP: can we model this in bufferView as capacity?
+        buffer.position(raf.getFilePointer());
+        this.bufferView = buffer.duplicate();
+        buffer.position(buffer.position() + length);
+        raf.skipBytes((int) length); // SNAP: long to int cast; RandomAccessFile skipBytes takes int, we need to support long here
     }
 
     /**
@@ -202,17 +176,6 @@ public class SegmentedByteArray implements ByteData {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Ensures that the segment at segmentIndex exists
-     *
-     * @param segmentIndex the segment index
-     */
-    private void ensureCapacity(int segmentIndex) {
-        while(segmentIndex >= segments.length) {
-            segments = Arrays.copyOf(segments, segments.length * 3 / 2);
-        }
-    }
-
     public void destroy() {
         throw new UnsupportedOperationException();
     }
@@ -221,20 +184,20 @@ public class SegmentedByteArray implements ByteData {
         throw new UnsupportedOperationException();
     }
 
-    public void pp(BufferedWriter debug) throws IOException {
-        StringBuffer pp = new StringBuffer();
-
-        int segmentSize = 1 << log2OfSegmentSize;
-        long maxIndex = segments.length * segmentSize;
-
-
-        pp.append("\n\n SegmentedByteArray get()s => ");
-        for (int g = 0; g < maxIndex; g ++) {
-            byte v = get(g);
-            pp.append(v+ " ");
-        }
-
-        pp.append("\n");
+//    public void pp(BufferedWriter debug) throws IOException {
+//        StringBuffer pp = new StringBuffer();
+//
+//        int segmentSize = 1 << log2OfSegmentSize;
+//        long maxIndex = segments.length * segmentSize;
+//
+//
+//        pp.append("\n\n SegmentedByteArray get()s => ");
+//        for (int g = 0; g < maxIndex; g ++) {
+//            byte v = get(g);
+//            pp.append(v+ " ");
+//        }
+//
+//        pp.append("\n");
 //        pp.append("\n SegmentedByteArray raw bytes underneath:\n");
 //        for (int i = 0; i < segments.length; i ++) {
 //            if (segments[i] == null) {
@@ -251,7 +214,6 @@ public class SegmentedByteArray implements ByteData {
 //            }
 //            pp.append("\n");
 //        }
-        debug.append(pp.toString());
-    }
-
+//         debug.append(pp.toString());
+//     }
 }

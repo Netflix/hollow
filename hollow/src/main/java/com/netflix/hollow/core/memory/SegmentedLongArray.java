@@ -41,9 +41,9 @@ import sun.misc.Unsafe;
  *
  */
 @SuppressWarnings("restriction")
-public class SegmentedLongArray {
+public class SegmentedLongArray {   // SNAP: Rename to EncodedLongBuffer
 
-    protected final BlobByteBuffer[] segments;
+    protected BlobByteBuffer bufferView;
     public final int log2OfSegmentSize; // in longs
     public final int log2OfByteSegments;
     protected final int bitmask;
@@ -57,7 +57,6 @@ public class SegmentedLongArray {
         int numSegments = (int)((numLongs - 1) >>> log2OfSegmentSize) + 1;
 
         this.bitmask = (1 << log2OfByteSegments) - 1;
-        this.segments = new BlobByteBuffer[numSegments];
     }
 
     /**
@@ -77,18 +76,15 @@ public class SegmentedLongArray {
      * @return the byte value
      */
     public long get(long index) {
+        if (this.bufferView == null) {
+            throw new IllegalStateException("Type is queried before it has been read in");
+        }
+
         long byteIndex = 8 * index;
         if (byteIndex > this.maxByteIndex) {  // it's illegal to read a byte starting past the last byte boundary of data
             throw new IllegalStateException();
         }
-
-        int segmentIndex = (int)(index >>> log2OfSegmentSize);  // log2OfSegmentSize is in longs
-        if (segments[segmentIndex] == null) {
-            throw new IllegalStateException();
-        }
-        BlobByteBuffer thisSegment = segments[segmentIndex];
-
-        return thisSegment.getLong(thisSegment.position() + (byteIndex & bitmask));
+        return this.bufferView.getLong(bufferView.position() + byteIndex);
     }
 
     public void fill(long value) {
@@ -108,32 +104,17 @@ public class SegmentedLongArray {
     }
 
     protected void readFrom(RandomAccessFile raf, BlobByteBuffer buffer, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
-        int segmentSize = 1 << memoryRecycler.getLog2OfLongSegmentSize();
-        int segment = 0;
-
         this.maxLongs = numLongs;
-        this.maxByteIndex = this.maxLongs * 64 - 8;
+        this.maxByteIndex = this.maxLongs * 64 - 8; // SNAP: should we work this into bufferView capacity?
 
         if(numLongs == 0)
             return;
 
-        long saveNumLongs = numLongs;
+        buffer.position(raf.getFilePointer());
+        this.bufferView = buffer.duplicate();
+        buffer.position(buffer.position() + numLongs*8);
+        raf.skipBytes((int) numLongs * 8);  // SNAP: RAF skipbytes takes int, must allow longs here
 
-        buffer.position((int) raf.getFilePointer());
-
-        while(numLongs > 0) {
-            long longsToReference = Math.min(segmentSize, numLongs);
-
-            segments[segment] = buffer.duplicate();  // returns a new direct buffer sharing the same content, with independent position tracking
-
-            buffer.position(buffer.position() + (int) (longsToReference * 8));
-
-            segment++;
-            numLongs -= longsToReference;
-
-        }
-
-        raf.skipBytes((int) saveNumLongs * 8);   // raf has to be advanced independently of buffer
     }
 
     protected void readFrom(DataInputStream dis, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
