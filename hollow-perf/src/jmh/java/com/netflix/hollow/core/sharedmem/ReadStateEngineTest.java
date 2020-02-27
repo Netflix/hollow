@@ -7,6 +7,7 @@ import com.netflix.hollow.core.api.gen.topn.TopN;
 import com.netflix.hollow.core.api.gen.topn.TopNAPI;
 import com.netflix.hollow.core.api.gen.topn.TopNAttribute;
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -58,9 +59,9 @@ public class ReadStateEngineTest {
         HollowBlobReader fileReader = new HollowBlobReader(readState);
         RandomAccessFile raf = new RandomAccessFile(TEST_FILE_TOPN, "r");
         FileChannel channel = raf.getChannel(); // Map MappedByteBuffer once, pass it everywhere
-        MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, raf.length());
+        BlobByteBuffer monolithicBuffer = BlobByteBuffer.mmapBlob(channel); //   channel.map(FileChannel.MapMode.READ_ONLY, 0, raf.length());
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_new"));
-        fileReader.readSnapshot(raf, buffer, debug);
+        fileReader.readSnapshot(raf, monolithicBuffer, debug);
         debug.flush();
         System.out.println("SNAP: Done setup");
     }

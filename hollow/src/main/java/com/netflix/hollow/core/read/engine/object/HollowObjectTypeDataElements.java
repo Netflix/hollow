@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.read.engine.object;
 
 import com.netflix.hollow.core.memory.SegmentedByteArray;
+import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
@@ -65,11 +66,11 @@ public class HollowObjectTypeDataElements {
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug, HollowObjectSchema unfilteredSchema) throws IOException {
+    void readSnapshot(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, HollowObjectSchema unfilteredSchema) throws IOException {
         readFromStream(raf, buffer, debug, false, unfilteredSchema);
     }
 
-    void readFromStream(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
+    void readFromStream(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
         maxOrdinal = VarInt.readVInt(raf);
 
         if(isDelta) {
@@ -116,7 +117,7 @@ public class HollowObjectTypeDataElements {
     }
 
 
-    private void readVarLengthData(RandomAccessFile raf, MappedByteBuffer buffer, HollowObjectSchema unfilteredSchema) throws IOException {
+    private void readVarLengthData(RandomAccessFile raf, BlobByteBuffer buffer, HollowObjectSchema unfilteredSchema) throws IOException {
         int filteredFieldIdx = 0;
 
         for(int i=0;i<unfilteredSchema.numFields();i++) {

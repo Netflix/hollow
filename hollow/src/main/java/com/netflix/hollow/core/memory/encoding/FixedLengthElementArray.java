@@ -121,32 +121,13 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         if (whichSegment >= segments.length) {
             throw new IllegalStateException();
         }
-
         debug_count ++;
 
-        long elementOffset = whichByte & byteBitmask;
-        boolean aligned = whichByte % 8 == 0;
-        LongBuffer segment = segments[whichSegment];
-        
-        long l;
-        if (aligned) {
-            elementOffset = elementOffset >>> 3;
-            l = segment.get((int) elementOffset) >>> whichBit;
+        BlobByteBuffer segment = segments[whichSegment];
+        long elementOffset = whichByte & byteBitmask;   // which byte in the current segment
 
-        } else {
-            // sun.misc.unsafe doesn't work as expected for unaligned reads into off heap LongBuffer, so instead we make
-            // aligned reads into the LongBuffer to copy over 2 long values to an on-heap long array and use sun.misc.unsafe
-            // on the long array. This can be optimized with platform specific bitwise operations to avoid the copy.
-            int aligedOffset = (int) elementOffset >>> 3;
-            long[] alignedLongs = new long[2];                // SNAP: may want to make this thread local instead of allocating for each request
-            alignedLongs[0] = segment.get(aligedOffset);      // segment.position() should be 0 for LongBuffer
-            alignedLongs[1] = segment.get(aligedOffset + 1);  // segment.position() should be 0 for LongBuffer
-
-            long offsetIntoLongArray = elementOffset & 0x07;
-            long unalignedLongVal = unsafe.getLong(alignedLongs, (long)Unsafe.ARRAY_LONG_BASE_OFFSET + offsetIntoLongArray);
-            l = unalignedLongVal >>> whichBit;
-        }
-
+        long longVal = segment.getLong(segment.position() + elementOffset);
+        long l =  longVal >>> whichBit;
         return l & mask;
     }
 
@@ -253,7 +234,7 @@ public class FixedLengthElementArray extends SegmentedLongArray {
     }
 
     // returns a FixedLengthElementArray that contains deserialized data from given file
-    public static FixedLengthElementArray deserializeFrom(RandomAccessFile raf, MappedByteBuffer buffer, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public static FixedLengthElementArray deserializeFrom(RandomAccessFile raf, BlobByteBuffer buffer, ArraySegmentRecycler memoryRecycler) throws IOException {
         long numLongs = VarInt.readVLong(raf);
         FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, numLongs * 64);
         arr.readFrom(raf, buffer, memoryRecycler, numLongs);

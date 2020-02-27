@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.memory;
 
+import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
@@ -42,10 +43,8 @@ import sun.misc.Unsafe;
 @SuppressWarnings("restriction")
 public class SegmentedLongArray {
 
-    private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
-
-    protected final LongBuffer[] segments;
-    public final int log2OfSegmentSize;
+    protected final BlobByteBuffer[] segments;
+    public final int log2OfSegmentSize; // in longs
     public final int log2OfByteSegments;
     protected final int bitmask;
     protected long maxLongs = -1;
@@ -57,8 +56,8 @@ public class SegmentedLongArray {
 
         int numSegments = (int)((numLongs - 1) >>> log2OfSegmentSize) + 1;
 
-        this.bitmask = (1 << log2OfSegmentSize) - 1;
-        this.segments = new LongBuffer[numSegments];
+        this.bitmask = (1 << log2OfByteSegments) - 1;
+        this.segments = new BlobByteBuffer[numSegments];
     }
 
     /**
@@ -74,19 +73,22 @@ public class SegmentedLongArray {
     /**
      * Get the value of the byte at the specified index.
      *
-     * @param index the index
+     * @param index the index (in multiples of 8 bytes)
      * @return the byte value
      */
     public long get(long index) {
-        if (index > this.maxByteIndex) {  // it's illegal to read a byte starting past the last byte boundary of data
+        long byteIndex = 8 * index;
+        if (byteIndex > this.maxByteIndex) {  // it's illegal to read a byte starting past the last byte boundary of data
             throw new IllegalStateException();
         }
 
-        int segmentIndex = (int)(index >>> log2OfSegmentSize);
+        int segmentIndex = (int)(index >>> log2OfSegmentSize);  // log2OfSegmentSize is in longs
         if (segments[segmentIndex] == null) {
             throw new IllegalStateException();
         }
-        return segments[segmentIndex].get(segments[segmentIndex].position() + (int)(index & bitmask));
+        BlobByteBuffer thisSegment = segments[segmentIndex];
+
+        return thisSegment.getLong(thisSegment.position() + (byteIndex & bitmask));
     }
 
     public void fill(long value) {
@@ -105,7 +107,7 @@ public class SegmentedLongArray {
         throw new UnsupportedOperationException();
     }
 
-    protected void readFrom(RandomAccessFile raf, MappedByteBuffer buffer, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
+    protected void readFrom(RandomAccessFile raf, BlobByteBuffer buffer, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
         int segmentSize = 1 << memoryRecycler.getLog2OfLongSegmentSize();
         int segment = 0;
 
@@ -122,7 +124,7 @@ public class SegmentedLongArray {
         while(numLongs > 0) {
             long longsToReference = Math.min(segmentSize, numLongs);
 
-            segments[segment] = buffer.asLongBuffer();  // returns a new direct buffer sharing the same content, with independent position tracking
+            segments[segment] = buffer.duplicate();  // returns a new direct buffer sharing the same content, with independent position tracking
 
             buffer.position(buffer.position() + (int) (longsToReference * 8));
 
