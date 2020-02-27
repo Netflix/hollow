@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.read.engine.set;
 
+import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
@@ -56,7 +57,7 @@ public class HollowSetTypeDataElements {
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug) throws IOException {
+    void readSnapshot(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug) throws IOException {
         readFromStream(raf, buffer, debug, false);
     }
 
@@ -64,7 +65,7 @@ public class HollowSetTypeDataElements {
         throw new UnsupportedOperationException();
     }
 
-    private void readFromStream(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug, boolean isDelta) throws IOException {
+    private void readFromStream(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, boolean isDelta) throws IOException {
         maxOrdinal = VarInt.readVInt(raf);
 
         if(isDelta) {

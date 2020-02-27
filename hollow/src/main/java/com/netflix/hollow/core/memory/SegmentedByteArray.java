@@ -16,16 +16,14 @@
  */
 package com.netflix.hollow.core.memory;
 
+import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.util.Arrays;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A segmented byte array backs the {@link ByteData} interface with array segments, which potentially come from a pool of reusable memory.<p>
@@ -46,14 +44,14 @@ import java.util.concurrent.locks.ReentrantLock;
 @SuppressWarnings("restriction")
 public class SegmentedByteArray implements ByteData {
 
-    private ByteBuffer[] segments;
+    private BlobByteBuffer[] segments;
     private final int log2OfSegmentSize;
     private final int bitmask;
     private final ArraySegmentRecycler memoryRecycler;
     private long maxIndex;
 
     public SegmentedByteArray(ArraySegmentRecycler memoryRecycler) {
-        this.segments = new ByteBuffer[2];
+        this.segments = new BlobByteBuffer[2];
         this.log2OfSegmentSize = memoryRecycler.getLog2OfByteSegmentSize();
         this.bitmask = (1 << log2OfSegmentSize) - 1;
         this.memoryRecycler = memoryRecycler;
@@ -84,7 +82,9 @@ public class SegmentedByteArray implements ByteData {
             throw new IllegalStateException();
         }
 
-        byte retVal = segments[segmentNo].get(segments[segmentNo].position() + (int)(index & bitmask));
+        long byteOffsetInSegment = (index & bitmask);
+        BlobByteBuffer segment = segments[segmentNo];
+        byte retVal = segment.getByte(segment.position() + byteOffsetInSegment);
         return retVal;
     }
 
@@ -159,7 +159,7 @@ public class SegmentedByteArray implements ByteData {
      * @param length the length of the data to copy
      * @throws IOException if the copy could not be performed
      */
-    public void readFrom(RandomAccessFile raf, MappedByteBuffer buffer, long length) throws IOException {
+    public void readFrom(RandomAccessFile raf, BlobByteBuffer buffer, long length) throws IOException {
         int segmentSize = 1 << log2OfSegmentSize;
         int segment = 0;
 
@@ -175,7 +175,7 @@ public class SegmentedByteArray implements ByteData {
             segments[segment] = buffer.duplicate(); // returns a new direct buffer sharing
                                                     // the same content but with different
                                                     // trackers for position etc.
-            buffer.position(buffer.position() + (int) thisSegmentSize); // SNAP: long to int cast due to MappedByteBuffer constraints
+            buffer.position(buffer.position() + thisSegmentSize);
 
             segment++;
             length -= thisSegmentSize;

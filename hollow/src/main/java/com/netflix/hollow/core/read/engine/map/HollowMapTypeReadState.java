@@ -23,6 +23,7 @@ import com.netflix.hollow.api.sampling.HollowMapSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
+import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
@@ -78,7 +79,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
 
     @Override
-    public void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void readSnapshot(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(raf);
         

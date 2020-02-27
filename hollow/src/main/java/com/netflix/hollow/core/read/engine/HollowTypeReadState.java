@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.api.sampling.HollowSampler;
+import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
@@ -121,7 +122,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      */
     public abstract int maxOrdinal();
 
-    public abstract void readSnapshot(RandomAccessFile raf, MappedByteBuffer buffer, BufferedWriter debug, ArraySegmentRecycler recycler) throws IOException;
+    public abstract void readSnapshot(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, ArraySegmentRecycler recycler) throws IOException;
     public abstract void applyDelta(DataInputStream dis, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException;
 
     public HollowSchema getSchema() {
