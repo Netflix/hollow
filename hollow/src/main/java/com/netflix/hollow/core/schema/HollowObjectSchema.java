@@ -21,7 +21,7 @@ import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-import com.netflix.hollow.core.read.filter.HollowFilterConfig.ObjectFilterConfig;
+import com.netflix.hollow.core.read.filter.TypeFilter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -222,20 +222,30 @@ public class HollowObjectSchema extends HollowSchema {
     }
 
     public HollowObjectSchema filterSchema(HollowFilterConfig config) {
-        ObjectFilterConfig typeConfig = config.getObjectTypeConfig(getName());
+        /*
+         * This method is preserved for binary compat from before TypeFilter was introduced.
+         */
+
+        return filterSchema((TypeFilter)config);
+    }
+
+    public HollowObjectSchema filterSchema(TypeFilter filter) {
+        String type = getName();
 
         int includedFields = 0;
 
         for(int i=0;i<numFields();i++) {
-            if(typeConfig.includesField(getFieldName(i)))
+            String field = getFieldName(i);
+            if(filter.includes(type, field))
                 includedFields++;
         }
 
         HollowObjectSchema filteredSchema = new HollowObjectSchema(getName(), includedFields, primaryKey);
 
         for(int i=0;i<numFields();i++) {
-            if(typeConfig.includesField(getFieldName(i)))
-                filteredSchema.addField(getFieldName(i), getFieldType(i), getReferencedType(i));
+            String field = getFieldName(i);
+            if(filter.includes(type, field))
+                filteredSchema.addField(field, getFieldType(i), getReferencedType(i));
         }
 
         return filteredSchema;

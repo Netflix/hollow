@@ -25,6 +25,7 @@ import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.tools.history.HollowHistoricalStateCreator;
 import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
 import java.io.IOException;
@@ -44,7 +45,7 @@ class HollowDataHolder {
     private final StaleHollowReferenceDetector staleReferenceDetector;
     private final HollowConsumer.ObjectLongevityConfig objLongevityConfig;
 
-    private HollowFilterConfig filter;
+    private TypeFilter filter;
 
     private HollowAPI currentAPI;
 
@@ -80,6 +81,14 @@ class HollowDataHolder {
     }
 
     HollowDataHolder setFilter(HollowFilterConfig filter) {
+        /*
+         * This method is preserved for binary compat from before TypeFilter was introduced.
+         */
+
+        return setFilter((TypeFilter)filter);
+    }
+
+    HollowDataHolder setFilter(TypeFilter filter) {
         this.filter = filter;
         return this;
     }

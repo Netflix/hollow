@@ -1,9 +1,13 @@
 package com.netflix.hollow.api.consumer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
+
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -30,22 +34,65 @@ public class CustomConsumerBuilderTest {
                 .withBlobRetriever(blobStore)
                 .build();
         Assert.assertNotNull(consumer);
-        Assert.assertFalse(consumer instanceof AugmentedConsumer);
+        assertThat(consumer).isNotInstanceOf(AugmentedConsumer.class);
     }
 
     @Test
-    public void augmentedBehavior() {
+    public void augmentedBehavior_deprecatedConstructor() {
+        HollowConsumer consumer = new AugmentedBuilder()
+                .withBlobRetriever(blobStore) // should be called before custom builder methods
+                .withDeprecatedAugmentation()
+                .build();
+        assertThat(consumer).isInstanceOf(AugmentedConsumer.class);
+    }
+
+    @Test
+    public void augmentedBehavior_builderConstructor() {
         HollowConsumer consumer = new AugmentedBuilder()
                 .withBlobRetriever(blobStore) // should be called before custom builder methods
                 .withAugmentation()
                 .build();
-        Assert.assertTrue(consumer instanceof AugmentedConsumer);
+        assertThat(consumer).isInstanceOf(AugmentedConsumer.class);
+    }
+
+    @Test
+    public void augmentedBehavior_breakingTypeFilter() {
+        try {
+            new AugmentedBuilder()
+                    .withBlobRetriever(blobStore)
+                    .withAugmentation()
+                    .withFilterConfig(new HollowFilterConfig(true))
+                    .withTypeFilter(TypeFilter.newTypeFilter().build())
+            .build();
+            fail();
+        } catch (IllegalStateException ex) {
+            assertThat(ex.getMessage()).startsWith("Only one of typeFilter");
+        }
     }
 
     private static class AugmentedBuilder extends HollowConsumer.Builder<AugmentedBuilder> {
-        private boolean shouldAugment = false;
+        enum Augmentation {
+            none, deprecatedConstructor, builderConstructor;
+        }
+        private Augmentation augmentation = Augmentation.none;
+
+        AugmentedBuilder withDeprecatedAugmentation() {
+            augmentation = Augmentation.deprecatedConstructor;
+            return this;
+        }
+
         AugmentedBuilder withAugmentation() {
-            shouldAugment = true;
+            augmentation = Augmentation.builderConstructor;
+            return this;
+        }
+
+        @Override
+        public AugmentedBuilder withFilterConfig(HollowFilterConfig filterConfig) {
+            /*
+             * this intentionally breaks the migration to TypeFilter so we can test
+             * our guard against the scenario where both filterConfig and typeFilter are set
+             */
+            this.filterConfig = filterConfig;
             return this;
         }
 
@@ -53,22 +100,32 @@ public class CustomConsumerBuilderTest {
         public HollowConsumer build() {
             checkArguments();
             HollowConsumer consumer;
-            if(shouldAugment)
-                consumer = new AugmentedConsumer(
-                        blobRetriever,
-                        announcementWatcher,
-                        refreshListeners,
-                        apiFactory,
-                        filterConfig,
-                        objectLongevityConfig,
-                        objectLongevityDetector,
-                        doubleSnapshotConfig,
-                        hashCodeFinder,
-                        refreshExecutor,
-                        metricsCollector
-                );
-            else
-                consumer = super.build();
+            switch (augmentation) {
+                case none:
+                    consumer = super.build();
+                    break;
+                case deprecatedConstructor:
+                    consumer = new AugmentedConsumer(
+                            blobRetriever,
+                            announcementWatcher,
+                            refreshListeners,
+                            apiFactory,
+                            filterConfig,
+                            objectLongevityConfig,
+                            objectLongevityDetector,
+                            doubleSnapshotConfig,
+                            hashCodeFinder,
+                            refreshExecutor,
+                            metricsCollector
+                    );
+                    break;
+                case builderConstructor:
+                    consumer = new AugmentedConsumer(this);
+                    break;
+
+                default:
+                    throw new IllegalStateException();
+            }
             return consumer;
         }
     }
@@ -97,7 +154,12 @@ public class CustomConsumerBuilderTest {
                     doubleSnapshotConfig,
                     hashCodeFinder,
                     refreshExecutor,
-                    metricsCollector);        }
+                    metricsCollector);
+        }
+
+        AugmentedConsumer(AugmentedBuilder builder) {
+            super(builder);
+        }
 
         @Override
         public String toString() {
