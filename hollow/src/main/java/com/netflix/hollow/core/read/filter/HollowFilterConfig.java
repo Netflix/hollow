@@ -48,8 +48,20 @@ import java.util.Set;
  * Note that when using this to configure a filter for a consumer, only the snapshot must be filtered.  Subsequent
  * deltas will automatically use the same filter.
  *
+ * <p>{@link HollowFilterConfig} is deprecated in favor of {@link TypeFilter}.</p>
+ *
+ * <p>{@code HollowFilterConfig} has these limitations:</p>
+ *
+ * <ul>
+ *     <li>cannot mix inclusions and exclusions in a single filter and cannot compose filters</li>
+ *     <li>recursive actions requires that callers already have the dataset's schema, leading to
+ *     a chicken-and-egg situation</li>
+ * </ul>
+ *
+ * @deprecated use {@link TypeFilter}
  */
-public class HollowFilterConfig {
+@Deprecated
+public class HollowFilterConfig implements TypeFilter {
 
     private final ObjectFilterConfig INCLUDE_ALL = new ObjectFilterConfig(Boolean.TRUE);
     private final ObjectFilterConfig INCLUDE_NONE = new ObjectFilterConfig(Boolean.FALSE);
@@ -214,6 +226,16 @@ public class HollowFilterConfig {
                 return INCLUDE_ALL;
             return INCLUDE_NONE;
         }
+    }
+
+    @Override
+    public boolean includes(String type) {
+        return doesIncludeType(type);
+    }
+
+    @Override
+    public boolean includes(String type, String field) {
+        return getObjectTypeConfig(type).includesField(field);
     }
 
     public class ObjectFilterConfig {

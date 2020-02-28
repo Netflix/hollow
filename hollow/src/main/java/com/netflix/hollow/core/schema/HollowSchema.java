@@ -209,6 +209,11 @@ public abstract class HollowSchema {
         public static boolean hasKey(int typeId) {
             return typeId == 4 || typeId == 5 || typeId == 6;
         }
-    }
 
+        public static class UnrecognizedSchemaTypeException extends IllegalStateException {
+            public UnrecognizedSchemaTypeException(String name, SchemaType type) {
+                super("unrecognized schema type; name=" + name + " type=" + type);
+            }
+        }
+    }
 }
