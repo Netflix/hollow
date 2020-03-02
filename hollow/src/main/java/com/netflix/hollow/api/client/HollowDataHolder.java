@@ -20,6 +20,7 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.TransitionAwareRefreshListener;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.HollowConstants;
+import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
@@ -28,10 +29,13 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.tools.history.HollowHistoricalStateCreator;
 import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.lang.ref.WeakReference;
+import java.nio.channels.FileChannel;
 
 /**
  * A class comprising much of the internal state of a {@link HollowConsumer}.  Not intended for external consumption.
@@ -133,12 +137,43 @@ class HollowDataHolder {
     }
 
     private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
-        try(InputStream is = snapshotBlob.getInputStream()) {
-            throw new UnsupportedOperationException();
+
+
+        RandomAccessFile raf = new RandomAccessFile(snapshotBlob.getFile(), "r");
+        FileChannel channel = raf.getChannel();
+        BlobByteBuffer buffer = BlobByteBuffer.mmapBlob(channel);
+        BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_new"));
+
+        try {
+            applyStateEngineTransition(raf, buffer, debug, snapshotBlob, refreshListeners);
+            initializeAPI();
+
+            for(HollowConsumer.RefreshListener refreshListener : refreshListeners) {
+                if (refreshListener instanceof TransitionAwareRefreshListener)
+                    ((TransitionAwareRefreshListener)refreshListener).snapshotApplied(currentAPI, stateEngine, snapshotBlob.getToVersion());
+            }
         } catch(Throwable t) {
             failedTransitionTracker.markFailedTransition(snapshotBlob);
             throw t;
         }
+    }
+
+
+    private void applyStateEngineTransition(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, HollowConsumer.Blob transition, HollowConsumer.RefreshListener[] refreshListeners) throws IOException {
+        if(transition.isSnapshot()) {
+            if(filter == null)
+                reader.readSnapshot(raf, buffer, debug);
+            else
+                reader.readSnapshot(raf, buffer, debug, filter);
+        } else {
+            throw new UnsupportedOperationException();
+            // reader.applyDelta(is);
+        }
+
+        setVersion(transition.getToVersion());
+
+        for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
+            refreshListener.blobLoaded(transition);
     }
 
     private void initializeAPI() {
