@@ -206,6 +206,11 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         public InputStream getInputStream() throws IOException {
             return new BufferedInputStream(Files.newInputStream(path));
         }
+
+        @Override
+        public File getFile() throws IOException {
+            return path.toFile();
+        }
         
     }
     
