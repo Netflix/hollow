@@ -165,6 +165,10 @@ public class HollowBlobReader {
         }
     }
 
+    private boolean hasDefinedHashCode(String type) {
+        return stateEngine.getHashCodeFinder().getTypesWithDefinedHashCodes().contains(type);
+    }
+
     private String readTypeStateSnapshot(DataInputStream is, HollowBlobHeader header, HollowFilterConfig filter) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(is);
 
@@ -188,13 +192,23 @@ public class HollowBlobReader {
             if(!filter.doesIncludeType(schema.getName())) {
                 HollowSetTypeReadState.discardSnapshot(is, numShards);
             } else {
-                populateTypeStateSnapshot(is, new HollowSetTypeReadState(stateEngine, (HollowSetSchema)schema, numShards));
+                HollowSetSchema setSchema = (HollowSetSchema) schema;
+                // Filter out hash key if overridden by a hash code finder
+                if (hasDefinedHashCode(setSchema.getElementType())) {
+                    setSchema = setSchema.withoutHashKey();
+                }
+                populateTypeStateSnapshot(is, new HollowSetTypeReadState(stateEngine, setSchema, numShards));
             }
         } else if(schema instanceof HollowMapSchema) {
             if(!filter.doesIncludeType(schema.getName())) {
                 HollowMapTypeReadState.discardSnapshot(is, numShards);
             } else {
-                populateTypeStateSnapshot(is, new HollowMapTypeReadState(stateEngine, (HollowMapSchema)schema, numShards));
+                HollowMapSchema mapSchema = (HollowMapSchema) schema;
+                // Filter out hash key if overridden by a hash code finder
+                if (hasDefinedHashCode(mapSchema.getKeyType())) {
+                    mapSchema = mapSchema.withoutHashKey();
+                }
+                populateTypeStateSnapshot(is, new HollowMapTypeReadState(stateEngine, mapSchema, numShards));
             }
         }
         

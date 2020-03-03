@@ -47,7 +47,7 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
         
         if(hashKeyFieldPaths == null && useDefaultHashKeys && (elementMapper instanceof HollowObjectTypeMapper))
             hashKeyFieldPaths = ((HollowObjectTypeMapper)elementMapper).getDefaultElementHashKey();
-        
+
         this.schema = new HollowSetSchema(typeName, elementMapper.getTypeName(), hashKeyFieldPaths);
         this.hashCodeFinder = stateEngine.getHashCodeFinder();
 

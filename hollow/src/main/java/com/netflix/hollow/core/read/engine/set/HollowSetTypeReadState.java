@@ -237,9 +237,15 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     @Override
     protected void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema) {
-        if(!getSchema().equals(withSchema))
-            throw new IllegalArgumentException("HollowSetTypeReadState cannot calculate checksum with unequal schemas: " + getSchema().getName());
-        
+        if (!getSchema().equals(withSchema)) {
+            // Apply checksum if withSchema does not declare a hash key
+            if (getSchema().getHashKey() != null && !getSchema().withoutHashKey().equals(withSchema)) {
+                throw new IllegalArgumentException(
+                        "HollowSetTypeReadState cannot calculate checksum with unequal schemas: " + getSchema()
+                                .getName());
+            }
+        }
+
         BitSet populatedOrdinals = getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
         for(int i=0;i<shards.length;i++)
@@ -273,8 +279,10 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 	}
 	
 	public void buildKeyDeriver() {
-	    if(getSchema().getHashKey() != null)
-	        this.keyDeriver = new HollowPrimaryKeyValueDeriver(getSchema().getHashKey(), getStateEngine());
+        if (getSchema().getHashKey() != null &&
+                getStateEngine().getSchema(getSchema().getElementType()) != null) {
+            this.keyDeriver = new HollowPrimaryKeyValueDeriver(getSchema().getHashKey(), getStateEngine());
+        }
 	    
 	    for(int i=0;i<shards.length;i++)
 	        shards[i].setKeyDeriver(keyDeriver);

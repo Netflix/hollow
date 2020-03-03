@@ -39,10 +39,25 @@ public class HollowSetSchema extends HollowCollectionSchema {
 
     private HollowTypeReadState elementTypeState;
 
+    /**
+     * Constructs a schema for a hollow set.
+     *
+     * @param schemaName the schema name
+     * @param elementType the element type name of the set
+     * @param hashKeyFieldPaths the field paths of the hash key applied to a set of this schema.
+     * If {@code null} or empty then the schema has no hash key and the hash function, applied to
+     * an element of a set to produce a hash code, is unspecified by this schema.
+     * Otherwise, the hash function is specified as described by
+     * {@link com.netflix.hollow.core.write.objectmapper.HollowHashKey}.
+     */
     public HollowSetSchema(String schemaName, String elementType, String... hashKeyFieldPaths) {
         super(schemaName);
         this.elementType = elementType;
-        this.hashKey = hashKeyFieldPaths == null || hashKeyFieldPaths.length == 0 ? null : new PrimaryKey(elementType, hashKeyFieldPaths);
+        if (hashKeyFieldPaths == null || hashKeyFieldPaths.length == 0) {
+            this.hashKey = null;
+        } else {
+            this.hashKey = new PrimaryKey(elementType, hashKeyFieldPaths);
+        }
     }
 
     @Override
@@ -68,6 +83,14 @@ public class HollowSetSchema extends HollowCollectionSchema {
         return SchemaType.SET;
     }
 
+    public HollowSetSchema withoutHashKey() {
+        if (hashKey == null) {
+            return this;
+        }
+
+        return new HollowSetSchema(getName(), getElementType());
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other)
@@ -80,7 +103,7 @@ public class HollowSetSchema extends HollowCollectionSchema {
         if(!getElementType().equals(otherSchema.getElementType()))
             return false;
 
-        return isNullableObjectEquals(hashKey, otherSchema.getHashKey());
+        return Objects.equals(getHashKey(), otherSchema.getHashKey());
     }
 
     @Override
@@ -99,11 +122,9 @@ public class HollowSetSchema extends HollowCollectionSchema {
 
         if(hashKey != null) {
             builder.append(" @HashKey(");
-            if(hashKey.numFields() > 0) {
-                builder.append(hashKey.getFieldPath(0));
-                for(int i=1;i<hashKey.numFields();i++) {
-                    builder.append(", ").append(hashKey.getFieldPath(i));
-                }
+            builder.append(hashKey.getFieldPath(0));
+            for(int i=1;i<hashKey.numFields();i++) {
+                builder.append(", ").append(hashKey.getFieldPath(i));
             }
             builder.append(")");
         }
@@ -116,7 +137,7 @@ public class HollowSetSchema extends HollowCollectionSchema {
     public void writeTo(OutputStream os) throws IOException {
         DataOutputStream dos = new DataOutputStream(os);
 
-        if(getHashKey() != null)
+        if (hashKey != null)
             dos.write(SchemaType.SET.getTypeIdWithPrimaryKey());
         else
             dos.write(SchemaType.SET.getTypeId());
@@ -124,9 +145,9 @@ public class HollowSetSchema extends HollowCollectionSchema {
         dos.writeUTF(getName());
         dos.writeUTF(getElementType());
 
-        if(getHashKey() != null) {
-            VarInt.writeVInt(dos, getHashKey().numFields());
-            for(int i=0;i<getHashKey().numFields();i++) {
+        if (hashKey != null) {
+            VarInt.writeVInt(dos, hashKey.numFields());
+            for (int i = 0; i < getHashKey().numFields(); i++) {
                 dos.writeUTF(getHashKey().getFieldPath(i));
             }
         }

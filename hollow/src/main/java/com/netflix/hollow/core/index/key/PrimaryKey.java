@@ -64,7 +64,7 @@ public class PrimaryKey {
     }
 
     public String[] getFieldPaths() {
-        return fieldPaths;
+        return fieldPaths.clone();
     }
 
     public FieldType getFieldType(HollowDataset dataset, int fieldPathIdx) {

@@ -63,15 +63,9 @@ public abstract class HollowSchema {
     public static HollowSchema withoutKeys(HollowSchema schema) {
         switch(schema.getSchemaType()) {
         case SET:
-            HollowSetSchema setSchema = (HollowSetSchema)schema;
-            if(setSchema.getHashKey() != null)
-                setSchema = new HollowSetSchema(setSchema.getName(), setSchema.getElementType());
-            return setSchema;
+            return ((HollowSetSchema)schema).withoutHashKey();
         case MAP:
-            HollowMapSchema mapSchema = (HollowMapSchema)schema;
-            if(mapSchema.getHashKey() != null)
-                mapSchema = new HollowMapSchema(mapSchema.getName(), mapSchema.getKeyType(), mapSchema.getValueType());
-            return mapSchema;
+            return ((HollowMapSchema)schema).withoutHashKey();
         default:
             return schema;
         }
@@ -124,12 +118,12 @@ public abstract class HollowSchema {
     private static HollowSetSchema readSetSchemaFrom(DataInputStream is, String schemaName, boolean hasHashKey) throws IOException {
         String elementType = is.readUTF();
 
-        String hashKeyFields[] = null;
+        String[] hashKeyFields = null;
 
         if(hasHashKey) {
             int numFields = VarInt.readVInt(is);
             hashKeyFields = new String[numFields];
-            for(int i=0;i<numFields;i++) {
+            for (int i = 0; i < numFields; i++) {
                 hashKeyFields[i] = is.readUTF();
             }
         }
@@ -152,7 +146,7 @@ public abstract class HollowSchema {
         if(hasHashKey) {
             int numFields = VarInt.readVInt(is);
             hashKeyFields = new String[numFields];
-            for(int i=0;i<numFields;i++) {
+            for (int i = 0; i < numFields; i++) {
                 hashKeyFields[i] = is.readUTF();
             }
         }

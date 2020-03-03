@@ -41,11 +41,27 @@ public class HollowMapSchema extends HollowSchema {
     private HollowTypeReadState keyTypeState;
     private HollowTypeReadState valueTypeState;
 
+    /**
+     * Constructs a schema for a hollow set.
+     *
+     * @param schemaName the schema name
+     * @param keyType the key type name of the map
+     * @param valueType the value type name of the map
+     * @param hashKeyFieldPaths the field paths of the hash key applied to a map of this schema.
+     * If {@code null} or empty then the schema has no hash key and the hash function, applied to
+     * a key of a map to produce a hash code, is unspecified by this schema.
+     * Otherwise, the hash function is specified as described by
+     * {@link com.netflix.hollow.core.write.objectmapper.HollowHashKey}.
+     */
     public HollowMapSchema(String schemaName, String keyType, String valueType, String... hashKeyFieldPaths) {
         super(schemaName);
         this.keyType = keyType;
         this.valueType = valueType;
-        this.hashKey = hashKeyFieldPaths == null || hashKeyFieldPaths.length == 0 ? null : new PrimaryKey(keyType, hashKeyFieldPaths);
+        if (hashKeyFieldPaths == null || hashKeyFieldPaths.length == 0) {
+            this.hashKey = null;
+        } else {
+            this.hashKey = new PrimaryKey(keyType, hashKeyFieldPaths);
+        }
     }
 
     public String getKeyType() {
@@ -81,6 +97,14 @@ public class HollowMapSchema extends HollowSchema {
         return SchemaType.MAP;
     }
 
+    public HollowMapSchema withoutHashKey() {
+        if (hashKey == null) {
+            return this;
+        }
+
+        return new HollowMapSchema(getName(), getKeyType(), getValueType());
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other)
@@ -95,7 +119,7 @@ public class HollowMapSchema extends HollowSchema {
         if(!getValueType().equals(otherSchema.getValueType()))
             return false;
 
-        return isNullableObjectEquals(hashKey, otherSchema.getHashKey());
+        return Objects.equals(getHashKey(), otherSchema.getHashKey());
     }
 
     @Override
@@ -115,11 +139,9 @@ public class HollowMapSchema extends HollowSchema {
 
         if(hashKey != null) {
             builder.append(" @HashKey(");
-            if(hashKey.numFields() > 0) {
-                builder.append(hashKey.getFieldPath(0));
-                for(int i=1;i<hashKey.numFields();i++) {
-                    builder.append(", ").append(hashKey.getFieldPath(i));
-                }
+            builder.append(hashKey.getFieldPath(0));
+            for(int i=1;i<hashKey.numFields();i++) {
+                builder.append(", ").append(hashKey.getFieldPath(i));
             }
             builder.append(")");
         }
@@ -132,7 +154,7 @@ public class HollowMapSchema extends HollowSchema {
     public void writeTo(OutputStream os) throws IOException {
         DataOutputStream dos = new DataOutputStream(os);
 
-        if(getHashKey() != null)
+        if (hashKey != null)
             dos.write(SchemaType.MAP.getTypeIdWithPrimaryKey());
         else
             dos.write(SchemaType.MAP.getTypeId());
@@ -141,12 +163,11 @@ public class HollowMapSchema extends HollowSchema {
         dos.writeUTF(getKeyType());
         dos.writeUTF(getValueType());
 
-        if(getHashKey() != null) {
+        if (hashKey != null) {
             VarInt.writeVInt(dos, getHashKey().numFields());
             for(int i=0;i<getHashKey().numFields();i++) {
                 dos.writeUTF(getHashKey().getFieldPath(i));
             }
         }
     }
-
 }

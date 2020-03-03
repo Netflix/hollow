@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class HollowTypeMapper {
-
     public static final long ASSIGNED_ORDINAL_CYCLE_MASK = 0xFFFFFFFF00000000L;
 
     private final ThreadLocal<HollowWriteRecord> writeRec = new ThreadLocal<>();

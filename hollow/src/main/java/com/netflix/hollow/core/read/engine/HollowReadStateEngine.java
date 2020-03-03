@@ -288,6 +288,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
         return false;
     }
 
+    @Deprecated
     public Set<String> getTypesWithDefinedHashCodes() {
         return typesWithDefinedHashCodes;
     }
