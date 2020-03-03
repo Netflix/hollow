@@ -52,6 +52,7 @@ public class HollowReadStateEngineBuilderTest {
                     Long.class.getSimpleName(), 0).getLong("value"));
     }
 
+    @Test
     public void testBuild_canConstructMultiple() {
         HollowReadStateEngineBuilder builder = new HollowReadStateEngineBuilder();
         builder.build();
