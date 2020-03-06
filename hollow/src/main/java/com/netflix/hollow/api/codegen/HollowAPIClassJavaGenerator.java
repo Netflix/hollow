@@ -48,6 +48,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -72,7 +73,7 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
 
         StringBuilder builder = new StringBuilder();
         appendPackageAndCommonImports(builder);
-
+        builder.append("import ").append(Objects.class.getName()).append(";\n");
         builder.append("import ").append(Collection.class.getName()).append(";\n");
         builder.append("import ").append(Collections.class.getName()).append(";\n");
         builder.append("import ").append(Set.class.getName()).append(";\n");
@@ -193,7 +194,8 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
             HollowSchema schema = schemaList.get(i);
             if(parameterizeClassNames) {
                 builder.append("    public <T> Collection<T> getAll").append(hollowImplClassname(schema.getName())).append("() {\n");
-                builder.append("        return new AllHollowRecordCollection<T>(getDataAccess().getTypeDataAccess(\"").append(schema.getName()).append("\").getTypeState()) {\n");
+                builder.append("        HollowTypeDataAccess tda = Objects.requireNonNull(getDataAccess().getTypeDataAccess(\"").append(schema.getName()).append("\"), \"type not loaded or does not exist in dataset; type=").append(schema.getName()).append("\");\n");
+                builder.append("        return new AllHollowRecordCollection<T>(tda.getTypeState()) {\n");
                 builder.append("            protected T getForOrdinal(int ordinal) {\n");
                 builder.append("                return get").append(hollowImplClassname(schema.getName())).append("(ordinal);\n");
                 builder.append("            }\n");
@@ -208,7 +210,8 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
                 String hollowImplClassname = hollowImplClassname(schema.getName());
 
                 builder.append("    public Collection<"+hollowImplClassname+"> getAll").append(hollowImplClassname).append("() {\n");
-                builder.append("        return new AllHollowRecordCollection<"+hollowImplClassname+">(getDataAccess().getTypeDataAccess(\"").append(schema.getName()).append("\").getTypeState()) {\n");
+                builder.append("        HollowTypeDataAccess tda = Objects.requireNonNull(getDataAccess().getTypeDataAccess(\"").append(schema.getName()).append("\"), \"type not loaded or does not exist in dataset; type=").append(schema.getName()).append("\");\n");
+                builder.append("        return new AllHollowRecordCollection<"+hollowImplClassname+">(tda.getTypeState()) {\n");
                 builder.append("            protected "+hollowImplClassname+" getForOrdinal(int ordinal) {\n");
                 builder.append("                return get").append(hollowImplClassname).append("(ordinal);\n");
                 builder.append("            }\n");
