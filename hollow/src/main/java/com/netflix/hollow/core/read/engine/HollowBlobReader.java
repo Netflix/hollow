@@ -98,8 +98,8 @@ public class HollowBlobReader {
 
         long endTime = System.currentTimeMillis();
 
-        log.info("SNAPSHOT COMPLETED IN " + (endTime - startTime) + "ms");
-        log.info("TYPES: " + typeNames);
+        log.info("mmap'ed SNAPSHOT COMPLETED IN " + (endTime - startTime) + "ms");
+        log.info("mmap'ed TYPES: " + typeNames);
 
         notifyEndUpdate();
 

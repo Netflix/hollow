@@ -44,7 +44,7 @@ public class HollowBlobHeaderReader {
 
         int headerVersion = raf.readInt();
         if(headerVersion != HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER) {
-            throw new IOException("The HollowBlob you are trying to read is incompatible.  "
+            throw new IOException("The HollowBlob you are trying to read using RandomAccessFile is incompatible.  "
                     + "The expected Hollow blob version was " + HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER + " but the actual version was " + headerVersion);
         }
 

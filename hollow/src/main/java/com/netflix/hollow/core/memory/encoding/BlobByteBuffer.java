@@ -49,8 +49,8 @@ public final class BlobByteBuffer {
                     : bufferCapacity;
             ByteBuffer buffer = channel.map(READ_ONLY, pos, cap);
             /*
-            if (!buffer.isLoaded()) // TODO(timt): make pre-fetching configurable
-                buffer.load();
+             * if (!((MappedByteBuffer) buffer).isLoaded()) // TODO(timt): make pre-fetching configurable
+             *    ((MappedByteBuffer) buffer).load();
              */
             spine[i] = buffer;
         }

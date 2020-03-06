@@ -161,8 +161,9 @@ class HollowDataHolder {
 
     private void applyStateEngineTransition(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, HollowConsumer.Blob transition, HollowConsumer.RefreshListener[] refreshListeners) throws IOException {
         if(transition.isSnapshot()) {
-            if(filter == null)
+            if(filter == null) {
                 reader.readSnapshot(raf, buffer, debug);
+            }
             else
                 reader.readSnapshot(raf, buffer, debug, filter);
         } else {
