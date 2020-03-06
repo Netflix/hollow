@@ -242,5 +242,23 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
 
             return new BufferedInputStream(Files.newInputStream(path));
         }
+
+
+        @Override
+        public File getFile() throws IOException {
+            Path tempPath = path.resolveSibling(path.getName(path.getNameCount()-1) + "-" + UUID.randomUUID().toString());
+            try(
+                    InputStream is = remoteBlob.getInputStream();
+                    OutputStream os = Files.newOutputStream(tempPath)
+            ) {
+                byte buf[] = new byte[4096];
+                int n;
+                while (-1 != (n = is.read(buf)))
+                    os.write(buf, 0, n);
+            }
+            Files.move(tempPath, path, REPLACE_EXISTING);
+
+            return path.toFile();
+        }
     }
 }

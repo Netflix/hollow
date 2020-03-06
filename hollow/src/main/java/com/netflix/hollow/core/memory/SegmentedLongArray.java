@@ -21,6 +21,7 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -113,8 +114,7 @@ public class SegmentedLongArray {   // SNAP: Rename to EncodedLongBuffer
         buffer.position(raf.getFilePointer());
         this.bufferView = buffer.duplicate();
         buffer.position(buffer.position() + numLongs*8);
-        raf.skipBytes((int) numLongs * 8);  // SNAP: RAF skipbytes takes int, must allow longs here
-
+        raf.seek(raf.getFilePointer() + (numLongs  * 8));
     }
 
     protected void readFrom(DataInputStream dis, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {

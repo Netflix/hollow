@@ -108,7 +108,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 
                 currentClass = currentClass.getSuperclass();
             }
-            throw new UnsupportedOperationException();
+            // throw new UnsupportedOperationException();
         }
 
         this.schema = new HollowObjectSchema(typeName, mappedFields.size(), getKeyFieldPaths(clazz));
@@ -319,7 +319,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
 
             this.subTypeMapper = subTypeMapper;
-            throw new UnsupportedOperationException();
+            // throw new UnsupportedOperationException();
         }
 
         private MappedField(MappedFieldType specialField) {

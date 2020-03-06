@@ -156,7 +156,7 @@ public class SegmentedByteArray implements ByteData {   // SNAP: Rename to Encod
         buffer.position(raf.getFilePointer());
         this.bufferView = buffer.duplicate();
         buffer.position(buffer.position() + length);
-        raf.skipBytes((int) length); // SNAP: long to int cast; RandomAccessFile skipBytes takes int, we need to support long here
+        raf.seek(raf.getFilePointer() + length);
     }
 
     /**
