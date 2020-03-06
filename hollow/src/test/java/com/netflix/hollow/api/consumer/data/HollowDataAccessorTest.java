@@ -15,6 +15,8 @@
  */
 package com.netflix.hollow.api.consumer.data;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor.UpdatedRecord;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
@@ -133,6 +135,20 @@ public class HollowDataAccessorTest extends AbstractStateEngineTest {
                                                                     /// though it was a "ghost" in the last cycle.
         assertObject(typeState, 1, 0, "zero"); /// even though "zero" had an equivalent record in the previous cycle at ordinal "4", it is now
                                                /// assigned to recycled ordinal "1".
+    }
+
+    @Test
+    public void typeMissing() throws IOException {
+        roundTripSnapshot();
+
+        String typeName = "ThisTypeDoesNotExist";
+        assertThatThrownBy(() -> {
+            new AbstractHollowDataAccessor<Object>(readStateEngine, typeName) {
+                @Override public Object getRecord(int ordinal) { return null; }
+            };
+        }).isInstanceOf(NullPointerException.class)
+          .hasMessageContaining(typeName)
+          .hasMessageContaining("not loaded");
     }
 
     private void addRecord(int intVal, String strVal) {
