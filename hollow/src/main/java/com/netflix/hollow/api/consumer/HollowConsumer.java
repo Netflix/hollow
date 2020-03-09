@@ -45,6 +45,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -302,7 +303,8 @@ public class HollowConsumer {
     }
 
     /**
-     * Returns a {@code CompletableFuture} that completes after the initial data load succeeds.
+     * Returns a {@code CompletableFuture} that completes after the initial data load succeeds. Also triggers the initial
+     * load asynchronously, to avoid waiting on a polling interval for the initial load.
      * <p>
      * Callers can use methods like {@link CompletableFuture#join()} or {@link CompletableFuture#get(long, TimeUnit)}
      * to block until the initial load is complete.
@@ -316,6 +318,11 @@ public class HollowConsumer {
      * @return a future which, when completed, has a value set to the data version that was initially loaded
      */
     public CompletableFuture<Long> getInitialLoad() {
+        try {
+            triggerAsyncRefresh();
+        } catch (RejectedExecutionException | NullPointerException e) {
+            LOG.log(Level.INFO, "Refresh triggered by getInitialLoad() failed; future attempts might succeed", e);
+        }
         return updater.getInitialLoad();
     }
 
