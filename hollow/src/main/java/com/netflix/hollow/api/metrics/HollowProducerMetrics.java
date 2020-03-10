@@ -66,8 +66,6 @@ public class HollowProducerMetrics extends HollowMetrics {
         if(readState != null) {
             HollowReadStateEngine hollowReadStateEngine = readState.getStateEngine();
             super.update(hollowReadStateEngine, version);
-        } else {
-            super.update(version);
         }
     }
 
