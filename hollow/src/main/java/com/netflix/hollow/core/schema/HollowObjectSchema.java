@@ -280,6 +280,8 @@ public class HollowObjectSchema extends HollowSchema {
         for(int i=0;i<numFields();i++) {
             if(getFieldType(i) != otherSchema.getFieldType(i))
                 return false;
+            if(getFieldType(i) == FieldType.REFERENCE && !getReferencedType(i).equals(otherSchema.getReferencedType(i)))
+                return false;
             if(!getFieldName(i).equals(otherSchema.getFieldName(i)))
                 return false;
         }
