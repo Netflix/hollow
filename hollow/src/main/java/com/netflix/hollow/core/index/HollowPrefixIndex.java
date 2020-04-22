@@ -29,6 +29,7 @@ import java.util.ArrayDeque;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -85,9 +86,9 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     @SuppressWarnings("WeakerAccess")
     public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath,
             int estimatedMaxStringDuplicates) {
+        Objects.requireNonNull(readStateEngine, "Hollow Prefix Key Index creation failed because read state wasn't initialized");
+        Objects.requireNonNull(type, "Hollow Prefix Key Index creation failed because type was null");
 
-        if (readStateEngine == null) throw new IllegalArgumentException("Read state engine cannot be null");
-        if (type == null) throw new IllegalArgumentException("type cannot be null");
         if (fieldPath == null || fieldPath.isEmpty())
             throw new IllegalArgumentException("fieldPath cannot be null or empty");
         if (estimatedMaxStringDuplicates < 1) {
