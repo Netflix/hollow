@@ -86,8 +86,9 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     @SuppressWarnings("WeakerAccess")
     public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath,
             int estimatedMaxStringDuplicates) {
-        Objects.requireNonNull(readStateEngine, "Hollow Prefix Key Index creation failed because read state wasn't initialized");
         Objects.requireNonNull(type, "Hollow Prefix Key Index creation failed because type was null");
+        Objects.requireNonNull(readStateEngine, "Hollow Prefix Key Index creation for type [" + type
+                + "] failed because read state wasn't initialized");
 
         if (fieldPath == null || fieldPath.isEmpty())
             throw new IllegalArgumentException("fieldPath cannot be null or empty");
