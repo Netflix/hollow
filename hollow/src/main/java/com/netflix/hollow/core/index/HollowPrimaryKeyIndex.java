@@ -89,7 +89,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      */
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler, BitSet specificOrdinalsToIndex) {
         Objects.requireNonNull(primaryKey, "Hollow Primary Key Index creation failed because primaryKey was null");
-        Objects.requireNonNull(stateEngine, "Hollow Primary Key Index creation for type [ + " + primaryKey.getType()
+        Objects.requireNonNull(stateEngine, "Hollow Primary Key Index creation for type [" + primaryKey.getType()
                 + "] failed because read state wasn't initialized");
 
         this.primaryKey = primaryKey;
