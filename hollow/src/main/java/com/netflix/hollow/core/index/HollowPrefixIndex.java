@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.index;
 
+import static java.util.Objects.requireNonNull;
+
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.FixedLengthMultipleOccurrenceElementArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
@@ -85,9 +87,10 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     @SuppressWarnings("WeakerAccess")
     public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath,
             int estimatedMaxStringDuplicates) {
+        requireNonNull(type, "Hollow Prefix Key Index creation failed because type was null");
+        requireNonNull(readStateEngine, "Hollow Prefix Key Index creation for type [" + type
+                + "] failed because read state wasn't initialized");
 
-        if (readStateEngine == null) throw new IllegalArgumentException("Read state engine cannot be null");
-        if (type == null) throw new IllegalArgumentException("type cannot be null");
         if (fieldPath == null || fieldPath.isEmpty())
             throw new IllegalArgumentException("fieldPath cannot be null or empty");
         if (estimatedMaxStringDuplicates < 1) {

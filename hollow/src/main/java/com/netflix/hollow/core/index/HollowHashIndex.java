@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.index;
 
+import static java.util.Objects.requireNonNull;
+
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
@@ -52,6 +54,10 @@ public class HollowHashIndex implements HollowTypeStateListener {
      * @param matchFields The query will match on the specified match fields.  The match fields may span collection elements and/or map keys or values.
      */
     public HollowHashIndex(HollowReadStateEngine stateEngine, String type, String selectField, String... matchFields) {
+        requireNonNull(type, "Hollow Hash Index creation failed because type was null");
+        requireNonNull(stateEngine, "Hollow Hash Index creation on type [" + type
+                + "] failed because read state wasn't initialized");
+
         this.stateEngine = stateEngine;
         this.type = type;
         this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(type);
