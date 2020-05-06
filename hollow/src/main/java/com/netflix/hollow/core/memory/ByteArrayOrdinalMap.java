@@ -22,6 +22,7 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicLongArray;
+import java.util.stream.IntStream;
 
 /**
  * This data structure maps byte sequences to ordinals.  This is a hash table.
