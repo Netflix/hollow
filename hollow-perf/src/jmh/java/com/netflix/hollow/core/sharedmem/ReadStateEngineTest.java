@@ -57,11 +57,11 @@ public class ReadStateEngineTest {
 
         readState = new HollowReadStateEngine();
         HollowBlobReader fileReader = new HollowBlobReader(readState);
-        RandomAccessFile raf = new RandomAccessFile(TEST_FILE_TOPN, "r");
+        HollowBlobInput in = new RandomAccessFile(TEST_FILE_TOPN, "r");
         FileChannel channel = raf.getChannel(); // Map MappedByteBuffer once, pass it everywhere
         BlobByteBuffer monolithicBuffer = BlobByteBuffer.mmapBlob(channel); //   channel.map(FileChannel.MapMode.READ_ONLY, 0, raf.length());
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_new"));
-        fileReader.readSnapshot(raf, monolithicBuffer, debug);
+        fileReader.readSnapshot(in, monolithicBuffer, debug);
         debug.flush();
         System.out.println("SNAP: Done setup");
     }

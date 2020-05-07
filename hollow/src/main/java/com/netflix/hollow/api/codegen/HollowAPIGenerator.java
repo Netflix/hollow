@@ -376,7 +376,7 @@ public class HollowAPIGenerator {
     }
 
     /**
-     * If setRestrictApiToFieldType is true, api code only generates {@code get<FieldName>} with return type as per schema
+     * If setRestrictApiToFieldType is true, api code only generates {@code deserializeFrom<FieldName>} with return type as per schema
      *
      * Defaults to false to be backwards compatible
      *

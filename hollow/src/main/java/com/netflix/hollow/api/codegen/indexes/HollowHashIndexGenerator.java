@@ -84,8 +84,8 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
             builder.append("        HollowHashIndexResult matches = idx.findMatches(keys);\n");
             builder.append("        if(matches == null) return Collections.emptySet();\n\n");
             builder.append("        return new AbstractHollowOrdinalIterable<" + hollowImplClassname(schema.getName()) + ">(matches.iterator()) {\n");
-            builder.append("            public " + hollowImplClassname(schema.getName()) + " getData(int ordinal) {\n");
-            builder.append("                return api.get" + hollowImplClassname(schema.getName()) + "(ordinal);\n");
+            builder.append("            public " + hollowImplClassname(schema.getName()) + " deserializeFrom(int ordinal) {\n");
+            builder.append("                return api.deserializeFrom" + hollowImplClassname(schema.getName()) + "(ordinal);\n");
             builder.append("            }\n");
             builder.append("        };\n");
             builder.append("    }\n\n");

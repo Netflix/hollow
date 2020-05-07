@@ -206,6 +206,7 @@ Your implementation of the `ObjectLongevityConfig` may be backed by a dynamic co
 ### Memory Pooling
 
 Hollow pools and reuses memory to minimize GC effects while updating data.  This pool of memory is kept arrays on the heap.  Each array in the pool has a fixed length.  When a long array or a byte array is required in Hollow, it will stitch together pooled array segments as a `SegmentedByteArray` or `SegmentedLongArray`.  These classes encapsulate the details of treating segmented arrays as contiguous ranges of values.
+// SNAP: TODO: doc for shared memory mode
 
 ## Delta-Based Producer Input
 

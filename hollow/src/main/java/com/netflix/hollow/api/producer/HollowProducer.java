@@ -91,7 +91,7 @@ import java.util.concurrent.Executor;
  *
  * <dt>An Executor for publishing snapshots</dt>
  * <dd>When consumers start up, if the latest announced version does not have a snapshot, they can load an earlier snapshot
- * and follow deltas to get up-to-date.  A state can therefore be available and announced prior to the availability of
+ * and follow deltas to deserializeFrom up-to-date.  A state can therefore be available and announced prior to the availability of
  * the snapshot.  If an Executor is supplied here, then it will be used to publish snapshots.  This can be useful if
  * snapshot publishing takes a long time -- subsequent cycles may proceed while snapshot uploads are still in progress.</dd>
  *

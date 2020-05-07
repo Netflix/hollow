@@ -21,21 +21,17 @@ import com.netflix.hollow.api.consumer.HollowConsumer.TransitionAwareRefreshList
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
-import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
-import com.netflix.hollow.tools.history.HollowHistoricalStateCreator;
 import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.lang.ref.WeakReference;
-import java.nio.channels.FileChannel;
 
 /**
  * A class comprising much of the internal state of a {@link HollowConsumer}.  Not intended for external consumption.
@@ -137,15 +133,13 @@ class HollowDataHolder {
     }
 
     private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
-
-
-        RandomAccessFile raf = new RandomAccessFile(snapshotBlob.getFile(), "r");
-        FileChannel channel = raf.getChannel();
-        BlobByteBuffer buffer = BlobByteBuffer.mmapBlob(channel);
+        // SNAP: TODO: Toggle memory mode
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_new"));
 
+        HollowBlobInput in = HollowBlobInput.randomAccessFile(snapshotBlob.getFile());
+
         try {
-            applyStateEngineTransition(raf, buffer, debug, snapshotBlob, refreshListeners);
+            applyStateEngineTransition(in, debug, snapshotBlob, refreshListeners);
             initializeAPI();
 
             for(HollowConsumer.RefreshListener refreshListener : refreshListeners) {
@@ -159,13 +153,13 @@ class HollowDataHolder {
     }
 
 
-    private void applyStateEngineTransition(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, HollowConsumer.Blob transition, HollowConsumer.RefreshListener[] refreshListeners) throws IOException {
+    private void applyStateEngineTransition(HollowBlobInput in, BufferedWriter debug, HollowConsumer.Blob transition, HollowConsumer.RefreshListener[] refreshListeners) throws IOException {
         if(transition.isSnapshot()) {
             if(filter == null) {
-                reader.readSnapshot(raf, buffer, debug);
+                reader.readSnapshot(in, debug);
             }
             else
-                reader.readSnapshot(raf, buffer, debug, filter);
+                reader.readSnapshot(in, debug, filter);
         } else {
             throw new UnsupportedOperationException();
             // reader.applyDelta(is);

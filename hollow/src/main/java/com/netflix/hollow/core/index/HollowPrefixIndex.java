@@ -115,7 +115,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
         String lastRefType = this.fieldPath.getLastRefTypeInPath();
 
-        // get all cardinality to estimate size of array bits needed.
+        // deserializeFrom all cardinality to estimate size of array bits needed.
         totalWords = readStateEngine.getTypeState(lastRefType).getPopulatedOrdinals().cardinality();
         averageWordLen = 0;
         double avg = 0;

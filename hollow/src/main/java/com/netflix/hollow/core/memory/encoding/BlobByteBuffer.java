@@ -161,7 +161,7 @@ public final class BlobByteBuffer {
         return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position);
     }
 
-//     public void get(byte[] dst, int offset, int length) {
+//     public void deserializeFrom(byte[] dst, int offset, int length) {
 //         if ((offset | length | (offset + length) | (dst.length - (offset + length))) < 0)
 //             throw new IndexOutOfBoundsException();
 //         if (position + length >= capacity)
@@ -177,10 +177,10 @@ public final class BlobByteBuffer {
 //
 //         if (length > remaining) { // spans two buffers
 //             // FIXME(timt): code review for off-by-one or other errors; even better, unit test it
-//             spine[spineIndex].get(dst, 0, remaining);
-//             spine[spineIndex + 1].get(dst, remaining, length - remaining);
+//             spine[spineIndex].deserializeFrom(dst, 0, remaining);
+//             spine[spineIndex + 1].deserializeFrom(dst, remaining, length - remaining);
 //         } else {
-//             spine[spineIndex].get(dst, offset, length);
+//             spine[spineIndex].deserializeFrom(dst, offset, length);
 //         }
 //         position += length;
 //     }
@@ -190,14 +190,14 @@ public final class BlobByteBuffer {
 //      * @see VarInt#readVInt(InputStream)
 //      */
 //     public int readVInt() throws BufferUnderflowException {
-//         byte b = get();
+//         byte b = deserializeFrom();
 //
 //         if(b == (byte) 0x80)
 //             throw new RuntimeException("Attempting to read null value as int");
 //
 //         int value = b & 0x7F;
 //         while ((b & 0x80) != 0) {
-//             b = get();
+//             b = deserializeFrom();
 //             value <<= 7;
 //             value |= (b & 0x7F);
 //         }
@@ -209,7 +209,7 @@ public final class BlobByteBuffer {
 //      * @see DataInput#readLong()
 //      */
 //     public long readLong() throws BufferUnderflowException {
-//         get(lbuff, 0, 8);
+//         deserializeFrom(lbuff, 0, 8);
 //         return  (long)(lbuff[0]       ) << 56 |
 //                 (long)(lbuff[1] & 0xFF) << 48 |
 //                 (long)(lbuff[2] & 0xFF) << 40 |
@@ -224,14 +224,14 @@ public final class BlobByteBuffer {
 //      * @see VarInt#readVLong(InputStream)
 //      */
 //     public long readVLong() throws BufferUnderflowException {
-//         byte b = get();
+//         byte b = deserializeFrom();
 //
 //         if(b == (byte) 0x80)
 //             throw new RuntimeException("Attempting to read null value as long");
 //
 //         long value = b & 0x7F;
 //         while ((b & 0x80) != 0) {
-//             b = get();
+//             b = deserializeFrom();
 //             value <<= 7;
 //             value |= (b & 0x7F);
 //         }

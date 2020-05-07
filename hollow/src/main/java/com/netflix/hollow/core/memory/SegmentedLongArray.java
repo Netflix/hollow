@@ -16,17 +16,13 @@
  */
 package com.netflix.hollow.core.memory;
 
-import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.nio.MappedByteBuffer;
 import sun.misc.Unsafe;
 
 /**
@@ -42,22 +38,31 @@ import sun.misc.Unsafe;
  *
  */
 @SuppressWarnings("restriction")
-public class SegmentedLongArray {   // SNAP: Rename to EncodedLongBuffer
+public class SegmentedLongArray {
 
-    protected BlobByteBuffer bufferView;
-    public final int log2OfSegmentSize; // in longs
-    public final int log2OfByteSegments;
+    private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
+
+    protected final long[][] segments;
+    protected final int log2OfSegmentSize;
     protected final int bitmask;
-    protected long maxLongs = -1;
-    protected long maxByteIndex = -1;
 
     public SegmentedLongArray(ArraySegmentRecycler memoryRecycler, long numLongs) {
         this.log2OfSegmentSize = memoryRecycler.getLog2OfLongSegmentSize();
-        this.log2OfByteSegments = 8 * this.log2OfSegmentSize;
-
         int numSegments = (int)((numLongs - 1) >>> log2OfSegmentSize) + 1;
+        long[][] segments = new long[numSegments][];
+        this.bitmask = (1 << log2OfSegmentSize) - 1;
 
-        this.bitmask = (1 << log2OfByteSegments) - 1;
+        for(int i=0;i<segments.length;i++) {
+            segments[i] = memoryRecycler.getLongArray();
+        }
+
+        /// The following assignment is purposefully placed *after* the population of all segments.
+        /// The final assignment after the initialization of the array guarantees that no thread
+        /// will see any of the array elements before assignment.
+        /// We can't risk the segment values being visible as null to any thread, because
+        /// FixedLengthElementArray uses Unsafe to access these values, which would cause the
+        /// JVM to crash with a segmentation fault.
+        this.segments = segments;
     }
 
     /**
@@ -67,29 +72,53 @@ public class SegmentedLongArray {   // SNAP: Rename to EncodedLongBuffer
      * @param value the byte value
      */
     public void set(long index, long value) {
-        throw new UnsupportedOperationException();
+        int segmentIndex = (int)(index >> log2OfSegmentSize);
+        int longInSegment = (int)(index & bitmask);
+        unsafe.putOrderedLong(segments[segmentIndex], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longInSegment), value);
+
+        /// duplicate the longs here so that we can read faster.
+        if(longInSegment == 0 && segmentIndex != 0)
+            unsafe.putOrderedLong(segments[segmentIndex - 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (1 << log2OfSegmentSize)), value);
     }
 
     /**
      * Get the value of the byte at the specified index.
      *
-     * @param index the index (in multiples of 8 bytes)
+     * @param index the index
      * @return the byte value
      */
     public long get(long index) {
-        if (this.bufferView == null) {
-            throw new IllegalStateException("Type is queried before it has been read in");
-        }
+        int segmentIndex = (int)(index >>> log2OfSegmentSize);
+        long ret = segments[segmentIndex][(int)(index & bitmask)];
 
-        long byteIndex = 8 * index;
-        if (byteIndex > this.maxByteIndex) {  // it's illegal to read a byte starting past the last byte boundary of data
+        return ret;
+    }
+
+    public static String ppBytesInLong(long l) {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(bos);
+            dos.writeLong(l);
+            dos.flush();
+            byte[] nativeLongBytes = bos.toByteArray();
+            String bytesChosenForUnalignedRead = "";
+            for (byte b : nativeLongBytes) {
+                bytesChosenForUnalignedRead += b + " ";
+            }
+            return bytesChosenForUnalignedRead;
+        } catch (IOException e) {
             throw new IllegalStateException();
         }
-        return this.bufferView.getLong(bufferView.position() + byteIndex);
     }
 
     public void fill(long value) {
-        throw new UnsupportedOperationException();
+        for(int i=0;i<segments.length;i++) {
+            long offset = Unsafe.ARRAY_LONG_BASE_OFFSET;
+            for(int j=0;j<segments[i].length;j++) {
+                unsafe.putOrderedLong(segments[i], offset, value);
+                offset += 8;
+            }
+        }
     }
 
     public void writeTo(DataOutputStream dos, long numLongs) throws IOException {
@@ -101,23 +130,41 @@ public class SegmentedLongArray {   // SNAP: Rename to EncodedLongBuffer
     }
 
     public void destroy(ArraySegmentRecycler memoryRecycler) {
-        throw new UnsupportedOperationException();
+        for(int i=0;i<segments.length;i++) {
+            if(segments[i] != null)
+                memoryRecycler.recycleLongArray(segments[i]);
+        }
     }
 
-    protected void readFrom(RandomAccessFile raf, BlobByteBuffer buffer, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
-        this.maxLongs = numLongs;
-        this.maxByteIndex = this.maxLongs * 64 - 8; // SNAP: should we work this into bufferView capacity?
+    protected void readFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, long numLongs) throws
+            IOException {
+        int segmentSize = 1 << memoryRecycler.getLog2OfLongSegmentSize();
+        int segment = 0;
 
         if(numLongs == 0)
             return;
 
-        buffer.position(raf.getFilePointer());
-        this.bufferView = buffer.duplicate();
-        buffer.position(buffer.position() + numLongs*8);
-        raf.seek(raf.getFilePointer() + (numLongs  * 8));
-    }
+        long fencepostLong = in.readLong();
 
-    protected void readFrom(DataInputStream dis, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
-        throw new UnsupportedOperationException();
+        while(numLongs > 0) {
+            long longsToCopy = Math.min(segmentSize, numLongs);
+
+            unsafe.putOrderedLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET, fencepostLong);
+
+            int longsCopied = 1;
+
+            while(longsCopied < longsToCopy) {
+                long l = in.readLong();
+                unsafe.putOrderedLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied++), l);
+            }
+
+            if(numLongs > longsCopied) {
+                unsafe.putOrderedLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied), dis.readLong());
+                fencepostLong = segments[segment][longsCopied];
+            }
+
+            segment++;
+            numLongs -= longsCopied;
+        }
     }
 }

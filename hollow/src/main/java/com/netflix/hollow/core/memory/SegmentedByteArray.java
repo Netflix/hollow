@@ -16,14 +16,12 @@
  */
 package com.netflix.hollow.core.memory;
 
-import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
-import java.io.BufferedWriter;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
+import sun.misc.Unsafe;
 
 /**
  * A segmented byte array backs the {@link ByteData} interface with array segments, which potentially come from a pool of reusable memory.<p>
@@ -42,19 +40,20 @@ import java.util.Arrays;
  *
  */
 @SuppressWarnings("restriction")
-public class SegmentedByteArray implements ByteData {   // SNAP: Rename to EncodedByteBuffer
+public class SegmentedByteArray implements VariableLengthData {
 
-    private BlobByteBuffer bufferView;
+    private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
+
+    private byte[][] segments;
     private final int log2OfSegmentSize;
     private final int bitmask;
     private final ArraySegmentRecycler memoryRecycler;
-    private long maxIndex;
 
     public SegmentedByteArray(ArraySegmentRecycler memoryRecycler) {
+        this.segments = new byte[2][];
         this.log2OfSegmentSize = memoryRecycler.getLog2OfByteSegmentSize();
         this.bitmask = (1 << log2OfSegmentSize) - 1;
         this.memoryRecycler = memoryRecycler;
-        this.maxIndex = -1;
     }
 
     /**
@@ -63,21 +62,19 @@ public class SegmentedByteArray implements ByteData {   // SNAP: Rename to Encod
      * @param value the byte value
      */
     public void set(long index, byte value) {
-        throw new UnsupportedOperationException();
+        int segmentIndex = (int)(index >> log2OfSegmentSize);
+        ensureCapacity(segmentIndex);
+        segments[segmentIndex][(int)(index & bitmask)] = value;
     }
 
     /**
      * Get the value of the byte at the specified index.
-     * @param index the index (in multiples of 1 byte)
+     * @param index the index
      * @return the byte value
      */
+    @Override
     public byte get(long index) {
-        if (index >= this.maxIndex) {
-            throw new IllegalStateException();
-        }
-
-        byte retVal = this.bufferView.getByte(this.bufferView.position() + index);
-        return retVal;
+        return segments[(int)(index >>> log2OfSegmentSize)][(int)(index & bitmask)];
     }
 
     /**
@@ -88,8 +85,11 @@ public class SegmentedByteArray implements ByteData {   // SNAP: Rename to Encod
      * @param destPos the position to begin writing in this array
      * @param length the length of the data to copy
      */
+    @Override
     public void copy(ByteData src, long srcPos, long destPos, long length) {
-        throw new UnsupportedOperationException();
+        for(long i=0;i<length;i++) {
+            set(destPos++, src.get(srcPos++));
+        }
     }
 
     /**
@@ -101,7 +101,22 @@ public class SegmentedByteArray implements ByteData {   // SNAP: Rename to Encod
      * @param length the length of the data to copy
      */
     public void copy(SegmentedByteArray src, long srcPos, long destPos, long length) {
-        throw new UnsupportedOperationException();
+        int segmentLength = 1 << log2OfSegmentSize;
+        int currentSegment = (int)(destPos >>> log2OfSegmentSize);
+        int segmentStartPos = (int)(destPos & bitmask);
+        int remainingBytesInSegment = segmentLength - segmentStartPos;
+
+        while(length > 0) {
+            int bytesToCopyFromSegment = (int) Math.min(remainingBytesInSegment, length);
+            ensureCapacity(currentSegment);
+            int copiedBytes = src.copy(srcPos, segments[currentSegment], segmentStartPos, bytesToCopyFromSegment);
+
+            srcPos += copiedBytes;
+            length -= copiedBytes;
+            segmentStartPos = 0;
+            remainingBytesInSegment = segmentLength;
+            currentSegment++;
+        }
     }
 
     /**
@@ -114,7 +129,24 @@ public class SegmentedByteArray implements ByteData {   // SNAP: Rename to Encod
      * @return the number of bytes copied
      */
     public int copy(long srcPos, byte[] data, int destPos, int length) {
-        throw new UnsupportedOperationException();
+        int segmentSize = 1 << log2OfSegmentSize;
+        int remainingBytesInSegment = (int)(segmentSize - (srcPos & bitmask));
+        int dataPosition = destPos;
+
+        while(length > 0) {
+            byte[] segment = segments[(int)(srcPos >>> log2OfSegmentSize)];
+
+            int bytesToCopyFromSegment = Math.min(remainingBytesInSegment, length);
+
+            System.arraycopy(segment, (int)(srcPos & bitmask), data, dataPosition, bytesToCopyFromSegment);
+
+            dataPosition += bytesToCopyFromSegment;
+            srcPos += bytesToCopyFromSegment;
+            remainingBytesInSegment = segmentSize - (int)(srcPos & bitmask);
+            length -= bytesToCopyFromSegment;
+        }
+
+        return dataPosition - destPos;
     }
     
     /**
@@ -127,7 +159,10 @@ public class SegmentedByteArray implements ByteData {   // SNAP: Rename to Encod
      * @return
      */
     public boolean rangeEquals(long rangeStart, SegmentedByteArray compareTo, long cmpStart, int length) {
-        throw new UnsupportedOperationException();
+    	for(int i=0;i<length;i++)
+    		if(get(rangeStart + i) != compareTo.get(cmpStart + i))
+    			return false;
+    	return true;
     }
 
     /**
@@ -140,23 +175,82 @@ public class SegmentedByteArray implements ByteData {   // SNAP: Rename to Encod
      * @param destPos the position to begin writing in this array
      * @param length the length of the data to copy
      */
-    public void orderedCopy(SegmentedByteArray src, long srcPos, long destPos, long length) {
-        throw new UnsupportedOperationException();
+    @Override
+    public void orderedCopy(VariableLengthData src, long srcPos, long destPos, long length) {
+        int segmentLength = 1 << log2OfSegmentSize;
+        int currentSegment = (int)(destPos >>> log2OfSegmentSize);
+        int segmentStartPos = (int)(destPos & bitmask);
+        int remainingBytesInSegment = segmentLength - segmentStartPos;
+
+        while(length > 0) {
+            int bytesToCopyFromSegment = (int) Math.min(remainingBytesInSegment, length);
+            ensureCapacity(currentSegment);
+            int copiedBytes = ((SegmentedByteArray) src).orderedCopy(srcPos, segments[currentSegment], segmentStartPos, bytesToCopyFromSegment);
+
+            srcPos += copiedBytes;
+            length -= copiedBytes;
+            segmentStartPos = 0;
+            remainingBytesInSegment = segmentLength;
+            currentSegment++;
+        }
+    }
+
+    /**
+     * copies exactly data.length bytes from this SegmentedByteArray into the provided byte array,
+     * guaranteeing that if the update is seen by another thread, then all other writes prior to
+     * this call are also visible to that thread.
+     *
+     * @param srcPos the position to begin copying from the source data
+     * @param data the source data
+     * @param destPos the position to begin writing in this array
+     * @param length the length of the data to copy
+     * @return the number of bytes copied
+     */
+    public int orderedCopy(long srcPos, byte[] data, int destPos, int length) {
+        int segmentSize = 1 << log2OfSegmentSize;
+        int remainingBytesInSegment = (int)(segmentSize - (srcPos & bitmask));
+        int dataPosition = destPos;
+
+        while(length > 0) {
+            byte[] segment = segments[(int)(srcPos >>> log2OfSegmentSize)];
+
+            int bytesToCopyFromSegment = Math.min(remainingBytesInSegment, length);
+
+            orderedCopy(segment, (int)(srcPos & bitmask), data, dataPosition, bytesToCopyFromSegment);
+
+            dataPosition += bytesToCopyFromSegment;
+            srcPos += bytesToCopyFromSegment;
+            remainingBytesInSegment = segmentSize - (int)(srcPos & bitmask);
+            length -= bytesToCopyFromSegment;
+        }
+
+        return dataPosition - destPos;
     }
 
     /**
      * Copy bytes from the supplied InputStream into this array.
      *
-     * @param raf the random access file
+     * @param is the source data
      * @param length the length of the data to copy
      * @throws IOException if the copy could not be performed
      */
-    public void readFrom(RandomAccessFile raf, BlobByteBuffer buffer, long length) throws IOException {
-        this.maxIndex = length; // SNAP: can we model this in bufferView as capacity?
-        buffer.position(raf.getFilePointer());
-        this.bufferView = buffer.duplicate();
-        buffer.position(buffer.position() + length);
-        raf.seek(raf.getFilePointer() + length);
+    @Override
+    public void loadFrom(HollowBlobInput is, long length) throws IOException {
+        int segmentSize = 1 << log2OfSegmentSize;
+        int segment = 0;
+
+        byte scratch[] = new byte[segmentSize];
+
+        while(length > 0) {
+            ensureCapacity(segment);
+            long bytesToCopy = Math.min(segmentSize, length);
+            long bytesCopied = 0;
+            while(bytesCopied < bytesToCopy) {
+                bytesCopied += is.read(scratch, (int)bytesCopied, (int)(bytesToCopy - bytesCopied));
+            }
+            orderedCopy(scratch, 0, segments[segment++], 0, (int)bytesCopied);
+            length -= bytesCopied;
+        }
     }
 
     /**
@@ -168,52 +262,60 @@ public class SegmentedByteArray implements ByteData {   // SNAP: Rename to Encod
      * @throws IOException if the write to the output stream could not be performed
      */
     public void writeTo(OutputStream os, long startPosition, long len) throws IOException {
-        throw new UnsupportedOperationException();
-        // SNAP: If we do get to writing, we'll have to make sure that the written data is at parity
+        int segmentSize = 1 << log2OfSegmentSize;
+        int remainingBytesInSegment = segmentSize - (int)(startPosition & bitmask);
+        long remainingBytesInCopy = len;
+
+        while(remainingBytesInCopy > 0) {
+            long bytesToCopyFromSegment = Math.min(remainingBytesInSegment, remainingBytesInCopy);
+
+            os.write(segments[(int)(startPosition >>> log2OfSegmentSize)], (int)(startPosition & bitmask), (int)bytesToCopyFromSegment);
+
+            startPosition += bytesToCopyFromSegment;
+            remainingBytesInSegment = segmentSize - (int)(startPosition & bitmask);
+            remainingBytesInCopy -= bytesToCopyFromSegment;
+        }
     }
 
     private void orderedCopy(byte[] src, int srcPos, byte[] dest, int destPos, int length) {
-        throw new UnsupportedOperationException();
+        int endSrcPos = srcPos + length;
+        destPos += Unsafe.ARRAY_BYTE_BASE_OFFSET;
+
+        while(srcPos < endSrcPos) {
+            unsafe.putByteVolatile(dest, destPos++, src[srcPos++]);
+        }
+    }
+
+    /**
+     * Ensures that the segment at segmentIndex exists
+     *
+     * @param segmentIndex the segment index
+     */
+    private void ensureCapacity(int segmentIndex) {
+        while(segmentIndex >= segments.length) {
+            segments = Arrays.copyOf(segments, segments.length * 3 / 2);
+        }
+
+        if(segments[segmentIndex] == null) {
+            segments[segmentIndex] = memoryRecycler.getByteArray();
+        }
     }
 
     public void destroy() {
-        throw new UnsupportedOperationException();
+        for(int i=0;i<segments.length;i++) {
+            if(segments[i] != null)
+                memoryRecycler.recycleByteArray(segments[i]);
+        }
     }
 
     public long size() {
-        throw new UnsupportedOperationException();
+        long size = 0;
+        for(int i=0;i<segments.length;i++) {
+            if(segments[i] != null)
+                size += segments[i].length;
+        }
+
+        return size;
     }
 
-//    public void pp(BufferedWriter debug) throws IOException {
-//        StringBuffer pp = new StringBuffer();
-//
-//        int segmentSize = 1 << log2OfSegmentSize;
-//        long maxIndex = segments.length * segmentSize;
-//
-//
-//        pp.append("\n\n SegmentedByteArray get()s => ");
-//        for (int g = 0; g < maxIndex; g ++) {
-//            byte v = get(g);
-//            pp.append(v+ " ");
-//        }
-//
-//        pp.append("\n");
-//        pp.append("\n SegmentedByteArray raw bytes underneath:\n");
-//        for (int i = 0; i < segments.length; i ++) {
-//            if (segments[i] == null) {
-//                pp.append("- - - - - NULL - - - - ");
-//                pp.append("\n");
-//                continue;
-//            }
-//
-//            pp.append(String.format("SegmentedByteArray i= %d/%d => ", i, segments.length-1));
-//
-//            for (int j = 0; j < segmentSize; j ++ ) {
-//                byte v = segments[i].get(segments[i].position() + j);
-//                pp.append(v + " ");
-//            }
-//            pp.append("\n");
-//        }
-//         debug.append(pp.toString());
-//     }
 }

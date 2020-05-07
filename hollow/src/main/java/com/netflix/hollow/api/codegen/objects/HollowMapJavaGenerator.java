@@ -108,12 +108,12 @@ public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
 
         classBuilder.append("    @Override\n");
         classBuilder.append("    public " + keyReturnType + " instantiateKey(int ordinal) {\n");
-        classBuilder.append("        return (" + keyReturnType + ") api().get").append(keyClassName).append("(ordinal);\n");
+        classBuilder.append("        return (" + keyReturnType + ") api().deserializeFrom").append(keyClassName).append("(ordinal);\n");
         classBuilder.append("    }\n\n");
 
         classBuilder.append("    @Override\n");
         classBuilder.append("    public " + valueReturnType + " instantiateValue(int ordinal) {\n");
-        classBuilder.append("        return (" + valueReturnType + ") api().get").append(valueClassName).append("(ordinal);\n");
+        classBuilder.append("        return (" + valueReturnType + ") api().deserializeFrom").append(valueClassName).append("(ordinal);\n");
         classBuilder.append("    }\n\n");
     }
 
@@ -121,7 +121,7 @@ public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
         if(schema.getHashKey() != null) {
             String valueReturnType = parameterizeValue ? "V" : valueClassName;
 
-            classBuilder.append("    public " + valueReturnType + " get(");
+            classBuilder.append("    public " + valueReturnType + " deserializeFrom(");
             classBuilder.append(getKeyFieldType(schema.getHashKey().getFieldPath(0))).append(" k0");
             for(int i=1;i<schema.getHashKey().numFields();i++)
                 classBuilder.append(", ").append(getKeyFieldType(schema.getHashKey().getFieldPath(i))).append(" k").append(i);

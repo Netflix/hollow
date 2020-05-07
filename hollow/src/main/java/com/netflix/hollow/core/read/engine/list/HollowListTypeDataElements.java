@@ -16,16 +16,15 @@
  */
 package com.netflix.hollow.core.read.engine.list;
 
-import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
+import com.netflix.hollow.core.memory.FixedLengthData;
+import com.netflix.hollow.core.memory.FixedLengthDataMode;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
 
 /**
  * This class holds the data for a {@link HollowListTypeReadState}.
@@ -37,8 +36,8 @@ public class HollowListTypeDataElements {
 
     int maxOrdinal;
 
-    FixedLengthElementArray listPointerArray;
-    FixedLengthElementArray elementArray;
+    FixedLengthData listPointerData;
+    FixedLengthData elementData;
 
     GapEncodedVariableLengthIntegerReader encodedAdditions;
     GapEncodedVariableLengthIntegerReader encodedRemovals;
@@ -53,58 +52,57 @@ public class HollowListTypeDataElements {
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug) throws IOException {
-        readFromStream(raf, buffer, debug, false);
+    void readSnapshot(HollowBlobInput in, BufferedWriter debug) throws IOException {
+        readFromInput(in, debug, false);
     }
 
-    void readDelta(RandomAccessFile raf) throws IOException {
-        throw new UnsupportedOperationException();
+    void readDelta(HollowBlobInput in, BufferedWriter debug) throws IOException {
+        readFromInput(in, debug, true);
     }
 
-    private void readFromStream(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, boolean isDelta) throws IOException {
-        maxOrdinal = VarInt.readVInt(raf);
+    private void readFromInput(HollowBlobInput in, BufferedWriter debug, boolean isDelta) throws IOException {
+        maxOrdinal = VarInt.readVInt(in);
 
         if(isDelta) {
-        //    encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
-        //    encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
-            throw new UnsupportedOperationException();
+            encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
+            encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
         }
 
-        bitsPerListPointer = VarInt.readVInt(raf);
-        bitsPerElement = VarInt.readVInt(raf);
-        totalNumberOfElements = VarInt.readVLong(raf);
+        bitsPerListPointer = VarInt.readVInt(in);
+        bitsPerElement = VarInt.readVInt(in);
+        totalNumberOfElements = VarInt.readVLong(in);
 
-        listPointerArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
-        elementArray = FixedLengthElementArray.deserializeFrom(raf, buffer, memoryRecycler);
+        listPointerData = FixedLengthDataMode.deserializeFrom(in, memoryRecycler);
+        elementData = FixedLengthDataMode.deserializeFrom(in, memoryRecycler);
 
-        // debug.append("HollowListTypeDataElements listPointerArray= \n");
-        // listPointerArray.pp(debug);
-        // debug.append("HollowListTypeDataElements elementArray= \n");
-        // elementArray.pp(debug);
+        // debug.append("HollowListTypeDataElements listPointerData= \n");
+        // listPointerData.pp(debug);
+        // debug.append("HollowListTypeDataElements elementData= \n");
+        // elementData.pp(debug);
         // debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowListTypeDataElements\n");
     }
 
-    static void discardFromStream(DataInputStream dis, int numShards, boolean isDelta) throws IOException {
+    static void discardFromStream(HollowBlobInput in, int numShards, boolean isDelta) throws IOException {
         if(numShards > 1)
-            VarInt.readVInt(dis); /// max ordinal
+            VarInt.readVInt(in); /// max ordinal
         
         for(int i=0;i<numShards;i++) {
-            VarInt.readVInt(dis); /// max ordinal
+            VarInt.readVInt(in); /// max ordinal
     
             if(isDelta) {
                 /// addition/removal ordinals
-                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
-                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
+                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(in);
+                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(in);
             }
     
             /// statistics
-            VarInt.readVInt(dis);
-            VarInt.readVInt(dis);
-            VarInt.readVLong(dis);
+            VarInt.readVInt(in);
+            VarInt.readVInt(in);
+            VarInt.readVLong(in);
     
             /// fixed-length data
-            FixedLengthElementArray.discardFrom(dis);
-            FixedLengthElementArray.discardFrom(dis);
+            FixedLengthData.discardFrom(in);
+            FixedLengthData.discardFrom(in);
         }
     }
 
@@ -113,8 +111,8 @@ public class HollowListTypeDataElements {
     }
 
     public void destroy() {
-        listPointerArray.destroy(memoryRecycler);
-        elementArray.destroy(memoryRecycler);
+        FixedLengthDataMode.destroy(listPointerData, memoryRecycler);
+        FixedLengthDataMode.destroy(elementData, memoryRecycler);
     }
 
 }

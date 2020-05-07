@@ -163,7 +163,7 @@ public interface HollowProducerListener extends
     }
 
     /**
-     * Called once populating task stage has finished successfully or failed. Use {@code ProducerStatus#getStatus()} to get status of the task.
+     * Called once populating task stage has finished successfully or failed. Use {@code ProducerStatus#getStatus()} to deserializeFrom status of the task.
      *
      * @param status A value of {@code Success} indicates that all data was successfully populated. {@code Fail} status indicates populating hollow with data failed.
      * @param elapsed Time taken to populate hollow.
@@ -207,7 +207,7 @@ public interface HollowProducerListener extends
     }
 
     /**
-     * Called once a blob has been published successfully or failed to published. Use {@link PublishStatus#getBlob()} to get more details on blob type and size.
+     * Called once a blob has been published successfully or failed to published. Use {@link PublishStatus#getBlob()} to deserializeFrom more details on blob type and size.
      * This method is called for every {@link com.netflix.hollow.api.producer.HollowProducer.Blob.Type} that was published.
      *
      * @param publishStatus Status of publishing. {@link PublishStatus#getStatus()} returns {@code SUCCESS} or {@code FAIL}.
@@ -477,7 +477,7 @@ public interface HollowProducerListener extends
         }
 
         /**
-         * An instance of {@code Blob} has methods to get details on type of blob, size, from and to version.
+         * An instance of {@code Blob} has methods to deserializeFrom details on type of blob, size, from and to version.
          *
          * @return Blob that was published.
          */

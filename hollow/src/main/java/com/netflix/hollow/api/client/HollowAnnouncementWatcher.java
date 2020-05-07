@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  * 2) Keeping the client up to date by calling triggerAsyncRefresh() on self when the latest version changes.
  * 
  * A default implementation {@link HollowAnnouncementWatcher.DefaultWatcher} is available.  If this implementation
- * is used, calling {@link HollowClient#triggerRefresh()} will always attempt to get to the latest state, unless an 
+ * is used, calling {@link HollowClient#triggerRefresh()} will always attempt to deserializeFrom to the latest state, unless an
  * explicit state was specified via {@link HollowClient#triggerRefreshTo(long)}.
  * 
  * @deprecated Implement the {@link HollowConsumer.AnnouncementWatcher} for use with the {@link HollowConsumer} instead.
