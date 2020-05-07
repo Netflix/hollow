@@ -99,9 +99,9 @@ public class GapEncodedVariableLengthIntegerReader {
         return new GapEncodedVariableLengthIntegerReader(arr, (int)numBytesEncodedOrdinals);
     }
 
-    public static void copyEncodedDeltaOrdinals(DataInputStream is, DataOutputStream... os) throws IOException {
-        long numBytesEncodedOrdinals = IOUtils.copyVLong(is, os);
-        IOUtils.copyBytes(is, os, numBytesEncodedOrdinals);
+    public static void copyEncodedDeltaOrdinals(HollowBlobInput in, DataOutputStream... os) throws IOException {
+        long numBytesEncodedOrdinals = IOUtils.copyVLong(in, os);
+        IOUtils.copyBytes(in, os, numBytesEncodedOrdinals);
     }
 
     public static void discardEncodedDeltaOrdinals(HollowBlobInput in) throws IOException {

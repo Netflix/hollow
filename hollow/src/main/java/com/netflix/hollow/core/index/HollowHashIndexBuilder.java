@@ -16,7 +16,7 @@
  */
 package com.netflix.hollow.core.index;
 
-import static com.netflix.hollow.core.memory.encoding.FixedLengthElementArray.bitsRequiredToRepresentValue;
+import static com.netflix.hollow.core.memory.FixedLengthData.bitsRequiredToRepresentValue;
 
 import com.netflix.hollow.core.index.traversal.HollowIndexerValueTraverser;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
