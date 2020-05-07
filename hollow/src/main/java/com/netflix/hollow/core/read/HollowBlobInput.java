@@ -1,5 +1,11 @@
 package com.netflix.hollow.core.read;
 
+import static com.netflix.hollow.core.memory.MemoryMode.Mode.ON_HEAP;
+import static com.netflix.hollow.core.memory.MemoryMode.Mode.SHARED_MEMORY;
+
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.producer.HollowProducer;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import java.io.Closeable;
@@ -16,6 +22,26 @@ public class HollowBlobInput implements Closeable {
 
     private HollowBlobInput() {}
 
+    public static HollowBlobInput modeBasedInput(HollowConsumer.Blob blob, MemoryMode.Mode mode) throws IOException {
+        if (mode.equals(SHARED_MEMORY)) {
+            return randomAccessFile(blob.getFile());
+        } else if (mode.equals(ON_HEAP)) {
+            return inputStream(blob.getInputStream());
+        } else {
+            throw new UnsupportedOperationException("Unsupported memory mode");
+        }
+    }
+
+    public static HollowBlobInput modeBasedInput(HollowProducer.Blob blob, MemoryMode.Mode mode) throws IOException {
+        if (mode.equals(SHARED_MEMORY)) {
+            throw new UnsupportedOperationException("Shared memory mode not supported for producer");
+        } else if (mode.equals(ON_HEAP)) {
+            return inputStream(blob.newInputStream());
+        } else {
+            throw new UnsupportedOperationException("Unsupported memory mode");
+        }
+    }
+
     public static HollowBlobInput randomAccessFile(File f) throws IOException {
         HollowBlobInput hbi = new HollowBlobInput();
         RandomAccessFile raf = new RandomAccessFile(f, "r");
@@ -25,7 +51,7 @@ public class HollowBlobInput implements Closeable {
         return hbi;
     }
 
-    public static HollowBlobInput inputStream(InputStream is) {
+    public static HollowBlobInput inputStream(InputStream is) { // SNAP: TODO: Can everything be a RandomAccessFile?
         HollowBlobInput hbi = new HollowBlobInput();
         DataInputStream dis = new DataInputStream(is);
         hbi.o = dis;
@@ -86,7 +112,7 @@ public class HollowBlobInput implements Closeable {
         if (o instanceof RandomAccessFile) {
             return ((RandomAccessFile) o).getFilePointer();
         } else if (o instanceof DataInputStream) {
-            throw new UnsupportedOperationException("Can not deserializeFrom file pointer for Hollow Blob Input of type DataInputStream");
+            throw new UnsupportedOperationException("Can not get file pointer for Hollow Blob Input of type DataInputStream");
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
         }

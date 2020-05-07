@@ -36,6 +36,7 @@ import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.Collection;
 import java.util.TreeSet;
@@ -104,6 +105,39 @@ public class HollowBlobReader {
         notifyEndUpdate();
 
         stateEngine.afterInitialization();
+    }
+
+    /**
+     * Update the state engine using a delta (or reverse delta) blob from the provided InputStream.
+     * <p>
+     * If a {@link HollowFilterConfig} was applied at the time the {@link HollowReadStateEngine} was initialized
+     * with a snapshot, it will continue to be in effect after the state is updated.
+     *
+     * @param in the Hollow blob input to read the delta from
+     * @throws IOException if the delta could not be applied
+     */
+    public void applyDelta(HollowBlobInput in, BufferedWriter debug) throws IOException {
+        HollowBlobHeader header = readHeader(in, true);
+        notifyBeginUpdate();
+
+        long startTime = System.currentTimeMillis();
+
+        int numStates = VarInt.readVInt(in);
+
+        Collection<String> typeNames = new TreeSet<String>();
+        for(int i=0;i<numStates;i++) {
+            String typeName = readTypeStateDelta(in, debug, header);
+            typeNames.add(typeName);
+            stateEngine.getMemoryRecycler().swap();
+        }
+
+        long endTime = System.currentTimeMillis();
+
+        log.info("DELTA COMPLETED IN " + (endTime - startTime) + "ms");
+        log.info("TYPES: " + typeNames);
+
+        notifyEndUpdate();
+
     }
 
     private HollowBlobHeader readHeader(HollowBlobInput f, boolean isDelta) throws IOException {

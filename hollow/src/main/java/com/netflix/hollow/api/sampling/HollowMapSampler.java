@@ -83,7 +83,7 @@ public class HollowMapSampler implements HollowSampler {
     public Collection<SampleResult> getSampleResults() {
         List<SampleResult> sampleResults = new ArrayList<SampleResult>(4);
         sampleResults.add(new SampleResult(typeName + ".size()", sizeSamples));
-        sampleResults.add(new SampleResult(typeName + ".deserializeFrom()", getSamples));
+        sampleResults.add(new SampleResult(typeName + ".get()", getSamples));
         sampleResults.add(new SampleResult(typeName + ".iterator()", iteratorSamples));
         sampleResults.add(new SampleResult(typeName + ".bucketValue()", bucketRetrievalSamples));
         return sampleResults;

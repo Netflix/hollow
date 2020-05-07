@@ -104,17 +104,17 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
             switch(schema.getFieldType(i)) {
             case STRING:
             case BYTES:
-                builder.append("        this.").append(fieldName).append(" = typeAPI.deserializeFrom").append(uppercase(fieldName)).append("(ordinal);\n");
+                builder.append("        this.").append(fieldName).append(" = typeAPI.get").append(uppercase(fieldName)).append("(ordinal);\n");
                 break;
             case BOOLEAN:
             case DOUBLE:
             case FLOAT:
             case INT:
             case LONG:
-                builder.append("        this.").append(fieldName).append(" = typeAPI.deserializeFrom").append(uppercase(fieldName)).append("Boxed(ordinal);\n");
+                builder.append("        this.").append(fieldName).append(" = typeAPI.get").append(uppercase(fieldName)).append("Boxed(ordinal);\n");
                 break;
             case REFERENCE:
-                builder.append("        this.").append(fieldName).append("Ordinal = typeAPI.deserializeFrom").append(uppercase(fieldName)).append("Ordinal(ordinal);\n");
+                builder.append("        this.").append(fieldName).append("Ordinal = typeAPI.get").append(uppercase(fieldName)).append("Ordinal(ordinal);\n");
                 Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
                 if(shortcut != null) {
                     String ordinalVariableName = fieldName + "TempOrdinal";
@@ -123,11 +123,11 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
 
                     for(int j=0;j<shortcut.getPath().length-1;j++) {
                         String typeAPIName = HollowCodeGenerationUtils.typeAPIClassname(shortcut.getPathTypes()[j]);
-                        builder.append("        " + ordinalVariableName + " = " + ordinalVariableName + " == -1 ? -1 : typeAPI.getAPI().deserializeFrom").append(typeAPIName).append("().deserializeFrom").append(uppercase(shortcut.getPath()[j])).append("Ordinal(").append(ordinalVariableName).append(");\n");
+                        builder.append("        " + ordinalVariableName + " = " + ordinalVariableName + " == -1 ? -1 : typeAPI.getAPI().get").append(typeAPIName).append("().get").append(uppercase(shortcut.getPath()[j])).append("Ordinal(").append(ordinalVariableName).append(");\n");
                     }
 
                     String typeAPIName = HollowCodeGenerationUtils.typeAPIClassname(shortcut.getPathTypes()[shortcut.getPathTypes().length-1]);
-                    builder.append("        this.").append(fieldName).append(" = ").append(ordinalVariableName).append(" == -1 ? null : ").append("typeAPI.getAPI().deserializeFrom").append(typeAPIName).append("().deserializeFrom").append(uppercase(shortcut.getPath()[shortcut.getPath().length-1])).append("(").append(ordinalVariableName).append(");\n");
+                    builder.append("        this.").append(fieldName).append(" = ").append(ordinalVariableName).append(" == -1 ? null : ").append("typeAPI.getAPI().get").append(typeAPIName).append("().get").append(uppercase(shortcut.getPath()[shortcut.getPath().length-1])).append("(").append(ordinalVariableName).append(");\n");
                 }
             }
         }
@@ -143,7 +143,7 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
                 if(shortcut != null)
                     addAccessor(builder, shortcut.getType(), fieldName);
 
-                builder.append("    public int deserializeFrom").append(uppercase(fieldName)).append("Ordinal(int ordinal) {\n");
+                builder.append("    public int get").append(uppercase(fieldName)).append("Ordinal(int ordinal) {\n");
                 builder.append("        return ").append(fieldName).append("Ordinal;\n");
                 builder.append("    }\n\n");
             } else {
@@ -177,63 +177,63 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
     private void addAccessor(StringBuilder builder, FieldType fieldType, String fieldName) {
         switch(fieldType) {
         case BOOLEAN:
-            builder.append("    public boolean deserializeFrom").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("    public boolean get").append(uppercase(fieldName)).append("(int ordinal) {\n");
             builder.append("        if(").append(fieldName).append(" == null)\n");
             builder.append("            return false;\n");
             builder.append("        return ").append(fieldName).append(".booleanValue();\n");
             builder.append("    }\n\n");
-            builder.append("    public Boolean deserializeFrom").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
+            builder.append("    public Boolean get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
             builder.append("        return ").append(fieldName).append(";\n");
             builder.append("    }\n\n");
             break;
         case BYTES:
-            builder.append("    public byte[] deserializeFrom").append(uppercase(fieldName)).append("(int ordinal) {\n");
-            // we need the cast to deserializeFrom around http://findbugs.sourceforge.net/bugDescriptions.html#EI_EXPOSE_REP
+            builder.append("    public byte[] get").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            // we need the cast to get around http://findbugs.sourceforge.net/bugDescriptions.html#EI_EXPOSE_REP
             builder.append("        return (byte[]) ").append(fieldName).append(";\n");
             builder.append("    }\n\n");
             break;
         case DOUBLE:
-            builder.append("    public double deserializeFrom").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("    public double get").append(uppercase(fieldName)).append("(int ordinal) {\n");
             builder.append("        if(").append(fieldName).append(" == null)\n");
             builder.append("            return Double.NaN;\n");
             builder.append("        return ").append(fieldName).append(".doubleValue();\n");
             builder.append("    }\n\n");
-            builder.append("    public Double deserializeFrom").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
+            builder.append("    public Double get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
             builder.append("        return ").append(fieldName).append(";\n");
             builder.append("    }\n\n");
             break;
         case FLOAT:
-            builder.append("    public float deserializeFrom").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("    public float get").append(uppercase(fieldName)).append("(int ordinal) {\n");
             builder.append("        if(").append(fieldName).append(" == null)\n");
             builder.append("            return Float.NaN;\n");
             builder.append("        return ").append(fieldName).append(".floatValue();\n");
             builder.append("    }\n\n");
-            builder.append("    public Float deserializeFrom").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
+            builder.append("    public Float get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
             builder.append("        return ").append(fieldName).append(";\n");
             builder.append("    }\n\n");
             break;
         case INT:
-            builder.append("    public int deserializeFrom").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("    public int get").append(uppercase(fieldName)).append("(int ordinal) {\n");
             builder.append("        if(").append(fieldName).append(" == null)\n");
             builder.append("            return Integer.MIN_VALUE;\n");
             builder.append("        return ").append(fieldName).append(".intValue();\n");
             builder.append("    }\n\n");
-            builder.append("    public Integer deserializeFrom").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
+            builder.append("    public Integer get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
             builder.append("        return ").append(fieldName).append(";\n");
             builder.append("    }\n\n");
             break;
         case LONG:
-            builder.append("    public long deserializeFrom").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("    public long get").append(uppercase(fieldName)).append("(int ordinal) {\n");
             builder.append("        if(").append(fieldName).append(" == null)\n");
             builder.append("            return Long.MIN_VALUE;\n");
             builder.append("        return ").append(fieldName).append(".longValue();\n");
             builder.append("    }\n\n");
-            builder.append("    public Long deserializeFrom").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
+            builder.append("    public Long get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
             builder.append("        return ").append(fieldName).append(";\n");
             builder.append("    }\n\n");
             break;
         case STRING:
-            builder.append("    public String deserializeFrom").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("    public String get").append(uppercase(fieldName)).append("(int ordinal) {\n");
             builder.append("        return ").append(fieldName).append(";\n");
             builder.append("    }\n\n");
             builder.append("    public boolean is").append(uppercase(fieldName)).append("Equal(int ordinal, String testValue) {\n");

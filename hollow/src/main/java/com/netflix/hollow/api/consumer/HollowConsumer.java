@@ -856,7 +856,7 @@ public class HollowConsumer {
     /**
      * A listener of refresh listener addition and removal.
      * <p>
-     * A {@link RefreshListener} implementation may  implement this interface to deserializeFrom notified before
+     * A {@link RefreshListener} implementation may  implement this interface to get notified before
      * the listener is added (via a call to {@link #addRefreshListener(RefreshListener)} and after a listener
      * is removed (via a call to {@link #removeRefreshListener(RefreshListener)}.
      * <p>

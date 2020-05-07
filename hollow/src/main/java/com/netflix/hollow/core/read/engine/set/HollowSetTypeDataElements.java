@@ -67,7 +67,8 @@ public class HollowSetTypeDataElements {
         maxOrdinal = VarInt.readVInt(in);
 
         if(isDelta) {
-            throw new UnsupportedOperationException();
+            encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
+            encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
         }
 
         bitsPerSetPointer = VarInt.readVInt(in);

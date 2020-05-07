@@ -58,27 +58,27 @@ public class HollowObjectDelegateInterfaceGenerator extends HollowObjectDelegate
             String methodFieldName = substituteInvalidChars(uppercase(schema.getFieldName(i)));
             switch(schema.getFieldType(i)) {
             case BOOLEAN:
-                classBuilder.append("    public boolean deserializeFrom").append(methodFieldName).append("(int ordinal);\n\n");
-                classBuilder.append("    public Boolean deserializeFrom").append(methodFieldName).append("Boxed(int ordinal);\n\n");
+                classBuilder.append("    public boolean get").append(methodFieldName).append("(int ordinal);\n\n");
+                classBuilder.append("    public Boolean get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
                 break;
             case BYTES:
-                classBuilder.append("    public byte[] deserializeFrom").append(methodFieldName).append("(int ordinal);\n\n");
+                classBuilder.append("    public byte[] get").append(methodFieldName).append("(int ordinal);\n\n");
                 break;
             case DOUBLE:
-                classBuilder.append("    public double deserializeFrom").append(methodFieldName).append("(int ordinal);\n\n");
-                classBuilder.append("    public Double deserializeFrom").append(methodFieldName).append("Boxed(int ordinal);\n\n");
+                classBuilder.append("    public double get").append(methodFieldName).append("(int ordinal);\n\n");
+                classBuilder.append("    public Double get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
                 break;
             case FLOAT:
-                classBuilder.append("    public float deserializeFrom").append(methodFieldName).append("(int ordinal);\n\n");
-                classBuilder.append("    public Float deserializeFrom").append(methodFieldName).append("Boxed(int ordinal);\n\n");
+                classBuilder.append("    public float get").append(methodFieldName).append("(int ordinal);\n\n");
+                classBuilder.append("    public Float get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
                 break;
             case INT:
-                classBuilder.append("    public int deserializeFrom").append(methodFieldName).append("(int ordinal);\n\n");
-                classBuilder.append("    public Integer deserializeFrom").append(methodFieldName).append("Boxed(int ordinal);\n\n");
+                classBuilder.append("    public int get").append(methodFieldName).append("(int ordinal);\n\n");
+                classBuilder.append("    public Integer get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
                 break;
             case LONG:
-                classBuilder.append("    public long deserializeFrom").append(methodFieldName).append("(int ordinal);\n\n");
-                classBuilder.append("    public Long deserializeFrom").append(methodFieldName).append("Boxed(int ordinal);\n\n");
+                classBuilder.append("    public long get").append(methodFieldName).append("(int ordinal);\n\n");
+                classBuilder.append("    public Long get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
                 break;
             case REFERENCE:
                 Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
@@ -89,14 +89,14 @@ public class HollowObjectDelegateInterfaceGenerator extends HollowObjectDelegate
                     case FLOAT:
                     case INT:
                     case LONG:
-                        classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType()) + " deserializeFrom").append(methodFieldName).append("(int ordinal);\n\n");
-                        classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType()) + " deserializeFrom").append(methodFieldName).append("Boxed(int ordinal);\n\n");
+                        classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType()) + " get").append(methodFieldName).append("(int ordinal);\n\n");
+                        classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType()) + " get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
                         break;
                     case BYTES:
-                        classBuilder.append("    public byte[] deserializeFrom").append(methodFieldName).append("(int ordinal);\n\n");
+                        classBuilder.append("    public byte[] get").append(methodFieldName).append("(int ordinal);\n\n");
                         break;
                     case STRING:
-                        classBuilder.append("    public String deserializeFrom").append(methodFieldName).append("(int ordinal);\n\n");
+                        classBuilder.append("    public String get").append(methodFieldName).append("(int ordinal);\n\n");
                         classBuilder.append("    public boolean is").append(methodFieldName).append("Equal(int ordinal, String testValue);\n\n");
                         break;
                     case REFERENCE:
@@ -104,10 +104,10 @@ public class HollowObjectDelegateInterfaceGenerator extends HollowObjectDelegate
                     }
                 }
 
-                classBuilder.append("    public int deserializeFrom").append(methodFieldName).append("Ordinal(int ordinal);\n\n");
+                classBuilder.append("    public int get").append(methodFieldName).append("Ordinal(int ordinal);\n\n");
                 break;
             case STRING:
-                classBuilder.append("    public String deserializeFrom").append(methodFieldName).append("(int ordinal);\n\n");
+                classBuilder.append("    public String get").append(methodFieldName).append("(int ordinal);\n\n");
                 classBuilder.append("    public boolean is").append(methodFieldName).append("Equal(int ordinal, String testValue);\n\n");
                 break;
             }

@@ -75,7 +75,6 @@ public class ByteDataBuffer {
     }
 
     public SegmentedByteArray getUnderlyingArray() {
-        throw new UnsupportedOperationException();
-        // return buf;
+        return buf;
     }
 }
