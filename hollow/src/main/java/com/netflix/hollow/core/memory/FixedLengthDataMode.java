@@ -1,7 +1,5 @@
 package com.netflix.hollow.core.memory;
 
-import static com.netflix.hollow.core.memory.VariableLengthDataMode.SHARED_MEMORY_MODE;
-
 import com.netflix.hollow.core.memory.encoding.EncodedLongBuffer;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
@@ -14,7 +12,6 @@ public class FixedLengthDataMode {
 
     public static FixedLengthData deserializeFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
 
-        // SNAP: TODO: Toggle memory mode: Should I model it as an enum thats passed everywhere?
         if (MemoryMode.getMemoryMode().equals(MemoryMode.Mode.SHARED_MEMORY)) {
             /// list pointer array
             EncodedLongBuffer data = EncodedLongBuffer.deserializeFrom(in);

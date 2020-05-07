@@ -244,7 +244,7 @@ public class HollowObjectSchema extends HollowSchema {
         HollowObjectSchema filteredSchema = new HollowObjectSchema(getName(), includedFields, primaryKey);
 
         if (MemoryMode.getMemoryMode().equals(MemoryMode.Mode.SHARED_MEMORY)) {
-            if (includedFields > 0) {
+            if (config.getSpecifiedTypes().size() > 0) {
                 throw new UnsupportedOperationException("Type filtering is not supported in shared memory mode");
             } else {
                 return filteredSchema;

@@ -2,6 +2,7 @@ package com.netflix.hollow.core.read;
 
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.VarInt;
+import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 
-public class HollowBlobInput {
+public class HollowBlobInput implements Closeable {
     Object o;
     BlobByteBuffer buffer;
 
@@ -137,6 +138,17 @@ public class HollowBlobInput {
             return ((RandomAccessFile) o).skipBytes((int) n);
         } else if (o instanceof DataInputStream) {
             return ((DataInputStream) o).skipBytes((int) n);
+        } else {
+            throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (o instanceof RandomAccessFile) {
+            ((RandomAccessFile) o).close();
+        } else if (o instanceof DataInputStream) {
+            ((DataInputStream) o).close();
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
         }
