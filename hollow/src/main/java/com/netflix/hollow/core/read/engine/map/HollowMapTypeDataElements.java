@@ -89,10 +89,10 @@ public class HollowMapTypeDataElements {
         mapPointerAndSizeData = FixedLengthDataMode.deserializeFrom(in, memoryRecycler);
         entryData = FixedLengthDataMode.deserializeFrom(in, memoryRecycler);
 
-        // debug.append("HollowMapTypeDataElements mapPointerAndSizeArray= \n");
-        // mapPointerAndSizeArray.pp(debug);
-        // debug.append("HollowMapTypeDataElements entryArray= \n");
-        // entryArray.pp(debug);
+        // debug.append("HollowMapTypeDataElements mapPointerAndSizeData= \n");
+        // mapPointerAndSizeData.pp(debug);
+        // debug.append("HollowMapTypeDataElements entryData= \n");
+        // entryData.pp(debug);
         // debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowMapTypeDataElements\n");
     }
 

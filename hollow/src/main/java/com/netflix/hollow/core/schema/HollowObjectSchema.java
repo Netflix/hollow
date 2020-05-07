@@ -18,6 +18,7 @@ package com.netflix.hollow.core.schema;
 
 import com.netflix.hollow.api.error.IncompatibleSchemaException;
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
@@ -241,6 +242,14 @@ public class HollowObjectSchema extends HollowSchema {
         }
 
         HollowObjectSchema filteredSchema = new HollowObjectSchema(getName(), includedFields, primaryKey);
+
+        if (MemoryMode.getMemoryMode().equals(MemoryMode.Mode.SHARED_MEMORY)) {
+            if (includedFields > 0) {
+                throw new UnsupportedOperationException("Type filtering is not supported in shared memory mode");
+            } else {
+                return filteredSchema;
+            }
+        }
 
         for(int i=0;i<numFields();i++) {
             String field = getFieldName(i);

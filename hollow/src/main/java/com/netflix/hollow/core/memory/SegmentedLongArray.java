@@ -159,7 +159,7 @@ public class SegmentedLongArray {
             }
 
             if(numLongs > longsCopied) {
-                unsafe.putOrderedLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied), dis.readLong());
+                unsafe.putOrderedLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied), in.readLong());
                 fencepostLong = segments[segment][longsCopied];
             }
 
