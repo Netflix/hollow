@@ -12,7 +12,6 @@ public class VariableLengthDataMode {
 
     public static VariableLengthData get(ArraySegmentRecycler memoryRecycler) throws IOException {
 
-        // SNAP: TODO: Toggle memory mode: Should I model it as an enum thats passed everywhere?
         if (SHARED_MEMORY_MODE) {
             return new EncodedByteBuffer();
         } else {

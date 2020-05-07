@@ -18,6 +18,7 @@ package com.netflix.hollow.core.read.engine.object;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.memory.FixedLengthDataMode;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.VariableLengthData;
 import com.netflix.hollow.core.memory.VariableLengthDataMode;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
@@ -85,7 +86,9 @@ public class HollowObjectTypeDataElements {
         readFieldStatistics(in, unfilteredSchema);
 
         fixedLengthData = FixedLengthDataMode.deserializeFrom(in, memoryRecycler);
-        removeExcludedFieldsFromFixedLengthData();  // SNAP: TODO: this was excluded in shared memory mode
+        if (MemoryMode.getMemoryMode().equals(MemoryMode.Mode.ON_HEAP)) {
+            removeExcludedFieldsFromFixedLengthData();
+        }
 
         readVarLengthData(in, unfilteredSchema);
 

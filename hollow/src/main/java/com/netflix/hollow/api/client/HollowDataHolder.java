@@ -20,23 +20,26 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.TransitionAwareRefreshListener;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.HollowConstants;
-import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.util.logging.Logger;
 
 /**
  * A class comprising much of the internal state of a {@link HollowConsumer}.  Not intended for external consumption.
  */
 class HollowDataHolder {
+    private static final Logger LOG = Logger.getLogger(HollowDataHolder.class.getName());
 
     private final HollowReadStateEngine stateEngine;
     private final HollowAPIFactory apiFactory;
@@ -133,10 +136,14 @@ class HollowDataHolder {
     }
 
     private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
-        // SNAP: TODO: Toggle memory mode
-        BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_new"));
+        BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_snapshot"));
 
-        HollowBlobInput in = HollowBlobInput.randomAccessFile(snapshotBlob.getFile());
+        HollowBlobInput in = null;
+        if (MemoryMode.getMemoryMode().equals(MemoryMode.Mode.ON_HEAP)) {
+            in = HollowBlobInput.inputStream(snapshotBlob.getInputStream());
+        } else {
+            in = HollowBlobInput.randomAccessFile(snapshotBlob.getFile());
+        }
 
         try {
             applyStateEngineTransition(in, debug, snapshotBlob, refreshListeners);
@@ -190,7 +197,47 @@ class HollowDataHolder {
     }
 
     private void applyDeltaTransition(HollowConsumer.Blob blob, boolean isSnapshotPlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
-        throw new UnsupportedOperationException();
+        if (MemoryMode.getMemoryMode().equals(MemoryMode.Mode.SHARED_MEMORY)) {
+            LOG.warning("Skipping delta transition in shared-memory mode");
+            return;
+        }
+        BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_delta"));
+
+        try(HollowBlobInput in = HollowBlobInput.inputStream(blob.getInputStream())) {
+            applyStateEngineTransition(in, debug, blob, refreshListeners);
+
+            if(objLongevityConfig.enableLongLivedObjectSupport()) {
+                HollowDataAccess previousDataAccess = currentAPI.getDataAccess();
+                HollowHistoricalStateDataAccess priorState = new HollowHistoricalStateCreator(null).createBasedOnNewDelta(currentVersion, stateEngine);
+                HollowProxyDataAccess newDataAccess = new HollowProxyDataAccess();
+                newDataAccess.setDataAccess(stateEngine);
+                currentAPI = apiFactory.createAPI(newDataAccess, currentAPI);
+
+                if(previousDataAccess instanceof HollowProxyDataAccess)
+                    ((HollowProxyDataAccess)previousDataAccess).setDataAccess(priorState);
+
+                wireHistoricalStateChain(priorState);
+            } else {
+                if(currentAPI.getDataAccess() != stateEngine)
+                    currentAPI = apiFactory.createAPI(stateEngine);
+
+                priorHistoricalDataAccess = null;
+            }
+
+            if(!staleReferenceDetector.isKnownAPIHandle(currentAPI))
+                staleReferenceDetector.newAPIHandle(currentAPI);
+
+            for(HollowConsumer.RefreshListener refreshListener : refreshListeners) {
+                if(!isSnapshotPlan)
+                    refreshListener.deltaUpdateOccurred(currentAPI, stateEngine, blob.getToVersion());
+                if (refreshListener instanceof TransitionAwareRefreshListener)
+                    ((TransitionAwareRefreshListener)refreshListener).deltaApplied(currentAPI, stateEngine, blob.getToVersion());
+            }
+
+        } catch(Throwable t) {
+            failedTransitionTracker.markFailedTransition(blob);
+            throw t;
+        }
     }
 
     private void wireHistoricalStateChain(HollowHistoricalStateDataAccess nextPriorState) {
