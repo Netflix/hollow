@@ -160,7 +160,7 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
             builder.append("            ").append(lowercase(typeAPIClassname(schema.getName()))).append(" = new ").append(typeAPIClassname(schema.getName())).append("(this, new Hollow").append(schemaType(schema)).append("MissingDataAccess(dataAccess, \"").append(schema.getName()).append("\"));\n");
             builder.append("        }\n");
             builder.append("        addTypeAPI(").append(lowercase(typeAPIClassname(schema.getName()))).append(");\n");
-            builder.append("        factory = factoryOverrides.deserializeFrom(\"").append(schema.getName()).append("\");\n");
+            builder.append("        factory = factoryOverrides.get(\"").append(schema.getName()).append("\");\n");
             builder.append("        if(factory == null)\n");
             builder.append("            factory = new ").append(hollowFactoryClassname(schema.getName())).append("();\n");
             builder.append("        if(cachedTypes.contains(\"").append(schema.getName()).append("\")) {\n");
@@ -185,7 +185,7 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
 
 
         for (HollowSchema schema : schemaList) {
-            builder.append("    public ").append(typeAPIClassname(schema.getName())).append(" deserializeFrom" + typeAPIClassname(schema.getName())).append("() {\n");
+            builder.append("    public ").append(typeAPIClassname(schema.getName())).append(" get" + typeAPIClassname(schema.getName())).append("() {\n");
             builder.append("        return ").append(lowercase(typeAPIClassname(schema.getName()))).append(";\n");
             builder.append("    }\n");
         }
@@ -197,12 +197,12 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
                 builder.append("        HollowTypeDataAccess tda = Objects.requireNonNull(getDataAccess().getTypeDataAccess(\"").append(schema.getName()).append("\"), \"type not loaded or does not exist in dataset; type=").append(schema.getName()).append("\");\n");
                 builder.append("        return new AllHollowRecordCollection<T>(tda.getTypeState()) {\n");
                 builder.append("            protected T getForOrdinal(int ordinal) {\n");
-                builder.append("                return deserializeFrom").append(hollowImplClassname(schema.getName())).append("(ordinal);\n");
+                builder.append("                return get").append(hollowImplClassname(schema.getName())).append("(ordinal);\n");
                 builder.append("            }\n");
                 builder.append("        };\n");
                 builder.append("    }\n");
 
-                builder.append("    public <T> T deserializeFrom").append(hollowImplClassname(schema.getName())).append("(int ordinal) {\n");
+                builder.append("    public <T> T get").append(hollowImplClassname(schema.getName())).append("(int ordinal) {\n");
                 builder.append("        objectCreationSampler.recordCreation(").append(i).append(");\n");
                 builder.append("        return (T) ").append(hollowObjectProviderName(schema.getName())).append(".getHollowObject(ordinal);\n");
                 builder.append("    }\n");
@@ -213,12 +213,12 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
                 builder.append("        HollowTypeDataAccess tda = Objects.requireNonNull(getDataAccess().getTypeDataAccess(\"").append(schema.getName()).append("\"), \"type not loaded or does not exist in dataset; type=").append(schema.getName()).append("\");\n");
                 builder.append("        return new AllHollowRecordCollection<"+hollowImplClassname+">(tda.getTypeState()) {\n");
                 builder.append("            protected "+hollowImplClassname+" getForOrdinal(int ordinal) {\n");
-                builder.append("                return deserializeFrom").append(hollowImplClassname).append("(ordinal);\n");
+                builder.append("                return get").append(hollowImplClassname).append("(ordinal);\n");
                 builder.append("            }\n");
                 builder.append("        };\n");
                 builder.append("    }\n");
 
-                builder.append("    public ").append(hollowImplClassname).append(" deserializeFrom").append(hollowImplClassname).append("(int ordinal) {\n");
+                builder.append("    public ").append(hollowImplClassname).append(" get").append(hollowImplClassname).append("(int ordinal) {\n");
                 builder.append("        objectCreationSampler.recordCreation(").append(i).append(");\n");
                 builder.append("        return (").append(hollowImplClassname).append(")").append(hollowObjectProviderName(schema.getName())).append(".getHollowObject(ordinal);\n");
                 builder.append("    }\n");

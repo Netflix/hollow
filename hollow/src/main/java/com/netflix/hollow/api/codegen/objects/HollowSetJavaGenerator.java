@@ -91,7 +91,7 @@ public class HollowSetJavaGenerator extends HollowCollectionsGenerator {
 
         classBuilder.append("    @Override\n");
         classBuilder.append("    public ").append(returnType).append(" instantiateElement(int ordinal) {\n");
-        classBuilder.append("        return (").append(returnType).append(") api().deserializeFrom").append(elementClassName).append("(ordinal);\n");
+        classBuilder.append("        return (").append(returnType).append(") api().get").append(elementClassName).append("(ordinal);\n");
         classBuilder.append("    }\n\n");
     }
 

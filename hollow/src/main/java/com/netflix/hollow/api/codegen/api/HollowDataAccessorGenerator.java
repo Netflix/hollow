@@ -103,7 +103,7 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
 
     protected void genPublicAPIs(StringBuilder builder) {
         builder.append("    @Override public " + type + " getRecord(int ordinal){\n");
-        builder.append("        return api.deserializeFrom" + type + "(ordinal);\n");
+        builder.append("        return api.get" + type + "(ordinal);\n");
         builder.append("    }\n\n");
     }
 }

@@ -96,7 +96,7 @@ public interface HollowObjectTypeDataAccess extends HollowTypeDataAccess {
     /**
      * @param ordinal the ordinal
      * @param fieldIndex the field index
-     * @param testValue the value to deserializeFrom against
+     * @param testValue the value to get against
      * @return whether or not the {@link FieldType#STRING} field's value at the specified fieldIndex for the specified ordinal is exactly equal to the given value.
      */
     boolean isStringFieldEqual(int ordinal, int fieldIndex, String testValue);

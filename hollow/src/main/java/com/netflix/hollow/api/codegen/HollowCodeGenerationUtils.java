@@ -310,21 +310,21 @@ public class HollowCodeGenerationUtils {
     }
 
     private static final Set<String> booleanMethodPrefixes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            "is", "has", "do", "should", "was", "contains", "enable", "disable", "deserializeFrom")));
+            "is", "has", "do", "should", "was", "contains", "enable", "disable", "get")));
     public static Set<String> getBooleanMethodPrefixes() { return booleanMethodPrefixes; }
 
     /**
-     * Rules: prepend "deserializeFrom" / "is" + upper case first char of field name
+     * Rules: prepend "get" / "is" + upper case first char of field name
      *
      * boolean/Boolean field:
-     *    - has a boolean prefix (@see {@link #booleanMethodPrefixes}), just return it; otherwise, prepend "deserializeFrom" + upper case first char
+     *    - has a boolean prefix (@see {@link #booleanMethodPrefixes}), just return it; otherwise, prepend "get" + upper case first char
      *
      *      boolean isPrimary - isPrimary()
      *      boolean hasStreams - hasStreams()
      *      boolean playable - getPlayable()
      *      boolean value - getValue()
      *
-     * other field type: prepend "deserializeFrom" + upper case first char
+     * other field type: prepend "get" + upper case first char
      *
      *      String title - getTitle()
      *
@@ -335,7 +335,7 @@ public class HollowCodeGenerationUtils {
      * @return accessor method name
      */
     public static String generateAccessortMethodName(String fieldName, Class<?> clazz) {
-        String prefix = "deserializeFrom";
+        String prefix = "get";
         if (boolean.class.equals(clazz) || Boolean.class.equals(clazz)) {
             for (String booleanPrefix : booleanMethodPrefixes) {
                 if (fieldName.startsWith(booleanPrefix) && fieldName.length() > booleanPrefix.length()) {
@@ -351,7 +351,7 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String generateBooleanAccessorMethodName(String fieldName, boolean useBooleanFieldErgonomics) {
-        return useBooleanFieldErgonomics ? generateAccessortMethodName(fieldName, boolean.class) : "deserializeFrom" + uppercase(fieldName);
+        return useBooleanFieldErgonomics ? generateAccessortMethodName(fieldName, boolean.class) : "get" + uppercase(fieldName);
     }
 
     /**

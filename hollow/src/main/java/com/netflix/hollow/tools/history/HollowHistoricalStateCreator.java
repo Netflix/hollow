@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.tools.history;
 
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -46,7 +47,9 @@ import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.Closeable;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -324,48 +327,48 @@ public class HollowHistoricalStateCreator {
     }
 
     private static HollowReadStateEngine roundTripStateEngine(HollowWriteStateEngine writeEngine) {
-//        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
-//        HollowReadStateEngine removedRecordCopies = new HollowReadStateEngine();
-//        HollowBlobReader reader = new HollowBlobReader(removedRecordCopies);
-//
-//        // Use a pipe to write and read concurrently to avoid writing
-//        // to temporary files or allocating memory
-//        // @@@ for small states it's more efficient to sequentially write to
-//        // and read from a byte array but it is tricky to estimate the size
-//        SimultaneousExecutor executor = new SimultaneousExecutor(1, HollowHistoricalStateCreator.class, "round-trip");
-//        Exception pipeException = null;
-//        // Ensure read-side is closed after completion of read
-//        try (PipedInputStream in = new PipedInputStream(1 << 15)) {
-//            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(in));
-//            executor.execute(() -> {
-//                // Ensure write-side is closed after completion of write
-//                try (Closeable ac = out) {
-//                    writer.writeSnapshot(out);
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            });
-//
-//            reader.readSnapshot(new BufferedInputStream(in));
-//        } catch (Exception e) {
-//            pipeException = e;
-//        }
-//
-//        // Ensure no underlying writer exception is lost due to broken pipe
-//        try {
-//            executor.awaitSuccessfulCompletion();
-//        } catch (InterruptedException | ExecutionException e) {
-//            if (pipeException == null) {
-//                throw new RuntimeException(e);
-//            }
-//
-//            pipeException.addSuppressed(e);
-//        }
-//        if (pipeException != null)
-//            throw new RuntimeException(pipeException);
-//
-//        return removedRecordCopies;
-        throw new UnsupportedOperationException();
+        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+        HollowReadStateEngine removedRecordCopies = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(removedRecordCopies);
+
+        // Use a pipe to write and read concurrently to avoid writing
+        // to temporary files or allocating memory
+        // @@@ for small states it's more efficient to sequentially write to
+        // and read from a byte array but it is tricky to estimate the size
+        SimultaneousExecutor executor = new SimultaneousExecutor(1, HollowHistoricalStateCreator.class, "round-trip");
+        Exception pipeException = null;
+        // Ensure read-side is closed after completion of read
+        try (PipedInputStream in = new PipedInputStream(1 << 15)) {
+            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(in));
+            executor.execute(() -> {
+                // Ensure write-side is closed after completion of write
+                try (Closeable ac = out) {
+                    writer.writeSnapshot(out);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_history_roundtrip"));
+            reader.readSnapshot(HollowBlobInput.inputStream(in), debug);
+        } catch (Exception e) {
+            pipeException = e;
+        }
+
+        // Ensure no underlying writer exception is lost due to broken pipe
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            if (pipeException == null) {
+                throw new RuntimeException(e);
+            }
+
+            pipeException.addSuppressed(e);
+        }
+        if (pipeException != null)
+            throw new RuntimeException(pipeException);
+
+        return removedRecordCopies;
     }
 
     private List<HollowSchema> schemasWithoutKeys(List<HollowSchema> schemas) {

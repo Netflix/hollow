@@ -72,7 +72,36 @@ public class FixedLengthMultipleOccurrenceElementArray {
      * @param element the element to add
      */
     public void addElement(long nodeIndex, long element) {
-        throw new UnsupportedOperationException();
+        if (element > elementMask) {
+            throw new IllegalArgumentException("Element " + element + " does not fit in "
+                    + bitsPerElement + " bits");
+        }
+        if (nodeIndex >= numNodes) {
+            throw new IllegalArgumentException("Provided nodeIndex  " + nodeIndex
+                    + " greater then numNodes " + numNodes);
+        }
+        if (element == NO_ELEMENT) {
+            // we use 0 to indicate an "empty" element, so we have to store ordinal zero here
+            nodesWithOrdinalZero.setElementValue(nodeIndex, 1, 1);
+            return;
+        }
+        long bucketStart = nodeIndex * maxElementsPerNode * bitsPerElement;
+        long currentIndex;
+        int offset = 0;
+        do {
+            currentIndex = bucketStart + offset * bitsPerElement;
+            offset++;
+        } while (storage.getElementValue(currentIndex, bitsPerElement, elementMask) != NO_ELEMENT
+                && offset < maxElementsPerNode);
+        if (storage.getElementValue(currentIndex, bitsPerElement, elementMask) != NO_ELEMENT) {
+            // we're full at this index - resize, then figure out the new current index
+            resizeStorage();
+            currentIndex = nodeIndex * maxElementsPerNode * bitsPerElement + offset * bitsPerElement;
+        }
+        /* we're adding to the first empty spot from the beginning of the bucket - this is
+         * preferable to adding at the end because we want our getElements method to be fast, and
+         * it's okay for addElement to be comparatively slow */
+        storage.setElementValue(currentIndex, bitsPerElement, element);
     }
 
     /**
@@ -85,7 +114,21 @@ public class FixedLengthMultipleOccurrenceElementArray {
      * @return a list of element at the node index
      */
     public List<Long> getElements(long nodeIndex) {
-        throw new UnsupportedOperationException();
+        long bucketStart = nodeIndex * maxElementsPerNode * bitsPerElement;
+        List<Long> ret = new ArrayList<>();
+        if (nodesWithOrdinalZero.getElementValue(nodeIndex, 1, 1) != NO_ELEMENT) {
+            // 0 indicates an "empty" element, so we fetch ordinal zeros from nodesWithOrdinalZero
+            ret.add(NO_ELEMENT);
+        }
+        for (int offset = 0; offset < maxElementsPerNode; offset++) {
+            long element = storage.getElementValue(bucketStart + offset * bitsPerElement,
+                    bitsPerElement, elementMask);
+            if (element == NO_ELEMENT) {
+                break; // we have exhausted the elements at this index
+            }
+            ret.add(element);
+        }
+        return ret;
     }
 
     /**
@@ -100,6 +143,29 @@ public class FixedLengthMultipleOccurrenceElementArray {
      * thread-safe.
      */
     private void resizeStorage() {
-        throw new UnsupportedOperationException();
+        int currentElementsPerNode = maxElementsPerNode;
+        int newElementsPerNode = (int) (currentElementsPerNode * RESIZE_MULTIPLE);
+        if (newElementsPerNode <= currentElementsPerNode) {
+            throw new IllegalStateException("cannot resize fixed length array from "
+                    + currentElementsPerNode + " to " + newElementsPerNode);
+        }
+        FixedLengthElementArray newStorage = new FixedLengthElementArray(memoryRecycler,
+                numNodes * bitsPerElement * newElementsPerNode);
+        LongStream.range(0, numNodes).forEach(nodeIndex -> {
+            long currentBucketStart = nodeIndex * currentElementsPerNode * bitsPerElement;
+            long newBucketStart = nodeIndex * newElementsPerNode * bitsPerElement;
+            for (int offset = 0; offset < currentElementsPerNode; offset++) {
+                long element = storage.getElementValue(currentBucketStart + offset * bitsPerElement,
+                        bitsPerElement, elementMask);
+                if (element == NO_ELEMENT) {
+                    break; // we have exhausted the elements at this index
+                }
+                newStorage.setElementValue(
+                        newBucketStart + offset * bitsPerElement, bitsPerElement, element);
+            }
+        });
+        storage.destroy(memoryRecycler);
+        storage = newStorage;
+        maxElementsPerNode = newElementsPerNode;
     }
 }

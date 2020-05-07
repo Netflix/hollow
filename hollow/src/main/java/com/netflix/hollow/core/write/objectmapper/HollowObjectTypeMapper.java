@@ -108,7 +108,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 
                 currentClass = currentClass.getSuperclass();
             }
-            // throw new UnsupportedOperationException();
         }
 
         this.schema = new HollowObjectSchema(typeName, mappedFields.size(), getKeyFieldPaths(clazz));
@@ -151,7 +150,19 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
     @Override
     public int write(Object obj) {
-        throw new UnsupportedOperationException();
+        if (hasAssignedOrdinalField) {
+            long assignedOrdinal = unsafe.getLong(obj, assignedOrdinalFieldOffset);
+            if((assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
+                return (int)assignedOrdinal & Integer.MAX_VALUE;
+        }
+
+        HollowObjectWriteRecord rec = copyToWriteRecord(obj, null);
+
+        int assignedOrdinal = writeState.add(rec);
+        if (hasAssignedOrdinalField) {
+            unsafe.putLong(obj, assignedOrdinalFieldOffset, (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits());
+        }
+        return assignedOrdinal;
     }
 
     @Override

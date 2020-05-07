@@ -237,7 +237,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
     }
 
     /**
-     * This implementation is motivated from several ideas to deserializeFrom a compact sparse set.
+     * This implementation is motivated from several ideas to get a compact sparse set.
      * When using a a bucket of BitSet, problems
      * - smaller sizes of BitSet are not useful, since null references are themselves 64/32 bit references.
      * - larger sizes of BitSet for truly sparse integers, has overhead of too many zeroes in one BitSet.
@@ -427,7 +427,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                 long value = longs[offset];
 
                 // unset whichBitInIndex in value
-                // to clear 3rd bit (00100 whichBitInLong) in 00101(value), & with 11011 to deserializeFrom 00001
+                // to clear 3rd bit (00100 whichBitInLong) in 00101(value), & with 11011 to get 00001
                 long updatedValue = value & ~whichBitInLong;
                 boolean isBucketEmpty = false;
                 if (updatedValue != 0) {

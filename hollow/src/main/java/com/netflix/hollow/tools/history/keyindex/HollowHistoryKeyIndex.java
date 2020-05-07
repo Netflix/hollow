@@ -18,6 +18,7 @@ package com.netflix.hollow.tools.history.keyindex;
 
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -28,7 +29,9 @@ import com.netflix.hollow.tools.history.HollowHistory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.Closeable;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -153,61 +156,62 @@ public class HollowHistoryKeyIndex {
     }
 
     private HollowReadStateEngine roundTripStateEngine(boolean isInitialUpdate, boolean isSnapshot) {
-//        HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
-//        // Use existing readStateEngine on initial update or delta;
-//        // otherwise, create new one to properly handle double snapshot
-//        HollowReadStateEngine newReadStateEngine = (isInitialUpdate || !isSnapshot)
-//                ? readStateEngine : new HollowReadStateEngine();
-//        HollowBlobReader reader = new HollowBlobReader(newReadStateEngine);
+        HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
+        // Use existing readStateEngine on initial update or delta;
+        // otherwise, create new one to properly handle double snapshot
+        HollowReadStateEngine newReadStateEngine = (isInitialUpdate || !isSnapshot)
+                ? readStateEngine : new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(newReadStateEngine);
 
-//        // Use a pipe to write and read concurrently to avoid writing
-//        // to temporary files or allocating memory
-//        // @@@ for small states it's more efficient to sequentially write to
-//        // and read from a byte array but it is tricky to estimate the size
-//        SimultaneousExecutor executor = new SimultaneousExecutor(1, HollowHistoryKeyIndex.class, "round-trip");
-//        Exception pipeException = null;
-//        // Ensure read-side is closed after completion of read
-//        try (PipedInputStream in = new PipedInputStream(1 << 15)) {
-//            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(in));
-//            executor.execute(() -> {
-//                // Ensure write-side is closed after completion of write
-//                try (Closeable ac = out) {
-//                    if (isInitialUpdate || isSnapshot) {
-//                        writer.writeSnapshot(out);
-//                    } else {
-//                        writer.writeDelta(out);
-//                    }
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            });
+        // Use a pipe to write and read concurrently to avoid writing
+        // to temporary files or allocating memory
+        // @@@ for small states it's more efficient to sequentially write to
+        // and read from a byte array but it is tricky to estimate the size
+        SimultaneousExecutor executor = new SimultaneousExecutor(1, HollowHistoryKeyIndex.class, "round-trip");
+        Exception pipeException = null;
+        // Ensure read-side is closed after completion of read
+        try (PipedInputStream in = new PipedInputStream(1 << 15)) {
+            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(in));
+            executor.execute(() -> {
+                // Ensure write-side is closed after completion of write
+                try (Closeable ac = out) {
+                    if (isInitialUpdate || isSnapshot) {
+                        writer.writeSnapshot(out);
+                    } else {
+                        writer.writeDelta(out);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
-//            BufferedInputStream bin = new BufferedInputStream(in);
-//            if (isInitialUpdate || isSnapshot) {
-//                reader.readSnapshot(bin);
-//            } else {
-//                reader.applyDelta(bin);
-//            }
-//        } catch (Exception e) {
-//            pipeException = e;
-//        }
+            BufferedInputStream bin = new BufferedInputStream(in);
+            HollowBlobInput hbi = HollowBlobInput.inputStream(bin);
+            BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_history_"));
+            if (isInitialUpdate || isSnapshot) {
+                reader.readSnapshot(hbi, debug);
+            } else {
+                reader.applyDelta(hbi, debug);
+            }
+        } catch (Exception e) {
+            pipeException = e;
+        }
 
-//        // Ensure no underlying writer exception is lost due to broken pipe
-//        try {
-//            executor.awaitSuccessfulCompletion();
-//        } catch (InterruptedException | ExecutionException e) {
-//            if (pipeException == null) {
-//                throw new RuntimeException(e);
-//            }
+        // Ensure no underlying writer exception is lost due to broken pipe
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            if (pipeException == null) {
+                throw new RuntimeException(e);
+            }
 
-//            pipeException.addSuppressed(e);
-//        }
-//        if (pipeException != null)
-//            throw new RuntimeException(pipeException);
+            pipeException.addSuppressed(e);
+        }
+        if (pipeException != null)
+            throw new RuntimeException(pipeException);
 
-//        writeStateEngine.prepareForNextCycle();
-//        return newReadStateEngine;
-        throw new UnsupportedOperationException();
+        writeStateEngine.prepareForNextCycle();
+        return newReadStateEngine;
     }
 
     private void rehashKeys() {
