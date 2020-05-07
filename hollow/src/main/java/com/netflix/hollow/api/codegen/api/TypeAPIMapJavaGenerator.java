@@ -65,11 +65,11 @@ public class TypeAPIMapJavaGenerator extends HollowTypeAPIGenerator {
         builder.append("    }\n\n");
 
         builder.append("    public ").append(typeAPIClassname(schema.getKeyType())).append(" getKeyAPI() {\n");
-        builder.append("        return getAPI().get").append(typeAPIClassname(schema.getKeyType())).append("();\n");
+        builder.append("        return getAPI().deserializeFrom").append(typeAPIClassname(schema.getKeyType())).append("();\n");
         builder.append("    }\n\n");
 
         builder.append("    public ").append(typeAPIClassname(schema.getValueType())).append(" getValueAPI() {\n");
-        builder.append("        return getAPI().get").append(typeAPIClassname(schema.getValueType())).append("();\n");
+        builder.append("        return getAPI().deserializeFrom").append(typeAPIClassname(schema.getValueType())).append("();\n");
         builder.append("    }\n\n");
 
         builder.append("    public ").append(delegateLookupClassname(schema)).append(" getDelegateLookupImpl() {\n");

@@ -19,6 +19,7 @@ package com.netflix.hollow.core.read.engine;
 import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -34,9 +35,7 @@ import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
 import java.util.Collection;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -66,7 +65,7 @@ public class HollowBlobReader {
      * @param f the RandomAccessFile to read the snapshot from
      * @throws IOException if the snapshot could not be read
      */
-    public void readSnapshot(RandomAccessFile f, BlobByteBuffer buffer, BufferedWriter debug) throws IOException {
+    public void readSnapshot(HollowBlobInput f, BlobByteBuffer buffer, BufferedWriter debug) throws IOException {
         readSnapshot(f, buffer, debug, new HollowFilterConfig(true));
     }
 
@@ -75,22 +74,22 @@ public class HollowBlobReader {
      * <p>
      * Apply the provided {@link HollowFilterConfig} to the state.
      *
-     * @param raf the RandomAccessFile to read the snaptshot from
+     * @param f the input stream or file to read the snapshot from
      * @param filter the filtering configuration to filter the snapshot
      * @throws IOException if the snapshot could not be read
      */
-    public void readSnapshot(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, HollowFilterConfig filter) throws IOException {
-        HollowBlobHeader header = readHeader(raf, false);
+    public void readSnapshot(HollowBlobInput in, BufferedWriter debug, HollowFilterConfig filter) throws IOException {
+        HollowBlobHeader header = readHeader(in, false);
 
         notifyBeginUpdate();
 
         long startTime = System.currentTimeMillis();
 
-        int numStates = VarInt.readVInt(raf);
+        int numStates = VarInt.readVInt(in);
 
         Collection<String> typeNames = new TreeSet<>();
         for(int i=0;i<numStates;i++) {
-            String typeName = readTypeFileSnapshot(raf, buffer, debug, header, filter);
+            String typeName = readTypeFileSnapshot(in, debug, header, filter);
             typeNames.add(typeName);
         }
 
@@ -106,7 +105,7 @@ public class HollowBlobReader {
         stateEngine.afterInitialization();
     }
 
-    private HollowBlobHeader readHeader(RandomAccessFile f, boolean isDelta) throws IOException {
+    private HollowBlobHeader readHeader(HollowBlobInput f, boolean isDelta) throws IOException {
         HollowBlobHeader header = headerReader.readHeader(f);
 
         if(isDelta && header.getOriginRandomizedTag() != stateEngine.getCurrentRandomizedTag())
@@ -133,45 +132,45 @@ public class HollowBlobReader {
         }
     }
 
-    private String readTypeFileSnapshot(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, HollowBlobHeader header, HollowFilterConfig filter) throws IOException {
-        HollowSchema schema = HollowSchema.readFrom(raf);
+    private String readTypeFileSnapshot(HollowBlobInput in, BufferedWriter debug, HollowBlobHeader header, HollowFilterConfig filter) throws IOException {
+        HollowSchema schema = HollowSchema.readFrom(in);
 
-        int numShards = readNumShards(raf);
+        int numShards = readNumShards(in);
 
         if(schema instanceof HollowObjectSchema) {
-            if(!filter.includes(typeName)) {
-                HollowObjectTypeReadState.discardSnapshot(is, (HollowObjectSchema)schema, numShards);
+            if(!filter.doesIncludeType(schema.getName())) {
+//                HollowObjectTypeReadState.discardSnapshot(in, (HollowObjectSchema)schema, numShards);
             } else {
                 HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
                 HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
-                populateTypeStateSnapshot(raf, buffer, debug, new HollowObjectTypeReadState(stateEngine, filteredSchema, unfilteredSchema, numShards));
+                populateTypeStateSnapshot(in, debug, new HollowObjectTypeReadState(stateEngine, filteredSchema, unfilteredSchema, numShards));
             }
         } else if (schema instanceof HollowListSchema) {
             if(!filter.includes(typeName)) {
                 HollowListTypeReadState.discardSnapshot(is, numShards);
             } else {
-                populateTypeStateSnapshot(raf, buffer, debug, new HollowListTypeReadState(stateEngine, (HollowListSchema)schema, numShards));
+                populateTypeStateSnapshot(in, debug, new HollowListTypeReadState(stateEngine, (HollowListSchema)schema, numShards));
             }
         } else if(schema instanceof HollowSetSchema) {
             if(!filter.includes(typeName)) {
                 HollowSetTypeReadState.discardSnapshot(is, numShards);
             } else {
-                populateTypeStateSnapshot(raf, buffer, debug, new HollowSetTypeReadState(stateEngine, (HollowSetSchema)schema, numShards));
+                populateTypeStateSnapshot(in, debug, new HollowSetTypeReadState(stateEngine, (HollowSetSchema)schema, numShards));
             }
         } else if(schema instanceof HollowMapSchema) {
             if(!filter.includes(typeName)) {
                 HollowMapTypeReadState.discardSnapshot(is, numShards);
             } else {
-                populateTypeStateSnapshot(raf, buffer, debug, new HollowMapTypeReadState(stateEngine, (HollowMapSchema)schema, numShards));
+                populateTypeStateSnapshot(in, debug, new HollowMapTypeReadState(stateEngine, (HollowMapSchema)schema, numShards));
             }
         }
 
         return typeName;
     }
 
-    private void populateTypeStateSnapshot(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, HollowTypeReadState typeState) throws IOException {
+    private void populateTypeStateSnapshot(HollowBlobInput in, BufferedWriter debug, HollowTypeReadState typeState) throws IOException {
         stateEngine.addTypeState(typeState);
-        typeState.readSnapshot(raf, buffer, debug, stateEngine.getMemoryRecycler());
+        typeState.readSnapshot(in, debug, stateEngine.getMemoryRecycler());
     }
 
     private String readTypeStateDelta(DataInputStream is, HollowBlobHeader header) throws IOException {
@@ -200,15 +199,15 @@ public class HollowBlobReader {
         return VarInt.readVInt(is);
     }
 
-    private int readNumShards(RandomAccessFile raf) throws IOException {
-        int backwardsCompatibilityBytes = VarInt.readVInt(raf);
+    private int readNumShards(HollowBlobInput in) throws IOException {
+        int backwardsCompatibilityBytes = VarInt.readVInt(in);
 
         if(backwardsCompatibilityBytes == 0)
             return 1;  /// produced by a version of hollow prior to 2.1.0, always only 1 shard.
 
-        skipForwardsCompatibilityBytes(raf);
+        skipForwardsCompatibilityBytes(in);
 
-        return VarInt.readVInt(raf);
+        return VarInt.readVInt(in);
     }
         
     private void skipForwardsCompatibilityBytes(DataInputStream is) throws IOException {
@@ -220,10 +219,10 @@ public class HollowBlobReader {
             bytesToSkip -= skippedBytes;
         }
     }
-    private void skipForwardsCompatibilityBytes(RandomAccessFile raf) throws IOException {
-        int bytesToSkip = VarInt.readVInt(raf);
+    private void skipForwardsCompatibilityBytes(HollowBlobInput in) throws IOException {
+        int bytesToSkip = VarInt.readVInt(in);
         while(bytesToSkip > 0) {
-            int skippedBytes = (int)raf.skipBytes(bytesToSkip);
+            int skippedBytes = (int)in.skipBytes(bytesToSkip);
             if(skippedBytes < 0)
                 throw new EOFException();
             bytesToSkip -= skippedBytes;

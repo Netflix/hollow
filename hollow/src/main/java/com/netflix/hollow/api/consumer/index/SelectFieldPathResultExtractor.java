@@ -128,7 +128,7 @@ final class SelectFieldPathResultExtractor<T> {
             try {
                 selectInstantiate = MethodHandles.lookup().findVirtual(
                         apiType,
-                        "get" + selectType.getSimpleName(),
+                        "deserializeFrom" + selectType.getSimpleName(),
                         MethodType.methodType(selectType, int.class));
             } catch (NoSuchMethodException | IllegalAccessException e) {
                 throw new IllegalArgumentException(

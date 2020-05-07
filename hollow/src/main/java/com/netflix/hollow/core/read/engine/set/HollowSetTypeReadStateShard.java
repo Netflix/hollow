@@ -23,9 +23,6 @@ import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.engine.SetMapKeyHasher;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.BitSet;
 
 class HollowSetTypeReadStateShard {
@@ -42,7 +39,7 @@ class HollowSetTypeReadStateShard {
 
         // try {
         //     BufferedWriter diag = new BufferedWriter(new FileWriter("/tmp/diag-set-" + count++));
-        //     this.currentDataVolatile.setPointerAndSizeArray.pp(diag);
+        //     this.currentDataVolatile.setPointerAndSizeData.pp(diag);
         //     diag.flush();
         // } catch (IOException e) {
         //     throw new UnsupportedOperationException();
@@ -50,7 +47,7 @@ class HollowSetTypeReadStateShard {
 
         do {
             currentData = this.currentDataVolatile;
-            size = (int)currentData.setPointerAndSizeArray.getElementValue(((long)ordinal * currentData.bitsPerFixedLengthSetPortion) + currentData.bitsPerSetPointer, currentData.bitsPerSetSizeValue);
+            size = (int)currentData.setPointerAndSizeData.getElementValue(((long)ordinal * currentData.bitsPerFixedLengthSetPortion) + currentData.bitsPerSetPointer, currentData.bitsPerSetSizeValue);
         } while(readWasUnsafe(currentData));
 
         return size;
@@ -69,7 +66,7 @@ class HollowSetTypeReadStateShard {
                 currentData = this.currentDataVolatile;
 
                 startBucket = getAbsoluteBucketStart(currentData, ordinal);
-                endBucket = currentData.setPointerAndSizeArray.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
+                endBucket = currentData.setPointerAndSizeData.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
             } while(readWasUnsafe(currentData));
 
             hashCode = HashCodes.hashInt(hashCode);
@@ -107,7 +104,7 @@ class HollowSetTypeReadStateShard {
                 currentData = this.currentDataVolatile;
 
                 startBucket = getAbsoluteBucketStart(currentData, ordinal);
-                endBucket = currentData.setPointerAndSizeArray.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
+                endBucket = currentData.setPointerAndSizeData.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
             } while(readWasUnsafe(currentData));
 
             long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
@@ -153,11 +150,11 @@ class HollowSetTypeReadStateShard {
     }
 
     private long getAbsoluteBucketStart(HollowSetTypeDataElements currentData, int ordinal) {
-        return ordinal == 0 ? 0 : currentData.setPointerAndSizeArray.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
+        return ordinal == 0 ? 0 : currentData.setPointerAndSizeData.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
     }
 
     private int absoluteBucketValue(HollowSetTypeDataElements currentData, long absoluteBucketIndex) {
-        return (int)currentData.elementArray.getElementValue(absoluteBucketIndex * currentData.bitsPerElement, currentData.bitsPerElement);
+        return (int)currentData.elementData.getElementValue(absoluteBucketIndex * currentData.bitsPerElement, currentData.bitsPerElement);
     }
     
     void invalidate() {

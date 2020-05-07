@@ -153,7 +153,7 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
      */
     private void addToSetIfNotPrimitiveOrCollection(Set<String> schemaNameSet, String... schemaNames) {
         for (String schemaName : schemaNames) {
-            // collections schemas get brought in by a star import
+            // collections schemas deserializeFrom brought in by a star import
             if (!HollowCodeGenerationUtils.isCollectionType(schemaName, dataset) &&
                     !HollowCodeGenerationUtils.isPrimitiveType(schemaName)) {
                 schemaNameSet.add(schemaName);

@@ -315,7 +315,7 @@ public class ThreadSafeBitSet {
             } else {
                 /// If we "lose the race" and are growing the ThreadSafeBitSet segments larger,
                 /// then we will gather the new canonical sets from the update which we missed on the next iteration of this loop.
-                /// Newly defined segments in newVisibleSegments will be discarded, they do not get to become canonical.
+                /// Newly defined segments in newVisibleSegments will be discarded, they do not deserializeFrom to become canonical.
                 visibleSegments = segments.get();
             }
         }

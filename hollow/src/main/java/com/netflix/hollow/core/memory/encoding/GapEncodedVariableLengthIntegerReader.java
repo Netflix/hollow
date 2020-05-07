@@ -18,6 +18,7 @@ package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.util.IOUtils;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -91,12 +92,11 @@ public class GapEncodedVariableLengthIntegerReader {
         data.writeTo(os, 0, numBytes);
     }
 
-    public static GapEncodedVariableLengthIntegerReader readEncodedDeltaOrdinals(DataInputStream dis, ArraySegmentRecycler memoryRecycler) throws IOException {
-        throw new UnsupportedOperationException();
-        // SegmentedByteArray arr = new SegmentedByteArray(memoryRecycler);
-        // long numBytesEncodedOrdinals = VarInt.readVLong(dis);
-        // arr.readFrom(dis, numBytesEncodedOrdinals);
-        // return new GapEncodedVariableLengthIntegerReader(arr, (int)numBytesEncodedOrdinals);
+    public static GapEncodedVariableLengthIntegerReader readEncodedDeltaOrdinals(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
+        SegmentedByteArray arr = new SegmentedByteArray(memoryRecycler);
+        long numBytesEncodedOrdinals = VarInt.readVLong(in);
+        arr.loadFrom(in, numBytesEncodedOrdinals);
+        return new GapEncodedVariableLengthIntegerReader(arr, (int)numBytesEncodedOrdinals);
     }
 
     public static void copyEncodedDeltaOrdinals(DataInputStream is, DataOutputStream... os) throws IOException {
@@ -104,10 +104,10 @@ public class GapEncodedVariableLengthIntegerReader {
         IOUtils.copyBytes(is, os, numBytesEncodedOrdinals);
     }
 
-    public static void discardEncodedDeltaOrdinals(DataInputStream dis) throws IOException {
-        long numBytesToSkip = VarInt.readVLong(dis);
+    public static void discardEncodedDeltaOrdinals(HollowBlobInput in) throws IOException {
+        long numBytesToSkip = VarInt.readVLong(in);
         while(numBytesToSkip > 0) {
-            numBytesToSkip -= dis.skip(numBytesToSkip);
+            numBytesToSkip -= in.skipBytes(numBytesToSkip);
         }
     }
 

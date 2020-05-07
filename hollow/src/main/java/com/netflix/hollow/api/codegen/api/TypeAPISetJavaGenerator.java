@@ -65,7 +65,7 @@ public class TypeAPISetJavaGenerator extends HollowTypeAPIGenerator {
         builder.append("    }\n\n");
 
         builder.append("    public ").append(typeAPIClassname(schema.getElementType())).append(" getElementAPI() {\n");
-        builder.append("        return getAPI().get").append(typeAPIClassname(schema.getElementType())).append("();\n");
+        builder.append("        return getAPI().deserializeFrom").append(typeAPIClassname(schema.getElementType())).append("();\n");
         builder.append("    }\n\n");
 
         builder.append("    public ").append(apiClassname).append(" getAPI() {\n");

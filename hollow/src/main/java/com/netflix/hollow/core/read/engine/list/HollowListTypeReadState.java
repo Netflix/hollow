@@ -20,9 +20,9 @@ import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowListSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
-import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -38,8 +38,6 @@ import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
 import java.util.BitSet;
 
 /**
@@ -72,57 +70,56 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     }
 
     @Override
-    public void readSnapshot(RandomAccessFile raf, BlobByteBuffer buffer, BufferedWriter debug, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void readSnapshot(HollowBlobInput in, BufferedWriter debug, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
-            maxOrdinal = VarInt.readVInt(raf);
+            maxOrdinal = VarInt.readVInt(in);
         
         for(int i=0;i<shards.length;i++) {
             HollowListTypeDataElements snapshotData = new HollowListTypeDataElements(memoryRecycler);
-            snapshotData.readSnapshot(raf, buffer, debug);
+            snapshotData.readSnapshot(in, debug);
             shards[i].setCurrentData(snapshotData);
         }
         
         if(shards.length == 1)
             maxOrdinal = shards[0].currentDataElements().maxOrdinal;
         
-        SnapshotPopulatedOrdinalsReader.readOrdinals(raf, stateListeners);
+        SnapshotPopulatedOrdinalsReader.readOrdinals(in, stateListeners);
     }
 
     @Override
-    public void applyDelta(DataInputStream dis, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException {
-//        if(shards.length > 1)
-//            maxOrdinal = VarInt.readVInt(dis);
-//
-//        for(int i=0; i<shards.length; i++) {
-//            HollowListTypeDataElements deltaData = new HollowListTypeDataElements(memoryRecycler);
-//            HollowListTypeDataElements nextData = new HollowListTypeDataElements(memoryRecycler);
-//            deltaData.readDelta(dis);
-//            HollowListTypeDataElements oldData = shards[i].currentDataElements();
-//            nextData.applyDelta(oldData, deltaData);
-//            shards[i].setCurrentData(nextData);
-//            notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
-//            deltaData.destroy();
-//            oldData.destroy();
-//            stateEngine.getMemoryRecycler().swap();
-//        }
-//
-//        if(shards.length == 1)
-//            maxOrdinal = shards[0].currentDataElements().maxOrdinal;
-        throw new UnsupportedOperationException();
+    public void applyDelta(HollowBlobInput in, BufferedWriter debug, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException {
+        if(shards.length > 1)
+            maxOrdinal = VarInt.readVInt(in);
+
+        for(int i=0; i<shards.length; i++) {
+            HollowListTypeDataElements deltaData = new HollowListTypeDataElements(memoryRecycler);
+            HollowListTypeDataElements nextData = new HollowListTypeDataElements(memoryRecycler);
+            deltaData.readDelta(in, debug);
+            HollowListTypeDataElements oldData = shards[i].currentDataElements();
+            nextData.applyDelta(oldData, deltaData);
+            shards[i].setCurrentData(nextData);
+            notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+            deltaData.destroy();
+            oldData.destroy();
+            stateEngine.getMemoryRecycler().swap();
+        }
+
+        if(shards.length == 1)
+            maxOrdinal = shards[0].currentDataElements().maxOrdinal;
     }
 
-    public static void discardSnapshot(DataInputStream dis, int numShards) throws IOException {
-        discardType(dis, numShards, false);
+    public static void discardSnapshot(HollowBlobInput in, int numShards) throws IOException {
+        discardType(in, numShards, false);
     }
 
-    public static void discardDelta(DataInputStream dis, int numShards) throws IOException {
-        discardType(dis, numShards, true);
+    public static void discardDelta(HollowBlobInput in, int numShards) throws IOException {
+        discardType(in, numShards, true);
     }
 
-    public static void discardType(DataInputStream dis, int numShards, boolean delta) throws IOException {
-        HollowListTypeDataElements.discardFromStream(dis, numShards, delta);
+    public static void discardType(HollowBlobInput in, int numShards, boolean delta) throws IOException {
+        HollowListTypeDataElements.discardFromStream(in, numShards, delta);
         if(!delta)
-            SnapshotPopulatedOrdinalsReader.discardOrdinals(dis);
+            SnapshotPopulatedOrdinalsReader.discardOrdinals(in);
     }
 
     @Override

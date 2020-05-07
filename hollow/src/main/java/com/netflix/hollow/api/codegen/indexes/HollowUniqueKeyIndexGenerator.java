@@ -125,7 +125,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
         builder.append("        int ordinal = idx.getMatchingOrdinal(keys);\n");
         builder.append("        if(ordinal == -1)\n");
         builder.append("            return null;\n");
-        builder.append("        return api.get" + hollowImplClassname(type) + "(ordinal);\n");
+        builder.append("        return api.deserializeFrom" + hollowImplClassname(type) + "(ordinal);\n");
         builder.append("    }\n\n");
     }
 

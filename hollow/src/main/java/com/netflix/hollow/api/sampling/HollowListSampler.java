@@ -76,7 +76,7 @@ public class HollowListSampler implements HollowSampler {
     public Collection<SampleResult> getSampleResults() {
         List<SampleResult> results = new ArrayList<SampleResult>();
         results.add(new SampleResult(typeName + ".size()", sizeSamples));
-        results.add(new SampleResult(typeName + ".get()", getSamples));
+        results.add(new SampleResult(typeName + ".deserializeFrom()", getSamples));
         results.add(new SampleResult(typeName + ".iterator()", iteratorSamples));
         return results;
     }

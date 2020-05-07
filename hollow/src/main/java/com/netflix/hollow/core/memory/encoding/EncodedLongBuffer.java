@@ -17,17 +17,15 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
-import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.SegmentedLongArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
-import sun.misc.Unsafe;
 
 /**
- * Each record in Hollow begins with a fixed-length number of bits.  At the lowest level, these bits 
- * are held in long arrays using the class FixedLengthElementArray.  This class allows for storage 
- * and retrieval of fixed-length data in a range of bits.  For example, if a FixedLengthElementArray 
+ * Each record in Hollow begins with a fixed-length number of bits.  At the lowest level, these bits
+ * are held in long arrays using the class FixedLengthElementArray.  This class allows for storage
+ * and retrieval of fixed-length data in a range of bits.  For example, if a FixedLengthElementArray
  * was queried for the 6-bit value starting at bit 7 in the following example range of bits:
  * <pre>
  *     0001000100100001101000010100101001111010101010010010101
@@ -35,9 +33,7 @@ import sun.misc.Unsafe;
  * <p>
  * The value 100100 in binary, or 36 in base 10, would be returned.
  * <p>
- * Note that for performance reasons, this class makes use of {@code sun.misc.Unsafe} to perform
- * unaligned memory reads.  This is designed exclusively for little-endian architectures, and has only been
- * fully battle-tested on x86-64.
+ * // SNAP: TODO: Update doc
  * As a result there two ways to obtain an element value from the bit string at a given bit index.  The first,
  * using {@link #getElementValue(long, int)} or {@link #getElementValue(long, int, long)}, leverages unsafe unaligned
  * (or misaligned) memory reads of {@code long} values from {@code long[]} array segments at byte index offsets within
@@ -59,46 +55,15 @@ import sun.misc.Unsafe;
  * result in missing the 2 most significant bits located at byte index 15.
  */
 @SuppressWarnings("restriction")
-public class FixedLengthElementArray extends SegmentedLongArray implements FixedLengthData {
+public class EncodedLongBuffer implements FixedLengthData {
 
-    private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
+    private static int debug_count = 0;
 
-    private final int log2OfSegmentSizeInBytes;
-    private final int byteBitmask;
+    private BlobByteBuffer bufferView;
+    private long maxLongs = -1;
+    private long maxByteIndex = -1;
 
-    public FixedLengthElementArray(ArraySegmentRecycler memoryRecycler, long numBits) {
-        super(memoryRecycler, ((numBits - 1) >>> 6) + 1);
-        this.log2OfSegmentSizeInBytes = log2OfSegmentSize + 3;
-        this.byteBitmask = (1 << log2OfSegmentSizeInBytes) - 1;
-    }
-
-    @Override
-    public void clearElementValue(long index, int bitsPerElement) {
-        long whichLong = index >>> 6;
-        int whichBit = (int) (index & 0x3F);
-
-        long mask = ((1L << bitsPerElement) - 1);
-
-        set(whichLong, get(whichLong) & ~(mask << whichBit));
-
-        int bitsRemaining = 64 - whichBit;
-
-        if (bitsRemaining < bitsPerElement)
-            set(whichLong + 1, get(whichLong + 1) & ~(mask >>> bitsRemaining));
-    }
-
-    @Override
-    public void setElementValue(long index, int bitsPerElement, long value) {
-        long whichLong = index >>> 6;
-        int whichBit = (int) (index & 0x3F);
-
-        set(whichLong, get(whichLong) | (value << whichBit));
-
-        int bitsRemaining = 64 - whichBit;
-
-        if (bitsRemaining < bitsPerElement)
-            set(whichLong + 1, get(whichLong + 1) | (value >>> bitsRemaining));
-    }
+    public EncodedLongBuffer() {}
 
     /**
      * Gets an element value, comprising of {@code bitsPerElement} bits, at the given
@@ -129,16 +94,14 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
      */
     @Override
     public long getElementValue(long index, int bitsPerElement, long mask) {
+
         long whichByte = index >>> 3;
         int whichBit = (int) (index & 0x07);
 
-        int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
+        debug_count ++;
 
-        long[] segment = segments[whichSegment];
-        long elementByteOffset = (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (whichByte & byteBitmask);
-        long longVal = unsafe.getLong(segment, elementByteOffset);
-        long l = longVal >>> whichBit;
-
+        long longVal = this.bufferView.getLong(this.bufferView.position() + whichByte);
+        long l =  longVal >>> whichBit;
         return l & mask;
     }
 
@@ -176,6 +139,7 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
      */
     @Override
     public long getLargeElementValue(long index, int bitsPerElement, long mask) {
+
         long whichLong = index >>> 6;
         int whichBit = (int) (index & 0x3F);
 
@@ -191,73 +155,98 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
         return l & mask;
     }
 
-    @Override
-    public void copyBits(FixedLengthData copyFrom, long sourceStartBit, long destStartBit, long numBits) {
-        if(numBits == 0)
+    /**
+     * Get the value of the byte at the specified index.
+     *
+     * @param index the index (in multiples of 8 bytes)
+     * @return the byte value
+     */
+    private long get(long index) {
+        if (this.bufferView == null) {
+            throw new IllegalStateException("Type is queried before it has been read in");
+        }
+
+        long byteIndex = 8 * index;
+        if (byteIndex > this.maxByteIndex) {  // it's illegal to read a byte starting past the last byte boundary of data
+            throw new IllegalStateException();
+        }
+        return this.bufferView.getLong(bufferView.position() + byteIndex);
+    }
+
+    private void loadFrom(HollowBlobInput in, long numLongs) throws IOException {
+        BlobByteBuffer buffer = in.getBuffer();
+        this.maxLongs = numLongs;
+        this.maxByteIndex = this.maxLongs * 64 - 8; // SNAP: should we work this into bufferView capacity?
+
+        if(numLongs == 0)
             return;
-        
-        if ((destStartBit & 63) != 0) {
-            int fillBits = (int) Math.min(64 - (destStartBit & 63), numBits);
-            long fillValue = copyFrom.getLargeElementValue(sourceStartBit, fillBits);
-            setElementValue(destStartBit, fillBits, fillValue);
 
-            destStartBit += fillBits;
-            sourceStartBit += fillBits;
-            numBits -= fillBits;
-        }
-
-        long currentWriteLong = destStartBit >>> 6;
-
-        while (numBits >= 64) {
-            long l = copyFrom.getLargeElementValue(sourceStartBit, 64, -1);
-            set(currentWriteLong, l);
-            numBits -= 64;
-            sourceStartBit += 64;
-            currentWriteLong++;
-        }
-
-        if (numBits != 0) {
-            destStartBit = currentWriteLong << 6;
-
-            long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) numBits);
-            setElementValue(destStartBit, (int) numBits, fillValue);
-        }
+        buffer.position(in.getFilePointer());
+        this.bufferView = buffer.duplicate();
+        buffer.position(buffer.position() + numLongs*8);
+        in.seek(in.getFilePointer() + (numLongs  * 8));
     }
 
     @Override
-    public void incrementMany(long startBit, long increment, long bitsBetweenIncrements, int numIncrements) {
-        long endBit = startBit + (bitsBetweenIncrements * numIncrements);
-        for(; startBit<endBit; startBit += bitsBetweenIncrements) {
-            increment(startBit, increment);
-        }
+    public void setElementValue(long index, int bitsPerElement, long value) {
+        throw new UnsupportedOperationException("Not supported in shared-memory mode");
     }
 
-    public void increment(long index, long increment) {
-        long whichByte = index >>> 3;
-        int whichBit = (int) (index & 0x07);
-
-        int whichSegment = (int) (whichByte >>> log2OfSegmentSizeInBytes);
-
-        long[] segment = segments[whichSegment];
-        long elementByteOffset = (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (whichByte & byteBitmask);
-        long l = unsafe.getLong(segment, elementByteOffset);
-
-        unsafe.putOrderedLong(segment, elementByteOffset, l + (increment << whichBit));
-
-        /// update the fencepost longs
-        if((whichByte & byteBitmask) > bitmask * 8 && (whichSegment + 1) < segments.length)
-            unsafe.putOrderedLong(segments[whichSegment + 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET, segments[whichSegment][bitmask + 1]);
-        if((whichByte & byteBitmask) < 8 && whichSegment > 0)
-            unsafe.putOrderedLong(segments[whichSegment - 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (bitmask + 1)), segments[whichSegment][0]);
+    @Override
+    public void copyBits(FixedLengthData copyFrom, long sourceStartBit, long destStartBit, long numBits){
+        throw new UnsupportedOperationException("Not supported in shared-memory mode");
     }
 
+    @Override
+    public void incrementMany(long startBit, long increment, long bitsBetweenIncrements, int numIncrements){
+        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+    }
 
-    public static FixedLengthElementArray deserializeFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler)
-            throws IOException {
+    @Override
+    public void clearElementValue(long index, int bitsPerElement) {
+        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+    }
 
+    // returns a EncodedLongBuffer that contains deserialized data from given file
+    public static EncodedLongBuffer deserializeFrom(HollowBlobInput in) throws IOException {
         long numLongs = VarInt.readVLong(in);
-        FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, numLongs * 64);
-        arr.readFrom(in, memoryRecycler, numLongs);
-        return arr;
+        EncodedLongBuffer buf = new EncodedLongBuffer();
+        buf.loadFrom(in, numLongs);
+        return buf;
     }
+
+
+    // debug utility: pretty print
+//    public void pp(BufferedWriter debug) throws IOException {
+//        StringBuffer pp = new StringBuffer();
+//
+//        int segmentSize = 1 << log2OfSegmentSize;
+//        long maxIndex = segments.length * segmentSize;
+//
+//
+//        pp.append("\n\n FixedLengthElementArray deserializeFrom()s =>");
+//        for (int g = 0; g < maxIndex; g ++) {
+//            long v = deserializeFrom(g);
+//            pp.append(v + " ");
+//        }
+//
+//        pp.append("\n");
+//        pp.append("\n FixedLengthElementArray raw bytes underneath:\n");
+//        for (int i = 0; i < segments.length; i ++) {
+//            if (segments[i] == null) {
+//                pp.append("- - - - - NULL - - - - ");
+//                pp.append("\n");
+//                continue;
+//            }
+//
+//            pp.append(String.format("FixedLengthElementArray i= %d/%d => ", i, segments.length-1));
+//
+//            for (int j = 0; j < segmentSize; j ++ ) {
+//                long v = segments[i].deserializeFrom(segments[i].position() + j);
+//                pp.append(v + " ");
+//            }
+//            pp.append("\n");
+//        }
+//        debug.append(pp.toString());
+//    }
 }

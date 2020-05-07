@@ -18,6 +18,7 @@ package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -188,15 +189,15 @@ public class VarInt {
         return value;
     }
 
-    public static int readVInt(RandomAccessFile raf) throws IOException {
-        byte b = (byte)raf.read();
+    public static int readVInt(HollowBlobInput in) throws IOException {
+        byte b = (byte)in.read();
 
         if(b == (byte) 0x80)
             throw new RuntimeException("Attempting to read null value as int");
 
         int value = b & 0x7F;
         while ((b & 0x80) != 0) {
-            b = (byte)raf.read();
+            b = (byte)in.read();
             value <<= 7;
             value |= (b & 0x7F);
         }
@@ -270,15 +271,15 @@ public class VarInt {
         return value;
     }
 
-    public static long readVLong(RandomAccessFile raf) throws IOException {
-        byte b = (byte)raf.read();
+    public static long readVLong(HollowBlobInput in) throws IOException {
+        byte b = (byte)in.read();
 
         if(b == (byte) 0x80)
             throw new RuntimeException("Attempting to read null value as long");
 
         long value = b & 0x7F;
         while ((b & 0x80) != 0) {
-            b = (byte)raf.read();
+            b = (byte)in.read();
             value <<= 7;
             value |= (b & 0x7F);
         }
