@@ -8,6 +8,7 @@ import com.netflix.hollow.core.api.gen.topn.TopNAPI;
 import com.netflix.hollow.core.api.gen.topn.TopNAttribute;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -15,6 +16,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -57,11 +59,9 @@ public class ReadStateEngineTest {
 
         readState = new HollowReadStateEngine();
         HollowBlobReader fileReader = new HollowBlobReader(readState);
-        HollowBlobInput in = new RandomAccessFile(TEST_FILE_TOPN, "r");
-        FileChannel channel = raf.getChannel(); // Map MappedByteBuffer once, pass it everywhere
-        BlobByteBuffer monolithicBuffer = BlobByteBuffer.mmapBlob(channel); //   channel.map(FileChannel.MapMode.READ_ONLY, 0, raf.length());
+        HollowBlobInput in = HollowBlobInput.randomAccessFile(new File(TEST_FILE_TOPN));
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_new"));
-        fileReader.readSnapshot(in, monolithicBuffer, debug);
+        fileReader.readSnapshot(in, debug);
         debug.flush();
         System.out.println("SNAP: Done setup");
     }
