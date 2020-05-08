@@ -79,60 +79,12 @@ public class HollowBlobHeaderReader {
         return header;
     }
 
-    public HollowBlobHeader readHeader(InputStream is) throws IOException {
-        HollowBlobHeader header = new HollowBlobHeader();
-        DataInputStream dis = new DataInputStream(is);
-
-        int headerVersion = dis.readInt();
-        if(headerVersion != HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER) {
-            throw new IOException("The HollowBlob you are trying to read is incompatible.  "
-                    + "The expected Hollow blob version was " + HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER + " but the actual version was " + headerVersion);
-        }
-
-        header.setBlobFormatVersion(headerVersion);
-
-        header.setOriginRandomizedTag(dis.readLong());
-        header.setDestinationRandomizedTag(dis.readLong());
-        
-        int oldBytesToSkip = VarInt.readVInt(is); /// pre v2.2.0 envelope
-        
-        if(oldBytesToSkip != 0) {
-            int numSchemas = VarInt.readVInt(is);
-            
-            List<HollowSchema> schemas = new ArrayList<HollowSchema>();
-            for(int i=0;i<numSchemas;i++)
-                schemas.add(HollowSchema.readFrom(is));
-            header.setSchemas(schemas);
-
-            int bytesToSkip = VarInt.readVInt(is); /// forwards-compatibility, new data can be added here.
-            while(bytesToSkip > 0) {
-                int skippedBytes = (int)is.skip(bytesToSkip);
-                if(skippedBytes < 0)
-                    throw new EOFException();
-                bytesToSkip -= skippedBytes;
-            }
-        }
-
-        Map<String, String> headerTags = readHeaderTags(dis);
-        header.setHeaderTags(headerTags);
-
-        return header;
-    }
-
     /**
      * Map of string header tags reading.
      *
-     * @param dis
+     * @param in the Hollow blob input
      * @throws IOException
      */
-    private Map<String, String> readHeaderTags(DataInputStream dis) throws IOException {
-        int numHeaderTags = dis.readShort();
-        Map<String, String> headerTags = new HashMap<String, String>();
-        for (int i = 0; i < numHeaderTags; i++) {
-            headerTags.put(dis.readUTF(), dis.readUTF());
-        }
-        return headerTags;
-    }
     private Map<String, String> readHeaderTags(HollowBlobInput in) throws IOException {
         int numHeaderTags = in.readShort();
         Map<String, String> headerTags = new HashMap<String, String>();

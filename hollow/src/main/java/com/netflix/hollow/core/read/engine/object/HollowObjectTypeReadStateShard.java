@@ -479,7 +479,7 @@ class HollowObjectTypeReadStateShard {
         
         for(int i=0;i<currentData.varLengthData.length;i++) {
             if(currentData.varLengthData[i] != null)
-                requiredBytes += 1; // SNAP: currentData.varLengthData[i].size();
+                requiredBytes += currentData.varLengthData[i].size();
         }
         
         return requiredBytes;

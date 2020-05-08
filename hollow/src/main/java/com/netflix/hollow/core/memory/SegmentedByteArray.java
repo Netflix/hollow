@@ -308,6 +308,7 @@ public class SegmentedByteArray implements VariableLengthData {
         }
     }
 
+    @Override
     public long size() {
         long size = 0;
         for(int i=0;i<segments.length;i++) {

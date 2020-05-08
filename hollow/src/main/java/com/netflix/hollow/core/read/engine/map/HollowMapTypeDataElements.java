@@ -16,18 +16,13 @@
  */
 package com.netflix.hollow.core.read.engine.map;
 
-import com.netflix.hollow.core.memory.EncodedByteBuffer;
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.memory.FixedLengthDataMode;
-import com.netflix.hollow.core.memory.SegmentedByteArray;
-import com.netflix.hollow.core.memory.encoding.EncodedLongBuffer;
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.IOException;
 
 /**

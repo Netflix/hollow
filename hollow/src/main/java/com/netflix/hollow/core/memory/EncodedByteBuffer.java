@@ -19,6 +19,7 @@ package com.netflix.hollow.core.memory;
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 // SNAP: TODO: @SuppressWarnings("restriction")
 public class EncodedByteBuffer implements VariableLengthData {
@@ -69,6 +70,11 @@ public class EncodedByteBuffer implements VariableLengthData {
     @Override
     public void orderedCopy(VariableLengthData src, long srcPos, long destPos, long length) {
         throw new UnsupportedOperationException("Operation not supported in shared-memory mode");
+    }
+
+    @Override
+    public long size() {
+        return 1; // SNAP: TODO: implement this for running explorer
     }
 
 // SNAP:
