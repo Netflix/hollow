@@ -18,6 +18,7 @@ package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -167,11 +168,11 @@ public class VarInt {
 
     /**
      * Read a variable length integer from the supplied InputStream
-     * @param in the input stream to read from
+     * @param in the Hollow blob input to read from
      * @return the int value
-     * @throws IOException if the value cannot be read from the input stream
+     * @throws IOException if the value cannot be read from the input
      */
-    public static int readVInt(InputStream in) throws IOException {
+    public static int readVInt(HollowBlobInput in) throws IOException {
         byte b = (byte)in.read();
 
         if(b == (byte) 0x80)
@@ -179,9 +180,9 @@ public class VarInt {
 
         int value = b & 0x7F;
         while ((b & 0x80) != 0) {
-          b = (byte)in.read();
-          value <<= 7;
-          value |= (b & 0x7F);
+            b = (byte)in.read();
+            value <<= 7;
+            value |= (b & 0x7F);
         }
 
         return value;
@@ -233,11 +234,11 @@ public class VarInt {
 
     /**
      * Read a variable length long from the supplied InputStream.
-     * @param in the input stream to read from
+     * @param in the Hollow blob input to read from
      * @return the long value
-     * @throws IOException if the value cannot be read from the input stream
+     * @throws IOException if the value cannot be read from the input
      */
-    public static long readVLong(InputStream in) throws IOException {
+    public static long readVLong(HollowBlobInput in) throws IOException {
         byte b = (byte)in.read();
 
         if(b == (byte) 0x80)
@@ -245,9 +246,9 @@ public class VarInt {
 
         long value = b & 0x7F;
         while ((b & 0x80) != 0) {
-          b = (byte)in.read();
-          value <<= 7;
-          value |= (b & 0x7F);
+            b = (byte)in.read();
+            value <<= 7;
+            value |= (b & 0x7F);
         }
 
         return value;

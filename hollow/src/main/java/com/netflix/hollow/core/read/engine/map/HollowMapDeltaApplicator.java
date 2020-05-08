@@ -67,8 +67,8 @@ class HollowMapDeltaApplicator {
         target.emptyBucketKeyValue = delta.emptyBucketKeyValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
-        target.mapPointerAndSizeArray = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion);
-        target.entryArray = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfBuckets * target.bitsPerMapEntry);
+        target.mapPointerAndSizeData = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion);
+        target.entryData = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfBuckets * target.bitsPerMapEntry);
 
         if(target.bitsPerMapPointer == from.bitsPerMapPointer
                 && target.bitsPerMapSizeValue == from.bitsPerMapSizeValue
@@ -115,17 +115,17 @@ class HollowMapDeltaApplicator {
         long mapPointerAndSizeBitsToCopy = (long)recordsToCopy * target.bitsPerFixedLengthMapPortion;
         long eachMapPointerDifference = currentWriteStartBucket - currentFromStateStartBucket;
 
-        target.mapPointerAndSizeArray.copyBits(from.mapPointerAndSizeArray, currentFromStateCopyStartBit, currentWriteStartBit, mapPointerAndSizeBitsToCopy);
-        target.mapPointerAndSizeArray.incrementMany(currentWriteStartBit, eachMapPointerDifference, target.bitsPerFixedLengthMapPortion, recordsToCopy);
+        target.mapPointerAndSizeData.copyBits(from.mapPointerAndSizeData, currentFromStateCopyStartBit, currentWriteStartBit, mapPointerAndSizeBitsToCopy);
+        target.mapPointerAndSizeData.incrementMany(currentWriteStartBit, eachMapPointerDifference, target.bitsPerFixedLengthMapPortion, recordsToCopy);
 
         currentFromStateCopyStartBit += mapPointerAndSizeBitsToCopy;
         currentWriteStartBit += mapPointerAndSizeBitsToCopy;
 
-        long fromDataEndElement = from.mapPointerAndSizeArray.getElementValue(currentFromStateCopyStartBit - from.bitsPerFixedLengthMapPortion, from.bitsPerMapPointer);
+        long fromDataEndElement = from.mapPointerAndSizeData.getElementValue(currentFromStateCopyStartBit - from.bitsPerFixedLengthMapPortion, from.bitsPerMapPointer);
         long bucketsToCopy = fromDataEndElement - currentFromStateStartBucket;
         long bitsToCopy = bucketsToCopy * from.bitsPerMapEntry;
 
-        target.entryArray.copyBits(from.entryArray, currentFromStateStartBucket * from.bitsPerMapEntry, currentWriteStartBucket * from.bitsPerMapEntry, bitsToCopy);
+        target.entryData.copyBits(from.entryData, currentFromStateStartBucket * from.bitsPerMapEntry, currentWriteStartBucket * from.bitsPerMapEntry, bitsToCopy);
 
         currentFromStateStartBucket += bucketsToCopy;
         currentWriteStartBucket += bucketsToCopy;
@@ -140,20 +140,20 @@ class HollowMapDeltaApplicator {
         }
 
         if(ordinal <= from.maxOrdinal) {
-            long fromDataEndBucket = from.mapPointerAndSizeArray.getElementValue(currentFromStateCopyStartBit, from.bitsPerMapPointer);
+            long fromDataEndBucket = from.mapPointerAndSizeData.getElementValue(currentFromStateCopyStartBit, from.bitsPerMapPointer);
             if(!removeData) {
                 for(long bucketIdx=currentFromStateStartBucket; bucketIdx<fromDataEndBucket; bucketIdx++) {
-                    long bucketKey = from.entryArray.getElementValue(bucketIdx * from.bitsPerMapEntry, from.bitsPerKeyElement);
-                    long bucketValue = from.entryArray.getElementValue(bucketIdx * from.bitsPerMapEntry + from.bitsPerKeyElement, from.bitsPerValueElement);
+                    long bucketKey = from.entryData.getElementValue(bucketIdx * from.bitsPerMapEntry, from.bitsPerKeyElement);
+                    long bucketValue = from.entryData.getElementValue(bucketIdx * from.bitsPerMapEntry + from.bitsPerKeyElement, from.bitsPerValueElement);
                     if(bucketKey == from.emptyBucketKeyValue)
                         bucketKey = target.emptyBucketKeyValue;
                     long currentWriteStartBucketBit = currentWriteStartBucket * target.bitsPerMapEntry;
-                    target.entryArray.setElementValue(currentWriteStartBucketBit, target.bitsPerKeyElement, bucketKey);
-                    target.entryArray.setElementValue(currentWriteStartBucketBit + target.bitsPerKeyElement, target.bitsPerValueElement, bucketValue);
+                    target.entryData.setElementValue(currentWriteStartBucketBit, target.bitsPerKeyElement, bucketKey);
+                    target.entryData.setElementValue(currentWriteStartBucketBit + target.bitsPerKeyElement, target.bitsPerValueElement, bucketValue);
                     currentWriteStartBucket++;
                 }
-                long fromDataSize = from.mapPointerAndSizeArray.getElementValue(currentFromStateCopyStartBit + from.bitsPerMapPointer, from.bitsPerMapSizeValue);
-                target.mapPointerAndSizeArray.setElementValue(currentWriteStartBit + target.bitsPerMapPointer, target.bitsPerMapSizeValue, fromDataSize);
+                long fromDataSize = from.mapPointerAndSizeData.getElementValue(currentFromStateCopyStartBit + from.bitsPerMapPointer, from.bitsPerMapSizeValue);
+                target.mapPointerAndSizeData.setElementValue(currentWriteStartBit + target.bitsPerMapPointer, target.bitsPerMapSizeValue, fromDataSize);
             } else {
                 removalsReader.advance();
             }
@@ -162,19 +162,19 @@ class HollowMapDeltaApplicator {
             currentFromStateCopyStartBit += from.bitsPerFixedLengthMapPortion;
         }
 
-        target.mapPointerAndSizeArray.setElementValue(currentWriteStartBit, target.bitsPerMapPointer, currentWriteStartBucket);
+        target.mapPointerAndSizeData.setElementValue(currentWriteStartBit, target.bitsPerMapPointer, currentWriteStartBucket);
         currentWriteStartBit += target.bitsPerFixedLengthMapPortion;
     }
 
     private void addFromDelta(GapEncodedVariableLengthIntegerReader additionsReader) {
-        long deltaDataEndBucket = delta.mapPointerAndSizeArray.getElementValue(currentDeltaCopyStartBit, delta.bitsPerMapPointer);
+        long deltaDataEndBucket = delta.mapPointerAndSizeData.getElementValue(currentDeltaCopyStartBit, delta.bitsPerMapPointer);
         for(long bucketIdx=currentDeltaStartBucket; bucketIdx<deltaDataEndBucket; bucketIdx++) {
-            long bucketEntry = delta.entryArray.getElementValue(bucketIdx * delta.bitsPerMapEntry, delta.bitsPerMapEntry);
-            target.entryArray.setElementValue(currentWriteStartBucket * target.bitsPerMapEntry, target.bitsPerMapEntry, bucketEntry);
+            long bucketEntry = delta.entryData.getElementValue(bucketIdx * delta.bitsPerMapEntry, delta.bitsPerMapEntry);
+            target.entryData.setElementValue(currentWriteStartBucket * target.bitsPerMapEntry, target.bitsPerMapEntry, bucketEntry);
             currentWriteStartBucket++;
         }
-        long deltaDataSize = delta.mapPointerAndSizeArray.getElementValue(currentDeltaCopyStartBit + delta.bitsPerMapPointer, delta.bitsPerMapSizeValue);
-        target.mapPointerAndSizeArray.setElementValue(currentWriteStartBit + target.bitsPerMapPointer, target.bitsPerMapSizeValue, deltaDataSize);
+        long deltaDataSize = delta.mapPointerAndSizeData.getElementValue(currentDeltaCopyStartBit + delta.bitsPerMapPointer, delta.bitsPerMapSizeValue);
+        target.mapPointerAndSizeData.setElementValue(currentWriteStartBit + target.bitsPerMapPointer, target.bitsPerMapSizeValue, deltaDataSize);
 
         currentDeltaStartBucket = deltaDataEndBucket;
         currentDeltaCopyStartBit += delta.bitsPerFixedLengthMapPortion;

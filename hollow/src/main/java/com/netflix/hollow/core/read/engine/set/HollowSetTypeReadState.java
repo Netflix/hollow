@@ -23,8 +23,10 @@ import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowSetSampler;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
+import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -39,8 +41,11 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 import java.util.BitSet;
 
 /**
@@ -76,31 +81,31 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
     }
 
     @Override
-    public void readSnapshot(DataInputStream dis, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void readSnapshot(HollowBlobInput in, BufferedWriter debug, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
-            maxOrdinal = VarInt.readVInt(dis);
+            maxOrdinal = VarInt.readVInt(in);
         
         for(int i=0;i<shards.length;i++) {
             HollowSetTypeDataElements snapshotData = new HollowSetTypeDataElements(memoryRecycler);
-            snapshotData.readSnapshot(dis);
+            snapshotData.readSnapshot(in, debug);
             shards[i].setCurrentData(snapshotData);
         }
         
         if(shards.length == 1)
             maxOrdinal = shards[0].currentDataElements().maxOrdinal;
         
-        SnapshotPopulatedOrdinalsReader.readOrdinals(dis, stateListeners);
+        SnapshotPopulatedOrdinalsReader.readOrdinals(in, stateListeners);
     }
 
     @Override
-    public void applyDelta(DataInputStream dis, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void applyDelta(HollowBlobInput in, BufferedWriter debug, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
-            maxOrdinal = VarInt.readVInt(dis);
+            maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0;i<shards.length;i++) {
             HollowSetTypeDataElements deltaData = new HollowSetTypeDataElements(memoryRecycler);
             HollowSetTypeDataElements nextData = new HollowSetTypeDataElements(memoryRecycler);
-            deltaData.readDelta(dis);
+            deltaData.readDelta(in, debug);
             HollowSetTypeDataElements oldData = shards[i].currentDataElements();
             nextData.applyDelta(oldData, deltaData);
             shards[i].setCurrentData(nextData);
@@ -109,23 +114,23 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
             oldData.destroy();
             stateEngine.getMemoryRecycler().swap();
         }
-        
+
         if(shards.length == 1)
             maxOrdinal = shards[0].currentDataElements().maxOrdinal;
     }
 
-    public static void discardSnapshot(DataInputStream dis, int numShards) throws IOException {
-        discardType(dis, numShards, false);
+    public static void discardSnapshot(HollowBlobInput in, int numShards) throws IOException {
+        discardType(in, numShards, false);
     }
 
-    public static void discardDelta(DataInputStream dis, int numShards) throws IOException {
-        discardType(dis, numShards, true);
+    public static void discardDelta(HollowBlobInput in, int numShards) throws IOException {
+        discardType(in, numShards, true);
     }
 
-    public static void discardType(DataInputStream dis, int numShards, boolean delta) throws IOException {
-        HollowSetTypeDataElements.discardFromStream(dis, numShards, delta);
+    public static void discardType(HollowBlobInput in, int numShards, boolean delta) throws IOException {
+        HollowSetTypeDataElements.discardFromStream(in, numShards, delta);
         if(!delta)
-            SnapshotPopulatedOrdinalsReader.discardOrdinals(dis);
+            SnapshotPopulatedOrdinalsReader.discardOrdinals(in);
     }
 
     @Override

@@ -25,7 +25,7 @@ import com.netflix.hollow.core.memory.SegmentedLongArray;
 * Hollow pools and reuses memory to minimize GC effects while updating data.  
 * This pool of memory is kept arrays on the heap.  Each array in the pool has a fixed length.  
 * When a long array or a byte array is required in Hollow, it will stitch together pooled array 
-* segments as a {@link SegmentedByteArray} or {@link SegmentedLongArray}.  
+* segments as a {@link SegmentedByteArray} or {@link SegmentedLongArray}.
 * These classes encapsulate the details of treating segmented arrays as contiguous ranges of values.
 */
 public interface ArraySegmentRecycler {

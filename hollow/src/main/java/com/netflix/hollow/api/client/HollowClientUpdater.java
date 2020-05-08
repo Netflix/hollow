@@ -24,7 +24,6 @@ import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -53,7 +52,7 @@ public class HollowClientUpdater {
     private final HollowConsumerMetrics metrics;
     private final HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
 
-    private TypeFilter filter;
+    private HollowFilterConfig filter;
 
     public HollowClientUpdater(HollowConsumer.BlobRetriever transitionCreator,
                                List<HollowConsumer.RefreshListener> refreshListeners,
@@ -253,10 +252,6 @@ public class HollowClientUpdater {
     }
 
     public void setFilter(HollowFilterConfig filter) {
-        this.filter = filter;
-    }
-
-    public void setFilter(TypeFilter filter) {
         this.filter = filter;
     }
 

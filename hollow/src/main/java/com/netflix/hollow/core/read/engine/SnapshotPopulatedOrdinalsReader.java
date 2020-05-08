@@ -16,7 +16,7 @@
  */
 package com.netflix.hollow.core.read.engine;
 
-import java.io.DataInputStream;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 
 public class SnapshotPopulatedOrdinalsReader {
@@ -24,18 +24,18 @@ public class SnapshotPopulatedOrdinalsReader {
     /**
      * Read populated ordinals as a bit set from a stream, and notify a listener for each populated ordinal.
      *
-     * @param dis the data input stream
+     * @param in the Hollow blob input data
      * @param listeners the type state listeners
      * @throws IOException if the ordinals cannot be read
      * @author dkoszewnik
      */
-    public static void readOrdinals(DataInputStream dis, HollowTypeStateListener[] listeners) throws IOException {
-        int numLongs = dis.readInt();
+    public static void readOrdinals(HollowBlobInput in, HollowTypeStateListener[] listeners) throws IOException {
+        int numLongs = in.readInt();
 
         int currentOrdinal = 0;
 
         for(int i=0;i<numLongs;i++) {
-            long l = dis.readLong();
+            long l = in.readLong();
             notifyPopulatedOrdinals(l, currentOrdinal, listeners);
             currentOrdinal += 64;
         }
@@ -58,12 +58,12 @@ public class SnapshotPopulatedOrdinalsReader {
         }
     }
 
-    public static void discardOrdinals(DataInputStream dis) throws IOException {
-        long numLongs = dis.readInt();
+    public static void discardOrdinals(HollowBlobInput in) throws IOException {
+        long numLongs = in.readInt();
         long bytesToSkip = numLongs * 8;
 
         while(bytesToSkip > 0)
-            bytesToSkip -= dis.skip(bytesToSkip);
+            bytesToSkip -= in.skipBytes(bytesToSkip);
     }
 
 }

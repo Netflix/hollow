@@ -85,7 +85,6 @@ public class IntList {
         return arr;
     }
 
-    @Override
     public boolean equals(Object other) {
         if(other instanceof IntList) {
             IntList that = (IntList)other;
@@ -100,10 +99,4 @@ public class IntList {
         return false;
     }
 
-    @Override
-    public int hashCode() {
-        int result = size;
-        result = 31 * result + Arrays.hashCode(values);
-        return result;
-    }
 }

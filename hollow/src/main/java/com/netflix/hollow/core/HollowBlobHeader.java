@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Represents the header of a serialized blob.  A blob header contains the following elements:  
@@ -96,21 +95,10 @@ public class HollowBlobHeader {
     public boolean equals(Object other) {
         if(other instanceof HollowBlobHeader) {
             HollowBlobHeader oh = (HollowBlobHeader)other;
-            return blobFormatVersion == oh.blobFormatVersion
-                    && headerTags.equals(oh.getHeaderTags())
+            return headerTags.equals(oh.getHeaderTags())
                     && originRandomizedTag == oh.originRandomizedTag
                     && destinationRandomizedTag == oh.destinationRandomizedTag;
         }
         return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = blobFormatVersion;
-        result = 31 * result + Objects.hash(headerTags,
-                originRandomizedTag,
-                destinationRandomizedTag,
-                blobFormatVersion);
-        return result;
     }
 }

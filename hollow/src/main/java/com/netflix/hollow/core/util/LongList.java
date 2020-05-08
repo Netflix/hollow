@@ -55,8 +55,7 @@ public class LongList {
     public void sort() {
         Arrays.sort(values, 0, size);
     }
-
-    @Override
+    
     public boolean equals(Object other) {
         if(other instanceof LongList) {
             LongList that = (LongList)other;
@@ -71,10 +70,4 @@ public class LongList {
         return false;
     }
 
-    @Override
-    public int hashCode() {
-        int result = size;
-        result = 31 * result + Arrays.hashCode(values);
-        return result;
-    }
 }

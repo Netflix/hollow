@@ -16,8 +16,6 @@
  */
 package com.netflix.hollow.test.consumer;
 
-import com.netflix.hollow.Internal;
-import com.netflix.hollow.PublicSpi;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
@@ -57,15 +55,9 @@ import java.util.concurrent.Executor;
  * If you wish to use triggerRefreshTo instead of triggerRefresh, do not provide an
  * AnnouncementWatcher.
  */
-@PublicSpi
 public class TestHollowConsumer extends HollowConsumer {
     private final BlobRetriever blobRetriever;
 
-    /**
-     * @deprecated use {@link TestHollowConsumer.Builder}
-     */
-    @Internal
-    @Deprecated
     protected TestHollowConsumer(BlobRetriever blobRetriever,
             AnnouncementWatcher announcementWatcher,
             List<RefreshListener> refreshListeners,
@@ -82,11 +74,6 @@ public class TestHollowConsumer extends HollowConsumer {
         this.blobRetriever = blobRetriever;
     }
 
-    protected TestHollowConsumer(Builder builder) {
-        super(builder);
-        this.blobRetriever = builder.blobRetriever();
-    }
-
     public TestHollowConsumer addSnapshot(long version, HollowWriteStateEngine stateEngine) throws IOException {
         if (blobRetriever instanceof TestBlobRetriever) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -99,17 +86,21 @@ public class TestHollowConsumer extends HollowConsumer {
         return this;
     }
 
-    @PublicSpi
     public static class Builder extends HollowConsumer.Builder<Builder> {
-        protected HollowConsumer.BlobRetriever blobRetriever() {
-            return blobRetriever;
-        }
-
         @Override
         public TestHollowConsumer build() {
             checkArguments();
-            TestHollowConsumer consumer = new TestHollowConsumer(this);
-            return consumer;
+            return new TestHollowConsumer(blobRetriever,
+                    announcementWatcher,
+                    refreshListeners,
+                    apiFactory,
+                    filterConfig,
+                    objectLongevityConfig,
+                    objectLongevityDetector,
+                    doubleSnapshotConfig,
+                    hashCodeFinder,
+                    refreshExecutor,
+                    metricsCollector);
         }
     }
 }

@@ -18,11 +18,14 @@ package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.schema.HollowSchema;
+import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,41 +39,41 @@ import java.util.Map;
  */
 public class HollowBlobHeaderReader {
 
-    public HollowBlobHeader readHeader(InputStream is) throws IOException {
+    public HollowBlobHeader readHeader(HollowBlobInput in) throws IOException {
         HollowBlobHeader header = new HollowBlobHeader();
-        DataInputStream dis = new DataInputStream(is);
+        in.seek(0);
 
-        int headerVersion = dis.readInt();
+        int headerVersion = in.readInt();
         if(headerVersion != HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER) {
-            throw new IOException("The HollowBlob you are trying to read is incompatible.  "
+            throw new IOException("The HollowBlob you are trying to read using RandomAccessFile is incompatible.  "
                     + "The expected Hollow blob version was " + HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER + " but the actual version was " + headerVersion);
         }
 
         header.setBlobFormatVersion(headerVersion);
 
-        header.setOriginRandomizedTag(dis.readLong());
-        header.setDestinationRandomizedTag(dis.readLong());
-        
-        int oldBytesToSkip = VarInt.readVInt(is); /// pre v2.2.0 envelope
-        
+        header.setOriginRandomizedTag(in.readLong());
+        header.setDestinationRandomizedTag(in.readLong());
+
+        int oldBytesToSkip = VarInt.readVInt(in); /// pre v2.2.0 envelope
+
         if(oldBytesToSkip != 0) {
-            int numSchemas = VarInt.readVInt(is);
-            
+            int numSchemas = VarInt.readVInt(in);
+
             List<HollowSchema> schemas = new ArrayList<HollowSchema>();
             for(int i=0;i<numSchemas;i++)
-                schemas.add(HollowSchema.readFrom(is));
+                schemas.add(HollowSchema.readFrom(in));
             header.setSchemas(schemas);
 
-            int bytesToSkip = VarInt.readVInt(is); /// forwards-compatibility, new data can be added here.
+            int bytesToSkip = VarInt.readVInt(in); /// forwards-compatibility, new data can be added here.
             while(bytesToSkip > 0) {
-                int skippedBytes = (int)is.skip(bytesToSkip);
+                int skippedBytes = (int)in.skipBytes(bytesToSkip);
                 if(skippedBytes < 0)
                     throw new EOFException();
                 bytesToSkip -= skippedBytes;
             }
         }
 
-        Map<String, String> headerTags = readHeaderTags(dis);
+        Map<String, String> headerTags = readHeaderTags(in);
         header.setHeaderTags(headerTags);
 
         return header;
@@ -79,14 +82,14 @@ public class HollowBlobHeaderReader {
     /**
      * Map of string header tags reading.
      *
-     * @param dis
+     * @param in the Hollow blob input
      * @throws IOException
      */
-    private Map<String, String> readHeaderTags(DataInputStream dis) throws IOException {
-        int numHeaderTags = dis.readShort();
+    private Map<String, String> readHeaderTags(HollowBlobInput in) throws IOException {
+        int numHeaderTags = in.readShort();
         Map<String, String> headerTags = new HashMap<String, String>();
         for (int i = 0; i < numHeaderTags; i++) {
-            headerTags.put(dis.readUTF(), dis.readUTF());
+            headerTags.put(in.readUTF(), in.readUTF());
         }
         return headerTags;
     }

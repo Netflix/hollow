@@ -19,8 +19,6 @@ package com.netflix.hollow.api.consumer;
 import static com.netflix.hollow.core.util.Threads.daemonThread;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
-import com.netflix.hollow.PublicApi;
-import com.netflix.hollow.PublicSpi;
 import com.netflix.hollow.api.client.FailedTransitionTracker;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClientUpdater;
@@ -33,7 +31,6 @@ import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.tools.history.HollowHistory;
@@ -45,14 +42,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * A HollowConsumer is the top-level class used by consumers of Hollow data to initialize and keep up-to-date a local in-memory
@@ -61,12 +57,15 @@ import java.util.logging.Logger;
  * are provided to this class.
  * <p>
  * To obtain a HollowConsumer, you should use a builder pattern, for example:
- * <pre>{@code
- * HollowConsumer consumer = newHollowConsumer().withBlobRetriever(retriever)
- *                                              .withAnnouncementWatcher(watcher)
- *                                              .withGeneratedAPIClass(MovieAPI.class)
- *                                              .build();
- * }</pre>
+ * <pre>
+ * {@code
+ *
+ * HollowConsumer consumer = HollowConsumer.withBlobRetriever(retriever)
+ *                                         .withAnnouncementWatcher(watcher)
+ *                                         .withGeneratedAPIClass(MovieAPI.class)
+ *                                         .build();
+ * }
+ * </pre>
  * <p>
  * The following components are injectable, but only an implementation of the HollowConsumer.BlobRetriever is
  * required to be injected, all other components are optional. :
@@ -111,7 +110,6 @@ import java.util.logging.Logger;
  * </dl>
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-@PublicApi
 public class HollowConsumer {
     private static final Logger LOG = Logger.getLogger(HollowConsumer.class.getName());
 
@@ -122,10 +120,6 @@ public class HollowConsumer {
 
     private final Executor refreshExecutor;
 
-    /**
-     * @deprecated use {@link HollowConsumer.Builder}
-     */
-    @Deprecated
     protected HollowConsumer(BlobRetriever blobRetriever,
                              AnnouncementWatcher announcementWatcher,
                              List<RefreshListener> refreshListeners,
@@ -141,10 +135,6 @@ public class HollowConsumer {
                 hashCodeFinder, refreshExecutor, null);
     }
 
-    /**
-     * @deprecated use {@link HollowConsumer.Builder}
-     */
-    @Deprecated
     protected HollowConsumer(BlobRetriever blobRetriever,
                              AnnouncementWatcher announcementWatcher,
                              List<RefreshListener> refreshListeners,
@@ -156,6 +146,7 @@ public class HollowConsumer {
                              HollowObjectHashCodeFinder hashCodeFinder,
                              Executor refreshExecutor,
                              HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
+
         this.metrics = new HollowConsumerMetrics();
         this.updater = new HollowClientUpdater(blobRetriever,
                 refreshListeners,
@@ -169,27 +160,6 @@ public class HollowConsumer {
         updater.setFilter(dataFilter);
         this.announcementWatcher = announcementWatcher;
         this.refreshExecutor = refreshExecutor;
-        this.refreshLock = new ReentrantReadWriteLock();
-        if (announcementWatcher != null)
-            announcementWatcher.subscribeToUpdates(this);
-    }
-
-    protected  <B extends Builder<B>> HollowConsumer(B builder) {
-        // duplicated with HollowConsumer(...) constructor above. We cannot chain constructor calls because that
-        // constructor subscribes to the announcement watcher and we have more setup to do first
-        this.metrics = new HollowConsumerMetrics();
-        this.updater = new HollowClientUpdater(builder.blobRetriever,
-                builder.refreshListeners,
-                builder.apiFactory,
-                builder.doubleSnapshotConfig,
-                builder.hashCodeFinder,
-                builder.objectLongevityConfig,
-                builder.objectLongevityDetector,
-                metrics,
-                builder.metricsCollector);
-        updater.setFilter(builder.typeFilter);
-        this.announcementWatcher = builder.announcementWatcher;
-        this.refreshExecutor = builder.refreshExecutor;
         this.refreshLock = new ReentrantReadWriteLock();
         if (announcementWatcher != null)
             announcementWatcher.subscribeToUpdates(this);
@@ -303,8 +273,7 @@ public class HollowConsumer {
     }
 
     /**
-     * Returns a {@code CompletableFuture} that completes after the initial data load succeeds. Also triggers the initial
-     * load asynchronously, to avoid waiting on a polling interval for the initial load.
+     * Returns a {@code CompletableFuture} that completes after the initial data load succeeds.
      * <p>
      * Callers can use methods like {@link CompletableFuture#join()} or {@link CompletableFuture#get(long, TimeUnit)}
      * to block until the initial load is complete.
@@ -318,11 +287,6 @@ public class HollowConsumer {
      * @return a future which, when completed, has a value set to the data version that was initially loaded
      */
     public CompletableFuture<Long> getInitialLoad() {
-        try {
-            triggerAsyncRefresh();
-        } catch (RejectedExecutionException | NullPointerException e) {
-            LOG.log(Level.INFO, "Refresh triggered by getInitialLoad() failed; future attempts might succeed", e);
-        }
         return updater.getInitialLoad();
     }
 
@@ -513,6 +477,10 @@ public class HollowConsumer {
          * @throws IOException if the input stream to the blob cannot be obtained
          */
         public abstract InputStream getInputStream() throws IOException;
+
+        public File getFile() throws IOException {
+            throw new NotImplementedException();
+        }
 
         /**
          * Blobs can be of types {@code SNAPSHOT}, {@code DELTA} or {@code REVERSE_DELTA}.
@@ -920,39 +888,22 @@ public class HollowConsumer {
         }
     }
 
-    public static <B extends HollowConsumer.Builder<B>> HollowConsumer.Builder<B> newHollowConsumer() {
-        return new Builder<>();
-    }
-
-    /**
-     * @deprecated use {@link #newHollowConsumer()}, i.e. {@code newHollowConsumer().withBlobRetriever(...)}
-     */
-    @Deprecated
     public static HollowConsumer.Builder<?> withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
         HollowConsumer.Builder<?> builder = new Builder<>();
         return builder.withBlobRetriever(blobRetriever);
     }
 
-    /**
-     * @deprecated use {@link #newHollowConsumer()}, i.e. {@code newHollowConsumer().withLocalBlobStore(...)}
-     */
     public static HollowConsumer.Builder<?> withLocalBlobStore(File localBlobStoreDir) {
         HollowConsumer.Builder<?> builder = new Builder<>();
         return builder.withLocalBlobStore(localBlobStoreDir);
     }
 
     @SuppressWarnings("unchecked")
-    @PublicSpi
     public static class Builder<B extends HollowConsumer.Builder<B>> {
 
         protected HollowConsumer.BlobRetriever blobRetriever = null;
         protected HollowConsumer.AnnouncementWatcher announcementWatcher = null;
-        /**
-         * @deprecated subclasses should use {@code typeFilter}
-         */
-        @Deprecated
-        protected HollowFilterConfig filterConfig = null; // retained for binary compat
-        protected TypeFilter typeFilter = null;
+        protected HollowFilterConfig filterConfig = null;
         protected List<HollowConsumer.RefreshListener> refreshListeners = new ArrayList<>();
         protected HollowAPIFactory apiFactory = HollowAPIFactory.DEFAULT_FACTORY;
         protected HollowObjectHashCodeFinder hashCodeFinder = new DefaultHashCodeFinder();
@@ -1012,72 +963,9 @@ public class HollowConsumer {
             return (B)this;
         }
 
-        /**
-         * <p>Specifies a filter config. Clears any type filter specified by {@code withTypeFilter(...)}.</p>
-         *
-         * <p>{@link HollowFilterConfig} is deprecated in favor of {@link TypeFilter}.</p>
-         *
-         * <p>{@code HollowFilterConfig} has these limitations:</p>
-         *
-         * <ul>
-         *     <li>cannot mix inclusions and exclusions in a single filter and cannot compose filters</li>
-         *     <li>recursive actions requires that callers already have the dataset's schema, leading to
-         *     a chicken-and-egg situation</li>
-         * </ul>
-         *
-         * @return this builder
-         * @see #withTypeFilter(TypeFilter)
-         * @see #withTypeFilter(UnaryOperator)
-         * @deprecated use {@link #withTypeFilter(TypeFilter)} or {@link #withTypeFilter(UnaryOperator)}
-         */
-        @Deprecated
         public B withFilterConfig(HollowFilterConfig filterConfig) {
-            this.typeFilter = filterConfig;
+            this.filterConfig = filterConfig;
             return (B)this;
-        }
-
-        /**
-         * <p>Specifies the type filter. Clears any filter config specified by {@code withFilterConfig()}</p>
-         *
-         * <p>{@link TypeFilter} is the replacement API for {@link HollowFilterConfig}. It improves upon its
-         * limitations, but lacks the ability to serialize/deserialize like {@code HollowFilterConfig} has.</p>
-         *
-         * @param typeFilter
-         * @return this builder
-         * @see #withTypeFilter(UnaryOperator)
-         * @see #withFilterConfig(HollowFilterConfig)
-         */
-        public B withTypeFilter(TypeFilter typeFilter) {
-            this.typeFilter = typeFilter;
-            return (B)this;
-        }
-
-        /**
-         * <p>Configures a new type filter on this consumer using a fluent API. Works as if by
-         * calling {@code withTypeFilter(op.apply(newTypeFilter())}. For example:</p>
-         *
-         * <pre>{@code
-         * consumerBuilder
-         *   ...
-         *   .withTypeFilter(filter -> filter
-         *     .excludeAll()
-         *     .includeRecursive("Alpha"))
-         *   .build();
-         * }</pre>
-         *
-         * <p>Clears any filter config specified by {@code withFilterConfig(...)}.</p>
-         *
-         * <p>{@link TypeFilter} is the replacement API for {@link HollowFilterConfig}. It improves upon its
-         * limitations, but lacks the ability to serialize/deserialize like {@code HollowFilterConfig} has.</p>
-         *
-         * @param op
-         * @return this builder
-         * @see #withTypeFilter(TypeFilter)
-         * @see #withFilterConfig(HollowFilterConfig)
-         */
-        public B withTypeFilter(UnaryOperator<TypeFilter.Builder> op) {
-            TypeFilter.Builder builder = op.apply(TypeFilter.newTypeFilter());
-            return withTypeFilter(builder.build());
         }
 
         public B withDoubleSnapshotConfig(HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig) {
@@ -1112,10 +1000,6 @@ public class HollowConsumer {
         }
 
         protected void checkArguments() {
-            if (filterConfig != null && typeFilter != null) {
-                // this should only be possible in custom subclasses that override #withFilterConfig(...)
-                throw new IllegalStateException("Only one of typeFilter and filterConfig can be set");
-            }
             if (blobRetriever == null && localBlobStoreDir == null) {
                 throw new IllegalArgumentException(
                         "A HollowBlobRetriever or local blob store directory must be specified when building a HollowClient");
@@ -1134,12 +1018,18 @@ public class HollowConsumer {
 
         public HollowConsumer build() {
             checkArguments();
-            if (filterConfig != null) {
-                // TODO: remove once deprecated #withFilterConfig is removed
-                typeFilter = filterConfig;
-                filterConfig = null;
-            }
-            return new HollowConsumer((B)this);
+            return new HollowConsumer(blobRetriever,
+                    announcementWatcher,
+                    refreshListeners,
+                    apiFactory,
+                    filterConfig,
+                    objectLongevityConfig,
+                    objectLongevityDetector,
+                    doubleSnapshotConfig,
+                    hashCodeFinder,
+                    refreshExecutor,
+                    metricsCollector);
         }
     }
+
 }

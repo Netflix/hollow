@@ -18,6 +18,8 @@ package com.netflix.hollow.core.memory;
 
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -72,11 +74,11 @@ public class SegmentedLongArray {
     public void set(long index, long value) {
         int segmentIndex = (int)(index >> log2OfSegmentSize);
         int longInSegment = (int)(index & bitmask);
-        unsafe.putOrderedLong(segments[segmentIndex], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longInSegment), value);
+        unsafe.putOrderedLong(segments[segmentIndex], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longInSegment), value);
 
         /// duplicate the longs here so that we can read faster.
         if(longInSegment == 0 && segmentIndex != 0)
-            unsafe.putOrderedLong(segments[segmentIndex - 1], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (1 << log2OfSegmentSize)), value);
+            unsafe.putOrderedLong(segments[segmentIndex - 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (1 << log2OfSegmentSize)), value);
     }
 
     /**
@@ -87,7 +89,26 @@ public class SegmentedLongArray {
      */
     public long get(long index) {
         int segmentIndex = (int)(index >>> log2OfSegmentSize);
-        return segments[segmentIndex][(int)(index & bitmask)];
+        long ret = segments[segmentIndex][(int)(index & bitmask)];
+
+        return ret;
+    }
+
+    public static String ppBytesInLong(long l) {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(bos);
+            dos.writeLong(l);
+            dos.flush();
+            byte[] nativeLongBytes = bos.toByteArray();
+            String bytesChosenForUnalignedRead = "";
+            for (byte b : nativeLongBytes) {
+                bytesChosenForUnalignedRead += b + " ";
+            }
+            return bytesChosenForUnalignedRead;
+        } catch (IOException e) {
+            throw new IllegalStateException();
+        }
     }
 
     public void fill(long value) {
@@ -115,39 +136,30 @@ public class SegmentedLongArray {
         }
     }
 
-    public static SegmentedLongArray deserializeFrom(DataInputStream dis, ArraySegmentRecycler memoryRecycler) throws IOException {
-        long numLongs = VarInt.readVLong(dis);
-
-        SegmentedLongArray arr = new SegmentedLongArray(memoryRecycler, numLongs);
-
-        arr.readFrom(dis, memoryRecycler, numLongs);
-
-        return arr;
-    }
-
-    protected void readFrom(DataInputStream dis, ArraySegmentRecycler memoryRecycler, long numLongs) throws IOException {
+    protected void readFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, long numLongs) throws
+            IOException {
         int segmentSize = 1 << memoryRecycler.getLog2OfLongSegmentSize();
         int segment = 0;
 
         if(numLongs == 0)
             return;
 
-        long fencepostLong = dis.readLong();
+        long fencepostLong = in.readLong();
 
         while(numLongs > 0) {
             long longsToCopy = Math.min(segmentSize, numLongs);
 
-            unsafe.putOrderedLong(segments[segment], (long)Unsafe.ARRAY_LONG_BASE_OFFSET, fencepostLong);
+            unsafe.putOrderedLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET, fencepostLong);
 
             int longsCopied = 1;
 
             while(longsCopied < longsToCopy) {
-                long l = dis.readLong();
-                unsafe.putOrderedLong(segments[segment], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied++), l);
+                long l = in.readLong();
+                unsafe.putOrderedLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied++), l);
             }
 
             if(numLongs > longsCopied) {
-                unsafe.putOrderedLong(segments[segment], (long)Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied), dis.readLong());
+                unsafe.putOrderedLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied), in.readLong());
                 fencepostLong = segments[segment][longsCopied];
             }
 

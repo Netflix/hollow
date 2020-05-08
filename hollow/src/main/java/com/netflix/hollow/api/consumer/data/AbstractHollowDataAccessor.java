@@ -15,8 +15,6 @@
  */
 package com.netflix.hollow.api.consumer.data;
 
-import static java.util.Objects.requireNonNull;
-
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
@@ -57,10 +55,8 @@ public abstract class AbstractHollowDataAccessor<T> {
     }
 
     public AbstractHollowDataAccessor(HollowReadStateEngine rStateEngine, String type, PrimaryKey primaryKey) {
-        this.rStateEngine = requireNonNull(rStateEngine, "read state required");
-        HollowTypeReadState typeState = requireNonNull(rStateEngine.getTypeState(type),
-                "type not loaded or does not exist in dataset; type=" + type);
-        HollowSchema schema = typeState.getSchema();
+        this.rStateEngine = rStateEngine;
+        HollowSchema schema = rStateEngine.getTypeState(type).getSchema();
         if (schema instanceof HollowObjectSchema) {
             this.type = type;
 

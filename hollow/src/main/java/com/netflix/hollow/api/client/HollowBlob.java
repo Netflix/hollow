@@ -17,8 +17,10 @@
 package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.core.HollowConstants;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * A HollowBlob, which is either a snapshot or a delta, defines three things:
@@ -74,6 +76,10 @@ public abstract class HollowBlob {
      * @throws IOException if the input stream to the blob cannot be obtained
      */
     public abstract InputStream getInputStream() throws IOException;
+
+    public File getFile() throws IOException {
+        throw new NotImplementedException();
+    }
 
     public boolean isSnapshot() {
         return fromVersion == HollowConstants.VERSION_NONE;

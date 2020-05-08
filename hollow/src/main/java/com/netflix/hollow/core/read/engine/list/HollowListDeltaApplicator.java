@@ -61,8 +61,8 @@ class HollowListDeltaApplicator {
         target.bitsPerListPointer = delta.bitsPerListPointer;
         target.bitsPerElement = delta.bitsPerElement;
 
-        target.listPointerArray = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerListPointer);
-        target.elementArray = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfElements * target.bitsPerElement);
+        target.listPointerData = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerListPointer);
+        target.elementData = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfElements * target.bitsPerElement);
 
         if(target.bitsPerListPointer == from.bitsPerListPointer
                 && target.bitsPerElement == from.bitsPerElement)
@@ -106,17 +106,17 @@ class HollowListDeltaApplicator {
         long listPointerBitsToCopy = (long)recordsToCopy * target.bitsPerListPointer;
         long eachListPointerDifference = currentWriteStartElement - currentFromStateStartElement;
 
-        target.listPointerArray.copyBits(from.listPointerArray, currentFromStateCopyStartBit, currentWriteStartBit, listPointerBitsToCopy);
-        target.listPointerArray.incrementMany(currentWriteStartBit, eachListPointerDifference, target.bitsPerListPointer, recordsToCopy);
+        target.listPointerData.copyBits(from.listPointerData, currentFromStateCopyStartBit, currentWriteStartBit, listPointerBitsToCopy);
+        target.listPointerData.incrementMany(currentWriteStartBit, eachListPointerDifference, target.bitsPerListPointer, recordsToCopy);
 
         currentFromStateCopyStartBit += listPointerBitsToCopy;
         currentWriteStartBit += listPointerBitsToCopy;
 
-        long fromDataEndElement = from.listPointerArray.getElementValue(currentFromStateCopyStartBit - from.bitsPerListPointer, from.bitsPerListPointer);
+        long fromDataEndElement = from.listPointerData.getElementValue(currentFromStateCopyStartBit - from.bitsPerListPointer, from.bitsPerListPointer);
         long elementsToCopy = fromDataEndElement - currentFromStateStartElement;
         long bitsToCopy = elementsToCopy * from.bitsPerElement;
 
-        target.elementArray.copyBits(from.elementArray, currentFromStateStartElement * from.bitsPerElement, currentWriteStartElement * from.bitsPerElement, bitsToCopy);
+        target.elementData.copyBits(from.elementData, currentFromStateStartElement * from.bitsPerElement, currentWriteStartElement * from.bitsPerElement, bitsToCopy);
 
         currentFromStateStartElement += elementsToCopy;
         currentWriteStartElement += elementsToCopy;
@@ -131,11 +131,11 @@ class HollowListDeltaApplicator {
         }
 
         if(i <= from.maxOrdinal) {
-            long fromDataEndElement = from.listPointerArray.getElementValue(currentFromStateCopyStartBit, from.bitsPerListPointer);
+            long fromDataEndElement = from.listPointerData.getElementValue(currentFromStateCopyStartBit, from.bitsPerListPointer);
             if(!removeData) {
                 for(long elementIdx=currentFromStateStartElement; elementIdx<fromDataEndElement; elementIdx++) {
-                    long elementOrdinal = from.elementArray.getElementValue(elementIdx * from.bitsPerElement, from.bitsPerElement);
-                    target.elementArray.setElementValue(currentWriteStartElement * target.bitsPerElement, target.bitsPerElement, elementOrdinal);
+                    long elementOrdinal = from.elementData.getElementValue(elementIdx * from.bitsPerElement, from.bitsPerElement);
+                    target.elementData.setElementValue(currentWriteStartElement * target.bitsPerElement, target.bitsPerElement, elementOrdinal);
                     currentWriteStartElement++;
                 }
             } else {
@@ -147,15 +147,15 @@ class HollowListDeltaApplicator {
         }
 
 
-        target.listPointerArray.setElementValue(currentWriteStartBit, target.bitsPerListPointer, currentWriteStartElement);
+        target.listPointerData.setElementValue(currentWriteStartBit, target.bitsPerListPointer, currentWriteStartElement);
         currentWriteStartBit += target.bitsPerListPointer;
     }
 
     private void addFromDelta(GapEncodedVariableLengthIntegerReader additionsReader) {
-        long deltaDataEndElement = delta.listPointerArray.getElementValue(currentDeltaCopyStartBit, delta.bitsPerListPointer);
+        long deltaDataEndElement = delta.listPointerData.getElementValue(currentDeltaCopyStartBit, delta.bitsPerListPointer);
         for(long elementIdx=currentDeltaStartElement; elementIdx<deltaDataEndElement; elementIdx++) {
-            long elementOrdinal = delta.elementArray.getElementValue(elementIdx * delta.bitsPerElement, delta.bitsPerElement);
-            target.elementArray.setElementValue(currentWriteStartElement * target.bitsPerElement, target.bitsPerElement, elementOrdinal);
+            long elementOrdinal = delta.elementData.getElementValue(elementIdx * delta.bitsPerElement, delta.bitsPerElement);
+            target.elementData.setElementValue(currentWriteStartElement * target.bitsPerElement, target.bitsPerElement, elementOrdinal);
             currentWriteStartElement++;
         }
         currentDeltaStartElement = deltaDataEndElement;

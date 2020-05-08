@@ -17,7 +17,6 @@
 package com.netflix.hollow.core.index;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-import static java.util.Objects.requireNonNull;
 
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.index.key.PrimaryKey;
@@ -88,9 +87,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      * @param specificOrdinalsToIndex the bit set
      */
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler, BitSet specificOrdinalsToIndex) {
-        requireNonNull(primaryKey, "Hollow Primary Key Index creation failed because primaryKey was null");
-        requireNonNull(stateEngine, "Hollow Primary Key Index creation for type [" + primaryKey.getType()
-                + "] failed because read state wasn't initialized");
+        if (primaryKey==null) throw new IllegalArgumentException("primaryKey can't not be null");
 
         this.primaryKey = primaryKey;
         this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
