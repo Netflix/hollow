@@ -31,7 +31,6 @@ import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.logging.Logger;
 
@@ -43,6 +42,7 @@ class HollowDataHolder {
 
     private final HollowReadStateEngine stateEngine;
     private final HollowAPIFactory apiFactory;
+    private final MemoryMode memoryMode;
     private final HollowBlobReader reader;
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
     private final FailedTransitionTracker failedTransitionTracker;
@@ -59,13 +59,15 @@ class HollowDataHolder {
 
     HollowDataHolder(HollowReadStateEngine stateEngine,
                             HollowAPIFactory apiFactory,
+                            MemoryMode memoryMode,
                             HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
                             FailedTransitionTracker failedTransitionTracker, 
                             StaleHollowReferenceDetector staleReferenceDetector, 
                             HollowConsumer.ObjectLongevityConfig objLongevityConfig) {
         this.stateEngine = stateEngine;
         this.apiFactory = apiFactory;
-        this.reader = new HollowBlobReader(stateEngine);
+        this.memoryMode = memoryMode;
+        this.reader = new HollowBlobReader(stateEngine, memoryMode);
         this.doubleSnapshotConfig = doubleSnapshotConfig;
         this.failedTransitionTracker = failedTransitionTracker;
         this.staleReferenceDetector = staleReferenceDetector;
@@ -138,7 +140,7 @@ class HollowDataHolder {
     private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_snapshot"));
 
-        HollowBlobInput in = HollowBlobInput.modeBasedInput(snapshotBlob, MemoryMode.getMemoryMode());
+        HollowBlobInput in = HollowBlobInput.modeBasedInput(snapshotBlob, memoryMode);
         try {
             applyStateEngineTransition(in, debug, snapshotBlob, refreshListeners);
             initializeAPI();
@@ -190,13 +192,13 @@ class HollowDataHolder {
     }
 
     private void applyDeltaTransition(HollowConsumer.Blob blob, boolean isSnapshotPlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
-        if (MemoryMode.getMemoryMode().equals(MemoryMode.Mode.SHARED_MEMORY)) {
+        if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
             LOG.warning("Skipping delta transition in shared-memory mode");
             return;
         }
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_delta"));
 
-        try (HollowBlobInput in = HollowBlobInput.modeBasedInput(blob, MemoryMode.getMemoryMode())) {
+        try (HollowBlobInput in = HollowBlobInput.modeBasedInput(blob, memoryMode)) {
             applyStateEngineTransition(in, debug, blob, refreshListeners);
 
             if(objLongevityConfig.enableLongLivedObjectSupport()) {

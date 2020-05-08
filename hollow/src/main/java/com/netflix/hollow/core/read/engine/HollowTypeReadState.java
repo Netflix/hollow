@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.api.sampling.HollowSampler;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
@@ -43,11 +44,13 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     protected static final HollowTypeStateListener[] EMPTY_LISTENERS = new HollowTypeStateListener[0];
 
     protected final HollowReadStateEngine stateEngine;
+    protected final MemoryMode memoryMode;
     protected final HollowSchema schema;
     protected HollowTypeStateListener[] stateListeners;
 
-    public HollowTypeReadState(HollowReadStateEngine stateEngine, HollowSchema schema) {
+    public HollowTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSchema schema) {
         this.stateEngine = stateEngine;
+        this.memoryMode = memoryMode;
         this.schema = schema;
         this.stateListeners = EMPTY_LISTENERS;
     }

@@ -20,6 +20,7 @@ import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowObjectSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -50,11 +51,11 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     private int maxOrdinal;
 
     public HollowObjectTypeReadState(HollowReadStateEngine fileEngine, HollowObjectSchema schema) {
-        this(fileEngine, schema, schema, 1);
+        this(fileEngine, MemoryMode.ON_HEAP, schema, schema, 1);
     }
 
-    public HollowObjectTypeReadState(HollowReadStateEngine fileEngine, HollowObjectSchema schema, HollowObjectSchema unfilteredSchema, int numShards) {
-        super(fileEngine, schema);
+    public HollowObjectTypeReadState(HollowReadStateEngine fileEngine, MemoryMode memoryMode, HollowObjectSchema schema, HollowObjectSchema unfilteredSchema, int numShards) {
+        super(fileEngine, memoryMode, schema);
         this.sampler = new HollowObjectSampler(schema, DisabledSamplingDirector.INSTANCE);
         this.unfilteredSchema = unfilteredSchema;
         this.shardNumberMask = numShards - 1;
@@ -86,7 +87,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0;i<shards.length;i++) {
-            HollowObjectTypeDataElements snapshotData = new HollowObjectTypeDataElements(getSchema(), memoryRecycler);
+            HollowObjectTypeDataElements snapshotData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
             snapshotData.readSnapshot(in, debug, unfilteredSchema);
             shards[i].setCurrentData(snapshotData);
         }
@@ -103,8 +104,8 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0;i<shards.length;i++) {
-            HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryRecycler);
-            HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryRecycler);
+            HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryMode, memoryRecycler);
+            HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
             deltaData.readDelta(in, debug);
             HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
             nextData.applyDelta(oldData, deltaData);

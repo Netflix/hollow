@@ -23,6 +23,7 @@ import com.netflix.hollow.api.sampling.HollowMapSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -59,7 +60,11 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     private int maxOrdinal;
 
     public HollowMapTypeReadState(HollowReadStateEngine stateEngine, HollowMapSchema schema, int numShards) {
-        super(stateEngine, schema);
+        this(stateEngine, MemoryMode.ON_HEAP, schema, numShards);
+    }
+
+    public HollowMapTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowMapSchema schema, int numShards) {
+        super(stateEngine, memoryMode, schema);
         this.sampler = new HollowMapSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         this.shardNumberMask = numShards - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
@@ -81,7 +86,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
             maxOrdinal = VarInt.readVInt(in);
         
         for(int i=0; i<shards.length; i++) {
-            HollowMapTypeDataElements snapshotData = new HollowMapTypeDataElements(memoryRecycler);
+            HollowMapTypeDataElements snapshotData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
             snapshotData.readSnapshot(in, debug);
             shards[i].setCurrentData(snapshotData);
         }
@@ -98,8 +103,8 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0; i<shards.length; i++) {
-            HollowMapTypeDataElements deltaData = new HollowMapTypeDataElements(memoryRecycler);
-            HollowMapTypeDataElements nextData = new HollowMapTypeDataElements(memoryRecycler);
+            HollowMapTypeDataElements deltaData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
+            HollowMapTypeDataElements nextData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
             deltaData.readDelta(in, debug);
             HollowMapTypeDataElements oldData = shards[i].currentDataElements();
             nextData.applyDelta(oldData, deltaData);

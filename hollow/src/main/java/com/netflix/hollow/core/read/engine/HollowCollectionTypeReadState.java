@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.read.engine;
 
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.dataaccess.HollowCollectionTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowCollectionSchema;
@@ -26,8 +27,8 @@ import com.netflix.hollow.core.schema.HollowSchema;
  */
 public abstract class HollowCollectionTypeReadState extends HollowTypeReadState implements HollowCollectionTypeDataAccess {
 
-    public HollowCollectionTypeReadState(HollowReadStateEngine stateEngine, HollowSchema schema) {
-        super(stateEngine, schema);
+    public HollowCollectionTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSchema schema) {
+        super(stateEngine, memoryMode, schema);
     }
 
     public abstract int size(int ordinal);

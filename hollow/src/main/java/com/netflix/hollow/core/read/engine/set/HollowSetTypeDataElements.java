@@ -18,6 +18,7 @@ package com.netflix.hollow.core.read.engine.set;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.memory.FixedLengthDataMode;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
@@ -50,8 +51,14 @@ public class HollowSetTypeDataElements {
     long totalNumberOfBuckets;
 
     final ArraySegmentRecycler memoryRecycler;
+    final MemoryMode memoryMode;
 
     public HollowSetTypeDataElements(ArraySegmentRecycler memoryRecycler) {
+        this(MemoryMode.ON_HEAP, memoryRecycler);
+    }
+
+    public HollowSetTypeDataElements(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
+        this.memoryMode = memoryMode;
         this.memoryRecycler = memoryRecycler;
     }
 
@@ -78,8 +85,8 @@ public class HollowSetTypeDataElements {
         emptyBucketValue = (1 << bitsPerElement) - 1;
         totalNumberOfBuckets = VarInt.readVLong(in);
 
-        setPointerAndSizeData = FixedLengthDataMode.deserializeFrom(in, memoryRecycler);
-        elementData = FixedLengthDataMode.deserializeFrom(in, memoryRecycler);
+        setPointerAndSizeData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
+        elementData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
 
         // debug.append("HollowSetTypeDataElements setPointerAndSizeData= \n");
         // setPointerAndSizeData.pp(debug);

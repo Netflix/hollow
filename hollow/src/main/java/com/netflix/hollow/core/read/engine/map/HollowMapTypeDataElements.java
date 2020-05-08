@@ -18,6 +18,7 @@ package com.netflix.hollow.core.read.engine.map;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.memory.FixedLengthDataMode;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
@@ -51,20 +52,26 @@ public class HollowMapTypeDataElements {
     long totalNumberOfBuckets;
 
     final ArraySegmentRecycler memoryRecycler;
+    final MemoryMode memoryMode;
 
     public HollowMapTypeDataElements(ArraySegmentRecycler memoryRecycler) {
+        this(MemoryMode.ON_HEAP, memoryRecycler);
+    }
+
+    public HollowMapTypeDataElements(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
+        this.memoryMode = memoryMode;
         this.memoryRecycler = memoryRecycler;
     }
 
     void readSnapshot(HollowBlobInput in, BufferedWriter debug) throws IOException {
-        readFromStream(in, debug, false);
+        readFromInput(in, debug, false);
     }
 
     void readDelta(HollowBlobInput in, BufferedWriter debug) throws IOException {
-        readFromStream(in, debug,true);
+        readFromInput(in, debug,true);
     }
 
-    private void readFromStream(HollowBlobInput in, BufferedWriter debug, boolean isDelta) throws IOException {
+    private void readFromInput(HollowBlobInput in, BufferedWriter debug, boolean isDelta) throws IOException {
         maxOrdinal = VarInt.readVInt(in);
 
         if(isDelta) {
@@ -81,8 +88,8 @@ public class HollowMapTypeDataElements {
         emptyBucketKeyValue = (1 << bitsPerKeyElement) - 1;
         totalNumberOfBuckets = VarInt.readVLong(in);
 
-        mapPointerAndSizeData = FixedLengthDataMode.deserializeFrom(in, memoryRecycler);
-        entryData = FixedLengthDataMode.deserializeFrom(in, memoryRecycler);
+        mapPointerAndSizeData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
+        entryData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
 
         // debug.append("HollowMapTypeDataElements mapPointerAndSizeData= \n");
         // mapPointerAndSizeData.pp(debug);

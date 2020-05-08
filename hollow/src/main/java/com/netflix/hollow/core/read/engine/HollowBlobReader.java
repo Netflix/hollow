@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
@@ -45,15 +46,25 @@ public class HollowBlobReader {
 
     private final Logger log = Logger.getLogger(HollowBlobReader.class.getName());
     private final HollowReadStateEngine stateEngine;
+    private final MemoryMode memoryMode;
     private final HollowBlobHeaderReader headerReader;
 
-    public HollowBlobReader(HollowReadStateEngine stateEngine) {
+    public HollowBlobReader(HollowReadStateEngine stateEngine) {    // SNAP: TODO: try removing this to see all callers where memory mode is initialized to ON_HEAP
         this(stateEngine, new HollowBlobHeaderReader());
     }
 
     public HollowBlobReader(HollowReadStateEngine stateEngine, HollowBlobHeaderReader headerReader) {
+        this(stateEngine, headerReader, MemoryMode.ON_HEAP);
+    }
+
+    public HollowBlobReader(HollowReadStateEngine stateEngine, MemoryMode memoryMode) {
+        this(stateEngine, new HollowBlobHeaderReader(), memoryMode);
+    }
+
+    public HollowBlobReader(HollowReadStateEngine stateEngine, HollowBlobHeaderReader headerReader, MemoryMode memoryMode) {
         this.stateEngine = stateEngine;
         this.headerReader = headerReader;
+        this.memoryMode = memoryMode;
     }
 
     /**
@@ -173,25 +184,25 @@ public class HollowBlobReader {
             } else {
                 HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
                 HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
-                populateTypeStateSnapshot(in, debug, new HollowObjectTypeReadState(stateEngine, filteredSchema, unfilteredSchema, numShards));
+                populateTypeStateSnapshot(in, debug, new HollowObjectTypeReadState(stateEngine, memoryMode, filteredSchema, unfilteredSchema, numShards));
             }
         } else if (schema instanceof HollowListSchema) {
             if(!filter.includes(typeName)) {
                 HollowListTypeReadState.discardSnapshot(is, numShards);
             } else {
-                populateTypeStateSnapshot(in, debug, new HollowListTypeReadState(stateEngine, (HollowListSchema)schema, numShards));
+                populateTypeStateSnapshot(in, debug, new HollowListTypeReadState(stateEngine, memoryMode, (HollowListSchema)schema, numShards));
             }
         } else if(schema instanceof HollowSetSchema) {
             if(!filter.includes(typeName)) {
                 HollowSetTypeReadState.discardSnapshot(is, numShards);
             } else {
-                populateTypeStateSnapshot(in, debug, new HollowSetTypeReadState(stateEngine, (HollowSetSchema)schema, numShards));
+                populateTypeStateSnapshot(in, debug, new HollowSetTypeReadState(stateEngine, memoryMode, (HollowSetSchema)schema, numShards));
             }
         } else if(schema instanceof HollowMapSchema) {
             if(!filter.includes(typeName)) {
                 HollowMapTypeReadState.discardSnapshot(is, numShards);
             } else {
-                populateTypeStateSnapshot(in, debug, new HollowMapTypeReadState(stateEngine, (HollowMapSchema)schema, numShards));
+                populateTypeStateSnapshot(in, debug, new HollowMapTypeReadState(stateEngine, memoryMode, (HollowMapSchema)schema, numShards));
             }
         }
 

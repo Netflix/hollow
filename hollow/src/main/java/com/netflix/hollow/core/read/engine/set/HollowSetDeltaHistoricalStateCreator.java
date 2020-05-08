@@ -18,6 +18,7 @@ package com.netflix.hollow.core.read.engine.set;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;

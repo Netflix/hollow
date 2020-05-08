@@ -23,6 +23,7 @@ import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowSetSampler;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
@@ -64,7 +65,11 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
     private int maxOrdinal;
 
     public HollowSetTypeReadState(HollowReadStateEngine stateEngine, HollowSetSchema schema, int numShards) {
-        super(stateEngine, schema);
+        this(stateEngine, MemoryMode.ON_HEAP, schema, numShards);
+    }
+
+    public HollowSetTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSetSchema schema, int numShards) {
+        super(stateEngine, memoryMode, schema);
         this.sampler = new HollowSetSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         this.shardNumberMask = numShards - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
@@ -86,7 +91,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
             maxOrdinal = VarInt.readVInt(in);
         
         for(int i=0;i<shards.length;i++) {
-            HollowSetTypeDataElements snapshotData = new HollowSetTypeDataElements(memoryRecycler);
+            HollowSetTypeDataElements snapshotData = new HollowSetTypeDataElements(memoryMode, memoryRecycler);
             snapshotData.readSnapshot(in, debug);
             shards[i].setCurrentData(snapshotData);
         }
@@ -99,12 +104,13 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     @Override
     public void applyDelta(HollowBlobInput in, BufferedWriter debug, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException {
+            // SNAP: TODO: maybe memoryRecycler can be collapsed into memory mode object?
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0;i<shards.length;i++) {
-            HollowSetTypeDataElements deltaData = new HollowSetTypeDataElements(memoryRecycler);
-            HollowSetTypeDataElements nextData = new HollowSetTypeDataElements(memoryRecycler);
+            HollowSetTypeDataElements deltaData = new HollowSetTypeDataElements(memoryMode, memoryRecycler);
+            HollowSetTypeDataElements nextData = new HollowSetTypeDataElements(memoryMode, memoryRecycler);
             deltaData.readDelta(in, debug);
             HollowSetTypeDataElements oldData = shards[i].currentDataElements();
             nextData.applyDelta(oldData, deltaData);
