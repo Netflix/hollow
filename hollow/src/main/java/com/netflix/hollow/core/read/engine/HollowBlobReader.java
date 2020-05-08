@@ -17,8 +17,6 @@
 package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.core.HollowBlobHeader;
-import com.netflix.hollow.core.memory.MemoryMode;
-import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
@@ -33,17 +31,14 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.util.Collection;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
 /**
- * A HollowBlobReader is used to populate (and update???) references in a {@link HollowReadStateEngine}, via the consumption
+ * A HollowBlobReader is used to populate and update data in a {@link HollowReadStateEngine}, via the consumption
  * of snapshot and delta blobs.
  */
 public class HollowBlobReader {
@@ -62,7 +57,7 @@ public class HollowBlobReader {
     }
 
     /**
-     * Initialize the state engine using a snapshot blob from the provided InputStream.
+     * Initialize the state engine using a snapshot blob from the provided HollowBlobInput.
      *
      * @param in the Hollow blob input to read the snapshot from
      * @throws IOException if the snapshot could not be read
@@ -108,7 +103,7 @@ public class HollowBlobReader {
     }
 
     /**
-     * Update the state engine using a delta (or reverse delta) blob from the provided InputStream.
+     * Update the state engine using a delta (or reverse delta) blob from the provided HollowBlobInput.
      * <p>
      * If a {@link HollowFilterConfig} was applied at the time the {@link HollowReadStateEngine} was initialized
      * with a snapshot, it will continue to be in effect after the state is updated.
@@ -223,17 +218,6 @@ public class HollowBlobReader {
         return schema.getName();
     }
 
-    private int readNumShards(DataInputStream is) throws IOException {
-        int backwardsCompatibilityBytes = VarInt.readVInt(is);
-        
-        if(backwardsCompatibilityBytes == 0)
-            return 1;  /// produced by a version of hollow prior to 2.1.0, always only 1 shard.
-        
-        skipForwardsCompatibilityBytes(is);
-        
-        return VarInt.readVInt(is);
-    }
-
     private int readNumShards(HollowBlobInput in) throws IOException {
         int backwardsCompatibilityBytes = VarInt.readVInt(in);
 
@@ -245,15 +229,6 @@ public class HollowBlobReader {
         return VarInt.readVInt(in);
     }
         
-    private void skipForwardsCompatibilityBytes(DataInputStream is) throws IOException {
-        int bytesToSkip = VarInt.readVInt(is);
-        while(bytesToSkip > 0) {
-            int skippedBytes = (int)is.skip(bytesToSkip);
-            if(skippedBytes < 0)
-                throw new EOFException();
-            bytesToSkip -= skippedBytes;
-        }
-    }
     private void skipForwardsCompatibilityBytes(HollowBlobInput in) throws IOException {
         int bytesToSkip = VarInt.readVInt(in);
         while(bytesToSkip > 0) {

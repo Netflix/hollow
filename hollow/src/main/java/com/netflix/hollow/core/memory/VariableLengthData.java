@@ -10,4 +10,6 @@ public interface VariableLengthData extends ByteData {
     void copy(ByteData src, long srcPos, long destPos, long length);
 
     void orderedCopy(VariableLengthData src, long srcPos, long destPos, long length);
+
+    long size();
 }

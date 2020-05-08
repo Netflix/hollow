@@ -170,8 +170,8 @@ public class HollowHistoryKeyIndex {
         SimultaneousExecutor executor = new SimultaneousExecutor(1, HollowHistoryKeyIndex.class, "round-trip");
         Exception pipeException = null;
         // Ensure read-side is closed after completion of read
-        try (PipedInputStream in = new PipedInputStream(1 << 15)) {
-            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(in));
+        try (PipedInputStream is = new PipedInputStream(1 << 15)) {
+            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(is));
             executor.execute(() -> {
                 // Ensure write-side is closed after completion of write
                 try (Closeable ac = out) {
@@ -185,13 +185,13 @@ public class HollowHistoryKeyIndex {
                 }
             });
 
-            BufferedInputStream bin = new BufferedInputStream(in);
-            HollowBlobInput hbi = HollowBlobInput.inputStream(bin);
+            BufferedInputStream bin = new BufferedInputStream(is);
+            HollowBlobInput in = HollowBlobInput.inputStream(bin);
             BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_history_"));
             if (isInitialUpdate || isSnapshot) {
-                reader.readSnapshot(hbi, debug);
+                reader.readSnapshot(in, debug);
             } else {
-                reader.applyDelta(hbi, debug);
+                reader.applyDelta(in, debug);
             }
         } catch (Exception e) {
             pipeException = e;

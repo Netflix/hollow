@@ -114,8 +114,8 @@ public class FilteredHollowBlobWriter {
         filter(true, in, out);
     }
 
-    public void filter(boolean delta, InputStream in, OutputStream... out) throws IOException {
-        HollowBlobInput hbi = HollowBlobInput.inputStream(in);
+    public void filter(boolean delta, InputStream is, OutputStream... out) throws IOException {
+        HollowBlobInput in = HollowBlobInput.inputStream(is);
 
         FilteredHollowBlobWriterStreamAndFilter allStreamAndFilters[] = FilteredHollowBlobWriterStreamAndFilter.combine(out, configs);
 
@@ -145,9 +145,9 @@ public class FilteredHollowBlobWriter {
 
             if(schema instanceof HollowObjectSchema) {
                 if(streamsWithType.length == 0)
-                    HollowObjectTypeReadState.discardType(hbi, (HollowObjectSchema)schema, numShards, delta);
+                    HollowObjectTypeReadState.discardType(in, (HollowObjectSchema)schema, numShards, delta);
                 else
-                    copyFilteredObjectState(delta, hbi, streamsWithType, (HollowObjectSchema)schema, numShards);
+                    copyFilteredObjectState(delta, in, streamsWithType, (HollowObjectSchema)schema, numShards);
             } else {
                 for(int j=0;j<streamsWithType.length;j++) {
                     schema.writeTo(streamsWithType[j].getStream());
@@ -158,39 +158,39 @@ public class FilteredHollowBlobWriter {
 
                 if (schema instanceof HollowListSchema) {
                     if(streamsWithType.length == 0)
-                        HollowListTypeReadState.discardType(hbi, numShards, delta);
+                        HollowListTypeReadState.discardType(in, numShards, delta);
                     else
-                        copyListState(delta, hbi, streamsOnly(streamsWithType), numShards);
+                        copyListState(delta, in, streamsOnly(streamsWithType), numShards);
                 } else if(schema instanceof HollowSetSchema) {
                     if(streamsWithType.length == 0)
-                        HollowSetTypeReadState.discardType(hbi, numShards, delta);
+                        HollowSetTypeReadState.discardType(in, numShards, delta);
                     else
-                        copySetState(delta, hbi, streamsOnly(streamsWithType), numShards);
+                        copySetState(delta, in, streamsOnly(streamsWithType), numShards);
                 } else if(schema instanceof HollowMapSchema) {
                     if(streamsWithType.length == 0)
-                        HollowMapTypeReadState.discardType(hbi, numShards, delta);
+                        HollowMapTypeReadState.discardType(in, numShards, delta);
                     else
-                        copyMapState(delta, hbi, streamsOnly(streamsWithType), numShards);
+                        copyMapState(delta, in, streamsOnly(streamsWithType), numShards);
                 }
             }
         }
     }
 
-    private int readNumShards(InputStream is) throws IOException {
-        int backwardsCompatibilityBytes = VarInt.readVInt(is);
+    private int readNumShards(HollowBlobInput in) throws IOException {
+        int backwardsCompatibilityBytes = VarInt.readVInt(in);
         
         if(backwardsCompatibilityBytes == 0)
             return 1;  /// produced by a version of hollow prior to 2.1.0, always only 1 shard.
         
-        skipForwardsCompatibilityBytes(is);
+        skipForwardsCompatibilityBytes(in);
         
-        return VarInt.readVInt(is);
+        return VarInt.readVInt(in);
     }
     
-    private void skipForwardsCompatibilityBytes(InputStream is) throws IOException {
-        int bytesToSkip = VarInt.readVInt(is);
+    private void skipForwardsCompatibilityBytes(HollowBlobInput in) throws IOException {
+        int bytesToSkip = VarInt.readVInt(in);
         while(bytesToSkip > 0) {
-            int skippedBytes = (int)is.skip(bytesToSkip);
+            int skippedBytes = (int)in.skipBytes(bytesToSkip);
             if(skippedBytes < 0)
                 throw new EOFException();
             bytesToSkip -= skippedBytes;
