@@ -35,7 +35,6 @@ import com.netflix.hollow.api.producer.validation.ValidatorListener;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.MemoryMode;
-import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
@@ -51,9 +50,6 @@ import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -762,14 +758,14 @@ abstract class AbstractHollowProducer {
 
     private void readSnapshot(HollowProducer.Blob blob, HollowReadStateEngine stateEngine) throws IOException {
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_consumer_snapshot"));
-        try (HollowBlobInput in = HollowBlobInput.modeBasedInput(blob, MemoryMode.getMemoryMode())) {
+        try (HollowBlobInput in = HollowBlobInput.modeBasedInput(blob, MemoryMode.ON_HEAP)) {   // shared memory mode not supported for producer
             new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).readSnapshot(in, debug);
         }
     }
 
     private void applyDelta(HollowProducer.Blob blob, HollowReadStateEngine stateEngine) throws IOException {
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_consumer_snapshot"));
-        try (HollowBlobInput in = HollowBlobInput.modeBasedInput(blob, MemoryMode.getMemoryMode())) {
+        try (HollowBlobInput in = HollowBlobInput.modeBasedInput(blob, MemoryMode.ON_HEAP)) {   // shared memory mode not supported for producer
             new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).applyDelta(in, debug);
         }
     }

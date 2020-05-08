@@ -20,6 +20,7 @@ import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowListSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -54,7 +55,11 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     private int maxOrdinal;
 
     public HollowListTypeReadState(HollowReadStateEngine stateEngine, HollowListSchema schema, int numShards) {
-        super(stateEngine, schema);
+        this(stateEngine, MemoryMode.ON_HEAP, schema, numShards);
+    }
+
+    public HollowListTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowListSchema schema, int numShards) {
+        super(stateEngine, memoryMode, schema);
         this.sampler = new HollowListSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         this.shardNumberMask = numShards - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
@@ -75,7 +80,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
             maxOrdinal = VarInt.readVInt(in);
         
         for(int i=0;i<shards.length;i++) {
-            HollowListTypeDataElements snapshotData = new HollowListTypeDataElements(memoryRecycler);
+            HollowListTypeDataElements snapshotData = new HollowListTypeDataElements(memoryMode, memoryRecycler);
             snapshotData.readSnapshot(in, debug);
             shards[i].setCurrentData(snapshotData);
         }
@@ -92,8 +97,8 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0; i<shards.length; i++) {
-            HollowListTypeDataElements deltaData = new HollowListTypeDataElements(memoryRecycler);
-            HollowListTypeDataElements nextData = new HollowListTypeDataElements(memoryRecycler);
+            HollowListTypeDataElements deltaData = new HollowListTypeDataElements(memoryMode, memoryRecycler);
+            HollowListTypeDataElements nextData = new HollowListTypeDataElements(memoryMode, memoryRecycler);
             deltaData.readDelta(in, debug);
             HollowListTypeDataElements oldData = shards[i].currentDataElements();
             nextData.applyDelta(oldData, deltaData);

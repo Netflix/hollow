@@ -5,20 +5,21 @@ import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class FixedLengthDataMode {
 
+    public static FixedLengthData deserializeFrom(HollowBlobInput in, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) throws IOException {
 
-
-    public static FixedLengthData deserializeFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
-
-        if (MemoryMode.getMemoryMode().equals(MemoryMode.Mode.SHARED_MEMORY)) {
+        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
+            FixedLengthElementArray data = FixedLengthElementArray.deserializeFrom(in, memoryRecycler);
+            return data;
+        } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
             /// list pointer array
             EncodedLongBuffer data = EncodedLongBuffer.deserializeFrom(in);
             return data;
         } else {
-            FixedLengthElementArray data = FixedLengthElementArray.deserializeFrom(in, memoryRecycler);
-            return data;
+            throw new NotImplementedException();
         }
     }
 

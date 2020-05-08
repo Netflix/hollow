@@ -22,6 +22,7 @@ import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.write.HollowBlobWriter;
@@ -78,7 +79,8 @@ public class TestHollowConsumer extends HollowConsumer {
             Executor refreshExecutor,
             HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
         super(blobRetriever, announcementWatcher, refreshListeners, apiFactory, dataFilter, objectLongevityConfig,
-                objectLongevityDetector, doubleSnapshotConfig, hashCodeFinder, refreshExecutor, metricsCollector);
+                objectLongevityDetector, doubleSnapshotConfig, hashCodeFinder, refreshExecutor, MemoryMode.ON_HEAP,
+                metricsCollector);
         this.blobRetriever = blobRetriever;
     }
 

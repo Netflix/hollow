@@ -1,13 +1,12 @@
 package com.netflix.hollow.core.read;
 
-import static com.netflix.hollow.core.memory.MemoryMode.Mode.ON_HEAP;
-import static com.netflix.hollow.core.memory.MemoryMode.Mode.SHARED_MEMORY;
+import static com.netflix.hollow.core.memory.MemoryMode.ON_HEAP;
+import static com.netflix.hollow.core.memory.MemoryMode.SHARED_MEMORY_LAZY;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
-import com.netflix.hollow.core.memory.encoding.VarInt;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
@@ -15,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class HollowBlobInput implements Closeable {
     Object o;
@@ -22,23 +22,23 @@ public class HollowBlobInput implements Closeable {
 
     private HollowBlobInput() {}
 
-    public static HollowBlobInput modeBasedInput(HollowConsumer.Blob blob, MemoryMode.Mode mode) throws IOException {
-        if (mode.equals(SHARED_MEMORY)) {
-            return randomAccessFile(blob.getFile());
-        } else if (mode.equals(ON_HEAP)) {
+    public static HollowBlobInput modeBasedInput(HollowConsumer.Blob blob, MemoryMode mode) throws IOException {
+        if (mode.equals(ON_HEAP)) {
             return inputStream(blob.getInputStream());
+        } else if (mode.equals(SHARED_MEMORY_LAZY)) {
+            return randomAccessFile(blob.getFile());
         } else {
-            throw new UnsupportedOperationException("Unsupported memory mode");
+            throw new NotImplementedException();
         }
     }
 
-    public static HollowBlobInput modeBasedInput(HollowProducer.Blob blob, MemoryMode.Mode mode) throws IOException {
-        if (mode.equals(SHARED_MEMORY)) {
-            throw new UnsupportedOperationException("Shared memory mode not supported for producer");
-        } else if (mode.equals(ON_HEAP)) {
+    public static HollowBlobInput modeBasedInput(HollowProducer.Blob blob, MemoryMode mode) throws IOException {
+        if (mode.equals(ON_HEAP)) {
             return inputStream(blob.newInputStream());
+        } else if (mode.equals(SHARED_MEMORY_LAZY)) {
+            throw new UnsupportedOperationException("Shared memory mode is not supported for producer");
         } else {
-            throw new UnsupportedOperationException("Unsupported memory mode");
+            throw new NotImplementedException();
         }
     }
 

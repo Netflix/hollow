@@ -31,6 +31,7 @@ import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.core.HollowConstants;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
@@ -122,6 +123,7 @@ public class HollowConsumer {
     protected final HollowConsumerMetrics metrics;
 
     private final Executor refreshExecutor;
+    private final MemoryMode memoryMode;
 
     /**
      * @deprecated use {@link HollowConsumer.Builder}
@@ -136,10 +138,11 @@ public class HollowConsumer {
                              ObjectLongevityDetector objectLongevityDetector,
                              DoubleSnapshotConfig doubleSnapshotConfig,
                              HollowObjectHashCodeFinder hashCodeFinder,
-                             Executor refreshExecutor) {
+                             Executor refreshExecutor,
+                             MemoryMode memoryMode) {
         this(blobRetriever, announcementWatcher, refreshListeners, apiFactory, dataFilter,
                 objectLongevityConfig, objectLongevityDetector, doubleSnapshotConfig,
-                hashCodeFinder, refreshExecutor, null);
+                hashCodeFinder, refreshExecutor, memoryMode,null);
     }
 
     /**
@@ -156,6 +159,7 @@ public class HollowConsumer {
                              DoubleSnapshotConfig doubleSnapshotConfig,
                              HollowObjectHashCodeFinder hashCodeFinder,
                              Executor refreshExecutor,
+                             MemoryMode memoryMode,
                              HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
         this.metrics = new HollowConsumerMetrics();
         this.updater = new HollowClientUpdater(blobRetriever,
@@ -163,6 +167,7 @@ public class HollowConsumer {
                 apiFactory,
                 doubleSnapshotConfig,
                 hashCodeFinder,
+                memoryMode,
                 objectLongevityConfig,
                 objectLongevityDetector,
                 metrics,
@@ -173,6 +178,7 @@ public class HollowConsumer {
         this.refreshLock = new ReentrantReadWriteLock();
         if (announcementWatcher != null)
             announcementWatcher.subscribeToUpdates(this);
+        this.memoryMode = memoryMode;
     }
 
     protected  <B extends Builder<B>> HollowConsumer(B builder) {
@@ -967,6 +973,7 @@ public class HollowConsumer {
         protected File localBlobStoreDir = null;
         protected boolean noFallBackForExistingSnapshot;
         protected Executor refreshExecutor = null;
+        protected MemoryMode memoryMode = MemoryMode.ON_HEAP;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
 
         public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
@@ -1102,6 +1109,11 @@ public class HollowConsumer {
 
         public B withRefreshExecutor(Executor refreshExecutor) {
             this.refreshExecutor = refreshExecutor;
+            return (B)this;
+        }
+
+        public B withMemoryMode(MemoryMode memoryMode) {
+            this.memoryMode = memoryMode;
             return (B)this;
         }
 

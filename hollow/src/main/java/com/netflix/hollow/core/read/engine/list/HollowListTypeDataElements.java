@@ -18,6 +18,7 @@ package com.netflix.hollow.core.read.engine.list;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.memory.FixedLengthDataMode;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
@@ -47,8 +48,14 @@ public class HollowListTypeDataElements {
     long totalNumberOfElements = 0;
 
     final ArraySegmentRecycler memoryRecycler;
+    final MemoryMode memoryMode;
 
     public HollowListTypeDataElements(ArraySegmentRecycler memoryRecycler) {
+        this(MemoryMode.ON_HEAP, memoryRecycler);
+    }
+
+    public HollowListTypeDataElements(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
+        this.memoryMode = memoryMode;
         this.memoryRecycler = memoryRecycler;
     }
 
@@ -72,8 +79,8 @@ public class HollowListTypeDataElements {
         bitsPerElement = VarInt.readVInt(in);
         totalNumberOfElements = VarInt.readVLong(in);
 
-        listPointerData = FixedLengthDataMode.deserializeFrom(in, memoryRecycler);
-        elementData = FixedLengthDataMode.deserializeFrom(in, memoryRecycler);
+        listPointerData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
+        elementData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
 
         // debug.append("HollowListTypeDataElements listPointerData= \n");
         // listPointerData.pp(debug);
