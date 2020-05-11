@@ -146,8 +146,8 @@ public class HollowBlobReader {
 
     }
 
-    private HollowBlobHeader readHeader(HollowBlobInput f, boolean isDelta) throws IOException {
-        HollowBlobHeader header = headerReader.readHeader(f);
+    private HollowBlobHeader readHeader(HollowBlobInput in, boolean isDelta) throws IOException {
+        HollowBlobHeader header = headerReader.readHeader(in);
 
         if(isDelta && header.getOriginRandomizedTag() != stateEngine.getCurrentRandomizedTag())
             throw new IOException("Attempting to apply a delta to a state from which it was not originated!");

@@ -166,7 +166,7 @@ public class HollowObjectTypeDataElements {
 
             if(schema.getPosition(unfilteredSchema.getFieldName(i)) != -1) {
                 if(numBytesInVarLengthData != 0) {
-                    varLengthData[filteredFieldIdx] = VariableLengthDataMode.get(memoryRecycler);
+                    varLengthData[filteredFieldIdx] = VariableLengthDataMode.get(memoryMode, memoryRecycler);
                     varLengthData[filteredFieldIdx].loadFrom(in, numBytesInVarLengthData);
                 }
                 filteredFieldIdx++;

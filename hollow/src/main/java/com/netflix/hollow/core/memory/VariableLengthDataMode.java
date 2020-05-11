@@ -5,17 +5,20 @@ import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class VariableLengthDataMode {
 
-    public static final boolean SHARED_MEMORY_MODE = true;
+    public static VariableLengthData get(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
 
-    public static VariableLengthData get(ArraySegmentRecycler memoryRecycler) throws IOException {
+        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
+            return new SegmentedByteArray(memoryRecycler);
 
-        if (SHARED_MEMORY_MODE) {
+        } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
+            /// list pointer array
             return new EncodedByteBuffer();
         } else {
-            return new SegmentedByteArray(memoryRecycler);
+            throw new NotImplementedException();
         }
     }
 
