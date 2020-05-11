@@ -12,12 +12,9 @@ public class FixedLengthDataMode {
     public static FixedLengthData deserializeFrom(HollowBlobInput in, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) throws IOException {
 
         if (memoryMode.equals(MemoryMode.ON_HEAP)) {
-            FixedLengthElementArray data = FixedLengthElementArray.deserializeFrom(in, memoryRecycler);
-            return data;
+            return FixedLengthElementArray.deserializeFrom(in, memoryRecycler);
         } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
-            /// list pointer array
-            EncodedLongBuffer data = EncodedLongBuffer.deserializeFrom(in);
-            return data;
+            return EncodedLongBuffer.deserializeFrom(in);
         } else {
             throw new NotImplementedException();
         }
