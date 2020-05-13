@@ -19,7 +19,9 @@ package com.netflix.hollow.core.schema;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -76,6 +78,10 @@ public abstract class HollowSchema {
         }
     }
 
+    // SNAP: TODO: Bring back all the input stream versions for backwards compatibility
+    public static HollowSchema readFrom(InputStream is) throws IOException {
+        return readFrom(HollowBlobInput.inputStream(is));
+    }
     public static HollowSchema readFrom(HollowBlobInput in) throws IOException {
         int schemaTypeId = in.read();
 
