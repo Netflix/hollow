@@ -159,7 +159,9 @@ public class HollowBlobInput implements Closeable {
     }
 
     public int skipBytes(long n) throws IOException {
-        // SNAP: TODO: lossy long to int cast here. InputStream used to have a skip(long) method
+        if (n > Integer.MAX_VALUE) {
+            throw new UnsupportedOperationException(); // SNAP: TODO: lossy long to int cast here. InputStream used to have a skip(long) method
+        }
         if (o instanceof RandomAccessFile) {
             return ((RandomAccessFile) o).skipBytes((int) n);
         } else if (o instanceof DataInputStream) {

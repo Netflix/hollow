@@ -34,6 +34,7 @@ import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -70,9 +71,13 @@ public class HollowBlobReader {
     /**
      * Initialize the state engine using a snapshot blob from the provided HollowBlobInput.
      *
-     * @param in the Hollow blob input to read the snapshot from
+     * @param is the Hollow blob input to read the snapshot from
      * @throws IOException if the snapshot could not be read
      */
+    public void readSnapshot(InputStream is, BufferedWriter debug) throws IOException { // SNAP: Need to keep inputstream flavors around for backwards compatibility
+        readSnapshot(HollowBlobInput.inputStream(is), debug);
+    }
+
     public void readSnapshot(HollowBlobInput in, BufferedWriter debug) throws IOException {
         readSnapshot(in, debug, new HollowFilterConfig(true));
     }
@@ -82,10 +87,14 @@ public class HollowBlobReader {
      * <p>
      * Apply the provided {@link HollowFilterConfig} to the state.
      *
-     * @param in the Hollow blob input to read the snapshot from
+     * @param is the Hollow blob input to read the snapshot from
      * @param filter the filtering configuration to filter the snapshot
      * @throws IOException if the snapshot could not be read
      */
+    public void readSnapshot(InputStream is, BufferedWriter debug, HollowFilterConfig filter) throws IOException {
+        readSnapshot(HollowBlobInput.inputStream(is), debug, filter);
+    }
+
     public void readSnapshot(HollowBlobInput in, BufferedWriter debug, HollowFilterConfig filter) throws IOException {
         HollowBlobHeader header = readHeader(in, false);
 
@@ -122,6 +131,10 @@ public class HollowBlobReader {
      * @param in the Hollow blob input to read the delta from
      * @throws IOException if the delta could not be applied
      */
+    public void applyDelta(InputStream in, BufferedWriter debug) throws IOException {
+        applyDelta(HollowBlobInput.inputStream(in), debug);
+    }
+
     public void applyDelta(HollowBlobInput in, BufferedWriter debug) throws IOException {
         HollowBlobHeader header = readHeader(in, true);
         notifyBeginUpdate();

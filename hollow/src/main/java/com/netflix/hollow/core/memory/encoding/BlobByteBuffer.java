@@ -10,6 +10,8 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import sun.misc.Unsafe;
 
 /**
@@ -23,8 +25,43 @@ import sun.misc.Unsafe;
 public final class BlobByteBuffer {
 
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
-
     private static final int MAX_BUFFER_CAPACITY = 1 << 30; // largest, positive power-of-two int
+
+    private final ByteBuffer[] spine;   // array of MappedByteBuffer
+    private final long capacity;
+    private final int shift;
+    private final int mask;
+    private long position;  // within index 0 to capacity-1 in the underlying ByteBuffer
+
+    Lock lock1 = new ReentrantLock();
+
+    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine) {
+        this(capacity, shift, mask, spine, 0);
+    }
+
+    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, long position) {
+        this.capacity = capacity;
+        this.shift = shift;
+        this.mask = mask;
+        this.position = position;
+
+        /// The following assignment is purposefully placed *after* the population of all segments.
+        /// The final assignment after the initialization of the array guarantees that no thread
+        /// will see any of the array elements before assignment.
+        /// We can't risk the segment values being visible as null to any thread, because
+        /// FixedLengthElementArray uses Unsafe to access these values, which would cause the
+        /// JVM to crash with a segmentation fault.
+        this.spine = spine;
+    }
+
+    public BlobByteBuffer duplicate() {
+        lock1.lock();
+        try {
+            return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position);
+        } finally {
+            lock1.unlock();
+        }
+    }
 
     public static BlobByteBuffer mmapBlob(FileChannel channel) throws IOException {
         long size = channel.size();
@@ -58,38 +95,14 @@ public final class BlobByteBuffer {
         return new BlobByteBuffer(size, shift, mask, spine);
     }
 
-    private final ByteBuffer[] spine;
-    private final long capacity;
-    private final int shift;
-    private final int mask;
-
-    private byte[] lbuff = new byte[8];  // buffer when reading int and long
-    private byte[] bbuff = new byte[80]; // buffer when reading UTF
-    private char[] cbuff = new char[80]; // buffer when reading UTF
-
-    private long position;  // 0 to capacity-1
-
-    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine) {
-        this(capacity, shift, mask, spine, 0);
-    }
-
-    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, long position) {
-        this.capacity = capacity;
-        this.shift = shift;
-        this.mask = mask;
-        this.position = position;
-
-        /// The following assignment is purposefully placed *after* the population of all segments.
-        /// The final assignment after the initialization of the array guarantees that no thread
-        /// will see any of the array elements before assignment.
-        /// We can't risk the segment values being visible as null to any thread, because
-        /// FixedLengthElementArray uses Unsafe to access these values, which would cause the
-        /// JVM to crash with a segmentation fault.
-        this.spine = spine;
-    }
-
     public long position() {
-        return this.position;
+        lock1.lock();
+        try {
+            return this.position;
+        } finally {
+            lock1.unlock();
+        }
+
     }
 
     // @param position in bytes
@@ -102,43 +115,109 @@ public final class BlobByteBuffer {
 
     // @param position in bytes from offset 0 in the backing BlobByteBuffer
     public byte getByte(long index) throws BufferUnderflowException {
-        int spineIndex = (int)(index >>> (shift));
-        int bufferIndex = (int)(index & mask);
-        return spine[spineIndex].get(bufferIndex);
+        lock1.lock();
+        try {
+            int spineIndex = (int)(index >>> (shift));
+            int bufferIndex = (int)(index & mask);
+            return spine[spineIndex].get(bufferIndex);
+        } finally {
+            lock1.unlock();
+        }
     }
 
     // Return long starting at given byte index
     // @param startByteIndex long position from offset 0 in the backing BlobByteBuffer
     public long getLong(long startByteIndex) throws BufferUnderflowException {
-        int spineIndex = (int)(startByteIndex >>> (shift));
-        int bufferByteIndex = (int)(startByteIndex & mask);
-        int alignmentOffset = (int)(startByteIndex - this.position()) % 8;
+        lock1.lock();
+        try {
+            int spineIndex = (int)(startByteIndex >>> (shift));
+            int bufferByteIndex = (int)(startByteIndex & mask);
+            int alignmentOffset = (int)(startByteIndex - this.position()) % 8;
 
-        if (!(bufferByteIndex + 8 < this.capacity))
-            throw new IllegalStateException();
+            if (!(bufferByteIndex + 8 < this.capacity))
+                throw new IllegalStateException();
 
-        long longVal;
-        if (alignmentOffset == 0) {
-            longVal = spine[spineIndex].getLong(bufferByteIndex);
-        } else {
-            // SNAP: Below logic can be optimized with bitwise operations
-            long[] longs = new long[2];
-            int firstBufferOffset = bufferByteIndex - alignmentOffset;
-            int secondBufferOffset = firstBufferOffset + 8;
-            longs[0] = spine[spineIndex].getLong(firstBufferOffset);
-            if ((secondBufferOffset & mask) == secondBufferOffset) {    // if next aligned long is in the same spine bucket
-                longs[1] = spine[spineIndex].getLong(secondBufferOffset);
-            } else {
-                if (!(spineIndex+1 < spine.length)) {
-                    longs[1] = spine[spineIndex+1].getLong(spine[spineIndex+1].position()); // read in the first long in the next spine bucket
-                } else {
-                    throw new IllegalStateException("Attempting to read unaligned long starting in the last 8 bytes of data");
-                }
+            long longVal;
+            if (alignmentOffset == 0 && bufferByteIndex + 8 <= spine[spineIndex].capacity()) {
+                longVal = spine[spineIndex].getLong(bufferByteIndex);   // SNAP: IndexOutOfBoundsException could occur here if bufferByteIndex is within 8 bytes of spine[spineIndex].capacity
+            } else if (alignmentOffset == 0) {  // if offset of long to be read is aligned in the underlying ByteBuffer but falls within last 8 bytes of the spine element capacity
+                // SNAP: This and above if condition can be collapsed, although not sure if that's efficient
+                // get bytes at bufferByteIndex to spine[spineIndex].capacity()-1,
+                // get remaining bytes (for a total of 8) from spine[spineIndex+1] starting at spine[spineIndex+1].position()
+
+                // SNAP: Shows that we get the same result within the spine element by using Util
+                // byte[] previousBytes = new byte[8];
+                // for (int i=0; i<8; i++)
+                //     previousBytes[i] = spine[spineIndex].get(bufferByteIndex -8 + i);
+                // long previousLongByByteBufferGetLong = spine[spineIndex].getLong(bufferByteIndex-8);
+                // long previousLongByUtil = BlobByteUtils.toLong(previousBytes);
+
+                longVal = BlobByteBufferUnalignedUtils.getLongOnBoundary(spine[spineIndex], spine[spineIndex+1], bufferByteIndex);
             }
-            longVal = unsafe.getLong(longs, Unsafe.ARRAY_LONG_BASE_OFFSET + alignmentOffset);
+            else {
+                // SNAP: Below logic can be optimized with bitwise operations
+                long[] longs = new long[2];
+                int firstBufferOffset = bufferByteIndex - alignmentOffset;
+                int secondBufferOffset = firstBufferOffset + 8;
+
+                longs[0] = spine[spineIndex].getLong(firstBufferOffset);
+                if ((secondBufferOffset & mask) == secondBufferOffset) {    // if next aligned long is in the same spine bucket
+                    if (secondBufferOffset + 8 <= spine[spineIndex].capacity()) {
+                        longs[1] = spine[spineIndex].getLong(secondBufferOffset);
+                    } else {
+                        longs[1] = BlobByteBufferUnalignedUtils.getLongOnBoundary(spine[spineIndex], spine[spineIndex+1], secondBufferOffset);
+                    }
+                } else {
+                    if (!(spineIndex + 1 < spine.length)) {
+                        longs[1] = spine[spineIndex + 1].getLong(
+                                spine[spineIndex + 1].position()); // read in the first long in the next spine bucket
+                    } else {
+                        throw new IllegalStateException(
+                                "Attempting to read unaligned long starting in the last 8 bytes of data");
+                    }
+                }
+                longVal = unsafe.getLong(longs, Unsafe.ARRAY_LONG_BASE_OFFSET + alignmentOffset);
+            }
+            return longVal;
+        } finally {
+            lock1.unlock();
         }
-        return longVal;
+
     }
+
+    public static class BlobByteBufferUnalignedUtils {
+
+        private static ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        private static byte[] bytes = new byte[Long.BYTES];
+
+        public static byte[] toBytes(long val) {
+            buffer.putLong(0, val);
+            return buffer.array();
+        }
+
+        public static long toLong(byte[] bytes) {
+            buffer.position(0);
+            buffer.put(bytes, 0, bytes.length);
+            buffer.flip();
+            return buffer.getLong();
+        }
+
+        public static long getLongOnBoundary(ByteBuffer currBuffer, ByteBuffer nextBuffer, int offset) {
+            int pickFromCurrent = currBuffer.capacity() - offset;
+            for (int i = 0; i < pickFromCurrent; i++)
+                bytes[i] = currBuffer.get(offset + i);
+            int pickFromNext = 8 - pickFromCurrent;
+            for (int i = 0; i < pickFromNext; i++)
+                bytes[pickFromCurrent + i] = nextBuffer.get(nextBuffer.position() + i);
+
+            return toLong(bytes);
+        }
+    }
+
+
+    private byte[] lbuff = new byte[8];  // buffer when reading int and long
+    private byte[] bbuff = new byte[80]; // buffer when reading UTF
+    private char[] cbuff = new char[80]; // buffer when reading UTF
 
     public static String ppBytesInLong(long l) {
         try {
@@ -155,10 +234,6 @@ public final class BlobByteBuffer {
         } catch (IOException e) {
             throw new IllegalStateException();
         }
-    }
-
-    public BlobByteBuffer duplicate() {
-        return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position);
     }
 
 //     public void deserializeFrom(byte[] dst, int offset, int length) {

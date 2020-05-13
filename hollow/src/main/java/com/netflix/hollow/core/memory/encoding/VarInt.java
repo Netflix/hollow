@@ -172,6 +172,22 @@ public class VarInt {
      * @return the int value
      * @throws IOException if the value cannot be read from the input
      */
+    public static int readVInt(InputStream in) throws IOException {
+        byte b = (byte)in.read();
+
+        if(b == (byte) 0x80)
+            throw new RuntimeException("Attempting to read null value as int");
+
+        int value = b & 0x7F;
+        while ((b & 0x80) != 0) {
+            b = (byte)in.read();
+            value <<= 7;
+            value |= (b & 0x7F);
+        }
+
+        return value;
+    }
+    // SNAP: TODO: Bring back all the input stream versions for backwards compatibility
     public static int readVInt(HollowBlobInput in) throws IOException {
         byte b = (byte)in.read();
 
