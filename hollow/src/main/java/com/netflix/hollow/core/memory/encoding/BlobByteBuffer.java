@@ -154,11 +154,11 @@ public final class BlobByteBuffer {
 
                 longVal = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex], spine[spineIndex+1], bufferByteIndex);
             }
-            else {
+            else {  // unaligned read
                 // SNAP: Below logic can be optimized with bitwise operations
                 long[] longs = new long[2];
                 int firstBufferOffset = bufferByteIndex - alignmentOffset; // SNAP: if this is negative then have to fetch the previous spine element
-                if (firstBufferOffset < 0) {
+                if (firstBufferOffset < 0) {    // if first aligned byte is in the previous spine bucket
                     if (spineIndex == 0) {
                         throw new IllegalStateException();
                     }
@@ -167,25 +167,24 @@ public final class BlobByteBuffer {
                     // SNAP: TODO: NOT SURE WHAT TO DO HERE.
                     //
                     longs[0] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex-1], spine[spineIndex], spine[spineIndex-1].capacity() + firstBufferOffset);
-                } else {
-                    longs[0] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex], spine[spineIndex+1], firstBufferOffset);
+                } else {    // if first aligned byte is in the current spine bucket
+                    if (firstBufferOffset + Long.BYTES <= spine[spineIndex].capacity())
+                        longs[0] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex],null, firstBufferOffset);
+                    else
+                        longs[0] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex], spine[spineIndex + 1], firstBufferOffset);
                 }
 
-                int secondBufferOffset = firstBufferOffset + 8;
+                int secondBufferOffset = firstBufferOffset + Long.BYTES;
                 if ((secondBufferOffset & mask) == secondBufferOffset) {    // if next aligned long is in the same spine bucket
-                    if (secondBufferOffset + 8 <= spine[spineIndex].capacity()) {
+                    if (secondBufferOffset + Long.BYTES <= spine[spineIndex].capacity())
                         longs[1] = spine[spineIndex].getLong(secondBufferOffset);
-                    } else {
+                    else
                         longs[1] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex], spine[spineIndex+1], secondBufferOffset);
-                    }
                 } else {
-                    if (!(spineIndex + 1 < spine.length)) {
-                        longs[1] = spine[spineIndex + 1].getLong(
-                                spine[spineIndex + 1].position()); // read in the first long in the next spine bucket
-                    } else {
-                        throw new IllegalStateException(
-                                "Attempting to read unaligned long starting in the last 8 bytes of data");
-                    }
+                    if (spineIndex + 1 < spine.length)
+                        longs[1] = spine[spineIndex + 1].getLong(spine[spineIndex + 1].position() + (secondBufferOffset & mask)); // read in aligned long from the next spine bucket
+                    else
+                        throw new IllegalStateException("Attempting to read unaligned long starting in the last 8 bytes of data");
                 }
                 longVal = unsafe.getLong(longs, Unsafe.ARRAY_LONG_BASE_OFFSET + alignmentOffset);
             }
@@ -198,25 +197,29 @@ public final class BlobByteBuffer {
 
     public static class BlobByteBufferUnalignedUtils {
 
-        private static ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-        private static byte[] bytes = new byte[Long.BYTES];
-
-        public static byte[] toBytes(long val) {
-            buffer.putLong(0, val);
-            return buffer.array();
-        }
+        // public static byte[] toBytes(long val) {
+        //     ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        //     buffer.putLong(0, val);
+        //     return buffer.array();
+        // }
 
         public static long toLong(byte[] bytes) {
-            buffer.position(0);
+            ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+            // buffer.position(0);
             buffer.put(bytes, 0, bytes.length);
             buffer.flip();
             return buffer.getLong();
         }
 
         public static long getAlignedLongAcrossSpineBoundary(ByteBuffer currBuffer, ByteBuffer nextBuffer, int offset) {
+            byte[] bytes = new byte[Long.BYTES];
             int pickFromCurrent = currBuffer.capacity() - offset;
-            for (int i = 0; i < pickFromCurrent; i++)
+            if (pickFromCurrent > 8)
+                pickFromCurrent = 8;
+
+            for (int i = 0; i < pickFromCurrent; i++) {
                 bytes[i] = currBuffer.get(offset + i);
+            }
             int pickFromNext = 8 - pickFromCurrent;
             for (int i = 0; i < pickFromNext; i++)
                 bytes[pickFromCurrent + i] = nextBuffer.get(nextBuffer.position() + i);
