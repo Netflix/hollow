@@ -20,7 +20,6 @@ import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.util.IOUtils;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

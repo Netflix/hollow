@@ -43,7 +43,6 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.util.IOUtils;
 import com.netflix.hollow.core.write.HollowBlobHeaderWriter;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;

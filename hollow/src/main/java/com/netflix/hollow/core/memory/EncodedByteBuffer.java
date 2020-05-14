@@ -19,7 +19,6 @@ package com.netflix.hollow.core.memory;
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 // SNAP: TODO: @SuppressWarnings("restriction")
 public class EncodedByteBuffer implements VariableLengthData {

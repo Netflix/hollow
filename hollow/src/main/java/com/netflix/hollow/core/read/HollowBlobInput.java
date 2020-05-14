@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class HollowBlobInput implements Closeable {
     Object o;
@@ -28,7 +27,7 @@ public class HollowBlobInput implements Closeable {
         } else if (mode.equals(SHARED_MEMORY_LAZY)) {
             return randomAccessFile(blob.getFile());
         } else {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -38,7 +37,7 @@ public class HollowBlobInput implements Closeable {
         } else if (mode.equals(SHARED_MEMORY_LAZY)) {
             throw new UnsupportedOperationException("Shared memory mode is not supported for producer");
         } else {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException("Memory mode " + mode.name() + " not supported");
         }
     }
 
