@@ -162,10 +162,6 @@ public final class BlobByteBuffer {
                     if (spineIndex == 0) {
                         throw new IllegalStateException();
                     }
-
-                    //
-                    // SNAP: TODO: NOT SURE WHAT TO DO HERE.
-                    //
                     longs[0] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex-1], spine[spineIndex], spine[spineIndex-1].capacity() + firstBufferOffset);
                 } else {    // if first aligned byte is in the current spine bucket
                     if (firstBufferOffset + Long.BYTES <= spine[spineIndex].capacity())
@@ -196,12 +192,6 @@ public final class BlobByteBuffer {
     }
 
     public static class BlobByteBufferUnalignedUtils {
-
-        // public static byte[] toBytes(long val) {
-        //     ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-        //     buffer.putLong(0, val);
-        //     return buffer.array();
-        // }
 
         public static long toLong(byte[] bytes) {
             ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
