@@ -5,7 +5,6 @@ import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class FixedLengthDataMode {
 
@@ -16,7 +15,7 @@ public class FixedLengthDataMode {
         } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
             return EncodedLongBuffer.deserializeFrom(in);
         } else {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
         }
     }
 

@@ -20,7 +20,6 @@ import com.netflix.hollow.core.HollowConstants;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * A HollowBlob, which is either a snapshot or a delta, defines three things:
@@ -78,7 +77,7 @@ public abstract class HollowBlob {
     public abstract InputStream getInputStream() throws IOException;
 
     public File getFile() throws IOException {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public boolean isSnapshot() {

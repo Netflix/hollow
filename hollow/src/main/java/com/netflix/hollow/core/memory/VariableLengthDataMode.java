@@ -1,11 +1,6 @@
 package com.netflix.hollow.core.memory;
 
-import com.netflix.hollow.core.memory.encoding.EncodedLongBuffer;
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
-import com.netflix.hollow.core.read.HollowBlobInput;
-import java.io.IOException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class VariableLengthDataMode {
 
@@ -18,7 +13,7 @@ public class VariableLengthDataMode {
             /// list pointer array
             return new EncodedByteBuffer();
         } else {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
         }
     }
 

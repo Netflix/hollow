@@ -19,7 +19,6 @@ package com.netflix.hollow.api.producer.fs;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import com.netflix.hollow.api.producer.HollowProducer;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

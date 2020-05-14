@@ -17,6 +17,7 @@
 package com.netflix.hollow.test.consumer;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -38,7 +39,13 @@ public class TestBlob extends Blob {
         this.inputStream = null;
     }
 
+    @Override
     public InputStream getInputStream() throws IOException {
         return inputStream;
+    }
+
+    @Override
+    public File getFile() throws IOException {
+        throw new UnsupportedOperationException();
     }
 }

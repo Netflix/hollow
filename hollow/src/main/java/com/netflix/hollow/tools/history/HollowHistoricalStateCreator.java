@@ -45,7 +45,6 @@ import com.netflix.hollow.tools.combine.IdentityOrdinalRemapper;
 import com.netflix.hollow.tools.combine.OrdinalRemapper;
 import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.Closeable;

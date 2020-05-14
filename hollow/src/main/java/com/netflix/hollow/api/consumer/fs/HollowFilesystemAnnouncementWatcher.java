@@ -22,7 +22,6 @@ import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
