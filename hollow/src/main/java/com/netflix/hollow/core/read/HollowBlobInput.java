@@ -21,7 +21,7 @@ public class HollowBlobInput implements Closeable {
 
     private HollowBlobInput() {}
 
-    public static HollowBlobInput modeBasedInput(HollowConsumer.Blob blob, MemoryMode mode) throws IOException {
+    public static HollowBlobInput modeBasedBlobInput(MemoryMode mode, HollowConsumer.Blob blob) throws IOException {
         if (mode.equals(ON_HEAP)) {
             return inputStream(blob.getInputStream());
         } else if (mode.equals(SHARED_MEMORY_LAZY)) {
@@ -31,7 +31,7 @@ public class HollowBlobInput implements Closeable {
         }
     }
 
-    public static HollowBlobInput modeBasedInput(HollowProducer.Blob blob, MemoryMode mode) throws IOException {
+    public static HollowBlobInput modeBasedBlobInput(MemoryMode mode, HollowProducer.Blob blob) throws IOException {
         if (mode.equals(ON_HEAP)) {
             return inputStream(blob.newInputStream());
         } else if (mode.equals(SHARED_MEMORY_LAZY)) {
