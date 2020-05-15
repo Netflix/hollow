@@ -161,8 +161,9 @@ class HollowDataHolder {
             if(filter == null) {
                 reader.readSnapshot(in, debug);
             }
-            else
+            else {
                 reader.readSnapshot(in, debug, filter);
+            }
         } else {
             reader.applyDelta(in, debug);
         }
