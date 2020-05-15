@@ -21,6 +21,7 @@ import com.netflix.hollow.core.memory.FixedLengthDataMode;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.VariableLengthData;
 import com.netflix.hollow.core.memory.VariableLengthDataMode;
+import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
@@ -73,14 +74,14 @@ public class HollowObjectTypeDataElements {
     }
 
     void readSnapshot(HollowBlobInput in, BufferedWriter debug, HollowObjectSchema unfilteredSchema) throws IOException {
-        readFromStream(in, debug, false, unfilteredSchema);
+        readFromInput(in, debug, false, unfilteredSchema);
     }
 
     void readDelta(HollowBlobInput in, BufferedWriter debug) throws IOException {
-        readFromStream(in, debug, true, schema);
+        readFromInput(in, debug, true, schema);
     }
 
-    void readFromStream(HollowBlobInput in, BufferedWriter debug, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
+    void readFromInput(HollowBlobInput in, BufferedWriter debug, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
         maxOrdinal = VarInt.readVInt(in);
 
         if(isDelta) {
@@ -107,30 +108,29 @@ public class HollowObjectTypeDataElements {
 
     private void removeExcludedFieldsFromFixedLengthData() {
         if(bitsPerField.length < bitsPerUnfilteredField.length) {
-            throw new UnsupportedOperationException("Filtering not supported for shared memory mode");  // SNAP: TODO: remove this
-//            long numBitsRequired = (long)bitsPerRecord * (maxOrdinal + 1);
-//            FixedLengthElementArray filteredData = new FixedLengthElementArray(memoryRecycler, numBitsRequired);
-//
-//            long currentReadBit = 0;
-//            long currentWriteBit = 0;
-//
-//            for(int i=0;i<=maxOrdinal;i++) {
-//                for(int j=0;j<bitsPerUnfilteredField.length;j++) {
-//                    if(unfilteredFieldIsIncluded[j]) {
-//                        long value = bitsPerUnfilteredField[j] < 56 ?
-//                                fixedLengthData.getElementValue(currentReadBit, bitsPerUnfilteredField[j]) :
-//                                fixedLengthData.getLargeElementValue(currentReadBit, bitsPerUnfilteredField[j]);
-//                        filteredData.setElementValue(currentWriteBit, bitsPerUnfilteredField[j], value);
-//                        currentWriteBit += bitsPerUnfilteredField[j];
-//                    }
-//
-//                    currentReadBit += bitsPerUnfilteredField[j];
-//                }
-//            }
-//
-//            FixedLengthDataMode.destroy(fixedLengthData, memoryRecycler);
-//            memoryRecycler.swap();
-//            fixedLengthData = filteredData;
+            long numBitsRequired = (long)bitsPerRecord * (maxOrdinal + 1);
+            FixedLengthElementArray filteredData = new FixedLengthElementArray(memoryRecycler, numBitsRequired);
+
+            long currentReadBit = 0;
+            long currentWriteBit = 0;
+
+            for(int i=0;i<=maxOrdinal;i++) {
+                for(int j=0;j<bitsPerUnfilteredField.length;j++) {
+                    if(unfilteredFieldIsIncluded[j]) {
+                        long value = bitsPerUnfilteredField[j] < 56 ?
+                                fixedLengthData.getElementValue(currentReadBit, bitsPerUnfilteredField[j]) :
+                                fixedLengthData.getLargeElementValue(currentReadBit, bitsPerUnfilteredField[j]);
+                        filteredData.setElementValue(currentWriteBit, bitsPerUnfilteredField[j], value);
+                        currentWriteBit += bitsPerUnfilteredField[j];
+                    }
+
+                    currentReadBit += bitsPerUnfilteredField[j];
+                }
+            }
+
+            FixedLengthDataMode.destroy(fixedLengthData, memoryRecycler);
+            memoryRecycler.swap();
+            fixedLengthData = filteredData;
         }
     }
 

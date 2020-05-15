@@ -1171,6 +1171,14 @@ public class HollowConsumer {
             if (refreshExecutor == null) {
                 refreshExecutor = newSingleThreadExecutor(r -> daemonThread(r, getClass(), "refresh"));
             }
+
+            if (!memoryMode.consumerSupported()) {
+                throw new UnsupportedOperationException("Cinder Consumer in " + memoryMode + " mode is not supported");
+            }
+
+            if (filterConfig != null && !memoryMode.supportsFiltering()) {
+                throw new UnsupportedOperationException("Filtering is not supported in shared memory mode");
+            }
         }
 
         public HollowConsumer build() {
