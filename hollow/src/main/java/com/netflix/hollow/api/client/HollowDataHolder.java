@@ -140,7 +140,7 @@ class HollowDataHolder {
     private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_snapshot"));
 
-        HollowBlobInput in = HollowBlobInput.modeBasedInput(snapshotBlob, memoryMode);
+        HollowBlobInput in = HollowBlobInput.modeBasedBlobInput(memoryMode, snapshotBlob);
         try {
             applyStateEngineTransition(in, debug, snapshotBlob, refreshListeners);
             initializeAPI();
@@ -199,7 +199,7 @@ class HollowDataHolder {
         }
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_delta"));
 
-        try (HollowBlobInput in = HollowBlobInput.modeBasedInput(blob, memoryMode)) {
+        try (HollowBlobInput in = HollowBlobInput.modeBasedBlobInput(memoryMode, blob)) {
             applyStateEngineTransition(in, debug, blob, refreshListeners);
 
             if(objLongevityConfig.enableLongLivedObjectSupport()) {

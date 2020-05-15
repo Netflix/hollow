@@ -758,14 +758,14 @@ abstract class AbstractHollowProducer {
 
     private void readSnapshot(HollowProducer.Blob blob, HollowReadStateEngine stateEngine) throws IOException {
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_consumer_snapshot"));
-        try (HollowBlobInput in = HollowBlobInput.modeBasedInput(blob, MemoryMode.ON_HEAP)) {   // shared memory mode not supported for producer
+        try (HollowBlobInput in = HollowBlobInput.modeBasedBlobInput(MemoryMode.ON_HEAP, blob)) {   // shared memory mode not supported for producer
             new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).readSnapshot(in, debug);
         }
     }
 
     private void applyDelta(HollowProducer.Blob blob, HollowReadStateEngine stateEngine) throws IOException {
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_consumer_snapshot"));
-        try (HollowBlobInput in = HollowBlobInput.modeBasedInput(blob, MemoryMode.ON_HEAP)) {   // shared memory mode not supported for producer
+        try (HollowBlobInput in = HollowBlobInput.modeBasedBlobInput(MemoryMode.ON_HEAP, blob)) {   // shared memory mode not supported for producer
             new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).applyDelta(in, debug);
         }
     }
