@@ -20,12 +20,10 @@ import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -315,7 +313,6 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
     private static class TypeC {
         private final TypeD cd;
 
@@ -333,7 +330,6 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
     private static class TypeTwoStrings {
         private final String b1;
         private final String b2;
