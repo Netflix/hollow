@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -59,9 +60,10 @@ public class HollowClientUpdaterTest {
         objectLongevityConfig = mock(HollowConsumer.ObjectLongevityConfig.class);
         objectLongevityDetector = mock(HollowConsumer.ObjectLongevityDetector.class);
         metrics = mock(HollowConsumerMetrics.class);
+        MemoryMode memoryMode = MemoryMode.ON_HEAP;
 
         subject = new HollowClientUpdater(retriever, emptyList(), apiFactory, snapshotConfig,
-                null, objectLongevityConfig, objectLongevityDetector, metrics, null);
+                null, memoryMode, objectLongevityConfig, objectLongevityDetector, metrics, null);
     }
 
     @Test

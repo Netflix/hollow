@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.read.object;
 
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -84,13 +85,13 @@ public class HollowObjectReverseDeltaTest {
 
         HollowBlobReader reader = new HollowBlobReader(readEngine);
 
-        reader.readSnapshot(new ByteArrayInputStream(snapshot));
+        reader.readSnapshot(HollowBlobInput.inputStream(new ByteArrayInputStream(snapshot)));
         assertState(100, 101);
-        reader.applyDelta(new ByteArrayInputStream(reverseDelta1));
+        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(reverseDelta1)));
         assertState(-100, 101);
-        reader.applyDelta(new ByteArrayInputStream(reverseDelta2));
+        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(reverseDelta2)));
         assertState(100, 101, -1, 103);
-        reader.applyDelta(new ByteArrayInputStream(reverseDelta3));
+        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(reverseDelta3)));
         assertState(100, 101, 102, 103);
     }
 

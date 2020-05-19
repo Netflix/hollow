@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
@@ -116,6 +117,7 @@ public class CustomConsumerBuilderTest {
                             doubleSnapshotConfig,
                             hashCodeFinder,
                             refreshExecutor,
+                            memoryMode,
                             metricsCollector
                     );
                     break;
@@ -142,6 +144,7 @@ public class CustomConsumerBuilderTest {
                 DoubleSnapshotConfig doubleSnapshotConfig,
                 HollowObjectHashCodeFinder hashCodeFinder,
                 Executor refreshExecutor,
+                MemoryMode memoryMode,
                 HollowMetricsCollector<HollowConsumerMetrics> metricsCollector
         ) {
             super(blobRetriever,
@@ -154,6 +157,7 @@ public class CustomConsumerBuilderTest {
                     doubleSnapshotConfig,
                     hashCodeFinder,
                     refreshExecutor,
+                    memoryMode,
                     metricsCollector);
         }
 

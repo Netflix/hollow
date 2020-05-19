@@ -27,6 +27,8 @@ import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.read.filter.TypeFilter;
+import com.netflix.hollow.tools.history.HollowHistoricalStateCreator;
 import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -140,8 +142,7 @@ class HollowDataHolder {
     private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_snapshot"));
 
-        HollowBlobInput in = HollowBlobInput.modeBasedBlobInput(memoryMode, snapshotBlob);
-        try {
+        try (HollowBlobInput in = HollowBlobInput.modeBasedBlobInput(memoryMode, snapshotBlob)) {   // SNAP: TODO: It implements closeable
             applyStateEngineTransition(in, debug, snapshotBlob, refreshListeners);
             initializeAPI();
 

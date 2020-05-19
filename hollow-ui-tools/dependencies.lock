@@ -1,0 +1,183 @@
+{
+    "compile": {
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    },
+    "compileClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0",
+            "requested": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "locked": "1.11",
+            "requested": "1.11"
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6",
+            "requested": "2.6"
+        },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7",
+            "requested": "1.7"
+        },
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    },
+    "default": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0",
+            "requested": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "locked": "1.11",
+            "requested": "1.11"
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6",
+            "requested": "2.6"
+        },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7",
+            "requested": "1.7"
+        },
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    },
+    "runtime": {
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    },
+    "runtimeClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0",
+            "requested": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "locked": "1.11",
+            "requested": "1.11"
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6",
+            "requested": "2.6"
+        },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7",
+            "requested": "1.7"
+        },
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    },
+    "testCompile": {
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    },
+    "testCompileClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0",
+            "requested": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "locked": "1.11",
+            "requested": "1.11"
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6",
+            "requested": "2.6"
+        },
+        "junit:junit": {
+            "locked": "4.11",
+            "requested": "4.11"
+        },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7",
+            "requested": "1.7"
+        },
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    },
+    "testRuntime": {
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    },
+    "testRuntimeClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0",
+            "requested": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "locked": "1.11",
+            "requested": "1.11"
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6",
+            "requested": "2.6"
+        },
+        "junit:junit": {
+            "locked": "4.11",
+            "requested": "4.11"
+        },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7",
+            "requested": "1.7"
+        },
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    },
+    "toolsCompile": {
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    },
+    "toolsCompileClasspath": {
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    },
+    "toolsRuntime": {
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    },
+    "toolsRuntimeClasspath": {
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.3.v20170317",
+            "requested": "9.4.3.v20170317"
+        }
+    }
+}

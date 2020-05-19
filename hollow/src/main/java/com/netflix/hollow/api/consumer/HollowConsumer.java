@@ -189,6 +189,7 @@ public class HollowConsumer {
                 builder.apiFactory,
                 builder.doubleSnapshotConfig,
                 builder.hashCodeFinder,
+                builder.memoryMode,
                 builder.objectLongevityConfig,
                 builder.objectLongevityDetector,
                 metrics,
@@ -197,6 +198,7 @@ public class HollowConsumer {
         this.announcementWatcher = builder.announcementWatcher;
         this.refreshExecutor = builder.refreshExecutor;
         this.refreshLock = new ReentrantReadWriteLock();
+        this.memoryMode = builder.memoryMode;
         if (announcementWatcher != null)
             announcementWatcher.subscribeToUpdates(this);
     }

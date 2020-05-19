@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.util;
 
+import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import java.util.Random;
@@ -178,14 +179,14 @@ public class FixedLengthElementArrayTest {
 
     @Test
     public void convenienceMethodForNumberOfBitsRequiredForValue() {
-        Assert.assertEquals(1, FixedLengthElementArray.bitsRequiredToRepresentValue(0));
-        Assert.assertEquals(1, FixedLengthElementArray.bitsRequiredToRepresentValue(1));
-        Assert.assertEquals(2, FixedLengthElementArray.bitsRequiredToRepresentValue(2));
-        Assert.assertEquals(2, FixedLengthElementArray.bitsRequiredToRepresentValue(3));
-        Assert.assertEquals(3, FixedLengthElementArray.bitsRequiredToRepresentValue(4));
-        Assert.assertEquals(5, FixedLengthElementArray.bitsRequiredToRepresentValue(16));
-        Assert.assertEquals(5, FixedLengthElementArray.bitsRequiredToRepresentValue(31));
-        Assert.assertEquals(63, FixedLengthElementArray.bitsRequiredToRepresentValue(Long.MAX_VALUE));
+        Assert.assertEquals(1, FixedLengthData.bitsRequiredToRepresentValue(0));
+        Assert.assertEquals(1, FixedLengthData.bitsRequiredToRepresentValue(1));
+        Assert.assertEquals(2, FixedLengthData.bitsRequiredToRepresentValue(2));
+        Assert.assertEquals(2, FixedLengthData.bitsRequiredToRepresentValue(3));
+        Assert.assertEquals(3, FixedLengthData.bitsRequiredToRepresentValue(4));
+        Assert.assertEquals(5, FixedLengthData.bitsRequiredToRepresentValue(16));
+        Assert.assertEquals(5, FixedLengthData.bitsRequiredToRepresentValue(31));
+        Assert.assertEquals(63, FixedLengthData.bitsRequiredToRepresentValue(Long.MAX_VALUE));
     }
 
 }
