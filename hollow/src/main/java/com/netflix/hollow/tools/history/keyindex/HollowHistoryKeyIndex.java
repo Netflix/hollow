@@ -192,6 +192,7 @@ public class HollowHistoryKeyIndex {
             } else {
                 reader.applyDelta(in, debug);
             }
+            in.close(); // SNAP: This includes a bug fix where inputstream wasn't being closed
         } catch (Exception e) {
             pipeException = e;
         }

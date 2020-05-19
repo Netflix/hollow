@@ -109,10 +109,14 @@ public class HollowBlobReader {
      * @throws IOException if the snapshot could not be read
      */
     public void readSnapshot(InputStream is, BufferedWriter debug, HollowFilterConfig filter) throws IOException {
+        readSnapshot(HollowBlobInput.inputStream(is), debug, (TypeFilter) filter);
+    }
+
+    public void readSnapshot(InputStream is, BufferedWriter debug, TypeFilter filter) throws IOException {
         readSnapshot(HollowBlobInput.inputStream(is), debug, filter);
     }
 
-    public void readSnapshot(HollowBlobInput in, BufferedWriter debug, HollowFilterConfig filter) throws IOException {
+    public void readSnapshot(HollowBlobInput in, BufferedWriter debug, TypeFilter filter) throws IOException {
         HollowBlobHeader header = readHeader(in, false);
 
         notifyBeginUpdate();
@@ -123,7 +127,7 @@ public class HollowBlobReader {
 
         Collection<String> typeNames = new TreeSet<>();
         for(int i=0;i<numStates;i++) {
-            String typeName = readTypeFileSnapshot(in, debug, header, filter);
+            String typeName = readTypeStateSnapshot(in, debug, header, filter);
             typeNames.add(typeName);
         }
 
@@ -209,14 +213,16 @@ public class HollowBlobReader {
         }
     }
 
-    private String readTypeFileSnapshot(HollowBlobInput in, BufferedWriter debug, HollowBlobHeader header, HollowFilterConfig filter) throws IOException {
+    private String readTypeStateSnapshot(HollowBlobInput in, BufferedWriter debug, HollowBlobHeader header, TypeFilter filter) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(in);
-
         int numShards = readNumShards(in);
+        String typeName = schema.getName();
+
 
         if(schema instanceof HollowObjectSchema) {
-            if(!filter.doesIncludeType(schema.getName())) {
+            if(!filter.includes(typeName)) {
                 HollowObjectTypeReadState.discardSnapshot(in, (HollowObjectSchema)schema, numShards);
+
             } else {
                 HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
                 HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
@@ -224,19 +230,19 @@ public class HollowBlobReader {
             }
         } else if (schema instanceof HollowListSchema) {
             if(!filter.includes(typeName)) {
-                HollowListTypeReadState.discardSnapshot(is, numShards);
+                HollowListTypeReadState.discardSnapshot(in, numShards);
             } else {
                 populateTypeStateSnapshot(in, debug, new HollowListTypeReadState(stateEngine, memoryMode, (HollowListSchema)schema, numShards));
             }
         } else if(schema instanceof HollowSetSchema) {
             if(!filter.includes(typeName)) {
-                HollowSetTypeReadState.discardSnapshot(is, numShards);
+                HollowSetTypeReadState.discardSnapshot(in, numShards);
             } else {
                 populateTypeStateSnapshot(in, debug, new HollowSetTypeReadState(stateEngine, memoryMode, (HollowSetSchema)schema, numShards));
             }
         } else if(schema instanceof HollowMapSchema) {
             if(!filter.includes(typeName)) {
-                HollowMapTypeReadState.discardSnapshot(is, numShards);
+                HollowMapTypeReadState.discardSnapshot(in, numShards);
             } else {
                 populateTypeStateSnapshot(in, debug, new HollowMapTypeReadState(stateEngine, memoryMode, (HollowMapSchema)schema, numShards));
             }

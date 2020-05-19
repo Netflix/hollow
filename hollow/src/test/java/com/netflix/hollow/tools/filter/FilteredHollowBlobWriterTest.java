@@ -17,6 +17,7 @@
 package com.netflix.hollow.tools.filter;
 
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
@@ -97,12 +98,12 @@ public class FilteredHollowBlobWriterTest {
         
         HollowReadStateEngine readEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(readEngine);
-        reader.readSnapshot(new ByteArrayInputStream(filteredBlobStream.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.inputStream(new ByteArrayInputStream(filteredBlobStream.toByteArray())));
         
         filteredBlobStream.reset();
         blobWriter.filterDelta(new ByteArrayInputStream(deltaData), filteredBlobStream);
         
-        reader.applyDelta(new ByteArrayInputStream(filteredBlobStream.toByteArray()));
+        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(filteredBlobStream.toByteArray())));
         
         Assert.assertEquals(2, readEngine.getSchemas().size());
         Assert.assertEquals(1, ((HollowObjectSchema)readEngine.getSchema("TypeA")).numFields());
@@ -124,7 +125,7 @@ public class FilteredHollowBlobWriterTest {
         filteredBlobStream.reset();
         blobWriter.filterDelta(new ByteArrayInputStream(removeOnlyDeltaData), filteredBlobStream);
         
-        reader.applyDelta(new ByteArrayInputStream(filteredBlobStream.toByteArray()));
+        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(filteredBlobStream.toByteArray())));
         
         Assert.assertEquals(2, readEngine.getTypeState("TypeA").getPopulatedOrdinals().cardinality());
         Assert.assertEquals(2, readEngine.getTypeState("TypeB").getPopulatedOrdinals().cardinality());

@@ -1,0 +1,50 @@
+{
+    "testCompileClasspath": {
+        "com.google.code.findbugs:findbugs": {
+            "locked": "3.0.1",
+            "requested": "3.0.1"
+        },
+        "com.netflix.hollow:hollow-test": {
+            "project": true
+        },
+        "junit:junit": {
+            "locked": "4.11",
+            "requested": "4.11"
+        },
+        "org.assertj:assertj-core": {
+            "locked": "3.15.0",
+            "requested": "3.15.0"
+        },
+        "org.mockito:mockito-core": {
+            "locked": "2.15.0",
+            "requested": "2.15.0"
+        }
+    },
+    "testRuntimeClasspath": {
+        "com.google.code.findbugs:findbugs": {
+            "locked": "3.0.1",
+            "requested": "3.0.1"
+        },
+        "com.netflix.hollow:hollow": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-test"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-test": {
+            "project": true
+        },
+        "junit:junit": {
+            "locked": "4.11",
+            "requested": "4.11"
+        },
+        "org.assertj:assertj-core": {
+            "locked": "3.15.0",
+            "requested": "3.15.0"
+        },
+        "org.mockito:mockito-core": {
+            "locked": "2.15.0",
+            "requested": "2.15.0"
+        }
+    }
+}

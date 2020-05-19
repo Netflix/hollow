@@ -29,7 +29,7 @@ public class SnapshotPopulatedOrdinalsReader {
      * @throws IOException if the ordinals cannot be read
      * @author dkoszewnik
      */
-    public static void readOrdinals(HollowBlobInput in, HollowTypeStateListener[] listeners) throws IOException {
+    public static void readOrdinals(HollowBlobInput in, HollowTypeStateListener[] listeners) throws IOException {   // SNAP: TODO: might need to preserve inputstream version for bkwd compatibility. But maybe not!
         int numLongs = in.readInt();
 
         int currentOrdinal = 0;

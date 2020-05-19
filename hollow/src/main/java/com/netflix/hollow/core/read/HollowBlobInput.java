@@ -41,6 +41,7 @@ public class HollowBlobInput implements Closeable {
         }
     }
 
+    // SNAP: TODO: Comment about how returned handle must be closed
     public static HollowBlobInput randomAccessFile(File f) throws IOException {
         HollowBlobInput hbi = new HollowBlobInput();
         RandomAccessFile raf = new RandomAccessFile(f, "r");

@@ -102,6 +102,7 @@ public class HollowRefreshListenerTests {
                         doubleSnapshotConfig,
                         hashCodeFinder,
                         refreshExecutor,
+                        memoryMode,
                         metricsCollector);
             }
         };
