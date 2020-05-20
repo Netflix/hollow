@@ -54,7 +54,7 @@ class HollowObjectTypeReadStateShard {
             long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
             int numBitsForField = currentData.bitsPerField[fieldIndex];
 
-            // try {
+            // try {        // SNAP: TODO: Remove
             //     BufferedWriter diag = new BufferedWriter(new FileWriter("/tmp/diag-obj-" + schema.getName() + "-" + count++));
             //     currentData.fixedLengthData.pp(diag);
             //     diag.flush();
@@ -172,7 +172,7 @@ class HollowObjectTypeReadStateShard {
         long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
         int numBitsForField = currentData.bitsPerField[fieldIndex];
 
-        // try {
+        // try {    // SNAP: TODO: Remove
         //     BufferedWriter diag = new BufferedWriter(new FileWriter("/tmp/diag-obj-" + schema.getName() + "-" + count++));
         //     currentData.fixedLengthData.pp(diag);
         //     diag.flush();
