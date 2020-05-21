@@ -17,7 +17,7 @@
 package com.netflix.hollow.core.write;
 
 import com.netflix.hollow.core.memory.ByteData;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.VarInt;
@@ -36,12 +36,12 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     private int maxOrdinal;
     private int maxShardOrdinal[];
     private FixedLengthElementArray fixedLengthLongArray[];
-    private ByteDataBuffer varLengthByteArrays[][];
+    private ByteDataArray varLengthByteArrays[][];
     private long recordBitOffset[];
 
     /// additional data required for writing delta
-    private ByteDataBuffer deltaAddedOrdinals[];
-    private ByteDataBuffer deltaRemovedOrdinals[];
+    private ByteDataArray deltaAddedOrdinals[];
+    private ByteDataArray deltaRemovedOrdinals[];
 
     public HollowObjectTypeWriteState(HollowObjectSchema schema) {
         this(schema, -1);
@@ -167,12 +167,12 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
         
         fixedLengthLongArray = new FixedLengthElementArray[numShards];
-        varLengthByteArrays = new ByteDataBuffer[numShards][];
+        varLengthByteArrays = new ByteDataArray[numShards][];
         recordBitOffset = new long[numShards];
         
         for(int i=0;i<numShards;i++) {
             fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numBitsPerRecord * (maxShardOrdinal[i] + 1));
-            varLengthByteArrays[i] = new ByteDataBuffer[getSchema().numFields()];
+            varLengthByteArrays[i] = new ByteDataArray[getSchema().numFields()];
         }
         
         int shardMask = numShards - 1;
@@ -262,9 +262,9 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
 
         fixedLengthLongArray = new FixedLengthElementArray[numShards];
-        deltaAddedOrdinals = new ByteDataBuffer[numShards];
-        deltaRemovedOrdinals = new ByteDataBuffer[numShards];
-        varLengthByteArrays = new ByteDataBuffer[numShards][];
+        deltaAddedOrdinals = new ByteDataArray[numShards];
+        deltaRemovedOrdinals = new ByteDataArray[numShards];
+        varLengthByteArrays = new ByteDataArray[numShards][];
         recordBitOffset = new long[numShards];
         int numAddedRecordsInShard[] = new int[numShards];
         
@@ -278,9 +278,9 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         
         for(int i=0;i<numShards;i++) {
             fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numAddedRecordsInShard[i] * numBitsPerRecord);
-            deltaAddedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
-            deltaRemovedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
-            varLengthByteArrays[i] = new ByteDataBuffer[getSchema().numFields()];
+            deltaAddedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+            deltaRemovedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+            varLengthByteArrays[i] = new ByteDataArray[getSchema().numFields()];
         }
 
         int previousRemovedOrdinal[] = new int[numShards];
@@ -355,7 +355,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     /// here we need to add the offsets for the variable-length field endings, as they will be read as the start position for the following record.
-    private void addNullRecord(int ordinal, long recordBitOffset, FixedLengthElementArray fixedLengthLongArray, ByteDataBuffer varLengthByteArrays[]) {
+    private void addNullRecord(int ordinal, long recordBitOffset, FixedLengthElementArray fixedLengthLongArray, ByteDataArray varLengthByteArrays[]) {
         for(int fieldIndex=0; fieldIndex < getSchema().numFields(); fieldIndex++) {
             if(getSchema().getFieldType(fieldIndex) == FieldType.STRING || getSchema().getFieldType(fieldIndex) == FieldType.BYTES) {
                 long fieldBitOffset = recordBitOffset + fieldStats.getFieldBitOffset(fieldIndex);
@@ -366,7 +366,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         }
     }
 
-    private void addRecord(int ordinal, long recordBitOffset, FixedLengthElementArray fixedLengthLongArray, ByteDataBuffer varLengthByteArrays[]) {
+    private void addRecord(int ordinal, long recordBitOffset, FixedLengthElementArray fixedLengthLongArray, ByteDataArray varLengthByteArrays[]) {
         long pointer = ordinalMap.getPointerForData(ordinal);
 
         for(int fieldIndex=0; fieldIndex < getSchema().numFields(); fieldIndex++) {
@@ -374,7 +374,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         }
     }
 
-    private long addRecordField(long readPointer, long recordBitOffset, int fieldIndex, FixedLengthElementArray fixedLengthLongArray, ByteDataBuffer varLengthByteArrays[]) {
+    private long addRecordField(long readPointer, long recordBitOffset, int fieldIndex, FixedLengthElementArray fixedLengthLongArray, ByteDataArray varLengthByteArrays[]) {
         FieldType fieldType = getSchema().getFieldType(fieldIndex);
         long fieldBitOffset = recordBitOffset + fieldStats.getFieldBitOffset(fieldIndex);
         int bitsPerElement = fieldStats.getMaxBitsForField(fieldIndex);
@@ -413,7 +413,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             break;
         case BYTES:
         case STRING:
-            ByteDataBuffer varLengthBuf = getByteArray(varLengthByteArrays, fieldIndex);
+            ByteDataArray varLengthBuf = getByteArray(varLengthByteArrays, fieldIndex);
 
             if(VarInt.readVNull(data, readPointer)) {
                 long offset = varLengthBuf.length();
@@ -435,9 +435,9 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         return readPointer;
     }
 
-    private ByteDataBuffer getByteArray(ByteDataBuffer buffers[], int index) {
+    private ByteDataArray getByteArray(ByteDataArray buffers[], int index) {
         if(buffers[index] == null) {
-            buffers[index] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+            buffers[index] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
         }
         return buffers[index];
     }

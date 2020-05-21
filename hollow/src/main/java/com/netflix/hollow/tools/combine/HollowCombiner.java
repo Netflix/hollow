@@ -19,7 +19,7 @@ package com.netflix.hollow.tools.combine;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -438,7 +438,7 @@ public class HollowCombiner {
         private final HollowTypeWriteState writeState;
         private final OrdinalRemapper ordinalRemapper;
         private final ByteArrayOrdinalMap hashOrderIndependentOrdinalMap;
-        private final ByteDataBuffer scratch;
+        private final ByteDataArray scratch;
 
         HollowCombinerCopier(HollowTypeReadState readState, HollowTypeWriteState writeState, OrdinalRemapper ordinalRemapper) {
             this.copier = HollowRecordCopier.createCopier(readState, writeState.getSchema(), ordinalRemapper, isDefinedHashCode(readState.getSchema()));
@@ -446,7 +446,7 @@ public class HollowCombiner {
             this.writeState = writeState;
             this.ordinalRemapper = ordinalRemapper;
             this.hashOrderIndependentOrdinalMap = hashOrderIndependentOrdinalMaps.get(readState.getSchema().getName());
-            this.scratch = hashOrderIndependentOrdinalMap != null ? new ByteDataBuffer(WastefulRecycler.SMALL_ARRAY_RECYCLER) : null;
+            this.scratch = hashOrderIndependentOrdinalMap != null ? new ByteDataArray(WastefulRecycler.SMALL_ARRAY_RECYCLER) : null;
         }
 
         int copy(int ordinal) {

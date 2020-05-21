@@ -20,7 +20,6 @@ import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 
-// SNAP: TODO: @SuppressWarnings("restriction")
 public class EncodedByteBuffer implements VariableLengthData {
 
     private BlobByteBuffer bufferView;
@@ -30,11 +29,6 @@ public class EncodedByteBuffer implements VariableLengthData {
         this.maxIndex = -1;
     }
 
-    /**
-     * Get the value of the byte at the specified index.
-     * @param index the index (in multiples of 1 byte)
-     * @return the byte value
-     */
     @Override
     public byte get(long index) {
         if (index >= this.maxIndex) {
@@ -46,16 +40,15 @@ public class EncodedByteBuffer implements VariableLengthData {
     }
 
     /**
-     * Copy bytes from the supplied InputStream into this array.
-     *
-     * @param in the random access file
-     * @param length the length of the data to copy
-     * @throws IOException if the copy could not be performed
+     * {@inheritDoc}
+     * This is achieved by initializing a {@code BlobByteBuffer} that is a view on the underlying {@code BlobByteBuffer}
+     * and advancing the position of the underlying buffer by <i>length</i> bytes.
      */
+    @Override
     public void loadFrom(HollowBlobInput in, long length) throws IOException {
         BlobByteBuffer buffer = in.getBuffer();
-        this.maxIndex = length; // SNAP: can we model this in bufferView as capacity?
-        buffer.position(in.getFilePointer());
+        this.maxIndex = length;
+        buffer.position(in.getFilePointer());   // SNAP: defensive
         this.bufferView = buffer.duplicate();
         buffer.position(buffer.position() + length);
         in.seek(in.getFilePointer() + length);
@@ -73,7 +66,7 @@ public class EncodedByteBuffer implements VariableLengthData {
 
     @Override
     public long size() {
-        return 1; // SNAP: TODO: implement this for running explorer
+        return maxIndex;
     }
 
 // SNAP:

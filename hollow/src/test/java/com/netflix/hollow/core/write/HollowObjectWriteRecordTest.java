@@ -16,7 +16,7 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.encoding.ZigZag;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
@@ -53,7 +53,7 @@ public class HollowObjectWriteRecordTest {
         translatedSchema.addField("FieldD", FieldType.STRING);
         translatedSchema.addField("FieldA", FieldType.INT);
 
-        ByteDataBuffer buf = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+        ByteDataArray buf = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
 
         rec.writeDataTo(buf, translatedSchema);
 

@@ -77,14 +77,6 @@ public class SegmentedByteArray implements VariableLengthData {
         return segments[(int)(index >>> log2OfSegmentSize)][(int)(index & bitmask)];
     }
 
-    /**
-     * Copy bytes from another ByteData to this array.
-     *
-     * @param src the source data
-     * @param srcPos the position to begin copying from the source data
-     * @param destPos the position to begin writing in this array
-     * @param length the length of the data to copy
-     */
     @Override
     public void copy(ByteData src, long srcPos, long destPos, long length) {
         for(long i=0;i<length;i++) {
@@ -165,16 +157,6 @@ public class SegmentedByteArray implements VariableLengthData {
     	return true;
     }
 
-    /**
-     * Copies the data from the provided source array into this array, guaranteeing that
-     * if the update is seen by another thread, then all other writes prior to this call
-     * are also visible to that thread.
-     *
-     * @param src the source data
-     * @param srcPos the position to begin copying from the source data
-     * @param destPos the position to begin writing in this array
-     * @param length the length of the data to copy
-     */
     @Override
     public void orderedCopy(VariableLengthData src, long srcPos, long destPos, long length) {
         int segmentLength = 1 << log2OfSegmentSize;
@@ -206,7 +188,7 @@ public class SegmentedByteArray implements VariableLengthData {
      * @param length the length of the data to copy
      * @return the number of bytes copied
      */
-    public int orderedCopy(long srcPos, byte[] data, int destPos, int length) {
+    private int orderedCopy(long srcPos, byte[] data, int destPos, int length) {
         int segmentSize = 1 << log2OfSegmentSize;
         int remainingBytesInSegment = (int)(segmentSize - (srcPos & bitmask));
         int dataPosition = destPos;
@@ -227,13 +209,6 @@ public class SegmentedByteArray implements VariableLengthData {
         return dataPosition - destPos;
     }
 
-    /**
-     * Copy bytes from the supplied InputStream into this array.
-     *
-     * @param is the source data
-     * @param length the length of the data to copy
-     * @throws IOException if the copy could not be performed
-     */
     @Override
     public void loadFrom(HollowBlobInput is, long length) throws IOException {
         int segmentSize = 1 << log2OfSegmentSize;

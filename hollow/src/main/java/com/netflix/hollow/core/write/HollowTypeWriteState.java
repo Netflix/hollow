@@ -20,7 +20,7 @@ import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavi
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.UNMIXED_HASHES;
 
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -52,7 +52,7 @@ public abstract class HollowTypeWriteState {
     protected ThreadSafeBitSet currentCyclePopulated;
     protected ThreadSafeBitSet previousCyclePopulated;
 
-    private final ThreadLocal<ByteDataBuffer> serializedScratchSpace;
+    private final ThreadLocal<ByteDataArray> serializedScratchSpace;
 
     protected HollowWriteStateEngine stateEngine;
     
@@ -61,7 +61,7 @@ public abstract class HollowTypeWriteState {
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
         this.schema = schema;
         this.ordinalMap = new ByteArrayOrdinalMap();
-        this.serializedScratchSpace = new ThreadLocal<ByteDataBuffer>();
+        this.serializedScratchSpace = new ThreadLocal<ByteDataArray>();
         this.currentCyclePopulated = new ThreadSafeBitSet();
         this.previousCyclePopulated = new ThreadSafeBitSet();
         this.numShards = numShards;
@@ -94,7 +94,7 @@ public abstract class HollowTypeWriteState {
     }
 
     private int assignOrdinal(HollowWriteRecord rec) {
-        ByteDataBuffer scratch = scratch();
+        ByteDataArray scratch = scratch();
         rec.writeDataTo(scratch);
         int ordinal = ordinalMap.getOrAssignOrdinal(scratch);
         scratch.reset();
@@ -103,7 +103,7 @@ public abstract class HollowTypeWriteState {
 
 
     private int reuseOrdinalFromRestoredState(HollowWriteRecord rec) {
-        ByteDataBuffer scratch = scratch();
+        ByteDataArray scratch = scratch();
 
         int ordinal;
 
@@ -199,7 +199,7 @@ public abstract class HollowTypeWriteState {
         if(!ordinalMap.isReadyForAddingObjects())
             throw new RuntimeException("The HollowWriteStateEngine is not ready to add more Objects.  Did you remember to call stateEngine.prepareForNextCycle()?");
 
-        ByteDataBuffer scratch = scratch();
+        ByteDataArray scratch = scratch();
         rec.writeDataTo(scratch);
         ordinalMap.put(scratch, newOrdinal);
         if(markPreviousCycle)
@@ -335,7 +335,7 @@ public abstract class HollowTypeWriteState {
     protected void restoreOrdinal(int ordinal, HollowRecordCopier copier, ByteArrayOrdinalMap destinationMap, HashBehavior hashBehavior) {
         HollowWriteRecord rec = copier.copy(ordinal);
 
-        ByteDataBuffer scratch = scratch();
+        ByteDataArray scratch = scratch();
         if(rec instanceof HollowHashableWriteRecord)
             ((HollowHashableWriteRecord)rec).writeDataTo(scratch, hashBehavior);
         else
@@ -350,10 +350,10 @@ public abstract class HollowTypeWriteState {
      * are referenced via a ThreadLocal variable.
      * @return the scratch byte array
      */
-    protected ByteDataBuffer scratch() {
-        ByteDataBuffer scratch = serializedScratchSpace.get();
+    protected ByteDataArray scratch() {
+        ByteDataArray scratch = serializedScratchSpace.get();
         if(scratch == null) {
-            scratch = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+            scratch = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
             serializedScratchSpace.set(scratch);
         }
         return scratch;

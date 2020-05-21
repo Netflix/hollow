@@ -25,7 +25,7 @@ import sun.misc.Unsafe;
 public final class BlobByteBuffer {
 
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
-    private static final int MAX_BUFFER_CAPACITY = 1 << 30; // largest, positive power-of-two int
+    private static final int MAX_SINGLE_BUFFER_CAPACITY = 1 << 30; // largest, positive power-of-two int
 
     private final ByteBuffer[] spine;   // array of MappedByteBuffer
     private final long capacity;
@@ -49,11 +49,16 @@ public final class BlobByteBuffer {
         /// The final assignment after the initialization of the array guarantees that no thread
         /// will see any of the array elements before assignment.
         /// We can't risk the segment values being visible as null to any thread, because
-        /// FixedLengthElementArray uses Unsafe to access these values, which would cause the
+        /// FixedLengthData uses Unsafe to access these values, which would cause the
         /// JVM to crash with a segmentation fault.
         this.spine = spine;
     }
 
+    /**
+     * Returns a view on the current {@code BlobByteBuffer} as a new {@code BlobByteBuffer}.
+     * The returned buffer's capacity, shift, mark, spine, and position will be identical to those of this buffer.
+     * @return a new {@code BlobByteBuffer} which is view on the current {@code BlobByteBuffer}
+     */
     public BlobByteBuffer duplicate() {
         lock1.lock();
         try {
@@ -67,8 +72,8 @@ public final class BlobByteBuffer {
         long size = channel.size();
 
         // divide into N buffers with an int capacity that is a power of 2
-        final int bufferCapacity = size > (long) MAX_BUFFER_CAPACITY
-                ? MAX_BUFFER_CAPACITY
+        final int bufferCapacity = size > (long) MAX_SINGLE_BUFFER_CAPACITY
+                ? MAX_SINGLE_BUFFER_CAPACITY
                 : Integer.highestOneBit((int) size);
         long bufferCount = size % bufferCapacity == 0
                 ? size / (long)bufferCapacity

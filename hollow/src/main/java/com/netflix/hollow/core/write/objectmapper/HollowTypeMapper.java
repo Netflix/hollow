@@ -16,7 +16,7 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -34,7 +34,7 @@ public abstract class HollowTypeMapper {
 
     private final ThreadLocal<HollowWriteRecord> writeRec = new ThreadLocal<>();
     
-    private final ThreadLocal<ByteDataBuffer> flatRecBuffer = new ThreadLocal<>();
+    private final ThreadLocal<ByteDataArray> flatRecBuffer = new ThreadLocal<>();
 
     protected abstract String getTypeName();
 
@@ -61,10 +61,10 @@ public abstract class HollowTypeMapper {
         return rec;
     }
     
-    protected ByteDataBuffer flatRecBuffer() {
-    	ByteDataBuffer buf = flatRecBuffer.get();
+    protected ByteDataArray flatRecBuffer() {
+    	ByteDataArray buf = flatRecBuffer.get();
     	if(buf == null) {
-    		buf = new ByteDataBuffer();
+    		buf = new ByteDataArray();
     		flatRecBuffer.set(buf);
     	}
     	buf.reset();
