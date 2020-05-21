@@ -205,8 +205,11 @@ Your implementation of the `ObjectLongevityConfig` may be backed by a dynamic co
 
 ### Memory Pooling
 
-Hollow pools and reuses memory to minimize GC effects while updating data.  This pool of memory is kept arrays on the heap.  Each array in the pool has a fixed length.  When a long array or a byte array is required in Hollow, it will stitch together pooled array segments as a `SegmentedByteArray` or `SegmentedLongArray`.  These classes encapsulate the details of treating segmented arrays as contiguous ranges of values.
-// SNAP: TODO: doc for shared memory mode
+Under normal operation, Hollow pools and reuses memory to minimize GC effects while updating data.  This pool of memory is kept as arrays on the heap. Each array in the pool has a fixed length.  When a long array or a byte array is required in Hollow, it will stitch together pooled array segments as a `SegmentedByteArray` or `SegmentedLongArray`.  These classes encapsulate the details of treating segmented arrays as contiguous ranges of values.
+
+
+In shared-memory mode (only applicable to data consumers), Hollow uses a `BlobByteBuffer` abstraction which is basically an array of Java's `MappedByteBuffer`s stitched together to serve as one contiguous `ByteBuffer`.
+During initial load a snapshot file is mmap-ed to virtual memory as a single `BlobByteBuffer`, and other `BlobByteBuffer`s are created as views into the underlying `BlobByteBuffer` to access components of the Hollow dataset. Beyond the initial snapshot load, delta applications are currently not supported.
 
 ## Delta-Based Producer Input
 
@@ -353,3 +356,8 @@ Each pointer field in the match array bucket references a specific type, and is 
 In addition to pointers which allow us to look up the matching key, each bucket in the _match array_ includes the number of matching records, and an offset into the _select array_.  The _select array_ contains lists of ordinals to matching records.
 
 When queried with a key, the index will hash the key, then look to the corresponding bucket in the _match array_.  The match pointers are used to compare the queried key with the matching key.  If a match is found, then the corresponding entries in the select array are returned as a `HollowHashIndexResult`.  Collisions are resolved with linear probing.  If after linear probing an empty bucket is encountered in the match array, no such record exists in the dataset.
+
+### Shared memory mode
+Traditionally, an entire Hollow dataset is loaded in JVM heap. While this leads to predictable performance, it also imposes eager loading of the underlying data and constrains the dataset size by physical memory size. An alternative approach is to use memory mapping to map Hollow data to virtual memory and then eagerly or lazily load data into off-heap physical memory. Eager loading would memory lock the dataset and provide similar performance guarantee as the traditional on-heap Hollow. Lazy loading would load data in physical memory in 4K-sized pages upon access and retain hot data in physical memory (by virtue of operating system paging) and thus enable faster application initialization and support for TB-scale datasets. Mapping Hollow data to shared memory also allows for memory deduplication across Hollow consumers on the same machine.
+
+The shared memory implementation is largely future work, but a limited shared-memory based lazy load functionality has been implemented. When configured for shared memory mode, a consumer will perform an initial snapshot load, it will not update, and data structures tracking indices continue to live on-heap. This limited functionality can be useful for local debugging with large Hollow datasets.
