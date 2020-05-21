@@ -184,15 +184,14 @@ public class HollowHistoryKeyIndex {
                 }
             });
 
-            BufferedInputStream bin = new BufferedInputStream(is);
-            HollowBlobInput in = HollowBlobInput.inputStream(bin);
-            BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_history_"));
-            if (isInitialUpdate || isSnapshot) {
-                reader.readSnapshot(in, debug);
-            } else {
-                reader.applyDelta(in, debug);
+            try (HollowBlobInput in = HollowBlobInput.inputStream(new BufferedInputStream(is))) {   // SNAP: fixed memory leak here, "bin" wasn't being closed
+                BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_history_"));
+                if (isInitialUpdate || isSnapshot) {
+                    reader.readSnapshot(in, debug);
+                } else {
+                    reader.applyDelta(in, debug);
+                }
             }
-            in.close(); // SNAP: This includes a bug fix where inputstream wasn't being closed
         } catch (Exception e) {
             pipeException = e;
         }
