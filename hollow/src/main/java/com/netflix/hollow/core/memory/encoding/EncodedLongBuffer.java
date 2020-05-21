@@ -57,8 +57,6 @@ import java.io.IOException;
 @SuppressWarnings("restriction")
 public class EncodedLongBuffer implements FixedLengthData {
 
-    private static int debug_count = 0;
-
     private BlobByteBuffer bufferView;
     private long maxLongs = -1;
     private long maxByteIndex = -1;
@@ -97,8 +95,6 @@ public class EncodedLongBuffer implements FixedLengthData {
 
         long whichByte = index >>> 3;
         int whichBit = (int) (index & 0x07);
-
-        debug_count ++;
 
         long longVal = this.bufferView.getLong(this.bufferView.position() + whichByte);
         long l =  longVal >>> whichBit;

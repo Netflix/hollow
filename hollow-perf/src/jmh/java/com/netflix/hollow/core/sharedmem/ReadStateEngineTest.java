@@ -10,9 +10,7 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.BitSet;
 import java.util.concurrent.TimeUnit;
@@ -51,9 +49,7 @@ public class ReadStateEngineTest {
         readState = new HollowReadStateEngine();
         HollowBlobReader fileReader = new HollowBlobReader(readState);
         HollowBlobInput in = HollowBlobInput.randomAccessFile(new File(TEST_FILE_TOPN));
-        BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_new"));
-        fileReader.readSnapshot(in, debug);
-        debug.flush();
+        fileReader.readSnapshot(in);
         System.out.println("SNAP: Done setup");
     }
 

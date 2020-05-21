@@ -31,9 +31,7 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
-import java.io.BufferedWriter;
 import java.io.EOFException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -45,8 +43,6 @@ import java.util.logging.Logger;
  * of snapshot and delta blobs.
  */
 public class HollowBlobReader {
-
-    BufferedWriter debug; // SNAP: To remove
 
     private final Logger log = Logger.getLogger(HollowBlobReader.class.getName());
     private final HollowReadStateEngine stateEngine;
@@ -69,11 +65,6 @@ public class HollowBlobReader {
         this.stateEngine = stateEngine;
         this.headerReader = headerReader;
         this.memoryMode = memoryMode;
-
-        try {
-            debug = new BufferedWriter(new FileWriter("/tmp/ephemeral"));
-        } catch (IOException e) {
-        }
     }
 
     /**
@@ -85,18 +76,12 @@ public class HollowBlobReader {
      * @deprecated use {@link #readSnapshot(HollowBlobInput)}
      */
     @Deprecated
-    // public void readSnapshot(InputStream is) throws IOException {
-    //     readSnapshot(HollowBlobInput.inputStream(is), debug);
-    // }
-    public void readSnapshot(InputStream is, BufferedWriter debug) throws IOException { // SNAP: Need to keep inputstream flavors around for backwards compatibility
-        readSnapshot(HollowBlobInput.inputStream(is), debug);
+    public void readSnapshot(InputStream is) throws IOException { // SNAP: Need to keep inputstream flavors around for backwards compatibility
+        readSnapshot(HollowBlobInput.inputStream(is));
     }
 
     public void readSnapshot(HollowBlobInput in) throws IOException {
-        readSnapshot(in, debug, new HollowFilterConfig(true));
-    }
-    public void readSnapshot(HollowBlobInput in, BufferedWriter debug) throws IOException {
-        readSnapshot(in, debug, new HollowFilterConfig(true));
+        readSnapshot(in, new HollowFilterConfig(true));
     }
 
     /**
@@ -108,15 +93,15 @@ public class HollowBlobReader {
      * @param filter the filtering configuration to filter the snapshot
      * @throws IOException if the snapshot could not be read
      */
-    public void readSnapshot(InputStream is, BufferedWriter debug, HollowFilterConfig filter) throws IOException {
-        readSnapshot(HollowBlobInput.inputStream(is), debug, (TypeFilter) filter);
+    public void readSnapshot(InputStream is, HollowFilterConfig filter) throws IOException {
+        readSnapshot(HollowBlobInput.inputStream(is), (TypeFilter) filter);
     }
 
-    public void readSnapshot(InputStream is, BufferedWriter debug, TypeFilter filter) throws IOException {
-        readSnapshot(HollowBlobInput.inputStream(is), debug, filter);
+    public void readSnapshot(InputStream is, TypeFilter filter) throws IOException {
+        readSnapshot(HollowBlobInput.inputStream(is), filter);
     }
 
-    public void readSnapshot(HollowBlobInput in, BufferedWriter debug, TypeFilter filter) throws IOException {
+    public void readSnapshot(HollowBlobInput in, TypeFilter filter) throws IOException {
         HollowBlobHeader header = readHeader(in, false);
 
         notifyBeginUpdate();
@@ -127,7 +112,7 @@ public class HollowBlobReader {
 
         Collection<String> typeNames = new TreeSet<>();
         for(int i=0;i<numStates;i++) {
-            String typeName = readTypeStateSnapshot(in, debug, header, filter);
+            String typeName = readTypeStateSnapshot(in, header, filter);
             typeNames.add(typeName);
         }
 
@@ -153,16 +138,13 @@ public class HollowBlobReader {
      * @throws IOException if the delta could not be applied
      */
     // public void applyDelta(InputStream in) throws IOException {
-    //     applyDelta(HollowBlobInput.inputStream(in), debug);
+    //     applyDelta(HollowBlobInput.inputStream(in));
     // }
-    public void applyDelta(InputStream in, BufferedWriter debug) throws IOException {
-        applyDelta(HollowBlobInput.inputStream(in), debug);
+    public void applyDelta(InputStream in) throws IOException {
+        applyDelta(HollowBlobInput.inputStream(in));
     }
 
     public void applyDelta(HollowBlobInput in) throws IOException {
-        applyDelta(in, debug);
-    }
-    public void applyDelta(HollowBlobInput in, BufferedWriter debug) throws IOException {
         HollowBlobHeader header = readHeader(in, true);
         notifyBeginUpdate();
 
@@ -172,7 +154,7 @@ public class HollowBlobReader {
 
         Collection<String> typeNames = new TreeSet<String>();
         for(int i=0;i<numStates;i++) {
-            String typeName = readTypeStateDelta(in, debug, header);
+            String typeName = readTypeStateDelta(in, header);
             typeNames.add(typeName);
             stateEngine.getMemoryRecycler().swap();
         }
@@ -213,7 +195,7 @@ public class HollowBlobReader {
         }
     }
 
-    private String readTypeStateSnapshot(HollowBlobInput in, BufferedWriter debug, HollowBlobHeader header, TypeFilter filter) throws IOException {
+    private String readTypeStateSnapshot(HollowBlobInput in, HollowBlobHeader header, TypeFilter filter) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(in);
         int numShards = readNumShards(in);
         String typeName = schema.getName();
@@ -226,44 +208,44 @@ public class HollowBlobReader {
             } else {
                 HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
                 HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
-                populateTypeStateSnapshot(in, debug, new HollowObjectTypeReadState(stateEngine, memoryMode, filteredSchema, unfilteredSchema, numShards));
+                populateTypeStateSnapshot(in, new HollowObjectTypeReadState(stateEngine, memoryMode, filteredSchema, unfilteredSchema, numShards));
             }
         } else if (schema instanceof HollowListSchema) {
             if(!filter.includes(typeName)) {
                 HollowListTypeReadState.discardSnapshot(in, numShards);
             } else {
-                populateTypeStateSnapshot(in, debug, new HollowListTypeReadState(stateEngine, memoryMode, (HollowListSchema)schema, numShards));
+                populateTypeStateSnapshot(in, new HollowListTypeReadState(stateEngine, memoryMode, (HollowListSchema)schema, numShards));
             }
         } else if(schema instanceof HollowSetSchema) {
             if(!filter.includes(typeName)) {
                 HollowSetTypeReadState.discardSnapshot(in, numShards);
             } else {
-                populateTypeStateSnapshot(in, debug, new HollowSetTypeReadState(stateEngine, memoryMode, (HollowSetSchema)schema, numShards));
+                populateTypeStateSnapshot(in, new HollowSetTypeReadState(stateEngine, memoryMode, (HollowSetSchema)schema, numShards));
             }
         } else if(schema instanceof HollowMapSchema) {
             if(!filter.includes(typeName)) {
                 HollowMapTypeReadState.discardSnapshot(in, numShards);
             } else {
-                populateTypeStateSnapshot(in, debug, new HollowMapTypeReadState(stateEngine, memoryMode, (HollowMapSchema)schema, numShards));
+                populateTypeStateSnapshot(in, new HollowMapTypeReadState(stateEngine, memoryMode, (HollowMapSchema)schema, numShards));
             }
         }
 
         return typeName;
     }
 
-    private void populateTypeStateSnapshot(HollowBlobInput in, BufferedWriter debug, HollowTypeReadState typeState) throws IOException {
+    private void populateTypeStateSnapshot(HollowBlobInput in, HollowTypeReadState typeState) throws IOException {
         stateEngine.addTypeState(typeState);
-        typeState.readSnapshot(in, debug, stateEngine.getMemoryRecycler());
+        typeState.readSnapshot(in, stateEngine.getMemoryRecycler());
     }
 
-    private String readTypeStateDelta(HollowBlobInput in, BufferedWriter debug, HollowBlobHeader header) throws IOException {
+    private String readTypeStateDelta(HollowBlobInput in, HollowBlobHeader header) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(in);
 
         int numShards = readNumShards(in);
 
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
         if(typeState != null) {
-            typeState.applyDelta(in, debug, schema, stateEngine.getMemoryRecycler());
+            typeState.applyDelta(in, schema, stateEngine.getMemoryRecycler());
         } else {
             discardDelta(in, schema, numShards);
         }

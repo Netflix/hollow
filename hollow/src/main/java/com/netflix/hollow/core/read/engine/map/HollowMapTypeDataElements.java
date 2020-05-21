@@ -23,7 +23,6 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
-import java.io.BufferedWriter;
 import java.io.IOException;
 
 /**
@@ -63,15 +62,15 @@ public class HollowMapTypeDataElements {
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(HollowBlobInput in, BufferedWriter debug) throws IOException {
-        readFromInput(in, debug, false);
+    void readSnapshot(HollowBlobInput in) throws IOException {
+        readFromInput(in, false);
     }
 
-    void readDelta(HollowBlobInput in, BufferedWriter debug) throws IOException {
-        readFromInput(in, debug,true);
+    void readDelta(HollowBlobInput in) throws IOException {
+        readFromInput(in,true);
     }
 
-    private void readFromInput(HollowBlobInput in, BufferedWriter debug, boolean isDelta) throws IOException {
+    private void readFromInput(HollowBlobInput in, boolean isDelta) throws IOException {
         maxOrdinal = VarInt.readVInt(in);
 
         if(isDelta) {

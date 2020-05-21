@@ -27,7 +27,6 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import java.io.BufferedWriter;
 import java.io.IOException;
 
 /**
@@ -73,15 +72,15 @@ public class HollowObjectTypeDataElements {
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(HollowBlobInput in, BufferedWriter debug, HollowObjectSchema unfilteredSchema) throws IOException {
-        readFromInput(in, debug, false, unfilteredSchema);
+    void readSnapshot(HollowBlobInput in, HollowObjectSchema unfilteredSchema) throws IOException {
+        readFromInput(in, false, unfilteredSchema);
     }
 
-    void readDelta(HollowBlobInput in, BufferedWriter debug) throws IOException {
-        readFromInput(in, debug, true, schema);
+    void readDelta(HollowBlobInput in) throws IOException {
+        readFromInput(in, true, schema);
     }
 
-    void readFromInput(HollowBlobInput in, BufferedWriter debug, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
+    void readFromInput(HollowBlobInput in, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
         maxOrdinal = VarInt.readVInt(in);
 
         if(isDelta) {
