@@ -223,7 +223,7 @@ public class HollowCombinerTest {
 
         HollowReadStateEngine readEngine = new HollowReadStateEngine(writeEngine.getHashCodeFinder(), true, new RecyclingRecycler());
         HollowBlobReader reader = new HollowBlobReader(readEngine);
-        reader.readSnapshot(HollowBlobInput.inputStream(new ByteArrayInputStream(baos.toByteArray())));
+        reader.readSnapshot(HollowBlobInput.dataInputStream(new ByteArrayInputStream(baos.toByteArray())));
 
         return readEngine;
     }

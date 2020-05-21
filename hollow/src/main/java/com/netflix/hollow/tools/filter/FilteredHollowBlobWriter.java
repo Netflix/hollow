@@ -114,7 +114,7 @@ public class FilteredHollowBlobWriter {
     }
 
     public void filter(boolean delta, InputStream is, OutputStream... out) throws IOException {
-        HollowBlobInput in = HollowBlobInput.inputStream(is);
+        HollowBlobInput in = HollowBlobInput.dataInputStream(is);
 
         FilteredHollowBlobWriterStreamAndFilter allStreamAndFilters[] = FilteredHollowBlobWriterStreamAndFilter.combine(out, configs);
 

@@ -156,13 +156,13 @@ public class RestoreWriteStateEngineHierarchyScenario {
         writer.writeSnapshot(snapshot);
         
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(delta.toByteArray())));
+        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(delta.toByteArray())));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
         
-        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(reverseDelta.toByteArray())));
+        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(reverseDelta.toByteArray())));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
@@ -170,19 +170,19 @@ public class RestoreWriteStateEngineHierarchyScenario {
         
         readStateEngine = new HollowReadStateEngine();
         reader = new HollowBlobReader(readStateEngine);
-        reader.readSnapshot(HollowBlobInput.inputStream(new ByteArrayInputStream(snapshot.toByteArray())));
+        reader.readSnapshot(HollowBlobInput.dataInputStream(new ByteArrayInputStream(snapshot.toByteArray())));
 
         assertA(readStateEngine, 1, "A", true);
         assertA(readStateEngine, 2, "B", true);
         assertA(readStateEngine, 3, "A", true);
         
-        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(reverseDelta.toByteArray())));
+        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(reverseDelta.toByteArray())));
         
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
         
-        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(delta.toByteArray())));
+        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(delta.toByteArray())));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
@@ -278,13 +278,13 @@ public class RestoreWriteStateEngineHierarchyScenario {
         writer.writeSnapshot(snapshot);
         
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(delta.toByteArray())));
+        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(delta.toByteArray())));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
         
-        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(reverseDelta.toByteArray())));
+        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(reverseDelta.toByteArray())));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
@@ -292,19 +292,19 @@ public class RestoreWriteStateEngineHierarchyScenario {
         
         readStateEngine = new HollowReadStateEngine();
         reader = new HollowBlobReader(readStateEngine);
-        reader.readSnapshot(HollowBlobInput.inputStream(new ByteArrayInputStream(snapshot.toByteArray())));
+        reader.readSnapshot(HollowBlobInput.dataInputStream(new ByteArrayInputStream(snapshot.toByteArray())));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
         
-        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(reverseDelta.toByteArray())));
+        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(reverseDelta.toByteArray())));
         
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
         
-        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(delta.toByteArray())));
+        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(delta.toByteArray())));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);

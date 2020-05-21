@@ -138,7 +138,7 @@ class HollowDataHolder {
     }
 
     private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
-        try (HollowBlobInput in = HollowBlobInput.modeBasedBlobInput(memoryMode, snapshotBlob)) {   // SNAP: TODO: It implements closeable
+        try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, snapshotBlob)) {   // SNAP: TODO: It implements closeable
             applyStateEngineTransition(in, snapshotBlob, refreshListeners);
             initializeAPI();
 
@@ -195,7 +195,7 @@ class HollowDataHolder {
             return;
         }
 
-        try (HollowBlobInput in = HollowBlobInput.modeBasedBlobInput(memoryMode, blob)) {
+        try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, blob)) {
             applyStateEngineTransition(in, blob, refreshListeners);
 
             if(objLongevityConfig.enableLongLivedObjectSupport()) {
