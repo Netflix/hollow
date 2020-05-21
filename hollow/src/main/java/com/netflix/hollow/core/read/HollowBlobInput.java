@@ -57,10 +57,6 @@ public class HollowBlobInput implements Closeable {
         return hbi;
     }
 
-    public BlobByteBuffer getBuffer() { // SNAP: TODO: Should I put a type check here? performance concerns?
-        return buffer;
-    }
-
     /**
      * Reads the next byte of data from the input stream by relaying the call to the underlying {@code DataInputStream} or
      * {@code RandomAccessFile}. The byte is returned as an integer in the range 0 to 255.
@@ -188,5 +184,9 @@ public class HollowBlobInput implements Closeable {
 
     public Object getInput() {
         return input;
+    }
+
+    public BlobByteBuffer getBuffer() { // SNAP: TODO: Should I put a type check here? performance concerns?
+        return buffer;
     }
 }
