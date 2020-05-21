@@ -70,6 +70,9 @@ public final class BlobByteBuffer {
 
     public static BlobByteBuffer mmapBlob(FileChannel channel) throws IOException {
         long size = channel.size();
+        if (size == 0) {
+            throw new IllegalStateException("File to be mmap-ed has no data");
+        }
 
         // divide into N buffers with an int capacity that is a power of 2
         final int bufferCapacity = size > (long) MAX_SINGLE_BUFFER_CAPACITY
