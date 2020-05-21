@@ -21,7 +21,7 @@ package com.netflix.hollow.core.memory;
  *  
  * This is useful because Hollow often uses pooled arrays to back range of bytes.  
  *
- * @see SegmentedByteArray
+ * @see SegmentedByteArray,EncodedByteBuffer
  *
  * @author dkoszewnik
  *
@@ -52,6 +52,11 @@ public interface ByteData {
         throw new UnsupportedOperationException();
     }
 
-    byte get(long position);
+    /**
+     * Get the value of the byte at the specified position.
+     * @param index the position (in byte units)
+     * @return the byte value
+     */
+    byte get(long index);
 
 }

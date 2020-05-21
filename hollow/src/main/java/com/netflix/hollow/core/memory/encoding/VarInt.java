@@ -17,7 +17,7 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.ByteData;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,22 +32,22 @@ public class VarInt {
 
 
     /**
-     * Write a 'null' variable length integer into the supplied {@link ByteDataBuffer}
+     * Write a 'null' variable length integer into the supplied {@link ByteDataArray}
      *
      * @param buf the buffer to write to
      */
-    public static void writeVNull(ByteDataBuffer buf) {
+    public static void writeVNull(ByteDataArray buf) {
         buf.write((byte)0x80);
         return;
     }
 
     /**
-     * Encode the specified long as a variable length integer into the supplied {@link ByteDataBuffer}
+     * Encode the specified long as a variable length integer into the supplied {@link ByteDataArray}
      *
      * @param buf the buffer to write to
      * @param value the long value
      */
-    public static void writeVLong(ByteDataBuffer buf, long value) {
+    public static void writeVLong(ByteDataArray buf, long value) {
         if(value < 0)                                buf.write((byte)0x81);
         if(value > 0xFFFFFFFFFFFFFFL || value < 0)   buf.write((byte)(0x80 | ((value >>> 56) & 0x7FL)));
         if(value > 0x1FFFFFFFFFFFFL || value < 0)    buf.write((byte)(0x80 | ((value >>> 49) & 0x7FL)));
@@ -83,12 +83,12 @@ public class VarInt {
     }
 
     /**
-     * Encode the specified int as a variable length integer into the supplied {@link ByteDataBuffer}
+     * Encode the specified int as a variable length integer into the supplied {@link ByteDataArray}
      *
      * @param buf the buffer to write to
      * @param value the int value
      */
-    public static void writeVInt(ByteDataBuffer buf, int value) {
+    public static void writeVInt(ByteDataArray buf, int value) {
         if(value > 0x0FFFFFFF || value < 0) buf.write((byte)(0x80 | ((value >>> 28))));
         if(value > 0x1FFFFF || value < 0)   buf.write((byte)(0x80 | ((value >>> 21) & 0x7F)));
         if(value > 0x3FFF || value < 0)     buf.write((byte)(0x80 | ((value >>> 14) & 0x7F)));

@@ -16,7 +16,7 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.util.IntList;
 
@@ -33,7 +33,7 @@ public class HollowListWriteRecord implements HollowWriteRecord {
     }
 
     @Override
-    public void writeDataTo(ByteDataBuffer buf) {
+    public void writeDataTo(ByteDataArray buf) {
         VarInt.writeVInt(buf, elementOrdinals.size());
 
         for(int i=0;i<elementOrdinals.size();i++) {

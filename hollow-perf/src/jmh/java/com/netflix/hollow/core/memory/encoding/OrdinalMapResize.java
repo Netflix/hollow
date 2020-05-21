@@ -1,7 +1,7 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import java.util.SplittableRandom;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -30,15 +30,15 @@ public class OrdinalMapResize {
     @Param("32")
     int contentSize = 32;
 
-    ByteDataBuffer[] content;
+    ByteDataArray[] content;
 
     @Setup
     public void setUp() {
         SplittableRandom r = new SplittableRandom(0);
 
-        content = new ByteDataBuffer[n];
+        content = new ByteDataArray[n];
         for (int i = 0; i < n; i++) {
-            ByteDataBuffer buf = new ByteDataBuffer();
+            ByteDataArray buf = new ByteDataArray();
             for (int j = 0; j < contentSize; j++) {
                 buf.write((byte) r.nextInt(0, 256));
             }

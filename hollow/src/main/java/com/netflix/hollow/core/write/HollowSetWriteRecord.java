@@ -19,7 +19,7 @@ package com.netflix.hollow.core.write;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.IGNORED_HASHES;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.MIXED_HASHES;
 
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.util.LongList;
@@ -48,12 +48,12 @@ public class HollowSetWriteRecord implements HollowHashableWriteRecord {
     }
 
     @Override
-    public void writeDataTo(ByteDataBuffer buf) {
+    public void writeDataTo(ByteDataArray buf) {
         writeDataTo(buf, defaultHashBehavior);
     }
 
     @Override
-    public void writeDataTo(ByteDataBuffer buf, HashBehavior hashBehavior) {
+    public void writeDataTo(ByteDataArray buf, HashBehavior hashBehavior) {
         elementsAndHashes.sort();
 
         int hashTableSize = HashCodes.hashTableSize(elementsAndHashes.size());

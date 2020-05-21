@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicLongArray;
 /**
  * This data structure maps byte sequences to ordinals.  This is a hash table.
  * <p>
- * The <code>pointersAndOrdinals</code> AtomicLongArray contains keys, and the {@link ByteDataBuffer}
+ * The <code>pointersAndOrdinals</code> AtomicLongArray contains keys, and the {@link ByteDataArray}
  * contains values.  Each key has two components.
  * <p>
  * The high 29 bits in the key represents the ordinal.  The low 35 bits represents the pointer to the start position
@@ -50,7 +50,7 @@ public class ByteArrayOrdinalMap {
     /// Ordinal is the high 29 bits.  Pointer to byte data is the low 35 bits.
     /// In addition need volatile access to the reference when resize occurs
     private volatile AtomicLongArray pointersAndOrdinals;
-    private final ByteDataBuffer byteData;
+    private final ByteDataArray byteData;
     private final FreeOrdinalTracker freeOrdinalTracker;
     private int size;
     private int sizeBeforeGrow;
@@ -75,7 +75,7 @@ public class ByteArrayOrdinalMap {
         size = bucketSize(size);
 
         this.freeOrdinalTracker = new FreeOrdinalTracker();
-        this.byteData = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+        this.byteData = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
         this.pointersAndOrdinals = emptyKeyArray(size);
         this.sizeBeforeGrow = (int) (((float) size) * 0.7); /// 70% load factor
         this.size = 0;
@@ -92,7 +92,7 @@ public class ByteArrayOrdinalMap {
         return (x < 256) ? 256 : (x >= 1 << 30) ? 1 << 30 : x + 1;
     }
 
-    public int getOrAssignOrdinal(ByteDataBuffer serializedRepresentation) {
+    public int getOrAssignOrdinal(ByteDataArray serializedRepresentation) {
         return getOrAssignOrdinal(serializedRepresentation, -1);
     }
 
@@ -109,7 +109,7 @@ public class ByteArrayOrdinalMap {
      * another sequence of bytes and the given sequence of bytes has not previously been added
      * @return the assigned ordinal
      */
-    public int getOrAssignOrdinal(ByteDataBuffer serializedRepresentation, int preferredOrdinal) {
+    public int getOrAssignOrdinal(ByteDataArray serializedRepresentation, int preferredOrdinal) {
         int hash = HashCodes.hashCode(serializedRepresentation);
 
         int ordinal = get(serializedRepresentation, hash);
@@ -117,7 +117,7 @@ public class ByteArrayOrdinalMap {
     }
 
     /// acquire the lock before writing.
-    private synchronized int assignOrdinal(ByteDataBuffer serializedRepresentation, int hash, int preferredOrdinal) {
+    private synchronized int assignOrdinal(ByteDataArray serializedRepresentation, int hash, int preferredOrdinal) {
         if (preferredOrdinal < -1 || preferredOrdinal > ORDINAL_MASK) {
             throw new IllegalArgumentException(String.format(
                     "The given preferred ordinal %s is out of bounds and not within the closed interval [-1, %s]",
@@ -201,7 +201,7 @@ public class ByteArrayOrdinalMap {
      * @param serializedRepresentation the serialized representation
      * @param ordinal the ordinal
      */
-    public void put(ByteDataBuffer serializedRepresentation, int ordinal) {
+    public void put(ByteDataArray serializedRepresentation, int ordinal) {
         if (ordinal < 0 || ordinal > ORDINAL_MASK) {
             throw new IllegalArgumentException(String.format(
                     "The given ordinal %s is out of bounds and not within the closed interval [0, %s]",
@@ -288,11 +288,11 @@ public class ByteArrayOrdinalMap {
      * @param serializedRepresentation the serialized representation
      * @return The ordinal for this serialized representation, or -1.
      */
-    public int get(ByteDataBuffer serializedRepresentation) {
+    public int get(ByteDataArray serializedRepresentation) {
         return get(serializedRepresentation, HashCodes.hashCode(serializedRepresentation));
     }
 
-    private int get(ByteDataBuffer serializedRepresentation, int hash) {
+    private int get(ByteDataArray serializedRepresentation, int hash) {
         AtomicLongArray pao = pointersAndOrdinals;
 
         int modBitmask = pao.length() - 1;
@@ -450,7 +450,7 @@ public class ByteArrayOrdinalMap {
      * Compare the byte sequence contained in the supplied ByteDataBuffer with the
      * sequence contained in the map pointed to by the specified key, byte by byte.
      */
-    private boolean compare(ByteDataBuffer serializedRepresentation, long key) {
+    private boolean compare(ByteDataArray serializedRepresentation, long key) {
         long position = key & POINTER_MASK;
 
         int sizeOfData = VarInt.readVInt(byteData.getUnderlyingArray(), position);
@@ -583,7 +583,7 @@ public class ByteArrayOrdinalMap {
         return arr;
     }
 
-    public ByteDataBuffer getByteData() {
+    public ByteDataArray getByteData() {
         return byteData;
     }
 

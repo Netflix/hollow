@@ -16,11 +16,11 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 
 public interface HollowHashableWriteRecord extends HollowWriteRecord {
 
-    public void writeDataTo(ByteDataBuffer buf, HashBehavior hashBehavior);
+    public void writeDataTo(ByteDataArray buf, HashBehavior hashBehavior);
     
     
     public enum HashBehavior {

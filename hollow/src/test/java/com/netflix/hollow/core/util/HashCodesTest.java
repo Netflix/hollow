@@ -18,7 +18,7 @@ package com.netflix.hollow.core.util;
 
 import static com.netflix.hollow.core.HollowConstants.HASH_TABLE_MAX_SIZE;
 
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
@@ -132,7 +132,7 @@ public class HashCodesTest {
     
     
     private int accurateStringHashCode(String str) {
-        ByteDataBuffer buf = new ByteDataBuffer(WastefulRecycler.SMALL_ARRAY_RECYCLER);
+        ByteDataArray buf = new ByteDataArray(WastefulRecycler.SMALL_ARRAY_RECYCLER);
 
         for(int i=0;i<str.length();i++) {
             VarInt.writeVInt(buf, str.charAt(i));

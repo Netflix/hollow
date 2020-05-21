@@ -20,12 +20,12 @@ import static com.netflix.hollow.core.HollowConstants.HASH_TABLE_MAX_SIZE;
 
 import com.netflix.hollow.core.memory.ArrayByteData;
 import com.netflix.hollow.core.memory.ByteData;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 
 public class HashCodes {
     private static final int MURMURHASH_SEED = 0xeab524b9;
 
-    public static int hashCode(ByteDataBuffer data) {
+    public static int hashCode(ByteDataArray data) {
         return hashCode(data.getUnderlyingArray(), 0, (int) data.length());
     }
 
