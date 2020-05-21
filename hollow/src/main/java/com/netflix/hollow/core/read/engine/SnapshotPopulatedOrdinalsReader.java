@@ -22,14 +22,14 @@ import java.io.IOException;
 public class SnapshotPopulatedOrdinalsReader {
 
     /**
-     * Read populated ordinals as a bit set from a stream, and notify a listener for each populated ordinal.
+     * Read populated ordinals as a bit set from a {@code HollowBlobInput}, and notify a listener for each populated ordinal.
      *
      * @param in the Hollow blob input data
      * @param listeners the type state listeners
      * @throws IOException if the ordinals cannot be read
      * @author dkoszewnik
      */
-    public static void readOrdinals(HollowBlobInput in, HollowTypeStateListener[] listeners) throws IOException {   // SNAP: TODO: might need to preserve inputstream version for bkwd compatibility. But maybe not!
+    public static void readOrdinals(HollowBlobInput in, HollowTypeStateListener[] listeners) throws IOException {
         int numLongs = in.readInt();
 
         int currentOrdinal = 0;
