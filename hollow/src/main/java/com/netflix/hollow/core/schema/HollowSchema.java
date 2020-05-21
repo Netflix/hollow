@@ -77,7 +77,7 @@ public abstract class HollowSchema {
         }
     }
 
-    // SNAP: TODO: Bring back all the input stream versions for backwards compatibility
+    // SNAP: TODO: Bring back all the input stream versions for backwards compatibility. External usages- https://sourcegraph.netflix.net/search?q=HollowSchema.readFrom&patternType=literal
     public static HollowSchema readFrom(InputStream is) throws IOException {
         return readFrom(HollowBlobInput.inputStream(is));
     }
