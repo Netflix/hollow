@@ -39,7 +39,7 @@ public class SnapshotPopulatedOrdinalsReaderTest {
             bitSet.set(i);
 
         DataInputStream dis = serializeToStream(bitSet);
-        SnapshotPopulatedOrdinalsReader.readOrdinals(HollowBlobInput.inputStream(dis), new HollowTypeStateListener[] { listener });
+        SnapshotPopulatedOrdinalsReader.readOrdinals(HollowBlobInput.dataInputStream(dis), new HollowTypeStateListener[] { listener });
 
         BitSet populatedOrdinals = listener.getPopulatedOrdinals();
         Assert.assertEquals(1000, populatedOrdinals.cardinality());

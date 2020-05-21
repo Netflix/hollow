@@ -4,7 +4,6 @@ import static com.netflix.hollow.core.memory.MemoryMode.ON_HEAP;
 import static com.netflix.hollow.core.memory.MemoryMode.SHARED_MEMORY_LAZY;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import java.io.Closeable;
@@ -15,29 +14,30 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 
+/**
+ * This class provides an abstraction to help navigate between use of DataInputStream or RandomAccessFile
+ * as the backing resource for Hollow Producer/Consumer Blob in order to work with the different memory modes.
+ */
 public class HollowBlobInput implements Closeable {
-    Object o;
-    BlobByteBuffer buffer;
+    private Object o;
+    private BlobByteBuffer buffer;
 
     private HollowBlobInput() {}
 
-    public static HollowBlobInput modeBasedBlobInput(MemoryMode mode, HollowConsumer.Blob blob) throws IOException {
+    /**
+     * Initialize the Hollow Blob Input object from the Hollow Consumer blob's Input Stream or Random Access File, depending on the configured memory mode
+     * @param mode Configured memory mode
+     * @param blob Hollow Consumer blob
+     * @return the initialized Hollow Blob Input
+     * @throws IOException if the Hollow Blob Input couldn't be initialized
+     */
+    public static HollowBlobInput modeBasedSelector(MemoryMode mode, HollowConsumer.Blob blob) throws IOException {
         if (mode.equals(ON_HEAP)) {
-            return inputStream(blob.getInputStream());
+            return dataInputStream(blob.getInputStream());
         } else if (mode.equals(SHARED_MEMORY_LAZY)) {
             return randomAccessFile(blob.getFile());
         } else {
             throw new UnsupportedOperationException();
-        }
-    }
-
-    public static HollowBlobInput modeBasedBlobInput(MemoryMode mode, HollowProducer.Blob blob) throws IOException {
-        if (mode.equals(ON_HEAP)) {
-            return inputStream(blob.newInputStream());
-        } else if (mode.equals(SHARED_MEMORY_LAZY)) {
-            throw new UnsupportedOperationException("Shared memory mode is not supported for producer");
-        } else {
-            throw new UnsupportedOperationException("Memory mode " + mode.name() + " not supported");
         }
     }
 
@@ -51,10 +51,9 @@ public class HollowBlobInput implements Closeable {
         return hbi;
     }
 
-    public static HollowBlobInput inputStream(InputStream is) { // SNAP: TODO: Can everything be a RandomAccessFile?
+    public static HollowBlobInput dataInputStream(InputStream is) { // SNAP: TODO: Can everything be a RandomAccessFile?
         HollowBlobInput hbi = new HollowBlobInput();
-        DataInputStream dis = new DataInputStream(is);
-        hbi.o = dis;
+        hbi.o = new DataInputStream(is);
         return hbi;
     }
 
@@ -158,14 +157,19 @@ public class HollowBlobInput implements Closeable {
         }
     }
 
-    public int skipBytes(long n) throws IOException {
-        if (n > Integer.MAX_VALUE) {
-            throw new UnsupportedOperationException(); // SNAP: TODO: lossy long to int cast here. InputStream used to have a skip(long) method
-        }
+    public long skipBytes(long n) throws IOException {
         if (o instanceof RandomAccessFile) {
-            return ((RandomAccessFile) o).skipBytes((int) n);
+            long total = 0;
+            int expected = 0;
+            int actual = 0;
+            do {
+                expected = (n-total) > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) (n-total);
+                actual = ((RandomAccessFile) o).skipBytes(expected);    // RandomAccessFile::skipBytes supports int values // SNAP: To Test
+                total = total + actual;
+            } while (total < n && actual > 0);
+            return total;
         } else if (o instanceof DataInputStream) {
-            return ((DataInputStream) o).skipBytes((int) n);
+            return ((DataInputStream) o).skip(n); // invokes InputStream::skip which supports long values // SNAP: To Test
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
         }

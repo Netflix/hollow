@@ -207,7 +207,7 @@ public class FakeHollowDiffGenerator {
 
         HollowReadStateEngine readEngine = new HollowReadStateEngine(true);
         HollowBlobReader reader = new HollowBlobReader(readEngine);
-        reader.readSnapshot(HollowBlobInput.inputStream(new ByteArrayInputStream(baos.toByteArray())));
+        reader.readSnapshot(HollowBlobInput.dataInputStream(new ByteArrayInputStream(baos.toByteArray())));
 
         return readEngine;
     }

@@ -55,8 +55,8 @@ public class RestoreWriteStateEngineMapReverseDeltaTest extends AbstractStateEng
         writer.writeDelta(deltaStream);
         
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(deltaStream.toByteArray())));
-        reader.applyDelta(HollowBlobInput.inputStream(new ByteArrayInputStream(reverseDeltaStream.toByteArray())));
+        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(deltaStream.toByteArray())));
+        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(reverseDeltaStream.toByteArray())));
         
         assertMapContains(0, 1, 1, 3);
         assertMapContains(0, 2, 2, 2);

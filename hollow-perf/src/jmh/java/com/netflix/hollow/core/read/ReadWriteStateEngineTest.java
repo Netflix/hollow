@@ -123,7 +123,7 @@ public class ReadWriteStateEngineTest {
                 }
             });
 
-            reader.readSnapshot(HollowBlobInput.inputStream(in));
+            reader.readSnapshot(HollowBlobInput.dataInputStream(in));
         } catch (Exception e) {
             pipeException = e;
         }
@@ -168,7 +168,7 @@ public class ReadWriteStateEngineTest {
                 }
             });
 
-            reader.readSnapshot(HollowBlobInput.inputStream(new BufferedInputStream(in)));
+            reader.readSnapshot(HollowBlobInput.dataInputStream(new BufferedInputStream(in)));
         } catch (Exception e) {
             pipeException = e;
         }
@@ -198,7 +198,7 @@ public class ReadWriteStateEngineTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writer.writeSnapshot(baos);
 
-        reader.readSnapshot(HollowBlobInput.inputStream(new ByteArrayInputStream(baos.toByteArray())));
+        reader.readSnapshot(HollowBlobInput.dataInputStream(new ByteArrayInputStream(baos.toByteArray())));
 
         return readEngine;
     }
@@ -215,7 +215,7 @@ public class ReadWriteStateEngineTest {
             out.flush();
         }
 
-        try (HollowBlobInput in = HollowBlobInput.inputStream(new BufferedInputStream(new FileInputStream(f)))) {
+        try (HollowBlobInput in = HollowBlobInput.dataInputStream(new BufferedInputStream(new FileInputStream(f)))) {
             reader.readSnapshot(in);
         }
 

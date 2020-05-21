@@ -77,7 +77,7 @@ public class HollowBlobReader {
      */
     @Deprecated
     public void readSnapshot(InputStream is) throws IOException { // SNAP: Need to keep inputstream flavors around for backwards compatibility
-        readSnapshot(HollowBlobInput.inputStream(is));
+        readSnapshot(HollowBlobInput.dataInputStream(is));
     }
 
     public void readSnapshot(HollowBlobInput in) throws IOException {
@@ -94,11 +94,11 @@ public class HollowBlobReader {
      * @throws IOException if the snapshot could not be read
      */
     public void readSnapshot(InputStream is, HollowFilterConfig filter) throws IOException {
-        readSnapshot(HollowBlobInput.inputStream(is), (TypeFilter) filter);
+        readSnapshot(HollowBlobInput.dataInputStream(is), (TypeFilter) filter);
     }
 
     public void readSnapshot(InputStream is, TypeFilter filter) throws IOException {
-        readSnapshot(HollowBlobInput.inputStream(is), filter);
+        readSnapshot(HollowBlobInput.dataInputStream(is), filter);
     }
 
     public void readSnapshot(HollowBlobInput in, TypeFilter filter) throws IOException {
@@ -138,10 +138,10 @@ public class HollowBlobReader {
      * @throws IOException if the delta could not be applied
      */
     // public void applyDelta(InputStream in) throws IOException {
-    //     applyDelta(HollowBlobInput.inputStream(in));
+    //     applyDelta(HollowBlobInput.dataInputStream(in));
     // }
     public void applyDelta(InputStream in) throws IOException {
-        applyDelta(HollowBlobInput.inputStream(in));
+        applyDelta(HollowBlobInput.dataInputStream(in));
     }
 
     public void applyDelta(HollowBlobInput in) throws IOException {
@@ -267,7 +267,7 @@ public class HollowBlobReader {
     private void skipForwardsCompatibilityBytes(HollowBlobInput in) throws IOException {
         int bytesToSkip = VarInt.readVInt(in);
         while(bytesToSkip > 0) {
-            int skippedBytes = (int)in.skipBytes(bytesToSkip);
+            int skippedBytes = (int) in.skipBytes(bytesToSkip);
             if(skippedBytes < 0)
                 throw new EOFException();
             bytesToSkip -= skippedBytes;
