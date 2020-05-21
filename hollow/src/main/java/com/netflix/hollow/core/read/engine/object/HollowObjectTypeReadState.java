@@ -32,7 +32,6 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.BitSet;
 
@@ -82,13 +81,13 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     }
 
     @Override
-    public void readSnapshot(HollowBlobInput in, BufferedWriter debug, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0;i<shards.length;i++) {
             HollowObjectTypeDataElements snapshotData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
-            snapshotData.readSnapshot(in, debug, unfilteredSchema);
+            snapshotData.readSnapshot(in, unfilteredSchema);
             shards[i].setCurrentData(snapshotData);
         }
 
@@ -99,14 +98,14 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     }
     
     @Override
-    public void applyDelta(HollowBlobInput in, BufferedWriter debug, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0;i<shards.length;i++) {
             HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryMode, memoryRecycler);
             HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
-            deltaData.readDelta(in, debug);
+            deltaData.readDelta(in);
             HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
             nextData.applyDelta(oldData, deltaData);
             shards[i].setCurrentData(nextData);

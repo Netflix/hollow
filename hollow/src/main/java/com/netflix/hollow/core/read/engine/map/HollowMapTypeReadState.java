@@ -40,7 +40,6 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.BitSet;
 
@@ -81,13 +80,13 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
 
     @Override
-    public void readSnapshot(HollowBlobInput in, BufferedWriter debug, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
         
         for(int i=0; i<shards.length; i++) {
             HollowMapTypeDataElements snapshotData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
-            snapshotData.readSnapshot(in, debug);
+            snapshotData.readSnapshot(in);
             shards[i].setCurrentData(snapshotData);
         }
         
@@ -98,14 +97,14 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
 
     @Override
-    public void applyDelta(HollowBlobInput in, BufferedWriter debug, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0; i<shards.length; i++) {
             HollowMapTypeDataElements deltaData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
             HollowMapTypeDataElements nextData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
-            deltaData.readDelta(in, debug);
+            deltaData.readDelta(in);
             HollowMapTypeDataElements oldData = shards[i].currentDataElements();
             nextData.applyDelta(oldData, deltaData);
             shards[i].setCurrentData(nextData);

@@ -28,9 +28,7 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.tools.history.HollowHistory;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.Closeable;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -185,11 +183,10 @@ public class HollowHistoryKeyIndex {
             });
 
             try (HollowBlobInput in = HollowBlobInput.inputStream(new BufferedInputStream(is))) {   // SNAP: fixed memory leak here, "bin" wasn't being closed
-                BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_history_"));
                 if (isInitialUpdate || isSnapshot) {
-                    reader.readSnapshot(in, debug);
+                    reader.readSnapshot(in);
                 } else {
-                    reader.applyDelta(in, debug);
+                    reader.applyDelta(in);
                 }
             }
         } catch (Exception e) {

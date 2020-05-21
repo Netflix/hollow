@@ -47,8 +47,6 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -757,16 +755,14 @@ abstract class AbstractHollowProducer {
     }
 
     private void readSnapshot(HollowProducer.Blob blob, HollowReadStateEngine stateEngine) throws IOException {
-        BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_consumer_snapshot"));
         try (HollowBlobInput in = HollowBlobInput.modeBasedBlobInput(MemoryMode.ON_HEAP, blob)) {   // shared memory mode not supported for producer
-            new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).readSnapshot(in, debug);
+            new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).readSnapshot(in);
         }
     }
 
     private void applyDelta(HollowProducer.Blob blob, HollowReadStateEngine stateEngine) throws IOException {
-        BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_consumer_snapshot"));
         try (HollowBlobInput in = HollowBlobInput.modeBasedBlobInput(MemoryMode.ON_HEAP, blob)) {   // shared memory mode not supported for producer
-            new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).applyDelta(in, debug);
+            new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).applyDelta(in);
         }
     }
 

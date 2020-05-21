@@ -75,11 +75,10 @@ public class StateEngineRoundTripper {
         HollowBlobReader reader = new HollowBlobReader(readEngine);
         InputStream is = new ByteArrayInputStream(baos.toByteArray());
         HollowBlobInput in = HollowBlobInput.inputStream(is);
-        BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_roundtripper_"));
         if(filter == null)
-            reader.readSnapshot(in, debug);
+            reader.readSnapshot(in);
         else
-            reader.readSnapshot(in, debug, filter);
+            reader.readSnapshot(in, filter);
     }
 
     /**
@@ -98,7 +97,7 @@ public class StateEngineRoundTripper {
         HollowBlobReader reader = new HollowBlobReader(readEngine);
         HollowBlobInput hbi = HollowBlobInput.inputStream(new ByteArrayInputStream(baos.toByteArray()));
         BufferedWriter debug = new BufferedWriter(new FileWriter("/tmp/debug_roundtripper_"));
-        reader.applyDelta(hbi, debug);
+        reader.applyDelta(hbi);
         writeEngine.prepareForNextCycle();
     }
 
