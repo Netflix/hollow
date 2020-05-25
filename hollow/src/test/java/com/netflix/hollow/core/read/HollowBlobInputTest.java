@@ -160,10 +160,11 @@ public class HollowBlobInputTest {
         HollowBlobInput inStream = HollowBlobInput.modeBasedSelector(MemoryMode.ON_HEAP, mockBlob);
         assertEquals(1l, inStream.skipBytes(1));
         assertEquals(1, inStream.read());   // next byte read is 1
+        assertEquals(12, inStream.skipBytes(2000));   // attempt to skip past end of file
 
         HollowBlobInput inBuffer = HollowBlobInput.modeBasedSelector(MemoryMode.SHARED_MEMORY_LAZY, mockBlob);
         assertEquals(1l, inBuffer.skipBytes(1));
         assertEquals(1, inBuffer.read());   // next byte read is 1
-
+        assertEquals(12, inBuffer.skipBytes(20));   // attempt to skip past end of file
     }
 }
