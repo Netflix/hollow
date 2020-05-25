@@ -153,6 +153,19 @@ public class HollowBlobInput implements Closeable {
         }
     }
 
+    /**
+     * This method attempts to skip a specified number of bytes and returns the actual number of bytes skipped. The
+     * behavior is differed based on whether the backing resource is a RandomAccessFile or InputStream. For InputStream,
+     * (as implemented in FileInputStream) this method may skip more bytes than what are remaining in the backing file.
+     * It will produce no exception and the number of bytes skipped may include some number of bytes that were beyond the
+     * EOF of the backing file. The next read attempt from the stream after skipping past the end will result in -1
+     * indicating the end of the file was reached. For RandomAccessFile, this method will return the actual bytes skipped
+     * and does not go past EOF.
+     *
+     * @param n number of bytes to skip
+     * @return number of bytes skipped
+     * @throws IOException
+     */
     public long skipBytes(long n) throws IOException {
         if (input instanceof RandomAccessFile) {
             long total = 0;
@@ -160,12 +173,12 @@ public class HollowBlobInput implements Closeable {
             int actual = 0;
             do {
                 expected = (n-total) > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) (n-total);
-                actual = ((RandomAccessFile) input).skipBytes(expected);    // RandomAccessFile::skipBytes supports int values // SNAP: To Test
+                actual = ((RandomAccessFile) input).skipBytes(expected);    // RandomAccessFile::skipBytes supports int
                 total = total + actual;
             } while (total < n && actual > 0);
             return total;
         } else if (input instanceof DataInputStream) {
-            return ((DataInputStream) input).skip(n); // invokes InputStream::skip which supports long values // SNAP: To Test
+            return ((DataInputStream) input).skip(n); // InputStream::skip supports long
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
         }
