@@ -135,7 +135,8 @@ public class SegmentedLongArray {
         }
     }
 
-    protected void readFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, long numLongs) throws
+    // SNAP: made public for testing
+    public void readFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, long numLongs) throws
             IOException {
         int segmentSize = 1 << memoryRecycler.getLog2OfLongSegmentSize();
         int segment = 0;

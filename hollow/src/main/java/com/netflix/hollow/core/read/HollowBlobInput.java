@@ -47,7 +47,7 @@ public class HollowBlobInput implements Closeable {
         RandomAccessFile raf = new RandomAccessFile(f, "r");
         hbi.input = raf;
         FileChannel channel = ((RandomAccessFile) hbi.input).getChannel();
-        hbi.buffer = BlobByteBuffer.mmapBlob(channel);
+        hbi.buffer = BlobByteBuffer.mmapBlob(channel, BlobByteBuffer.MAX_SINGLE_BUFFER_CAPACITY);
         return hbi;
     }
 

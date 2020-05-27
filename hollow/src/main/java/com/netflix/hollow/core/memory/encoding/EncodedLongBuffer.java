@@ -206,6 +206,11 @@ public class EncodedLongBuffer implements FixedLengthData {
     // returns a EncodedLongBuffer that contains deserialized data from given file
     public static EncodedLongBuffer deserializeFrom(HollowBlobInput in) throws IOException {
         long numLongs = VarInt.readVLong(in);
+        return deserializeFrom(in, numLongs);
+    }
+
+    // SNAP: created for testing
+    public static EncodedLongBuffer deserializeFrom(HollowBlobInput in, long numLongs) throws IOException {
         EncodedLongBuffer buf = new EncodedLongBuffer();
         buf.loadFrom(in, numLongs);
         return buf;
