@@ -49,7 +49,7 @@ public class HollowBlobInputTest {
         // Then to test reading UTF, 2 bytes for UTF length (containing unsigned short value of 1) and then the string "test"
         leadingBytes = new byte[] {0, 1, 0, 1, 0, 1, 0, 1};
         Files.write(testFile, leadingBytes);
-        byte[] utfLen = new byte[] {0, 1};   // bytes corresponding to a short of value 4
+        byte[] utfLen = new byte[] {0, 1};   // bytes corresponding to a short of value 1
         Files.write(testFile, utfLen, StandardOpenOption.APPEND);
         Files.write(testFile, "test".getBytes(), StandardOpenOption.APPEND);
         when(mockBlob.getInputStream()).thenReturn(new FileInputStream(testFile.toFile()));
@@ -160,11 +160,11 @@ public class HollowBlobInputTest {
         HollowBlobInput inStream = HollowBlobInput.modeBasedSelector(MemoryMode.ON_HEAP, mockBlob);
         assertEquals(1l, inStream.skipBytes(1));
         assertEquals(1, inStream.read());   // next byte read is 1
-        assertEquals(12, inStream.skipBytes(2000));   // attempt to skip past end of file
+        assertEquals(2000, inStream.skipBytes(2000));   // successfully skips past end of file for FileInputStream
 
         HollowBlobInput inBuffer = HollowBlobInput.modeBasedSelector(MemoryMode.SHARED_MEMORY_LAZY, mockBlob);
         assertEquals(1l, inBuffer.skipBytes(1));
         assertEquals(1, inBuffer.read());   // next byte read is 1
-        assertEquals(12, inBuffer.skipBytes(20));   // attempt to skip past end of file
+        assertEquals(12, inBuffer.skipBytes(2000));   // stops at end of file for RandomAccessFile
     }
 }

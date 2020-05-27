@@ -25,7 +25,7 @@ import sun.misc.Unsafe;
 public final class BlobByteBuffer {
 
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
-    private static final int MAX_SINGLE_BUFFER_CAPACITY = 1 << 30; // largest, positive power-of-two int
+    public static final int MAX_SINGLE_BUFFER_CAPACITY = 1 << 30; // largest, positive power-of-two int
 
     private final ByteBuffer[] spine;   // array of MappedByteBuffer
     private final long capacity;
@@ -68,15 +68,15 @@ public final class BlobByteBuffer {
         }
     }
 
-    public static BlobByteBuffer mmapBlob(FileChannel channel) throws IOException {
+    public static BlobByteBuffer mmapBlob(FileChannel channel, int singleBufferCapacity) throws IOException {
         long size = channel.size();
         if (size == 0) {
             throw new IllegalStateException("File to be mmap-ed has no data");
         }
 
         // divide into N buffers with an int capacity that is a power of 2
-        final int bufferCapacity = size > (long) MAX_SINGLE_BUFFER_CAPACITY
-                ? MAX_SINGLE_BUFFER_CAPACITY
+        final int bufferCapacity = size > (long) singleBufferCapacity
+                ? singleBufferCapacity
                 : Integer.highestOneBit((int) size);
         long bufferCount = size % bufferCapacity == 0
                 ? size / (long)bufferCapacity
@@ -115,15 +115,18 @@ public final class BlobByteBuffer {
 
     // @param position in bytes
     public BlobByteBuffer position(long position) {
-        if (position >= capacity || position < 0)
+        if (position > capacity || position < 0)
             throw new IllegalArgumentException("invalid position; position=" + position + " capacity=" + capacity);
         this.position = position;
         return this;
     }
 
-    // @param position in bytes from offset 0 in the backing BlobByteBuffer
+    // @param index position in bytes from offset 0 in the backing BlobByteBuffer
     public byte getByte(long index) throws BufferUnderflowException {
         lock1.lock();
+        if (index >= capacity) {  // defensive
+            throw new IllegalStateException();
+        }
         try {
             int spineIndex = (int)(index >>> (shift));
             int bufferIndex = (int)(index & mask);
@@ -142,7 +145,7 @@ public final class BlobByteBuffer {
             int bufferByteIndex = (int)(startByteIndex & mask);
             int alignmentOffset = (int)(startByteIndex - this.position()) % 8;
 
-            if (!(bufferByteIndex + 8 < this.capacity))
+            if (bufferByteIndex + Long.BYTES > this.capacity)  // defensive
                 throw new IllegalStateException();
 
             long longVal;
@@ -171,17 +174,26 @@ public final class BlobByteBuffer {
                         throw new IllegalStateException();
                     }
                     longs[0] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex-1], spine[spineIndex], spine[spineIndex-1].capacity() + firstBufferOffset);
+                    // SNAP:
+                    // ByteBuffer prevByteBuffer = spine[spineIndex - 1];
+                    // ByteBuffer thisByteBuffer = spine[spineIndex];
+                    // longs[0] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(prevByteBuffer, thisByteBuffer, prevByteBuffer.capacity() + firstBufferOffset);
                 } else {    // if first aligned byte is in the current spine bucket
                     if (firstBufferOffset + Long.BYTES <= spine[spineIndex].capacity())
                         longs[0] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex],null, firstBufferOffset);
                     else
                         longs[0] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex], spine[spineIndex + 1], firstBufferOffset);
+
+                    // SNAP:
+                    // ByteBuffer thisByteBuffer = spine[spineIndex];
+                    // ByteBuffer nextByteBuffer = (spineIndex + 1 < spine.length) ? spine[spineIndex + 1] : null;
+                    // longs[0] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(thisByteBuffer, nextByteBuffer, firstBufferOffset);
                 }
 
                 int secondBufferOffset = firstBufferOffset + Long.BYTES;
                 if ((secondBufferOffset & mask) == secondBufferOffset) {    // if next aligned long is in the same spine bucket
                     if (secondBufferOffset + Long.BYTES <= spine[spineIndex].capacity())
-                        longs[1] = spine[spineIndex].getLong(secondBufferOffset);
+                        longs[1] = spine[spineIndex].getLong(secondBufferOffset);   // optimization, as opposed to using getAlignedLongAcrossSpineBoundary() which copies individual bytes
                     else
                         longs[1] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex], spine[spineIndex+1], secondBufferOffset);
                 } else {
