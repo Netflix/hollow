@@ -24,7 +24,6 @@ import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowSetTypeWriteState;
 import com.netflix.hollow.core.write.HollowSetWriteRecord;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.Assert;
@@ -54,8 +53,8 @@ public class RestoreWriteStateEngineSetReverseDeltaTest extends AbstractStateEng
         writer.writeDelta(deltaStream);
         
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(deltaStream.toByteArray())));
-        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(reverseDeltaStream.toByteArray())));
+        reader.applyDelta(HollowBlobInput.sequential(deltaStream.toByteArray()));
+        reader.applyDelta(HollowBlobInput.sequential(reverseDeltaStream.toByteArray()));
         
         assertSetContains(0, 1, 3);
         assertSetContains(0, 2, 2);

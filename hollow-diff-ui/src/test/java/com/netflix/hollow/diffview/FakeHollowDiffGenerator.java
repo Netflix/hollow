@@ -36,7 +36,6 @@ import com.netflix.hollow.core.write.HollowSetWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.hollow.tools.diff.HollowTypeDiff;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -207,7 +206,7 @@ public class FakeHollowDiffGenerator {
 
         HollowReadStateEngine readEngine = new HollowReadStateEngine(true);
         HollowBlobReader reader = new HollowBlobReader(readEngine);
-        reader.readSnapshot(HollowBlobInput.dataInputStream(new ByteArrayInputStream(baos.toByteArray())));
+        reader.readSnapshot(HollowBlobInput.sequential(baos.toByteArray()));
 
         return readEngine;
     }

@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import org.junit.Assert;
 import org.junit.Test;
-import sun.jvm.hotspot.utilities.Bits;
 import sun.misc.Unsafe;
 
 public class BlobByteBufferTest {
@@ -68,20 +67,20 @@ public class BlobByteBufferTest {
         //      overlapping with out of bounds long
 
         // aligned/unaligned longs
-        HollowBlobInput hbi1 = HollowBlobInput.dataInputStream(new FileInputStream(testFile));
+        HollowBlobInput hbi1 = HollowBlobInput.sequential(new FileInputStream(testFile));
         hbi1.skipBytes(padding + 16);        // skip past the first 16 bytes of test data written to file
         FixedLengthElementArray testLongArray = FixedLengthElementArray.deserializeFrom(hbi1, WastefulRecycler.DEFAULT_INSTANCE, numLongsWritten);
 
-        HollowBlobInput hbi2 = HollowBlobInput.randomAccessFile(testFile, TEST_SINGLE_BUFFER_CAPACITY_BYTES);
+        HollowBlobInput hbi2 = HollowBlobInput.randomAccess(testFile, TEST_SINGLE_BUFFER_CAPACITY_BYTES);
         hbi2.skipBytes(padding  + 16);       // skip past the first 16 bytes of test data written to file
         EncodedLongBuffer testLongBuffer = EncodedLongBuffer.deserializeFrom(hbi2, numLongsWritten);
         for (int i=0; i<numLongsWritten; i++) {
-            assertEquals(testLongArray.get(i), testLongBuffer.getElementValue(i * Long.BYTES * Bits.BitsPerByte, bitsPerLong));
+            assertEquals(testLongArray.get(i), testLongBuffer.getElementValue(i * Long.BYTES * 8, bitsPerLong));
         }
 
         // out of bounds long
         try {
-            testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * Bits.BitsPerByte, bitsPerLong);
+            testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * 8, bitsPerLong);
             Assert.fail();
         } catch (IllegalStateException e) {
             // this is expected
@@ -91,7 +90,7 @@ public class BlobByteBufferTest {
 
         // overlapping with out of bounds long
         try {
-            testLongBuffer.getElementValue((numLongsWritten-1)* Long.BYTES * Bits.BitsPerByte + Long.BYTES, bitsPerLong);
+            testLongBuffer.getElementValue((numLongsWritten-1)* Long.BYTES * 8 + Long.BYTES, bitsPerLong);
             Assert.fail();
         } catch (IllegalStateException e) {
             // this is expected
@@ -112,10 +111,10 @@ public class BlobByteBufferTest {
         // SNAP: SegmentedByteArray vs. EncodedByteBuffer
         //
         SegmentedByteArray testByteArray = new SegmentedByteArray(WastefulRecycler.DEFAULT_INSTANCE);
-        testByteArray.loadFrom(HollowBlobInput.dataInputStream(new FileInputStream(testFile)), testFile.length());
+        testByteArray.loadFrom(HollowBlobInput.sequential(new FileInputStream(testFile)), testFile.length());
 
         EncodedByteBuffer testByteBuffer = new EncodedByteBuffer();
-        testByteBuffer.loadFrom(HollowBlobInput.randomAccessFile(testFile, TEST_SINGLE_BUFFER_CAPACITY_BYTES), testFile.length());
+        testByteBuffer.loadFrom(HollowBlobInput.randomAccess(testFile, TEST_SINGLE_BUFFER_CAPACITY_BYTES), testFile.length());
 
         // aligned bytes - BlobByteBuffer vs. SegmentedByteArray
         assertEquals(testByteArray.get(0 + padding), testByteBuffer.get(0 + padding));
@@ -196,7 +195,7 @@ public class BlobByteBufferTest {
     //
     //        // aligned bytes - BlobByteBuffer vs. SegmentedByteArray
     //        SegmentedByteArray testByteArray = new SegmentedByteArray(WastefulRecycler.DEFAULT_INSTANCE);
-    //        testByteArray.loadFrom(HollowBlobInput.dataInputStream(new FileInputStream(testFile.toFile())), testBytes.length);
+    //        testByteArray.loadFrom(HollowBlobInput.sequential(new FileInputStream(testFile.toFile())), testBytes.length);
     //        assertEquals(testByteArray.get(0), testBuffer.getByte(0));
     //        assertEquals(testByteArray.get(8), testBuffer.getByte(8));
     //        assertEquals(testByteArray.get(16), testBuffer.getByte(16));
@@ -209,7 +208,7 @@ public class BlobByteBufferTest {
     //
     //        // aligned long - BlobByteBuffer vs. SegmentedLongArray
     //        SegmentedLongArray testLongArray = new SegmentedLongArray(WastefulRecycler.DEFAULT_INSTANCE, 14);
-    //        testLongArray.readFrom(HollowBlobInput.dataInputStream(new FileInputStream(testFile.toFile())), WastefulRecycler.DEFAULT_INSTANCE, 14);
+    //        testLongArray.readFrom(HollowBlobInput.sequential(new FileInputStream(testFile.toFile())), WastefulRecycler.DEFAULT_INSTANCE, 14);
     //        assertEquals(testLongArray.get(2), testBuffer.getLong(16));
     //
     //        // aligned long in view buffer - BlobByteBuffer vs. SegmentedLongArray

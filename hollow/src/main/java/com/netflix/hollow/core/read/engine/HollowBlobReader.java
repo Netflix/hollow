@@ -77,7 +77,7 @@ public class HollowBlobReader {
      */
     @Deprecated
     public void readSnapshot(InputStream is) throws IOException { // SNAP: Need to keep inputstream flavors around for backwards compatibility
-        readSnapshot(HollowBlobInput.dataInputStream(is));
+        readSnapshot(HollowBlobInput.sequential(is));
     }
 
     public void readSnapshot(HollowBlobInput in) throws IOException {
@@ -94,11 +94,11 @@ public class HollowBlobReader {
      * @throws IOException if the snapshot could not be read
      */
     public void readSnapshot(InputStream is, HollowFilterConfig filter) throws IOException {
-        readSnapshot(HollowBlobInput.dataInputStream(is), (TypeFilter) filter);
+        readSnapshot(HollowBlobInput.sequential(is), (TypeFilter) filter);
     }
 
     public void readSnapshot(InputStream is, TypeFilter filter) throws IOException {
-        readSnapshot(HollowBlobInput.dataInputStream(is), filter);
+        readSnapshot(HollowBlobInput.sequential(is), filter);
     }
 
     public void readSnapshot(HollowBlobInput in, TypeFilter filter) throws IOException {
@@ -138,10 +138,10 @@ public class HollowBlobReader {
      * @throws IOException if the delta could not be applied
      */
     // public void applyDelta(InputStream in) throws IOException {
-    //     applyDelta(HollowBlobInput.dataInputStream(in));
+    //     applyDelta(HollowBlobInput.sequential(in));
     // }
     public void applyDelta(InputStream in) throws IOException {
-        applyDelta(HollowBlobInput.dataInputStream(in));
+        applyDelta(HollowBlobInput.sequential(in));
     }
 
     public void applyDelta(HollowBlobInput in) throws IOException {
