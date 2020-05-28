@@ -96,6 +96,10 @@ public class EncodedLongBuffer implements FixedLengthData {
         long whichByte = index >>> 3;
         int whichBit = (int) (index & 0x07);
 
+        if (whichByte > this.maxByteIndex) {  // it's illegal to read a byte starting past the last byte boundary of data
+            throw new IllegalStateException();
+        }
+
         long longVal = this.bufferView.getLong(this.bufferView.position() + whichByte);
         long l =  longVal >>> whichBit;
         return l & mask;
@@ -152,9 +156,9 @@ public class EncodedLongBuffer implements FixedLengthData {
     }
 
     /**
-     * Get the value of the byte at the specified index.
+     * Get the value of the long at the specified index.
      *
-     * @param index the index (in multiples of 8 bytes)
+     * @param index the long index eg. long at index 0 (0-7 bytes)m long at index 1 (8-15 bytes)
      * @return the byte value
      */
     private long get(long index) {
@@ -162,7 +166,7 @@ public class EncodedLongBuffer implements FixedLengthData {
             throw new IllegalStateException("Type is queried before it has been read in");
         }
 
-        long byteIndex = 8 * index;
+        long byteIndex = index * Long.BYTES;
         if (byteIndex > this.maxByteIndex) {  // it's illegal to read a byte starting past the last byte boundary of data
             throw new IllegalStateException();
         }
@@ -172,15 +176,15 @@ public class EncodedLongBuffer implements FixedLengthData {
     private void loadFrom(HollowBlobInput in, long numLongs) throws IOException {
         BlobByteBuffer buffer = in.getBuffer();
         this.maxLongs = numLongs;
-        this.maxByteIndex = this.maxLongs * 64 - 8; // SNAP: should we work this into bufferView capacity?
+        this.maxByteIndex = (this.maxLongs - 1) * Long.BYTES; // SNAP: should we work this into bufferView capacity?
 
         if(numLongs == 0)
             return;
 
         buffer.position(in.getFilePointer());
         this.bufferView = buffer.duplicate();
-        buffer.position(buffer.position() + numLongs*8);
-        in.seek(in.getFilePointer() + (numLongs  * 8));
+        buffer.position(buffer.position() + (numLongs * Long.BYTES));
+        in.seek(in.getFilePointer() + (numLongs  * Long.BYTES));
     }
 
     @Override

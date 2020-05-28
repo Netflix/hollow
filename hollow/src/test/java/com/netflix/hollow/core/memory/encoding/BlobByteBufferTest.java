@@ -14,9 +14,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.junit.Assert;
 import org.junit.Test;
+import sun.jvm.hotspot.utilities.Bits;
 import sun.misc.Unsafe;
 
 public class BlobByteBufferTest {
@@ -36,8 +37,8 @@ public class BlobByteBufferTest {
         // adding padding writes the test longs at a non-aligned byte
         for (int padding = 0; padding < Long.BYTES; padding ++) {
             // write a File of TEST_SINGLE_BUFFER_CAPACITY_BYTES*4 size, assuming TEST_SINGLE_BUFFER_CAPACITY_BYTES is 32
-            Path testFile = writeTestFileUnaligned("/fixed_length_data_modes", padding);
-            testFile.toFile().deleteOnExit();
+            File testFile = writeTestFileUnaligned("/fixed_length_data_modes", padding);
+            testFile.deleteOnExit();
 
             readUsingFixedLengthDataModes(testFile, padding, numLongsWritten, bitsPerLong);
         }
@@ -50,8 +51,8 @@ public class BlobByteBufferTest {
 
         // adding padding writes the test longs at a non-aligned byte
         for (int padding = 0; padding < Long.BYTES; padding ++) {
-            Path testFile = writeTestFileUnaligned("/variable_length_data_modes", padding);
-            testFile.toFile().deleteOnExit();
+            File testFile = writeTestFileUnaligned("/variable_length_data_modes", padding);
+            testFile.deleteOnExit();
 
             readUsingVariableLengthDataModes(testFile, padding);
         }
@@ -60,73 +61,64 @@ public class BlobByteBufferTest {
     }
 
 
-    private void readUsingFixedLengthDataModes(Path testFile, int padding, int numLongsWritten, int bitsPerLong) throws IOException {
-        // test read parity between SegmentedLongArray and EncodedByteBuffer for-
+    private void readUsingFixedLengthDataModes(File testFile, int padding, int numLongsWritten, int bitsPerLong) throws IOException {
+        // test read parity between FixedLengthElementArray and EncodedLongBuffer for-
         //      aligned long,
-        //      unaligned longs,
+        //      unaligned long,
         //      aligned and at spine boundary long,
         //      unaligned and at spine boundary long,
         //      out of bounds long
         //      overlapping with out of bounds long
-        //      first long (aligned)
-        //      first long (unaligned)
 
-        RandomAccessFile raf = new RandomAccessFile(testFile.toFile(), "r");
-        FileChannel channel = raf.getChannel();
-        BlobByteBuffer testBuffer = BlobByteBuffer.mmapBlob(channel, TEST_SINGLE_BUFFER_CAPACITY_BYTES);
-
-        //
-        // SNAP: SegmentedByteArray vs. EncodedByteBuffer
-        //
-        SegmentedByteArray testByteArray = new SegmentedByteArray(WastefulRecycler.DEFAULT_INSTANCE);
-        testByteArray.loadFrom(HollowBlobInput.dataInputStream(new FileInputStream(testFile.toFile())), testFile.toFile().length());
-
-        // aligned bytes - BlobByteBuffer vs. SegmentedByteArray
-        assertEquals(testByteArray.get(0 + padding), testBuffer.getByte(0 + padding));
-        assertEquals(testByteArray.get(8 + padding), testBuffer.getByte(8 + padding));
-        assertEquals(testByteArray.get(16 + padding), testBuffer.getByte(16 + padding));
-        assertEquals(testByteArray.get(23 + padding), testBuffer.getByte(23 + padding));
-        assertEquals(testByteArray.get(1 + padding), testBuffer.getByte(1 + padding));
-
-        //  unaligned bytes - BlobByteBuffer vs. SegmentedByteArray
-        assertEquals(testByteArray.get(1 + padding), testBuffer.getByte(1 + padding));
-        assertEquals(testByteArray.get(13 + padding), testBuffer.getByte(13 + padding));
-        assertEquals(testByteArray.get(127 + padding), testBuffer.getByte(127 + padding));
-
-        //
-        // SNAP: FixedLengthElementArray vs. EncodedLongBuffer
-        //
-        // unaligned long - BlobByteBuffer vs. SegmentedLongArray
-        HollowBlobInput hbi1 = HollowBlobInput.dataInputStream(new FileInputStream(testFile.toFile()));
+        // aligned/unaligned longs
+        HollowBlobInput hbi1 = HollowBlobInput.dataInputStream(new FileInputStream(testFile));
         hbi1.skipBytes(padding + 16);        // skip past the first 16 bytes of test data written to file
         FixedLengthElementArray testLongArray = FixedLengthElementArray.deserializeFrom(hbi1, WastefulRecycler.DEFAULT_INSTANCE, numLongsWritten);
 
-        HollowBlobInput hbi2 = HollowBlobInput.randomAccessFile(testFile.toFile());
+        HollowBlobInput hbi2 = HollowBlobInput.randomAccessFile(testFile);
         hbi2.skipBytes(padding  + 16);       // skip past the first 16 bytes of test data written to file
         EncodedLongBuffer testLongBuffer = EncodedLongBuffer.deserializeFrom(hbi2, numLongsWritten);
         for (int i=0; i<numLongsWritten; i++) {
-            assertEquals(testLongArray.get(i), testLongBuffer.getElementValue(i*Long.BYTES*8, bitsPerLong));
+            assertEquals(testLongArray.get(i), testLongBuffer.getElementValue(i * Long.BYTES * Bits.BitsPerByte, bitsPerLong));
         }
-        // SNAP: TODO: This doesn't hold because of the way we're writing out the longs- inconsistent byte order
+
+        // out of bounds long
+        try {
+            testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * Bits.BitsPerByte, bitsPerLong);
+            Assert.fail();
+        } catch (IllegalStateException e) {
+            // this is expected
+        } catch (Exception e) {
+            Assert.fail();
+        }
+
+        // overlapping with out of bounds long
+        try {
+            testLongBuffer.getElementValue((numLongsWritten-1)* Long.BYTES * Bits.BitsPerByte + Long.BYTES, bitsPerLong);
+            Assert.fail();
+        } catch (IllegalStateException e) {
+            // this is expected
+        } catch (Exception e) {
+            Assert.fail();
+        }
 
         // TODO: Test long read across spine boundary
     }
 
-    private void readUsingVariableLengthDataModes(Path testFile, int padding) throws IOException {
-        // test read parity between SegmentedByteArray and EncodedLongBuffer for-
+    private void readUsingVariableLengthDataModes(File testFile, int padding) throws IOException {
+        // test read parity between SegmentedByteArray and EncodedByteBuffer for-
         //      aligned byte,
         //      unaligned byte,
         //      out of bounds byte
-        //      first byte
 
         //
         // SNAP: SegmentedByteArray vs. EncodedByteBuffer
         //
         SegmentedByteArray testByteArray = new SegmentedByteArray(WastefulRecycler.DEFAULT_INSTANCE);
-        testByteArray.loadFrom(HollowBlobInput.dataInputStream(new FileInputStream(testFile.toFile())), testFile.toFile().length());
+        testByteArray.loadFrom(HollowBlobInput.dataInputStream(new FileInputStream(testFile)), testFile.length());
 
         EncodedByteBuffer testByteBuffer = new EncodedByteBuffer();
-        testByteBuffer.loadFrom(HollowBlobInput.randomAccessFile(testFile.toFile()), testFile.toFile().length());
+        testByteBuffer.loadFrom(HollowBlobInput.randomAccessFile(testFile), testFile.length());
 
         // aligned bytes - BlobByteBuffer vs. SegmentedByteArray
         assertEquals(testByteArray.get(0 + padding), testByteBuffer.get(0 + padding));
@@ -139,10 +131,20 @@ public class BlobByteBufferTest {
         assertEquals(testByteArray.get(1 + padding), testByteBuffer.get(1 + padding));
         assertEquals(testByteArray.get(13 + padding), testByteBuffer.get(13 + padding));
         assertEquals(testByteArray.get(127 + padding), testByteBuffer.get(127 + padding));
+
+        // out of bounds read
+        try {
+            testByteBuffer.get(testFile.length());
+            Assert.fail();
+        } catch (IllegalStateException e) {
+            // this is expected
+        } catch (Exception e) {
+            Assert.fail();
+        }
     }
 
     // write a File of TEST_SINGLE_BUFFER_CAPACITY_BYTES*4 size, assuming TEST_SINGLE_BUFFER_CAPACITY_BYTES is 32
-    private Path writeTestFileUnaligned(String filename, int padding) throws IOException {
+    private File writeTestFileUnaligned(String filename, int padding) throws IOException {
         File f = new File(Paths.get(SCRATCH_DIR).toString() + filename + ".test");
         DataOutputStream out = new DataOutputStream(new FileOutputStream(f));
         // Path testFile = Files.createTempFile(Paths.get(SCRATCH_DIR), filename,"test");
@@ -178,7 +180,7 @@ public class BlobByteBufferTest {
         out.flush();
         out.close();
         f.deleteOnExit();
-        return f.toPath();
+        return f;
     }
 
 
