@@ -7,6 +7,7 @@ import static com.netflix.hollow.core.memory.encoding.BlobByteBuffer.MAX_SINGLE_
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
@@ -34,21 +35,21 @@ public class HollowBlobInput implements Closeable {
      */
     public static HollowBlobInput modeBasedSelector(MemoryMode mode, HollowConsumer.Blob blob) throws IOException {
         if (mode.equals(ON_HEAP)) {
-            return dataInputStream(blob.getInputStream());
+            return sequential(blob.getInputStream());
         } else if (mode.equals(SHARED_MEMORY_LAZY)) {
-            return randomAccessFile(blob.getFile());
+            return randomAccess(blob.getFile());
         } else {
             throw new UnsupportedOperationException();
         }
     }
 
     // SNAP: TODO: Comment about how returned handle must be closed
-    public static HollowBlobInput randomAccessFile(File f) throws IOException {
-        return randomAccessFile(f, MAX_SINGLE_BUFFER_CAPACITY);
+    public static HollowBlobInput randomAccess(File f) throws IOException {
+        return randomAccess(f, MAX_SINGLE_BUFFER_CAPACITY);
     }
 
     // SNAP: for testing
-    public static HollowBlobInput randomAccessFile(File f, int singleBufferCapacity) throws IOException {
+    public static HollowBlobInput randomAccess(File f, int singleBufferCapacity) throws IOException {
         HollowBlobInput hbi = new HollowBlobInput();
         RandomAccessFile raf = new RandomAccessFile(f, "r");
         hbi.input = raf;
@@ -57,7 +58,12 @@ public class HollowBlobInput implements Closeable {
         return hbi;
     }
 
-    public static HollowBlobInput dataInputStream(InputStream is) { // SNAP: TODO: Can everything be a RandomAccessFile?
+    public static HollowBlobInput sequential(byte[] bytes) {
+        InputStream is = new ByteArrayInputStream(bytes);
+        return sequential(is);
+    }
+
+    public static HollowBlobInput sequential(InputStream is) { // SNAP: TODO: Can everything be a RandomAccessFile?
         HollowBlobInput hbi = new HollowBlobInput();
         hbi.input = new DataInputStream(is);
         return hbi;

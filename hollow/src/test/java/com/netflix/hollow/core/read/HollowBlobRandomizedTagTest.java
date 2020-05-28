@@ -20,7 +20,6 @@ import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.Assert;
@@ -85,15 +84,15 @@ public class HollowBlobRandomizedTagTest {
         HollowReadStateEngine stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
 
-        reader.readSnapshot(HollowBlobInput.dataInputStream(new ByteArrayInputStream(snapshot)));
-        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(delta1)));
+        reader.readSnapshot(HollowBlobInput.sequential(snapshot));
+        reader.applyDelta(HollowBlobInput.sequential(delta1));
 
         try {
-            reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(delta1)));
+            reader.applyDelta(HollowBlobInput.sequential(delta1));
             Assert.fail("Should have refused to apply delta to incorrect state");
         } catch(IOException expected) { }
 
-        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(delta2)));
+        reader.applyDelta(HollowBlobInput.sequential(delta2));
     }
 
     @Test
@@ -101,23 +100,23 @@ public class HollowBlobRandomizedTagTest {
         HollowReadStateEngine stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
 
-        reader.readSnapshot(HollowBlobInput.dataInputStream(new ByteArrayInputStream(snapshot2)));
+        reader.readSnapshot(HollowBlobInput.sequential(snapshot2));
 
         try {
-            reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(reversedelta1)));
+            reader.applyDelta(HollowBlobInput.sequential(reversedelta1));
             Assert.fail("Should have refused to apply reverse delta to incorrect state");
         } catch(IOException expected) { }
 
-        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(reversedelta2)));
-        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(reversedelta1)));
+        reader.applyDelta(HollowBlobInput.sequential(reversedelta2));
+        reader.applyDelta(HollowBlobInput.sequential(reversedelta1));
 
         try {
-            reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(delta2)));
+            reader.applyDelta(HollowBlobInput.sequential(delta2));
             Assert.fail("Should have refused to apply delta to incorrect state");
         } catch(IOException expected) { }
 
-        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(delta1)));
-        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(delta2)));
+        reader.applyDelta(HollowBlobInput.sequential(delta1));
+        reader.applyDelta(HollowBlobInput.sequential(delta2));
     }
 
 }

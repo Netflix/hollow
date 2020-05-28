@@ -25,7 +25,6 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.Assert;
@@ -55,8 +54,8 @@ public class HollowStateDeltaPatcherTest {
         patcher.getStateEngine().prepareForNextCycle();
         
         HollowBlobReader reader = new HollowBlobReader(state1);
-        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(delta1.toByteArray())));
-        reader.applyDelta(HollowBlobInput.dataInputStream(new ByteArrayInputStream(delta2.toByteArray())));
+        reader.applyDelta(HollowBlobInput.sequential(delta1.toByteArray()));
+        reader.applyDelta(HollowBlobInput.sequential(delta2.toByteArray()));
 
         HollowChecksum checksum1 = HollowChecksum.forStateEngineWithCommonSchemas(state1, state2);
         HollowChecksum checksum2 = HollowChecksum.forStateEngineWithCommonSchemas(state2, state1);

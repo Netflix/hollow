@@ -48,7 +48,7 @@ public class ReadStateEngineTest {
 
         readState = new HollowReadStateEngine();
         HollowBlobReader fileReader = new HollowBlobReader(readState);
-        HollowBlobInput in = HollowBlobInput.randomAccessFile(new File(TEST_FILE_TOPN));
+        HollowBlobInput in = HollowBlobInput.randomAccess(new File(TEST_FILE_TOPN));
         fileReader.readSnapshot(in);
         System.out.println("SNAP: Done setup");
     }
