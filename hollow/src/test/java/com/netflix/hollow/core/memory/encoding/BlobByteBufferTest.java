@@ -12,8 +12,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,7 +40,6 @@ public class BlobByteBufferTest {
 
             readUsingFixedLengthDataModes(testFile, padding, numLongsWritten, bitsPerLong);
         }
-
     }
 
     @Test
@@ -75,7 +72,7 @@ public class BlobByteBufferTest {
         hbi1.skipBytes(padding + 16);        // skip past the first 16 bytes of test data written to file
         FixedLengthElementArray testLongArray = FixedLengthElementArray.deserializeFrom(hbi1, WastefulRecycler.DEFAULT_INSTANCE, numLongsWritten);
 
-        HollowBlobInput hbi2 = HollowBlobInput.randomAccessFile(testFile);
+        HollowBlobInput hbi2 = HollowBlobInput.randomAccessFile(testFile, TEST_SINGLE_BUFFER_CAPACITY_BYTES);
         hbi2.skipBytes(padding  + 16);       // skip past the first 16 bytes of test data written to file
         EncodedLongBuffer testLongBuffer = EncodedLongBuffer.deserializeFrom(hbi2, numLongsWritten);
         for (int i=0; i<numLongsWritten; i++) {
@@ -118,7 +115,7 @@ public class BlobByteBufferTest {
         testByteArray.loadFrom(HollowBlobInput.dataInputStream(new FileInputStream(testFile)), testFile.length());
 
         EncodedByteBuffer testByteBuffer = new EncodedByteBuffer();
-        testByteBuffer.loadFrom(HollowBlobInput.randomAccessFile(testFile), testFile.length());
+        testByteBuffer.loadFrom(HollowBlobInput.randomAccessFile(testFile, TEST_SINGLE_BUFFER_CAPACITY_BYTES), testFile.length());
 
         // aligned bytes - BlobByteBuffer vs. SegmentedByteArray
         assertEquals(testByteArray.get(0 + padding), testByteBuffer.get(0 + padding));
