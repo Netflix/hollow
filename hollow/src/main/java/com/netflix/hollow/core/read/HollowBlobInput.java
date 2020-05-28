@@ -2,6 +2,7 @@ package com.netflix.hollow.core.read;
 
 import static com.netflix.hollow.core.memory.MemoryMode.ON_HEAP;
 import static com.netflix.hollow.core.memory.MemoryMode.SHARED_MEMORY_LAZY;
+import static com.netflix.hollow.core.memory.encoding.BlobByteBuffer.MAX_SINGLE_BUFFER_CAPACITY;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.memory.MemoryMode;
@@ -43,11 +44,16 @@ public class HollowBlobInput implements Closeable {
 
     // SNAP: TODO: Comment about how returned handle must be closed
     public static HollowBlobInput randomAccessFile(File f) throws IOException {
+        return randomAccessFile(f, MAX_SINGLE_BUFFER_CAPACITY);
+    }
+
+    // SNAP: for testing
+    public static HollowBlobInput randomAccessFile(File f, int singleBufferCapacity) throws IOException {
         HollowBlobInput hbi = new HollowBlobInput();
         RandomAccessFile raf = new RandomAccessFile(f, "r");
         hbi.input = raf;
         FileChannel channel = ((RandomAccessFile) hbi.input).getChannel();
-        hbi.buffer = BlobByteBuffer.mmapBlob(channel, BlobByteBuffer.MAX_SINGLE_BUFFER_CAPACITY);
+        hbi.buffer = BlobByteBuffer.mmapBlob(channel, singleBufferCapacity);
         return hbi;
     }
 
