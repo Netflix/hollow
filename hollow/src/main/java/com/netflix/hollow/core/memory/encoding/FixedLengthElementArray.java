@@ -251,11 +251,16 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
             unsafe.putOrderedLong(segments[whichSegment - 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (bitmask + 1)), segments[whichSegment][0]);
     }
 
-
     public static FixedLengthElementArray deserializeFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler)
             throws IOException {
 
         long numLongs = VarInt.readVLong(in);
+        return deserializeFrom(in, memoryRecycler, numLongs);
+    }
+
+    public static FixedLengthElementArray deserializeFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, long numLongs)
+            throws IOException {
+
         FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, numLongs * 64);
         arr.readFrom(in, memoryRecycler, numLongs);
         return arr;
