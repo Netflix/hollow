@@ -28,8 +28,6 @@ public class BlobByteBufferTest {
         // Add some padding bytes at the beginning of file so that longs are written at unaligned locations
 
         int numLongsWritten = 14;
-        int bitsPerLong = 60; // should be less than 61 or else result is undefined
-        // TODO: Test different bitsPerLong and longs written to unaligned bits
 
         // adding padding writes the test longs at a non-aligned byte
         for (int padding = 0; padding < Long.BYTES; padding ++) {
@@ -37,7 +35,7 @@ public class BlobByteBufferTest {
             File testFile = writeTestFileUnaligned("/fixed_length_data_modes", padding);
             testFile.deleteOnExit();
 
-            readUsingFixedLengthDataModes(testFile, padding, numLongsWritten, bitsPerLong);
+            readUsingFixedLengthDataModes(testFile, padding, numLongsWritten);
         }
     }
 
@@ -52,12 +50,10 @@ public class BlobByteBufferTest {
 
             readUsingVariableLengthDataModes(testFile, padding);
         }
-
-        // TODO: Can write be at unaligned bit?
     }
 
 
-    private void readUsingFixedLengthDataModes(File testFile, int padding, int numLongsWritten, int bitsPerLong) throws IOException {
+    private void readUsingFixedLengthDataModes(File testFile, int padding, int numLongsWritten) throws IOException {
         // test read parity between FixedLengthElementArray and EncodedLongBuffer for-
         //      aligned long,
         //      unaligned long,
@@ -66,7 +62,6 @@ public class BlobByteBufferTest {
         //      out of bounds long
         //      overlapping with out of bounds long
 
-        // aligned/unaligned longs
         HollowBlobInput hbi1 = HollowBlobInput.sequential(new FileInputStream(testFile));
         hbi1.skipBytes(padding + 16);        // skip past the first 16 bytes of test data written to file
         FixedLengthElementArray testLongArray = FixedLengthElementArray.deserializeFrom(hbi1, WastefulRecycler.DEFAULT_INSTANCE, numLongsWritten);
@@ -74,13 +69,17 @@ public class BlobByteBufferTest {
         HollowBlobInput hbi2 = HollowBlobInput.randomAccess(testFile, TEST_SINGLE_BUFFER_CAPACITY_BYTES);
         hbi2.skipBytes(padding  + 16);       // skip past the first 16 bytes of test data written to file
         EncodedLongBuffer testLongBuffer = EncodedLongBuffer.deserializeFrom(hbi2, numLongsWritten);
-        for (int i=0; i<numLongsWritten; i++) {
-            assertEquals(testLongArray.get(i), testLongBuffer.getElementValue(i * Long.BYTES * 8, bitsPerLong));
+
+        // read each values starting at each bit index and for bit length 1 to 60
+        for (int i = 0; i< (numLongsWritten - 1) * Long.BYTES * 8; i ++) {
+            for (int j = 1; j < 61; j ++) {
+                assertEquals(testLongArray.getElementValue(i, j), testLongBuffer.getElementValue(i, j));
+            }
         }
 
         // out of bounds long
         try {
-            testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * 8, bitsPerLong);
+            testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * 8, 60);
             Assert.fail();
         } catch (IllegalStateException e) {
             // this is expected
@@ -90,15 +89,13 @@ public class BlobByteBufferTest {
 
         // overlapping with out of bounds long
         try {
-            testLongBuffer.getElementValue((numLongsWritten-1)* Long.BYTES * 8 + Long.BYTES, bitsPerLong);
+            testLongBuffer.getElementValue((numLongsWritten-1)* Long.BYTES * 8 + Long.BYTES, 60);
             Assert.fail();
         } catch (IllegalStateException e) {
             // this is expected
         } catch (Exception e) {
             Assert.fail();
         }
-
-        // TODO: Test long read across spine boundary
     }
 
     private void readUsingVariableLengthDataModes(File testFile, int padding) throws IOException {
