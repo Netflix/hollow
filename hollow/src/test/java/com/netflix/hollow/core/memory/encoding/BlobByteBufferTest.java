@@ -21,7 +21,7 @@ public class BlobByteBufferTest {
 
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
     private static final String SCRATCH_DIR = System.getProperty("java.io.tmpdir");
-    private static final int TEST_SINGLE_BUFFER_CAPACITY_BYTES =  32;
+    private static final int TEST_SINGLE_BUFFER_CAPACITY_BYTES =  16;   // SNAP: keep it a multiple of 8?
 
     @Test
     public void testParityBetweenFixedLengthDataModes() throws IOException {
