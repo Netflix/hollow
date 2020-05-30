@@ -6,6 +6,7 @@ import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -225,7 +226,37 @@ public final class BlobByteBuffer {
         for (int i = 0; i < 8; i ++ ) {
             bytes[i] = getByte(withEndiannness(startByteIndex + i, nextAlignedByte));
         }
-        return BlobByteBufferUnalignedUtils.toLong(bytes);
+
+        long l = ((long) (bytes[0]) << 56) +
+                 ((long) (bytes[1]) << 48) +
+                 ((long) (bytes[2]) << 40) +
+                 ((long) (bytes[3]) << 32) +
+                 ((long) (bytes[4]) << 24) +
+                 ((long) (bytes[5]) << 16) +
+                 ((long) (bytes[6]) <<  8) +
+                 ((long) (bytes[7]));
+
+
+        byte[] reversedMakeLongBytes = new byte[8];
+        for (int i=0; i<8;i ++) {
+            reversedMakeLongBytes[i] = bytes[7-i];
+        }
+
+        // SNAP: construct long here
+        long revL = ((long) (reversedMakeLongBytes[0]) << 56) +
+                    ((long) (reversedMakeLongBytes[1]) << 48) +
+                    ((long) (reversedMakeLongBytes[2]) << 40) +
+                    ((long) (reversedMakeLongBytes[3]) << 32) +
+                    ((long) (reversedMakeLongBytes[4]) << 24) +
+                    ((long) (reversedMakeLongBytes[5]) << 16) +
+                    ((long) (reversedMakeLongBytes[6]) <<  8) +
+                    ((long) (reversedMakeLongBytes[7]));
+
+        BigInteger bi = new BigInteger(bytes);
+        BigInteger revBi = new BigInteger(reversedMakeLongBytes);   // SNAP: THis is correct!
+
+        return l;
+        // return BlobByteBufferUnalignedUtils.toLong(bytes);
     }
 
     // assume big endianness, it is validated in the constructor
@@ -242,6 +273,7 @@ public final class BlobByteBuffer {
     // Return long starting at given byte index
     // @param startByteIndex long position from offset 0 in the backing BlobByteBuffer
     public long getLong(long startByteIndex) throws BufferUnderflowException {
+
         long expected = getLongVerbose(startByteIndex);
 
         lock1.lock();
@@ -250,23 +282,18 @@ public final class BlobByteBuffer {
             if (bufferByteIndex + Long.BYTES > this.capacity)  // defensive
                 throw new IllegalStateException();
 
-            int alignmentOffset = (int)(startByteIndex - this.position()) % 8;
-
             byte[] makeLongBytes = new byte[8];
             long actual = makeLong(startByteIndex, makeLongBytes);
 
+            if (actual != expected) {
+                System.out.println("Here");
+            }
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             DataOutputStream dos = new DataOutputStream(bos);
             dos.writeLong(expected);
             dos.flush();
             byte[] expectedBytes = bos.toByteArray();
-
-            ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
-            DataOutputStream dos2 = new DataOutputStream(bos2);
-            dos2.writeLong(actual);
-            dos2.flush();
-            byte[] actualbytes = bos2.toByteArray();
 
             if (actual == expected) {
                 return actual;
