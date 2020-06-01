@@ -47,7 +47,7 @@ public class HollowListDeltaHistoricalStateCreator {
     public HollowListDeltaHistoricalStateCreator(HollowListTypeReadState typeState) {
         this.typeState = typeState;
         this.stateEngineDataElements = typeState.currentDataElements();
-        this.historicalDataElements = new HollowListTypeDataElements(WastefulRecycler.DEFAULT_INSTANCE);    // SNAP: TODO: find and eliminate instances of MemorymOde.ON_HEAP  from callers, provide constructors in called classes instead for bkwd compatibility
+        this.historicalDataElements = new HollowListTypeDataElements(WastefulRecycler.DEFAULT_INSTANCE);
         this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class));
         this.shardNumberMask = stateEngineDataElements.length - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(stateEngineDataElements.length);

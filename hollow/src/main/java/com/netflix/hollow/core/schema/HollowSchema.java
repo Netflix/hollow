@@ -77,9 +77,14 @@ public abstract class HollowSchema {
         }
     }
 
-    // SNAP: TODO: Bring back all the input stream versions for backwards compatibility. External usages- https://sourcegraph.netflix.net/search?q=HollowSchema.readFrom&patternType=literal
+    /**
+     * @deprecated use {@link HollowSchema#readFrom(HollowBlobInput}
+     */
+    @Deprecated
     public static HollowSchema readFrom(InputStream is) throws IOException {
-        return readFrom(HollowBlobInput.serial(is));
+        try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
+            return readFrom(hbi);
+        }
     }
     public static HollowSchema readFrom(HollowBlobInput in) throws IOException {
         int schemaTypeId = in.read();
@@ -122,6 +127,7 @@ public abstract class HollowSchema {
 
         return schema;
     }
+
     private static HollowSetSchema readSetSchemaFrom(HollowBlobInput in, String schemaName, boolean hasHashKey) throws IOException {
         String elementType = in.readUTF();
 

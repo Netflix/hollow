@@ -40,7 +40,8 @@ import java.util.logging.Logger;
 
 /**
  * A HollowBlobReader is used to populate and update data in a {@link HollowReadStateEngine}, via the consumption
- * of snapshot and delta blobs.
+ * of snapshot and delta blobs. Caller can choose between on-heap or shared-memory mode; defaults to (and for
+ * backwards compatibility) on-heap mode.
  */
 public class HollowBlobReader {
 
@@ -49,7 +50,7 @@ public class HollowBlobReader {
     private final MemoryMode memoryMode;
     private final HollowBlobHeaderReader headerReader;
 
-    public HollowBlobReader(HollowReadStateEngine stateEngine) {    // SNAP: TODO: try removing this to see all callers where memory mode is initialized to ON_HEAP
+    public HollowBlobReader(HollowReadStateEngine stateEngine) {
         this(stateEngine, new HollowBlobHeaderReader());
     }
 
@@ -68,7 +69,7 @@ public class HollowBlobReader {
     }
 
     /**
-     * Initialize the state engine using a snapshot blob from the provided HollowBlobInput.
+     * Initialize the state engine using a snapshot blob from the provided input stream.
      *
      * @param is the input stream to read the snapshot from
      * @throws IOException if the snapshot could not be read
@@ -76,7 +77,7 @@ public class HollowBlobReader {
      * @deprecated use {@link #readSnapshot(HollowBlobInput)}
      */
     @Deprecated
-    public void readSnapshot(InputStream is) throws IOException { // SNAP: Need to keep inputstream flavors around for backwards compatibility
+    public void readSnapshot(InputStream is) throws IOException {
         try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
             readSnapshot(hbi);
         }
@@ -87,8 +88,6 @@ public class HollowBlobReader {
      *
      * @param in the Hollow blob input to read the snapshot from
      * @throws IOException if the snapshot could not be read
-     *
-     * @deprecated use {@link #readSnapshot(HollowBlobInput)}
      */
     public void readSnapshot(HollowBlobInput in) throws IOException {
         readSnapshot(in, new HollowFilterConfig(true));
@@ -113,9 +112,9 @@ public class HollowBlobReader {
     }
 
     /**
-     * Initialize the file engine using a snapshot from the provided RandomAccessFile.
+     * Initialize the file engine using a snapshot from the provided input stream.
      * <p>
-     * Apply the provided {@link HollowFilterConfig} to the state.
+     * Apply the provided {@link TypeFilter} to the state.
      *
      * @param is the input stream to read the snapshot from
      * @param filter the filtering configuration to filter the snapshot
@@ -131,9 +130,9 @@ public class HollowBlobReader {
     }
 
     /**
-     * Initialize the file engine using a snapshot from the provided RandomAccessFile.
+     * Initialize the file engine using a snapshot from the provided Hollow Blob Input.
      * <p>
-     * Apply the provided {@link HollowFilterConfig} to the state.
+     * Apply the provided {@link TypeFilter} to the state.
      *
      * @param in the Hollow blob input to read the snapshot from
      * @param filter the filtering configuration to filter the snapshot
@@ -167,7 +166,7 @@ public class HollowBlobReader {
     }
 
     /**
-     * Update the state engine using a delta (or reverse delta) blob from the provided HollowBlobInput.
+     * Update the state engine using a delta (or reverse delta) blob from the provided input stream.
      * <p>
      * If a {@link HollowFilterConfig} was applied at the time the {@link HollowReadStateEngine} was initialized
      * with a snapshot, it will continue to be in effect after the state is updated.

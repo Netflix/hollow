@@ -171,6 +171,8 @@ public class VarInt {
      * @param in the Hollow blob input to read from
      * @return the int value
      * @throws IOException if the value cannot be read from the input
+     *
+     * @deprecated use {@link VarInt#readVInt(HollowBlobInput)} instead
      */
     public static int readVInt(InputStream in) throws IOException {
         byte b = (byte)in.read();
@@ -187,7 +189,13 @@ public class VarInt {
 
         return value;
     }
-    // SNAP: TODO: Bring back all the input stream versions for backwards compatibility
+
+    /**
+     * Read a variable length integer from the supplied HollowBlobInput
+     * @param in the Hollow blob input to read from
+     * @return the int value
+     * @throws IOException if the value cannot be read from the input
+     */
     public static int readVInt(HollowBlobInput in) throws IOException {
         byte b = (byte)in.read();
 
@@ -250,6 +258,30 @@ public class VarInt {
 
     /**
      * Read a variable length long from the supplied InputStream.
+     * @param in the input stream to read from
+     * @return the long value
+     * @throws IOException if the value cannot be read from the input stream
+     *
+     * @deprecated use {@link VarInt#readVLong(HollowBlobInput)} instead
+     */
+    public static long readVLong(InputStream in) throws IOException {
+        byte b = (byte)in.read();
+
+        if(b == (byte) 0x80)
+            throw new RuntimeException("Attempting to read null value as long");
+
+        long value = b & 0x7F;
+        while ((b & 0x80) != 0) {
+            b = (byte)in.read();
+            value <<= 7;
+            value |= (b & 0x7F);
+        }
+
+        return value;
+    }
+
+    /**
+     * Read a variable length long from the supplied HollowBlobInput.
      * @param in the Hollow blob input to read from
      * @return the long value
      * @throws IOException if the value cannot be read from the input

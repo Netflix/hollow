@@ -54,14 +54,6 @@ class HollowObjectTypeReadStateShard {
             long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
             int numBitsForField = currentData.bitsPerField[fieldIndex];
 
-            // try {        // SNAP: TODO: Remove
-            //     BufferedWriter diag = new BufferedWriter(new FileWriter("/tmp/diag-obj-" + schema.getName() + "-" + count++));
-            //     currentData.fixedLengthData.pp(diag);
-            //     diag.flush();
-            // } catch (IOException e) {
-            //     throw new UnsupportedOperationException();
-            // }
-
             fixedLengthValue = numBitsForField <= 56 ?
                     currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField)
                     : currentData.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
@@ -171,17 +163,7 @@ class HollowObjectTypeReadStateShard {
     private long readFixedLengthFieldValue(HollowObjectTypeDataElements currentData, int ordinal, int fieldIndex) {
         long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
         int numBitsForField = currentData.bitsPerField[fieldIndex];
-
-        // try {    // SNAP: TODO: Remove
-        //     BufferedWriter diag = new BufferedWriter(new FileWriter("/tmp/diag-obj-" + schema.getName() + "-" + count++));
-        //     currentData.fixedLengthData.pp(diag);
-        //     diag.flush();
-        // } catch (IOException e) {
-        //     throw new UnsupportedOperationException();
-        // }
-
         long value = currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField);
-
         return value;
     }
 
