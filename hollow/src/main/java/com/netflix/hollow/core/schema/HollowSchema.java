@@ -79,7 +79,7 @@ public abstract class HollowSchema {
 
     // SNAP: TODO: Bring back all the input stream versions for backwards compatibility. External usages- https://sourcegraph.netflix.net/search?q=HollowSchema.readFrom&patternType=literal
     public static HollowSchema readFrom(InputStream is) throws IOException {
-        return readFrom(HollowBlobInput.sequential(is));
+        return readFrom(HollowBlobInput.serial(is));
     }
     public static HollowSchema readFrom(HollowBlobInput in) throws IOException {
         int schemaTypeId = in.read();

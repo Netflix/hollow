@@ -182,7 +182,7 @@ public class HollowHistoryKeyIndex {
                 }
             });
 
-            try (HollowBlobInput in = HollowBlobInput.sequential(new BufferedInputStream(is))) {   // SNAP: fixed memory leak here, "bin" wasn't being closed
+            try (HollowBlobInput in = HollowBlobInput.serial(new BufferedInputStream(is))) {   // SNAP: fixed memory leak here, "bin" wasn't being closed
                 if (isInitialUpdate || isSnapshot) {
                     reader.readSnapshot(in);
                 } else {

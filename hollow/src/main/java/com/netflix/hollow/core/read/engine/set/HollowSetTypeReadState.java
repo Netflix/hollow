@@ -99,7 +99,6 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException {
-            // SNAP: TODO: maybe memoryRecycler can be collapsed into memory mode object?
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 

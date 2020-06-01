@@ -754,13 +754,13 @@ abstract class AbstractHollowProducer {
     }
 
     private void readSnapshot(HollowProducer.Blob blob, HollowReadStateEngine stateEngine) throws IOException {
-        try (HollowBlobInput in = HollowBlobInput.sequential(blob.newInputStream())) {   // shared memory mode is not supported for producer
+        try (HollowBlobInput in = HollowBlobInput.serial(blob.newInputStream())) {   // shared memory mode is not supported for producer
             new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).readSnapshot(in);
         }
     }
 
     private void applyDelta(HollowProducer.Blob blob, HollowReadStateEngine stateEngine) throws IOException {
-        try (HollowBlobInput in = HollowBlobInput.sequential(blob.newInputStream())) {   // shared memory mode is not supported for producer
+        try (HollowBlobInput in = HollowBlobInput.serial(blob.newInputStream())) {   // shared memory mode is not supported for producer
             new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).applyDelta(in);
         }
     }

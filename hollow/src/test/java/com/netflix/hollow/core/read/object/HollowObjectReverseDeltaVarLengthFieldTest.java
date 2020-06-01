@@ -60,8 +60,8 @@ public class HollowObjectReverseDeltaVarLengthFieldTest extends AbstractStateEng
 		roundTripDelta();
 
 		HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-		reader.applyDelta(HollowBlobInput.sequential(reverseDelta2));
-		reader.applyDelta(HollowBlobInput.sequential(reverseDelta1));
+		reader.applyDelta(HollowBlobInput.serial(reverseDelta2));
+		reader.applyDelta(HollowBlobInput.serial(reverseDelta1));
 		
 		Assert.assertEquals("four", ((HollowObjectTypeReadState)readStateEngine.getTypeState("String")).readString(3, 0));
 	}

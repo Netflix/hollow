@@ -44,7 +44,7 @@ public class DefinedHashHeadersTest {
         
         HollowReadStateEngine readEngine = new HollowReadStateEngine(true);
         HollowBlobReader reader = new HollowBlobReader(readEngine);
-        reader.readSnapshot(HollowBlobInput.sequential(baos.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         
         String headerTag = readEngine.getHeaderTag(HollowObjectHashCodeFinder.DEFINED_HASH_CODES_HEADER_NAME);
         

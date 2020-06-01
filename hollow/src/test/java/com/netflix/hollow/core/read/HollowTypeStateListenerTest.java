@@ -104,7 +104,7 @@ public class HollowTypeStateListenerTest {
         writeStateEngine.prepareForWrite();
         blobWriter.writeSnapshot(baos);
         writeStateEngine.prepareForNextCycle();
-        blobReader.readSnapshot(HollowBlobInput.sequential(baos.toByteArray()));
+        blobReader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         baos.reset();
     }
 
@@ -112,7 +112,7 @@ public class HollowTypeStateListenerTest {
         writeStateEngine.prepareForWrite();
         blobWriter.writeDelta(baos);
         writeStateEngine.prepareForNextCycle();
-        blobReader.applyDelta(HollowBlobInput.sequential(baos.toByteArray()));
+        blobReader.applyDelta(HollowBlobInput.serial(baos.toByteArray()));
         baos.reset();
     }
 

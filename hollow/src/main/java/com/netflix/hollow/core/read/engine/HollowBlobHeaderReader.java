@@ -36,8 +36,8 @@ import java.util.Map;
  */
 public class HollowBlobHeaderReader {
 
-    public HollowBlobHeader readHeader(InputStream is) throws IOException { // SNAP: Need to keep inputstream flavors around for backwards compatibility
-        return readHeader(HollowBlobInput.sequential(is));
+    public HollowBlobHeader readHeader(InputStream is) throws IOException {
+        return readHeader(HollowBlobInput.serial(is));
     }
 
     public HollowBlobHeader readHeader(HollowBlobInput in) throws IOException {

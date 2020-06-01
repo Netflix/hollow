@@ -54,8 +54,8 @@ public class HollowStateDeltaPatcherTest {
         patcher.getStateEngine().prepareForNextCycle();
         
         HollowBlobReader reader = new HollowBlobReader(state1);
-        reader.applyDelta(HollowBlobInput.sequential(delta1.toByteArray()));
-        reader.applyDelta(HollowBlobInput.sequential(delta2.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(delta1.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(delta2.toByteArray()));
 
         HollowChecksum checksum1 = HollowChecksum.forStateEngineWithCommonSchemas(state1, state2);
         HollowChecksum checksum2 = HollowChecksum.forStateEngineWithCommonSchemas(state2, state1);

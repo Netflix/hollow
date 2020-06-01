@@ -98,12 +98,12 @@ public class FilteredHollowBlobWriterTest {
         
         HollowReadStateEngine readEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(readEngine);
-        reader.readSnapshot(HollowBlobInput.sequential(filteredBlobStream.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.serial(filteredBlobStream.toByteArray()));
         
         filteredBlobStream.reset();
         blobWriter.filterDelta(new ByteArrayInputStream(deltaData), filteredBlobStream);
         
-        reader.applyDelta(HollowBlobInput.sequential(filteredBlobStream.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(filteredBlobStream.toByteArray()));
         
         Assert.assertEquals(2, readEngine.getSchemas().size());
         Assert.assertEquals(1, ((HollowObjectSchema)readEngine.getSchema("TypeA")).numFields());
@@ -125,7 +125,7 @@ public class FilteredHollowBlobWriterTest {
         filteredBlobStream.reset();
         blobWriter.filterDelta(new ByteArrayInputStream(removeOnlyDeltaData), filteredBlobStream);
         
-        reader.applyDelta(HollowBlobInput.sequential(filteredBlobStream.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(filteredBlobStream.toByteArray()));
         
         Assert.assertEquals(2, readEngine.getTypeState("TypeA").getPopulatedOrdinals().cardinality());
         Assert.assertEquals(2, readEngine.getTypeState("TypeB").getPopulatedOrdinals().cardinality());

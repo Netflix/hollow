@@ -70,16 +70,26 @@ public class HollowBlobReader {
     /**
      * Initialize the state engine using a snapshot blob from the provided HollowBlobInput.
      *
-     * @param is the Hollow blob input to read the snapshot from
+     * @param is the input stream to read the snapshot from
      * @throws IOException if the snapshot could not be read
      *
      * @deprecated use {@link #readSnapshot(HollowBlobInput)}
      */
     @Deprecated
     public void readSnapshot(InputStream is) throws IOException { // SNAP: Need to keep inputstream flavors around for backwards compatibility
-        readSnapshot(HollowBlobInput.sequential(is));
+        try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
+            readSnapshot(hbi);
+        }
     }
 
+    /**
+     * Initialize the state engine using a snapshot blob from the provided HollowBlobInput.
+     *
+     * @param in the Hollow blob input to read the snapshot from
+     * @throws IOException if the snapshot could not be read
+     *
+     * @deprecated use {@link #readSnapshot(HollowBlobInput)}
+     */
     public void readSnapshot(HollowBlobInput in) throws IOException {
         readSnapshot(in, new HollowFilterConfig(true));
     }
@@ -89,18 +99,46 @@ public class HollowBlobReader {
      * <p>
      * Apply the provided {@link HollowFilterConfig} to the state.
      *
-     * @param is the Hollow blob input to read the snapshot from
+     * @param is the input stream to read the snapshot from
+     * @param filter the filtering configuration to filter the snapshot
+     * @throws IOException if the snapshot could not be read
+     *
+     * @deprecated use {@link #readSnapshot(HollowBlobInput, TypeFilter)}
+     */
+    @Deprecated
+    public void readSnapshot(InputStream is, HollowFilterConfig filter) throws IOException {
+        try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
+            readSnapshot(hbi, (TypeFilter) filter);
+        }
+    }
+
+    /**
+     * Initialize the file engine using a snapshot from the provided RandomAccessFile.
+     * <p>
+     * Apply the provided {@link HollowFilterConfig} to the state.
+     *
+     * @param is the input stream to read the snapshot from
+     * @param filter the filtering configuration to filter the snapshot
+     * @throws IOException if the snapshot could not be read
+     *
+     * @deprecated use {@link #readSnapshot(HollowBlobInput, TypeFilter)}
+     */
+    @Deprecated
+    public void readSnapshot(InputStream is, TypeFilter filter) throws IOException {
+        try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
+            readSnapshot(hbi, filter);
+        }
+    }
+
+    /**
+     * Initialize the file engine using a snapshot from the provided RandomAccessFile.
+     * <p>
+     * Apply the provided {@link HollowFilterConfig} to the state.
+     *
+     * @param in the Hollow blob input to read the snapshot from
      * @param filter the filtering configuration to filter the snapshot
      * @throws IOException if the snapshot could not be read
      */
-    public void readSnapshot(InputStream is, HollowFilterConfig filter) throws IOException {
-        readSnapshot(HollowBlobInput.sequential(is), (TypeFilter) filter);
-    }
-
-    public void readSnapshot(InputStream is, TypeFilter filter) throws IOException {
-        readSnapshot(HollowBlobInput.sequential(is), filter);
-    }
-
     public void readSnapshot(HollowBlobInput in, TypeFilter filter) throws IOException {
         HollowBlobHeader header = readHeader(in, false);
 
@@ -134,16 +172,25 @@ public class HollowBlobReader {
      * If a {@link HollowFilterConfig} was applied at the time the {@link HollowReadStateEngine} was initialized
      * with a snapshot, it will continue to be in effect after the state is updated.
      *
+     * @param in the input stream to read the delta from
+     * @throws IOException if the delta could not be applied
+     */
+    @Deprecated
+    public void applyDelta(InputStream in) throws IOException {
+        try (HollowBlobInput hbi = HollowBlobInput.serial(in)) {
+            applyDelta(hbi);
+        }
+    }
+
+    /**
+     * Update the state engine using a delta (or reverse delta) blob from the provided HollowBlobInput.
+     * <p>
+     * If a {@link HollowFilterConfig} was applied at the time the {@link HollowReadStateEngine} was initialized
+     * with a snapshot, it will continue to be in effect after the state is updated.
+     *
      * @param in the Hollow blob input to read the delta from
      * @throws IOException if the delta could not be applied
      */
-    // public void applyDelta(InputStream in) throws IOException {
-    //     applyDelta(HollowBlobInput.sequential(in));
-    // }
-    public void applyDelta(InputStream in) throws IOException {
-        applyDelta(HollowBlobInput.sequential(in));
-    }
-
     public void applyDelta(HollowBlobInput in) throws IOException {
         HollowBlobHeader header = readHeader(in, true);
         notifyBeginUpdate();

@@ -53,8 +53,8 @@ public class RestoreWriteStateEngineSetReverseDeltaTest extends AbstractStateEng
         writer.writeDelta(deltaStream);
         
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.applyDelta(HollowBlobInput.sequential(deltaStream.toByteArray()));
-        reader.applyDelta(HollowBlobInput.sequential(reverseDeltaStream.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(deltaStream.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(reverseDeltaStream.toByteArray()));
         
         assertSetContains(0, 1, 3);
         assertSetContains(0, 2, 2);

@@ -68,38 +68,4 @@ public class EncodedByteBuffer implements VariableLengthData {
     public long size() {
         return maxIndex + 1;
     }
-
-// SNAP:
-//    public void pp(BufferedWriter debug) throws IOException {
-//        StringBuffer pp = new StringBuffer();
-//
-//        int segmentSize = 1 << log2OfSegmentSize;
-//        long maxIndex = segments.length * segmentSize;
-//
-//
-//        pp.append("\n\n EncodedByteBuffer deserializeFrom()s => ");
-//        for (int g = 0; g < maxIndex; g ++) {
-//            byte v = deserializeFrom(g);
-//            pp.append(v+ " ");
-//        }
-//
-//        pp.append("\n");
-//        pp.append("\n EncodedByteBuffer raw bytes underneath:\n");
-//        for (int i = 0; i < segments.length; i ++) {
-//            if (segments[i] == null) {
-//                pp.append("- - - - - NULL - - - - ");
-//                pp.append("\n");
-//                continue;
-//            }
-//
-//            pp.append(String.format("EncodedByteBuffer i= %d/%d => ", i, segments.length-1));
-//
-//            for (int j = 0; j < segmentSize; j ++ ) {
-//                byte v = segments[i].deserializeFrom(segments[i].position() + j);
-//                pp.append(v + " ");
-//            }
-//            pp.append("\n");
-//        }
-//         debug.append(pp.toString());
-//     }
 }

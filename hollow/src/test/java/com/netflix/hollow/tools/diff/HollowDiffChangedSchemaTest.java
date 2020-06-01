@@ -202,7 +202,7 @@ public class HollowDiffChangedSchemaTest {
 
         HollowReadStateEngine readStateEngine = new HollowReadStateEngine(true);
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.readSnapshot(HollowBlobInput.sequential(baos.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         return readStateEngine;
     }
 }

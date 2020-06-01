@@ -91,18 +91,9 @@ public class HollowObjectTypeDataElements {
         readFieldStatistics(in, unfilteredSchema);
 
         fixedLengthData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
-        removeExcludedFieldsFromFixedLengthData();  // SNAP: TODO: Removed check for on heap mode here, added unsupported exception in the call
+        removeExcludedFieldsFromFixedLengthData();
 
         readVarLengthData(in, unfilteredSchema);
-
-        // debug.append("HollowObjectTypeDataElements for " + schema.toString() + " \n");
-        // fixedLengthData.pp(debug);
-        // for (int i= 0; i < varLengthData.length; i++) {
-        //     if (varLengthData[i] != null) {
-        //         varLengthData[i].pp(debug);
-        //     }
-        // }
-        // debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowObjectTypeDataElements for " + schema.toString() + "\n");
     }
 
     private void removeExcludedFieldsFromFixedLengthData() {

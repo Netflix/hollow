@@ -63,7 +63,7 @@ public class HistoryUITest {
 
         HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.readSnapshot(HollowBlobInput.sequential(baos.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         HollowHistory history = new HollowHistory(readStateEngine, 0, 10);
         history.getKeyIndex().addTypeIndex("TypeA", "a1");
 
@@ -81,7 +81,7 @@ public class HistoryUITest {
 
         baos = new ByteArrayOutputStream();
         writer.writeDelta(baos);
-        reader.applyDelta(HollowBlobInput.sequential(baos.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(baos.toByteArray()));
         history.deltaOccurred(19991231235959999L);
 
         stateEngine.prepareForNextCycle();
@@ -97,7 +97,7 @@ public class HistoryUITest {
 
         baos = new ByteArrayOutputStream();
         writer.writeDelta(baos);
-        reader.applyDelta(HollowBlobInput.sequential(baos.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(baos.toByteArray()));
         history.deltaOccurred(20001231235959999L);
 
         // Double Snapshot

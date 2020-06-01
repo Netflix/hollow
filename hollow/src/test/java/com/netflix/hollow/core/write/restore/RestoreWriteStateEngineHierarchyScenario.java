@@ -155,13 +155,13 @@ public class RestoreWriteStateEngineHierarchyScenario {
         writer.writeSnapshot(snapshot);
         
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.applyDelta(HollowBlobInput.sequential(delta.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(delta.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
         
-        reader.applyDelta(HollowBlobInput.sequential(reverseDelta.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(reverseDelta.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
@@ -169,19 +169,19 @@ public class RestoreWriteStateEngineHierarchyScenario {
         
         readStateEngine = new HollowReadStateEngine();
         reader = new HollowBlobReader(readStateEngine);
-        reader.readSnapshot(HollowBlobInput.sequential(snapshot.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.serial(snapshot.toByteArray()));
 
         assertA(readStateEngine, 1, "A", true);
         assertA(readStateEngine, 2, "B", true);
         assertA(readStateEngine, 3, "A", true);
         
-        reader.applyDelta(HollowBlobInput.sequential(reverseDelta.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(reverseDelta.toByteArray()));
         
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
         
-        reader.applyDelta(HollowBlobInput.sequential(delta.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(delta.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
@@ -277,13 +277,13 @@ public class RestoreWriteStateEngineHierarchyScenario {
         writer.writeSnapshot(snapshot);
         
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.applyDelta(HollowBlobInput.sequential(delta.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(delta.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
         
-        reader.applyDelta(HollowBlobInput.sequential(reverseDelta.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(reverseDelta.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
@@ -291,19 +291,19 @@ public class RestoreWriteStateEngineHierarchyScenario {
         
         readStateEngine = new HollowReadStateEngine();
         reader = new HollowBlobReader(readStateEngine);
-        reader.readSnapshot(HollowBlobInput.sequential(snapshot.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.serial(snapshot.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
         
-        reader.applyDelta(HollowBlobInput.sequential(reverseDelta.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(reverseDelta.toByteArray()));
         
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
         
-        reader.applyDelta(HollowBlobInput.sequential(delta.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(delta.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);

@@ -84,15 +84,15 @@ public class HollowBlobRandomizedTagTest {
         HollowReadStateEngine stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
 
-        reader.readSnapshot(HollowBlobInput.sequential(snapshot));
-        reader.applyDelta(HollowBlobInput.sequential(delta1));
+        reader.readSnapshot(HollowBlobInput.serial(snapshot));
+        reader.applyDelta(HollowBlobInput.serial(delta1));
 
         try {
-            reader.applyDelta(HollowBlobInput.sequential(delta1));
+            reader.applyDelta(HollowBlobInput.serial(delta1));
             Assert.fail("Should have refused to apply delta to incorrect state");
         } catch(IOException expected) { }
 
-        reader.applyDelta(HollowBlobInput.sequential(delta2));
+        reader.applyDelta(HollowBlobInput.serial(delta2));
     }
 
     @Test
@@ -100,23 +100,23 @@ public class HollowBlobRandomizedTagTest {
         HollowReadStateEngine stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
 
-        reader.readSnapshot(HollowBlobInput.sequential(snapshot2));
+        reader.readSnapshot(HollowBlobInput.serial(snapshot2));
 
         try {
-            reader.applyDelta(HollowBlobInput.sequential(reversedelta1));
+            reader.applyDelta(HollowBlobInput.serial(reversedelta1));
             Assert.fail("Should have refused to apply reverse delta to incorrect state");
         } catch(IOException expected) { }
 
-        reader.applyDelta(HollowBlobInput.sequential(reversedelta2));
-        reader.applyDelta(HollowBlobInput.sequential(reversedelta1));
+        reader.applyDelta(HollowBlobInput.serial(reversedelta2));
+        reader.applyDelta(HollowBlobInput.serial(reversedelta1));
 
         try {
-            reader.applyDelta(HollowBlobInput.sequential(delta2));
+            reader.applyDelta(HollowBlobInput.serial(delta2));
             Assert.fail("Should have refused to apply delta to incorrect state");
         } catch(IOException expected) { }
 
-        reader.applyDelta(HollowBlobInput.sequential(delta1));
-        reader.applyDelta(HollowBlobInput.sequential(delta2));
+        reader.applyDelta(HollowBlobInput.serial(delta1));
+        reader.applyDelta(HollowBlobInput.serial(delta2));
     }
 
 }

@@ -27,7 +27,9 @@ public class HollowBlobInput implements Closeable {
     private HollowBlobInput() {}
 
     /**
-     * Initialize the Hollow Blob Input object from the Hollow Consumer blob's Input Stream or Random Access File, depending on the configured memory mode
+     * Initialize the Hollow Blob Input object from the Hollow Consumer blob's Input Stream or Random Access File,
+     * depending on the configured memory mode. The returned HollowBlobInput object must be closed to free up resources.
+     *
      * @param mode Configured memory mode
      * @param blob Hollow Consumer blob
      * @return the initialized Hollow Blob Input
@@ -35,7 +37,7 @@ public class HollowBlobInput implements Closeable {
      */
     public static HollowBlobInput modeBasedSelector(MemoryMode mode, HollowConsumer.Blob blob) throws IOException {
         if (mode.equals(ON_HEAP)) {
-            return sequential(blob.getInputStream());
+            return serial(blob.getInputStream());
         } else if (mode.equals(SHARED_MEMORY_LAZY)) {
             return randomAccess(blob.getFile());
         } else {
@@ -43,12 +45,21 @@ public class HollowBlobInput implements Closeable {
         }
     }
 
-    // SNAP: TODO: Comment about how returned handle must be closed
+    /**
+     * Initialize a random access Hollow Blob input object from a file. The returned HollowBlobInput object must be
+     * closed to free up resources.
+     *
+     * @param f file containing the Hollow blob
+     * @return a random access HollowBlobInput object
+     * @throws IOException if the mmap operation reported an IOException
+     */
     public static HollowBlobInput randomAccess(File f) throws IOException {
         return randomAccess(f, MAX_SINGLE_BUFFER_CAPACITY);
     }
 
-    // SNAP: for testing
+    /**
+     * Useful for testing with custom buffer capacity
+     */
     public static HollowBlobInput randomAccess(File f, int singleBufferCapacity) throws IOException {
         HollowBlobInput hbi = new HollowBlobInput();
         RandomAccessFile raf = new RandomAccessFile(f, "r");
@@ -58,12 +69,22 @@ public class HollowBlobInput implements Closeable {
         return hbi;
     }
 
-    public static HollowBlobInput sequential(byte[] bytes) {
+    /**
+     * Shorthand for calling {@link HollowBlobInput#serial(InputStream)} on a byte[]
+     */
+    public static HollowBlobInput serial(byte[] bytes) {
         InputStream is = new ByteArrayInputStream(bytes);
-        return sequential(is);
+        return serial(is);
     }
 
-    public static HollowBlobInput sequential(InputStream is) { // SNAP: TODO: Can everything be a RandomAccessFile?
+    /**
+     * Initialize a serial access Hollow Blob input object from an input stream. The returned HollowBlobInput object
+     * must be closed to free up resources.
+     *
+     * @param is input stream containing for Hollow blob data
+     * @return a serial access HollowBlobInput object
+     */
+    public static HollowBlobInput serial(InputStream is) {
         HollowBlobInput hbi = new HollowBlobInput();
         hbi.input = new DataInputStream(is);
         return hbi;
@@ -87,6 +108,15 @@ public class HollowBlobInput implements Closeable {
         }
     }
 
+    /**
+     * Reads up to {@code len} bytes of data from the HollowBlobInput by relaying the call to the underlying
+     * {@code DataInputStream} or {@code RandomAccessFile} into an array of bytes. This method blocks until at
+     * least one byte of input is available.
+     *
+     * @return an integer in the range 0 to 255
+     * @throws IOException if underlying {@code DataInputStream} or {@code RandomAccessFile}
+     * @throws UnsupportedOperationException if the input type wasn't  one of {@code DataInputStream} or {@code RandomAccessFile}
+     */
     public int read(byte b[], int off, int len) throws IOException {
         if (input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).read(b, off, len);
@@ -115,6 +145,12 @@ public class HollowBlobInput implements Closeable {
         }
     }
 
+    /**
+     * Returns the current offset in this input at which the next read would occur.
+     *
+     * @return current offset from the beginning of the file, in bytes
+     * @exception IOException if an I/O error occurs.
+     */
     public long getFilePointer() throws IOException {
         if (input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).getFilePointer();
@@ -125,6 +161,13 @@ public class HollowBlobInput implements Closeable {
         }
     }
 
+    /**
+     * Reads two bytes from the input (at the current file pointer) into a signed 16-bit short, and advances the offset
+     * in input.
+     *
+     * @return short value read from current offset in input
+     * @exception IOException if an I/O error occurs.
+     */
     public final short readShort() throws IOException {
         if (input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).readShort();
@@ -135,6 +178,13 @@ public class HollowBlobInput implements Closeable {
         }
     }
 
+    /**
+     * Reads 4 bytes from the input (at the current file pointer) into a signed 32-bit int, and advances the offset
+     * in input.
+     *
+     * @return int value read from current offset in input
+     * @exception IOException if an I/O error occurs.
+     */
     public final int readInt() throws IOException {
         if (input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).readInt();
@@ -145,6 +195,13 @@ public class HollowBlobInput implements Closeable {
         }
     }
 
+    /**
+     * Reads 8 bytes from the input (at the current file pointer) into a signed 64-bit long, and advances the offset
+     * in input.
+     *
+     * @return long value read from current offset in input
+     * @exception IOException if an I/O error occurs.
+     */
     public final long readLong() throws IOException {
         if (input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).readLong();
@@ -155,6 +212,12 @@ public class HollowBlobInput implements Closeable {
         }
     }
 
+    /**
+     * Reads in a string from this file, encoded using <a href="DataInput.html#modified-utf-8">modified UTF-8</a>
+     * format, and advances the offset in input.
+     * @return UTF-8 string read from current offset in input
+     * @exception IOException if an I/O error occurs.
+     */
     public final String readUTF() throws IOException {
         if (input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).readUTF();
@@ -196,6 +259,10 @@ public class HollowBlobInput implements Closeable {
         }
     }
 
+    /**
+     * Closes underlying InputStream/RandomAccessFile and releases any system resources associated with the Hollow Blob Input.
+     * @throws IOException
+     */
     @Override
     public void close() throws IOException {
         if (input instanceof RandomAccessFile) {
@@ -211,7 +278,13 @@ public class HollowBlobInput implements Closeable {
         return input;
     }
 
-    public BlobByteBuffer getBuffer() { // SNAP: TODO: Should I put a type check here? performance concerns?
-        return buffer;
+    public BlobByteBuffer getBuffer() {
+        if (input instanceof RandomAccessFile) {
+            return buffer;
+        } else if (input instanceof DataInputStream) {
+            throw new UnsupportedOperationException("No buffer associated with underlying DataInputStream");
+        } else {
+            throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
+        }
     }
 }

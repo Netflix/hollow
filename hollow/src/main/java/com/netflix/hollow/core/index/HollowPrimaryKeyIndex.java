@@ -448,7 +448,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         int hashTableSize = HashCodes.hashTableSize(ordinals.cardinality());
         int bitsPerElement = (32 - Integer.numberOfLeadingZeros(typeState.maxOrdinal() + 1));
 
-        FixedLengthElementArray hashedArray = new FixedLengthElementArray(memoryRecycler, (long)hashTableSize * (long)bitsPerElement);  // SNAP: TODO: Can this also be made shared-memory based?
+        FixedLengthElementArray hashedArray = new FixedLengthElementArray(memoryRecycler, (long)hashTableSize * (long)bitsPerElement);
 
         int hashMask = hashTableSize - 1;
 

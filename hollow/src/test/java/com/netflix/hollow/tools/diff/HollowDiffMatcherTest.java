@@ -144,7 +144,7 @@ public class HollowDiffMatcherTest {
         HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
         readStateEngine.addTypeListener("TestObject", new PopulatedOrdinalListener());
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.readSnapshot(HollowBlobInput.sequential(baos.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         return (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
     }
     

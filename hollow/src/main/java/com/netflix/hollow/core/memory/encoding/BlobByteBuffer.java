@@ -2,37 +2,36 @@ package com.netflix.hollow.core.memory.encoding;
 
 import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
 
-import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import sun.misc.Unsafe;
 
 /**
- * <p>A stitching of {@link MappedByteBuffer}s to operate on large memory mapped blobs. Not threadsafe.</p>
+ * <p>A stitching of {@link MappedByteBuffer}s to operate on large memory mapped blobs. {@code MappedByteBuffer} is
+ * limited to mapping memory of integral size. Note that that JDK 14 will introduce improved API for accessing foreign
+ * memory and replace {@code MappedByteBuffer}.
+ *
+ * This class is not thread safe, but it *is* safe to share the underlying Byte Buffers for parallel reads</p>
  *
  * <p>The largest blob size supported is ~2 exobytes. Presumably other limits in Hollow or practical limits
  * are reached before encountering this limit.</p>
+ *
+ * @author Sunjeet Singh
+ *         Tim Taylor
+ *
  */
-// FIXME(timt): ByteBuffer isn't thread safe, but it *is* safe to share the underlying byte arrays, e.g
-//              to split() from a progenitor buffer
 public final class BlobByteBuffer {
 
-    private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
     public static final int MAX_SINGLE_BUFFER_CAPACITY = 1 << 30; // largest, positive power-of-two int
 
-    private final ByteBuffer[] spine;   // array of MappedByteBuffer
+    private final ByteBuffer[] spine;   // array of MappedByteBuffers
     private final long capacity;
     private final int shift;
     private final int mask;
     private long position;  // within index 0 to capacity-1 in the underlying ByteBuffer
-
-    Lock lock1 = new ReentrantLock();
 
     private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine) {
         this(capacity, shift, mask, spine, 0);
@@ -49,12 +48,9 @@ public final class BlobByteBuffer {
         this.mask = mask;
         this.position = position;
 
-        /// The following assignment is purposefully placed *after* the population of all segments.
-        /// The final assignment after the initialization of the array guarantees that no thread
-        /// will see any of the array elements before assignment.
-        /// We can't risk the segment values being visible as null to any thread, because
-        /// FixedLengthData uses Unsafe to access these values, which would cause the
-        /// JVM to crash with a segmentation fault.
+        // The following assignment is purposefully placed *after* the population of all segments (this method is called
+        // after mmap). The final assignment after the initialization of the array of MappedByteBuffers guarantees that
+        // no thread will see any of the array elements before assignment.
         this.spine = spine;
     }
 
@@ -64,21 +60,16 @@ public final class BlobByteBuffer {
      * @return a new {@code BlobByteBuffer} which is view on the current {@code BlobByteBuffer}
      */
     public BlobByteBuffer duplicate() {
-        lock1.lock();
-        try {
-            return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position);
-        } finally {
-            lock1.unlock();
-        }
+        return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position);
     }
 
     /**
      * mmap the entire contents of FileChannel into an array of {@code MappedByteBuffer}s, each of size singleBufferCapacity.
      * @param channel FileChannel for file to be mmap-ed
-     * @param singleBufferCapacity Size of individual MappedByteBuffers in array of MappedByteBuffers required to map the
-     *                entire file channel. It must be a power of 2, and due to MappedByteBuffer constraints it is limited
-     *                to the max integer that is a power of 2.
-     * @return BlobByteBuffer containing an array of MappedByteBuffers that mmap-ed the entire file channel
+     * @param singleBufferCapacity Size of individual MappedByteBuffers in array of {@code MappedByteBuffer}s required
+     *                to map the entire file channel. It must be a power of 2, and due to {@code MappedByteBuffer}
+     *                constraints it is limited to the max integer that is a power of 2.
+     * @return BlobByteBuffer containing an array of {@code MappedByteBuffer}s that mmap-ed the entire file channel
      * @throws IOException
      */
     public static BlobByteBuffer mmapBlob(FileChannel channel, int singleBufferCapacity) throws IOException {
@@ -124,13 +115,7 @@ public final class BlobByteBuffer {
      * @return position in bytes
      */
     public long position() {
-        lock1.lock();
-        try {
-            return this.position;
-        } finally {
-            lock1.unlock();
-        }
-
+        return this.position;
     }
 
     /**
@@ -152,17 +137,12 @@ public final class BlobByteBuffer {
      * @throws IndexOutOfBoundsException if index out of bounds of the backing buffer
      */
     public byte getByte(long index) throws BufferUnderflowException {
-        lock1.lock();
         if (index >= capacity) {  // defensive
             throw new IllegalStateException();
         }
-        try {
-            int spineIndex = (int)(index >>> (shift));
-            int bufferIndex = (int)(index & mask);
-            return spine[spineIndex].get(bufferIndex);
-        } finally {
-            lock1.unlock();
-        }
+        int spineIndex = (int)(index >>> (shift));
+        int bufferIndex = (int)(index & mask);
+        return spine[spineIndex].get(bufferIndex);
     }
 
     /**

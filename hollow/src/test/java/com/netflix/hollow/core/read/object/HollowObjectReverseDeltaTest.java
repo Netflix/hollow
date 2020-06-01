@@ -84,13 +84,13 @@ public class HollowObjectReverseDeltaTest {
 
         HollowBlobReader reader = new HollowBlobReader(readEngine);
 
-        reader.readSnapshot(HollowBlobInput.sequential(snapshot));
+        reader.readSnapshot(HollowBlobInput.serial(snapshot));
         assertState(100, 101);
-        reader.applyDelta(HollowBlobInput.sequential(reverseDelta1));
+        reader.applyDelta(HollowBlobInput.serial(reverseDelta1));
         assertState(-100, 101);
-        reader.applyDelta(HollowBlobInput.sequential(reverseDelta2));
+        reader.applyDelta(HollowBlobInput.serial(reverseDelta2));
         assertState(100, 101, -1, 103);
-        reader.applyDelta(HollowBlobInput.sequential(reverseDelta3));
+        reader.applyDelta(HollowBlobInput.serial(reverseDelta3));
         assertState(100, 101, 102, 103);
     }
 
