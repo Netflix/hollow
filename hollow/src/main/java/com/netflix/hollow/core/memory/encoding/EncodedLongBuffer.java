@@ -176,7 +176,7 @@ public class EncodedLongBuffer implements FixedLengthData {
     private void loadFrom(HollowBlobInput in, long numLongs) throws IOException {
         BlobByteBuffer buffer = in.getBuffer();
         this.maxLongs = numLongs;
-        this.maxByteIndex = (this.maxLongs - 1) * Long.BYTES; // SNAP: should we work this into bufferView capacity?
+        this.maxByteIndex = (this.maxLongs * Long.BYTES) - 1; // SNAP: should we work this into bufferView capacity?
 
         if(numLongs == 0)
             return;
