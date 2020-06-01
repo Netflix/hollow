@@ -31,7 +31,7 @@ public class EncodedByteBuffer implements VariableLengthData {
 
     @Override
     public byte get(long index) {
-        if (index >= this.maxIndex) {
+        if (index > this.maxIndex) {
             throw new IllegalStateException();
         }
 
@@ -47,7 +47,7 @@ public class EncodedByteBuffer implements VariableLengthData {
     @Override
     public void loadFrom(HollowBlobInput in, long length) throws IOException {
         BlobByteBuffer buffer = in.getBuffer();
-        this.maxIndex = length;
+        this.maxIndex = length - 1;
         buffer.position(in.getFilePointer());   // SNAP: defensive
         this.bufferView = buffer.duplicate();
         buffer.position(buffer.position() + length);
@@ -66,7 +66,7 @@ public class EncodedByteBuffer implements VariableLengthData {
 
     @Override
     public long size() {
-        return maxIndex;
+        return maxIndex + 1;
     }
 
 // SNAP:

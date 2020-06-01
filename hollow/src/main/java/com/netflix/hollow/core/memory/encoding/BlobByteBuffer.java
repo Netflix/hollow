@@ -6,7 +6,6 @@ import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -176,7 +175,7 @@ public final class BlobByteBuffer {
             if (alignmentOffset == 0 && bufferByteIndex + 8 <= spine[spineIndex].capacity()) {
                 longVal = spine[spineIndex].getLong(bufferByteIndex);   // SNAP: IndexOutOfBoundsException could occur here if bufferByteIndex is within 8 bytes of spine[spineIndex].capacity
             } else if (alignmentOffset == 0) {  // if offset of long to be read is aligned in the underlying ByteBuffer but falls within last 8 bytes of the spine element capacity
-                longVal = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex], spine[spineIndex+1], bufferByteIndex);
+                longVal = BlobByteBufferUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex], spine[spineIndex+1], bufferByteIndex);
             }
             else {  // unaligned read
                 long[] longs = new long[2];
@@ -187,11 +186,11 @@ public final class BlobByteBuffer {
                     }
                     ByteBuffer prevByteBuffer = spine[spineIndex - 1];
                     ByteBuffer thisByteBuffer = spine[spineIndex];
-                    longs[0] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(prevByteBuffer, thisByteBuffer, prevByteBuffer.capacity() + firstBufferOffset);
+                    longs[0] = BlobByteBufferUtils.getAlignedLongAcrossSpineBoundary(prevByteBuffer, thisByteBuffer, prevByteBuffer.capacity() + firstBufferOffset);
                 } else {    // if first aligned byte is in the current spine bucket
                     ByteBuffer thisByteBuffer = spine[spineIndex];
                     ByteBuffer nextByteBuffer = (spineIndex + 1 < spine.length) ? spine[spineIndex + 1] : null;
-                    longs[0] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(thisByteBuffer, nextByteBuffer, firstBufferOffset);
+                    longs[0] = BlobByteBufferUtils.getAlignedLongAcrossSpineBoundary(thisByteBuffer, nextByteBuffer, firstBufferOffset);
                 }
 
                 int secondBufferOffset = firstBufferOffset + Long.BYTES;
@@ -199,7 +198,7 @@ public final class BlobByteBuffer {
                     if (secondBufferOffset + Long.BYTES <= spine[spineIndex].capacity())
                         longs[1] = spine[spineIndex].getLong(secondBufferOffset);   // optimization, as opposed to using getAlignedLongAcrossSpineBoundary() which copies individual bytes
                     else
-                        longs[1] = BlobByteBufferUnalignedUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex], spine[spineIndex+1], secondBufferOffset);
+                        longs[1] = BlobByteBufferUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex], spine[spineIndex+1], secondBufferOffset);
                 } else {
                     if (spineIndex + 1 < spine.length)
                         longs[1] = spine[spineIndex + 1].getLong(spine[spineIndex + 1].position() + (secondBufferOffset & mask)); // read in aligned long from the next spine bucket
@@ -226,7 +225,7 @@ public final class BlobByteBuffer {
             bytes[i] = getByte(withEndiannness(startByteIndex + i, nextAlignedByte));
         }
 
-        long l = BlobByteBufferUnalignedUtils.toLongAlignedLittleEndian(bytes);
+        long l = BlobByteBufferUtils.toLong(bytes);
 
 //        byte[] reversedMakeLongBytes = new byte[8];
 //        for (int i=0; i<8;i ++) {
@@ -244,16 +243,16 @@ public final class BlobByteBuffer {
 //                    ((long) (reversedMakeLongBytes[7]));
 //
 //        BigInteger bi = new BigInteger(bytes);
-//        long test = BlobByteBufferUnalignedUtils.toLong(bytes);
+//        long test = BlobByteBufferUnalignedUtils.toLongUsingBuffer(bytes);
 //
 //        BigInteger revBi = new BigInteger(reversedMakeLongBytes);   // SNAP: EITHER THIS
-//        long testRev = BlobByteBufferUnalignedUtils.toLong(reversedMakeLongBytes);  // SNAP: OR THIS
+//        long testRev = BlobByteBufferUnalignedUtils.toLongUsingBuffer(reversedMakeLongBytes);  // SNAP: OR THIS
 //
-//        long optimal = BlobByteBufferUnalignedUtils.toLongAlignedLittleEndian(bytes);
-//        long optimalRev = BlobByteBufferUnalignedUtils.toLongAlignedLittleEndian(reversedMakeLongBytes);
+//        long optimal = BlobByteBufferUnalignedUtils.toLong(bytes);
+//        long optimalRev = BlobByteBufferUnalignedUtils.toLong(reversedMakeLongBytes);
 
         return l;
-        // return BlobByteBufferUnalignedUtils.toLong(bytes);
+        // return BlobByteBufferUnalignedUtils.toLongUsingBuffer(bytes);
     }
 
     // assume big endianness, it is validated in the constructor
@@ -302,7 +301,7 @@ public final class BlobByteBuffer {
                 if (!Arrays.equals(reversedMakeLongBytes, expectedBytes)) {
                     System.out.println("Stop Here");
                 }
-                return BlobByteBufferUnalignedUtils.toLong(reversedMakeLongBytes);
+                return BlobByteBufferUtils.toLongUsingBuffer(reversedMakeLongBytes);
                 // return expected;    // SNAP: bytes match but need to deserialize to long correctly
             }
         } catch (IOException e) {
@@ -314,7 +313,7 @@ public final class BlobByteBuffer {
     }
 
 
-    public static class BlobByteBufferUnalignedUtils {
+    public static class BlobByteBufferUtils {
 
         public static long toLong2(byte[] bytes) {
             ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
@@ -324,7 +323,7 @@ public final class BlobByteBuffer {
             return buffer.getLong();
         }
 
-        public static long toLong(byte[] bytes) {
+        public static long toLongUsingBuffer(byte[] bytes) {
             ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
             // buffer.position(0);
             buffer.put(bytes, 0, bytes.length);
@@ -332,7 +331,7 @@ public final class BlobByteBuffer {
             return buffer.getLong();
         }
 
-        public static long toLongAlignedLittleEndian(byte[] bytes) {
+        public static long toLong(byte[] bytes) {
             return ((((long) (bytes[7]       )) << 56) |
                     (((long) (bytes[6] & 0xff)) << 48) |
                     (((long) (bytes[5] & 0xff)) << 40) |

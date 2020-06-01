@@ -89,7 +89,7 @@ public class BlobByteBufferTest {
 
         // overlapping with out of bounds long
         try {
-            testLongBuffer.getElementValue((numLongsWritten-1)* Long.BYTES * 8 + Long.BYTES, 60);
+            testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * 8, 60);
             Assert.fail();
         } catch (IllegalStateException e) {
             // this is expected
