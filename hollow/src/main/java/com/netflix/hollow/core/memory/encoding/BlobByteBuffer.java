@@ -3,15 +3,12 @@ package com.netflix.hollow.core.memory.encoding;
 import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
 
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Arrays;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import sun.misc.Unsafe;
@@ -75,10 +72,22 @@ public final class BlobByteBuffer {
         }
     }
 
+    /**
+     * mmap the entire contents of FileChannel into an array of {@code MappedByteBuffer}s, each of size singleBufferCapacity.
+     * @param channel FileChannel for file to be mmap-ed
+     * @param singleBufferCapacity Size of individual MappedByteBuffers in array of MappedByteBuffers required to map the
+     *                entire file channel. It must be a power of 2, and due to MappedByteBuffer constraints it is limited
+     *                to the max integer that is a power of 2.
+     * @return BlobByteBuffer containing an array of MappedByteBuffers that mmap-ed the entire file channel
+     * @throws IOException
+     */
     public static BlobByteBuffer mmapBlob(FileChannel channel, int singleBufferCapacity) throws IOException {
         long size = channel.size();
         if (size == 0) {
             throw new IllegalStateException("File to be mmap-ed has no data");
+        }
+        if ((singleBufferCapacity & (singleBufferCapacity - 1)) != 0) { // should be a power of 2
+            throw new IllegalArgumentException("singleBufferCapacity must be a power of 2");
         }
 
         // divide into N buffers with an int capacity that is a power of 2
@@ -110,6 +119,10 @@ public final class BlobByteBuffer {
         return new BlobByteBuffer(size, shift, mask, spine);
     }
 
+    /**
+     * Return position in bytes.
+     * @return position in bytes
+     */
     public long position() {
         lock1.lock();
         try {
@@ -120,7 +133,11 @@ public final class BlobByteBuffer {
 
     }
 
-    // @param position in bytes
+    /**
+     * Set position, in bytes.
+     * @param position the byte index to set position to
+     * @return new position in bytes
+     */
     public BlobByteBuffer position(long position) {
         if (position > capacity || position < 0)
             throw new IllegalArgumentException("invalid position; position=" + position + " capacity=" + capacity);
@@ -128,7 +145,12 @@ public final class BlobByteBuffer {
         return this;
     }
 
-    // @param index position in bytes from offset 0 in the backing BlobByteBuffer
+    /**
+     * Reads the byte at the given index.
+     * @param index byte index (from offset 0 in the backing BlobByteBuffer) at which to read byte value
+     * @return byte at the given index
+     * @throws IndexOutOfBoundsException if index out of bounds of the backing buffer
+     */
     public byte getByte(long index) throws BufferUnderflowException {
         lock1.lock();
         if (index >= capacity) {  // defensive
@@ -144,318 +166,48 @@ public final class BlobByteBuffer {
     }
 
     /**
-     * BlobByteBuffer is an array of ByteBuffers. For longs that start at 8-byte boundaries relative to the start of the
-     * ByteBuffer (note that this is not necessarily 8-byte aligned with the backing BlobByteBuffer), ByteBuffer::getLong
-     * returns a valid result. However for unaligned reads i.e. reading a long starting at a byte that is not at an 8-byte
-     * multiple offset relative to the start of the buffer, two aligned longs need to be read using ByteBuffer::getLong,
-     * serialized into a byte array, and then an unsafe.getLong needs to be performed into that array. Moreover, the
-     * two longs (or single unaligned long) could occur at the boundary between two spine buckets.
-     *
-     * @param startByteIndex
-     * @return
-     * @throws BufferUnderflowException
+     * Return the long value starting from given byte index. This method is thread safe.
+     * @param startByteIndex byte index (from offset 0 in the backing BlobByteBuffer) at which to start reading long value
+     * @returns long value
      */
-    // Return long starting at given byte index
-    // @param startByteIndex long position from offset 0 in the backing BlobByteBuffer
-    public long getLongVerbose(long startByteIndex) throws BufferUnderflowException {
-        lock1.lock();
-        try {
-            int spineIndex = (int)(startByteIndex >>> (shift));
-            int bufferByteIndex = (int)(startByteIndex & mask);
-            int alignmentOffset = (int)(startByteIndex - this.position()) % 8;
+    public long getLong(long startByteIndex) throws BufferUnderflowException {
 
-            if (bufferByteIndex + Long.BYTES > this.capacity)  // defensive
-                throw new IllegalStateException();
+        int bufferByteIndex = (int)(startByteIndex & mask);
+        if (bufferByteIndex + Long.BYTES > this.capacity)  // defensive
+            throw new IllegalStateException();
 
-            long longVal;
+        int alignmentOffset = (int)(startByteIndex - this.position()) % Long.BYTES;
+        long nextAlignedPos = startByteIndex - alignmentOffset + Long.BYTES;
 
-            // SNAP: TEMP:
-            // long l = spine[spineIndex].getLong(bufferByteIndex);
-
-            if (alignmentOffset == 0 && bufferByteIndex + 8 <= spine[spineIndex].capacity()) {
-                longVal = spine[spineIndex].getLong(bufferByteIndex);   // SNAP: IndexOutOfBoundsException could occur here if bufferByteIndex is within 8 bytes of spine[spineIndex].capacity
-            } else if (alignmentOffset == 0) {  // if offset of long to be read is aligned in the underlying ByteBuffer but falls within last 8 bytes of the spine element capacity
-                longVal = BlobByteBufferUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex], spine[spineIndex+1], bufferByteIndex);
-            }
-            else {  // unaligned read
-                long[] longs = new long[2];
-                int firstBufferOffset = bufferByteIndex - alignmentOffset; // SNAP: if this is negative then have to fetch the previous spine element
-                if (firstBufferOffset < 0) {    // if first aligned byte is in the previous spine bucket
-                    if (spineIndex == 0) {
-                        throw new IllegalStateException();
-                    }
-                    ByteBuffer prevByteBuffer = spine[spineIndex - 1];
-                    ByteBuffer thisByteBuffer = spine[spineIndex];
-                    longs[0] = BlobByteBufferUtils.getAlignedLongAcrossSpineBoundary(prevByteBuffer, thisByteBuffer, prevByteBuffer.capacity() + firstBufferOffset);
-                } else {    // if first aligned byte is in the current spine bucket
-                    ByteBuffer thisByteBuffer = spine[spineIndex];
-                    ByteBuffer nextByteBuffer = (spineIndex + 1 < spine.length) ? spine[spineIndex + 1] : null;
-                    longs[0] = BlobByteBufferUtils.getAlignedLongAcrossSpineBoundary(thisByteBuffer, nextByteBuffer, firstBufferOffset);
-                }
-
-                int secondBufferOffset = firstBufferOffset + Long.BYTES;
-                if ((secondBufferOffset & mask) == secondBufferOffset) {    // if next aligned long is in the same spine bucket
-                    if (secondBufferOffset + Long.BYTES <= spine[spineIndex].capacity())
-                        longs[1] = spine[spineIndex].getLong(secondBufferOffset);   // optimization, as opposed to using getAlignedLongAcrossSpineBoundary() which copies individual bytes
-                    else
-                        longs[1] = BlobByteBufferUtils.getAlignedLongAcrossSpineBoundary(spine[spineIndex], spine[spineIndex+1], secondBufferOffset);
-                } else {
-                    if (spineIndex + 1 < spine.length)
-                        longs[1] = spine[spineIndex + 1].getLong(spine[spineIndex + 1].position() + (secondBufferOffset & mask)); // read in aligned long from the next spine bucket
-                    else
-                        throw new IllegalStateException("Attempting to read unaligned long starting in the last 8 bytes of data");
-                }
-                longVal = unsafe.getLong(longs, Unsafe.ARRAY_LONG_BASE_OFFSET + alignmentOffset);
-                // if (l == longVal) {
-                //     int a = 5;
-                // }
-            }
-            return longVal;
-        } finally {
-            lock1.unlock();
+        byte[] bytes = new byte[Long.BYTES];
+        for (int i = 0; i < Long.BYTES; i ++ ) {
+            bytes[i] = getByte(bigEndian(startByteIndex + i, nextAlignedPos));
         }
 
+        return ((((long) (bytes[7]       )) << 56) |
+                (((long) (bytes[6] & 0xff)) << 48) |
+                (((long) (bytes[5] & 0xff)) << 40) |
+                (((long) (bytes[4] & 0xff)) << 32) |
+                (((long) (bytes[3] & 0xff)) << 24) |
+                (((long) (bytes[2] & 0xff)) << 16) |
+                (((long) (bytes[1] & 0xff)) <<  8) |
+                (((long) (bytes[0] & 0xff))      ));
     }
 
-    // get 8 bytes corresponding to a long and construct the long
-    public long makeLong(long startByteIndex, byte[] bytes) {
-        int alignmentOffset = (int)(startByteIndex - this.position()) % 8;
-        long nextAlignedByte = startByteIndex - alignmentOffset + 8;
-        for (int i = 0; i < 8; i ++ ) {
-            bytes[i] = getByte(withEndiannness(startByteIndex + i, nextAlignedByte));
-        }
-
-        long l = BlobByteBufferUtils.toLong(bytes);
-
-//        byte[] reversedMakeLongBytes = new byte[8];
-//        for (int i=0; i<8;i ++) {
-//            reversedMakeLongBytes[i] = bytes[7-i];
-//        }
-//
-//        // SNAP: construct long here
-//        long revL = ((long) (reversedMakeLongBytes[0]) << 56) +
-//                    ((long) (reversedMakeLongBytes[1]) << 48) +
-//                    ((long) (reversedMakeLongBytes[2]) << 40) +
-//                    ((long) (reversedMakeLongBytes[3]) << 32) +
-//                    ((long) (reversedMakeLongBytes[4]) << 24) +
-//                    ((long) (reversedMakeLongBytes[5]) << 16) +
-//                    ((long) (reversedMakeLongBytes[6]) <<  8) +
-//                    ((long) (reversedMakeLongBytes[7]));
-//
-//        BigInteger bi = new BigInteger(bytes);
-//        long test = BlobByteBufferUnalignedUtils.toLongUsingBuffer(bytes);
-//
-//        BigInteger revBi = new BigInteger(reversedMakeLongBytes);   // SNAP: EITHER THIS
-//        long testRev = BlobByteBufferUnalignedUtils.toLongUsingBuffer(reversedMakeLongBytes);  // SNAP: OR THIS
-//
-//        long optimal = BlobByteBufferUnalignedUtils.toLong(bytes);
-//        long optimalRev = BlobByteBufferUnalignedUtils.toLong(reversedMakeLongBytes);
-
-        return l;
-        // return BlobByteBufferUnalignedUtils.toLongUsingBuffer(bytes);
-    }
-
-    // assume big endianness, it is validated in the constructor
-    public long withEndiannness(long index, long boundary) {
+    /**
+     * Given big-endian byte order, returns the position into the buffer for a given byte index. Java nio DirectByteBuffers
+     * are by default big-endian. Big-endianness is validated in the constructor.
+     * @param index byte index
+     * @param boundary index of the next 8-byte aligned byte
+     * @return position in buffer
+     */
+    private long bigEndian(long index, long boundary) {
         long result;
         if (index < boundary) {
-            result = (boundary - 8) + (boundary - index) - 1;
+            result = (boundary - Long.BYTES) + (boundary - index) - 1;
         } else {
-            result = boundary + (boundary + 8 - index) - 1;
+            result = boundary + (boundary + Long.BYTES - index) - 1;
         }
         return result;
     }
-
-    // Return long starting at given byte index
-    // @param startByteIndex long position from offset 0 in the backing BlobByteBuffer
-    public long getLong(long startByteIndex) throws BufferUnderflowException {
-
-        long expected = getLongVerbose(startByteIndex);
-
-        lock1.lock();
-        try {
-            int bufferByteIndex = (int)(startByteIndex & mask);
-            if (bufferByteIndex + Long.BYTES > this.capacity)  // defensive
-                throw new IllegalStateException();
-
-            byte[] makeLongBytes = new byte[8];
-            long actual = makeLong(startByteIndex, makeLongBytes);
-
-            if (actual != expected) {
-                System.out.println("Here");
-            }
-
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(bos);
-            dos.writeLong(expected);
-            dos.flush();
-            byte[] expectedBytes = bos.toByteArray();
-
-            if (actual == expected) {
-                return actual;
-            } else {
-                byte[] reversedMakeLongBytes = new byte[8];
-                for (int i=0; i<8;i ++) {
-                    reversedMakeLongBytes[i] = makeLongBytes[7-i];
-                }
-                if (!Arrays.equals(reversedMakeLongBytes, expectedBytes)) {
-                    System.out.println("Stop Here");
-                }
-                return BlobByteBufferUtils.toLongUsingBuffer(reversedMakeLongBytes);
-                // return expected;    // SNAP: bytes match but need to deserialize to long correctly
-            }
-        } catch (IOException e) {
-            throw new RuntimeException();
-        } finally {
-            lock1.unlock();
-        }
-
-    }
-
-
-    public static class BlobByteBufferUtils {
-
-        public static long toLong2(byte[] bytes) {
-            ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-            // buffer.position(0);
-            buffer.put(bytes, 0, bytes.length);
-            buffer.flip();
-            return buffer.getLong();
-        }
-
-        public static long toLongUsingBuffer(byte[] bytes) {
-            ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-            // buffer.position(0);
-            buffer.put(bytes, 0, bytes.length);
-            buffer.flip();
-            return buffer.getLong();
-        }
-
-        public static long toLong(byte[] bytes) {
-            return ((((long) (bytes[7]       )) << 56) |
-                    (((long) (bytes[6] & 0xff)) << 48) |
-                    (((long) (bytes[5] & 0xff)) << 40) |
-                    (((long) (bytes[4] & 0xff)) << 32) |
-                    (((long) (bytes[3] & 0xff)) << 24) |
-                    (((long) (bytes[2] & 0xff)) << 16) |
-                    (((long) (bytes[1] & 0xff)) <<  8) |
-                    (((long) (bytes[0] & 0xff))      ));
-        }
-
-        public static long getAlignedLongAcrossSpineBoundary(ByteBuffer currBuffer, ByteBuffer nextBuffer, int offset) {
-            byte[] bytes = new byte[Long.BYTES];
-            int pickFromCurrent = currBuffer.capacity() - offset;
-            if (pickFromCurrent > 8)
-                pickFromCurrent = 8;
-
-            for (int i = 0; i < pickFromCurrent; i++) {
-                bytes[i] = currBuffer.get(offset + i);
-            }
-            int pickFromNext = 8 - pickFromCurrent;
-            for (int i = 0; i < pickFromNext; i++)
-                bytes[pickFromCurrent + i] = nextBuffer.get(nextBuffer.position() + i);
-
-            return toLong2(bytes);
-        }
-    }
-
-
-    private byte[] lbuff = new byte[8];  // buffer when reading int and long
-    private byte[] bbuff = new byte[80]; // buffer when reading UTF
-    private char[] cbuff = new char[80]; // buffer when reading UTF
-
-    public static String ppBytesInLong(long l) {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(bos);
-            dos.writeLong(l);
-            dos.flush();
-            byte[] nativeLongBytes = bos.toByteArray();
-            String bytesChosenForUnalignedRead = "";
-            for (byte b : nativeLongBytes) {
-                bytesChosenForUnalignedRead += b + " ";
-            }
-            return bytesChosenForUnalignedRead;
-        } catch (IOException e) {
-            throw new IllegalStateException();
-        }
-    }
-
-//     public void deserializeFrom(byte[] dst, int offset, int length) {
-//         if ((offset | length | (offset + length) | (dst.length - (offset + length))) < 0)
-//             throw new IndexOutOfBoundsException();
-//         if (position + length >= capacity)
-//             throw new BufferUnderflowException();
-//
-//         int spineIndex = (int)(position >>> shift);
-//         int bufferPosition = (int)(position & mask);
-//
-//         // FIXME(timt): mixing absolute (in other methods) and relative gets
-//         spine[spineIndex].position(bufferPosition);
-//
-//         int remaining = spine[spineIndex].remaining();
-//
-//         if (length > remaining) { // spans two buffers
-//             // FIXME(timt): code review for off-by-one or other errors; even better, unit test it
-//             spine[spineIndex].deserializeFrom(dst, 0, remaining);
-//             spine[spineIndex + 1].deserializeFrom(dst, remaining, length - remaining);
-//         } else {
-//             spine[spineIndex].deserializeFrom(dst, offset, length);
-//         }
-//         position += length;
-//     }
-
-//
-//     /**
-//      * @see VarInt#readVInt(InputStream)
-//      */
-//     public int readVInt() throws BufferUnderflowException {
-//         byte b = deserializeFrom();
-//
-//         if(b == (byte) 0x80)
-//             throw new RuntimeException("Attempting to read null value as int");
-//
-//         int value = b & 0x7F;
-//         while ((b & 0x80) != 0) {
-//             b = deserializeFrom();
-//             value <<= 7;
-//             value |= (b & 0x7F);
-//         }
-//
-//         return value;
-//     }
-//
-//     /**
-//      * @see DataInput#readLong()
-//      */
-//     public long readLong() throws BufferUnderflowException {
-//         deserializeFrom(lbuff, 0, 8);
-//         return  (long)(lbuff[0]       ) << 56 |
-//                 (long)(lbuff[1] & 0xFF) << 48 |
-//                 (long)(lbuff[2] & 0xFF) << 40 |
-//                 (long)(lbuff[3] & 0xFF) << 32 |
-//                 (long)(lbuff[4] & 0xFF) << 24 |
-//                 (long)(lbuff[5] & 0xFF) << 16 |
-//                 (long)(lbuff[6] & 0xFF) <<  8 |
-//                 (long)(lbuff[7] & 0xFF);
-//     }
-//
-//     /**
-//      * @see VarInt#readVLong(InputStream)
-//      */
-//     public long readVLong() throws BufferUnderflowException {
-//         byte b = deserializeFrom();
-//
-//         if(b == (byte) 0x80)
-//             throw new RuntimeException("Attempting to read null value as long");
-//
-//         long value = b & 0x7F;
-//         while ((b & 0x80) != 0) {
-//             b = deserializeFrom();
-//             value <<= 7;
-//             value |= (b & 0x7F);
-//         }
-//         return value;
-//     }
-//
 }
