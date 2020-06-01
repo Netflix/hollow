@@ -13,7 +13,6 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import sun.misc.Unsafe;
@@ -227,33 +226,31 @@ public final class BlobByteBuffer {
             bytes[i] = getByte(withEndiannness(startByteIndex + i, nextAlignedByte));
         }
 
-        long l = ((long) (bytes[0]) << 56) +
-                 ((long) (bytes[1]) << 48) +
-                 ((long) (bytes[2]) << 40) +
-                 ((long) (bytes[3]) << 32) +
-                 ((long) (bytes[4]) << 24) +
-                 ((long) (bytes[5]) << 16) +
-                 ((long) (bytes[6]) <<  8) +
-                 ((long) (bytes[7]));
+        long l = BlobByteBufferUnalignedUtils.toLongAlignedLittleEndian(bytes);
 
-
-        byte[] reversedMakeLongBytes = new byte[8];
-        for (int i=0; i<8;i ++) {
-            reversedMakeLongBytes[i] = bytes[7-i];
-        }
-
-        // SNAP: construct long here
-        long revL = ((long) (reversedMakeLongBytes[0]) << 56) +
-                    ((long) (reversedMakeLongBytes[1]) << 48) +
-                    ((long) (reversedMakeLongBytes[2]) << 40) +
-                    ((long) (reversedMakeLongBytes[3]) << 32) +
-                    ((long) (reversedMakeLongBytes[4]) << 24) +
-                    ((long) (reversedMakeLongBytes[5]) << 16) +
-                    ((long) (reversedMakeLongBytes[6]) <<  8) +
-                    ((long) (reversedMakeLongBytes[7]));
-
-        BigInteger bi = new BigInteger(bytes);
-        BigInteger revBi = new BigInteger(reversedMakeLongBytes);   // SNAP: THis is correct!
+//        byte[] reversedMakeLongBytes = new byte[8];
+//        for (int i=0; i<8;i ++) {
+//            reversedMakeLongBytes[i] = bytes[7-i];
+//        }
+//
+//        // SNAP: construct long here
+//        long revL = ((long) (reversedMakeLongBytes[0]) << 56) +
+//                    ((long) (reversedMakeLongBytes[1]) << 48) +
+//                    ((long) (reversedMakeLongBytes[2]) << 40) +
+//                    ((long) (reversedMakeLongBytes[3]) << 32) +
+//                    ((long) (reversedMakeLongBytes[4]) << 24) +
+//                    ((long) (reversedMakeLongBytes[5]) << 16) +
+//                    ((long) (reversedMakeLongBytes[6]) <<  8) +
+//                    ((long) (reversedMakeLongBytes[7]));
+//
+//        BigInteger bi = new BigInteger(bytes);
+//        long test = BlobByteBufferUnalignedUtils.toLong(bytes);
+//
+//        BigInteger revBi = new BigInteger(reversedMakeLongBytes);   // SNAP: EITHER THIS
+//        long testRev = BlobByteBufferUnalignedUtils.toLong(reversedMakeLongBytes);  // SNAP: OR THIS
+//
+//        long optimal = BlobByteBufferUnalignedUtils.toLongAlignedLittleEndian(bytes);
+//        long optimalRev = BlobByteBufferUnalignedUtils.toLongAlignedLittleEndian(reversedMakeLongBytes);
 
         return l;
         // return BlobByteBufferUnalignedUtils.toLong(bytes);
@@ -333,6 +330,17 @@ public final class BlobByteBuffer {
             buffer.put(bytes, 0, bytes.length);
             buffer.flip();
             return buffer.getLong();
+        }
+
+        public static long toLongAlignedLittleEndian(byte[] bytes) {
+            return ((((long) (bytes[7]       )) << 56) |
+                    (((long) (bytes[6] & 0xff)) << 48) |
+                    (((long) (bytes[5] & 0xff)) << 40) |
+                    (((long) (bytes[4] & 0xff)) << 32) |
+                    (((long) (bytes[3] & 0xff)) << 24) |
+                    (((long) (bytes[2] & 0xff)) << 16) |
+                    (((long) (bytes[1] & 0xff)) <<  8) |
+                    (((long) (bytes[0] & 0xff))      ));
         }
 
         public static long getAlignedLongAcrossSpineBoundary(ByteBuffer currBuffer, ByteBuffer nextBuffer, int offset) {
