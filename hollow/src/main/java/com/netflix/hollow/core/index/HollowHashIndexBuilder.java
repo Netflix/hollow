@@ -356,8 +356,12 @@ public class HollowHashIndexBuilder {
                 for(int j=0;j<fieldPath.length - 1;j++) {
                     HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
                     readState = objectAccess.getSchema().getReferencedTypeState(fieldPath[j]);
-                    matchOrdinal = objectAccess.readOrdinal(matchOrdinal, fieldPath[j]);
-                    hashOrdinal = objectAccess.readOrdinal(hashOrdinal, fieldPath[j]);
+                    if(matchOrdinal != -1) {
+                        matchOrdinal = objectAccess.readOrdinal(matchOrdinal, fieldPath[j]);
+                    }
+                    if(hashOrdinal != -1) {
+                        hashOrdinal = objectAccess.readOrdinal(hashOrdinal, fieldPath[j]);
+                    }
                 }
 
                 if(matchOrdinal != hashOrdinal) {
@@ -392,6 +396,10 @@ public class HollowHashIndexBuilder {
                     HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
                     readState = objectAccess.getSchema().getReferencedTypeState(fieldPath[j]);
                     ordinal = objectAccess.readOrdinal(ordinal, fieldPath[j]);
+                    // Cannot find nested ordinal for null parent
+                    if(ordinal == -1) {
+                        break;
+                    }
                 }
 
                 int fieldHashCode = ordinal == -1 ? -1 : HollowReadFieldUtils.fieldHashCode((HollowObjectTypeDataAccess) readState, ordinal, fieldPath[fieldPath.length-1]);

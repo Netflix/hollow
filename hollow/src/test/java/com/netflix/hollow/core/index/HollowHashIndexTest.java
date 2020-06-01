@@ -20,12 +20,13 @@ import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.Test;
 
 
 public class HollowHashIndexTest extends AbstractStateEngineTest {
@@ -191,6 +192,19 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         assertIteratorContainsAll(index.findMatches(-1.0f).iterator(), 1);
     }
 
+    @Test
+    public void testIndexingReferenceTypeFieldWithNullValues() throws Exception {
+        mapper.add(new TypeC(null));
+        mapper.add(new TypeC(new TypeD(null)));
+        mapper.add(new TypeC(new TypeD("one")));
+
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeC", "", "cd.d1.value");
+
+        Assert.assertNull(index.findMatches("none"));
+        assertIteratorContainsAll(index.findMatches("one").iterator(), 2);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testFindingMatchForNullQueryValue() throws Exception {
         mapper.add(new TypeB("one:"));
@@ -297,6 +311,24 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         public TypeB(String b1, boolean isDuplicate) {
             this.b1 = b1;
             this.isDuplicate = isDuplicate;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TypeC {
+        private final TypeD cd;
+
+        public TypeC(TypeD cd) {
+            this.cd = cd;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TypeD {
+        private final String d1;
+
+        public TypeD(String d1) {
+            this.d1 = d1;
         }
     }
 

@@ -163,6 +163,10 @@ public class HollowHashIndex implements HollowTypeStateListener {
                     HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
                     readState = objectAccess.getSchema().getReferencedTypeState(fieldPath[j]);
                     hashOrdinal = objectAccess.readOrdinal(hashOrdinal, fieldPath[j]);
+                    // Cannot find nested ordinal for null parent
+                    if(hashOrdinal == -1) {
+                        break;
+                    }
                 }
 
                 HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
