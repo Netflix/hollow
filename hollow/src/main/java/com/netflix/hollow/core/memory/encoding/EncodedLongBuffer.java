@@ -44,7 +44,6 @@ import java.io.IOException;
 public class EncodedLongBuffer implements FixedLengthData {
 
     private BlobByteBuffer bufferView;
-    private long maxLongs = -1;
     private long maxByteIndex = -1;
 
     public EncodedLongBuffer() {}
@@ -82,7 +81,7 @@ public class EncodedLongBuffer implements FixedLengthData {
         long whichByte = index >>> 3;
         int whichBit = (int) (index & 0x07);
 
-        if (whichByte + ceil(bitsPerElement/8) > this.maxByteIndex) {
+        if (whichByte + ceil(bitsPerElement/8) > this.maxByteIndex + 1) {
             throw new IllegalStateException();
         }
 
@@ -143,12 +142,10 @@ public class EncodedLongBuffer implements FixedLengthData {
 
     private void loadFrom(HollowBlobInput in, long numLongs) throws IOException {
         BlobByteBuffer buffer = in.getBuffer();
-        this.maxLongs = numLongs;
-        this.maxByteIndex = (this.maxLongs * Long.BYTES) - 1;
-
         if(numLongs == 0)
             return;
 
+        this.maxByteIndex = (numLongs * Long.BYTES) - 1;
         buffer.position(in.getFilePointer());
         this.bufferView = buffer.duplicate();
         buffer.position(buffer.position() + (numLongs * Long.BYTES));

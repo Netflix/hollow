@@ -31,19 +31,9 @@ class HollowSetTypeReadStateShard {
 
     private HollowPrimaryKeyValueDeriver keyDeriver;
 
-    private int count = 0;
-
     public int size(int ordinal) {
         HollowSetTypeDataElements currentData;
         int size;
-
-        // try {
-        //     BufferedWriter diag = new BufferedWriter(new FileWriter("/tmp/diag-set-" + count++));
-        //     this.currentDataVolatile.setPointerAndSizeData.pp(diag);
-        //     diag.flush();
-        // } catch (IOException e) {
-        //     throw new UnsupportedOperationException();
-        // }
 
         do {
             currentData = this.currentDataVolatile;
