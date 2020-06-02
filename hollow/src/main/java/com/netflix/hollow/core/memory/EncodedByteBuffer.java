@@ -48,7 +48,7 @@ public class EncodedByteBuffer implements VariableLengthData {
     public void loadFrom(HollowBlobInput in, long length) throws IOException {
         BlobByteBuffer buffer = in.getBuffer();
         this.maxIndex = length - 1;
-        buffer.position(in.getFilePointer());   // SNAP: defensive
+        buffer.position(in.getFilePointer());
         this.bufferView = buffer.duplicate();
         buffer.position(buffer.position() + length);
         in.seek(in.getFilePointer() + length);

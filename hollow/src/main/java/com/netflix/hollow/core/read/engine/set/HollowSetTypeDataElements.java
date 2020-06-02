@@ -84,8 +84,8 @@ public class HollowSetTypeDataElements {
         emptyBucketValue = (1 << bitsPerElement) - 1;
         totalNumberOfBuckets = VarInt.readVLong(in);
 
-        setPointerAndSizeData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
-        elementData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
+        setPointerAndSizeData = FixedLengthDataMode.newFrom(in, memoryMode, memoryRecycler);
+        elementData = FixedLengthDataMode.newFrom(in, memoryMode, memoryRecycler);
 
         // debug.append("HollowSetTypeDataElements setPointerAndSizeData= \n");
         // setPointerAndSizeData.pp(debug);

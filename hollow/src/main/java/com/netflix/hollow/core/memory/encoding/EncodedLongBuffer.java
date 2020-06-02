@@ -23,17 +23,8 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 
 /**
- * Each record in Hollow begins with a fixed-length number of bits.  At the lowest level, these bits
- * are held in long arrays using the class FixedLengthElementArray.  This class allows for storage
- * and retrieval of fixed-length data in a range of bits.  For example, if a FixedLengthElementArray
- * was queried for the 6-bit value starting at bit 7 in the following example range of bits:
- * <pre>
- *     0001000100100001101000010100101001111010101010010010101
- * </pre>
- * <p>
- * The value 100100 in binary, or 36 in base 10, would be returned.
- * <p>
- * // SNAP: TODO: Update doc
+ * This class allows for storage and retrieval of fixed-length data in ByteBuffers.
+ *
  * As a result there two ways to obtain an element value from the bit string at a given bit index.  The first,
  * using {@link #getElementValue(long, int)} or {@link #getElementValue(long, int, long)}, leverages unsafe unaligned
  * (or misaligned) memory reads of {@code long} values from {@code long[]} array segments at byte index offsets within
@@ -46,6 +37,7 @@ import java.io.IOException;
  * at the last byte of the last index in a {@code long[]} array segment.  A {@code long[]} array segment is allocated
  * with a length that is one plus the desired length to ensure such access is safe (see the implementations of
  * {@link ArraySegmentRecycler#getLongArray()}.
+ * // SNAP: can we read a few bytes close to the last byte of data, or do we need to pad it too??? (read above)
  * In addition, the value of the last underlying element is the same as the value of the first underlying element in the
  * subsequent array segment (see {@link SegmentedLongArray#set}).  This ensures that an element (n-bit) value can be
  * correctly returned when performing an unaligned read that would otherwise cross an array segment boundary.
@@ -96,7 +88,7 @@ public class EncodedLongBuffer implements FixedLengthData {
         long whichByte = index >>> 3;
         int whichBit = (int) (index & 0x07);
 
-        if (whichByte > this.maxByteIndex) {  // it's illegal to read a byte starting past the last byte boundary of data
+        if (whichByte > this.maxByteIndex) {
             throw new IllegalStateException();
         }
 
@@ -128,6 +120,7 @@ public class EncodedLongBuffer implements FixedLengthData {
      * <p>
      * This method should be utilized if the {@code bitsPerElement} may exceed {@code 60} bits,
      * otherwise the method {@link #getLargeElementValue(long, int, long)} can be utilized instead.
+     * // SNAP: Test this method
      *
      * @param index the bit index
      * @param bitsPerElement bits per element, may be greater than 60
@@ -167,7 +160,7 @@ public class EncodedLongBuffer implements FixedLengthData {
         }
 
         long byteIndex = index * Long.BYTES;
-        if (byteIndex > this.maxByteIndex) {  // it's illegal to read a byte starting past the last byte boundary of data
+        if (byteIndex > this.maxByteIndex) {
             throw new IllegalStateException();
         }
         return this.bufferView.getLong(bufferView.position() + byteIndex);
@@ -176,7 +169,7 @@ public class EncodedLongBuffer implements FixedLengthData {
     private void loadFrom(HollowBlobInput in, long numLongs) throws IOException {
         BlobByteBuffer buffer = in.getBuffer();
         this.maxLongs = numLongs;
-        this.maxByteIndex = (this.maxLongs * Long.BYTES) - 1; // SNAP: should we work this into bufferView capacity?
+        this.maxByteIndex = (this.maxLongs * Long.BYTES) - 1;
 
         if(numLongs == 0)
             return;
@@ -207,51 +200,21 @@ public class EncodedLongBuffer implements FixedLengthData {
         throw new UnsupportedOperationException("Not supported in shared-memory mode");
     }
 
-    // returns a EncodedLongBuffer that contains deserialized data from given file
-    public static EncodedLongBuffer deserializeFrom(HollowBlobInput in) throws IOException {
+    /**
+     * returns a new EncodedLongBuffer that contains data deserialized from the given file. First a variable length integer
+     * is read that indicates how many long values are then to be read from the input.
+     *
+     * @input in Hollow Blob Input to read data from
+     * @return new EncodedLongBuffer
+     */
+    public static EncodedLongBuffer newFrom(HollowBlobInput in) throws IOException {
         long numLongs = VarInt.readVLong(in);
-        return deserializeFrom(in, numLongs);
+        return newFrom(in, numLongs);
     }
 
-    // SNAP: created for testing
-    public static EncodedLongBuffer deserializeFrom(HollowBlobInput in, long numLongs) throws IOException {
+    public static EncodedLongBuffer newFrom(HollowBlobInput in, long numLongs) throws IOException {
         EncodedLongBuffer buf = new EncodedLongBuffer();
         buf.loadFrom(in, numLongs);
         return buf;
     }
-
-
-    // debug utility: pretty print
-//    public void pp(BufferedWriter debug) throws IOException {
-//        StringBuffer pp = new StringBuffer();
-//
-//        int segmentSize = 1 << log2OfSegmentSize;
-//        long maxIndex = segments.length * segmentSize;
-//
-//
-//        pp.append("\n\n FixedLengthElementArray deserializeFrom()s =>");
-//        for (int g = 0; g < maxIndex; g ++) {
-//            long v = deserializeFrom(g);
-//            pp.append(v + " ");
-//        }
-//
-//        pp.append("\n");
-//        pp.append("\n FixedLengthElementArray raw bytes underneath:\n");
-//        for (int i = 0; i < segments.length; i ++) {
-//            if (segments[i] == null) {
-//                pp.append("- - - - - NULL - - - - ");
-//                pp.append("\n");
-//                continue;
-//            }
-//
-//            pp.append(String.format("FixedLengthElementArray i= %d/%d => ", i, segments.length-1));
-//
-//            for (int j = 0; j < segmentSize; j ++ ) {
-//                long v = segments[i].deserializeFrom(segments[i].position() + j);
-//                pp.append(v + " ");
-//            }
-//            pp.append("\n");
-//        }
-//        debug.append(pp.toString());
-//    }
 }

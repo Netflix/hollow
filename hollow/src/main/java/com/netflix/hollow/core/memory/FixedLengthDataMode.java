@@ -5,15 +5,18 @@ import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 public class FixedLengthDataMode {
 
-    public static FixedLengthData deserializeFrom(HollowBlobInput in, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) throws IOException {
+    private static final Logger LOG = Logger.getLogger(FixedLengthDataMode.class.getName());
+
+    public static FixedLengthData newFrom(HollowBlobInput in, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) throws IOException {
 
         if (memoryMode.equals(MemoryMode.ON_HEAP)) {
-            return FixedLengthElementArray.deserializeFrom(in, memoryRecycler);
+            return FixedLengthElementArray.newFrom(in, memoryRecycler);
         } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
-            return EncodedLongBuffer.deserializeFrom(in);
+            return EncodedLongBuffer.newFrom(in);
         } else {
             throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
         }
@@ -23,7 +26,7 @@ public class FixedLengthDataMode {
         if (fld instanceof FixedLengthElementArray) {
             ((FixedLengthElementArray) fld).destroy(memoryRecycler);
         } else if (fld instanceof EncodedLongBuffer) {
-            throw new UnsupportedOperationException("Destroy operation not supported in shared memory mode");   // SNAP: Should this be NOP instead?
+            LOG.warning("Destroy operation is a no-op in shared memory mode");
         } else {
             throw new UnsupportedOperationException("Unknown type");
         }

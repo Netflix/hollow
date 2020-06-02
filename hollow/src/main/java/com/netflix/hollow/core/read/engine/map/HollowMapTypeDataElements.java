@@ -87,8 +87,8 @@ public class HollowMapTypeDataElements {
         emptyBucketKeyValue = (1 << bitsPerKeyElement) - 1;
         totalNumberOfBuckets = VarInt.readVLong(in);
 
-        mapPointerAndSizeData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
-        entryData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
+        mapPointerAndSizeData = FixedLengthDataMode.newFrom(in, memoryMode, memoryRecycler);
+        entryData = FixedLengthDataMode.newFrom(in, memoryMode, memoryRecycler);
 
         // debug.append("HollowMapTypeDataElements mapPointerAndSizeData= \n");
         // mapPointerAndSizeData.pp(debug);

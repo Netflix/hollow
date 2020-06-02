@@ -90,7 +90,7 @@ public class HollowObjectTypeDataElements {
 
         readFieldStatistics(in, unfilteredSchema);
 
-        fixedLengthData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
+        fixedLengthData = FixedLengthDataMode.newFrom(in, memoryMode, memoryRecycler);
         removeExcludedFieldsFromFixedLengthData();
 
         readVarLengthData(in, unfilteredSchema);

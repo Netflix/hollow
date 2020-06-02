@@ -61,11 +61,11 @@ public class BlobByteBufferTest {
 
         HollowBlobInput hbi1 = HollowBlobInput.serial(new FileInputStream(testFile));
         hbi1.skipBytes(padding + 16);        // skip past the first 16 bytes of test data written to file
-        FixedLengthElementArray testLongArray = FixedLengthElementArray.deserializeFrom(hbi1, WastefulRecycler.DEFAULT_INSTANCE, numLongsWritten);
+        FixedLengthElementArray testLongArray = FixedLengthElementArray.newFrom(hbi1, WastefulRecycler.DEFAULT_INSTANCE, numLongsWritten);
 
         HollowBlobInput hbi2 = HollowBlobInput.randomAccess(testFile, TEST_SINGLE_BUFFER_CAPACITY_BYTES);
         hbi2.skipBytes(padding  + 16);       // skip past the first 16 bytes of test data written to file
-        EncodedLongBuffer testLongBuffer = EncodedLongBuffer.deserializeFrom(hbi2, numLongsWritten);
+        EncodedLongBuffer testLongBuffer = EncodedLongBuffer.newFrom(hbi2, numLongsWritten);
 
         // read each values starting at each bit index and for bit length 1 to 60
         for (int i = 0; i< (numLongsWritten - 1) * Long.BYTES * 8; i ++) {

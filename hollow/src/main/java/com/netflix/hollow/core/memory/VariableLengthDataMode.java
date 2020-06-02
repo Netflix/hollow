@@ -1,8 +1,11 @@
 package com.netflix.hollow.core.memory;
 
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import java.util.logging.Logger;
 
 public class VariableLengthDataMode {
+
+    private static final Logger LOG = Logger.getLogger(VariableLengthDataMode.class.getName());
 
     public static VariableLengthData get(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
 
@@ -21,7 +24,7 @@ public class VariableLengthDataMode {
         if (vld instanceof SegmentedByteArray) {
             ((SegmentedByteArray) vld).destroy();
         } else if (vld instanceof EncodedByteBuffer) {
-            throw new UnsupportedOperationException("Destroy operation not supported in shared memory mode");   // SNAP: Should this be NOP instead?
+            LOG.warning("Destroy operation is a no-op in shared memory mode");
         } else {
             throw new UnsupportedOperationException("Unknown type");
         }

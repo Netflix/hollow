@@ -77,8 +77,8 @@ public class HollowListTypeDataElements {
         bitsPerElement = VarInt.readVInt(in);
         totalNumberOfElements = VarInt.readVLong(in);
 
-        listPointerData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
-        elementData = FixedLengthDataMode.deserializeFrom(in, memoryMode, memoryRecycler);
+        listPointerData = FixedLengthDataMode.newFrom(in, memoryMode, memoryRecycler);
+        elementData = FixedLengthDataMode.newFrom(in, memoryMode, memoryRecycler);
 
         // debug.append("HollowListTypeDataElements listPointerData= \n");
         // listPointerData.pp(debug);

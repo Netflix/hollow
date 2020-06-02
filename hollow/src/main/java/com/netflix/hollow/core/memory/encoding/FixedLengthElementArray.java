@@ -25,16 +25,6 @@ import java.io.IOException;
 import sun.misc.Unsafe;
 
 /**
- * Each record in Hollow begins with a fixed-length number of bits.  At the lowest level, these bits 
- * are held in long arrays using the class FixedLengthElementArray.  This class allows for storage 
- * and retrieval of fixed-length data in a range of bits.  For example, if a FixedLengthElementArray 
- * was queried for the 6-bit value starting at bit 7 in the following example range of bits:
- * <pre>
- *     0001000100100001101000010100101001111010101010010010101
- * </pre>
- * <p>
- * The value 100100 in binary, or 36 in base 10, would be returned.
- * <p>
  * Note that for performance reasons, this class makes use of {@code sun.misc.Unsafe} to perform
  * unaligned memory reads.  This is designed exclusively for little-endian architectures, and has only been
  * fully battle-tested on x86-64.
@@ -251,14 +241,14 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
             unsafe.putOrderedLong(segments[whichSegment - 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (bitmask + 1)), segments[whichSegment][0]);
     }
 
-    public static FixedLengthElementArray deserializeFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler)
+    public static FixedLengthElementArray newFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler)
             throws IOException {
 
         long numLongs = VarInt.readVLong(in);
-        return deserializeFrom(in, memoryRecycler, numLongs);
+        return newFrom(in, memoryRecycler, numLongs);
     }
 
-    public static FixedLengthElementArray deserializeFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, long numLongs)
+    public static FixedLengthElementArray newFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, long numLongs)
             throws IOException {
 
         FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, numLongs * 64);

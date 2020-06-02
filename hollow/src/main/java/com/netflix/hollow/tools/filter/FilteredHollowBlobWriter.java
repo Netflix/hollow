@@ -253,7 +253,7 @@ public class FilteredHollowBlobWriter {
             /// END SETUP ///
     
             /// read the unfiltered long array into memory
-            FixedLengthElementArray unfilteredFixedLengthFields = FixedLengthElementArray.deserializeFrom(in, memoryRecycler);
+            FixedLengthElementArray unfilteredFixedLengthFields = FixedLengthElementArray.newFrom(in, memoryRecycler);
     
             /// populate the filtered arrays (each field just gets written to all FixedLengthArrayWriters assigned to its field index)
             long bitsPerRecord = 0;
