@@ -16,9 +16,9 @@
  */
 package com.netflix.hollow.core.memory.encoding;
 
+import static java.lang.Math.ceil;
+
 import com.netflix.hollow.core.memory.FixedLengthData;
-import com.netflix.hollow.core.memory.SegmentedLongArray;
-import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 
@@ -26,25 +26,19 @@ import java.io.IOException;
  * This class allows for storage and retrieval of fixed-length data in ByteBuffers.
  *
  * As a result there two ways to obtain an element value from the bit string at a given bit index.  The first,
- * using {@link #getElementValue(long, int)} or {@link #getElementValue(long, int, long)}, leverages unsafe unaligned
- * (or misaligned) memory reads of {@code long} values from {@code long[]} array segments at byte index offsets within
- * the arrays.
- * The second, using {@link #getLargeElementValue(long, int)} or
- * {@link #getLargeElementValue(long, int, long)}, leverages safe access to {@code long[]} array segments but
- * requires more work to compose an element value from bits that cover two underlying elements in {@code long[]} array
- * segments.
- * The first approach needs to ensure a segmentation fault (SEGV) does not occur when when reading a {@code long} value
- * at the last byte of the last index in a {@code long[]} array segment.  A {@code long[]} array segment is allocated
- * with a length that is one plus the desired length to ensure such access is safe (see the implementations of
- * {@link ArraySegmentRecycler#getLongArray()}.
- * // SNAP: can we read a few bytes close to the last byte of data, or do we need to pad it too??? (read above)
- * In addition, the value of the last underlying element is the same as the value of the first underlying element in the
- * subsequent array segment (see {@link SegmentedLongArray#set}).  This ensures that an element (n-bit) value can be
- * correctly returned when performing an unaligned read that would otherwise cross an array segment boundary.
- * Furthermore, there is an additional constraint that first method can only support element values of 60-bits or less.
- * Two 60-bit values in sequence can be represented exactly in 15 bytes.  Two 61-bit values in sequence require 16
- * bytes.  For such a bit string performing an unaligned read at byte index 7 to obtain the second 61-bit value will
- * result in missing the 2 most significant bits located at byte index 15.
+ * using {@link #getElementValue(long, int)} or {@link #getElementValue(long, int, long)}, at byte index offsets within
+ * the buffers. The second, using {@link #getLargeElementValue(long, int)} or
+ * {@link #getLargeElementValue(long, int, long)}, by reading two long values and then composing an element value
+ * from bits that cover the two.
+ *
+ * In the counterpart {@link FixedLengthElementArray} implementation a long read into the last 8 bytes of data was safe
+ * because of a padding of 1 long at the end. Instead, this implementation returns a zero byte if the 8 byte range past
+ * the buffer capacity is queried.
+ *
+ * {@link #getElementValue} can only support element values of 60-bits or less since two 60-bit values in sequence can
+ * be represented exactly in 15 bytes.  Two 61-bit values in sequence require 16 bytes.  For such a bit string
+ * performing an unaligned read at byte index 7 to obtain the second 61-bit value will result in missing the 2 most
+ * significant bits located at byte index 15.
  */
 @SuppressWarnings("restriction")
 public class EncodedLongBuffer implements FixedLengthData {
@@ -57,7 +51,7 @@ public class EncodedLongBuffer implements FixedLengthData {
 
     /**
      * Gets an element value, comprising of {@code bitsPerElement} bits, at the given
-     * bit {@code index}.
+     * bit {@code index}. {@code bitsPerElement} should be less than 61 bits.
      *
      * @param index the bit index
      * @param bitsPerElement bits per element, must be less than 61 otherwise
@@ -71,7 +65,7 @@ public class EncodedLongBuffer implements FixedLengthData {
 
     /**
      * Gets a masked element value, comprising of {@code bitsPerElement} bits, at the given
-     * bit {@code index}.
+     * bit {@code index}. {@code bitsPerElement} should be less than 61 bits.
      *
      * @param index the bit index
      * @param bitsPerElement bits per element, must be less than 61 otherwise
@@ -88,7 +82,7 @@ public class EncodedLongBuffer implements FixedLengthData {
         long whichByte = index >>> 3;
         int whichBit = (int) (index & 0x07);
 
-        if (whichByte > this.maxByteIndex) {
+        if (whichByte + ceil(bitsPerElement/8) > this.maxByteIndex) {
             throw new IllegalStateException();
         }
 
@@ -120,7 +114,6 @@ public class EncodedLongBuffer implements FixedLengthData {
      * <p>
      * This method should be utilized if the {@code bitsPerElement} may exceed {@code 60} bits,
      * otherwise the method {@link #getLargeElementValue(long, int, long)} can be utilized instead.
-     * // SNAP: Test this method
      *
      * @param index the bit index
      * @param bitsPerElement bits per element, may be greater than 60
@@ -136,34 +129,16 @@ public class EncodedLongBuffer implements FixedLengthData {
         long whichLong = index >>> 6;
         int whichBit = (int) (index & 0x3F);
 
-        long l = get(whichLong) >>> whichBit;
+        long l = this.bufferView.getLong(bufferView.position() + whichLong * Long.BYTES) >>> whichBit;
 
         int bitsRemaining = 64 - whichBit;
 
         if (bitsRemaining < bitsPerElement) {
             whichLong++;
-            l |= get(whichLong) << bitsRemaining;
+            l |= this.bufferView.getLong(bufferView.position() + whichLong * Long.BYTES) << bitsRemaining;
         }
 
         return l & mask;
-    }
-
-    /**
-     * Get the value of the long at the specified index.
-     *
-     * @param index the long index eg. long at index 0 (0-7 bytes)m long at index 1 (8-15 bytes)
-     * @return the byte value
-     */
-    private long get(long index) {
-        if (this.bufferView == null) {
-            throw new IllegalStateException("Type is queried before it has been read in");
-        }
-
-        long byteIndex = index * Long.BYTES;
-        if (byteIndex > this.maxByteIndex) {
-            throw new IllegalStateException();
-        }
-        return this.bufferView.getLong(bufferView.position() + byteIndex);
     }
 
     private void loadFrom(HollowBlobInput in, long numLongs) throws IOException {
@@ -201,17 +176,23 @@ public class EncodedLongBuffer implements FixedLengthData {
     }
 
     /**
-     * returns a new EncodedLongBuffer that contains data deserialized from the given file. First a variable length integer
-     * is read that indicates how many long values are then to be read from the input.
+     * Returns a new EncodedLongBuffer from deserializing the given input. The value of the first variable length integer
+     * in the input indicates how many long values are to then be read from the input.
      *
-     * @input in Hollow Blob Input to read data from
-     * @return new EncodedLongBuffer
+     * @input in Hollow Blob Input to read data (a var int and then that many longs) from
+     * @return new EncodedLongBuffer containing data read from input
      */
     public static EncodedLongBuffer newFrom(HollowBlobInput in) throws IOException {
         long numLongs = VarInt.readVLong(in);
         return newFrom(in, numLongs);
     }
 
+    /**
+     * Returns a new EncodedLongBuffer from deserializing numLongs longs from given input.
+     *
+     * @input in Hollow Blob Input to read numLongs longs from
+     * @return new EncodedLongBuffer containing data read from input
+     */
     public static EncodedLongBuffer newFrom(HollowBlobInput in, long numLongs) throws IOException {
         EncodedLongBuffer buf = new EncodedLongBuffer();
         buf.loadFrom(in, numLongs);

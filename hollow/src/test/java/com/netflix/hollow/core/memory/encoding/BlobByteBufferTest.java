@@ -36,28 +36,15 @@ public class BlobByteBufferTest {
         }
     }
 
-    @Test
-    public void testParityBetweenVariableLengthDataModes() throws IOException {
-        // Add some padding bytes at the beginning of file so that longs are written at unaligned locations
-
-        // adding padding writes the test longs at a non-aligned byte
-        for (int padding = 0; padding < Long.BYTES; padding ++) {
-            File testFile = writeTestFileUnaligned("/variable_length_data_modes", padding);
-            testFile.deleteOnExit();
-
-            readUsingVariableLengthDataModes(testFile, padding);
-        }
-    }
-
-
     private void readUsingFixedLengthDataModes(File testFile, int padding, int numLongsWritten) throws IOException {
         // test read parity between FixedLengthElementArray and EncodedLongBuffer for-
         //      aligned long,
         //      unaligned long,
         //      aligned and at spine boundary long,
         //      unaligned and at spine boundary long,
+        //      partly out of bounds long but queried bits are within bounds
+        //      partly out of bounds long and queried bits are out of bounds
         //      out of bounds long
-        //      overlapping with out of bounds long
 
         HollowBlobInput hbi1 = HollowBlobInput.serial(new FileInputStream(testFile));
         hbi1.skipBytes(padding + 16);        // skip past the first 16 bytes of test data written to file
@@ -67,11 +54,36 @@ public class BlobByteBufferTest {
         hbi2.skipBytes(padding  + 16);       // skip past the first 16 bytes of test data written to file
         EncodedLongBuffer testLongBuffer = EncodedLongBuffer.newFrom(hbi2, numLongsWritten);
 
-        // read each values starting at each bit index and for bit length 1 to 60
+        // read each values starting at each bit index
         for (int i = 0; i< (numLongsWritten - 1) * Long.BYTES * 8; i ++) {
+
+            // for bit length 1 to 60
             for (int j = 1; j < 61; j ++) {
                 assertEquals(testLongArray.getElementValue(i, j), testLongBuffer.getElementValue(i, j));
             }
+
+            // for bit length 1 to 64
+            for (int j = 1; j <= 64; j ++) {
+                assertEquals(testLongArray.getLargeElementValue(i, j), testLongBuffer.getLargeElementValue(i, j));
+            }
+        }
+
+        // partly out of bounds long but queried bits are within bounds
+        //
+        // get a 15-bit element that is in the last 15 bits of the buffer, but it would enforce an 8-byte long read
+        // starting at the last 2 bytes in buffer but extending past the end of the buffer
+        assertEquals(testLongArray.getElementValue(numLongsWritten * Long.BYTES * 8 - 2 * 8, 15),
+                     testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * 8 - 2 * 8, 15));
+
+        // partly out of bounds long and queried bits are out of bounds
+        // get a 16-bit element that is in the last 15 bits of the buffer
+        try {
+            testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * 8 - 2 * 8, 16);
+            Assert.fail();
+        } catch (IllegalStateException e) {
+            // this is expected
+        } catch (Exception e) {
+            Assert.fail();
         }
 
         // out of bounds long
@@ -83,15 +95,18 @@ public class BlobByteBufferTest {
         } catch (Exception e) {
             Assert.fail();
         }
+    }
 
-        // overlapping with out of bounds long
-        try {
-            testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * 8, 60);
-            Assert.fail();
-        } catch (IllegalStateException e) {
-            // this is expected
-        } catch (Exception e) {
-            Assert.fail();
+    @Test
+    public void testParityBetweenVariableLengthDataModes() throws IOException {
+        // Add some padding bytes at the beginning of file so that longs are written at unaligned locations
+
+        // adding padding writes the test longs at a non-aligned byte
+        for (int padding = 0; padding < Long.BYTES; padding ++) {
+            File testFile = writeTestFileUnaligned("/variable_length_data_modes", padding);
+            testFile.deleteOnExit();
+
+            readUsingVariableLengthDataModes(testFile, padding);
         }
     }
 
@@ -153,7 +168,7 @@ public class BlobByteBufferTest {
                 789123456000L, 891234567000L,   // bytes 64-79
                 912345678000L, 123456789000L,   // bytes 80-95
                 234567891000L, 345678912000L,   // bytes 96-111
-                456789123000L, 567891234000L,   // bytes 112-127
+                Long.MAX_VALUE, Long.MAX_VALUE,   // bytes 112-127
         };
 
         for (int i=0; i<values.length; i++) {

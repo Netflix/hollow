@@ -25,13 +25,14 @@ import java.nio.channels.FileChannel;
  */
 public final class BlobByteBuffer {
 
-    public static final int MAX_SINGLE_BUFFER_CAPACITY = 1 << 30; // largest, positive power-of-two int
+    public static final int MAX_SINGLE_BUFFER_CAPACITY = 1 << 30;   // largest, positive power-of-two int
 
     private final ByteBuffer[] spine;   // array of MappedByteBuffers
-    private final long capacity;
+    private final long capacity;        // in bytes
     private final int shift;
     private final int mask;
-    private long position;  // within index 0 to capacity-1 in the underlying ByteBuffer
+
+    private long position;              // within index 0 to capacity-1 in the underlying ByteBuffer
 
     private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine) {
         this(capacity, shift, mask, spine, 0);
@@ -137,12 +138,19 @@ public final class BlobByteBuffer {
      * @throws IndexOutOfBoundsException if index out of bounds of the backing buffer
      */
     public byte getByte(long index) throws BufferUnderflowException {
-        if (index >= capacity) {  // defensive
-            throw new IllegalStateException();
+        if (index < capacity) {
+            int spineIndex = (int)(index >>> (shift));
+            int bufferIndex = (int)(index & mask);
+            return spine[spineIndex].get(bufferIndex);
         }
-        int spineIndex = (int)(index >>> (shift));
-        int bufferIndex = (int)(index & mask);
-        return spine[spineIndex].get(bufferIndex);
+        else {
+            assert(index < capacity + Long.BYTES);
+            // this situation occurs when read for bits near the end of the buffer requires reading a long value that
+            // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case,
+            // return 0 for (index >= capacity - Long.BYTES && index < capacity )
+            // these zero bytes will be discarded anyway when the returned long value is shifted to get the queried bits
+            return (byte) 0;
+        }
     }
 
     /**
@@ -151,10 +159,6 @@ public final class BlobByteBuffer {
      * @returns long value
      */
     public long getLong(long startByteIndex) throws BufferUnderflowException {
-
-        int bufferByteIndex = (int)(startByteIndex & mask);
-        if (bufferByteIndex + Long.BYTES > this.capacity)  // defensive
-            throw new IllegalStateException();
 
         int alignmentOffset = (int)(startByteIndex - this.position()) % Long.BYTES;
         long nextAlignedPos = startByteIndex - alignmentOffset + Long.BYTES;

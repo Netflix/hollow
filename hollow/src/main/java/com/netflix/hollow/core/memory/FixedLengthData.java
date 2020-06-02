@@ -16,11 +16,8 @@ import java.io.IOException;
  * the value 100100 in binary, or 36 in base 10, would be returned. </p>
  * <p>
  *     As a result there two ways to obtain an element value from the bit string at a given bit index.  The first,
- * using {@link #getElementValue(long, int)} or {@link #getElementValue(long, int, long)}, leverages unsafe unaligned
- * (or misaligned) memory reads of {@code long} values from {@code long[]} array segments at byte index offsets within
- * the backing arrays or ByteBuffers. The second, using {@link #getLargeElementValue(long, int)} or
- * {@link #getLargeElementValue(long, int, long)}, leverages safe access to array segments but requires more work to
- * compose an element value from bits that cover two underlying elements in the backing long[] array segments or ByteBuffer.
+ * using {@link #getElementValue} for values less than 61 bits in length and the second, using
+ * {@link #getLargeElementValue} that is recommended for values of upto 64 bits in length.
  * </p>
  */
 public interface FixedLengthData {

@@ -19,7 +19,6 @@ package com.netflix.hollow.core.memory;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import sun.misc.Unsafe;
@@ -65,10 +64,10 @@ public class SegmentedLongArray {
     }
 
     /**
-     * Set the byte at the given index to the specified value
+     * Set the long at the given index to the specified value
      *
-     * @param index the index
-     * @param value the byte value
+     * @param index the index (eg. the long at index 0 occupies bytes 0-7, long at index 1 occupies bytes 8-15, etc.)
+     * @param value the long value
      */
     public void set(long index, long value) {
         int segmentIndex = (int)(index >> log2OfSegmentSize);
@@ -81,33 +80,16 @@ public class SegmentedLongArray {
     }
 
     /**
-     * Get the value of the byte at the specified index.
+     * Get the value of the long at the specified index.
      *
-     * @param index the index
-     * @return the byte value
+     * @param index the index (eg. the long at index 0 occupies bytes 0-7, long at index 1 occupies bytes 8-15, etc.)
+     * @return the long value
      */
     public long get(long index) {
         int segmentIndex = (int)(index >>> log2OfSegmentSize);
         long ret = segments[segmentIndex][(int)(index & bitmask)];
 
         return ret;
-    }
-
-    public static String ppBytesInLong(long l) {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(bos);
-            dos.writeLong(l);
-            dos.flush();
-            byte[] nativeLongBytes = bos.toByteArray();
-            String bytesChosenForUnalignedRead = "";
-            for (byte b : nativeLongBytes) {
-                bytesChosenForUnalignedRead += b + " ";
-            }
-            return bytesChosenForUnalignedRead;
-        } catch (IOException e) {
-            throw new IllegalStateException();
-        }
     }
 
     public void fill(long value) {
