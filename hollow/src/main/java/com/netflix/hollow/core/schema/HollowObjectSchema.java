@@ -241,6 +241,7 @@ public class HollowObjectSchema extends HollowSchema {
         }
 
         HollowObjectSchema filteredSchema = new HollowObjectSchema(getName(), includedFields, primaryKey);
+
         for(int i=0;i<numFields();i++) {
             String field = getFieldName(i);
             if(filter.includes(type, field))

@@ -72,13 +72,13 @@ public class BlobByteBufferTest {
         //
         // get a 15-bit element that is in the last 15 bits of the buffer, but it would enforce an 8-byte long read
         // starting at the last 2 bytes in buffer but extending past the end of the buffer
-        assertEquals(testLongArray.getElementValue(numLongsWritten * Long.BYTES * 8 - 2 * 8, 15),
-                     testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * 8 - 2 * 8, 15));
+        assertEquals(testLongArray.getElementValue(numLongsWritten * Long.BYTES * 8 - 2 * 8, 16),
+                     testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * 8 - 2 * 8, 16));
 
         // partly out of bounds long and queried bits are out of bounds
         // get a 16-bit element that is in the last 15 bits of the buffer
         try {
-            testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * 8 - 2 * 8, 16);
+            testLongBuffer.getElementValue(numLongsWritten * Long.BYTES * 8 - 2 * 8, 17);
             Assert.fail();
         } catch (IllegalStateException e) {
             // this is expected

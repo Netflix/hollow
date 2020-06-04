@@ -90,33 +90,11 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
             set(whichLong + 1, get(whichLong + 1) | (value >>> bitsRemaining));
     }
 
-    /**
-     * Gets an element value, comprising of {@code bitsPerElement} bits, at the given
-     * bit {@code index}.
-     *
-     * @param index the bit index
-     * @param bitsPerElement bits per element, must be less than 61 otherwise
-     * the result is undefined
-     * @return the element value
-     */
     @Override
     public long getElementValue(long index, int bitsPerElement) {
         return getElementValue(index, bitsPerElement, ((1L << bitsPerElement) - 1));
     }
 
-    /**
-     * Gets a masked element value, comprising of {@code bitsPerElement} bits, at the given
-     * bit {@code index}.
-     *
-     * @param index the bit index
-     * @param bitsPerElement bits per element, must be less than 61 otherwise
-     * the result is undefined
-     * @param mask the mask to apply to an element value before it is returned.
-     * The mask should be less than or equal to {@code (1L << bitsPerElement) - 1} to
-     * guarantee that one or more (possibly) partial element values occurring
-     * before and after the desired element value are not included in the returned value.
-     * @return the masked element value
-     */
     @Override
     public long getElementValue(long index, int bitsPerElement, long mask) {
         long whichByte = index >>> 3;
@@ -132,38 +110,12 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
         return l & mask;
     }
 
-    /**
-     * Gets a large element value, comprising of {@code bitsPerElement} bits, at the given
-     * bit {@code index}.
-     * <p>
-     * This method should be utilized if the {@code bitsPerElement} may exceed {@code 60} bits,
-     * otherwise the method {@link #getLargeElementValue(long, int)} can be utilized instead.
-     *
-     * @param index the bit index
-     * @param bitsPerElement bits per element, may be greater than 60
-     * @return the large element value
-     */
     @Override
     public long getLargeElementValue(long index, int bitsPerElement) {
         long mask = bitsPerElement == 64 ? -1 : ((1L << bitsPerElement) - 1);
         return getLargeElementValue(index, bitsPerElement, mask);
     }
 
-    /**
-     * Gets a masked large element value, comprising of {@code bitsPerElement} bits, at the given
-     * bit {@code index}.
-     * <p>
-     * This method should be utilized if the {@code bitsPerElement} may exceed {@code 60} bits,
-     * otherwise the method {@link #getLargeElementValue(long, int, long)} can be utilized instead.
-     *
-     * @param index the bit index
-     * @param bitsPerElement bits per element, may be greater than 60
-     * @param mask the mask to apply to an element value before it is returned.
-     * The mask should be less than or equal to {@code (1L << bitsPerElement) - 1} to
-     * guarantee that one or more (possibly) partial element values occurring
-     * before and after the desired element value are not included in the returned value.
-     * @return the masked large element value
-     */
     @Override
     public long getLargeElementValue(long index, int bitsPerElement, long mask) {
         long whichLong = index >>> 6;

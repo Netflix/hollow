@@ -17,10 +17,10 @@
 package com.netflix.hollow.core.read.engine.object;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
-import com.netflix.hollow.core.memory.FixedLengthDataMode;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.VariableLengthData;
-import com.netflix.hollow.core.memory.VariableLengthDataMode;
+import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
@@ -90,7 +90,7 @@ public class HollowObjectTypeDataElements {
 
         readFieldStatistics(in, unfilteredSchema);
 
-        fixedLengthData = FixedLengthDataMode.newFrom(in, memoryMode, memoryRecycler);
+        fixedLengthData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
         removeExcludedFieldsFromFixedLengthData();
 
         readVarLengthData(in, unfilteredSchema);
@@ -118,7 +118,7 @@ public class HollowObjectTypeDataElements {
                 }
             }
 
-            FixedLengthDataMode.destroy(fixedLengthData, memoryRecycler);
+            FixedLengthDataFactory.destroy(fixedLengthData, memoryRecycler);
             memoryRecycler.swap();
             fixedLengthData = filteredData;
         }
@@ -156,7 +156,7 @@ public class HollowObjectTypeDataElements {
 
             if(schema.getPosition(unfilteredSchema.getFieldName(i)) != -1) {
                 if(numBytesInVarLengthData != 0) {
-                    varLengthData[filteredFieldIdx] = VariableLengthDataMode.get(memoryMode, memoryRecycler);
+                    varLengthData[filteredFieldIdx] = VariableLengthDataFactory.get(memoryMode, memoryRecycler);
                     varLengthData[filteredFieldIdx].loadFrom(in, numBytesInVarLengthData);
                 }
                 filteredFieldIdx++;
@@ -204,10 +204,10 @@ public class HollowObjectTypeDataElements {
     }
 
     public void destroy() {
-        FixedLengthDataMode.destroy(fixedLengthData, memoryRecycler);
+        FixedLengthDataFactory.destroy(fixedLengthData, memoryRecycler);
         for(int i=0;i<varLengthData.length;i++) {
             if(varLengthData[i] != null)
-                VariableLengthDataMode.destroy(varLengthData[i]);
+                VariableLengthDataFactory.destroy(varLengthData[i]);
         }
     }
 

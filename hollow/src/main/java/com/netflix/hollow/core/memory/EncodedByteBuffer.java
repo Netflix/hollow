@@ -20,18 +20,21 @@ import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 
+/**
+ * {@ccode BlobByteBuffer} based implementation of variable length byte data that only supports read.
+ */
 public class EncodedByteBuffer implements VariableLengthData {
 
     private BlobByteBuffer bufferView;
-    private long maxIndex;
+    private long length;
 
     public EncodedByteBuffer() {
-        this.maxIndex = -1;
+        this.length = 0;
     }
 
     @Override
     public byte get(long index) {
-        if (index > this.maxIndex) {
+        if (index >= this.length) {
             throw new IllegalStateException();
         }
 
@@ -47,7 +50,7 @@ public class EncodedByteBuffer implements VariableLengthData {
     @Override
     public void loadFrom(HollowBlobInput in, long length) throws IOException {
         BlobByteBuffer buffer = in.getBuffer();
-        this.maxIndex = length - 1;
+        this.length = length;
         buffer.position(in.getFilePointer());
         this.bufferView = buffer.duplicate();
         buffer.position(buffer.position() + length);
@@ -66,6 +69,6 @@ public class EncodedByteBuffer implements VariableLengthData {
 
     @Override
     public long size() {
-        return maxIndex + 1;
+        return length;
     }
 }

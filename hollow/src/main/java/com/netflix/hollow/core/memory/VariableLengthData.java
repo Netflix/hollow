@@ -3,6 +3,11 @@ package com.netflix.hollow.core.memory;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 
+/**
+ * Conceptually this can be thought of as a single byte array or buffer of undefined length.  It will grow automatically
+ * when a byte is written to an index greater than the currently allocated array/buffer.
+ *  *
+ */
 public interface VariableLengthData extends ByteData {
 
     /**

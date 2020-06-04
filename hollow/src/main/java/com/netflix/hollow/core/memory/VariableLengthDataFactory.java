@@ -3,9 +3,9 @@ package com.netflix.hollow.core.memory;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.util.logging.Logger;
 
-public class VariableLengthDataMode {
+public class VariableLengthDataFactory {
 
-    private static final Logger LOG = Logger.getLogger(VariableLengthDataMode.class.getName());
+    private static final Logger LOG = Logger.getLogger(VariableLengthDataFactory.class.getName());
 
     public static VariableLengthData get(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
 

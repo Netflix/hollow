@@ -7,11 +7,11 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-public class FixedLengthDataMode {
+public class FixedLengthDataFactory {
 
-    private static final Logger LOG = Logger.getLogger(FixedLengthDataMode.class.getName());
+    private static final Logger LOG = Logger.getLogger(FixedLengthDataFactory.class.getName());
 
-    public static FixedLengthData newFrom(HollowBlobInput in, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public static FixedLengthData get(HollowBlobInput in, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) throws IOException {
 
         if (memoryMode.equals(MemoryMode.ON_HEAP)) {
             return FixedLengthElementArray.newFrom(in, memoryRecycler);

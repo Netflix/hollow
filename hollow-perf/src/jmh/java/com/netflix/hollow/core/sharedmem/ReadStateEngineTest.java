@@ -92,5 +92,7 @@ public class ReadStateEngineTest {
 }
 
 /***
- * Flattening SegmentedLong and SegmentedByte arrays to BlobByteBuffers, averaging 235 ms / op as opposed to 150ms ms /op with vanilla implementation
+ * Flattening SegmentedLong and SegmentedByte arrays to BlobByteBuffers, averaging (with optimization) 145 ms / op as opposed to 150ms ms /op with vanilla implementation
+ *
+ * ReadStateEngineTest.scan  1000  avgt  500  145.031 ± 0.620  ms/op
  */

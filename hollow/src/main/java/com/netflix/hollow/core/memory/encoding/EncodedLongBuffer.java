@@ -49,130 +49,6 @@ public class EncodedLongBuffer implements FixedLengthData {
     public EncodedLongBuffer() {}
 
     /**
-     * Gets an element value, comprising of {@code bitsPerElement} bits, at the given
-     * bit {@code index}. {@code bitsPerElement} should be less than 61 bits.
-     *
-     * @param index the bit index
-     * @param bitsPerElement bits per element, must be less than 61 otherwise
-     * the result is undefined
-     * @return the element value
-     */
-    @Override
-    public long getElementValue(long index, int bitsPerElement) {
-        return getElementValue(index, bitsPerElement, ((1L << bitsPerElement) - 1));
-    }
-
-    /**
-     * Gets a masked element value, comprising of {@code bitsPerElement} bits, at the given
-     * bit {@code index}. {@code bitsPerElement} should be less than 61 bits.
-     *
-     * @param index the bit index
-     * @param bitsPerElement bits per element, must be less than 61 otherwise
-     * the result is undefined
-     * @param mask the mask to apply to an element value before it is returned.
-     * The mask should be less than or equal to {@code (1L << bitsPerElement) - 1} to
-     * guarantee that one or more (possibly) partial element values occurring
-     * before and after the desired element value are not included in the returned value.
-     * @return the masked element value
-     */
-    @Override
-    public long getElementValue(long index, int bitsPerElement, long mask) {
-
-        long whichByte = index >>> 3;
-        int whichBit = (int) (index & 0x07);
-
-        if (whichByte + ceil(bitsPerElement/8) > this.maxByteIndex + 1) {
-            throw new IllegalStateException();
-        }
-
-        long longVal = this.bufferView.getLong(this.bufferView.position() + whichByte);
-        long l =  longVal >>> whichBit;
-        return l & mask;
-    }
-
-    /**
-     * Gets a large element value, comprising of {@code bitsPerElement} bits, at the given
-     * bit {@code index}.
-     * <p>
-     * This method should be utilized if the {@code bitsPerElement} may exceed {@code 60} bits,
-     * otherwise the method {@link #getLargeElementValue(long, int)} can be utilized instead.
-     *
-     * @param index the bit index
-     * @param bitsPerElement bits per element, may be greater than 60
-     * @return the large element value
-     */
-    @Override
-    public long getLargeElementValue(long index, int bitsPerElement) {
-        long mask = bitsPerElement == 64 ? -1 : ((1L << bitsPerElement) - 1);
-        return getLargeElementValue(index, bitsPerElement, mask);
-    }
-
-    /**
-     * Gets a masked large element value, comprising of {@code bitsPerElement} bits, at the given
-     * bit {@code index}.
-     * <p>
-     * This method should be utilized if the {@code bitsPerElement} may exceed {@code 60} bits,
-     * otherwise the method {@link #getLargeElementValue(long, int, long)} can be utilized instead.
-     *
-     * @param index the bit index
-     * @param bitsPerElement bits per element, may be greater than 60
-     * @param mask the mask to apply to an element value before it is returned.
-     * The mask should be less than or equal to {@code (1L << bitsPerElement) - 1} to
-     * guarantee that one or more (possibly) partial element values occurring
-     * before and after the desired element value are not included in the returned value.
-     * @return the masked large element value
-     */
-    @Override
-    public long getLargeElementValue(long index, int bitsPerElement, long mask) {
-
-        long whichLong = index >>> 6;
-        int whichBit = (int) (index & 0x3F);
-
-        long l = this.bufferView.getLong(bufferView.position() + whichLong * Long.BYTES) >>> whichBit;
-
-        int bitsRemaining = 64 - whichBit;
-
-        if (bitsRemaining < bitsPerElement) {
-            whichLong++;
-            l |= this.bufferView.getLong(bufferView.position() + whichLong * Long.BYTES) << bitsRemaining;
-        }
-
-        return l & mask;
-    }
-
-    private void loadFrom(HollowBlobInput in, long numLongs) throws IOException {
-        BlobByteBuffer buffer = in.getBuffer();
-        if(numLongs == 0)
-            return;
-
-        this.maxByteIndex = (numLongs * Long.BYTES) - 1;
-        buffer.position(in.getFilePointer());
-        this.bufferView = buffer.duplicate();
-        buffer.position(buffer.position() + (numLongs * Long.BYTES));
-        in.seek(in.getFilePointer() + (numLongs  * Long.BYTES));
-    }
-
-    @Override
-    public void setElementValue(long index, int bitsPerElement, long value) {
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
-    }
-
-    @Override
-    public void copyBits(FixedLengthData copyFrom, long sourceStartBit, long destStartBit, long numBits){
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
-    }
-
-    @Override
-    public void incrementMany(long startBit, long increment, long bitsBetweenIncrements, int numIncrements){
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
-    }
-
-    @Override
-    public void clearElementValue(long index, int bitsPerElement) {
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
-    }
-
-    /**
      * Returns a new EncodedLongBuffer from deserializing the given input. The value of the first variable length integer
      * in the input indicates how many long values are to then be read from the input.
      *
@@ -194,5 +70,81 @@ public class EncodedLongBuffer implements FixedLengthData {
         EncodedLongBuffer buf = new EncodedLongBuffer();
         buf.loadFrom(in, numLongs);
         return buf;
+    }
+
+    private void loadFrom(HollowBlobInput in, long numLongs) throws IOException {
+        BlobByteBuffer buffer = in.getBuffer();
+        if(numLongs == 0)
+            return;
+
+        this.maxByteIndex = (numLongs * Long.BYTES) - 1;
+        buffer.position(in.getFilePointer());
+        this.bufferView = buffer.duplicate();
+        buffer.position(buffer.position() + (numLongs * Long.BYTES));
+        in.seek(in.getFilePointer() + (numLongs  * Long.BYTES));
+    }
+
+    @Override
+    public long getElementValue(long index, int bitsPerElement) {
+        return getElementValue(index, bitsPerElement, ((1L << bitsPerElement) - 1));
+    }
+
+    @Override
+    public long getElementValue(long index, int bitsPerElement, long mask) {
+
+        long whichByte = index >>> 3;
+        int whichBit = (int) (index & 0x07);
+
+        if (whichByte + ceil((float) bitsPerElement/8) > this.maxByteIndex + 1) {
+            throw new IllegalStateException();
+        }
+
+        long longVal = this.bufferView.getLong(this.bufferView.position() + whichByte);
+        long l =  longVal >>> whichBit;
+        return l & mask;
+    }
+
+    @Override
+    public long getLargeElementValue(long index, int bitsPerElement) {
+        long mask = bitsPerElement == 64 ? -1 : ((1L << bitsPerElement) - 1);
+        return getLargeElementValue(index, bitsPerElement, mask);
+    }
+
+    @Override
+    public long getLargeElementValue(long index, int bitsPerElement, long mask) {
+
+        long whichLong = index >>> 6;
+        int whichBit = (int) (index & 0x3F);
+
+        long l = this.bufferView.getLong(bufferView.position() + whichLong * Long.BYTES) >>> whichBit;
+
+        int bitsRemaining = 64 - whichBit;
+
+        if (bitsRemaining < bitsPerElement) {
+            whichLong++;
+            l |= this.bufferView.getLong(bufferView.position() + whichLong * Long.BYTES) << bitsRemaining;
+        }
+
+        return l & mask;
+    }
+
+    @Override
+    public void setElementValue(long index, int bitsPerElement, long value) {
+        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+    }
+
+    @Override
+    public void copyBits(FixedLengthData copyFrom, long sourceStartBit, long destStartBit, long numBits){
+        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+    }
+
+    @Override
+    public void incrementMany(long startBit, long increment, long bitsBetweenIncrements, int numIncrements){
+        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+    }
+
+    @Override
+    public void clearElementValue(long index, int bitsPerElement) {
+        throw new UnsupportedOperationException("Not supported in shared-memory mode");
     }
 }

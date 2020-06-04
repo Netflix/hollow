@@ -17,7 +17,7 @@
 package com.netflix.hollow.core.read.engine.map;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
-import com.netflix.hollow.core.memory.FixedLengthDataMode;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
@@ -87,8 +87,8 @@ public class HollowMapTypeDataElements {
         emptyBucketKeyValue = (1 << bitsPerKeyElement) - 1;
         totalNumberOfBuckets = VarInt.readVLong(in);
 
-        mapPointerAndSizeData = FixedLengthDataMode.newFrom(in, memoryMode, memoryRecycler);
-        entryData = FixedLengthDataMode.newFrom(in, memoryMode, memoryRecycler);
+        mapPointerAndSizeData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
+        entryData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
 
         // debug.append("HollowMapTypeDataElements mapPointerAndSizeData= \n");
         // mapPointerAndSizeData.pp(debug);
@@ -128,8 +128,8 @@ public class HollowMapTypeDataElements {
     }
 
     public void destroy() {
-        FixedLengthDataMode.destroy(mapPointerAndSizeData, memoryRecycler);
-        FixedLengthDataMode.destroy(entryData, memoryRecycler);
+        FixedLengthDataFactory.destroy(mapPointerAndSizeData, memoryRecycler);
+        FixedLengthDataFactory.destroy(entryData, memoryRecycler);
     }
 
 }
