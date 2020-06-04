@@ -15,7 +15,10 @@ import java.nio.file.Paths;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class BlobByteBufferTest {
+/**
+ * Tests parity between on-heap and shared-memory consumer mode by reading test data from on-heap arrays vs. off-heap buffers
+ */
+public class OnHeapArrayVsOffHeapBufferAcceptanceTest {
 
     private static final String SCRATCH_DIR = System.getProperty("java.io.tmpdir");
     private static final int TEST_SINGLE_BUFFER_CAPACITY_BYTES =  16;
