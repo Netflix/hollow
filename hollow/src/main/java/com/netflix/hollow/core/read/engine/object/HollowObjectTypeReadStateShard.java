@@ -34,8 +34,6 @@ import java.util.List;
 
 class HollowObjectTypeReadStateShard {
 
-    int count = 0;
-
     private volatile HollowObjectTypeDataElements currentDataVolatile;
 
     private final HollowObjectSchema schema;
@@ -163,7 +161,9 @@ class HollowObjectTypeReadStateShard {
     private long readFixedLengthFieldValue(HollowObjectTypeDataElements currentData, int ordinal, int fieldIndex) {
         long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
         int numBitsForField = currentData.bitsPerField[fieldIndex];
+
         long value = currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField);
+
         return value;
     }
 
