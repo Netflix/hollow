@@ -79,12 +79,6 @@ public class HollowListTypeDataElements {
 
         listPointerData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
         elementData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
-
-        // debug.append("HollowListTypeDataElements listPointerData= \n");
-        // listPointerData.pp(debug);
-        // debug.append("HollowListTypeDataElements elementData= \n");
-        // elementData.pp(debug);
-        // debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowListTypeDataElements\n");
     }
 
     static void discardFromStream(HollowBlobInput in, int numShards, boolean isDelta) throws IOException {

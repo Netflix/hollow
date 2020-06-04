@@ -89,12 +89,6 @@ public class HollowMapTypeDataElements {
 
         mapPointerAndSizeData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
         entryData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
-
-        // debug.append("HollowMapTypeDataElements mapPointerAndSizeData= \n");
-        // mapPointerAndSizeData.pp(debug);
-        // debug.append("HollowMapTypeDataElements entryData= \n");
-        // entryData.pp(debug);
-        // debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowMapTypeDataElements\n");
     }
 
     static void discardFromInput(HollowBlobInput in, int numShards, boolean isDelta) throws IOException {

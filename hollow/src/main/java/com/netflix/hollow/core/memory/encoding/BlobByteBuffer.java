@@ -21,7 +21,6 @@ import java.nio.channels.FileChannel;
  *
  * @author Sunjeet Singh
  *         Tim Taylor
- *
  */
 public final class BlobByteBuffer {
 

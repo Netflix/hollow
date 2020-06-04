@@ -86,12 +86,6 @@ public class HollowSetTypeDataElements {
 
         setPointerAndSizeData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
         elementData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
-
-        // debug.append("HollowSetTypeDataElements setPointerAndSizeData= \n");
-        // setPointerAndSizeData.pp(debug);
-        // debug.append("HollowSetTypeDataElements elementData= \n");
-        // elementData.pp(debug);
-        // debug.append("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * end HollowSetTypeDataElements\n");
     }
 
     static void discardFromStream(HollowBlobInput in, int numShards, boolean isDelta) throws IOException {

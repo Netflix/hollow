@@ -26,15 +26,15 @@ import java.io.IOException;
 public class EncodedByteBuffer implements VariableLengthData {
 
     private BlobByteBuffer bufferView;
-    private long length;
+    private long size;
 
     public EncodedByteBuffer() {
-        this.length = 0;
+        this.size = 0;
     }
 
     @Override
     public byte get(long index) {
-        if (index >= this.length) {
+        if (index >= this.size) {
             throw new IllegalStateException();
         }
 
@@ -50,7 +50,7 @@ public class EncodedByteBuffer implements VariableLengthData {
     @Override
     public void loadFrom(HollowBlobInput in, long length) throws IOException {
         BlobByteBuffer buffer = in.getBuffer();
-        this.length = length;
+        this.size = length;
         buffer.position(in.getFilePointer());
         this.bufferView = buffer.duplicate();
         buffer.position(buffer.position() + length);
@@ -69,6 +69,6 @@ public class EncodedByteBuffer implements VariableLengthData {
 
     @Override
     public long size() {
-        return length;
+        return size;
     }
 }
