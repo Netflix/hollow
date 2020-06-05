@@ -14,12 +14,14 @@
  *     limitations under the License.
 *#
 
-<p><b>Approx. Total Heap Footprint:</b> $totalHeapFootprint</p>
+<p><b>Approx. Total Heap Footprint:</b> $totalHeapFootprint (Holes: $totalHoleFootprint)</p>
 
 <table border="1">
     <tr>
         <th><a href="$basePath/home?sort=typeName">Data Type</a></th>
         <th><a href="$basePath/home?sort=numRecords">Records</a></th>
+        <th><a href="$basePath/home?sort=numHoles">Holes</a></th>
+        <th><a href="$basePath/home?sort=holeSize">Hole Footprint</a></th>
 		<th><a href="$basePath/home?sort=heapSize">Heap Footprint</a></th>
 		<th><a href="$basePath/home?sort=primaryKey">Primary Key</a></th>
 		<th><a href="$basePath/home?sort=primaryKey">Schema</a></th>
@@ -29,6 +31,8 @@
         <tr>
             <td><a href="$basePath/type?type=$esc.url($typeOverview.getTypeName())">$esc.html($typeOverview.getTypeName())</a></th>
             <td>$typeOverview.getNumRecords()</td>
+            <td>$typeOverview.getNumHoles()</td>
+            <td>$typeOverview.getApproxHoleFootprint()</td>
             <td>$typeOverview.getApproxHeapFootprint()</td>
             <td><pre>$esc.html($typeOverview.getPrimaryKey())</pre></td>
             <td><pre>$esc.html($typeOverview.getSchema())</pre></td>
