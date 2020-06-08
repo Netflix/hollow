@@ -26,6 +26,7 @@ import com.netflix.hollow.explorer.ui.model.TypeOverview;
 import com.netflix.hollow.ui.HollowUISession;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -47,12 +48,15 @@ public class ShowAllTypesPage extends HollowExplorerPage {
         
         for(HollowTypeReadState typeState : ui.getStateEngine().getTypeStates()) {
             String typeName = typeState.getSchema().getName();
-            int numRecords = typeState.getPopulatedOrdinals() == null ? Integer.MIN_VALUE : typeState.getPopulatedOrdinals().cardinality();
+            BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
+            int numRecords = populatedOrdinals == null ? Integer.MIN_VALUE : populatedOrdinals.cardinality();
+            int numHoles = populatedOrdinals == null ? Integer.MIN_VALUE : populatedOrdinals.length()-populatedOrdinals.cardinality();
+            long approxHoleFootprint = typeState.getApproximateHoleCostInBytes();
             PrimaryKey primaryKey = typeState.getSchema().getSchemaType() == SchemaType.OBJECT ? ((HollowObjectSchema)typeState.getSchema()).getPrimaryKey() : null;
             long approxHeapFootprint = typeState.getApproximateHeapFootprintInBytes();
             HollowSchema schema = typeState.getSchema();
             
-            typeOverviews.add(new TypeOverview(typeName, numRecords, approxHeapFootprint, primaryKey, schema));
+            typeOverviews.add(new TypeOverview(typeName, numRecords, numHoles, approxHoleFootprint, approxHeapFootprint, primaryKey, schema));
         }
 
         switch(sort) {
@@ -70,6 +74,12 @@ public class ShowAllTypesPage extends HollowExplorerPage {
                 }
             });
             break;
+            case "numHoles":
+                typeOverviews.sort((o1, o2) -> Integer.compare(o2.getNumHolesInt(), o1.getNumHolesInt()));
+                break;
+            case "holeSize":
+                typeOverviews.sort((o1, o2) -> Long.compare(o2.getApproxHoleFootprintLong(), o1.getApproxHoleFootprintLong()));
+                break;
         case "heapSize":
             Collections.sort(typeOverviews, new Comparator<TypeOverview>() {
                 public int compare(TypeOverview o1, TypeOverview o2) {
@@ -89,7 +99,8 @@ public class ShowAllTypesPage extends HollowExplorerPage {
                 }
             });
         }
-        
+
+        ctx.put("totalHoleFootprint", totalApproximateHoleFootprint(typeOverviews));
         ctx.put("totalHeapFootprint", totalApproximateHeapFootprint(typeOverviews));
         ctx.put("typeOverviews", typeOverviews);
     }
@@ -104,5 +115,12 @@ public class ShowAllTypesPage extends HollowExplorerPage {
         for(TypeOverview type : allTypes)
             totalHeapFootprint += type.getApproxHeapFootprintLong();
         return TypeOverview.heapFootprintDisplayString(totalHeapFootprint);
+    }
+
+    private String totalApproximateHoleFootprint(List<TypeOverview> allTypes) {
+        long totalFootprint = 0;
+        for(TypeOverview type : allTypes)
+            totalFootprint += type.getApproxHoleFootprintLong();
+        return TypeOverview.heapFootprintDisplayString(totalFootprint);
     }
 }

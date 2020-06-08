@@ -26,13 +26,17 @@ public class TypeOverview {
 
     private final String typeName;
     private final int numRecords;
+    private final int numHoles;
+    private final long approxHoleFootprint;
     private final long approxHeapFootprint;
     private final PrimaryKey primaryKey;
     private final HollowSchema schema;
     
-    public TypeOverview(String typeName, int numRecords, long approxHeapFootprint, PrimaryKey primaryKey, HollowSchema schema) {
+    public TypeOverview(String typeName, int numRecords, int numHoles, long approxHoleFootprint,  long approxHeapFootprint, PrimaryKey primaryKey, HollowSchema schema) {
         this.typeName = typeName;
         this.numRecords = numRecords;
+        this.numHoles = numHoles;
+        this.approxHoleFootprint = approxHoleFootprint;
         this.approxHeapFootprint = approxHeapFootprint;
         this.primaryKey = primaryKey;
         this.schema = schema;
@@ -49,7 +53,13 @@ public class TypeOverview {
     public String getNumRecords() {
         return NumberFormat.getIntegerInstance().format(numRecords);
     }
-    
+
+    public int getNumHolesInt() { return numHoles; }
+    public String getNumHoles() { return NumberFormat.getIntegerInstance().format(numHoles); }
+
+    public long getApproxHoleFootprintLong() { return approxHoleFootprint; }
+    public String getApproxHoleFootprint() {  return heapFootprintDisplayString(approxHoleFootprint); }
+
     public long getApproxHeapFootprintLong() {
         return approxHeapFootprint;
     }
