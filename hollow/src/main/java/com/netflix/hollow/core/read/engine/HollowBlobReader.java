@@ -17,7 +17,6 @@
 package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.core.HollowBlobHeader;
-import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
@@ -47,7 +46,6 @@ public class HollowBlobReader {
 
     private final Logger log = Logger.getLogger(HollowBlobReader.class.getName());
     private final HollowReadStateEngine stateEngine;
-    private final MemoryMode memoryMode;
     private final HollowBlobHeaderReader headerReader;
 
     public HollowBlobReader(HollowReadStateEngine stateEngine) {
@@ -55,17 +53,8 @@ public class HollowBlobReader {
     }
 
     public HollowBlobReader(HollowReadStateEngine stateEngine, HollowBlobHeaderReader headerReader) {
-        this(stateEngine, headerReader, MemoryMode.ON_HEAP);
-    }
-
-    public HollowBlobReader(HollowReadStateEngine stateEngine, MemoryMode memoryMode) {
-        this(stateEngine, new HollowBlobHeaderReader(), memoryMode);
-    }
-
-    public HollowBlobReader(HollowReadStateEngine stateEngine, HollowBlobHeaderReader headerReader, MemoryMode memoryMode) {
         this.stateEngine = stateEngine;
         this.headerReader = headerReader;
-        this.memoryMode = memoryMode;
     }
 
     /**
@@ -143,7 +132,7 @@ public class HollowBlobReader {
 
         Collection<String> typeNames = new TreeSet<>();
         for(int i=0;i<numStates;i++) {
-            String typeName = readTypeStateSnapshot(in, header, filter);
+            String typeName = readTypeStateSnapshot(in, filter);
             typeNames.add(typeName);
         }
 
@@ -193,7 +182,7 @@ public class HollowBlobReader {
 
         Collection<String> typeNames = new TreeSet<String>();
         for(int i=0;i<numStates;i++) {
-            String typeName = readTypeStateDelta(in, header);
+            String typeName = readTypeStateDelta(in);
             typeNames.add(typeName);
             stateEngine.getMemoryRecycler().swap();
         }
@@ -234,7 +223,7 @@ public class HollowBlobReader {
         }
     }
 
-    private String readTypeStateSnapshot(HollowBlobInput in, HollowBlobHeader header, TypeFilter filter) throws IOException {
+    private String readTypeStateSnapshot(HollowBlobInput in, TypeFilter filter) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(in);
         int numShards = readNumShards(in);
         String typeName = schema.getName();
@@ -247,25 +236,25 @@ public class HollowBlobReader {
             } else {
                 HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
                 HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
-                populateTypeStateSnapshot(in, new HollowObjectTypeReadState(stateEngine, memoryMode, filteredSchema, unfilteredSchema, numShards));
+                populateTypeStateSnapshot(in, new HollowObjectTypeReadState(stateEngine, in.getMemoryMode(), filteredSchema, unfilteredSchema, numShards));
             }
         } else if (schema instanceof HollowListSchema) {
             if(!filter.includes(typeName)) {
                 HollowListTypeReadState.discardSnapshot(in, numShards);
             } else {
-                populateTypeStateSnapshot(in, new HollowListTypeReadState(stateEngine, memoryMode, (HollowListSchema)schema, numShards));
+                populateTypeStateSnapshot(in, new HollowListTypeReadState(stateEngine, in.getMemoryMode(), (HollowListSchema)schema, numShards));
             }
         } else if(schema instanceof HollowSetSchema) {
             if(!filter.includes(typeName)) {
                 HollowSetTypeReadState.discardSnapshot(in, numShards);
             } else {
-                populateTypeStateSnapshot(in, new HollowSetTypeReadState(stateEngine, memoryMode, (HollowSetSchema)schema, numShards));
+                populateTypeStateSnapshot(in, new HollowSetTypeReadState(stateEngine, in.getMemoryMode(), (HollowSetSchema)schema, numShards));
             }
         } else if(schema instanceof HollowMapSchema) {
             if(!filter.includes(typeName)) {
                 HollowMapTypeReadState.discardSnapshot(in, numShards);
             } else {
-                populateTypeStateSnapshot(in, new HollowMapTypeReadState(stateEngine, memoryMode, (HollowMapSchema)schema, numShards));
+                populateTypeStateSnapshot(in, new HollowMapTypeReadState(stateEngine, in.getMemoryMode(), (HollowMapSchema)schema, numShards));
             }
         }
 
@@ -277,7 +266,7 @@ public class HollowBlobReader {
         typeState.readSnapshot(in, stateEngine.getMemoryRecycler());
     }
 
-    private String readTypeStateDelta(HollowBlobInput in, HollowBlobHeader header) throws IOException {
+    private String readTypeStateDelta(HollowBlobInput in) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(in);
 
         int numShards = readNumShards(in);

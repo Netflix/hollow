@@ -21,10 +21,18 @@ import java.nio.channels.FileChannel;
  * as the underlying resource for Hollow Producer/Consumer Blob to support the different memory modes.
  */
 public class HollowBlobInput implements Closeable {
+    private final MemoryMode memoryMode;
+
     private Object input;
     private BlobByteBuffer buffer;
 
-    private HollowBlobInput() {}
+    private HollowBlobInput(MemoryMode memoryMode) {
+        this.memoryMode = memoryMode;
+    }
+
+    public MemoryMode getMemoryMode() {
+        return memoryMode;
+    }
 
     /**
      * Initialize the Hollow Blob Input object from the Hollow Consumer blob's Input Stream or Random Access File,
@@ -60,8 +68,8 @@ public class HollowBlobInput implements Closeable {
     /**
      * Useful for testing with custom buffer capacity
      */
-    public static HollowBlobInput randomAccess(File f, int singleBufferCapacity) throws IOException {
-        HollowBlobInput hbi = new HollowBlobInput();
+    public static HollowBlobInput randomAccess(File f,int singleBufferCapacity) throws IOException {
+        HollowBlobInput hbi = new HollowBlobInput(SHARED_MEMORY_LAZY);
         RandomAccessFile raf = new RandomAccessFile(f, "r");
         hbi.input = raf;
         FileChannel channel = ((RandomAccessFile) hbi.input).getChannel();
@@ -85,7 +93,7 @@ public class HollowBlobInput implements Closeable {
      * @return a serial access HollowBlobInput object
      */
     public static HollowBlobInput serial(InputStream is) {
-        HollowBlobInput hbi = new HollowBlobInput();
+        HollowBlobInput hbi = new HollowBlobInput(ON_HEAP);
         hbi.input = new DataInputStream(is);
         return hbi;
     }
