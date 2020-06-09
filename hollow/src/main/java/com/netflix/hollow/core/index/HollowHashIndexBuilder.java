@@ -18,6 +18,7 @@ package com.netflix.hollow.core.index;
 
 import static com.netflix.hollow.core.memory.encoding.FixedLengthElementArray.bitsRequiredToRepresentValue;
 
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.index.traversal.HollowIndexerValueTraverser;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
@@ -113,7 +114,7 @@ public class HollowHashIndexBuilder {
 
 
         int ordinal = populatedOrdinals.nextSetBit(0);
-        while(ordinal != -1) {
+        while(ordinal != HollowConstants.ORDINAL_NONE) {
             traverser.traverse(ordinal);
 
             for(int i=0;i<traverser.getNumMatches();i++) {
@@ -191,14 +192,14 @@ public class HollowHashIndexBuilder {
             while(selectOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                 int selectBucket = HashCodes.hashInt(selectOrdinal) & matchIndexBucketMask;
                 int bucketOrdinal = (int)finalSelectArray.getElementValue((currentSelectArrayBucket + selectBucket) * bitsPerSelectHashEntry, bitsPerSelectHashEntry) - 1;
-                while(bucketOrdinal != -1 && bucketOrdinal != selectOrdinal) {
+                while(bucketOrdinal != HollowConstants.ORDINAL_NONE && bucketOrdinal != selectOrdinal) {
                     ///TODO: If select field type is not REFERENCE, then we should dedup -- unless we are reference counting for delta application
                     ///ordinals here with the same value for the specified field.
                     selectBucket = (selectBucket + 1) & matchIndexBucketMask;
                     bucketOrdinal = (int)finalSelectArray.getElementValue((currentSelectArrayBucket + selectBucket) * bitsPerSelectHashEntry, bitsPerSelectHashEntry) - 1;
                 }
 
-                if(bucketOrdinal == -1)
+                if(bucketOrdinal == HollowConstants.ORDINAL_NONE)
                     finalSelectArray.setElementValue((currentSelectArrayBucket + selectBucket) * bitsPerSelectHashEntry, bitsPerSelectHashEntry, selectOrdinal + 1);
 
                 selectOrdinal = selectOrdinalIter.next();
@@ -356,10 +357,10 @@ public class HollowHashIndexBuilder {
                 for(int j=0;j<fieldPath.length - 1;j++) {
                     HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
                     readState = objectAccess.getSchema().getReferencedTypeState(fieldPath[j]);
-                    if(matchOrdinal != -1) {
+                    if(matchOrdinal != HollowConstants.ORDINAL_NONE) {
                         matchOrdinal = objectAccess.readOrdinal(matchOrdinal, fieldPath[j]);
                     }
-                    if(hashOrdinal != -1) {
+                    if(hashOrdinal != HollowConstants.ORDINAL_NONE) {
                         hashOrdinal = objectAccess.readOrdinal(hashOrdinal, fieldPath[j]);
                     }
                 }
@@ -377,7 +378,7 @@ public class HollowHashIndexBuilder {
     }
 
     private boolean isAnyFieldNull(int matchOrdinal, int hashOrdinal) {
-        return matchOrdinal == -1 || hashOrdinal == -1;
+        return matchOrdinal == HollowConstants.ORDINAL_NONE || hashOrdinal == HollowConstants.ORDINAL_NONE;
     }
 
     private int getMatchHash(int matchIdx) {
@@ -397,12 +398,12 @@ public class HollowHashIndexBuilder {
                     readState = objectAccess.getSchema().getReferencedTypeState(fieldPath[j]);
                     ordinal = objectAccess.readOrdinal(ordinal, fieldPath[j]);
                     // Cannot find nested ordinal for null parent
-                    if(ordinal == -1) {
+                    if(ordinal == HollowConstants.ORDINAL_NONE) {
                         break;
                     }
                 }
 
-                int fieldHashCode = ordinal == -1 ? -1 : HollowReadFieldUtils.fieldHashCode((HollowObjectTypeDataAccess) readState, ordinal, fieldPath[fieldPath.length-1]);
+                int fieldHashCode = ordinal == HollowConstants.ORDINAL_NONE ? HollowConstants.ORDINAL_NONE : HollowReadFieldUtils.fieldHashCode((HollowObjectTypeDataAccess) readState, ordinal, fieldPath[fieldPath.length-1]);
                 matchHash ^= HashCodes.hashInt(fieldHashCode);
             }
         }
