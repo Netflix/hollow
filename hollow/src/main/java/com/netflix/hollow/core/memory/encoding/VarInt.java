@@ -171,8 +171,6 @@ public class VarInt {
      * @param in the Hollow blob input to read from
      * @return the int value
      * @throws IOException if the value cannot be read from the input
-     *
-     * @deprecated use {@link VarInt#readVInt(HollowBlobInput)} instead
      */
     public static int readVInt(InputStream in) throws IOException {
         byte b = (byte)in.read();
@@ -261,8 +259,6 @@ public class VarInt {
      * @param in the input stream to read from
      * @return the long value
      * @throws IOException if the value cannot be read from the input stream
-     *
-     * @deprecated use {@link VarInt#readVLong(HollowBlobInput)} instead
      */
     public static long readVLong(InputStream in) throws IOException {
         byte b = (byte)in.read();

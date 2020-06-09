@@ -77,10 +77,6 @@ public abstract class HollowSchema {
         }
     }
 
-    /**
-     * @deprecated use {@link HollowSchema#readFrom(HollowBlobInput}
-     */
-    @Deprecated
     public static HollowSchema readFrom(InputStream is) throws IOException {
         try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
             return readFrom(hbi);

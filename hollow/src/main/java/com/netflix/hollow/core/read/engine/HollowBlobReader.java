@@ -73,10 +73,7 @@ public class HollowBlobReader {
      *
      * @param is the input stream to read the snapshot from
      * @throws IOException if the snapshot could not be read
-     *
-     * @deprecated use {@link #readSnapshot(HollowBlobInput)}
      */
-    @Deprecated
     public void readSnapshot(InputStream is) throws IOException {
         try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
             readSnapshot(hbi);
@@ -102,7 +99,7 @@ public class HollowBlobReader {
      * @param filter the filtering configuration to filter the snapshot
      * @throws IOException if the snapshot could not be read
      *
-     * @deprecated use {@link #readSnapshot(HollowBlobInput, TypeFilter)}
+     * @deprecated use {@link #readSnapshot(InputStream, TypeFilter)}
      */
     @Deprecated
     public void readSnapshot(InputStream is, HollowFilterConfig filter) throws IOException {
@@ -119,10 +116,7 @@ public class HollowBlobReader {
      * @param is the input stream to read the snapshot from
      * @param filter the filtering configuration to filter the snapshot
      * @throws IOException if the snapshot could not be read
-     *
-     * @deprecated use {@link #readSnapshot(HollowBlobInput, TypeFilter)}
      */
-    @Deprecated
     public void readSnapshot(InputStream is, TypeFilter filter) throws IOException {
         try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
             readSnapshot(hbi, filter);
@@ -174,7 +168,6 @@ public class HollowBlobReader {
      * @param in the input stream to read the delta from
      * @throws IOException if the delta could not be applied
      */
-    @Deprecated
     public void applyDelta(InputStream in) throws IOException {
         try (HollowBlobInput hbi = HollowBlobInput.serial(in)) {
             applyDelta(hbi);
