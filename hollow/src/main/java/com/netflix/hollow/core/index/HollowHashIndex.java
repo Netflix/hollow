@@ -18,6 +18,7 @@ package com.netflix.hollow.core.index;
 
 import static java.util.Objects.requireNonNull;
 
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
@@ -164,14 +165,14 @@ public class HollowHashIndex implements HollowTypeStateListener {
                     readState = objectAccess.getSchema().getReferencedTypeState(fieldPath[j]);
                     hashOrdinal = objectAccess.readOrdinal(hashOrdinal, fieldPath[j]);
                     // Cannot find nested ordinal for null parent
-                    if(hashOrdinal == -1) {
+                    if(hashOrdinal == HollowConstants.ORDINAL_NONE) {
                         break;
                     }
                 }
 
                 HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
                 int fieldIdx = fieldPath[fieldPath.length-1];
-                if(hashOrdinal == -1 || !HollowReadFieldUtils.fieldValueEquals(objectAccess, hashOrdinal, fieldIdx, query[i])) {
+                if(hashOrdinal == HollowConstants.ORDINAL_NONE || !HollowReadFieldUtils.fieldValueEquals(objectAccess, hashOrdinal, fieldIdx, query[i])) {
                     return false;
                 }
             }
