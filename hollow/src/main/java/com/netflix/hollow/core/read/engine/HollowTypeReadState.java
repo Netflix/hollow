@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     public abstract int maxOrdinal();
 
     public abstract void readSnapshot(DataInputStream dis, ArraySegmentRecycler recycler) throws IOException;
-    public abstract void applyDelta(DataInputStream dis, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException;
+    public abstract void applyDelta(DataInputStream dis, HollowSchema schema, ArraySegmentRecycler memoryRecycler, boolean isRadial) throws IOException;
 
     public HollowSchema getSchema() {
         return schema;

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -51,6 +51,10 @@ public abstract class HollowTypeWriteState {
 
     protected ThreadSafeBitSet currentCyclePopulated;
     protected ThreadSafeBitSet previousCyclePopulated;
+    
+    protected ThreadSafeBitSet removedSinceHubState;
+    protected ThreadSafeBitSet previousCycleRemovedSinceHubState;
+    protected int hubStateMaxOrdinal;
 
     private final ThreadLocal<ByteDataBuffer> serializedScratchSpace;
 
@@ -147,6 +151,9 @@ public abstract class HollowTypeWriteState {
             restoreFrom(restoredReadState);
             wroteData = false;
         }
+        
+        if(removedSinceHubState != null)
+            removedSinceHubState = previousCycleRemovedSinceHubState;
     }
 
     public void addAllObjectsFromPreviousCycle() {
@@ -243,6 +250,16 @@ public abstract class HollowTypeWriteState {
     public void resizeOrdinalMap(int size) {
         ordinalMap.resize(size);
     }
+    
+    /**
+     * Mark the current state as a hub state, from which radial deltas will be produced.
+     * This should be called during the write phase of the cycle, before calling prepareForNextCycle(). 
+     */
+    public void markHubState() {
+        removedSinceHubState = new ThreadSafeBitSet();
+        previousCycleRemovedSinceHubState = removedSinceHubState;
+        hubStateMaxOrdinal = (int)currentCyclePopulated.maxSetBit();
+    }
 
     /**
      * Called to perform a state transition.<p>
@@ -258,6 +275,9 @@ public abstract class HollowTypeWriteState {
         currentCyclePopulated = temp;
 
         currentCyclePopulated.clearAll();
+        
+        if(removedSinceHubState != null)
+            previousCycleRemovedSinceHubState = removedSinceHubState;
 
         restoredMap = null;
         restoredSchema = null;
@@ -278,6 +298,11 @@ public abstract class HollowTypeWriteState {
                 ordinal = unusedPreviousOrdinals.nextSetBit(ordinal + 1);
             }
         }
+        
+        if(removedSinceHubState != null) {
+            ThreadSafeBitSet removedThisCycle = previousCyclePopulated.andNot(currentCyclePopulated);
+            removedSinceHubState = ThreadSafeBitSet.orAll(removedSinceHubState, removedThisCycle);
+        }
 
         ordinalMap.prepareForWrite();
         wroteData = true;
@@ -285,6 +310,12 @@ public abstract class HollowTypeWriteState {
     
     public boolean hasChangedSinceLastCycle() {
         return !currentCyclePopulated.equals(previousCyclePopulated);
+    }
+    
+    public boolean hasChangedSinceHubState() {
+        if(removedSinceHubState == null)
+            return false;
+        return currentCyclePopulated.maxSetBit() != hubStateMaxOrdinal || !removedSinceHubState.isEmpty();
     }
     
     public boolean isRestored() {
@@ -302,6 +333,10 @@ public abstract class HollowTypeWriteState {
     public abstract void calculateReverseDelta();
 
     public abstract void writeReverseDelta(DataOutputStream dos) throws IOException;
+    
+    public abstract void calculateRadialDelta();
+    
+    public abstract void writeRadialDelta(DataOutputStream dos) throws IOException;
     
     protected void restoreFrom(HollowTypeReadState readState) {
         if(previousCyclePopulated.cardinality() != 0 || currentCyclePopulated.cardinality() != 0)

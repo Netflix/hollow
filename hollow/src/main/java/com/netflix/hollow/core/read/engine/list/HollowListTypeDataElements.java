@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -97,8 +97,8 @@ public class HollowListTypeDataElements {
         }
     }
 
-    public void applyDelta(HollowListTypeDataElements fromData, HollowListTypeDataElements deltaData) {
-        new HollowListDeltaApplicator(fromData, deltaData, this).applyDelta();
+    public void applyDelta(HollowListTypeDataElements fromData, HollowListTypeDataElements deltaData, boolean isRadial) {
+        new HollowListDeltaApplicator(fromData, deltaData, this).applyDelta(isRadial);
     }
 
     public void destroy() {

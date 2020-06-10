@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -439,6 +439,122 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
         }
     }
 
+    @Override
+    public void calculateRadialDelta() {
+        maxOrdinal = ordinalMap.maxOrdinal();
+        int bitsPerMapFixedLengthPortion = bitsPerMapSizeValue + bitsPerMapPointer;
+        int bitsPerMapEntry = bitsPerKeyElement + bitsPerValueElement;
+
+        numMapsInDelta = new int[numShards];
+        numBucketsInDelta = new long[numShards];
+        mapPointersAndSizesArray = new FixedLengthElementArray[numShards];
+        entryArray = new FixedLengthElementArray[numShards];
+        deltaAddedOrdinals = new ByteDataBuffer[numShards];
+        deltaRemovedOrdinals = new ByteDataBuffer[numShards];
+        
+        ThreadSafeBitSet deltaAdditions = currentCyclePopulated.and(removedSinceHubState);
+        int ordinal = currentCyclePopulated.nextSetBit(hubStateMaxOrdinal + 1);
+        while(ordinal != -1) {
+            deltaAdditions.set(ordinal);
+            ordinal = currentCyclePopulated.nextSetBit(ordinal + 1);
+        }
+
+        int shardMask = numShards - 1;
+        
+        int addedOrdinal = deltaAdditions.nextSetBit(0);
+        while(addedOrdinal != -1) {
+            numMapsInDelta[addedOrdinal & shardMask]++;
+            long readPointer = ordinalMap.getPointerForData(addedOrdinal);
+            int size = VarInt.readVInt(ordinalMap.getByteData().getUnderlyingArray(), readPointer);
+            numBucketsInDelta[addedOrdinal & shardMask] += HashCodes.hashTableSize(size);
+
+            addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
+        }
+
+        for(int i=0;i<numShards;i++) {
+            mapPointersAndSizesArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numMapsInDelta[i] * bitsPerMapFixedLengthPortion);
+            entryArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, numBucketsInDelta[i] * bitsPerMapEntry);
+            deltaAddedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+            deltaRemovedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+        }
+
+        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
+
+        int mapCounter[] = new int[numShards];
+        long bucketCounter[] = new long[numShards];
+        int previousRemovedOrdinal[] = new int[numShards];
+        int previousAddedOrdinal[] = new int[numShards];
+        
+        HollowWriteStateEnginePrimaryKeyHasher primaryKeyHasher = null;
+
+        if(getSchema().getHashKey() != null)
+            primaryKeyHasher = new HollowWriteStateEnginePrimaryKeyHasher(getSchema().getHashKey(), getStateEngine());
+
+        for(ordinal=0;ordinal<=maxOrdinal;ordinal++) {
+            int shardNumber = ordinal & shardMask;
+            if(deltaAdditions.get(ordinal)) {
+                long readPointer = ordinalMap.getPointerForData(ordinal);
+
+                int size = VarInt.readVInt(data, readPointer);
+                readPointer += VarInt.sizeOfVInt(size);
+
+                int numBuckets = HashCodes.hashTableSize(size);
+
+                long endBucketPosition = bucketCounter[shardNumber] + numBuckets;
+
+                mapPointersAndSizesArray[shardNumber].setElementValue((long)bitsPerMapFixedLengthPortion * mapCounter[shardNumber], bitsPerMapPointer, endBucketPosition);
+                mapPointersAndSizesArray[shardNumber].setElementValue(((long)bitsPerMapFixedLengthPortion * mapCounter[shardNumber]) + bitsPerMapPointer, bitsPerMapSizeValue, size);
+
+                int keyElementOrdinal = 0;
+
+                for(int j=0;j<numBuckets;j++) {
+                    entryArray[shardNumber].setElementValue((long)bitsPerMapEntry * (bucketCounter[shardNumber] + j), bitsPerKeyElement, (1L << bitsPerKeyElement) - 1);
+                }
+
+                for(int j=0;j<size;j++) {
+                    int keyElementOrdinalDelta = VarInt.readVInt(data, readPointer);
+                    readPointer += VarInt.sizeOfVInt(keyElementOrdinalDelta);
+                    int valueElementOrdinal = VarInt.readVInt(data, readPointer);
+                    readPointer += VarInt.sizeOfVInt(valueElementOrdinal);
+                    int hashedBucket = VarInt.readVInt(data, readPointer);
+                    readPointer += VarInt.sizeOfVInt(hashedBucket);
+
+                    keyElementOrdinal += keyElementOrdinalDelta;
+
+                    if(primaryKeyHasher != null)
+                        hashedBucket = primaryKeyHasher.getRecordHash(keyElementOrdinal) & (numBuckets - 1);
+
+                    while(entryArray[shardNumber].getElementValue((long)bitsPerMapEntry * (bucketCounter[shardNumber] + hashedBucket), bitsPerKeyElement) != ((1L << bitsPerKeyElement) - 1)) {
+                        hashedBucket++;
+                        hashedBucket &= (numBuckets - 1);
+                    }
+
+                    long mapEntryBitOffset = (long)bitsPerMapEntry * (bucketCounter[shardNumber] + hashedBucket);
+                    entryArray[shardNumber].clearElementValue(mapEntryBitOffset, bitsPerMapEntry);
+                    entryArray[shardNumber].setElementValue(mapEntryBitOffset, bitsPerKeyElement, keyElementOrdinal);
+                    entryArray[shardNumber].setElementValue(mapEntryBitOffset + bitsPerKeyElement, bitsPerValueElement, valueElementOrdinal);
+                }
+
+                bucketCounter[shardNumber] += numBuckets;
+                mapCounter[shardNumber]++;
+
+                int shardOrdinal = ordinal / numShards;
+                VarInt.writeVInt(deltaAddedOrdinals[shardNumber], shardOrdinal - previousAddedOrdinal[shardNumber]);
+                previousAddedOrdinal[shardNumber] = shardOrdinal;
+            } 
+            
+            if(removedSinceHubState.get(ordinal) && ordinal <= hubStateMaxOrdinal) {
+                int shardOrdinal = ordinal / numShards;
+                VarInt.writeVInt(deltaRemovedOrdinals[shardNumber], shardOrdinal - previousRemovedOrdinal[shardNumber]);
+                previousRemovedOrdinal[shardNumber] = shardOrdinal;
+            }
+        }
+    }
+    
+    public void writeRadialDelta(DataOutputStream dos) throws IOException {
+        writeCalculatedDelta(dos);
+    }
+    
     private void writeCalculatedDelta(DataOutputStream os) throws IOException {
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     }
     
     @Override
-    public void applyDelta(DataInputStream dis, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void applyDelta(DataInputStream dis, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler, boolean isRadial) throws IOException {
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(dis);
 
@@ -106,7 +106,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryRecycler);
             deltaData.readDelta(dis);
             HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
-            nextData.applyDelta(oldData, deltaData);
+            nextData.applyDelta(oldData, deltaData, isRadial);
             shards[i].setCurrentData(nextData);
             notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
             deltaData.destroy();

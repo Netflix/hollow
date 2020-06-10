@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public class HollowBlobWriter {
         stateEngine.prepareForWrite();
 
         DataOutputStream dos = new DataOutputStream(os);
-        writeHeader(dos, stateEngine.getSchemas(), false);
+        writeHeader(dos, stateEngine.getSchemas(), BlobHeaderType.SNAPSHOT);
 
         VarInt.writeVInt(dos, stateEngine.getOrderedTypeStates().size());
 
@@ -88,7 +88,7 @@ public class HollowBlobWriter {
      * @throws IOException if the delta blob could not be written
      * @throws IllegalStateException if the current state is restored from the previous state
      * and current state contains unrestored state for one or more types.  This indicates those
-     * types have not been declared to the producer as part it's initialized data model.
+     * types have not been declared to the producer as part its initialized data model.
      * @see com.netflix.hollow.api.producer.HollowProducer#initializeDataModel(Class[])
      */
     public void writeDelta(OutputStream os) throws IOException {
@@ -100,7 +100,7 @@ public class HollowBlobWriter {
         List<HollowSchema> changedTypes = changedTypes();
         
         DataOutputStream dos = new DataOutputStream(os);
-        writeHeader(dos, changedTypes, false);
+        writeHeader(dos, changedTypes, BlobHeaderType.DELTA);
 
         VarInt.writeVInt(dos, changedTypes.size());
 
@@ -142,7 +142,7 @@ public class HollowBlobWriter {
      * @throws IOException if the reverse delta blob could not be written
      * @throws IllegalStateException if the current state is restored from the previous state
      * and current state contains unrestored state for one or more types.  This indicates those
-     * types have not been declared to the producer as part it's initialized data model.
+     * types have not been declared to the producer as part its initialized data model.
      * @see com.netflix.hollow.api.producer.HollowProducer#initializeDataModel(Class[])
      */
     public void writeReverseDelta(OutputStream os) throws IOException {
@@ -154,7 +154,7 @@ public class HollowBlobWriter {
         List<HollowSchema> changedTypes = changedTypes();
 
         DataOutputStream dos = new DataOutputStream(os);
-        writeHeader(dos, changedTypes, true);
+        writeHeader(dos, changedTypes, BlobHeaderType.REVERSE_DELTA);
 
         VarInt.writeVInt(dos, changedTypes.size());
 
@@ -187,6 +187,61 @@ public class HollowBlobWriter {
         }
         os.flush();
     }
+    
+    /**
+     * Serialize the changes necessary to transition a consumer from the latest "hub" state to the
+     * current state as a radial delta blob.
+     *
+     * @param os the output stream to write the radial delta blob
+     * @throws IOException if the radial delta blob could not be written
+     * @throws IllegalStateException if the current state is restored from the previous state
+     * and current state contains unrestored state for one or more types.  This indicates those
+     * types have not been declared to the producer as part its initialized data model.
+     * @see com.netflix.hollow.api.producer.HollowProducer#initializeDataModel(Class[])
+     */
+    public void writeRadialDelta(OutputStream os) throws IOException {
+        stateEngine.prepareForWrite();
+        
+        if(stateEngine.isRestored())
+            stateEngine.ensureAllNecessaryStatesRestored();
+        
+        List<HollowSchema> changedTypes = changedTypesSinceHubState();
+
+        DataOutputStream dos = new DataOutputStream(os);
+        writeHeader(dos, changedTypes, BlobHeaderType.RADIAL_DELTA);
+
+        VarInt.writeVInt(dos, changedTypes.size());
+
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-radial-delta");
+
+        for(final HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
+            executor.execute(new Runnable() {
+                public void run() {
+                    if(typeState.hasChangedSinceHubState())
+                        typeState.calculateRadialDelta();
+                }
+            });
+        }
+
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        for(HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
+            if(typeState.hasChangedSinceHubState()) {
+                HollowSchema schema = typeState.getSchema();
+                schema.writeTo(dos);
+    
+                writeNumShards(dos, typeState.getNumShards());
+    
+                typeState.writeRadialDelta(dos);
+            }
+        }
+        os.flush();
+    }
+    
 
     private List<HollowSchema> changedTypes() {
         List<HollowSchema> changedTypes = new ArrayList<HollowSchema>();
@@ -201,6 +256,19 @@ public class HollowBlobWriter {
         return changedTypes;
     }
     
+    private List<HollowSchema> changedTypesSinceHubState() {
+        List<HollowSchema> changedTypes = new ArrayList<HollowSchema>();
+        
+        List<HollowTypeWriteState> orderedTypeStates = stateEngine.getOrderedTypeStates();
+        for(int i=0;i<orderedTypeStates.size();i++) {
+            HollowTypeWriteState writeState = orderedTypeStates.get(i);
+            if(writeState.hasChangedSinceHubState())
+                changedTypes.add(writeState.getSchema());
+        }
+
+        return changedTypes;
+    }    
+    
     private void writeNumShards(DataOutputStream dos, int numShards) throws IOException {
         VarInt.writeVInt(dos, 1 + VarInt.sizeOfVInt(numShards)); /// pre 2.1.0 forwards compatibility:
                                                                  /// skip new forwards-compatibility and num shards
@@ -210,17 +278,34 @@ public class HollowBlobWriter {
         VarInt.writeVInt(dos, numShards);
     }
 
-    private void writeHeader(DataOutputStream os, List<HollowSchema> schemasToInclude, boolean isReverseDelta) throws IOException {
+    private void writeHeader(DataOutputStream os, List<HollowSchema> schemasToInclude, BlobHeaderType type) throws IOException {
         HollowBlobHeader header = new HollowBlobHeader();
         header.setHeaderTags(stateEngine.getHeaderTags());
-        if(isReverseDelta) {
-            header.setOriginRandomizedTag(stateEngine.getNextStateRandomizedTag());
-            header.setDestinationRandomizedTag(stateEngine.getPreviousStateRandomizedTag());
-        } else {
+        
+        switch(type) {
+        case SNAPSHOT:
+        case DELTA:
             header.setOriginRandomizedTag(stateEngine.getPreviousStateRandomizedTag());
             header.setDestinationRandomizedTag(stateEngine.getNextStateRandomizedTag());
+            break;
+        case REVERSE_DELTA:
+            header.setOriginRandomizedTag(stateEngine.getNextStateRandomizedTag());
+            header.setDestinationRandomizedTag(stateEngine.getPreviousStateRandomizedTag());
+            break;
+        case RADIAL_DELTA:
+            header.setOriginRandomizedTag(stateEngine.getHubStateRandomizedTag());
+            header.setDestinationRandomizedTag(stateEngine.getNextStateRandomizedTag());
+            break;
         }
+        
         header.setSchemas(schemasToInclude);
         headerWriter.writeHeader(header, os);
+    }
+    
+    private static enum BlobHeaderType {
+        SNAPSHOT,
+        DELTA,
+        REVERSE_DELTA,
+        RADIAL_DELTA;
     }
 }

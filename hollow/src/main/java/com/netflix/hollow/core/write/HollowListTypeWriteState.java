@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -318,6 +318,87 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         }
     }
 
+    @Override
+    public void calculateRadialDelta() {
+        maxOrdinal = ordinalMap.maxOrdinal();
+
+        numListsInDelta = new int[numShards];
+        numElementsInDelta = new long[numShards];
+        
+        listPointerArray = new FixedLengthElementArray[numShards];
+        elementArray = new FixedLengthElementArray[numShards];
+        deltaAddedOrdinals = new ByteDataBuffer[numShards];
+        deltaRemovedOrdinals = new ByteDataBuffer[numShards];
+        
+        ThreadSafeBitSet deltaAdditions = currentCyclePopulated.and(removedSinceHubState);
+        int ordinal = currentCyclePopulated.nextSetBit(hubStateMaxOrdinal + 1);
+        while(ordinal != -1) {
+            deltaAdditions.set(ordinal);
+            ordinal = currentCyclePopulated.nextSetBit(ordinal + 1);
+        }
+
+        int shardMask = numShards - 1;
+        
+        int addedOrdinal = deltaAdditions.nextSetBit(0);
+        while(addedOrdinal != -1) {
+            numListsInDelta[addedOrdinal & shardMask]++;
+            long readPointer = ordinalMap.getPointerForData(addedOrdinal);
+            numElementsInDelta[addedOrdinal & shardMask] += VarInt.readVInt(ordinalMap.getByteData().getUnderlyingArray(), readPointer);
+            
+            addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
+        }
+        
+        for(int i=0;i<numShards;i++) {
+            listPointerArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numListsInDelta[i] * bitsPerListPointer);
+            elementArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, numElementsInDelta[i] * bitsPerElement);
+            deltaAddedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+            deltaRemovedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+        }
+
+        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
+
+        int listCounter[] = new int[numShards];
+        long elementCounter[] = new long[numShards];
+        int previousRemovedOrdinal[] = new int[numShards];
+        int previousAddedOrdinal[] = new int[numShards];
+
+        for(ordinal=0;ordinal<=maxOrdinal;ordinal++) {
+            int shardNumber = ordinal & shardMask;
+            if(deltaAdditions.get(ordinal)) {
+                long readPointer = ordinalMap.getPointerForData(ordinal);
+
+                int size = VarInt.readVInt(data, readPointer);
+                readPointer += VarInt.sizeOfVInt(size);
+
+                listPointerArray[shardNumber].setElementValue((long)bitsPerListPointer * listCounter[shardNumber], bitsPerListPointer, elementCounter[shardNumber] + size);
+
+                for(int j=0;j<size;j++) {
+                    int elementOrdinal = VarInt.readVInt(data, readPointer);
+                    readPointer += VarInt.sizeOfVInt(elementOrdinal);
+                    elementArray[shardNumber].setElementValue((long)bitsPerElement * elementCounter[shardNumber], bitsPerElement, elementOrdinal);
+                    elementCounter[shardNumber]++;
+                }
+
+                listCounter[shardNumber]++;
+
+                int shardOrdinal = ordinal / numShards;
+                VarInt.writeVInt(deltaAddedOrdinals[shardNumber], shardOrdinal - previousAddedOrdinal[shardNumber]);
+                previousAddedOrdinal[shardNumber] = shardOrdinal;
+            }
+            
+            if(removedSinceHubState.get(ordinal) && ordinal <= hubStateMaxOrdinal) {
+                int shardOrdinal = ordinal / numShards;
+                VarInt.writeVInt(deltaRemovedOrdinals[shardNumber], shardOrdinal - previousRemovedOrdinal[shardNumber]);
+                previousRemovedOrdinal[shardNumber] = shardOrdinal;
+            }
+        }
+    }
+    
+    @Override
+    public void writeRadialDelta(DataOutputStream dos) throws IOException {
+        writeCalculatedDelta(dos);
+    }
+    
     private void writeCalculatedDelta(DataOutputStream os) throws IOException {
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -48,13 +48,14 @@ class HollowMapDeltaApplicator {
         this.target = target;
     }
 
-    public void applyDelta() {
-        removalsReader = from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
+    public void applyDelta(boolean isRadial) {
+        removalsReader = isRadial ? delta.encodedRemovals : from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
         additionsReader = delta.encodedAdditions;
         removalsReader.reset();
         additionsReader.reset();
 
-        target.encodedRemovals = delta.encodedRemovals;
+        if(!isRadial)
+            target.encodedRemovals = delta.encodedRemovals;
 
         target.maxOrdinal = delta.maxOrdinal;
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -143,7 +143,7 @@ public class HollowBlobReader {
 
         Collection<String> typeNames = new TreeSet<String>();
         for(int i=0;i<numStates;i++) {
-            String typeName = readTypeStateDelta(dis, header);
+            String typeName = readTypeStateDelta(dis, header, false);
             typeNames.add(typeName);
             stateEngine.getMemoryRecycler().swap();
         }
@@ -156,6 +156,42 @@ public class HollowBlobReader {
         notifyEndUpdate();
 
     }
+    
+    /**
+     * Update the state engine using a radial delta blob from the provided InputStream.
+     * <p>
+     * If a {@link HollowFilterConfig} was applied at the time the {@link HollowReadStateEngine} was initialized
+     * with a snapshot, it will continue to be in effect after the state is updated.
+     *
+     * @param is the input stream to read the delta from
+     * @throws IOException if the delta could not be applied
+     */
+    public void applyRadialDelta(InputStream is) throws IOException {
+        HollowBlobHeader header = readHeader(is, true);
+        notifyBeginUpdate();
+
+        long startTime = System.currentTimeMillis();
+
+        DataInputStream dis = new DataInputStream(is);
+
+        int numStates = VarInt.readVInt(dis);
+
+        Collection<String> typeNames = new TreeSet<String>();
+        for(int i=0;i<numStates;i++) {
+            String typeName = readTypeStateDelta(dis, header, true);
+            typeNames.add(typeName);
+            stateEngine.getMemoryRecycler().swap();
+        }
+
+        long endTime = System.currentTimeMillis();
+
+        log.info("RADIAL DELTA COMPLETED IN " + (endTime - startTime) + "ms");
+        log.info("TYPES: " + typeNames);
+
+        notifyEndUpdate();
+
+    }
+    
 
     private HollowBlobHeader readHeader(InputStream is, boolean isDelta) throws IOException {
         HollowBlobHeader header = headerReader.readHeader(is);
@@ -225,14 +261,14 @@ public class HollowBlobReader {
         typeState.readSnapshot(is, stateEngine.getMemoryRecycler());
     }
 
-    private String readTypeStateDelta(DataInputStream is, HollowBlobHeader header) throws IOException {
+    private String readTypeStateDelta(DataInputStream is, HollowBlobHeader header, boolean isRadial) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(is);
 
         int numShards = readNumShards(is);
 
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
         if(typeState != null) {
-            typeState.applyDelta(is, schema, stateEngine.getMemoryRecycler());
+            typeState.applyDelta(is, schema, stateEngine.getMemoryRecycler(), isRadial);
         } else {
             discardDelta(is, schema, numShards);
         }

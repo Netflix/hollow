@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -167,7 +167,20 @@ public class ThreadSafeBitSet {
         }
     }
 
+    public boolean isEmpty() {
+        ThreadSafeBitSetSegments segments = this.segments.get();
 
+        for(int i=0;i<segments.numSegments();i++) {
+            AtomicLongArray segment = segments.getSegment(i);
+            for(int j=0;j<segment.length();j++) {
+                if(segment.get(j) != 0)
+                    return false;
+            }
+        }
+
+        return true;
+    }
+    
     /**
      * @return the number of bits which are set in this bit set.
      */
@@ -241,6 +254,40 @@ public class ThreadSafeBitSet {
         ThreadSafeBitSet andNot = new ThreadSafeBitSet(log2SegmentSize);
         andNot.segments.set(newSegments);
         return andNot;
+    }
+    
+    /**
+     * Return a new bit set which contains all bits which are contained in this bit set, and which are ALSO contained in the <code>other</code> bit set.<p>
+     *
+     * In other words, return a new bit set, which is a bitwise and with the other bit set.
+     *
+     * @param other the other bit set
+     * @return the resulting bit set
+     */
+    public ThreadSafeBitSet and(ThreadSafeBitSet other) {
+        if(other.log2SegmentSize != log2SegmentSize)
+            throw new IllegalArgumentException("Segment sizes must be the same");
+
+        ThreadSafeBitSetSegments thisSegments = this.segments.get();
+        ThreadSafeBitSetSegments otherSegments = other.segments.get();
+        ThreadSafeBitSetSegments newSegments = new ThreadSafeBitSetSegments(thisSegments.numSegments(), numLongsPerSegment);
+
+        for(int i=0;i<thisSegments.numSegments();i++) {
+            AtomicLongArray thisArray = thisSegments.getSegment(i);
+            AtomicLongArray otherArray = (i < otherSegments.numSegments()) ? otherSegments.getSegment(i) : null;
+            AtomicLongArray newArray = newSegments.getSegment(i);
+
+            for(int j=0;j<thisArray.length();j++) {
+                long thisLong = thisArray.get(j);
+                long otherLong = (otherArray == null) ? 0 : otherArray.get(j);
+
+                newArray.set(j, thisLong & otherLong);
+            }
+        }
+
+        ThreadSafeBitSet and = new ThreadSafeBitSet(log2SegmentSize);
+        and.segments.set(newSegments);
+        return and;
     }
 
     /**

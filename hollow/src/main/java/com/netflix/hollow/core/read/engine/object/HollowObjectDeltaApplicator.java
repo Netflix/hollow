@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -54,13 +54,14 @@ class HollowObjectDeltaApplicator {
         this.target = target;
     }
 
-    void applyDelta() {
-        removalsReader = from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
+    void applyDelta(boolean isRadial) {
+        removalsReader = isRadial ? delta.encodedRemovals : from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
         additionsReader = delta.encodedAdditions;
         removalsReader.reset();
         additionsReader.reset();
 
-        target.encodedRemovals = delta.encodedRemovals;
+        if(!isRadial)
+            target.encodedRemovals = delta.encodedRemovals;
 
         target.maxOrdinal = delta.maxOrdinal;
 
@@ -202,9 +203,13 @@ class HollowObjectDeltaApplicator {
 
         /// skip over var length data in from state, if removed.
         if(removeData && target.varLengthData[fieldIndex] != null) {
-            long readValue = from.fixedLengthData.getElementValue(currentFromStateReadFixedLengthStartBit + from.bitOffsetPerField[fieldIndex], from.bitsPerField[fieldIndex]);
-            if((readValue & (1L << (from.bitsPerField[fieldIndex] - 1))) == 0)
-                currentFromStateReadVarLengthDataPointers[fieldIndex] = readValue;
+            try {
+                long readValue = from.fixedLengthData.getElementValue(currentFromStateReadFixedLengthStartBit + from.bitOffsetPerField[fieldIndex], from.bitsPerField[fieldIndex]);
+                if((readValue & (1L << (from.bitsPerField[fieldIndex] - 1))) == 0)
+                    currentFromStateReadVarLengthDataPointers[fieldIndex] = readValue;
+            } catch(ArrayIndexOutOfBoundsException e) {
+                e.printStackTrace();
+            }
         }
     }
 

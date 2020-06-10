@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -74,6 +74,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private boolean preparedForNextCycle = true;
     private long previousStateRandomizedTag = -1L;
     private long nextStateRandomizedTag;
+    private long hubStateRandomizedTag = -1L;
 
     public HollowWriteStateEngine() {
         this(new DefaultHashCodeFinder());
@@ -203,6 +204,21 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         }
 
         preparedForNextCycle = false;
+    }
+    
+    /**
+     * Mark the current state as a hub state, from which radial deltas will be produced.
+     * This should be called during the write phase of the cycle, before calling prepareForNextCycle(). 
+     */
+    public void markHubState() {
+        if(preparedForNextCycle)
+            throw new IllegalStateException("markHubState() should only be called during the \"writing\" phase of a cycle.");
+        
+        for(final Map.Entry<String, HollowTypeWriteState> typeStateEntry : writeStates.entrySet()) {
+            typeStateEntry.getValue().markHubState();
+        }
+        
+        hubStateRandomizedTag = nextStateRandomizedTag;
     }
 
     /**
@@ -383,6 +399,10 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     
     public void overridePreviousStateRandomizedTag(long previousStateRandomizedTag) {
         this.previousStateRandomizedTag = previousStateRandomizedTag;
+    }
+    
+    public long getHubStateRandomizedTag() {
+        return hubStateRandomizedTag;
     }
     
     public long getNextStateRandomizedTag() {
