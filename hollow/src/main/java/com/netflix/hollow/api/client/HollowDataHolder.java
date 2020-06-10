@@ -67,7 +67,7 @@ class HollowDataHolder {
         this.stateEngine = stateEngine;
         this.apiFactory = apiFactory;
         this.memoryMode = memoryMode;
-        this.reader = new HollowBlobReader(stateEngine);
+        this.reader = new HollowBlobReader(stateEngine, memoryMode);
         this.doubleSnapshotConfig = doubleSnapshotConfig;
         this.failedTransitionTracker = failedTransitionTracker;
         this.staleReferenceDetector = staleReferenceDetector;
