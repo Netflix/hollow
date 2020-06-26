@@ -960,7 +960,7 @@ public class HollowConsumer {
         protected HollowConsumer.ObjectLongevityConfig objectLongevityConfig = ObjectLongevityConfig.DEFAULT_CONFIG;
         protected HollowConsumer.ObjectLongevityDetector objectLongevityDetector = ObjectLongevityDetector.DEFAULT_DETECTOR;
         protected File localBlobStoreDir = null;
-        protected boolean noFallBackForExistingSnapshot;
+        protected boolean useExistingStaleSnapshot;
         protected Executor refreshExecutor = null;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
 
@@ -969,14 +969,39 @@ public class HollowConsumer {
             return (B)this;
         }
 
+        /**
+         * This is the same as {@link #withLocalBlobStore(File, boolean)} where the boolean argument
+         * is set to {@code false}.
+         * @see #withLocalBlobStore(File, boolean)
+         */
         public B withLocalBlobStore(File localBlobStoreDir) {
             this.localBlobStoreDir = localBlobStoreDir;
             return (B)this;
         }
 
-        public B withLocalBlobStore(File localBlobStoreDir, boolean noFallBackForExistingSnapshot) {
+        /**
+         * Provide a directory that will be used to cache blobs.
+         *
+         * When this is supplied, Hollow will look in this directory for a blob before falling back
+         * to retrieving using the configured {@link HollowConsumer.BlobRetriever}.
+         * If it does not find the blob in the configured local blob store directory, it will
+         * retrieve the blob using the configured blobRetriever and then use it from there.
+         * Note that cached files are never deleted from {@code localBlobStoreDir}, meaning if you
+         * use this on a long-running instance you will eventually run out of disk space. As such, a
+         * local blob store is better suited for local development, testing, or tooling purposes.
+         *
+         * @param localBlobStoreDir the directory used to store cached blobs. This will be created
+         *   if it does not already exist.
+         * @param useExistingStaleSnapshot
+         *   IF this is true
+         *   AND Hollow is trying to retrieve a snapshot
+         *   AND it hasn't already cached a snapshot for that specific version
+         *   AND it has cached a snapshot of an older version
+         *   THEN Hollow will use the older cached snapshot instead of fetching the desired snapshot
+         */
+        public B withLocalBlobStore(File localBlobStoreDir, boolean useExistingStaleSnapshot) {
             this.localBlobStoreDir = localBlobStoreDir;
-            this.noFallBackForExistingSnapshot = noFallBackForExistingSnapshot;
+            this.useExistingStaleSnapshot = useExistingStaleSnapshot;
             return (B)this;
         }
 
@@ -1124,7 +1149,7 @@ public class HollowConsumer {
             BlobRetriever blobRetriever = this.blobRetriever;
             if (localBlobStoreDir != null) {
                 this.blobRetriever = new HollowFilesystemBlobRetriever(
-                        localBlobStoreDir.toPath(), blobRetriever, noFallBackForExistingSnapshot);
+                        localBlobStoreDir.toPath(), blobRetriever, useExistingStaleSnapshot);
             }
 
             if (refreshExecutor == null) {

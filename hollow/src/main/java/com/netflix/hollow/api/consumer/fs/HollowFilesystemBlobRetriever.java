@@ -33,7 +33,7 @@ import java.util.UUID;
 public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriever {
     private final Path blobStorePath;
     private final HollowConsumer.BlobRetriever fallbackBlobRetriever;
-    private final boolean noFallBackForExistingSnapshot;
+    private final boolean useExistingStaleSnapshot;
 
     /**
      * A new HollowFilesystemBlobRetriever which is not backed by a remote store.
@@ -68,15 +68,15 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
      * @param blobStorePath          The directory from which to retrieve blobs, if available
      * @param fallbackBlobRetriever  The remote blob retriever from which to retrieve blobs if they are not already
      *                               available on the filesystem.
-     * @param noFallBackForExistingSnapshot  If true and a snapshot blob is requested then if there exists a local snapshot
+     * @param useExistingStaleSnapshot  If true and a snapshot blob is requested then if there exists a local snapshot
      *                               blob present for the desired version then that snapshot blob is returned and
      *                               the fallback blob retriever (if present) is not queried.
      */
     public HollowFilesystemBlobRetriever(Path blobStorePath, HollowConsumer.BlobRetriever fallbackBlobRetriever,
-            boolean noFallBackForExistingSnapshot) {
+            boolean useExistingStaleSnapshot) {
         this.blobStorePath = blobStorePath;
         this.fallbackBlobRetriever = fallbackBlobRetriever;
-        this.noFallBackForExistingSnapshot = noFallBackForExistingSnapshot;
+        this.useExistingStaleSnapshot = useExistingStaleSnapshot;
 
         try {
             if(!Files.exists(this.blobStorePath)){
@@ -116,7 +116,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         if (maxVersionBeforeDesired != HollowConstants.VERSION_NONE) {
             filesystemBlob = new FilesystemBlob(blobStorePath.resolve(maxVersionBeforeDesiredFilename),
                     maxVersionBeforeDesired);
-            if (noFallBackForExistingSnapshot) {
+            if (useExistingStaleSnapshot) {
                 return filesystemBlob;
             }
         }
