@@ -28,13 +28,9 @@ import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
+import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -243,6 +239,28 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         for(HollowTypeWriteState typeState : orderedTypeStates) {
             typeState.addAllObjectsFromPreviousCycle();
         }
+    }
+
+    /**
+     * Add all objects of the provided type from the previous cycle, exactly as they were in the previous cycle, while
+     * also considering referenced records.
+     * @param typeName The type name of the records that should added from the previous cycle
+     * @param readStateEngine The read state of the previous cycle (should be retrieved using the method linked below)
+     * {@link com.netflix.hollow.api.producer.HollowProducer.WriteState#getPriorState()}
+     */
+    public void addAllObjectsFromPreviousCycle(String typeName, HollowReadStateEngine readStateEngine) {
+        HashMap<String, BitSet> recordsMap = new HashMap<>();
+        HollowTypeWriteState typeState = getTypeState(typeName);
+
+        BitSet previousRecords = typeState.getPreviousCyclePopulatedBitSet().toBitSet();
+        recordsMap.put(typeName, previousRecords);
+
+        TransitiveSetTraverser.addTransitiveMatches(readStateEngine, recordsMap);
+
+        recordsMap.forEach((key, value) -> {
+            HollowTypeWriteState state = getTypeState(key);
+            value.stream().forEach(state::addOrdinalFromPreviousCycle);
+        });
     }
 
     /**
