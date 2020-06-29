@@ -29,8 +29,14 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.BitSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
