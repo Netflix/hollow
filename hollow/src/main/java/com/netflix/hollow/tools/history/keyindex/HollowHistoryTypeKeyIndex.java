@@ -142,7 +142,6 @@ public class HollowHistoryTypeKeyIndex {
             bucket = (bucket + 1) & bucketMask;
         hashedRecordKeys[bucket] = ordinal;
 
-        indexFields:
         for(int j=0;j<primaryKey.numFields();j++) {
             if(keyFieldIsIndexed[j]) {
                 int fieldBucket = HashCodes.hashInt(HollowReadFieldUtils.fieldHashCode(keyTypeState, ordinal, j)) & bucketMask;
@@ -152,14 +151,15 @@ public class HollowHistoryTypeKeyIndex {
                     if(HollowReadFieldUtils.fieldsAreEqual(keyTypeState, ordinal, j, keyTypeState, representativeOrdinal, j)) {
                         hashedFieldKeyChains.add(((long)chainStartIndex << 32) | ordinal);
                         hashedFieldKeys[j][fieldBucket] = hashedFieldKeyChains.size() - 1;
-                        break indexFields;
+                        break;
                     }
                     fieldBucket = (fieldBucket + 1) & bucketMask;
                     chainStartIndex = hashedFieldKeys[j][fieldBucket];
                 }
-
-                hashedFieldKeyChains.add(((long)Integer.MAX_VALUE << 32) | ordinal);
-                hashedFieldKeys[j][fieldBucket] = hashedFieldKeyChains.size() - 1;
+                if (chainStartIndex == -1) {
+                    hashedFieldKeyChains.add(((long) Integer.MAX_VALUE << 32) | ordinal);
+                    hashedFieldKeys[j][fieldBucket] = hashedFieldKeyChains.size() - 1;
+                }
             }
         }
     }
