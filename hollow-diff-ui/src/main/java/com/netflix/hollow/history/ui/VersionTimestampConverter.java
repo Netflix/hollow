@@ -43,7 +43,7 @@ public class VersionTimestampConverter {
 
             Date adjustedDate = new Date(date.getTime() + ADD_MILLIS_TO_TIMESTAMP);
 
-            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd HH:mm");
+            SimpleDateFormat sdf = new SimpleDateFormat("[MM/dd HH:mm z] ");
             sdf.setTimeZone(timeZone);
 
             return sdf.format(adjustedDate);
