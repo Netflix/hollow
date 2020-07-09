@@ -120,7 +120,7 @@ function httpGet(theUrl) {
 </script>
 <table width="100%">
     <tr>
-        <td valign="top" bgcolor="#cccccc" width="120">
+        <td valign="top" bgcolor="#cccccc" width="150">
             #foreach($changeVersion in $changeVersions)
                 <a href="$basePath/historicalObject?version=$changeVersion.getVersionId()&type=$typeName&keyOrdinal=$keyOrdinal">$changeVersion.getDateDisplayString()</a>
                 #if($changeVersion.getVersionId() == $version) 
