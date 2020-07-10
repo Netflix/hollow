@@ -27,6 +27,8 @@ import com.netflix.hollow.api.client.HollowClientUpdater;
 import com.netflix.hollow.api.client.StaleHollowReferenceDetector;
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
+import com.netflix.hollow.api.consumer.index.AbstractHollowUniqueKeyIndex;
+import com.netflix.hollow.api.consumer.index.ConsumerIndexCache;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
@@ -121,6 +123,7 @@ public class HollowConsumer {
     protected final HollowConsumerMetrics metrics;
 
     private final Executor refreshExecutor;
+    private final ConsumerIndexCache<?> indexCache;
 
     /**
      * @deprecated use {@link HollowConsumer.Builder}
@@ -170,6 +173,7 @@ public class HollowConsumer {
         this.announcementWatcher = announcementWatcher;
         this.refreshExecutor = refreshExecutor;
         this.refreshLock = new ReentrantReadWriteLock();
+        this.indexCache = new ConsumerIndexCache<>(this);
         if (announcementWatcher != null)
             announcementWatcher.subscribeToUpdates(this);
     }
@@ -425,6 +429,43 @@ public class HollowConsumer {
      */
     public HollowConsumerMetrics getMetrics() {
         return metrics;
+    }
+
+    /**
+     * Returns the default index for an index type, creating the index if necessary.
+     *
+     * <p>Commonly used with the code generated {@code *PrimaryKeyIndex} class:
+     *
+     * <pre>{@code
+     * FooPrimaryKeyIndex index = consumer.uniqueKeyIndex(FooPrimaryKeyIndex.class);
+     * }</pre>
+     *
+     * <p>Repeated calls with the same {@code indexClass} will return the same index. The index will live for the
+     * duration of the consumer and will stay current as the consumer receives data updates.
+
+     * @param indexClass
+     * @param <I> index class that extends {@link AbstractHollowUniqueKeyIndex}
+     * @return
+     */
+    public <I extends AbstractHollowUniqueKeyIndex<?,?>> I uniqueKeyIndex(Class<I> indexClass) {
+        AbstractHollowUniqueKeyIndex<?, ?> index = indexCache.uniqueKeyIndex(indexClass);
+        // TODO(timt): gross
+        return indexClass.cast(index);
+    }
+
+    public <I extends AbstractHollowUniqueKeyIndex<?,?>> I uniqueKeyIndex(Class<I> indexClass,
+            String name) {
+        AbstractHollowUniqueKeyIndex<?, ?> index = indexCache.uniqueKeyIndex(indexClass, name);
+        // TODO(timt): gross
+        return indexClass.cast(index);
+    }
+
+    public <I extends AbstractHollowUniqueKeyIndex<?,?>> I uniqueKeyIndex(Class<I> indexClass,
+            String name,
+            String... fieldPaths) {
+        AbstractHollowUniqueKeyIndex<?, ?> index = indexCache.uniqueKeyIndex(indexClass, name, fieldPaths);
+        // TODO(timt): gross
+        return indexClass.cast(index);
     }
 
     /**
