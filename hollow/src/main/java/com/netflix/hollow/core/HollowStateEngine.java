@@ -17,9 +17,14 @@
 package com.netflix.hollow.core;
 
 import com.netflix.hollow.api.error.SchemaNotFoundException;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.StateEngineUtil;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -59,4 +64,19 @@ public interface HollowStateEngine extends HollowDataset {
     Map<String, String> getHeaderTags();
 
     String getHeaderTag(String name);
+
+    default List<PrimaryKey> getPrimaryKeys() {
+        List<HollowSchema> schemas = getSchemas();
+
+        List<PrimaryKey> primaryKeys = new ArrayList<>();
+        for (HollowSchema schema : schemas) {
+            if (schema.getSchemaType() == HollowSchema.SchemaType.OBJECT) {
+                PrimaryKey pk = ((HollowObjectSchema) schema).getPrimaryKey();
+                if (pk != null)
+                    primaryKeys.add(pk);
+            }
+        }
+
+        return StateEngineUtil.sortPrimaryKeys(primaryKeys, this);
+    }
 }

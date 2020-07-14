@@ -32,6 +32,7 @@ import com.netflix.hollow.core.schema.HollowSchemaSorter;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.hollow.core.util.StateEngineUtil;
 import com.netflix.hollow.core.write.HollowHashableWriteRecord;
 import com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
@@ -172,7 +173,7 @@ public class HollowCombiner {
             keysByType.put(primaryKey.getType(), primaryKey);
         }
 
-        this.primaryKeys = sortPrimaryKeys(new ArrayList<>(keysByType.values()));
+        this.primaryKeys = StateEngineUtil.sortPrimaryKeys(new ArrayList<>(keysByType.values()), output);
     }
 
     public List<PrimaryKey> getPrimaryKeys() {
@@ -194,26 +195,7 @@ public class HollowCombiner {
             }
         }
         
-        this.primaryKeys = sortPrimaryKeys(keys);
-    }
-    
-    private List<PrimaryKey> sortPrimaryKeys(List<PrimaryKey> primaryKeys) {
-        final List<HollowSchema> dependencyOrderedSchemas = HollowSchemaSorter.dependencyOrderedSchemaList(output.getSchemas());
-        primaryKeys.sort(new Comparator<PrimaryKey>() {
-            public int compare(PrimaryKey o1, PrimaryKey o2) {
-                return schemaDependencyIdx(o1) - schemaDependencyIdx(o2);
-            }
-
-            private int schemaDependencyIdx(PrimaryKey key) {
-                for (int i = 0; i < dependencyOrderedSchemas.size(); i++) {
-                    if (dependencyOrderedSchemas.get(i).getName().equals(key.getType()))
-                        return i;
-                }
-                throw new IllegalArgumentException("Primary key defined for non-existent type: " + key.getType());
-            }
-        });
-        
-        return primaryKeys;
+        this.primaryKeys = StateEngineUtil.sortPrimaryKeys(keys, output);
     }
 
     /**
