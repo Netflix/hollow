@@ -65,6 +65,16 @@ public interface HollowStateEngine extends HollowDataset {
 
     String getHeaderTag(String name);
 
+    default PrimaryKey getPrimaryKey(String typeName) {
+        PrimaryKey pk=null;
+        HollowSchema schema = getSchema(typeName);
+        if (schema.getSchemaType() == HollowSchema.SchemaType.OBJECT) {
+            pk = ((HollowObjectSchema) schema).getPrimaryKey();
+        }
+
+        return pk;
+    }
+
     default List<PrimaryKey> getPrimaryKeys() {
         List<HollowSchema> schemas = getSchemas();
 
