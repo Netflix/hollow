@@ -1178,7 +1178,7 @@ public class HollowConsumer {
                 throw new UnsupportedOperationException("Cinder Consumer in " + memoryMode + " mode is not supported");
             }
 
-            if (filterConfig != null && !memoryMode.supportsFiltering()) {
+            if ((filterConfig != null || typeFilter != null) && !memoryMode.supportsFiltering()) {
                 throw new UnsupportedOperationException("Filtering is not supported in shared memory mode");
             }
         }
