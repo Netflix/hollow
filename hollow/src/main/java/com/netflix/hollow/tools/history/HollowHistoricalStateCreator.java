@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.tools.history;
 
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -44,7 +45,6 @@ import com.netflix.hollow.tools.combine.IdentityOrdinalRemapper;
 import com.netflix.hollow.tools.combine.OrdinalRemapper;
 import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
@@ -346,7 +346,9 @@ public class HollowHistoricalStateCreator {
                 }
             });
 
-            reader.readSnapshot(new BufferedInputStream(in));
+            try (HollowBlobInput hbi = HollowBlobInput.serial(in)) {
+                reader.readSnapshot(hbi);
+            }
         } catch (Exception e) {
             pipeException = e;
         }

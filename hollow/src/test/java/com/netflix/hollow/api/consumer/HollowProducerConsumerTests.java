@@ -26,7 +26,9 @@ import com.netflix.hollow.api.producer.validation.ValidationStatus;
 import com.netflix.hollow.api.producer.validation.ValidationStatusException;
 import com.netflix.hollow.api.producer.validation.ValidationStatusListener;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.tools.compact.HollowCompactor.CompactionConfig;
 import java.time.Duration;
 import java.util.BitSet;
@@ -451,6 +453,49 @@ public class HollowProducerConsumerTests {
         for (int i = 10000; i < 20000; i++) {
             Assert.assertTrue(foundValues.get(i));
         }
+    }
+
+    @Test
+    public void consumerFilteringSupport() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .build();
+
+        /// Showing verbose version of `runCycle(producer, 1);`
+        long version = producer.runCycle(state -> state.add(1));
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
+                .withTypeFilter(new TypeFilter() {
+                    @Override public boolean includes(String type) {
+                        return true;
+                    }
+
+                    @Override public boolean includes(String type, String field) {
+                        return true;
+                    }
+                })
+                .build();
+        consumer.triggerRefreshTo(version);
+        Assert.assertEquals(version, consumer.getCurrentVersionId());
+
+        // Filtering is not supported in shared memory mode
+        try {
+            HollowConsumer.withBlobRetriever(blobStore)
+                    .withMemoryMode(MemoryMode.SHARED_MEMORY_LAZY)
+                    .withTypeFilter(new TypeFilter() {
+                        @Override public boolean includes(String type) {
+                            return true;
+                        }
+
+                        @Override public boolean includes(String type, String field) {
+                            return true;
+                        }
+                    })
+                    .build();
+        } catch (UnsupportedOperationException e) {
+            return;
+        }
+        Assert.fail();  // fail if UnsupportedOperationException was not thrown
     }
 
     private long runCycle(HollowProducer producer, final int cycleNumber) {

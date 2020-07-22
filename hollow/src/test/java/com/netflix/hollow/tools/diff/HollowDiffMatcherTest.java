@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.tools.diff;
 
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -28,7 +29,6 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.Assert;
@@ -144,7 +144,7 @@ public class HollowDiffMatcherTest {
         HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
         readStateEngine.addTypeListener("TestObject", new PopulatedOrdinalListener());
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         return (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
     }
     

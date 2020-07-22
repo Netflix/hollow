@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2020 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,13 +16,17 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
-import com.netflix.hollow.core.memory.SegmentedByteArray;
+import com.netflix.hollow.core.memory.FixedLengthData;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
+import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.memory.VariableLengthData;
+import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
@@ -37,8 +41,8 @@ public class HollowObjectTypeDataElements {
 
     int maxOrdinal;
 
-    FixedLengthElementArray fixedLengthData;
-    final SegmentedByteArray varLengthData[];
+    FixedLengthData fixedLengthData;
+    final VariableLengthData varLengthData[];
 
     GapEncodedVariableLengthIntegerReader encodedAdditions;
     GapEncodedVariableLengthIntegerReader encodedRemovals;
@@ -52,38 +56,44 @@ public class HollowObjectTypeDataElements {
     private boolean unfilteredFieldIsIncluded[];
 
     final ArraySegmentRecycler memoryRecycler;
+    final MemoryMode memoryMode;
 
     public HollowObjectTypeDataElements(HollowObjectSchema schema, ArraySegmentRecycler memoryRecycler) {
-        varLengthData = new SegmentedByteArray[schema.numFields()];
+        this(schema, MemoryMode.ON_HEAP, memoryRecycler);
+    }
+
+    public HollowObjectTypeDataElements(HollowObjectSchema schema, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
+        varLengthData = new VariableLengthData[schema.numFields()];
         bitsPerField = new int[schema.numFields()];
         bitOffsetPerField = new int[schema.numFields()];
         nullValueForField = new long[schema.numFields()];
         this.schema = schema;
+        this.memoryMode = memoryMode;
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(DataInputStream dis, HollowObjectSchema unfilteredSchema) throws IOException {
-        readFromStream(dis, false, unfilteredSchema);
+    void readSnapshot(HollowBlobInput in, HollowObjectSchema unfilteredSchema) throws IOException {
+        readFromInput(in, false, unfilteredSchema);
     }
 
-    void readDelta(DataInputStream dis) throws IOException {
-        readFromStream(dis, true, schema);
+    void readDelta(HollowBlobInput in) throws IOException {
+        readFromInput(in, true, schema);
     }
 
-    void readFromStream(DataInputStream dis, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
-        maxOrdinal = VarInt.readVInt(dis);
+    void readFromInput(HollowBlobInput in, boolean isDelta, HollowObjectSchema unfilteredSchema) throws IOException {
+        maxOrdinal = VarInt.readVInt(in);
 
         if(isDelta) {
-            encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
-            encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+            encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
+            encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
         }
 
-        readFieldStatistics(dis, unfilteredSchema);
+        readFieldStatistics(in, unfilteredSchema);
 
-        fixedLengthData = FixedLengthElementArray.deserializeFrom(dis, memoryRecycler);
+        fixedLengthData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
         removeExcludedFieldsFromFixedLengthData();
 
-        readVarLengthData(dis, unfilteredSchema);
+        readVarLengthData(in, unfilteredSchema);
     }
 
     private void removeExcludedFieldsFromFixedLengthData() {
@@ -99,7 +109,7 @@ public class HollowObjectTypeDataElements {
                     if(unfilteredFieldIsIncluded[j]) {
                         long value = bitsPerUnfilteredField[j] < 56 ?
                                 fixedLengthData.getElementValue(currentReadBit, bitsPerUnfilteredField[j]) :
-                                    fixedLengthData.getLargeElementValue(currentReadBit, bitsPerUnfilteredField[j]);
+                                fixedLengthData.getLargeElementValue(currentReadBit, bitsPerUnfilteredField[j]);
                         filteredData.setElementValue(currentWriteBit, bitsPerUnfilteredField[j], value);
                         currentWriteBit += bitsPerUnfilteredField[j];
                     }
@@ -108,13 +118,13 @@ public class HollowObjectTypeDataElements {
                 }
             }
 
-            fixedLengthData.destroy(memoryRecycler);
+            FixedLengthDataFactory.destroy(fixedLengthData, memoryRecycler);
             memoryRecycler.swap();
             fixedLengthData = filteredData;
         }
     }
 
-    private void readFieldStatistics(DataInputStream dis, HollowObjectSchema unfilteredSchema) throws IOException {
+    private void readFieldStatistics(HollowBlobInput in, HollowObjectSchema unfilteredSchema) throws IOException {
         bitsPerRecord = 0;
 
         bitsPerUnfilteredField = new int[unfilteredSchema.numFields()];
@@ -123,7 +133,7 @@ public class HollowObjectTypeDataElements {
         int filteredFieldIdx = 0;
 
         for(int i=0;i<unfilteredSchema.numFields();i++) {
-            int readBitsPerField = VarInt.readVInt(dis);
+            int readBitsPerField = VarInt.readVInt(in);
             bitsPerUnfilteredField[i] = readBitsPerField;
             unfilteredFieldIsIncluded[i] = schema.getPosition(unfilteredSchema.getFieldName(i)) != -1;
 
@@ -138,52 +148,52 @@ public class HollowObjectTypeDataElements {
     }
 
 
-    private void readVarLengthData(DataInputStream dis, HollowObjectSchema unfilteredSchema) throws IOException {
+    private void readVarLengthData(HollowBlobInput in, HollowObjectSchema unfilteredSchema) throws IOException {
         int filteredFieldIdx = 0;
 
         for(int i=0;i<unfilteredSchema.numFields();i++) {
-            long numBytesInVarLengthData = VarInt.readVLong(dis);
+            long numBytesInVarLengthData = VarInt.readVLong(in);
 
             if(schema.getPosition(unfilteredSchema.getFieldName(i)) != -1) {
                 if(numBytesInVarLengthData != 0) {
-                    varLengthData[filteredFieldIdx] = new SegmentedByteArray(memoryRecycler);
-                    varLengthData[filteredFieldIdx].readFrom(dis, numBytesInVarLengthData);
+                    varLengthData[filteredFieldIdx] = VariableLengthDataFactory.get(memoryMode, memoryRecycler);
+                    varLengthData[filteredFieldIdx].loadFrom(in, numBytesInVarLengthData);
                 }
                 filteredFieldIdx++;
             } else {
                 while(numBytesInVarLengthData > 0) {
-                    numBytesInVarLengthData -= dis.skip(numBytesInVarLengthData);
+                    numBytesInVarLengthData -= in.skipBytes(numBytesInVarLengthData);
                 }
             }
         }
     }
 
-    static void discardFromStream(DataInputStream dis, HollowObjectSchema schema, int numShards, boolean isDelta) throws IOException {
+    static void discardFromInput(HollowBlobInput in, HollowObjectSchema schema, int numShards, boolean isDelta) throws IOException {
         if(numShards > 1)
-            VarInt.readVInt(dis); // max ordinal
-        
+            VarInt.readVInt(in); // max ordinal
+
         for(int i=0;i<numShards;i++) {
-            VarInt.readVInt(dis); // max ordinal
+            VarInt.readVInt(in); // max ordinal
 
             if(isDelta) {
                 /// addition/removal ordinals
-                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
-                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
+                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(in);
+                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(in);
             }
-    
+
             /// field statistics
             for(int j=0;j<schema.numFields();j++) {
-                VarInt.readVInt(dis);
+                VarInt.readVInt(in);
             }
-    
+
             /// fixed length data
-            FixedLengthElementArray.discardFrom(dis);
-    
+            FixedLengthData.discardFrom(in);
+
             /// variable length data
             for(int j=0;j<schema.numFields();j++) {
-                long numBytesInVarLengthData = VarInt.readVLong(dis);
+                long numBytesInVarLengthData = VarInt.readVLong(in);
                 while(numBytesInVarLengthData > 0) {
-                    numBytesInVarLengthData -= dis.skip(numBytesInVarLengthData);
+                    numBytesInVarLengthData -= in.skipBytes(numBytesInVarLengthData);
                 }
             }
         }
@@ -194,10 +204,10 @@ public class HollowObjectTypeDataElements {
     }
 
     public void destroy() {
-        fixedLengthData.destroy(memoryRecycler);
+        FixedLengthDataFactory.destroy(fixedLengthData, memoryRecycler);
         for(int i=0;i<varLengthData.length;i++) {
             if(varLengthData[i] != null)
-                varLengthData[i].destroy();
+                VariableLengthDataFactory.destroy(varLengthData[i]);
         }
     }
 

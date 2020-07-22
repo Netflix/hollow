@@ -17,13 +17,14 @@
 package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.api.sampling.HollowSampler;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -38,11 +39,13 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     protected static final HollowTypeStateListener[] EMPTY_LISTENERS = new HollowTypeStateListener[0];
 
     protected final HollowReadStateEngine stateEngine;
+    protected final MemoryMode memoryMode;
     protected final HollowSchema schema;
     protected HollowTypeStateListener[] stateListeners;
 
-    public HollowTypeReadState(HollowReadStateEngine stateEngine, HollowSchema schema) {
+    public HollowTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSchema schema) {
         this.stateEngine = stateEngine;
+        this.memoryMode = memoryMode;
         this.schema = schema;
         this.stateListeners = EMPTY_LISTENERS;
     }
@@ -118,8 +121,8 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      */
     public abstract int maxOrdinal();
 
-    public abstract void readSnapshot(DataInputStream dis, ArraySegmentRecycler recycler) throws IOException;
-    public abstract void applyDelta(DataInputStream dis, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException;
+    public abstract void readSnapshot(HollowBlobInput in, ArraySegmentRecycler recycler) throws IOException;
+    public abstract void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException;
 
     public HollowSchema getSchema() {
         return schema;

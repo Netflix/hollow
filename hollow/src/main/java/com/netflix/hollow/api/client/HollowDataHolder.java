@@ -20,6 +20,8 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.TransitionAwareRefreshListener;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.HollowConstants;
+import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
@@ -29,16 +31,18 @@ import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.tools.history.HollowHistoricalStateCreator;
 import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.util.logging.Logger;
 
 /**
  * A class comprising much of the internal state of a {@link HollowConsumer}.  Not intended for external consumption.
  */
 class HollowDataHolder {
+    private static final Logger LOG = Logger.getLogger(HollowDataHolder.class.getName());
 
     private final HollowReadStateEngine stateEngine;
     private final HollowAPIFactory apiFactory;
+    private final MemoryMode memoryMode;
     private final HollowBlobReader reader;
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
     private final FailedTransitionTracker failedTransitionTracker;
@@ -55,13 +59,15 @@ class HollowDataHolder {
 
     HollowDataHolder(HollowReadStateEngine stateEngine,
                             HollowAPIFactory apiFactory,
+                            MemoryMode memoryMode,
                             HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
                             FailedTransitionTracker failedTransitionTracker, 
                             StaleHollowReferenceDetector staleReferenceDetector, 
                             HollowConsumer.ObjectLongevityConfig objLongevityConfig) {
         this.stateEngine = stateEngine;
         this.apiFactory = apiFactory;
-        this.reader = new HollowBlobReader(stateEngine);
+        this.memoryMode = memoryMode;
+        this.reader = new HollowBlobReader(stateEngine, memoryMode);
         this.doubleSnapshotConfig = doubleSnapshotConfig;
         this.failedTransitionTracker = failedTransitionTracker;
         this.staleReferenceDetector = staleReferenceDetector;
@@ -132,10 +138,10 @@ class HollowDataHolder {
     }
 
     private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
-        try(InputStream is = snapshotBlob.getInputStream()) {
-            applyStateEngineTransition(is, snapshotBlob, refreshListeners);
+        try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, snapshotBlob)) {
+            applyStateEngineTransition(in, snapshotBlob, refreshListeners);
             initializeAPI();
-            
+
             for(HollowConsumer.RefreshListener refreshListener : refreshListeners) {
                 if (refreshListener instanceof TransitionAwareRefreshListener)
                     ((TransitionAwareRefreshListener)refreshListener).snapshotApplied(currentAPI, stateEngine, snapshotBlob.getToVersion());
@@ -144,6 +150,25 @@ class HollowDataHolder {
             failedTransitionTracker.markFailedTransition(snapshotBlob);
             throw t;
         }
+    }
+
+
+    private void applyStateEngineTransition(HollowBlobInput in, HollowConsumer.Blob transition, HollowConsumer.RefreshListener[] refreshListeners) throws IOException {
+        if(transition.isSnapshot()) {
+            if(filter == null) {
+                reader.readSnapshot(in);
+            }
+            else {
+                reader.readSnapshot(in, filter);
+            }
+        } else {
+            reader.applyDelta(in);
+        }
+
+        setVersion(transition.getToVersion());
+
+        for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
+            refreshListener.blobLoaded(transition);
     }
 
     private void initializeAPI() {
@@ -165,8 +190,13 @@ class HollowDataHolder {
     }
 
     private void applyDeltaTransition(HollowConsumer.Blob blob, boolean isSnapshotPlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
-        try(InputStream is = blob.getInputStream()) {
-            applyStateEngineTransition(is, blob, refreshListeners);
+        if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
+            LOG.warning("Skipping delta transition in shared-memory mode");
+            return;
+        }
+
+        try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, blob)) {
+            applyStateEngineTransition(in, blob, refreshListeners);
 
             if(objLongevityConfig.enableLongLivedObjectSupport()) {
                 HollowDataAccess previousDataAccess = currentAPI.getDataAccess();
@@ -182,13 +212,13 @@ class HollowDataHolder {
             } else {
                 if(currentAPI.getDataAccess() != stateEngine)
                     currentAPI = apiFactory.createAPI(stateEngine);
-                
+
                 priorHistoricalDataAccess = null;
             }
 
             if(!staleReferenceDetector.isKnownAPIHandle(currentAPI))
                 staleReferenceDetector.newAPIHandle(currentAPI);
-            
+
             for(HollowConsumer.RefreshListener refreshListener : refreshListeners) {
                 if(!isSnapshotPlan)
                     refreshListener.deltaUpdateOccurred(currentAPI, stateEngine, blob.getToVersion());
@@ -211,22 +241,6 @@ class HollowDataHolder {
         }
 
         priorHistoricalDataAccess = new WeakReference<HollowHistoricalStateDataAccess>(nextPriorState);
-    }
-
-    private void applyStateEngineTransition(InputStream is, HollowConsumer.Blob transition, HollowConsumer.RefreshListener[] refreshListeners) throws IOException {
-        if(transition.isSnapshot()) {
-            if(filter == null)
-                reader.readSnapshot(is);
-            else
-                reader.readSnapshot(is, filter);
-        } else {
-            reader.applyDelta(is);
-        }
-
-        setVersion(transition.getToVersion());
-        
-        for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
-            refreshListener.blobLoaded(transition);
     }
 
     private void setVersion(long version) {

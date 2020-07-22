@@ -37,7 +37,7 @@ class HollowSetTypeReadStateShard {
 
         do {
             currentData = this.currentDataVolatile;
-            size = (int)currentData.setPointerAndSizeArray.getElementValue(((long)ordinal * currentData.bitsPerFixedLengthSetPortion) + currentData.bitsPerSetPointer, currentData.bitsPerSetSizeValue);
+            size = (int)currentData.setPointerAndSizeData.getElementValue(((long)ordinal * currentData.bitsPerFixedLengthSetPortion) + currentData.bitsPerSetPointer, currentData.bitsPerSetSizeValue);
         } while(readWasUnsafe(currentData));
 
         return size;
@@ -56,7 +56,7 @@ class HollowSetTypeReadStateShard {
                 currentData = this.currentDataVolatile;
 
                 startBucket = getAbsoluteBucketStart(currentData, ordinal);
-                endBucket = currentData.setPointerAndSizeArray.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
+                endBucket = currentData.setPointerAndSizeData.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
             } while(readWasUnsafe(currentData));
 
             hashCode = HashCodes.hashInt(hashCode);
@@ -94,7 +94,7 @@ class HollowSetTypeReadStateShard {
                 currentData = this.currentDataVolatile;
 
                 startBucket = getAbsoluteBucketStart(currentData, ordinal);
-                endBucket = currentData.setPointerAndSizeArray.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
+                endBucket = currentData.setPointerAndSizeData.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
             } while(readWasUnsafe(currentData));
 
             long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
@@ -140,11 +140,11 @@ class HollowSetTypeReadStateShard {
     }
 
     private long getAbsoluteBucketStart(HollowSetTypeDataElements currentData, int ordinal) {
-        return ordinal == 0 ? 0 : currentData.setPointerAndSizeArray.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
+        return ordinal == 0 ? 0 : currentData.setPointerAndSizeData.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
     }
 
     private int absoluteBucketValue(HollowSetTypeDataElements currentData, long absoluteBucketIndex) {
-        return (int)currentData.elementArray.getElementValue(absoluteBucketIndex * currentData.bitsPerElement, currentData.bitsPerElement);
+        return (int)currentData.elementData.getElementValue(absoluteBucketIndex * currentData.bitsPerElement, currentData.bitsPerElement);
     }
     
     void invalidate() {

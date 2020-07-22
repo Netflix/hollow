@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.tools.diff;
 
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowListSchema;
@@ -34,7 +35,6 @@ import com.netflix.hollow.core.write.HollowSetTypeWriteState;
 import com.netflix.hollow.core.write.HollowSetWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.tools.diff.count.HollowFieldDiff;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.Before;
@@ -202,7 +202,7 @@ public class HollowDiffChangedSchemaTest {
 
         HollowReadStateEngine readStateEngine = new HollowReadStateEngine(true);
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         return readStateEngine;
     }
 }

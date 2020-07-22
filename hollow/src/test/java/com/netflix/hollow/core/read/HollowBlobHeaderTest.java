@@ -20,7 +20,6 @@ import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -85,18 +84,18 @@ public class HollowBlobHeaderTest {
     private void roundTripSnapshot() throws IOException {
         blobWriter.writeSnapshot(baos);
         writeStateEngine.prepareForNextCycle();
-        blobReader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+        blobReader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         baos.reset();
     }
 
     private void roundTripDelta() throws IOException {
         blobWriter.writeSnapshot(baos);
         writeStateEngine.prepareForNextCycle();
-        blobReader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+        blobReader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         baos.reset();
         blobWriter.writeDelta(baos);
         writeStateEngine.prepareForNextCycle();
-        blobReader.applyDelta(new ByteArrayInputStream(baos.toByteArray()));
+        blobReader.applyDelta(HollowBlobInput.serial(baos.toByteArray()));
         baos.reset();
     }
 }

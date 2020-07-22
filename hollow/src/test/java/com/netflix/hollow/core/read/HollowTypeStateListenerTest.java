@@ -25,7 +25,6 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.BitSet;
@@ -105,7 +104,7 @@ public class HollowTypeStateListenerTest {
         writeStateEngine.prepareForWrite();
         blobWriter.writeSnapshot(baos);
         writeStateEngine.prepareForNextCycle();
-        blobReader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+        blobReader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         baos.reset();
     }
 
@@ -113,7 +112,7 @@ public class HollowTypeStateListenerTest {
         writeStateEngine.prepareForWrite();
         blobWriter.writeDelta(baos);
         writeStateEngine.prepareForNextCycle();
-        blobReader.applyDelta(new ByteArrayInputStream(baos.toByteArray()));
+        blobReader.applyDelta(HollowBlobInput.serial(baos.toByteArray()));
         baos.reset();
     }
 

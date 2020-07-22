@@ -20,8 +20,10 @@ import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowObjectSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -30,7 +32,6 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.BitSet;
 
@@ -41,19 +42,19 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     private final HollowObjectSchema unfilteredSchema;
     private final HollowObjectSampler sampler;
-    
+
     private final int shardNumberMask;
     private final int shardOrdinalShift;
     private final HollowObjectTypeReadStateShard shards[];
-    
+
     private int maxOrdinal;
 
-    public HollowObjectTypeReadState(HollowReadStateEngine stateEngine, HollowObjectSchema schema) {
-        this(stateEngine, schema, schema, 1);
+    public HollowObjectTypeReadState(HollowReadStateEngine fileEngine, HollowObjectSchema schema) {
+        this(fileEngine, MemoryMode.ON_HEAP, schema, schema, 1);
     }
 
-    public HollowObjectTypeReadState(HollowReadStateEngine stateEngine, HollowObjectSchema schema, HollowObjectSchema unfilteredSchema, int numShards) {
-        super(stateEngine, schema);
+    public HollowObjectTypeReadState(HollowReadStateEngine fileEngine, MemoryMode memoryMode, HollowObjectSchema schema, HollowObjectSchema unfilteredSchema, int numShards) {
+        super(fileEngine, memoryMode, schema);
         this.sampler = new HollowObjectSampler(schema, DisabledSamplingDirector.INSTANCE);
         this.unfilteredSchema = unfilteredSchema;
         this.shardNumberMask = numShards - 1;
@@ -80,31 +81,31 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     }
 
     @Override
-    public void readSnapshot(DataInputStream dis, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
-            maxOrdinal = VarInt.readVInt(dis);
-        
+            maxOrdinal = VarInt.readVInt(in);
+
         for(int i=0;i<shards.length;i++) {
-            HollowObjectTypeDataElements snapshotData = new HollowObjectTypeDataElements(getSchema(), memoryRecycler);
-            snapshotData.readSnapshot(dis, unfilteredSchema);
+            HollowObjectTypeDataElements snapshotData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
+            snapshotData.readSnapshot(in, unfilteredSchema);
             shards[i].setCurrentData(snapshotData);
         }
-        
+
         if(shards.length == 1)
             maxOrdinal = shards[0].currentDataElements().maxOrdinal;
-        
-        SnapshotPopulatedOrdinalsReader.readOrdinals(dis, stateListeners);
+
+        SnapshotPopulatedOrdinalsReader.readOrdinals(in, stateListeners);
     }
     
     @Override
-    public void applyDelta(DataInputStream dis, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
-            maxOrdinal = VarInt.readVInt(dis);
+            maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0;i<shards.length;i++) {
-            HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryRecycler);
-            HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryRecycler);
-            deltaData.readDelta(dis);
+            HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryMode, memoryRecycler);
+            HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
+            deltaData.readDelta(in);
             HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
             nextData.applyDelta(oldData, deltaData);
             shards[i].setCurrentData(nextData);
@@ -113,23 +114,23 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             oldData.destroy();
             stateEngine.getMemoryRecycler().swap();
         }
-        
+
         if(shards.length == 1)
             maxOrdinal = shards[0].currentDataElements().maxOrdinal;
     }
 
-    public static void discardSnapshot(DataInputStream dis, HollowObjectSchema schema, int numShards) throws IOException {
-        discardType(dis, schema, numShards, false);
+    public static void discardSnapshot(HollowBlobInput in, HollowObjectSchema schema, int numShards) throws IOException {
+        discardType(in, schema, numShards, false);
     }
 
-    public static void discardDelta(DataInputStream dis, HollowObjectSchema schema, int numShards) throws IOException {
-        discardType(dis, schema, numShards, true);
+    public static void discardDelta(HollowBlobInput in, HollowObjectSchema schema, int numShards) throws IOException {
+        discardType(in, schema, numShards, true);
     }
 
-    public static void discardType(DataInputStream dis, HollowObjectSchema schema, int numShards, boolean delta) throws IOException {
-        HollowObjectTypeDataElements.discardFromStream(dis, schema, numShards, delta);
+    public static void discardType(HollowBlobInput in, HollowObjectSchema schema, int numShards, boolean delta) throws IOException {
+        HollowObjectTypeDataElements.discardFromInput(in, schema, numShards, delta);
         if(!delta)
-            SnapshotPopulatedOrdinalsReader.discardOrdinals(dis);
+            SnapshotPopulatedOrdinalsReader.discardOrdinals(in);
     }
 
     @Override

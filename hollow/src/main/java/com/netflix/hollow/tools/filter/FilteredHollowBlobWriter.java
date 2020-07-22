@@ -27,6 +27,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
@@ -42,7 +43,6 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.util.IOUtils;
 import com.netflix.hollow.core.write.HollowBlobHeaderWriter;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -113,8 +113,8 @@ public class FilteredHollowBlobWriter {
         filter(true, in, out);
     }
 
-    public void filter(boolean delta, InputStream in, OutputStream... out) throws IOException {
-        DataInputStream dis = new DataInputStream(in);
+    public void filter(boolean delta, InputStream is, OutputStream... out) throws IOException {
+        HollowBlobInput in = HollowBlobInput.serial(is);
 
         FilteredHollowBlobWriterStreamAndFilter allStreamAndFilters[] = FilteredHollowBlobWriterStreamAndFilter.combine(out, configs);
 
@@ -144,9 +144,9 @@ public class FilteredHollowBlobWriter {
 
             if(schema instanceof HollowObjectSchema) {
                 if(streamsWithType.length == 0)
-                    HollowObjectTypeReadState.discardType(dis, (HollowObjectSchema)schema, numShards, delta);
+                    HollowObjectTypeReadState.discardType(in, (HollowObjectSchema)schema, numShards, delta);
                 else
-                    copyFilteredObjectState(delta, dis, streamsWithType, (HollowObjectSchema)schema, numShards);
+                    copyFilteredObjectState(delta, in, streamsWithType, (HollowObjectSchema)schema, numShards);
             } else {
                 for(int j=0;j<streamsWithType.length;j++) {
                     schema.writeTo(streamsWithType[j].getStream());
@@ -157,39 +157,39 @@ public class FilteredHollowBlobWriter {
 
                 if (schema instanceof HollowListSchema) {
                     if(streamsWithType.length == 0)
-                        HollowListTypeReadState.discardType(dis, numShards, delta);
+                        HollowListTypeReadState.discardType(in, numShards, delta);
                     else
-                        copyListState(delta, dis, streamsOnly(streamsWithType), numShards);
+                        copyListState(delta, in, streamsOnly(streamsWithType), numShards);
                 } else if(schema instanceof HollowSetSchema) {
                     if(streamsWithType.length == 0)
-                        HollowSetTypeReadState.discardType(dis, numShards, delta);
+                        HollowSetTypeReadState.discardType(in, numShards, delta);
                     else
-                        copySetState(delta, dis, streamsOnly(streamsWithType), numShards);
+                        copySetState(delta, in, streamsOnly(streamsWithType), numShards);
                 } else if(schema instanceof HollowMapSchema) {
                     if(streamsWithType.length == 0)
-                        HollowMapTypeReadState.discardType(dis, numShards, delta);
+                        HollowMapTypeReadState.discardType(in, numShards, delta);
                     else
-                        copyMapState(delta, dis, streamsOnly(streamsWithType), numShards);
+                        copyMapState(delta, in, streamsOnly(streamsWithType), numShards);
                 }
             }
         }
     }
 
-    private int readNumShards(InputStream is) throws IOException {
-        int backwardsCompatibilityBytes = VarInt.readVInt(is);
+    private int readNumShards(HollowBlobInput in) throws IOException {
+        int backwardsCompatibilityBytes = VarInt.readVInt(in);
         
         if(backwardsCompatibilityBytes == 0)
             return 1;  /// produced by a version of hollow prior to 2.1.0, always only 1 shard.
         
-        skipForwardsCompatibilityBytes(is);
+        skipForwardsCompatibilityBytes(in);
         
-        return VarInt.readVInt(is);
+        return VarInt.readVInt(in);
     }
     
-    private void skipForwardsCompatibilityBytes(InputStream is) throws IOException {
-        int bytesToSkip = VarInt.readVInt(is);
+    private void skipForwardsCompatibilityBytes(HollowBlobInput in) throws IOException {
+        int bytesToSkip = VarInt.readVInt(in);
         while(bytesToSkip > 0) {
-            int skippedBytes = (int)is.skip(bytesToSkip);
+            int skippedBytes = (int)in.skipBytes(bytesToSkip);
             if(skippedBytes < 0)
                 throw new EOFException();
             bytesToSkip -= skippedBytes;
@@ -197,7 +197,7 @@ public class FilteredHollowBlobWriter {
     }
 
     @SuppressWarnings("unchecked")
-    private void copyFilteredObjectState(boolean delta, DataInputStream is, FilteredHollowBlobWriterStreamAndFilter[] streamAndFilters, HollowObjectSchema schema, int numShards) throws IOException {
+    private void copyFilteredObjectState(boolean delta, HollowBlobInput in, FilteredHollowBlobWriterStreamAndFilter[] streamAndFilters, HollowObjectSchema schema, int numShards) throws IOException {
         DataOutputStream[] os = streamsOnly(streamAndFilters);
         HollowObjectSchema[] filteredObjectSchemas = new HollowObjectSchema[os.length];
 
@@ -212,15 +212,15 @@ public class FilteredHollowBlobWriter {
         }
 
         if(numShards > 1)
-            copyVInt(is, os);
+            copyVInt(in, os);
         
         for(int shard=0;shard<numShards;shard++) {
-            int maxShardOrdinal = copyVInt(is, os);
+            int maxShardOrdinal = copyVInt(in, os);
             int numRecordsToCopy = maxShardOrdinal + 1;
     
             if(delta) {
-                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(is, os);
-                GapEncodedVariableLengthIntegerReader addedOrdinals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(is, memoryRecycler);
+                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
+                GapEncodedVariableLengthIntegerReader addedOrdinals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
                 numRecordsToCopy = addedOrdinals.remainingElements();
                 for(DataOutputStream stream : os)
                     addedOrdinals.writeTo(stream);
@@ -229,7 +229,7 @@ public class FilteredHollowBlobWriter {
             /// SETUP ///
             int bitsPerField[] = new int[schema.numFields()];
             for(int i=0;i<schema.numFields();i++)
-                bitsPerField[i] = VarInt.readVInt(is);
+                bitsPerField[i] = VarInt.readVInt(in);
     
             FixedLengthElementArray fixedLengthArraysPerStream[] = new FixedLengthElementArray[os.length];
             long bitsRequiredPerStream[] = new long[os.length];
@@ -253,7 +253,7 @@ public class FilteredHollowBlobWriter {
             /// END SETUP ///
     
             /// read the unfiltered long array into memory
-            FixedLengthElementArray unfilteredFixedLengthFields = FixedLengthElementArray.deserializeFrom(is, memoryRecycler);
+            FixedLengthElementArray unfilteredFixedLengthFields = FixedLengthElementArray.newFrom(in, memoryRecycler);
     
             /// populate the filtered arrays (each field just gets written to all FixedLengthArrayWriters assigned to its field index)
             long bitsPerRecord = 0;
@@ -298,13 +298,13 @@ public class FilteredHollowBlobWriter {
                 DataOutputStream streamsWithField[] = new DataOutputStream[streamsWithFieldList.size()];
                 streamsWithField = streamsWithFieldList.toArray(streamsWithField);
     
-                long numBytesInVarLengthData = IOUtils.copyVLong(is, streamsWithField);
-                IOUtils.copyBytes(is, streamsWithField, numBytesInVarLengthData);
+                long numBytesInVarLengthData = IOUtils.copyVLong(in, streamsWithField);
+                IOUtils.copyBytes(in, streamsWithField, numBytesInVarLengthData);
             }
         }
 
         if(!delta)
-            copySnapshotPopulatedOrdinals(is, os);
+            copySnapshotPopulatedOrdinals(in, os);
     }
 
     private long writeBitsPerField(HollowObjectSchema unfilteredSchema, int bitsPerField[], HollowObjectSchema filteredSchema, DataOutputStream os) throws IOException {
@@ -365,87 +365,87 @@ public class FilteredHollowBlobWriter {
         return filteredSchema;
     }
 
-    private void copyListState(boolean delta, DataInputStream is, DataOutputStream[] os, int numShards) throws IOException {
+    private void copyListState(boolean delta, HollowBlobInput in, DataOutputStream[] os, int numShards) throws IOException {
         if(numShards > 1)
-            copyVInt(is, os);
+            copyVInt(in, os);
         
         for(int shard=0;shard<numShards;shard++) {
-            copyVInt(is, os);  /// maxOrdinal
+            copyVInt(in, os);  /// maxOrdinal
     
             if(delta) {
-                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(is, os);
-                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(is, os);
+                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
+                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
             }
     
-            copyVInt(is, os);  /// bitsPerListPointer
-            copyVInt(is, os);  /// bitsPerElement
-            copyVLong(is, os); /// totalNumberOfElements
+            copyVInt(in, os);  /// bitsPerListPointer
+            copyVInt(in, os);  /// bitsPerElement
+            copyVLong(in, os); /// totalNumberOfElements
     
-            copySegmentedLongArray(is, os);
-            copySegmentedLongArray(is, os);
+            copySegmentedLongArray(in, os);
+            copySegmentedLongArray(in, os);
         }
 
         if(!delta)
-            copySnapshotPopulatedOrdinals(is, os);
+            copySnapshotPopulatedOrdinals(in, os);
     }
 
-    private void copySetState(boolean delta, DataInputStream is, DataOutputStream[] os, int numShards) throws IOException {
+    private void copySetState(boolean delta, HollowBlobInput in, DataOutputStream[] os, int numShards) throws IOException {
         if(numShards > 1)
-            copyVInt(is, os);
+            copyVInt(in, os);
         
         for(int shard=0;shard<numShards;shard++) {
-            copyVInt(is, os);  /// max ordinal
+            copyVInt(in, os);  /// max ordinal
     
             if(delta) {
-                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(is, os);
-                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(is, os);
+                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
+                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
             }
     
-            copyVInt(is, os);  /// bitsPerSetPointer
-            copyVInt(is, os);  /// bitsPerSetSizeValue
-            copyVInt(is, os);  /// bitsPerElement
-            copyVLong(is, os); /// totalNumberOfBuckets
+            copyVInt(in, os);  /// bitsPerSetPointer
+            copyVInt(in, os);  /// bitsPerSetSizeValue
+            copyVInt(in, os);  /// bitsPerElement
+            copyVLong(in, os); /// totalNumberOfBuckets
     
-            copySegmentedLongArray(is, os);
-            copySegmentedLongArray(is, os);
+            copySegmentedLongArray(in, os);
+            copySegmentedLongArray(in, os);
         }
 
         if(!delta)
-            copySnapshotPopulatedOrdinals(is, os);
+            copySnapshotPopulatedOrdinals(in, os);
     }
 
-    private void copyMapState(boolean delta, DataInputStream is, DataOutputStream[] os, int numShards) throws IOException {
+    private void copyMapState(boolean delta, HollowBlobInput in, DataOutputStream[] os, int numShards) throws IOException {
         if(numShards > 1)
-            copyVInt(is, os);
+            copyVInt(in, os);
         
         for(int shard=0;shard<numShards;shard++) {
-            copyVInt(is, os);  /// max ordinal
+            copyVInt(in, os);  /// max ordinal
     
             if(delta) {
-                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(is, os);
-                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(is, os);
+                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
+                GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
             }
     
-            copyVInt(is, os);  /// bitsPerMapPointer
-            copyVInt(is, os);  /// bitsPerMapSizeValue
-            copyVInt(is, os);  /// bitsPerKeyElement
-            copyVInt(is, os);  /// bitsPerValueElement
-            copyVLong(is, os); /// totalNumberOfBuckets
+            copyVInt(in, os);  /// bitsPerMapPointer
+            copyVInt(in, os);  /// bitsPerMapSizeValue
+            copyVInt(in, os);  /// bitsPerKeyElement
+            copyVInt(in, os);  /// bitsPerValueElement
+            copyVLong(in, os); /// totalNumberOfBuckets
     
-            copySegmentedLongArray(is, os);
-            copySegmentedLongArray(is, os);
+            copySegmentedLongArray(in, os);
+            copySegmentedLongArray(in, os);
         }
 
         if(!delta)
-            copySnapshotPopulatedOrdinals(is, os);
+            copySnapshotPopulatedOrdinals(in, os);
     }
 
-    private void copySnapshotPopulatedOrdinals(DataInputStream is, DataOutputStream[] os) throws IOException {
-        int numLongs = is.readInt();
+    private void copySnapshotPopulatedOrdinals(HollowBlobInput in, DataOutputStream[] os) throws IOException {
+        int numLongs = in.readInt();
         for(int i=0;i<os.length;i++)
             os[i].writeInt(numLongs);
 
-        IOUtils.copyBytes(is, os, numLongs * 8);
+        IOUtils.copyBytes(in, os, numLongs * 8);
     }
     
 }

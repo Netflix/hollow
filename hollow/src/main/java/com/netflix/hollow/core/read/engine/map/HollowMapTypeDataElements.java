@@ -16,11 +16,13 @@
  */
 package com.netflix.hollow.core.read.engine.map;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.FixedLengthData;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
-import java.io.DataInputStream;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 
 /**
@@ -33,8 +35,8 @@ public class HollowMapTypeDataElements {
 
     int maxOrdinal;
 
-    FixedLengthElementArray mapPointerAndSizeArray;
-    FixedLengthElementArray entryArray;
+    FixedLengthData mapPointerAndSizeData;
+    FixedLengthData entryData;
 
     GapEncodedVariableLengthIntegerReader encodedRemovals;
     GapEncodedVariableLengthIntegerReader encodedAdditions;
@@ -49,66 +51,69 @@ public class HollowMapTypeDataElements {
     long totalNumberOfBuckets;
 
     final ArraySegmentRecycler memoryRecycler;
+    final MemoryMode memoryMode;
 
     public HollowMapTypeDataElements(ArraySegmentRecycler memoryRecycler) {
+        this(MemoryMode.ON_HEAP, memoryRecycler);
+    }
+
+    public HollowMapTypeDataElements(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
+        this.memoryMode = memoryMode;
         this.memoryRecycler = memoryRecycler;
     }
 
-    void readSnapshot(DataInputStream dis) throws IOException {
-        readFromStream(dis, false);
+    void readSnapshot(HollowBlobInput in) throws IOException {
+        readFromInput(in, false);
     }
 
-    void readDelta(DataInputStream dis) throws IOException {
-        readFromStream(dis, true);
+    void readDelta(HollowBlobInput in) throws IOException {
+        readFromInput(in,true);
     }
 
-    private void readFromStream(DataInputStream dis, boolean isDelta) throws IOException {
-        maxOrdinal = VarInt.readVInt(dis);
+    private void readFromInput(HollowBlobInput in, boolean isDelta) throws IOException {
+        maxOrdinal = VarInt.readVInt(in);
 
         if(isDelta) {
-            encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
-            encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(dis, memoryRecycler);
+            encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
+            encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
         }
 
-        bitsPerMapPointer = VarInt.readVInt(dis);
-        bitsPerMapSizeValue = VarInt.readVInt(dis);
-        bitsPerKeyElement = VarInt.readVInt(dis);
-        bitsPerValueElement = VarInt.readVInt(dis);
+        bitsPerMapPointer = VarInt.readVInt(in);
+        bitsPerMapSizeValue = VarInt.readVInt(in);
+        bitsPerKeyElement = VarInt.readVInt(in);
+        bitsPerValueElement = VarInt.readVInt(in);
         bitsPerFixedLengthMapPortion = bitsPerMapPointer + bitsPerMapSizeValue;
         bitsPerMapEntry = bitsPerKeyElement + bitsPerValueElement;
         emptyBucketKeyValue = (1 << bitsPerKeyElement) - 1;
-        totalNumberOfBuckets = VarInt.readVLong(dis);
+        totalNumberOfBuckets = VarInt.readVLong(in);
 
-        /// list pointer array
-        mapPointerAndSizeArray = FixedLengthElementArray.deserializeFrom(dis, memoryRecycler);
-
-        /// element array
-        entryArray = FixedLengthElementArray.deserializeFrom(dis, memoryRecycler);
+        mapPointerAndSizeData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
+        entryData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
     }
 
-    static void discardFromStream(DataInputStream dis, int numShards, boolean isDelta) throws IOException {
+    static void discardFromInput(HollowBlobInput in, int numShards, boolean isDelta) throws IOException {
         if(numShards > 1)
-            VarInt.readVInt(dis); /// max ordinal
+            VarInt.readVInt(in); /// max ordinal
 
         for(int i=0; i<numShards; i++) {
-            VarInt.readVInt(dis); /// max ordinal
+            VarInt.readVInt(in); /// max ordinal
 
             if(isDelta) {
                 /// addition/removal ordinals
-                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
-                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(dis);
+                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(in);
+                GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(in);
             }
     
             /// statistics
-            VarInt.readVInt(dis);
-            VarInt.readVInt(dis);
-            VarInt.readVInt(dis);
-            VarInt.readVInt(dis);
-            VarInt.readVLong(dis);
+            VarInt.readVInt(in);
+            VarInt.readVInt(in);
+            VarInt.readVInt(in);
+            VarInt.readVInt(in);
+            VarInt.readVLong(in);
     
             /// fixed length data
-            FixedLengthElementArray.discardFrom(dis);
-            FixedLengthElementArray.discardFrom(dis);
+            FixedLengthData.discardFrom(in);
+            FixedLengthData.discardFrom(in);
         }
     }
 
@@ -117,8 +122,8 @@ public class HollowMapTypeDataElements {
     }
 
     public void destroy() {
-        mapPointerAndSizeArray.destroy(memoryRecycler);
-        entryArray.destroy(memoryRecycler);
+        FixedLengthDataFactory.destroy(mapPointerAndSizeData, memoryRecycler);
+        FixedLengthDataFactory.destroy(entryData, memoryRecycler);
     }
 
 }

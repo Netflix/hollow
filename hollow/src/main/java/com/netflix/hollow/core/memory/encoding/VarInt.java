@@ -17,7 +17,8 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.ByteData;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,22 +32,22 @@ public class VarInt {
 
 
     /**
-     * Write a 'null' variable length integer into the supplied {@link ByteDataBuffer}
+     * Write a 'null' variable length integer into the supplied {@link ByteDataArray}
      *
      * @param buf the buffer to write to
      */
-    public static void writeVNull(ByteDataBuffer buf) {
+    public static void writeVNull(ByteDataArray buf) {
         buf.write((byte)0x80);
         return;
     }
 
     /**
-     * Encode the specified long as a variable length integer into the supplied {@link ByteDataBuffer}
+     * Encode the specified long as a variable length integer into the supplied {@link ByteDataArray}
      *
      * @param buf the buffer to write to
      * @param value the long value
      */
-    public static void writeVLong(ByteDataBuffer buf, long value) {
+    public static void writeVLong(ByteDataArray buf, long value) {
         if(value < 0)                                buf.write((byte)0x81);
         if(value > 0xFFFFFFFFFFFFFFL || value < 0)   buf.write((byte)(0x80 | ((value >>> 56) & 0x7FL)));
         if(value > 0x1FFFFFFFFFFFFL || value < 0)    buf.write((byte)(0x80 | ((value >>> 49) & 0x7FL)));
@@ -82,12 +83,12 @@ public class VarInt {
     }
 
     /**
-     * Encode the specified int as a variable length integer into the supplied {@link ByteDataBuffer}
+     * Encode the specified int as a variable length integer into the supplied {@link ByteDataArray}
      *
      * @param buf the buffer to write to
      * @param value the int value
      */
-    public static void writeVInt(ByteDataBuffer buf, int value) {
+    public static void writeVInt(ByteDataArray buf, int value) {
         if(value > 0x0FFFFFFF || value < 0) buf.write((byte)(0x80 | ((value >>> 28))));
         if(value > 0x1FFFFF || value < 0)   buf.write((byte)(0x80 | ((value >>> 21) & 0x7F)));
         if(value > 0x3FFF || value < 0)     buf.write((byte)(0x80 | ((value >>> 14) & 0x7F)));
@@ -167,9 +168,9 @@ public class VarInt {
 
     /**
      * Read a variable length integer from the supplied InputStream
-     * @param in the input stream to read from
+     * @param in the Hollow blob input to read from
      * @return the int value
-     * @throws IOException if the value cannot be read from the input stream
+     * @throws IOException if the value cannot be read from the input
      */
     public static int readVInt(InputStream in) throws IOException {
         byte b = (byte)in.read();
@@ -179,9 +180,31 @@ public class VarInt {
 
         int value = b & 0x7F;
         while ((b & 0x80) != 0) {
-          b = (byte)in.read();
-          value <<= 7;
-          value |= (b & 0x7F);
+            b = (byte)in.read();
+            value <<= 7;
+            value |= (b & 0x7F);
+        }
+
+        return value;
+    }
+
+    /**
+     * Read a variable length integer from the supplied HollowBlobInput
+     * @param in the Hollow blob input to read from
+     * @return the int value
+     * @throws IOException if the value cannot be read from the input
+     */
+    public static int readVInt(HollowBlobInput in) throws IOException {
+        byte b = (byte)in.read();
+
+        if(b == (byte) 0x80)
+            throw new RuntimeException("Attempting to read null value as int");
+
+        int value = b & 0x7F;
+        while ((b & 0x80) != 0) {
+            b = (byte)in.read();
+            value <<= 7;
+            value |= (b & 0x7F);
         }
 
         return value;
@@ -245,9 +268,31 @@ public class VarInt {
 
         long value = b & 0x7F;
         while ((b & 0x80) != 0) {
-          b = (byte)in.read();
-          value <<= 7;
-          value |= (b & 0x7F);
+            b = (byte)in.read();
+            value <<= 7;
+            value |= (b & 0x7F);
+        }
+
+        return value;
+    }
+
+    /**
+     * Read a variable length long from the supplied HollowBlobInput.
+     * @param in the Hollow blob input to read from
+     * @return the long value
+     * @throws IOException if the value cannot be read from the input
+     */
+    public static long readVLong(HollowBlobInput in) throws IOException {
+        byte b = (byte)in.read();
+
+        if(b == (byte) 0x80)
+            throw new RuntimeException("Attempting to read null value as long");
+
+        long value = b & 0x7F;
+        while ((b & 0x80) != 0) {
+            b = (byte)in.read();
+            value <<= 7;
+            value |= (b & 0x7F);
         }
 
         return value;

@@ -39,8 +39,8 @@ class HollowListTypeReadStateShard {
                 long fixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
 
                 startAndEndElement = ordinal == 0 ?
-                        currentData.listPointerArray.getElementValue(fixedLengthOffset, currentData.bitsPerListPointer) << currentData.bitsPerListPointer :
-                            currentData.listPointerArray.getElementValue(fixedLengthOffset - currentData.bitsPerListPointer, currentData.bitsPerListPointer * 2);
+                        currentData.listPointerData.getElementValue(fixedLengthOffset, currentData.bitsPerListPointer) << currentData.bitsPerListPointer :
+                            currentData.listPointerData.getElementValue(fixedLengthOffset - currentData.bitsPerListPointer, currentData.bitsPerListPointer * 2);
 
             } while(readWasUnsafe(currentData));
 
@@ -52,7 +52,7 @@ class HollowListTypeReadStateShard {
             if(elementIndex >= endElement)
                 throw new ArrayIndexOutOfBoundsException("Array index out of bounds: " + listIndex + ", list size: " + (endElement - startElement));
 
-            elementOrdinal = (int)currentData.elementArray.getElementValue(elementIndex * currentData.bitsPerElement, currentData.bitsPerElement);
+            elementOrdinal = (int)currentData.elementData.getElementValue(elementIndex * currentData.bitsPerElement, currentData.bitsPerElement);
         } while(readWasUnsafe(currentData));
 
         return elementOrdinal;
@@ -68,8 +68,8 @@ class HollowListTypeReadStateShard {
             long fixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
 
             long startAndEndElement = ordinal == 0 ?
-                    currentData.listPointerArray.getElementValue(fixedLengthOffset, currentData.bitsPerListPointer) << currentData.bitsPerListPointer :
-                        currentData.listPointerArray.getElementValue(fixedLengthOffset - currentData.bitsPerListPointer, currentData.bitsPerListPointer * 2);
+                    currentData.listPointerData.getElementValue(fixedLengthOffset, currentData.bitsPerListPointer) << currentData.bitsPerListPointer :
+                        currentData.listPointerData.getElementValue(fixedLengthOffset - currentData.bitsPerListPointer, currentData.bitsPerListPointer * 2);
 
             long endElement = startAndEndElement >> currentData.bitsPerListPointer;
             long startElement = startAndEndElement &  ((1 << currentData.bitsPerListPointer) - 1);

@@ -17,8 +17,8 @@
 package com.netflix.hollow.core.schema;
 
 import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -78,82 +78,85 @@ public abstract class HollowSchema {
     }
 
     public static HollowSchema readFrom(InputStream is) throws IOException {
-        int schemaTypeId = is.read();
+        try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
+            return readFrom(hbi);
+        }
+    }
+    public static HollowSchema readFrom(HollowBlobInput in) throws IOException {
+        int schemaTypeId = in.read();
 
-        DataInputStream dis = new DataInputStream(is);
-
-        String schemaName = dis.readUTF();
+        String schemaName = in.readUTF();
 
         switch(SchemaType.fromTypeId(schemaTypeId)) {
             case OBJECT:
-                return readObjectSchemaFrom(dis, schemaName, SchemaType.hasKey(schemaTypeId));
+                return readObjectSchemaFrom(in, schemaName, SchemaType.hasKey(schemaTypeId));
             case LIST:
-                return readListSchemaFrom(dis, schemaName);
+                return readListSchemaFrom(in, schemaName);
             case SET:
-                return readSetSchemaFrom(dis, schemaName, SchemaType.hasKey(schemaTypeId));
+                return readSetSchemaFrom(in, schemaName, SchemaType.hasKey(schemaTypeId));
             case MAP:
-                return readMapSchemaFrom(dis, schemaName, SchemaType.hasKey(schemaTypeId));
+                return readMapSchemaFrom(in, schemaName, SchemaType.hasKey(schemaTypeId));
         }
 
         throw new IOException();
     }
 
-    private static HollowObjectSchema readObjectSchemaFrom(DataInputStream is, String schemaName, boolean hasPrimaryKey) throws IOException {
+    private static HollowObjectSchema readObjectSchemaFrom(HollowBlobInput in, String schemaName, boolean hasPrimaryKey) throws IOException {
         String[] keyFieldPaths = null;
         if (hasPrimaryKey) {
-            int numFields = VarInt.readVInt(is);
+            int numFields = VarInt.readVInt(in);
             keyFieldPaths = new String[numFields];
             for(int i=0;i<numFields;i++) {
-                keyFieldPaths[i] = is.readUTF();
+                keyFieldPaths[i] = in.readUTF();
             }
         }
 
-        int numFields = is.readShort();
+        int numFields = in.readShort();
         HollowObjectSchema schema = new HollowObjectSchema(schemaName, numFields, keyFieldPaths);
 
         for(int i=0;i<numFields;i++) {
-            String fieldName = is.readUTF();
-            FieldType fieldType = FieldType.valueOf(is.readUTF());
-            String referencedType = fieldType == FieldType.REFERENCE ? is.readUTF() : null;
+            String fieldName = in.readUTF();
+            FieldType fieldType = FieldType.valueOf(in.readUTF());
+            String referencedType = fieldType == FieldType.REFERENCE ? in.readUTF() : null;
             schema.addField(fieldName, fieldType, referencedType);
         }
 
         return schema;
     }
 
-    private static HollowSetSchema readSetSchemaFrom(DataInputStream is, String schemaName, boolean hasHashKey) throws IOException {
-        String elementType = is.readUTF();
+    private static HollowSetSchema readSetSchemaFrom(HollowBlobInput in, String schemaName, boolean hasHashKey) throws IOException {
+        String elementType = in.readUTF();
 
         String hashKeyFields[] = null;
 
         if(hasHashKey) {
-            int numFields = VarInt.readVInt(is);
+            int numFields = VarInt.readVInt(in);
             hashKeyFields = new String[numFields];
             for(int i=0;i<numFields;i++) {
-                hashKeyFields[i] = is.readUTF();
+                hashKeyFields[i] = in.readUTF();
             }
         }
 
         return new HollowSetSchema(schemaName, elementType, hashKeyFields);
     }
 
-    private static HollowListSchema readListSchemaFrom(DataInputStream is, String schemaName) throws IOException {
-        String elementType = is.readUTF();
+    private static HollowListSchema readListSchemaFrom(HollowBlobInput in, String schemaName) throws IOException {
+        String elementType = in.readUTF();
 
         return new HollowListSchema(schemaName, elementType);
     }
 
-    private static HollowMapSchema readMapSchemaFrom(DataInputStream is, String schemaName, boolean hasHashKey) throws IOException {
-        String keyType = is.readUTF();
-        String valueType = is.readUTF();
+    private static HollowMapSchema readMapSchemaFrom(HollowBlobInput in, String schemaName, boolean hasHashKey) throws IOException {
+        String keyType = in.readUTF();
+        String valueType = in.readUTF();
 
         String hashKeyFields[] = null;
 
         if(hasHashKey) {
-            int numFields = VarInt.readVInt(is);
+            int numFields = VarInt.readVInt(in);
             hashKeyFields = new String[numFields];
             for(int i=0;i<numFields;i++) {
-                hashKeyFields[i] = is.readUTF();
+                hashKeyFields[i] = in.readUTF();
             }
         }
 

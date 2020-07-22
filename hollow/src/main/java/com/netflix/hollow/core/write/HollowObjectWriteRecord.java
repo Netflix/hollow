@@ -16,7 +16,7 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.encoding.ZigZag;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
@@ -27,15 +27,15 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
 
     private final HollowObjectSchema schema;
 
-    private final ByteDataBuffer fieldData[];
+    private final ByteDataArray fieldData[];
     private final boolean isNonNull[];
 
     public HollowObjectWriteRecord(HollowObjectSchema schema) {
         this.schema = schema;
-        this.fieldData = new ByteDataBuffer[schema.numFields()];
+        this.fieldData = new ByteDataArray[schema.numFields()];
         this.isNonNull = new boolean[schema.numFields()];
         for (int i = 0; i < fieldData.length; i++) {
-            fieldData[i] = new ByteDataBuffer(WastefulRecycler.SMALL_ARRAY_RECYCLER);
+            fieldData[i] = new ByteDataArray(WastefulRecycler.SMALL_ARRAY_RECYCLER);
         }
     }
 
@@ -49,13 +49,13 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
      *
      * @param buf the data buffer to write data to
      */
-    public void writeDataTo(ByteDataBuffer buf) {
+    public void writeDataTo(ByteDataArray buf) {
         for (int i = 0; i < fieldData.length; i++) {
             writeField(buf, i);
         }
     }
 
-    public void writeDataTo(ByteDataBuffer buf, HollowObjectSchema translate) {
+    public void writeDataTo(ByteDataArray buf, HollowObjectSchema translate) {
         for(int i=0; i < translate.numFields(); i++) {
             int fieldIndex = schema.getPosition(translate.getFieldName(i));
 
@@ -67,7 +67,7 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
         }
     }
 
-    private void writeField(ByteDataBuffer buf, int fieldIndex) {
+    private void writeField(ByteDataArray buf, int fieldIndex) {
         if (isNonNull[fieldIndex]) {
             if (getSchema().getFieldType(fieldIndex).isVariableLength())
                 VarInt.writeVInt(buf, (int)fieldData[fieldIndex].length());
@@ -89,7 +89,7 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
     public void setNull(String fieldName) {
         int fieldIndex = getSchema().getPosition(fieldName);
 
-        ByteDataBuffer fieldBuffer = getFieldBuffer(fieldIndex);
+        ByteDataArray fieldBuffer = getFieldBuffer(fieldIndex);
         FieldType fieldType = getSchema().getFieldType(fieldIndex);
 
         writeNull(fieldBuffer, fieldType);
@@ -103,7 +103,7 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
 
             validateFieldType(fieldIndex, fieldName, FieldType.INT);
 
-            ByteDataBuffer buf = getFieldBuffer(fieldIndex);
+            ByteDataArray buf = getFieldBuffer(fieldIndex);
 
             // zig zag encoding
             VarInt.writeVInt(buf, ZigZag.encodeInt(value));
@@ -118,7 +118,7 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
 
             validateFieldType(fieldIndex, fieldName, FieldType.LONG);
 
-            ByteDataBuffer buf = getFieldBuffer(fieldIndex);
+            ByteDataArray buf = getFieldBuffer(fieldIndex);
 
             // zig zag encoding
             VarInt.writeVLong(buf, ZigZag.encodeLong(value));
@@ -130,7 +130,7 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
 
         validateFieldType(fieldIndex, fieldName, FieldType.FLOAT);
 
-        ByteDataBuffer buf = getFieldBuffer(fieldIndex);
+        ByteDataArray buf = getFieldBuffer(fieldIndex);
 
         int intBits = Float.floatToIntBits(value);
         writeFixedLengthInt(buf, intBits);
@@ -141,7 +141,7 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
 
         validateFieldType(fieldIndex, fieldName, FieldType.DOUBLE);
 
-        ByteDataBuffer buf = getFieldBuffer(fieldIndex);
+        ByteDataArray buf = getFieldBuffer(fieldIndex);
 
         long longBits = Double.doubleToLongBits(value);
         writeFixedLengthLong(buf, longBits);
@@ -152,7 +152,7 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
 
         validateFieldType(fieldIndex, fieldName, FieldType.BOOLEAN);
 
-        ByteDataBuffer buf = getFieldBuffer(fieldIndex);
+        ByteDataArray buf = getFieldBuffer(fieldIndex);
 
         buf.write(value ? (byte) 1 : (byte) 0);
     }
@@ -164,7 +164,7 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
 
         validateFieldType(fieldIndex, fieldName, FieldType.BYTES);
 
-        ByteDataBuffer buf = getFieldBuffer(fieldIndex);
+        ByteDataArray buf = getFieldBuffer(fieldIndex);
 
         for (int i = 0; i < value.length; i++) {
             buf.write(value[i]);
@@ -178,7 +178,7 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
 
         validateFieldType(fieldIndex, fieldName, FieldType.STRING);
 
-        ByteDataBuffer buf = getFieldBuffer(fieldIndex);
+        ByteDataArray buf = getFieldBuffer(fieldIndex);
 
         for(int i=0;i<value.length();i++) {
             VarInt.writeVInt(buf, value.charAt(i));
@@ -190,12 +190,12 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
 
         validateFieldType(fieldIndex, fieldName, FieldType.REFERENCE);
 
-        ByteDataBuffer buf = getFieldBuffer(fieldIndex);
+        ByteDataArray buf = getFieldBuffer(fieldIndex);
 
         VarInt.writeVInt(buf, ordinal);
     }
 
-    private void writeNull(ByteDataBuffer buf, FieldType fieldType) {
+    private void writeNull(ByteDataArray buf, FieldType fieldType) {
         if(fieldType == FieldType.FLOAT) {
             writeNullFloat(buf);
         } else if(fieldType == FieldType.DOUBLE) {
@@ -213,7 +213,7 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
      * @param field
      * @return
      */
-    private ByteDataBuffer getFieldBuffer(int fieldPosition) {
+    private ByteDataArray getFieldBuffer(int fieldPosition) {
         isNonNull[fieldPosition] = true;
         fieldData[fieldPosition].reset();
         return fieldData[fieldPosition];
@@ -225,14 +225,14 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
     /**
      * Serialize a special 4-byte long sequence indicating a null Float value.
      */
-    private static void writeNullFloat(final ByteDataBuffer fieldBuffer) {
+    private static void writeNullFloat(final ByteDataArray fieldBuffer) {
         writeFixedLengthInt(fieldBuffer, NULL_FLOAT_BITS);
     }
 
     /**
      * Write 4 consecutive bytes
      */
-    private static void writeFixedLengthInt(ByteDataBuffer fieldBuffer, int intBits) {
+    private static void writeFixedLengthInt(ByteDataArray fieldBuffer, int intBits) {
         fieldBuffer.write((byte) (intBits >>> 24));
         fieldBuffer.write((byte) (intBits >>> 16));
         fieldBuffer.write((byte) (intBits >>> 8));
@@ -242,14 +242,14 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
     /**
      * Serialize a special 8-byte long sequence indicating a null Double value.
      */
-    private static void writeNullDouble(ByteDataBuffer fieldBuffer) {
+    private static void writeNullDouble(ByteDataArray fieldBuffer) {
         writeFixedLengthLong(fieldBuffer, NULL_DOUBLE_BITS);
     }
 
     /**
      * Write 8 consecutive bytes
      */
-    private static void writeFixedLengthLong(ByteDataBuffer fieldBuffer, long intBits) {
+    private static void writeFixedLengthLong(ByteDataArray fieldBuffer, long intBits) {
         fieldBuffer.write((byte) (intBits >>> 56));
         fieldBuffer.write((byte) (intBits >>> 48));
         fieldBuffer.write((byte) (intBits >>> 40));

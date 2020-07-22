@@ -27,6 +27,7 @@ import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
@@ -104,7 +105,8 @@ public class HollowClient {
                                                Collections.singletonList(consumerRefreshListenerFor(updateListener)), 
                                                apiFactory,
                                                doubleSnapshotConfig, 
-                                               hashCodeFinder, 
+                                               hashCodeFinder,
+                                               MemoryMode.ON_HEAP,
                                                memoryConfig,
                                                updateListener,
                                                hollowConsumerMetrics,

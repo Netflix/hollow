@@ -18,6 +18,7 @@ package com.netflix.hollow.tools.history.keyindex;
 
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -25,7 +26,6 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.tools.history.HollowHistory;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
@@ -167,8 +167,8 @@ public class HollowHistoryKeyIndex {
         SimultaneousExecutor executor = new SimultaneousExecutor(1, HollowHistoryKeyIndex.class, "round-trip");
         Exception pipeException = null;
         // Ensure read-side is closed after completion of read
-        try (PipedInputStream in = new PipedInputStream(1 << 15)) {
-            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(in));
+        try (PipedInputStream is = new PipedInputStream(1 << 15)) {
+            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(is));
             executor.execute(() -> {
                 // Ensure write-side is closed after completion of write
                 try (Closeable ac = out) {
@@ -182,11 +182,12 @@ public class HollowHistoryKeyIndex {
                 }
             });
 
-            BufferedInputStream bin = new BufferedInputStream(in);
-            if (isInitialUpdate || isSnapshot) {
-                reader.readSnapshot(bin);
-            } else {
-                reader.applyDelta(bin);
+            try (HollowBlobInput in = HollowBlobInput.serial(new BufferedInputStream(is))) {
+                if (isInitialUpdate || isSnapshot) {
+                    reader.readSnapshot(in);
+                } else {
+                    reader.applyDelta(in);
+                }
             }
         } catch (Exception e) {
             pipeException = e;

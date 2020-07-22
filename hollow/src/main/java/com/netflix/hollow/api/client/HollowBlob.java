@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.core.HollowConstants;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -74,6 +75,10 @@ public abstract class HollowBlob {
      * @throws IOException if the input stream to the blob cannot be obtained
      */
     public abstract InputStream getInputStream() throws IOException;
+
+    public File getFile() throws IOException {
+        throw new UnsupportedOperationException();
+    }
 
     public boolean isSnapshot() {
         return fromVersion == HollowConstants.VERSION_NONE;

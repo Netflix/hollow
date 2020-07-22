@@ -66,8 +66,8 @@ class HollowSetDeltaApplicator {
         target.emptyBucketValue = delta.emptyBucketValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
-        target.setPointerAndSizeArray = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion);
-        target.elementArray = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfBuckets * target.bitsPerElement);
+        target.setPointerAndSizeData = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion);
+        target.elementData = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfBuckets * target.bitsPerElement);
 
         if(target.bitsPerSetPointer == from.bitsPerSetPointer
                 && target.bitsPerSetSizeValue == from.bitsPerSetSizeValue
@@ -113,17 +113,17 @@ class HollowSetDeltaApplicator {
         long setPointerAndSizeBitsToCopy = (long)recordsToCopy * target.bitsPerFixedLengthSetPortion;
         long eachSetPointerDifference = currentWriteStartBucket - currentFromStateStartBucket;
 
-        target.setPointerAndSizeArray.copyBits(from.setPointerAndSizeArray, currentFromStateCopyStartBit, currentWriteStartBit, setPointerAndSizeBitsToCopy);
-        target.setPointerAndSizeArray.incrementMany(currentWriteStartBit, eachSetPointerDifference, target.bitsPerFixedLengthSetPortion, recordsToCopy);
+        target.setPointerAndSizeData.copyBits(from.setPointerAndSizeData, currentFromStateCopyStartBit, currentWriteStartBit, setPointerAndSizeBitsToCopy);
+        target.setPointerAndSizeData.incrementMany(currentWriteStartBit, eachSetPointerDifference, target.bitsPerFixedLengthSetPortion, recordsToCopy);
 
         currentFromStateCopyStartBit += setPointerAndSizeBitsToCopy;
         currentWriteStartBit += setPointerAndSizeBitsToCopy;
 
-        long fromDataEndElement = from.setPointerAndSizeArray.getElementValue(currentFromStateCopyStartBit - from.bitsPerFixedLengthSetPortion, from.bitsPerSetPointer);
+        long fromDataEndElement = from.setPointerAndSizeData.getElementValue(currentFromStateCopyStartBit - from.bitsPerFixedLengthSetPortion, from.bitsPerSetPointer);
         long bucketsToCopy = fromDataEndElement - currentFromStateStartBucket;
         long bitsToCopy = bucketsToCopy * from.bitsPerElement;
 
-        target.elementArray.copyBits(from.elementArray, currentFromStateStartBucket * from.bitsPerElement, currentWriteStartBucket * from.bitsPerElement, bitsToCopy);
+        target.elementData.copyBits(from.elementData, currentFromStateStartBucket * from.bitsPerElement, currentWriteStartBucket * from.bitsPerElement, bitsToCopy);
 
         currentFromStateStartBucket += bucketsToCopy;
         currentWriteStartBucket += bucketsToCopy;
@@ -138,17 +138,17 @@ class HollowSetDeltaApplicator {
         }
 
         if(i <= from.maxOrdinal) {
-            long fromDataEndBucket = from.setPointerAndSizeArray.getElementValue(currentFromStateCopyStartBit, from.bitsPerSetPointer);
+            long fromDataEndBucket = from.setPointerAndSizeData.getElementValue(currentFromStateCopyStartBit, from.bitsPerSetPointer);
             if(!removeData) {
                 for(long bucketIdx=currentFromStateStartBucket; bucketIdx<fromDataEndBucket; bucketIdx++) {
-                    long bucketValue = from.elementArray.getElementValue(bucketIdx * from.bitsPerElement, from.bitsPerElement);
+                    long bucketValue = from.elementData.getElementValue(bucketIdx * from.bitsPerElement, from.bitsPerElement);
                     if(bucketValue == from.emptyBucketValue)
                         bucketValue = target.emptyBucketValue;
-                    target.elementArray.setElementValue(currentWriteStartBucket * target.bitsPerElement, target.bitsPerElement, bucketValue);
+                    target.elementData.setElementValue(currentWriteStartBucket * target.bitsPerElement, target.bitsPerElement, bucketValue);
                     currentWriteStartBucket++;
                 }
-                long fromDataSize = from.setPointerAndSizeArray.getElementValue(currentFromStateCopyStartBit + from.bitsPerSetPointer, from.bitsPerSetSizeValue);
-                target.setPointerAndSizeArray.setElementValue(currentWriteStartBit + target.bitsPerSetPointer, target.bitsPerSetSizeValue, fromDataSize);
+                long fromDataSize = from.setPointerAndSizeData.getElementValue(currentFromStateCopyStartBit + from.bitsPerSetPointer, from.bitsPerSetSizeValue);
+                target.setPointerAndSizeData.setElementValue(currentWriteStartBit + target.bitsPerSetPointer, target.bitsPerSetSizeValue, fromDataSize);
             } else {
                 removalsReader.advance();
             }
@@ -157,21 +157,21 @@ class HollowSetDeltaApplicator {
             currentFromStateCopyStartBit += from.bitsPerFixedLengthSetPortion;
         }
 
-        target.setPointerAndSizeArray.setElementValue(currentWriteStartBit, target.bitsPerSetPointer, currentWriteStartBucket);
+        target.setPointerAndSizeData.setElementValue(currentWriteStartBit, target.bitsPerSetPointer, currentWriteStartBucket);
         currentWriteStartBit += target.bitsPerFixedLengthSetPortion;
     }
 
 
 
     private void addFromDelta(GapEncodedVariableLengthIntegerReader additionsReader) {
-        long deltaDataEndBucket = delta.setPointerAndSizeArray.getElementValue(currentDeltaCopyStartBit, delta.bitsPerSetPointer);
+        long deltaDataEndBucket = delta.setPointerAndSizeData.getElementValue(currentDeltaCopyStartBit, delta.bitsPerSetPointer);
         for(long bucketIdx=currentDeltaStartBucket; bucketIdx<deltaDataEndBucket; bucketIdx++) {
-            long bucketValue = delta.elementArray.getElementValue(bucketIdx * delta.bitsPerElement, delta.bitsPerElement);
-            target.elementArray.setElementValue(currentWriteStartBucket * target.bitsPerElement, target.bitsPerElement, bucketValue);
+            long bucketValue = delta.elementData.getElementValue(bucketIdx * delta.bitsPerElement, delta.bitsPerElement);
+            target.elementData.setElementValue(currentWriteStartBucket * target.bitsPerElement, target.bitsPerElement, bucketValue);
             currentWriteStartBucket++;
         }
-        long deltaDataSize = delta.setPointerAndSizeArray.getElementValue(currentDeltaCopyStartBit + delta.bitsPerSetPointer, delta.bitsPerSetSizeValue);
-        target.setPointerAndSizeArray.setElementValue(currentWriteStartBit + target.bitsPerSetPointer, target.bitsPerSetSizeValue, deltaDataSize);
+        long deltaDataSize = delta.setPointerAndSizeData.getElementValue(currentDeltaCopyStartBit + delta.bitsPerSetPointer, delta.bitsPerSetSizeValue);
+        target.setPointerAndSizeData.setElementValue(currentWriteStartBit + target.bitsPerSetPointer, target.bitsPerSetSizeValue, deltaDataSize);
 
         currentDeltaStartBucket = deltaDataEndBucket;
         currentDeltaCopyStartBit += delta.bitsPerFixedLengthSetPortion;

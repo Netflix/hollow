@@ -19,7 +19,7 @@ package com.netflix.hollow.core.write.objectmapper.flatrecords;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.ArrayByteData;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -45,7 +45,7 @@ public class FlatRecordWriter {
 
     private final HollowDataset dataset;
     private final HollowSchemaIdentifierMapper schemaIdMapper;
-    private final ByteDataBuffer buf;
+    private final ByteDataArray buf;
 
     private final Map<Integer, List<RecordLocation>> recordLocationsByHashCode;
     private final IntList recordLocationsByOrdinal;
@@ -53,7 +53,7 @@ public class FlatRecordWriter {
     public FlatRecordWriter(HollowDataset dataset, HollowSchemaIdentifierMapper schemaIdMapper) {
         this.dataset = dataset;
         this.schemaIdMapper = schemaIdMapper;
-        this.buf = new ByteDataBuffer();
+        this.buf = new ByteDataArray();
         this.recordLocationsByOrdinal = new IntList();
         this.recordLocationsByHashCode = new HashMap<>();
     }

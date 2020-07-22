@@ -26,16 +26,16 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
  * @author dkoszewnik
  *
  */
-public class ByteDataBuffer {
+public class ByteDataArray {
 
     private final SegmentedByteArray buf;
     private long position;
 
-    public ByteDataBuffer() {
+    public ByteDataArray() {
         this(WastefulRecycler.DEFAULT_INSTANCE);
     }
 
-    public ByteDataBuffer(ArraySegmentRecycler memoryRecycler) {
+    public ByteDataArray(ArraySegmentRecycler memoryRecycler) {
         buf = new SegmentedByteArray(memoryRecycler);
     }
 
@@ -55,7 +55,7 @@ public class ByteDataBuffer {
         return position;
     }
 
-    public void copyTo(ByteDataBuffer other) {
+    public void copyTo(ByteDataArray other) {
         other.buf.copy(buf, 0, other.position, position);
         other.position += position;
     }

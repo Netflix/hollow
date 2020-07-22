@@ -16,11 +16,11 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
@@ -44,7 +44,7 @@ public class DefinedHashHeadersTest {
         
         HollowReadStateEngine readEngine = new HollowReadStateEngine(true);
         HollowBlobReader reader = new HollowBlobReader(readEngine);
-        reader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         
         String headerTag = readEngine.getHeaderTag(HollowObjectHashCodeFinder.DEFINED_HASH_CODES_HEADER_NAME);
         

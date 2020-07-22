@@ -17,11 +17,11 @@
 package com.netflix.hollow.core.read.object;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.Assert;
@@ -60,8 +60,8 @@ public class HollowObjectReverseDeltaVarLengthFieldTest extends AbstractStateEng
 		roundTripDelta();
 
 		HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-		reader.applyDelta(new ByteArrayInputStream(reverseDelta2));
-		reader.applyDelta(new ByteArrayInputStream(reverseDelta1));
+		reader.applyDelta(HollowBlobInput.serial(reverseDelta2));
+		reader.applyDelta(HollowBlobInput.serial(reverseDelta1));
 		
 		Assert.assertEquals("four", ((HollowObjectTypeReadState)readStateEngine.getTypeState("String")).readString(3, 0));
 	}

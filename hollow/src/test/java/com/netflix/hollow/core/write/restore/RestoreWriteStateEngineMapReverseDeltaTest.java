@@ -17,13 +17,13 @@
 package com.netflix.hollow.core.write.restore;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.Assert;
@@ -54,8 +54,8 @@ public class RestoreWriteStateEngineMapReverseDeltaTest extends AbstractStateEng
         writer.writeDelta(deltaStream);
         
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.applyDelta(new ByteArrayInputStream(deltaStream.toByteArray()));
-        reader.applyDelta(new ByteArrayInputStream(reverseDeltaStream.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(deltaStream.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(reverseDeltaStream.toByteArray()));
         
         assertMapContains(0, 1, 1, 3);
         assertMapContains(0, 2, 2, 2);

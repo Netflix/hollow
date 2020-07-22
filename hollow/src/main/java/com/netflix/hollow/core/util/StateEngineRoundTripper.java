@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.util;
 
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
@@ -69,13 +70,14 @@ public class StateEngineRoundTripper {
         writer.writeSnapshot(baos);
         writeEngine.prepareForNextCycle();
 
-
         HollowBlobReader reader = new HollowBlobReader(readEngine);
         InputStream is = new ByteArrayInputStream(baos.toByteArray());
-        if(filter == null)
-            reader.readSnapshot(is);
-        else
-            reader.readSnapshot(is, filter);
+        try (HollowBlobInput in = HollowBlobInput.serial(is)) {
+            if (filter == null)
+                reader.readSnapshot(in);
+            else
+                reader.readSnapshot(in, filter);
+        }
     }
 
     /**
@@ -92,7 +94,9 @@ public class StateEngineRoundTripper {
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
         writer.writeDelta(baos);
         HollowBlobReader reader = new HollowBlobReader(readEngine);
-        reader.applyDelta(new ByteArrayInputStream(baos.toByteArray()));
+        try (HollowBlobInput hbi = HollowBlobInput.serial(baos.toByteArray())) {
+            reader.applyDelta(hbi);
+        }
         writeEngine.prepareForNextCycle();
     }
 

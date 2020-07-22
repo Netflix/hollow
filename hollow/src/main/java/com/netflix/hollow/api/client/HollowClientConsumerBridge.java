@@ -20,6 +20,7 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -40,6 +41,11 @@ class HollowClientConsumerBridge {
                     public InputStream getInputStream() throws IOException {
                         return blob.getInputStream();
                     }
+
+                    @Override
+                    public File getFile() throws IOException {
+                        return blob.getFile();
+                    }
                 };
             }
             
@@ -54,6 +60,11 @@ class HollowClientConsumerBridge {
                     public InputStream getInputStream() throws IOException {
                         return blob.getInputStream();
                     }
+
+                    @Override
+                    public File getFile() throws IOException {
+                        return blob.getFile();
+                    }
                 };
             }
             
@@ -67,6 +78,11 @@ class HollowClientConsumerBridge {
                     @Override
                     public InputStream getInputStream() throws IOException {
                         return blob.getInputStream();
+                    }
+
+                    @Override
+                    public File getFile() throws IOException {
+                        return blob.getFile();
                     }
                 };
             }
@@ -93,6 +109,10 @@ class HollowClientConsumerBridge {
                     @Override
                     public InputStream getInputStream() throws IOException {
                         return transition.getInputStream();
+                    }
+                    @Override
+                    public File getFile() throws IOException {
+                        return transition.getFile();
                     }
                 });
             }

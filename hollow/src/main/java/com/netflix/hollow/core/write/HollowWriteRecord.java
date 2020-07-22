@@ -16,11 +16,11 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 
 public interface HollowWriteRecord {
 
-    public void writeDataTo(ByteDataBuffer buf);
+    public void writeDataTo(ByteDataArray buf);
 
     public void reset();
 

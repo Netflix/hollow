@@ -17,7 +17,7 @@
 package com.netflix.hollow.core.write;
 
 import com.netflix.hollow.core.memory.ByteData;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.VarInt;
@@ -42,8 +42,8 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     /// additional data required for writing delta
     private int numListsInDelta[];
     private long numElementsInDelta[];
-    private ByteDataBuffer deltaAddedOrdinals[];
-    private ByteDataBuffer deltaRemovedOrdinals[];
+    private ByteDataArray deltaAddedOrdinals[];
+    private ByteDataArray deltaRemovedOrdinals[];
 
     public HollowListTypeWriteState(HollowListSchema schema) {
         this(schema, -1);
@@ -258,8 +258,8 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         
         listPointerArray = new FixedLengthElementArray[numShards];
         elementArray = new FixedLengthElementArray[numShards];
-        deltaAddedOrdinals = new ByteDataBuffer[numShards];
-        deltaRemovedOrdinals = new ByteDataBuffer[numShards];
+        deltaAddedOrdinals = new ByteDataArray[numShards];
+        deltaRemovedOrdinals = new ByteDataArray[numShards];
         
         ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
         
@@ -277,8 +277,8 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         for(int i=0;i<numShards;i++) {
             listPointerArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numListsInDelta[i] * bitsPerListPointer);
             elementArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, numElementsInDelta[i] * bitsPerElement);
-            deltaAddedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
-            deltaRemovedOrdinals[i] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
+            deltaAddedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+            deltaRemovedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
         }
 
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();

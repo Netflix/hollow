@@ -60,11 +60,11 @@ public class ByteArrayOrdinalTest {
         Assert.assertArrayEquals(ordinals, newOrdinals);
     }
 
-    static ByteDataBuffer createBuffer(String s) {
-        return write(new ByteDataBuffer(), s);
+    static ByteDataArray createBuffer(String s) {
+        return write(new ByteDataArray(), s);
     }
 
-    static ByteDataBuffer write(ByteDataBuffer bdb, String s) {
+    static ByteDataArray write(ByteDataArray bdb, String s) {
         for (byte b : s.getBytes()) {
             bdb.write(b);
         }

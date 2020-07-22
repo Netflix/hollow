@@ -17,8 +17,8 @@
 package com.netflix.hollow.core.memory;
 
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import sun.misc.Unsafe;
@@ -40,7 +40,7 @@ import sun.misc.Unsafe;
  *
  */
 @SuppressWarnings("restriction")
-public class SegmentedByteArray implements ByteData {
+public class SegmentedByteArray implements VariableLengthData {
 
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
 
@@ -72,18 +72,12 @@ public class SegmentedByteArray implements ByteData {
      * @param index the index
      * @return the byte value
      */
+    @Override
     public byte get(long index) {
         return segments[(int)(index >>> log2OfSegmentSize)][(int)(index & bitmask)];
     }
 
-    /**
-     * Copy bytes from another ByteData to this array.
-     *
-     * @param src the source data
-     * @param srcPos the position to begin copying from the source data
-     * @param destPos the position to begin writing in this array
-     * @param length the length of the data to copy
-     */
+    @Override
     public void copy(ByteData src, long srcPos, long destPos, long length) {
         for(long i=0;i<length;i++) {
             set(destPos++, src.get(srcPos++));
@@ -105,7 +99,7 @@ public class SegmentedByteArray implements ByteData {
         int remainingBytesInSegment = segmentLength - segmentStartPos;
 
         while(length > 0) {
-            int bytesToCopyFromSegment = (int)Math.min(remainingBytesInSegment, length);
+            int bytesToCopyFromSegment = (int) Math.min(remainingBytesInSegment, length);
             ensureCapacity(currentSegment);
             int copiedBytes = src.copy(srcPos, segments[currentSegment], segmentStartPos, bytesToCopyFromSegment);
 
@@ -163,26 +157,17 @@ public class SegmentedByteArray implements ByteData {
     	return true;
     }
 
-    /**
-     * Copies the data from the provided source array into this array, guaranteeing that
-     * if the update is seen by another thread, then all other writes prior to this call
-     * are also visible to that thread.
-     *
-     * @param src the source data
-     * @param srcPos the position to begin copying from the source data
-     * @param destPos the position to begin writing in this array
-     * @param length the length of the data to copy
-     */
-    public void orderedCopy(SegmentedByteArray src, long srcPos, long destPos, long length) {
+    @Override
+    public void orderedCopy(VariableLengthData src, long srcPos, long destPos, long length) {
         int segmentLength = 1 << log2OfSegmentSize;
         int currentSegment = (int)(destPos >>> log2OfSegmentSize);
         int segmentStartPos = (int)(destPos & bitmask);
         int remainingBytesInSegment = segmentLength - segmentStartPos;
 
         while(length > 0) {
-            int bytesToCopyFromSegment = (int)Math.min(remainingBytesInSegment, length);
+            int bytesToCopyFromSegment = (int) Math.min(remainingBytesInSegment, length);
             ensureCapacity(currentSegment);
-            int copiedBytes = src.orderedCopy(srcPos, segments[currentSegment], segmentStartPos, bytesToCopyFromSegment);
+            int copiedBytes = ((SegmentedByteArray) src).orderedCopy(srcPos, segments[currentSegment], segmentStartPos, bytesToCopyFromSegment);
 
             srcPos += copiedBytes;
             length -= copiedBytes;
@@ -203,7 +188,7 @@ public class SegmentedByteArray implements ByteData {
      * @param length the length of the data to copy
      * @return the number of bytes copied
      */
-    public int orderedCopy(long srcPos, byte[] data, int destPos, int length) {
+    private int orderedCopy(long srcPos, byte[] data, int destPos, int length) {
         int segmentSize = 1 << log2OfSegmentSize;
         int remainingBytesInSegment = (int)(segmentSize - (srcPos & bitmask));
         int dataPosition = destPos;
@@ -224,14 +209,8 @@ public class SegmentedByteArray implements ByteData {
         return dataPosition - destPos;
     }
 
-    /**
-     * Copy bytes from the supplied InputStream into this array.
-     *
-     * @param is the source data
-     * @param length the length of the data to copy
-     * @throws IOException if the copy could not be performed
-     */
-    public void readFrom(InputStream is, long length) throws IOException {
+    @Override
+    public void loadFrom(HollowBlobInput is, long length) throws IOException {
         int segmentSize = 1 << log2OfSegmentSize;
         int segment = 0;
 
@@ -304,6 +283,7 @@ public class SegmentedByteArray implements ByteData {
         }
     }
 
+    @Override
     public long size() {
         long size = 0;
         for(int i=0;i<segments.length;i++) {

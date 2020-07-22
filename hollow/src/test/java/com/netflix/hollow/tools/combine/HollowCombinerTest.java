@@ -22,6 +22,7 @@ import com.netflix.hollow.api.objects.generic.GenericHollowSet;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
@@ -39,7 +40,6 @@ import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowSetTypeWriteState;
 import com.netflix.hollow.core.write.HollowSetWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -222,7 +222,7 @@ public class HollowCombinerTest {
 
         HollowReadStateEngine readEngine = new HollowReadStateEngine(writeEngine.getHashCodeFinder(), true, new RecyclingRecycler());
         HollowBlobReader reader = new HollowBlobReader(readEngine);
-        reader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
 
         return readEngine;
     }

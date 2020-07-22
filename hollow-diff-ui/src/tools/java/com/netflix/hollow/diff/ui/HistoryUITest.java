@@ -1,6 +1,7 @@
 package com.netflix.hollow.diff.ui;
 
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -16,7 +17,6 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
 import com.netflix.hollow.tools.history.HollowHistory;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.Test;
@@ -63,7 +63,7 @@ public class HistoryUITest {
 
         HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-        reader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+        reader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         HollowHistory history = new HollowHistory(readStateEngine, 0, 10);
         history.getKeyIndex().addTypeIndex("TypeA", "a1");
 
@@ -81,7 +81,7 @@ public class HistoryUITest {
 
         baos = new ByteArrayOutputStream();
         writer.writeDelta(baos);
-        reader.applyDelta(new ByteArrayInputStream(baos.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(baos.toByteArray()));
         history.deltaOccurred(19991231235959999L);
 
         stateEngine.prepareForNextCycle();
@@ -97,7 +97,7 @@ public class HistoryUITest {
 
         baos = new ByteArrayOutputStream();
         writer.writeDelta(baos);
-        reader.applyDelta(new ByteArrayInputStream(baos.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(baos.toByteArray()));
         history.deltaOccurred(20001231235959999L);
 
         // Double Snapshot

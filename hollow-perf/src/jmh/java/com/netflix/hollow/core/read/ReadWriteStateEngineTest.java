@@ -10,14 +10,12 @@ import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.concurrent.ExecutionException;
@@ -124,7 +122,7 @@ public class ReadWriteStateEngineTest {
                 }
             });
 
-            reader.readSnapshot(in);
+            reader.readSnapshot(HollowBlobInput.serial(in));
         } catch (Exception e) {
             pipeException = e;
         }
@@ -169,7 +167,7 @@ public class ReadWriteStateEngineTest {
                 }
             });
 
-            reader.readSnapshot(new BufferedInputStream(in));
+            reader.readSnapshot(HollowBlobInput.serial(new BufferedInputStream(in)));
         } catch (Exception e) {
             pipeException = e;
         }
@@ -199,8 +197,7 @@ public class ReadWriteStateEngineTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writer.writeSnapshot(baos);
 
-        InputStream is = new ByteArrayInputStream(baos.toByteArray());
-        reader.readSnapshot(is);
+        reader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
 
         return readEngine;
     }
@@ -217,8 +214,8 @@ public class ReadWriteStateEngineTest {
             out.flush();
         }
 
-        try (InputStream is = new BufferedInputStream(new FileInputStream(f))) {
-            reader.readSnapshot(is);
+        try (HollowBlobInput in = HollowBlobInput.serial(new BufferedInputStream(new FileInputStream(f)))) {
+            reader.readSnapshot(in);
         }
 
         return readEngine;
