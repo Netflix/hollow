@@ -78,10 +78,10 @@ public abstract class HollowSchema {
     }
 
     public static HollowSchema readFrom(InputStream is) throws IOException {
-        try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
-            return readFrom(hbi);
-        }
+        HollowBlobInput hbi = HollowBlobInput.serial(is);
+        return readFrom(hbi);
     }
+
     public static HollowSchema readFrom(HollowBlobInput in) throws IOException {
         int schemaTypeId = in.read();
 
