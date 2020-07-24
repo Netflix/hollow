@@ -25,7 +25,7 @@
     
     #foreach($overviewRow in $overviewRows)
         <tr>
-            <td><a href="$basePath/state?version=$overviewRow.getVersion()">$overviewRow.getDateDisplayString() $overviewRow.getVersion()</a></th>
+            <td><a href="$basePath/state?version=$overviewRow.getVersion()">$overviewRow.getDateDisplayString() $overviewRow.getVersion()</a></td>
             <td>
                 <table width="100%"><tr>
                     <td align="left">$overviewRow.getTopLevelChanges().getTotal()</td>
