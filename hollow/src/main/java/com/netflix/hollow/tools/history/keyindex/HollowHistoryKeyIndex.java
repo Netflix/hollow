@@ -182,13 +182,13 @@ public class HollowHistoryKeyIndex {
                 }
             });
 
-            try (HollowBlobInput in = HollowBlobInput.serial(new BufferedInputStream(is))) {
-                if (isInitialUpdate || isSnapshot) {
-                    reader.readSnapshot(in);
-                } else {
-                    reader.applyDelta(in);
-                }
+            HollowBlobInput in = HollowBlobInput.serial(new BufferedInputStream(is));
+            if (isInitialUpdate || isSnapshot) {
+                reader.readSnapshot(in);
+            } else {
+                reader.applyDelta(in);
             }
+
         } catch (Exception e) {
             pipeException = e;
         }

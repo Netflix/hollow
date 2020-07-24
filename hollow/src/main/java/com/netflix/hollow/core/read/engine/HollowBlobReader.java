@@ -75,9 +75,8 @@ public class HollowBlobReader {
      * @throws IOException if the snapshot could not be read
      */
     public void readSnapshot(InputStream is) throws IOException {
-        try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
-            readSnapshot(hbi);
-        }
+        HollowBlobInput hbi = HollowBlobInput.serial(is);
+        readSnapshot(hbi);
     }
 
     /**
@@ -103,9 +102,8 @@ public class HollowBlobReader {
      */
     @Deprecated
     public void readSnapshot(InputStream is, HollowFilterConfig filter) throws IOException {
-        try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
-            readSnapshot(hbi, (TypeFilter) filter);
-        }
+        HollowBlobInput hbi = HollowBlobInput.serial(is);
+        readSnapshot(hbi, (TypeFilter) filter);
     }
 
     /**
@@ -118,9 +116,8 @@ public class HollowBlobReader {
      * @throws IOException if the snapshot could not be read
      */
     public void readSnapshot(InputStream is, TypeFilter filter) throws IOException {
-        try (HollowBlobInput hbi = HollowBlobInput.serial(is)) {
-            readSnapshot(hbi, filter);
-        }
+        HollowBlobInput hbi = HollowBlobInput.serial(is);
+        readSnapshot(hbi, filter);
     }
 
     /**
@@ -153,8 +150,8 @@ public class HollowBlobReader {
 
         long endTime = System.currentTimeMillis();
 
-        log.info("mmap'ed SNAPSHOT COMPLETED IN " + (endTime - startTime) + "ms");
-        log.info("mmap'ed TYPES: " + typeNames);
+        log.info("SNAPSHOT COMPLETED IN " + (endTime - startTime) + "ms");
+        log.info("TYPES: " + typeNames);
 
         notifyEndUpdate();
 
@@ -171,9 +168,8 @@ public class HollowBlobReader {
      * @throws IOException if the delta could not be applied
      */
     public void applyDelta(InputStream in) throws IOException {
-        try (HollowBlobInput hbi = HollowBlobInput.serial(in)) {
-            applyDelta(hbi);
-        }
+        HollowBlobInput hbi = HollowBlobInput.serial(in);
+        applyDelta(hbi);
     }
 
     /**
