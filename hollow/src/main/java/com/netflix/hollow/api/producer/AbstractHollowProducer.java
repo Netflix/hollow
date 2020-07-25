@@ -796,6 +796,7 @@ abstract class AbstractHollowProducer {
         }
     }
 
+    
     private void announce(ProducerListeners listeners, HollowProducer.ReadState readState) {
         if (announcer != null) {
             Status.StageWithStateBuilder status = listeners.fireAnnouncementStart(readState);

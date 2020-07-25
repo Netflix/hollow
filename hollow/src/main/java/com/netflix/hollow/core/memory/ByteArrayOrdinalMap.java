@@ -20,11 +20,9 @@ import com.netflix.hollow.api.error.HollowException;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
-import com.netflix.hollow.core.util.SimultaneousExecutor;
 
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.stream.IntStream;
