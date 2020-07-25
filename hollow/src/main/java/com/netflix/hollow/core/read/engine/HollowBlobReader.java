@@ -133,6 +133,7 @@ public class HollowBlobReader {
         validateMemoryMode(in.getMemoryMode());
 
         HollowBlobHeader header = readHeader(in, false);
+        filter = filter.resolve(header.getSchemas());
 
         notifyBeginUpdate();
 
