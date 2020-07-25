@@ -16,11 +16,16 @@
  */
 package com.netflix.hollow.core.memory;
 
+import com.netflix.hollow.api.error.HollowException;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
+
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.stream.IntStream;
 
@@ -544,18 +549,26 @@ public class ByteArrayOrdinalMap {
 
         int modBitmask = newKeys.length() - 1;
 
-        IntStream.range(0,length).parallel().forEach(i->{
-            long value = valuesToAdd[i];
-            if (value != EMPTY_BUCKET_VALUE) {
-                int hash = rehashPreviouslyAddedData(value);
-                int bucket = hash & modBitmask;
-                boolean isSet = false;
-                while(!isSet){
-                    isSet = newKeys.compareAndSet(bucket,EMPTY_BUCKET_VALUE,value);
-                    bucket = (bucket + 1) & modBitmask;
-                }
-            }
-        });
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
+
+        try {
+            forkJoinPool.submit(()->{
+                IntStream.range(0,length).parallel().forEach(i->{
+                    long value = valuesToAdd[i];
+                    if (value != EMPTY_BUCKET_VALUE) {
+                        int hash = rehashPreviouslyAddedData(value);
+                        int bucket = hash & modBitmask;
+                        boolean isSet = false;
+                        while(!isSet){
+                            isSet = newKeys.compareAndSet(bucket,EMPTY_BUCKET_VALUE,value);
+                            bucket = (bucket + 1) & modBitmask;
+                        }
+                    }
+                });
+            }).get();
+        } catch (Exception e) {
+            throw new HollowException("Unable to populate byte array map", e);
+        }
     }
 
     /**

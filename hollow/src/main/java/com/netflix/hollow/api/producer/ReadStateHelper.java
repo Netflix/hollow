@@ -29,7 +29,7 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  *
  */
-final public class ReadStateHelper {
+final class ReadStateHelper {
     static ReadStateHelper newDeltaChain() {
         return new ReadStateHelper(null, null);
     }
@@ -86,7 +86,7 @@ final public class ReadStateHelper {
         return new ReadStateHelper(newReadState(current.getVersion(), pending.getStateEngine()), null);
     }
 
-    public ReadState current() {
+    ReadState current() {
         return current;
     }
 
