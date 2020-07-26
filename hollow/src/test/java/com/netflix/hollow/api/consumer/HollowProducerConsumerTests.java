@@ -464,16 +464,13 @@ public class HollowProducerConsumerTests {
         /// Showing verbose version of `runCycle(producer, 1);`
         long version = producer.runCycle(state -> state.add(1));
 
-        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
-                .withTypeFilter(new TypeFilter() {
-                    @Override public boolean includes(String type) {
-                        return true;
-                    }
+        TypeFilter filterConfig = TypeFilter.newTypeFilter()
+                .excludeAll()
+                .include("String")
+                .build();
 
-                    @Override public boolean includes(String type, String field) {
-                        return true;
-                    }
-                })
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
+                .withTypeFilter(filterConfig)
                 .build();
         consumer.triggerRefreshTo(version);
         Assert.assertEquals(version, consumer.getCurrentVersionId());
@@ -482,15 +479,7 @@ public class HollowProducerConsumerTests {
         try {
             HollowConsumer.withBlobRetriever(blobStore)
                     .withMemoryMode(MemoryMode.SHARED_MEMORY_LAZY)
-                    .withTypeFilter(new TypeFilter() {
-                        @Override public boolean includes(String type) {
-                            return true;
-                        }
-
-                        @Override public boolean includes(String type, String field) {
-                            return true;
-                        }
-                    })
+                    .withTypeFilter(filterConfig)
                     .build();
         } catch (UnsupportedOperationException e) {
             return;
