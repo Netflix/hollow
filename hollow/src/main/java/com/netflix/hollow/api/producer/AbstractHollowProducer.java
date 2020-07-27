@@ -375,9 +375,9 @@ abstract class AbstractHollowProducer {
 
                 ReadStateHelper candidate = readStates.roundtrip(toVersion);
                 cycleStatus.readState(candidate.pending());
-                candidate = doIntegrityCheck ?
+                candidate = doIntegrityCheck ? 
                         checkIntegrity(listeners, candidate, artifacts, schemaChangedFromPriorVersion) :
-                        noIntegrityCheck(candidate, artifacts);
+                            noIntegrityCheck(candidate, artifacts);
 
                 try {
                     validate(listeners, candidate.pending());
@@ -728,11 +728,11 @@ abstract class AbstractHollowProducer {
             listeners.fireIntegrityCheckComplete(status);
         }
     }
-
+    
     private ReadStateHelper noIntegrityCheck(ReadStateHelper readStates, Artifacts artifacts) throws IOException {
         ReadStateHelper result = readStates;
 
-        if(!readStates.hasCurrent() ||
+        if(!readStates.hasCurrent() || 
                 (!readStates.current().getStateEngine().hasIdenticalSchemas(getWriteEngine()) && artifacts.snapshot != null)) {
             HollowReadStateEngine pending = readStates.pending().getStateEngine();
             readSnapshot(artifacts.snapshot, pending);
@@ -745,7 +745,7 @@ abstract class AbstractHollowProducer {
                 }
 
                 applyDelta(artifacts.delta, current);
-
+                
                 result = readStates.swap();
             }
         }
@@ -796,7 +796,7 @@ abstract class AbstractHollowProducer {
         }
     }
 
-
+    
     private void announce(ProducerListeners listeners, HollowProducer.ReadState readState) {
         if (announcer != null) {
             Status.StageWithStateBuilder status = listeners.fireAnnouncementStart(readState);
