@@ -132,8 +132,14 @@ public class HollowClientUpdater {
                     ((HollowConsumer.TransitionAwareRefreshListener)listener).transitionsPlanned(beforeVersion, requestedVersion, updatePlan.isSnapshotPlan(), updatePlan.getTransitionSequence());
 
             if (updatePlan.destinationVersion() == HollowConstants.VERSION_NONE
-                    && requestedVersion != HollowConstants.VERSION_LATEST)
-                throw new IllegalArgumentException(String.format("Could not create an update plan for version %s, because that version or any previous versions could not be retrieved.", requestedVersion));
+                    && requestedVersion != HollowConstants.VERSION_LATEST) {
+                String msg = String.format("Could not create an update plan for version %s, because "
+                        + "that version or any qualifying previous versions could not be retrieved.", requestedVersion);
+                if (beforeVersion != HollowConstants.VERSION_NONE) {
+                    msg += String.format(" Consumer will remain at current version %s until next update attempt.", beforeVersion);
+                }
+                throw new IllegalArgumentException(msg);
+            }
 
             if (updatePlan.equals(HollowUpdatePlan.DO_NOTHING)
                     && requestedVersion == HollowConstants.VERSION_LATEST)

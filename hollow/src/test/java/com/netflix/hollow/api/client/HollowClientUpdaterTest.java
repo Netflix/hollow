@@ -93,7 +93,8 @@ public class HollowClientUpdaterTest {
     public void testUpdateTo_updateToArbitraryVersionButNoVersionsRetrieved_throwsException() throws Throwable {
         long v = Long.MAX_VALUE - 1;
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage(String.format("Could not create an update plan for version %s, because that version or any previous versions could not be retrieved.", v));
+        expectedException.expectMessage(String.format("Could not create an update plan for version %s, because that "
+                + "version or any qualifying previous versions could not be retrieved.", v));
         subject.updateTo(v);
     }
 
@@ -122,7 +123,7 @@ public class HollowClientUpdaterTest {
     }
 
     @Test
-    public void initialLoad_firstSucceeded() throws Throwable {
+    public void testInitialLoadSucceedsThenBadUpdatePlan_throwsException() throws Throwable {
         // much setup
         // 1. construct a real-ish snapshot blob
         HollowWriteStateEngine stateEngine = new HollowWriteStateEngineBuilder()
@@ -147,5 +148,13 @@ public class HollowClientUpdaterTest {
 
         // amaze!
         assertTrue(subject.getInitialLoad().isDone());
+
+        // test exception msg when subsequent update fails to fetch qualifying versions
+        long v = Long.MAX_VALUE - 1;
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(String.format("Could not create an update plan for version %s, because that "
+                + "version or any qualifying previous versions could not be retrieved. Consumer will remain at current "
+                + "version %s until next update attempt.", v, subject.getCurrentVersionId()));
+        subject.updateTo(v);
     }
 }
