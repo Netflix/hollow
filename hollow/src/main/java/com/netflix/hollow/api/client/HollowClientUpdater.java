@@ -151,12 +151,19 @@ public class HollowClientUpdater {
             if (updatePlan.isSnapshotPlan()) {
                 HollowDataHolder oldDh = hollowDataHolderVolatile;
                 if (oldDh == null || doubleSnapshotConfig.allowDoubleSnapshot()) {
-                    // The volatile field needs to be assigned here because it may be accessed when
-                    // executing the update plan, for example a refresh listener may access the consumer
-                    // after the plan has been applied (such as a unique key indexer).
-                    HollowDataHolder newDh = hollowDataHolderVolatile = newHollowDataHolder();
+                    HollowDataHolder newDh = newHollowDataHolder();
                     try {
-                        newDh.update(updatePlan, localListeners);
+                        /* We need to assign the volatile field after API init since it may be
+                         * accessed during the update plan application, for example via a refresh
+                         * listener (such as a unique key indexer) that calls getAPI. If we do it after
+                         * newDh.update(), refresh listeners will see the old API. If we do it
+                         * before then we open ourselves up to a race where a caller will get back
+                         * null if they call getAPI after assigning the volatile but before the API
+                         * is initialized in HollowDataHolder#initializeAPI.
+                         * Also note that hollowDataHolderVolatile only changes for snapshot plans,
+                         * and it is only for snapshot plans that HollowDataHolder#initializeAPI is
+                         * called. */
+                        newDh.update(updatePlan, localListeners, () -> hollowDataHolderVolatile = newDh);
                     } catch (Throwable t) {
                         // If the update plan failed then revert back to the old holder
                         hollowDataHolderVolatile = oldDh;
@@ -165,7 +172,7 @@ public class HollowClientUpdater {
                     forceDoubleSnapshot = false;
                 }
             } else {
-                hollowDataHolderVolatile.update(updatePlan, localListeners);
+                hollowDataHolderVolatile.update(updatePlan, localListeners, () -> {});
             }
 
             for(HollowConsumer.RefreshListener refreshListener : localListeners)

@@ -99,7 +99,8 @@ class HollowDataHolder {
         return this;
     }
 
-    void update(HollowUpdatePlan updatePlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
+    void update(HollowUpdatePlan updatePlan, HollowConsumer.RefreshListener[] refreshListeners,
+            Runnable apiInitCallback) throws Throwable {
         // Only fail if double snapshot is configured.
         // This is a short term solution until it is decided to either remove this feature
         // or refine it.
@@ -111,18 +112,21 @@ class HollowDataHolder {
         // such as when a new delta is published.
         // Note that a refresh listener may also induce a failed transition, likely unknowingly,
         // by throwing an exception.
-        if(doubleSnapshotConfig.allowDoubleSnapshot() && failedTransitionTracker.anyTransitionWasFailed(updatePlan)) {
+        if (doubleSnapshotConfig.allowDoubleSnapshot() && failedTransitionTracker.anyTransitionWasFailed(updatePlan)) {
             throw new RuntimeException("Update plan contains known failing transition!");
         }
 
-        if(updatePlan.isSnapshotPlan())
-            applySnapshotPlan(updatePlan, refreshListeners);
-        else
+        if (updatePlan.isSnapshotPlan()) {
+            applySnapshotPlan(updatePlan, refreshListeners, apiInitCallback);
+        } else {
             applyDeltaOnlyPlan(updatePlan, refreshListeners);
+        }
     }
 
-    private void applySnapshotPlan(HollowUpdatePlan updatePlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
-        applySnapshotTransition(updatePlan.getSnapshotTransition(), refreshListeners);
+    private void applySnapshotPlan(HollowUpdatePlan updatePlan,
+            HollowConsumer.RefreshListener[] refreshListeners,
+            Runnable apiInitCallback) throws Throwable {
+        applySnapshotTransition(updatePlan.getSnapshotTransition(), refreshListeners, apiInitCallback);
             
         for(HollowConsumer.Blob blob : updatePlan.getDeltaTransitions()) {
             applyDeltaTransition(blob, true, refreshListeners);
@@ -137,16 +141,18 @@ class HollowDataHolder {
         }
     }
 
-    private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
+    private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob,
+            HollowConsumer.RefreshListener[] refreshListeners,
+            Runnable apiInitCallback) throws Throwable {
         try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, snapshotBlob)) {
             applyStateEngineTransition(in, snapshotBlob, refreshListeners);
-            initializeAPI();
+            initializeAPI(apiInitCallback);
 
-            for(HollowConsumer.RefreshListener refreshListener : refreshListeners) {
+            for (HollowConsumer.RefreshListener refreshListener : refreshListeners) {
                 if (refreshListener instanceof TransitionAwareRefreshListener)
                     ((TransitionAwareRefreshListener)refreshListener).snapshotApplied(currentAPI, stateEngine, snapshotBlob.getToVersion());
             }
-        } catch(Throwable t) {
+        } catch (Throwable t) {
             failedTransitionTracker.markFailedTransition(snapshotBlob);
             throw t;
         }
@@ -171,16 +177,20 @@ class HollowDataHolder {
             refreshListener.blobLoaded(transition);
     }
 
-    private void initializeAPI() {
-        if(objLongevityConfig.enableLongLivedObjectSupport()) {
+    private void initializeAPI(Runnable r) {
+        if (objLongevityConfig.enableLongLivedObjectSupport()) {
             HollowProxyDataAccess dataAccess = new HollowProxyDataAccess();
             dataAccess.setDataAccess(stateEngine);
             currentAPI = apiFactory.createAPI(dataAccess);
         } else {
             currentAPI = apiFactory.createAPI(stateEngine);
         }
-        
         staleReferenceDetector.newAPIHandle(currentAPI);
+        try {
+            r.run();
+        } catch (Throwable t) {
+            LOG.warning("Failed to execute API init callback: " + t);
+        }
     }
 
     private void applyDeltaOnlyPlan(HollowUpdatePlan updatePlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
