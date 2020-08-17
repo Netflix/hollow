@@ -49,6 +49,9 @@ public abstract class HollowSchema {
     private final String name;
 
     public HollowSchema(String name) {
+        if (name == null || name == "") {
+            throw new IllegalArgumentException("Type name in Hollow Schema was " + (name == null ? "null" : "an empty string"));
+        }
         this.name = name;
     }
 

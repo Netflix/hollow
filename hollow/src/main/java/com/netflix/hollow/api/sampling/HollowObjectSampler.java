@@ -26,7 +26,8 @@ import java.util.List;
 
 public class HollowObjectSampler implements HollowSampler {
 
-    public static final HollowObjectSampler NULL_SAMPLER = new HollowObjectSampler(new HollowObjectSchema("", 0), DisabledSamplingDirector.INSTANCE);
+    public static final HollowObjectSampler NULL_SAMPLER = new HollowObjectSampler(
+            new HollowObjectSchema("test", 0), DisabledSamplingDirector.INSTANCE);
 
     private final String typeName;
     private final String fieldNames[];
