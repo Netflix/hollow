@@ -16,6 +16,9 @@
  */
 package com.netflix.hollow.core.schema;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -56,5 +59,22 @@ public class HollowSchemaTest {
         Assert.assertTrue(SchemaType.hasKey(4));
         Assert.assertTrue(SchemaType.hasKey(5));
         Assert.assertTrue(SchemaType.hasKey(6));
+    }
+
+    @Test
+    public void invalidName() {
+        try {
+            new HollowObjectSchema("", 1);
+            fail();
+        } catch (IllegalArgumentException ex) {
+            assertEquals("Type name in Hollow Schema was an empty string", ex.getMessage());
+        }
+
+        try {
+            new HollowObjectSchema(null, 1);
+            fail();
+        } catch (IllegalArgumentException ex) {
+            assertEquals("Type name in Hollow Schema was null", ex.getMessage());
+        }
     }
 }
