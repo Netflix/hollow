@@ -24,14 +24,27 @@ public class HollowDiffOverviewTypeEntry {
     private final int unmatchedInTo;
     private final int totalInFrom;
     private final int totalInTo;
+    private final long heapInFrom;
+    private final long heapInTo;
+    private final long holeInFrom;
+    private final long holeInTo;
 
     public HollowDiffOverviewTypeEntry(String typeName, long totalDiffScore, int unmatchedInFrom, int unmatchedInTo, int totalInFrom, int totalInTo) {
+        this(typeName, totalDiffScore, unmatchedInFrom, unmatchedInTo, totalInFrom, totalInTo, 0, 0, 0, 0);
+    }
+
+    public HollowDiffOverviewTypeEntry(String typeName, long totalDiffScore, int unmatchedInFrom, int unmatchedInTo, int totalInFrom, int totalInTo,
+                                       long heapInFrom, long heapInTo, long holeInFrom, long holeInTo) {
         this.typeName = typeName;
         this.totalDiffScore = totalDiffScore;
         this.unmatchedInFrom = unmatchedInFrom;
         this.unmatchedInTo = unmatchedInTo;
         this.totalInFrom = totalInFrom;
         this.totalInTo = totalInTo;
+        this.heapInFrom = heapInFrom;
+        this.heapInTo = heapInTo;
+        this.holeInFrom = holeInFrom;
+        this.holeInTo = holeInTo;
     }
 
     public String getTypeName() {
@@ -52,6 +65,11 @@ public class HollowDiffOverviewTypeEntry {
     public int getTotalInTo() {
         return totalInTo;
     }
+
+    public long getHeapInFrom() { return heapInFrom; }
+    public long getHeapInTo() { return heapInTo; }
+    public long getHoleInFrom() { return holeInFrom; }
+    public long getHoleInTo() { return holeInTo; }
 
     public String getBgColor() {
         if  (totalDiffScore > 0 || unmatchedInFrom > 0 || unmatchedInTo > 0)
