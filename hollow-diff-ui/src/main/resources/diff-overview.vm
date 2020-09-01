@@ -40,6 +40,10 @@
             <td>$typeOverview.getUnmatchedInTo()</td>
             <td>$typeOverview.getTotalInFrom()</td>
             <td>$typeOverview.getTotalInTo()</td>
+            <td>$typeOverview.getHeapInFrom()</td>
+            <td>$typeOverview.getHeapInTo()</td>
+            <td>$typeOverview.getHoleInFrom()</td>
+            <td>$typeOverview.getHoleInTo()</td>
         </tr>
     #end
 </table>
