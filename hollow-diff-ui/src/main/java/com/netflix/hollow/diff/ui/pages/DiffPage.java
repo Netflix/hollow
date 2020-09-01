@@ -63,6 +63,15 @@ public abstract class DiffPage {
         ctx.put("fromBlobName", diffUI.getFromBlobName());
         ctx.put("toBlobName", diffUI.getToBlobName());
 
+        HollowDiff diff = diffUI.getDiff();
+        long heapFrom = diff.getFromStateEngine().calcApproxDataSize();
+        long heapTo = diff.getToStateEngine().calcApproxDataSize();
+        long heapDiff = heapTo-heapFrom;
+        ctx.put("fromHeap", heapFrom);
+        ctx.put("toHeap", heapTo);
+        ctx.put("diffHeap", heapDiff);
+        ctx.put("diffHeap_cssClass", heapDiff<=0 ? "heap_dec" : "heap_inc");
+
         setUpContext(req, session, ctx);
 
         ctx.put("headerEntries", getHeaderEntries());

@@ -32,6 +32,12 @@
         .envTxt_test {
             color: #009999;
         }
+        .heap_inc {
+            color: #FF0000;
+        }
+        .heap_dec {
+            color: #008000;
+        }
     </style>
 </head>
 <body>
