@@ -19,7 +19,7 @@
         <th colspan="6">Summary</th>
         <th>Heap From: $fromHeap</th>
         <th>Heap To: $toHeap</th>
-        <th colspan="2">HEAP Diff: <span class="$diffHeap_cssClass"> $diffHeap </span></th>
+        <th colspan="2">Heap Diff: <span class="$diffHeap_cssClass"> $diffHeap </span></th>
     </tr>
     <tr style="background-color:#9EBFF9">
         <th>Type</th>
