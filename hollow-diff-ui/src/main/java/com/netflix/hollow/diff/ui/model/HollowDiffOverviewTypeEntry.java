@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.diff.ui.model;
 
+import static com.netflix.hollow.HollowDiffUtil.formatBytes;
+
 public class HollowDiffOverviewTypeEntry {
 
     private final String typeName;
@@ -65,11 +67,15 @@ public class HollowDiffOverviewTypeEntry {
     public int getTotalInTo() {
         return totalInTo;
     }
-
     public long getHeapInFrom() { return heapInFrom; }
     public long getHeapInTo() { return heapInTo; }
     public long getHoleInFrom() { return holeInFrom; }
     public long getHoleInTo() { return holeInTo; }
+
+    public String getHeapInFromFormatted() { return formatBytes(heapInFrom); }
+    public String getHeapInToFormatted() { return formatBytes(heapInTo); }
+    public String getHoleInFromFormatted() { return formatBytes(holeInFrom); }
+    public String getHoleInToFormatted() { return formatBytes(holeInTo); }
 
     public String getBgColor() {
         if  (totalDiffScore > 0 || unmatchedInFrom > 0 || unmatchedInTo > 0)

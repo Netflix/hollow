@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.diff.ui.pages;
 
+import static com.netflix.hollow.HollowDiffUtil.formatBytes;
+
 import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.diff.ui.model.HollowHeaderEntry;
 import com.netflix.hollow.tools.diff.HollowDiff;
@@ -67,9 +69,9 @@ public abstract class DiffPage {
         long heapFrom = diff.getFromStateEngine().calcApproxDataSize();
         long heapTo = diff.getToStateEngine().calcApproxDataSize();
         long heapDiff = heapTo-heapFrom;
-        ctx.put("fromHeap", heapFrom);
-        ctx.put("toHeap", heapTo);
-        ctx.put("diffHeap", heapDiff);
+        ctx.put("fromHeap", formatBytes(heapFrom));
+        ctx.put("toHeap", formatBytes(heapTo));
+        ctx.put("diffHeap", (heapDiff > 0 ? "+" : "") + formatBytes(heapDiff));
         ctx.put("diffHeap_cssClass", heapDiff<=0 ? "heap_dec" : "heap_inc");
 
         setUpContext(req, session, ctx);
