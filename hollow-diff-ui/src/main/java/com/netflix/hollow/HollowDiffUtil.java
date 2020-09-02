@@ -7,6 +7,8 @@ public class HollowDiffUtil {
     private static final DecimalFormat BYTE_FORMATTER = new DecimalFormat("#,##0.#");
 
     public static String formatBytes(long sizeInBytes) {
+        if (sizeInBytes==0) return "0";
+
         String sign = (sizeInBytes < 0) ? "-" : "";
         sizeInBytes = Math.abs(sizeInBytes);
         int digitGroups = (int) (Math.log10(sizeInBytes)/Math.log10(1024));

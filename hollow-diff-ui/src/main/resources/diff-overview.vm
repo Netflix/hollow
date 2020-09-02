@@ -15,13 +15,13 @@
  *#
 
 <table border="1" cellpadding="5">
-    <tr>
-        <th align="right" colspan="6">Total HEAP Footprint Diff: <span class="$diffHeap_cssClass">$diffHeap</span></th>
-        <th>Total Heap From: $fromHeap</th>
-        <th>Total Heap To: $toHeap</th>
-        <th colspan="2">&nbsp;</th>
+    <tr style="background-color:#6885B9">
+        <th colspan="6">Summary</th>
+        <th>Heap From: $fromHeap</th>
+        <th>Heap To: $toHeap</th>
+        <th colspan="2">HEAP Diff: <span class="$diffHeap_cssClass"> $diffHeap </span></th>
     </tr>
-    <tr>
+    <tr style="background-color:#9EBFF9">
         <th>Type</th>
         <th><a href="$path/?sortBy=diffs"># Total Diffs</a></th>
         <th><a href="$path/?sortBy=unmatchedFrom"># FROM - Extra</a></th>
@@ -35,7 +35,7 @@
     </tr>
 
     #foreach($typeOverview in $typeOverviewEntries)
-        <tr bgcolor="$typeOverview.getBgColor()">
+        <tr bgcolor="$typeOverview.getBgColor()" align="right">
             <td>
                 <a href="$path/typediff?type=$typeOverview.getTypeName()">
                     $typeOverview.getTypeName()
