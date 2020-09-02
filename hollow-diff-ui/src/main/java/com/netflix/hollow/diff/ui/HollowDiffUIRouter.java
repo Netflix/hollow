@@ -19,7 +19,7 @@ package com.netflix.hollow.diff.ui;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.hollow.ui.HollowUIRouter;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,7 +34,7 @@ public class HollowDiffUIRouter extends HollowUIRouter {
 
     public HollowDiffUIRouter(String baseUrlPath) {
         super(baseUrlPath);
-        this.diffUIs = new HashMap<String, HollowDiffUI>();
+        this.diffUIs = new LinkedHashMap<>();
     }
 
     public boolean handle(String target, HttpServletRequest req, HttpServletResponse resp) throws IOException {

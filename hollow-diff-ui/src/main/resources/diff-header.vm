@@ -33,9 +33,15 @@
             color: #009999;
         }
         .heap_inc {
+            padding-left: 5px;
+            padding-right: 5px;
+            background-color:#FFFFFF;
             color: #FF0000;
         }
         .heap_dec {
+            padding-left: 5px;
+            padding-right: 5px;
+            background-color:#FFFFFF;
             color: #008000;
         }
     </style>
