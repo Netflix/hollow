@@ -16,7 +16,7 @@
  */
 package com.netflix.hollow.diff.ui.model;
 
-import static com.netflix.hollow.HollowDiffUtil.formatBytes;
+import static com.netflix.hollow.ui.HollowDiffUtil.formatBytes;
 
 public class HollowDiffOverviewTypeEntry {
 

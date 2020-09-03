@@ -16,7 +16,7 @@
  */
 package com.netflix.hollow.diff.ui.pages;
 
-import static com.netflix.hollow.HollowDiffUtil.formatBytes;
+import static com.netflix.hollow.ui.HollowDiffUtil.formatBytes;
 
 import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.diff.ui.model.HollowHeaderEntry;

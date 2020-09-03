@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.explorer.ui.pages;
 
+import static com.netflix.hollow.ui.HollowDiffUtil.formatBytes;
+
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -114,13 +116,13 @@ public class ShowAllTypesPage extends HollowExplorerPage {
         long totalHeapFootprint = 0;
         for(TypeOverview type : allTypes)
             totalHeapFootprint += type.getApproxHeapFootprintLong();
-        return TypeOverview.heapFootprintDisplayString(totalHeapFootprint);
+        return formatBytes(totalHeapFootprint);
     }
 
     private String totalApproximateHoleFootprint(List<TypeOverview> allTypes) {
         long totalFootprint = 0;
         for(TypeOverview type : allTypes)
             totalFootprint += type.getApproxHoleFootprintLong();
-        return TypeOverview.heapFootprintDisplayString(totalFootprint);
+        return formatBytes(totalFootprint);
     }
 }
