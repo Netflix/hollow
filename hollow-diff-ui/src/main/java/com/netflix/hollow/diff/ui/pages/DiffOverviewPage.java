@@ -22,8 +22,6 @@ import com.netflix.hollow.diff.ui.model.HollowDiffOverviewTypeEntry;
 import com.netflix.hollow.tools.diff.HollowTypeDiff;
 import com.netflix.hollow.ui.HollowUISession;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
@@ -43,7 +41,7 @@ public class DiffOverviewPage extends DiffPage {
 
     private List<HollowDiffOverviewTypeEntry> getTypeEntries(String sortBy) {
 
-        List<HollowDiffOverviewTypeEntry> overviewEntries = new ArrayList<HollowDiffOverviewTypeEntry>();
+        List<HollowDiffOverviewTypeEntry> overviewEntries = new ArrayList<>();
 
         for(HollowTypeDiff diff : getDiff().getTypeDiffs()) {
             long totalDiffScore = diff.getTotalDiffScore();
@@ -73,77 +71,29 @@ public class DiffOverviewPage extends DiffPage {
         }
 
         if(sortBy == null || "diffs".equals(sortBy)) {
-            Collections.sort(overviewEntries, new Comparator<HollowDiffOverviewTypeEntry>() {
-                @Override
-                public int compare(HollowDiffOverviewTypeEntry o1, HollowDiffOverviewTypeEntry o2) {
-                    long o1Diff = o1.getTotalDiffScore();
-                    long o2Diff = o2.getTotalDiffScore();
-                    if(o2Diff < o1Diff)
-                        return -1;
-                    if(o2Diff == o1Diff)
-                        return 0;
-                    return 1;
-                }
+            overviewEntries.sort((o1, o2) -> {
+                long o1Diff = o1.getTotalDiffScore();
+                long o2Diff = o2.getTotalDiffScore();
+                return Long.compare(o2Diff, o1Diff);
             });
         } else if("unmatchedFrom".equals(sortBy)) {
-            Collections.sort(overviewEntries, new Comparator<HollowDiffOverviewTypeEntry>() {
-                @Override
-                public int compare(HollowDiffOverviewTypeEntry o1, HollowDiffOverviewTypeEntry o2) {
-                    return o2.getUnmatchedInFrom() - o1.getUnmatchedInFrom();
-                }
-            });
+            overviewEntries.sort((o1, o2) -> o2.getUnmatchedInFrom() - o1.getUnmatchedInFrom());
         } else if("unmatchedTo".equals(sortBy)) {
-            Collections.sort(overviewEntries, new Comparator<HollowDiffOverviewTypeEntry>() {
-                @Override
-                public int compare(HollowDiffOverviewTypeEntry o1, HollowDiffOverviewTypeEntry o2) {
-                    return o2.getUnmatchedInTo() - o1.getUnmatchedInTo();
-                }
-            });
+            overviewEntries.sort((o1, o2) -> o2.getUnmatchedInTo() - o1.getUnmatchedInTo());
         } else if("fromCount".equals(sortBy)) {
-            Collections.sort(overviewEntries, new Comparator<HollowDiffOverviewTypeEntry>() {
-                @Override
-                public int compare(HollowDiffOverviewTypeEntry o1, HollowDiffOverviewTypeEntry o2) {
-                    return o2.getTotalInFrom() - o1.getTotalInFrom();
-                }
-            });
+            overviewEntries.sort((o1, o2) -> o2.getTotalInFrom() - o1.getTotalInFrom());
         } else if("toCount".equals(sortBy)) {
-            Collections.sort(overviewEntries, new Comparator<HollowDiffOverviewTypeEntry>() {
-                @Override
-                public int compare(HollowDiffOverviewTypeEntry o1, HollowDiffOverviewTypeEntry o2) {
-                    return o2.getTotalInTo() - o1.getTotalInTo();
-                }
-            });
+            overviewEntries.sort((o1, o2) -> o2.getTotalInTo() - o1.getTotalInTo());
         } else if("fromHeap".equals(sortBy)) {
-            Collections.sort(overviewEntries, new Comparator<HollowDiffOverviewTypeEntry>() {
-                @Override
-                public int compare(HollowDiffOverviewTypeEntry o1, HollowDiffOverviewTypeEntry o2) {
-                    return (int)(o2.getHeapInFrom() - o1.getHeapInFrom());
-                }
-            });
+            overviewEntries.sort((o1, o2) -> (int) (o2.getHeapInFrom() - o1.getHeapInFrom()));
         } else if("toHeap".equals(sortBy)) {
-            Collections.sort(overviewEntries, new Comparator<HollowDiffOverviewTypeEntry>() {
-                @Override
-                public int compare(HollowDiffOverviewTypeEntry o1, HollowDiffOverviewTypeEntry o2) {
-                    return (int)(o2.getHeapInTo() - o1.getHeapInTo());
-                }
-            });
+            overviewEntries.sort((o1, o2) -> (int) (o2.getHeapInTo() - o1.getHeapInTo()));
         } else if("fromHole".equals(sortBy)) {
-            Collections.sort(overviewEntries, new Comparator<HollowDiffOverviewTypeEntry>() {
-                @Override
-                public int compare(HollowDiffOverviewTypeEntry o1, HollowDiffOverviewTypeEntry o2) {
-                    return (int)(o2.getHoleInFrom() - o1.getHoleInFrom());
-                }
-            });
+            overviewEntries.sort((o1, o2) -> (int) (o2.getHoleInFrom() - o1.getHoleInFrom()));
         } else if("toHole".equals(sortBy)) {
-            Collections.sort(overviewEntries, new Comparator<HollowDiffOverviewTypeEntry>() {
-                @Override
-                public int compare(HollowDiffOverviewTypeEntry o1, HollowDiffOverviewTypeEntry o2) {
-                    return (int)(o2.getHoleInTo() - o1.getHoleInTo());
-                }
-            });
+            overviewEntries.sort((o1, o2) -> (int) (o2.getHoleInTo() - o1.getHoleInTo()));
         }
 
         return overviewEntries;
     }
-
 }

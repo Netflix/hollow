@@ -16,14 +16,13 @@
  */
 package com.netflix.hollow.explorer.ui.model;
 
+import static com.netflix.hollow.ui.HollowDiffUtil.formatBytes;
+
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowSchema;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 public class TypeOverview {
-    private static final String[] HEAP_SIZE_UNITS = new String[] { "B", "KB", "MB", "GB", "TB" };
-
     private final String typeName;
     private final int numRecords;
     private final int numHoles;
@@ -49,7 +48,6 @@ public class TypeOverview {
     public int getNumRecordsInt() {
         return numRecords;
     }
-
     public String getNumRecords() {
         return NumberFormat.getIntegerInstance().format(numRecords);
     }
@@ -58,15 +56,10 @@ public class TypeOverview {
     public String getNumHoles() { return NumberFormat.getIntegerInstance().format(numHoles); }
 
     public long getApproxHoleFootprintLong() { return approxHoleFootprint; }
-    public String getApproxHoleFootprint() {  return heapFootprintDisplayString(approxHoleFootprint); }
+    public String getApproxHoleFootprint() {  return formatBytes(approxHoleFootprint); }
 
-    public long getApproxHeapFootprintLong() {
-        return approxHeapFootprint;
-    }
-
-    public String getApproxHeapFootprint() {
-        return heapFootprintDisplayString(approxHeapFootprint);
-    }
+    public long getApproxHeapFootprintLong() { return approxHeapFootprint; }
+    public String getApproxHeapFootprint() { return formatBytes(approxHeapFootprint); }
 
     public String getPrimaryKey() {
         return primaryKey == null ? "" : primaryKey.toString();
@@ -74,11 +67,5 @@ public class TypeOverview {
 
     public String getSchema() {
         return schema.toString();
-    }
-
-    public static String heapFootprintDisplayString(long approxHeapFootprint) {
-        if(approxHeapFootprint <= 0) return "0";
-        int digitGroups = (int) (Math.log10(approxHeapFootprint)/Math.log10(1024));
-        return new DecimalFormat("#,##0.#").format(approxHeapFootprint/Math.pow(1024, digitGroups)) + " " + HEAP_SIZE_UNITS[digitGroups];
     }
 }
