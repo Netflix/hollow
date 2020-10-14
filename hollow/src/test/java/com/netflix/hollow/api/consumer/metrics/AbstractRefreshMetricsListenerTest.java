@@ -103,7 +103,7 @@ public class AbstractRefreshMetricsListenerTest {
             public void refreshEndMetricsReporting(ConsumerRefreshMetrics refreshMetrics) {
                 Assert.assertEquals(0l, refreshMetrics.getConsecutiveFailures());
                 Assert.assertEquals(true, refreshMetrics.getIsRefreshSuccess());
-                Assert.assertEquals(0l, refreshMetrics.getRefreshSuccessAgeMillisOptional().getAsLong());
+                Assert.assertEquals(0l, refreshMetrics.getRefreshSuccessAgeMillis().getAsLong());
                 Assert.assertNotEquals(0l, refreshMetrics.getRefreshEndTimeNano());
             }
         }
@@ -119,7 +119,7 @@ public class AbstractRefreshMetricsListenerTest {
             public void refreshEndMetricsReporting(ConsumerRefreshMetrics refreshMetrics) {
                 Assert.assertNotEquals(0l, refreshMetrics.getConsecutiveFailures());
                 Assert.assertEquals(false, refreshMetrics.getIsRefreshSuccess());
-                Assert.assertNotEquals(Optional.empty(), refreshMetrics.getRefreshSuccessAgeMillisOptional());
+                Assert.assertNotEquals(Optional.empty(), refreshMetrics.getRefreshSuccessAgeMillis());
                 Assert.assertNotEquals(0l, refreshMetrics.getRefreshEndTimeNano());
             }
         }

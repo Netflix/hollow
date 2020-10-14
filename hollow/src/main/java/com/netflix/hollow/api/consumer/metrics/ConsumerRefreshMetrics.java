@@ -28,8 +28,9 @@ public class ConsumerRefreshMetrics {
     private BlobType overallRefreshType;            // snapshot, delta, or reverse delta
     private UpdatePlanDetails updatePlanDetails;    // details about the update plan such as no. and types of transitions and no. of successful transitions
     private long consecutiveFailures;
-    private OptionalLong refreshSuccessAgeMillisOptional; // time elapsed since the previous successful refresh
+    private OptionalLong refreshSuccessAgeMillis;   // time elapsed since the previous successful refresh
     private long refreshEndTimeNano;                // monotonic system time when refresh ended
+    private OptionalLong versionPublishTimeSeconds; // time at which refreshed version was published
 
     /**
      * A class that contains details of the consumer refresh update plan that may be useful to report as metrics or logs.
@@ -73,11 +74,14 @@ public class ConsumerRefreshMetrics {
     public long getConsecutiveFailures() {
         return consecutiveFailures;
     }
-    public OptionalLong getRefreshSuccessAgeMillisOptional() {
-        return refreshSuccessAgeMillisOptional;
+    public OptionalLong getRefreshSuccessAgeMillis() {
+        return refreshSuccessAgeMillis;
     }
     public long getRefreshEndTimeNano() {
         return refreshEndTimeNano;
+    }
+    public OptionalLong getVersionPublishTimeSeconds() {
+        return versionPublishTimeSeconds;
     }
 
     private ConsumerRefreshMetrics(Builder builder) {
@@ -87,8 +91,9 @@ public class ConsumerRefreshMetrics {
         this.overallRefreshType = builder.overallRefreshType;
         this.updatePlanDetails = builder.updatePlanDetails;
         this.consecutiveFailures = builder.consecutiveFailures;
-        this.refreshSuccessAgeMillisOptional = builder.refreshSuccessAgeMillisOptional;
+        this.refreshSuccessAgeMillis = builder.refreshSuccessAgeMillis;
         this.refreshEndTimeNano = builder.refreshEndTimeNano;
+        this.versionPublishTimeSeconds = builder.versionPublishTimeSeconds;
     }
 
     public static final class Builder {
@@ -98,11 +103,13 @@ public class ConsumerRefreshMetrics {
         private BlobType overallRefreshType;
         private UpdatePlanDetails updatePlanDetails;
         private long consecutiveFailures;
-        private OptionalLong refreshSuccessAgeMillisOptional;
+        private OptionalLong refreshSuccessAgeMillis;
         private long refreshEndTimeNano;
+        private OptionalLong versionPublishTimeSeconds;
 
         public Builder() {
-            refreshSuccessAgeMillisOptional = OptionalLong.empty();
+            refreshSuccessAgeMillis = OptionalLong.empty();
+            versionPublishTimeSeconds = OptionalLong.empty();
         }
 
         public Builder setDurationMillis(long durationMillis) {
@@ -130,12 +137,16 @@ public class ConsumerRefreshMetrics {
             this.consecutiveFailures = consecutiveFailures;
             return this;
         }
-        public Builder setRefreshSuccessAgeMillisOptional(long refreshSuccessAgeMillis) {
-            this.refreshSuccessAgeMillisOptional = OptionalLong.of(refreshSuccessAgeMillis);
+        public Builder setRefreshSuccessAgeMillis(long refreshSuccessAgeMillis) {
+            this.refreshSuccessAgeMillis = OptionalLong.of(refreshSuccessAgeMillis);
             return this;
         }
         public Builder setRefreshEndTimeNano(long refreshEndTimeNano) {
             this.refreshEndTimeNano = refreshEndTimeNano;
+            return this;
+        }
+        public Builder setVersionPublishTimeSeconds(long versionPublishTimeSeconds) {
+            this.versionPublishTimeSeconds = OptionalLong.of(versionPublishTimeSeconds);
             return this;
         }
 
