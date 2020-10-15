@@ -30,7 +30,7 @@ public class ConsumerRefreshMetrics {
     private long consecutiveFailures;
     private OptionalLong refreshSuccessAgeMillis;   // time elapsed since the previous successful refresh
     private long refreshEndTimeNano;                // monotonic system time when refresh ended
-    private OptionalLong versionPublishTimeSeconds; // time at which refreshed version was published
+    private OptionalLong versionTimestamp;          // data version after refresh, converted to timestamp in milliseconds
 
     /**
      * A class that contains details of the consumer refresh update plan that may be useful to report as metrics or logs.
@@ -80,8 +80,8 @@ public class ConsumerRefreshMetrics {
     public long getRefreshEndTimeNano() {
         return refreshEndTimeNano;
     }
-    public OptionalLong getVersionPublishTimeSeconds() {
-        return versionPublishTimeSeconds;
+    public OptionalLong getVersionTimestamp() {
+        return versionTimestamp;
     }
 
     private ConsumerRefreshMetrics(Builder builder) {
@@ -93,7 +93,7 @@ public class ConsumerRefreshMetrics {
         this.consecutiveFailures = builder.consecutiveFailures;
         this.refreshSuccessAgeMillis = builder.refreshSuccessAgeMillis;
         this.refreshEndTimeNano = builder.refreshEndTimeNano;
-        this.versionPublishTimeSeconds = builder.versionPublishTimeSeconds;
+        this.versionTimestamp = builder.versionTimestamp;
     }
 
     public static final class Builder {
@@ -105,11 +105,11 @@ public class ConsumerRefreshMetrics {
         private long consecutiveFailures;
         private OptionalLong refreshSuccessAgeMillis;
         private long refreshEndTimeNano;
-        private OptionalLong versionPublishTimeSeconds;
+        private OptionalLong versionTimestamp;
 
         public Builder() {
             refreshSuccessAgeMillis = OptionalLong.empty();
-            versionPublishTimeSeconds = OptionalLong.empty();
+            versionTimestamp = OptionalLong.empty();
         }
 
         public Builder setDurationMillis(long durationMillis) {
@@ -145,8 +145,8 @@ public class ConsumerRefreshMetrics {
             this.refreshEndTimeNano = refreshEndTimeNano;
             return this;
         }
-        public Builder setVersionPublishTimeSeconds(long versionPublishTimeSeconds) {
-            this.versionPublishTimeSeconds = OptionalLong.of(versionPublishTimeSeconds);
+        public Builder setVersionTimestamp(long versionTimestamp) {
+            this.versionTimestamp = OptionalLong.of(versionTimestamp);
             return this;
         }
 

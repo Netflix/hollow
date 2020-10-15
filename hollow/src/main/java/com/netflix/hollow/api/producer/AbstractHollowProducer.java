@@ -20,6 +20,7 @@ import static com.netflix.hollow.api.producer.ProducerListenerSupport.ProducerLi
 import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.toList;
 
+import com.netflix.hollow.api.common.VersionMinterWithCounter;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.api.metrics.HollowProducerMetrics;

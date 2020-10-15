@@ -18,6 +18,7 @@ package com.netflix.hollow.api.producer;
 
 import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
 
+import com.netflix.hollow.api.common.VersionMinterWithCounter;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.api.metrics.HollowProducerMetrics;
@@ -43,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.function.UnaryOperator;
 
 /**
  * A HollowProducer is the top-level class used by producers of Hollow data to populate, publish, and announce data states.
@@ -756,6 +758,18 @@ public class HollowProducer extends AbstractHollowProducer {
             return withListeners((HollowProducerEventListener[]) listeners);
         }
 
+        /**
+         * Specifies a custom version minter implementation to generate Hollow version numbers. By default
+         * {@link VersionMinterWithCounter} is used.
+         * <p>
+         * Note that if a custom version minter is used then consumers will, in order to accurately report any metrics
+         * that rely on parsing version number for e.g. staleness since cycle started, need to specify a custom
+         * implementation for getting timestamp back from version using-
+         * {@link HollowConsumer.Builder#withTimestampFromVersion(UnaryOperator)}
+         *
+         * @param versionMinter a version minter implementation
+         * @return this builder
+         */
         public B withVersionMinter(HollowProducer.VersionMinter versionMinter) {
             this.versionMinter = versionMinter;
             return (B) this;

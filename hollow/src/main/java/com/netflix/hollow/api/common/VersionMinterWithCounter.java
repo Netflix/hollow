@@ -14,9 +14,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.producer;
+package com.netflix.hollow.api.common;
 
 import com.netflix.hollow.api.producer.HollowProducer.VersionMinter;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -27,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
-public class VersionMinterWithCounter implements HollowProducer.VersionMinter {
+public class VersionMinterWithCounter implements VersionMinter {
 
     private static AtomicInteger versionCounter = new AtomicInteger();
 
@@ -48,6 +49,28 @@ public class VersionMinterWithCounter implements HollowProducer.VersionMinter {
         String versionStr = formattedDate + String.format("%03d", versionCounter.incrementAndGet() % 1000);
 
         return Long.parseLong(versionStr);
+    }
+
+    /**
+     * Convert version to timestamp in milliseconds. Although the result is in millisecond resolution, its precision is
+     * in seconds i.e., the last 3 digits representing milliseconds are zeroed out.<p>
+     *
+     * @param version Hollow data version
+     * @return timestamp in milliseconds resolution and seconds precision
+     */
+    public static long timestampFromVersion(long version) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS"); // treat last 3 chars as ms, ignore later
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        try {
+            Date date = sdf.parse(String.valueOf(version));
+            long millisRes = date.getTime();
+            long secondsRes =  millisRes - (millisRes % 1000);  // switch to seconds resolution by zeroing out milliseconds
+            return secondsRes;
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
+
     }
 
 }

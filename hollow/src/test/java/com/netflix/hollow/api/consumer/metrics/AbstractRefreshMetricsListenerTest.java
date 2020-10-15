@@ -6,6 +6,7 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -172,5 +173,40 @@ public class AbstractRefreshMetricsListenerTest {
         failureTestRefreshMetricsListener.blobLoaded(null);
         failureTestRefreshMetricsListener.refreshFailed(TEST_VERSION_LOW, TEST_VERSION_HIGH, TEST_VERSION_HIGH, null);
 
+    }
+
+    @Test
+    public void testRefreshSuccessWhenExceptionParsingVersion() {
+        class SuccessTestRefreshMetricsListener extends AbstractRefreshMetricsListener {
+            SuccessTestRefreshMetricsListener(UnaryOperator<Long> timestampFromVersion) {
+                this.timestampFromVersion = timestampFromVersion;
+            }
+            @Override
+            public void refreshEndMetricsReporting(ConsumerRefreshMetrics refreshMetrics) {
+                Assert.assertEquals(true, refreshMetrics.getIsRefreshSuccess());
+            }
+        }
+        SuccessTestRefreshMetricsListener successTestRefreshMetricsListener = new SuccessTestRefreshMetricsListener(
+                (version) -> { throw new IllegalStateException("Something went wrong parsing version number"); });
+
+        successTestRefreshMetricsListener.refreshStarted(TEST_VERSION_LOW, TEST_VERSION_HIGH);
+        successTestRefreshMetricsListener.refreshSuccessful(TEST_VERSION_LOW, TEST_VERSION_HIGH, TEST_VERSION_HIGH);
+    }
+
+    @Test
+    public void testRefreshSuccessWhenCustomVersionMinter() {
+        class SuccessTestRefreshMetricsListener extends AbstractRefreshMetricsListener {
+            SuccessTestRefreshMetricsListener() {
+                this.timestampFromVersion = v -> v+1;
+            }
+            @Override
+            public void refreshEndMetricsReporting(ConsumerRefreshMetrics refreshMetrics) {
+                Assert.assertEquals(TEST_VERSION_HIGH + 1, refreshMetrics.getVersionTimestamp().getAsLong());
+            }
+        }
+        SuccessTestRefreshMetricsListener successTestRefreshMetricsListener = new SuccessTestRefreshMetricsListener();
+
+        successTestRefreshMetricsListener.refreshStarted(TEST_VERSION_LOW, TEST_VERSION_HIGH);
+        successTestRefreshMetricsListener.refreshSuccessful(TEST_VERSION_LOW, TEST_VERSION_HIGH, TEST_VERSION_HIGH);
     }
 }

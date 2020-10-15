@@ -23,13 +23,10 @@ import com.netflix.hollow.api.consumer.HollowConsumer.AbstractRefreshListener;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob.BlobType;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.OptionalLong;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,15 +51,12 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     private ConsumerRefreshMetrics.UpdatePlanDetails updatePlanDetails;  // Some details about the transitions comprising a refresh
     // visible for testing
     ConsumerRefreshMetrics.Builder refreshMetricsBuilder;
-    private final SimpleDateFormat sdf;
 
+    protected UnaryOperator<Long> timestampFromVersion;
 
     public AbstractRefreshMetricsListener() {
         lastRefreshTimeNanoOptional = OptionalLong.empty();
         consecutiveFailures = 0l;
-
-        sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS"); // treats last 3 chars in version string as ms
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     @Override
@@ -135,12 +129,11 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
             .setRefreshEndTimeNano(refreshEndTimeNano);
 
         try {
-            Date date = sdf.parse(String.valueOf(afterVersion));
-            long versionPublishTimeSeconds = date.getTime() / 1000;  // version string is normally at seconds resolution
-            refreshMetricsBuilder.setVersionPublishTimeSeconds(versionPublishTimeSeconds);
-        } catch (ParseException e) {
-            log.log(Level.WARNING, String.format("afterVersion (%s) is not a parseable date format, metric for "
-                    + "duration  since publish time can not be computed", afterVersion));
+            long versionTimestamp = timestampFromVersion.apply(afterVersion);
+            refreshMetricsBuilder.setVersionTimestamp(versionTimestamp);
+        } catch (Exception e) {
+            log.log(Level.WARNING, String.format("Could not compute timestamp from afterVersion (%s), metrics "
+                    + "depending on this logic will not be reported", afterVersion), e);
         }
 
         noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
@@ -159,6 +152,16 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         if (lastRefreshTimeNanoOptional.isPresent()) {
             refreshMetricsBuilder.setRefreshSuccessAgeMillis(TimeUnit.NANOSECONDS.toMillis(
                     refreshEndTimeNano - lastRefreshTimeNanoOptional.getAsLong()));
+        }
+
+        try {
+            if (afterVersion != VERSION_NONE) {
+                long versionTimestamp = timestampFromVersion.apply(afterVersion);
+                refreshMetricsBuilder.setVersionTimestamp(versionTimestamp);
+            }
+        } catch (Exception e) {
+            log.log(Level.WARNING, String.format("Could not compute timestamp from afterVersion (%s), metrics "
+                    + "depending on this logic will not be reported", afterVersion), e);
         }
 
         noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
