@@ -2,7 +2,7 @@
 
 # Hollow
 
-[![Build Status](https://travis-ci.org/Netflix/hollow.svg?branch=master)](https://travis-ci.org/Netflix/hollow)
+[![Build Status](https://travis-ci.com/Netflix/hollow.svg?branch=master)](https://travis-ci.com/Netflix/hollow)
 [![Join the chat at https://gitter.im/Netflix/hollow](https://badges.gitter.im/Netflix/hollow.svg)](https://gitter.im/Netflix/hollow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/Netflix/hollow.svg)](#)
 [ ![Download](https://api.bintray.com/packages/netflixoss/maven/hollow/images/download.svg) ](https://bintray.com/netflixoss/maven/hollow/_latestVersion)
