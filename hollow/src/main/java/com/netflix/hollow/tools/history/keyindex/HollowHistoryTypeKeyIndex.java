@@ -17,13 +17,17 @@
 package com.netflix.hollow.tools.history.keyindex;
 
 import com.netflix.hollow.core.HollowDataset;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.util.LongList;
 import com.netflix.hollow.core.util.RemovedOrdinalIterator;
@@ -206,6 +210,125 @@ public class HollowHistoryTypeKeyIndex {
         return HashCodes.hashInt(hashCode);
     }
 
+    private Object[] parseKey(PrimaryKey primaryKey, String keyString) {
+        // Split by the number of fields of the primary key
+        // This ensures correct extraction of an empty value for the last field
+        String fields[] = keyString.split(":", primaryKey.numFields());
+
+        Object key[] = new Object[fields.length];
+
+        for(int i=0;i<fields.length;i++) {
+            switch(primaryKey.getFieldType(readStateEngine, i)) {
+                case BOOLEAN:
+                    key[i] = Boolean.parseBoolean(fields[i]);
+                    break;
+                case STRING:
+                    key[i] = fields[i];
+                    break;
+                case INT:
+                case REFERENCE:
+                    key[i] = Integer.parseInt(fields[i]);
+                    break;
+                case LONG:
+                    key[i] = Long.parseLong(fields[i]);
+                    break;
+                case DOUBLE:
+                    key[i] = Double.parseDouble(fields[i]);
+                    break;
+                case FLOAT:
+                    key[i] = Float.parseFloat(fields[i]);
+                    break;
+                case BYTES:
+                    key[i] = null; //TODO
+            }
+        }
+        return key;
+    }
+
+    private HollowPrimaryKeyIndex findPrimaryKeyIndex(HollowTypeReadState typeState) {
+        if(getPrimaryKey(typeState.getSchema()) == null)
+            return null;
+
+        for(HollowTypeStateListener listener : typeState.getListeners()) {
+            if(listener instanceof HollowPrimaryKeyIndex) {
+                if(((HollowPrimaryKeyIndex) listener).getPrimaryKey().equals(getPrimaryKey(typeState.getSchema())))
+                    return (HollowPrimaryKeyIndex)listener;
+            }
+        }
+
+        return null;
+    }
+
+    private PrimaryKey getPrimaryKey(HollowSchema schema) {
+        if(schema.getSchemaType() == HollowSchema.SchemaType.OBJECT)
+            return ((HollowObjectSchema)schema).getPrimaryKey();
+        return null;
+    }
+
+    private Integer getOrdinalToDisplay(String query, Object[] parsedKey, BitSet selectedOrdinals, int[][] fieldPathIndexes, HollowObjectTypeReadState keyTypeState) {
+
+        int ordinal = -1;
+
+        // verify ordinal key matches parsed key
+        if (ordinal != -1 && selectedOrdinals.get(ordinal)
+                && recordKeyEquals(keyTypeState, ordinal, parsedKey, fieldPathIndexes)) {
+            return ordinal;
+        } else {
+            HollowPrimaryKeyIndex idx = findPrimaryKeyIndex(keyTypeState);
+            if (idx != null) {
+                // N.B. - findOrdinal can return -1, the caller deals with it
+                return findOrdinal(idx, query);
+            } else {
+                // no index, scan through records
+                ordinal = selectedOrdinals.nextSetBit(0);
+                while (ordinal != -1) {
+                    if (recordKeyEquals(keyTypeState, ordinal, parsedKey, fieldPathIndexes)) {
+                        return ordinal;
+                    }
+                    ordinal = selectedOrdinals.nextSetBit(ordinal + 1);
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    private boolean recordKeyEquals(HollowTypeReadState typeState, int ordinal, Object[] key, int[][] fieldPathIndexes) {
+        HollowObjectTypeReadState objState = (HollowObjectTypeReadState)typeState;
+
+        for(int i=0;i<fieldPathIndexes.length;i++) {
+            int curOrdinal = ordinal;
+            HollowObjectTypeReadState curState = objState;
+
+            for(int j=0;j<fieldPathIndexes[i].length - 1;j++) {
+                curOrdinal = curState.readOrdinal(curOrdinal, fieldPathIndexes[i][j]);
+                curState = (HollowObjectTypeReadState) curState.getSchema().getReferencedTypeState(fieldPathIndexes[i][j]);
+            }
+
+            if(!HollowReadFieldUtils.fieldValueEquals(curState, curOrdinal, fieldPathIndexes[i][fieldPathIndexes[i].length-1], key[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    private int findOrdinal(HollowPrimaryKeyIndex idx, String keyString) {
+        Object[] key = parseKey(idx.getPrimaryKey(), keyString);
+
+        return idx.getMatchingOrdinal(key);
+    }
+
+    private int[][] getFieldPathIndexes(PrimaryKey primaryKey) {
+        if(primaryKey != null) {
+            int fieldPathIndexes[][] = new int[primaryKey.numFields()][];
+            for(int i=0;i<primaryKey.numFields();i++) {
+                fieldPathIndexes[i] = primaryKey.getFieldPathIndex(readStateEngine, i);
+            }
+            return fieldPathIndexes;
+        }
+
+        return null;
+    }
     public IntList queryIndexedFields(final String query) {
         final HollowObjectTypeReadState keyTypeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(primaryKey.getType());
         IntList matchingKeys = new IntList();
@@ -213,6 +336,28 @@ public class HollowHistoryTypeKeyIndex {
             return matchingKeys;
         }
 
+        String[] parts;
+        if (query.contains(":")) {  // composite field query
+            parts = query.split(":");
+            if (parts.length != primaryKey.numFields()) {
+                return matchingKeys;
+            }
+
+            Object[] parsedKey;
+            try {
+                parsedKey = parseKey(primaryKey, query);
+            } catch(Exception e) {
+                return matchingKeys;
+            }
+
+            BitSet selectedOrdinals = keyTypeState.getPopulatedOrdinals();
+            int fieldPathIndexes[][] = getFieldPathIndexes(primaryKey);
+            Integer ordinal = getOrdinalToDisplay(query, parsedKey, selectedOrdinals, fieldPathIndexes, keyTypeState);
+            matchingKeys.add(ordinal);
+            return matchingKeys;
+        }
+
+        // match query against each indexed field
         for(int i=0;i<primaryKey.numFields();i++) {
             final int fieldIndex = i;
             try {
