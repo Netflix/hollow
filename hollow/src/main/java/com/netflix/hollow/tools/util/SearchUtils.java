@@ -15,11 +15,13 @@ public class SearchUtils {
 
     /**
      * Parse a colon-separated string into a primary key, throw exception if format exception for eg. if primary key was
-     * expecting an integer but keyString didn't contain a parseable integer at the right spot
+     * expecting an integer but keyString didn't contain a parse-able integer at the right spot.
      */
     public static Object[] parseKey(HollowReadStateEngine readStateEngine, PrimaryKey primaryKey, String keyString) {
-        // Split by the number of fields of the primary key
-        // This ensures correct extraction of an empty value for the last field
+        /**
+         * Split by the number of fields of the primary key.
+         * This ensures correct extraction of an empty value for the last field.
+         */
         String fields[] = keyString.split(":", primaryKey.numFields());
 
         Object key[] = new Object[fields.length];
@@ -46,14 +48,14 @@ public class SearchUtils {
                     key[i] = Float.parseFloat(fields[i]);
                     break;
                 case BYTES:
-                    key[i] = null; //TODO
+                    key[i] = null;
             }
         }
         return key;
     }
 
     /**
-     * Return field index in object schema for each field comprising primary key
+     * Return field index in object schema for each field comprising primary key.
      */
     public static int[][] getFieldPathIndexes(HollowReadStateEngine readStateEngine, PrimaryKey primaryKey) {
         if(primaryKey != null) {
@@ -68,7 +70,7 @@ public class SearchUtils {
     }
 
     /**
-     * Returns primary key index for a given type if it exists
+     * Returns primary key index for a given type if it exists.
      */
     public static HollowPrimaryKeyIndex findPrimaryKeyIndex(HollowTypeReadState typeState) {
         if(getPrimaryKey(typeState.getSchema()) == null)
@@ -85,7 +87,7 @@ public class SearchUtils {
     }
 
     /**
-     * Get the primary key for an object schema
+     * Get the primary key for an object schema.
      */
     public static PrimaryKey getPrimaryKey(HollowSchema schema) {
         if(schema.getSchemaType() == HollowSchema.SchemaType.OBJECT)
@@ -94,7 +96,7 @@ public class SearchUtils {
     }
 
     /**
-     * Returns the ordinal corresponding to the search result of searching by primary key
+     * Returns the ordinal corresponding to the search result of searching by primary key.
      */
     public static Integer getOrdinalToDisplay(HollowReadStateEngine readStateEngine, String query, Object[] parsedKey,
             int ordinal, BitSet selectedOrdinals, int[][] fieldPathIndexes, HollowTypeReadState keyTypeState) {
@@ -110,7 +112,7 @@ public class SearchUtils {
                 HollowPrimaryKeyIndex idx = findPrimaryKeyIndex(keyTypeState);
                 if (idx != null) {
                     // N.B. - findOrdinal can return -1, the caller deals with it
-                    return findOrdinal(readStateEngine, idx, query);
+                    return idx.getMatchingOrdinal(parsedKey);
                 } else {
                     // no index, scan through records
                     ordinal = selectedOrdinals.nextSetBit(0);
@@ -125,7 +127,6 @@ public class SearchUtils {
         }
         return -1;
     }
-
 
     private static boolean recordKeyEquals(HollowTypeReadState typeState, int ordinal, Object[] key, int[][] fieldPathIndexes) {
         HollowObjectTypeReadState objState = (HollowObjectTypeReadState)typeState;
@@ -145,11 +146,4 @@ public class SearchUtils {
 
         return true;
     }
-
-    private static int findOrdinal(HollowReadStateEngine readStateEngine, HollowPrimaryKeyIndex idx, String keyString) {
-        Object[] key = parseKey(readStateEngine, idx.getPrimaryKey(), keyString);
-
-        return idx.getMatchingOrdinal(key);
-    }
-
 }

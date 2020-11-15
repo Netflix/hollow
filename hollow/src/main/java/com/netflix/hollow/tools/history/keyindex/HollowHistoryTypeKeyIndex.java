@@ -218,7 +218,7 @@ public class HollowHistoryTypeKeyIndex {
         }
 
         String[] parts;
-        if (query.contains(":")) {  // composite field query, won't work if a value contains ':'
+        if (query.contains(":")) {  // composite field query, uses ':' as separator
             parts = query.split(":");
             if (parts.length != primaryKey.numFields()) {
                 return matchingKeys;
