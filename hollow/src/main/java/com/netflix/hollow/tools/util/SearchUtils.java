@@ -97,33 +97,35 @@ public class SearchUtils {
      * Returns the ordinal corresponding to the search result of searching by primary key
      */
     public static Integer getOrdinalToDisplay(HollowReadStateEngine readStateEngine, String query, Object[] parsedKey,
-            BitSet selectedOrdinals, int[][] fieldPathIndexes, HollowTypeReadState keyTypeState) {
+            int ordinal, BitSet selectedOrdinals, int[][] fieldPathIndexes, HollowTypeReadState keyTypeState) {
 
-        int ordinal = -1;
-
-        // verify ordinal key matches parsed key
-        if (ordinal != -1 && selectedOrdinals.get(ordinal)
-                && recordKeyEquals(keyTypeState, ordinal, parsedKey, fieldPathIndexes)) {
+        if ("".equals(query) && ordinal != -1) { // trust ordinal if query is empty
             return ordinal;
-        } else {
-            HollowPrimaryKeyIndex idx = findPrimaryKeyIndex(keyTypeState);
-            if (idx != null) {
-                // N.B. - findOrdinal can return -1, the caller deals with it
-                return findOrdinal(readStateEngine, idx, query);
+        } else if (!"".equals(query)) {
+            // verify ordinal key matches parsed key
+            if (ordinal != -1 && selectedOrdinals.get(ordinal)
+                    && recordKeyEquals(keyTypeState, ordinal, parsedKey, fieldPathIndexes)) {
+                return ordinal;
             } else {
-                // no index, scan through records
-                ordinal = selectedOrdinals.nextSetBit(0);
-                while (ordinal != -1) {
-                    if (recordKeyEquals(keyTypeState, ordinal, parsedKey, fieldPathIndexes)) {
-                        return ordinal;
+                HollowPrimaryKeyIndex idx = findPrimaryKeyIndex(keyTypeState);
+                if (idx != null) {
+                    // N.B. - findOrdinal can return -1, the caller deals with it
+                    return findOrdinal(readStateEngine, idx, query);
+                } else {
+                    // no index, scan through records
+                    ordinal = selectedOrdinals.nextSetBit(0);
+                    while (ordinal != -1) {
+                        if (recordKeyEquals(keyTypeState, ordinal, parsedKey, fieldPathIndexes)) {
+                            return ordinal;
+                        }
+                        ordinal = selectedOrdinals.nextSetBit(ordinal + 1);
                     }
-                    ordinal = selectedOrdinals.nextSetBit(ordinal + 1);
                 }
             }
         }
-
         return -1;
     }
+
 
     private static boolean recordKeyEquals(HollowTypeReadState typeState, int ordinal, Object[] key, int[][] fieldPathIndexes) {
         HollowObjectTypeReadState objState = (HollowObjectTypeReadState)typeState;

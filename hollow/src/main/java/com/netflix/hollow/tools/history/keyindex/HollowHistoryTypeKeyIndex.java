@@ -233,7 +233,7 @@ public class HollowHistoryTypeKeyIndex {
 
             BitSet selectedOrdinals = keyTypeState.getPopulatedOrdinals();
             int fieldPathIndexes[][] = getFieldPathIndexes(readStateEngine, primaryKey);
-            Integer ordinal = getOrdinalToDisplay(readStateEngine, query, parsedKey, selectedOrdinals, fieldPathIndexes, keyTypeState);
+            int ordinal = getOrdinalToDisplay(readStateEngine, query, parsedKey, -1, selectedOrdinals, fieldPathIndexes, keyTypeState);
             matchingKeys.add(ordinal);
             return matchingKeys;
         }

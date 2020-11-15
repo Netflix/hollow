@@ -100,8 +100,9 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         }
 
         HollowTypeReadState readTypeState = getTypeState(req);
-        Integer ordinal = getOrdinalToDisplay(ui.getStateEngine(), key, parsedKey, selectedOrdinals, fieldPathIndexes, readTypeState);
-        if (ordinal != null && !ordinal.equals(-1) && "".equals(key)
+        int ordinal = req.getParameter("ordinal") == null ? -1 : Integer.parseInt(req.getParameter("ordinal"));
+        ordinal = getOrdinalToDisplay(ui.getStateEngine(), key, parsedKey, ordinal, selectedOrdinals, fieldPathIndexes, readTypeState);
+        if (ordinal != -1 && "".equals(key)
                 && fieldPathIndexes != null) {
             // set key for the case where it was unset previously
             key = getKey(-1, typeState, ordinal, fieldPathIndexes).getKey();
