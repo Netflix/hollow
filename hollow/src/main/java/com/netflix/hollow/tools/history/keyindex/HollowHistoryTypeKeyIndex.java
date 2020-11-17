@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.tools.history.keyindex;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.tools.util.SearchUtils.MULTI_FIELD_KEY_DELIMITER;
 import static com.netflix.hollow.tools.util.SearchUtils.getFieldPathIndexes;
 import static com.netflix.hollow.tools.util.SearchUtils.getOrdinalToDisplay;
 import static com.netflix.hollow.tools.util.SearchUtils.parseKey;
@@ -142,7 +144,7 @@ public class HollowHistoryTypeKeyIndex {
         int bucketMask = hashedRecordKeys.length - 1;
 
         int bucket = hashKeyRecord(keyTypeState, ordinal) & bucketMask;
-        while(hashedRecordKeys[bucket] != -1)
+        while(hashedRecordKeys[bucket] != ORDINAL_NONE)
             bucket = (bucket + 1) & bucketMask;
         hashedRecordKeys[bucket] = ordinal;
 
@@ -150,7 +152,7 @@ public class HollowHistoryTypeKeyIndex {
             if(keyFieldIsIndexed[j]) {
                 int fieldBucket = HashCodes.hashInt(HollowReadFieldUtils.fieldHashCode(keyTypeState, ordinal, j)) & bucketMask;
                 int chainStartIndex = hashedFieldKeys[j][fieldBucket];
-                while(chainStartIndex != -1) {
+                while(chainStartIndex != ORDINAL_NONE) {
                     int representativeOrdinal = (int)hashedFieldKeyChains.get(chainStartIndex);
                     if(HollowReadFieldUtils.fieldsAreEqual(keyTypeState, ordinal, j, keyTypeState, representativeOrdinal, j)) {
                         hashedFieldKeyChains.add(((long)chainStartIndex << 32) | ordinal);
@@ -160,7 +162,7 @@ public class HollowHistoryTypeKeyIndex {
                     fieldBucket = (fieldBucket + 1) & bucketMask;
                     chainStartIndex = hashedFieldKeys[j][fieldBucket];
                 }
-                if (chainStartIndex == -1) {
+                if (chainStartIndex == ORDINAL_NONE) {
                     hashedFieldKeyChains.add(((long) Integer.MAX_VALUE << 32) | ordinal);
                     hashedFieldKeys[j][fieldBucket] = hashedFieldKeyChains.size() - 1;
                 }
@@ -170,7 +172,7 @@ public class HollowHistoryTypeKeyIndex {
 
     private int[] initializeHashedKeyArray(int hashTableSize) {
         int[] hashedRecordKeys = new int[hashTableSize];
-        Arrays.fill(hashedRecordKeys, -1);
+        Arrays.fill(hashedRecordKeys, ORDINAL_NONE);
         return hashedRecordKeys;
     }
 
@@ -190,7 +192,7 @@ public class HollowHistoryTypeKeyIndex {
 
         int bucket = findKeyHashCode(typeState, ordinal) & bucketMask;
 
-        while(hashedRecordKeys[bucket] != -1) {
+        while(hashedRecordKeys[bucket] != ORDINAL_NONE) {
             if(recordMatchesKey(typeState, ordinal, keyTypeState, hashedRecordKeys[bucket]))
                 return hashedRecordKeys[bucket];
 
@@ -198,7 +200,7 @@ public class HollowHistoryTypeKeyIndex {
             bucket &= bucketMask;
         }
 
-        return -1;
+        return ORDINAL_NONE;
     }
 
     private int findKeyHashCode(HollowObjectTypeReadState typeState, int ordinal) {
@@ -218,8 +220,8 @@ public class HollowHistoryTypeKeyIndex {
         }
 
         String[] parts;
-        if (query.contains(":")) {  // composite field query, uses ':' as separator
-            parts = query.split(":");
+        if (query.contains(MULTI_FIELD_KEY_DELIMITER)) {  // composite field query, uses ':' as separator
+            parts = query.split(MULTI_FIELD_KEY_DELIMITER);
             if (parts.length != primaryKey.numFields()) {
                 return matchingKeys;
             }
@@ -233,7 +235,7 @@ public class HollowHistoryTypeKeyIndex {
 
             BitSet selectedOrdinals = keyTypeState.getPopulatedOrdinals();
             int fieldPathIndexes[][] = getFieldPathIndexes(readStateEngine, primaryKey);
-            int ordinal = getOrdinalToDisplay(readStateEngine, query, parsedKey, -1, selectedOrdinals, fieldPathIndexes, keyTypeState);
+            int ordinal = getOrdinalToDisplay(readStateEngine, query, parsedKey, ORDINAL_NONE, selectedOrdinals, fieldPathIndexes, keyTypeState);
             matchingKeys.add(ordinal);
             return matchingKeys;
         }
@@ -302,14 +304,14 @@ public class HollowHistoryTypeKeyIndex {
         int hashIntCode = HashCodes.hashInt(hashCode);
         int bucket = hashIntCode & (hashedFieldKeys[fieldIndex].length - 1);
 
-        while(hashedFieldKeys[fieldIndex][bucket] != -1) {
+        while(hashedFieldKeys[fieldIndex][bucket] != ORDINAL_NONE) {
             int chainIndex = hashedFieldKeys[fieldIndex][bucket];
             int representativeOrdinal = (int)hashedFieldKeyChains.get(chainIndex);
             if(matcher.foundMatch(representativeOrdinal)) {
-                while(representativeOrdinal != -1) {
+                while(representativeOrdinal != ORDINAL_NONE) {
                     results.add(representativeOrdinal);
                     chainIndex = (int)(hashedFieldKeyChains.get(chainIndex) >> 32);
-                    representativeOrdinal = (chainIndex == Integer.MAX_VALUE) ? -1 : (int)hashedFieldKeyChains.get(chainIndex);
+                    representativeOrdinal = (chainIndex == Integer.MAX_VALUE) ? ORDINAL_NONE : (int)hashedFieldKeyChains.get(chainIndex);
                 }
                 return;
             }
@@ -382,7 +384,7 @@ public class HollowHistoryTypeKeyIndex {
 
         RemovedOrdinalIterator iter = new RemovedOrdinalIterator(populatedOrdinals, previousOrdinals);
         int ordinal = iter.next();
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             writeKeyObject(typeState, ordinal, rec);
             ordinal = iter.next();
         }
@@ -403,7 +405,7 @@ public class HollowHistoryTypeKeyIndex {
         for(int i=0;i<primaryKey.numFields();i++) {
             builder.append(HollowReadFieldUtils.displayString(typeState, keyOrdinal, i));
             if(i < primaryKey.numFields() - 1)
-                builder.append(':');
+                builder.append(MULTI_FIELD_KEY_DELIMITER);
         }
         return builder.toString();
     }

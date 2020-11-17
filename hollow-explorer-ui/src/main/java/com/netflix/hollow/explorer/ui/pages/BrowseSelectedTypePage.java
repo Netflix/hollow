@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.explorer.ui.pages;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.tools.util.SearchUtils.MULTI_FIELD_KEY_DELIMITER;
 import static com.netflix.hollow.tools.util.SearchUtils.getFieldPathIndexes;
 import static com.netflix.hollow.tools.util.SearchUtils.getOrdinalToDisplay;
 import static com.netflix.hollow.tools.util.SearchUtils.getPrimaryKey;
@@ -85,9 +87,9 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         
         List<TypeKey> keys = new ArrayList<>(pageSize);
         
-        for(int i=0;i<pageSize && currentOrdinal != -1;i++) {
+        for(int i = 0; i < pageSize && currentOrdinal != ORDINAL_NONE; i ++) {
             keys.add(getKey(startRec + i, typeState, currentOrdinal, fieldPathIndexes));
-            currentOrdinal = selectedOrdinals.nextSetBit(currentOrdinal+1);
+            currentOrdinal = selectedOrdinals.nextSetBit(currentOrdinal + 1);
         }
 
         
@@ -100,12 +102,12 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         }
 
         HollowTypeReadState readTypeState = getTypeState(req);
-        int ordinal = req.getParameter("ordinal") == null ? -1 : Integer.parseInt(req.getParameter("ordinal"));
+        int ordinal = req.getParameter("ordinal") == null ? ORDINAL_NONE : Integer.parseInt(req.getParameter("ordinal"));
         ordinal = getOrdinalToDisplay(ui.getStateEngine(), key, parsedKey, ordinal, selectedOrdinals, fieldPathIndexes, readTypeState);
-        if (ordinal != -1 && "".equals(key)
+        if (ordinal != ORDINAL_NONE && "".equals(key)
                 && fieldPathIndexes != null) {
             // set key for the case where it was unset previously
-            key = getKey(-1, typeState, ordinal, fieldPathIndexes).getKey();
+            key = getKey(ORDINAL_NONE, typeState, ordinal, fieldPathIndexes).getKey();
         }
 
         int numRecords = selectedOrdinals.cardinality();
@@ -128,9 +130,9 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         ui.getVelocityEngine().getTemplate("browse-selected-type-top.vm").merge(ctx, writer);
         try {
             Writer htmlEscapingWriter = new HtmlEscapingWriter(writer);
-            if (!"".equals(key) && ordinal != null && ordinal.equals(-1)) {
+            if (!"".equals(key) && ordinal != null && ordinal.equals(ORDINAL_NONE)) {
                 htmlEscapingWriter.append("ERROR: Key " + key + " was not found!");
-            } else if (ordinal != null && !ordinal.equals(-1)) {
+            } else if (ordinal != null && !ordinal.equals(ORDINAL_NONE)) {
                 HollowStringifier stringifier = "json".equals(req.getParameter("display"))
                     ? new HollowRecordJsonStringifier() : new HollowRecordStringifier();
                 stringifier.stringify(htmlEscapingWriter, ui.getStateEngine(),
@@ -158,9 +160,9 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
                 }
 
                 if(i > 0)
-                    keyBuilder.append(":");
+                    keyBuilder.append(MULTI_FIELD_KEY_DELIMITER);
 
-                keyBuilder.append(HollowReadFieldUtils.fieldValueObject(curState, curOrdinal, fieldPathIndexes[i][fieldPathIndexes[i].length-1]));
+                keyBuilder.append(HollowReadFieldUtils.fieldValueObject(curState, curOrdinal, fieldPathIndexes[i][fieldPathIndexes[i].length - 1]));
             }
 
             return new TypeKey(recordIdx, ordinal, keyBuilder.toString());

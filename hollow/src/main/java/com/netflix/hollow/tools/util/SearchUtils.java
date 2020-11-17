@@ -1,5 +1,7 @@
 package com.netflix.hollow.tools.util;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
@@ -13,6 +15,7 @@ import java.util.BitSet;
 
 public class SearchUtils {
 
+    public static final String MULTI_FIELD_KEY_DELIMITER = ":";
     /**
      * Parse a colon-separated string into a primary key, throw exception if format exception for eg. if primary key was
      * expecting an integer but keyString didn't contain a parse-able integer at the right spot.
@@ -22,7 +25,7 @@ public class SearchUtils {
          * Split by the number of fields of the primary key.
          * This ensures correct extraction of an empty value for the last field.
          */
-        String fields[] = keyString.split(":", primaryKey.numFields());
+        String fields[] = keyString.split(MULTI_FIELD_KEY_DELIMITER, primaryKey.numFields());
 
         Object key[] = new Object[fields.length];
 
@@ -101,22 +104,22 @@ public class SearchUtils {
     public static Integer getOrdinalToDisplay(HollowReadStateEngine readStateEngine, String query, Object[] parsedKey,
             int ordinal, BitSet selectedOrdinals, int[][] fieldPathIndexes, HollowTypeReadState keyTypeState) {
 
-        if ("".equals(query) && ordinal != -1) { // trust ordinal if query is empty
+        if ("".equals(query) && ordinal != ORDINAL_NONE) { // trust ordinal if query is empty
             return ordinal;
         } else if (!"".equals(query)) {
             // verify ordinal key matches parsed key
-            if (ordinal != -1 && selectedOrdinals.get(ordinal)
+            if (ordinal != ORDINAL_NONE && selectedOrdinals.get(ordinal)
                     && recordKeyEquals(keyTypeState, ordinal, parsedKey, fieldPathIndexes)) {
                 return ordinal;
             } else {
                 HollowPrimaryKeyIndex idx = findPrimaryKeyIndex(keyTypeState);
                 if (idx != null) {
-                    // N.B. - findOrdinal can return -1, the caller deals with it
+                    // N.B. - findOrdinal can return ORDINAL_NONE, the caller deals with it
                     return idx.getMatchingOrdinal(parsedKey);
                 } else {
                     // no index, scan through records
                     ordinal = selectedOrdinals.nextSetBit(0);
-                    while (ordinal != -1) {
+                    while (ordinal != ORDINAL_NONE) {
                         if (recordKeyEquals(keyTypeState, ordinal, parsedKey, fieldPathIndexes)) {
                             return ordinal;
                         }
@@ -125,7 +128,7 @@ public class SearchUtils {
                 }
             }
         }
-        return -1;
+        return ORDINAL_NONE;
     }
 
     private static boolean recordKeyEquals(HollowTypeReadState typeState, int ordinal, Object[] key, int[][] fieldPathIndexes) {
@@ -140,7 +143,7 @@ public class SearchUtils {
                 curState = (HollowObjectTypeReadState) curState.getSchema().getReferencedTypeState(fieldPathIndexes[i][j]);
             }
 
-            if(!HollowReadFieldUtils.fieldValueEquals(curState, curOrdinal, fieldPathIndexes[i][fieldPathIndexes[i].length-1], key[i]))
+            if(!HollowReadFieldUtils.fieldValueEquals(curState, curOrdinal, fieldPathIndexes[i][fieldPathIndexes[i].length - 1], key[i]))
                 return false;
         }
 
