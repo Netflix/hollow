@@ -1,6 +1,7 @@
 package com.netflix.hollow.tools.util;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.core.schema.HollowObjectSchema.FieldType.BYTES;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
@@ -51,7 +52,7 @@ public class SearchUtils {
                     key[i] = Float.parseFloat(fields[i]);
                     break;
                 case BYTES:
-                    key[i] = null;
+                    throw new IllegalArgumentException("Primary key contains a field of type BYTES");
             }
         }
         return key;
@@ -76,13 +77,14 @@ public class SearchUtils {
      * Returns primary key index for a given type if it exists.
      */
     public static HollowPrimaryKeyIndex findPrimaryKeyIndex(HollowTypeReadState typeState) {
-        if(getPrimaryKey(typeState.getSchema()) == null)
+        PrimaryKey pkey = getPrimaryKey(typeState.getSchema());
+        if(pkey == null)
             return null;
 
         for(HollowTypeStateListener listener : typeState.getListeners()) {
             if(listener instanceof HollowPrimaryKeyIndex) {
-                if(((HollowPrimaryKeyIndex) listener).getPrimaryKey().equals(getPrimaryKey(typeState.getSchema())))
-                    return (HollowPrimaryKeyIndex)listener;
+                if(((HollowPrimaryKeyIndex) listener).getPrimaryKey().equals(pkey))
+                    return (HollowPrimaryKeyIndex) listener;
             }
         }
 
