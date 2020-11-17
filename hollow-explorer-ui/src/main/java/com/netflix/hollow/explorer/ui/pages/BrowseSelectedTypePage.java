@@ -16,15 +16,17 @@
  */
 package com.netflix.hollow.explorer.ui.pages;
 
-import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.tools.util.SearchUtils.MULTI_FIELD_KEY_DELIMITER;
+import static com.netflix.hollow.tools.util.SearchUtils.getFieldPathIndexes;
+import static com.netflix.hollow.tools.util.SearchUtils.getOrdinalToDisplay;
+import static com.netflix.hollow.tools.util.SearchUtils.getPrimaryKey;
+import static com.netflix.hollow.tools.util.SearchUtils.parseKey;
+
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
-import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.explorer.ui.model.QueryResult;
 import com.netflix.hollow.explorer.ui.model.TypeKey;
@@ -38,10 +40,13 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
 
 public class BrowseSelectedTypePage extends HollowExplorerPage {
+    private static final Logger LOG = Logger.getLogger(BrowseSelectedTypePage.class.getName());
     private static final String SESSION_ATTR_QUERY_RESULT = "query-result";
 
     public BrowseSelectedTypePage(HollowExplorerUI ui) {
@@ -81,30 +86,32 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         }
         
         PrimaryKey primaryKey = getPrimaryKey(typeState.getSchema());
-        int fieldPathIndexes[][] = getFieldPathIndexes(primaryKey); 
+        int fieldPathIndexes[][] = getFieldPathIndexes(ui.getStateEngine(), primaryKey);
         
         List<TypeKey> keys = new ArrayList<>(pageSize);
         
-        for(int i=0;i<pageSize && currentOrdinal != -1;i++) {
+        for(int i = 0; i < pageSize && currentOrdinal != ORDINAL_NONE; i ++) {
             keys.add(getKey(startRec + i, typeState, currentOrdinal, fieldPathIndexes));
-            currentOrdinal = selectedOrdinals.nextSetBit(currentOrdinal+1);
+            currentOrdinal = selectedOrdinals.nextSetBit(currentOrdinal + 1);
         }
 
         
         String key = req.getParameter("key") == null ? "" : req.getParameter("key");
         Object parsedKey[] = null;
         try {
-            parsedKey = parseKey(primaryKey, key);
+            parsedKey = parseKey(ui.getStateEngine(), primaryKey, key);
         } catch(Exception e) {
+            LOG.log(Level.WARNING, String.format("Failed to parse query=%s into %s", key, primaryKey.toString()), e);
             key = "";
         }
 
-        Integer ordinal =
-            getOrdinalToDisplay(req, key, parsedKey, selectedOrdinals, fieldPathIndexes);
-        if (ordinal != null && !ordinal.equals(-1) && "".equals(key)
+        HollowTypeReadState readTypeState = getTypeState(req);
+        int ordinal = req.getParameter("ordinal") == null ? ORDINAL_NONE : Integer.parseInt(req.getParameter("ordinal"));
+        ordinal = getOrdinalToDisplay(ui.getStateEngine(), key, parsedKey, ordinal, selectedOrdinals, fieldPathIndexes, readTypeState);
+        if (ordinal != ORDINAL_NONE && "".equals(key)
                 && fieldPathIndexes != null) {
             // set key for the case where it was unset previously
-            key = getKey(-1, typeState, ordinal, fieldPathIndexes).getKey();
+            key = getKey(ORDINAL_NONE, typeState, ordinal, fieldPathIndexes).getKey();
         }
 
         int numRecords = selectedOrdinals.cardinality();
@@ -120,38 +127,6 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         ctx.put("display", displayFormat);
     }
 
-    private Integer getOrdinalToDisplay(HttpServletRequest req, String key,
-            Object[] parsedKey, BitSet selectedOrdinals, int[][] fieldPathIndexes) {
-        HollowTypeReadState typeState = getTypeState(req);
-        int ordinal = req.getParameter("ordinal") == null ? -1
-            : Integer.parseInt(req.getParameter("ordinal"));
-        if ("".equals(key) && ordinal != -1) { // trust ordinal if key is empty
-            return ordinal;
-        } else if (!"".equals(key)) {
-            // verify ordinal key matches parsed key
-            if (ordinal != -1 && selectedOrdinals.get(ordinal)
-                    && recordKeyEquals(typeState, ordinal, parsedKey, fieldPathIndexes)) {
-                return ordinal;
-            } else {
-                HollowPrimaryKeyIndex idx = findPrimaryKeyIndex(typeState);
-                if (idx != null) {
-                    // N.B. - findOrdinal can return -1, the caller deals with it
-                    return findOrdinal(idx, key);
-                } else {
-                    // no index, scan through records
-                    ordinal = selectedOrdinals.nextSetBit(0);
-                    while (ordinal != -1) {
-                        if (recordKeyEquals(typeState, ordinal, parsedKey, fieldPathIndexes)) {
-                            return ordinal;
-                        }
-                        ordinal = selectedOrdinals.nextSetBit(ordinal + 1);
-                    }
-                }
-            }
-        }
-        return -1;
-    }
-
     @Override
     protected void renderPage(HttpServletRequest req, VelocityContext ctx, Writer writer) {
         String key = (String) ctx.get("key");
@@ -159,9 +134,9 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         ui.getVelocityEngine().getTemplate("browse-selected-type-top.vm").merge(ctx, writer);
         try {
             Writer htmlEscapingWriter = new HtmlEscapingWriter(writer);
-            if (!"".equals(key) && ordinal != null && ordinal.equals(-1)) {
+            if (!"".equals(key) && ordinal != null && ordinal.equals(ORDINAL_NONE)) {
                 htmlEscapingWriter.append("ERROR: Key " + key + " was not found!");
-            } else if (ordinal != null && !ordinal.equals(-1)) {
+            } else if (ordinal != null && !ordinal.equals(ORDINAL_NONE)) {
                 HollowStringifier stringifier = "json".equals(req.getParameter("display"))
                     ? new HollowRecordJsonStringifier() : new HollowRecordStringifier();
                 stringifier.stringify(htmlEscapingWriter, ui.getStateEngine(),
@@ -176,120 +151,28 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
     private TypeKey getKey(int recordIdx, HollowTypeReadState typeState, int ordinal, int[][] fieldPathIndexes) {
         if(fieldPathIndexes != null) {
             StringBuilder keyBuilder = new StringBuilder();
-            
+
             HollowObjectTypeReadState objState = (HollowObjectTypeReadState)typeState;
-            
+
             for(int i=0;i<fieldPathIndexes.length;i++) {
                 int curOrdinal = ordinal;
                 HollowObjectTypeReadState curState = objState;
-                
+
                 for(int j=0;j<fieldPathIndexes[i].length - 1;j++) {
                     curOrdinal = curState.readOrdinal(curOrdinal, fieldPathIndexes[i][j]);
                     curState = (HollowObjectTypeReadState) curState.getSchema().getReferencedTypeState(fieldPathIndexes[i][j]);
                 }
-                
+
                 if(i > 0)
-                    keyBuilder.append(":");
-                
-                keyBuilder.append(HollowReadFieldUtils.fieldValueObject(curState, curOrdinal, fieldPathIndexes[i][fieldPathIndexes[i].length-1]));
+                    keyBuilder.append(MULTI_FIELD_KEY_DELIMITER);
+
+                keyBuilder.append(HollowReadFieldUtils.fieldValueObject(curState, curOrdinal, fieldPathIndexes[i][fieldPathIndexes[i].length - 1]));
             }
-            
+
             return new TypeKey(recordIdx, ordinal, keyBuilder.toString());
         }
-        
-        return new TypeKey(recordIdx, ordinal, "", "ORDINAL:"+ordinal);
-    }
-    
-    private PrimaryKey getPrimaryKey(HollowSchema schema) {
-        if(schema.getSchemaType() == SchemaType.OBJECT)
-            return ((HollowObjectSchema)schema).getPrimaryKey();
-        return null;
-    }
 
-    private int[][] getFieldPathIndexes(PrimaryKey primaryKey) {
-        if(primaryKey != null) {
-            int fieldPathIndexes[][] = new int[primaryKey.numFields()][];
-            for(int i=0;i<primaryKey.numFields();i++) {
-                fieldPathIndexes[i] = primaryKey.getFieldPathIndex(ui.getStateEngine(), i);
-            }
-            return fieldPathIndexes;
-        }
-        
-        return null;
-    }
-    
-    private HollowPrimaryKeyIndex findPrimaryKeyIndex(HollowTypeReadState typeState) {
-        if(getPrimaryKey(typeState.getSchema()) == null)
-            return null;
-        
-        for(HollowTypeStateListener listener : typeState.getListeners()) {
-            if(listener instanceof HollowPrimaryKeyIndex) {
-                if(((HollowPrimaryKeyIndex) listener).getPrimaryKey().equals(getPrimaryKey(typeState.getSchema())))
-                    return (HollowPrimaryKeyIndex)listener;
-            }
-        }
-        
-        return null;
-    }
-    
-    private int findOrdinal(HollowPrimaryKeyIndex idx, String keyString) {
-        Object[] key = parseKey(idx.getPrimaryKey(), keyString);
-        
-        return idx.getMatchingOrdinal(key);
-    }
-
-    private Object[] parseKey(PrimaryKey primaryKey, String keyString) {
-        // Split by the number of fields of the primary key
-        // This ensures correct extraction of an empty value for the last field
-        String fields[] = keyString.split(":", primaryKey.numFields());
-        
-        Object key[] = new Object[fields.length];
-        
-        for(int i=0;i<fields.length;i++) {
-            switch(primaryKey.getFieldType(ui.getStateEngine(), i)) {
-            case BOOLEAN:
-                key[i] = Boolean.parseBoolean(fields[i]);
-                break;
-            case STRING:
-                key[i] = fields[i];
-                break;
-            case INT:
-            case REFERENCE:
-                key[i] = Integer.parseInt(fields[i]);
-                break;
-            case LONG:
-                key[i] = Long.parseLong(fields[i]);
-                break;
-            case DOUBLE:
-                key[i] = Double.parseDouble(fields[i]);
-                break;
-            case FLOAT:
-                key[i] = Float.parseFloat(fields[i]);
-                break;
-            case BYTES:
-                key[i] = null; //TODO
-            }
-        }
-        return key;
-    }
-    
-    private boolean recordKeyEquals(HollowTypeReadState typeState, int ordinal, Object[] key, int[][] fieldPathIndexes) {
-        HollowObjectTypeReadState objState = (HollowObjectTypeReadState)typeState;
-        
-        for(int i=0;i<fieldPathIndexes.length;i++) {
-            int curOrdinal = ordinal;
-            HollowObjectTypeReadState curState = objState;
-            
-            for(int j=0;j<fieldPathIndexes[i].length - 1;j++) {
-                curOrdinal = curState.readOrdinal(curOrdinal, fieldPathIndexes[i][j]);
-                curState = (HollowObjectTypeReadState) curState.getSchema().getReferencedTypeState(fieldPathIndexes[i][j]);
-            }
-            
-            if(!HollowReadFieldUtils.fieldValueEquals(curState, curOrdinal, fieldPathIndexes[i][fieldPathIndexes[i].length-1], key[i]))
-                return false;
-        }
-        
-        return true;
+        return new TypeKey(recordIdx, ordinal, "", "ORDINAL:" + ordinal);
     }
 
     private HollowTypeReadState getTypeState(HttpServletRequest req) {
