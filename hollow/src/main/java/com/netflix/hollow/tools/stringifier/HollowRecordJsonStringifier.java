@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.tools.stringifier;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
@@ -126,7 +128,7 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
 
         if (typeDataAccess == null) {
             writer.append("{ }");
-        } else if (ordinal == -1) {
+        } else if (ordinal == ORDINAL_NONE) {
             writer.append("null");
         } else {
             if (typeDataAccess instanceof HollowObjectTypeDataAccess) {
