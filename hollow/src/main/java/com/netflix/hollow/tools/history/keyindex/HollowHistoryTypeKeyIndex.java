@@ -39,12 +39,8 @@ import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class HollowHistoryTypeKeyIndex {
-
-    private static final Logger LOG = Logger.getLogger(HollowHistoryTypeKeyIndex.class.getName());
 
     private final PrimaryKey primaryKey;
     private final String[][] keyFieldParts;
@@ -234,7 +230,6 @@ public class HollowHistoryTypeKeyIndex {
             try {
                 parsedKey = parseKey(readStateEngine, primaryKey, query);
             } catch(Exception e) {
-                LOG.log(Level.WARNING, String.format("Failed to parse query=%s into %s", query, primaryKey.toString()), e);
                 return matchingKeys;
             }
 
