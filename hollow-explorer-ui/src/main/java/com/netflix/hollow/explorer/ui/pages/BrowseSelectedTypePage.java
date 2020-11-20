@@ -40,13 +40,10 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
 
 public class BrowseSelectedTypePage extends HollowExplorerPage {
-    private static final Logger LOG = Logger.getLogger(BrowseSelectedTypePage.class.getName());
     private static final String SESSION_ATTR_QUERY_RESULT = "query-result";
 
     public BrowseSelectedTypePage(HollowExplorerUI ui) {
@@ -101,7 +98,6 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         try {
             parsedKey = parseKey(ui.getStateEngine(), primaryKey, key);
         } catch(Exception e) {
-            LOG.log(Level.WARNING, String.format("Failed to parse query=%s into %s", key, primaryKey.toString()), e);
             key = "";
         }
 
