@@ -31,11 +31,11 @@ import org.openjdk.jmh.annotations.Warmup;
 @Fork(1)
 public class NonAlignedMemoryAccessTest {
 
-    @Param( {"14"})
+    @Param( {"14000"})  // multiple of 14
     private int numLongsWritten;
 
     private static final String SCRATCH_DIR = System.getProperty("java.io.tmpdir");
-    private static final int TEST_SINGLE_BUFFER_CAPACITY_BYTES =  16;
+    private static final int TEST_SINGLE_BUFFER_CAPACITY_BYTES =  16 * 1024;
 
     @Setup
     public void setUp() {
@@ -183,29 +183,31 @@ public class NonAlignedMemoryAccessTest {
         File f = new File(Paths.get(SCRATCH_DIR).toString() + filename + ".test");
         DataOutputStream out = new DataOutputStream(new FileOutputStream(f));
 
-        for (int i=0; i<padding; i++) {
+        for (int i = 0; i < padding; i++) {
             out.writeByte((byte) 0xff);
         }
 
         byte[] leadingBytes = new byte[] {0, 1, 0, 1, 0, 1, 0, 1};  // bytes 0-7
-        for (int i=0; i<leadingBytes.length; i++) {
+        for (int i = 0; i < leadingBytes.length; i++) {
             out.writeByte(leadingBytes[i]);
         }
 
         out.writeUTF("abcdef");
 
-        long[] values = {
-                123456789000L, 234567891000L,   // bytes 16-31
-                345678912000L, 456789123000L,   // bytes 32-47
-                567891234000L, 678912345000L,   // bytes 48-63
-                789123456000L, 891234567000L,   // bytes 64-79
-                912345678000L, 123456789000L,   // bytes 80-95
-                234567891000L, 345678912000L,   // bytes 96-111
-                Long.MAX_VALUE, Long.MAX_VALUE,   // bytes 112-127
-        };
+        for (int iters = 0; iters < numLongsWritten / 14; iters ++) {
+            long[] values = {
+                    123456789000L, 234567891000L,   // bytes 16-31
+                    345678912000L, 456789123000L,   // bytes 32-47
+                    567891234000L, 678912345000L,   // bytes 48-63
+                    789123456000L, 891234567000L,   // bytes 64-79
+                    912345678000L, 123456789000L,   // bytes 80-95
+                    234567891000L, 345678912000L,   // bytes 96-111
+                    Long.MAX_VALUE, Long.MAX_VALUE,   // bytes 112-127
+            };
 
-        for (int i=0; i<values.length; i++) {
-            out.writeLong(values[i]);
+            for (int i = 0; i < values.length; i++) {
+                out.writeLong(values[i]);
+            }
         }
 
         out.flush();
