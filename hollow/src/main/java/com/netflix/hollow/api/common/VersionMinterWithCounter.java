@@ -72,5 +72,4 @@ public class VersionMinterWithCounter implements VersionMinter {
         }
 
     }
-
 }

@@ -17,16 +17,18 @@
 package com.netflix.hollow.api.consumer.metrics;
 
 import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.AbstractRefreshListener;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob.BlobType;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalLong;
 import java.util.concurrent.TimeUnit;
-import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,11 +54,12 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     // visible for testing
     ConsumerRefreshMetrics.Builder refreshMetricsBuilder;
 
-    protected UnaryOperator<Long> timestampFromVersion;
+    private Map<Long, Long> cycleVersionStartTimes;
 
     public AbstractRefreshMetricsListener() {
         lastRefreshTimeNanoOptional = OptionalLong.empty();
         consecutiveFailures = 0l;
+        cycleVersionStartTimes = new HashMap<>();
     }
 
     @Override
@@ -66,6 +69,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         refreshMetricsBuilder = new ConsumerRefreshMetrics.Builder();
         refreshMetricsBuilder.setIsInitialLoad(currentVersion == VERSION_NONE);
         refreshMetricsBuilder.setUpdatePlanDetails(updatePlanDetails);
+        cycleVersionStartTimes.clear();
     }
 
     /**
@@ -128,12 +132,8 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
             .setRefreshSuccessAgeMillis(0l)
             .setRefreshEndTimeNano(refreshEndTimeNano);
 
-        try {
-            long versionTimestamp = timestampFromVersion.apply(afterVersion);
-            refreshMetricsBuilder.setVersionTimestamp(versionTimestamp);
-        } catch (Exception e) {
-            log.log(Level.WARNING, String.format("Could not compute timestamp from afterVersion (%s), metrics "
-                    + "depending on this logic will not be reported", afterVersion), e);
+        if (cycleVersionStartTimes.containsKey(afterVersion)) {
+            refreshMetricsBuilder.setCycleStartTimestamp(Long.valueOf(cycleVersionStartTimes.get(afterVersion)));
         }
 
         noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
@@ -154,14 +154,8 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
                     refreshEndTimeNano - lastRefreshTimeNanoOptional.getAsLong()));
         }
 
-        try {
-            if (afterVersion != VERSION_NONE) {
-                long versionTimestamp = timestampFromVersion.apply(afterVersion);
-                refreshMetricsBuilder.setVersionTimestamp(versionTimestamp);
-            }
-        } catch (Exception e) {
-            log.log(Level.WARNING, String.format("Could not compute timestamp from afterVersion (%s), metrics "
-                    + "depending on this logic will not be reported", afterVersion), e);
+        if (cycleVersionStartTimes.containsKey(afterVersion)) {  // SNAP: TODO: Test when VERSION_NONE
+            refreshMetricsBuilder.setCycleStartTimestamp(Long.valueOf(cycleVersionStartTimes.get(afterVersion)));
         }
 
         noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
@@ -169,12 +163,24 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
     @Override
     public void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-        // no-op
+        trackCycleStartTime(version, stateEngine.getHeaderTags());
     }
 
     @Override
     public void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-        // no-op
+        trackCycleStartTime(version, stateEngine.getHeaderTags());
+    }
+
+    private void trackCycleStartTime(long version, Map<String, String> headers) {
+        if (headers != null) {
+            String cycleStartMetric = headers.get(HEADER_TAG_METRIC_CYCLE_START);
+            if (cycleStartMetric != null && cycleStartMetric != "") {
+                Long cycleStartTimestamp = Long.valueOf(cycleStartMetric);
+                if (cycleStartTimestamp != null) {
+                    cycleVersionStartTimes.put(version, cycleStartTimestamp);
+                }
+            }
+        }
     }
 
     @Override
