@@ -28,7 +28,7 @@ public class ConsumerRefreshMetrics {
     private BlobType overallRefreshType;            // snapshot, delta, or reverse delta
     private UpdatePlanDetails updatePlanDetails;    // details about the update plan such as no. and types of transitions and no. of successful transitions
     private long consecutiveFailures;
-    private OptionalLong refreshSuccessAgeMillis;   // time elapsed since the previous successful refresh
+    private OptionalLong refreshSuccessAgeMillisOptional; // time elapsed since the previous successful refresh
     private long refreshEndTimeNano;                // monotonic system time when refresh ended
     private OptionalLong cycleStartTimestamp;       // timestamp in millis of when cycle started for the loaded data version
 
@@ -74,8 +74,8 @@ public class ConsumerRefreshMetrics {
     public long getConsecutiveFailures() {
         return consecutiveFailures;
     }
-    public OptionalLong getRefreshSuccessAgeMillis() {
-        return refreshSuccessAgeMillis;
+    public OptionalLong getRefreshSuccessAgeMillisOptional() {
+        return refreshSuccessAgeMillisOptional;
     }
     public long getRefreshEndTimeNano() {
         return refreshEndTimeNano;
@@ -91,7 +91,7 @@ public class ConsumerRefreshMetrics {
         this.overallRefreshType = builder.overallRefreshType;
         this.updatePlanDetails = builder.updatePlanDetails;
         this.consecutiveFailures = builder.consecutiveFailures;
-        this.refreshSuccessAgeMillis = builder.refreshSuccessAgeMillis;
+        this.refreshSuccessAgeMillisOptional = builder.refreshSuccessAgeMillisOptional;
         this.refreshEndTimeNano = builder.refreshEndTimeNano;
         this.cycleStartTimestamp = builder.cycleStartTimestamp;
     }
@@ -103,12 +103,12 @@ public class ConsumerRefreshMetrics {
         private BlobType overallRefreshType;
         private UpdatePlanDetails updatePlanDetails;
         private long consecutiveFailures;
-        private OptionalLong refreshSuccessAgeMillis;
+        private OptionalLong refreshSuccessAgeMillisOptional;
         private long refreshEndTimeNano;
         private OptionalLong cycleStartTimestamp;
 
         public Builder() {
-            refreshSuccessAgeMillis = OptionalLong.empty();
+            refreshSuccessAgeMillisOptional = OptionalLong.empty();
             cycleStartTimestamp = OptionalLong.empty();
         }
 
@@ -137,8 +137,8 @@ public class ConsumerRefreshMetrics {
             this.consecutiveFailures = consecutiveFailures;
             return this;
         }
-        public Builder setRefreshSuccessAgeMillis(long refreshSuccessAgeMillis) {
-            this.refreshSuccessAgeMillis = OptionalLong.of(refreshSuccessAgeMillis);
+        public Builder setRefreshSuccessAgeMillisOptional(long refreshSuccessAgeMillis) {
+            this.refreshSuccessAgeMillisOptional = OptionalLong.of(refreshSuccessAgeMillis);
             return this;
         }
         public Builder setRefreshEndTimeNano(long refreshEndTimeNano) {

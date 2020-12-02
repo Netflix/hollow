@@ -69,7 +69,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         refreshMetricsBuilder = new ConsumerRefreshMetrics.Builder();
         refreshMetricsBuilder.setIsInitialLoad(currentVersion == VERSION_NONE);
         refreshMetricsBuilder.setUpdatePlanDetails(updatePlanDetails);
-        cycleVersionStartTimes.clear();
+        cycleVersionStartTimes.clear(); // clear map to avoid accumulation over time
     }
 
     /**
@@ -129,7 +129,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         refreshMetricsBuilder.setDurationMillis(durationMillis)
             .setIsRefreshSuccess(true)
             .setConsecutiveFailures(consecutiveFailures)
-            .setRefreshSuccessAgeMillis(0l)
+            .setRefreshSuccessAgeMillisOptional(0l)
             .setRefreshEndTimeNano(refreshEndTimeNano);
 
         if (cycleVersionStartTimes.containsKey(afterVersion)) {
@@ -150,11 +150,11 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
                 .setConsecutiveFailures(consecutiveFailures)
                 .setRefreshEndTimeNano(refreshEndTimeNano);
         if (lastRefreshTimeNanoOptional.isPresent()) {
-            refreshMetricsBuilder.setRefreshSuccessAgeMillis(TimeUnit.NANOSECONDS.toMillis(
+            refreshMetricsBuilder.setRefreshSuccessAgeMillisOptional(TimeUnit.NANOSECONDS.toMillis(
                     refreshEndTimeNano - lastRefreshTimeNanoOptional.getAsLong()));
         }
 
-        if (cycleVersionStartTimes.containsKey(afterVersion)) {  // SNAP: TODO: Test when VERSION_NONE
+        if (cycleVersionStartTimes.containsKey(afterVersion)) {
             refreshMetricsBuilder.setCycleStartTimestamp(Long.valueOf(cycleVersionStartTimes.get(afterVersion)));
         }
 
@@ -171,6 +171,9 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         trackCycleStartTime(version, stateEngine.getHeaderTags());
     }
 
+    /**
+     * If the blob header contains producer cycle start time tag then save its value in version to cycle start time map
+     */
     private void trackCycleStartTime(long version, Map<String, String> headers) {
         if (headers != null) {
             String cycleStartMetric = headers.get(HEADER_TAG_METRIC_CYCLE_START);

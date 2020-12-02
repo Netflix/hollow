@@ -26,7 +26,6 @@ import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClientUpdater;
 import com.netflix.hollow.api.client.StaleHollowReferenceDetector;
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
-import com.netflix.hollow.api.common.VersionMinterWithCounter;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
@@ -977,8 +976,6 @@ public class HollowConsumer {
         protected Executor refreshExecutor = null;
         protected MemoryMode memoryMode = MemoryMode.ON_HEAP;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
-        protected UnaryOperator<Long> timestampFromVersion = (version) ->
-                VersionMinterWithCounter.timestampFromVersion(version);
 
         public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -1148,20 +1145,6 @@ public class HollowConsumer {
 
         public B withMetricsCollector(HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
             this.metricsCollector = metricsCollector;
-            return (B)this;
-        }
-
-        /**
-         * Specify a UnaryOperator to convert a Hollow version to timestamp in milliseconds.
-         * <p>
-         * If none specified then a default of {@link VersionMinterWithCounter#timestampFromVersion} is used. The
-         * provided UnaryOperator is used in computing metrics.
-         *
-         * @param timestampFromVersion a UnaryOperator that converts a version to timestamp in milliseconds
-         * @return this builder
-         */
-        public B withTimestampFromVersion(UnaryOperator<Long> timestampFromVersion) {
-            this.timestampFromVersion = timestampFromVersion;
             return (B)this;
         }
 

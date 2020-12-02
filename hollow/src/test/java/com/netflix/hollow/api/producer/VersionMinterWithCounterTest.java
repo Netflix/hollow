@@ -1,4 +1,4 @@
-package com.netflix.hollow.api.common;
+package com.netflix.hollow.api.producer;
 
 import static org.junit.Assert.assertEquals;
 

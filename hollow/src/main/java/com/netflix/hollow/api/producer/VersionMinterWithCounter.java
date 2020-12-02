@@ -14,7 +14,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.common;
+package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.api.producer.HollowProducer.VersionMinter;
 import java.text.ParseException;
