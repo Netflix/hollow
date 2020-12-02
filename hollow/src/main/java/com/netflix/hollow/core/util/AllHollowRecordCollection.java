@@ -18,46 +18,10 @@ package com.netflix.hollow.core.util;
 
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
-import java.util.AbstractCollection;
-import java.util.BitSet;
-import java.util.Iterator;
 
-public abstract class AllHollowRecordCollection<T> extends AbstractCollection<T> {
-    
-    private final BitSet populatedOrdinals;
-    
+public abstract class AllHollowRecordCollection<T> extends HollowRecordCollection<T> {
+
     public AllHollowRecordCollection(HollowTypeReadState typeState) {
-        this.populatedOrdinals = typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
+        super(typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals());
     }
-
-    @Override
-    public Iterator<T> iterator() {
-        return new Iterator<T>() {
-            private int ordinal = populatedOrdinals.nextSetBit(0);
-
-            public boolean hasNext() {
-                return ordinal != -1;
-            }
-
-            @Override
-            public T next() {
-                T t = getForOrdinal(ordinal);
-                ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
-                return t;
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
-
-    @Override
-    public int size() {
-        return populatedOrdinals.cardinality();
-    }
-    
-    protected abstract T getForOrdinal(int ordinal);
-
 }
