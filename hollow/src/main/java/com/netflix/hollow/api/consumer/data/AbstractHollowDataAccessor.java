@@ -101,15 +101,18 @@ public abstract class AbstractHollowDataAccessor<T> {
     protected void computeDataChange(String type, HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
         HollowTypeReadState typeState = stateEngine.getTypeDataAccess(type).getTypeState();
 
+        BitSet previousOrdinals = typeState.getPreviousOrdinals();
+        BitSet currentOrdinals = typeState.getPopulatedOrdinals();
+
         // track removed ordinals
         removedOrdinals = new BitSet();
-        removedOrdinals.or(typeState.getPreviousOrdinals());
-        removedOrdinals.andNot(typeState.getPopulatedOrdinals());
+        removedOrdinals.or(previousOrdinals);
+        removedOrdinals.andNot(currentOrdinals);
 
         // track added ordinals
         addedOrdinals = new BitSet();
-        addedOrdinals.or(typeState.getPopulatedOrdinals());
-        addedOrdinals.andNot(typeState.getPreviousOrdinals());
+        addedOrdinals.or(currentOrdinals);
+        addedOrdinals.andNot(previousOrdinals);
 
         // track updated ordinals
         updatedRecords = new ArrayList<>();
@@ -124,6 +127,10 @@ public abstract class AbstractHollowDataAccessor<T> {
 
                 if (removedOrdinal != -1) { // record was re-added after being removed = update
                     updatedRecords.add(new UpdatedRecordOrdinal(removedOrdinal, addedOrdinal));
+
+                    // removedOrdinal && addedOrdinal is from an UPDATE so clear it from explicit tracking
+                    addedOrdinals.clear(addedOrdinal);
+                    removedOrdinals.clear(removedOrdinal);
                 }
 
                 addedOrdinal = addedOrdinals.nextSetBit(addedOrdinal + 1);
