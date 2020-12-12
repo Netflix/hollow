@@ -28,6 +28,12 @@ public final class Threads {
         return daemonThread(r, "hollow", context, description);
     }
 
+    public static Thread daemonThread(Runnable r, Class<?> context, String description, int priority) {
+        Thread thread = daemonThread(r, "hollow", context, description);
+        thread.setPriority(priority);
+        return thread;
+    }
+
     public static Thread daemonThread(Runnable r, String platform, Class<?> context, String description) {
         requireNonNull(platform, "platform required");
         requireNonNull(context, "context required");

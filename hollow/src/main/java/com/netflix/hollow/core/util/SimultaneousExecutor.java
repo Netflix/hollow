@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -144,8 +145,38 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
      * @param description brief description used to name created threads; combined with {@code context}
      */
     public SimultaneousExecutor(int numThreads, Class<?> context, String description) {
-        super(numThreads, numThreads, 100, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
-                r -> daemonThread(r, context, description));
+        this(numThreads, context, description, Thread.NORM_PRIORITY);
+    }
+
+
+    /**
+     * Creates an executor with number of threads calculated from the
+     * specified factor and threads named according to {@code context} and {@code description}.
+     *
+     * @param threadsPerCpu calculated as {@code processors * threadsPerCpu} then used as {@code corePoolSize} and {@code maximumPoolSize}
+     * @param context combined with {@code description} to name created threads
+     * @param description brief description used to name created threads; combined with {@code context}
+     * @param threadPriority the priority set to each thread
+     */
+    public SimultaneousExecutor(double threadsPerCpu, Class<?> context, String description, int threadPriority) {
+        this((int) ((double) Runtime.getRuntime().availableProcessors() * threadsPerCpu), context, description, threadPriority);
+    }
+
+    /**
+     * Creates an executor with the specified number of threads and threads named
+     * according to {@code context} and {@code description}.
+     *
+     * @param numThreads used as {@code corePoolSize} and {@code maximumPoolSize}
+     * @param context combined with {@code description} to name created threads
+     * @param description brief description used to name created threads; combined with {@code context}
+     * @param threadPriority the priority set to each thread
+     */
+    public SimultaneousExecutor(int numThreads, Class<?> context, String description, int threadPriority) {
+        this(numThreads, r -> daemonThread(r, context, description, threadPriority));
+    }
+
+    protected SimultaneousExecutor(int numThreads, ThreadFactory threadFactory) {
+        super(numThreads, numThreads, 100, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), threadFactory);
     }
 
     /**
