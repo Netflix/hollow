@@ -27,19 +27,22 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.core.util.AllHollowRecordCollection;
+import com.netflix.hollow.core.util.HollowRecordCollection;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class AbstractHollowDataAccessor<T> {
     protected final String type;
     protected final PrimaryKey primaryKey;
     protected final HollowReadStateEngine rStateEngine;
 
-    private List<T> removedRecords = Collections.emptyList();
-    private List<T> addedRecords = Collections.emptyList();
+    private BitSet removedOrdinals = new BitSet();
+    private BitSet addedOrdinals = new BitSet();
     private List<UpdatedRecord<T>> updatedRecords = Collections.emptyList();
 
     private boolean isDataChangeComputed = false;
@@ -98,60 +101,41 @@ public abstract class AbstractHollowDataAccessor<T> {
     protected void computeDataChange(String type, HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
         HollowTypeReadState typeState = stateEngine.getTypeDataAccess(type).getTypeState();
 
+        BitSet previousOrdinals = typeState.getPreviousOrdinals();
+        BitSet currentOrdinals = typeState.getPopulatedOrdinals();
+
         // track removed ordinals
-        BitSet removedOrdinals = new BitSet();
-        removedOrdinals.or(typeState.getPreviousOrdinals());
-        removedOrdinals.andNot(typeState.getPopulatedOrdinals());
+        removedOrdinals = new BitSet();
+        removedOrdinals.or(previousOrdinals);
+        removedOrdinals.andNot(currentOrdinals);
 
         // track added ordinals
-        BitSet addedOrdinals = new BitSet();
-        addedOrdinals.or(typeState.getPopulatedOrdinals());
-        addedOrdinals.andNot(typeState.getPreviousOrdinals());
+        addedOrdinals = new BitSet();
+        addedOrdinals.or(currentOrdinals);
+        addedOrdinals.andNot(previousOrdinals);
 
+        // track updated ordinals
+        updatedRecords = new ArrayList<>();
         HollowPrimaryKeyValueDeriver keyDeriver = new HollowPrimaryKeyValueDeriver(primaryKey, stateEngine);
         HollowPrimaryKeyIndex removalsIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey, stateEngine.getMemoryRecycler(), removedOrdinals);
 
-        List<T> addedRecords = new ArrayList<>();
-        List<T> removedRecords = new ArrayList<>();
-        List<UpdatedRecord<T>> updatedRecords = new ArrayList<>();
-
-        BitSet updatedRecordOrdinals = new BitSet();
-
-        { // Determine added / updated records (removed records and added back with different value)
+        { // Determine updated records (removed records and added back with different value)
             int addedOrdinal = addedOrdinals.nextSetBit(0);
             while (addedOrdinal != -1) {
                 Object[] key = keyDeriver.getRecordKey(addedOrdinal);
                 int removedOrdinal = removalsIndex.getMatchingOrdinal(key);
 
-                T addedRecord = getRecord(addedOrdinal);
                 if (removedOrdinal != -1) { // record was re-added after being removed = update
-                    updatedRecordOrdinals.set(removedOrdinal);
-                    T removedRecord = getRecord(removedOrdinal);
-                    updatedRecords.add(new UpdatedRecord<T>(removedRecord, addedRecord));
-                } else {
-                    addedRecords.add(addedRecord);
+                    updatedRecords.add(new UpdatedRecordOrdinal(removedOrdinal, addedOrdinal));
+
+                    // removedOrdinal && addedOrdinal is from an UPDATE so clear it from explicit tracking
+                    addedOrdinals.clear(addedOrdinal);
+                    removedOrdinals.clear(removedOrdinal);
                 }
 
                 addedOrdinal = addedOrdinals.nextSetBit(addedOrdinal + 1);
             }
         }
-
-        { // determine removed records
-            int removedOrdinal = removedOrdinals.nextSetBit(0);
-            while (removedOrdinal != -1) {
-                // exclude records that was removed but re-added with different ordinal since that is considered as updated record
-                if (!updatedRecordOrdinals.get(removedOrdinal)) {
-                    T removedRecord = getRecord(removedOrdinal);
-                    removedRecords.add(removedRecord);
-                }
-
-                removedOrdinal = removedOrdinals.nextSetBit(removedOrdinal + 1);
-            }
-        }
-
-        this.removedRecords = Collections.unmodifiableList(removedRecords);
-        this.addedRecords = Collections.unmodifiableList(addedRecords);
-        this.updatedRecords = Collections.unmodifiableList(updatedRecords);
     }
 
     /**
@@ -192,7 +176,10 @@ public abstract class AbstractHollowDataAccessor<T> {
      */
     public Collection<T> getAddedRecords() {
         if (!isDataChangeComputed) computeDataChange();
-        return addedRecords;
+
+        return new HollowRecordCollection<T>(addedOrdinals) { @Override protected T getForOrdinal(int ordinal) {
+                return getRecord(ordinal);
+            }};
     }
 
     /**
@@ -201,7 +188,9 @@ public abstract class AbstractHollowDataAccessor<T> {
      */
     public Collection<T> getRemovedRecords() {
         if (!isDataChangeComputed) computeDataChange();
-        return removedRecords;
+        return new HollowRecordCollection<T>(removedOrdinals) { @Override protected T getForOrdinal(int ordinal) {
+            return getRecord(ordinal);
+        }};
     }
 
     /**
@@ -211,6 +200,38 @@ public abstract class AbstractHollowDataAccessor<T> {
     public Collection<UpdatedRecord<T>> getUpdatedRecords() {
         if (!isDataChangeComputed) computeDataChange();
         return updatedRecords;
+    }
+
+    private class UpdatedRecordOrdinal extends UpdatedRecord<T>{
+        private final int before;
+        private final int after;
+
+        private UpdatedRecordOrdinal(int before, int after) {
+            super(null, null);
+            this.before = before;
+            this.after = after;
+        }
+
+        public T getBefore() {
+            return getRecord(before);
+        }
+
+        public T getAfter() { return getRecord(after);}
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            UpdatedRecordOrdinal that = (UpdatedRecordOrdinal) o;
+            return before == that.before &&
+                    after == that.after;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), before, after);
+        }
     }
 
     /**
@@ -268,9 +289,9 @@ public abstract class AbstractHollowDataAccessor<T> {
         public String toString() {
             StringBuilder builder = new StringBuilder();
             builder.append("UpdatedRecord [before=");
-            builder.append(before);
+            builder.append(getBefore());
             builder.append(", after=");
-            builder.append(after);
+            builder.append(getAfter());
             builder.append("]");
             return builder.toString();
         }
