@@ -111,7 +111,7 @@ public class RecordCountVarianceValidator implements ValidatorListener {
         vrb.detail(ACTUAL_CHANGE_PERCENT_NAME, actualChangePercent);
 
         if (Float.compare(actualChangePercent, allowableVariancePercent) > 0) {
-            if(!onlyValidateDropsInCardinality || latestCardinality < previousCardinality) {
+            if (!onlyValidateDropsInCardinality || latestCardinality < previousCardinality) {
                 String message = String.format(FAILED_RECORD_COUNT_VALIDATION, typeName, actualChangePercent,
                         allowableVariancePercent);
 

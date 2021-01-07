@@ -63,7 +63,6 @@ public class RecordCountVarianceValidatorTests {
             Assert.fail();
         } catch (ValidationStatusException expected) {
             Assert.assertEquals(1, expected.getValidationStatus().getResults().size());
-            //System.out.println("Message:"+expected.getIndividualFailures().get(0).getMessage());
             Assert.assertTrue(expected.getValidationStatus().getResults().get(0).getMessage()
                     .startsWith("Record count validation for type"));
         }
@@ -92,7 +91,6 @@ public class RecordCountVarianceValidatorTests {
             });
             Assert.fail();
         } catch (ValidationStatusException expected) {
-            //System.out.println("Message:"+expected.getIndividualFailures().get(0).getMessage());
             Assert.assertEquals(1, expected.getValidationStatus().getResults().size());
             Assert.assertTrue(expected.getValidationStatus().getResults().get(0).getMessage()
                     .startsWith("Record count validation for type"));
@@ -122,7 +120,6 @@ public class RecordCountVarianceValidatorTests {
             });
             Assert.fail();
         } catch (ValidationStatusException expected) {
-            //System.out.println("Message:"+expected.getIndividualFailures().get(0).getMessage());
             Assert.assertEquals(1, expected.getValidationStatus().getResults().size());
             Assert.assertTrue(expected.getValidationStatus().getResults().get(0).getMessage()
                     .startsWith("Record count validation for type"));
@@ -134,7 +131,6 @@ public class RecordCountVarianceValidatorTests {
         HollowProducer producer = HollowProducer.withPublisher(blobStore).withBlobStager(new HollowInMemoryBlobStager())
                 .withListener(new RecordCountVarianceValidator("TypeWithPrimaryKey", 50f)).build();
 
-        // runCycle(producer, 1);
         producer.runCycle(new Populator() {
 
             public void populate(WriteState newState) throws Exception {
@@ -162,7 +158,6 @@ public class RecordCountVarianceValidatorTests {
         HollowProducer producer = HollowProducer.withPublisher(blobStore).withBlobStager(new HollowInMemoryBlobStager())
                 .withListener(new RecordCountVarianceValidator("TypeWithPrimaryKey", 1f, true)).build();
 
-        // runCycle(producer, 1);
         producer.runCycle(new Populator() {
 
             public void populate(WriteState newState) throws Exception {
