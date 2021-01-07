@@ -46,7 +46,7 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
         super(packageName, SUB_PACKAGE_NAME, dataset, config);
         this.className = getClassName(schema);
         this.apiclassName = apiclassName;
-        this.type =  hollowImplClassname(schema.getName());
+        this.type = schema.getName();
         this.schema = schema;
     }
 
