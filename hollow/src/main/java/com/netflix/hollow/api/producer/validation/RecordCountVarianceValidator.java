@@ -45,6 +45,7 @@ public class RecordCountVarianceValidator implements ValidatorListener {
     private static final String NAME = RecordCountVarianceValidator.class.getName();
 
     private final String typeName;
+    private final boolean onlyValidateDropsInCardinality;
 
     private final float allowableVariancePercent;
 
@@ -58,7 +59,24 @@ public class RecordCountVarianceValidator implements ValidatorListener {
      * Anything more results in failure of validation.
      */
     public RecordCountVarianceValidator(String typeName, float allowableVariancePercent) {
+        this(typeName, allowableVariancePercent, false);
+    }
+
+    /**
+     * @param typeName type name
+     * @param allowableVariancePercent: Used to validate if the cardinality change in current cycle is with in the
+     * @param onlyValidateDropsInCardinality: If true, only drops in cardinality will cause a failure of validation
+     * allowed percent.
+     * Ex: 0% allowableVariancePercent ensures type cardinality does not vary at all for cycle to cycle.
+     * Ex: Number of state in United States.
+     * 10% allowableVariancePercent: from previous cycle any addition or removal within 10% cardinality is valid.
+     * Anything more results in failure of validation.
+     */
+    public RecordCountVarianceValidator(String typeName,
+                                        float allowableVariancePercent,
+                                        boolean onlyValidateDropsInCardinality) {
         this.typeName = typeName;
+        this.onlyValidateDropsInCardinality = onlyValidateDropsInCardinality;
         if (allowableVariancePercent < 0) {
             throw new IllegalArgumentException("RecordCountVarianceValidator for type " + typeName
                     + ": cannot have allowableVariancePercent less than 0. Value provided: "
@@ -93,9 +111,12 @@ public class RecordCountVarianceValidator implements ValidatorListener {
         vrb.detail(ACTUAL_CHANGE_PERCENT_NAME, actualChangePercent);
 
         if (Float.compare(actualChangePercent, allowableVariancePercent) > 0) {
-            String message = String.format(FAILED_RECORD_COUNT_VALIDATION, typeName, actualChangePercent,
-                    allowableVariancePercent);
-            return vrb.failed(message);
+            if(!onlyValidateDropsInCardinality || latestCardinality < previousCardinality) {
+                String message = String.format(FAILED_RECORD_COUNT_VALIDATION, typeName, actualChangePercent,
+                        allowableVariancePercent);
+
+                return vrb.failed(message);
+            }
         }
 
         return vrb.passed();

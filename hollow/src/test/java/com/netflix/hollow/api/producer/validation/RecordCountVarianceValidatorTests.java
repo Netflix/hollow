@@ -100,6 +100,36 @@ public class RecordCountVarianceValidatorTests {
     }
 
     @Test
+    public void failTestTooManyRemoved_onlyValidateDropsInCardinality() {
+        try {
+            HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                    .withBlobStager(new HollowInMemoryBlobStager())
+                    .withListener(new RecordCountVarianceValidator("TypeWithPrimaryKey", 1f, true)).build();
+
+            producer.runCycle(new Populator() {
+                public void populate(WriteState newState) throws Exception {
+                    newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
+                    newState.add(new TypeWithPrimaryKey(1, "Angelina Jolie", "as;dlkfjasd;l"));
+                    newState.add(new TypeWithPrimaryKey(1, "Bruce Willis", "as;dlkfjasd;l"));
+                }
+            });
+
+            producer.runCycle(new Populator() {
+                public void populate(WriteState newState) throws Exception {
+                    newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
+                    newState.add(new TypeWithPrimaryKey(1, "Angelina Jolie", "as;dlkfjasd;l"));
+                }
+            });
+            Assert.fail();
+        } catch (ValidationStatusException expected) {
+            //System.out.println("Message:"+expected.getIndividualFailures().get(0).getMessage());
+            Assert.assertEquals(1, expected.getValidationStatus().getResults().size());
+            Assert.assertTrue(expected.getValidationStatus().getResults().get(0).getMessage()
+                    .startsWith("Record count validation for type"));
+        }
+    }
+
+    @Test
     public void passTestNoMoreChangeThanExpected() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore).withBlobStager(new HollowInMemoryBlobStager())
                 .withListener(new RecordCountVarianceValidator("TypeWithPrimaryKey", 50f)).build();
@@ -124,6 +154,36 @@ public class RecordCountVarianceValidatorTests {
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
         consumer.triggerRefresh();
         Assert.assertEquals(3, consumer.getStateEngine().getTypeState("TypeWithPrimaryKey").getPopulatedOrdinals()
+                .cardinality());
+    }
+
+    @Test
+    public void passTestNoMoreChangeThanExpected_onlyValidateDropsInCardinality() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore).withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(new RecordCountVarianceValidator("TypeWithPrimaryKey", 1f, true)).build();
+
+        // runCycle(producer, 1);
+        producer.runCycle(new Populator() {
+
+            public void populate(WriteState newState) throws Exception {
+                newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
+                newState.add(new TypeWithPrimaryKey(1, "Angelina Jolie", "as;dlkfjasd;l"));
+            }
+        });
+
+        producer.runCycle(new Populator() {
+
+            public void populate(WriteState newState) throws Exception {
+                newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
+                newState.add(new TypeWithPrimaryKey(2, "Angelina Jolie", "as;dlkfjasd;l"));
+                newState.add(new TypeWithPrimaryKey(7, "Bruce Willis", "as;dlkfjasd;l"));
+                newState.add(new TypeWithPrimaryKey(9, "Tom Hardy", "as;dlkfjasd;l"));
+                newState.add(new TypeWithPrimaryKey(10, "Tom Cruise", "as;dlkfjasd;l"));
+            }
+        });
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefresh();
+        Assert.assertEquals(5, consumer.getStateEngine().getTypeState("TypeWithPrimaryKey").getPopulatedOrdinals()
                 .cardinality());
     }
 
