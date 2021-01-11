@@ -148,7 +148,7 @@ public class HollowClientUpdater {
             if (updatePlan.destinationVersion(requestedVersion) == getCurrentVersionId())
                 return true;
 
-            if (updatePlan.isSnapshotPlan()) {
+            if (updatePlan.isSnapshotPlan()) {  // 1 snapshot and 0+ delta transitions
                 HollowDataHolder oldDh = hollowDataHolderVolatile;
                 if (oldDh == null || doubleSnapshotConfig.allowDoubleSnapshot()) {
                     HollowDataHolder newDh = newHollowDataHolder();
@@ -171,7 +171,7 @@ public class HollowClientUpdater {
                     }
                     forceDoubleSnapshot = false;
                 }
-            } else {
+            } else {    // 0 snapshot and 1+ delta transitions
                 hollowDataHolderVolatile.update(updatePlan, localListeners, () -> {});
             }
 

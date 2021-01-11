@@ -353,9 +353,13 @@ abstract class AbstractHollowProducer {
         // 1. Begin a new cycle
         Artifacts artifacts = new Artifacts();
         HollowWriteStateEngine writeEngine = getWriteEngine();
+
         try {
             // 1a. Prepare the write state
             writeEngine.prepareForNextCycle();
+
+            // save timestamp in ms of when cycle starts
+            writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START, String.valueOf(System.currentTimeMillis()));
 
             // 2. Populate the state
             populate(listeners, incrementalPopulator, populator, toVersion);
@@ -405,6 +409,8 @@ abstract class AbstractHollowProducer {
                 writeEngine.resetToLastPrepareForNextCycle();
                 cycleStatus.success();
                 listeners.fireNoDelta(toVersion);
+
+                log.info("Populate stage completed with no delta in output state; skipping publish, announce, etc.");
             }
         } catch (Throwable th) {
             writeEngine.resetToLastPrepareForNextCycle();

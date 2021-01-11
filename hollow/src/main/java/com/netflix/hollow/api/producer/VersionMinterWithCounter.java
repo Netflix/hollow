@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
-public class VersionMinterWithCounter implements HollowProducer.VersionMinter {
+public class VersionMinterWithCounter implements VersionMinter {
 
     private static AtomicInteger versionCounter = new AtomicInteger();
 
@@ -49,5 +49,4 @@ public class VersionMinterWithCounter implements HollowProducer.VersionMinter {
 
         return Long.parseLong(versionStr);
     }
-
 }

@@ -47,6 +47,12 @@ public interface HollowStateEngine extends HollowDataset {
      */
     String HEADER_TAG_SCHEMA_CHANGE = "hollow.schema.changedFromPriorVersion";
 
+    /**
+     * A header tag indicating the timestamp in milliseconds of when the producer cycle started
+     * for this state engine.
+     */
+    String HEADER_TAG_METRIC_CYCLE_START = "hollow.metric.cycle.start";
+
     @Override
     List<HollowSchema> getSchemas();
 

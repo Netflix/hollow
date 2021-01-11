@@ -30,6 +30,7 @@ public class ConsumerRefreshMetrics {
     private long consecutiveFailures;
     private OptionalLong refreshSuccessAgeMillisOptional; // time elapsed since the previous successful refresh
     private long refreshEndTimeNano;                // monotonic system time when refresh ended
+    private OptionalLong cycleStartTimestamp;       // timestamp in millis of when cycle started for the loaded data version
 
     /**
      * A class that contains details of the consumer refresh update plan that may be useful to report as metrics or logs.
@@ -79,6 +80,9 @@ public class ConsumerRefreshMetrics {
     public long getRefreshEndTimeNano() {
         return refreshEndTimeNano;
     }
+    public OptionalLong getCycleStartTimestamp() {
+        return cycleStartTimestamp;
+    }
 
     private ConsumerRefreshMetrics(Builder builder) {
         this.durationMillis = builder.durationMillis;
@@ -89,6 +93,7 @@ public class ConsumerRefreshMetrics {
         this.consecutiveFailures = builder.consecutiveFailures;
         this.refreshSuccessAgeMillisOptional = builder.refreshSuccessAgeMillisOptional;
         this.refreshEndTimeNano = builder.refreshEndTimeNano;
+        this.cycleStartTimestamp = builder.cycleStartTimestamp;
     }
 
     public static final class Builder {
@@ -100,9 +105,11 @@ public class ConsumerRefreshMetrics {
         private long consecutiveFailures;
         private OptionalLong refreshSuccessAgeMillisOptional;
         private long refreshEndTimeNano;
+        private OptionalLong cycleStartTimestamp;
 
         public Builder() {
             refreshSuccessAgeMillisOptional = OptionalLong.empty();
+            cycleStartTimestamp = OptionalLong.empty();
         }
 
         public Builder setDurationMillis(long durationMillis) {
@@ -136,6 +143,10 @@ public class ConsumerRefreshMetrics {
         }
         public Builder setRefreshEndTimeNano(long refreshEndTimeNano) {
             this.refreshEndTimeNano = refreshEndTimeNano;
+            return this;
+        }
+        public Builder setCycleStartTimestamp(long cycleStartTimestamp) {
+            this.cycleStartTimestamp = OptionalLong.of(cycleStartTimestamp);
             return this;
         }
 

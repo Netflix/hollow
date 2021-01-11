@@ -17,13 +17,16 @@
 package com.netflix.hollow.api.consumer.metrics;
 
 import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.AbstractRefreshListener;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob.BlobType;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalLong;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -51,9 +54,12 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     // visible for testing
     ConsumerRefreshMetrics.Builder refreshMetricsBuilder;
 
+    private final Map<Long, Long> cycleVersionStartTimes;
+
     public AbstractRefreshMetricsListener() {
         lastRefreshTimeNanoOptional = OptionalLong.empty();
         consecutiveFailures = 0l;
+        cycleVersionStartTimes = new HashMap<>();
     }
 
     @Override
@@ -63,6 +69,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         refreshMetricsBuilder = new ConsumerRefreshMetrics.Builder();
         refreshMetricsBuilder.setIsInitialLoad(currentVersion == VERSION_NONE);
         refreshMetricsBuilder.setUpdatePlanDetails(updatePlanDetails);
+        cycleVersionStartTimes.clear(); // clear map to avoid accumulation over time
     }
 
     /**
@@ -106,7 +113,8 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
             refreshEndMetricsReporting(refreshMetrics);
         } catch (Exception e) {
             // Metric reporting is not considered critical to consumer refresh. Log exceptions and continue.
-            log.log(Level.SEVERE, "Encountered an exception in reporting consumer refresh metrics, ignoring exception and continuing with consumer refresh", e);
+            log.log(Level.SEVERE, "Encountered an exception in reporting consumer refresh metrics, ignoring exception "
+                    + "and continuing with consumer refresh", e);
         }
     }
 
@@ -119,10 +127,14 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         lastRefreshTimeNanoOptional = OptionalLong.of(refreshEndTimeNano);
 
         refreshMetricsBuilder.setDurationMillis(durationMillis)
-                .setIsRefreshSuccess(true)
-                .setConsecutiveFailures(consecutiveFailures)
-                .setRefreshSuccessAgeMillisOptional(0l)
-                .setRefreshEndTimeNano(refreshEndTimeNano);
+            .setIsRefreshSuccess(true)
+            .setConsecutiveFailures(consecutiveFailures)
+            .setRefreshSuccessAgeMillisOptional(0l)
+            .setRefreshEndTimeNano(refreshEndTimeNano);
+
+        if (cycleVersionStartTimes.containsKey(afterVersion)) {
+            refreshMetricsBuilder.setCycleStartTimestamp(cycleVersionStartTimes.get(afterVersion));
+        }
 
         noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
     }
@@ -138,7 +150,12 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
                 .setConsecutiveFailures(consecutiveFailures)
                 .setRefreshEndTimeNano(refreshEndTimeNano);
         if (lastRefreshTimeNanoOptional.isPresent()) {
-            refreshMetricsBuilder.setRefreshSuccessAgeMillisOptional(TimeUnit.NANOSECONDS.toMillis(refreshEndTimeNano - lastRefreshTimeNanoOptional.getAsLong()));
+            refreshMetricsBuilder.setRefreshSuccessAgeMillisOptional(TimeUnit.NANOSECONDS.toMillis(
+                    refreshEndTimeNano - lastRefreshTimeNanoOptional.getAsLong()));
+        }
+
+        if (cycleVersionStartTimes.containsKey(afterVersion)) {
+            refreshMetricsBuilder.setCycleStartTimestamp(cycleVersionStartTimes.get(afterVersion));
         }
 
         noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
@@ -146,12 +163,32 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
     @Override
     public void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-        // no-op
+        trackCycleStartTime(version, stateEngine.getHeaderTags());
     }
 
     @Override
     public void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-        // no-op
+        trackCycleStartTime(version, stateEngine.getHeaderTags());
+    }
+
+    /**
+     * If the blob header contains producer cycle start time tag then save its value in version to cycle start time map
+     */
+    private void trackCycleStartTime(long version, Map<String, String> headers) {
+        if (headers != null) {
+            String cycleStartMetric = headers.get(HEADER_TAG_METRIC_CYCLE_START);
+            if (cycleStartMetric != null && !cycleStartMetric.isEmpty()) {
+                try {
+                    Long cycleStartTimestamp = Long.valueOf(cycleStartMetric);
+                    if (cycleStartTimestamp != null) {
+                        cycleVersionStartTimes.put(version, cycleStartTimestamp);
+                    }
+                } catch (NumberFormatException e) {
+                    log.log(Level.WARNING, "Blob header contained HEADER_TAG_METRIC_CYCLE_START but its value could"
+                            + "not be parsed as a long. Consumer metrics relying on cycle start time will be unreliable.", e);
+                }
+            }
+        }
     }
 
     @Override
