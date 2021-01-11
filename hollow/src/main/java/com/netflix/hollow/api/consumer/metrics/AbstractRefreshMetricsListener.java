@@ -54,7 +54,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     // visible for testing
     ConsumerRefreshMetrics.Builder refreshMetricsBuilder;
 
-    private Map<Long, Long> cycleVersionStartTimes;
+    private final Map<Long, Long> cycleVersionStartTimes;
 
     public AbstractRefreshMetricsListener() {
         lastRefreshTimeNanoOptional = OptionalLong.empty();
@@ -133,7 +133,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
             .setRefreshEndTimeNano(refreshEndTimeNano);
 
         if (cycleVersionStartTimes.containsKey(afterVersion)) {
-            refreshMetricsBuilder.setCycleStartTimestamp(Long.valueOf(cycleVersionStartTimes.get(afterVersion)));
+            refreshMetricsBuilder.setCycleStartTimestamp(cycleVersionStartTimes.get(afterVersion));
         }
 
         noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
@@ -155,7 +155,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         }
 
         if (cycleVersionStartTimes.containsKey(afterVersion)) {
-            refreshMetricsBuilder.setCycleStartTimestamp(Long.valueOf(cycleVersionStartTimes.get(afterVersion)));
+            refreshMetricsBuilder.setCycleStartTimestamp(cycleVersionStartTimes.get(afterVersion));
         }
 
         noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
@@ -177,10 +177,15 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     private void trackCycleStartTime(long version, Map<String, String> headers) {
         if (headers != null) {
             String cycleStartMetric = headers.get(HEADER_TAG_METRIC_CYCLE_START);
-            if (cycleStartMetric != null && cycleStartMetric != "") {
-                Long cycleStartTimestamp = Long.valueOf(cycleStartMetric);
-                if (cycleStartTimestamp != null) {
-                    cycleVersionStartTimes.put(version, cycleStartTimestamp);
+            if (cycleStartMetric != null && !cycleStartMetric.isEmpty()) {
+                try {
+                    Long cycleStartTimestamp = Long.valueOf(cycleStartMetric);
+                    if (cycleStartTimestamp != null) {
+                        cycleVersionStartTimes.put(version, cycleStartTimestamp);
+                    }
+                } catch (NumberFormatException e) {
+                    log.log(Level.WARNING, "Blob header contained HEADER_TAG_METRIC_CYCLE_START but its value could"
+                            + "not be parsed as a long. Consumer metrics relying on cycle start time will be unreliable.", e);
                 }
             }
         }

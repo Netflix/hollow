@@ -120,7 +120,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(readStateEngine, "Test", "test1");
 
         Assert.assertEquals(-1, idx.getMatchingOrdinal(100));
-        Assert.assertEquals(false, idx.containsDuplicates());
+        Assert.assertFalse(idx.containsDuplicates());
     }
 
     @Test
@@ -182,7 +182,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         int a2Pos = ((HollowObjectSchema) readStateEngine.getTypeState(typeA).getSchema()).getPosition("a2");
         HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(readStateEngine, "TypeA", "a1");
         idx.listenForDeltaUpdates();
-        Assert.assertEquals(false, idx.containsDuplicates());
+        Assert.assertFalse(idx.containsDuplicates());
 
         // add dups
         int numOfDups = (int) (numOfItems * 0.2);
@@ -217,7 +217,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         { // remove dups
             addDataForDupTesting(writeStateEngine, a1ValueStart, a2Value, numOfItems);
             roundTripDelta();
-            Assert.assertEquals(false, idx.containsDuplicates()); // Make sure there is no dups
+            Assert.assertFalse(idx.containsDuplicates()); // Make sure there is no dups
 
             HollowObjectTypeReadState readTypeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(typeA);
             for (int i = 0; i < readTypeState.maxOrdinal(); i++) {
@@ -260,7 +260,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         { // remove original
             addDataForDupTesting(writeStateEngine, a1dupValueStart, a2dupValues, numOfDups);
             roundTripDelta();
-            Assert.assertEquals(false, idx.containsDuplicates()); // Make sure there is no dups
+            Assert.assertFalse(idx.containsDuplicates()); // Make sure there is no dups
 
             HollowObjectTypeReadState readTypeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(typeA);
             for (int i = 0; i < readTypeState.maxOrdinal(); i++) {

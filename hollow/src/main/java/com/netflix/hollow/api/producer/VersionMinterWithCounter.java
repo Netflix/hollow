@@ -50,26 +50,4 @@ public class VersionMinterWithCounter implements VersionMinter {
 
         return Long.parseLong(versionStr);
     }
-
-    /**
-     * Convert version to timestamp in milliseconds. Although the result is in millisecond resolution, its precision is
-     * in seconds i.e., the last 3 digits representing milliseconds are zeroed out.<p>
-     *
-     * @param version Hollow data version
-     * @return timestamp in milliseconds resolution and seconds precision
-     */
-    public static long timestampFromVersion(long version) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS"); // treat last 3 chars as ms, ignore later
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        try {
-            Date date = sdf.parse(String.valueOf(version));
-            long millisRes = date.getTime();
-            long secondsRes =  millisRes - (millisRes % 1000);  // switch to seconds resolution by zeroing out milliseconds
-            return secondsRes;
-        } catch (ParseException e) {
-            throw new IllegalArgumentException(e);
-        }
-
-    }
 }

@@ -55,7 +55,7 @@ public class AbstractRefreshMetricsListenerTest {
     public void testRefreshStartedWithSubsequentLoad() {
         concreteRefreshMetricsListener.refreshStarted(TEST_VERSION_LOW, TEST_VERSION_HIGH);
         ConsumerRefreshMetrics refreshMetrics = concreteRefreshMetricsListener.refreshMetricsBuilder.build();
-        Assert.assertEquals(false, refreshMetrics.getIsInitialLoad());
+        Assert.assertFalse(refreshMetrics.getIsInitialLoad());
         Assert.assertNotNull(refreshMetrics.getUpdatePlanDetails());
     }
 
@@ -137,10 +137,10 @@ public class AbstractRefreshMetricsListenerTest {
             @Override
             public void refreshEndMetricsReporting(ConsumerRefreshMetrics refreshMetrics) {
                 Assert.assertNotEquals(0l, refreshMetrics.getConsecutiveFailures());
-                Assert.assertEquals(false, refreshMetrics.getIsRefreshSuccess());
+                Assert.assertFalse(refreshMetrics.getIsRefreshSuccess());
                 Assert.assertNotEquals(Optional.empty(), refreshMetrics.getRefreshSuccessAgeMillisOptional());
                 Assert.assertNotEquals(0l, refreshMetrics.getRefreshEndTimeNano());
-                Assert.assertEquals(false, refreshMetrics.getCycleStartTimestamp().isPresent());
+                Assert.assertFalse(refreshMetrics.getCycleStartTimestamp().isPresent());
             }
         }
         FailureTestRefreshMetricsListener failTestRefreshMetricsListener = new FailureTestRefreshMetricsListener();

@@ -141,7 +141,7 @@ public class AbstractProducerMetricsListenerTest {
             public void announcementMetricsReporting(AnnouncementMetrics announcementMetrics) {
                 Assert.assertNotNull(announcementMetrics);
                 Assert.assertEquals(TEST_DATA_SIZE, announcementMetrics.getDataSizeBytes());
-                Assert.assertEquals(false, announcementMetrics.getIsAnnouncementSuccess());
+                Assert.assertFalse(announcementMetrics.getIsAnnouncementSuccess());
                 Assert.assertEquals(TEST_ANNOUNCEMENT_DURATION_MILLIS,
                         announcementMetrics.getAnnouncementDurationMillis());
                 Assert.assertEquals(OptionalLong.of(TEST_LAST_ANNOUNCEMENT_NANOS),
