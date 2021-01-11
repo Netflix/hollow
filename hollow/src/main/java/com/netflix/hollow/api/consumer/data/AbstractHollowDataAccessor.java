@@ -40,6 +40,7 @@ public abstract class AbstractHollowDataAccessor<T> {
     protected final String type;
     protected final PrimaryKey primaryKey;
     protected final HollowReadStateEngine rStateEngine;
+    protected final HollowTypeReadState typeState;
 
     private BitSet removedOrdinals = new BitSet();
     private BitSet addedOrdinals = new BitSet();
@@ -61,7 +62,7 @@ public abstract class AbstractHollowDataAccessor<T> {
 
     public AbstractHollowDataAccessor(HollowReadStateEngine rStateEngine, String type, PrimaryKey primaryKey) {
         this.rStateEngine = requireNonNull(rStateEngine, "read state required");
-        HollowTypeReadState typeState = requireNonNull(rStateEngine.getTypeState(type),
+        this.typeState = requireNonNull(rStateEngine.getTypeState(type),
                 "type not loaded or does not exist in dataset; type=" + type);
         HollowSchema schema = typeState.getSchema();
         if (schema instanceof HollowObjectSchema) {
@@ -79,6 +80,17 @@ public abstract class AbstractHollowDataAccessor<T> {
         } else {
             throw new RuntimeException(String.format("Unsupported DataType=%s with SchemaType=%s : %s", type, schema.getSchemaType(), "Only supported type=" + SchemaType.OBJECT));
         }
+    }
+
+    /**
+     * Indicate whether Data Accessor contains prior state
+     *
+     * NOTE: This is critical since loading a Snapshot will not contain any information about changes from prior state
+     *
+     * @return true indicate it contains prior state
+     */
+    public boolean hasPriorState() {
+        return !typeState.getPreviousOrdinals().isEmpty();
     }
 
     /**
