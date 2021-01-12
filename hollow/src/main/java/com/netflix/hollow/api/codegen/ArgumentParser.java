@@ -38,7 +38,7 @@ public class ArgumentParser<T extends Enum> {
             return value;
         }
     }
-    private static final Pattern COMMAND_LINE_ARG_PATTERN = Pattern.compile("--(\\w+)=([\\w,./-]+)");
+    private static final Pattern COMMAND_LINE_ARG_PATTERN = Pattern.compile("--(\\w+)=([\\w, ./-]+)");
 
     private final List<ParsedArgument> parsedArguments = new ArrayList<>();
 
