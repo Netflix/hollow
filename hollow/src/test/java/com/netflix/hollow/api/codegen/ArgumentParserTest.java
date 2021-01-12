@@ -24,6 +24,7 @@ public class ArgumentParserTest {
     enum Commands {
         orderCoffee,
         drinkCoffee,
+        tossCoffee,
         writeArgumentParserClass;
     };
 
@@ -53,6 +54,7 @@ public class ArgumentParserTest {
             "--orderCoffee=first", "--drinkCoffee=next", "--writeArgumentParserClass=yay"}).getParsedArguments().size());
         assertParsedArgument("--orderCoffee=fi.rst", Commands.orderCoffee, "fi.rst");
         assertParsedArgument("--drinkCoffee=ne/x--t", Commands.drinkCoffee, "ne/x--t");
+        assertParsedArgument("--tossCoffee=with space", Commands.tossCoffee, "with space");
         assertParsedArgument("--writeArgumentParserClass=compl_ete", Commands.writeArgumentParserClass, "compl_ete");
 
     }
