@@ -62,6 +62,16 @@ public class HollowDiffMatcher {
     }
 
     public void calculateMatches() {
+        if (fromTypeState==null) {
+            toTypeState.getPopulatedOrdinals().stream().forEach(i -> extraInTo.add(i));
+            return;
+        }
+
+        if (toTypeState==null) {
+            fromTypeState.getPopulatedOrdinals().stream().forEach(i -> extraInFrom.add(i));
+            return;
+        }
+
         fromIdx = new HollowPrimaryKeyIndex(fromTypeState.getStateEngine(), fromTypeState.getSchema().getName(), matchPaths.toArray(new String[matchPaths.size()]));
         toIdx = new HollowPrimaryKeyIndex(toTypeState.getStateEngine(), toTypeState.getSchema().getName(), matchPaths.toArray(new String[matchPaths.size()]));
 
