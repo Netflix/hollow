@@ -66,8 +66,8 @@ public class DiffOverviewPage extends DiffPage {
             HollowTypeReadState toTypeState = diff.getToTypeState();
 
             overviewEntries.add(new HollowDiffOverviewTypeEntry(diff.getTypeName(), totalDiffScore, unmatchedInFrom, unmatchedInTo, fromCount, toCount,
-                    fromTypeState.getApproximateHeapFootprintInBytes(), toTypeState.getApproximateHeapFootprintInBytes(),
-                    fromTypeState.getApproximateHoleCostInBytes(), toTypeState.getApproximateHoleCostInBytes()));
+                    fromTypeState==null ? 0:fromTypeState.getApproximateHeapFootprintInBytes(), toTypeState==null ? 0:toTypeState.getApproximateHeapFootprintInBytes(),
+                    fromTypeState==null ? 0:fromTypeState.getApproximateHoleCostInBytes(), toTypeState==null ? 0:toTypeState.getApproximateHoleCostInBytes()));
         }
 
         if(sortBy == null || "diffs".equals(sortBy)) {
