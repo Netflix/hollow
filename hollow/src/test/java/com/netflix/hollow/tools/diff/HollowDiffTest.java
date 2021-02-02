@@ -50,6 +50,7 @@ public class HollowDiffTest {
     HollowObjectSchema typeDSchema;
 
     HollowObjectSchema typeESchema;
+    HollowObjectSchema typeFSchema;
 
     HollowListSchema listOfTypeCSchema;
     HollowSetSchema setOfTypeDSchema;
@@ -78,6 +79,9 @@ public class HollowDiffTest {
 
         typeESchema = new HollowObjectSchema("TypeE", 1, "e1");
         typeESchema.addField("e1", FieldType.FLOAT);
+
+        typeFSchema = new HollowObjectSchema("TypeF", 1);
+        typeFSchema.addField("f1", FieldType.FLOAT);
 
         listOfTypeCSchema = new HollowListSchema("ListOfTypeC", "TypeC");
         setOfTypeDSchema = new HollowSetSchema("SetOfTypeD", "TypeD");
@@ -213,7 +217,7 @@ public class HollowDiffTest {
         HollowWriteStateEngine toStateEngine = newWriteStateEngine();
         HollowDiff diff = new HollowDiff(readEngine(fromStateEngine), readEngine(toStateEngine));
 
-        Assert.assertEquals(1, diff.getTypeDiffs().size());
+        Assert.assertEquals(4, diff.getTypeDiffs().size());
 
         HollowTypeDiff typeDDiff = diff.getTypeDiff("TypeD");
         Assert.assertNotNull(typeDDiff);
@@ -237,21 +241,7 @@ public class HollowDiffTest {
         HollowDiff diff = new HollowDiff(readEngine(fromStateEngine), readEngine(toStateEngine));
         diff.calculateDiffs();
 
-        Assert.assertEquals(2, diff.getTypeDiffs().size());
-
-        {
-            HollowTypeDiff typeDDiff = diff.getTypeDiff("TypeD");
-            Assert.assertNotNull(typeDDiff);
-
-            HollowDiffMatcher matcher = typeDDiff.getMatcher();
-            Assert.assertNotNull(matcher);
-
-            List<String> matchPaths = matcher.getMatchPaths();
-            Assert.assertEquals(2, matchPaths.size());
-            Assert.assertEquals("d1", matchPaths.get(0));
-            Assert.assertEquals("d2", matchPaths.get(1));
-        }
-
+        Assert.assertEquals(5, diff.getTypeDiffs().size());
         {
             HollowTypeDiff typeEDiff = diff.getTypeDiff("TypeE");
             Assert.assertNotNull(typeEDiff);
@@ -262,6 +252,59 @@ public class HollowDiffTest {
             List<String> matchPathsE = matcherE.getMatchPaths();
             Assert.assertEquals(1, matchPathsE.size());
             Assert.assertEquals("e1", matchPathsE.get(0));
+
+            Assert.assertEquals( typeEDiff.getUnmatchedOrdinalsInFrom().size(), 0 );
+            Assert.assertEquals( typeEDiff.getUnmatchedOrdinalsInTo().size(), 1 );
+        }
+    }
+
+    @Test
+    public void testDiffTypeWithoutPrimaryKey() throws Exception {
+        HollowWriteStateEngine fromStateEngine = newWriteStateEngine();
+        HollowWriteStateEngine toStateEngine = newWriteStateEngine();
+        addCRec(toStateEngine, c(2, true));
+
+        fromStateEngine.addTypeState(new HollowObjectTypeWriteState(typeFSchema));
+        toStateEngine.addTypeState(new HollowObjectTypeWriteState(typeFSchema));
+        addFRec(fromStateEngine, f(1));
+        addFRec(fromStateEngine, f(2));
+        addFRec(toStateEngine, f(2));
+        addFRec(toStateEngine, f(3));
+        addFRec(toStateEngine, f(4));
+
+        HollowDiff diff = new HollowDiff(readEngine(fromStateEngine), readEngine(toStateEngine));
+        diff.calculateDiffs();
+
+        Assert.assertEquals(5, diff.getTypeDiffs().size());
+        { // Multi Field without Primary Key
+            HollowTypeDiff typeDiff = diff.getTypeDiff("TypeC");
+            Assert.assertNotNull(typeDiff);
+
+            HollowDiffMatcher matcher = typeDiff.getMatcher();
+            Assert.assertNotNull(matcher);
+
+            // No Primary Key so not match Paths
+            List<String> matchPaths = matcher.getMatchPaths();
+            Assert.assertEquals(0, matchPaths.size());
+
+            Assert.assertEquals( typeDiff.getUnmatchedOrdinalsInFrom().size(), 0 );
+            Assert.assertEquals( typeDiff.getUnmatchedOrdinalsInTo().size(), 1 );
+        }
+
+        { // Single Field without Primary Key
+            HollowTypeDiff typeDiff = diff.getTypeDiff("TypeF");
+            Assert.assertNotNull(typeDiff);
+
+            HollowDiffMatcher matcher = typeDiff.getMatcher();
+            Assert.assertNotNull(matcher);
+
+            // Automatic add single field
+            List<String> matchPaths = matcher.getMatchPaths();
+            Assert.assertEquals(1, matchPaths.size());
+            Assert.assertEquals("f1", matchPaths.get(0));
+
+            Assert.assertEquals( typeDiff.getUnmatchedOrdinalsInFrom().size(), 1 );
+            Assert.assertEquals( typeDiff.getUnmatchedOrdinalsInTo().size(), 2 );
         }
     }
 
@@ -382,6 +425,12 @@ public class HollowDiffTest {
         return stateEngine.add("TypeE", rec);
     }
 
+    private int addFRec(HollowWriteStateEngine stateEngine, TypeFRec typeF) {
+        HollowObjectWriteRecord rec = new HollowObjectWriteRecord(typeFSchema);
+        rec.setFloat("f1", typeF.f1);
+        return stateEngine.add("TypeF", rec);
+    }
+
     private TypeCRec[] cList(TypeCRec... cs) {
         return cs;
     }
@@ -422,6 +471,12 @@ public class HollowDiffTest {
         return rec;
     }
 
+    private TypeFRec f(float f1) {
+        TypeFRec rec = new TypeFRec();
+        rec.f1 = f1;
+        return rec;
+    }
+
     private static class MapEntry {
         TypeCRec key;
         TypeDRec value;
@@ -440,6 +495,10 @@ public class HollowDiffTest {
 
     private static class TypeERec {
         private float e1;
+    }
+
+    private static class TypeFRec {
+        private float f1;
     }
 
 }

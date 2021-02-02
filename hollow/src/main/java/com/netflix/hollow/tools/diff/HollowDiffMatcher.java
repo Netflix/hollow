@@ -21,6 +21,7 @@ import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.util.LongList;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -45,7 +46,7 @@ public class HollowDiffMatcher {
     private HollowPrimaryKeyIndex toIdx;
 
     public HollowDiffMatcher(HollowObjectTypeReadState fromTypeState, HollowObjectTypeReadState toTypeState) {
-        this.matchPaths = new ArrayList<String>();
+        this.matchPaths = new ArrayList<>();
         this.fromTypeState = fromTypeState;
         this.toTypeState = toTypeState;
         this.matchedOrdinals = new LongList();
@@ -68,6 +69,13 @@ public class HollowDiffMatcher {
         }
 
         if (toTypeState==null) {
+            fromTypeState.getPopulatedOrdinals().stream().forEach(i -> extraInFrom.add(i));
+            return;
+        }
+
+        // No Primary Key so no matching will be done
+        if (matchPaths==null || matchPaths.isEmpty()) {
+            toTypeState.getPopulatedOrdinals().stream().forEach(i -> extraInTo.add(i));
             fromTypeState.getPopulatedOrdinals().stream().forEach(i -> extraInFrom.add(i));
             return;
         }
@@ -118,14 +126,15 @@ public class HollowDiffMatcher {
     public String getKeyDisplayString(HollowObjectTypeReadState state, int ordinal) {
         Object[] key = null;
 
-        if(state == fromTypeState) {
+        if(state == fromTypeState && fromIdx!=null) {
             key = fromIdx.getRecordKey(ordinal);
-        } else if(state == toTypeState) {
+        } else if(state == toTypeState && toIdx!=null) {
             key = toIdx.getRecordKey(ordinal);
         }
 
+        // Show Display similar to Hollow Explorer when there is no primary key
         if(key == null)
-            return null;
+            return "ORDINAL:" + ordinal;
 
         return keyDisplayString(key);
     }
