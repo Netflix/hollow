@@ -44,6 +44,7 @@ public class HollowTypeDiff {
     private final HollowDiffMatcher matcher;
     private final String type;
     private final Set<String> shortcutTypes;
+    private boolean hasMatchPaths;
 
     private List<HollowFieldDiff> calculatedFieldDiffs;
 
@@ -53,10 +54,14 @@ public class HollowTypeDiff {
         this.from = (HollowObjectTypeReadState) rootDiff.getFromStateEngine().getTypeState(type);
         this.to = (HollowObjectTypeReadState) rootDiff.getToStateEngine().getTypeState(type);
         this.matcher = new HollowDiffMatcher(this.from, this.to);
-        this.shortcutTypes = new HashSet<String>();
+        this.shortcutTypes = new HashSet<>();
 
-        for(String matchPath : matchPaths) {
-            addMatchPath(matchPath);
+        // Allow Basic diffing of Type that do not have PrimaryKey/MatchPaths
+        this.hasMatchPaths = matchPaths!=null && matchPaths.length>0;
+        if (hasMatchPaths) {
+            for (String matchPath : matchPaths) {
+                addMatchPath(matchPath);
+            }
         }
     }
 
@@ -65,6 +70,14 @@ public class HollowTypeDiff {
      */
     public String getTypeName() {
         return type;
+    }
+
+    /**
+     * Indicate whether Match Paths are defined
+     * @return true to indicate there is
+     */
+    public boolean hasMatchPaths() {
+        return !matcher.getMatchPaths().isEmpty();
     }
 
     /**

@@ -21,6 +21,7 @@ import static com.netflix.hollow.ui.HollowDiffUtil.formatBytes;
 public class HollowDiffOverviewTypeEntry {
 
     private final String typeName;
+    private final boolean hasUniqueKey;
     private final long totalDiffScore;
     private final int unmatchedInFrom;
     private final int unmatchedInTo;
@@ -32,12 +33,19 @@ public class HollowDiffOverviewTypeEntry {
     private final long holeInTo;
 
     public HollowDiffOverviewTypeEntry(String typeName, long totalDiffScore, int unmatchedInFrom, int unmatchedInTo, int totalInFrom, int totalInTo) {
-        this(typeName, totalDiffScore, unmatchedInFrom, unmatchedInTo, totalInFrom, totalInTo, 0, 0, 0, 0);
+        this(typeName, false, totalDiffScore, unmatchedInFrom, unmatchedInTo, totalInFrom, totalInTo, 0, 0, 0, 0);
     }
 
     public HollowDiffOverviewTypeEntry(String typeName, long totalDiffScore, int unmatchedInFrom, int unmatchedInTo, int totalInFrom, int totalInTo,
                                        long heapInFrom, long heapInTo, long holeInFrom, long holeInTo) {
+        this(typeName, false, totalDiffScore, unmatchedInFrom, unmatchedInTo, totalInFrom, totalInTo, heapInFrom, heapInTo, holeInFrom, holeInTo);
+
+    }
+
+    public HollowDiffOverviewTypeEntry(String typeName, boolean hasUniqueKey, long totalDiffScore, int unmatchedInFrom, int unmatchedInTo, int totalInFrom, int totalInTo,
+                                       long heapInFrom, long heapInTo, long holeInFrom, long holeInTo) {
         this.typeName = typeName;
+        this.hasUniqueKey = hasUniqueKey;
         this.totalDiffScore = totalDiffScore;
         this.unmatchedInFrom = unmatchedInFrom;
         this.unmatchedInTo = unmatchedInTo;
@@ -52,6 +60,9 @@ public class HollowDiffOverviewTypeEntry {
     public String getTypeName() {
         return typeName;
     }
+
+    public boolean hasUniqueKey() { return hasUniqueKey;}
+
     public long getTotalDiffScore() {
         return totalDiffScore;
     }

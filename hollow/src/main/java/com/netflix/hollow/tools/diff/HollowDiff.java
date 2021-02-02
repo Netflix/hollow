@@ -22,6 +22,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -83,10 +84,15 @@ public class HollowDiff {
             schemas.addAll(toStateEngine.getSchemas());
             for (HollowSchema schema : schemas) {
                 if (schema instanceof HollowObjectSchema) {
-                    PrimaryKey pKey = ((HollowObjectSchema) schema).getPrimaryKey();
-                    if (pKey == null) continue;
+                    HollowObjectSchema objectSchema = ((HollowObjectSchema) schema);
+                    PrimaryKey pKey = objectSchema.getPrimaryKey();
 
-                    addTypeDiff(schema.getName(), pKey.getFieldPaths());
+                    // Handle diffing of type with single field
+                    if (pKey==null && objectSchema.numFields()==1) {
+                        pKey = new PrimaryKey(schema.getName(), objectSchema.getFieldName(0));
+                    }
+
+                    addTypeDiff(schema.getName(), pKey==null? null : pKey.getFieldPaths());
                 }
             }
         }
