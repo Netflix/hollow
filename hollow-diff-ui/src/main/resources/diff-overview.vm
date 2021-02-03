@@ -23,9 +23,9 @@
     </tr>
     <tr style="background-color:#9EBFF9">
         <th>Type</th>
-        <th><a href="$path/?sortBy=diffs"># Total Diffs</a></th>
-        <th><a href="$path/?sortBy=unmatchedFrom"># FROM - Extra</a></th>
-        <th><a href="$path/?sortBy=unmatchedTo"># TO - Extra</a></th>
+        <th><a href="$path/?sortBy=diffs">Diff Score</a></th>
+        <th><a href="$path/?sortBy=unmatchedFrom"># FROM - Unmatched</a></th>
+        <th><a href="$path/?sortBy=unmatchedTo"># TO - Unmatched</a></th>
         <th><a href="$path/?sortBy=fromCount">FROM - Item Count</a></th>
         <th><a href="$path/?sortBy=toCount">TO - Item Count</a></th>
         <th><a href="$path/?sortBy=fromHeap">FROM - Heap Footprint</a></th>

@@ -62,6 +62,8 @@ public class HollowDiffOverviewTypeEntry {
     }
 
     public boolean hasUniqueKey() { return hasUniqueKey;}
+    public boolean hasUnmatched() { return unmatchedInFrom > 0 || unmatchedInTo > 0; }
+    public boolean hasData() { return totalInFrom!=0 || totalInTo!=0; }
 
     public long getTotalDiffScore() {
         return totalDiffScore;
@@ -78,6 +80,9 @@ public class HollowDiffOverviewTypeEntry {
     public int getTotalInTo() {
         return totalInTo;
     }
+
+    public int getDeltaSize() { return Math.abs(totalInFrom - totalInTo); }
+
     public long getHeapInFrom() { return heapInFrom; }
     public long getHeapInTo() { return heapInTo; }
     public long getHoleInFrom() { return holeInFrom; }
@@ -89,12 +94,13 @@ public class HollowDiffOverviewTypeEntry {
     public String getHoleInToFormatted() { return formatBytes(holeInTo); }
 
     public String getBgColor() {
-        if (!hasUniqueKey)
-            return "#FFFBDB"; // No Unique Key
-        else if  (totalDiffScore > 0 || unmatchedInFrom > 0 || unmatchedInTo > 0)
-            return "#FFCC99"; // Has Diff
-        else if (totalInFrom == 0 && totalInTo == 0)
+        if (totalInFrom == 0 && totalInTo == 0)
             return "#D0D0D0"; // No Data
+        else if (!hasUniqueKey) {
+            if (totalInFrom!=totalInTo) return "#F0E592";
+            return "#FFFBDB"; // No Unique Key
+        } else if  (totalDiffScore > 0 || unmatchedInFrom > 0 || unmatchedInTo > 0)
+            return "#FFCC99"; // Has Diff
         return "";
     }
 }
