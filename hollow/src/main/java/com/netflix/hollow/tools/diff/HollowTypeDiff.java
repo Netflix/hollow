@@ -25,6 +25,7 @@ import com.netflix.hollow.tools.diff.count.HollowDiffObjectCountingNode;
 import com.netflix.hollow.tools.diff.count.HollowFieldDiff;
 import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,7 +45,6 @@ public class HollowTypeDiff {
     private final HollowDiffMatcher matcher;
     private final String type;
     private final Set<String> shortcutTypes;
-    private boolean hasMatchPaths;
 
     private List<HollowFieldDiff> calculatedFieldDiffs;
 
@@ -57,8 +57,7 @@ public class HollowTypeDiff {
         this.shortcutTypes = new HashSet<>();
 
         // Allow Basic diffing of Type that do not have PrimaryKey/MatchPaths
-        this.hasMatchPaths = matchPaths!=null && matchPaths.length>0;
-        if (hasMatchPaths) {
+        if (matchPaths!=null && matchPaths.length>0) {
             for (String matchPath : matchPaths) {
                 addMatchPath(matchPath);
             }
