@@ -217,7 +217,7 @@ public class HollowDiffTest {
         HollowWriteStateEngine toStateEngine = newWriteStateEngine();
         HollowDiff diff = new HollowDiff(readEngine(fromStateEngine), readEngine(toStateEngine));
 
-        Assert.assertEquals(4, diff.getTypeDiffs().size());
+        Assert.assertEquals(1, diff.getTypeDiffs().size());
 
         HollowTypeDiff typeDDiff = diff.getTypeDiff("TypeD");
         Assert.assertNotNull(typeDDiff);
@@ -241,7 +241,7 @@ public class HollowDiffTest {
         HollowDiff diff = new HollowDiff(readEngine(fromStateEngine), readEngine(toStateEngine));
         diff.calculateDiffs();
 
-        Assert.assertEquals(5, diff.getTypeDiffs().size());
+        Assert.assertEquals(2, diff.getTypeDiffs().size());
         {
             HollowTypeDiff typeEDiff = diff.getTypeDiff("TypeE");
             Assert.assertNotNull(typeEDiff);
@@ -272,7 +272,7 @@ public class HollowDiffTest {
         addFRec(toStateEngine, f(3));
         addFRec(toStateEngine, f(4));
 
-        HollowDiff diff = new HollowDiff(readEngine(fromStateEngine), readEngine(toStateEngine));
+        HollowDiff diff = new HollowDiff(readEngine(fromStateEngine), readEngine(toStateEngine), true, true);
         diff.calculateDiffs();
 
         Assert.assertEquals(5, diff.getTypeDiffs().size());

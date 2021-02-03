@@ -64,7 +64,7 @@ public class HollowDiff {
      * @param to the "to" state
      */
     public HollowDiff(HollowReadStateEngine from, HollowReadStateEngine to) {
-        this(from, to, true);
+        this(from, to, true, false);
     }
 
     /**
@@ -77,6 +77,20 @@ public class HollowDiff {
      * @param isAutoDiscoverTypeDiff If true, all OBJECT types with a defined PrimaryKey will be configured to be diffed.
      */
     public HollowDiff(HollowReadStateEngine from, HollowReadStateEngine to, boolean isAutoDiscoverTypeDiff) {
+        this(from, to, isAutoDiscoverTypeDiff, false);
+    }
+
+    /**
+     * Instantiate a HollowDiff.
+     * <p>
+     * To calculate the diff, call calculateDiff().
+     *
+     * @param from the "from" state
+     * @param to the "to" state
+     * @param isAutoDiscoverTypeDiff If true, all OBJECT types with a defined PrimaryKey will be configured to be diffed.
+     * @param isIncludeNonPrimaryKeyTypes If true, all OBJECT types without PrimaryKey will also be configured to be diffed.
+     */
+    public HollowDiff(HollowReadStateEngine from, HollowReadStateEngine to, boolean isAutoDiscoverTypeDiff, boolean isIncludeNonPrimaryKeyTypes) {
         this.fromStateEngine = from;
         this.toStateEngine = to;
         this.equalityMapping = new DiffEqualityMapping(from, to);
@@ -89,6 +103,7 @@ public class HollowDiff {
                 if (schema instanceof HollowObjectSchema) {
                     HollowObjectSchema objectSchema = ((HollowObjectSchema) schema);
                     PrimaryKey pKey = objectSchema.getPrimaryKey();
+                    if (pKey==null && !isIncludeNonPrimaryKeyTypes) continue;
 
                     // Support basic Single Field Types
                     if (pKey==null && objectSchema.numFields()==1 && SINGLE_FIELD_SUPPORTED_TYPES.contains(objectSchema.getFieldType(0))) {

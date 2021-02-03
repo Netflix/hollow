@@ -89,10 +89,12 @@ public class HollowDiffOverviewTypeEntry {
     public String getHoleInToFormatted() { return formatBytes(holeInTo); }
 
     public String getBgColor() {
-        if  (totalDiffScore > 0 || unmatchedInFrom > 0 || unmatchedInTo > 0)
-            return "#FFCC99";
+        if (!hasUniqueKey)
+            return "#FFFBDB"; // No Unique Key
+        else if  (totalDiffScore > 0 || unmatchedInFrom > 0 || unmatchedInTo > 0)
+            return "#FFCC99"; // Has Diff
         else if (totalInFrom == 0 && totalInTo == 0)
-            return "#D0D0D0";
+            return "#D0D0D0"; // No Data
         return "";
     }
 }
