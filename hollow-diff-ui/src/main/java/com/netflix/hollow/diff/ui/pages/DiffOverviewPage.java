@@ -22,6 +22,7 @@ import com.netflix.hollow.diff.ui.model.HollowDiffOverviewTypeEntry;
 import com.netflix.hollow.tools.diff.HollowTypeDiff;
 import com.netflix.hollow.ui.HollowUISession;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
@@ -72,9 +73,20 @@ public class DiffOverviewPage extends DiffPage {
 
         if(sortBy == null || "diffs".equals(sortBy)) {
             overviewEntries.sort((o1, o2) -> {
-                long o1Diff = o1.getTotalDiffScore();
-                long o2Diff = o2.getTotalDiffScore();
-                return Long.compare(o2Diff, o1Diff);
+                int result = Comparator
+                        .comparing(HollowDiffOverviewTypeEntry::getTotalDiffScore)
+                        .thenComparing(HollowDiffOverviewTypeEntry::getDeltaSize)
+                        .thenComparing(HollowDiffOverviewTypeEntry::hasData)
+                        .thenComparing(HollowDiffOverviewTypeEntry::hasUnmatched)
+                        .thenComparing(HollowDiffOverviewTypeEntry::hasUniqueKey)
+                        .compare(o2, o1);
+
+                // Fallback to Type Name Ordering
+                if (result==0) {
+                    return o1.getTypeName().compareTo(o2.getTypeName());
+                }
+
+                return result;
             });
         } else if("unmatchedFrom".equals(sortBy)) {
             overviewEntries.sort((o1, o2) -> o2.getUnmatchedInFrom() - o1.getUnmatchedInFrom());
