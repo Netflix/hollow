@@ -19,11 +19,13 @@ package com.netflix.hollow.tools.diff;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,7 @@ import java.util.logging.Logger;
  *
  */
 public class HollowDiff {
+    private final EnumSet<FieldType> SINGLE_FIELD_SUPPORTED_TYPES = EnumSet.of(FieldType.INT, FieldType.LONG, FieldType.DOUBLE, FieldType.STRING, FieldType.FLOAT, FieldType.BOOLEAN);
 
     private final Logger log = Logger.getLogger(HollowDiff.class.getName());
     private final HollowReadStateEngine fromStateEngine;
@@ -87,8 +90,8 @@ public class HollowDiff {
                     HollowObjectSchema objectSchema = ((HollowObjectSchema) schema);
                     PrimaryKey pKey = objectSchema.getPrimaryKey();
 
-                    // Handle diffing of type with single field
-                    if (pKey==null && objectSchema.numFields()==1) {
+                    // Support basic Single Field Types
+                    if (pKey==null && objectSchema.numFields()==1 && SINGLE_FIELD_SUPPORTED_TYPES.contains(objectSchema.getFieldType(0))) {
                         pKey = new PrimaryKey(schema.getName(), objectSchema.getFieldName(0));
                     }
 
