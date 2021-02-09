@@ -39,8 +39,6 @@ import java.util.Objects;
  *      
  * </dl>
  * 
- * @author dkoszewnik
- *
  */
 public class HollowBlobHeader {
 

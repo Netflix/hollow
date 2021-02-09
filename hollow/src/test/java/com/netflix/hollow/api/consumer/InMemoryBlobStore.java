@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -20,22 +20,32 @@ import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
+import com.netflix.hollow.core.read.OptionalBlobPartInput;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /// This InMemoryBlobStore is both a HollowProducer.Publisher and HollowConsumer.BlobRetriever!
 public class InMemoryBlobStore implements BlobRetriever, Publisher {
     
+    private final Set<String> optionalPartsToRetrieve;
+
     private Map<Long, Blob> snapshots;
     private Map<Long, Blob> deltas;
     private Map<Long, Blob> reverseDeltas;
     
     public InMemoryBlobStore() {
+        this(null);
+    }
+
+    public InMemoryBlobStore(Set<String> optionalPartsToRetrieve) {
         this.snapshots = new HashMap<Long, Blob>();
         this.deltas = new HashMap<Long, Blob>();
         this.reverseDeltas = new HashMap<Long, Blob>();
+        this.optionalPartsToRetrieve = optionalPartsToRetrieve;
     }
 
     @Override
@@ -72,6 +82,23 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
             @Override
             public InputStream getInputStream() throws IOException {
                 return blob.newInputStream();
+            }
+
+            @Override
+            public OptionalBlobPartInput getOptionalBlobPartInputs() throws IOException {
+                if(blob.getOptionalPartConfig() == null || optionalPartsToRetrieve == null)
+                    return null;
+
+                OptionalBlobPartInput parts = new OptionalBlobPartInput();
+                for(String part : blob.getOptionalPartConfig().getParts()) {
+                    if(optionalPartsToRetrieve.contains(part))
+                        parts.addInput(part, blob.newOptionalPartInputStream(part));
+                }
+
+                if(parts.getInputsByPartName().isEmpty())
+                    return null;
+
+                return parts;
             }
         };
         

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.HollowBlobOptionalPartHeader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -57,26 +58,61 @@ public class HollowBlobHeaderReader {
         int oldBytesToSkip = VarInt.readVInt(in); /// pre v2.2.0 envelope
 
         if(oldBytesToSkip != 0) {
-            int numSchemas = VarInt.readVInt(in);
+            header.setSchemas(readSchemas(in));
 
-            List<HollowSchema> schemas = new ArrayList<HollowSchema>();
-            for(int i=0;i<numSchemas;i++)
-                schemas.add(HollowSchema.readFrom(in));
-            header.setSchemas(schemas);
-
-            int bytesToSkip = VarInt.readVInt(in); /// forwards-compatibility, new data can be added here.
-            while(bytesToSkip > 0) {
-                int skippedBytes = (int)in.skipBytes(bytesToSkip);
-                if(skippedBytes < 0)
-                    throw new EOFException();
-                bytesToSkip -= skippedBytes;
-            }
+            /// forwards-compatibility, new data can be added here.
+            skipForwardCompatibilityBytes(in);
         }
 
         Map<String, String> headerTags = readHeaderTags(in);
         header.setHeaderTags(headerTags);
 
         return header;
+    }
+
+    public HollowBlobOptionalPartHeader readPartHeader(InputStream is) throws IOException {
+        return readPartHeader(HollowBlobInput.serial(is));
+    }
+
+    public HollowBlobOptionalPartHeader readPartHeader(HollowBlobInput in) throws IOException {
+        int headerVersion = in.readInt();
+        if(headerVersion != HollowBlobOptionalPartHeader.HOLLOW_BLOB_PART_VERSION_HEADER) {
+            throw new IOException("The HollowBlob optional part you are trying to read is incompatible. "
+                    + "The expected Hollow blob version was " + HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER
+                    + " but the actual version was " + headerVersion);
+        }
+
+        HollowBlobOptionalPartHeader header = new HollowBlobOptionalPartHeader(in.readUTF());
+        
+        header.setOriginRandomizedTag(in.readLong());
+        header.setDestinationRandomizedTag(in.readLong());
+
+        header.setSchemas(readSchemas(in));
+
+        /// forwards-compatibility, new data can be added here.
+        skipForwardCompatibilityBytes(in);
+
+        return header;
+    }
+    
+    private List<HollowSchema> readSchemas(HollowBlobInput in) throws IOException {
+        int numSchemas = VarInt.readVInt(in);
+
+        List<HollowSchema> schemas = new ArrayList<HollowSchema>(numSchemas);
+        for(int i=0;i<numSchemas;i++)
+            schemas.add(HollowSchema.readFrom(in));
+
+        return schemas;
+    }
+    
+    private void skipForwardCompatibilityBytes(HollowBlobInput in) throws IOException, EOFException {
+        int bytesToSkip = VarInt.readVInt(in);
+        while(bytesToSkip > 0) {
+            int skippedBytes = (int)in.skipBytes(bytesToSkip);
+            if(skippedBytes < 0)
+                throw new EOFException();
+            bytesToSkip -= skippedBytes;
+        }
     }
 
     /**

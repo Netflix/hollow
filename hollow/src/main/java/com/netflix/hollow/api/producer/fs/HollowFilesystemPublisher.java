@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.producer.fs;
 
 import com.netflix.hollow.api.producer.HollowProducer;
+import com.netflix.hollow.api.producer.ProducerOptionalBlobPartConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -55,7 +56,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
             destination = blobStorePath.resolve(String.format("%s-%d-%d", blob.getType().prefix, blob.getFromVersion(), blob.getToVersion()));
             break;
         }
-            
+
         try(
                 InputStream is = blob.newInputStream();
                 OutputStream os = Files.newOutputStream(destination)
@@ -66,6 +67,36 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
                 os.write(buf, 0, n);
         } catch(IOException e) {
             throw new RuntimeException("Unable to publish file!", e);
+        }
+
+        ProducerOptionalBlobPartConfig optionalPartConfig = blob.getOptionalPartConfig();
+        if(optionalPartConfig != null) {
+            for(String partName : optionalPartConfig.getParts()) {
+                Path partDestination = null;
+
+                switch(blob.getType()) {
+                case SNAPSHOT:
+                    partDestination = blobStorePath.resolve(String.format("%s_%s-%d", blob.getType().prefix, partName, blob.getToVersion()));
+                    break;
+                case DELTA:
+                case REVERSE_DELTA:
+                    partDestination = blobStorePath.resolve(String.format("%s_%s-%d-%d", blob.getType().prefix, partName, blob.getFromVersion(), blob.getToVersion()));
+                    break;
+                }
+
+                try(
+                        InputStream is = blob.newOptionalPartInputStream(partName);
+                        OutputStream os = Files.newOutputStream(partDestination)
+                ) {
+                    byte buf[] = new byte[4096];
+                    int n;
+                    while (-1 != (n = is.read(buf)))
+                        os.write(buf, 0, n);
+                } catch(IOException e) {
+                    throw new RuntimeException("Unable to publish optional part file: " + partName, e);
+                }
+                
+            }
         }
     }
 }

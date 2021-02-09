@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -576,17 +576,26 @@ public class HollowProducer extends AbstractHollowProducer {
         protected final long fromVersion;
         protected final long toVersion;
         protected final Blob.Type type;
-
+        protected final ProducerOptionalBlobPartConfig optionalPartConfig;
 
         protected Blob(long fromVersion, long toVersion, Blob.Type type) {
+            this(fromVersion, toVersion, type, null);
+        }
+
+        protected Blob(long fromVersion, long toVersion, Blob.Type type, ProducerOptionalBlobPartConfig optionalPartConfig) {
             this.fromVersion = fromVersion;
             this.toVersion = toVersion;
             this.type = type;
+            this.optionalPartConfig = optionalPartConfig;
         }
 
         protected abstract void write(HollowBlobWriter writer) throws IOException;
 
         public abstract InputStream newInputStream() throws IOException;
+
+        public InputStream newOptionalPartInputStream(String partName) throws IOException {
+            throw new UnsupportedOperationException("The provided HollowProducer.Blob implementation does not support optional blob parts");
+        }
 
         public abstract void cleanup();
 
@@ -609,6 +618,10 @@ public class HollowProducer extends AbstractHollowProducer {
 
         public long getToVersion() {
             return this.toVersion;
+        }
+
+        public ProducerOptionalBlobPartConfig getOptionalPartConfig() {
+            return optionalPartConfig;
         }
 
         /**
@@ -658,6 +671,7 @@ public class HollowProducer extends AbstractHollowProducer {
         SingleProducerEnforcer singleProducerEnforcer = new BasicSingleProducerEnforcer();
         HollowObjectHashCodeFinder hashCodeFinder = null;
         boolean doIntegrityCheck = true;
+        ProducerOptionalBlobPartConfig optionalPartConfig = null;
 
         public B withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;
@@ -666,6 +680,11 @@ public class HollowProducer extends AbstractHollowProducer {
 
         public B withBlobCompressor(HollowProducer.BlobCompressor compressor) {
             this.compressor = compressor;
+            return (B) this;
+        }
+
+        public B withOptionalPartConfig(ProducerOptionalBlobPartConfig optionalPartConfig) {
+            this.optionalPartConfig = optionalPartConfig;
             return (B) this;
         }
 
@@ -816,12 +835,15 @@ public class HollowProducer extends AbstractHollowProducer {
                 throw new IllegalArgumentException(
                         "Both a custom BlobStager and a staging directory were specified -- please specify only one of these.");
             }
+            if (stager != null && optionalPartConfig != null) {
+                throw new IllegalArgumentException(
+                        "Both a custom BlobStager and an optional blob part config were specified -- please specify only one of these.");
+            }
 
             if (this.stager == null) {
                 BlobCompressor compressor = this.compressor != null ? this.compressor : BlobCompressor.NO_COMPRESSION;
-                File stagingDir = this.stagingDir != null ? this.stagingDir : new File(
-                        System.getProperty("java.io.tmpdir"));
-                this.stager = new HollowFilesystemBlobStager(stagingDir.toPath(), compressor);
+                File stagingDir = this.stagingDir != null ? this.stagingDir : new File(System.getProperty("java.io.tmpdir"));
+                this.stager = new HollowFilesystemBlobStager(stagingDir.toPath(), compressor, optionalPartConfig);
             }
         }
 
