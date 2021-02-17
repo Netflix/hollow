@@ -21,7 +21,6 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob.BlobType;
 import com.netflix.hollow.core.HollowConstants;
-import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.OptionalBlobPartInput;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -83,7 +82,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         this.blobStorePath = blobStorePath;
         this.fallbackBlobRetriever = fallbackBlobRetriever;
         this.useExistingStaleSnapshot = useExistingStaleSnapshot;
-        this.optionalBlobParts = fallbackBlobRetriever.configuredOptionalBlobParts();
+        this.optionalBlobParts = fallbackBlobRetriever == null ? null : fallbackBlobRetriever.configuredOptionalBlobParts();
 
         ensurePathExists(blobStorePath);
     }
@@ -289,7 +288,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
             
             OptionalBlobPartInput input = new OptionalBlobPartInput();
             for(Map.Entry<String, Path> pathEntry : optionalPartPaths.entrySet()) {
-                input.addInput(pathEntry.getKey(), new BufferedInputStream(Files.newInputStream(pathEntry.getValue())));
+                input.addInput(pathEntry.getKey(), pathEntry.getValue().toFile());
             }
             return input;
         }
@@ -356,14 +355,13 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
 
             OptionalBlobPartInput localOptionalParts = new OptionalBlobPartInput();
 
-
-            for(Map.Entry<String, HollowBlobInput> entry : remoteOptionalParts.getInputsByPartName().entrySet()) {
+            for(Map.Entry<String, InputStream> entry : remoteOptionalParts.getInputStreamsByPartName().entrySet()) {
                 Path tempPath = path.resolveSibling(path.getName(path.getNameCount()-1) + "_" + entry.getKey() + "-" + UUID.randomUUID().toString());
                 Path destPath = getBlobType() == BlobType.SNAPSHOT ?
                         path.resolveSibling(getBlobType().getType() + "_" + entry.getKey() + "-" + getToVersion())
                             : path.resolveSibling(getBlobType().getType() + "_" + entry.getKey() + "-" + getFromVersion() + "-" + getToVersion());
                 try(
-                        HollowBlobInput is = entry.getValue();
+                        InputStream is = entry.getValue();
                         OutputStream os = Files.newOutputStream(tempPath)
                 ) {
                     byte buf[] = new byte[4096];

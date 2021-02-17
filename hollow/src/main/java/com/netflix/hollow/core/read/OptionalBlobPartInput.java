@@ -16,29 +16,69 @@
  */
 package com.netflix.hollow.core.read;
 
+import com.netflix.hollow.core.memory.MemoryMode;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class OptionalBlobPartInput {
 
-    private final Map<String, HollowBlobInput> inputsByPartName;
+    private final Map<String, Object> inputsByPartName;
 
     public OptionalBlobPartInput() {
         this.inputsByPartName = new HashMap<>();
     }
-
-    public void addInput(String partName, InputStream in) {
-        addInput(partName, HollowBlobInput.serial(in));
+    
+    public void addInput(String partName, File file) {
+        inputsByPartName.put(partName, file);
     }
 
-    public void addInput(String partName, HollowBlobInput in) {
+    public void addInput(String partName, InputStream in) {
         inputsByPartName.put(partName, in);
     }
 
-    public Map<String, HollowBlobInput> getInputsByPartName() {
-        return Collections.unmodifiableMap(inputsByPartName);
+    public File getFile(String partName) {
+        Object f = inputsByPartName.get(partName);
+        if(f instanceof File)
+            return (File)f;
+        throw new UnsupportedOperationException();
+    }
+    
+    public InputStream getInputStream(String partName) throws IOException {
+        Object o = inputsByPartName.get(partName);
+        if(o instanceof File)
+            return new BufferedInputStream(new BufferedInputStream(new FileInputStream((File)o)));
+        return (InputStream)o;
+    }
+    
+    public Set<String> getPartNames() {
+        return inputsByPartName.keySet();
+    }
+    
+    public Map<String, HollowBlobInput> getInputsByPartName(MemoryMode mode) throws IOException {
+        Map<String, HollowBlobInput> map = new HashMap<>(inputsByPartName.size());
+        
+        for(String part : getPartNames()) {
+            map.put(part, HollowBlobInput.modeBasedSelector(mode, this, part));
+        }
+        
+        return map;
+
+    }
+    
+    public Map<String, InputStream> getInputStreamsByPartName() throws IOException {
+        Map<String, InputStream> map = new HashMap<>(inputsByPartName.size());
+        
+        for(String part : getPartNames()) {
+            map.put(part, getInputStream(part));
+        }
+        
+        return map;
     }
 
 }

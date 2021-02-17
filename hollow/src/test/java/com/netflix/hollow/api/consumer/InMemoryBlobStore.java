@@ -95,7 +95,7 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
                         parts.addInput(part, blob.newOptionalPartInputStream(part));
                 }
 
-                if(parts.getInputsByPartName().isEmpty())
+                if(parts.getPartNames().isEmpty())
                     return null;
 
                 return parts;

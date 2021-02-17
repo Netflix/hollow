@@ -145,10 +145,12 @@ public class HollowBlobReader {
 
     public void readSnapshot(HollowBlobInput in, OptionalBlobPartInput optionalParts, TypeFilter filter) throws IOException {
         validateMemoryMode(in.getMemoryMode());
-        validateMemoryMode(optionalParts);
+        Map<String, HollowBlobInput> optionalPartInputs = null;
+        if(optionalParts != null)
+            optionalPartInputs = optionalParts.getInputsByPartName(in.getMemoryMode());
 
         HollowBlobHeader header = readHeader(in, false);
-        List<HollowBlobOptionalPartHeader> partHeaders = readPartHeaders(header, optionalParts);
+        List<HollowBlobOptionalPartHeader> partHeaders = readPartHeaders(header, optionalPartInputs, in.getMemoryMode());
         List<HollowSchema> allSchemas = combineSchemas(header, partHeaders);
 
         filter = filter.resolve(allSchemas);
@@ -165,8 +167,8 @@ public class HollowBlobReader {
             typeNames.add(typeName);
         }
 
-        if(optionalParts != null) {
-            for(Map.Entry<String, HollowBlobInput> optionalPartEntry : optionalParts.getInputsByPartName().entrySet()) {
+        if(optionalPartInputs != null) {
+            for(Map.Entry<String, HollowBlobInput> optionalPartEntry : optionalPartInputs.entrySet()) {
                 numStates = VarInt.readVInt(optionalPartEntry.getValue());
 
                 for(int i=0;i<numStates;i++) {
@@ -217,10 +219,12 @@ public class HollowBlobReader {
 
     public void applyDelta(HollowBlobInput in, OptionalBlobPartInput optionalParts) throws IOException {
         validateMemoryMode(in.getMemoryMode());
-        validateMemoryMode(optionalParts);
+        Map<String, HollowBlobInput> optionalPartInputs = null;
+        if(optionalParts != null)
+            optionalPartInputs = optionalParts.getInputsByPartName(in.getMemoryMode());
 
         HollowBlobHeader header = readHeader(in, true);
-        List<HollowBlobOptionalPartHeader> partHeaders = readPartHeaders(header, optionalParts);
+        List<HollowBlobOptionalPartHeader> partHeaders = readPartHeaders(header, optionalPartInputs, in.getMemoryMode());
         notifyBeginUpdate();
 
         long startTime = System.currentTimeMillis();
@@ -234,8 +238,8 @@ public class HollowBlobReader {
             stateEngine.getMemoryRecycler().swap();
         }
 
-        if(optionalParts != null) {
-            for(Map.Entry<String, HollowBlobInput> optionalPartEntry : optionalParts.getInputsByPartName().entrySet()) {
+        if(optionalPartInputs != null) {
+            for(Map.Entry<String, HollowBlobInput> optionalPartEntry : optionalPartInputs.entrySet()) {
                 numStates = VarInt.readVInt(optionalPartEntry.getValue());
 
                 for(int i=0;i<numStates;i++) {
@@ -265,11 +269,10 @@ public class HollowBlobReader {
         return header;
     }
 
-    private List<HollowBlobOptionalPartHeader> readPartHeaders(HollowBlobHeader header, OptionalBlobPartInput in) throws IOException {
-        if(in == null)
+    private List<HollowBlobOptionalPartHeader> readPartHeaders(HollowBlobHeader header, Map<String, HollowBlobInput> inputsByPartName, MemoryMode mode) throws IOException {
+        if(inputsByPartName == null)
             return Collections.emptyList();
 
-        Map<String, HollowBlobInput> inputsByPartName = in.getInputsByPartName();
         List<HollowBlobOptionalPartHeader> list = new ArrayList<>(inputsByPartName.size());
         for(Map.Entry<String, HollowBlobInput> entry : inputsByPartName.entrySet()) {
             HollowBlobOptionalPartHeader partHeader = headerReader.readPartHeader(entry.getValue());
@@ -403,13 +406,6 @@ public class HollowBlobReader {
             HollowSetTypeReadState.discardDelta(in, numShards);
         else if(schema instanceof HollowMapSchema)
             HollowMapTypeReadState.discardDelta(in, numShards);
-    }
-
-    private void validateMemoryMode(OptionalBlobPartInput partInput) {
-        if(partInput != null) {
-            for(Map.Entry<String, HollowBlobInput> partEntry : partInput.getInputsByPartName().entrySet())
-                validateMemoryMode(partEntry.getValue().getMemoryMode());
-        }
     }
 
     private void validateMemoryMode(MemoryMode inputMode) {
