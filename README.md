@@ -21,7 +21,7 @@ Release binaries are available from Maven Central and jCenter.
 
 |GroupID/Org|ArtifactID/Name|Latest Stable Version|
 |-----------|---------------|---------------------|
-|com.netflix.hollow|hollow|3.0.1|
+|com.netflix.hollow|hollow|5.1.3|
 
 In a Maven `.pom` file:
 
@@ -29,14 +29,14 @@ In a Maven `.pom` file:
         <dependency>
                 <groupId>com.netflix.hollow</groupId>
                 <artifactId>hollow</artifactId>
-                <version>3.0.1</version>
+                <version>5.1.3</version>
         </dependency>
         ...
 
 In a Gradle `build.gradle` file:
 
         ...
-        compile 'com.netflix.hollow:hollow:3.0.1'
+        compile 'com.netflix.hollow:hollow:5.1.3'
         ...
         
 Release candidate binaries, matching the `-rc\.*` pattern for an artifact's version, are available from the jCenter [oss-candidate](https://dl.bintray.com/netflixoss/oss-candidate/) repository, which may be declared in a `build.gradle` file:
