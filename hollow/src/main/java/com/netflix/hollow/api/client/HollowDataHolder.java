@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -158,17 +158,16 @@ class HollowDataHolder {
         }
     }
 
-
     private void applyStateEngineTransition(HollowBlobInput in, HollowConsumer.Blob transition, HollowConsumer.RefreshListener[] refreshListeners) throws IOException {
         if(transition.isSnapshot()) {
             if(filter == null) {
-                reader.readSnapshot(in);
+                reader.readSnapshot(in, transition.getOptionalBlobPartInputs());
             }
             else {
-                reader.readSnapshot(in, filter);
+                reader.readSnapshot(in, transition.getOptionalBlobPartInputs(), filter);
             }
         } else {
-            reader.applyDelta(in);
+            reader.applyDelta(in, transition.getOptionalBlobPartInputs());
         }
 
         setVersion(transition.getToVersion());

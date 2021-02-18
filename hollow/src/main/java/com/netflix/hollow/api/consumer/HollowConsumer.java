@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.read.OptionalBlobPartInput;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
@@ -44,6 +45,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
@@ -462,6 +464,11 @@ public class HollowConsumer {
          * @return the blob of the reverse delta
          */
         HollowConsumer.Blob retrieveReverseDeltaBlob(long currentVersion);
+
+        default Set<String> configuredOptionalBlobParts() {
+            return null;
+        }
+
     }
 
     /**
@@ -521,6 +528,19 @@ public class HollowConsumer {
          * @throws IOException if the input stream to the blob cannot be obtained
          */
         public abstract InputStream getInputStream() throws IOException;
+
+        /**
+         * Implementations may define how to retrieve the optional blob part data for this specific transition from a data store.
+         * <p>
+         * It is expected that none of the returned InputStreams will be interrupted.  For this reason, it is a good idea to
+         * retrieve the entire blob part data (e.g. to disk) from a remote datastore prior to returning these streams.
+         * 
+         * @return
+         * @throws IOException
+         */
+        public OptionalBlobPartInput getOptionalBlobPartInputs() throws IOException {
+            return null;
+        }
 
         public File getFile() throws IOException {
             throw new UnsupportedOperationException();

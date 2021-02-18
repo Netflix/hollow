@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.api.producer.ProducerOptionalBlobPartConfig;
+import com.netflix.hollow.api.producer.ProducerOptionalBlobPartConfig.ConfiguredOutputStream;
 import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.HollowBlobOptionalPartHeader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
@@ -24,7 +27,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link HollowBlobWriter} is used to serialize snapshot, delta, and reverse delta blobs based on the data state
@@ -46,12 +52,18 @@ public class HollowBlobWriter {
      * @throws IOException if the snapshot blob could not be written
      */
     public void writeSnapshot(OutputStream os) throws IOException {
+        writeSnapshot(os, null);
+    }
+
+    public void writeSnapshot(OutputStream os, ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams partStreams) throws IOException {
+        Map<String, DataOutputStream> partStreamsByType = Collections.emptyMap();
+        if(partStreams != null)
+            partStreamsByType = partStreams.getStreamsByType();
+
         stateEngine.prepareForWrite();
 
         DataOutputStream dos = new DataOutputStream(os);
-        writeHeader(dos, stateEngine.getSchemas(), false);
-
-        VarInt.writeVInt(dos, stateEngine.getOrderedTypeStates().size());
+        writeHeaders(dos, partStreams, stateEngine.getSchemas(), false);
 
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-snapshot");
 
@@ -70,15 +82,23 @@ public class HollowBlobWriter {
         }
 
         for(HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
+            DataOutputStream partStream = partStreamsByType.get(typeState.getSchema().getName());
+            if(partStream == null)
+                partStream = dos;
+
             HollowSchema schema = typeState.getSchema();
-            schema.writeTo(dos);
+            schema.writeTo(partStream);
 
-            writeNumShards(dos, typeState.getNumShards());
+            writeNumShards(partStream, typeState.getNumShards());
 
-            typeState.writeSnapshot(dos);
+            typeState.writeSnapshot(partStream);
         }
+
         os.flush();
+        if(partStreams != null)
+            partStreams.flush();
     }
+
 
     /**
      * Serialize the changes necessary to transition a consumer from the previous state
@@ -92,6 +112,14 @@ public class HollowBlobWriter {
      * @see com.netflix.hollow.api.producer.HollowProducer#initializeDataModel(Class[])
      */
     public void writeDelta(OutputStream os) throws IOException {
+        writeDelta(os, null);
+    }
+
+    public void writeDelta(OutputStream os, ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams partStreams) throws IOException {
+        Map<String, DataOutputStream> partStreamsByType = Collections.emptyMap();
+        if(partStreams != null)
+            partStreamsByType = partStreams.getStreamsByType();
+
         stateEngine.prepareForWrite();
         
         if(stateEngine.isRestored())
@@ -100,9 +128,7 @@ public class HollowBlobWriter {
         List<HollowSchema> changedTypes = changedTypes();
         
         DataOutputStream dos = new DataOutputStream(os);
-        writeHeader(dos, changedTypes, false);
-
-        VarInt.writeVInt(dos, changedTypes.size());
+        writeHeaders(dos, partStreams, changedTypes, false);
 
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-delta");
 
@@ -123,15 +149,22 @@ public class HollowBlobWriter {
 
         for(HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
             if(typeState.hasChangedSinceLastCycle()) {
+                DataOutputStream partStream = partStreamsByType.get(typeState.getSchema().getName());
+                if(partStream == null)
+                    partStream = dos;
+
                 HollowSchema schema = typeState.getSchema();
-                schema.writeTo(dos);
+                schema.writeTo(partStream);
 
-                writeNumShards(dos, typeState.getNumShards());
+                writeNumShards(partStream, typeState.getNumShards());
 
-                typeState.writeDelta(dos);
+                typeState.writeDelta(partStream);
             }
         }
+
         os.flush();
+        if(partStreams != null)
+            partStreams.flush();
     }
 
     /**
@@ -146,6 +179,14 @@ public class HollowBlobWriter {
      * @see com.netflix.hollow.api.producer.HollowProducer#initializeDataModel(Class[])
      */
     public void writeReverseDelta(OutputStream os) throws IOException {
+        writeReverseDelta(os, null);
+    }
+
+    public void writeReverseDelta(OutputStream os, ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams partStreams) throws IOException {
+        Map<String, DataOutputStream> partStreamsByType = Collections.emptyMap();
+        if(partStreams != null)
+            partStreamsByType = partStreams.getStreamsByType();
+
         stateEngine.prepareForWrite();
         
         if(stateEngine.isRestored())
@@ -154,9 +195,7 @@ public class HollowBlobWriter {
         List<HollowSchema> changedTypes = changedTypes();
 
         DataOutputStream dos = new DataOutputStream(os);
-        writeHeader(dos, changedTypes, true);
-
-        VarInt.writeVInt(dos, changedTypes.size());
+        writeHeaders(dos, partStreams, changedTypes, true);
 
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-reverse-delta");
 
@@ -177,15 +216,22 @@ public class HollowBlobWriter {
 
         for(HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
             if(typeState.hasChangedSinceLastCycle()) {
+                DataOutputStream partStream = partStreamsByType.get(typeState.getSchema().getName());
+                if(partStream == null)
+                    partStream = dos;
+
                 HollowSchema schema = typeState.getSchema();
-                schema.writeTo(dos);
+                schema.writeTo(partStream);
 
-                writeNumShards(dos, typeState.getNumShards());
+                writeNumShards(partStream, typeState.getNumShards());
 
-                typeState.writeReverseDelta(dos);
+                typeState.writeReverseDelta(partStream);
             }
         }
+
         os.flush();
+        if(partStreams != null)
+            partStreams.flush();
     }
 
     private List<HollowSchema> changedTypes() {
@@ -210,7 +256,29 @@ public class HollowBlobWriter {
         VarInt.writeVInt(dos, numShards);
     }
 
-    private void writeHeader(DataOutputStream os, List<HollowSchema> schemasToInclude, boolean isReverseDelta) throws IOException {
+    private void writeHeaders(DataOutputStream os, ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams partStreams, List<HollowSchema> schemasToInclude, boolean isReverseDelta) throws IOException {
+
+        /// bucket schemas by part
+        List<HollowSchema> mainSchemas = schemasToInclude;
+        Map<String, List<HollowSchema>> schemasByPartName = Collections.emptyMap();
+        if(partStreams != null) {
+            mainSchemas = new ArrayList<>();
+
+            Map<String, String> partNameByType = partStreams.getPartNameByType();
+            schemasByPartName = new HashMap<>();
+
+            for(HollowSchema schema : schemasToInclude) {
+                String partName = partNameByType.get(schema.getName());
+                if(partName == null) {
+                    mainSchemas.add(schema);
+                } else {
+                    List<HollowSchema> partSchemas = schemasByPartName.computeIfAbsent(partName, n -> new ArrayList<>());
+                    partSchemas.add(schema);
+                }
+            }
+        }
+
+        /// write main header
         HollowBlobHeader header = new HollowBlobHeader();
         header.setHeaderTags(stateEngine.getHeaderTags());
         if(isReverseDelta) {
@@ -220,7 +288,34 @@ public class HollowBlobWriter {
             header.setOriginRandomizedTag(stateEngine.getPreviousStateRandomizedTag());
             header.setDestinationRandomizedTag(stateEngine.getNextStateRandomizedTag());
         }
-        header.setSchemas(schemasToInclude);
+        header.setSchemas(mainSchemas);
         headerWriter.writeHeader(header, os);
+
+        VarInt.writeVInt(os, mainSchemas.size());
+
+        if(partStreams != null) {
+            /// write part headers
+            for(Map.Entry<String, ConfiguredOutputStream> entry : partStreams.getPartStreams().entrySet()) {
+                String partName = entry.getKey();
+                HollowBlobOptionalPartHeader partHeader = new HollowBlobOptionalPartHeader(partName);
+                if(isReverseDelta) {
+                    partHeader.setOriginRandomizedTag(stateEngine.getNextStateRandomizedTag());
+                    partHeader.setDestinationRandomizedTag(stateEngine.getPreviousStateRandomizedTag());
+                } else {
+                    partHeader.setOriginRandomizedTag(stateEngine.getPreviousStateRandomizedTag());
+                    partHeader.setDestinationRandomizedTag(stateEngine.getNextStateRandomizedTag());
+                }
+
+                List<HollowSchema> partSchemas = schemasByPartName.get(partName);
+                if(partSchemas == null)
+                    partSchemas = Collections.emptyList();
+
+                partHeader.setSchemas(partSchemas);
+
+                headerWriter.writePartHeader(partHeader, entry.getValue().getStream());
+
+                VarInt.writeVInt(entry.getValue().getStream(), partSchemas.size());
+            }
+        }
     }
 }

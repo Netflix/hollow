@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.HollowBlobOptionalPartHeader;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.OptionalBlobPartInput;
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -34,7 +36,11 @@ import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
@@ -130,10 +136,24 @@ public class HollowBlobReader {
      * @throws IOException if the snapshot could not be read
      */
     public void readSnapshot(HollowBlobInput in, TypeFilter filter) throws IOException {
+        readSnapshot(in, null, filter);
+    }
+
+    public void readSnapshot(HollowBlobInput in, OptionalBlobPartInput optionalParts) throws IOException {
+        readSnapshot(in, optionalParts, new HollowFilterConfig(true));
+    }
+
+    public void readSnapshot(HollowBlobInput in, OptionalBlobPartInput optionalParts, TypeFilter filter) throws IOException {
         validateMemoryMode(in.getMemoryMode());
+        Map<String, HollowBlobInput> optionalPartInputs = null;
+        if(optionalParts != null)
+            optionalPartInputs = optionalParts.getInputsByPartName(in.getMemoryMode());
 
         HollowBlobHeader header = readHeader(in, false);
-        filter = filter.resolve(header.getSchemas());
+        List<HollowBlobOptionalPartHeader> partHeaders = readPartHeaders(header, optionalPartInputs, in.getMemoryMode());
+        List<HollowSchema> allSchemas = combineSchemas(header, partHeaders);
+
+        filter = filter.resolve(allSchemas);
 
         notifyBeginUpdate();
 
@@ -145,6 +165,17 @@ public class HollowBlobReader {
         for(int i=0;i<numStates;i++) {
             String typeName = readTypeStateSnapshot(in, filter);
             typeNames.add(typeName);
+        }
+
+        if(optionalPartInputs != null) {
+            for(Map.Entry<String, HollowBlobInput> optionalPartEntry : optionalPartInputs.entrySet()) {
+                numStates = VarInt.readVInt(optionalPartEntry.getValue());
+
+                for(int i=0;i<numStates;i++) {
+                    String typeName = readTypeStateSnapshot(optionalPartEntry.getValue(), filter);
+                    typeNames.add(typeName);
+                }
+            }
         }
 
         stateEngine.wireTypeStatesToSchemas();
@@ -183,9 +214,17 @@ public class HollowBlobReader {
      * @throws IOException if the delta could not be applied
      */
     public void applyDelta(HollowBlobInput in) throws IOException {
+        applyDelta(in, null);
+    }
+
+    public void applyDelta(HollowBlobInput in, OptionalBlobPartInput optionalParts) throws IOException {
         validateMemoryMode(in.getMemoryMode());
+        Map<String, HollowBlobInput> optionalPartInputs = null;
+        if(optionalParts != null)
+            optionalPartInputs = optionalParts.getInputsByPartName(in.getMemoryMode());
 
         HollowBlobHeader header = readHeader(in, true);
+        List<HollowBlobOptionalPartHeader> partHeaders = readPartHeaders(header, optionalPartInputs, in.getMemoryMode());
         notifyBeginUpdate();
 
         long startTime = System.currentTimeMillis();
@@ -199,13 +238,24 @@ public class HollowBlobReader {
             stateEngine.getMemoryRecycler().swap();
         }
 
+        if(optionalPartInputs != null) {
+            for(Map.Entry<String, HollowBlobInput> optionalPartEntry : optionalPartInputs.entrySet()) {
+                numStates = VarInt.readVInt(optionalPartEntry.getValue());
+
+                for(int i=0;i<numStates;i++) {
+                    String typeName = readTypeStateDelta(optionalPartEntry.getValue());
+                    typeNames.add(typeName);
+                    stateEngine.getMemoryRecycler().swap();
+                }
+            }
+        }
+
         long endTime = System.currentTimeMillis();
 
         log.info("DELTA COMPLETED IN " + (endTime - startTime) + "ms");
         log.info("TYPES: " + typeNames);
 
         notifyEndUpdate();
-
     }
 
     private HollowBlobHeader readHeader(HollowBlobInput in, boolean isDelta) throws IOException {
@@ -217,6 +267,38 @@ public class HollowBlobReader {
         stateEngine.setCurrentRandomizedTag(header.getDestinationRandomizedTag());
         stateEngine.setHeaderTags(header.getHeaderTags());
         return header;
+    }
+
+    private List<HollowBlobOptionalPartHeader> readPartHeaders(HollowBlobHeader header, Map<String, HollowBlobInput> inputsByPartName, MemoryMode mode) throws IOException {
+        if(inputsByPartName == null)
+            return Collections.emptyList();
+
+        List<HollowBlobOptionalPartHeader> list = new ArrayList<>(inputsByPartName.size());
+        for(Map.Entry<String, HollowBlobInput> entry : inputsByPartName.entrySet()) {
+            HollowBlobOptionalPartHeader partHeader = headerReader.readPartHeader(entry.getValue());
+            if(!partHeader.getPartName().equals(entry.getKey()))
+                throw new IllegalArgumentException("Optional blob part expected name " + entry.getKey() + " but was " + partHeader.getPartName());
+            if(partHeader.getOriginRandomizedTag() != header.getOriginRandomizedTag()
+                    || partHeader.getDestinationRandomizedTag() != header.getDestinationRandomizedTag())
+                throw new IllegalArgumentException("Optional blob part " + entry.getKey() + " does not appear to be matched with the main input");
+
+            list.add(partHeader);
+        }
+
+        return list;
+    }
+
+    private List<HollowSchema> combineSchemas(HollowBlobHeader header, List<HollowBlobOptionalPartHeader> partHeaders) throws IOException {
+        if(partHeaders.isEmpty())
+            return header.getSchemas();
+
+        List<HollowSchema> schemas = new ArrayList<>(header.getSchemas());
+
+        for(HollowBlobOptionalPartHeader partHeader : partHeaders) {
+            schemas.addAll(partHeader.getSchemas());
+        }
+
+        return schemas;
     }
 
     private void notifyBeginUpdate() {

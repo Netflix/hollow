@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.write;
 
 import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.HollowBlobOptionalPartHeader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.schema.HollowSchema;
 import java.io.ByteArrayOutputStream;
@@ -63,4 +64,20 @@ public class HollowBlobHeaderWriter {
         }
     }
     
+    public void writePartHeader(HollowBlobOptionalPartHeader header, DataOutputStream dos) throws IOException {
+        dos.writeInt(HollowBlobOptionalPartHeader.HOLLOW_BLOB_PART_VERSION_HEADER);
+
+        dos.writeUTF(header.getPartName());
+
+        dos.writeLong(header.getOriginRandomizedTag());
+        dos.writeLong(header.getDestinationRandomizedTag());
+
+        VarInt.writeVInt(dos, header.getSchemas().size());
+        for(HollowSchema schema : header.getSchemas())
+            schema.writeTo(dos);
+
+        ///backwards compatibility -- new data can be added here by first indicating number of bytes used, will be skipped by existing readers.
+        VarInt.writeVInt(dos, 0);
+    }
+
 }

@@ -54,6 +54,26 @@ public class HollowBlobInput implements Closeable {
     }
 
     /**
+     * Initialize the Hollow Blob Input object from the Hollow Consumer blob's Input Stream or Random Access File,
+     * depending on the configured memory mode. The returned HollowBlobInput object must be closed to free up resources.
+     *
+     * @param mode Configured memory mode
+     * @param blob Hollow Consumer blob
+     * @param partName the name of the optional part
+     * @return the initialized Hollow Blob Input
+     * @throws IOException if the Hollow Blob Input couldn't be initialized
+     */
+    public static HollowBlobInput modeBasedSelector(MemoryMode mode, OptionalBlobPartInput input, String partName) throws IOException {
+        if (mode.equals(ON_HEAP)) {
+            return serial(input.getInputStream(partName));
+        } else if (mode.equals(SHARED_MEMORY_LAZY)) {
+            return randomAccess(input.getFile(partName));
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    /**
      * Initialize a random access Hollow Blob input object from a file. The returned HollowBlobInput object must be
      * closed to free up resources.
      *

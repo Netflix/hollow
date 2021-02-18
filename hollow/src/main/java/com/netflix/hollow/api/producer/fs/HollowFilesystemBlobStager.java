@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.BlobCompressor;
 import com.netflix.hollow.api.producer.HollowProducer.BlobStager;
+import com.netflix.hollow.api.producer.ProducerOptionalBlobPartConfig;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import java.io.BufferedInputStream;
@@ -35,33 +36,44 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class HollowFilesystemBlobStager implements BlobStager {
 
     protected Path stagingPath;
     protected BlobCompressor compressor;
+    protected ProducerOptionalBlobPartConfig optionalPartConfig;
 
     /**
-     * Constructor to create a new HollowFilesystemBlobStager with default disk path (java.io.tmpdir) and no compression for Hollow blobs.
+     * Constructor to create a new HollowFilesystemBlobStager with default disk path
+     * (java.io.tmpdir) and no compression for Hollow blobs.
      */
     public HollowFilesystemBlobStager() {
         this(Paths.get(System.getProperty("java.io.tmpdir")), BlobCompressor.NO_COMPRESSION);
     }
 
     /**
-     * Constructor to create a new HollowFilesystemBlobStager with specified disk path and compression for Hollow blobs.
+     * Constructor to create a new HollowFilesystemBlobStager with specified disk
+     * path and compression for Hollow blobs.
      *
      * @param stagingPath the path where to stage blobs
      * @param compressor the blob compressor
      * @throws RuntimeException if errors occur when creating the specified path
      */
     public HollowFilesystemBlobStager(Path stagingPath, BlobCompressor compressor) throws RuntimeException {
+        this(stagingPath, compressor, null);
+    }
+
+    public HollowFilesystemBlobStager(Path stagingPath, BlobCompressor compressor, ProducerOptionalBlobPartConfig optionalPartConfig) throws RuntimeException {
         this.stagingPath = stagingPath;
         this.compressor = compressor;
+        this.optionalPartConfig = optionalPartConfig;
 
         try {
-            if(!Files.exists(stagingPath))
+            if (!Files.exists(stagingPath))
                 Files.createDirectories(stagingPath);
         } catch (IOException e) {
             throw new RuntimeException("Could not create folder; path=" + this.stagingPath, e);
@@ -70,7 +82,8 @@ public class HollowFilesystemBlobStager implements BlobStager {
     }
 
     /**
-     * Constructor to create a new HollowFilesystemBlobStager with specified disk path and compression for Hollow blobs.
+     * Constructor to create a new HollowFilesystemBlobStager with specified disk
+     * path and compression for Hollow blobs.
      *
      * @param stagingPath        directory to use to write hollow blob files.
      * @param compressor the {@link HollowProducer.BlobCompressor} to compress blob files with
@@ -84,77 +97,115 @@ public class HollowFilesystemBlobStager implements BlobStager {
 
     @Override
     public HollowProducer.Blob openSnapshot(long version) {
-        return new FilesystemBlob(HollowConstants.VERSION_NONE, version, SNAPSHOT, stagingPath, compressor);
+        return new FilesystemBlob(HollowConstants.VERSION_NONE, version, SNAPSHOT, stagingPath, compressor, optionalPartConfig);
     }
 
     @Override
-    public HollowProducer.Blob openDelta(long fromVersion, long toVersion){
-        return new FilesystemBlob(fromVersion, toVersion, DELTA, stagingPath, compressor);
+    public HollowProducer.Blob openDelta(long fromVersion, long toVersion) {
+        return new FilesystemBlob(fromVersion, toVersion, DELTA, stagingPath, compressor, optionalPartConfig);
     }
 
     @Override
     public HollowProducer.Blob openReverseDelta(long fromVersion, long toVersion) {
-        return new FilesystemBlob(fromVersion, toVersion, REVERSE_DELTA, stagingPath, compressor);
+        return new FilesystemBlob(fromVersion, toVersion, REVERSE_DELTA, stagingPath, compressor, optionalPartConfig);
     }
 
     public static class FilesystemBlob extends Blob {
 
         protected final Path path;
+        protected final Map<String, Path> optionalPartPaths;
         private final BlobCompressor compressor;
-        
-        private FilesystemBlob(long fromVersion, long toVersion, Type type, Path dirPath, BlobCompressor compressor) {
-            super(fromVersion, toVersion, type);
-            
+
+        private FilesystemBlob(long fromVersion, long toVersion, Type type, Path dirPath, BlobCompressor compressor, ProducerOptionalBlobPartConfig optionalPartConfig) {
+            super(fromVersion, toVersion, type, optionalPartConfig);
+
+            this.optionalPartPaths = optionalPartConfig == null ? Collections.emptyMap() : new HashMap<>();
+
             this.compressor = compressor;
 
             int randomExtension = new Random().nextInt() & Integer.MAX_VALUE;
 
             switch (type) {
-                case SNAPSHOT:
-                    this.path = dirPath.resolve(String.format("%s-%d.%s", type.prefix, toVersion, Integer.toHexString(randomExtension)));
-                    break;
-                case DELTA:
-                case REVERSE_DELTA:
-                    this.path = dirPath.resolve(String.format("%s-%d-%d.%s", type.prefix, fromVersion, toVersion, Integer.toHexString(randomExtension)));
-                    break;
-                default:
-                    throw new IllegalStateException("unknown blob type, type=" + type);
+            case SNAPSHOT:
+                this.path = dirPath.resolve(String.format("%s-%d.%s", type.prefix, toVersion, Integer.toHexString(randomExtension)));
+                break;
+            case DELTA:
+            case REVERSE_DELTA:
+                this.path = dirPath.resolve(String.format("%s-%d-%d.%s", type.prefix, fromVersion, toVersion, Integer.toHexString(randomExtension)));
+                break;
+            default:
+                throw new IllegalStateException("unknown blob type, type=" + type);
+            }
+
+            if (optionalPartConfig != null) {
+                for (String part : optionalPartConfig.getParts()) {
+                    Path partPath;
+                    switch (type) {
+                    case SNAPSHOT:
+                        partPath = dirPath.resolve(String.format("%s_%s-%d.%s", type.prefix, part, toVersion, Integer.toHexString(randomExtension)));
+                        break;
+                    case DELTA:
+                    case REVERSE_DELTA:
+                        partPath = dirPath.resolve(String.format("%s_%s-%d-%d.%s", type.prefix, part, fromVersion, toVersion, Integer.toHexString(randomExtension)));
+                        break;
+                    default:
+                        throw new IllegalStateException("unknown blob type, type=" + type);
+                    }
+                    optionalPartPaths.put(part, partPath);
+                }
             }
         }
-        
+
         @Override
         public File getFile() {
             return path.toFile();
         }
 
         @Override
-        public Path getPath() { return path; }
+        public Path getPath() {
+            return path;
+        }
 
         @Override
         protected void write(HollowBlobWriter writer) throws IOException {
             Path parent = this.path.getParent();
-            if(!Files.exists(parent))
+            if (!Files.exists(parent))
                 Files.createDirectories(parent);
 
-            if(!Files.exists(path))
+            if (!Files.exists(path))
                 Files.createFile(path);
 
+            ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams optionalPartStreams = null;
+
+            if (optionalPartConfig != null) {
+                optionalPartStreams = optionalPartConfig.newStreams();
+
+                for (Map.Entry<String, Path> partPathEntry : optionalPartPaths.entrySet()) {
+                    String partName = partPathEntry.getKey();
+                    Path partPath = partPathEntry.getValue();
+                    optionalPartStreams.addOutputStream(partName, new BufferedOutputStream(compressor.compress(Files.newOutputStream(partPath))));
+                }
+            }
 
             try (OutputStream os = new BufferedOutputStream(compressor.compress(Files.newOutputStream(path)))) {
                 switch (type) {
-                    case SNAPSHOT:
-                        writer.writeSnapshot(os);
-                        break;
-                    case DELTA:
-                        writer.writeDelta(os);
-                        break;
-                    case REVERSE_DELTA:
-                        writer.writeReverseDelta(os);
-                        break;
-                    default:
-                        throw new IllegalStateException("unknown type, type=" + type);
+                case SNAPSHOT:
+                    writer.writeSnapshot(os, optionalPartStreams);
+                    break;
+                case DELTA:
+                    writer.writeDelta(os, optionalPartStreams);
+                    break;
+                case REVERSE_DELTA:
+                    writer.writeReverseDelta(os, optionalPartStreams);
+                    break;
+                default:
+                    throw new IllegalStateException("unknown type, type=" + type);
                 }
+            } finally {
+                if (optionalPartStreams != null)
+                    optionalPartStreams.close();
             }
+
         }
 
         @Override
@@ -163,9 +214,26 @@ public class HollowFilesystemBlobStager implements BlobStager {
         }
 
         @Override
+        public InputStream newOptionalPartInputStream(String partName) throws IOException {
+            Path partPath = optionalPartPaths.get(partName);
+            if (partPath == null)
+                throw new IllegalArgumentException("Path for part " + partName + " does not exist.");
+
+            return new BufferedInputStream(compressor.decompress(Files.newInputStream(partPath)));
+        }
+
+        @Override
         public void cleanup() {
+            cleanupFile(path);
+            for (Map.Entry<String, Path> entry : optionalPartPaths.entrySet()) {
+                cleanupFile(entry.getValue());
+            }
+        }
+
+        private void cleanupFile(Path path) {
             try {
-                if (this.path != null) Files.delete(this.path);
+                if (path != null)
+                    Files.delete(path);
             } catch (IOException e) {
                 throw new RuntimeException("Could not cleanup file: " + this.path.toString(), e);
             }

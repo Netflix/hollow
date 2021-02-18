@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@ package com.netflix.hollow.api.consumer.fs;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.HollowConsumer.Blob.BlobType;
 import com.netflix.hollow.core.HollowConstants;
+import com.netflix.hollow.core.read.OptionalBlobPartInput;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -28,12 +30,16 @@ import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriever {
     private final Path blobStorePath;
     private final HollowConsumer.BlobRetriever fallbackBlobRetriever;
     private final boolean useExistingStaleSnapshot;
+    private final Set<String> optionalBlobParts;
 
     /**
      * A new HollowFilesystemBlobRetriever which is not backed by a remote store.
@@ -43,7 +49,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
      */
     @SuppressWarnings("unused")
     public HollowFilesystemBlobRetriever(Path blobStorePath) {
-        this(blobStorePath, null);
+        this(blobStorePath, null, false);
     }
 
     /**
@@ -72,12 +78,33 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
      *                               blob present for the desired version then that snapshot blob is returned and
      *                               the fallback blob retriever (if present) is not queried.
      */
-    public HollowFilesystemBlobRetriever(Path blobStorePath, HollowConsumer.BlobRetriever fallbackBlobRetriever,
-            boolean useExistingStaleSnapshot) {
+    public HollowFilesystemBlobRetriever(Path blobStorePath, HollowConsumer.BlobRetriever fallbackBlobRetriever, boolean useExistingStaleSnapshot) {
         this.blobStorePath = blobStorePath;
         this.fallbackBlobRetriever = fallbackBlobRetriever;
         this.useExistingStaleSnapshot = useExistingStaleSnapshot;
+        this.optionalBlobParts = fallbackBlobRetriever == null ? null : fallbackBlobRetriever.configuredOptionalBlobParts();
 
+        ensurePathExists(blobStorePath);
+    }
+
+    /**
+     * A new HollowFilesystemBlobRetriever which is not backed by a remote store.
+     * 
+     * Uses the configured optional blob parts
+     *
+     * @param blobStorePath The directory from which to retrieve blobs
+     * @since 2.12.0
+     */
+    public HollowFilesystemBlobRetriever(Path blobStorePath, Set<String> optionalBlobParts) {
+        this.blobStorePath = blobStorePath;
+        this.optionalBlobParts = optionalBlobParts;
+        this.useExistingStaleSnapshot = true;
+        this.fallbackBlobRetriever = null;
+
+        ensurePathExists(blobStorePath);
+    }
+
+    private void ensurePathExists(Path blobStorePath) {
         try {
             if(!Files.exists(this.blobStorePath)){
                 Files.createDirectories(this.blobStorePath);
@@ -92,10 +119,9 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         Path exactPath = blobStorePath.resolve("snapshot-" + desiredVersion);
 
         if(Files.exists(exactPath))
-            return new FilesystemBlob(exactPath, desiredVersion);
+            return filesystemBlob(BlobType.SNAPSHOT, -1L, desiredVersion);
         
         long maxVersionBeforeDesired = HollowConstants.VERSION_NONE;
-        String maxVersionBeforeDesiredFilename = null;
 
         try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(blobStorePath)) {
             for (Path path : directoryStream) {
@@ -104,7 +130,6 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                     long version = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
                     if(version < desiredVersion && version > maxVersionBeforeDesired) {
                         maxVersionBeforeDesired = version;
-                        maxVersionBeforeDesiredFilename = filename;
                     }
                 }
             }
@@ -114,13 +139,12 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
 
         HollowConsumer.Blob filesystemBlob = null;
         if (maxVersionBeforeDesired != HollowConstants.VERSION_NONE) {
-            filesystemBlob = new FilesystemBlob(blobStorePath.resolve(maxVersionBeforeDesiredFilename),
-                    maxVersionBeforeDesired);
+            filesystemBlob = filesystemBlob(BlobType.SNAPSHOT, -1L, maxVersionBeforeDesired);
             if (useExistingStaleSnapshot) {
                 return filesystemBlob;
             }
         }
-
+        
         if(fallbackBlobRetriever != null) {
             HollowConsumer.Blob remoteBlob = fallbackBlobRetriever.retrieveSnapshotBlob(desiredVersion);
             if(remoteBlob != null && (filesystemBlob == null || remoteBlob.getToVersion() != filesystemBlob.getToVersion()))
@@ -128,6 +152,45 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         }
         
         return filesystemBlob;
+    }
+
+    private HollowConsumer.Blob filesystemBlob(HollowConsumer.Blob.BlobType type, long currentVersion, long destinationVersion) {
+        Path path;
+        Map<String, Path> optionalPartPaths = null;
+        switch(type) {
+        case SNAPSHOT:
+            path = blobStorePath.resolve("snapshot-" + destinationVersion);
+            if(optionalBlobParts != null && !optionalBlobParts.isEmpty()) {
+                optionalPartPaths = new HashMap<>(optionalBlobParts.size());
+                for(String part : optionalBlobParts) {
+                    optionalPartPaths.put(part, blobStorePath.resolve("snapshot_"+part+"-"+destinationVersion));
+                }
+            }
+            
+            return new FilesystemBlob(path, destinationVersion, optionalPartPaths);
+        case DELTA:
+            path = blobStorePath.resolve("delta-" + currentVersion + "-" + destinationVersion);
+            if(optionalBlobParts != null && !optionalBlobParts.isEmpty()) {
+                optionalPartPaths = new HashMap<>(optionalBlobParts.size());
+                for(String part : optionalBlobParts) {
+                    optionalPartPaths.put(part, blobStorePath.resolve("delta_"+part+"-"+currentVersion+"-"+destinationVersion));
+                }
+            }
+            
+            return new FilesystemBlob(path, destinationVersion, optionalPartPaths);
+        case REVERSE_DELTA:
+            path = blobStorePath.resolve("reversedelta-" + currentVersion + "-" + destinationVersion);
+            if(optionalBlobParts != null && !optionalBlobParts.isEmpty()) {
+                optionalPartPaths = new HashMap<>(optionalBlobParts.size());
+                for(String part : optionalBlobParts) {
+                    optionalPartPaths.put(part, blobStorePath.resolve("reversedelta_"+part+"-"+currentVersion+"-"+destinationVersion));
+                }
+            }
+            
+            return new FilesystemBlob(path, destinationVersion, optionalPartPaths);
+        default:
+            throw new IllegalArgumentException("Unknown BlobType: " + type.toString());
+        }
     }
 
     @Override
@@ -138,7 +201,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                 String filename = path.getFileName().toString();
                 if(filename.startsWith("delta-" + currentVersion)) {
                     long destinationVersion = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
-                    return new FilesystemBlob(blobStorePath.resolve(filename), currentVersion, destinationVersion);
+                    return filesystemBlob(BlobType.DELTA, currentVersion, destinationVersion);
                 }
             }
         } catch(IOException ex) {
@@ -161,7 +224,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                 String filename = path.getFileName().toString();
                 if(filename.startsWith("reversedelta-" + currentVersion)) {
                     long destinationVersion = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
-                    return new FilesystemBlob(blobStorePath.resolve(filename), currentVersion, destinationVersion);
+                    return filesystemBlob(BlobType.REVERSE_DELTA, currentVersion, destinationVersion);
                 }
             }
         } catch(IOException ex) {
@@ -180,6 +243,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
     private static class FilesystemBlob extends HollowConsumer.Blob {
 
         private final Path path;
+        private final Map<String, Path> optionalPartPaths;
 
         @Deprecated
         FilesystemBlob(File snapshotFile, long toVersion) {
@@ -190,16 +254,26 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
          * @since 2.12.0
          */
         FilesystemBlob(Path snapshotPath, long toVersion) {
-            super(toVersion);
-            this.path = snapshotPath;
+            this(snapshotPath, toVersion, null);
         }
 
         /**
          * @since 2.12.0
          */
         FilesystemBlob(Path deltaPath, long fromVersion, long toVersion) {
+            this(deltaPath, fromVersion, toVersion, null);
+        }
+
+        FilesystemBlob(Path snapshotPath, long toVersion, Map<String, Path> optionalPartPaths) {
+            super(toVersion);
+            this.path = snapshotPath;
+            this.optionalPartPaths = optionalPartPaths;
+        }
+
+        FilesystemBlob(Path deltaPath, long fromVersion, long toVersion, Map<String, Path> optionalPartPaths) {
             super(fromVersion, toVersion);
             this.path = deltaPath;
+            this.optionalPartPaths = optionalPartPaths;
         }
 
         @Override
@@ -208,12 +282,24 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         }
 
         @Override
+        public OptionalBlobPartInput getOptionalBlobPartInputs() throws IOException {
+            if(optionalPartPaths == null || optionalPartPaths.isEmpty())
+                return null;
+            
+            OptionalBlobPartInput input = new OptionalBlobPartInput();
+            for(Map.Entry<String, Path> pathEntry : optionalPartPaths.entrySet()) {
+                input.addInput(pathEntry.getKey(), pathEntry.getValue().toFile());
+            }
+            return input;
+        }
+
+        @Override
         public File getFile() throws IOException {
             return path.toFile();
         }
         
     }
-    
+
     private static class BlobForBackupToFilesystem extends HollowConsumer.Blob {
         
         private final HollowConsumer.Blob remoteBlob;
@@ -260,5 +346,36 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
 
             return path.toFile();
         }
+
+        @Override
+        public OptionalBlobPartInput getOptionalBlobPartInputs() throws IOException {
+            OptionalBlobPartInput remoteOptionalParts = remoteBlob.getOptionalBlobPartInputs();
+            if(remoteOptionalParts == null)
+                return null;
+
+            OptionalBlobPartInput localOptionalParts = new OptionalBlobPartInput();
+
+            for(Map.Entry<String, InputStream> entry : remoteOptionalParts.getInputStreamsByPartName().entrySet()) {
+                Path tempPath = path.resolveSibling(path.getName(path.getNameCount()-1) + "_" + entry.getKey() + "-" + UUID.randomUUID().toString());
+                Path destPath = getBlobType() == BlobType.SNAPSHOT ?
+                        path.resolveSibling(getBlobType().getType() + "_" + entry.getKey() + "-" + getToVersion())
+                            : path.resolveSibling(getBlobType().getType() + "_" + entry.getKey() + "-" + getFromVersion() + "-" + getToVersion());
+                try(
+                        InputStream is = entry.getValue();
+                        OutputStream os = Files.newOutputStream(tempPath)
+                ) {
+                    byte buf[] = new byte[4096];
+                    int n;
+                    while (-1 != (n = is.read(buf, 0, buf.length)))
+                        os.write(buf, 0, n);
+                }
+                Files.move(tempPath, destPath, REPLACE_EXISTING);
+                
+                localOptionalParts.addInput(entry.getKey(), new BufferedInputStream(Files.newInputStream(destPath)));
+            }
+
+            return localOptionalParts;
+        }
+
     }
 }
