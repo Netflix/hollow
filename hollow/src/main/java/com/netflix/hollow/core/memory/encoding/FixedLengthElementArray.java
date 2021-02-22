@@ -27,26 +27,33 @@ import sun.misc.Unsafe;
 /**
  * Note that for performance reasons, this class makes use of {@code sun.misc.Unsafe} to perform
  * unaligned memory reads.  This is designed exclusively for little-endian architectures, and has only been
- * fully battle-tested on x86-64.
- * As a result there two ways to obtain an element value from the bit string at a given bit index.  The first,
- * using {@link #getElementValue(long, int)} or {@link #getElementValue(long, int, long)}, leverages unsafe unaligned
- * (or misaligned) memory reads of {@code long} values from {@code long[]} array segments at byte index offsets within
- * the arrays.
- * The second, using {@link #getLargeElementValue(long, int)} or
- * {@link #getLargeElementValue(long, int, long)}, leverages safe access to {@code long[]} array segments but
- * requires more work to compose an element value from bits that cover two underlying elements in {@code long[]} array
- * segments.
- * The first approach needs to ensure a segmentation fault (SEGV) does not occur when when reading a {@code long} value
- * at the last byte of the last index in a {@code long[]} array segment.  A {@code long[]} array segment is allocated
- * with a length that is one plus the desired length to ensure such access is safe (see the implementations of
- * {@link ArraySegmentRecycler#getLongArray()}.
+ * fully battle-tested on x86-64. As a result there two ways to obtain an element value from the bit string at a given
+ * bit index.
+ * <br><br>
+ * {@link #getElementValue(long, int)} or {@link #getElementValue(long, int, long)}: These methods leverage unsafe
+ * unaligned (or misaligned) memory reads of {@code long} values from {@code long[]} array segments at byte index
+ * offsets within the arrays.
+ * <br><br>
+ * {@link #getLargeElementValue(long, int)} or {@link #getLargeElementValue(long, int, long)}: These methods leverage
+ * safe access to {@code long[]} array segments but require more work to compose an element value from bits that cover
+ * two underlying elements in {@code long[]} array segments.
+ * <br><br>
+ * The methods reading unaligned values need to ensure a segmentation fault (SEGV) does not occur when when reading a
+ * {@code long} value at the last byte of the last index in a {@code long[]} array segment.  A {@code long[]} array
+ * segment is allocated with a length that is one plus the desired length to ensure such access is safe (see the
+ * implementations of {@link ArraySegmentRecycler#getLongArray()}.
+ * <br><br>
  * In addition, the value of the last underlying element is the same as the value of the first underlying element in the
  * subsequent array segment (see {@link SegmentedLongArray#set}).  This ensures that an element (n-bit) value can be
  * correctly returned when performing an unaligned read that would otherwise cross an array segment boundary.
- * Furthermore, there is an additional constraint that first method can only support element values of 60-bits or less.
- * Two 60-bit values in sequence can be represented exactly in 15 bytes.  Two 61-bit values in sequence require 16
- * bytes.  For such a bit string performing an unaligned read at byte index 7 to obtain the second 61-bit value will
- * result in missing the 2 most significant bits located at byte index 15.
+ * <br><br>
+ * Furthermore, there is an additional constraint that the element values cannot exceed 58 bits. This is because reading
+ * values that are unaligned with byte boundaries requires shifting by the number of bits the address is offset by
+ * within a byte. For 58 bit values, the offset from a byte boundary can be as high as 6 bits. 58 bits can be shifted 6
+ * bits and still fit within the 64 bit space. For 59 bit values the offset from a byte boundary can be as high as
+ * 7 bits. Shifting a 59 bit value by 6 or 7 bits will both overflow the 64 bit space, resulting in an invalid value
+ * when reading.
+ *
  */
 @SuppressWarnings("restriction")
 public class FixedLengthElementArray extends SegmentedLongArray implements FixedLengthData {
