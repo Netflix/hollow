@@ -31,21 +31,22 @@ class HollowListTypeReadStateShard {
         int elementOrdinal;
 
         do {
-            long startAndEndElement;
+            long startElement;
+            long endElement;
 
             do {
                 currentData = this.currentDataVolatile;
 
-                long fixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
-
-                startAndEndElement = ordinal == 0 ?
-                        currentData.listPointerData.getElementValue(fixedLengthOffset, currentData.bitsPerListPointer) << currentData.bitsPerListPointer :
-                            currentData.listPointerData.getElementValue(fixedLengthOffset - currentData.bitsPerListPointer, currentData.bitsPerListPointer * 2);
-
+                if (ordinal == 0) {
+                    startElement = 0;
+                    endElement = currentData.listPointerData.getElementValue(0, currentData.bitsPerListPointer);
+                } else {
+                    long endFixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
+                    long startFixedLengthOffset = endFixedLengthOffset - currentData.bitsPerListPointer;
+                    startElement = currentData.listPointerData.getElementValue(startFixedLengthOffset, currentData.bitsPerListPointer);
+                    endElement = currentData.listPointerData.getElementValue(endFixedLengthOffset, currentData.bitsPerListPointer);
+                }
             } while(readWasUnsafe(currentData));
-
-            long endElement = startAndEndElement >> currentData.bitsPerListPointer;
-            long startElement = startAndEndElement &  ((1 << currentData.bitsPerListPointer) - 1);
 
             long elementIndex = startElement + listIndex;
 
@@ -65,14 +66,17 @@ class HollowListTypeReadStateShard {
         do {
             currentData = this.currentDataVolatile;
 
-            long fixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
-
-            long startAndEndElement = ordinal == 0 ?
-                    currentData.listPointerData.getElementValue(fixedLengthOffset, currentData.bitsPerListPointer) << currentData.bitsPerListPointer :
-                        currentData.listPointerData.getElementValue(fixedLengthOffset - currentData.bitsPerListPointer, currentData.bitsPerListPointer * 2);
-
-            long endElement = startAndEndElement >> currentData.bitsPerListPointer;
-            long startElement = startAndEndElement &  ((1 << currentData.bitsPerListPointer) - 1);
+            long startElement;
+            long endElement;
+            if (ordinal == 0) {
+                startElement = 0;
+                endElement = currentData.listPointerData.getElementValue(0, currentData.bitsPerListPointer);
+            } else {
+                long endFixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
+                long startFixedLengthOffset = endFixedLengthOffset - currentData.bitsPerListPointer;
+                startElement = currentData.listPointerData.getElementValue(startFixedLengthOffset, currentData.bitsPerListPointer);
+                endElement = currentData.listPointerData.getElementValue(endFixedLengthOffset, currentData.bitsPerListPointer);
+            }
 
             size = (int)(endElement - startElement);
         } while(readWasUnsafe(currentData));
