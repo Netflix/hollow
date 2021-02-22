@@ -16,7 +16,7 @@ import java.io.IOException;
  * the value 100100 in binary, or 36 in base 10, would be returned. </p>
  * <p>
  *     As a result there two ways to obtain an element value from the bit string at a given bit index.  The first,
- * using {@link #getElementValue} for values less than 61 bits in length and the second, using
+ * using {@link #getElementValue} for values less than 59 bits in length and the second, using
  * {@link #getLargeElementValue} that is recommended for values of upto 64 bits in length.
  * </p>
  */
@@ -24,10 +24,10 @@ public interface FixedLengthData {
 
     /**
      * Gets an element value, comprising of {@code bitsPerElement} bits, at the given
-     * bit {@code index}. {@code bitsPerElement} should be less than 61 bits.
+     * bit {@code index}. {@code bitsPerElement} should be less than 59 bits.
      *
      * @param index the bit index
-     * @param bitsPerElement bits per element, must be less than 61 otherwise
+     * @param bitsPerElement bits per element, must be less than 59 otherwise
      * the result is undefined
      * @return the element value
      */
@@ -38,7 +38,7 @@ public interface FixedLengthData {
      * bit {@code index}.
      *
      * @param index the bit index
-     * @param bitsPerElement bits per element, must be less than 61 otherwise
+     * @param bitsPerElement bits per element, must be less than 59 otherwise
      * the result is undefined
      * @param mask the mask to apply to an element value before it is returned.
      * The mask should be less than or equal to {@code (1L << bitsPerElement) - 1} to
@@ -52,11 +52,11 @@ public interface FixedLengthData {
      * Gets a large element value, comprising of {@code bitsPerElement} bits, at the given
      * bit {@code index}.
      * <p>
-     * This method should be utilized if the {@code bitsPerElement} may exceed {@code 60} bits,
+     * This method should be utilized if the {@code bitsPerElement} may exceed {@code 58} bits,
      * otherwise the method {@link #getLargeElementValue(long, int)} can be utilized instead.
      *
      * @param index the bit index
-     * @param bitsPerElement bits per element, may be greater than 60
+     * @param bitsPerElement bits per element, may be greater than 58
      * @return the large element value
      */
     long getLargeElementValue(long index, int bitsPerElement);
@@ -65,11 +65,11 @@ public interface FixedLengthData {
      * Gets a masked large element value, comprising of {@code bitsPerElement} bits, at the given
      * bit {@code index}.
      * <p>
-     * This method should be utilized if the {@code bitsPerElement} may exceed {@code 60} bits,
+     * This method should be utilized if the {@code bitsPerElement} may exceed {@code 58} bits,
      * otherwise the method {@link #getLargeElementValue(long, int, long)} can be utilized instead.
      *
      * @param index the bit index
-     * @param bitsPerElement bits per element, may be greater than 60
+     * @param bitsPerElement bits per element, may be greater than 58
      * @param mask the mask to apply to an element value before it is returned.
      * The mask should be less than or equal to {@code (1L << bitsPerElement) - 1} to
      * guarantee that one or more (possibly) partial element values occurring

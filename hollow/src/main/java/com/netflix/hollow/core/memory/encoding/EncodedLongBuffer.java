@@ -23,22 +23,24 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 
 /**
- * This class allows for storage and retrieval of fixed-length data in ByteBuffers.
- *
- * As a result there two ways to obtain an element value from the bit string at a given bit index.  The first,
- * using {@link #getElementValue(long, int)} or {@link #getElementValue(long, int, long)}, at byte index offsets within
- * the buffers. The second, using {@link #getLargeElementValue(long, int)} or
- * {@link #getLargeElementValue(long, int, long)}, by reading two long values and then composing an element value
- * from bits that cover the two.
- *
+ * This class allows for storage and retrieval of fixed-length data in ByteBuffers. As a result there two ways to obtain
+ * an element value from the bit string at a given bit index.
+ * <br><br>
+ * {@link #getElementValue(long, int)} or {@link #getElementValue(long, int, long)}: at byte index offsets within
+ * the buffers.
+ * <br><br>
+ * {@link #getLargeElementValue(long, int)} or {@link #getLargeElementValue(long, int, long)}: by reading two long
+ * values and then composing an element value from bits that cover the two.
+ * <br><br>
  * In the counterpart {@link FixedLengthElementArray} implementation a long read into the last 8 bytes of data was safe
  * because of a padding of 1 long at the end. Instead, this implementation returns a zero byte if the 8 byte range past
  * the buffer capacity is queried.
- *
- * {@link #getElementValue} can only support element values of 60-bits or less since two 60-bit values in sequence can
- * be represented exactly in 15 bytes.  Two 61-bit values in sequence require 16 bytes.  For such a bit string
- * performing an unaligned read at byte index 7 to obtain the second 61-bit value will result in missing the 2 most
- * significant bits located at byte index 15.
+ * <br><br>
+ * {@link #getElementValue} can only support element values of 58 bits or less. This is because reading values that are
+ * unaligned with byte boundaries requires shifting by the number of bits the address is offset by within a byte. For
+ * 58 bit values, the offset from a byte boundary can be as high as 6 bits. 58 bits can be shifted 6 bits and still fit
+ * within the 64 bit space. For 59 bit values the offset from a byte boundary can be as high as 7 bits. Shifting a
+ * 59 bit value by 6 or 7 bits will both overflow the 64 bit space, resulting in an invalid value when reading.
  */
 @SuppressWarnings("restriction")
 public class EncodedLongBuffer implements FixedLengthData {
