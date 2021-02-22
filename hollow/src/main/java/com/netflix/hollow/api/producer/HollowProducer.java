@@ -597,6 +597,10 @@ public class HollowProducer extends AbstractHollowProducer {
             throw new UnsupportedOperationException("The provided HollowProducer.Blob implementation does not support optional blob parts");
         }
 
+        public Path getOptionalPartPath(String partName) {
+            throw new UnsupportedOperationException("The provided HollowProducer.Blob implementation does not support optional blob parts");
+        }
+
         public abstract void cleanup();
 
         @Deprecated

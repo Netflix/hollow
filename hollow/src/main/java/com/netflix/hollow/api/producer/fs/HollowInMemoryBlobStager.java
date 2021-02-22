@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -116,6 +117,11 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
         @Override
         public InputStream newOptionalPartInputStream(String partName) throws IOException {
             return new ByteArrayInputStream(optionalParts.get(partName));
+        }
+
+        @Override
+        public Path getOptionalPartPath(String partName) {
+            throw new UnsupportedOperationException("Path is not available");
         }
 
         @Override

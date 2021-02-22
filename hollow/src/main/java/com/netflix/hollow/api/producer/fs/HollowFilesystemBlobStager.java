@@ -223,6 +223,14 @@ public class HollowFilesystemBlobStager implements BlobStager {
         }
 
         @Override
+        public Path getOptionalPartPath(String partName) {
+            Path partPath = optionalPartPaths.get(partName);
+            if (partPath == null)
+                throw new IllegalArgumentException("Path for part " + partName + " does not exist.");
+            return partPath;
+        }
+
+        @Override
         public void cleanup() {
             cleanupFile(path);
             for (Map.Entry<String, Path> entry : optionalPartPaths.entrySet()) {
