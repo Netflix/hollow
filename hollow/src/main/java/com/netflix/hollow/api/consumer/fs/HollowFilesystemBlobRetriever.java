@@ -177,7 +177,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                 }
             }
             
-            return new FilesystemBlob(path, destinationVersion, optionalPartPaths);
+            return new FilesystemBlob(path, currentVersion, destinationVersion, optionalPartPaths);
         case REVERSE_DELTA:
             path = blobStorePath.resolve("reversedelta-" + currentVersion + "-" + destinationVersion);
             if(optionalBlobParts != null && !optionalBlobParts.isEmpty()) {
@@ -187,7 +187,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                 }
             }
             
-            return new FilesystemBlob(path, destinationVersion, optionalPartPaths);
+            return new FilesystemBlob(path, currentVersion, destinationVersion, optionalPartPaths);
         default:
             throw new IllegalArgumentException("Unknown BlobType: " + type.toString());
         }
