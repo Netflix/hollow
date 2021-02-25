@@ -160,7 +160,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
 
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
-        int elementCounter[] = new int[numShards];
+        long elementCounter[] = new long[numShards];
         int shardMask = numShards - 1;
 
         for(int ordinal=0;ordinal<=maxOrdinal;ordinal++) {
