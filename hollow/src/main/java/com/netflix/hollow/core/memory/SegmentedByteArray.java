@@ -42,7 +42,7 @@ import sun.misc.Unsafe;
 @SuppressWarnings("restriction")
 public class SegmentedByteArray implements VariableLengthData {
 
-    private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
+    private static final HollowUnsafeHandle unsafe = HollowUnsafeHandle.getUnsafe();
 
     private byte[][] segments;
     private final int log2OfSegmentSize;

@@ -39,7 +39,7 @@ import sun.misc.Unsafe;
 @SuppressWarnings("restriction")
 public class SegmentedLongArrayPlainPut {
 
-    private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
+    private static final HollowUnsafeHandle unsafe = HollowUnsafeHandle.getUnsafe();
 
     protected final long[][] segments;
     protected final int log2OfSegmentSize;

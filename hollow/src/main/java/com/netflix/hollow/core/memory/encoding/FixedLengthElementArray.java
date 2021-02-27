@@ -58,7 +58,7 @@ import sun.misc.Unsafe;
 @SuppressWarnings("restriction")
 public class FixedLengthElementArray extends SegmentedLongArray implements FixedLengthData {
 
-    private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
+    private static final HollowUnsafeHandle unsafe = HollowUnsafeHandle.getUnsafe();
 
     private final int log2OfSegmentSizeInBytes;
     private final int byteBitmask;

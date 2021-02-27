@@ -33,12 +33,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
 public class HollowObjectTypeMapper extends HollowTypeMapper {
     
-    private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
+    private static final HollowUnsafeHandle unsafe = HollowUnsafeHandle.getUnsafe();
     private final HollowObjectMapper parentMapper;
 
     private final String typeName;
