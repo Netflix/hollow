@@ -56,7 +56,6 @@ public class HollowUnsafeHandle {
             unsafe.putOrderedLong(o, l, l1);
         } else {
             // Assume little endian
-            // TODO: detect if the address is 64, 32, 16, or 8 bit aligned and run different code?
             unsafe.putByteVolatile(o, l, (byte) (l1));
             unsafe.putByteVolatile(o, l + 1, (byte) (l1 >>> 8));
             unsafe.putByteVolatile(o, l + 2, (byte) (l1 >>> 16));
@@ -73,7 +72,6 @@ public class HollowUnsafeHandle {
             return unsafe.getLong(o, l);
         } else {
             // Assume little endian
-            // TODO: detect if the address is 64, 32, 16, or 8 bit aligned and run different code?
             return ((long) unsafe.getByte(o, l) & 0xFF)
                     | (((long) unsafe.getByte(o, l + 1) & 0xFF) << 8)
                     | (((long) unsafe.getByte(o, l + 2) & 0xFF) << 16)
@@ -114,7 +112,6 @@ public class HollowUnsafeHandle {
             unsafe.putLong(o, l, l1);
         } else {
             // Assume little endian
-            // TODO: detect if the address is 64, 32, 16, or 8 bit aligned and run different code?
             unsafe.putByte(o, l, (byte) (l1));
             unsafe.putByte(o, l + 1, (byte) (l1 >>> 8));
             unsafe.putByte(o, l + 2, (byte) (l1 >>> 16));
