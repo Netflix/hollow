@@ -77,19 +77,27 @@ public class HollowUnsafeHandle {
         }
     }
 
-    public long getLong(Object o, long l) {
-        if (UNALIGNED_ALLOWED) {
-            return unsafe.getLong(o, l);
+    public long getLong(Object o, long offset) {
+        if (UNALIGNED_ALLOWED || (offset & 7) == 0) {
+            return unsafe.getLong(o, offset);
+        } else if ((offset & 3) == 0) {
+            return ((long) unsafe.getInt(o, offset) & 0xFFFFFFFFL)
+                    | (((long) unsafe.getInt(o, offset + 4) & 0xFFFFFFFFL) << 32);
+        } else if ((offset & 1) == 0) {
+            return ((long) unsafe.getShort(o, offset) & 0xFFFF)
+                    | (((long) unsafe.getShort(o, offset + 2) & 0xFFFF) << 16)
+                    | (((long) unsafe.getShort(o, offset + 4) & 0xFFFF) << 32)
+                    | (((long) unsafe.getShort(o, offset + 6) & 0xFFFF) << 48);
         } else {
             // Assume little endian
-            return ((long) unsafe.getByte(o, l) & 0xFF)
-                    | (((long) unsafe.getByte(o, l + 1) & 0xFF) << 8)
-                    | (((long) unsafe.getByte(o, l + 2) & 0xFF) << 16)
-                    | (((long) unsafe.getByte(o, l + 3) & 0xFF) << 24)
-                    | (((long) unsafe.getByte(o, l + 4) & 0xFF) << 32)
-                    | (((long) unsafe.getByte(o, l + 5) & 0xFF) << 40)
-                    | (((long) unsafe.getByte(o, l + 6) & 0xFF) << 48)
-                    | (((long) unsafe.getByte(o, l + 7) & 0xFF) << 56);
+            return ((long) unsafe.getByte(o, offset) & 0xFF)
+                    | (((long) unsafe.getByte(o, offset + 1) & 0xFF) << 8)
+                    | (((long) unsafe.getByte(o, offset + 2) & 0xFF) << 16)
+                    | (((long) unsafe.getByte(o, offset + 3) & 0xFF) << 24)
+                    | (((long) unsafe.getByte(o, offset + 4) & 0xFF) << 32)
+                    | (((long) unsafe.getByte(o, offset + 5) & 0xFF) << 40)
+                    | (((long) unsafe.getByte(o, offset + 6) & 0xFF) << 48)
+                    | (((long) unsafe.getByte(o, offset + 7) & 0xFF) << 56);
         }
     }
 
