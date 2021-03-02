@@ -51,19 +51,29 @@ public class HollowUnsafeHandle {
         return singleton;
     }
 
-    public void putOrderedLong(Object o, long l, long l1) {
-        if (UNALIGNED_ALLOWED) {
-            unsafe.putOrderedLong(o, l, l1);
+    public void putOrderedLong(Object o, long offset, long value) {
+        if (UNALIGNED_ALLOWED || (offset & 7) == 0) {
+            unsafe.putOrderedLong(o, offset, value);
+        } else if ((offset & 3) == 0) {
+            // 4 byte aligned, little endian
+            unsafe.putOrderedInt(o, offset, (int)(value));
+            unsafe.putOrderedInt(o, offset + 4, (int)(value >>> 32));
+        } else if ((offset & 1) == 0) {
+            // 2 byte aligned, little endian
+            unsafe.putShortVolatile(o, offset, (short)(value));
+            unsafe.putShortVolatile(o, offset + 2, (short)(value >>> 16));
+            unsafe.putShortVolatile(o, offset + 4, (short)(value >>> 32));
+            unsafe.putShortVolatile(o, offset + 6, (short)(value >>> 48));
         } else {
-            // Assume little endian
-            unsafe.putByteVolatile(o, l, (byte) (l1));
-            unsafe.putByteVolatile(o, l + 1, (byte) (l1 >>> 8));
-            unsafe.putByteVolatile(o, l + 2, (byte) (l1 >>> 16));
-            unsafe.putByteVolatile(o, l + 3, (byte) (l1 >>> 24));
-            unsafe.putByteVolatile(o, l + 4, (byte) (l1 >>> 32));
-            unsafe.putByteVolatile(o, l + 5, (byte) (l1 >>> 40));
-            unsafe.putByteVolatile(o, l + 6, (byte) (l1 >>> 48));
-            unsafe.putByteVolatile(o, l + 7, (byte) (l1 >>> 56));
+            // 1 byte aligned, little endian
+            unsafe.putByteVolatile(o, offset, (byte) (value));
+            unsafe.putByteVolatile(o, offset + 1, (byte) (value >>> 8));
+            unsafe.putByteVolatile(o, offset + 2, (byte) (value >>> 16));
+            unsafe.putByteVolatile(o, offset + 3, (byte) (value >>> 24));
+            unsafe.putByteVolatile(o, offset + 4, (byte) (value >>> 32));
+            unsafe.putByteVolatile(o, offset + 5, (byte) (value >>> 40));
+            unsafe.putByteVolatile(o, offset + 6, (byte) (value >>> 48));
+            unsafe.putByteVolatile(o, offset + 7, (byte) (value >>> 56));
         }
     }
 
