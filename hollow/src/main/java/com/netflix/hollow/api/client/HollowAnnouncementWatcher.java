@@ -20,7 +20,6 @@ import static com.netflix.hollow.core.util.Threads.daemonThread;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.HollowConstants;
-
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

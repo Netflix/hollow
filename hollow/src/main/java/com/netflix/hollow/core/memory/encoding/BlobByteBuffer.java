@@ -155,7 +155,7 @@ public final class BlobByteBuffer {
     /**
      * Return the long value starting from given byte index. This method is thread safe.
      * @param startByteIndex byte index (from offset 0 in the backing BlobByteBuffer) at which to start reading long value
-     * @returns long value
+     * @return long value
      */
     public long getLong(long startByteIndex) throws BufferUnderflowException {
 

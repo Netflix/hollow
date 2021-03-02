@@ -1,5 +1,4 @@
 plugins {
-  id "com.github.johnrengelman.shadow" version "4.0.2"
   id "me.champeau.gradle.jmh" version "0.4.6"
 }
 
@@ -22,5 +21,3 @@ compileJava {
 jmh {
   duplicateClassesStrategy = 'warn'
 }
-
-

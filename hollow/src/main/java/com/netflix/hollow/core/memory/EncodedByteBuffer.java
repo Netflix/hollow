@@ -21,7 +21,7 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 
 /**
- * {@ccode BlobByteBuffer} based implementation of variable length byte data that only supports read.
+ * {@code BlobByteBuffer} based implementation of variable length byte data that only supports read.
  */
 public class EncodedByteBuffer implements VariableLengthData {
 

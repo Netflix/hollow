@@ -28,7 +28,6 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.core.util.AllHollowRecordCollection;
 import com.netflix.hollow.core.util.HollowRecordCollection;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
