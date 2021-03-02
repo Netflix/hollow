@@ -10,3 +10,6 @@
 **.iws
 .idea
 venv
+
+# publishing secrets
+secrets/signing-key

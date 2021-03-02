@@ -25,7 +25,6 @@ import com.netflix.hollow.tools.diff.count.HollowDiffObjectCountingNode;
 import com.netflix.hollow.tools.diff.count.HollowFieldDiff;
 import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

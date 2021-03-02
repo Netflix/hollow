@@ -58,7 +58,7 @@ public class HollowBlobInput implements Closeable {
      * depending on the configured memory mode. The returned HollowBlobInput object must be closed to free up resources.
      *
      * @param mode Configured memory mode
-     * @param blob Hollow Consumer blob
+     * @param input Hollow Consumer blob
      * @param partName the name of the optional part
      * @return the initialized Hollow Blob Input
      * @throws IOException if the Hollow Blob Input couldn't be initialized

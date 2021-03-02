@@ -10,10 +10,11 @@ import java.io.IOException;
  * {@code FixedLengthData} data structures which can be either backed by long arrays or ByteBuffers.
  * For example, if an EncodedLongBuffer was queried for the 6-bit value starting at bit 7 in the following example
  * range of bits:
+ * </p>
  * <pre>
  *     0001000100100001101000010100101001111010101010010010101
  * </pre>
- * the value 100100 in binary, or 36 in base 10, would be returned. </p>
+ * <p> the value 100100 in binary, or 36 in base 10, would be returned. </p>
  * <p>
  *     As a result there two ways to obtain an element value from the bit string at a given bit index.  The first,
  * using {@link #getElementValue} for values less than 59 bits in length and the second, using

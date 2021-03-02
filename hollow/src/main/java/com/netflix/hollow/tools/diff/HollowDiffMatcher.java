@@ -21,7 +21,6 @@ import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.util.LongList;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;

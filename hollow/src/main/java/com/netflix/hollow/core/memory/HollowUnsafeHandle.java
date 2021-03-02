@@ -19,7 +19,6 @@ package com.netflix.hollow.core.memory;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")

@@ -54,7 +54,7 @@ public class EncodedLongBuffer implements FixedLengthData {
      * Returns a new EncodedLongBuffer from deserializing the given input. The value of the first variable length integer
      * in the input indicates how many long values are to then be read from the input.
      *
-     * @input in Hollow Blob Input to read data (a var int and then that many longs) from
+     * @param in Hollow Blob Input to read data (a var int and then that many longs) from
      * @return new EncodedLongBuffer containing data read from input
      */
     public static EncodedLongBuffer newFrom(HollowBlobInput in) throws IOException {
@@ -65,7 +65,7 @@ public class EncodedLongBuffer implements FixedLengthData {
     /**
      * Returns a new EncodedLongBuffer from deserializing numLongs longs from given input.
      *
-     * @input in Hollow Blob Input to read numLongs longs from
+     * @param in Hollow Blob Input to read numLongs longs from
      * @return new EncodedLongBuffer containing data read from input
      */
     public static EncodedLongBuffer newFrom(HollowBlobInput in, long numLongs) throws IOException {

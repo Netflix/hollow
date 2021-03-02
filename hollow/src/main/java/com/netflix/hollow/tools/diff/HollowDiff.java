@@ -23,7 +23,6 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
-
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;

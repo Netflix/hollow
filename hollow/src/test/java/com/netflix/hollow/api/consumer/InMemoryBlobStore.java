@@ -21,7 +21,6 @@ import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.hollow.core.read.OptionalBlobPartInput;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;

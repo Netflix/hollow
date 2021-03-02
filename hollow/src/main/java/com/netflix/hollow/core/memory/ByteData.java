@@ -21,7 +21,8 @@ package com.netflix.hollow.core.memory;
  *  
  * This is useful because Hollow often uses pooled arrays to back range of bytes.  
  *
- * @see SegmentedByteArray,EncodedByteBuffer
+ * @see SegmentedByteArray
+ * @see EncodedByteBuffer
  *
  * @author dkoszewnik
  *

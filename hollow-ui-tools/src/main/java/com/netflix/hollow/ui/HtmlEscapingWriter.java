@@ -18,7 +18,6 @@ package com.netflix.hollow.ui;
 
 import java.io.IOException;
 import java.io.Writer;
-
 import org.apache.commons.lang.StringEscapeUtils;
 
 public class HtmlEscapingWriter extends Writer {
