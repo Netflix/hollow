@@ -72,11 +72,14 @@ public class SegmentedLongArray {
     public void set(long index, long value) {
         int segmentIndex = (int)(index >> log2OfSegmentSize);
         int longInSegment = (int)(index & bitmask);
-        unsafe.putOrderedLong(segments[segmentIndex], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longInSegment), value);
+        unsafe.putLong(segments[segmentIndex], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longInSegment), value);
+        unsafe.storeFence();
 
         /// duplicate the longs here so that we can read faster.
-        if(longInSegment == 0 && segmentIndex != 0)
-            unsafe.putOrderedLong(segments[segmentIndex - 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (1 << log2OfSegmentSize)), value);
+        if(longInSegment == 0 && segmentIndex != 0) {
+            unsafe.putLong(segments[segmentIndex - 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (1 << log2OfSegmentSize)), value);
+            unsafe.storeFence();
+        }
     }
 
     /**
@@ -96,7 +99,8 @@ public class SegmentedLongArray {
         for(int i=0;i<segments.length;i++) {
             long offset = Unsafe.ARRAY_LONG_BASE_OFFSET;
             for(int j=0;j<segments[i].length;j++) {
-                unsafe.putOrderedLong(segments[i], offset, value);
+                unsafe.putLong(segments[i], offset, value);
+                unsafe.storeFence();
                 offset += 8;
             }
         }
@@ -130,17 +134,22 @@ public class SegmentedLongArray {
         while(numLongs > 0) {
             long longsToCopy = Math.min(segmentSize, numLongs);
 
-            unsafe.putOrderedLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET, fencepostLong);
+            unsafe.putLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET, fencepostLong);
+            unsafe.storeFence();
 
             int longsCopied = 1;
 
             while(longsCopied < longsToCopy) {
                 long l = in.readLong();
-                unsafe.putOrderedLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied++), l);
+                unsafe.putLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied++), l);
+                unsafe.storeFence();
             }
 
+            unsafe.storeFence();
+
             if(numLongs > longsCopied) {
-                unsafe.putOrderedLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied), in.readLong());
+                unsafe.putLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied), in.readLong());
+                unsafe.storeFence();
                 fencepostLong = segments[segment][longsCopied];
             }
 
