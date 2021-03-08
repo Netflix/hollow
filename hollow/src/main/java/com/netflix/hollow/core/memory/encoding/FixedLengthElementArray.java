@@ -192,7 +192,6 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
         long l = unsafe.getLong(segment, elementByteOffset);
 
         unsafe.putLong(segment, elementByteOffset, l + (increment << whichBit));
-        unsafe.storeFence();
 
         /// update the fencepost longs
         if((whichByte & byteBitmask) > bitmask * 8 && (whichSegment + 1) < segments.length) {
