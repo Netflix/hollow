@@ -26,6 +26,7 @@ import com.netflix.hollow.explorer.ui.pages.ShowAllTypesPage;
 import com.netflix.hollow.ui.HollowUIRouter;
 import com.netflix.hollow.ui.HollowUISession;
 import java.io.IOException;
+import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,9 +36,12 @@ public class HollowExplorerUI extends HollowUIRouter {
     private final HollowConsumer consumer;
     private final HollowClient client;
     private final HollowReadStateEngine stateEngine;
-    
-    private String headerDisplayString;
-    
+    /** General purpose map to store header string and corresponding values used in HollowExplorer. It also stores headerDisplayString
+     *  for backwards compatibility.
+     **/
+    private final HashMap<String, String> headerDisplayMap = new HashMap<>();
+    private final static String HEADER_DISPLAY_STRING = "headerDisplayString";
+
     private final ShowAllTypesPage showAllTypesPage;
     private final BrowseSelectedTypePage browseTypePage;
     private final BrowseSchemaPage browseSchemaPage;
@@ -105,13 +109,21 @@ public class HollowExplorerUI extends HollowUIRouter {
             return client.getStateEngine();
         return stateEngine;
     }
-    
-    public void setHeaderDisplayString(String str) {
-        this.headerDisplayString = str;
-    }
-    
+
     public String getHeaderDisplayString() {
-        return headerDisplayString;
+        return headerDisplayMap.get(HEADER_DISPLAY_STRING);
+    }
+
+    public void setHeaderDisplayString(String str) {
+        this.headerDisplayMap.put(HEADER_DISPLAY_STRING, str);
+    }
+
+    public void addToHeaderDisplayMap(String key, String value) {
+        headerDisplayMap.put(key, value);
+    }
+
+    public String getFromHeaderDisplayMap(String key) {
+        return headerDisplayMap.get(key);
     }
     
 }
