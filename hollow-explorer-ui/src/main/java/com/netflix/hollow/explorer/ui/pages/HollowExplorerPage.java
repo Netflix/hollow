@@ -16,7 +16,6 @@
  */
 package com.netflix.hollow.explorer.ui.pages;
 
-import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.ui.EscapingTool;
 import com.netflix.hollow.ui.HollowUISession;
 import java.io.IOException;
@@ -42,13 +41,18 @@ public abstract class HollowExplorerPage {
 
     public void render(HttpServletRequest req, HttpServletResponse resp, HollowUISession session) throws IOException {
         VelocityContext ctx = new VelocityContext();
-
-        if(ui.getHeaderDisplayString() != null)
-            ctx.put("headerDisplayString", ui.getHeaderDisplayString());
         
-        if(ui.getCurrentStateVersion() != Long.MIN_VALUE)
+        if (ui.getCurrentStateVersion() != Long.MIN_VALUE)
             ctx.put("stateVersion", ui.getCurrentStateVersion());
-        
+
+        String headerDisplayString = ui.getHeaderDisplayString();
+        if (headerDisplayString != null) {
+            ctx.put("headerDisplayString", headerDisplayString);
+            String headerDisplayURL = (ui.getFromHeaderDisplayMap(headerDisplayString) != null)
+                    ? ui.getFromHeaderDisplayMap(headerDisplayString) : "";
+            ctx.put("headerStringURL", headerDisplayURL);
+        }
+
         ctx.put("basePath", ui.getBaseURLPath());
 
         ctx.put("esc", new EscapingTool());
