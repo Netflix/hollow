@@ -148,15 +148,17 @@ public class HollowClientUpdaterTest {
         when(retriever.retrieveSnapshotBlob(anyLong()))
                 .thenReturn(blob);
 
-        AtomicBoolean listenerCalled=new AtomicBoolean(false);
-        subject.addRefreshListener(new AbstractRefreshListener(){
+        AtomicBoolean listenerCalled = new AtomicBoolean(false);
+        subject.addRefreshListener(new AbstractRefreshListener() {
             @Override
-            public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+            public void refreshSuccessful(long beforeVersion, long afterVersion,
+                long requestedVersion) {
                 listenerCalled.set(true);
                 // verify metrics are correct when calling the callback
-                verify(metrics).updateTypeStateMetrics(any(HollowReadStateEngine.class), eq(requestedVersion));
+                verify(metrics)
+                    .updateTypeStateMetrics(any(HollowReadStateEngine.class), eq(requestedVersion));
             }
-        },null);
+        }, null);
 
         // such act
         subject.updateTo(VERSION_LATEST);
@@ -165,7 +167,8 @@ public class HollowClientUpdaterTest {
         assertTrue(subject.getInitialLoad().isDone());
 
         // verify metrics were updated
-        verify(metrics).updateTypeStateMetrics(any(HollowReadStateEngine.class), eq(VERSION_LATEST));
+        verify(metrics)
+            .updateTypeStateMetrics(any(HollowReadStateEngine.class), eq(VERSION_LATEST));
         assertTrue(listenerCalled.get());
 
         // test exception msg when subsequent update fails to fetch qualifying versions
