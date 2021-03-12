@@ -175,14 +175,14 @@ public class HollowClientUpdater {
                 hollowDataHolderVolatile.update(updatePlan, localListeners, () -> {});
             }
 
-            for(HollowConsumer.RefreshListener refreshListener : localListeners)
-                refreshListener.refreshSuccessful(beforeVersion, getCurrentVersionId(), requestedVersion);
-
             metrics.updateTypeStateMetrics(getStateEngine(), requestedVersion);
             if(metricsCollector != null)
                 metricsCollector.collect(metrics);
 
             initialLoad.complete(getCurrentVersionId()); // only set the first time
+            for(HollowConsumer.RefreshListener refreshListener : localListeners)
+                refreshListener.refreshSuccessful(beforeVersion, getCurrentVersionId(), requestedVersion);
+
             return getCurrentVersionId() == requestedVersion;
         } catch(Throwable th) {
             forceDoubleSnapshotNextUpdate();
