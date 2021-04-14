@@ -22,6 +22,7 @@ import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.OptionalBlobPartInput;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
@@ -144,8 +145,9 @@ class HollowDataHolder {
     private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob,
             HollowConsumer.RefreshListener[] refreshListeners,
             Runnable apiInitCallback) throws Throwable {
-        try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, snapshotBlob)) {
-            applyStateEngineTransition(in, snapshotBlob, refreshListeners);
+        try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, snapshotBlob);
+             OptionalBlobPartInput optionalPartIn = snapshotBlob.getOptionalBlobPartInputs()) {
+            applyStateEngineTransition(in, optionalPartIn, snapshotBlob, refreshListeners);
             initializeAPI(apiInitCallback);
 
             for (HollowConsumer.RefreshListener refreshListener : refreshListeners) {
@@ -158,16 +160,16 @@ class HollowDataHolder {
         }
     }
 
-    private void applyStateEngineTransition(HollowBlobInput in, HollowConsumer.Blob transition, HollowConsumer.RefreshListener[] refreshListeners) throws IOException {
+    private void applyStateEngineTransition(HollowBlobInput in, OptionalBlobPartInput optionalPartIn, HollowConsumer.Blob transition, HollowConsumer.RefreshListener[] refreshListeners) throws IOException {
         if(transition.isSnapshot()) {
             if(filter == null) {
-                reader.readSnapshot(in, transition.getOptionalBlobPartInputs());
+                reader.readSnapshot(in, optionalPartIn);
             }
             else {
-                reader.readSnapshot(in, transition.getOptionalBlobPartInputs(), filter);
+                reader.readSnapshot(in, optionalPartIn, filter);
             }
         } else {
-            reader.applyDelta(in, transition.getOptionalBlobPartInputs());
+            reader.applyDelta(in, optionalPartIn);
         }
 
         setVersion(transition.getToVersion());
@@ -204,8 +206,9 @@ class HollowDataHolder {
             return;
         }
 
-        try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, blob)) {
-            applyStateEngineTransition(in, blob, refreshListeners);
+        try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, blob);
+             OptionalBlobPartInput optionalPartIn = blob.getOptionalBlobPartInputs()) {
+            applyStateEngineTransition(in, optionalPartIn, blob, refreshListeners);
 
             if(objLongevityConfig.enableLongLivedObjectSupport()) {
                 HollowDataAccess previousDataAccess = currentAPI.getDataAccess();
