@@ -19,6 +19,8 @@ package com.netflix.hollow.api.producer.listener;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
 import java.time.Duration;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A listener of announcement events associated with the producer announcement stage.
@@ -28,6 +30,20 @@ import java.time.Duration;
  * registering on the producer itself
  * (see {@link HollowProducer#addListener(HollowProducerEventListener)}.
  */
+
+
+class CustomListener implements AnnouncementListener {
+    @Override
+    public void onAnnouncementStart(Map<String, ChangedOrdinal> addedRemovedModifiedOridnalMap) {
+        ChangedOrdinal movieChangedOrdinals = addedRemovedModifiedOridnalMap.get("Movie");
+        Set<Long> addedMovieOrdinals = movieChangedOrdinals.addedOrdinals;
+        for (long ordinal : addedMovieOrdinals) {
+            Movie addedMovie = MovieAPI.getByOrdinal(ordinal);
+        }
+
+    }
+
+}
 public interface AnnouncementListener extends HollowProducerEventListener {
     /**
      * Called when the {@code HollowProducer} has begun announcing the {@code HollowBlob} published this cycle.
@@ -35,6 +51,18 @@ public interface AnnouncementListener extends HollowProducerEventListener {
      * @param version of {@code HollowBlob} that will be announced.
      */
     void onAnnouncementStart(long version);
+
+
+    default void onAnnouncementStart(HollowProducer.ReadState readState) {}
+
+    class ChangedOrdinal {
+        Set<Long> addedOrdinals;
+        Set<Long> removedOrdinals;
+        Set<Long> modifiedOrdinals;
+    }
+
+    default void onAnnouncementStart(Map<String, ChangedOrdinal> addedRemovedModifiedOridnalMap) {
+    }
 
     /**
      * Called after the announcement stage finishes normally or abnormally. A {@code SUCCESS} status indicates

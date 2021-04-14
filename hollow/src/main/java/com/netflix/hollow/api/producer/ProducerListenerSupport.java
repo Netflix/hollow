@@ -287,6 +287,10 @@ final class ProducerListenerSupport extends ListenerSupport {
             fire(AnnouncementListener.class,
                     l -> l.onAnnouncementStart(version));
 
+            Map<String, AnnouncementListener.ChangedOrdinal> changedOrdinalMap = computeChangedOrdinalMap(readState);
+            fire(AnnouncementListener.class,
+                    l -> l.onAnnouncementStart(changedOrdinalMap));
+
             return new Status.StageWithStateBuilder().readState(readState);
         }
 
