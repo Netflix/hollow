@@ -18,20 +18,25 @@ package com.netflix.hollow.core.read;
 
 import com.netflix.hollow.core.memory.MemoryMode;
 import java.io.BufferedInputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class OptionalBlobPartInput {
+public class OptionalBlobPartInput implements Closeable {
 
     private final Map<String, Object> inputsByPartName;
+    private final List<InputStream> streamsToClose;
 
     public OptionalBlobPartInput() {
         this.inputsByPartName = new HashMap<>();
+        this.streamsToClose = new ArrayList<>();
     }
     
     public void addInput(String partName, File file) {
@@ -39,6 +44,7 @@ public class OptionalBlobPartInput {
     }
 
     public void addInput(String partName, InputStream in) {
+        streamsToClose.add(in);
         inputsByPartName.put(partName, in);
     }
 
@@ -51,8 +57,11 @@ public class OptionalBlobPartInput {
     
     public InputStream getInputStream(String partName) throws IOException {
         Object o = inputsByPartName.get(partName);
-        if(o instanceof File)
-            return new BufferedInputStream(new BufferedInputStream(new FileInputStream((File)o)));
+        if(o instanceof File) {
+            InputStream stream = new BufferedInputStream(new FileInputStream((File)o));
+            streamsToClose.add(stream);
+            return stream;
+        }
         return (InputStream)o;
     }
     
@@ -79,6 +88,21 @@ public class OptionalBlobPartInput {
         }
         
         return map;
+    }
+
+    @Override
+    public void close() throws IOException {
+        IOException thrownException = null;
+        for(InputStream is : streamsToClose) {
+            try {
+                is.close();
+            } catch(IOException ex) {
+                thrownException = ex;
+            }
+        }
+        
+        if(thrownException != null)
+            throw thrownException;
     }
 
 }
