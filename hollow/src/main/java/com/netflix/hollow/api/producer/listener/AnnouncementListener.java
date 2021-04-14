@@ -40,9 +40,7 @@ class CustomListener implements AnnouncementListener {
         for (long ordinal : addedMovieOrdinals) {
             Movie addedMovie = MovieAPI.getByOrdinal(ordinal);
         }
-
     }
-
 }
 public interface AnnouncementListener extends HollowProducerEventListener {
     /**
