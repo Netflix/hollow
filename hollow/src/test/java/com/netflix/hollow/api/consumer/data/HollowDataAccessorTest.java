@@ -138,6 +138,38 @@ public class HollowDataAccessorTest extends AbstractStateEngineTest {
     }
 
     @Test
+    public void testDoubleSnapshotChanges() throws IOException {
+        addRecord(1, "one");
+        addRecord(2, "two");
+        addRecord(3, "three");
+
+        roundTripSnapshot();
+        {
+            GenericHollowRecordDataAccessor dAccessor = new GenericHollowRecordDataAccessor(readStateEngine, TEST_TYPE);
+            dAccessor.computeDataChange();
+            Assert.assertTrue(dAccessor.isDataChangeComputed());
+
+            Assert.assertEquals(3, dAccessor.getAddedRecords().size());
+            assertList(dAccessor.getAddedRecords(), Arrays.asList(1, 2, 3));
+            Assert.assertTrue(dAccessor.getRemovedRecords().isEmpty());
+            Assert.assertTrue(dAccessor.getUpdatedRecords().isEmpty());
+        }
+
+        writeStateEngine.prepareForNextCycle(); /// not necessary to call, but needs to be a no-op.
+        addRecord(4, "four"); // added
+        // addRecord(2, "two"); // removed
+        addRecord(3, "three_updated"); // updated
+
+        roundTripSnapshot();
+        {
+            GenericHollowRecordDataAccessor dAccessor = new GenericHollowRecordDataAccessor(readStateEngine, TEST_TYPE);
+            Assert.assertEquals(2, dAccessor.getAddedRecords().size()); // double snapshot; all records in new state are additions
+            Assert.assertEquals(0, dAccessor.getRemovedRecords().size()); // double snapshot; no removals
+            Assert.assertEquals(0, dAccessor.getUpdatedRecords().size()); // double snapshot; no modifications
+        }
+    }
+
+    @Test
     public void typeMissing() throws IOException {
         roundTripSnapshot();
 
