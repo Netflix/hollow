@@ -222,15 +222,16 @@ public class StaleHollowReferenceDetector {
 
         private void detach() {
             HollowAPI api = apiHandle.get();
-            HollowDataAccess dataAccess = api.getDataAccess();
+            if(api != null) {
+                HollowDataAccess dataAccess = api.getDataAccess();
 
-            if(dataAccess instanceof HollowProxyDataAccess)
-                ((HollowProxyDataAccess) dataAccess).disableDataAccess();
-            else if (dataAccess instanceof HollowReadStateEngine)
-                ((HollowReadStateEngine) dataAccess).invalidate();
+                if (dataAccess instanceof HollowProxyDataAccess)
+                    ((HollowProxyDataAccess) dataAccess).disableDataAccess();
+                else if (dataAccess instanceof HollowReadStateEngine)
+                    ((HollowReadStateEngine) dataAccess).invalidate();
 
-            api.detachCaches();
-
+                api.detachCaches();
+            }
             detached = true;
         }
 
