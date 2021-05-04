@@ -231,8 +231,8 @@ public class StaleHollowReferenceDetector {
                     ((HollowReadStateEngine) dataAccess).invalidate();
 
                 api.detachCaches();
-                detached = true;
             }
+            detached = true;
         }
 
         private boolean shouldBeginUsageDetectionPeriod() {
