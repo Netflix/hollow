@@ -18,6 +18,8 @@ package com.netflix.hollow.api.producer.listener;
 
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+
 import java.time.Duration;
 
 /**
@@ -35,6 +37,16 @@ public interface AnnouncementListener extends HollowProducerEventListener {
      * @param version of {@code HollowBlob} that will be announced.
      */
     void onAnnouncementStart(long version);
+
+    /**
+     * Called when the {@code HollowProducer} has begun announcing the {@code HollowBlob} published this cycle.
+     * This method is useful for cases where the read state passed from upstream can be used to compute added,
+     * removed and updated ordinals. 
+     *
+     * @param readState the read state
+     *
+     */
+    void onAnnouncementStart(HollowProducer.ReadState readState);
 
     /**
      * Called after the announcement stage finishes normally or abnormally. A {@code SUCCESS} status indicates
