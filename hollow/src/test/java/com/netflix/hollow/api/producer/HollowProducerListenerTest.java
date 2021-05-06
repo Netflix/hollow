@@ -272,6 +272,13 @@ public class HollowProducerListenerTest {
                 Assert.assertEquals(newDeltaChainVersion, version);
             }
 
+            @Override
+            public void onAnnouncementStart(HollowProducer.ReadState readState) {
+                reportCaller();
+                Assert.assertEquals(newDeltaChainVersion, readState.getVersion());
+                Assert.assertNotNull("Read state engine should not be null.", readState.getStateEngine());
+            }
+
             @Override public void onAnnouncementComplete(
                     Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
                 if (status.getCause() instanceof AssertionError) {
@@ -447,6 +454,13 @@ public class HollowProducerListenerTest {
                 Assert.assertEquals(cycleStartVersion, version);
             }
 
+            @Override
+            public void onAnnouncementStart(HollowProducer.ReadState readState) {
+                reportCaller();
+                Assert.assertEquals(cycleStartVersion, readState.getVersion());
+                Assert.assertNotNull("Read state engine should not be null.", readState.getStateEngine());
+            }
+
             @Override public void onAnnouncementComplete(
                     Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
                 if (status.getCause() instanceof AssertionError) {
@@ -607,6 +621,11 @@ public class HollowProducerListenerTest {
             }
 
             @Override public void onAnnouncementStart(long version) {
+                Assert.fail();
+            }
+
+            @Override
+            public void onAnnouncementStart(HollowProducer.ReadState readState) {
                 Assert.fail();
             }
 

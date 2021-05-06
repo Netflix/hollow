@@ -41,7 +41,7 @@ public interface AnnouncementListener extends HollowProducerEventListener {
     /**
      * Called when the {@code HollowProducer} has begun announcing the {@code HollowBlob} published this cycle.
      * This method is useful for cases where the read state passed from upstream can be used to compute added,
-     * removed and updated ordinals. 
+     * removed and updated ordinals.
      *
      * @param readState the read state
      *
