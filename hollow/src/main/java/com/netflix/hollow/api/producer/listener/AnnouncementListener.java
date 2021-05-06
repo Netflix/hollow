@@ -18,8 +18,6 @@ package com.netflix.hollow.api.producer.listener;
 
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-
 import java.time.Duration;
 
 /**
