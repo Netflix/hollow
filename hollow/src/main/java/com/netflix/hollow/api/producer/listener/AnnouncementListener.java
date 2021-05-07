@@ -37,6 +37,16 @@ public interface AnnouncementListener extends HollowProducerEventListener {
     void onAnnouncementStart(long version);
 
     /**
+     * Called when the {@code HollowProducer} has begun announcing the {@code HollowBlob} published this cycle.
+     * This method is useful for cases where the read state passed from upstream can be used to compute added,
+     * removed and updated ordinals.
+     *
+     * @param readState the read state
+     *
+     */
+    void onAnnouncementStart(HollowProducer.ReadState readState);
+
+    /**
      * Called after the announcement stage finishes normally or abnormally. A {@code SUCCESS} status indicates
      * that the {@code HollowBlob} published this cycle has been announced to consumers.
      *

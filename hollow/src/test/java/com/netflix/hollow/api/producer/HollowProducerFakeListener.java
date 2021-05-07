@@ -64,5 +64,8 @@ public class HollowProducerFakeListener implements HollowProducerListener {
     public void onAnnouncementStart(long version) { }
 
     @Override
+    public void onAnnouncementStart(HollowProducer.ReadState readState) { }
+
+    @Override
     public void onAnnouncementComplete(ProducerStatus status, long elapsed, TimeUnit unit) { }
 }

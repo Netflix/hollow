@@ -58,5 +58,9 @@ public class AbstractHollowProducerListener implements HollowProducerListener {
 
     // AnnouncementListener
     @Override public void onAnnouncementStart(long version) {}
+
+    @Override
+    public void onAnnouncementStart(HollowProducer.ReadState readState) {}
+
     @Override public void onAnnouncementComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}
 }
