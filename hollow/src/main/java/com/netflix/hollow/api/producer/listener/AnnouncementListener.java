@@ -44,7 +44,7 @@ public interface AnnouncementListener extends HollowProducerEventListener {
      * @param readState the read state
      *
      */
-    void onAnnouncementStart(HollowProducer.ReadState readState);
+    default void onAnnouncementStart(HollowProducer.ReadState readState) { };
 
     /**
      * Called after the announcement stage finishes normally or abnormally. A {@code SUCCESS} status indicates
