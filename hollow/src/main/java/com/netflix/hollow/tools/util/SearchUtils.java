@@ -1,7 +1,6 @@
 package com.netflix.hollow.tools.util;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-import static com.netflix.hollow.core.schema.HollowObjectSchema.FieldType.BYTES;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
@@ -17,16 +16,23 @@ import java.util.BitSet;
 public class SearchUtils {
 
     public static final String MULTI_FIELD_KEY_DELIMITER = ":";
+    public static final String REGEX_MATCH_DELIMITER = "\\:";
+    public static final String ESCAPED_MULTI_FIELD_KEY_DELIMITER = "\\\\:";
+
     /**
-     * Parse a colon-separated string into a primary key, throw exception if format exception for eg. if primary key was
-     * expecting an integer but keyString didn't contain a parse-able integer at the right spot.
+     * Parse a colon-separated string into a primary key based on a delimiter (for .eg. ':'), and throw exception if
+     * format unexpected for eg. if primary key was expecting an integer but keyString didn't contain a parse-able
+     * integer at the right spot.
+     *
+     * If the the value of the field itself contains the delimiter character, the value can be escaped using backslash
+     * in order to perform search.
      */
     public static Object[] parseKey(HollowReadStateEngine readStateEngine, PrimaryKey primaryKey, String keyString) {
         /**
-         * Split by the number of fields of the primary key.
-         * This ensures correct extraction of an empty value for the last field.
+         * Split by the number of fields of the primary key. This ensures correct extraction of an empty value for the last field.
+         * Escape the delimiter if it is preceded by a backslash.
          */
-        String fields[] = keyString.split(MULTI_FIELD_KEY_DELIMITER, primaryKey.numFields());
+        String fields[] = keyString.split("(?<!\\\\)" + MULTI_FIELD_KEY_DELIMITER, primaryKey.numFields());
 
         Object key[] = new Object[fields.length];
 
@@ -36,7 +42,7 @@ public class SearchUtils {
                     key[i] = Boolean.parseBoolean(fields[i]);
                     break;
                 case STRING:
-                    key[i] = fields[i];
+                    key[i] = fields[i].replaceAll(ESCAPED_MULTI_FIELD_KEY_DELIMITER, MULTI_FIELD_KEY_DELIMITER);
                     break;
                 case INT:
                 case REFERENCE:
