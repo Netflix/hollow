@@ -17,7 +17,9 @@
 package com.netflix.hollow.explorer.ui.pages;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.tools.util.SearchUtils.ESCAPED_MULTI_FIELD_KEY_DELIMITER;
 import static com.netflix.hollow.tools.util.SearchUtils.MULTI_FIELD_KEY_DELIMITER;
+import static com.netflix.hollow.tools.util.SearchUtils.REGEX_MATCH_DELIMITER;
 import static com.netflix.hollow.tools.util.SearchUtils.getFieldPathIndexes;
 import static com.netflix.hollow.tools.util.SearchUtils.getOrdinalToDisplay;
 import static com.netflix.hollow.tools.util.SearchUtils.getPrimaryKey;
@@ -147,6 +149,7 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
     private TypeKey getKey(int recordIdx, HollowTypeReadState typeState, int ordinal, int[][] fieldPathIndexes) {
         if(fieldPathIndexes != null) {
             StringBuilder keyBuilder = new StringBuilder();
+            StringBuilder delimiterEscapedKeyBuilder = new StringBuilder();
 
             HollowObjectTypeReadState objState = (HollowObjectTypeReadState)typeState;
 
@@ -159,13 +162,23 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
                     curState = (HollowObjectTypeReadState) curState.getSchema().getReferencedTypeState(fieldPathIndexes[i][j]);
                 }
 
-                if(i > 0)
+                if(i > 0) {
                     keyBuilder.append(MULTI_FIELD_KEY_DELIMITER);
+                    delimiterEscapedKeyBuilder.append(MULTI_FIELD_KEY_DELIMITER);
+                }
 
-                keyBuilder.append(HollowReadFieldUtils.fieldValueObject(curState, curOrdinal, fieldPathIndexes[i][fieldPathIndexes[i].length - 1]));
+                Object fieldValueObject = HollowReadFieldUtils.fieldValueObject(curState, curOrdinal, fieldPathIndexes[i][fieldPathIndexes[i].length - 1]);
+                keyBuilder.append(fieldValueObject);
+                if (fieldValueObject instanceof String) {
+                    // escape delimiters if present in the value
+                    delimiterEscapedKeyBuilder.append(((String) fieldValueObject)
+                            .replaceAll(REGEX_MATCH_DELIMITER, ESCAPED_MULTI_FIELD_KEY_DELIMITER));
+                } else {
+                    delimiterEscapedKeyBuilder.append(fieldValueObject);
+                }
             }
 
-            return new TypeKey(recordIdx, ordinal, keyBuilder.toString());
+            return new TypeKey(recordIdx, ordinal, delimiterEscapedKeyBuilder.toString(), keyBuilder.toString());
         }
 
         return new TypeKey(recordIdx, ordinal, "", "ORDINAL:" + ordinal);

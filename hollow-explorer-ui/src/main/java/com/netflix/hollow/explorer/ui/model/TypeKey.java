@@ -23,10 +23,6 @@ public class TypeKey {
     private final String keyDisplayStr;
     private final int ordinal;
     
-    public TypeKey(int idx, int ordinal, String keyStr) {
-        this(idx, ordinal, keyStr, keyStr);
-    }
-    
     public TypeKey(int idx, int ordinal, String keyStr, String keyDisplayStr) {
         this.idx = idx;
         this.ordinal = ordinal;
