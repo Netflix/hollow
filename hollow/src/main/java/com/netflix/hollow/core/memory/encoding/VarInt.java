@@ -19,6 +19,7 @@ package com.netflix.hollow.core.memory.encoding;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -173,14 +174,14 @@ public class VarInt {
      * @throws IOException if the value cannot be read from the input
      */
     public static int readVInt(InputStream in) throws IOException {
-        byte b = (byte)in.read();
+        byte b = readByteSafely(in);
 
         if(b == (byte) 0x80)
             throw new RuntimeException("Attempting to read null value as int");
 
         int value = b & 0x7F;
         while ((b & 0x80) != 0) {
-            b = (byte)in.read();
+            b = readByteSafely(in);
             value <<= 7;
             value |= (b & 0x7F);
         }
@@ -195,14 +196,14 @@ public class VarInt {
      * @throws IOException if the value cannot be read from the input
      */
     public static int readVInt(HollowBlobInput in) throws IOException {
-        byte b = (byte)in.read();
+        byte b = readByteSafely(in);
 
         if(b == (byte) 0x80)
             throw new RuntimeException("Attempting to read null value as int");
 
         int value = b & 0x7F;
         while ((b & 0x80) != 0) {
-            b = (byte)in.read();
+            b = readByteSafely(in);
             value <<= 7;
             value |= (b & 0x7F);
         }
@@ -261,14 +262,14 @@ public class VarInt {
      * @throws IOException if the value cannot be read from the input stream
      */
     public static long readVLong(InputStream in) throws IOException {
-        byte b = (byte)in.read();
+        byte b = readByteSafely(in);
 
         if(b == (byte) 0x80)
             throw new RuntimeException("Attempting to read null value as long");
 
         long value = b & 0x7F;
         while ((b & 0x80) != 0) {
-            b = (byte)in.read();
+            b = readByteSafely(in);
             value <<= 7;
             value |= (b & 0x7F);
         }
@@ -283,14 +284,14 @@ public class VarInt {
      * @throws IOException if the value cannot be read from the input
      */
     public static long readVLong(HollowBlobInput in) throws IOException {
-        byte b = (byte)in.read();
+        byte b = readByteSafely(in);
 
         if(b == (byte) 0x80)
             throw new RuntimeException("Attempting to read null value as long");
 
         long value = b & 0x7F;
         while ((b & 0x80) != 0) {
-            b = (byte)in.read();
+            b = readByteSafely(in);
             value <<= 7;
             value |= (b & 0x7F);
         }
@@ -373,4 +374,19 @@ public class VarInt {
         return numInts;
     }
 
+    public static byte readByteSafely(InputStream is) throws IOException {
+        int i = is.read();
+        if(i == -1) {
+            throw new EOFException("Unexpected end of VarInt record");
+        }
+        return (byte)i;
+    }
+
+    public static byte readByteSafely(HollowBlobInput in) throws IOException {
+        int i = in.read();
+        if(i == -1) {
+            throw new EOFException("Unexpected end of VarInt record");
+        }
+        return (byte)i;
+    }
 }
