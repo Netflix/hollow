@@ -297,7 +297,6 @@ public class ProducerListenerSupportTest {
         Mockito.verify(listener).onIntegrityCheckStart(version);
     }
 
-
     @Test
     public void fireAnnouncementStartDontStopWhenOneFails() {
         long version = 31337;
@@ -306,5 +305,6 @@ public class ProducerListenerSupportTest {
         Mockito.doThrow(RuntimeException.class).when(listener).onAnnouncementStart(version);
         listenerSupport.listeners().fireAnnouncementStart(readState);
         Mockito.verify(listener).onAnnouncementStart(version);
+        Mockito.verify(listener).onAnnouncementStart(readState);
     }
 }
