@@ -286,6 +286,8 @@ final class ProducerListenerSupport extends ListenerSupport {
             long version = readState.getVersion();
             fire(AnnouncementListener.class,
                     l -> l.onAnnouncementStart(version));
+            fire(AnnouncementListener.class,
+                    l -> l.onAnnouncementStart(readState));
 
             return new Status.StageWithStateBuilder().readState(readState);
         }

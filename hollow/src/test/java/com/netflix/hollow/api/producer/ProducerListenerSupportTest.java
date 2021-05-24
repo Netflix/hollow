@@ -306,5 +306,7 @@ public class ProducerListenerSupportTest {
         Mockito.doThrow(RuntimeException.class).when(listener).onAnnouncementStart(version);
         listenerSupport.listeners().fireAnnouncementStart(readState);
         Mockito.verify(listener).onAnnouncementStart(version);
+        Mockito.verify(listener).onAnnouncementStart(readState);
     }
+    
 }
