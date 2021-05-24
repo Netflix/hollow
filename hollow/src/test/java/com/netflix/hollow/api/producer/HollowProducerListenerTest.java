@@ -297,8 +297,10 @@ public class HollowProducerListenerTest {
 
         producer.runCycle(ws -> ws.add(new Top(1)));
 
-        Assert.assertTrue(ls.callCount.values().stream().allMatch(c -> c == 1));
+        Assert.assertTrue(ls.callCount.entrySet().stream().filter(c -> !c.getKey().equals("onAnnouncementStart")).allMatch(c -> c.getValue() == 1));
+        Assert.assertEquals(ls.callCount.get("onAnnouncementStart").intValue(), 2);
         Assert.assertEquals(16, ls.callCount.size());
+
     }
 
 
