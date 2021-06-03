@@ -18,6 +18,8 @@ package com.netflix.hollow.api.producer.enforcer;
 
 import com.netflix.hollow.api.producer.AbstractHollowProducerListener;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +28,8 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
     private boolean doStopUponCycleComplete = false;
     private boolean wasPrimary = false;
     private final Logger logger = Logger.getLogger(AbstractSingleProducerEnforcer.class.getName());
+
+    private volatile Lock lock = new ReentrantLock();
 
     protected abstract void _enable();
 
@@ -42,7 +46,12 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
         if (_isPrimary()) {
             return;
         }
-        _enable();
+        lock.lock();
+        try {
+            _enable();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -76,6 +85,15 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
     }
 
     @Override
+    public void lock() {
+        lock.lock();
+    }
+
+    @Override public void unlock() {
+        lock.unlock();
+
+    }
+    @Override
     public void onCycleStart(long version) {
         hasCycleStarted = true;
     }
@@ -90,7 +108,12 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
 
     private void disableNow() {
         if (_isPrimary()) {
-            _disable();
+            lock.lock();
+            try {
+                _disable();
+            } finally {
+                lock.unlock();
+            }
         }
         doStopUponCycleComplete = false;
         wasPrimary = false;

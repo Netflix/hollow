@@ -807,14 +807,21 @@ abstract class AbstractHollowProducer {
         if (announcer != null) {
             Status.StageWithStateBuilder status = listeners.fireAnnouncementStart(readState);
             try {
-                if (!singleProducerEnforcer.isPrimary()) {
-                    // This situation can arise when the producer is asked to relinquish primary status mid-cycle.
-                    // An announcement by a non-primary producer could mean that a different producer instance could
-                    // have been running concurrently as primary and that would break the delta chain.
-                    log.log(Level.INFO, "Fail the announcement because current producer is not primary (aka leader)");
-                    throw new IllegalStateException("Announcement failed primary (aka leader) check");
+                // don't allow producer to enable/disable between validating primary status and then announcing
+                singleProducerEnforcer.lock();
+                try {
+                    if (!singleProducerEnforcer.isPrimary()) {
+                        // This situation can arise when the producer is asked to relinquish primary status mid-cycle.
+                        // If this non-primary producer is allowed to announce then a different producer instance could
+                        // have been running concurrently as primary and that would break the delta chain.
+                        log.log(Level.INFO,
+                                "Fail the announcement because current producer is not primary (aka leader)");
+                        throw new IllegalStateException("Announcement failed primary (aka leader) check");
+                    }
+                    announcer.announce(readState.getVersion(), readState.getStateEngine().getHeaderTags());
+                } finally {
+                    singleProducerEnforcer.unlock();
                 }
-                announcer.announce(readState.getVersion(), readState.getStateEngine().getHeaderTags());
                 status.success();
             } catch (Throwable th) {
                 status.fail(th);

@@ -27,8 +27,9 @@ public interface SingleProducerEnforcer {
     void enable();
 
     /**
-     * Relinquish the primary producer status. disable() can be invoked any time, but takes affect only after
-     * current cycle is completed (or if no cycle is running).
+     * Relinquish the primary producer status. disable() can be invoked any time, and it gives up producer primary
+     * status thereby allowing a different producer to acquire primary status. If the current producer is mid-cycle
+     * then the cycle continues on but will result in an announcement failure.
      */
     void disable();
 
@@ -38,10 +39,18 @@ public interface SingleProducerEnforcer {
      */
     boolean isPrimary();
 
-
     /**
      * Force marking producer to enable processing cycles.
      */
     void force();
 
+    /**
+     * Lock local changes to primary status i.e. block enable or disable until unlock is called
+     */
+    default void lock() {}
+
+    /**
+     * Unlock local changes to producer primary status i.e. enable/disable are unblocked
+     */
+    default void unlock() {}
 }
