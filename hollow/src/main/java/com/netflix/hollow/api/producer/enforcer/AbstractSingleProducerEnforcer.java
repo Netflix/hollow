@@ -29,7 +29,7 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
     private boolean wasPrimary = false;
     private final Logger logger = Logger.getLogger(AbstractSingleProducerEnforcer.class.getName());
 
-    private volatile Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
     protected abstract void _enable();
 

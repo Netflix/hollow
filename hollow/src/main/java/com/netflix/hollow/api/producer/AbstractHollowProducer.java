@@ -604,7 +604,28 @@ abstract class AbstractHollowProducer {
         Status.PublishBuilder builder = new Status.PublishBuilder();
         try {
             builder.blob(blob);
-            publishBlob(blob);
+            if (!blob.type.equals(HollowProducer.Blob.Type.SNAPSHOT)) {
+                // Don't allow producer to enable/disable between validating primary status and publishing for delta
+                // or reverse delta blobs. No need to check for primary status when publishing snapshots because a
+                // snapshot publishby a non-primary producer would be harmless, and the wasted effort is justified
+                // by the shorter wait for a call to release the primary status when artifacts are being published.
+                try {
+                    singleProducerEnforcer.lock();
+                    if (!singleProducerEnforcer.isPrimary()) {
+                        // This situation can arise when the producer is asked to relinquish primary status mid-cycle.
+                        // If this non-primary producer is allowed to publish a delta or reverse delta then a different
+                        // producer instance could have been running concurrently as primary and that could break the delta chain.
+                        log.log(Level.INFO,
+                                "Publish failed because current producer is not primary (aka leader)");
+                        throw new IllegalStateException("Publish failed primary (aka leader) check");
+                    }
+                    publishBlob(blob);
+                } finally {
+                    singleProducerEnforcer.unlock();
+                }
+            } else {
+                publishBlob(blob);
+            }
             builder.success();
         } catch (Throwable t) {
             builder.fail(t);
