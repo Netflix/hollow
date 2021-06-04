@@ -38,5 +38,4 @@ public class BasicSingleProducerEnforcer extends AbstractSingleProducerEnforcer 
     protected void _force() {
         isPrimary = true;
     }
-
 }

@@ -30,6 +30,7 @@ import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
 import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
+import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -138,6 +139,51 @@ public class HollowProducerTest {
 
         Assert.assertEquals(v1, v2);
         Assert.assertTrue(v3 > v2);
+    }
+
+    @Test
+    public void testNonPrimaryCantPublish() {
+        // when producer starts cycle as primary but relinquishes primary status sometime before publish
+        BasicSingleProducerEnforcer enforcer = new BasicSingleProducerEnforcer();
+        HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
+                .withSingleProducerEnforcer(enforcer)
+                .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath()))
+                .build();
+
+        producer.runCycle(ws -> {
+            ws.add(1);
+        });
+
+        producer.addListener(new ProducerYieldsPrimaryBeforePublish(enforcer));
+        try {
+            producer.runCycle(ws -> {
+                ws.add(2);
+            });
+        } catch (IllegalStateException e) {
+            Assert.assertEquals("Publish failed primary (aka leader) check", e.getMessage());
+            return;
+        }
+        Assert.fail();
+    }
+
+    @Test
+    public void testNonPrimaryProducerCantAnnounce() {
+        // when producer starts cycle as primary but relinquishes primary status sometime before announcement
+        BasicSingleProducerEnforcer enforcer = new BasicSingleProducerEnforcer();
+        HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
+                .withSingleProducerEnforcer(enforcer)
+                .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath()))
+                .build();
+        producer.addListener(new ProducerYieldsPrimaryBeforeAnnounce(enforcer));
+        try {
+            producer.runCycle(ws -> {
+                ws.add(1);
+            });
+        } catch (IllegalStateException e) {
+            Assert.assertEquals("Announcement failed primary (aka leader) check", e.getMessage());
+            return;
+        }
+        Assert.fail();
     }
 
     @Test
@@ -373,6 +419,32 @@ public class HollowProducerTest {
         @Override
         public void onProducerRestoreComplete(RestoreStatus status, long elapsed, TimeUnit unit) {
             lastRestoreStatus = status;
+        }
+    }
+
+    private class ProducerYieldsPrimaryBeforePublish extends AbstractHollowProducerListener {
+        private SingleProducerEnforcer singleProducerEnforcer;
+
+        ProducerYieldsPrimaryBeforePublish(SingleProducerEnforcer singleProducerEnforcer) {
+            this.singleProducerEnforcer = singleProducerEnforcer;
+        }
+
+        @Override
+        public void onPopulateStart(long version) {
+            singleProducerEnforcer.disable();
+        }
+    }
+
+    private class ProducerYieldsPrimaryBeforeAnnounce extends AbstractHollowProducerListener {
+        private SingleProducerEnforcer singleProducerEnforcer;
+
+        ProducerYieldsPrimaryBeforeAnnounce(SingleProducerEnforcer singleProducerEnforcer) {
+            this.singleProducerEnforcer = singleProducerEnforcer;
+        }
+
+        @Override
+        public void onValidationStart(long version) {
+            singleProducerEnforcer.disable();
         }
     }
 
