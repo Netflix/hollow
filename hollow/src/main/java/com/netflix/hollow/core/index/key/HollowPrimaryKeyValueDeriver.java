@@ -22,6 +22,7 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Used to retrieve and test equality of PrimaryKey values for records.
@@ -126,7 +127,9 @@ public class HollowPrimaryKeyValueDeriver {
         Object[] results = new Object[fieldPathIndexes.length];
 
         for (int i = 0; i < fieldPathIndexes.length; i++) {
-            results[i] = readValue(ordinal, i);
+            if (Objects.nonNull(readValue(ordinal, i))) {
+                results[i] = readValue(ordinal, i);
+            }
         }
         return results;
     }

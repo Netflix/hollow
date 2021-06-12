@@ -39,6 +39,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -276,13 +277,18 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      */
     public int getMatchingOrdinal(Object... keys) {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
-        if(fieldPathIndexes.length != keys.length || hashTable.bitsPerElement == 0)
+
+        // for special case of keys containing one null element
+        if (keys == null || (fieldPathIndexes.length != keys.length) || hashTable.bitsPerElement == 0)
             return -1;
 
         int hashCode = 0;
-        for(int i=0;i<keys.length;i++)
-            hashCode ^= keyHashCode(keys[i], i);
-
+        for (int i = 0;i < keys.length;i++) {
+            // null values can percolate from upstream in the method's Object array
+            if (Objects.nonNull(keys[i])) {
+                hashCode ^= keyHashCode(keys[i], i);
+            }
+        }
         int ordinal = -1;
 
         do {
