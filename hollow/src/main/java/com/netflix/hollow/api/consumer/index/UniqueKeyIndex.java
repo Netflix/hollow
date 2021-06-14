@@ -79,8 +79,9 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
         this.matchFieldPaths = matchFields.stream()
                 .map(mf -> mf.fieldPath.toString())
                 .toArray(String[]::new);
-
+        
         this.hpki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), uniqueSchemaName, matchFieldPaths);
+        this.keyArray = new Object[matchFields.size()];
     }
 
     static <Q> List<MatchFieldPathArgumentExtractor<Q>> validatePrimaryKeyFieldPaths(
@@ -160,7 +161,6 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
      */
     public T findMatch(Q key) {
 
-        this.keyArray = new Object[matchFields.size()];
         int keyArrayLogicalSize = 0;
         for (int i = 0; i < matchFields.size(); i++)
         {
