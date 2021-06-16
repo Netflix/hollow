@@ -56,7 +56,6 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
     final List<MatchFieldPathArgumentExtractor<Q>> matchFields;
     final String uniqueSchemaName;
     final String[] matchFieldPaths;
-    Object[] keyArray;
     HollowPrimaryKeyIndex hpki;
 
     UniqueKeyIndex(
@@ -81,7 +80,6 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
                 .toArray(String[]::new);
         
         this.hpki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), uniqueSchemaName, matchFieldPaths);
-        this.keyArray = new Object[matchFields.size()];
     }
 
     static <Q> List<MatchFieldPathArgumentExtractor<Q>> validatePrimaryKeyFieldPaths(
@@ -160,13 +158,13 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
      * @return the unique object
      */
     public T findMatch(Q key) {
-
+        Object[] keyArray = new Object[matchFields.size()];
         int keyArrayLogicalSize = 0;
         for (int i = 0; i < matchFields.size(); i++)
         {
             Object matched = matchFields.get(i).extract(key);
             if (matched != null) {
-                this.keyArray[keyArrayLogicalSize++] = matched;
+                keyArray[keyArrayLogicalSize++] = matched;
             }
         }
 
@@ -174,13 +172,13 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
         if (keyArrayLogicalSize <= 0)
             return null;
         else if (keyArrayLogicalSize == 1)
-            ordinal = hpki.getMatchingOrdinal(this.keyArray[0]);
+            ordinal = hpki.getMatchingOrdinal(keyArray[0]);
         else if (keyArrayLogicalSize == 2)
-            ordinal = hpki.getMatchingOrdinal(this.keyArray[0], this.keyArray[1]);
+            ordinal = hpki.getMatchingOrdinal(keyArray[0], keyArray[1]);
         else if (keyArrayLogicalSize == 3)
-            ordinal = hpki.getMatchingOrdinal(this.keyArray[0], this.keyArray[1], this.keyArray[2]);
+            ordinal = hpki.getMatchingOrdinal(keyArray[0], keyArray[1], keyArray[2]);
         else
-            ordinal = hpki.getMatchingOrdinal(this.keyArray);
+            ordinal = hpki.getMatchingOrdinal(keyArray);
 
         if (ordinal == HollowConstants.ORDINAL_NONE) {
             return null;
