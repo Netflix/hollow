@@ -21,12 +21,12 @@ import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.util.LongList;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Intended for use in the context of a HollowDiff.
@@ -46,7 +46,7 @@ public class HollowDiffMatcher {
 
     private HollowPrimaryKeyIndex fromIdx;
     private HollowPrimaryKeyIndex toIdx;
-    private static final Logger LOGGER = LoggerFactory.getLogger(HollowDiffMatcher.class);
+    private static final Logger LOGGER = Logger.getLogger("HollowDiffMatcher.class");
 
     public HollowDiffMatcher(HollowObjectTypeReadState fromTypeState, HollowObjectTypeReadState toTypeState) {
         this.matchPaths = new ArrayList<>();
@@ -99,9 +99,11 @@ public class HollowDiffMatcher {
             try {
                 matchedOrdinal = fromIdx.getMatchingOrdinal(key);
             } catch(NullPointerException ex) {
-                LOGGER.error("Null values found for type " + toTypeState.getSchema().getName()
+                LOGGER.log(Level.SEVERE, "Null values found for type " + toTypeState.getSchema().getName()
+                        + " with key field values " + Arrays.asList(key) + " at ordinal : " + candidateToMatchOrdinal);
+                throw new RuntimeException("Error fetching matching ordinal for null type " + toTypeState.getSchema().getName()
                         + " with key field values " + Arrays.asList(key) + " at ordinal : " + candidateToMatchOrdinal
-                        + " with stacktrace : " + ex.getStackTrace());
+                        + "with stack trace " + ex.getCause());
             }
 
             if(matchedOrdinal != -1) {
