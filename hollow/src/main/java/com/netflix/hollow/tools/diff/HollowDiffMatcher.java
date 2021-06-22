@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.tools.diff;
 
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -25,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Intended for use in the context of a HollowDiff.
@@ -46,7 +45,6 @@ public class HollowDiffMatcher {
 
     private HollowPrimaryKeyIndex fromIdx;
     private HollowPrimaryKeyIndex toIdx;
-    private static final Logger LOGGER = Logger.getLogger("HollowDiffMatcher.class");
 
     public HollowDiffMatcher(HollowObjectTypeReadState fromTypeState, HollowObjectTypeReadState toTypeState) {
         this.matchPaths = new ArrayList<>();
@@ -95,15 +93,13 @@ public class HollowDiffMatcher {
         int candidateToMatchOrdinal = toPopulatedOrdinals.nextSetBit(0);
         while(candidateToMatchOrdinal != -1) {
             Object key[] = toIdx.getRecordKey(candidateToMatchOrdinal);
-            int matchedOrdinal = -1;
+            int matchedOrdinal = HollowConstants.ORDINAL_NONE;
             try {
                 matchedOrdinal = fromIdx.getMatchingOrdinal(key);
             } catch(NullPointerException ex) {
-                LOGGER.log(Level.SEVERE, "Null values found for type " + toTypeState.getSchema().getName()
-                        + " with key field values " + Arrays.asList(key) + " at ordinal : " + candidateToMatchOrdinal);
                 throw new RuntimeException("Error fetching matching ordinal for null type " + toTypeState.getSchema().getName()
                         + " with key field values " + Arrays.asList(key) + " at ordinal : " + candidateToMatchOrdinal
-                        + "with stack trace " + ex.getCause());
+                        + "with stack trace ", ex);
             }
 
             if(matchedOrdinal != -1) {
