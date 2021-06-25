@@ -358,9 +358,6 @@ abstract class AbstractHollowProducer {
             // 1a. Prepare the write state
             writeEngine.prepareForNextCycle();
 
-            // save timestamp in ms of when cycle starts
-            writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START, String.valueOf(System.currentTimeMillis()));
-
             // 2. Populate the state
             populate(listeners, incrementalPopulator, populator, toVersion);
 

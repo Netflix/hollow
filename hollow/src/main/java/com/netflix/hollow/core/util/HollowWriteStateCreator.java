@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.util;
 
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
+
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -191,6 +193,10 @@ public class HollowWriteStateCreator {
         
         writeEngine.addHeaderTags(readEngine.getHeaderTags());
         writeEngine.overrideNextStateRandomizedTag(readEngine.getCurrentRandomizedTag());
+        if (readEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START) != null) {
+            writeEngine.overrideCycleStartTs(Long.valueOf(
+                    readEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START)));
+        }
         writeEngine.prepareForWrite();
     }
 }

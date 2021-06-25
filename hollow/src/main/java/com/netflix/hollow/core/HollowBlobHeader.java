@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.OptionalLong;
 
 /**
  * Represents the header of a serialized blob.  A blob header contains the following elements:  
@@ -49,6 +50,7 @@ public class HollowBlobHeader {
     private long originRandomizedTag;
     private long destinationRandomizedTag;
     private int blobFormatVersion = HOLLOW_BLOB_VERSION_HEADER;
+    private OptionalLong cycleStartTsTag = OptionalLong.empty();
 
     public Map<String, String> getHeaderTags() {
         return headerTags;
@@ -88,6 +90,14 @@ public class HollowBlobHeader {
 
     public int getBlobFormatVersion() {
         return blobFormatVersion;
+    }
+
+    public void setCycleStartTsTag(long cycleStartTs) {
+        this.cycleStartTsTag = OptionalLong.of(cycleStartTs);
+    }
+
+    public OptionalLong getCycleStartTsTag() {
+        return cycleStartTsTag;
     }
 
     @Override

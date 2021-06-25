@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.tools.patch.delta;
 
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
+
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -104,6 +106,10 @@ public class HollowStateDeltaPatcher {
      */
     public void prepareInitialTransition() {
         writeEngine.overridePreviousStateRandomizedTag(from.getCurrentRandomizedTag());
+        if (from.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START) != null) {
+            writeEngine.overridePreviousCycleStartTs(Long.valueOf(
+                    from.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START)));
+        }
         copyUnchangedDataToIntermediateState();
         remapTheChangedDataToUnusedOrdinals();
     }
