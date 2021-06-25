@@ -280,13 +280,17 @@ public class HollowBlobWriter {
 
         /// write main header
         HollowBlobHeader header = new HollowBlobHeader();
-        header.setHeaderTags(stateEngine.getHeaderTags());
+        header.getHeaderTags().putAll(stateEngine.getHeaderTags());
         if(isReverseDelta) {
             header.setOriginRandomizedTag(stateEngine.getNextStateRandomizedTag());
             header.setDestinationRandomizedTag(stateEngine.getPreviousStateRandomizedTag());
+            // cycle start time on reverse delta from v1 to v0 is the cycle start time of v0
+            stateEngine.getPreviousCycleStartTs().ifPresent(t -> header.setCycleStartTsTag(t));
         } else {
             header.setOriginRandomizedTag(stateEngine.getPreviousStateRandomizedTag());
             header.setDestinationRandomizedTag(stateEngine.getNextStateRandomizedTag());
+            // cycle start time on delta from v0 to v1 is the cycle start time of v1
+            stateEngine.getCycleStartTs().ifPresent(t -> header.setCycleStartTsTag(t));
         }
         header.setSchemas(mainSchemas);
         headerWriter.writeHeader(header, os);

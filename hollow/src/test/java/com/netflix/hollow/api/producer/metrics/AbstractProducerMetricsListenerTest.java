@@ -1,5 +1,6 @@
 package com.netflix.hollow.api.producer.metrics;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.producer.HollowProducer;
@@ -45,7 +46,7 @@ public class AbstractProducerMetricsListenerTest {
         final class TestProducerMetricsListener extends AbstractProducerMetricsListener {
             @Override
             public void cycleMetricsReporting(CycleMetrics cycleMetrics) {
-                Assert.assertNotNull(cycleMetrics);
+                assertNotNull(cycleMetrics);
                 Assert.assertEquals(0l, cycleMetrics.getConsecutiveFailures());
                 Assert.assertEquals(Optional.empty(), cycleMetrics.getIsCycleSuccess());
                 Assert.assertEquals(OptionalLong.empty(), cycleMetrics.getCycleDurationMillis());
@@ -61,7 +62,7 @@ public class AbstractProducerMetricsListenerTest {
         final class TestProducerMetricsListener extends AbstractProducerMetricsListener {
             @Override
             public void cycleMetricsReporting(CycleMetrics cycleMetrics) {
-                Assert.assertNotNull(cycleMetrics);
+                assertNotNull(cycleMetrics);
                 Assert.assertEquals(0l, cycleMetrics.getConsecutiveFailures());
                 Assert.assertEquals(Optional.empty(), cycleMetrics.getIsCycleSuccess());
                 Assert.assertEquals(OptionalLong.empty(), cycleMetrics.getCycleDurationMillis());
@@ -78,7 +79,7 @@ public class AbstractProducerMetricsListenerTest {
         final class TestProducerMetricsListener extends AbstractProducerMetricsListener {
             @Override
             public void cycleMetricsReporting(CycleMetrics cycleMetrics) {
-                Assert.assertNotNull(cycleMetrics);
+                assertNotNull(cycleMetrics);
                 Assert.assertEquals(0l, cycleMetrics.getConsecutiveFailures());
                 Assert.assertEquals(Optional.of(true), cycleMetrics.getIsCycleSuccess());
                 Assert.assertEquals(OptionalLong.of(TEST_CYCLE_DURATION_MILLIS.toMillis()), cycleMetrics.getCycleDurationMillis());
@@ -98,7 +99,7 @@ public class AbstractProducerMetricsListenerTest {
         final class TestProducerMetricsListener extends AbstractProducerMetricsListener {
             @Override
             public void cycleMetricsReporting(CycleMetrics cycleMetrics) {
-                Assert.assertNotNull(cycleMetrics);
+                assertNotNull(cycleMetrics);
                 Assert.assertEquals(1l, cycleMetrics.getConsecutiveFailures());
                 Assert.assertEquals(Optional.of(false), cycleMetrics.getIsCycleSuccess());
                 Assert.assertEquals(OptionalLong.of(TEST_CYCLE_DURATION_MILLIS.toMillis()), cycleMetrics.getCycleDurationMillis());
@@ -117,7 +118,7 @@ public class AbstractProducerMetricsListenerTest {
         final class TestProducerMetricsListener extends AbstractProducerMetricsListener {
             @Override
             public void announcementMetricsReporting(AnnouncementMetrics announcementMetrics) {
-                Assert.assertNotNull(announcementMetrics);
+                assertNotNull(announcementMetrics);
                 Assert.assertEquals(TEST_DATA_SIZE, announcementMetrics.getDataSizeBytes());
                 Assert.assertEquals(true, announcementMetrics.getIsAnnouncementSuccess());
                 Assert.assertEquals(TEST_ANNOUNCEMENT_DURATION_MILLIS,
@@ -139,7 +140,7 @@ public class AbstractProducerMetricsListenerTest {
         final class TestProducerMetricsListener extends AbstractProducerMetricsListener {
             @Override
             public void announcementMetricsReporting(AnnouncementMetrics announcementMetrics) {
-                Assert.assertNotNull(announcementMetrics);
+                assertNotNull(announcementMetrics);
                 Assert.assertEquals(TEST_DATA_SIZE, announcementMetrics.getDataSizeBytes());
                 Assert.assertFalse(announcementMetrics.getIsAnnouncementSuccess());
                 Assert.assertEquals(TEST_ANNOUNCEMENT_DURATION_MILLIS,

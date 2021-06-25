@@ -2,9 +2,15 @@ package com.netflix.hollow.api.consumer.metrics;
 
 import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.InMemoryBlobStore;
+import com.netflix.hollow.api.producer.HollowProducer;
+import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -207,6 +213,93 @@ public class AbstractRefreshMetricsListenerTest {
         failureTestRefreshMetricsListener.snapshotUpdateOccurred(null, mockStateEngine, TEST_VERSION_LOW);
 
         failureTestRefreshMetricsListener.refreshFailed(TEST_VERSION_LOW-1, TEST_VERSION_LOW, TEST_VERSION_HIGH, null);
+    }
 
+    @Test
+    public void testCycleStart() throws InterruptedException {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+        HollowProducer p = HollowProducer
+                .withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .build();
+        p.initializeDataModel(X.class);
+
+        long version1 = p.runCycle(ws -> {
+            ws.add(new X(1));
+        });
+
+        class TestRefreshMetricsListener extends AbstractRefreshMetricsListener {
+            int run = 0;
+            long reportedCycleStartV1 = 0;
+
+            @Override
+            public void refreshEndMetricsReporting(ConsumerRefreshMetrics refreshMetrics) {
+                run ++;
+                assertNotNull(refreshMetrics.getCycleStartTimestamp());
+
+                if (run == 1) {
+                    reportedCycleStartV1 = refreshMetrics.getCycleStartTimestamp().getAsLong();
+                }
+
+                if (run == 2) {
+                    long reportedCycleStartV2 = refreshMetrics.getCycleStartTimestamp().getAsLong();
+                    assertTrue(reportedCycleStartV2 > reportedCycleStartV1);
+                }
+
+                if (run == 3) {
+                    assertEquals(reportedCycleStartV1, refreshMetrics.getCycleStartTimestamp().getAsLong());
+                }
+            }
+        }
+        TestRefreshMetricsListener testMetricsListener = new TestRefreshMetricsListener();
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
+                .withRefreshListener(testMetricsListener)
+                .build();
+        consumer.triggerRefreshTo(version1);    // snapshot load
+        final String cycleStartV1 = consumer.getStateEngine().getHeaderTag(HEADER_TAG_METRIC_CYCLE_START);
+
+        Thread.sleep(1);
+
+        long version2 = p.runCycle(ws -> {
+            ws.add(new X(2));
+        });
+
+        consumer.triggerRefreshTo(version2);    // delta transition
+        final String cycleStartV2 = consumer.getStateEngine().getHeaderTag(HEADER_TAG_METRIC_CYCLE_START);
+        assertTrue(Long.valueOf(cycleStartV2) > Long.valueOf(cycleStartV1));
+
+        consumer.triggerRefreshTo(version1);    // reverse delta transition
+        assertEquals(cycleStartV1, consumer.getStateEngine().getHeaderTag(HEADER_TAG_METRIC_CYCLE_START));
+
+
+        HollowProducer p2 = HollowProducer
+                .withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .build();
+        p2.initializeDataModel(X.class);
+
+        Thread.sleep(1);
+
+        p2.restore(version2, blobStore);
+        long version3 = p2.runCycle(ws -> {
+            ws.add(new X(3));
+        });
+
+        consumer.triggerRefreshTo(version3);    // delta transition
+        final String cycleStartV3 = consumer.getStateEngine().getHeaderTag(HEADER_TAG_METRIC_CYCLE_START);
+        assertTrue(Long.valueOf(cycleStartV3) > Long.valueOf(cycleStartV2));
+
+        consumer.triggerRefreshTo(version2);    // reverse delta transition
+        assertEquals(cycleStartV2, consumer.getStateEngine().getHeaderTag(HEADER_TAG_METRIC_CYCLE_START));
+    }
+
+    static class X {
+        final int id;
+
+        X(int id) {
+            this.id = id;
+        }
     }
 }

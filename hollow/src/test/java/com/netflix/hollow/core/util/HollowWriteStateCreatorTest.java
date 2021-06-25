@@ -16,6 +16,11 @@
  */
 package com.netflix.hollow.core.util;
 
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -38,14 +43,33 @@ public class HollowWriteStateCreatorTest {
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
         mapper.add(new Integer(1));
         writeEngine.addHeaderTag("CopyTag", "copied");
-        
+
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
+        String cycleStartTime = readEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START);
+
         HollowWriteStateEngine recreatedWriteEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(readEngine);
         HollowReadStateEngine recreatedReadEngine = StateEngineRoundTripper.roundTripSnapshot(recreatedWriteEngine);
         
-        Assert.assertEquals(HollowChecksum.forStateEngine(readEngine), HollowChecksum.forStateEngine(recreatedReadEngine));
-        Assert.assertEquals("copied", recreatedReadEngine.getHeaderTag("CopyTag"));
-        Assert.assertEquals(readEngine.getCurrentRandomizedTag(), recreatedReadEngine.getCurrentRandomizedTag());
+        assertEquals(HollowChecksum.forStateEngine(readEngine), HollowChecksum.forStateEngine(recreatedReadEngine));
+        assertEquals("copied", recreatedReadEngine.getHeaderTag("CopyTag"));
+        assertEquals(readEngine.getCurrentRandomizedTag(), recreatedReadEngine.getCurrentRandomizedTag());
+        assertEquals(cycleStartTime, recreatedReadEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START));
+
+    }
+
+    @Test
+    public void recreatesUsingReadEngine_backwardsCompatible_cycleStartTimeNotSet() throws IOException {
+        // cycle start time header was not set on original read state
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+
+        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
+        readEngine.getHeaderTags().remove(HEADER_TAG_METRIC_CYCLE_START);
+
+        HollowWriteStateEngine recreatedWriteEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(readEngine);
+        HollowReadStateEngine recreatedReadEngine = StateEngineRoundTripper.roundTripSnapshot(recreatedWriteEngine);
+
+        assertNotNull(recreatedReadEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START));
+
     }
     
     @Test
@@ -84,16 +108,16 @@ public class HollowWriteStateCreatorTest {
         HollowReadStateEngine recreatedReadEngine = StateEngineRoundTripper.roundTripSnapshot(repopulatedWriteStateEngine);
         
         GenericHollowObject one = new GenericHollowObject(recreatedReadEngine, "Integer", 0);
-        Assert.assertEquals(1, one.getInt("value"));
-        Assert.assertNull(one.getString("anotherValue"));
+        assertEquals(1, one.getInt("value"));
+        assertNull(one.getString("anotherValue"));
         
         GenericHollowObject two = new GenericHollowObject(recreatedReadEngine, "Integer", 1);
-        Assert.assertEquals(2, two.getInt("value"));
-        Assert.assertNull(two.getString("anotherValue"));
+        assertEquals(2, two.getInt("value"));
+        assertNull(two.getString("anotherValue"));
         
         GenericHollowObject three = new GenericHollowObject(recreatedReadEngine, "Integer", 2);
-        Assert.assertEquals(3, three.getInt("value"));
-        Assert.assertEquals("3", three.getString("anotherValue"));
+        assertEquals(3, three.getInt("value"));
+        assertEquals("3", three.getString("anotherValue"));
     }
     
     @Test
@@ -118,17 +142,17 @@ public class HollowWriteStateCreatorTest {
 
         HollowObjectSchema schema = (HollowObjectSchema)recreatedReadEngine.getSchema("Integer");
         
-        Assert.assertEquals(1, schema.numFields());
-        Assert.assertEquals("value", schema.getFieldName(0));
+        assertEquals(1, schema.numFields());
+        assertEquals("value", schema.getFieldName(0));
         
         GenericHollowObject one = new GenericHollowObject(recreatedReadEngine, "Integer", 0);
-        Assert.assertEquals(1, one.getInt("value"));
+        assertEquals(1, one.getInt("value"));
         
         GenericHollowObject two = new GenericHollowObject(recreatedReadEngine, "Integer", 1);
-        Assert.assertEquals(2, two.getInt("value"));
+        assertEquals(2, two.getInt("value"));
         
         GenericHollowObject three = new GenericHollowObject(recreatedReadEngine, "Integer", 2);
-        Assert.assertEquals(3, three.getInt("value"));
+        assertEquals(3, three.getInt("value"));
     }
     
     @Test
@@ -153,9 +177,9 @@ public class HollowWriteStateCreatorTest {
     @Test
     public void testReadSchemaFileIntoWriteState() throws Exception {
         HollowWriteStateEngine engine = new HollowWriteStateEngine();
-        Assert.assertEquals("Should have no type states", 0, engine.getOrderedTypeStates().size());
+        assertEquals("Should have no type states", 0, engine.getOrderedTypeStates().size());
         HollowWriteStateCreator.readSchemaFileIntoWriteState("schema1.txt", engine);
-        Assert.assertEquals("Should now have types", 2, engine.getOrderedTypeStates().size());
+        assertEquals("Should now have types", 2, engine.getOrderedTypeStates().size());
     }
     
     @SuppressWarnings("unused")

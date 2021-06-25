@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.write;
 
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
+
 import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.HollowBlobOptionalPartHeader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
@@ -55,7 +57,10 @@ public class HollowBlobHeaderWriter {
         ///backwards compatibility -- new data can be added here by first indicating number of bytes used, will be skipped by existing readers.
         VarInt.writeVInt(dos, 0);
 
-        /// write the header tags -- intended to include input source data versions
+        // add header tag for cycle start timestamp
+        header.getCycleStartTsTag().ifPresent(t -> header.getHeaderTags().put(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(t)));
+
+        /// write the header tags -- for eg. custom tags indicating input source data versions
         dos.writeShort(header.getHeaderTags().size());
 
         for (Map.Entry<String, String> headerTag : header.getHeaderTags().entrySet()) {

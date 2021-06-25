@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalLong;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -74,6 +75,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private boolean preparedForNextCycle = true;
     private long previousStateRandomizedTag = -1L;
     private long nextStateRandomizedTag;
+    private OptionalLong cycleStartTs = OptionalLong.of(System.currentTimeMillis());
+    private OptionalLong previousCycleStartTs = OptionalLong.empty();
 
     public HollowWriteStateEngine() {
         this(new DefaultHashCodeFinder());
@@ -168,6 +171,11 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
         previousStateRandomizedTag = readStateEngine.getCurrentRandomizedTag();
         nextStateRandomizedTag = mintNewRandomizedStateTag();
+        if (readStateEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START) != null) {
+            previousCycleStartTs = OptionalLong.of(Long.valueOf(
+                    readStateEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START)));
+        }
+        cycleStartTs = OptionalLong.of(System.currentTimeMillis());
 
         try {
             executor.awaitSuccessfulCompletion();
@@ -214,6 +222,9 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
         previousStateRandomizedTag = nextStateRandomizedTag;
         nextStateRandomizedTag = mintNewRandomizedStateTag();
+        // save timestamp in ms of when cycle starts
+        previousCycleStartTs = cycleStartTs;
+        cycleStartTs = OptionalLong.of(System.currentTimeMillis());
 
         try {
             SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "prepare-for-next-cycle");
@@ -407,7 +418,23 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     public void setTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
         this.targetMaxTypeShardSize = targetMaxTypeShardSize;
     }
-    
+
+    public OptionalLong getCycleStartTs() {
+        return cycleStartTs;
+    }
+
+    public void overrideCycleStartTs(long cycleStartTs) {
+        this.cycleStartTs = OptionalLong.of(cycleStartTs);
+    }
+
+    public OptionalLong getPreviousCycleStartTs() {
+        return previousCycleStartTs;
+    }
+
+    public void overridePreviousCycleStartTs(long previousCycleStartTs) {
+        this.previousCycleStartTs = OptionalLong.of(previousCycleStartTs);
+    }
+
     long getTargetMaxTypeShardSize() {
         return targetMaxTypeShardSize;
     }
