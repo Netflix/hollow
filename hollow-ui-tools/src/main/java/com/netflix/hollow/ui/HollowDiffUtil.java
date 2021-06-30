@@ -12,7 +12,7 @@ public class HollowDiffUtil {
         sizeInBytes = Math.abs(sizeInBytes);
 
         int digitGroups = (int) (Math.log10(sizeInBytes)/Math.log10(1024));
-        DecimalFormat formmater = new DecimalFormat("#,##0.##");
-        return sign + formmater.format(sizeInBytes / Math.pow(1024, digitGroups)) + " " + HEAP_SIZE_UNITS[digitGroups];
+        DecimalFormat formatter = new DecimalFormat("#,##0.##");
+        return sign + formatter.format(sizeInBytes / Math.pow(1024, digitGroups)) + " " + HEAP_SIZE_UNITS[digitGroups];
     }
 }
