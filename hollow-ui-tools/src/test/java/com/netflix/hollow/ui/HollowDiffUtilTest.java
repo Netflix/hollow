@@ -23,6 +23,13 @@ public class HollowDiffUtilTest {
         Assert.assertEquals( "1 PiB", formatBytes(1024 * (long)Math.pow(2, 40)));
 
         Assert.assertEquals( "8 EiB", formatBytes(Long.MAX_VALUE));
+
+        // Validate Decimal
+        Assert.assertEquals( "95.37 MiB", formatBytes(100000000));
+        Assert.assertEquals( "-9.54 MiB", formatBytes(-10000000));
+        Assert.assertEquals( "1.95 KiB", formatBytes(2001));
+        Assert.assertEquals( "19.53 KiB", formatBytes(20000));
+        Assert.assertEquals( "186.26 GiB", formatBytes(200000000000L));
     }
 
     private void sampleTesting(double multiple, String unit, long ... bytes) {
