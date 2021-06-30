@@ -5,8 +5,6 @@ import static com.netflix.hollow.ui.HollowDiffUtil.formatBytes;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 public class HollowDiffUtilTest {
 
     @Test
