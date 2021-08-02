@@ -193,10 +193,16 @@ public class HollowWriteStateCreator {
         
         writeEngine.addHeaderTags(readEngine.getHeaderTags());
         writeEngine.overrideNextStateRandomizedTag(readEngine.getCurrentRandomizedTag());
-        if (readEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START) != null) {
-            writeEngine.overrideCycleStartTs(Long.valueOf(
-                    readEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START)));
+
+        // override current cycle start time
+        writeEngine.overrideCycleStartTs(System.currentTimeMillis());
+
+        // set previousCycleStartTs to the restored read state's cycle time
+        String readStateCycleStartTs = readEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START);
+        if (readStateCycleStartTs != null) {
+            writeEngine.overridePreviousCycleStartTs(Long.valueOf(readStateCycleStartTs));
         }
+
         writeEngine.prepareForWrite();
     }
 }

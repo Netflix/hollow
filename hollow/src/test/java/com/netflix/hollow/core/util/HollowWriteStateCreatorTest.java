@@ -31,6 +31,7 @@ import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
+import java.util.OptionalLong;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,12 +49,14 @@ public class HollowWriteStateCreatorTest {
         String cycleStartTime = readEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START);
 
         HollowWriteStateEngine recreatedWriteEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(readEngine);
+        // use cycle start time of read state to initialize previous cycle time of new write state
+        assertEquals(OptionalLong.of(Long.valueOf(cycleStartTime)), recreatedWriteEngine.getPreviousCycleStartTs());
+
         HollowReadStateEngine recreatedReadEngine = StateEngineRoundTripper.roundTripSnapshot(recreatedWriteEngine);
         
         assertEquals(HollowChecksum.forStateEngine(readEngine), HollowChecksum.forStateEngine(recreatedReadEngine));
         assertEquals("copied", recreatedReadEngine.getHeaderTag("CopyTag"));
         assertEquals(readEngine.getCurrentRandomizedTag(), recreatedReadEngine.getCurrentRandomizedTag());
-        assertEquals(cycleStartTime, recreatedReadEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START));
 
     }
 

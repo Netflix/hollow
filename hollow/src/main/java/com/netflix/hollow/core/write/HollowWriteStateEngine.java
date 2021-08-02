@@ -65,7 +65,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private final Map<String, HollowTypeWriteState> writeStates;
     private final Map<String, HollowSchema> hollowSchemas;
     private final List<HollowTypeWriteState> orderedTypeStates;
-    private final Map<String,String> headerTags = new ConcurrentHashMap<String, String>();
+    private final Map<String,String> headerTags = new ConcurrentHashMap<>();
     private final HollowObjectHashCodeFinder hashCodeFinder;
     
     //// target a maximum shard size to reduce excess memory pool requirement 
@@ -284,8 +284,11 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         
         /// recreate a new randomized tag, to avoid any potential conflict with aborted versions
         nextStateRandomizedTag = mintNewRandomizedStateTag();
+
+        /// re-assign cycle start time but preserve previousCycleStartTs
+        cycleStartTs = OptionalLong.of(System.currentTimeMillis());
+
         preparedForNextCycle = true;
-        
     }
 
     /**

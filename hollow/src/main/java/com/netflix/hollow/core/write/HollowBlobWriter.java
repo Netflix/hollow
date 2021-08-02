@@ -280,7 +280,7 @@ public class HollowBlobWriter {
 
         /// write main header
         HollowBlobHeader header = new HollowBlobHeader();
-        header.getHeaderTags().putAll(stateEngine.getHeaderTags());
+        header.getHeaderTags().putAll(stateEngine.getHeaderTags()); // make a deep copy
         if(isReverseDelta) {
             header.setOriginRandomizedTag(stateEngine.getNextStateRandomizedTag());
             header.setDestinationRandomizedTag(stateEngine.getPreviousStateRandomizedTag());
