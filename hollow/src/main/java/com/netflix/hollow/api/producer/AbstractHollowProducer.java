@@ -607,7 +607,7 @@ abstract class AbstractHollowProducer {
             if (!blob.type.equals(HollowProducer.Blob.Type.SNAPSHOT)) {
                 // Don't allow producer to enable/disable between validating primary status and publishing for delta
                 // or reverse delta blobs. No need to check for primary status when publishing snapshots because a
-                // snapshot publishby a non-primary producer would be harmless, and the wasted effort is justified
+                // snapshot publish by a non-primary producer would be harmless, and the wasted effort is justified
                 // by the shorter wait for a call to release the primary status when artifacts are being published.
                 try {
                     singleProducerEnforcer.lock();
@@ -617,7 +617,7 @@ abstract class AbstractHollowProducer {
                         // producer instance could have been running concurrently as primary and that could break the delta chain.
                         log.log(Level.INFO,
                                 "Publish failed because current producer is not primary (aka leader)");
-                        throw new IllegalStateException("Publish failed primary (aka leader) check");
+                        throw new HollowProducer.NotPrimaryMidCycleException("Publish failed primary (aka leader) check");
                     }
                     publishBlob(blob);
                 } finally {
@@ -837,7 +837,7 @@ abstract class AbstractHollowProducer {
                         // have been running concurrently as primary and that would break the delta chain.
                         log.log(Level.INFO,
                                 "Fail the announcement because current producer is not primary (aka leader)");
-                        throw new IllegalStateException("Announcement failed primary (aka leader) check");
+                        throw new HollowProducer.NotPrimaryMidCycleException("Announcement failed primary (aka leader) check");
                     }
                     announcer.announce(readState.getVersion(), readState.getStateEngine().getHeaderTags());
                 } finally {

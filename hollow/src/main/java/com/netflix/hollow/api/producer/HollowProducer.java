@@ -333,6 +333,15 @@ public class HollowProducer extends AbstractHollowProducer {
             super(type.name() + " checksum invalid");
         }
     }
+    /**
+     * This exception is thrown when a publishing producer for the current cycle is not primary.
+     * */
+    public static final class NotPrimaryMidCycleException extends IllegalStateException {
+
+        NotPrimaryMidCycleException(String message) {
+            super(message);
+        }
+    }
 
     public interface VersionMinter {
         /**

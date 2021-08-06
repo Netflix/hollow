@@ -160,6 +160,7 @@ public class HollowProducerTest {
                 ws.add(2);
             });
         } catch (IllegalStateException e) {
+            Assert.assertTrue(e instanceof HollowProducer.NotPrimaryMidCycleException);
             Assert.assertEquals("Publish failed primary (aka leader) check", e.getMessage());
             return;
         }
@@ -179,7 +180,7 @@ public class HollowProducerTest {
             producer.runCycle(ws -> {
                 ws.add(1);
             });
-        } catch (IllegalStateException e) {
+        } catch (HollowProducer.NotPrimaryMidCycleException e) {
             Assert.assertEquals("Announcement failed primary (aka leader) check", e.getMessage());
             return;
         }
