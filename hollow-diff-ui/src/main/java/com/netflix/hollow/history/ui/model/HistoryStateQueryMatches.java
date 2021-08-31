@@ -76,6 +76,9 @@ public class HistoryStateQueryMatches {
 
             
             HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping = historicalState.getKeyOrdinalMapping().getTypeMapping(type);
+            if (typeKeyMapping == null) {
+                return;
+            }
             HollowObjectTypeDataAccess typeDataAccess = (HollowObjectTypeDataAccess) historicalState.getDataAccess().getTypeDataAccess(type);
 
             for(int i=0;i<queryMatchingKeys.size();i++) {
