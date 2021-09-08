@@ -50,7 +50,12 @@ public abstract class HistoryPage {
         ctx.put("showHomeLink", !(this instanceof HistoryOverviewPage));
         ctx.put("basePath", ui.getBaseURLPath());
 
-        setUpContext(req, session, ctx);
+        try {
+            setUpContext(req, session, ctx);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
 
         if(includeHeaderAndFooter())
             headerTemplate.merge(ctx, writer);
