@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.HollowConsumer.Blob.BlobType;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -25,6 +27,7 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.OptionalInt;
 
 public class HollowListTypeWriteState extends HollowTypeWriteState {
 
@@ -232,7 +235,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void calculateDelta() {
-        calculateDelta(previousCyclePopulated, currentCyclePopulated);
+        calculateDelta(previousCyclePopulated, currentCyclePopulated, BlobType.DELTA);
     }
 
     @Override
@@ -242,7 +245,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void calculateReverseDelta() {
-        calculateDelta(currentCyclePopulated, previousCyclePopulated);
+        calculateDelta(currentCyclePopulated, previousCyclePopulated, BlobType.REVERSE_DELTA);
     }
 
     @Override
@@ -250,7 +253,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         writeCalculatedDelta(dos);
     }
 
-    private void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated) {
+    private void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, BlobType blobType) {
         maxOrdinal = ordinalMap.maxOrdinal();
 
         numListsInDelta = new int[numShards];
@@ -260,7 +263,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         elementArray = new FixedLengthElementArray[numShards];
         deltaAddedOrdinals = new ByteDataArray[numShards];
         deltaRemovedOrdinals = new ByteDataArray[numShards];
-        
+
         ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
         
         int shardMask = numShards - 1;
@@ -287,6 +290,8 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         long elementCounter[] = new long[numShards];
         int previousRemovedOrdinal[] = new int[numShards];
         int previousAddedOrdinal[] = new int[numShards];
+        int addedCount = 0;
+        int removedCount = 0;
 
         for(int ordinal=0;ordinal<=maxOrdinal;ordinal++) {
             int shardNumber = ordinal & shardMask;
@@ -309,12 +314,19 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
 
                 int shardOrdinal = ordinal / numShards;
                 VarInt.writeVInt(deltaAddedOrdinals[shardNumber], shardOrdinal - previousAddedOrdinal[shardNumber]);
+                addedCount++;
                 previousAddedOrdinal[shardNumber] = shardOrdinal;
             } else if(fromCyclePopulated.get(ordinal) && !toCyclePopulated.get(ordinal)) {
                 int shardOrdinal = ordinal / numShards;
                 VarInt.writeVInt(deltaRemovedOrdinals[shardNumber], shardOrdinal - previousRemovedOrdinal[shardNumber]);
+                removedCount++;
                 previousRemovedOrdinal[shardNumber] = shardOrdinal;
             }
+        }
+
+        if (blobType.equals(HollowConsumer.Blob.BlobType.DELTA)) {
+            deltaAddedOrdinalCount = OptionalInt.of(addedCount);
+            deltaRemovedOrdinalCount = OptionalInt.of(removedCount);
         }
     }
 
