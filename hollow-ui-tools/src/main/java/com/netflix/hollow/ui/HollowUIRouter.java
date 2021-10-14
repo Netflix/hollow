@@ -72,8 +72,12 @@ public abstract class HollowUIRouter {
 
     protected boolean serveResource(HttpServletRequest req, HttpServletResponse resp, String resourceName) {
         try {
-            if(req.getParameter("contentType") != null) {
-                resp.setContentType(resourceName);
+            if(resourceName.endsWith(".css")) {
+                resp.setContentType("text/css");
+            } else if(resourceName.endsWith(".js")) {
+                resp.setContentType("text/javascript");
+            } else if(resourceName.endsWith(".png")) {
+                resp.setContentType("image/png");
             }
 
             InputStream is = this.getClass().getResourceAsStream("/" + resourceName);
