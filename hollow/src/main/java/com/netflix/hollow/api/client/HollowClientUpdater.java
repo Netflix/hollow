@@ -43,6 +43,7 @@ public class HollowClientUpdater {
     private final HollowUpdatePlanner planner;
     private final CompletableFuture<Long> initialLoad;
     private boolean forceDoubleSnapshot = false;
+    private volatile boolean schemaChanged = false;
     private final FailedTransitionTracker failedTransitionTracker;
     private final StaleHollowReferenceDetector staleReferenceDetector;
 
@@ -106,7 +107,6 @@ public class HollowClientUpdater {
                 LOG.warning("No versions to update to, initializing to empty state");
                 // attempting to refresh, but no available versions - initialize to empty state
                 hollowDataHolderVolatile = newHollowDataHolder();
-                forceDoubleSnapshotNextUpdate(); // intentionally ignore doubleSnapshotConfig
             }
             return true;
         }
@@ -170,6 +170,7 @@ public class HollowClientUpdater {
                         throw t;
                     }
                     forceDoubleSnapshot = false;
+                    schemaChanged = false;
                 }
             } else {    // 0 snapshot and 1+ delta transitions
                 hollowDataHolderVolatile.update(updatePlan, localListeners, () -> {});
@@ -231,11 +232,21 @@ public class HollowClientUpdater {
     }
 
     /**
+     * Registers that a schema change was detected. {@code HollowClientUpdater} will then attempt a double snapshot
+     * on the next refresh if {@link com.netflix.hollow.api.consumer.HollowConsumer.DoubleSnapshotConfig} sets both
+     * {@code attemptOnSchemaChange()} and {@code allowDoubleSnapshot}.
+     */
+    public void schemaChanged() {
+        this.schemaChanged = true;
+    }
+
+    /**
      * Whether or not a snapshot plan should be created. Visible for testing.
      */
     boolean shouldCreateSnapshotPlan() {
         return getCurrentVersionId() == HollowConstants.VERSION_NONE
-            ||  (forceDoubleSnapshot && doubleSnapshotConfig.allowDoubleSnapshot());
+           || (forceDoubleSnapshot && doubleSnapshotConfig.allowDoubleSnapshot())
+           || (schemaChanged && doubleSnapshotConfig.attemptOnSchemaChange() && doubleSnapshotConfig.allowDoubleSnapshot());
     }
 
     private HollowDataHolder newHollowDataHolder() {

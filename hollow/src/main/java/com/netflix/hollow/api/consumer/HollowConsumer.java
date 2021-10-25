@@ -26,6 +26,7 @@ import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClientUpdater;
 import com.netflix.hollow.api.client.StaleHollowReferenceDetector;
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
+import com.netflix.hollow.api.consumer.fs.HollowFilesystemAnnouncementWatcher;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
@@ -356,9 +357,18 @@ public class HollowConsumer {
 
     /**
      * Will force a double snapshot refresh on the next update.
+     * Honors {@code doubleSnapshotConfig.allowDoubleSnapshot()}.
      */
     public void forceDoubleSnapshotNextUpdate() {
         updater.forceDoubleSnapshotNextUpdate();
+    }
+
+    /**
+     * Registers that a schema change was detected. A double snapshot will be attempted on the next refresh if the
+     * specified {@link DoubleSnapshotConfig} sets both {@code attemptOnSchemaChange()} and {@code allowDoubleSnapshot}.
+     */
+    public void schemaChanged() {
+        updater.schemaChanged();
     }
 
     /**
@@ -607,7 +617,7 @@ public class HollowConsumer {
         long getLatestVersion();
 
         /**
-         * Implementations of this method should subscribe a HollowConsumer to updates to announced versions.
+         * Implementations of this method should subscribe a HollowConsumer to update to announced versions.
          * <p>
          * When announcements are received via a push mechanism, or polling reveals a new version, a call should be placed to one
          * of the flavors of {@link HollowConsumer#triggerRefresh()} on the provided HollowConsumer.
@@ -623,6 +633,18 @@ public class HollowConsumer {
 
         int maxDeltasBeforeDoubleSnapshot();
 
+        /**
+         * Configured consumer to attempt a double snapshot update when an incoming version contains a schema change.
+         *
+         * Executing the double snapshot requires
+         *  (a) {@code allowDoubleSnapshot()} to also be set, and
+         *  (b) Notifying the consumer of presence of schema change by calling {@code consumer.schemaChanged()}
+         *      before refresh is triggered. This is typically done by the {@code AnnouncementWatcher}.
+         */
+        default boolean attemptOnSchemaChange() {
+            return false;
+        }
+
         DoubleSnapshotConfig DEFAULT_CONFIG = new DoubleSnapshotConfig() {
             @Override
             public int maxDeltasBeforeDoubleSnapshot() {
@@ -632,6 +654,11 @@ public class HollowConsumer {
             @Override
             public boolean allowDoubleSnapshot() {
                 return true;
+            }
+
+            @Override
+            public boolean attemptOnSchemaChange() {
+                return false;
             }
         };
     }
@@ -1200,6 +1227,13 @@ public class HollowConsumer {
 
             if ((filterConfig != null || typeFilter != null) && !memoryMode.supportsFiltering()) {
                 throw new UnsupportedOperationException("Filtering is not supported in shared memory mode");
+            }
+
+            if (doubleSnapshotConfig.attemptOnSchemaChange()) {
+                if (announcementWatcher != null && announcementWatcher instanceof HollowFilesystemAnnouncementWatcher) {
+                    throw new UnsupportedOperationException("Auto double snapshot on schema change is not available "
+                            + "with HollowFilesystemAnnouncementWatcher");
+                }
             }
         }
 

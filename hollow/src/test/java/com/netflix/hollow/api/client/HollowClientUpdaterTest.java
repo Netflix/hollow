@@ -28,38 +28,42 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.test.HollowWriteStateEngineBuilder;
+import com.netflix.hollow.test.consumer.TestBlobRetriever;
+import com.netflix.hollow.test.consumer.TestHollowConsumer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 public class HollowClientUpdaterTest {
-    private HollowConsumer.BlobRetriever retriever;
-    private HollowConsumer.DoubleSnapshotConfig snapshotConfig;
-    private HollowConsumerMetrics metrics;
+    @Mock private HollowConsumer.BlobRetriever retriever;
+    @Mock private HollowConsumer.DoubleSnapshotConfig snapshotConfig;
+    @Mock private HollowConsumerMetrics metrics;
+
+    @Mock private HollowConsumer.ObjectLongevityConfig objectLongevityConfig;
+    @Mock private HollowConsumer.ObjectLongevityDetector objectLongevityDetector;
+    @Mock private HollowAPIFactory apiFactory;
 
     private HollowClientUpdater subject;
-    private HollowConsumer.ObjectLongevityConfig objectLongevityConfig;
-    private HollowConsumer.ObjectLongevityDetector objectLongevityDetector;
-    private HollowAPIFactory apiFactory;
 
     @Before
     public void setUp() {
-        retriever = mock(HollowConsumer.BlobRetriever.class);
-        apiFactory = mock(HollowAPIFactory.class);
-        snapshotConfig = mock(HollowConsumer.DoubleSnapshotConfig.class);
-        objectLongevityConfig = mock(HollowConsumer.ObjectLongevityConfig.class);
-        objectLongevityDetector = mock(HollowConsumer.ObjectLongevityDetector.class);
-        metrics = mock(HollowConsumerMetrics.class);
+        MockitoAnnotations.initMocks(this);
+
         MemoryMode memoryMode = MemoryMode.ON_HEAP;
 
         subject = new HollowClientUpdater(retriever, emptyList(), apiFactory, snapshotConfig,
@@ -156,5 +160,158 @@ public class HollowClientUpdaterTest {
                 + "version or any qualifying previous versions could not be retrieved. Consumer will remain at current "
                 + "version %s until next update attempt.", v, subject.getCurrentVersionId()));
         subject.updateTo(v);
+    }
+
+    @Test
+    public void doubleSnapshotIfSchemaChangeSignaled() throws Exception {
+        HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = new HollowConsumer.DoubleSnapshotConfig() {
+            @Override public boolean allowDoubleSnapshot() {
+                return true;
+            }
+            @Override public int maxDeltasBeforeDoubleSnapshot() {
+                return 32;
+            }
+            @Override public boolean attemptOnSchemaChange() {
+                return true;
+            }
+        };
+        TransitionListener transitionListener = transitionAConsumerAndSignalSchemaChange(doubleSnapshotConfig, true);
+        // Double snapshot transition will be applied because we signal schema change and DoubleSnapshotConfig allows
+        // double snapshot on schema change.
+        assertTrue(transitionListener.getSnapshot());
+    }
+
+    @Test
+    public void noDoubleSnapshotOnSchemaChangeIfNotConfigured() throws IOException {
+        HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = new HollowConsumer.DoubleSnapshotConfig() {
+            @Override public boolean allowDoubleSnapshot() {
+                return true;
+            }
+            @Override public int maxDeltasBeforeDoubleSnapshot() {
+                return 32;
+            }
+            @Override public boolean attemptOnSchemaChange() {
+                return false;
+            }
+        };
+        TransitionListener transitionListener = transitionAConsumerAndSignalSchemaChange(doubleSnapshotConfig, true);
+        // Delta transition will be applied despite signaling schema change because DoubleSnapshotConfig does not
+        // attempt double snapshot on schema change
+        assertTrue(transitionListener.getDelta());
+    }
+
+    @Test
+    public void noDoubleSnapshotOnSchemaChangeIfDoubleSnapshotsDisabled() throws IOException {
+        HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = new HollowConsumer.DoubleSnapshotConfig() {
+            @Override public boolean allowDoubleSnapshot() {
+                return false;
+            }
+            @Override public int maxDeltasBeforeDoubleSnapshot() {
+                return 32;
+            }
+            @Override public boolean attemptOnSchemaChange() {
+                return true;
+            }
+        };
+        TransitionListener transitionListener = transitionAConsumerAndSignalSchemaChange(doubleSnapshotConfig, true);
+        // Delta transition will be applied despite signaling schema change because DoubleSnapshotConfig does not
+        // allow double snapshots
+        assertTrue(transitionListener.getDelta());
+    }
+
+    @Test
+    public void noDoubleSnapshotIfNoSchemaChangeSignaled() throws Exception {
+        HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = new HollowConsumer.DoubleSnapshotConfig() {
+            @Override public boolean allowDoubleSnapshot() {
+                return true;
+            }
+            @Override public int maxDeltasBeforeDoubleSnapshot() {
+                return 32;
+            }
+            @Override public boolean attemptOnSchemaChange() {
+                return true;
+            }
+        };
+        TransitionListener transitionListener = transitionAConsumerAndSignalSchemaChange(doubleSnapshotConfig, false);
+        // Delta transition was applied because although DoubleSnapshotConfig was configured to double snapshot on
+        // schema change, no signal was sent to consumer that schema changed
+        assertTrue(transitionListener.getDelta());
+        assertFalse(transitionListener.getSnapshot());
+    }
+
+    /**
+     * Transitions a TestHollowConsumer to initial load and then applies a refresh when both snapshot and
+     * delta are available. It is used to test which transition was applied by the consumer for variations
+     * of {@code DoubleSnapshotConfig} and {@code signalSchemaChange}.
+     */
+    private TransitionListener transitionAConsumerAndSignalSchemaChange(
+            HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig, boolean signalSchemaChange)
+            throws IOException {
+        TransitionListener transitionListener = new TransitionListener();
+        TestHollowConsumer consumer = new TestHollowConsumer.Builder()
+                .withBlobRetriever(new TestBlobRetriever())
+                .withDoubleSnapshotConfig(doubleSnapshotConfig)
+                .withRefreshListener(transitionListener)
+                .build();
+
+        HollowWriteStateEngine state1 = new HollowWriteStateEngineBuilder(Collections.singletonList(Object.class))
+                .add(new Object())
+                .build();
+        HollowWriteStateEngine state2Snapshot = new HollowWriteStateEngineBuilder(Collections.singletonList(
+                Object.class))
+                .add(new Object())
+                .build();
+        HollowWriteStateEngine state2Delta = new HollowWriteStateEngineBuilder(Collections.singletonList(Object.class))
+                .add(new Object())
+                .build();
+
+        // SNAPSHOT
+        consumer.applySnapshot(1L, state1);
+        assertTrue(transitionListener.getSnapshot());
+        assertFalse(transitionListener.getDelta());
+
+        // Register both SNAPSHOT and DELTA, let HollowClientUpdater pick which to apply based on
+        // DoubleSnapshotConfig. Later, identify which one was applied based on data in snapshot or delta state
+        consumer.addSnapshot(2L, state2Snapshot);
+        consumer.addDelta(1L, 2L, state2Delta);
+
+        if (signalSchemaChange) {
+            consumer.schemaChanged();   // signal to consumer that schema changed
+        }
+
+        consumer.triggerRefreshTo(2L);
+        return transitionListener;
+    }
+
+    /**
+     * Detects whether a consumer transition involved a snapshot or delta update
+     */
+    class TransitionListener implements HollowConsumer.RefreshListener {
+        private boolean snapshot = false;
+        private boolean delta = false;
+
+        boolean getSnapshot() {
+            return snapshot;
+        }
+        boolean getDelta() {
+            return delta;
+        }
+
+        @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+            snapshot = false;
+            delta = false;
+        }
+        @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+            snapshot = true;
+        }
+        @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+            delta = true;
+        }
+        @Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
+            fail();
+        }
+
+        @Override public void blobLoaded(HollowConsumer.Blob transition) {}
+        @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {}
     }
 }
