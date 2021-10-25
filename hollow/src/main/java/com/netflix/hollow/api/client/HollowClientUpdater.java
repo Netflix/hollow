@@ -106,7 +106,7 @@ public class HollowClientUpdater {
                 LOG.warning("No versions to update to, initializing to empty state");
                 // attempting to refresh, but no available versions - initialize to empty state
                 hollowDataHolderVolatile = newHollowDataHolder();
-                forceDoubleSnapshotNextUpdate(); // intentionally ignore doubleSnapshotConfig
+                forceDoubleSnapshotNextUpdate();
             }
             return true;
         }

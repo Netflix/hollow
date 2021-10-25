@@ -26,6 +26,7 @@ import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClientUpdater;
 import com.netflix.hollow.api.client.StaleHollowReferenceDetector;
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
+import com.netflix.hollow.api.consumer.fs.HollowFilesystemAnnouncementWatcher;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
@@ -125,6 +126,7 @@ public class HollowConsumer {
 
     private final Executor refreshExecutor;
     private final MemoryMode memoryMode;
+    private final DoubleSnapshotConfig doubleSnapshotConfig;
 
     /**
      * @deprecated use {@link HollowConsumer.Builder}
@@ -163,6 +165,7 @@ public class HollowConsumer {
                              MemoryMode memoryMode,
                              HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
         this.metrics = new HollowConsumerMetrics();
+        this.doubleSnapshotConfig = doubleSnapshotConfig;
         this.updater = new HollowClientUpdater(blobRetriever,
                 refreshListeners,
                 apiFactory,
@@ -186,6 +189,7 @@ public class HollowConsumer {
         // duplicated with HollowConsumer(...) constructor above. We cannot chain constructor calls because that
         // constructor subscribes to the announcement watcher and we have more setup to do first
         this.metrics = new HollowConsumerMetrics();
+        this.doubleSnapshotConfig = builder.doubleSnapshotConfig;
         this.updater = new HollowClientUpdater(builder.blobRetriever,
                 builder.refreshListeners,
                 builder.apiFactory,
@@ -344,6 +348,14 @@ public class HollowConsumer {
     }
 
     /**
+     * @return Double snapshot config for consumer, controls whether consumer is
+     * able to update using snapshot instead of delta states
+     */
+    public DoubleSnapshotConfig getDoubleSnapshotConfig() {
+        return doubleSnapshotConfig;
+    }
+
+    /**
      * Equivalent to calling {@link #getAPI()} and casting to the specified API.
      *
      * @param apiClass the class of the API
@@ -356,6 +368,7 @@ public class HollowConsumer {
 
     /**
      * Will force a double snapshot refresh on the next update.
+     * Honors {@code doubleSnapshotConfig.allowDoubleSnapshot()}.
      */
     public void forceDoubleSnapshotNextUpdate() {
         updater.forceDoubleSnapshotNextUpdate();
@@ -623,6 +636,15 @@ public class HollowConsumer {
 
         int maxDeltasBeforeDoubleSnapshot();
 
+        /**
+         * Controls whether a consumer should attempt a double snapshot update to a version
+         * when that version contains a schema change. Executing the double snapshot
+         * requires {@code allowDoubleSnapshot()} to also be set.
+         */
+        default boolean attemptOnSchemaUpdate() {
+            return false;
+        }
+
         DoubleSnapshotConfig DEFAULT_CONFIG = new DoubleSnapshotConfig() {
             @Override
             public int maxDeltasBeforeDoubleSnapshot() {
@@ -632,6 +654,11 @@ public class HollowConsumer {
             @Override
             public boolean allowDoubleSnapshot() {
                 return true;
+            }
+
+            @Override
+            public boolean attemptOnSchemaUpdate() {
+                return false;
             }
         };
     }
@@ -1200,6 +1227,13 @@ public class HollowConsumer {
 
             if ((filterConfig != null || typeFilter != null) && !memoryMode.supportsFiltering()) {
                 throw new UnsupportedOperationException("Filtering is not supported in shared memory mode");
+            }
+
+            if (doubleSnapshotConfig.attemptOnSchemaUpdate()) {
+                if (announcementWatcher != null && announcementWatcher instanceof HollowFilesystemAnnouncementWatcher) {
+                    throw new UnsupportedOperationException("Auto double snapshot on schema change is not available "
+                            + "with HollowFilesystemAnnouncementWatcher");
+                }
             }
         }
 
