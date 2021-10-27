@@ -90,8 +90,7 @@ public class HollowPerformanceAPIGenerator {
         generate(dataset, packageName, apiClassname, destinationPath, checkFieldExistsMethods);
     }
     
-    private static void generate(HollowDataset dataset, String packageName, String apiClassName, Path destination, Set<String> checkFieldExistsMethods)
-            throws IOException {
+    private void generate(HollowDataset dataset, String packageName, String apiClassName, Path destination, Set<String> checkFieldExistsMethods) throws IOException {
         Path apiClassDestination = destination.resolve(apiClassName + ".java");
         if (!Files.exists(apiClassDestination)) {
             Files.createDirectories(destination);
