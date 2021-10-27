@@ -201,6 +201,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                 String filename = path.getFileName().toString();
                 if(filename.startsWith("delta-" + currentVersion)) {
                     long destinationVersion = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
+                    // TODO: to support double snapshot on schema change add schema change flag to file name
                     return filesystemBlob(BlobType.DELTA, currentVersion, destinationVersion);
                 }
             }

@@ -501,6 +501,8 @@ public class HollowConsumer {
         private final long toVersion;
         private final BlobType blobType;
 
+        private boolean schemaChange;
+
         /**
          * Instantiate a snapshot to a specified data state version.
          *
@@ -526,6 +528,11 @@ public class HollowConsumer {
                 this.blobType = BlobType.REVERSE_DELTA;
             else
                 this.blobType = BlobType.DELTA;
+        }
+
+        public Blob(long fromVersion, long toVersion, boolean schemaChange) {
+            this(fromVersion, toVersion);
+            this.schemaChange = schemaChange;
         }
 
         /**
@@ -597,6 +604,10 @@ public class HollowConsumer {
         public BlobType getBlobType() {
             return blobType;
         }
+
+        public boolean getSchemaChange() {
+            return schemaChange;
+        }
     }
 
     /**
@@ -634,12 +645,11 @@ public class HollowConsumer {
         int maxDeltasBeforeDoubleSnapshot();
 
         /**
-         * Configured consumer to attempt a double snapshot update when an incoming version contains a schema change.
+         * Attempt a double snapshot update when an incoming version contains a schema change.
+         * Executing the double snapshot also requires {@code allowDoubleSnapshot()} to also be set.
          *
-         * Executing the double snapshot requires
-         *  (a) {@code allowDoubleSnapshot()} to also be set, and
-         *  (b) Notifying the consumer of presence of schema change by calling {@code consumer.schemaChanged()}
-         *      before refresh is triggered. This is typically done by the {@code AnnouncementWatcher}.
+         * NOTE: The consumer needs to be notified of schema changes by calling {@code consumer.schemaChanged()}.
+         *       This is typically handled by the {@code AnnouncementWatcher} implementation.
          */
         default boolean attemptOnSchemaChange() {
             return false;

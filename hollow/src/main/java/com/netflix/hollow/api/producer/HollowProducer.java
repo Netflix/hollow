@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -578,6 +579,10 @@ public class HollowProducer extends AbstractHollowProducer {
          * @param blob the blob to publish
          */
         void publish(HollowProducer.Blob blob);
+
+        default void publish(HollowProducer.Blob blob, Map<String, String> metadata) {
+            publish(blob);
+        }
     }
 
     public static abstract class Blob {

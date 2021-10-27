@@ -50,7 +50,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -366,21 +368,23 @@ abstract class AbstractHollowProducer {
 
             // 3. Produce a new state if there's work to do
             if (writeEngine.hasChangedSinceLastCycle()) {
-                boolean schemaChangedFromPriorVersion = readStates.hasCurrent() &&
+                boolean schemaChanged = readStates.hasCurrent() &&
                         !writeEngine.hasIdenticalSchemas(readStates.current().getStateEngine());
-                if (schemaChangedFromPriorVersion) {
+                Map<String, String> deltaMetadata = new HashMap<>();
+                if (schemaChanged) {
                     writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE, Boolean.TRUE.toString());
+                    deltaMetadata.put(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE, Boolean.TRUE.toString());
                 } else {
                     writeEngine.getHeaderTags().remove(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE);
                 }
 
                 // 3a. Publish, run checks & validation, then announce new state consumers
-                publish(listeners, toVersion, artifacts);
+                publish(listeners, toVersion, artifacts, deltaMetadata);
 
                 ReadStateHelper candidate = readStates.roundtrip(toVersion);
                 cycleStatus.readState(candidate.pending());
                 candidate = doIntegrityCheck ? 
-                        checkIntegrity(listeners, candidate, artifacts, schemaChangedFromPriorVersion) :
+                        checkIntegrity(listeners, candidate, artifacts, schemaChanged) :
                             noIntegrityCheck(candidate, artifacts);
 
                 try {
@@ -541,7 +545,8 @@ abstract class AbstractHollowProducer {
     /*
      * Publish the write state, storing the artifacts in the provided object. Visible for testing.
      */
-    void publish(ProducerListeners listeners, long toVersion, Artifacts artifacts) throws IOException {
+    void publish(ProducerListeners listeners, long toVersion, Artifacts artifacts,
+            Map<String, String> deltaMetadata) throws IOException {
         Status.StageBuilder psb = listeners.firePublishStart(toVersion);
         try {
             if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
@@ -553,7 +558,7 @@ abstract class AbstractHollowProducer {
                 artifacts.reverseDelta = stageBlob(listeners,
                         blobStager.openReverseDelta(toVersion, readStates.current().getVersion()));
 
-                publishBlob(listeners, artifacts.delta);
+                publishBlob(listeners, artifacts.delta, deltaMetadata);
                 publishBlob(listeners, artifacts.reverseDelta);
 
                 if (--numStatesUntilNextSnapshot < 0) {
@@ -601,6 +606,10 @@ abstract class AbstractHollowProducer {
     }
 
     private void publishBlob(ProducerListeners listeners, HollowProducer.Blob blob) {
+        publishBlob(listeners, blob, new HashMap<>());
+    }
+
+    private void publishBlob(ProducerListeners listeners, HollowProducer.Blob blob, Map<String, String> deltaMetadata) {
         Status.PublishBuilder builder = new Status.PublishBuilder();
         try {
             builder.blob(blob);
@@ -619,7 +628,11 @@ abstract class AbstractHollowProducer {
                                 "Publish failed because current producer is not primary (aka leader)");
                         throw new HollowProducer.NotPrimaryMidCycleException("Publish failed primary (aka leader) check");
                     }
-                    publishBlob(blob);
+                    if (blob.type.equals(HollowProducer.Blob.Type.DELTA)) {
+                        publishBlob(blob, deltaMetadata);
+                    } else {
+                        publishBlob(blob);
+                    }
                 } finally {
                     singleProducerEnforcer.unlock();
                 }
@@ -676,8 +689,12 @@ abstract class AbstractHollowProducer {
     }
 
     private void publishBlob(HollowProducer.Blob b) {
+        publisher.publish(b, new HashMap<>());
+    }
+
+    private void publishBlob(HollowProducer.Blob b, Map<String, String> metadata) {
         try {
-            publisher.publish(b);
+            publisher.publish(b, metadata);
         } finally {
             blobStorageCleaner.clean(b.getType());
         }

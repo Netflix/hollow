@@ -34,6 +34,8 @@ public class HollowUpdatePlan implements Iterable<HollowConsumer.Blob> {
 
     private final List<HollowConsumer.Blob> transitions;
 
+    private boolean containsSchemaChange = false;
+
     private HollowUpdatePlan(List<HollowConsumer.Blob> transitions) {
         this.transitions = transitions;
     }
@@ -44,6 +46,14 @@ public class HollowUpdatePlan implements Iterable<HollowConsumer.Blob> {
 
     public boolean isSnapshotPlan() {
         return !transitions.isEmpty() && transitions.get(0).isSnapshot();
+    }
+
+    public boolean isContainsSchemaChange() {
+        return containsSchemaChange;
+    }
+
+    public void containsSchemaChange() {
+        this.containsSchemaChange = true;
     }
 
     public HollowConsumer.Blob getSnapshotTransition() {

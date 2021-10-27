@@ -61,6 +61,10 @@ public class HollowUpdatePlanner {
         return planUpdate(HollowConstants.VERSION_NONE, desiredVersion, true);
     }
 
+    public HollowUpdatePlan planUpdate(long currentVersion, long desiredVersion, boolean allowSnapshot) throws Exception {
+        return planUpdate(currentVersion, desiredVersion, allowSnapshot, false);
+    }
+
     /**
      * @param currentVersion - The current version of the hollow state engine, or HollowConstants.VERSION_NONE if not yet initialized
      * @param desiredVersion - The version to which the hollow state engine should be updated once the resultant steps are applied.
@@ -68,7 +72,8 @@ public class HollowUpdatePlanner {
      * @return the sequence of steps necessary to bring a hollow state engine up to date.
      * @throws Exception if the plan cannot be updated
      */
-    public HollowUpdatePlan planUpdate(long currentVersion, long desiredVersion, boolean allowSnapshot) throws Exception {
+    public HollowUpdatePlan planUpdate(long currentVersion, long desiredVersion, boolean allowSnapshot,
+            boolean doubleSnashotOnSchemaChange) throws Exception {
         if(desiredVersion == currentVersion)
             return HollowUpdatePlan.DO_NOTHING;
 
@@ -79,10 +84,15 @@ public class HollowUpdatePlanner {
 
         long deltaDestinationVersion = deltaPlan.destinationVersion(currentVersion);
 
+        if (deltaPlan.isContainsSchemaChange() && doubleSnashotOnSchemaChange && allowSnapshot) {
+            HollowUpdatePlan snapshotPlan = snapshotPlan(desiredVersion);
+        }
+
         if(deltaDestinationVersion != desiredVersion && allowSnapshot) {
             HollowUpdatePlan snapshotPlan = snapshotPlan(desiredVersion);
             long snapshotDestinationVersion = snapshotPlan.destinationVersion(currentVersion);
 
+            // TODO: review
             if(snapshotDestinationVersion == desiredVersion
                     || ((deltaDestinationVersion > desiredVersion) && (snapshotDestinationVersion < desiredVersion))
                     || ((snapshotDestinationVersion < desiredVersion) && (snapshotDestinationVersion > deltaDestinationVersion)))
@@ -162,6 +172,9 @@ public class HollowUpdatePlanner {
         HollowConsumer.Blob transition = transitionCreator.retrieveDeltaBlob(currentVersion);
 
         if(transition != null) {
+            if (transition.getSchemaChange()) { // SNAP: TODO: validate that delta blob also contains schema change metadata, not just announcements
+                plan.containsSchemaChange();
+            }
             if(transition.getToVersion() <= desiredVersion) {
                 plan.add(transition);
             }

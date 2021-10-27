@@ -46,6 +46,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
     protected Path stagingPath;
     protected BlobCompressor compressor;
     protected ProducerOptionalBlobPartConfig optionalPartConfig;
+    protected Map<String, String> metadata;
 
     /**
      * Constructor to create a new HollowFilesystemBlobStager with default disk path
@@ -68,9 +69,15 @@ public class HollowFilesystemBlobStager implements BlobStager {
     }
 
     public HollowFilesystemBlobStager(Path stagingPath, BlobCompressor compressor, ProducerOptionalBlobPartConfig optionalPartConfig) throws RuntimeException {
+        this(stagingPath, compressor, optionalPartConfig, new HashMap<>());
+    }
+
+    public HollowFilesystemBlobStager(Path stagingPath, BlobCompressor compressor, ProducerOptionalBlobPartConfig optionalPartConfig,
+            Map<String, String> metadata) throws RuntimeException {
         this.stagingPath = stagingPath;
         this.compressor = compressor;
         this.optionalPartConfig = optionalPartConfig;
+        this.metadata = metadata;
 
         try {
             if (!Files.exists(stagingPath))
