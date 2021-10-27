@@ -18,6 +18,8 @@ package com.netflix.hollow.core.schema;
 
 import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.HollowDataset;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +62,15 @@ public class SimpleHollowDataset implements HollowDataset {
         if(schema == null)
             throw new SchemaNotFoundException(typeName, schemas.keySet());
         return schema;
+    }
+
+    public static SimpleHollowDataset fromClassDefinitions(Class<?>... classes) {
+        HollowWriteStateEngine stateEngine = new HollowWriteStateEngine();
+        HollowObjectMapper mapper = new HollowObjectMapper(stateEngine);
+        for(Class<?> clazz : classes) {
+            mapper.initializeTypeState(clazz);
+        }
+        return new SimpleHollowDataset(stateEngine.getSchemas());
     }
 
 }
