@@ -1013,6 +1013,13 @@ public class HollowConsumer {
         }
 
         /**
+         * @see #withLocalBlobStore(File)
+         */
+        public B withLocalBlobStore(String localBlobStoreDir) {
+            return withLocalBlobStore(new File(localBlobStoreDir));
+        }
+
+        /**
          * Provide a directory that will be used to cache blobs.
          *
          * When this is supplied, Hollow will look in this directory for a blob before falling back
@@ -1036,6 +1043,13 @@ public class HollowConsumer {
             this.localBlobStoreDir = localBlobStoreDir;
             this.useExistingStaleSnapshot = useExistingStaleSnapshot;
             return (B)this;
+        }
+
+        /**
+         * @see #withLocalBlobStore(File, boolean)
+         */
+        public B withLocalBlobStore(String localBlobStoreDir, boolean useExistingStaleSnapshot) {
+            return withLocalBlobStore(new File(localBlobStoreDir), useExistingStaleSnapshot);
         }
 
         public B withAnnouncementWatcher(HollowConsumer.AnnouncementWatcher announcementWatcher) {
