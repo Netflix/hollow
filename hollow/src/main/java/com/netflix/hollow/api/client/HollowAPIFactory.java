@@ -77,7 +77,12 @@ public interface HollowAPIFactory {
                 Constructor<T> constructor = generatedAPIClass.getConstructor(HollowDataAccess.class, Set.class);
                 return constructor.newInstance(dataAccess, cachedTypes);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                try {
+                    Constructor<T> constructor = generatedAPIClass.getConstructor(HollowDataAccess.class);
+                    return constructor.newInstance(dataAccess);
+                } catch(Exception e2) {
+                    throw new RuntimeException(e2);
+                }
             }
         }
 
@@ -87,7 +92,12 @@ public interface HollowAPIFactory {
                 Constructor<T> constructor = generatedAPIClass.getConstructor(HollowDataAccess.class, Set.class, Map.class, generatedAPIClass);
                 return constructor.newInstance(dataAccess, cachedTypes, Collections.emptyMap(), previousCycleAPI);
             } catch(Exception e) {
-                throw new RuntimeException(e);
+                try {
+                    Constructor<T> constructor = generatedAPIClass.getConstructor(HollowDataAccess.class);
+                    return constructor.newInstance(dataAccess);
+                } catch(Exception e2) {
+                    throw new RuntimeException(e2);
+                }
             }
         }
     }
