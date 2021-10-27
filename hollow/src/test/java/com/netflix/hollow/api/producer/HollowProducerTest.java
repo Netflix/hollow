@@ -322,7 +322,8 @@ public class HollowProducerTest {
         Assert.assertEquals("Should have no populated ordinals", 0,
                 producer.getWriteEngine().getTypeState("TestPojo").getPopulatedBitSet().cardinality());
         doThrow(new RuntimeException("Publish failed")).when(producer).publish(
-                any(ProducerListenerSupport.ProducerListeners.class), any(Long.class), any(AbstractHollowProducer.Artifacts.class));
+                any(ProducerListenerSupport.ProducerListeners.class), any(Long.class), any(AbstractHollowProducer.Artifacts.class),
+                any(boolean.class));
         try {
             producer.runCycle(newState -> newState.add(new TestPojoV1(1, 1)));
         } catch (RuntimeException e) { // expected

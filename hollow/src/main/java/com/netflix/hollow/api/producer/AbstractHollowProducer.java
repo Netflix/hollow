@@ -370,16 +370,14 @@ abstract class AbstractHollowProducer {
             if (writeEngine.hasChangedSinceLastCycle()) {
                 boolean schemaChanged = readStates.hasCurrent() &&
                         !writeEngine.hasIdenticalSchemas(readStates.current().getStateEngine());
-                Map<String, String> deltaMetadata = new HashMap<>();
                 if (schemaChanged) {
                     writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE, Boolean.TRUE.toString());
-                    deltaMetadata.put(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE, Boolean.TRUE.toString());
                 } else {
                     writeEngine.getHeaderTags().remove(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE);
                 }
 
                 // 3a. Publish, run checks & validation, then announce new state consumers
-                publish(listeners, toVersion, artifacts, deltaMetadata);
+                publish(listeners, toVersion, artifacts, schemaChanged);
 
                 ReadStateHelper candidate = readStates.roundtrip(toVersion);
                 cycleStatus.readState(candidate.pending());
@@ -545,8 +543,7 @@ abstract class AbstractHollowProducer {
     /*
      * Publish the write state, storing the artifacts in the provided object. Visible for testing.
      */
-    void publish(ProducerListeners listeners, long toVersion, Artifacts artifacts,
-            Map<String, String> deltaMetadata) throws IOException {
+    void publish(ProducerListeners listeners, long toVersion, Artifacts artifacts, boolean schemaChanged) throws IOException {
         Status.StageBuilder psb = listeners.firePublishStart(toVersion);
         try {
             if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
@@ -558,10 +555,12 @@ abstract class AbstractHollowProducer {
                 artifacts.reverseDelta = stageBlob(listeners,
                         blobStager.openReverseDelta(toVersion, readStates.current().getVersion()));
 
+                Map<String, String> deltaMetadata = new HashMap<>();
+                deltaMetadata.put(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE, Boolean.TRUE.toString());
                 publishBlob(listeners, artifacts.delta, deltaMetadata);
                 publishBlob(listeners, artifacts.reverseDelta);
 
-                if (--numStatesUntilNextSnapshot < 0) {
+                if (schemaChanged || --numStatesUntilNextSnapshot < 0) {
                     if (snapshotPublishExecutor == null) {
                         publishBlob(listeners, artifacts.snapshot);
                         artifacts.markSnapshotPublishComplete();

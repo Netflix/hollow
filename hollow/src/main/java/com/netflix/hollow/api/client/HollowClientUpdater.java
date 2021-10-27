@@ -124,7 +124,8 @@ public class HollowClientUpdater {
         try {
             HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan()
                 ? planner.planInitializingUpdate(requestedVersion)
-                : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersion, doubleSnapshotConfig);
+                : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersion,
+                        doubleSnapshotConfig.allowDoubleSnapshot(), doubleSnapshotConfig.attemptOnSchemaChange());
 
             for (HollowConsumer.RefreshListener listener : localListeners)
                 if (listener instanceof HollowConsumer.TransitionAwareRefreshListener)

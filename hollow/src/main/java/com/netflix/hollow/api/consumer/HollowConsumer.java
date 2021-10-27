@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -501,7 +502,7 @@ public class HollowConsumer {
         private final long toVersion;
         private final BlobType blobType;
 
-        private boolean schemaChange;
+        private Map<String, String> metadata;
 
         /**
          * Instantiate a snapshot to a specified data state version.
@@ -530,9 +531,9 @@ public class HollowConsumer {
                 this.blobType = BlobType.DELTA;
         }
 
-        public Blob(long fromVersion, long toVersion, boolean schemaChange) {
+        public Blob(long fromVersion, long toVersion, Map<String, String> metadata) {
             this(fromVersion, toVersion);
-            this.schemaChange = schemaChange;
+            this.metadata = metadata;
         }
 
         /**
@@ -605,8 +606,8 @@ public class HollowConsumer {
             return blobType;
         }
 
-        public boolean getSchemaChange() {
-            return schemaChange;
+        public Map<String, String> getMetadata() {
+            return metadata;
         }
     }
 

@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.api.client;
 
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.HollowConstants;
 
@@ -69,11 +71,12 @@ public class HollowUpdatePlanner {
      * @param currentVersion - The current version of the hollow state engine, or HollowConstants.VERSION_NONE if not yet initialized
      * @param desiredVersion - The version to which the hollow state engine should be updated once the resultant steps are applied.
      * @param allowSnapshot  - Allow a snapshot plan to be created if the destination version is not reachable
+     * @param attemptSnapshotOnSchemaChange - Attempt snapshot if schema change is observed (in delta publish metadata) in delta transition plan
      * @return the sequence of steps necessary to bring a hollow state engine up to date.
      * @throws Exception if the plan cannot be updated
      */
     public HollowUpdatePlan planUpdate(long currentVersion, long desiredVersion, boolean allowSnapshot,
-            boolean doubleSnashotOnSchemaChange) throws Exception {
+            boolean attemptSnapshotOnSchemaChange) throws Exception {
         if(desiredVersion == currentVersion)
             return HollowUpdatePlan.DO_NOTHING;
 
@@ -84,15 +87,15 @@ public class HollowUpdatePlanner {
 
         long deltaDestinationVersion = deltaPlan.destinationVersion(currentVersion);
 
-        if (deltaPlan.isContainsSchemaChange() && doubleSnashotOnSchemaChange && allowSnapshot) {
+        if (deltaPlan.isDeltaPlanContainsSchemaChange() && attemptSnapshotOnSchemaChange && allowSnapshot) {
             HollowUpdatePlan snapshotPlan = snapshotPlan(desiredVersion);
+            return snapshotPlan;
         }
 
         if(deltaDestinationVersion != desiredVersion && allowSnapshot) {
             HollowUpdatePlan snapshotPlan = snapshotPlan(desiredVersion);
             long snapshotDestinationVersion = snapshotPlan.destinationVersion(currentVersion);
 
-            // TODO: review
             if(snapshotDestinationVersion == desiredVersion
                     || ((deltaDestinationVersion > desiredVersion) && (snapshotDestinationVersion < desiredVersion))
                     || ((snapshotDestinationVersion < desiredVersion) && (snapshotDestinationVersion > deltaDestinationVersion)))
@@ -126,6 +129,9 @@ public class HollowUpdatePlanner {
             return HollowUpdatePlan.DO_NOTHING;
 
         plan.appendPlan(deltaPlan(nearestPreviousSnapshotVersion, desiredVersion, Integer.MAX_VALUE));
+
+        // SNAP: TODO: if plan.isDeltaPlanContainsSchemaChange() then we've initialized to old schema
+            // fix: maybe always publish snapshot if schema changed?
 
         return plan;
     }
@@ -172,8 +178,8 @@ public class HollowUpdatePlanner {
         HollowConsumer.Blob transition = transitionCreator.retrieveDeltaBlob(currentVersion);
 
         if(transition != null) {
-            if (transition.getSchemaChange()) { // SNAP: TODO: validate that delta blob also contains schema change metadata, not just announcements
-                plan.containsSchemaChange();
+            if (Boolean.TRUE.equals(transition.getMetadata().get(HEADER_TAG_SCHEMA_CHANGE))) { // SNAP: TODO: validate that delta blob also contains schema change metadata, not just announcements
+                plan.setDeltaPlanContainsSchemaChange();
             }
             if(transition.getToVersion() <= desiredVersion) {
                 plan.add(transition);
