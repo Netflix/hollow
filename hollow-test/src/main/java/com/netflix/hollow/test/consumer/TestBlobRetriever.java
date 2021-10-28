@@ -19,6 +19,7 @@ package com.netflix.hollow.test.consumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.api.consumer.HollowConsumer.HeaderBlob;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,17 +40,34 @@ public class TestBlobRetriever implements BlobRetriever {
 
     @Override
     public Blob retrieveSnapshotBlob(long desiredVersion) {
-        return snapshots.get(desiredVersion);
+        Blob b = snapshots.get(desiredVersion);
+        resetStream(b);
+        return b;
     }
 
     @Override
     public Blob retrieveDeltaBlob(long currentVersion) {
-        return deltas.get(currentVersion);
+        Blob b = deltas.get(currentVersion);
+        resetStream(b);
+        return b;
     }
 
     @Override
     public Blob retrieveReverseDeltaBlob(long currentVersion) {
-        return reverseDeltas.get(currentVersion);
+        Blob b = reverseDeltas.get(currentVersion);
+        resetStream(b);
+        return b;
+    }
+
+    // so blob can be reused
+    private void resetStream(Blob b) {
+        try {
+            if (b!= null && b.getInputStream() != null) {
+                b.getInputStream().reset();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to get and reset stream", e);
+        }
     }
 
     public void addSnapshot(long desiredVersion, Blob transition) {

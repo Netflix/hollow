@@ -134,4 +134,22 @@ public class HollowEffigy {
         COLLECTION
     }
 
+    @Override
+    public int hashCode() {
+        int hashcode = 31 + getFields().hashCode();
+        return hashcode;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if(this == other)
+            return true;
+
+        if(other instanceof HollowEffigy) {
+            HollowEffigy otherEffigy = (HollowEffigy) other;
+            return this.getFields().equals(otherEffigy.getFields());
+        }
+
+        return false;
+    }
 }

@@ -33,23 +33,23 @@ import com.netflix.hollow.core.util.RemovedOrdinalIterator;
  */
 public class HollowSetDeltaHistoricalStateCreator {
 
-    private final HollowSetTypeReadState typeState;
-    private final HollowSetTypeDataElements stateEngineDataElements[];
     private final HollowSetTypeDataElements historicalDataElements;
-    private final RemovedOrdinalIterator iter;
-    
+
     private final int shardNumberMask;
     private final int shardOrdinalShift;
 
+    private HollowSetTypeReadState typeState;
+    private HollowSetTypeDataElements stateEngineDataElements[];
+    private RemovedOrdinalIterator iter;
     private IntMap ordinalMapping;
     private int nextOrdinal;
     private long nextStartBucket;
 
-    public HollowSetDeltaHistoricalStateCreator(HollowSetTypeReadState typeState) {
+    public HollowSetDeltaHistoricalStateCreator(HollowSetTypeReadState typeState, boolean reverse) {
         this.typeState = typeState;
         this.stateEngineDataElements = typeState.currentDataElements();
         this.historicalDataElements = new HollowSetTypeDataElements(WastefulRecycler.DEFAULT_INSTANCE);
-        this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class));
+        this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class), reverse);
         this.shardNumberMask = stateEngineDataElements.length - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(stateEngineDataElements.length);
     }
@@ -69,6 +69,12 @@ public class HollowSetDeltaHistoricalStateCreator {
 
             ordinal = iter.next();
         }
+    }
+
+    public void dereferenceTypeState() {
+        this.typeState = null;
+        this.stateEngineDataElements = null;
+        this.iter = null;
     }
 
     public IntMap getOrdinalMapping() {

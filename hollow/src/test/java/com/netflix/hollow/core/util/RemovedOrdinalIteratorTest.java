@@ -22,12 +22,12 @@ import org.junit.Test;
 
 public class RemovedOrdinalIteratorTest {
 
+    private static final BitSet PREVIOUS_ORDINALS = bitSet(1, 2, 3, 4, 6, 7, 9, 10);
+    private static final BitSet CURRENT_ORDINALS = bitSet(1, 3, 4, 5, 7, 8, 9);
+
     @Test
     public void iteratesOverRemovedOrdinals() {
-        BitSet previousOrdinals = bitSet(1, 2, 3, 4, 6, 7, 9, 10);
-        BitSet currentOrdinals = bitSet(1, 3, 4, 5, 7, 8, 9);
-
-        RemovedOrdinalIterator iter = new RemovedOrdinalIterator(previousOrdinals, currentOrdinals);
+        RemovedOrdinalIterator iter = new RemovedOrdinalIterator(PREVIOUS_ORDINALS, CURRENT_ORDINALS);
 
         Assert.assertEquals(2, iter.next());
         Assert.assertEquals(6, iter.next());
@@ -35,7 +35,16 @@ public class RemovedOrdinalIteratorTest {
         Assert.assertEquals(-1, iter.next());
     }
 
-    private BitSet bitSet(int... setBits) {
+    @Test
+    public void iteratesOverAddedOrdinals() {
+        RemovedOrdinalIterator iterFlip = new RemovedOrdinalIterator(PREVIOUS_ORDINALS, CURRENT_ORDINALS, true);
+
+        Assert.assertEquals(5, iterFlip.next());
+        Assert.assertEquals(8, iterFlip.next());
+        Assert.assertEquals(-1, iterFlip.next());
+    }
+
+    private static BitSet bitSet(int... setBits) {
         BitSet bitSet = new BitSet();
         for(int bit : setBits) {
             bitSet.set(bit);

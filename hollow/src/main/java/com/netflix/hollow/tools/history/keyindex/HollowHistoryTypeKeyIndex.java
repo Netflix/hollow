@@ -93,14 +93,18 @@ public class HollowHistoryTypeKeyIndex {
         readStateEngine=readEngine;
     }
 
-    public void update(HollowObjectTypeReadState latestTypeState, boolean isDelta) {
-        copyExistingKeys();
+    public void update(HollowObjectTypeReadState latestTypeState, boolean isDeltaAndIndexInitialized) {
+        // copies over keys corresponding to previously populated ordinals AND currently populated ordinals
+        copyExistingKeys(); // only populates the ordianl map (to be the OR of previous and current ordinals)
         if (latestTypeState == null) return;
 
-        if (isDelta)
-            populateNewCurrentRecordKeys(latestTypeState);
-        else
-            populateAllCurrentRecordKeys(latestTypeState);
+        if (isDeltaAndIndexInitialized) {
+            // record all newly seen keys when going from v1->v2 or v2->v1 to the history type key index
+            populateNewCurrentRecordKeysIntoIndex(latestTypeState);
+        } else {
+            // usually on the first fwd delta transition, or on  double snapshot
+            populateAllCurrentRecordKeysIntoIndex(latestTypeState);
+        }
     }
 
     public void hashRecordKeys() {
@@ -362,7 +366,7 @@ public class HollowHistoryTypeKeyIndex {
         typeState.addAllObjectsFromPreviousCycle();
     }
 
-    private void populateAllCurrentRecordKeys(HollowObjectTypeReadState typeState) {
+    private void populateAllCurrentRecordKeysIntoIndex(HollowObjectTypeReadState typeState) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(keySchema);
         PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
         BitSet previousOrdinals = listener.getPreviousOrdinals();
@@ -376,7 +380,7 @@ public class HollowHistoryTypeKeyIndex {
         }
     }
 
-    private void populateNewCurrentRecordKeys(HollowObjectTypeReadState typeState) {
+    private void populateNewCurrentRecordKeysIntoIndex(HollowObjectTypeReadState typeState) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(keySchema);
         PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
         BitSet populatedOrdinals = listener.getPopulatedOrdinals();

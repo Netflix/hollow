@@ -39,6 +39,7 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
         this.keyIndex = keyIndex;
     }
 
+    // this is only invoked for double snapshots
     private HollowHistoricalStateTypeKeyOrdinalMapping(String typeName, HollowHistoryTypeKeyIndex keyIndex, IntMap addedOrdinalMap, IntMap removedOrdinalMap) {
         this.typeName = typeName;
         this.keyIndex = keyIndex;
@@ -51,7 +52,6 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
         this.addedOrdinalMap = new IntMap(numAdditions);
         this.removedOrdinalMap = new IntMap(numRemovals);
     }
-
     public void added(HollowTypeReadState typeState, int ordinal) {
         int recordKeyOrdinal = keyIndex.findKeyIndexOrdinal((HollowObjectTypeReadState)typeState, ordinal);
         addedOrdinalMap.put(recordKeyOrdinal, ordinal);
@@ -66,6 +66,7 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
         removedOrdinalMap.put(recordKeyOrdinal, mappedOrdinal);
     }
 
+    // this is only invoked for double snapshots
     public HollowHistoricalStateTypeKeyOrdinalMapping remap(OrdinalRemapper remapper) {
         IntMap newAddedOrdinalMap = new IntMap(addedOrdinalMap.size());
         IntMapEntryIterator addedIter = addedOrdinalMap.iterator();

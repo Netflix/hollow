@@ -33,23 +33,23 @@ import com.netflix.hollow.core.util.RemovedOrdinalIterator;
  */
 public class HollowObjectDeltaHistoricalStateCreator {
 
-    private final HollowObjectTypeReadState typeState;
-    private final HollowObjectTypeDataElements stateEngineDataElements[];
     private final HollowObjectTypeDataElements historicalDataElements;
-    private final RemovedOrdinalIterator iter;
-    
+
     private final int shardNumberMask;
     private final int shardOrdinalShift;
 
+    private HollowObjectTypeReadState typeState;
+    private HollowObjectTypeDataElements stateEngineDataElements[];
+    private RemovedOrdinalIterator iter;
     private IntMap ordinalMapping;
     private int nextOrdinal;
     private final long currentWriteVarLengthDataPointers[];
 
-    public HollowObjectDeltaHistoricalStateCreator(HollowObjectTypeReadState typeState) {
+    public HollowObjectDeltaHistoricalStateCreator(HollowObjectTypeReadState typeState, boolean reverse) {
         this.typeState = typeState;
         this.stateEngineDataElements = typeState.currentDataElements();
         this.historicalDataElements = new HollowObjectTypeDataElements(typeState.getSchema(), WastefulRecycler.DEFAULT_INSTANCE);
-        this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class));
+        this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class), reverse);
         this.currentWriteVarLengthDataPointers = new long[typeState.getSchema().numFields()];
         this.shardNumberMask = stateEngineDataElements.length - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(stateEngineDataElements.length);
@@ -75,6 +75,16 @@ public class HollowObjectDeltaHistoricalStateCreator {
 
             ordinal = iter.next();
         }
+    }
+
+    /**
+     * Once a historical state has been created, the references into the original read state can be released so that
+     * the original read state can be GC'ed.
+     */
+    public void dereferenceTypeState() {
+        this.typeState = null;
+        this.stateEngineDataElements = null;
+        this.iter = null;
     }
 
     public IntMap getOrdinalMapping() {
