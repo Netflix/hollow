@@ -14,37 +14,33 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.explorer.ui.jetty;
+package com.netflix.hollow.explorer.ui;
 
 import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.explorer.ui.HollowExplorerUI;
+import com.netflix.hollow.ui.HollowUIWebServer;
+import com.netflix.hollow.ui.HttpHandlerWithServletSupport;
 
-/**
- * @deprecated use {@link com.netflix.hollow.explorer.ui.HollowExplorerUIServer}. This is deprecated because package name
- * contains "jetty" but jetty-server dep is no longer required. Instead, this class lives on as an adapter
- * over {@link com.netflix.hollow.explorer.ui.HollowExplorerUIServer}.
- */
-@Deprecated
 public class HollowExplorerUIServer {
-
-    private final com.netflix.hollow.explorer.ui.HollowExplorerUIServer server;
+    private final HollowUIWebServer server;
+    private final HollowExplorerUI ui;
 
     public HollowExplorerUIServer(HollowReadStateEngine readEngine, int port) {
-        server = new com.netflix.hollow.explorer.ui.HollowExplorerUIServer( readEngine, port);
+        this(new HollowExplorerUI("", readEngine), port);
     }
 
     public HollowExplorerUIServer(HollowConsumer consumer, int port) {
-        server = new com.netflix.hollow.explorer.ui.HollowExplorerUIServer( consumer, port);
+        this(new HollowExplorerUI("", consumer), port);
     }
 
     public HollowExplorerUIServer(HollowClient client, int port) {
-        server = new com.netflix.hollow.explorer.ui.HollowExplorerUIServer( client, port);
+        this(new HollowExplorerUI("", client), port);
     }
 
     public HollowExplorerUIServer(HollowExplorerUI ui, int port) {
-        server = new com.netflix.hollow.explorer.ui.HollowExplorerUIServer(ui, port);
+        this.server = new HollowUIWebServer(new HttpHandlerWithServletSupport(ui), port);
+        this.ui = ui;
     }
 
     public HollowExplorerUIServer start() throws Exception {
@@ -62,7 +58,7 @@ public class HollowExplorerUIServer {
     }
 
     public HollowExplorerUI getUI() {
-        return server.getUI();
-    } 
+        return ui;
+    }
 
 }

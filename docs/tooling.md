@@ -194,11 +194,6 @@ server.join();
 
 The above call to `server.join()` will block forever.  While the above code is running, you can point a browser to _http://localhost:8080_ to explore your data.
 
-!!! warning "Jetty: Optional Dependency"
-    If using the `HollowExplorerUIServer`, you'll need to include a dependency on Jetty.  For example, with a Gradle build you may add the dependency:
-
-    `compile 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'`
-
 ### Explorer Usage
 
 Upon opening your browser, you should see something like this:
