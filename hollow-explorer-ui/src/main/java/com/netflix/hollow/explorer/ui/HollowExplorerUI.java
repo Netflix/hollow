@@ -71,27 +71,30 @@ public class HollowExplorerUI extends HollowUIRouter {
         this.queryPage = new QueryPage(this);
     }
 
-    public boolean handle(String target, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        
-        String pageName = getTargetRootPath(target);
+    public void handle( String target, HttpServletRequest request, HttpServletResponse response)
+        throws IOException {
+        doGet(request, response);
+    }
+
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String pageName = getTargetRootPath(req.getPathInfo());
         
         HollowUISession session = HollowUISession.getSession(req, resp);
         
         if("".equals(pageName) || "home".equals(pageName)) {
             showAllTypesPage.render(req, resp, session);
-            return true;
+            return;
         } else if("type".equals(pageName)) {
             browseTypePage.render(req, resp, session);
-            return true;
+            return;
         } else if("schema".equals(pageName)) {
             browseSchemaPage.render(req, resp, session);
-            return true;
+            return;
         } else if("query".equals(pageName)) {
             queryPage.render(req, resp, session);
-            return true;
+            return;
         }
-        
-        return false;
     }
 
     public long getCurrentStateVersion() {

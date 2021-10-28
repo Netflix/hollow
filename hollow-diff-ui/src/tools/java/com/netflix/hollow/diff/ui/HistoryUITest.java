@@ -14,7 +14,7 @@ import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
+import com.netflix.hollow.history.ui.webserver.HollowHistoryUIServer;
 import com.netflix.hollow.tools.history.HollowHistory;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
 import java.io.ByteArrayOutputStream;

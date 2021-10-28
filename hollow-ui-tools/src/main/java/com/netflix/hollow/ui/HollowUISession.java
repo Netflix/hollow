@@ -25,11 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.server.Response;
 
 public class HollowUISession {
 
     private static final long SESSION_ABANDONMENT_MILLIS = 60 * 60 * 1000;
+    private static final String HTTP_ONLY_COMMENT = "__HTTP_ONLY__";
 
     private final Map<String, Object> sessionParams;
     private long lastAccessed;
@@ -70,7 +70,7 @@ public class HollowUISession {
         if(sessionId == null) {
             sessionId = new Random().nextLong() & Long.MAX_VALUE;
             Cookie cookie = new Cookie("hollowUISessionId", sessionId.toString());
-            cookie.setComment(Response.HTTP_ONLY_COMMENT);
+            cookie.setComment(HTTP_ONLY_COMMENT);
             resp.addCookie(cookie);
         }
 
