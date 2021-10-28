@@ -14,17 +14,13 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.diff.ui.jetty;
 
-import com.netflix.hollow.ui.jetty.AbstractOptionalDependencyHelper;
+package com.netflix.hollow.diff.ui.webserver;
 
-final class OptionalDependencyHelper extends AbstractOptionalDependencyHelper {
-    HollowDiffUIServer.UIServer.Factory uiServerFactory() {
-        return (HollowDiffUIServer.UIServer.Factory)newFactory(
-                "com.netflix.hollow.diff.ui.jetty.JettyBasedUIServer$Factory",
-                "org.eclipse.jetty.server.Server",
-                "please add jetty-server (org.eclipse.jetty:jetty-server) to your dependencies");
-    }
+import com.netflix.hollow.diff.ui.HollowDiffUI;
+import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.ui.UIServer;
 
-    OptionalDependencyHelper() {}
+public interface DiffUIServer extends UIServer{
+       HollowDiffUI addDiff(String diffPath, HollowDiff diff, String fromBlobName, String toBlobName);
 }
