@@ -75,7 +75,7 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     public HollowHistoryUI(String baseUrlPath, HollowConsumer consumer, int numStatesToTrack, TimeZone timeZone) {
         this(baseUrlPath, createHistory(consumer, numStatesToTrack), timeZone);
     }
-    
+
     private static HollowHistory createHistory(HollowConsumer consumer, int numStatesToTrack) {
         consumer.getRefreshLock().lock();
         try {
@@ -115,57 +115,55 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     public HollowHistory getHistory() {
         return history;
     }
+ 
+    public void handle(String target, HttpServletRequest request, HttpServletResponse response)
+        throws IOException {
+        doGet(request, response);
+    }
 
-    public boolean handle(String target, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String pageName = getTargetRootPath(target);
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String pageName = getTargetRootPath(req.getPathInfo());
 
         if("diffrowdata".equals(pageName)) {
             diffViewOutputGenerator.uncollapseRow(req, resp);
-            return true;
+            return;
         } else if("collapsediffrow".equals(pageName)) {
             diffViewOutputGenerator.collapseRow(req, resp);
-            return true;
+            return;
         }
 
         resp.setContentType("text/html");
 
 
         if("resource".equals(pageName)) {
-            if(serveResource(req, resp, getResourceName(target)))
-                return true;
+            if(serveResource(req, resp, getResourceName(req.getPathInfo())))
+                return;
         } else if("".equals(pageName) || "overview".equals(pageName)) {
         	if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
         		overviewPage.sendJson(req, resp);
-        		return true;
+        		return;
         	}
             overviewPage.render(req, getSession(req, resp), resp.getWriter());
-            return true;
         } else if("state".equals(pageName)) {
         	if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
         		statePage.sendJson(req, resp);
-        		return true;
+        		return;
         	}
             statePage.render(req, getSession(req, resp), resp.getWriter());
-            return true;
         } else if("statetype".equals(pageName)) {
         	if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
         		stateTypePage.sendJson(req, getSession(req, resp),  resp);
-        		return true;
+        		return;
         	}
             stateTypePage.render(req, getSession(req, resp), resp.getWriter());
-            return true;
         } else if("statetypeexpand".equals(pageName)) {
             stateTypeExpandPage.render(req, getSession(req, resp), resp.getWriter());
-            return true;
         } else if("query".equals(pageName)) {
             queryPage.render(req, getSession(req, resp), resp.getWriter());
-            return true;
         } else if("historicalObject".equals(pageName)) {
             objectDiffPage.render(req, getSession(req, resp), resp.getWriter());
-            return true;
         }
-
-        return false;
     }
     
     public void addCustomHollowRecordNamer(String typeName, HollowHistoryRecordNamer recordNamer) {
