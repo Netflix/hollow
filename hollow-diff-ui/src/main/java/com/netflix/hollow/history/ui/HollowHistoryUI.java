@@ -64,6 +64,13 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
 
     private String[] overviewDisplayHeaders;
 
+    /**
+     * HollowHistoryUI constructor that builds history for a consumer that transitions forwards i.e. in increasing
+     * version order (v1, v2, v3...). This constructor defaults max states to 1024 and time zone to PST.
+     *
+     * @param baseUrlPath url path for history UI endpoint
+     * @param consumer HollowConsumer (already initialized with data) that will be traversing forward deltas or double snapshots
+     */
     public HollowHistoryUI(String baseUrlPath, HollowConsumer consumer) {
         this(baseUrlPath, consumer, 1024, VersionTimestampConverter.PACIFIC_TIMEZONE);
     }
@@ -76,15 +83,21 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
         this(baseUrlPath, createHistory(consumer, numStatesToTrack), timeZone);
     }
     
-    private static HollowHistory createHistory(HollowConsumer consumer, int numStatesToTrack) {
-        consumer.getRefreshLock().lock();
-        try {
-            HollowHistory history = new HollowHistory(consumer.getStateEngine(), consumer.getCurrentVersionId(), numStatesToTrack);
-            consumer.addRefreshListener(new HollowHistoryRefreshListener(history));
-            return history;
-        } finally {
-            consumer.getRefreshLock().unlock();
-        }
+    /**
+     * HollowHistoryUI that supports building history in both directions simultaneously.
+     * Fwd and rev consumers should be initialized to the same version before calling this constructor.
+     * This constructor defaults max states to 1024 and time zone to PST.
+     *
+     * @param baseUrlPath url path for history UI endpoint
+     * @param consumerFwd HollowConsumer (already initialized with data) that will be traversing forward deltas or double snapshots
+     * @param consumerRev HollowConsumer (also initialized to the same version as consumerFwd) that will be traversing reverse deltas
+     */
+    public HollowHistoryUI(String baseUrlPath, HollowConsumer consumerFwd, HollowConsumer consumerRev) {
+        this(baseUrlPath, consumerFwd, consumerRev, 1024, VersionTimestampConverter.PACIFIC_TIMEZONE);
+    }
+
+    public HollowHistoryUI(String baseUrlPath, HollowConsumer consumerFwd, HollowConsumer consumerRev, int numStatesToTrack, TimeZone timeZone) {
+        this(baseUrlPath, createHistory(consumerFwd, consumerRev, numStatesToTrack), timeZone);
     }
 
     public HollowHistoryUI(String baseUrlPath, HollowHistory history) {
@@ -105,13 +118,44 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
         this.viewProvider = new HollowHistoryViewProvider(this);
         this.diffViewOutputGenerator = new DiffViewOutputGenerator(viewProvider);
 
-        this.customHollowEffigyFactories = new HashMap<String, CustomHollowEffigyFactory>();
-        this.customHollowRecordNamers = new HashMap<String, HollowHistoryRecordNamer>();
-        this.matchHints = new HashMap<String, PrimaryKey>();
+        this.customHollowEffigyFactories = new HashMap<>();
+        this.customHollowRecordNamers = new HashMap<>();
+        this.matchHints = new HashMap<>();
         this.overviewDisplayHeaders = new String[0];
         this.timeZone = timeZone;
     }
-    
+
+    private static HollowHistory createHistory(HollowConsumer consumer, int numStatesToTrack) {
+        return createHistory(consumer, null, numStatesToTrack);
+    }
+
+    private static HollowHistory createHistory(HollowConsumer consumerFwd, HollowConsumer consumerRev, int numStatesToTrack) {
+        if (consumerRev == null) {
+            consumerFwd.getRefreshLock().lock();
+            try {
+                HollowHistory history = new HollowHistory(consumerFwd.getStateEngine(), consumerFwd.getCurrentVersionId(), numStatesToTrack);
+                consumerFwd.addRefreshListener(new HollowHistoryRefreshListener(history));
+                return history;
+            } finally {
+                consumerFwd.getRefreshLock().unlock();
+            }
+        } else {
+            consumerFwd.getRefreshLock().lock();
+            consumerRev.getRefreshLock().lock();
+            try {
+                HollowHistory history = new HollowHistory(consumerFwd.getStateEngine(), consumerRev.getStateEngine(),
+                        consumerFwd.getCurrentVersionId(), consumerRev.getCurrentVersionId(), numStatesToTrack);
+                consumerFwd.addRefreshListener(new HollowHistoryRefreshListener(history));
+                consumerRev.addRefreshListener(new HollowHistoryRefreshListener(history));
+                return history;
+            } finally {
+                consumerFwd.getRefreshLock().unlock();
+                consumerRev.getRefreshLock().unlock();
+            }
+
+        }
+    }
+
     public HollowHistory getHistory() {
         return history;
     }

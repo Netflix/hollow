@@ -27,13 +27,33 @@ public class HollowHistoryUIServer {
 
     private final UIServer server;
     private final HollowHistoryUI ui;
-    
+
+    /**
+     * HollowHistoryUIServer that builds history using a consumer that transitions forwards i.e. in increasing version 
+     * order (v1, v2, v3...). This constructor defaults time zone to PST.
+     *
+     * @param consumer HollowConsumer (already initialized with data) that will be traversing forward deltas
+     * @param port server port
+     */
+    public HollowHistoryUIServer(HollowConsumer consumer, int port) {
+        this(new HollowHistoryUI("", consumer), port);
+    }
+
     public HollowHistoryUIServer(HollowConsumer consumer, int port, TimeZone timeZone) {
         this(new HollowHistoryUI("", consumer, timeZone), port);
     }
 
-    public HollowHistoryUIServer(HollowConsumer consumer, int port) {
-        this(new HollowHistoryUI("", consumer), port);
+    /**
+     * Serves HollowHistoryUI that supports building history in both directions simultaneously.
+     * Fwd and rev consumers should be initialized to the same version before calling this constructor.
+     * Attempting double snapshots or forward version transitions on consumerRev will have unintended consequences on history.
+     *
+     * @param consumerFwd HollowConsumer (already initialized with data) that will be traversing forward deltas
+     * @param consumerRev HollowConsumer (also initialized to the same version as consumerFwd) that will be traversing reverse deltas
+     * @param port server port
+     */
+    public HollowHistoryUIServer(HollowConsumer consumerFwd, HollowConsumer consumerRev, int port) {
+        this(new HollowHistoryUI("", consumerFwd, consumerRev), port);
     }
 
     public HollowHistoryUIServer(HollowConsumer consumer, int numStatesToTrack, int port, TimeZone timeZone) {

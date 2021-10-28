@@ -36,22 +36,28 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * A {@code HollowHistoryKeyIndex} index is used to track all records seen in all known states.
+ * It achieves this by maintaining a growing readStateEngine. A delta transition applies incoming keys to this
+ * readStateEngine, and a snapshot transition applies all the existing keys in readStateEngine and new keys
+ * in the incoming snapshot into a new readStateEngine that is used moving forward.
+ */
 public class HollowHistoryKeyIndex {
 
     private final HollowHistory history;
     private final Map<String, HollowHistoryTypeKeyIndex> typeKeyIndexes;
-    private final HollowWriteStateEngine writeStateEngine;
-    private HollowReadStateEngine readStateEngine;
+    private final HollowWriteStateEngine indexWriteStateEngine;
+    private HollowReadStateEngine indexReadStateEngine;
 
     public HollowHistoryKeyIndex(HollowHistory history) {
         this.history = history;
         this.typeKeyIndexes = new HashMap<String, HollowHistoryTypeKeyIndex>();
-        this.writeStateEngine = new HollowWriteStateEngine();
-        this.readStateEngine = new HollowReadStateEngine();
+        this.indexWriteStateEngine = new HollowWriteStateEngine();
+        this.indexReadStateEngine = new HollowReadStateEngine();
     }
 
     public int numUniqueKeys(String type) {
-        return readStateEngine.getTypeState(type).maxOrdinal() + 1;
+        return indexReadStateEngine.getTypeState(type).maxOrdinal() + 1;
     }
 
     public String getKeyDisplayString(String type, int keyOrdinal) {
@@ -71,7 +77,7 @@ public class HollowHistoryKeyIndex {
     }
 
     public HollowHistoryTypeKeyIndex addTypeIndex(PrimaryKey primaryKey, HollowDataset dataModel) {
-        HollowHistoryTypeKeyIndex keyIdx = new HollowHistoryTypeKeyIndex(primaryKey, dataModel, writeStateEngine, readStateEngine);
+        HollowHistoryTypeKeyIndex keyIdx = new HollowHistoryTypeKeyIndex(primaryKey, dataModel, indexWriteStateEngine, indexReadStateEngine);
         typeKeyIndexes.put(primaryKey.getType(), keyIdx);
         return keyIdx;
     }
@@ -103,15 +109,24 @@ public class HollowHistoryKeyIndex {
     public void update(HollowReadStateEngine latestStateEngine, boolean isDelta) {
         boolean isInitialUpdate = !isInitialized();
 
+        // For all the types in the key index make sure a {@code HollowHistoryTypeKeyIndex} index is initialized (and
+        // has a writeable write state engine)
+        // The type index stores ordinals (in a sequence independent of how they existed in the read state) and the
+        // value of the primary keys.
         initializeTypeIndexes(latestStateEngine);
+
+        // This call updates the type key indexes of all types in this history key index.
         updateTypeIndexes(latestStateEngine, isDelta && !isInitialUpdate);
 
-        HollowReadStateEngine newReadState = roundTripStateEngine(isInitialUpdate, !isDelta);
-        if (newReadState != readStateEngine) {
+        HollowReadStateEngine newIndexReadState = roundTripStateEngine(isInitialUpdate, !isDelta);
+
+        // if snapshot update then a new read state was generated, update the types in the history index to point to this
+        // new read state
+        if (newIndexReadState != indexReadStateEngine) {
             // New ReadState was created so let's update references to old one
-            readStateEngine = newReadState;
+            indexReadStateEngine = newIndexReadState;
             for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
-                entry.getValue().updateReadStateEngine(readStateEngine);
+                entry.getValue().updateReadStateEngine(indexReadStateEngine);
             }
         }
 
@@ -119,7 +134,7 @@ public class HollowHistoryKeyIndex {
     }
 
     public boolean isInitialized() {
-        return !readStateEngine.getTypeStates().isEmpty();
+        return !indexReadStateEngine.getTypeStates().isEmpty();
     }
 
     private void initializeTypeIndexes(HollowReadStateEngine latestStateEngine) {
@@ -152,12 +167,16 @@ public class HollowHistoryKeyIndex {
         }
     }
 
+    /**
+     * Updates the tracked readStateEngine based on populated writeStateEngine. Depending on whether this is an initial
+     * load or double snapshot etc. it invokes a snapshot or delta transition.
+     */
     private HollowReadStateEngine roundTripStateEngine(boolean isInitialUpdate, boolean isSnapshot) {
-        HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
+        HollowBlobWriter writer = new HollowBlobWriter(indexWriteStateEngine);
         // Use existing readStateEngine on initial update or delta;
         // otherwise, create new one to properly handle double snapshot
         HollowReadStateEngine newReadStateEngine = (isInitialUpdate || !isSnapshot)
-                ? readStateEngine : new HollowReadStateEngine();
+                ? indexReadStateEngine : new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(newReadStateEngine);
 
         // Use a pipe to write and read concurrently to avoid writing
@@ -206,7 +225,7 @@ public class HollowHistoryKeyIndex {
         if (pipeException != null)
             throw new RuntimeException(pipeException);
 
-        writeStateEngine.prepareForNextCycle();
+        indexWriteStateEngine.prepareForNextCycle();
         return newReadStateEngine;
     }
 
