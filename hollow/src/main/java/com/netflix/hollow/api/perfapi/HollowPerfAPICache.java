@@ -30,7 +30,6 @@ public class HollowPerfAPICache<T> {
             HollowTypePerfAPI typeAPI,
             POJOInstantiator<T> instantiator,
             HollowPerfAPICache<T> previous) {
-        assert previous == null || typeAPI.maskedTypeIdx == previous.typeAPI.maskedTypeIdx : "Cache type mismatch";
 
         this.typeAPI = typeAPI;
         if(!typeAPI.isMissingType()) {
