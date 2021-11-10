@@ -507,6 +507,15 @@ public class HollowProducer extends AbstractHollowProducer {
         HollowProducer.Blob openSnapshot(long version);
 
         /**
+         * Returns a blob with which a {@code HollowProducer} will write a header for the version specified.
+         * <p>
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.Blob)}.
+         * @param version the blob version
+         * @return a {@link HollowProducer.Blob} representing a header for the {@code version}
+         */
+        HollowProducer.Blob openHeader(long version);
+
+        /**
          * Returns a blob with which a {@code HollowProducer} will write a forward delta from the version specified to
          * the version specified, i.e. {@code fromVersion => toVersion}.
          * <p>
@@ -643,7 +652,8 @@ public class HollowProducer extends AbstractHollowProducer {
         public enum Type {
             SNAPSHOT("snapshot"),
             DELTA("delta"),
-            REVERSE_DELTA("reversedelta");
+            REVERSE_DELTA("reversedelta"),
+            HEADER("header");
 
             public final String prefix;
 
@@ -898,6 +908,9 @@ public class HollowProducer extends AbstractHollowProducer {
                 case REVERSE_DELTA:
                     cleanReverseDeltas();
                     break;
+                case HEADER:
+                    cleanHeaders();
+                    break;
             }
         }
 
@@ -915,6 +928,11 @@ public class HollowProducer extends AbstractHollowProducer {
          * This method provides an opportunity to remove old reverse deltas.
          */
         public abstract void cleanReverseDeltas();
+
+        /**
+         * This method provides an opportunity to remove old headers.
+         */
+        public abstract void cleanHeaders();
     }
 
     /**

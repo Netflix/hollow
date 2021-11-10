@@ -47,6 +47,11 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
     }
 
     @Override
+    public Blob openHeader(long version) {
+        return new InMemoryBlob(HollowConstants.VERSION_NONE, version, Blob.Type.HEADER, optionalPartConfig);
+    }
+
+    @Override
     public Blob openDelta(long fromVersion, long toVersion) {
         return new InMemoryBlob(fromVersion, toVersion, Blob.Type.DELTA, optionalPartConfig);
     }
@@ -55,7 +60,7 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
     public Blob openReverseDelta(long fromVersion, long toVersion) {
         return new InMemoryBlob(fromVersion, toVersion, Blob.Type.REVERSE_DELTA, optionalPartConfig);
     }
-    
+
     
     
     public static class InMemoryBlob extends Blob {
@@ -96,6 +101,9 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
                 break;
             case REVERSE_DELTA:
                 writer.writeReverseDelta(baos, optionalPartStreams);
+                break;
+            case HEADER:
+                writer.writeHeader(baos, optionalPartStreams);
                 break;
             }
 

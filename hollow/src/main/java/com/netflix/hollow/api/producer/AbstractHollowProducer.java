@@ -546,6 +546,7 @@ abstract class AbstractHollowProducer {
         try {
             if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
                 artifacts.snapshot = stageBlob(listeners, blobStager.openSnapshot(toVersion));
+                artifacts.header = stageBlob(listeners, blobStager.openHeader(toVersion));
 
             if (readStates.hasCurrent()) {
                 artifacts.delta = stageBlob(listeners,
@@ -857,6 +858,7 @@ abstract class AbstractHollowProducer {
         HollowProducer.Blob snapshot = null;
         HollowProducer.Blob delta = null;
         HollowProducer.Blob reverseDelta = null;
+        HollowProducer.Blob header = null;
 
         boolean cleanupCalled;
         boolean snapshotPublishComplete;
@@ -873,6 +875,10 @@ abstract class AbstractHollowProducer {
             if (reverseDelta != null) {
                 reverseDelta.cleanup();
                 reverseDelta = null;
+            }
+            if (header != null) {
+                header.cleanup();
+                header = null;
             }
         }
 
@@ -896,6 +902,8 @@ abstract class AbstractHollowProducer {
         boolean hasReverseDelta() {
             return reverseDelta != null;
         }
+
+        boolean hasHeader() { return header != null; }
     }
 
     /**
@@ -913,6 +921,10 @@ abstract class AbstractHollowProducer {
 
         @Override
         public void cleanReverseDeltas() {
+        }
+
+        @Override
+        public void cleanHeaders() {
         }
     }
 

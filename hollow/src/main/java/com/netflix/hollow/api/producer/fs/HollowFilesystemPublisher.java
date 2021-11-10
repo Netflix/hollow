@@ -49,6 +49,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
         
         switch(blob.getType()) {
         case SNAPSHOT:
+        case HEADER:
             destination = blobStorePath.resolve(String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
             break;
         case DELTA:
@@ -76,6 +77,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
 
                 switch(blob.getType()) {
                 case SNAPSHOT:
+                case HEADER:
                     partDestination = blobStorePath.resolve(String.format("%s_%s-%d", blob.getType().prefix, partName, blob.getToVersion()));
                     break;
                 case DELTA:

@@ -55,6 +55,19 @@ public class HollowBlobWriter {
         writeSnapshot(os, null);
     }
 
+    public void writeHeader(OutputStream os, ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams partStreams) throws IOException {
+        stateEngine.prepareForWrite();
+
+        DataOutputStream dos = new DataOutputStream(os);
+        HollowBlobHeader header = new HollowBlobHeader();
+        writeHeaders(dos, partStreams, stateEngine.getSchemas(), false, header);
+        headerWriter.writeHeader(header, dos);
+
+        os.flush();
+        if(partStreams != null)
+            partStreams.flush();
+    }
+
     public void writeSnapshot(OutputStream os, ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams partStreams) throws IOException {
         Map<String, DataOutputStream> partStreamsByType = Collections.emptyMap();
         if(partStreams != null)
@@ -63,7 +76,8 @@ public class HollowBlobWriter {
         stateEngine.prepareForWrite();
 
         DataOutputStream dos = new DataOutputStream(os);
-        writeHeaders(dos, partStreams, stateEngine.getSchemas(), false);
+        HollowBlobHeader header = new HollowBlobHeader();
+        writeHeaders(dos, partStreams, stateEngine.getSchemas(), false, header);
 
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-snapshot");
 
@@ -128,7 +142,8 @@ public class HollowBlobWriter {
         List<HollowSchema> changedTypes = changedTypes();
         
         DataOutputStream dos = new DataOutputStream(os);
-        writeHeaders(dos, partStreams, changedTypes, false);
+        HollowBlobHeader header = new HollowBlobHeader();
+        writeHeaders(dos, partStreams, changedTypes, false, header);
 
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-delta");
 
@@ -195,7 +210,8 @@ public class HollowBlobWriter {
         List<HollowSchema> changedTypes = changedTypes();
 
         DataOutputStream dos = new DataOutputStream(os);
-        writeHeaders(dos, partStreams, changedTypes, true);
+        HollowBlobHeader header = new HollowBlobHeader();
+        writeHeaders(dos, partStreams, changedTypes, true, header);
 
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-reverse-delta");
 
@@ -256,7 +272,7 @@ public class HollowBlobWriter {
         VarInt.writeVInt(dos, numShards);
     }
 
-    private void writeHeaders(DataOutputStream os, ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams partStreams, List<HollowSchema> schemasToInclude, boolean isReverseDelta) throws IOException {
+    private void writeHeaders(DataOutputStream os, ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams partStreams, List<HollowSchema> schemasToInclude, boolean isReverseDelta, /* output */ HollowBlobHeader header) throws IOException {
 
         /// bucket schemas by part
         List<HollowSchema> mainSchemas = schemasToInclude;
@@ -279,7 +295,6 @@ public class HollowBlobWriter {
         }
 
         /// write main header
-        HollowBlobHeader header = new HollowBlobHeader();
         header.setHeaderTags(stateEngine.getHeaderTags());
         if(isReverseDelta) {
             header.setOriginRandomizedTag(stateEngine.getNextStateRandomizedTag());

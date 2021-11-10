@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.producer.fs;
 
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.HEADER;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
 
@@ -101,6 +102,11 @@ public class HollowFilesystemBlobStager implements BlobStager {
     }
 
     @Override
+    public HollowProducer.Blob openHeader(long version) {
+        return new FilesystemBlob(HollowConstants.VERSION_NONE, version, HEADER, stagingPath, compressor, optionalPartConfig);
+    }
+
+    @Override
     public HollowProducer.Blob openDelta(long fromVersion, long toVersion) {
         return new FilesystemBlob(fromVersion, toVersion, DELTA, stagingPath, compressor, optionalPartConfig);
     }
@@ -127,6 +133,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
 
             switch (type) {
             case SNAPSHOT:
+            case HEADER:
                 this.path = dirPath.resolve(String.format("%s-%d.%s", type.prefix, toVersion, Integer.toHexString(randomExtension)));
                 break;
             case DELTA:
@@ -142,6 +149,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
                     Path partPath;
                     switch (type) {
                     case SNAPSHOT:
+                    case HEADER:
                         partPath = dirPath.resolve(String.format("%s_%s-%d.%s", type.prefix, part, toVersion, Integer.toHexString(randomExtension)));
                         break;
                     case DELTA:
@@ -198,6 +206,8 @@ public class HollowFilesystemBlobStager implements BlobStager {
                 case REVERSE_DELTA:
                     writer.writeReverseDelta(os, optionalPartStreams);
                     break;
+                case HEADER:
+                    writer.writeHeader(os, optionalPartStreams);
                 default:
                     throw new IllegalStateException("unknown type, type=" + type);
                 }

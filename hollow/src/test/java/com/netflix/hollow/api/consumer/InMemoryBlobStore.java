@@ -35,6 +35,7 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
     private Map<Long, Blob> snapshots;
     private Map<Long, Blob> deltas;
     private Map<Long, Blob> reverseDeltas;
+    private Map<Long, Blob> headers;
     
     public InMemoryBlobStore() {
         this(null);
@@ -47,20 +48,29 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
         this.optionalPartsToRetrieve = optionalPartsToRetrieve;
     }
 
-    @Override
-    public Blob retrieveSnapshotBlob(long desiredVersion) {
-        Blob snapshot = snapshots.get(desiredVersion);
+    private Blob getDesiredVersion(long desiredVersion, Map<Long, Blob> map) {
+        Blob snapshot = map.get(desiredVersion);
         if(snapshot != null)
             return snapshot;
-        
+
         long greatestPriorSnapshotVersion = Long.MIN_VALUE;
-        
-        for(Map.Entry<Long, Blob> entry : snapshots.entrySet()) {
+
+        for(Map.Entry<Long, Blob> entry : map.entrySet()) {
             if(entry.getKey() > greatestPriorSnapshotVersion && entry.getKey() < desiredVersion)
                 greatestPriorSnapshotVersion = entry.getKey();
         }
-        
-        return snapshots.get(greatestPriorSnapshotVersion);
+
+        return map.get(greatestPriorSnapshotVersion);
+    }
+
+    @Override
+    public Blob retrieveSnapshotBlob(long desiredVersion) {
+        return getDesiredVersion(desiredVersion, snapshots);
+    }
+
+    @Override
+    public Blob retrieveHeaderBlob(long desiredVersion) {
+        return getDesiredVersion(desiredVersion, headers);
     }
 
     @Override
@@ -110,6 +120,9 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
             break;
         case REVERSE_DELTA:
             reverseDeltas.put(blob.getFromVersion(), consumerBlob);
+            break;
+        case HEADER:
+            headers.put(blob.getToVersion(), consumerBlob);
             break;
         }
     }
