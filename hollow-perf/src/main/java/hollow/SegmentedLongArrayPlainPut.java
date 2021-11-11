@@ -66,6 +66,9 @@ public class SegmentedLongArrayPlainPut {
 
     /**
      * Set the byte at the given index to the specified value
+     *
+     * @param index specified index
+     * @param value to be inserted at specified index
      */
     public void set(long index, long value) {
         int segmentIndex = (int) (index >> log2OfSegmentSize);
@@ -81,6 +84,9 @@ public class SegmentedLongArrayPlainPut {
 
     /**
      * Get the value of the byte at the specified index.
+     *
+     * @param index specified index
+     * @return long value of the byte at the specified index
      */
     public long get(long index) {
         int segmentIndex = (int) (index >>> log2OfSegmentSize);
