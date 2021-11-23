@@ -36,6 +36,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriever {
+    private static final int BUFFER_SIZE = 1048576;
+
     private final Path blobStorePath;
     private final HollowConsumer.BlobRetriever fallbackBlobRetriever;
     private final boolean useExistingStaleSnapshot;
@@ -83,7 +85,6 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         this.fallbackBlobRetriever = fallbackBlobRetriever;
         this.useExistingStaleSnapshot = useExistingStaleSnapshot;
         this.optionalBlobParts = fallbackBlobRetriever == null ? null : fallbackBlobRetriever.configuredOptionalBlobParts();
-
         ensurePathExists(blobStorePath);
     }
 
@@ -319,7 +320,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                     InputStream is = remoteBlob.getInputStream();
                     OutputStream os = Files.newOutputStream(tempPath)
             ) {
-                byte buf[] = new byte[4096];
+                byte buf[] = new byte[BUFFER_SIZE];
                 int n;
                 while (-1 != (n = is.read(buf)))
                     os.write(buf, 0, n);
@@ -337,7 +338,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                     InputStream is = remoteBlob.getInputStream();
                     OutputStream os = Files.newOutputStream(tempPath)
             ) {
-                byte buf[] = new byte[4096];
+                byte buf[] = new byte[BUFFER_SIZE];
                 int n;
                 while (-1 != (n = is.read(buf)))
                     os.write(buf, 0, n);
@@ -364,7 +365,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                         InputStream is = entry.getValue();
                         OutputStream os = Files.newOutputStream(tempPath)
                 ) {
-                    byte buf[] = new byte[4096];
+                    byte buf[] = new byte[BUFFER_SIZE];
                     int n;
                     while (-1 != (n = is.read(buf, 0, buf.length)))
                         os.write(buf, 0, n);
