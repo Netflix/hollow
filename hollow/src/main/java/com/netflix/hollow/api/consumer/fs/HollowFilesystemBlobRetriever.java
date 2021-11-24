@@ -118,7 +118,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
     public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion) {
         Path exactPath = blobStorePath.resolve("snapshot-" + desiredVersion);
 
-        if(Files.exists(exactPath))
+        if(Files.exists(exactPath) && allRequestedPartsExist(BlobType.SNAPSHOT, desiredVersion))
             return filesystemBlob(BlobType.SNAPSHOT, -1L, desiredVersion);
         
         long maxVersionBeforeDesired = HollowConstants.VERSION_NONE;
@@ -128,7 +128,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                 String filename = path.getFileName().toString();
                 if(filename.startsWith("snapshot-")) {
                     long version = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
-                    if(version < desiredVersion && version > maxVersionBeforeDesired) {
+                    if(version < desiredVersion && version > maxVersionBeforeDesired && allRequestedPartsExist(BlobType.SNAPSHOT, version)) {
                         maxVersionBeforeDesired = version;
                     }
                 }
@@ -199,7 +199,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(blobStorePath)) {
             for (Path path : directoryStream) {
                 String filename = path.getFileName().toString();
-                if(filename.startsWith("delta-" + currentVersion)) {
+                if(filename.startsWith("delta-" + currentVersion) && allRequestedPartsExist(BlobType.DELTA, currentVersion)) {
                     long destinationVersion = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
                     return filesystemBlob(BlobType.DELTA, currentVersion, destinationVersion);
                 }
@@ -222,7 +222,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(blobStorePath)) {
             for (Path path : directoryStream) {
                 String filename = path.getFileName().toString();
-                if(filename.startsWith("reversedelta-" + currentVersion)) {
+                if(filename.startsWith("reversedelta-" + currentVersion) && allRequestedPartsExist(BlobType.REVERSE_DELTA, currentVersion)) {
                     long destinationVersion = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
                     return filesystemBlob(BlobType.REVERSE_DELTA, currentVersion, destinationVersion);
                 }
@@ -239,7 +239,32 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         
         return null;
     }
-    
+
+    private boolean allRequestedPartsExist(HollowConsumer.Blob.BlobType type, long version) {
+        if(optionalBlobParts == null || optionalBlobParts.isEmpty())
+            return true;
+
+        for(String part : optionalBlobParts) {
+            String filename = null;
+            switch(type) {
+            case SNAPSHOT:
+                filename = "snapshot_" + part + "-" + version;
+                break;
+            case DELTA:
+                filename = "delta_" + part + "-" + version;
+                break;
+            case REVERSE_DELTA:
+                filename = "reversedelta_" + part + "-" + version;
+                break;
+            }
+
+            if(!Files.exists(blobStorePath.resolve(filename)))
+                return false;
+        }
+
+        return true;
+    }    
+
     private static class FilesystemBlob extends HollowConsumer.Blob {
 
         private final Path path;
