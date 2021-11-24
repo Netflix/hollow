@@ -118,7 +118,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
     public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion) {
         Path exactPath = blobStorePath.resolve("snapshot-" + desiredVersion);
 
-        if(Files.exists(exactPath) && allRequestedPartsExist(BlobType.SNAPSHOT, desiredVersion))
+        if(Files.exists(exactPath) && allRequestedPartsExist(BlobType.SNAPSHOT, -1L, desiredVersion))
             return filesystemBlob(BlobType.SNAPSHOT, -1L, desiredVersion);
         
         long maxVersionBeforeDesired = HollowConstants.VERSION_NONE;
@@ -128,7 +128,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                 String filename = path.getFileName().toString();
                 if(filename.startsWith("snapshot-")) {
                     long version = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
-                    if(version < desiredVersion && version > maxVersionBeforeDesired && allRequestedPartsExist(BlobType.SNAPSHOT, version)) {
+                    if(version < desiredVersion && version > maxVersionBeforeDesired && allRequestedPartsExist(BlobType.SNAPSHOT, -1L, version)) {
                         maxVersionBeforeDesired = version;
                     }
                 }
@@ -199,9 +199,10 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(blobStorePath)) {
             for (Path path : directoryStream) {
                 String filename = path.getFileName().toString();
-                if(filename.startsWith("delta-" + currentVersion) && allRequestedPartsExist(BlobType.DELTA, currentVersion)) {
+                if(filename.startsWith("delta-" + currentVersion)) {
                     long destinationVersion = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
-                    return filesystemBlob(BlobType.DELTA, currentVersion, destinationVersion);
+                    if(allRequestedPartsExist(BlobType.DELTA, currentVersion, destinationVersion))
+                        return filesystemBlob(BlobType.DELTA, currentVersion, destinationVersion);
                 }
             }
         } catch(IOException ex) {
@@ -222,9 +223,10 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(blobStorePath)) {
             for (Path path : directoryStream) {
                 String filename = path.getFileName().toString();
-                if(filename.startsWith("reversedelta-" + currentVersion) && allRequestedPartsExist(BlobType.REVERSE_DELTA, currentVersion)) {
+                if(filename.startsWith("reversedelta-" + currentVersion)) {
                     long destinationVersion = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
-                    return filesystemBlob(BlobType.REVERSE_DELTA, currentVersion, destinationVersion);
+                    if(allRequestedPartsExist(BlobType.REVERSE_DELTA, currentVersion, destinationVersion))
+                        return filesystemBlob(BlobType.REVERSE_DELTA, currentVersion, destinationVersion);
                 }
             }
         } catch(IOException ex) {
@@ -240,7 +242,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         return null;
     }
 
-    private boolean allRequestedPartsExist(HollowConsumer.Blob.BlobType type, long version) {
+    private boolean allRequestedPartsExist(HollowConsumer.Blob.BlobType type, long currentVersion, long destinationVersion) {
         if(optionalBlobParts == null || optionalBlobParts.isEmpty())
             return true;
 
@@ -248,13 +250,13 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
             String filename = null;
             switch(type) {
             case SNAPSHOT:
-                filename = "snapshot_" + part + "-" + version;
+                filename = "snapshot_" + part + "-" + destinationVersion;
                 break;
             case DELTA:
-                filename = "delta_" + part + "-" + version;
+                filename = "delta_" + part + "-" + currentVersion + "-" + destinationVersion;
                 break;
             case REVERSE_DELTA:
-                filename = "reversedelta_" + part + "-" + version;
+                filename = "reversedelta_" + part + "-" + currentVersion + "-" + destinationVersion;
                 break;
             }
 
