@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.read;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.HollowConsumer.DoubleSnapshotConfig;
 import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
@@ -40,7 +41,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -189,6 +192,41 @@ public class HollowBlobOptionalPartTest {
         } catch(IllegalArgumentException ex) {
             Assert.assertEquals("Optional blob part C does not appear to be matched with the main input", ex.getMessage());
         }
+    }
+    
+    @Test
+    public void testFilesystemBlobRetriever() throws IOException {
+        File localBlobStore = createLocalDir();
+        HollowFilesystemPublisher publisher = new HollowFilesystemPublisher(localBlobStore.toPath());
+        HollowInMemoryBlobStager stager = new HollowInMemoryBlobStager(newPartConfig());
+        
+        HollowProducer producer = HollowProducer.withPublisher(publisher).withBlobStager(stager).build();
+        producer.initializeDataModel(TypeA.class);
+        
+        long v1 = producer.runCycle(state -> {
+            state.add(new TypeA("1", 1, new TypeB((short)1, 1L, 1f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('1', null))));
+            state.add(new TypeA("2", 2, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
+            state.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
+        });
+        
+        long v2 = producer.runCycle(state -> {
+            state.add(new TypeA("1", 1, new TypeB((short)1, 1L, 1f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('1', null))));
+            state.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
+            state.add(new TypeA("4", 4, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
+        });
+        
+        HollowFilesystemBlobRetriever blobRetriever = new HollowFilesystemBlobRetriever(localBlobStore.toPath(), new HashSet<>(Arrays.asList("B", "C")));
+        
+        HollowConsumer consumer = HollowConsumer.newHollowConsumer()
+                .withBlobRetriever(blobRetriever)
+                .withDoubleSnapshotConfig(new DoubleSnapshotConfig() {
+                    @Override public int maxDeltasBeforeDoubleSnapshot() { return Integer.MAX_VALUE; }
+                    @Override public boolean allowDoubleSnapshot() { return false; }
+                }).build();
+
+        consumer.triggerRefreshTo(v1);
+        consumer.triggerRefreshTo(v2);
+        consumer.triggerRefreshTo(v1);
     }
 
     @Test
