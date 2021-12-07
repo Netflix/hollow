@@ -62,6 +62,9 @@ public class HollowFilesystemBlobStorageCleaner extends HollowProducer.BlobStora
         }
     }
 
+    @Override
+    public void cleanHeader() {
+    }
 
     @Override
     public void cleanDeltas() { }

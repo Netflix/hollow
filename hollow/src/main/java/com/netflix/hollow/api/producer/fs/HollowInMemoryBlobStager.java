@@ -18,9 +18,12 @@ package com.netflix.hollow.api.producer.fs;
 
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
+import com.netflix.hollow.api.producer.HollowProducer.HeaderBlob;
 import com.netflix.hollow.api.producer.ProducerOptionalBlobPartConfig;
 import com.netflix.hollow.core.HollowConstants;
+import com.netflix.hollow.core.write.HollowBlobHeaderWriter;
 import com.netflix.hollow.core.write.HollowBlobWriter;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -47,11 +50,6 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
     }
 
     @Override
-    public Blob openHeader(long version) {
-        return new InMemoryBlob(HollowConstants.VERSION_NONE, version, Blob.Type.HEADER, optionalPartConfig);
-    }
-
-    @Override
     public Blob openDelta(long fromVersion, long toVersion) {
         return new InMemoryBlob(fromVersion, toVersion, Blob.Type.DELTA, optionalPartConfig);
     }
@@ -61,8 +59,35 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
         return new InMemoryBlob(fromVersion, toVersion, Blob.Type.REVERSE_DELTA, optionalPartConfig);
     }
 
-    
-    
+    @Override
+    public HollowProducer.HeaderBlob openHeader(long version) {
+        return new InMemoryHeaderBlob(HollowConstants.VERSION_NONE, version);
+    }
+
+    public static class InMemoryHeaderBlob extends HeaderBlob {
+        private byte[] data;
+
+        protected InMemoryHeaderBlob(long fromVersion, long toVersion) {
+            super(fromVersion, toVersion);
+        }
+
+        @Override
+        public void cleanup() {
+        }
+
+        @Override
+        protected void write(HollowBlobWriter blobWriter) throws IOException {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            blobWriter.writeHeader(baos, null);
+            data = baos.toByteArray();
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            return new ByteArrayInputStream(data);
+        }
+    }
+
     public static class InMemoryBlob extends Blob {
 
         private byte[] data;
@@ -101,9 +126,6 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
                 break;
             case REVERSE_DELTA:
                 writer.writeReverseDelta(baos, optionalPartStreams);
-                break;
-            case HEADER:
-                writer.writeHeader(baos, optionalPartStreams);
                 break;
             }
 

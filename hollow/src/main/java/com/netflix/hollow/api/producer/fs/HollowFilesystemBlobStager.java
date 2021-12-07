@@ -16,18 +16,15 @@
  */
 package com.netflix.hollow.api.producer.fs;
 
-import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
-import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.HEADER;
-import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
-import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
-
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
+import com.netflix.hollow.api.producer.HollowProducer.HeaderBlob;
 import com.netflix.hollow.api.producer.HollowProducer.BlobCompressor;
 import com.netflix.hollow.api.producer.HollowProducer.BlobStager;
 import com.netflix.hollow.api.producer.ProducerOptionalBlobPartConfig;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.write.HollowBlobWriter;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -41,6 +38,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
+import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
 
 public class HollowFilesystemBlobStager implements BlobStager {
 
@@ -102,11 +103,6 @@ public class HollowFilesystemBlobStager implements BlobStager {
     }
 
     @Override
-    public HollowProducer.Blob openHeader(long version) {
-        return new FilesystemBlob(HollowConstants.VERSION_NONE, version, HEADER, stagingPath, compressor, optionalPartConfig);
-    }
-
-    @Override
     public HollowProducer.Blob openDelta(long fromVersion, long toVersion) {
         return new FilesystemBlob(fromVersion, toVersion, DELTA, stagingPath, compressor, optionalPartConfig);
     }
@@ -114,6 +110,53 @@ public class HollowFilesystemBlobStager implements BlobStager {
     @Override
     public HollowProducer.Blob openReverseDelta(long fromVersion, long toVersion) {
         return new FilesystemBlob(fromVersion, toVersion, REVERSE_DELTA, stagingPath, compressor, optionalPartConfig);
+    }
+
+    @Override
+    public HollowProducer.HeaderBlob openHeader(long version) {
+        return new FilesystemHeaderBlob(HollowConstants.VERSION_NONE, version, stagingPath, compressor);
+    }
+
+    public static class FilesystemHeaderBlob extends HeaderBlob {
+        protected final Path path;
+        private final BlobCompressor compressor;
+
+        protected FilesystemHeaderBlob(long fromVersion, long toVersion, Path dirPath, BlobCompressor compressor) {
+            super(fromVersion, toVersion);
+            this.compressor = compressor;
+            int randomExtension = new Random().nextInt() & Integer.MAX_VALUE;
+            this.path = dirPath.resolve(String.format("header-%d.%s", toVersion, Integer.toHexString(randomExtension)));
+        }
+
+        @Override
+        public void cleanup() {
+            if (path != null) {
+                try {
+                    Files.delete(path);
+                } catch (IOException e) {
+                    throw new RuntimeException("Could not cleanup file: " + this.path, e);
+                }
+            }
+        }
+
+        @Override
+        protected void write(HollowBlobWriter blobWriter) throws IOException {
+            Path parent = this.path.getParent();
+            if (!Files.exists(parent))
+                Files.createDirectories(parent);
+
+            if (!Files.exists(path))
+                Files.createFile(path);
+
+            try (OutputStream os = new BufferedOutputStream(compressor.compress(Files.newOutputStream(path)))) {
+                blobWriter.writeHeader(os, null);
+            }
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            return new BufferedInputStream(compressor.decompress(Files.newInputStream(this.path)));
+        }
     }
 
     public static class FilesystemBlob extends Blob {
@@ -133,7 +176,6 @@ public class HollowFilesystemBlobStager implements BlobStager {
 
             switch (type) {
             case SNAPSHOT:
-            case HEADER:
                 this.path = dirPath.resolve(String.format("%s-%d.%s", type.prefix, toVersion, Integer.toHexString(randomExtension)));
                 break;
             case DELTA:
@@ -149,7 +191,6 @@ public class HollowFilesystemBlobStager implements BlobStager {
                     Path partPath;
                     switch (type) {
                     case SNAPSHOT:
-                    case HEADER:
                         partPath = dirPath.resolve(String.format("%s_%s-%d.%s", type.prefix, part, toVersion, Integer.toHexString(randomExtension)));
                         break;
                     case DELTA:
@@ -206,8 +247,6 @@ public class HollowFilesystemBlobStager implements BlobStager {
                 case REVERSE_DELTA:
                     writer.writeReverseDelta(os, optionalPartStreams);
                     break;
-                case HEADER:
-                    writer.writeHeader(os, optionalPartStreams);
                 default:
                     throw new IllegalStateException("unknown type, type=" + type);
                 }

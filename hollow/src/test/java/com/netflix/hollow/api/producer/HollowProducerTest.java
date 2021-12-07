@@ -16,10 +16,6 @@
  */
 package com.netflix.hollow.api.producer;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
-
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
@@ -36,6 +32,11 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,10 +48,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 
 public class HollowProducerTest {
     private static final String NAMESPACE = "hollowProducerTest";
@@ -470,6 +471,11 @@ public class HollowProducerTest {
             blobMap.put(blob.getToVersion(), blob);
             blobFileMap.put(blob.getToVersion(), copiedFile);
             System.out.println("Published:" + copiedFile);
+        }
+
+        @Override
+        public void publish(HollowProducer.HeaderBlob headerBlob) {
+            // Not needed for now.
         }
     }
 

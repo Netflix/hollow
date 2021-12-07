@@ -21,6 +21,8 @@ import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.hollow.core.read.OptionalBlobPartInput;
+import com.netflix.hollow.core.write.HollowBlobHeaderWriter;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -35,7 +37,7 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
     private Map<Long, Blob> snapshots;
     private Map<Long, Blob> deltas;
     private Map<Long, Blob> reverseDeltas;
-    private Map<Long, Blob> headers;
+    private Map<Long, HollowProducer.HeaderBlob> headers;
     
     public InMemoryBlobStore() {
         this(null);
@@ -69,11 +71,6 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
     }
 
     @Override
-    public Blob retrieveHeaderBlob(long desiredVersion) {
-        return getDesiredVersion(desiredVersion, headers);
-    }
-
-    @Override
     public Blob retrieveDeltaBlob(long currentVersion) {
         return deltas.get(currentVersion);
     }
@@ -83,8 +80,29 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
         return reverseDeltas.get(currentVersion);
     }
 
-    
-    
+
+    @Override
+    public void publish(HollowProducer.HeaderBlob headerBlob) {
+        HollowProducer.HeaderBlob consumerHeaderBlob =
+                new HollowProducer.HeaderBlob(headerBlob.getFromVersion(), headerBlob.getToVersion()) {
+            @Override
+            public void cleanup() {
+
+            }
+
+            @Override
+            protected void write(HollowBlobHeaderWriter headerWriter) throws IOException {
+
+            }
+
+            @Override
+            public InputStream newInputStream() throws IOException {
+                return null;
+            }
+        };
+        headers.put(headerBlob.getToVersion(), consumerHeaderBlob);
+    }
+
     @Override
     public void publish(final HollowProducer.Blob blob) {
         Blob consumerBlob = new Blob(blob.getFromVersion(), blob.getToVersion()) {
@@ -120,9 +138,6 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
             break;
         case REVERSE_DELTA:
             reverseDeltas.put(blob.getFromVersion(), consumerBlob);
-            break;
-        case HEADER:
-            headers.put(blob.getToVersion(), consumerBlob);
             break;
         }
     }

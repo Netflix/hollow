@@ -452,13 +452,6 @@ public class HollowConsumer {
         HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion);
 
         /**
-         * Returns the header for the state with the greatest version identifier which is equal to or less than the desired version
-         * @param desiredVersion the desired version
-         * @return the blob of the snapshot
-         */
-        HollowConsumer.Blob retrieveHeaderBlob(long desiredVersion);
-
-        /**
          * Returns a delta transition which can be applied to the specified version identifier
          * @param currentVersion the current version
          * @return the blob of the delta

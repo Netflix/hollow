@@ -146,6 +146,15 @@ public final class Status {
         }
     }
 
+    static final class PublishHeaderBuilder extends AbstractStatusBuilder<PublishHeaderBuilder> {
+        HollowProducer.HeaderBlob headerBlob;
+
+        PublishHeaderBuilder headerBlob(HollowProducer.HeaderBlob headerBlob) {
+            this.headerBlob = headerBlob;
+            return this;
+        }
+    }
+
     static final class RestoreStageBuilder extends AbstractStatusBuilder<RestoreStageBuilder> {
         long versionDesired;
         long versionReached;

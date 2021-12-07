@@ -16,10 +16,6 @@
  */
 package com.netflix.hollow.api.producer;
 
-import static com.netflix.hollow.api.producer.ProducerListenerSupport.ProducerListeners;
-import static java.lang.System.currentTimeMillis;
-import static java.util.stream.Collectors.toList;
-
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.api.metrics.HollowProducerMetrics;
@@ -41,11 +37,13 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
+import com.netflix.hollow.core.write.HollowBlobHeaderWriter;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,6 +56,10 @@ import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.netflix.hollow.api.producer.ProducerListenerSupport.ProducerListeners;
+import static java.lang.System.currentTimeMillis;
+import static java.util.stream.Collectors.toList;
 
 abstract class AbstractHollowProducer {
 
@@ -544,9 +546,10 @@ abstract class AbstractHollowProducer {
     void publish(ProducerListeners listeners, long toVersion, Artifacts artifacts) throws IOException {
         Status.StageBuilder psb = listeners.firePublishStart(toVersion);
         try {
+            // We want a header to be created for all states.
+            artifacts.header = stageHeader(listeners, blobStager.openHeader(toVersion));
             if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
                 artifacts.snapshot = stageBlob(listeners, blobStager.openSnapshot(toVersion));
-                artifacts.header = stageBlob(listeners, blobStager.openHeader(toVersion));
 
             if (readStates.hasCurrent()) {
                 artifacts.delta = stageBlob(listeners,
@@ -574,13 +577,30 @@ abstract class AbstractHollowProducer {
                 artifacts.markSnapshotPublishComplete();
                 numStatesUntilNextSnapshot = numStatesBetweenSnapshots;
             }
-
+            publishHeader(listeners, artifacts.header);
             psb.success();
         } catch (Throwable throwable) {
             psb.fail(throwable);
             throw throwable;
         } finally {
             listeners.firePublishComplete(psb);
+        }
+    }
+
+    private HollowProducer.HeaderBlob stageHeader(ProducerListeners listeners, HollowProducer.HeaderBlob headerBlob)
+            throws IOException {
+        Status.PublishHeaderBuilder builder = new Status.PublishHeaderBuilder();
+        HollowBlobHeaderWriter writer = new HollowBlobHeaderWriter();
+        try {
+            builder.headerBlob(headerBlob);
+            headerBlob.write(writer);
+            builder.success();
+            return headerBlob;
+        } catch (Throwable t) {
+            builder.fail(t);
+            throw t;
+        } finally {
+            listeners.fireHeaderBlobStage(builder);
         }
     }
 
@@ -598,6 +618,19 @@ abstract class AbstractHollowProducer {
             throw t;
         } finally {
             listeners.fireBlobStage(builder);
+        }
+    }
+
+    private void publishHeader(ProducerListeners listeners, HollowProducer.HeaderBlob headerBlob) {
+        Status.PublishHeaderBuilder builder = new Status.PublishHeaderBuilder();
+        try {
+            publishHeaderBlob(headerBlob);
+            builder.success();
+        } catch (Throwable t) {
+            builder.fail(t);
+            throw t;
+        } finally {
+            listeners.fireHeaderBlobPublish(builder);
         }
     }
 
@@ -681,6 +714,14 @@ abstract class AbstractHollowProducer {
             publisher.publish(b);
         } finally {
             blobStorageCleaner.clean(b.getType());
+        }
+    }
+
+    private void publishHeaderBlob(HollowProducer.HeaderBlob b) {
+        try {
+            publisher.publish(b);
+        } finally {
+            blobStorageCleaner.cleanHeader();
         }
     }
 
@@ -858,7 +899,7 @@ abstract class AbstractHollowProducer {
         HollowProducer.Blob snapshot = null;
         HollowProducer.Blob delta = null;
         HollowProducer.Blob reverseDelta = null;
-        HollowProducer.Blob header = null;
+        HollowProducer.HeaderBlob header = null;
 
         boolean cleanupCalled;
         boolean snapshotPublishComplete;
@@ -916,15 +957,15 @@ abstract class AbstractHollowProducer {
         }
 
         @Override
-        public void cleanDeltas() {
-        }
-
-        @Override
         public void cleanReverseDeltas() {
         }
 
         @Override
-        public void cleanHeaders() {
+        public void cleanDeltas() {
+        }
+
+        @Override
+        public void cleanHeader() {
         }
     }
 

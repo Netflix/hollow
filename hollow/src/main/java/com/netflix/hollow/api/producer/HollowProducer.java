@@ -29,6 +29,7 @@ import com.netflix.hollow.api.producer.validation.ValidatorListener;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
+import com.netflix.hollow.core.write.HollowBlobHeaderWriter;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
@@ -509,11 +510,11 @@ public class HollowProducer extends AbstractHollowProducer {
         /**
          * Returns a blob with which a {@code HollowProducer} will write a header for the version specified.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.HeaderBlob)}.
          * @param version the blob version
-         * @return a {@link HollowProducer.Blob} representing a header for the {@code version}
+         * @return a {@link HollowProducer.HeaderBlob} representing a header for the {@code version}
          */
-        HollowProducer.Blob openHeader(long version);
+        HollowProducer.HeaderBlob openHeader(long version);
 
         /**
          * Returns a blob with which a {@code HollowProducer} will write a forward delta from the version specified to
@@ -587,6 +588,37 @@ public class HollowProducer extends AbstractHollowProducer {
          * @param blob the blob to publish
          */
         void publish(HollowProducer.Blob blob);
+
+        /**
+         * Publish the headerBlob specified to this publisher's header blobstore.
+         * <p>
+         * {@link BlobStager#openHeader(long)} on this publisher.
+         *
+         * @param headerBlob the header blob to publish
+         */
+        void publish(HollowProducer.HeaderBlob headerBlob);
+    }
+
+    public static abstract class HeaderBlob {
+        protected final long toVersion;
+        protected final long fromVersion;
+
+        protected HeaderBlob(long fromVersion, long toVersion) {
+            this.fromVersion = fromVersion;
+            this.toVersion = toVersion;
+        }
+
+        public abstract void cleanup();
+        protected abstract void write(HollowBlobWriter blobWriter) throws IOException;
+        public abstract InputStream newInputStream() throws IOException;
+
+        public long getFromVersion() {
+            return this.fromVersion;
+        }
+
+        public long getToVersion() {
+            return toVersion;
+        }
     }
 
     public static abstract class Blob {
@@ -652,8 +684,7 @@ public class HollowProducer extends AbstractHollowProducer {
         public enum Type {
             SNAPSHOT("snapshot"),
             DELTA("delta"),
-            REVERSE_DELTA("reversedelta"),
-            HEADER("header");
+            REVERSE_DELTA("reversedelta");
 
             public final String prefix;
 
@@ -908,9 +939,6 @@ public class HollowProducer extends AbstractHollowProducer {
                 case REVERSE_DELTA:
                     cleanReverseDeltas();
                     break;
-                case HEADER:
-                    cleanHeaders();
-                    break;
             }
         }
 
@@ -930,9 +958,9 @@ public class HollowProducer extends AbstractHollowProducer {
         public abstract void cleanReverseDeltas();
 
         /**
-         * This method provides an opportunity to remove old headers.
+         * This method provides an opportunity to remove old header blobs.
          */
-        public abstract void cleanHeaders();
+        public abstract void cleanHeader();
     }
 
     /**
