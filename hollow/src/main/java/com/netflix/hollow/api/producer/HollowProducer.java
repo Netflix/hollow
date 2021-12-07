@@ -619,6 +619,15 @@ public class HollowProducer extends AbstractHollowProducer {
         public long getToVersion() {
             return toVersion;
         }
+
+        @Deprecated
+        public File getFile() {
+            throw new UnsupportedOperationException("File is not available");
+        }
+
+        public Path getPath() {
+            throw new UnsupportedOperationException("Path is not available");
+        }
     }
 
     public static abstract class Blob {

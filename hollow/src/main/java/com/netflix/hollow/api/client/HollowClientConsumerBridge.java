@@ -50,25 +50,6 @@ class HollowClientConsumerBridge {
             }
 
             @Override
-            public Blob retrieveHeaderBlob(long desiredVersion) {
-                final HollowBlob blob = blobRetriever.retrieveDeltaBlob(desiredVersion);
-                if(blob == null)
-                    return null;
-
-                return new HollowConsumer.Blob(blob.getFromVersion(), blob.getToVersion()) {
-                    @Override
-                    public InputStream getInputStream() throws IOException {
-                        return blob.getInputStream();
-                    }
-
-                    @Override
-                    public File getFile() throws IOException {
-                        return blob.getFile();
-                    }
-                };
-            }
-
-            @Override
             public Blob retrieveDeltaBlob(long currentVersion) {
                 final HollowBlob blob = blobRetriever.retrieveDeltaBlob(currentVersion);
                 if(blob == null)

@@ -157,6 +157,16 @@ public class HollowFilesystemBlobStager implements BlobStager {
         public InputStream newInputStream() throws IOException {
             return new BufferedInputStream(compressor.decompress(Files.newInputStream(this.path)));
         }
+
+        @Override
+        public File getFile() {
+            return path.toFile();
+        }
+
+        @Override
+        public Path getPath() {
+            return path;
+        }
     }
 
     public static class FilesystemBlob extends Blob {

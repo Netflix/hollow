@@ -28,6 +28,7 @@ import com.netflix.hollow.api.producer.validation.ValidationResult;
 import com.netflix.hollow.api.producer.validation.ValidationStatus;
 import com.netflix.hollow.api.producer.validation.ValidationStatusException;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
+import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -590,7 +591,7 @@ abstract class AbstractHollowProducer {
     private HollowProducer.HeaderBlob stageHeader(ProducerListeners listeners, HollowProducer.HeaderBlob headerBlob)
             throws IOException {
         Status.PublishHeaderBuilder builder = new Status.PublishHeaderBuilder();
-        HollowBlobHeaderWriter writer = new HollowBlobHeaderWriter();
+        HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
         try {
             builder.headerBlob(headerBlob);
             headerBlob.write(writer);
@@ -797,7 +798,17 @@ abstract class AbstractHollowProducer {
             listeners.fireIntegrityCheckComplete(status);
         }
     }
-    
+
+    private void verifyHeader(HollowProducer.HeaderBlob header) {
+        HollowBlobHeaderReader reader = new HollowBlobHeaderReader();
+        try {
+            HollowBlobHeader readHeader = reader.readHeader(header.newInputStream());
+            System.out.println();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private ReadStateHelper noIntegrityCheck(ReadStateHelper readStates, Artifacts artifacts) throws IOException {
         ReadStateHelper result = readStates;
 

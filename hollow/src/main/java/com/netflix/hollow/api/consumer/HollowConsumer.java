@@ -469,6 +469,34 @@ public class HollowConsumer {
             return null;
         }
 
+        HollowConsumer.HeaderBlob retrieveHeaderBlob(long desiredVersion);
+    }
+
+    protected static abstract class AbstractVersionedBlob {
+        protected final long fromVersion;
+        protected final long toVersion;
+
+        protected AbstractVersionedBlob(long fromVersion, long toVersion) {
+            this.fromVersion = fromVersion;
+            this.toVersion = toVersion;
+        }
+
+        public long getFromVersion() {
+            return fromVersion;
+        }
+
+        public long getToVersion() {
+            return toVersion;
+        }
+
+        public abstract InputStream getInputStream() throws IOException;
+    }
+
+    public static abstract class HeaderBlob extends AbstractVersionedBlob{
+
+        protected HeaderBlob(long fromVersion, long toVersion) {
+            super(fromVersion, toVersion);
+        }
     }
 
     /**
@@ -485,10 +513,8 @@ public class HollowConsumer {
      * <dd>Implementations will define how to retrieve the actual blob data for this specific blob from a data store as an InputStream.</dd>
      * </dl>
      */
-    public static abstract class Blob {
+    public static abstract class Blob extends AbstractVersionedBlob{
 
-        private final long fromVersion;
-        private final long toVersion;
         private final BlobType blobType;
 
         /**
@@ -507,8 +533,7 @@ public class HollowConsumer {
          * @param toVersion the version to end the delta from
          */
         public Blob(long fromVersion, long toVersion) {
-            this.fromVersion = fromVersion;
-            this.toVersion = toVersion;
+            super(fromVersion, toVersion);
 
             if (this.isSnapshot())
                 this.blobType = BlobType.SNAPSHOT;

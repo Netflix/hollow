@@ -20,6 +20,7 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducerListener;
 import com.netflix.hollow.api.producer.Status;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HollowProducerMetrics extends HollowMetrics {
@@ -101,12 +102,6 @@ public class HollowProducerMetrics extends HollowMetrics {
                     reverseDeltasCompleted++;
                 else
                     reverseDeltasFailed++;
-                break;
-            case HEADER:
-                if(status.getType() == Status.StatusType.SUCCESS)
-                    headersCompleted++;
-                else
-                    headersFailed++;
                 break;
         }
     }

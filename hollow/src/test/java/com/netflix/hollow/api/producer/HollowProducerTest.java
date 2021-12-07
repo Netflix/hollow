@@ -20,6 +20,7 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
+import com.netflix.hollow.api.producer.HollowProducer.HeaderBlob;
 import com.netflix.hollow.api.producer.HollowProducer.Blob.Type;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
@@ -62,6 +63,8 @@ public class HollowProducerTest {
 
     private Map<Long, Blob> blobMap = new HashMap<>();
     private Map<Long, File> blobFileMap = new HashMap<>();
+    private Map<Long, HeaderBlob> headerBlobMap = new HashMap<>();
+    private Map<Long, File> headerFileMap = new HashMap<>();
     private ProducerStatus lastProducerStatus;
     private RestoreStatus lastRestoreStatus;
 
@@ -454,11 +457,19 @@ public class HollowProducerTest {
         @Override
         public void publish(Blob blob) {
             File blobFile = blob.getFile();
-            if (!blobFile.exists()) throw new RuntimeException("File does not existis: " + blobFile);
-
             if (!blob.getType().equals(Type.SNAPSHOT)) {
-                return; // Only snapshot is needed for smoke Test
+                // Only snapshot is needed for smoke Test
+                return;
             }
+            File copiedFile = copyFile(blobFile);
+
+            blobMap.put(blob.getToVersion(), blob);
+            blobFileMap.put(blob.getToVersion(), copiedFile);
+            System.out.println("Published:" + copiedFile);
+        }
+
+        private File copyFile(File blobFile) {
+            if (!blobFile.exists()) throw new RuntimeException("File does not exists: " + blobFile);
 
             // Copy file
             File copiedFile = new File(tmpFolder, "copied_" + blobFile.getName());
@@ -467,15 +478,17 @@ public class HollowProducerTest {
             } catch (IOException e) {
                 throw new RuntimeException("Failed to publish:" + copiedFile, e);
             }
-
-            blobMap.put(blob.getToVersion(), blob);
-            blobFileMap.put(blob.getToVersion(), copiedFile);
-            System.out.println("Published:" + copiedFile);
+            return copiedFile;
         }
 
         @Override
-        public void publish(HollowProducer.HeaderBlob headerBlob) {
-            // Not needed for now.
+        public void publish(HeaderBlob headerBlob) {
+            File headerBlobFile = headerBlob.getFile();
+            File copiedFile = copyFile(headerBlobFile);
+
+            headerBlobMap.put(headerBlob.getToVersion(), headerBlob);
+            headerFileMap.put(headerBlob.getToVersion(), copiedFile);
+            System.out.println("Published Header:" + copiedFile);
         }
     }
 

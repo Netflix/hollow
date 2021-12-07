@@ -44,12 +44,27 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     }
 
     @Override
+    public void publish(HollowProducer.HeaderBlob headerBlob) {
+        Path destination = blobStorePath.resolve(String.format("header-%d", headerBlob.getToVersion()));
+        try (
+                InputStream is = headerBlob.newInputStream();
+                OutputStream os = Files.newOutputStream(destination)
+        ) {
+            byte buf[] = new byte[4096];
+            int n;
+            while (-1 != (n = is.read(buf)))
+                os.write(buf, 0, n);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to publish file!", e);
+        }
+    }
+
+    @Override
     public void publish(HollowProducer.Blob blob) {
         Path destination = null;
         
         switch(blob.getType()) {
         case SNAPSHOT:
-        case HEADER:
             destination = blobStorePath.resolve(String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
             break;
         case DELTA:
@@ -77,7 +92,6 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
 
                 switch(blob.getType()) {
                 case SNAPSHOT:
-                case HEADER:
                     partDestination = blobStorePath.resolve(String.format("%s_%s-%d", blob.getType().prefix, partName, blob.getToVersion()));
                     break;
                 case DELTA:
