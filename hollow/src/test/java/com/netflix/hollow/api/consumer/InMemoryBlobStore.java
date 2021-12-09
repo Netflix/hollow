@@ -16,14 +16,13 @@
  */
 package com.netflix.hollow.api.consumer;
 
-import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import com.netflix.hollow.api.consumer.HollowConsumer.AbstractVersionedBlob;
-import com.netflix.hollow.api.consumer.HollowConsumer.HeaderBlob;
+import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
+import com.netflix.hollow.api.consumer.HollowConsumer.HeaderBlob;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.hollow.core.read.OptionalBlobPartInput;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;

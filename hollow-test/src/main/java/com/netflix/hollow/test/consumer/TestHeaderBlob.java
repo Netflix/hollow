@@ -1,7 +1,6 @@
 package com.netflix.hollow.test.consumer;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.HeaderBlob;
-
 import java.io.IOException;
 import java.io.InputStream;
 
