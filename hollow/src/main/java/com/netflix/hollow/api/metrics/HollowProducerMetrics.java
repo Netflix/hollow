@@ -20,7 +20,6 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducerListener;
 import com.netflix.hollow.api.producer.Status;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HollowProducerMetrics extends HollowMetrics {

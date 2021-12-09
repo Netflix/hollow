@@ -16,11 +16,12 @@
  */
 package com.netflix.hollow.api.consumer.fs;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob.BlobType;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.OptionalBlobPartInput;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriever {
     private final Path blobStorePath;

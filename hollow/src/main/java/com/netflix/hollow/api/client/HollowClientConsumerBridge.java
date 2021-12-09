@@ -21,8 +21,6 @@ import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
