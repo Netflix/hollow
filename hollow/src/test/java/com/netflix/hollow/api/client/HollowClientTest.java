@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
@@ -155,6 +156,11 @@ public class HollowClientTest {
                     return new ByteArrayInputStream(snapshot1.toByteArray());
                 }
             };
+        }
+
+        @Override
+        public HollowBlobHeader retrieveHeaderBlob(long desiredVersion) {
+            return new HollowBlobHeader();
         }
 
         @Override

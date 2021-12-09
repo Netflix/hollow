@@ -17,6 +17,7 @@
 package com.netflix.hollow.test.consumer;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
+import com.netflix.hollow.api.consumer.HollowConsumer.HeaderBlob;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,12 @@ public class TestBlobRetriever implements BlobRetriever {
     private final Map<Long, Blob> snapshots = new HashMap<>();
     private final Map<Long, Blob> deltas = new HashMap<>();
     private final Map<Long, Blob> reverseDeltas = new HashMap<>();
+    private final Map<Long, HeaderBlob> headers = new HashMap<>();
+
+    @Override
+    public HeaderBlob retrieveHeaderBlob(long desiredVersion) {
+        return headers.get(desiredVersion);
+    }
 
     @Override
     public Blob retrieveSnapshotBlob(long desiredVersion) {
@@ -57,4 +64,7 @@ public class TestBlobRetriever implements BlobRetriever {
         reverseDeltas.put(currentVersion, transition);
     }
 
+    public void addHeader(long desiredVersion, HeaderBlob headerBlob) {
+        headers.put(desiredVersion, headerBlob);
+    }
 }

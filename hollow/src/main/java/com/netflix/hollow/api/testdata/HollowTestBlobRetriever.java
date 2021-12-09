@@ -17,8 +17,8 @@
 package com.netflix.hollow.api.testdata;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
-import com.netflix.hollow.api.consumer.HollowConsumer.HeaderBlob;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
+import com.netflix.hollow.api.consumer.HollowConsumer.HeaderBlob;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
