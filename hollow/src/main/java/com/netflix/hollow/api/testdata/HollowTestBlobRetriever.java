@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.testdata;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
+import com.netflix.hollow.api.consumer.HollowConsumer.HeaderBlob;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -32,6 +33,7 @@ class HollowTestBlobRetriever implements BlobRetriever {
     private final Map<Long, Blob> snapshots = new HashMap<>();
     private final Map<Long, Blob> deltas = new HashMap<>();
     private final Map<Long, Blob> reverseDeltas = new HashMap<>();
+    private final Map<Long, HeaderBlob> headers = new HashMap<>();
 
     @Override
     public Blob retrieveSnapshotBlob(long desiredVersion) {
@@ -48,6 +50,11 @@ class HollowTestBlobRetriever implements BlobRetriever {
         return reverseDeltas.get(currentVersion);
     }
 
+    @Override
+    public HeaderBlob retrieveHeaderBlob(long desiredVersion) {
+        return headers.get(desiredVersion);
+    }
+
     public void addSnapshot(long desiredVersion, Blob transition) {
         snapshots.put(desiredVersion, transition);
     }
@@ -56,10 +63,28 @@ class HollowTestBlobRetriever implements BlobRetriever {
         deltas.put(currentVersion, transition);
     }
 
+    public void addHeader(long desiredVersion, HeaderBlob headerBlob) {
+        headers.put(desiredVersion, headerBlob);
+    }
+
     public void addReverseDelta(long currentVersion, Blob transition) {
         reverseDeltas.put(currentVersion, transition);
     }
-    
+
+    public static class TestHeaderBlob extends HeaderBlob {
+        private final byte[] data;
+
+        protected TestHeaderBlob(long fromVersion, long toVersion, byte[] data) {
+            super(fromVersion, toVersion);
+            this.data = data;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return new ByteArrayInputStream(data);
+        }
+    }
+
     public static class TestBlob extends Blob {
     	
     	private final byte[] data;

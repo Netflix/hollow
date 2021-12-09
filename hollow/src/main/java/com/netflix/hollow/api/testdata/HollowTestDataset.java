@@ -52,7 +52,17 @@ public abstract class HollowTestDataset {
     			.newHollowConsumer()
     			.withBlobRetriever(blobRetriever);
     }
-    
+
+    public void buildHeader(HollowConsumer consumer) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+            writer.writeHeader(baos, null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void buildSnapshot(HollowConsumer consumer) {
         for(HollowTestRecord<Void> rec : recsToAdd) {
             rec.addTo(writeEngine);
@@ -64,6 +74,7 @@ public abstract class HollowTestDataset {
             writer.writeSnapshot(baos);
             writeEngine.prepareForNextCycle();
             blobRetriever.addSnapshot(currentState, new HollowTestBlobRetriever.TestBlob(currentState, baos.toByteArray()));
+
             consumer.triggerRefreshTo(currentState);
         } catch(IOException rethrow) {
             throw new RuntimeException(rethrow);

@@ -19,7 +19,10 @@ package com.netflix.hollow.api.client;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +32,21 @@ class HollowClientConsumerBridge {
     
     static HollowConsumer.BlobRetriever consumerBlobRetrieverFor(final HollowBlobRetriever blobRetriever) {
         return new HollowConsumer.BlobRetriever() {
-            
+
+            @Override
+            public HollowConsumer.HeaderBlob retrieveHeaderBlob(long desiredVersion) {
+                final HollowBlobHeader blob = blobRetriever.retrieveHeaderBlob(desiredVersion);
+                if(blob == null)
+                    return null;
+
+                return new HollowConsumer.HeaderBlob(-1L, desiredVersion) {
+                    @Override
+                    public InputStream getInputStream() throws IOException {
+                        return null;
+                    }
+                };
+            }
+
             @Override
             public Blob retrieveSnapshotBlob(long desiredVersion) {
                 final HollowBlob blob = blobRetriever.retrieveSnapshotBlob(desiredVersion);
@@ -86,6 +103,7 @@ class HollowClientConsumerBridge {
                     }
                 };
             }
+
         };
     }
     

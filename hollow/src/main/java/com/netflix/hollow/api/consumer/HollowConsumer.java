@@ -490,6 +490,10 @@ public class HollowConsumer {
         }
 
         public abstract InputStream getInputStream() throws IOException;
+
+        public File getFile() throws IOException {
+            throw new UnsupportedOperationException();
+        }
     }
 
     public static abstract class HeaderBlob extends AbstractVersionedBlob{
@@ -565,10 +569,6 @@ public class HollowConsumer {
          */
         public OptionalBlobPartInput getOptionalBlobPartInputs() throws IOException {
             return null;
-        }
-
-        public File getFile() throws IOException {
-            throw new UnsupportedOperationException();
         }
 
         /**
