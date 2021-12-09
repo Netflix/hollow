@@ -678,6 +678,7 @@ public class HollowProducer extends AbstractHollowProducer {
         VersionMinter versionMinter = new VersionMinterWithCounter();
         Executor snapshotPublishExecutor = null;
         int numStatesBetweenSnapshots = 0;
+        boolean focusHoleFillInFewestShards = false;
         long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
         HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
         BlobStorageCleaner blobStorageCleaner = new DummyBlobStorageCleaner();
@@ -805,6 +806,11 @@ public class HollowProducer extends AbstractHollowProducer {
 
         public B withTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
             this.targetMaxTypeShardSize = targetMaxTypeShardSize;
+            return (B) this;
+        }
+
+        public B withFocusHoleFillInFewestShards(boolean focusHoleFillInFewestShards) {
+            this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
             return (B) this;
         }
 
