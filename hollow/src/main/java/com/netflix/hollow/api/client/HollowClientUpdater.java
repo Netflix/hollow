@@ -55,6 +55,8 @@ public class HollowClientUpdater {
     private final HollowConsumerMetrics metrics;
     private final HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
 
+    private boolean skipTypeShardUpdateWithNoAdditions;
+
     private TypeFilter filter;
 
     public HollowClientUpdater(HollowConsumer.BlobRetriever transitionCreator,
@@ -82,6 +84,13 @@ public class HollowClientUpdater {
         this.metrics = metrics;
         this.metricsCollector = metricsCollector;
         this.initialLoad = new CompletableFuture<>();
+    }
+
+    public void setSkipShardUpdateWithNoAdditions(boolean skipTypeShardUpdateWithNoAdditions) {
+        this.skipTypeShardUpdateWithNoAdditions = skipTypeShardUpdateWithNoAdditions;
+        HollowDataHolder dataHolder = hollowDataHolderVolatile;
+        if(dataHolder != null)
+            dataHolder.getStateEngine().setSkipTypeShardUpdateWithNoAdditions(skipTypeShardUpdateWithNoAdditions);
     }
 
     /**
@@ -242,7 +251,8 @@ public class HollowClientUpdater {
         return new HollowDataHolder(newStateEngine(), apiFactory, memoryMode,
                 doubleSnapshotConfig, failedTransitionTracker,
                 staleReferenceDetector, objectLongevityConfig)
-                .setFilter(filter);
+                .setFilter(filter)
+                .setSkipTypeShardUpdateWithNoAdditions(skipTypeShardUpdateWithNoAdditions);
     }
 
     private HollowReadStateEngine newStateEngine() {

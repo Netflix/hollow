@@ -21,6 +21,7 @@ import com.netflix.hollow.api.sampling.HollowObjectSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -104,14 +105,35 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         for(int i=0;i<shards.length;i++) {
             HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryMode, memoryRecycler);
-            HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
             deltaData.readDelta(in);
-            HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
-            nextData.applyDelta(oldData, deltaData);
-            shards[i].setCurrentData(nextData);
-            notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
-            deltaData.destroy();
-            oldData.destroy();
+            if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
+
+                if(!deltaData.encodedRemovals.isEmpty())
+                    notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+
+                HollowObjectTypeDataElements currentData = shards[i].currentDataElements();
+                GapEncodedVariableLengthIntegerReader oldRemovals = currentData.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : currentData.encodedRemovals;
+                if(oldRemovals.isEmpty()) {
+                    currentData.encodedRemovals = deltaData.encodedRemovals;
+                    oldRemovals.destroy();
+                } else {
+                    if(!deltaData.encodedRemovals.isEmpty()) {
+                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryRecycler);
+                        oldRemovals.destroy();
+                    }
+                    deltaData.encodedRemovals.destroy();
+                }
+
+                deltaData.encodedAdditions.destroy();
+            } else {
+                HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
+                HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
+                nextData.applyDelta(oldData, deltaData);
+                shards[i].setCurrentData(nextData);
+                notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+                deltaData.destroy();
+                oldData.destroy();
+            }
             stateEngine.getMemoryRecycler().swap();
         }
 
