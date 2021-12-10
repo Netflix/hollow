@@ -131,9 +131,9 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
                 nextData.applyDelta(oldData, deltaData);
                 shards[i].setCurrentData(nextData);
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
-                deltaData.destroy();
                 oldData.destroy();
             }
+            deltaData.destroy();
             stateEngine.getMemoryRecycler().swap();
         }
 
