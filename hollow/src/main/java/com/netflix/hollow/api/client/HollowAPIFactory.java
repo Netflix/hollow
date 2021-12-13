@@ -72,7 +72,7 @@ public interface HollowAPIFactory {
 
         
         @Override
-        public T createAPI(HollowDataAccess dataAccess) {https://github.com/Netflix/hollow/pull/555
+        public T createAPI(HollowDataAccess dataAccess) {
             try {
                 Constructor<T> constructor = generatedAPIClass.getConstructor(HollowDataAccess.class, Set.class);
                 return constructor.newInstance(dataAccess, cachedTypes);
