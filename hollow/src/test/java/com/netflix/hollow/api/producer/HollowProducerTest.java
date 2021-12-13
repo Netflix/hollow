@@ -540,6 +540,7 @@ public class HollowProducerTest {
 
         @Override
         public HollowConsumer.HeaderBlob retrieveHeaderBlob(long desiredVersion) {
+            // No header available.
             return null;
         }
     }
