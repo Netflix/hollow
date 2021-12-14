@@ -139,7 +139,7 @@ public class HollowObjectTypeDataElements {
 
             if(unfilteredFieldIsIncluded[i]) {
                 bitsPerField[filteredFieldIdx] = readBitsPerField;
-                nullValueForField[filteredFieldIdx] = (1L << bitsPerField[filteredFieldIdx]) - 1;
+                nullValueForField[filteredFieldIdx] = bitsPerField[filteredFieldIdx] == 64 ? -1L : (1L << bitsPerField[filteredFieldIdx]) - 1;
                 bitOffsetPerField[filteredFieldIdx] = bitsPerRecord;
                 bitsPerRecord += bitsPerField[filteredFieldIdx];
                 filteredFieldIdx++;

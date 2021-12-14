@@ -957,9 +957,8 @@ public class HollowConsumer {
     }
 
     /**
-     * @deprecated use {@link #newHollowConsumer()}, i.e. {@code newHollowConsumer().withBlobRetriever(...)}
+     * Convenience method for {@code .newHollowConsumer().withBlobRetriever(...)}
      */
-    @Deprecated
     public static HollowConsumer.Builder<?> withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
         HollowConsumer.Builder<?> builder = new Builder<>();
         return builder.withBlobRetriever(blobRetriever);

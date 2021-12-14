@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ public class FieldStatistics {
     private final HollowObjectSchema schema;
 
     private final int maxBitsForField[];
+    private final long nullValueForField[];
     private final long totalSizeOfVarLengthField[];
 
     private int numBitsPerRecord;
@@ -33,6 +34,7 @@ public class FieldStatistics {
     public FieldStatistics(HollowObjectSchema schema) {
         this.schema = schema;
         this.maxBitsForField = new int[schema.numFields()];
+        this.nullValueForField = new long[schema.numFields()];
         this.totalSizeOfVarLengthField = new long[schema.numFields()];
         this.bitOffsetForField = new int[schema.numFields()];
     }
@@ -49,6 +51,10 @@ public class FieldStatistics {
         return maxBitsForField[fieldIndex];
     }
 
+    public long getNullValueForField(int fieldIndex) {
+        return nullValueForField[fieldIndex];
+    }
+
     public void addFixedLengthFieldRequiredBits(int fieldIndex, int numberOfBits) {
         if(numberOfBits > maxBitsForField[fieldIndex])
             maxBitsForField[fieldIndex] = numberOfBits;
@@ -59,13 +65,13 @@ public class FieldStatistics {
     }
 
     public void completeCalculations() {
-        for(int i=0;i<totalSizeOfVarLengthField.length;i++) {
+        for(int i=0;i<schema.numFields();i++) {
             if(schema.getFieldType(i) == FieldType.STRING || schema.getFieldType(i) == FieldType.BYTES) {
                 maxBitsForField[i] = bitsRequiredForRepresentation(totalSizeOfVarLengthField[i]) + 1; // one extra bit for null.
             }
-        }
 
-        for(int i=0;i<maxBitsForField.length;i++) {
+            nullValueForField[i] = maxBitsForField[i] == 64 ? -1L : (1L << maxBitsForField[i]) - 1;
+
             bitOffsetForField[i] = numBitsPerRecord;
             numBitsPerRecord += maxBitsForField[i];
         }
