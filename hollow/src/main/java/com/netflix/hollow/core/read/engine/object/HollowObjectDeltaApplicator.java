@@ -72,7 +72,7 @@ class HollowObjectDeltaApplicator {
 
         for(int i=0;i<target.bitsPerField.length;i++) {
             target.bitsPerField[i] = deltaFieldIndexMapping[i] == -1 ? from.bitsPerField[i] : delta.bitsPerField[deltaFieldIndexMapping[i]];
-            target.nullValueForField[i] = (1L << target.bitsPerField[i]) - 1;
+            target.nullValueForField[i] = target.bitsPerField[i] == 64 ? -1L : (1L << target.bitsPerField[i]) - 1;
             target.bitOffsetPerField[i] = target.bitsPerRecord;
             target.bitsPerRecord += target.bitsPerField[i];
             if(target.bitsPerField[i] != 0)
