@@ -7,12 +7,12 @@ import java.io.InputStream;
 public class TestHeaderBlob extends HeaderBlob {
     private final InputStream inputStream;
 
-    public TestHeaderBlob(long fromVersion, long toVersion) {
-        this(fromVersion, toVersion, null);
+    public TestHeaderBlob(long version) {
+        this(version, null);
     }
 
-    public TestHeaderBlob(long fromVersion, long toVersion, InputStream inputStream) {
-        super(fromVersion, toVersion);
+    public TestHeaderBlob(long version, InputStream inputStream) {
+        super(version);
         this.inputStream = inputStream;
     }
 

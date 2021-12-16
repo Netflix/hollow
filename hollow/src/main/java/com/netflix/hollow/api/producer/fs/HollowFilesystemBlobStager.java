@@ -113,18 +113,18 @@ public class HollowFilesystemBlobStager implements BlobStager {
 
     @Override
     public HollowProducer.HeaderBlob openHeader(long version) {
-        return new FilesystemHeaderBlob(HollowConstants.VERSION_NONE, version, stagingPath, compressor);
+        return new FilesystemHeaderBlob(version, stagingPath, compressor);
     }
 
     public static class FilesystemHeaderBlob extends HeaderBlob {
         protected final Path path;
         private final BlobCompressor compressor;
 
-        protected FilesystemHeaderBlob(long fromVersion, long toVersion, Path dirPath, BlobCompressor compressor) {
-            super(fromVersion, toVersion);
+        protected FilesystemHeaderBlob(long version, Path dirPath, BlobCompressor compressor) {
+            super(version);
             this.compressor = compressor;
             int randomExtension = new Random().nextInt() & Integer.MAX_VALUE;
-            this.path = dirPath.resolve(String.format("header-%d.%s", toVersion, Integer.toHexString(randomExtension)));
+            this.path = dirPath.resolve(String.format("header-%d.%s", version, Integer.toHexString(randomExtension)));
         }
 
         @Override

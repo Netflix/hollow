@@ -59,14 +59,14 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
 
     @Override
     public HollowProducer.HeaderBlob openHeader(long version) {
-        return new InMemoryHeaderBlob(HollowConstants.VERSION_NONE, version);
+        return new InMemoryHeaderBlob(version);
     }
 
     public static class InMemoryHeaderBlob extends HeaderBlob {
         private byte[] data;
 
-        protected InMemoryHeaderBlob(long fromVersion, long toVersion) {
-            super(fromVersion, toVersion);
+        protected InMemoryHeaderBlob(long version) {
+            super(version);
         }
 
         @Override

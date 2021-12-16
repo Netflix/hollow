@@ -37,7 +37,7 @@ class HollowClientConsumerBridge {
                 if(blob == null)
                     return null;
 
-                return new HollowConsumer.HeaderBlob(-1L, desiredVersion) {
+                return new HollowConsumer.HeaderBlob(desiredVersion) {
                     @Override
                     public InputStream getInputStream() throws IOException {
                         return null;

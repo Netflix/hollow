@@ -556,6 +556,7 @@ abstract class AbstractHollowProducer {
                 artifacts.reverseDelta = stageBlob(listeners,
                         blobStager.openReverseDelta(toVersion, readStates.current().getVersion()));
 
+                publishHeader(listeners, artifacts.header);
                 publishBlob(listeners, artifacts.delta);
                 publishBlob(listeners, artifacts.reverseDelta);
 
@@ -572,11 +573,11 @@ abstract class AbstractHollowProducer {
                     artifacts.markSnapshotPublishComplete();
                 }
             } else {
+                publishHeader(listeners, artifacts.header);
                 publishBlob(listeners, artifacts.snapshot);
                 artifacts.markSnapshotPublishComplete();
                 numStatesUntilNextSnapshot = numStatesBetweenSnapshots;
             }
-            publishHeader(listeners, artifacts.header);
             psb.success();
         } catch (Throwable throwable) {
             psb.fail(throwable);

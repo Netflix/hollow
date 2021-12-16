@@ -88,13 +88,13 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
 
     @Override
     public void publish(HollowProducer.HeaderBlob headerBlob) {
-        HeaderBlob consumerBlob = new HeaderBlob(headerBlob.getFromVersion(), headerBlob.getToVersion()) {
+        HeaderBlob consumerBlob = new HeaderBlob(headerBlob.getVersion()) {
             @Override
             public InputStream getInputStream() throws IOException {
                 return headerBlob.newInputStream();
             }
         };
-        headers.put(headerBlob.getToVersion(), consumerBlob);
+        headers.put(headerBlob.getVersion(), consumerBlob);
     }
 
     @Override

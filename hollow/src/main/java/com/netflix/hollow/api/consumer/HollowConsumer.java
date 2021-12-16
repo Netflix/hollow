@@ -39,6 +39,8 @@ import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.tools.history.HollowHistory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -498,8 +500,12 @@ public class HollowConsumer {
 
     public static abstract class HeaderBlob extends AbstractVersionedBlob{
 
-        protected HeaderBlob(long fromVersion, long toVersion) {
-            super(fromVersion, toVersion);
+        protected HeaderBlob(long version) {
+            super(-1L, version);
+        }
+
+        public long getVersion() {
+            return this.toVersion;
         }
     }
 

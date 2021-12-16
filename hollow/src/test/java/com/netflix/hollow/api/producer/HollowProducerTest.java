@@ -485,8 +485,8 @@ public class HollowProducerTest {
             File headerBlobFile = headerBlob.getFile();
             File copiedFile = copyFile(headerBlobFile);
 
-            headerBlobMap.put(headerBlob.getToVersion(), headerBlob);
-            headerFileMap.put(headerBlob.getToVersion(), copiedFile);
+            headerBlobMap.put(headerBlob.getVersion(), headerBlob);
+            headerFileMap.put(headerBlob.getVersion(), copiedFile);
             System.out.println("Published Header:" + copiedFile);
         }
     }

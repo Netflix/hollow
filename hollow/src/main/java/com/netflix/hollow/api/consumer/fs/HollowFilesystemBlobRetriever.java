@@ -119,7 +119,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
     public HollowConsumer.HeaderBlob retrieveHeaderBlob(long desiredVersion) {
         Path exactPath = blobStorePath.resolve("header-" + desiredVersion);
         if (Files.exists(exactPath))
-            return new FilesystemHeaderBlob(exactPath, -1L, desiredVersion);
+            return new FilesystemHeaderBlob(exactPath, desiredVersion);
 
         long maxVersionBeforeDesired = HollowConstants.VERSION_NONE;
         try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(blobStorePath)) {
@@ -137,7 +137,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         }
         HollowConsumer.HeaderBlob filesystemBlob = null;
         if (maxVersionBeforeDesired != HollowConstants.VERSION_NONE) {
-            filesystemBlob = new FilesystemHeaderBlob(blobStorePath.resolve("snapshot-" + maxVersionBeforeDesired), -1L, maxVersionBeforeDesired);
+            filesystemBlob = new FilesystemHeaderBlob(blobStorePath.resolve("snapshot-" + maxVersionBeforeDesired), maxVersionBeforeDesired);
             if (useExistingStaleSnapshot) {
                 return filesystemBlob;
             }
@@ -308,8 +308,8 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
     private static class FilesystemHeaderBlob extends HollowConsumer.HeaderBlob {
         private final Path path;
 
-        protected FilesystemHeaderBlob(Path headerPath,long fromVersion, long toVersion) {
-            super(fromVersion, toVersion);
+        protected FilesystemHeaderBlob(Path headerPath, long version) {
+            super(version);
             this.path = headerPath;
         }
 
@@ -389,7 +389,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         private final Path path;
 
         protected HeaderBlobFromBackupToFilesystem(HollowConsumer.HeaderBlob remoteHeaderBlob, Path destinationPath) {
-            super(remoteHeaderBlob.getFromVersion(), remoteHeaderBlob.getToVersion());
+            super(remoteHeaderBlob.getVersion());
             this.path = destinationPath;
             this.remoteHeaderBlob = remoteHeaderBlob;
         }

@@ -595,28 +595,23 @@ public class HollowProducer extends AbstractHollowProducer {
          *
          * @param headerBlob the header blob to publish
          */
-        void publish(HollowProducer.HeaderBlob headerBlob);
+        default void publish(HollowProducer.HeaderBlob headerBlob) {
+        }
     }
 
     public static abstract class HeaderBlob {
-        protected final long toVersion;
-        protected final long fromVersion;
+        protected final long version;
 
-        protected HeaderBlob(long fromVersion, long toVersion) {
-            this.fromVersion = fromVersion;
-            this.toVersion = toVersion;
+        protected HeaderBlob(long version) {
+            this.version = version;
         }
 
         public abstract void cleanup();
         protected abstract void write(HollowBlobWriter blobWriter) throws IOException;
         public abstract InputStream newInputStream() throws IOException;
 
-        public long getFromVersion() {
-            return this.fromVersion;
-        }
-
-        public long getToVersion() {
-            return toVersion;
+        public long getVersion() {
+            return version;
         }
 
         @Deprecated

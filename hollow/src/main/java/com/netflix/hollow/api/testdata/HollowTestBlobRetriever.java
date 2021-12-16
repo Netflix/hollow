@@ -74,8 +74,8 @@ class HollowTestBlobRetriever implements BlobRetriever {
     public static class TestHeaderBlob extends HeaderBlob {
         private final byte[] data;
 
-        protected TestHeaderBlob(long fromVersion, long toVersion, byte[] data) {
-            super(fromVersion, toVersion);
+        protected TestHeaderBlob(long version, byte[] data) {
+            super(version);
             this.data = data;
         }
 

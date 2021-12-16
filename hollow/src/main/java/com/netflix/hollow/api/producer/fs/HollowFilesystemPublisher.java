@@ -45,7 +45,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
 
     @Override
     public void publish(HollowProducer.HeaderBlob headerBlob) {
-        Path destination = blobStorePath.resolve(String.format("header-%d", headerBlob.getToVersion()));
+        Path destination = blobStorePath.resolve(String.format("header-%d", headerBlob.getVersion()));
         try (
                 InputStream is = headerBlob.newInputStream();
                 OutputStream os = Files.newOutputStream(destination)

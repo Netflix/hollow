@@ -276,10 +276,10 @@ public class HollowUpdatePlannerTest {
         mockTransitionCreator.addSnapshot(desiredVersion, result);
     }
 
-    private void addMockHeader(long desiredVersion, long actualVersion) {
-        HeaderBlob result = new TestHeaderBlob(Long.MIN_VALUE, actualVersion);
+    private void addMockHeader(long actualVersion) {
+        HeaderBlob result = new TestHeaderBlob(actualVersion);
 
-        mockTransitionCreator.addHeader(desiredVersion, result);
+        mockTransitionCreator.addHeader(actualVersion, result);
     }
 
     private void addMockDelta(long fromVersion, long toVersion) {
