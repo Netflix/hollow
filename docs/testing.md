@@ -34,3 +34,42 @@ TestHollowConsumer consumer = new TestHollowConsumer.Builder()
 consumer.addSnapshot(latestVersion, stateEngine);
 consumer.triggerRefresh();
 ```
+
+### HollowTestDataAPIGenerator
+
+Hollow Test Data API eases the creation of dummy data for testing. 
+
+The Test API can be generated using the `HollowTestDataAPIGenerator` class by passing in a `HollowDataset` or using the data model like- 
+
+```java
+HollowTestDataAPIGenerator.generate(
+    readStateEngine, // from a pre-published state or from the data model using SimpleHollowDataset.fromClassDefinitions(Movie.class) 
+    "some.package.name", 
+    "InputTestData",
+    "/path/to/generated/sources/");
+```
+
+Then dummy data can be initialized using the generated API, for e.g.-
+```java
+InputTestData input = new InputTestData();
+input
+    .Movie() 
+        .id(1L)
+        .title("foo")
+        .countries() // is a set 
+            .String("US")
+            .String("CA")
+            .up() // to parent
+        .tags() // is a map
+            .entry(TYPE, "Movie")
+            .entry(GENRE, "action");
+```
+
+And a `HollowConsumer` can be initialized with the dummy data like- 
+```java
+HollowConsumer consumer = input
+    .newConsumerBuilder()
+    .withGeneratedAPIClass(ClientAPI.class) // note this is the client API used by consumers (and not the Test API generated above)
+    .build();
+input.buildSnapshot(consumer);
+```
