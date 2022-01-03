@@ -136,12 +136,88 @@ Each `HollowTypeReadState` underneath a `HollowReadStateEngine` contains the met
 
 ## Caching
 
-Although a lot of effort has gone into minimizing the cost to read Hollow data, there is still inevitably a performance difference between accessing a field in a POJO and accessing a field in Hollow.  In general, this will not be a performance bottleneck, but in some rare cases the performance of tight inner loops may suffer on consumers.  
+Although a lot of effort has gone into minimizing the cost to read Hollow data, there is still inevitably a performance difference between accessing a field in a POJO and accessing a field in Hollow [see also: [Performance API](#performance-api)]. In general, this will not be a performance bottleneck, but in some rare cases the performance of tight inner loops may suffer on consumers.
 
 When there is a type with a low cardinality, we can instantiate and cache a POJO implementation for each ordinal, which can be used by consumers in tight inner loops.  This is accomplished by simply passing a `Set<String>` as the second constructor argument when instantiating a custom-generated Hollow API.  The elements in the Set should be the types to cache.
 
 !!! danger "Avoid Premature Optimization"
     Caching should be used judiciously.  In all but the tightest of loops, caching will be unnecessary, and can even be detrimental to performance for types with a large cardinality.
+
+## Performance API
+
+A specially generated consumer API allows for traversal of a dataset without ever creating POJOs. Instead, record handles are longs (called Refs). The high bits of a Ref contain a type identifier, and the low bits contain the record's ordinal.
+
+Performance API can be generated using the `HollowPerformanceAPIGenerator` class like-
+```java
+HollowDataset dataset = SimpleHollowDataset.fromClassDefinitions(TestRecord.class);  // alternatively, a snapshot from a previous producer run can be used if available
+HollowPerformanceAPIGenerator.newBuilder()
+        .withDataset(dataset)
+        .withAPIClassname("TestPerfAPI")
+        .withPackageName("some.package.name")
+        .withDestination("/path/to/generated/sources")
+        .build()
+        .generateSourceFiles();
+```
+
+For an example of Performance API usage consider this data model-
+```java
+@HollowPrimaryKey(fields="id")
+public class TestRecord {
+
+    public final int id;
+    @HollowInline
+    public final String strVal;
+    @HollowHashKey(fields= {"subVal", "iSubVal"})
+    public Set<TestSubRecord> sub;
+
+    public TestRecord(int id, String strVal, int... subVal) {
+        this.id = id;
+        this.strVal = strVal;
+        this.sub = new HashSet<>();
+
+        for(int val : subVal) {
+            sub.add(new TestSubRecord(val, String.valueOf(val)));
+        }
+    }
+
+    @HollowTypeName(name="TestSubRecord")
+    public static class TestSubRecord {
+        @HollowInline final String subVal;
+        final int iSubVal;
+
+        public TestSubRecord(int iSubVal, String subVal) {
+            this.iSubVal = iSubVal;
+            this.subVal = subVal;
+        }
+    }
+}
+```
+
+Performance API usage-
+```java
+HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever)
+    .withAnnouncementWatcher(announcementWatcher)
+    .withGeneratedAPIClass(TestPerfAPI.class) // in place of the traditional client API
+    .build();
+
+TestPerfAPI api = (TestPerfAPI) consumer.getAPI();
+
+long ref = api.TestRecord.refForOrdinal(1);
+System.out.println(api.TestRecord.getId(ref));
+System.out.println(api.TestRecord.getStrVal(ref));
+
+long subSetRef = api.TestRecord.getSubRef(ref);
+
+HollowPerfReferenceIterator iter = api.SetOfTestSubRecord.iterator(subSetRef);
+while(iter.hasNext()) {
+    long subRef = iter.next();
+    System.out.println(api.TestSubRecord.getSubVal(subRef));
+}
+
+Set<Integer> subSet = api.SetOfTestSubRecord.backedSet(subSetRef, api.TestSubRecord::getISubVal, k -> new Object[] { String.valueOf(k), k });
+System.out.println(subSet);
+System.out.println(subSet.contains(2002));
+```
 
 ## Hollow Heap Effects
 
