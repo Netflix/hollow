@@ -43,13 +43,15 @@ The Test API can be generated using the `HollowTestDataAPIGenerator` class by pa
 
 ```java
 HollowTestDataAPIGenerator.generate(
-    readStateEngine, // from a pre-published state or from the data model using SimpleHollowDataset.fromClassDefinitions(Movie.class) 
+    dataset,
     "some.package.name", 
     "InputTestData",
-    "/path/to/generated/sources/");
+    "/path/to/generated/sources");
 ```
-
-Then dummy data can be initialized using the generated API, for e.g.-
+where `dataset` could be a snapshot published by a prior producer run if available, or it could be initialized from the 
+data model classes by doing `SimpleHollowDataset.fromClassDefinitions(Movie.class)` where `Movie.class` is the 
+top-level Class in the data model. In this example an instance of the generated class `InputTestData` can then be used 
+to construct a state for the consumer with dummy data for the test for e.g.-
 ```java
 InputTestData input = new InputTestData();
 input
@@ -65,11 +67,11 @@ input
             .entry(GENRE, "action");
 ```
 
-And a `HollowConsumer` can be initialized with the dummy data like- 
+And a `HollowConsumer` can be initialized with the data state like-
 ```java
 HollowConsumer consumer = input
     .newConsumerBuilder()
-    .withGeneratedAPIClass(ClientAPI.class) // note this is the client API used by consumers (and not the Test API generated above)
+    .withGeneratedAPIClass(ClientAPI.class) // the client API used to access data in a Hollow Consumer and not the test data generator API that was generated in this example
     .build();
 input.buildSnapshot(consumer);
 ```
