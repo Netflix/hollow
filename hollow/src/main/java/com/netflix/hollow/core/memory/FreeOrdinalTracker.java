@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -83,8 +83,49 @@ public class FreeOrdinalTracker {
      */
     public void sort() {
         Arrays.sort(freeOrdinals, 0, size);
+        reverseFreeOrdinalPool();
+    }
 
-        /// reverse the ordering
+    /**
+     * Focus returned ordinal holes in as few shards as possible.
+     * Within each shard, return ordinals in ascending order.
+     */
+    public void sort(int numShards) {
+        int shardNumberMask = numShards - 1;
+        Shard shards[] = new Shard[numShards];
+        for(int i=0;i<shards.length;i++)
+            shards[i] = new Shard();
+
+        for(int i=0;i<size;i++)
+            shards[freeOrdinals[i] & shardNumberMask].freeOrdinalCount++;
+
+        Shard orderedShards[] = Arrays.copyOf(shards, shards.length);
+        Arrays.sort(orderedShards, (s1, s2) -> s2.freeOrdinalCount - s1.freeOrdinalCount);
+
+        for(int i=1;i<numShards;i++)
+            orderedShards[i].currentPos = orderedShards[i-1].currentPos + orderedShards[i-1].freeOrdinalCount;
+
+        /// each shard will receive the ordinals in ascending order.
+        Arrays.sort(freeOrdinals, 0, size);
+
+        int newFreeOrdinals[] = new int[freeOrdinals.length];
+        for(int i=0;i<size;i++) {
+            Shard shard = shards[freeOrdinals[i] & shardNumberMask];
+            newFreeOrdinals[shard.currentPos] = freeOrdinals[i];
+            shard.currentPos++;
+        }
+
+        freeOrdinals = newFreeOrdinals;
+
+        reverseFreeOrdinalPool();
+    }
+
+    private static class Shard {
+        private int freeOrdinalCount;
+        private int currentPos;
+    }
+
+    private void reverseFreeOrdinalPool() {
         int midpoint = size / 2;
         for(int i=0;i<midpoint;i++) {
             int temp = freeOrdinals[i];

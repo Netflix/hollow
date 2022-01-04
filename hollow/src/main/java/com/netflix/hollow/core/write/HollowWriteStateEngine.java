@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -69,6 +69,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     
     //// target a maximum shard size to reduce excess memory pool requirement 
     private long targetMaxTypeShardSize = Long.MAX_VALUE;
+    //// focus filling ordinal holes in as few shards as possible to make delta application more efficient for consumers
+    private boolean focusHoleFillInFewestShards = false;
 
     private List<String> restoredStates;
     private boolean preparedForNextCycle = true;
@@ -396,11 +398,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     /**
      * Setting a target max type shard size (specified in bytes) will limit the excess memory pool required to perform delta transitions.
      * 
-     * For use cases where all consumers are running with hollow v2.1.0 or greater, it is recommended to set this value to 
-     * something reasonably small, for example 25MB.
-     * 
-     * In a future release, this value will default to  (25 * 1024 * 1024).  It is currently set to Long.MAX_VALUE to retain backwards
-     * compatibility with pre v2.1.0 consumers.
+     * This value defaults to  (16 * 1024 * 1024).
      *
      * @param targetMaxTypeShardSize the target max type shard size, in bytes
      */
@@ -412,6 +410,19 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         return targetMaxTypeShardSize;
     }
     
+    /**
+     * Experimental: Setting this will focus the holes returned by the FreeOrdinalTracker for each state into as few shards as possible.
+     *
+     * This can be used by the consumers to reduce the work necessary to apply a delta, by skipping recreation of shards where no records are added.
+     */
+    public void setFocusHoleFillInFewestShards(boolean focusHoleFillInFewestShards) {
+        this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
+    }
+
+    boolean isFocusHoleFillInFewestShards() {
+        return focusHoleFillInFewestShards;
+    }
+
     private long mintNewRandomizedStateTag() {
         Random rand = new Random();
         

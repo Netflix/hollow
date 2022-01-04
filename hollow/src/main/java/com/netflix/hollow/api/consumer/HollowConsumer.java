@@ -197,6 +197,8 @@ public class HollowConsumer {
                 metrics,
                 builder.metricsCollector);
         updater.setFilter(builder.typeFilter);
+        if(builder.skipTypeShardUpdateWithNoAdditions)
+            updater.setSkipShardUpdateWithNoAdditions(true);
         this.announcementWatcher = builder.announcementWatcher;
         this.refreshExecutor = builder.refreshExecutor;
         this.refreshLock = new ReentrantReadWriteLock();
@@ -995,6 +997,7 @@ public class HollowConsumer {
         protected Executor refreshExecutor = null;
         protected MemoryMode memoryMode = MemoryMode.ON_HEAP;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
+        protected boolean skipTypeShardUpdateWithNoAdditions = false;
 
         public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -1178,6 +1181,14 @@ public class HollowConsumer {
 
         public B withMetricsCollector(HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
             this.metricsCollector = metricsCollector;
+            return (B)this;
+        }
+        
+        /**
+         * Experimental: When there are no updates for a type shard in a delta, skip updating that type shard.
+         */
+        public B withSkipTypeShardUpdateWithNoAdditions() {
+            this.skipTypeShardUpdateWithNoAdditions = true;
             return (B)this;
         }
 

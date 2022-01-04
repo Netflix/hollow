@@ -55,6 +55,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     private final Map<String, List<HollowTypeStateListener>> listeners;
     private final HollowObjectHashCodeFinder hashCodeFinder;
     private final boolean listenToAllPopulatedOrdinals;
+    private boolean skipTypeShardUpdateWithNoAdditions;
     private ArraySegmentRecycler memoryRecycler;
     private Map<String,String> headerTags;
     private Set<String> typesWithDefinedHashCodes = new HashSet<String>();
@@ -203,6 +204,17 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
 
     public boolean isListenToAllPopulatedOrdinals() {
         return listenToAllPopulatedOrdinals;
+    }
+
+    /**
+     * Experimental: When there are no updates for a type shard in a delta, skip updating that type shard.
+     */
+    public void setSkipTypeShardUpdateWithNoAdditions(boolean skipTypeShardUpdateWithNoAdditions) {
+        this.skipTypeShardUpdateWithNoAdditions = skipTypeShardUpdateWithNoAdditions;
+    }
+
+    public boolean isSkipTypeShardUpdateWithNoAdditions() {
+        return skipTypeShardUpdateWithNoAdditions;
     }
 
     @Override

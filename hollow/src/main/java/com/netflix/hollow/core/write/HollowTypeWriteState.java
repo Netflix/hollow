@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -138,12 +138,12 @@ public abstract class HollowTypeWriteState {
     public void resetToLastPrepareForNextCycle() {
         if(restoredReadState == null) {
             currentCyclePopulated.clearAll();
-            ordinalMap.compact(previousCyclePopulated);
+            ordinalMap.compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
         } else {
             /// this state engine began the cycle as a restored state engine
             currentCyclePopulated.clearAll();
             previousCyclePopulated.clearAll();
-            ordinalMap.compact(previousCyclePopulated);
+            ordinalMap.compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
             restoreFrom(restoredReadState);
             wroteData = false;
         }
@@ -251,7 +251,7 @@ public abstract class HollowTypeWriteState {
      * Postcondition: We are ready to add objects to this state engine for the next server cycle.
      */
     public void prepareForNextCycle() {
-        ordinalMap.compact(currentCyclePopulated);
+        ordinalMap.compact(currentCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
 
         ThreadSafeBitSet temp = previousCyclePopulated;
         previousCyclePopulated = currentCyclePopulated;
