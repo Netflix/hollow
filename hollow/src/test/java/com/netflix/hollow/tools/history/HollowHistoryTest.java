@@ -20,6 +20,7 @@ import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.api.objects.generic.GenericHollowRecordHelper;
 import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -28,8 +29,11 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoryTypeKeyIndex;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.Assert;
@@ -46,7 +50,8 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
 
     private static final String B_TYPE = "B";
     private static final String B_FN_PREFIX = "b";
-    
+
+
     @Override
     @Before
     public void setUp() {
@@ -64,6 +69,8 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
 
         super.setUp();
     }
+
+
 
     @Test
     public void test() throws IOException {

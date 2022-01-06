@@ -57,6 +57,7 @@ public class HollowHistory {
     private final HollowHistoricalStateCreator creator;
     private final int maxHistoricalStatesToKeep;
 
+    private HollowHistoricalStateDataAccess latestHollowHistoricalDataAccess;
     private HollowReadStateEngine latestHollowReadStateEngine;
     private Map<String, String> latestHeaderEntries;
     private final List<HollowHistoricalState> historicalStates;
@@ -167,6 +168,27 @@ public class HollowHistory {
         HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
 
         addHistoricalState(historicalState);
+        this.latestVersion = newVersion;
+        this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
+    }
+
+    /**
+     * Call this method after each time a delta occurs in the backing {@link HollowReadStateEngine}.  This
+     * is how the HollowHistory knows how to create a new {@link HollowHistoricalState}.
+     *
+     * @param newVersion The version of the new state
+     */
+    public void reverseDeltaOccurred(long newVersion) {
+        keyIndex.update(latestHollowReadStateEngine, true);
+
+        HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);// snap:
+
+        historicalDataAccess.setNextState(latestHollowReadStateEngine);
+
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta();
+        HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
+
+        addHistoricalStateReverseDelta(historicalState);
         this.latestVersion = newVersion;
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
     }
@@ -346,11 +368,24 @@ public class HollowHistory {
             historicalStates.get(0).setNextState(historicalState);
         }
 
-        historicalStates.add(0, historicalState);
+        historicalStates.add(0, historicalState);   // add to the beginning of the list
         historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
 
         if(historicalStates.size() > maxHistoricalStatesToKeep) {
             removeHistoricalStates(1);
+        }
+    }
+    private void addHistoricalStateReverseDelta(HollowHistoricalState historicalState) {
+        if(historicalStates.size() > 0) {
+            historicalState.getDataAccess().setNextState(historicalStates.get(0).getDataAccess());
+            historicalState.setNextState(historicalStates.get(0));
+        }
+
+        historicalStates.add(historicalState);  // add to the end of the list
+        historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
+
+        if(historicalStates.size() > maxHistoricalStatesToKeep) {
+            removeHistoricalStates(1);  // SNAP: test that the expected state is being dropped
         }
     }
 
