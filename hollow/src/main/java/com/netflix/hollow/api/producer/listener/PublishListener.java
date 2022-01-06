@@ -97,23 +97,4 @@ public interface PublishListener extends HollowProducerEventListener {
      * @param elapsed duration of the publish stage in {@code unit} units
      */
     void onPublishComplete(Status status, long version, Duration elapsed);
-
-    /**
-     * Called once a header blob has been staged successfully or failed to stage.
-     *
-     * @param status status of staging. {@link Status#getType()} returns {@code SUCCESS} or {@code FAIL}.
-     * @param headerBlob the header blob
-     * @param elapsed time taken to stage the header blob
-     */
-    default void onHeaderBlobStage(Status status, HollowProducer.HeaderBlob headerBlob, Duration elapsed) {
-    }
-
-    /**
-     * Called once a header blob has been published successfully or failed to published.
-     *
-     * @param status status of publishing. {@link Status#getType()} returns {@code SUCCESS} or {@code FAIL}.
-     * @param headerBlob the header blob
-     * @param elapsed time taken to publish the blob
-     */
-    void onHeaderBlobPublish(Status status, HollowProducer.HeaderBlob headerBlob, Duration elapsed);
 }

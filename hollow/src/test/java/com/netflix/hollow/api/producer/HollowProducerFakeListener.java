@@ -1,6 +1,5 @@
 package com.netflix.hollow.api.producer;
 
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 public class HollowProducerFakeListener implements HollowProducerListener {
@@ -42,10 +41,6 @@ public class HollowProducerFakeListener implements HollowProducerListener {
 
     @Override
     public void onPublishStart(long version) { }
-
-    @Override
-    public void onHeaderBlobPublish(com.netflix.hollow.api.producer.Status status, HollowProducer.HeaderBlob headerBlob, Duration elapsed) {
-    }
 
     @Override
     public void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit) { }

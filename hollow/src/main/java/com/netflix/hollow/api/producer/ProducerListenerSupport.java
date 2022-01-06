@@ -213,27 +213,10 @@ final class ProducerListenerSupport extends ListenerSupport {
                     l -> l.onBlobStage(s, blob, elapsed));
         }
 
-        void fireHeaderBlobStage(Status.PublishHeaderBuilder b) {
-            Status s = b.build();
-            HollowProducer.HeaderBlob blob = b.headerBlob;
-            Duration elapsed = b.elapsed();
-
-            fire(PublishListener.class,
-                    l -> l.onHeaderBlobStage(s, blob, elapsed));
-        }
 
         void fireBlobPublishAsync(CompletableFuture<HollowProducer.Blob> f) {
             fire(PublishListener.class,
                     l -> l.onBlobPublishAsync(f));
-        }
-
-        void fireHeaderBlobPublish(Status.PublishHeaderBuilder b) {
-            Status s = b.build();
-            HollowProducer.HeaderBlob blob = b.headerBlob;
-            Duration elapsed = b.elapsed();
-
-            fire(PublishListener.class,
-                    l -> l.onHeaderBlobPublish(s, blob, elapsed));
         }
 
         void fireBlobPublish(Status.PublishBuilder b) {
@@ -253,7 +236,6 @@ final class ProducerListenerSupport extends ListenerSupport {
             fire(PublishListener.class,
                     l -> l.onPublishComplete(s, version, elapsed));
         }
-
 
         Status.StageWithStateBuilder fireIntegrityCheckStart(HollowProducer.ReadState readState) {
             long version = readState.getVersion();

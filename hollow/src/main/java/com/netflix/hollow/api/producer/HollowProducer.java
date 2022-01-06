@@ -959,11 +959,6 @@ public class HollowProducer extends AbstractHollowProducer {
          * This method provides an opportunity to remove old reverse deltas.
          */
         public abstract void cleanReverseDeltas();
-
-        /**
-         * This method provides an opportunity to remove old header blobs.
-         */
-        public abstract void cleanHeader();
     }
 
     /**

@@ -33,6 +33,8 @@ import com.netflix.hollow.api.producer.HollowProducerListener.Status;
 import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
+import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
@@ -213,6 +215,19 @@ public class HollowProducerTest {
         Assert.assertNotNull(lastRestoreStatus);
         Assert.assertEquals(Status.SUCCESS, lastRestoreStatus.getStatus());
         Assert.assertEquals("Version should be the same", version, lastRestoreStatus.getDesiredVersion());
+    }
+
+    @Test
+    public void testHeaderPublish() throws IOException {
+        HollowProducer producer = createProducer(tmpFolder, schema);
+        long version = testPublishV1(producer, 2, 10);
+        HollowConsumer.HeaderBlob headerBlob = blobRetriever.retrieveHeaderBlob(version);
+        Assert.assertNotNull(headerBlob);
+        Assert.assertEquals(version, headerBlob.getVersion());
+        HollowBlobHeader header = new HollowBlobHeaderReader().readHeader(headerBlob.getInputStream());
+        Assert.assertNotNull(header);
+        Assert.assertEquals(1, header.getSchemas().size());
+        Assert.assertEquals(schema, header.getSchemas().get(0));
     }
 
     @Test
@@ -540,8 +555,28 @@ public class HollowProducerTest {
 
         @Override
         public HollowConsumer.HeaderBlob retrieveHeaderBlob(long desiredVersion) {
-            // No header available.
-            return null;
+            long blobVersion = desiredVersion;
+            File blobFile = headerFileMap.get(desiredVersion);
+            if (blobFile == null) {
+                // find the closest one
+                blobVersion = headerFileMap.keySet().stream()
+                        .filter(l -> l < desiredVersion)
+                        .reduce(Long.MIN_VALUE, Math::max);
+                if (blobVersion == Long.MIN_VALUE) {
+                    return null;
+                } else {
+                    blobFile = headerFileMap.get(blobVersion);
+                }
+            }
+            final File blobFileFinal = blobFile;
+
+            System.out.println("Restored: " + blobFile);
+            return new HollowConsumer.HeaderBlob(blobVersion) {
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return new FileInputStream(blobFileFinal);
+                }
+            };
         }
     }
 }

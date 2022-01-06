@@ -234,17 +234,6 @@ public class HollowProducerListenerTest {
                 Assert.fail();
             }
 
-            @Override
-            public void onHeaderBlobStage(Status status, HollowProducer.HeaderBlob headerBlob, Duration elapsed) {
-                reportCaller();
-            }
-
-            @Override
-            public void onHeaderBlobPublish(Status status, HollowProducer.HeaderBlob headerBlob, Duration elapsed) {
-                reportCaller();
-                Assert.assertTrue(callCount.containsKey("onHeaderBlobStage"));
-                Assert.assertEquals(Status.StatusType.SUCCESS, status.getType());
-            }
 
             @Override public void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed) {
                 if (status.getCause() instanceof AssertionError) {
@@ -311,7 +300,7 @@ public class HollowProducerListenerTest {
 
         Assert.assertTrue(ls.callCount.entrySet().stream().filter(c -> !c.getKey().equals("onAnnouncementStart")).allMatch(c -> c.getValue() == 1));
         Assert.assertEquals(ls.callCount.get("onAnnouncementStart").intValue(), 2);
-        Assert.assertEquals(18, ls.callCount.size());
+        Assert.assertEquals(16, ls.callCount.size());
 
     }
 
@@ -431,18 +420,6 @@ public class HollowProducerListenerTest {
                 Assert.fail();
             }
 
-            @Override
-            public void onHeaderBlobPublish(Status status, HollowProducer.HeaderBlob headerBlob, Duration elapsed) {
-                reportCaller();
-                Assert.assertTrue(callCount.containsKey("onHeaderBlobStage"));
-                Assert.assertEquals(Status.StatusType.SUCCESS, status.getType());
-            }
-
-            @Override
-            public void onHeaderBlobStage(Status status, HollowProducer.HeaderBlob headerBlob, Duration elapsed) {
-                reportCaller();
-            }
-
             @Override public void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed) {
                 if (status.getCause() instanceof AssertionError) {
                     return;
@@ -511,7 +488,7 @@ public class HollowProducerListenerTest {
                 .allMatch(c -> c == 1));
         Assert.assertEquals(3, ls.callCount.get("onBlobStage").intValue());
         Assert.assertEquals(3, ls.callCount.get("onBlobPublish").intValue());
-        Assert.assertEquals(14, ls.callCount.size());
+        Assert.assertEquals(12, ls.callCount.size());
     }
 
     @Test
@@ -623,13 +600,6 @@ public class HollowProducerListenerTest {
                 Assert.fail();
             }
 
-            @Override
-            public void onHeaderBlobPublish(Status status, HollowProducer.HeaderBlob headerBlob, Duration elapsed) {
-                if (status.getCause() instanceof AssertionError) {
-                    return;
-                }
-                Assert.fail();
-            }
 
             @Override public void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed) {
                 if (status.getCause() instanceof AssertionError) {
@@ -799,9 +769,6 @@ public class HollowProducerListenerTest {
             @Override public void onBlobStage(Status status, HollowProducer.Blob blob, Duration elapsed) {
             }
 
-            @Override
-            public void onHeaderBlobPublish(Status status, HollowProducer.HeaderBlob headerBlob, Duration elapsed) {
-            }
 
             @Override public void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed) {
                 Assert.assertNotEquals(HollowProducer.Blob.Type.SNAPSHOT, blob.getType());
@@ -857,10 +824,6 @@ public class HollowProducerListenerTest {
             }
 
             @Override public void onBlobStage(Status status, HollowProducer.Blob blob, Duration elapsed) {
-            }
-
-            @Override
-            public void onHeaderBlobPublish(Status status, HollowProducer.HeaderBlob headerBlob, Duration elapsed) {
             }
 
             @Override public void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed) {

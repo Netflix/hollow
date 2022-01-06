@@ -546,7 +546,7 @@ abstract class AbstractHollowProducer {
         Status.StageBuilder psb = listeners.firePublishStart(toVersion);
         try {
             // We want a header to be created for all states.
-            artifacts.header = stageHeader(listeners, blobStager.openHeader(toVersion));
+            artifacts.header = blobStager.openHeader(toVersion);
             if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
                 artifacts.snapshot = stageBlob(listeners, blobStager.openSnapshot(toVersion));
 
@@ -556,7 +556,7 @@ abstract class AbstractHollowProducer {
                 artifacts.reverseDelta = stageBlob(listeners,
                         blobStager.openReverseDelta(toVersion, readStates.current().getVersion()));
 
-                publishHeader(listeners, artifacts.header);
+                publishHeaderBlob(artifacts.header);
                 publishBlob(listeners, artifacts.delta);
                 publishBlob(listeners, artifacts.reverseDelta);
 
@@ -573,7 +573,7 @@ abstract class AbstractHollowProducer {
                     artifacts.markSnapshotPublishComplete();
                 }
             } else {
-                publishHeader(listeners, artifacts.header);
+                publishHeaderBlob(artifacts.header);
                 publishBlob(listeners, artifacts.snapshot);
                 artifacts.markSnapshotPublishComplete();
                 numStatesUntilNextSnapshot = numStatesBetweenSnapshots;
@@ -587,21 +587,11 @@ abstract class AbstractHollowProducer {
         }
     }
 
-    private HollowProducer.HeaderBlob stageHeader(ProducerListeners listeners, HollowProducer.HeaderBlob headerBlob)
+    private HollowProducer.HeaderBlob publishHeader(HollowProducer.HeaderBlob headerBlob)
             throws IOException {
-        Status.PublishHeaderBuilder builder = new Status.PublishHeaderBuilder();
         HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
-        try {
-            builder.headerBlob(headerBlob);
-            headerBlob.write(writer);
-            builder.success();
-            return headerBlob;
-        } catch (Throwable t) {
-            builder.fail(t);
-            throw t;
-        } finally {
-            listeners.fireHeaderBlobStage(builder);
-        }
+        headerBlob.write(writer);
+        return headerBlob;
     }
 
     private HollowProducer.Blob stageBlob(ProducerListeners listeners, HollowProducer.Blob blob)
@@ -618,19 +608,6 @@ abstract class AbstractHollowProducer {
             throw t;
         } finally {
             listeners.fireBlobStage(builder);
-        }
-    }
-
-    private void publishHeader(ProducerListeners listeners, HollowProducer.HeaderBlob headerBlob) {
-        Status.PublishHeaderBuilder builder = new Status.PublishHeaderBuilder();
-        try {
-            publishHeaderBlob(headerBlob);
-            builder.success();
-        } catch (Throwable t) {
-            builder.fail(t);
-            throw t;
-        } finally {
-            listeners.fireHeaderBlobPublish(builder);
         }
     }
 
@@ -719,9 +696,11 @@ abstract class AbstractHollowProducer {
 
     private void publishHeaderBlob(HollowProducer.HeaderBlob b) {
         try {
+            HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
+            b.write(writer);
             publisher.publish(b);
-        } finally {
-            blobStorageCleaner.cleanHeader();
+        } catch (IOException e){
+            throw new RuntimeException(e);
         }
     }
 
@@ -972,10 +951,6 @@ abstract class AbstractHollowProducer {
 
         @Override
         public void cleanDeltas() {
-        }
-
-        @Override
-        public void cleanHeader() {
         }
     }
 
