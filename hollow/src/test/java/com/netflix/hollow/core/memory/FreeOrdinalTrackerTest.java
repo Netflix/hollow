@@ -1,0 +1,63 @@
+/*
+ *  Copyright 2021 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
+package com.netflix.hollow.core.memory;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+public class FreeOrdinalTrackerTest {
+
+    @Test
+    public void minimizeNumberOfUpdatedShards() {
+        FreeOrdinalTracker tracker = new FreeOrdinalTracker();
+        for(int i=0;i<100;i++)
+            tracker.getFreeOrdinal();
+
+        // shard 3
+        tracker.returnOrdinalToPool(15);
+
+        // shard 1
+        tracker.returnOrdinalToPool(13);
+        tracker.returnOrdinalToPool(9);
+        tracker.returnOrdinalToPool(17);
+        tracker.returnOrdinalToPool(5);
+        tracker.returnOrdinalToPool(1);
+        tracker.returnOrdinalToPool(21);
+
+        // shard 2
+        tracker.returnOrdinalToPool(2);
+        tracker.returnOrdinalToPool(10);
+        tracker.returnOrdinalToPool(14);
+
+        /// sort for 4 shards
+        tracker.sort(4);
+
+        Assert.assertEquals(1, tracker.getFreeOrdinal());
+        Assert.assertEquals(5, tracker.getFreeOrdinal());
+        Assert.assertEquals(9, tracker.getFreeOrdinal());
+        Assert.assertEquals(13, tracker.getFreeOrdinal());
+        Assert.assertEquals(17, tracker.getFreeOrdinal());
+        Assert.assertEquals(21, tracker.getFreeOrdinal());
+        Assert.assertEquals(2, tracker.getFreeOrdinal());
+        Assert.assertEquals(10, tracker.getFreeOrdinal());
+        Assert.assertEquals(14, tracker.getFreeOrdinal());
+        Assert.assertEquals(15, tracker.getFreeOrdinal());
+        Assert.assertEquals(100, tracker.getFreeOrdinal());
+        Assert.assertEquals(101, tracker.getFreeOrdinal());
+    }
+
+}

@@ -92,7 +92,7 @@ abstract class AbstractHollowProducer {
         this(new HollowFilesystemBlobStager(), publisher, announcer,
                 Collections.emptyList(),
                 new VersionMinterWithCounter(), null, 0,
-                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, null,
+                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
                 null, true);
     }
@@ -104,7 +104,7 @@ abstract class AbstractHollowProducer {
         this(b.stager, b.publisher, b.announcer,
                 b.eventListeners,
                 b.versionMinter, b.snapshotPublishExecutor,
-                b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize,
+                b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
                 b.hashCodeFinder, b.doIntegrityCheck);
     }
@@ -118,6 +118,7 @@ abstract class AbstractHollowProducer {
             Executor snapshotPublishExecutor,
             int numStatesBetweenSnapshots,
             long targetMaxTypeShardSize,
+            boolean focusHoleFillInFewestShards,
             HollowMetricsCollector<HollowProducerMetrics> metricsCollector,
             HollowProducer.BlobStorageCleaner blobStorageCleaner,
             SingleProducerEnforcer singleProducerEnforcer,
@@ -137,6 +138,7 @@ abstract class AbstractHollowProducer {
                 ? new HollowWriteStateEngine()
                 : new HollowWriteStateEngine(hashCodeFinder);
         writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
+        writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
 
         this.objectMapper = new HollowObjectMapper(writeEngine);
         if (hashCodeFinder != null) {

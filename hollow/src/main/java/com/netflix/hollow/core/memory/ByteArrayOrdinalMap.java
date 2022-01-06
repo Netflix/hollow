@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016-2019 Netflix, Inc.
+ *  Copyright 2016-2021 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -358,7 +358,7 @@ public class ByteArrayOrdinalMap {
      *
      * @param usedOrdinals a bit set representing the ordinals which are currently referenced by any image.
      */
-    public void compact(ThreadSafeBitSet usedOrdinals) {
+    public void compact(ThreadSafeBitSet usedOrdinals, int numShards, boolean focusHoleFillInFewestShards) {
         long[] populatedReverseKeys = new long[size];
 
         int counter = 0;
@@ -398,7 +398,11 @@ public class ByteArrayOrdinalMap {
         }
 
         byteData.setPosition(currentCopyPointer);
-        freeOrdinalTracker.sort();
+
+        if(focusHoleFillInFewestShards && numShards > 1)
+            freeOrdinalTracker.sort(numShards);
+        else
+            freeOrdinalTracker.sort();
 
         // Reset the array then fill with compacted values
         // Volatile store not required, could use plain store

@@ -403,7 +403,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         case INT:
         case REFERENCE:
             if(VarInt.readVNull(data, readPointer)) {
-               fixedLengthLongArray.setElementValue(fieldBitOffset, bitsPerElement, (1L << bitsPerElement) - 1);
+               fixedLengthLongArray.setElementValue(fieldBitOffset, bitsPerElement, fieldStats.getNullValueForField(fieldIndex));
                readPointer += 1;
             } else {
                 long vLong = VarInt.readVLong(data, readPointer);

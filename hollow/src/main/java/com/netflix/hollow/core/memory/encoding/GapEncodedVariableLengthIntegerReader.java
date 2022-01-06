@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.memory.encoding;
 
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -44,6 +45,10 @@ public class GapEncodedVariableLengthIntegerReader {
         this.data = data;
         this.numBytes = numBytes;
         reset();
+    }
+
+    public boolean isEmpty() {
+        return numBytes == 0;
     }
 
     public void advance() {
@@ -110,4 +115,29 @@ public class GapEncodedVariableLengthIntegerReader {
         }
     }
 
+    public static GapEncodedVariableLengthIntegerReader combine(GapEncodedVariableLengthIntegerReader reader1, GapEncodedVariableLengthIntegerReader reader2, ArraySegmentRecycler memoryRecycler) {
+        reader1.reset();
+        reader2.reset();
+        ByteDataArray arr = new ByteDataArray(memoryRecycler);
+        int cur = 0;
+
+        while(reader1.nextElement() != Integer.MAX_VALUE || reader2.nextElement() != Integer.MAX_VALUE) {
+            if(reader1.nextElement() < reader2.nextElement()) {
+                VarInt.writeVInt(arr, reader1.nextElement() - cur);
+                cur = reader1.nextElement();
+                reader1.advance();
+            } else if(reader2.nextElement() < reader1.nextElement()) {
+                VarInt.writeVInt(arr, reader2.nextElement() - cur);
+                cur = reader2.nextElement();
+                reader2.advance();
+            } else {
+                VarInt.writeVInt(arr, reader1.nextElement() - cur);
+                cur = reader1.nextElement();
+                reader1.advance();
+                reader2.advance();
+            }
+        }
+
+        return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingArray(), (int)arr.length());
+    }
 }

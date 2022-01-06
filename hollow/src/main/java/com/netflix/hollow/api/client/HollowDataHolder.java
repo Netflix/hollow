@@ -100,6 +100,11 @@ class HollowDataHolder {
         return this;
     }
 
+    HollowDataHolder setSkipTypeShardUpdateWithNoAdditions(boolean skipTypeShardUpdateWithNoAdditions) {
+        this.stateEngine.setSkipTypeShardUpdateWithNoAdditions(skipTypeShardUpdateWithNoAdditions);
+        return this;
+    }
+
     void update(HollowUpdatePlan updatePlan, HollowConsumer.RefreshListener[] refreshListeners,
             Runnable apiInitCallback) throws Throwable {
         // Only fail if double snapshot is configured.
