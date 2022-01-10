@@ -172,6 +172,25 @@ public class HollowHistory {
     }
 
     /**
+     * Call this method after each time a delta occurs in the backing {@link HollowReadStateEngine}.  This
+     * is how the HollowHistory knows how to create a new {@link HollowHistoricalState}.
+     *
+     * @param newVersion The version of the new state
+     */
+    public void reverseDeltaOccurred(long newVersion) {
+        keyIndex.update(latestHollowReadStateEngine, true);
+
+        HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
+        historicalDataAccess.setNextState(latestHollowReadStateEngine);
+
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta();
+        HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
+
+        addReverseHistoricalState(historicalState);
+        this.latestVersion = newVersion;
+        this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
+    }
+    /**
      * Call this method after each time a double snapshot occurs.
      * <p>
      * This method will replace the previous backing {@link HollowReadStateEngine} with the newly
@@ -344,6 +363,20 @@ public class HollowHistory {
         if(historicalStates.size() > 0) {
             historicalStates.get(0).getDataAccess().setNextState(historicalState.getDataAccess());
             historicalStates.get(0).setNextState(historicalState);
+        }
+
+        historicalStates.add(0, historicalState);
+        historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
+
+        if(historicalStates.size() > maxHistoricalStatesToKeep) {
+            removeHistoricalStates(1);
+        }
+    }
+
+    private void addReverseHistoricalState(HollowHistoricalState historicalState) {
+        if(historicalStates.size() > 0) {
+            historicalState.getDataAccess().setNextState(historicalStates.get(0).getDataAccess());
+            historicalState.setNextState(historicalStates.get(0));
         }
 
         historicalStates.add(0, historicalState);
