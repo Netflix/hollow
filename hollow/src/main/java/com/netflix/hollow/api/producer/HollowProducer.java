@@ -499,7 +499,7 @@ public class HollowProducer extends AbstractHollowProducer {
         /**
          * Returns a blob with which a {@code HollowProducer} will write a snapshot for the version specified.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.AbstractPublishArtifact)}.
          *
          * @param version the blob version
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
@@ -509,7 +509,7 @@ public class HollowProducer extends AbstractHollowProducer {
         /**
          * Returns a blob with which a {@code HollowProducer} will write a header for the version specified.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.HeaderBlob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.AbstractPublishArtifact)}.
          * @param version the blob version
          * @return a {@link HollowProducer.HeaderBlob} representing a header for the {@code version}
          */
@@ -519,7 +519,7 @@ public class HollowProducer extends AbstractHollowProducer {
          * Returns a blob with which a {@code HollowProducer} will write a forward delta from the version specified to
          * the version specified, i.e. {@code fromVersion => toVersion}.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.AbstractPublishArtifact)}.
          * <p>
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
@@ -533,7 +533,7 @@ public class HollowProducer extends AbstractHollowProducer {
          * Returns a blob with which a {@code HollowProducer} will write a reverse delta from the version specified to
          * the version specified, i.e. {@code fromVersion <= toVersion}.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.AbstractPublishArtifact)}.
          * <p>
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
