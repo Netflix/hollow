@@ -44,7 +44,15 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     }
 
     @Override
-    public void publish(HollowProducer.HeaderBlob headerBlob) {
+    public void publish(HollowProducer.AbstractPublishArtifact publishArtifact) {
+        if (publishArtifact instanceof HollowProducer.HeaderBlob) {
+            publishHeader((HollowProducer.HeaderBlob) publishArtifact);
+        } else {
+            publishBlob((HollowProducer.Blob) publishArtifact);
+        }
+    }
+
+    private void publishHeader(HollowProducer.HeaderBlob headerBlob) {
         Path destination = blobStorePath.resolve(String.format("header-%d", headerBlob.getVersion()));
         try (
                 InputStream is = headerBlob.newInputStream();
@@ -59,8 +67,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
         }
     }
 
-    @Override
-    public void publish(HollowProducer.Blob blob) {
+    private void publishBlob(HollowProducer.Blob blob) {
         Path destination = null;
         
         switch(blob.getType()) {

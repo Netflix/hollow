@@ -468,8 +468,7 @@ public class HollowProducerTest {
     }
 
     private class FakeBlobPublisher implements HollowProducer.Publisher {
-        @Override
-        public void publish(Blob blob) {
+        private void publishBlob(Blob blob) {
             File blobFile = blob.getFile();
             if (!blob.getType().equals(Type.SNAPSHOT)) {
                 // Only snapshot is needed for smoke Test
@@ -495,14 +494,22 @@ public class HollowProducerTest {
             return copiedFile;
         }
 
-        @Override
-        public void publish(HeaderBlob headerBlob) {
+        private void publishHeader(HeaderBlob headerBlob) {
             File headerBlobFile = headerBlob.getFile();
             File copiedFile = copyFile(headerBlobFile);
 
             headerBlobMap.put(headerBlob.getVersion(), headerBlob);
             headerFileMap.put(headerBlob.getVersion(), copiedFile);
             System.out.println("Published Header:" + copiedFile);
+        }
+
+        @Override
+        public void publish(HollowProducer.AbstractPublishArtifact publishArtifact) {
+            if (publishArtifact instanceof HeaderBlob) {
+                publishHeader((HeaderBlob) publishArtifact);
+            } else {
+                publishBlob((Blob) publishArtifact);
+            }
         }
     }
 

@@ -87,7 +87,15 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
     }
 
     @Override
-    public void publish(HollowProducer.HeaderBlob headerBlob) {
+    public void publish(HollowProducer.AbstractPublishArtifact publishArtifact) {
+        if (publishArtifact instanceof HollowProducer.HeaderBlob) {
+            publishHeader((HollowProducer.HeaderBlob) publishArtifact);
+        } else {
+            publishBlob((HollowProducer.Blob) publishArtifact);
+        }
+    }
+
+    private void publishHeader(HollowProducer.HeaderBlob headerBlob) {
         HeaderBlob consumerBlob = new HeaderBlob(headerBlob.getVersion()) {
             @Override
             public InputStream getInputStream() throws IOException {
@@ -97,8 +105,7 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
         headers.put(headerBlob.getVersion(), consumerBlob);
     }
 
-    @Override
-    public void publish(final HollowProducer.Blob blob) {
+    private void publishBlob(final HollowProducer.Blob blob) {
         Blob consumerBlob = new Blob(blob.getFromVersion(), blob.getToVersion()) {
             @Override
             public InputStream getInputStream() throws IOException {

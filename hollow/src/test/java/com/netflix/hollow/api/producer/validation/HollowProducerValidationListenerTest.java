@@ -39,15 +39,7 @@ public class HollowProducerValidationListenerTest {
 
     @Before
     public void setup() {
-        publisher = new Publisher() {
-            @Override
-            public void publish(HollowProducer.Blob blob) {
-            }
-
-            @Override
-            public void publish(HollowProducer.HeaderBlob headerBlob) {
-            }
-        };
+        publisher = publishArtifact -> {};
         announcer = version -> {};
     }
 

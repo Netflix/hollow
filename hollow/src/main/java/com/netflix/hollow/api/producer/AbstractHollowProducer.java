@@ -589,13 +589,6 @@ abstract class AbstractHollowProducer {
         }
     }
 
-    private HollowProducer.HeaderBlob publishHeader(HollowProducer.HeaderBlob headerBlob)
-            throws IOException {
-        HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
-        headerBlob.write(writer);
-        return headerBlob;
-    }
-
     private HollowProducer.Blob stageBlob(ProducerListeners listeners, HollowProducer.Blob blob)
             throws IOException {
         Status.PublishBuilder builder = new Status.PublishBuilder();

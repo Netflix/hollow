@@ -583,36 +583,17 @@ public class HollowProducer extends AbstractHollowProducer {
          * It is guaranteed that {@code blob} was created by calling one of
          * {@link BlobStager#openSnapshot(long)}, {@link BlobStager#openDelta(long, long)}, or
          * {@link BlobStager#openReverseDelta(long, long)} on this publisher.
-         *
-         * @param blob the blob to publish
-         */
-        void publish(HollowProducer.Blob blob);
-
-        /**
-         * Publish the headerBlob specified to this publisher's header blobstore.
-         * <p>
          * {@link BlobStager#openHeader(long)} on this publisher.
          *
-         * @param headerBlob the header blob to publish
+         * @param publishArtifact the blob to publish
          */
-        default void publish(HollowProducer.HeaderBlob headerBlob) {
-        }
+        void publish(HollowProducer.AbstractPublishArtifact publishArtifact);
     }
 
-    public static abstract class HeaderBlob {
-        protected final long version;
-
-        protected HeaderBlob(long version) {
-            this.version = version;
-        }
-
+    public static abstract class AbstractPublishArtifact {
         public abstract void cleanup();
         protected abstract void write(HollowBlobWriter blobWriter) throws IOException;
         public abstract InputStream newInputStream() throws IOException;
-
-        public long getVersion() {
-            return version;
-        }
 
         @Deprecated
         public File getFile() {
@@ -624,7 +605,19 @@ public class HollowProducer extends AbstractHollowProducer {
         }
     }
 
-    public static abstract class Blob {
+    public static abstract class HeaderBlob extends AbstractPublishArtifact{
+        protected final long version;
+
+        protected HeaderBlob(long version) {
+            this.version = version;
+        }
+
+        public long getVersion() {
+            return version;
+        }
+    }
+
+    public static abstract class Blob extends AbstractPublishArtifact{
 
         protected final long fromVersion;
         protected final long toVersion;
@@ -642,27 +635,12 @@ public class HollowProducer extends AbstractHollowProducer {
             this.optionalPartConfig = optionalPartConfig;
         }
 
-        protected abstract void write(HollowBlobWriter writer) throws IOException;
-
-        public abstract InputStream newInputStream() throws IOException;
-
         public InputStream newOptionalPartInputStream(String partName) throws IOException {
             throw new UnsupportedOperationException("The provided HollowProducer.Blob implementation does not support optional blob parts");
         }
 
         public Path getOptionalPartPath(String partName) {
             throw new UnsupportedOperationException("The provided HollowProducer.Blob implementation does not support optional blob parts");
-        }
-
-        public abstract void cleanup();
-
-        @Deprecated
-        public File getFile() {
-            throw new UnsupportedOperationException("File is not available");
-        }
-
-        public Path getPath() {
-            throw new UnsupportedOperationException("Path is not available");
         }
 
         public Type getType() {
