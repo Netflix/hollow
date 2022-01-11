@@ -179,15 +179,18 @@ public class HollowHistory {
      */
     public void reverseDeltaOccurred(long newVersion) {
         keyIndex.update(latestHollowReadStateEngine, true);
-
-        HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
+        long version = 0;
+        if(historicalStates.size()>0){
+            version = historicalStates.get(historicalStates.size()-1).getVersion();
+        }
+        HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(version, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta();
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromReverseDelta();
         HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
 
         addReverseHistoricalState(historicalState);
-        this.latestVersion = newVersion;
+        this.latestVersion = historicalStates.get(0).getVersion();
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
     }
     /**
@@ -308,6 +311,45 @@ public class HollowHistory {
         return keyOrdinalMapping;
     }
 
+    private HollowHistoricalStateKeyOrdinalMapping createKeyOrdinalMappingFromReverseDelta() {
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = new HollowHistoricalStateKeyOrdinalMapping(keyIndex);
+
+        for(String keyType : keyIndex.getTypeKeyIndexes().keySet()) {
+            HollowHistoricalStateTypeKeyOrdinalMapping typeMapping = keyOrdinalMapping.getTypeMapping(keyType);
+            HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestHollowReadStateEngine.getTypeState(keyType);
+            if (typeState==null) {
+                // The type is present in the history's primary key index but is not present
+                // in the latest read state; ensure the mapping is initialized to the default state
+                typeMapping.prepare(0, 0);
+                typeMapping.finish();
+                continue;
+            }
+
+            PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
+
+            RemovedOrdinalIterator removalIterator = new RemovedOrdinalIterator(listener);
+            RemovedOrdinalIterator additionsIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
+
+            typeMapping.prepare(additionsIterator.countTotal(), removalIterator.countTotal());
+
+            int removedOrdinal = removalIterator.next();
+            while(removedOrdinal != -1) {
+                typeMapping.added(typeState, removedOrdinal);
+                removedOrdinal = removalIterator.next();
+            }
+
+            int addedOrdinal = additionsIterator.next();
+            while(addedOrdinal != -1) {
+                typeMapping.removed(typeState, addedOrdinal);
+                addedOrdinal = additionsIterator.next();
+            }
+
+            typeMapping.finish();
+        }
+
+        return keyOrdinalMapping;
+    }
+
     private HollowHistoricalStateKeyOrdinalMapping createKeyOrdinalMappingFromDoubleSnapshot(HollowReadStateEngine newStateEngine, DiffEqualityMappingOrdinalRemapper ordinalRemapper) {
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = new HollowHistoricalStateKeyOrdinalMapping(keyIndex);
         DiffEqualityMapping mapping = ordinalRemapper.getDiffEqualityMapping();
@@ -375,15 +417,15 @@ public class HollowHistory {
 
     private void addReverseHistoricalState(HollowHistoricalState historicalState) {
         if(historicalStates.size() > 0) {
-            historicalState.getDataAccess().setNextState(historicalStates.get(0).getDataAccess());
-            historicalState.setNextState(historicalStates.get(0));
+            historicalState.getDataAccess().setNextState(historicalStates.get(historicalStates.size()-1).getDataAccess());
+            historicalState.setNextState(historicalStates.get(historicalStates.size()-1));
         }
 
-        historicalStates.add(0, historicalState);
+        historicalStates.add(historicalState);
         historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
 
         if(historicalStates.size() > maxHistoricalStatesToKeep) {
-            removeHistoricalStates(1);
+            removeHistoricalStatesForReverseDelta(1);
         }
     }
 
@@ -408,6 +450,31 @@ public class HollowHistory {
 
         while (n-- > 0) {
             HollowHistoricalState removedState = historicalStates.remove(historicalStates.size() - 1);
+            historicalStateLookupMap.remove(removedState.getVersion());
+        }
+    }
+
+    /**
+     * Removes the last {@code n} historical states.
+     *
+     * @param n the number of historical states to remove
+     * @throws IllegalArgumentException if the {@code n} is less than {@code 0} or
+     * greater than the {@link #getNumberOfHistoricalStates() number} of historical
+     * states.
+     */
+    public void removeHistoricalStatesForReverseDelta(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException(String.format(
+                    "Number of states to remove is negative: %d", n));
+        }
+        if (n > historicalStates.size()) {
+            throw new IllegalArgumentException(String.format(
+                    "Number of states to remove, %d, is greater than the number of states. %d",
+                    n, historicalStates.size()));
+        }
+
+        while (n-- > 0) {
+            HollowHistoricalState removedState = historicalStates.remove(0);
             historicalStateLookupMap.remove(removedState.getVersion());
         }
     }
