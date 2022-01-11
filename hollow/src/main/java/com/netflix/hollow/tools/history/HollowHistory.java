@@ -176,9 +176,9 @@ public class HollowHistory {
      * Call this method after each time a delta occurs in the backing {@link HollowReadStateEngine}.  This
      * is how the HollowHistory knows how to create a new {@link HollowHistoricalState}.
      *
-     * @param newVersion The version of the new state
+     * @param oldVersion The version of the old state
      */
-    public void reverseDeltaOccurred(long newVersion) {
+    public void reverseDeltaOccurred(long oldVersion) {
         keyIndex.update(latestHollowReadStateEngine, true);
 
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);// snap:
@@ -186,10 +186,10 @@ public class HollowHistory {
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta();
-        HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
+        HollowHistoricalState historicalState = new HollowHistoricalState(oldVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
 
         addHistoricalStateReverseDelta(historicalState);
-        this.latestVersion = newVersion;
+        this.latestVersion = oldVersion;
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
     }
 
@@ -377,8 +377,8 @@ public class HollowHistory {
     }
     private void addHistoricalStateReverseDelta(HollowHistoricalState historicalState) {
         if(historicalStates.size() > 0) {
-            historicalState.getDataAccess().setNextState(historicalStates.get(0).getDataAccess());
-            historicalState.setNextState(historicalStates.get(0));
+            historicalStates.get(0).getDataAccess().setNextState(historicalState.getDataAccess());
+            historicalStates.get(0).setNextState(historicalState);
         }
 
         historicalStates.add(historicalState);  // add to the end of the list

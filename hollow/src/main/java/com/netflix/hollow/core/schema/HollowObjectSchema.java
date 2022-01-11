@@ -49,7 +49,7 @@ public class HollowObjectSchema extends HollowSchema {
 
     private int size;
 
-    public HollowObjectSchema(String schemaName, int numFields, String... keyFieldPaths) {
+    public  HollowObjectSchema(String schemaName, int numFields, String... keyFieldPaths) {
         this(schemaName, numFields, keyFieldPaths == null || keyFieldPaths.length == 0 ? null : new PrimaryKey(schemaName, keyFieldPaths));
     }
 
