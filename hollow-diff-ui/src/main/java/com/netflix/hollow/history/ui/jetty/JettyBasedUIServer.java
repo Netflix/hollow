@@ -14,29 +14,38 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.explorer.ui.webserver;
+package com.netflix.hollow.history.ui.jetty;
 
-import com.netflix.hollow.explorer.ui.HollowExplorerUI;
-import com.netflix.hollow.ui.HttpHandlerWithServletSupport;
-import com.netflix.hollow.ui.UIBaseWebServer;
-import com.netflix.hollow.ui.UIServer;
+import com.netflix.hollow.history.ui.HollowHistoryUI;
+import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer.UIServer;
+import org.eclipse.jetty.server.Server;
 
-final class UIWebServer implements UIServer {
+final class JettyBasedUIServer implements UIServer {
+    private final Server server;
+    private final HollowHistoryHandler handler;
 
-    private final UIBaseWebServer server;
-
-    public UIWebServer(HollowExplorerUI ui, int port) {
-        server = new UIBaseWebServer(new HttpHandlerWithServletSupport(ui), port);
+    private JettyBasedUIServer(HollowHistoryUI ui, int port) {
+        this.server = new Server(port);
+        this.handler = new HollowHistoryHandler(ui);
     }
 
     public void start() throws Exception {
+        server.setHandler(handler);
         server.start();
     }
+
     public void stop() throws Exception {
         server.stop();
     }
+
     public void join() throws InterruptedException {
         server.join();
     }
 
+    public static final class Factory implements UIServer.Factory {
+        @Override
+        public UIServer newServer(HollowHistoryUI ui, int port) {
+            return new JettyBasedUIServer(ui, port);
+        }
+    }
 }

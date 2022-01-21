@@ -21,29 +21,27 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 
-/**
- * @deprecated
- * This class is replaced by {@link com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer}
- */
-@Deprecated
 public class HollowExplorerUIServer {
+    private static final UIServer.Factory FACTORY = new OptionalDependencyHelper().explorerUIServerFactory();
 
-    private final com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer server;    
+    private final UIServer server;
+    private final HollowExplorerUI ui;
 
     public HollowExplorerUIServer(HollowReadStateEngine readEngine, int port) {
-        server = new com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer( readEngine, port);
+        this(new HollowExplorerUI("", readEngine), port);
     }
 
     public HollowExplorerUIServer(HollowConsumer consumer, int port) {
-        server = new com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer( consumer, port);
+        this(new HollowExplorerUI("", consumer), port);
     }
 
     public HollowExplorerUIServer(HollowClient client, int port) {
-        server = new com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer( client, port);
+        this(new HollowExplorerUI("", client), port);
     }
 
     public HollowExplorerUIServer(HollowExplorerUI ui, int port) {
-        server = new com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer(ui, port);
+        this.server = FACTORY.newServer(ui, port);
+        this.ui = ui;
     }
 
     public HollowExplorerUIServer start() throws Exception {
@@ -51,17 +49,26 @@ public class HollowExplorerUIServer {
         return this;
     }
 
+    public void stop() throws Exception {
+        server.stop();
+    }
+
     public HollowExplorerUIServer join() throws InterruptedException {
         server.join();
         return this;
     }
 
-    public void stop() throws Exception {
-        server.stop();
+    public HollowExplorerUI getUI() {
+        return ui;
     }
 
-    public HollowExplorerUI getUI() {
-        return server.getUI();
-    } 
+    static interface UIServer {
+        void start() throws Exception;
+        void stop() throws Exception;
+        void join() throws InterruptedException;
 
+        static interface Factory {
+            UIServer newServer(HollowExplorerUI ui, int port);
+        }
+    }
 }

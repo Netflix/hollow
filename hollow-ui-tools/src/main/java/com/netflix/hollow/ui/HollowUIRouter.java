@@ -16,9 +16,7 @@
  */
 package com.netflix.hollow.ui;
 
-import java.io.IOException;
 import java.io.InputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
@@ -26,14 +24,10 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
-public abstract class HollowUIRouter extends HttpServlet {
+public abstract class HollowUIRouter {
 
     protected final String baseUrlPath;
     protected final VelocityEngine velocityEngine;
-
-    @Override
-    public abstract void doGet(HttpServletRequest request,
-        HttpServletResponse response) throws IOException;
 
     public HollowUIRouter(String baseUrlPath) {
         if(!baseUrlPath.startsWith("/"))
