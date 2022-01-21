@@ -36,7 +36,7 @@ public class HollowMapDeltaHistoricalStateCreator {
     private final HollowMapTypeReadState typeState;
     private final HollowMapTypeDataElements stateEngineDataElements[];
     private final HollowMapTypeDataElements historicalDataElements;
-    private final RemovedOrdinalIterator iter;
+    private RemovedOrdinalIterator iter;
 
     private final int shardNumberMask;
     private final int shardOrdinalShift;
@@ -128,6 +128,12 @@ public class HollowMapDeltaHistoricalStateCreator {
 
         nextOrdinal++;
         nextStartBucket += numBuckets;
+    }
+
+    public void reverse(){
+        PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
+
+        iter = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
     }
 
 }

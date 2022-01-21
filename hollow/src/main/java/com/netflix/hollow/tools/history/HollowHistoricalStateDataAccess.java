@@ -38,7 +38,7 @@ import java.util.Map;
 public class HollowHistoricalStateDataAccess implements HollowDataAccess {
 
     private final HollowHistory totalHistory;
-    private final long version;
+    private long version;
     private final OrdinalRemapper removedCopyOrdinalMapping;
     private final Map<String, HollowHistoricalSchemaChange> schemaChanges;
     private final Map<String, HollowHistoricalTypeDataAccess> typeDataAccessMap;
@@ -106,6 +106,10 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
 
     public long getVersion() {
         return version;
+    }
+
+    public void setVersion(long newVersion) {
+        version = newVersion;
     }
 
     public void setNextState(HollowDataAccess nextState) {

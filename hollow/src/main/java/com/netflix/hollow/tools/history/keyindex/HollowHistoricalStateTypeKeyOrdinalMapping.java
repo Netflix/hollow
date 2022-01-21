@@ -51,7 +51,6 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
         this.addedOrdinalMap = new IntMap(numAdditions);
         this.removedOrdinalMap = new IntMap(numRemovals);
     }
-
     public void added(HollowTypeReadState typeState, int ordinal) {
         int recordKeyOrdinal = keyIndex.findKeyIndexOrdinal((HollowObjectTypeReadState)typeState, ordinal);
         addedOrdinalMap.put(recordKeyOrdinal, ordinal);
@@ -63,6 +62,20 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
 
     public void removed(HollowTypeReadState typeState, int stateEngineOrdinal, int mappedOrdinal) {
         int recordKeyOrdinal = keyIndex.findKeyIndexOrdinal((HollowObjectTypeReadState)typeState, stateEngineOrdinal);
+        removedOrdinalMap.put(recordKeyOrdinal, mappedOrdinal);
+    }
+
+    public void addedReverse(HollowTypeReadState typeState, int ordinal) {
+        int recordKeyOrdinal = keyIndex.findKeyIndexOrdinalReverse((HollowObjectTypeReadState)typeState, ordinal);
+        addedOrdinalMap.put(recordKeyOrdinal, ordinal);
+    }
+
+    public void removedReverse(HollowTypeReadState typeState, int ordinal) {
+        removedReverse(typeState, ordinal, ordinal);
+    }
+
+    public void removedReverse(HollowTypeReadState typeState, int stateEngineOrdinal, int mappedOrdinal) {
+        int recordKeyOrdinal = keyIndex.findKeyIndexOrdinalReverse((HollowObjectTypeReadState)typeState, stateEngineOrdinal);
         removedOrdinalMap.put(recordKeyOrdinal, mappedOrdinal);
     }
 

@@ -97,6 +97,30 @@ public class HollowHistoricalStateCreator {
         return dataAccess;
     }
 
+    /**
+     * Create a {@link HollowDataAccess} for the prior state of the supplied {@link HollowReadStateEngine} after a delta
+     * has been applied.
+     *
+     * @param version The state's version
+     * @param stateEngine The current {@link HollowReadStateEngine} to which a delta has been applied.
+     * @return a data access for history
+     */
+    public HollowHistoricalStateDataAccess createBasedOnNewReverseDelta(long version, HollowReadStateEngine stateEngine) {
+        IntMapOrdinalRemapper typeRemovedOrdinalMapping = new IntMapOrdinalRemapper();
+
+        List<HollowTypeReadState> historicalTypeStates = new ArrayList<HollowTypeReadState>(stateEngine.getTypeStates().size());
+
+        for(HollowTypeReadState typeState : stateEngine.getTypeStates()) {
+            createReverseDeltaHistoricalTypeState(typeRemovedOrdinalMapping, historicalTypeStates, typeState);
+        }
+
+        HollowHistoricalStateDataAccess dataAccess = new HollowHistoricalStateDataAccess(totalHistory, version, stateEngine, historicalTypeStates, typeRemovedOrdinalMapping, Collections.<String, HollowHistoricalSchemaChange>emptyMap());
+        dataAccess.setNextState(stateEngine);
+
+        return dataAccess;
+    }
+
+
     private void createDeltaHistoricalTypeState(IntMapOrdinalRemapper typeRemovedOrdinalMapping, List<HollowTypeReadState> historicalTypeStates, HollowTypeReadState typeState) {
         if(typeState instanceof HollowObjectTypeReadState) {
             HollowObjectDeltaHistoricalStateCreator deltaHistoryCreator = new HollowObjectDeltaHistoricalStateCreator((HollowObjectTypeReadState)typeState);
@@ -115,6 +139,34 @@ public class HollowHistoricalStateCreator {
             historicalTypeStates.add(deltaHistoryCreator.createHistoricalTypeReadState());
         } else if(typeState instanceof HollowMapTypeReadState) {
             HollowMapDeltaHistoricalStateCreator deltaHistoryCreator = new HollowMapDeltaHistoricalStateCreator((HollowMapTypeReadState)typeState);
+            deltaHistoryCreator.populateHistory();
+            typeRemovedOrdinalMapping.addOrdinalRemapping(typeState.getSchema().getName(), deltaHistoryCreator.getOrdinalMapping());
+            historicalTypeStates.add(deltaHistoryCreator.createHistoricalTypeReadState());
+        }
+    }
+
+    private void createReverseDeltaHistoricalTypeState(IntMapOrdinalRemapper typeRemovedOrdinalMapping, List<HollowTypeReadState> historicalTypeStates, HollowTypeReadState typeState) {
+        if(typeState instanceof HollowObjectTypeReadState) {
+            HollowObjectDeltaHistoricalStateCreator deltaHistoryCreator = new HollowObjectDeltaHistoricalStateCreator((HollowObjectTypeReadState)typeState);
+            deltaHistoryCreator.reverse();
+            deltaHistoryCreator.populateHistory();
+            typeRemovedOrdinalMapping.addOrdinalRemapping(typeState.getSchema().getName(), deltaHistoryCreator.getOrdinalMapping());
+            historicalTypeStates.add(deltaHistoryCreator.createHistoricalTypeReadState());
+        } else if(typeState instanceof HollowListTypeReadState) {
+            HollowListDeltaHistoricalStateCreator deltaHistoryCreator = new HollowListDeltaHistoricalStateCreator((HollowListTypeReadState)typeState);
+            deltaHistoryCreator.reverse();
+            deltaHistoryCreator.populateHistory();
+            typeRemovedOrdinalMapping.addOrdinalRemapping(typeState.getSchema().getName(), deltaHistoryCreator.getOrdinalMapping());
+            historicalTypeStates.add(deltaHistoryCreator.createHistoricalTypeReadState());
+        } else if(typeState instanceof HollowSetTypeReadState) {
+            HollowSetDeltaHistoricalStateCreator deltaHistoryCreator = new HollowSetDeltaHistoricalStateCreator((HollowSetTypeReadState)typeState);
+            deltaHistoryCreator.reverse();
+            deltaHistoryCreator.populateHistory();
+            typeRemovedOrdinalMapping.addOrdinalRemapping(typeState.getSchema().getName(), deltaHistoryCreator.getOrdinalMapping());
+            historicalTypeStates.add(deltaHistoryCreator.createHistoricalTypeReadState());
+        } else if(typeState instanceof HollowMapTypeReadState) {
+            HollowMapDeltaHistoricalStateCreator deltaHistoryCreator = new HollowMapDeltaHistoricalStateCreator((HollowMapTypeReadState)typeState);
+            deltaHistoryCreator.reverse();
             deltaHistoryCreator.populateHistory();
             typeRemovedOrdinalMapping.addOrdinalRemapping(typeState.getSchema().getName(), deltaHistoryCreator.getOrdinalMapping());
             historicalTypeStates.add(deltaHistoryCreator.createHistoricalTypeReadState());

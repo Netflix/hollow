@@ -203,6 +203,24 @@ public class HollowHistoryTypeKeyIndex {
         return ORDINAL_NONE;
     }
 
+    public int findKeyIndexOrdinalReverse(HollowObjectTypeReadState typeState, int ordinal) {
+        HollowObjectTypeReadState keyTypeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(primaryKey.getType());
+
+        int bucketMask = hashedRecordKeys.length - 1;
+
+        int bucket = findKeyHashCode(typeState, ordinal) & bucketMask;
+
+        while(hashedRecordKeys[bucket] != ORDINAL_NONE) {
+            if(recordMatchesKey(typeState, ordinal, keyTypeState, hashedRecordKeys[bucket]))
+                return hashedRecordKeys[bucket];
+
+            bucket++;
+            bucket &= bucketMask;
+        }
+
+        return ORDINAL_NONE;
+    }
+
     private int findKeyHashCode(HollowObjectTypeReadState typeState, int ordinal) {
         int hashCode = 0;
         for (String[] keyFieldPart : keyFieldParts) {
