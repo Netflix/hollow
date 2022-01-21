@@ -16,12 +16,6 @@
  */
 package com.netflix.hollow.tools.history.keyindex;
 
-import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-import static com.netflix.hollow.tools.util.SearchUtils.MULTI_FIELD_KEY_DELIMITER;
-import static com.netflix.hollow.tools.util.SearchUtils.getFieldPathIndexes;
-import static com.netflix.hollow.tools.util.SearchUtils.getOrdinalToDisplay;
-import static com.netflix.hollow.tools.util.SearchUtils.parseKey;
-
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
@@ -37,8 +31,15 @@ import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+
 import java.util.Arrays;
 import java.util.BitSet;
+
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.tools.util.SearchUtils.MULTI_FIELD_KEY_DELIMITER;
+import static com.netflix.hollow.tools.util.SearchUtils.getFieldPathIndexes;
+import static com.netflix.hollow.tools.util.SearchUtils.getOrdinalToDisplay;
+import static com.netflix.hollow.tools.util.SearchUtils.parseKey;
 
 public class HollowHistoryTypeKeyIndex {
 
@@ -93,14 +94,19 @@ public class HollowHistoryTypeKeyIndex {
         readStateEngine=readEngine;
     }
 
-    public void update(HollowObjectTypeReadState latestTypeState, boolean isDelta) {
-        copyExistingKeys();
+    public void update(HollowObjectTypeReadState latestTypeState, boolean isDeltaAndIndexInitialized) {
+        // copies over keys corresponding to previously populated ordinals AND currently populated ordinals
+        copyExistingKeys(); // only popylates the ordianl map (to be the OR of previous and current ordinals)
         if (latestTypeState == null) return;
 
-        if (isDelta)
-            populateNewCurrentRecordKeys(latestTypeState);
-        else
-            populateAllCurrentRecordKeys(latestTypeState);
+        if (isDeltaAndIndexInitialized) {
+            // For fwd delta transition: write all key objects that were added when going from v1 -> v2 to the history type key index
+            populateNewCurrentRecordKeysIntoIndex(latestTypeState);
+        }
+        else {
+            // when index is not yet initialized with data (usually on first fwd delta transition) or on  double snapshot
+            populateAllCurrentRecordKeysIntoIndex(latestTypeState);
+        }
     }
 
     public void hashRecordKeys() {
@@ -362,7 +368,7 @@ public class HollowHistoryTypeKeyIndex {
         typeState.addAllObjectsFromPreviousCycle();
     }
 
-    private void populateAllCurrentRecordKeys(HollowObjectTypeReadState typeState) {
+    private void populateAllCurrentRecordKeysIntoIndex(HollowObjectTypeReadState typeState) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(keySchema);
         PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
         BitSet previousOrdinals = listener.getPreviousOrdinals();
@@ -376,7 +382,7 @@ public class HollowHistoryTypeKeyIndex {
         }
     }
 
-    private void populateNewCurrentRecordKeys(HollowObjectTypeReadState typeState) {
+    private void populateNewCurrentRecordKeysIntoIndex(HollowObjectTypeReadState typeState) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(keySchema);
         PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
         BitSet populatedOrdinals = listener.getPopulatedOrdinals();

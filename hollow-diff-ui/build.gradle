@@ -12,8 +12,7 @@ dependencies {
     api project(':hollow-ui-tools')
     implementation 'com.google.code.gson:gson:2.8.0'
 
-    implementation "javax.ws.rs:jsr311-api:1.1.1"
-    implementation "javax.servlet:javax.servlet-api:3.1.0"
+    implementation 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'
 
     testImplementation 'junit:junit:4.11'
 }

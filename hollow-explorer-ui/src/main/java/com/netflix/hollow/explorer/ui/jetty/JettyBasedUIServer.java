@@ -14,35 +14,38 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.diff.ui.webserver;
+package com.netflix.hollow.explorer.ui.jetty;
 
+import com.netflix.hollow.explorer.ui.HollowExplorerUI;
+import com.netflix.hollow.explorer.ui.jetty.HollowExplorerUIServer.UIServer;
+import org.eclipse.jetty.server.Server;
 
-import com.netflix.hollow.diff.ui.HollowDiffUI;
-import com.netflix.hollow.diff.ui.HollowDiffUIRouter;
-import com.netflix.hollow.tools.diff.HollowDiff;
-import com.netflix.hollow.ui.HttpHandlerWithServletSupport;
-import com.netflix.hollow.ui.UIBaseWebServer;
+final class JettyBasedUIServer implements UIServer {
+    private final Server server;
+    private final HollowExplorerHandler handler;
 
-final class UIWebServer implements DiffUIServer {
-    private final HollowDiffUIRouter router;
-    private final UIBaseWebServer server;
-
-    public UIWebServer(HollowDiffUIRouter theRouter, int port) {
-        this.router = theRouter;
-        server = new UIBaseWebServer(new HttpHandlerWithServletSupport(theRouter), port);
-    }
-
-    public HollowDiffUI addDiff(String diffPath, HollowDiff diff, String fromBlobName, String toBlobName) {
-        return this.router.addDiff(diffPath, diff, fromBlobName, toBlobName);
+    private JettyBasedUIServer(HollowExplorerUI ui, int port) {
+        this.server = new Server(port);
+        this.handler = new HollowExplorerHandler(ui);
     }
 
     public void start() throws Exception {
+        server.setHandler(handler);
         server.start();
     }
+
     public void stop() throws Exception {
         server.stop();
     }
+
     public void join() throws InterruptedException {
         server.join();
+    }
+
+    public static final class Factory implements UIServer.Factory {
+        @Override
+        public UIServer newServer(HollowExplorerUI ui, int port) {
+            return new JettyBasedUIServer(ui, port);
+        }
     }
 }
