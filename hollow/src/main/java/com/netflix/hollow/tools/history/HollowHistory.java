@@ -367,12 +367,12 @@ public class HollowHistory {
 
             PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
 
-            //RemovedOrdinalIterator removalIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
-            //RemovedOrdinalIterator additionsIterator = new RemovedOrdinalIterator(listener);
+            RemovedOrdinalIterator removalIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
+            RemovedOrdinalIterator additionsIterator = new RemovedOrdinalIterator(listener);
 
 //*
-            RemovedOrdinalIterator removalIterator = new RemovedOrdinalIterator(listener);
-            RemovedOrdinalIterator additionsIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
+            //RemovedOrdinalIterator removalIterator = new RemovedOrdinalIterator(listener);
+            //RemovedOrdinalIterator additionsIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
 //*/
 /*
             PopulatedOrdinalListener listener1 = typeState.getListener(PopulatedOrdinalListener.class);
