@@ -36,6 +36,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * A {@code HollowHistoryKeyIndex} index is used to track all secords seen in all knwon states.
+ * It achieves this by maintaining a growing readStateEngine. A delta transition applies incoming keys tot his
+ * readStateEngine, and a snapshot transition applies all the existing keys in readStateEngine and new keys
+ * in the incoming snapshot into a new readStateEngine that is used moving forward.
+ */
 public class HollowHistoryKeyIndex {
 
     private final HollowHistory history;
@@ -103,10 +109,16 @@ public class HollowHistoryKeyIndex {
     public void update(HollowReadStateEngine latestStateEngine, boolean isDelta) {
         boolean isInitialUpdate = !isInitialized();
 
+        // for all the types in the key index make sure a {@code HollowHistoryTypeKeyIndex} index is initialized (and
+        // has a writeable write state engine)
         initializeTypeIndexes(latestStateEngine);
+        // this call updates the type key indexes of all types in this history key index. This is done by mutating the
+        // underlying writeStateEngine, and later reading it back as a readStateEngine
         updateTypeIndexes(latestStateEngine, isDelta && !isInitialUpdate);
-
         HollowReadStateEngine newReadState = roundTripStateEngine(isInitialUpdate, !isDelta);
+
+        // if snapshot update then a new read state was generated, udpate the types in the history index to point to this
+        // new read state
         if (newReadState != readStateEngine) {
             // New ReadState was created so let's update references to old one
             readStateEngine = newReadState;
@@ -152,6 +164,10 @@ public class HollowHistoryKeyIndex {
         }
     }
 
+    /**
+     * Updates the tracked readStateEngine based on populated writeStateEngine. Depending on whether this is an initial
+     * load or double snapshot etc. it invokes a snapshot or delta transition.
+     */
     private HollowReadStateEngine roundTripStateEngine(boolean isInitialUpdate, boolean isSnapshot) {
         HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
         // Use existing readStateEngine on initial update or delta;

@@ -25,13 +25,20 @@ public class HistoryStateTypeChangeSummary {
     private final int modifications;
     private final int additions;
     private final int removals;
+    private final boolean reverse;
     
     public HistoryStateTypeChangeSummary(long stateVersion, String typeName, HollowHistoricalStateTypeKeyOrdinalMapping mapping) {
+        this(stateVersion, typeName, mapping, false);
+    }
+
+    public HistoryStateTypeChangeSummary(long stateVersion, String typeName, HollowHistoricalStateTypeKeyOrdinalMapping mapping,
+                                         boolean reverse) {
         this.stateVersion = stateVersion;
         this.typeName = typeName;
         this.modifications = mapping.getNumberOfModifiedRecords();
         this.additions = mapping.getNumberOfNewRecords();
         this.removals = mapping.getNumberOfRemovedRecords();
+        this.reverse = reverse;
     }
     
     public long getVersion() {
@@ -51,11 +58,11 @@ public class HistoryStateTypeChangeSummary {
     }
 
     public int getAdditions() {
-        return additions;
+        return reverse ? removals : additions;
     }
 
     public int getRemovals() {
-        return removals;
+        return reverse ? additions : removals;
     }
     
     public boolean isEmpty() {
