@@ -227,9 +227,9 @@ public class HollowHistory {
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(false);
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(true);
         // SNAP: TODO: ??? For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity in UI
-        HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
+        HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
         addReverseHistoricalState(historicalState);
 
         this.latestVersion = newVersion;
