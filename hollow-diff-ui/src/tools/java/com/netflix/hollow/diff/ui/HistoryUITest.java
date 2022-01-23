@@ -269,18 +269,16 @@ public class HistoryUITest {
             stateEngine.prepareForWrite();
 
             //reinit output stream
-            ByteArrayOutputStream baos_v3_to_v4 = new ByteArrayOutputStream();
             ByteArrayOutputStream baos_v4_to_v3 = new ByteArrayOutputStream();
 
-            //write delta based on new records
-            writer.writeDelta(baos_v3_to_v4);
+            //write snapshot to output stream
+            ByteArrayOutputStream baos_v4 = new ByteArrayOutputStream();
+            writer.writeSnapshot(baos_v4);
+
+            // due to unrelated bug in reverse delta header behavior, modify header after writing snapshot
+            stateEngine.addHeaderTag("snapversion", "v3");
             writer.writeReverseDelta(baos_v4_to_v3);
 
-
-
-            ByteArrayOutputStream baos_v4 = new ByteArrayOutputStream();
-            //write snapshot to output stream
-            writer.writeSnapshot(baos_v4);
 
             readStateEngine = new HollowReadStateEngine();
             reader = new HollowBlobReader(readStateEngine);
