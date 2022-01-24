@@ -32,7 +32,6 @@ import com.netflix.hollow.api.producer.validation.ValidationResult;
 import com.netflix.hollow.api.producer.validation.ValidationStatus;
 import com.netflix.hollow.api.producer.validation.ValidationStatusException;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
-import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -552,13 +551,13 @@ abstract class AbstractHollowProducer {
             if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
                 artifacts.snapshot = stageBlob(listeners, blobStager.openSnapshot(toVersion));
 
+            publishHeaderBlob(artifacts.header);
             if (readStates.hasCurrent()) {
                 artifacts.delta = stageBlob(listeners,
                         blobStager.openDelta(readStates.current().getVersion(), toVersion));
                 artifacts.reverseDelta = stageBlob(listeners,
                         blobStager.openReverseDelta(toVersion, readStates.current().getVersion()));
 
-                publishHeaderBlob(artifacts.header);
                 publishBlob(listeners, artifacts.delta);
                 publishBlob(listeners, artifacts.reverseDelta);
 
@@ -575,7 +574,6 @@ abstract class AbstractHollowProducer {
                     artifacts.markSnapshotPublishComplete();
                 }
             } else {
-                publishHeaderBlob(artifacts.header);
                 publishBlob(listeners, artifacts.snapshot);
                 artifacts.markSnapshotPublishComplete();
                 numStatesUntilNextSnapshot = numStatesBetweenSnapshots;
@@ -769,16 +767,6 @@ abstract class AbstractHollowProducer {
             throw th;
         } finally {
             listeners.fireIntegrityCheckComplete(status);
-        }
-    }
-
-    private void verifyHeader(HollowProducer.HeaderBlob header) {
-        HollowBlobHeaderReader reader = new HollowBlobHeaderReader();
-        try {
-            HollowBlobHeader readHeader = reader.readHeader(header.newInputStream());
-            System.out.println();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

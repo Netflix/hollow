@@ -40,7 +40,7 @@ class HollowClientConsumerBridge {
                 return new HollowConsumer.HeaderBlob(desiredVersion) {
                     @Override
                     public InputStream getInputStream() throws IOException {
-                        return null;
+                        throw new UnsupportedOperationException();
                     }
                 };
             }

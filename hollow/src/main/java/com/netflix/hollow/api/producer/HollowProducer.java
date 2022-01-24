@@ -578,6 +578,19 @@ public class HollowProducer extends AbstractHollowProducer {
     public interface Publisher {
 
         /**
+         * Deprecated - Should use {@link Publisher#publish(AbstractPublishArtifact)} instead.<p>
+         * Publish the blob specified to this publisher's blobstore.
+         * <p>
+         * It is guaranteed that {@code blob} was created by calling one of
+         * {@link BlobStager#openSnapshot(long)}, {@link BlobStager#openDelta(long, long)}, or
+         * {@link BlobStager#openReverseDelta(long, long)} on this publisher.
+         *
+         * @param blob the blob to publish
+         */
+        @Deprecated
+        void publish(HollowProducer.Blob blob);
+
+        /**
          * Publish the blob specified to this publisher's blobstore.
          * <p>
          * It is guaranteed that {@code blob} was created by calling one of

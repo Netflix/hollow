@@ -51,5 +51,7 @@ public interface HollowBlobRetriever {
      * @param desiredVersion the desired version
      * @return the header for the state with an identifier equal to or less than the desired version
      */
-    HollowBlobHeader retrieveHeaderBlob(long desiredVersion);
+    default HollowBlobHeader retrieveHeaderBlob(long desiredVersion) {
+        return new HollowBlobHeader();
+    }
 }
