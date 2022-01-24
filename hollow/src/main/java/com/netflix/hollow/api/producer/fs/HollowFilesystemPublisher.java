@@ -49,7 +49,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     }
 
     @Override
-    public void publish(HollowProducer.AbstractPublishArtifact publishArtifact) {
+    public void publish(HollowProducer.PublishArtifact publishArtifact) {
         if (publishArtifact instanceof HollowProducer.HeaderBlob) {
             publishHeader((HollowProducer.HeaderBlob) publishArtifact);
         } else {
@@ -57,7 +57,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
         }
     }
 
-    private void publishContent(HollowProducer.AbstractPublishArtifact publishArtifact, Path destination) {
+    private void publishContent(HollowProducer.PublishArtifact publishArtifact, Path destination) {
         try (
                 InputStream is = publishArtifact.newInputStream();
                 OutputStream os = Files.newOutputStream(destination)

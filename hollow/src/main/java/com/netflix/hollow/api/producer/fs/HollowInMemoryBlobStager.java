@@ -74,7 +74,7 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
         }
 
         @Override
-        protected void write(HollowBlobWriter blobWriter) throws IOException {
+        public void write(HollowBlobWriter blobWriter) throws IOException {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             blobWriter.writeHeader(baos, null);
             data = baos.toByteArray();
@@ -100,7 +100,7 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
         }
 
         @Override
-        protected void write(HollowBlobWriter writer) throws IOException {
+        public void write(HollowBlobWriter writer) throws IOException {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams optionalPartStreams = null;

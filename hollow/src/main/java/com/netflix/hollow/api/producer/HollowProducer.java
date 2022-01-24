@@ -499,7 +499,7 @@ public class HollowProducer extends AbstractHollowProducer {
         /**
          * Returns a blob with which a {@code HollowProducer} will write a snapshot for the version specified.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.AbstractPublishArtifact)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.PublishArtifact)}.
          *
          * @param version the blob version
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
@@ -509,7 +509,7 @@ public class HollowProducer extends AbstractHollowProducer {
         /**
          * Returns a blob with which a {@code HollowProducer} will write a header for the version specified.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.AbstractPublishArtifact)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.PublishArtifact)}.
          * @param version the blob version
          * @return a {@link HollowProducer.HeaderBlob} representing a header for the {@code version}
          */
@@ -519,7 +519,7 @@ public class HollowProducer extends AbstractHollowProducer {
          * Returns a blob with which a {@code HollowProducer} will write a forward delta from the version specified to
          * the version specified, i.e. {@code fromVersion => toVersion}.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.AbstractPublishArtifact)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.PublishArtifact)}.
          * <p>
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
@@ -533,7 +533,7 @@ public class HollowProducer extends AbstractHollowProducer {
          * Returns a blob with which a {@code HollowProducer} will write a reverse delta from the version specified to
          * the version specified, i.e. {@code fromVersion <= toVersion}.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.AbstractPublishArtifact)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.PublishArtifact)}.
          * <p>
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
@@ -578,7 +578,7 @@ public class HollowProducer extends AbstractHollowProducer {
     public interface Publisher {
 
         /**
-         * Deprecated - Should use {@link Publisher#publish(AbstractPublishArtifact)} instead.<p>
+         * Deprecated - Should use {@link Publisher#publish(PublishArtifact)} instead.<p>
          * Publish the blob specified to this publisher's blobstore.
          * <p>
          * It is guaranteed that {@code blob} was created by calling one of
@@ -600,25 +600,25 @@ public class HollowProducer extends AbstractHollowProducer {
          *
          * @param publishArtifact the blob to publish
          */
-        void publish(HollowProducer.AbstractPublishArtifact publishArtifact);
+        void publish(HollowProducer.PublishArtifact publishArtifact);
     }
 
-    public static abstract class AbstractPublishArtifact {
-        public abstract void cleanup();
-        protected abstract void write(HollowBlobWriter blobWriter) throws IOException;
-        public abstract InputStream newInputStream() throws IOException;
+    public interface PublishArtifact {
+        void cleanup();
+        void write(HollowBlobWriter blobWriter) throws IOException;
+        InputStream newInputStream() throws IOException;
 
         @Deprecated
-        public File getFile() {
+        default File getFile() {
             throw new UnsupportedOperationException("File is not available");
         }
 
-        public Path getPath() {
+        default Path getPath() {
             throw new UnsupportedOperationException("Path is not available");
         }
     }
 
-    public static abstract class HeaderBlob extends AbstractPublishArtifact{
+    public static abstract class HeaderBlob implements PublishArtifact{
         protected final long version;
 
         protected HeaderBlob(long version) {
@@ -630,7 +630,7 @@ public class HollowProducer extends AbstractHollowProducer {
         }
     }
 
-    public static abstract class Blob extends AbstractPublishArtifact{
+    public static abstract class Blob implements PublishArtifact{
 
         protected final long fromVersion;
         protected final long toVersion;

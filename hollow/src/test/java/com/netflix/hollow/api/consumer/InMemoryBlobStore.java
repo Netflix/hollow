@@ -91,7 +91,7 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
     }
 
     @Override
-    public void publish(HollowProducer.AbstractPublishArtifact publishArtifact) {
+    public void publish(HollowProducer.PublishArtifact publishArtifact) {
         if (publishArtifact instanceof HollowProducer.HeaderBlob) {
             publishHeader((HollowProducer.HeaderBlob) publishArtifact);
         } else {

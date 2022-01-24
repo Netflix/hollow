@@ -139,7 +139,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
         }
 
         @Override
-        protected void write(HollowBlobWriter blobWriter) throws IOException {
+        public void write(HollowBlobWriter blobWriter) throws IOException {
             Path parent = this.path.getParent();
             if (!Files.exists(parent))
                 Files.createDirectories(parent);
@@ -225,7 +225,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
         }
 
         @Override
-        protected void write(HollowBlobWriter writer) throws IOException {
+        public void write(HollowBlobWriter writer) throws IOException {
             Path parent = this.path.getParent();
             if (!Files.exists(parent))
                 Files.createDirectories(parent);

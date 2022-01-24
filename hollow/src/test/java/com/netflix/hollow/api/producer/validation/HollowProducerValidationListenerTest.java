@@ -45,7 +45,7 @@ public class HollowProducerValidationListenerTest {
             }
 
             @Override
-            public void publish(HollowProducer.AbstractPublishArtifact publishArtifact) {
+            public void publish(HollowProducer.PublishArtifact publishArtifact) {
             }
         };
         announcer = version -> {};
