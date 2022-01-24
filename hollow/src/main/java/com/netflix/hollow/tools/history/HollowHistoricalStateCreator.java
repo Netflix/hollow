@@ -325,6 +325,7 @@ public class HollowHistoricalStateCreator {
         return unmatchedRecordCount;
     }
 
+    // for double snapshot only
     private IntMap copyAllRecords(HollowTypeReadState typeState, DiffEqualityMappingOrdinalRemapper ordinalRemapper, HollowWriteStateEngine writeEngine) {
         String typeName = typeState.getSchema().getName();
         HollowRecordCopier recordCopier = HollowRecordCopier.createCopier(typeState, ordinalRemapper, false);  ///NOTE: This will invalidate custom hash codes
@@ -341,6 +342,7 @@ public class HollowHistoricalStateCreator {
     }
 
 
+    // for double snapshot only
     public HollowHistoricalStateDataAccess copyButRemapOrdinals(HollowHistoricalStateDataAccess previous, OrdinalRemapper ordinalRemapper) {
         HollowWriteStateEngine writeEngine = HollowWriteStateCreator.createWithSchemas(schemasWithoutKeys(previous.getSchemas()));
 
@@ -357,6 +359,7 @@ public class HollowHistoricalStateCreator {
         return new HollowHistoricalStateDataAccess(totalHistory, previous.getVersion(), roundTripStateEngine(writeEngine), typeRemovedOrdinalRemapping, previous.getSchemaChanges());
     }
 
+    // for double snapshot only
     private void copyRemappedRecords(HollowTypeReadState readTypeState, OrdinalRemapper ordinalRemapper, HollowWriteStateEngine writeEngine) {
         String typeName = readTypeState.getSchema().getName();
         HollowTypeWriteState typeState = writeEngine.getTypeState(typeName);
@@ -368,6 +371,7 @@ public class HollowHistoricalStateCreator {
         }
     }
 
+    // for double snapshot only
     private IntMap remapPreviousOrdinalMapping(IntMap previousOrdinalMapping, String typeName, OrdinalRemapper ordinalRemapper) {
         IntMapEntryIterator ordinalMappingIter = previousOrdinalMapping.iterator();
         IntMap ordinalLookupMap = new IntMap(previousOrdinalMapping.size());

@@ -203,7 +203,7 @@ public class HollowHistory {
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(false);
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(false, false);
         HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
 
         addHistoricalState(historicalState);
@@ -227,8 +227,10 @@ public class HollowHistory {
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(true);
-        // SNAP: TODO: ??? For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity in UI
+        // I think we want the same behavior here i.e. preserve the removed ordinals when going delta or reverse delta since
+        // we wont see that data again. However then the from/to in the display are inverted
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(false, true);
+        // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity in UI
         HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
         addReverseHistoricalState(historicalState);
 
@@ -295,6 +297,7 @@ public class HollowHistory {
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
     }
 
+    // only on double snapshot
     private void remapHistoricalStateOrdinals(final DiffEqualityMappingOrdinalRemapper remapper, final HollowHistoricalStateDataAccess[] remappedDataAccesses, final HollowHistoricalStateKeyOrdinalMapping[] remappedKeyOrdinalMappings) {
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "remap");
         final int numThreads = executor.getCorePoolSize();
@@ -317,8 +320,8 @@ public class HollowHistory {
         }
     }
 
-    private HollowHistoricalStateKeyOrdinalMapping createKeyOrdinalMappingFromDelta(boolean reverse) {
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = new HollowHistoricalStateKeyOrdinalMapping(keyIndex);
+    private HollowHistoricalStateKeyOrdinalMapping createKeyOrdinalMappingFromDelta(boolean testReverse, boolean typeMappingsReverse) {
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = new HollowHistoricalStateKeyOrdinalMapping(keyIndex, typeMappingsReverse);
 
         for(String keyType : keyIndex.getTypeKeyIndexes().keySet()) {
             HollowHistoricalStateTypeKeyOrdinalMapping typeMapping = keyOrdinalMapping.getTypeMapping(keyType);
@@ -336,7 +339,7 @@ public class HollowHistory {
             RemovedOrdinalIterator removalIterator;
             RemovedOrdinalIterator additionsIterator;
 
-            if (!reverse) {
+            if (!testReverse) {
                 removalIterator = new RemovedOrdinalIterator(listener);
                 additionsIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
             } else {
@@ -348,7 +351,7 @@ public class HollowHistory {
 
             int removedOrdinal = removalIterator.next();
             while(removedOrdinal != -1) {
-                if (!reverse) {
+                if (!testReverse) {
                     typeMapping.removed(typeState, removedOrdinal);
                 } else {
                     typeMapping.removedReverse(typeState, removedOrdinal);
@@ -358,7 +361,7 @@ public class HollowHistory {
 
             int addedOrdinal = additionsIterator.next();
             while(addedOrdinal != -1) {
-                if (!reverse) {
+                if (!testReverse) {
                     typeMapping.added(typeState, addedOrdinal);
                 } else {
                     typeMapping.addedReverse(typeState, addedOrdinal);

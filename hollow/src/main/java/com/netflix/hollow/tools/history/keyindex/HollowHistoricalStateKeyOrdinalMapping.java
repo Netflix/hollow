@@ -23,19 +23,27 @@ import java.util.Map;
 public class HollowHistoricalStateKeyOrdinalMapping {
 
     private final Map<String, HollowHistoricalStateTypeKeyOrdinalMapping> typeMappings;
+    private final boolean reverse;
 
     public HollowHistoricalStateKeyOrdinalMapping(HollowHistoryKeyIndex keyIndex) {
+        this(keyIndex, false);
+    }
+
+    public HollowHistoricalStateKeyOrdinalMapping(HollowHistoryKeyIndex keyIndex, boolean reverse) {
         this.typeMappings = new HashMap<String, HollowHistoricalStateTypeKeyOrdinalMapping>();
+        this.reverse = reverse;
 
         for(Map.Entry<String, HollowHistoryTypeKeyIndex> entry : keyIndex.getTypeKeyIndexes().entrySet()) {
-            typeMappings.put(entry.getKey(), new HollowHistoricalStateTypeKeyOrdinalMapping(entry.getKey(), entry.getValue()));
+            typeMappings.put(entry.getKey(), new HollowHistoricalStateTypeKeyOrdinalMapping(entry.getKey(), entry.getValue(), reverse));
         }
     }
 
-    private HollowHistoricalStateKeyOrdinalMapping(Map<String, HollowHistoricalStateTypeKeyOrdinalMapping> typeMappings) {
+    private HollowHistoricalStateKeyOrdinalMapping(Map<String, HollowHistoricalStateTypeKeyOrdinalMapping> typeMappings, boolean reverse) {
         this.typeMappings = typeMappings;
+        this.reverse = reverse;
     }
 
+    // TODO: only on double-snapshot, should we reverse here?
     public HollowHistoricalStateKeyOrdinalMapping remap(OrdinalRemapper remapper) {
         Map<String, HollowHistoricalStateTypeKeyOrdinalMapping> typeMappings = new HashMap<String, HollowHistoricalStateTypeKeyOrdinalMapping>();
 
@@ -43,7 +51,7 @@ public class HollowHistoricalStateKeyOrdinalMapping {
             typeMappings.put(entry.getKey(), entry.getValue().remap(remapper));
         }
 
-        return new HollowHistoricalStateKeyOrdinalMapping(typeMappings);
+        return new HollowHistoricalStateKeyOrdinalMapping(typeMappings, reverse);
     }
 
     public HollowHistoricalStateTypeKeyOrdinalMapping getTypeMapping(String typeName) {
