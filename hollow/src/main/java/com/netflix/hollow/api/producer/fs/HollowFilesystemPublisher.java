@@ -44,6 +44,11 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     }
 
     @Override
+    public void publish(HollowProducer.Blob blob) {
+        publishBlob(blob);
+    }
+
+    @Override
     public void publish(HollowProducer.AbstractPublishArtifact publishArtifact) {
         if (publishArtifact instanceof HollowProducer.HeaderBlob) {
             publishHeader((HollowProducer.HeaderBlob) publishArtifact);
@@ -52,10 +57,9 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
         }
     }
 
-    private void publishHeader(HollowProducer.HeaderBlob headerBlob) {
-        Path destination = blobStorePath.resolve(String.format("header-%d", headerBlob.getVersion()));
+    private void publishContent(HollowProducer.AbstractPublishArtifact publishArtifact, Path destination) {
         try (
-                InputStream is = headerBlob.newInputStream();
+                InputStream is = publishArtifact.newInputStream();
                 OutputStream os = Files.newOutputStream(destination)
         ) {
             byte buf[] = new byte[4096];
@@ -65,6 +69,11 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
         } catch (IOException e) {
             throw new RuntimeException("Unable to publish file!", e);
         }
+    }
+
+    private void publishHeader(HollowProducer.HeaderBlob headerBlob) {
+        Path destination = blobStorePath.resolve(String.format("header-%d", headerBlob.getVersion()));
+        publishContent(headerBlob, destination);
     }
 
     private void publishBlob(HollowProducer.Blob blob) {
@@ -80,17 +89,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
             break;
         }
 
-        try(
-                InputStream is = blob.newInputStream();
-                OutputStream os = Files.newOutputStream(destination)
-        ) {
-            byte buf[] = new byte[4096];
-            int n;
-            while (-1 != (n = is.read(buf)))
-                os.write(buf, 0, n);
-        } catch(IOException e) {
-            throw new RuntimeException("Unable to publish file!", e);
-        }
+        publishContent(blob, destination);
 
         ProducerOptionalBlobPartConfig optionalPartConfig = blob.getOptionalPartConfig();
         if(optionalPartConfig != null) {

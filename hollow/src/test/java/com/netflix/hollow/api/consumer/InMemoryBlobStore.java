@@ -16,7 +16,6 @@
  */
 package com.netflix.hollow.api.consumer;
 
-import com.netflix.hollow.api.consumer.HollowConsumer.AbstractVersionedBlob;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.api.consumer.HollowConsumer.HeaderBlob;
@@ -51,14 +50,14 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
         this.optionalPartsToRetrieve = optionalPartsToRetrieve;
     }
 
-    private HollowConsumer.AbstractVersionedBlob getDesiredVersion(long desiredVersion, Map<Long, ? extends AbstractVersionedBlob> map) {
-        HollowConsumer.AbstractVersionedBlob snapshot = map.get(desiredVersion);
+    private HollowConsumer.VersionedBlob getDesiredVersion(long desiredVersion, Map<Long, ? extends HollowConsumer.VersionedBlob> map) {
+        HollowConsumer.VersionedBlob snapshot = map.get(desiredVersion);
         if(snapshot != null)
             return snapshot;
 
         long greatestPriorSnapshotVersion = Long.MIN_VALUE;
 
-        for(Map.Entry<Long, ? extends AbstractVersionedBlob> entry : map.entrySet()) {
+        for(Map.Entry<Long, ? extends HollowConsumer.VersionedBlob> entry : map.entrySet()) {
             if(entry.getKey() > greatestPriorSnapshotVersion && entry.getKey() < desiredVersion)
                 greatestPriorSnapshotVersion = entry.getKey();
         }
@@ -84,6 +83,11 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
     @Override
     public HeaderBlob retrieveHeaderBlob(long desiredVersion) {
         return (HeaderBlob) getDesiredVersion(desiredVersion, headers);
+    }
+
+    @Override
+    public void publish(HollowProducer.Blob blob) {
+        publishBlob(blob);
     }
 
     @Override

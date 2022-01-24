@@ -476,38 +476,25 @@ public class HollowConsumer {
         HollowConsumer.HeaderBlob retrieveHeaderBlob(long desiredVersion);
     }
 
-    protected static abstract class AbstractVersionedBlob {
-        protected final long fromVersion;
-        protected final long toVersion;
+    protected interface VersionedBlob {
 
-        protected AbstractVersionedBlob(long fromVersion, long toVersion) {
-            this.fromVersion = fromVersion;
-            this.toVersion = toVersion;
-        }
+        InputStream getInputStream() throws IOException;
 
-        public long getFromVersion() {
-            return fromVersion;
-        }
-
-        public long getToVersion() {
-            return toVersion;
-        }
-
-        public abstract InputStream getInputStream() throws IOException;
-
-        public File getFile() throws IOException {
+         default File getFile() throws IOException {
             throw new UnsupportedOperationException();
         }
     }
 
-    public static abstract class HeaderBlob extends AbstractVersionedBlob{
+    public static abstract class HeaderBlob implements VersionedBlob{
+
+        private final long version;
 
         protected HeaderBlob(long version) {
-            super(-1L, version);
+            this.version = version;
         }
 
         public long getVersion() {
-            return this.toVersion;
+            return this.version;
         }
     }
 
@@ -525,8 +512,10 @@ public class HollowConsumer {
      * <dd>Implementations will define how to retrieve the actual blob data for this specific blob from a data store as an InputStream.</dd>
      * </dl>
      */
-    public static abstract class Blob extends AbstractVersionedBlob{
+    public static abstract class Blob implements VersionedBlob{
 
+        protected final long fromVersion;
+        protected final long toVersion;
         private final BlobType blobType;
 
         /**
@@ -545,7 +534,8 @@ public class HollowConsumer {
          * @param toVersion the version to end the delta from
          */
         public Blob(long fromVersion, long toVersion) {
-            super(fromVersion, toVersion);
+            this.fromVersion = fromVersion;
+            this.toVersion = toVersion;
 
             if (this.isSnapshot())
                 this.blobType = BlobType.SNAPSHOT;

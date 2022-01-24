@@ -145,8 +145,8 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
 
         if(fallbackBlobRetriever != null) {
             HollowConsumer.HeaderBlob remoteBlob = fallbackBlobRetriever.retrieveHeaderBlob(desiredVersion);
-            if(remoteBlob != null && (filesystemBlob == null || remoteBlob.getToVersion() != filesystemBlob.getToVersion()))
-                return new HeaderBlobFromBackupToFilesystem(remoteBlob, blobStorePath.resolve("header-" + remoteBlob.getToVersion()));
+            if(remoteBlob != null && (filesystemBlob == null || remoteBlob.getVersion() != filesystemBlob.getVersion()))
+                return new HeaderBlobFromBackupToFilesystem(remoteBlob, blobStorePath.resolve("header-" + remoteBlob.getVersion()));
         }
 
         return filesystemBlob;
