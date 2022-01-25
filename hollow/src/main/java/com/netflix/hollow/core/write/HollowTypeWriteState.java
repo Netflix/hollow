@@ -153,7 +153,7 @@ public abstract class HollowTypeWriteState {
         if(!ordinalMap.isReadyForAddingObjects())
             throw new RuntimeException("The HollowWriteStateEngine is not ready to add more Objects.  Did you remember to call stateEngine.prepareForNextCycle()?");
 
-        currentCyclePopulated = ThreadSafeBitSet.orAll(previousCyclePopulated, currentCyclePopulated);
+            currentCyclePopulated = ThreadSafeBitSet.orAll(previousCyclePopulated, currentCyclePopulated);  // SNAP: forward delta specific operation
     }
     
     public void addOrdinalFromPreviousCycle(int ordinal) {

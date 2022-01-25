@@ -5,6 +5,7 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -19,6 +20,8 @@ import com.netflix.hollow.tools.history.HollowHistory;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.BitSet;
+
 import org.junit.Test;
 
 public class HistoryUITest {
@@ -93,8 +96,10 @@ public class HistoryUITest {
             //reinit output stream
             ByteArrayOutputStream baos_v1_to_v2 = new ByteArrayOutputStream();
             baos_v2_to_v1 = new ByteArrayOutputStream();
+            ByteArrayOutputStream baos_v2 = new ByteArrayOutputStream();
 
             //write delta based on new records
+            writer.writeSnapshot(baos_v2);
             writer.writeDelta(baos_v1_to_v2);
             writer.writeReverseDelta(baos_v2_to_v1);
 
@@ -168,10 +173,13 @@ public class HistoryUITest {
             readStateEngine = new HollowReadStateEngine();
             reader = new HollowBlobReader(readStateEngine);
             //load snapshot from output stream to read state engine
-            reader.readSnapshot(HollowBlobInput.serial(baos_v3.toByteArray()));
+            reader.readSnapshot(HollowBlobInput.serial(baos_v2.toByteArray()));
             //>>>do not init history with the snapshot
-            history = new HollowHistory(readStateEngine, 3L, 10);
+            history = new HollowHistory(readStateEngine, 2L, 10);
             history.getKeyIndex().addTypeIndex("TypeA", "a1");
+
+            reader.applyDelta(HollowBlobInput.serial(baos_v2_to_v3.toByteArray()));
+            history.deltaOccurred(3L);
 
             reader.applyDelta(HollowBlobInput.serial(baos_v3_to_v4.toByteArray()));
             history.deltaOccurred(4L);
@@ -233,6 +241,8 @@ public class HistoryUITest {
 
             //write delta based on new records
             writer.writeDelta(baos_v1_to_v2);
+            // due to unrelated bug in reverse delta header behavior, modify header after writing snapshot
+            stateEngine.addHeaderTag("snapversion", "v1");
             writer.writeReverseDelta(baos_v2_to_v1);
 
             stateEngine.prepareForNextCycle();
@@ -252,19 +262,21 @@ public class HistoryUITest {
 
             //write delta based on new records
             writer.writeDelta(baos_v2_to_v3);
+            // due to unrelated bug in reverse delta header behavior, modify header after writing snapshot
+            stateEngine.addHeaderTag("snapversion", "v2");
             writer.writeReverseDelta(baos_v3_to_v2);
 
             //v4
             stateEngine.prepareForNextCycle();
             stateEngine.addHeaderTag("snapversion", "v4");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 18 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 19 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 6, 12 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 15, 13 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 8, 10 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 18, 10 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 28, 90 });
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 18 });  // 0
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });   // 1
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 19 });  // 2
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 6, 12 });  // 3
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 15, 13 }); // 4
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 8, 10 });  // 5
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 18, 10 }); // 6
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 28, 90 }); // 7
 
             stateEngine.prepareForWrite();
 
@@ -284,21 +296,38 @@ public class HistoryUITest {
             reader = new HollowBlobReader(readStateEngine);
             //load snapshot from output stream to read state engine
             reader.readSnapshot(HollowBlobInput.serial(baos_v4.toByteArray()));
+            exploreOrdinals(readStateEngine);
             //>>>do not init history with the snapshot
             history = new HollowHistory(readStateEngine, 4L, 10, true, true);
             history.getKeyIndex().addTypeIndex("TypeA", "a1");
 
             reader.applyDelta(HollowBlobInput.serial(baos_v4_to_v3.toByteArray()));
+            exploreOrdinals(readStateEngine);
             history.reverseDeltaOccurred(3L);
 
-//             reader.applyDelta(HollowBlobInput.serial(baos_v3_to_v2.toByteArray()));
-//             history.reverseDeltaOccurred(2L);
+            reader.applyDelta(HollowBlobInput.serial(baos_v3_to_v2.toByteArray()));
+            exploreOrdinals(readStateEngine);
+            history.reverseDeltaOccurred(2L);
 //
 //             reader.applyDelta(HollowBlobInput.serial(baos_v2_to_v1.toByteArray()));
 //             history.reverseDeltaOccurred(1L);
         }
 
         return history;
+    }
+
+    private void exploreOrdinals(HollowReadStateEngine readStateEngine) {
+        System.out.println("snapversion= " + readStateEngine.getHeaderTags().get("snapversion"));
+        for (HollowTypeReadState typeReadState : readStateEngine.getTypeStates()) {
+            BitSet populatedOrdinals = typeReadState.getPopulatedOrdinals();
+            System.out.println("SNAP: PopulatedOrdinals= " + populatedOrdinals);
+            int ordinal = populatedOrdinals.nextSetBit(0);
+            while (ordinal != -1) {
+                HollowObjectTypeReadState o = (HollowObjectTypeReadState) typeReadState;
+                System.out.println(String.format("%s: %s, %s", ordinal, o.readInt(ordinal, 0), o.readInt(ordinal, 1)));
+                ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+            }
+        }
     }
 
 

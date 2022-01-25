@@ -26,7 +26,7 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
 
     private final String typeName;
     private final HollowHistoryTypeKeyIndex keyIndex;
-    private final boolean reverse;
+    private final boolean typeMappingsReverse;
 
     private IntMap addedOrdinalMap;
     private IntMap removedOrdinalMap;
@@ -38,17 +38,17 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
     public HollowHistoricalStateTypeKeyOrdinalMapping(String typeName, HollowHistoryTypeKeyIndex keyIndex) {
         this(typeName, keyIndex, false);
     }
-    public HollowHistoricalStateTypeKeyOrdinalMapping(String typeName, HollowHistoryTypeKeyIndex keyIndex, boolean reverse) {
+    public HollowHistoricalStateTypeKeyOrdinalMapping(String typeName, HollowHistoryTypeKeyIndex keyIndex, boolean typeMappingsReverse) {
         this.typeName = typeName;
         this.keyIndex = keyIndex;
-        this.reverse = reverse;
+        this.typeMappingsReverse = typeMappingsReverse;
     }
 
     // SNAP: only for double snapshot, should we even reverse here?
     private HollowHistoricalStateTypeKeyOrdinalMapping(String typeName, HollowHistoryTypeKeyIndex keyIndex, IntMap addedOrdinalMap, IntMap removedOrdinalMap, boolean reverse) {
         this.typeName = typeName;
         this.keyIndex = keyIndex;
-        this.reverse = reverse;
+        this.typeMappingsReverse = reverse;
         this.addedOrdinalMap = addedOrdinalMap;
         this.removedOrdinalMap = removedOrdinalMap;
         finish();
@@ -98,7 +98,7 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
         while(removedIter.next())
             newRemovedOrdinalMap.put(removedIter.getKey(), remapper.getMappedOrdinal(typeName, removedIter.getValue()));
 
-        return new HollowHistoricalStateTypeKeyOrdinalMapping(typeName, keyIndex, newAddedOrdinalMap, newRemovedOrdinalMap, reverse);
+        return new HollowHistoricalStateTypeKeyOrdinalMapping(typeName, keyIndex, newAddedOrdinalMap, newRemovedOrdinalMap, typeMappingsReverse);
     }
 
     public void finish() {
@@ -114,19 +114,19 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
     }
 
     public IntMapEntryIterator removedOrdinalMappingIterator() {
-        return reverse ? addedOrdinalMap.iterator() : removedOrdinalMap.iterator();
+        return typeMappingsReverse ? addedOrdinalMap.iterator() : removedOrdinalMap.iterator();
     }
 
     public IntMapEntryIterator addedOrdinalMappingIterator() {
-        return reverse ? removedOrdinalMap.iterator() : addedOrdinalMap.iterator();
+        return typeMappingsReverse ? removedOrdinalMap.iterator() : addedOrdinalMap.iterator();
     }
 
     public int findRemovedOrdinal(int keyOrdinal) {
-        return reverse ? addedOrdinalMap.get(keyOrdinal) : removedOrdinalMap.get(keyOrdinal);
+        return typeMappingsReverse ? addedOrdinalMap.get(keyOrdinal) : removedOrdinalMap.get(keyOrdinal);
     }
 
     public int findAddedOrdinal(int keyOrdinal) {
-        return reverse ? removedOrdinalMap.get(keyOrdinal) : addedOrdinalMap.get(keyOrdinal);
+        return typeMappingsReverse ? removedOrdinalMap.get(keyOrdinal) : addedOrdinalMap.get(keyOrdinal);
     }
 
     public HollowHistoryTypeKeyIndex getKeyIndex() {
@@ -134,11 +134,11 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
     }
 
     public int getNumberOfNewRecords() {
-        return reverse ? numberOfRemovedRecords : numberOfNewRecords;
+        return typeMappingsReverse ? numberOfRemovedRecords : numberOfNewRecords;
     }
 
     public int getNumberOfRemovedRecords() {
-        return reverse ? numberOfNewRecords : numberOfRemovedRecords;
+        return typeMappingsReverse ? numberOfNewRecords : numberOfRemovedRecords;
     }
 
     public int getNumberOfModifiedRecords() {

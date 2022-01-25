@@ -121,7 +121,6 @@ public class HollowHistoricalStateCreator {
     }
 
 
-    // SNAP: need to create ReverseDeltaHistoricalTypeState similarly, with added ordinal iterator instead of removed
     private void createDeltaHistoricalTypeState(IntMapOrdinalRemapper typeRemovedOrdinalMapping, List<HollowTypeReadState> historicalTypeStates, HollowTypeReadState typeState) {
         if(typeState instanceof HollowObjectTypeReadState) {
             HollowObjectDeltaHistoricalStateCreator deltaHistoryCreator = new HollowObjectDeltaHistoricalStateCreator((HollowObjectTypeReadState)typeState);
@@ -150,7 +149,7 @@ public class HollowHistoricalStateCreator {
     private void createReverseDeltaHistoricalTypeState(IntMapOrdinalRemapper typeRemovedOrdinalMapping, List<HollowTypeReadState> historicalTypeStates, HollowTypeReadState typeState) {
         if(typeState instanceof HollowObjectTypeReadState) {
             HollowObjectDeltaHistoricalStateCreator deltaHistoryCreator = new HollowObjectDeltaHistoricalStateCreator((HollowObjectTypeReadState)typeState);
-            // deltaHistoryCreator.reverse();   // TODO: unused, these methods can be dropped
+            // deltaHistoryCreator.reverse();
             deltaHistoryCreator.populateHistory();
             typeRemovedOrdinalMapping.addOrdinalRemapping(typeState.getSchema().getName(), deltaHistoryCreator.getOrdinalMapping());
             historicalTypeStates.add(deltaHistoryCreator.createHistoricalTypeReadState());

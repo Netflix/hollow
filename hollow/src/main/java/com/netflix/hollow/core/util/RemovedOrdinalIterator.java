@@ -35,10 +35,21 @@ public class RemovedOrdinalIterator {
         this(listener.getPreviousOrdinals(), listener.getPopulatedOrdinals());
     }
 
-    public RemovedOrdinalIterator(BitSet previousOrdinals, BitSet populatedOrdinals) {
+    /**
+     * When passed ordinal bitsets in this order, (previous, current), then it helps compute which ordinals were
+     * removed in this transition.
+     * For history forward delta transitions: if gets passed bitsets in the reverse order, so (current, previous),
+     * so it will identify which ordinals are present in current but removed in previous, i.e. which ordinals were
+     * added in this forward delta transition.
+     * To get the equivalent for reverse delta transitions:
+     * pass bitsets in order (previous, current), and
+     * @param previousOrdinals
+     * @param populatedOrdinals
+     */
+    public RemovedOrdinalIterator(BitSet previousOrdinals, BitSet populatedOrdinals) {  // assumes that populatedOrdinals.length >= previousOrdinals.length
         this.previousOrdinals = previousOrdinals;
         this.populatedOrdinals = populatedOrdinals;
-        this.previousOrdinalsLength = previousOrdinals.length();
+        this.previousOrdinalsLength = previousOrdinals.length();    // SNAP: should work in both directions, test it out
     }
 
     public int next() {

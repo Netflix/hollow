@@ -46,18 +46,18 @@ public class HollowHistoryKeyIndex {
 
     private final HollowHistory history;
     private final Map<String, HollowHistoryTypeKeyIndex> typeKeyIndexes;
-    private final HollowWriteStateEngine writeStateEngine;
-    private HollowReadStateEngine readStateEngine;
+    private final HollowWriteStateEngine indexWriteStateEngine;
+    private HollowReadStateEngine indexReadStateEngine;
 
     public HollowHistoryKeyIndex(HollowHistory history) {
         this.history = history;
         this.typeKeyIndexes = new HashMap<String, HollowHistoryTypeKeyIndex>();
-        this.writeStateEngine = new HollowWriteStateEngine();
-        this.readStateEngine = new HollowReadStateEngine();
+        this.indexWriteStateEngine = new HollowWriteStateEngine();
+        this.indexReadStateEngine = new HollowReadStateEngine();
     }
 
     public int numUniqueKeys(String type) {
-        return readStateEngine.getTypeState(type).maxOrdinal() + 1;
+        return indexReadStateEngine.getTypeState(type).maxOrdinal() + 1;
     }
 
     public String getKeyDisplayString(String type, int keyOrdinal) {
@@ -77,7 +77,7 @@ public class HollowHistoryKeyIndex {
     }
 
     public HollowHistoryTypeKeyIndex addTypeIndex(PrimaryKey primaryKey, HollowDataset dataModel) {
-        HollowHistoryTypeKeyIndex keyIdx = new HollowHistoryTypeKeyIndex(primaryKey, dataModel, writeStateEngine, readStateEngine);
+        HollowHistoryTypeKeyIndex keyIdx = new HollowHistoryTypeKeyIndex(primaryKey, dataModel, indexWriteStateEngine, indexReadStateEngine);
         typeKeyIndexes.put(primaryKey.getType(), keyIdx);
         return keyIdx;
     }
@@ -107,23 +107,29 @@ public class HollowHistoryKeyIndex {
     }
 
     public void update(HollowReadStateEngine latestStateEngine, boolean isDelta) {
+        update(latestStateEngine, isDelta, false);
+    }
+
+    public void update(HollowReadStateEngine latestStateEngine, boolean isDelta, boolean reverse) {
         boolean isInitialUpdate = !isInitialized();
 
         // for all the types in the key index make sure a {@code HollowHistoryTypeKeyIndex} index is initialized (and
         // has a writeable write state engine)
+        // The type index basically stores ordinals in its own sequence, and the value of the primary keys.
         initializeTypeIndexes(latestStateEngine);
         // this call updates the type key indexes of all types in this history key index. This is done by mutating the
-        // underlying writeStateEngine, and later reading it back as a readStateEngine
-        updateTypeIndexes(latestStateEngine, isDelta && !isInitialUpdate);
-        HollowReadStateEngine newReadState = roundTripStateEngine(isInitialUpdate, !isDelta);
+        // underlying writeStateEngine, and later reading it back as a readStateEngine.
+        // The type index basically stores ordinals in its own sequence, and the value of the primary keys.
+        updateTypeIndexes(latestStateEngine, isDelta && !isInitialUpdate, reverse);
+        HollowReadStateEngine newIndexReadState = roundTripStateEngine(isInitialUpdate, !isDelta);
 
         // if snapshot update then a new read state was generated, udpate the types in the history index to point to this
         // new read state
-        if (newReadState != readStateEngine) {
+        if (newIndexReadState != indexReadStateEngine) {
             // New ReadState was created so let's update references to old one
-            readStateEngine = newReadState;
+            indexReadStateEngine = newIndexReadState;
             for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
-                entry.getValue().updateReadStateEngine(readStateEngine);
+                entry.getValue().updateReadStateEngine(indexReadStateEngine);
             }
         }
 
@@ -131,7 +137,7 @@ public class HollowHistoryKeyIndex {
     }
 
     public boolean isInitialized() {
-        return !readStateEngine.getTypeStates().isEmpty();
+        return !indexReadStateEngine.getTypeStates().isEmpty();
     }
 
     private void initializeTypeIndexes(HollowReadStateEngine latestStateEngine) {
@@ -147,14 +153,14 @@ public class HollowHistoryKeyIndex {
         }
     }
 
-    private void updateTypeIndexes(final HollowReadStateEngine latestStateEngine, final boolean isDelta) {
+    private void updateTypeIndexes(final HollowReadStateEngine latestStateEngine, final boolean isDelta, final boolean reverse) {
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "update-type-indexes");
 
         for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
-            executor.execute(() -> {
+            // executor.execute(() -> {
                 HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestStateEngine.getTypeState(entry.getKey());
-                entry.getValue().update(typeState, isDelta);
-            });
+                entry.getValue().update(typeState, isDelta, reverse);
+            // });
         }
 
         try {
@@ -169,11 +175,11 @@ public class HollowHistoryKeyIndex {
      * load or double snapshot etc. it invokes a snapshot or delta transition.
      */
     private HollowReadStateEngine roundTripStateEngine(boolean isInitialUpdate, boolean isSnapshot) {
-        HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
+        HollowBlobWriter writer = new HollowBlobWriter(indexWriteStateEngine);
         // Use existing readStateEngine on initial update or delta;
         // otherwise, create new one to properly handle double snapshot
         HollowReadStateEngine newReadStateEngine = (isInitialUpdate || !isSnapshot)
-                ? readStateEngine : new HollowReadStateEngine();
+                ? indexReadStateEngine : new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(newReadStateEngine);
 
         // Use a pipe to write and read concurrently to avoid writing
@@ -222,7 +228,7 @@ public class HollowHistoryKeyIndex {
         if (pipeException != null)
             throw new RuntimeException(pipeException);
 
-        writeStateEngine.prepareForNextCycle();
+        indexWriteStateEngine.prepareForNextCycle();
         return newReadStateEngine;
     }
 

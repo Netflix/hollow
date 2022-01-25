@@ -187,19 +187,21 @@ public class HollowHistory {
         // the version from before the delta transition. That gets updated in this method.
         // This call updates the state stored in keyIndex (in instance variable readStateEngine) with the passed read state engine
         // Note that the history key index indexes all the records from all the previously known states into an internal
-        // ever-growing readStateEngine.
+        // ever-growing readStateEngine with ordinals independent from those in the "namespace".
         keyIndex.update(latestHollowReadStateEngine, true);
         log.info("delta from :"+latestVersion+" to :"+newVersion);
 
-        // A {@code HollowHistoricalStateDataAccess} is used to save records that won't exist in future transitions but need to
+        // A {@code HollowHistoricalStateDataAccess} is used to save records that won't exist in future states but need to
         // be accessible in the history view. It achieves this by storing references to that data (ordinal remapper) into
         // the monolithic history key index.
-        // SNAP: BUG ???
+        //
+        // SNAP: This is it!
+        // Fwd delta v1->v2: looks up ordinals removed in v2, the  copies over data from v2 read state
+        // Rev delta v2->v1: should look up ordinals added in v2, then copy over data from v2 read state
         // Irrespective of whether following deltas or reverse details, this should track records corresponding to
-        //  the removed ordinals (just that in the reverse delta case those will correspond to added records)
-        // When building using deltas {@code HollowHistoricalStateDataAccess} should
-        // save the removed ordinals, and when building using reverse deltas it should save the added ordinals.
-        // SNAP: INt map ordinal remapping stuff could be doing that key indexing thingy
+        //  the removed ordinals (just that in the reverse delta case those should be reported as added records in the fwd direction)
+        // Ordinal mapping: HollowHistoricalStateDataAccess maintains per-type ordinal mapping from removed ordinal no. to new ordinal in historical state
+        //                   named typeRemovedOrdinalMapping
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
@@ -219,16 +221,23 @@ public class HollowHistory {
      * @param newVersion The version of the new state
      */
     public void reverseDeltaOccurred(long newVersion) {
-        keyIndex.update(latestHollowReadStateEngine, true);
+        keyIndex.update(latestHollowReadStateEngine, true, false);
+            // SNAP: hwo does ordinal in key index mapping to record in historical state work?
 
         log.info("SNAP: Reverse delta from : "+  latestVersion +" to :"+ newVersion);
 
-        // pass in the higher version i.e. before applying reverse delta    // TODO: note unused createBasedOnNewReverseDelta
+        // SNAP: This is it!
+        // Rev delta v2->v1: should look up ordinals added in v2, then copy over data from v1 read state
+
+        // pass in the higher version i.e. before applying reverse delta
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
         // I think we want the same behavior here i.e. preserve the removed ordinals when going delta or reverse delta since
-        // we wont see that data again. However then the from/to in the display are inverted
+        // we won't see that data again. However then the from/to in the display are inverted
+        // Builds a per-historical state per-type keyOrdinalMapping which maps an ordinal in the historical key index to ordinal in the latest read state engine
+        // in UI: this object powers: list keys that were added/removed/modified in a particular historical state
+        //         For that reason it reverses the logic when returning the added/removed ordinals
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(false, true);
         // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity in UI
         HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);

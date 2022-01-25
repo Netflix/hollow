@@ -93,14 +93,19 @@ public class HollowHistoryTypeKeyIndex {
         readStateEngine=readEngine;
     }
 
-    public void update(HollowObjectTypeReadState latestTypeState, boolean isDelta) {
-        copyExistingKeys();
+    public void update(HollowObjectTypeReadState latestTypeState, boolean isDeltaAndIndexInitialized, boolean reverse) {
+        // copies over keys corresponding to previously populated ordinals AND currently populated ordinals
+        copyExistingKeys(); // only popylates the ordianl map (to be the OR of previous and current ordinals)
         if (latestTypeState == null) return;
 
-        if (isDelta)
-            populateNewCurrentRecordKeys(latestTypeState);
-        else
-            populateAllCurrentRecordKeys(latestTypeState);
+        if (isDeltaAndIndexInitialized) {
+            // For fwd delta transition: write all key objects that were added when going from v1 -> v2 to the history type key index
+            populateNewCurrentRecordKeysIntoIndex(latestTypeState, reverse);
+        }
+        else {
+            // when index is not yet initialized with data (usually on first fwd delta transition) or on  double snapshot
+            populateAllCurrentRecordKeysIntoIndex(latestTypeState);
+        }
     }
 
     public void hashRecordKeys() {
@@ -377,30 +382,36 @@ public class HollowHistoryTypeKeyIndex {
         HollowTypeWriteState typeState = writeStateEngine.getTypeState(primaryKey.getType());
         if (typeState == null) return;
 
-        typeState.addAllObjectsFromPreviousCycle();
+        typeState.addAllObjectsFromPreviousCycle(); // SNAP: works for delta, right?
     }
 
-    private void populateAllCurrentRecordKeys(HollowObjectTypeReadState typeState) {
+    private void populateAllCurrentRecordKeysIntoIndex(HollowObjectTypeReadState typeState) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(keySchema);
         PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
         BitSet previousOrdinals = listener.getPreviousOrdinals();
         BitSet populatedOrdinals = listener.getPopulatedOrdinals();
 
+        // SNAP: This is it! ON fwd delta all previous and current ordinals data can be retrieved to be indexed, but on reverse deltas
+        //       The previous ordinals (state with greater version) correspond to something else in the current type state
         int maxLength = Math.max(previousOrdinals.length(), populatedOrdinals.length());
 
         for(int i=0;i<maxLength;i++) {
-            if(populatedOrdinals.get(i) || previousOrdinals.get(i))
+            if(populatedOrdinals.get(i) || previousOrdinals.get(i)) // look it! both previous and current ordinals are looked up in current state.
+            // Instead, reverse delta should look up previous ordinals in previous state
                 writeKeyObject(typeState, i, rec);
         }
     }
 
-    private void populateNewCurrentRecordKeys(HollowObjectTypeReadState typeState) {
+    // for fwd delta: when this is called, typeState's currentCyclePopulated is OR of previousCyclePopulated and currentCyclePopulated
+    private void populateNewCurrentRecordKeysIntoIndex(HollowObjectTypeReadState typeState, boolean reverse) {  // SNAP: reverse is not needed, index should always track addition of new keys whether going fwd ot reverse direction
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(keySchema);
         PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
         BitSet populatedOrdinals = listener.getPopulatedOrdinals();
         BitSet previousOrdinals = listener.getPreviousOrdinals();
 
-        RemovedOrdinalIterator iter = new RemovedOrdinalIterator(populatedOrdinals, previousOrdinals);
+        RemovedOrdinalIterator iter = reverse ?
+                new RemovedOrdinalIterator(previousOrdinals, populatedOrdinals) :
+                new RemovedOrdinalIterator(populatedOrdinals, previousOrdinals);
         int ordinal = iter.next();
         while(ordinal != ORDINAL_NONE) {
             writeKeyObject(typeState, ordinal, rec);
