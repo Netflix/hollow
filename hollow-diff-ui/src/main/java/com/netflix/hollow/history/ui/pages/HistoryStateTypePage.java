@@ -71,13 +71,10 @@ public class HistoryStateTypePage extends HistoryPage {
     	List<List<String>> groups = new ArrayList<List<String>>();
     	groups.add(groupByOptions);
     	changes.put("groups", groups);
-
-		boolean reverse = false;
+    	
     	// handle additions
     	if(typeChange.getAddedRecords().isEmpty()) {
-    		changes.put(
-					reverse ? "removals" : "additions",
-					new ArrayList<List<String>>());
+    		changes.put("additions", new ArrayList<List<String>>());
     	} else if(!typeChange.getAddedRecords().hasSubGroups()){
     		List<RecordDiff> addedDiffs = typeChange.getAddedRecords().getRecordDiffs();
     		List<List<String>> idRecords = new ArrayList<List<String>>();
@@ -87,9 +84,7 @@ public class HistoryStateTypePage extends HistoryPage {
     			data.add(new Integer(diff.getKeyOrdinal()).toString());
     			idRecords.add(data);
     		}
-    		changes.put(
-					reverse ? "removals" : "additions",
-					idRecords);
+    		changes.put("additions", idRecords);
     	} else {
     		// This has sub groups
     		List<List<String>> idRecords = new ArrayList<List<String>>();
@@ -99,9 +94,7 @@ public class HistoryStateTypePage extends HistoryPage {
     			data.add(changeGroup.getHierarchicalFieldName());
     			idRecords.add(data);
     		}
-    		changes.put(
-					reverse ? "removals" : "additions",
-					idRecords);
+    		changes.put("additions", idRecords);
     	}
 
     	// handle modifications
@@ -131,9 +124,7 @@ public class HistoryStateTypePage extends HistoryPage {
     	
     	// handle removals
     	if(typeChange.getRemovedRecords().isEmpty()) {
-    		changes.put(
-					reverse ? "additions" : "removals",
-					new ArrayList<List<String>>());
+    		changes.put("removals", new ArrayList<List<String>>());
     	} else if(!typeChange.getRemovedRecords().hasSubGroups()){
     		List<RecordDiff> removedDiffs = typeChange.getRemovedRecords().getRecordDiffs();
     		List<List<String>> idRecords = new ArrayList<List<String>>();
@@ -143,9 +134,7 @@ public class HistoryStateTypePage extends HistoryPage {
     			data.add(new Integer(diff.getKeyOrdinal()).toString());
     			idRecords.add(data);
     		}
-    		changes.put(
-					reverse ? "additions" : "removals",
-					idRecords);
+    		changes.put("removals", idRecords);
     	} else {
     		// This has sub groups
     		List<List<String>> idRecords = new ArrayList<List<String>>();
@@ -155,9 +144,7 @@ public class HistoryStateTypePage extends HistoryPage {
     			data.add(changeGroup.getHierarchicalFieldName());
     			idRecords.add(data);
     		}
-    		changes.put(
-					reverse ? "additions" : "removals",
-					idRecords);
+    		changes.put("removals", idRecords);    		
     	}
     	
     	

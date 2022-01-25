@@ -34,17 +34,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.velocity.VelocityContext;
 
 public class HistoryOverviewPage extends HistoryPage {
-    private final boolean reverse;
 
     public HistoryOverviewPage(HollowHistoryUI ui) {
         super(ui, "history-overview.vm");
-        this.reverse = ui.getHistory().getReverse();
     }
 
     @Override
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         List<HistoryOverviewRow> rows = getHistoryOverview();
-
+        
         ctx.put("overviewDisplayHeaders", ui.getOverviewDisplayHeaders());
         ctx.put("overviewRows", rows);
     }
@@ -67,12 +65,12 @@ public class HistoryOverviewPage extends HistoryPage {
     	List<HistoryOverviewRow> rows = new ArrayList<HistoryOverviewRow>();
     	
         for(HollowHistoricalState state : ui.getHistory().getHistoricalStates()) {
-            ChangeBreakdown totalBreakdown = new ChangeBreakdown(ui.getHistory().getReverse());
+            ChangeBreakdown totalBreakdown = new ChangeBreakdown();
 
             Map<String, ChangeBreakdown> topLevelChangesByType = new HashMap<String, ChangeBreakdown>();
 
             for(Map.Entry<String, HollowHistoricalStateTypeKeyOrdinalMapping> entry : state.getKeyOrdinalMapping().getTypeMappings().entrySet()) {
-                topLevelChangesByType.put(entry.getKey(), new ChangeBreakdown(entry.getValue(), ui.getHistory().getReverse()));
+                topLevelChangesByType.put(entry.getKey(), new ChangeBreakdown(entry.getValue()));
                 totalBreakdown.addTypeBreakown(entry.getValue());
             }
 
@@ -110,22 +108,10 @@ public class HistoryOverviewPage extends HistoryPage {
         private int modifiedRecords;
         private int addedRecords;
         private int removedRecords;
-        private final boolean reverse;
 
-        public ChangeBreakdown() {
-            this(false);
-        }
-
-        public ChangeBreakdown(boolean reverse) {
-            this.reverse = reverse;
-        }
+        public ChangeBreakdown() { }
 
         public ChangeBreakdown(HollowHistoricalStateTypeKeyOrdinalMapping keyMapping) {
-            this(keyMapping, false);
-        }
-
-        public ChangeBreakdown(HollowHistoricalStateTypeKeyOrdinalMapping keyMapping, boolean reverse) {
-            this.reverse = reverse;
             addTypeBreakown(keyMapping);
         }
 
@@ -140,11 +126,11 @@ public class HistoryOverviewPage extends HistoryPage {
         }
 
         public int getAddedRecords() {
-            return reverse ? removedRecords : addedRecords;
+            return addedRecords;
         }
 
         public int getRemovedRecords() {
-            return reverse ? addedRecords : removedRecords;
+            return removedRecords;
         }
 
         public int getTotal() {

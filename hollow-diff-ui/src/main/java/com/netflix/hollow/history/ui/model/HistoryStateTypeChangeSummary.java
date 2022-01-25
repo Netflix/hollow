@@ -25,7 +25,6 @@ public class HistoryStateTypeChangeSummary {
     private final int modifications;
     private final int additions;
     private final int removals;
-
     
     public HistoryStateTypeChangeSummary(long stateVersion, String typeName, HollowHistoricalStateTypeKeyOrdinalMapping mapping) {
         this.stateVersion = stateVersion;

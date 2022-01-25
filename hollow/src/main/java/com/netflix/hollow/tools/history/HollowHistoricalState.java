@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * A data state from the past, represented as just the changes which happened on the subsequent transition.
- * Contains links to all subsequent deltas which happened in the interim between this state
+ * Contains links to all subsequent deltas which happened in the interim between the this state 
  * and the now current state.
  *
  */

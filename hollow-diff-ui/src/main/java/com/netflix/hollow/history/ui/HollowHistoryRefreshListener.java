@@ -22,8 +22,6 @@ import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.tools.history.HollowHistory;
 
-import java.util.List;
-
 public class HollowHistoryRefreshListener extends HollowConsumer.AbstractRefreshListener {
 
     private final HollowHistory history;
@@ -45,6 +43,6 @@ public class HollowHistoryRefreshListener extends HollowConsumer.AbstractRefresh
 	@Override public void refreshStarted(long currentVersion, long requestedVersion) { }
 	@Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) { }
 	@Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }
-	@Override public void blobLoaded(Blob transition) {	}
-
+	@Override public void blobLoaded(Blob transition) { }
+	
 }

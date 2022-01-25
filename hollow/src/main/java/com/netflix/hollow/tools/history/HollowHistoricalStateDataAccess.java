@@ -160,7 +160,7 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
             HollowHistoricalStateDataAccess historicalState = (HollowHistoricalStateDataAccess)state;
             if(historicalState.getOrdinalMapping().ordinalIsMapped(typeName, ordinal))
                 return state.getTypeDataAccess(typeName);
-            state = historicalState.getNextState(); // SNAP: THis is it! It's going up to v4 instead of going down to v2
+            state = historicalState.getNextState();
         }
 
         return state.getTypeDataAccess(typeName);
