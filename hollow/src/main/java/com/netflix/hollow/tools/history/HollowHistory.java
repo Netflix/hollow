@@ -66,7 +66,7 @@ public class HollowHistory {
     /**
      * a list of historical states in decreasing order of version i.e. index 0 holds the highest version
      * note that internally HollowHistoricalStates are linked in the order ot increasing versions, so irrespective of
-     * whether history was build using deltas or reverse deltas
+     * whether history was built using deltas or reverse deltas
      *  the list {@code historicalStates} ordered like: V3 -> V2 -> V1
      *  and the states are linked like: V1.next = V2; V2.next = V3; // TODO: not sure if ordinal preservation matters here
      */
@@ -231,7 +231,8 @@ public class HollowHistory {
 
         // pass in the higher version i.e. before applying reverse delta
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
-        historicalDataAccess.setNextState(latestHollowReadStateEngine);
+        // SNAP: TODO: what are the side effects of disabling this
+        // historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
         // I think we want the same behavior here i.e. preserve the removed ordinals when going delta or reverse delta since
         // we won't see that data again. However then the from/to in the display are inverted
@@ -454,9 +455,12 @@ public class HollowHistory {
     private void addReverseHistoricalState(HollowHistoricalState historicalState) {
         if(historicalStates.size() > 0) {
             log.info("addReverseHistoricalState==> "+historicalState.getVersion()+" -> end => "+historicalStates.get(historicalStates.size()-1).getVersion()+" -> start => "+historicalStates.get(0).getVersion());
-            historicalState.getDataAccess().setNextState(historicalStates.get(historicalStates.size()-1).getDataAccess());
-            // historicalStates.get(historicalStates.size()-1).getDataAccess().setVersion(newVersion);  // SNAP:
-            historicalState.setNextState(historicalStates.get(historicalStates.size()-1));
+//             historicalState.getDataAccess().setNextState(historicalStates.get(historicalStates.size()-1).getDataAccess());
+//             // historicalStates.get(historicalStates.size()-1).getDataAccess().setVersion(newVersion);  // SNAP:
+//             historicalState.setNextState(historicalStates.get(historicalStates.size()-1));
+
+            historicalStates.get(historicalStates.size()-1).getDataAccess().setNextState(historicalState.getDataAccess());
+            historicalStates.get(historicalStates.size()-1).setNextState(historicalState);
         }
 
         historicalStates.add(historicalState);
