@@ -26,6 +26,7 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.tools.history.HollowHistory;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
@@ -109,14 +110,15 @@ public class HollowHistoryKeyIndex {
     public void update(HollowReadStateEngine latestStateEngine, boolean isDelta) {
         boolean isInitialUpdate = !isInitialized();
 
-        // for all the types in the key index make sure a {@code HollowHistoryTypeKeyIndex} index is initialized (and
+        // For all the types in the key index make sure a {@code HollowHistoryTypeKeyIndex} index is initialized (and
         // has a writeable write state engine)
-        // The type index basically stores ordinals in its own sequence, and the value of the primary keys.
+        // The type index stores ordinals (in a sequence independent of how they existed in the read state) and the
+        // value of the primary keys.
         initializeTypeIndexes(latestStateEngine);
-        // this call updates the type key indexes of all types in this history key index. This is done by mutating the
-        // underlying writeStateEngine, and later reading it back as a readStateEngine.
-        // The type index basically stores ordinals in its own sequence, and the value of the primary keys.
+
+        // This call updates the type key indexes of all types in this history key index.
         updateTypeIndexes(latestStateEngine, isDelta && !isInitialUpdate);
+
         HollowReadStateEngine newIndexReadState = roundTripStateEngine(isInitialUpdate, !isDelta);
 
         // if snapshot update then a new read state was generated, udpate the types in the history index to point to this
@@ -153,10 +155,10 @@ public class HollowHistoryKeyIndex {
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "update-type-indexes");
 
         for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
-            // executor.execute(() -> {
+            executor.execute(() -> {
                 HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestStateEngine.getTypeState(entry.getKey());
                 entry.getValue().update(typeState, isDelta);
-            // });
+            });
         }
 
         try {

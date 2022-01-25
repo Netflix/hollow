@@ -217,12 +217,12 @@ public class HollowHistory {
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(false, false);
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(false);
         HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
 
         addHistoricalState(historicalState);
         this.latestVersion = newVersion;
-        log.info(" delta from latestVersion :"+this.latestVersion);
+        log.info("Delta to latestVersion :"+this.latestVersion);
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
     }
 
@@ -233,7 +233,7 @@ public class HollowHistory {
      * @param newVersion The version of the new state
      */
     public void reverseDeltaOccurred(long newVersion) {
-        keyIndex.update(latestHollowReadStateEngine, true, false);
+        keyIndex.update(latestHollowReadStateEngine, true);
 
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
@@ -248,13 +248,14 @@ public class HollowHistory {
          * ordinals is flipped (but only when querying) depending on delta directionality. For computating purposes they are
          * identical.
          */
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(false, true);
-        // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity in UI
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(true);
+        // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity with
+        // reporting history using fwd deltas
         HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
         addReverseHistoricalState(historicalState);
 
         this.latestVersion = newVersion;
-        log.info("reverse delta to latestVersion :"+this.latestVersion);
+        log.info("Reverse delta to latestVersion :"+this.latestVersion);
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
     }
 
@@ -280,7 +281,6 @@ public class HollowHistory {
         DiffEqualityMapping mapping = new DiffEqualityMapping(latestHollowReadStateEngine, newHollowStateEngine, true, !ignoreListOrderingOnDoubleSnapshot);
         DiffEqualityMappingOrdinalRemapper remapper = new DiffEqualityMappingOrdinalRemapper(mapping);
 
-        // TODO: latestVersion for reverse delta is not the current version
         historicalDataAccess = creator.createHistoricalStateFromDoubleSnapshot(latestVersion, latestHollowReadStateEngine, newHollowStateEngine, remapper);
 
         HollowHistoricalStateDataAccess nextRemappedDataAccess = historicalDataAccess;
@@ -339,7 +339,7 @@ public class HollowHistory {
         }
     }
 
-    private HollowHistoricalStateKeyOrdinalMapping createKeyOrdinalMappingFromDelta(boolean testReverse, boolean typeMappingsReverse) {
+    private HollowHistoricalStateKeyOrdinalMapping createKeyOrdinalMappingFromDelta(boolean typeMappingsReverse) {
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = new HollowHistoricalStateKeyOrdinalMapping(keyIndex, typeMappingsReverse);
 
         for(String keyType : keyIndex.getTypeKeyIndexes().keySet()) {
@@ -358,33 +358,20 @@ public class HollowHistory {
             RemovedOrdinalIterator removalIterator;
             RemovedOrdinalIterator additionsIterator;
 
-            if (!testReverse) {
-                removalIterator = new RemovedOrdinalIterator(listener);
-                additionsIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
-            } else {
-                additionsIterator = new RemovedOrdinalIterator(listener);
-                removalIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
-            }
+            removalIterator = new RemovedOrdinalIterator(listener);
+            additionsIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
 
             typeMapping.prepare(additionsIterator.countTotal(), removalIterator.countTotal());
 
             int removedOrdinal = removalIterator.next();
             while(removedOrdinal != -1) {
-                if (!testReverse) {
-                    typeMapping.removed(typeState, removedOrdinal);
-                } else {
-                    typeMapping.removedReverse(typeState, removedOrdinal);
-                }
+                typeMapping.removed(typeState, removedOrdinal);
                 removedOrdinal = removalIterator.next();
             }
 
             int addedOrdinal = additionsIterator.next();
             while(addedOrdinal != -1) {
-                if (!testReverse) {
-                    typeMapping.added(typeState, addedOrdinal);
-                } else {
-                    typeMapping.addedReverse(typeState, addedOrdinal);
-                }
+                typeMapping.added(typeState, addedOrdinal);
                 addedOrdinal = additionsIterator.next();
             }
 
