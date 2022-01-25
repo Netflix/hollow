@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class HollowHistoricalState {
 
-    private final long version;
+    private long version;
     private final HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping;
     private final HollowHistoricalStateDataAccess dataAccess;
     private final Map<String, String> headerEntries;
@@ -49,6 +49,9 @@ public class HollowHistoricalState {
         return version;
     }
 
+    public void setVersion(long newVersion) {
+        version = newVersion;
+    }
     /**
      * @return A {@link HollowDataAccess} which can be used to retrieve the data from this state.  For example,
      * you can use this with a generated Hollow API or the generic hollow object API.

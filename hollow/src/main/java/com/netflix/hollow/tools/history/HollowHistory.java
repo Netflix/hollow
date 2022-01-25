@@ -252,9 +252,9 @@ public class HollowHistory {
         // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity with
         // reporting history using fwd deltas
         HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
-        addReverseHistoricalState(historicalState);
+        addReverseHistoricalState(newVersion, historicalState);
 
-        this.latestVersion = newVersion;
+        this.latestVersion = historicalStates.get(0).getVersion();;
         log.info("Reverse delta to latestVersion :"+this.latestVersion);
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
     }
@@ -448,13 +448,16 @@ public class HollowHistory {
         }
     }
 
-    private void addReverseHistoricalState(HollowHistoricalState historicalState) {
+    private void addReverseHistoricalState(long newVersion, HollowHistoricalState historicalState) {
         if(historicalStates.size() > 0) {
             historicalStates.get(historicalStates.size()-1).getDataAccess().setNextState(historicalState.getDataAccess());
+            historicalStates.get(historicalStates.size()-1).getDataAccess().setVersion(newVersion);
             historicalStates.get(historicalStates.size()-1).setNextState(historicalState);
         }
 
         historicalStates.add(historicalState);
+        historicalState.setVersion(newVersion);
+        historicalState.getDataAccess().setVersion(0L);
         historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
 
         if(historicalStates.size() > maxHistoricalStatesToKeep) {
