@@ -107,10 +107,6 @@ public class HollowHistoryKeyIndex {
     }
 
     public void update(HollowReadStateEngine latestStateEngine, boolean isDelta) {
-        update(latestStateEngine, isDelta, false);
-    }
-
-    public void update(HollowReadStateEngine latestStateEngine, boolean isDelta, boolean reverse) {
         boolean isInitialUpdate = !isInitialized();
 
         // for all the types in the key index make sure a {@code HollowHistoryTypeKeyIndex} index is initialized (and
@@ -120,7 +116,7 @@ public class HollowHistoryKeyIndex {
         // this call updates the type key indexes of all types in this history key index. This is done by mutating the
         // underlying writeStateEngine, and later reading it back as a readStateEngine.
         // The type index basically stores ordinals in its own sequence, and the value of the primary keys.
-        updateTypeIndexes(latestStateEngine, isDelta && !isInitialUpdate, reverse);
+        updateTypeIndexes(latestStateEngine, isDelta && !isInitialUpdate);
         HollowReadStateEngine newIndexReadState = roundTripStateEngine(isInitialUpdate, !isDelta);
 
         // if snapshot update then a new read state was generated, udpate the types in the history index to point to this
@@ -153,13 +149,13 @@ public class HollowHistoryKeyIndex {
         }
     }
 
-    private void updateTypeIndexes(final HollowReadStateEngine latestStateEngine, final boolean isDelta, final boolean reverse) {
+    private void updateTypeIndexes(final HollowReadStateEngine latestStateEngine, final boolean isDelta) {
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "update-type-indexes");
 
         for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
             // executor.execute(() -> {
                 HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestStateEngine.getTypeState(entry.getKey());
-                entry.getValue().update(typeState, isDelta, reverse);
+                entry.getValue().update(typeState, isDelta);
             // });
         }
 

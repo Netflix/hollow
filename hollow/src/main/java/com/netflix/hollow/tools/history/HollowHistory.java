@@ -64,19 +64,20 @@ public class HollowHistory {
     private Map<String, String> latestHeaderEntries;
 
     /**
-     * a list of historical states in decreasing order of version i.e. index 0 holds the highest version
-     * note that internally HollowHistoricalStates are linked in the order ot increasing versions, so irrespective of
-     * whether history was built using deltas or reverse deltas
-     *  the list {@code historicalStates} ordered like: V3 -> V2 -> V1
-     *  and the states are linked like: V1.next = V2; V2.next = V3; // TODO: not sure if ordinal preservation matters here
+     * A list of historical states in decreasing order of version i.e. index 0 holds the highest version
+     *  {@code historicalStates} ordered like: V3 -> V2 -> V1 (as displayed to user)
+     *  however internally the states are linked like:
+     *      V1.nextState = V2; V2.nextState = V3; etc. if building using fwd deltas, but
+     *      V3.nextState = V2; V2.nextState = V1; etc. if building using reverse deltas
      */
     private final List<HollowHistoricalState> historicalStates;
 
-    // a map of version to HollowHistoricalState for quick retrieval
+    // A map of version to HollowHistoricalState for quick retrieval
     private final Map<Long, HollowHistoricalState> historicalStateLookupMap;
 
-    // the state engine and version corresponding to the current state. When traversing deltas this is the highest version,
-    // and when traversing reverse deltas this is the lowest version.
+    // The state engine and version corresponding to the current read state.
+    // When traversing deltas from v1 to v2 this is the state corresponding to v2, and when traversing reverse
+    // delta from v2 to v1 this is the state corresponding to v1.
     private HollowReadStateEngine latestHollowReadStateEngine;
     private long latestVersion;
 
@@ -183,25 +184,36 @@ public class HollowHistory {
      * @param newVersion The version of the new state
      */
     public void deltaOccurred(long newVersion) {
-        // At this point the delta update has been already applied to latestHollowReadStateEngine, but latestVersion is still
-        // the version from before the delta transition. That gets updated in this method.
-        // This call updates the state stored in keyIndex (in instance variable readStateEngine) with the passed read state engine
-        // Note that the history key index indexes all the records from all the previously known states into an internal
-        // ever-growing readStateEngine with ordinals independent from those in the "namespace".
-        keyIndex.update(latestHollowReadStateEngine, true);
-        log.info("delta from :"+latestVersion+" to :"+newVersion);
+        // At this point the delta update has been already applied to latestHollowReadStateEngine, but {@code latestVersion}
+        // is still the version from before the delta transition. {@code latestVersion} gets updated in this method.
 
-        // A {@code HollowHistoricalStateDataAccess} is used to save records that won't exist in future states but need to
-        // be accessible in the history view. It achieves this by storing references to that data (ordinal remapper) into
-        // the monolithic history key index.
+        // This updates the state stored in keyIndex (in its member readStateEngine) with the passed read state engine.
+        // The {@code readStateEngine} in keyIndex stores an ever growing record of all keys ever seen by this HollowHistory
+        // instance i.e. all keys seen in initial load/double-snapshot or added/removed in deltas/reversedeltas are added to
+        // this index monolithic index. Don't worry, it doesnt store a copy of the actual data, just the primary key values
+        // for each type that has a primary key defined.
+        keyIndex.update(latestHollowReadStateEngine, true);
+
+        // A {@code HollowHistoricalStateDataAccess} is used to save data that won't exist in future states so it needs to
+        // be stashed away somewhere for makeing it accessible in the history view. It achieves this by copying over
+        // data corresponding to ghost records in the latest state (i.e. ordinals were previously populated but are not
+        // populated in the latest state) into a new state engine where it assigns new ordinals (0, 1, 2, etc.) to each
+        // removed record. This mapping of original ordinal in the read state to its new ordinal position in the historical
+        // state data access for all removed records in each type is stored in the member {@code typeRemovedOrdinalMapping}.
         //
-        // SNAP: This is it!
-        // Fwd delta v1->v2: looks up ordinals removed in v2, the  copies over data from v2 read state
-        // Rev delta v2->v1: should look up ordinals added in v2, then copy over data from v2 read state
-        // Irrespective of whether following deltas or reverse details, this should track records corresponding to
-        //  the removed ordinals (just that in the reverse delta case those should be reported as added records in the fwd direction)
-        // Ordinal mapping: HollowHistoricalStateDataAccess maintains per-type ordinal mapping from removed ordinal no. to new ordinal in historical state
-        //                   named typeRemovedOrdinalMapping
+        // The behavior for building history using reverse deltas is the same as with fwd deltas, in that it needs to
+        // track data corresponding to ordinals removed in delta transition irrespective of the delta direction, because
+        // that is the data which will be lost on the next version transition. So,
+        //   When building history using fwd deltas for e.g. v1->v2 it looks up ordinals removed in v2, then copies over
+        //   data corresponding to the removed ordinal from v2's read state into an internal read state under ordinals 0,1,2,etc.
+        //   When building history using rev delta for e.g. v2->v1: it looks up ordinals removed in going from v2 to v1
+        //   (which in the fwd delta sense is actually records that were added in going from v1 to v2), then copies over data
+        //   from v1 read state corresponding to these removed ordinals.
+        //
+        // For parity in UI, we want to display to user the same "directionality" in the diff irrespective of whether History
+        // was building using fwd or reverse deltas. So although the construction of a HollowHistoricalState using fwd/reverse
+        // deltas is identical, the significant of added vs removed is flipped when it is queried by the user.
+        //
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
@@ -222,23 +234,20 @@ public class HollowHistory {
      */
     public void reverseDeltaOccurred(long newVersion) {
         keyIndex.update(latestHollowReadStateEngine, true, false);
-            // SNAP: hwo does ordinal in key index mapping to record in historical state work?
 
-        log.info("SNAP: Reverse delta from : "+  latestVersion +" to :"+ newVersion);
-
-        // SNAP: This is it!
-        // Rev delta v2->v1: should look up ordinals added in v2, then copy over data from v1 read state
-
-        // pass in the higher version i.e. before applying reverse delta
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
-        // SNAP: TODO: what are the side effects of disabling this
-        // historicalDataAccess.setNextState(latestHollowReadStateEngine);
+        historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
-        // I think we want the same behavior here i.e. preserve the removed ordinals when going delta or reverse delta since
-        // we won't see that data again. However then the from/to in the display are inverted
-        // Builds a per-historical state per-type keyOrdinalMapping which maps an ordinal in the historical key index to ordinal in the latest read state engine
-        // in UI: this object powers: list keys that were added/removed/modified in a particular historical state
-        //         For that reason it reverses the logic when returning the added/removed ordinals
+        /**
+         * {@code keyOrdinalMapping} maps an ordinal in the monolithic history key index to its ordinal in the corresponding
+         * read state engine (which can then be mapped to the ordinal in the history state's limited data access to retrieve data).
+         * This mapping is done for each type under each historical state. It is used to power the UI view where given a
+         * historic version it lists all keys that were added/removed/modified in that version, and can then retrieve the
+         * data for those keys.
+         * There is a difference in how fwd and reverse deltas are handled here in that the significance of added vs removed
+         * ordinals is flipped (but only when querying) depending on delta directionality. For computating purposes they are
+         * identical.
+         */
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(false, true);
         // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity in UI
         HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);

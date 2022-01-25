@@ -9,20 +9,18 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
-import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.history.ui.webserver.HollowHistoryUIServer;
 import com.netflix.hollow.tools.history.HollowHistory;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.BitSet;
-
-import org.junit.Test;
 
 public class HistoryUITest {
 
@@ -153,36 +151,33 @@ public class HistoryUITest {
             //write snapshot to output stream
             writer.writeSnapshot(baos_v4);
 
+            readStateEngine = new HollowReadStateEngine();
+            reader = new HollowBlobReader(readStateEngine);
+            //load snapshot from output stream to read state engine
+            reader.readSnapshot(HollowBlobInput.serial(baos_v1.toByteArray()));
+            //>>>do not init history with the snapshot
+            history = new HollowHistory(readStateEngine, 1L, 10);
+            history.getKeyIndex().addTypeIndex("TypeA", "a1");
+            reader.applyDelta(HollowBlobInput.serial(baos_v1_to_v2.toByteArray()));
+            history.deltaOccurred(2L);
+            reader.applyDelta(HollowBlobInput.serial(baos_v2_to_v3.toByteArray()));
+            history.deltaOccurred(3L);
+            reader.applyDelta(HollowBlobInput.serial(baos_v3_to_v4.toByteArray()));
+            history.deltaOccurred(4L);
+
 //             readStateEngine = new HollowReadStateEngine();
 //             reader = new HollowBlobReader(readStateEngine);
 //             //load snapshot from output stream to read state engine
-//             reader.readSnapshot(HollowBlobInput.serial(baos_v1.toByteArray()));
+//             reader.readSnapshot(HollowBlobInput.serial(baos_v2.toByteArray()));
 //             //>>>do not init history with the snapshot
-//             history = new HollowHistory(readStateEngine, 1L, 10);
+//             history = new HollowHistory(readStateEngine, 2L, 10);
 //             history.getKeyIndex().addTypeIndex("TypeA", "a1");
-//
-//             reader.applyDelta(HollowBlobInput.serial(baos_v1_to_v2.toByteArray()));
-//             history.deltaOccurred(2L);
 //
 //             reader.applyDelta(HollowBlobInput.serial(baos_v2_to_v3.toByteArray()));
 //             history.deltaOccurred(3L);
 //
 //             reader.applyDelta(HollowBlobInput.serial(baos_v3_to_v4.toByteArray()));
 //             history.deltaOccurred(4L);
-
-            readStateEngine = new HollowReadStateEngine();
-            reader = new HollowBlobReader(readStateEngine);
-            //load snapshot from output stream to read state engine
-            reader.readSnapshot(HollowBlobInput.serial(baos_v2.toByteArray()));
-            //>>>do not init history with the snapshot
-            history = new HollowHistory(readStateEngine, 2L, 10);
-            history.getKeyIndex().addTypeIndex("TypeA", "a1");
-
-            reader.applyDelta(HollowBlobInput.serial(baos_v2_to_v3.toByteArray()));
-            history.deltaOccurred(3L);
-
-            reader.applyDelta(HollowBlobInput.serial(baos_v3_to_v4.toByteArray()));
-            history.deltaOccurred(4L);
         }
 
         return history;
@@ -308,9 +303,9 @@ public class HistoryUITest {
             reader.applyDelta(HollowBlobInput.serial(baos_v3_to_v2.toByteArray()));
             exploreOrdinals(readStateEngine);
             history.reverseDeltaOccurred(2L);
-//
-//             reader.applyDelta(HollowBlobInput.serial(baos_v2_to_v1.toByteArray()));
-//             history.reverseDeltaOccurred(1L);
+
+           reader.applyDelta(HollowBlobInput.serial(baos_v2_to_v1.toByteArray()));
+           history.reverseDeltaOccurred(1L);
         }
 
         return history;
