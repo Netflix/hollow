@@ -51,6 +51,16 @@ public class RemovedOrdinalIterator {
         return ORDINAL_NONE;
     }
 
+    public int nextSet() {
+        while(ordinal < previousOrdinalsLength) {
+            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+            if(ordinal>=0 && previousOrdinals.get(ordinal))
+                return ordinal;
+        }
+
+        return ORDINAL_NONE;
+    }
+
     public void reset() {
         ordinal = ORDINAL_NONE;
     }

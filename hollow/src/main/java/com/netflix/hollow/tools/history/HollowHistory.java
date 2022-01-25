@@ -450,11 +450,6 @@ public class HollowHistory {
 
     private void addReverseHistoricalState(HollowHistoricalState historicalState) {
         if(historicalStates.size() > 0) {
-            log.info("addReverseHistoricalState==> "+historicalState.getVersion()+" -> end => "+historicalStates.get(historicalStates.size()-1).getVersion()+" -> start => "+historicalStates.get(0).getVersion());
-//             historicalState.getDataAccess().setNextState(historicalStates.get(historicalStates.size()-1).getDataAccess());
-//             // historicalStates.get(historicalStates.size()-1).getDataAccess().setVersion(newVersion);  // SNAP:
-//             historicalState.setNextState(historicalStates.get(historicalStates.size()-1));
-
             historicalStates.get(historicalStates.size()-1).getDataAccess().setNextState(historicalState.getDataAccess());
             historicalStates.get(historicalStates.size()-1).setNextState(historicalState);
         }

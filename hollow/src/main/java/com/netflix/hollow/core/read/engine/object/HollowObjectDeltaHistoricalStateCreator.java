@@ -49,7 +49,6 @@ public class HollowObjectDeltaHistoricalStateCreator {
         this.typeState = typeState;
         this.stateEngineDataElements = typeState.currentDataElements();
         this.historicalDataElements = new HollowObjectTypeDataElements(typeState.getSchema(), WastefulRecycler.DEFAULT_INSTANCE);
-        // SNAP: ??? do I or not, need to create ReverseDeltaHistoricalTypeState similarly, with added ordinal iterator instead of removed
         this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class));
         this.currentWriteVarLengthDataPointers = new long[typeState.getSchema().numFields()];
         this.shardNumberMask = stateEngineDataElements.length - 1;

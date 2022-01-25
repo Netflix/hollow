@@ -25,7 +25,7 @@ import java.util.BitSet;
 public class HistoryUITest {
 
     @Test
-    public void startServerOnPort7777() throws Exception {
+    public void startServerOnPorts7777And7778() throws Exception {
 
         HollowHistory historyD = createHistoryD();
         HollowHistoryUIServer serverD = new HollowHistoryUIServer(historyD, 7777);
@@ -164,20 +164,6 @@ public class HistoryUITest {
             history.deltaOccurred(3L);
             reader.applyDelta(HollowBlobInput.serial(baos_v3_to_v4.toByteArray()));
             history.deltaOccurred(4L);
-
-//             readStateEngine = new HollowReadStateEngine();
-//             reader = new HollowBlobReader(readStateEngine);
-//             //load snapshot from output stream to read state engine
-//             reader.readSnapshot(HollowBlobInput.serial(baos_v2.toByteArray()));
-//             //>>>do not init history with the snapshot
-//             history = new HollowHistory(readStateEngine, 2L, 10);
-//             history.getKeyIndex().addTypeIndex("TypeA", "a1");
-//
-//             reader.applyDelta(HollowBlobInput.serial(baos_v2_to_v3.toByteArray()));
-//             history.deltaOccurred(3L);
-//
-//             reader.applyDelta(HollowBlobInput.serial(baos_v3_to_v4.toByteArray()));
-//             history.deltaOccurred(4L);
         }
 
         return history;

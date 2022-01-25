@@ -383,7 +383,7 @@ public class HollowHistoryTypeKeyIndex {
         HollowTypeWriteState typeState = writeStateEngine.getTypeState(primaryKey.getType());
         if (typeState == null) return;
 
-        typeState.addAllObjectsFromPreviousCycle(); // SNAP: works for delta, right?
+        typeState.addAllObjectsFromPreviousCycle();
     }
 
     private void populateAllCurrentRecordKeysIntoIndex(HollowObjectTypeReadState typeState) {

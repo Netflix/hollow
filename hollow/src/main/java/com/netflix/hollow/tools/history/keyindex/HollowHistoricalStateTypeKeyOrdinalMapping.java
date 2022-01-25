@@ -44,7 +44,7 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
         this.typeMappingsReverse = typeMappingsReverse;
     }
 
-    // SNAP: only for double snapshot, should we even reverse here?
+    // double snapshot only
     private HollowHistoricalStateTypeKeyOrdinalMapping(String typeName, HollowHistoryTypeKeyIndex keyIndex, IntMap addedOrdinalMap, IntMap removedOrdinalMap, boolean reverse) {
         this.typeName = typeName;
         this.keyIndex = keyIndex;
