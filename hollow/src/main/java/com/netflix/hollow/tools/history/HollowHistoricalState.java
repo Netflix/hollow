@@ -34,12 +34,22 @@ public class HollowHistoricalState {
     private final HollowHistoricalStateDataAccess dataAccess;
     private final Map<String, String> headerEntries;
     private HollowHistoricalState nextState;
+    private boolean reverseDelta = false;
+
+    public HollowHistoricalState(long version, HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping, HollowHistoricalStateDataAccess dataAccess, Map<String, String> headerEntries, boolean reverseDelta) {
+        this(version, keyOrdinalMapping, dataAccess, headerEntries);
+        this.reverseDelta = reverseDelta;
+    }
 
     public HollowHistoricalState(long version, HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping, HollowHistoricalStateDataAccess dataAccess, Map<String, String> headerEntries) {
         this.version = version;
         this.dataAccess = dataAccess;
         this.keyOrdinalMapping = keyOrdinalMapping;
         this.headerEntries = headerEntries;
+    }
+
+    public boolean IsReverseDelta() {
+        return reverseDelta;
     }
 
     /**

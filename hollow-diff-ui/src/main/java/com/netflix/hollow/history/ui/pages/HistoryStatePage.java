@@ -49,6 +49,11 @@ public class HistoryStatePage extends HistoryPage {
         
         long nextStateVersion = getNextStateVersion(historicalState);
         long prevStateVersion = getPreviousStateVersion(historicalState);
+        if(historicalState.IsReverseDelta()){
+            long temp = nextStateVersion;
+            nextStateVersion = prevStateVersion;
+            prevStateVersion = temp;
+        }
 
         List<HistoryStateTypeChangeSummary> typeChanges = new ArrayList<HistoryStateTypeChangeSummary>();
 
@@ -108,7 +113,7 @@ public class HistoryStatePage extends HistoryPage {
     }
     
     private long getNextStateVersion(HollowHistoricalState currentHistoricalState) {
-        if(currentHistoricalState.getNextState() != null)
+        if (currentHistoricalState.getNextState() != null)
             return currentHistoricalState.getNextState().getVersion();
         return -1;
     }
