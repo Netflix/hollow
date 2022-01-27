@@ -170,7 +170,7 @@ public class HistoryUITest {
     }
 
 
-    private HollowHistory createReverseHistoryR() throws IOException {
+    private HollowHistory createReverseHistoryR() throws IOException, Exception {
         ByteArrayOutputStream baos_v2_to_v1, baos_v3_to_v2;
         HollowHistory history;
         HollowReadStateEngine readStateEngine;

@@ -82,7 +82,7 @@ public class ReverseDeltaHistoryUITest {
         return history;
     }
 
-    private HollowHistory createHistoryReverse() throws IOException {
+    private HollowHistory createHistoryReverse() throws IOException, Exception {
         //setup producer
         stateEngine = new HollowWriteStateEngine();
 

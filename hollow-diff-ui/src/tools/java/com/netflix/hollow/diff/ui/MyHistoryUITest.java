@@ -322,6 +322,7 @@ public class MyHistoryUITest {
             history.deltaOccurred(20001231235959999L);
             exploreOrdinals(readStateEngine);
 
+
         }
 
         return history;
@@ -347,14 +348,59 @@ public class MyHistoryUITest {
         HollowReadStateEngine readStateEngine;
         HollowBlobReader reader;
         HollowWriteStateEngine stateEngine;
+        schema = new HollowObjectSchema("TypeA", 2);
+        schema.addField("a1", FieldType.INT);
+        schema.addField("a2", FieldType.INT);
+
+        bSchema = new HollowObjectSchema("TypeB", 2, "b1");
+        bSchema.addField("b1", FieldType.INT);
+        bSchema.addField("b2", FieldType.INT);
+/*
+        { // do double snapshot and remove type
+            //new producer
+            HollowWriteStateEngine stateEngine2 = new HollowWriteStateEngine();
+            //use old schema
+            stateEngine2.addTypeState(new HollowObjectTypeWriteState(schema));
+            addRec(stateEngine2, schema, new String[] { "a1", "a2" }, new int[] { 1, 1 });
+            addRec(stateEngine2, schema, new String[] { "a1", "a2" }, new int[] { 22, 22 });
+            //new read engine
+            HollowReadStateEngine readStateEngine2 = new HollowReadStateEngine();
+            //populate new read engine with new write engine
+            StateEngineRoundTripper.roundTripSnapshot(stateEngine2, readStateEngine2, null);
+            //update index
+            //setupKeyIndex(readStateEngine2, history);
+            //stitch history with double snap
+            //history.doubleSnapshotOccurred(readStateEngine2, 20021231235959999L);
+            history = new HollowHistory(readStateEngine2, 20021231235959999L, 10, true, true);
+            history.getKeyIndex().addTypeIndex("TypeA", "a1");
+        }
+
+
+        { // do double snapshot and introduce new type
+            //new producer
+            HollowWriteStateEngine stateEngine2 = new HollowWriteStateEngine();
+            //attach new and old schema
+            stateEngine2.addTypeState(new HollowObjectTypeWriteState(schema));
+            stateEngine2.addTypeState(new HollowObjectTypeWriteState(bSchema));
+            //add recs
+            addRec(stateEngine2, schema, new String[] { "a1", "a2" }, new int[] { 1, 1 });
+            addRec(stateEngine2, schema, new String[] { "a1", "a2" }, new int[] { 2, 2 });
+            addRec(stateEngine2, bSchema, new String[] { "b1", "b2" }, new int[] { 9, 999 });
+            //new readengine
+            HollowReadStateEngine readStateEngine2 = new HollowReadStateEngine();
+            //populate new read engine with new write engine
+            StateEngineRoundTripper.roundTripSnapshot(stateEngine2, readStateEngine2, null);
+            //update index
+            setupKeyIndex(readStateEngine2, history);
+            history.doubleSnapshotOccurred(readStateEngine2, 20011231235959999L);
+        }
+*/
+
 
         {
-            schema = new HollowObjectSchema("TypeA", 2);
+
 
             stateEngine = new HollowWriteStateEngine();
-            schema.addField("a1", FieldType.INT);
-            schema.addField("a2", FieldType.INT);
-
             //attach schema to write state engine
             stateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
             stateEngine.addHeaderTag("snapversion", "0");
@@ -446,8 +492,13 @@ public class MyHistoryUITest {
             reader = new HollowBlobReader(readStateEngine);
             //load snapshot from output stream to read state engine
             reader.readSnapshot(HollowBlobInput.serial(baos_v4.toByteArray()));
+            //StateEngineRoundTripper.roundTripSnapshot(stateEngine2, readStateEngine2, null);
+            //update index
+            //setupKeyIndex(readStateEngine, history);
+            //stitch history with double snap
+            //history.doubleSnapshotOccurred(readStateEngine, 20021231235959999L);
             //>>>do not init history with the snapshot
-            history = new HollowHistory(readStateEngine, 0, 10);
+            history = new HollowHistory(readStateEngine, 0, 10, true, true);
             history.getKeyIndex().addTypeIndex("TypeA", "a1");
             System.out.println("RDelta version 0");
             exploreOrdinals(readStateEngine);
@@ -469,6 +520,10 @@ public class MyHistoryUITest {
             history.reverseDeltaOccurred(19981231235959999L);
             System.out.println("Delta version 20001231235959999L");
             exploreOrdinals(readStateEngine);
+
+
+           // history.removeHistoricalStates(1);
+            //history.reverseDeltaOccurred(19981231235959999L);
             //HollowExplorerUIServer ui_delta = new HollowExplorerUIServer(readStateEngine, 8888);
             //ui_delta.start();
             //ui_delta.join();

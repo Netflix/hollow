@@ -31,7 +31,6 @@ import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateKeyOrdinalMapping;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -39,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
+
 
 /**
  * Retains, in memory, the changes in a dataset over many states.  Indexes data for efficient retrieval from any
@@ -232,7 +232,10 @@ public class HollowHistory {
      *
      * @param newVersion The version of the new state
      */
-    public void reverseDeltaOccurred(long newVersion) {
+    public void reverseDeltaOccurred(long newVersion) throws Exception {
+        if(historicalStates.size() == maxHistoricalStatesToKeep) {
+            throw new Exception("Reached max Historical States.");
+        }
         keyIndex.update(latestHollowReadStateEngine, true);
 
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
@@ -251,7 +254,7 @@ public class HollowHistory {
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(true);
         // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity with
         // reporting history using fwd deltas
-        HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
+        HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries, true);
         addReverseHistoricalState(newVersion, historicalState);
 
         this.latestVersion = historicalStates.get(0).getVersion();;
@@ -460,9 +463,6 @@ public class HollowHistory {
         historicalState.getDataAccess().setVersion(0L);
         historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
 
-        if(historicalStates.size() > maxHistoricalStatesToKeep) {
-            removeHistoricalStatesForReverseDelta(1);
-        }
     }
 
     /**
@@ -488,30 +488,14 @@ public class HollowHistory {
             HollowHistoricalState removedState = historicalStates.remove(historicalStates.size() - 1);
             historicalStateLookupMap.remove(removedState.getVersion());
         }
-    }
-
-    /**
-     * Removes the last {@code n} historical states.
-     *
-     * @param n the number of historical states to remove
-     * @throws IllegalArgumentException if the {@code n} is less than {@code 0} or
-     * greater than the {@link #getNumberOfHistoricalStates() number} of historical
-     * states.
-     */
-    public void removeHistoricalStatesForReverseDelta(int n) {
-        if (n < 0) {
-            throw new IllegalArgumentException(String.format(
-                    "Number of states to remove is negative: %d", n));
-        }
-        if (n > historicalStates.size()) {
-            throw new IllegalArgumentException(String.format(
-                    "Number of states to remove, %d, is greater than the number of states. %d",
-                    n, historicalStates.size()));
-        }
-
-        while (n-- > 0) {
-            HollowHistoricalState removedState = historicalStates.remove(0);
-            historicalStateLookupMap.remove(removedState.getVersion());
+        if(reverse){
+            if(historicalStates.size() == 0){
+                this.latestVersion = 0L;
+            }else{
+                historicalStates.get(historicalStates.size()-1).getDataAccess().setNextState(null);
+                historicalStates.get(historicalStates.size()-1).getDataAccess().setVersion(0L);
+                historicalStates.get(historicalStates.size()-1).setNextState(null);
+            }
         }
     }
 }
