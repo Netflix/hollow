@@ -34,8 +34,6 @@ public class HollowProducerMetrics extends HollowMetrics {
     private int deltasFailed = 0;
     private int reverseDeltasCompleted = 0;
     private int reverseDeltasFailed = 0;
-    private int headersCompleted = 0;
-    private int headersFailed = 0;
 
     /**
      * Updates the producer metrics:
@@ -139,13 +137,5 @@ public class HollowProducerMetrics extends HollowMetrics {
 
     public int getReverseDeltasFailed() {
         return reverseDeltasFailed;
-    }
-
-    public int getHeadersCompleted() {
-        return headersCompleted;
-    }
-
-    public int getHeadersFailed() {
-        return headersFailed;
     }
 }

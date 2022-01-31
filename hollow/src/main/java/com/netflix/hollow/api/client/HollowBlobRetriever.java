@@ -48,10 +48,10 @@ public interface HollowBlobRetriever {
     HollowBlob retrieveReverseDeltaBlob(long currentVersion);
 
     /**
-     * @param desiredVersion the desired version
-     * @return the header for the state with an identifier equal to or less than the desired version
+     * @param currentVersion the desired version
+     * @return the header for the state with an identifier equal to currentVersion
      */
-    default HollowBlobHeader retrieveHeaderBlob(long desiredVersion) {
+    default HollowBlobHeader retrieveHeaderBlob(long currentVersion) {
         return new HollowBlobHeader();
     }
 }

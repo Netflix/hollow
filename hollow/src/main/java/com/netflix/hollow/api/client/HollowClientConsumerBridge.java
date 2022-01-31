@@ -32,14 +32,15 @@ class HollowClientConsumerBridge {
         return new HollowConsumer.BlobRetriever() {
 
             @Override
-            public HollowConsumer.HeaderBlob retrieveHeaderBlob(long desiredVersion) {
-                final HollowBlobHeader blob = blobRetriever.retrieveHeaderBlob(desiredVersion);
-                if(blob == null)
+            public HollowConsumer.HeaderBlob retrieveHeaderBlob(long currentVersion) {
+                final HollowBlobHeader headerBlob = blobRetriever.retrieveHeaderBlob(currentVersion);
+                if(headerBlob == null)
                     return null;
 
-                return new HollowConsumer.HeaderBlob(desiredVersion) {
+                return new HollowConsumer.HeaderBlob(currentVersion) {
                     @Override
                     public InputStream getInputStream() throws IOException {
+                        // Getting input stream from HeaderBlob is not supported for ClientConsumerBridge.
                         throw new UnsupportedOperationException();
                     }
                 };

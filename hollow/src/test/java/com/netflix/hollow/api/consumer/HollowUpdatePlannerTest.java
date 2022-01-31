@@ -19,10 +19,8 @@ package com.netflix.hollow.api.consumer;
 import com.netflix.hollow.api.client.HollowUpdatePlan;
 import com.netflix.hollow.api.client.HollowUpdatePlanner;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
-import com.netflix.hollow.api.consumer.HollowConsumer.HeaderBlob;
 import com.netflix.hollow.test.consumer.TestBlob;
 import com.netflix.hollow.test.consumer.TestBlobRetriever;
-import com.netflix.hollow.test.consumer.TestHeaderBlob;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -274,12 +272,6 @@ public class HollowUpdatePlannerTest {
         Blob result = new TestBlob(Long.MIN_VALUE, actualVersion);
 
         mockTransitionCreator.addSnapshot(desiredVersion, result);
-    }
-
-    private void addMockHeader(long actualVersion) {
-        HeaderBlob result = new TestHeaderBlob(actualVersion);
-
-        mockTransitionCreator.addHeader(actualVersion, result);
     }
 
     private void addMockDelta(long fromVersion, long toVersion) {

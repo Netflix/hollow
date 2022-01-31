@@ -159,7 +159,7 @@ public class HollowClientTest {
         }
 
         @Override
-        public HollowBlobHeader retrieveHeaderBlob(long desiredVersion) {
+        public HollowBlobHeader retrieveHeaderBlob(long currentVersion) {
             return new HollowBlobHeader();
         }
 

@@ -595,12 +595,17 @@ public class HollowProducer extends AbstractHollowProducer {
          * <p>
          * It is guaranteed that {@code blob} was created by calling one of
          * {@link BlobStager#openSnapshot(long)}, {@link BlobStager#openDelta(long, long)}, or
-         * {@link BlobStager#openReverseDelta(long, long)} on this publisher.
+         * {@link BlobStager#openDelta(long, long)} on this publisher, or
+         * {@link BlobStager#openReverseDelta(long, long)} on this publisher, or
          * {@link BlobStager#openHeader(long)} on this publisher.
          *
          * @param publishArtifact the blob to publish
          */
-        void publish(HollowProducer.PublishArtifact publishArtifact);
+        default void publish(HollowProducer.PublishArtifact publishArtifact) {
+            if (publishArtifact instanceof HollowProducer.Blob) {
+                publish((HollowProducer.Blob)publishArtifact);
+            }
+        }
     }
 
     public interface PublishArtifact {
