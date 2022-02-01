@@ -1,9 +1,12 @@
 package com.netflix.hollow.diff.ui;
 
+import static org.junit.Assert.assertEquals;
+
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.util.IntMap;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
@@ -11,14 +14,13 @@ import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
 import com.netflix.hollow.tools.history.HollowHistory;
+import com.netflix.hollow.tools.history.HollowHistoricalState;
+import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ReverseDeltaHistoryUITest {
 
@@ -35,6 +37,94 @@ public class ReverseDeltaHistoryUITest {
         serverReverse.join();
     }
 
+    @Test
+    public void matchDeltaWithReverseDelta() throws Exception {
+        HollowHistory historyD = createHistory();
+        HollowHistory historyR = createHistoryReverse();
+
+        //OverviewPage
+        assertEquals("Should have same number of Historical States",
+                historyD.getHistoricalStates().length,
+                historyR.getHistoricalStates().length);
+        for(int i=0; i<historyR.getHistoricalStates().length; i++) {
+            HollowHistoricalState stateR = historyR.getHistoricalStates()[i];
+            HollowHistoricalState stateD = historyD.getHistoricalStates()[i];
+
+            assertEquals("Version should match", stateD.getVersion(), stateR.getVersion());
+            assertEquals("Not same number of type mappings",stateD.getKeyOrdinalMapping().getTypeMappings().size(),
+                    stateR.getKeyOrdinalMapping().getTypeMappings().size());
+            for(String key: stateD.getKeyOrdinalMapping().getTypeMappings().keySet()) {
+                HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMappingD = stateD.getKeyOrdinalMapping().getTypeMappings().get(key);
+                HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMappingR = stateR.getKeyOrdinalMapping().getTypeMappings().get(key);
+                assertEquals("Added records are not equal", typeKeyMappingD.getNumberOfNewRecords(),
+                        typeKeyMappingR.getNumberOfNewRecords());
+                assertEquals("Removed records are not equal", typeKeyMappingD.getNumberOfRemovedRecords(),
+                        typeKeyMappingR.getNumberOfRemovedRecords());
+                assertEquals("Removed records are not equal", typeKeyMappingD.getNumberOfModifiedRecords(),
+                        typeKeyMappingR.getNumberOfModifiedRecords());
+
+                IntMap.IntMapEntryIterator removedIterD = typeKeyMappingD.removedOrdinalMappingIterator();
+                IntMap.IntMapEntryIterator addedIterD = typeKeyMappingD.addedOrdinalMappingIterator();
+
+                IntMap.IntMapEntryIterator removedIterR = typeKeyMappingR.removedOrdinalMappingIterator();
+                IntMap.IntMapEntryIterator addedIterR = typeKeyMappingR.addedOrdinalMappingIterator();
+                boolean removeIterDSate = true;
+                boolean removeIterRState = true;
+
+                boolean addedIterDSate = true;
+                boolean addedIterRState = true;
+
+                removeIterDSate = removedIterD.next();
+                removeIterRState = removedIterR.next();
+                while(removeIterDSate && removeIterRState){
+                    int fromOrdinalD = removedIterD.getValue();
+                    int toOrdinalD = typeKeyMappingD.findAddedOrdinal(removedIterD.getKey());
+
+                    int fromOrdinalR = removedIterR.getValue();
+                    int toOrdinalR = typeKeyMappingR.findAddedOrdinal(removedIterR.getKey());
+
+                    assertEquals("From Ordinals not same", fromOrdinalD, fromOrdinalR);
+                    assertEquals("To Ordinals not same", toOrdinalD, toOrdinalR);
+                    removeIterDSate = removedIterD.next();
+                    removeIterRState = removedIterR.next();
+                }
+
+                assertEquals("Not same number of removed ordinals", removeIterDSate, removeIterRState);
+                addedIterDSate = addedIterD.next();
+                addedIterRState = addedIterR.next();
+                while(addedIterDSate && addedIterRState) {
+                    if(typeKeyMappingD.findRemovedOrdinal(addedIterD.getKey()) == -1 &&
+                            typeKeyMappingR.findRemovedOrdinal(addedIterR.getKey()) == -1) {;
+                        int toOrdinalD = addedIterD.getValue();
+                        int toOrdinalR = addedIterR.getValue();
+                        assertEquals("Not same to ordinal", toOrdinalD, toOrdinalR);
+                    }
+                    addedIterDSate = addedIterD.next();
+                    addedIterRState = addedIterR.next();
+                }
+                assertEquals("Not same number of added ordinals", addedIterDSate, addedIterRState);
+                //header entries compare
+
+                assertEquals("Not same next version", getNextStateVersion(stateD), getPreviousStateVersion(stateR, historyR));
+                assertEquals("Not same next version", getNextStateVersion(stateR), getPreviousStateVersion(stateD, historyD));
+            }
+        }
+    }
+
+    private long getNextStateVersion(HollowHistoricalState currentHistoricalState) {
+        if (currentHistoricalState.getNextState() != null)
+            return currentHistoricalState.getNextState().getVersion();
+        return -1;
+    }
+
+    private long getPreviousStateVersion(HollowHistoricalState currentHistoricalState, HollowHistory history) {
+        for(HollowHistoricalState state : history.getHistoricalStates()) {
+            if(state.getNextState() == currentHistoricalState) {
+                return state.getVersion();
+            }
+        }
+        return -1;
+    }
 
     private HollowWriteStateEngine stateEngine;
     private HollowObjectSchema schema;
