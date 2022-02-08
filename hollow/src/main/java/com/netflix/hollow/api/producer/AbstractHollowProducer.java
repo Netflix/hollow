@@ -681,7 +681,7 @@ abstract class AbstractHollowProducer {
 
     private void publishBlob(HollowProducer.Blob b) {
         try {
-            publisher.publish(b);
+            publisher.publish((HollowProducer.PublishArtifact)b);
         } finally {
             blobStorageCleaner.clean(b.getType());
         }

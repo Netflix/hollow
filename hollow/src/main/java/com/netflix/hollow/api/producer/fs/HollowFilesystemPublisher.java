@@ -44,6 +44,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     }
 
     @Override
+    // For backwards compatability.
     public void publish(HollowProducer.Blob blob) {
         publishBlob(blob);
     }

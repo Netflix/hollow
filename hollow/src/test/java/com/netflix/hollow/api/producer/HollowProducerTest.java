@@ -504,11 +504,6 @@ public class HollowProducerTest {
         }
 
         @Override
-        public void publish(Blob blob) {
-            publishBlob(blob);
-        }
-
-        @Override
         public void publish(HollowProducer.PublishArtifact publishArtifact) {
             if (publishArtifact instanceof HeaderBlob) {
                 publishHeader((HeaderBlob) publishArtifact);

@@ -588,7 +588,9 @@ public class HollowProducer extends AbstractHollowProducer {
          * @param blob the blob to publish
          */
         @Deprecated
-        void publish(HollowProducer.Blob blob);
+        default void publish(HollowProducer.Blob blob) {
+            throw new UnsupportedOperationException("publish(HollowProducer.Blob blob) is deprecated.");
+        }
 
         /**
          * Publish the blob specified to this publisher's blobstore.

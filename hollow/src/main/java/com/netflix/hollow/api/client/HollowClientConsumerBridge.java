@@ -19,7 +19,6 @@ package com.netflix.hollow.api.client;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import com.netflix.hollow.api.custom.HollowAPI;
-import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.io.File;
 import java.io.IOException;
@@ -33,17 +32,7 @@ class HollowClientConsumerBridge {
 
             @Override
             public HollowConsumer.HeaderBlob retrieveHeaderBlob(long currentVersion) {
-                final HollowBlobHeader headerBlob = blobRetriever.retrieveHeaderBlob(currentVersion);
-                if(headerBlob == null)
-                    return null;
-
-                return new HollowConsumer.HeaderBlob(currentVersion) {
-                    @Override
-                    public InputStream getInputStream() throws IOException {
-                        // Getting input stream from HeaderBlob is not supported for ClientConsumerBridge.
-                        throw new UnsupportedOperationException();
-                    }
-                };
+                throw new UnsupportedOperationException();
             }
 
             @Override

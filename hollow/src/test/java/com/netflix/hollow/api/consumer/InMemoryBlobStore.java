@@ -86,6 +86,7 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
     }
 
     @Override
+    // For backwards compatability.
     public void publish(HollowProducer.Blob blob) {
         publishBlob(blob);
     }
