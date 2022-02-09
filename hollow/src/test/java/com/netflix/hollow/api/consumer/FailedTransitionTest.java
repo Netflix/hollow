@@ -216,9 +216,9 @@ public class FailedTransitionTest {
         }
 
         @Override
-        public HollowConsumer.HeaderBlob retrieveHeaderBlob(long desiredVersion) {
-            HollowConsumer.HeaderBlob blob = br.retrieveHeaderBlob(desiredVersion);
-            return new HollowConsumer.HeaderBlob(desiredVersion) {
+        public HollowConsumer.HeaderBlob retrieveHeaderBlob(long version) {
+            HollowConsumer.HeaderBlob blob = br.retrieveHeaderBlob(version);
+            return new HollowConsumer.HeaderBlob(version) {
 
                 @Override
                 public InputStream getInputStream() throws IOException {

@@ -81,8 +81,8 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
     }
 
     @Override
-    public HeaderBlob retrieveHeaderBlob(long desiredVersion) {
-        return (HeaderBlob) getDesiredVersion(desiredVersion, headers);
+    public HeaderBlob retrieveHeaderBlob(long currentVersion) {
+        return headers.get(currentVersion);
     }
 
     @Override

@@ -561,27 +561,13 @@ public class HollowProducerTest {
         }
 
         @Override
-        public HollowConsumer.HeaderBlob retrieveHeaderBlob(long desiredVersion) {
-            long blobVersion = desiredVersion;
-            File blobFile = headerFileMap.get(desiredVersion);
-            if (blobFile == null) {
-                // find the closest one
-                blobVersion = headerFileMap.keySet().stream()
-                        .filter(l -> l < desiredVersion)
-                        .reduce(Long.MIN_VALUE, Math::max);
-                if (blobVersion == Long.MIN_VALUE) {
-                    return null;
-                } else {
-                    blobFile = headerFileMap.get(blobVersion);
-                }
-            }
-            final File blobFileFinal = blobFile;
-
+        public HollowConsumer.HeaderBlob retrieveHeaderBlob(long currentVersion) {
+            final File blobFile = headerFileMap.get(currentVersion);
             System.out.println("Restored: " + blobFile);
-            return new HollowConsumer.HeaderBlob(blobVersion) {
+            return new HollowConsumer.HeaderBlob(currentVersion) {
                 @Override
                 public InputStream getInputStream() throws IOException {
-                    return new FileInputStream(blobFileFinal);
+                    return new FileInputStream(blobFile);
                 }
             };
         }
