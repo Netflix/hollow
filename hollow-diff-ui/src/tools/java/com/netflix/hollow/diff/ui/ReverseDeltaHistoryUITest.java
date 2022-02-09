@@ -13,6 +13,10 @@ import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
+import com.netflix.hollow.history.ui.model.HistoryStateTypeChanges;
+import com.netflix.hollow.history.ui.model.RecordDiff;
+import com.netflix.hollow.history.ui.model.RecordDiffTreeNode;
+import com.netflix.hollow.history.ui.naming.HollowHistoryRecordNamer;
 import com.netflix.hollow.tools.history.HollowHistory;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
@@ -20,6 +24,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.*;
 
 public class ReverseDeltaHistoryUITest {
@@ -41,19 +46,27 @@ public class ReverseDeltaHistoryUITest {
     public void matchDeltaWithReverseDelta() throws Exception {
         HollowHistory historyD = createHistory();
         HollowHistory historyR = createHistoryReverse();
-
+        long currentRandomizedTagD = historyD.getLatestState().getCurrentRandomizedTag();
+        long currentRandomizedTagR = historyD.getLatestState().getCurrentRandomizedTag();
         //OverviewPage
         assertEquals("Should have same number of Historical States",
                 historyD.getHistoricalStates().length,
                 historyR.getHistoricalStates().length);
-        for(int i=0; i<historyR.getHistoricalStates().length; i++) {
-            HollowHistoricalState stateR = historyR.getHistoricalStates()[i];
-            HollowHistoricalState stateD = historyD.getHistoricalStates()[i];
+        for(int j=0; j<historyR.getHistoricalStates().length; j++) {
+            HollowHistoricalState stateR = historyR.getHistoricalStates()[j];
+            HollowHistoricalState stateD = historyD.getHistoricalStates()[j];
 
             assertEquals("Version should match", stateD.getVersion(), stateR.getVersion());
-            assertEquals("Not same number of type mappings",stateD.getKeyOrdinalMapping().getTypeMappings().size(),
+            assertEquals("Not same number of type mappings", stateD.getKeyOrdinalMapping().getTypeMappings().size(),
                     stateR.getKeyOrdinalMapping().getTypeMappings().size());
-            for(String key: stateD.getKeyOrdinalMapping().getTypeMappings().keySet()) {
+
+
+            //header entries compare
+
+            assertEquals("Not same next version", getNextStateVersion(stateD), getPreviousStateVersion(stateR, historyR));
+            assertEquals("Not same next version", getNextStateVersion(stateR), getPreviousStateVersion(stateD, historyD));
+
+            for (String key : stateD.getKeyOrdinalMapping().getTypeMappings().keySet()) {
                 HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMappingD = stateD.getKeyOrdinalMapping().getTypeMappings().get(key);
                 HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMappingR = stateR.getKeyOrdinalMapping().getTypeMappings().get(key);
                 assertEquals("Added records are not equal", typeKeyMappingD.getNumberOfNewRecords(),
@@ -76,7 +89,8 @@ public class ReverseDeltaHistoryUITest {
 
                 removeIterDSate = removedIterD.next();
                 removeIterRState = removedIterR.next();
-                while(removeIterDSate && removeIterRState){
+
+                while (removeIterDSate && removeIterRState) {
                     int fromOrdinalD = removedIterD.getValue();
                     int toOrdinalD = typeKeyMappingD.findAddedOrdinal(removedIterD.getKey());
 
@@ -92,9 +106,10 @@ public class ReverseDeltaHistoryUITest {
                 assertEquals("Not same number of removed ordinals", removeIterDSate, removeIterRState);
                 addedIterDSate = addedIterD.next();
                 addedIterRState = addedIterR.next();
-                while(addedIterDSate && addedIterRState) {
-                    if(typeKeyMappingD.findRemovedOrdinal(addedIterD.getKey()) == -1 &&
-                            typeKeyMappingR.findRemovedOrdinal(addedIterR.getKey()) == -1) {;
+                while (addedIterDSate && addedIterRState) {
+                    if (typeKeyMappingD.findRemovedOrdinal(addedIterD.getKey()) == -1 &&
+                            typeKeyMappingR.findRemovedOrdinal(addedIterR.getKey()) == -1) {
+                        ;
                         int toOrdinalD = addedIterD.getValue();
                         int toOrdinalR = addedIterR.getValue();
                         assertEquals("Not same to ordinal", toOrdinalD, toOrdinalR);
@@ -103,10 +118,102 @@ public class ReverseDeltaHistoryUITest {
                     addedIterRState = addedIterR.next();
                 }
                 assertEquals("Not same number of added ordinals", addedIterDSate, addedIterRState);
-                //header entries compare
 
-                assertEquals("Not same next version", getNextStateVersion(stateD), getPreviousStateVersion(stateR, historyR));
-                assertEquals("Not same next version", getNextStateVersion(stateR), getPreviousStateVersion(stateD, historyD));
+                //for each type in historical state  build state changes
+                HistoryStateTypeChanges typeChangesD = new HistoryStateTypeChanges(stateD, key, HollowHistoryRecordNamer.DEFAULT_RECORD_NAMER, new String[0]);
+                HistoryStateTypeChanges typeChangesR = new HistoryStateTypeChanges(stateR, key, HollowHistoryRecordNamer.DEFAULT_RECORD_NAMER, new String[0]);
+
+                List<RecordDiff> addedDiffsD = typeChangesD.getAddedRecords().getRecordDiffs();
+                List<RecordDiff> addedDiffsR = typeChangesR.getAddedRecords().getRecordDiffs();
+
+                List<RecordDiff> removedDiffsD = typeChangesD.getRemovedRecords().getRecordDiffs();
+                List<RecordDiff> removedDiffsR = typeChangesR.getRemovedRecords().getRecordDiffs();
+
+                List<RecordDiff> modifiedDiffsD = typeChangesD.getModifiedRecords().getRecordDiffs();
+                List<RecordDiff> modifiedDiffsR = typeChangesR.getModifiedRecords().getRecordDiffs();
+
+                assertEquals("Add Diffs do not match", addedDiffsD.size(), addedDiffsR.size());
+                assertEquals("Remove Diffs do not match", removedDiffsD.size(), removedDiffsR.size());
+                assertEquals("Modified Diffs do not match", modifiedDiffsD.size(), modifiedDiffsR.size());
+
+                assertEquals("Added subgroups does not match", typeChangesD.getAddedRecords().hasSubGroups(), typeChangesR.getAddedRecords().hasSubGroups());
+                assertEquals("Removed subgroups does not match", typeChangesD.getRemovedRecords().hasSubGroups(), typeChangesR.getRemovedRecords().hasSubGroups());
+                assertEquals("Added subgroups does not match", typeChangesD.getModifiedRecords().hasSubGroups(), typeChangesR.getModifiedRecords().hasSubGroups());
+
+                if (!typeChangesD.getAddedRecords().isEmpty()) {
+                    if (!typeChangesD.getAddedRecords().hasSubGroups()) {
+                        for (int i = 0; i < addedDiffsD.size(); i++) {
+                            assertEquals("Added Record Diff Identity String does not match", addedDiffsD.get(i).getIdentifierString(),
+                                    addedDiffsR.get(i).getIdentifierString());
+                            assertEquals("Added Record Diff Key Ordinal does not match", addedDiffsD.get(i).getKeyOrdinal(),
+                                    addedDiffsR.get(i).getKeyOrdinal());
+                        }
+                    } else {
+                        assertEquals("Added records of sub groups does not match", typeChangesD.getAddedRecords().getSubGroups().size(),
+                                typeChangesR.getAddedRecords().getSubGroups().size());
+                        for (int i = 0; i < typeChangesD.getAddedRecords().getSubGroups().size(); i++) {
+                            assertEquals("Added Record group name does not match",
+                                    ((RecordDiffTreeNode) typeChangesD.getAddedRecords().getSubGroups().toArray()[i]).getGroupName(),
+                                    ((RecordDiffTreeNode) typeChangesR.getAddedRecords().getSubGroups().toArray()[i]).getGroupName());
+                            assertEquals("Added Record group name does not match",
+                                    ((RecordDiffTreeNode) typeChangesD.getAddedRecords().getSubGroups().toArray()[i]).getDiffCount(),
+                                    ((RecordDiffTreeNode) typeChangesR.getAddedRecords().getSubGroups().toArray()[i]).getDiffCount());
+                            assertEquals("Added Record group name does not match",
+                                    ((RecordDiffTreeNode) typeChangesD.getAddedRecords().getSubGroups().toArray()[i]).getHierarchicalFieldName(),
+                                    ((RecordDiffTreeNode) typeChangesR.getAddedRecords().getSubGroups().toArray()[i]).getHierarchicalFieldName());
+                        }
+                    }
+                }
+
+                if (!typeChangesD.getModifiedRecords().isEmpty()) {
+                    if (!typeChangesD.getModifiedRecords().hasSubGroups()) {
+                        for (int i = 0; i < modifiedDiffsD.size(); i++) {
+                            assertEquals("Modified Record Diff Identity String does not match", modifiedDiffsD.get(i).getIdentifierString(),
+                                    modifiedDiffsR.get(i).getIdentifierString());
+                            assertEquals("Modified Record Diff Key Ordinal does not match", modifiedDiffsD.get(i).getKeyOrdinal(),
+                                    modifiedDiffsR.get(i).getKeyOrdinal());
+                        }
+                    } else {
+                        assertEquals("Modified records of sub groups does not match", typeChangesD.getModifiedRecords().getSubGroups().size(),
+                                typeChangesR.getModifiedRecords().getSubGroups().size());
+                        for (int i = 0; i < typeChangesD.getModifiedRecords().getSubGroups().size(); i++) {
+                            assertEquals("Modified Record group name does not match",
+                                    ((RecordDiffTreeNode) typeChangesD.getModifiedRecords().getSubGroups().toArray()[i]).getGroupName(),
+                                    ((RecordDiffTreeNode) typeChangesR.getModifiedRecords().getSubGroups().toArray()[i]).getGroupName());
+                            assertEquals("Modified Record group name does not match",
+                                    ((RecordDiffTreeNode) typeChangesD.getModifiedRecords().getSubGroups().toArray()[i]).getDiffCount(),
+                                    ((RecordDiffTreeNode) typeChangesR.getModifiedRecords().getSubGroups().toArray()[i]).getDiffCount());
+                            assertEquals("Modified Record group name does not match",
+                                    ((RecordDiffTreeNode) typeChangesD.getModifiedRecords().getSubGroups().toArray()[i]).getHierarchicalFieldName(),
+                                    ((RecordDiffTreeNode) typeChangesR.getModifiedRecords().getSubGroups().toArray()[i]).getHierarchicalFieldName());
+                        }
+                    }
+                }
+
+                if (!typeChangesD.getRemovedRecords().isEmpty()) {
+                    if (!typeChangesD.getRemovedRecords().hasSubGroups()) {
+                        for (int i = 0; i < removedDiffsD.size(); i++) {
+                            assertEquals("Removed Record Diff Identity String does not match", removedDiffsD.get(i).getIdentifierString(),
+                                    removedDiffsR.get(i).getIdentifierString());
+                            assertEquals("Removed Record Diff Key Ordinal does not match", removedDiffsD.get(i).getKeyOrdinal(),
+                                    removedDiffsR.get(i).getKeyOrdinal());
+                        }
+                    } else {
+                        assertEquals("Removed records of sub groups does not match", typeChangesD.getRemovedRecords().getSubGroups().size(),
+                                typeChangesR.getRemovedRecords().getSubGroups().size());
+                        for (int i = 0; i < typeChangesD.getRemovedRecords().getSubGroups().size(); i++) {
+                            assertEquals("Removed Record group name does not match",
+                                    ((RecordDiffTreeNode) typeChangesD.getRemovedRecords().getSubGroups().toArray()[i]).getGroupName(),
+                                    ((RecordDiffTreeNode) typeChangesR.getRemovedRecords().getSubGroups().toArray()[i]).getGroupName());
+                            assertEquals("Removed Record group name does not match",
+                                    ((RecordDiffTreeNode) typeChangesD.getRemovedRecords().getSubGroups().toArray()[i]).getDiffCount(),
+                                    ((RecordDiffTreeNode) typeChangesR.getRemovedRecords().getSubGroups().toArray()[i]).getDiffCount());
+                            assertEquals("Removed Record group name does not match",
+                                    ((RecordDiffTreeNode) typeChangesD.getRemovedRecords().getSubGroups().toArray()[i]).getHierarchicalFieldName(),
+                                    ((RecordDiffTreeNode) typeChangesR.getRemovedRecords().getSubGroups().toArray()[i]).getHierarchicalFieldName());
+                        }
+                    }
+                }
             }
         }
     }
