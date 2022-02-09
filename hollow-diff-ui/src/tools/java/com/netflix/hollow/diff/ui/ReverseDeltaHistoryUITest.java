@@ -12,6 +12,12 @@ import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.diffview.DiffViewOutputGenerator;
+import com.netflix.hollow.diffview.HollowDiffViewRow;
+import com.netflix.hollow.diffview.HollowHistoryView;
+import com.netflix.hollow.diffview.HollowObjectDiffViewGenerator;
+import com.netflix.hollow.diffview.effigy.pairer.exact.HistoryExactRecordMatcher;
+import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
 import com.netflix.hollow.history.ui.model.HistoryStateTypeChanges;
 import com.netflix.hollow.history.ui.model.RecordDiff;
@@ -46,15 +52,43 @@ public class ReverseDeltaHistoryUITest {
     public void matchDeltaWithReverseDelta() throws Exception {
         HollowHistory historyD = createHistory();
         HollowHistory historyR = createHistoryReverse();
+        HollowHistoryUI uiD = new HollowHistoryUI("", historyD);
+        HollowHistoryUI uiR = new HollowHistoryUI("", historyR);
         long currentRandomizedTagD = historyD.getLatestState().getCurrentRandomizedTag();
         long currentRandomizedTagR = historyD.getLatestState().getCurrentRandomizedTag();
+        String strD, strR;
+        List<RecordDiff> addedDiffsD;
+        List<RecordDiff> addedDiffsR;
+        List<RecordDiff> removedDiffsD;
+        List<RecordDiff> removedDiffsR;
+        List<RecordDiff> modifiedDiffsD;
+        List<RecordDiff> modifiedDiffsR;
+        int fromOrdinalD;
+        int toOrdinalD;
+        int fromOrdinalR;
+        int toOrdinalR;
+        boolean removeIterDSate;
+        boolean removeIterRState;
+        boolean addedIterDSate;
+        boolean addedIterRState;
+        HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMappingD;
+        HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMappingR;
+        IntMap.IntMapEntryIterator removedIterD;
+        IntMap.IntMapEntryIterator addedIterD;
+        IntMap.IntMapEntryIterator removedIterR;
+        IntMap.IntMapEntryIterator addedIterR;
+        HollowHistoricalState stateR;
+        HollowHistoricalState stateD;
+        HistoryStateTypeChanges typeChangesD;
+        HistoryStateTypeChanges typeChangesR;
+
         //OverviewPage
         assertEquals("Should have same number of Historical States",
                 historyD.getHistoricalStates().length,
                 historyR.getHistoricalStates().length);
         for(int j=0; j<historyR.getHistoricalStates().length; j++) {
-            HollowHistoricalState stateR = historyR.getHistoricalStates()[j];
-            HollowHistoricalState stateD = historyD.getHistoricalStates()[j];
+            stateR = historyR.getHistoricalStates()[j];
+            stateD = historyD.getHistoricalStates()[j];
 
             assertEquals("Version should match", stateD.getVersion(), stateR.getVersion());
             assertEquals("Not same number of type mappings", stateD.getKeyOrdinalMapping().getTypeMappings().size(),
@@ -67,8 +101,14 @@ public class ReverseDeltaHistoryUITest {
             assertEquals("Not same next version", getNextStateVersion(stateR), getPreviousStateVersion(stateD, historyD));
 
             for (String key : stateD.getKeyOrdinalMapping().getTypeMappings().keySet()) {
-                HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMappingD = stateD.getKeyOrdinalMapping().getTypeMappings().get(key);
-                HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMappingR = stateR.getKeyOrdinalMapping().getTypeMappings().get(key);
+                removeIterDSate = true;
+                removeIterRState = true;
+                addedIterDSate = true;
+                addedIterRState = true;
+
+                typeKeyMappingD = stateD.getKeyOrdinalMapping().getTypeMappings().get(key);
+                typeKeyMappingR = stateR.getKeyOrdinalMapping().getTypeMappings().get(key);
+
                 assertEquals("Added records are not equal", typeKeyMappingD.getNumberOfNewRecords(),
                         typeKeyMappingR.getNumberOfNewRecords());
                 assertEquals("Removed records are not equal", typeKeyMappingD.getNumberOfRemovedRecords(),
@@ -76,26 +116,20 @@ public class ReverseDeltaHistoryUITest {
                 assertEquals("Removed records are not equal", typeKeyMappingD.getNumberOfModifiedRecords(),
                         typeKeyMappingR.getNumberOfModifiedRecords());
 
-                IntMap.IntMapEntryIterator removedIterD = typeKeyMappingD.removedOrdinalMappingIterator();
-                IntMap.IntMapEntryIterator addedIterD = typeKeyMappingD.addedOrdinalMappingIterator();
-
-                IntMap.IntMapEntryIterator removedIterR = typeKeyMappingR.removedOrdinalMappingIterator();
-                IntMap.IntMapEntryIterator addedIterR = typeKeyMappingR.addedOrdinalMappingIterator();
-                boolean removeIterDSate = true;
-                boolean removeIterRState = true;
-
-                boolean addedIterDSate = true;
-                boolean addedIterRState = true;
+                removedIterD = typeKeyMappingD.removedOrdinalMappingIterator();
+                addedIterD = typeKeyMappingD.addedOrdinalMappingIterator();
+                removedIterR = typeKeyMappingR.removedOrdinalMappingIterator();
+                addedIterR = typeKeyMappingR.addedOrdinalMappingIterator();
 
                 removeIterDSate = removedIterD.next();
                 removeIterRState = removedIterR.next();
 
                 while (removeIterDSate && removeIterRState) {
-                    int fromOrdinalD = removedIterD.getValue();
-                    int toOrdinalD = typeKeyMappingD.findAddedOrdinal(removedIterD.getKey());
 
-                    int fromOrdinalR = removedIterR.getValue();
-                    int toOrdinalR = typeKeyMappingR.findAddedOrdinal(removedIterR.getKey());
+                    fromOrdinalD = removedIterD.getValue();
+                    toOrdinalD = typeKeyMappingD.findAddedOrdinal(removedIterD.getKey());
+                    fromOrdinalR = removedIterR.getValue();
+                    toOrdinalR = typeKeyMappingR.findAddedOrdinal(removedIterR.getKey());
 
                     assertEquals("From Ordinals not same", fromOrdinalD, fromOrdinalR);
                     assertEquals("To Ordinals not same", toOrdinalD, toOrdinalR);
@@ -109,9 +143,8 @@ public class ReverseDeltaHistoryUITest {
                 while (addedIterDSate && addedIterRState) {
                     if (typeKeyMappingD.findRemovedOrdinal(addedIterD.getKey()) == -1 &&
                             typeKeyMappingR.findRemovedOrdinal(addedIterR.getKey()) == -1) {
-                        ;
-                        int toOrdinalD = addedIterD.getValue();
-                        int toOrdinalR = addedIterR.getValue();
+                        toOrdinalD = addedIterD.getValue();
+                        toOrdinalR = addedIterR.getValue();
                         assertEquals("Not same to ordinal", toOrdinalD, toOrdinalR);
                     }
                     addedIterDSate = addedIterD.next();
@@ -120,17 +153,15 @@ public class ReverseDeltaHistoryUITest {
                 assertEquals("Not same number of added ordinals", addedIterDSate, addedIterRState);
 
                 //for each type in historical state  build state changes
-                HistoryStateTypeChanges typeChangesD = new HistoryStateTypeChanges(stateD, key, HollowHistoryRecordNamer.DEFAULT_RECORD_NAMER, new String[0]);
-                HistoryStateTypeChanges typeChangesR = new HistoryStateTypeChanges(stateR, key, HollowHistoryRecordNamer.DEFAULT_RECORD_NAMER, new String[0]);
+                typeChangesD = new HistoryStateTypeChanges(stateD, key, HollowHistoryRecordNamer.DEFAULT_RECORD_NAMER, new String[0]);
+                typeChangesR = new HistoryStateTypeChanges(stateR, key, HollowHistoryRecordNamer.DEFAULT_RECORD_NAMER, new String[0]);
 
-                List<RecordDiff> addedDiffsD = typeChangesD.getAddedRecords().getRecordDiffs();
-                List<RecordDiff> addedDiffsR = typeChangesR.getAddedRecords().getRecordDiffs();
-
-                List<RecordDiff> removedDiffsD = typeChangesD.getRemovedRecords().getRecordDiffs();
-                List<RecordDiff> removedDiffsR = typeChangesR.getRemovedRecords().getRecordDiffs();
-
-                List<RecordDiff> modifiedDiffsD = typeChangesD.getModifiedRecords().getRecordDiffs();
-                List<RecordDiff> modifiedDiffsR = typeChangesR.getModifiedRecords().getRecordDiffs();
+                addedDiffsD = typeChangesD.getAddedRecords().getRecordDiffs();
+                addedDiffsR = typeChangesR.getAddedRecords().getRecordDiffs();
+                removedDiffsD = typeChangesD.getRemovedRecords().getRecordDiffs();
+                removedDiffsR = typeChangesR.getRemovedRecords().getRecordDiffs();
+                modifiedDiffsD = typeChangesD.getModifiedRecords().getRecordDiffs();
+                modifiedDiffsR = typeChangesR.getModifiedRecords().getRecordDiffs();
 
                 assertEquals("Add Diffs do not match", addedDiffsD.size(), addedDiffsR.size());
                 assertEquals("Remove Diffs do not match", removedDiffsD.size(), removedDiffsR.size());
@@ -147,6 +178,11 @@ public class ReverseDeltaHistoryUITest {
                                     addedDiffsR.get(i).getIdentifierString());
                             assertEquals("Added Record Diff Key Ordinal does not match", addedDiffsD.get(i).getKeyOrdinal(),
                                     addedDiffsR.get(i).getKeyOrdinal());
+
+
+                            strD = getDiffViewOutput(stateD, key, addedDiffsD.get(i), currentRandomizedTagD, uiD);
+                            strR = getDiffViewOutput(stateR, key, addedDiffsR.get(i), currentRandomizedTagR, uiR);
+                            assertEquals("Add Record Diff view does not match", strD, strR);
                         }
                     } else {
                         assertEquals("Added records of sub groups does not match", typeChangesD.getAddedRecords().getSubGroups().size(),
@@ -172,6 +208,9 @@ public class ReverseDeltaHistoryUITest {
                                     modifiedDiffsR.get(i).getIdentifierString());
                             assertEquals("Modified Record Diff Key Ordinal does not match", modifiedDiffsD.get(i).getKeyOrdinal(),
                                     modifiedDiffsR.get(i).getKeyOrdinal());
+                            strD = getDiffViewOutput(stateD, key, modifiedDiffsD.get(i), currentRandomizedTagD, uiD);
+                            strR = getDiffViewOutput(stateR, key, modifiedDiffsR.get(i), currentRandomizedTagR, uiR);
+                            assertEquals("Modified Record Diff view does not match", strD, strR);
                         }
                     } else {
                         assertEquals("Modified records of sub groups does not match", typeChangesD.getModifiedRecords().getSubGroups().size(),
@@ -197,6 +236,9 @@ public class ReverseDeltaHistoryUITest {
                                     removedDiffsR.get(i).getIdentifierString());
                             assertEquals("Removed Record Diff Key Ordinal does not match", removedDiffsD.get(i).getKeyOrdinal(),
                                     removedDiffsR.get(i).getKeyOrdinal());
+                            strD = getDiffViewOutput(stateD, key, removedDiffsD.get(i), currentRandomizedTagD, uiD);
+                            strR = getDiffViewOutput(stateR, key, removedDiffsR.get(i), currentRandomizedTagR, uiR);
+                            assertEquals("Removed Record Diff view does not match", strD, strR);
                         }
                     } else {
                         assertEquals("Removed records of sub groups does not match", typeChangesD.getRemovedRecords().getSubGroups().size(),
@@ -216,6 +258,28 @@ public class ReverseDeltaHistoryUITest {
                 }
             }
         }
+    }
+
+
+    public String getDiffViewOutput(HollowHistoricalState stateD, String key, RecordDiff addedDiff, long currentRandomizedTagD, HollowHistoryUI historyUI) {
+        HollowDiffViewRow rootRowD = new HollowObjectDiffViewGenerator(stateD.getDataAccess(), stateD.getDataAccess(),
+                historyUI, key,
+                addedDiff.getFromOrdinal(),
+                addedDiff.getToOrdinal()).getHollowDiffViewRows();
+        HollowHistoryView objectViewD = new HollowHistoryView(stateD.getVersion(), key,
+                addedDiff.getKeyOrdinal(), currentRandomizedTagD,
+                rootRowD, HistoryExactRecordMatcher.INSTANCE);
+        objectViewD.resetView();
+
+        String diffViewOutputD = null;
+        try {
+            StringWriter writer = new StringWriter();
+            DiffViewOutputGenerator.buildChildRowDisplayData(objectViewD.getRootRow(), writer);
+            diffViewOutputD = writer.toString();
+        } catch(IOException unexpected) {
+            throw new RuntimeException(unexpected);
+        }
+        return diffViewOutputD;
     }
 
     private long getNextStateVersion(HollowHistoricalState currentHistoricalState) {
