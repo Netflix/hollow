@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.core.HollowBlobHeader;
 
 /**
  * An interface which defines the necessary interactions of a {@link HollowClient} with a blob data store. 
@@ -32,18 +33,25 @@ public interface HollowBlobRetriever {
      * @param desiredVersion the desired version
      * @return the snapshot for the state with an identifier equal to or less than the desired version
      */
-    public HollowBlob retrieveSnapshotBlob(long desiredVersion);
+    HollowBlob retrieveSnapshotBlob(long desiredVersion);
 
     /**
      * @param currentVersion the current version
      * @return a delta transition which can be applied to the currentVersion
      */
-    public HollowBlob retrieveDeltaBlob(long currentVersion);
+    HollowBlob retrieveDeltaBlob(long currentVersion);
 
     /**
      * @param currentVersion the current version
      * @return a reverse delta transition which can be applied to the currentVersion
      */
-    public HollowBlob retrieveReverseDeltaBlob(long currentVersion);
+    HollowBlob retrieveReverseDeltaBlob(long currentVersion);
 
+    /**
+     * @param currentVersion the desired version
+     * @return the header for the state with an identifier equal to currentVersion
+     */
+    default HollowBlobHeader retrieveHeaderBlob(long currentVersion) {
+        return new HollowBlobHeader();
+    }
 }

@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+
 public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriever {
     private final Path blobStorePath;
     private final HollowConsumer.BlobRetriever fallbackBlobRetriever;
@@ -112,6 +113,43 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         } catch (IOException e) {
             throw new RuntimeException("Could not create folder for blobRetriever; path=" + blobStorePath, e);
         }
+    }
+
+    @Override
+    public HollowConsumer.HeaderBlob retrieveHeaderBlob(long desiredVersion) {
+        Path exactPath = blobStorePath.resolve("header-" + desiredVersion);
+        if (Files.exists(exactPath))
+            return new FilesystemHeaderBlob(exactPath, desiredVersion);
+
+        long maxVersionBeforeDesired = HollowConstants.VERSION_NONE;
+        try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(blobStorePath)) {
+            for (Path path : directoryStream) {
+                String filename = path.getFileName().toString();
+                if(filename.startsWith("header-")) {
+                    long version = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
+                    if(version < desiredVersion && version > maxVersionBeforeDesired) {
+                        maxVersionBeforeDesired = version;
+                    }
+                }
+            }
+        } catch(IOException ex) {
+            throw new RuntimeException("Error listing header files; path=" + blobStorePath, ex);
+        }
+        HollowConsumer.HeaderBlob filesystemBlob = null;
+        if (maxVersionBeforeDesired != HollowConstants.VERSION_NONE) {
+            filesystemBlob = new FilesystemHeaderBlob(blobStorePath.resolve("snapshot-" + maxVersionBeforeDesired), maxVersionBeforeDesired);
+            if (useExistingStaleSnapshot) {
+                return filesystemBlob;
+            }
+        }
+
+        if(fallbackBlobRetriever != null) {
+            HollowConsumer.HeaderBlob remoteBlob = fallbackBlobRetriever.retrieveHeaderBlob(desiredVersion);
+            if(remoteBlob != null && (filesystemBlob == null || remoteBlob.getVersion() != filesystemBlob.getVersion()))
+                return new HeaderBlobFromBackupToFilesystem(remoteBlob, blobStorePath.resolve("header-" + remoteBlob.getVersion()));
+        }
+
+        return filesystemBlob;
     }
 
     @Override
@@ -267,6 +305,25 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         return true;
     }    
 
+    private static class FilesystemHeaderBlob extends HollowConsumer.HeaderBlob {
+        private final Path path;
+
+        protected FilesystemHeaderBlob(Path headerPath, long version) {
+            super(version);
+            this.path = headerPath;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return new BufferedInputStream(Files.newInputStream(path));
+        }
+
+        @Override
+        public File getFile() throws IOException {
+            return path.toFile();
+        }
+    }
+
     private static class FilesystemBlob extends HollowConsumer.Blob {
 
         private final Path path;
@@ -325,6 +382,52 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
             return path.toFile();
         }
         
+    }
+
+    private static class HeaderBlobFromBackupToFilesystem extends HollowConsumer.HeaderBlob {
+        private final HollowConsumer.HeaderBlob remoteHeaderBlob;
+        private final Path path;
+
+        protected HeaderBlobFromBackupToFilesystem(HollowConsumer.HeaderBlob remoteHeaderBlob, Path destinationPath) {
+            super(remoteHeaderBlob.getVersion());
+            this.path = destinationPath;
+            this.remoteHeaderBlob = remoteHeaderBlob;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+
+            Path tempPath = path.resolveSibling(path.getName(path.getNameCount()-1) + "-" + UUID.randomUUID().toString());
+            try(
+                    InputStream is = remoteHeaderBlob.getInputStream();
+                    OutputStream os = Files.newOutputStream(tempPath)
+            ) {
+                byte buf[] = new byte[4096];
+                int n;
+                while (-1 != (n = is.read(buf)))
+                    os.write(buf, 0, n);
+            }
+            Files.move(tempPath, path, REPLACE_EXISTING);
+
+            return new BufferedInputStream(Files.newInputStream(path));
+        }
+
+        @Override
+        public File getFile() throws IOException {
+            Path tempPath = path.resolveSibling(path.getName(path.getNameCount()-1) + "-" + UUID.randomUUID().toString());
+            try(
+                    InputStream is = remoteHeaderBlob.getInputStream();
+                    OutputStream os = Files.newOutputStream(tempPath)
+            ) {
+                byte buf[] = new byte[4096];
+                int n;
+                while (-1 != (n = is.read(buf)))
+                    os.write(buf, 0, n);
+            }
+            Files.move(tempPath, path, REPLACE_EXISTING);
+
+            return path.toFile();
+        }
     }
 
     private static class BlobForBackupToFilesystem extends HollowConsumer.Blob {

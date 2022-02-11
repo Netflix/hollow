@@ -57,6 +57,8 @@ import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
+
 /**
  * A HollowConsumer is the top-level class used by consumers of Hollow data to initialize and keep up-to-date a local in-memory
  * copy of a hollow dataset.  The interactions between the "blob" transition store and announcement listener are defined by
@@ -471,6 +473,31 @@ public class HollowConsumer {
             return null;
         }
 
+        default HollowConsumer.HeaderBlob retrieveHeaderBlob(long currentVersion) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    protected interface VersionedBlob {
+
+        InputStream getInputStream() throws IOException;
+
+         default File getFile() throws IOException {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public static abstract class HeaderBlob implements VersionedBlob{
+
+        private final long version;
+
+        protected HeaderBlob(long version) {
+            this.version = version;
+        }
+
+        public long getVersion() {
+            return this.version;
+        }
     }
 
     /**
@@ -487,10 +514,10 @@ public class HollowConsumer {
      * <dd>Implementations will define how to retrieve the actual blob data for this specific blob from a data store as an InputStream.</dd>
      * </dl>
      */
-    public static abstract class Blob {
+    public static abstract class Blob implements VersionedBlob{
 
-        private final long fromVersion;
-        private final long toVersion;
+        protected final long fromVersion;
+        protected final long toVersion;
         private final BlobType blobType;
 
         /**
@@ -542,10 +569,6 @@ public class HollowConsumer {
          */
         public OptionalBlobPartInput getOptionalBlobPartInputs() throws IOException {
             return null;
-        }
-
-        public File getFile() throws IOException {
-            throw new UnsupportedOperationException();
         }
 
         /**

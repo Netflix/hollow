@@ -499,7 +499,7 @@ public class HollowProducer extends AbstractHollowProducer {
         /**
          * Returns a blob with which a {@code HollowProducer} will write a snapshot for the version specified.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.PublishArtifact)}.
          *
          * @param version the blob version
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
@@ -507,10 +507,19 @@ public class HollowProducer extends AbstractHollowProducer {
         HollowProducer.Blob openSnapshot(long version);
 
         /**
+         * Returns a blob with which a {@code HollowProducer} will write a header for the version specified.
+         * <p>
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.PublishArtifact)}.
+         * @param version the blob version
+         * @return a {@link HollowProducer.HeaderBlob} representing a header for the {@code version}
+         */
+        HollowProducer.HeaderBlob openHeader(long version);
+
+        /**
          * Returns a blob with which a {@code HollowProducer} will write a forward delta from the version specified to
          * the version specified, i.e. {@code fromVersion => toVersion}.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.PublishArtifact)}.
          * <p>
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
@@ -524,7 +533,7 @@ public class HollowProducer extends AbstractHollowProducer {
          * Returns a blob with which a {@code HollowProducer} will write a reverse delta from the version specified to
          * the version specified, i.e. {@code fromVersion <= toVersion}.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.PublishArtifact)}.
          * <p>
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
@@ -569,6 +578,7 @@ public class HollowProducer extends AbstractHollowProducer {
     public interface Publisher {
 
         /**
+         * Deprecated - Should use {@link Publisher#publish(PublishArtifact)} instead.<p>
          * Publish the blob specified to this publisher's blobstore.
          * <p>
          * It is guaranteed that {@code blob} was created by calling one of
@@ -577,10 +587,57 @@ public class HollowProducer extends AbstractHollowProducer {
          *
          * @param blob the blob to publish
          */
-        void publish(HollowProducer.Blob blob);
+        @Deprecated
+        default void publish(HollowProducer.Blob blob) {
+            throw new UnsupportedOperationException("publish(HollowProducer.Blob blob) is deprecated.");
+        }
+
+        /**
+         * Publish the blob specified to this publisher's blobstore.
+         * <p>
+         * It is guaranteed that {@code blob} was created by calling one of
+         * {@link BlobStager#openSnapshot(long)}, {@link BlobStager#openDelta(long, long)}, or
+         * {@link BlobStager#openDelta(long, long)} on this publisher, or
+         * {@link BlobStager#openReverseDelta(long, long)} on this publisher, or
+         * {@link BlobStager#openHeader(long)} on this publisher.
+         *
+         * @param publishArtifact the blob to publish
+         */
+        default void publish(HollowProducer.PublishArtifact publishArtifact) {
+            if (publishArtifact instanceof HollowProducer.Blob) {
+                publish((HollowProducer.Blob)publishArtifact);
+            }
+        }
     }
 
-    public static abstract class Blob {
+    public interface PublishArtifact {
+        void cleanup();
+        void write(HollowBlobWriter blobWriter) throws IOException;
+        InputStream newInputStream() throws IOException;
+
+        @Deprecated
+        default File getFile() {
+            throw new UnsupportedOperationException("File is not available");
+        }
+
+        default Path getPath() {
+            throw new UnsupportedOperationException("Path is not available");
+        }
+    }
+
+    public static abstract class HeaderBlob implements PublishArtifact{
+        protected final long version;
+
+        protected HeaderBlob(long version) {
+            this.version = version;
+        }
+
+        public long getVersion() {
+            return version;
+        }
+    }
+
+    public static abstract class Blob implements PublishArtifact{
 
         protected final long fromVersion;
         protected final long toVersion;
@@ -598,27 +655,12 @@ public class HollowProducer extends AbstractHollowProducer {
             this.optionalPartConfig = optionalPartConfig;
         }
 
-        protected abstract void write(HollowBlobWriter writer) throws IOException;
-
-        public abstract InputStream newInputStream() throws IOException;
-
         public InputStream newOptionalPartInputStream(String partName) throws IOException {
             throw new UnsupportedOperationException("The provided HollowProducer.Blob implementation does not support optional blob parts");
         }
 
         public Path getOptionalPartPath(String partName) {
             throw new UnsupportedOperationException("The provided HollowProducer.Blob implementation does not support optional blob parts");
-        }
-
-        public abstract void cleanup();
-
-        @Deprecated
-        public File getFile() {
-            throw new UnsupportedOperationException("File is not available");
-        }
-
-        public Path getPath() {
-            throw new UnsupportedOperationException("Path is not available");
         }
 
         public Type getType() {

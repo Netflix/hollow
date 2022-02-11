@@ -29,7 +29,12 @@ class HollowClientConsumerBridge {
     
     static HollowConsumer.BlobRetriever consumerBlobRetrieverFor(final HollowBlobRetriever blobRetriever) {
         return new HollowConsumer.BlobRetriever() {
-            
+
+            @Override
+            public HollowConsumer.HeaderBlob retrieveHeaderBlob(long currentVersion) {
+                throw new UnsupportedOperationException();
+            }
+
             @Override
             public Blob retrieveSnapshotBlob(long desiredVersion) {
                 final HollowBlob blob = blobRetriever.retrieveSnapshotBlob(desiredVersion);
@@ -48,7 +53,7 @@ class HollowClientConsumerBridge {
                     }
                 };
             }
-            
+
             @Override
             public Blob retrieveDeltaBlob(long currentVersion) {
                 final HollowBlob blob = blobRetriever.retrieveDeltaBlob(currentVersion);
@@ -86,6 +91,7 @@ class HollowClientConsumerBridge {
                     }
                 };
             }
+
         };
     }
     

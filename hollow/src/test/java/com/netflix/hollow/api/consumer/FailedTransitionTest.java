@@ -215,6 +215,21 @@ public class FailedTransitionTest {
             this.br = br;
         }
 
+        @Override
+        public HollowConsumer.HeaderBlob retrieveHeaderBlob(long version) {
+            HollowConsumer.HeaderBlob blob = br.retrieveHeaderBlob(version);
+            return new HollowConsumer.HeaderBlob(version) {
+
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    if (failer.getAsBoolean()) {
+                        throw new IOException("FAILED");
+                    }
+                    return blob.getInputStream();
+                }
+            };
+        }
+
         @Override public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion) {
             HollowConsumer.Blob blob = br.retrieveSnapshotBlob(desiredVersion);
             return new HollowConsumer.Blob(desiredVersion) {

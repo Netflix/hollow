@@ -24,6 +24,7 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.BlobCompressor;
 import com.netflix.hollow.api.producer.HollowProducer.BlobStager;
+import com.netflix.hollow.api.producer.HollowProducer.HeaderBlob;
 import com.netflix.hollow.api.producer.ProducerOptionalBlobPartConfig;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.write.HollowBlobWriter;
@@ -110,6 +111,63 @@ public class HollowFilesystemBlobStager implements BlobStager {
         return new FilesystemBlob(fromVersion, toVersion, REVERSE_DELTA, stagingPath, compressor, optionalPartConfig);
     }
 
+    @Override
+    public HollowProducer.HeaderBlob openHeader(long version) {
+        return new FilesystemHeaderBlob(version, stagingPath, compressor);
+    }
+
+    public static class FilesystemHeaderBlob extends HeaderBlob {
+        protected final Path path;
+        private final BlobCompressor compressor;
+
+        protected FilesystemHeaderBlob(long version, Path dirPath, BlobCompressor compressor) {
+            super(version);
+            this.compressor = compressor;
+            int randomExtension = new Random().nextInt() & Integer.MAX_VALUE;
+            this.path = dirPath.resolve(String.format("header-%d.%s", version, Integer.toHexString(randomExtension)));
+        }
+
+        @Override
+        public void cleanup() {
+            if (path != null) {
+                try {
+                    Files.delete(path);
+                } catch (IOException e) {
+                    throw new RuntimeException("Could not cleanup file: " + this.path, e);
+                }
+            }
+        }
+
+        @Override
+        public void write(HollowBlobWriter blobWriter) throws IOException {
+            Path parent = this.path.getParent();
+            if (!Files.exists(parent))
+                Files.createDirectories(parent);
+
+            if (!Files.exists(path))
+                Files.createFile(path);
+
+            try (OutputStream os = new BufferedOutputStream(compressor.compress(Files.newOutputStream(path)))) {
+                blobWriter.writeHeader(os, null);
+            }
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            return new BufferedInputStream(compressor.decompress(Files.newInputStream(this.path)));
+        }
+
+        @Override
+        public File getFile() {
+            return path.toFile();
+        }
+
+        @Override
+        public Path getPath() {
+            return path;
+        }
+    }
+
     public static class FilesystemBlob extends Blob {
 
         protected final Path path;
@@ -167,7 +225,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
         }
 
         @Override
-        protected void write(HollowBlobWriter writer) throws IOException {
+        public void write(HollowBlobWriter writer) throws IOException {
             Path parent = this.path.getParent();
             if (!Files.exists(parent))
                 Files.createDirectories(parent);

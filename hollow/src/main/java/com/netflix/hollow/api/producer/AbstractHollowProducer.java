@@ -546,9 +546,12 @@ abstract class AbstractHollowProducer {
     void publish(ProducerListeners listeners, long toVersion, Artifacts artifacts) throws IOException {
         Status.StageBuilder psb = listeners.firePublishStart(toVersion);
         try {
+            // We want a header to be created for all states.
+            artifacts.header = blobStager.openHeader(toVersion);
             if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
                 artifacts.snapshot = stageBlob(listeners, blobStager.openSnapshot(toVersion));
 
+            publishHeaderBlob(artifacts.header);
             if (readStates.hasCurrent()) {
                 artifacts.delta = stageBlob(listeners,
                         blobStager.openDelta(readStates.current().getVersion(), toVersion));
@@ -575,7 +578,6 @@ abstract class AbstractHollowProducer {
                 artifacts.markSnapshotPublishComplete();
                 numStatesUntilNextSnapshot = numStatesBetweenSnapshots;
             }
-
             psb.success();
         } catch (Throwable throwable) {
             psb.fail(throwable);
@@ -679,9 +681,19 @@ abstract class AbstractHollowProducer {
 
     private void publishBlob(HollowProducer.Blob b) {
         try {
-            publisher.publish(b);
+            publisher.publish((HollowProducer.PublishArtifact)b);
         } finally {
             blobStorageCleaner.clean(b.getType());
+        }
+    }
+
+    private void publishHeaderBlob(HollowProducer.HeaderBlob b) {
+        try {
+            HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
+            b.write(writer);
+            publisher.publish(b);
+        } catch (IOException e){
+            throw new RuntimeException(e);
         }
     }
 
@@ -757,7 +769,7 @@ abstract class AbstractHollowProducer {
             listeners.fireIntegrityCheckComplete(status);
         }
     }
-    
+
     private ReadStateHelper noIntegrityCheck(ReadStateHelper readStates, Artifacts artifacts) throws IOException {
         ReadStateHelper result = readStates;
 
@@ -859,6 +871,7 @@ abstract class AbstractHollowProducer {
         HollowProducer.Blob snapshot = null;
         HollowProducer.Blob delta = null;
         HollowProducer.Blob reverseDelta = null;
+        HollowProducer.HeaderBlob header = null;
 
         boolean cleanupCalled;
         boolean snapshotPublishComplete;
@@ -875,6 +888,10 @@ abstract class AbstractHollowProducer {
             if (reverseDelta != null) {
                 reverseDelta.cleanup();
                 reverseDelta = null;
+            }
+            if (header != null) {
+                header.cleanup();
+                header = null;
             }
         }
 
@@ -898,6 +915,8 @@ abstract class AbstractHollowProducer {
         boolean hasReverseDelta() {
             return reverseDelta != null;
         }
+
+        boolean hasHeader() { return header != null; }
     }
 
     /**
@@ -910,11 +929,11 @@ abstract class AbstractHollowProducer {
         }
 
         @Override
-        public void cleanDeltas() {
+        public void cleanReverseDeltas() {
         }
 
         @Override
-        public void cleanReverseDeltas() {
+        public void cleanDeltas() {
         }
     }
 

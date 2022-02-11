@@ -213,6 +213,7 @@ final class ProducerListenerSupport extends ListenerSupport {
                     l -> l.onBlobStage(s, blob, elapsed));
         }
 
+
         void fireBlobPublishAsync(CompletableFuture<HollowProducer.Blob> f) {
             fire(PublishListener.class,
                     l -> l.onBlobPublishAsync(f));
@@ -235,7 +236,6 @@ final class ProducerListenerSupport extends ListenerSupport {
             fire(PublishListener.class,
                     l -> l.onPublishComplete(s, version, elapsed));
         }
-
 
         Status.StageWithStateBuilder fireIntegrityCheckStart(HollowProducer.ReadState readState) {
             long version = readState.getVersion();

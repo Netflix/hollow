@@ -18,6 +18,7 @@ package com.netflix.hollow.api.producer.fs;
 
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
+import com.netflix.hollow.api.producer.HollowProducer.HeaderBlob;
 import com.netflix.hollow.api.producer.ProducerOptionalBlobPartConfig;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.write.HollowBlobWriter;
@@ -55,9 +56,36 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
     public Blob openReverseDelta(long fromVersion, long toVersion) {
         return new InMemoryBlob(fromVersion, toVersion, Blob.Type.REVERSE_DELTA, optionalPartConfig);
     }
-    
-    
-    
+
+    @Override
+    public HollowProducer.HeaderBlob openHeader(long version) {
+        return new InMemoryHeaderBlob(version);
+    }
+
+    public static class InMemoryHeaderBlob extends HeaderBlob {
+        private byte[] data;
+
+        protected InMemoryHeaderBlob(long version) {
+            super(version);
+        }
+
+        @Override
+        public void cleanup() {
+        }
+
+        @Override
+        public void write(HollowBlobWriter blobWriter) throws IOException {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            blobWriter.writeHeader(baos, null);
+            data = baos.toByteArray();
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            return new ByteArrayInputStream(data);
+        }
+    }
+
     public static class InMemoryBlob extends Blob {
 
         private byte[] data;
@@ -72,7 +100,7 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
         }
 
         @Override
-        protected void write(HollowBlobWriter writer) throws IOException {
+        public void write(HollowBlobWriter writer) throws IOException {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams optionalPartStreams = null;

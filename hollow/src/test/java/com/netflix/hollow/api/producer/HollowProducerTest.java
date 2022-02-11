@@ -25,6 +25,7 @@ import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.Blob.Type;
+import com.netflix.hollow.api.producer.HollowProducer.HeaderBlob;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
@@ -32,6 +33,8 @@ import com.netflix.hollow.api.producer.HollowProducerListener.Status;
 import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
+import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
@@ -61,6 +64,8 @@ public class HollowProducerTest {
 
     private Map<Long, Blob> blobMap = new HashMap<>();
     private Map<Long, File> blobFileMap = new HashMap<>();
+    private Map<Long, HeaderBlob> headerBlobMap = new HashMap<>();
+    private Map<Long, File> headerFileMap = new HashMap<>();
     private ProducerStatus lastProducerStatus;
     private RestoreStatus lastRestoreStatus;
 
@@ -210,6 +215,19 @@ public class HollowProducerTest {
         Assert.assertNotNull(lastRestoreStatus);
         Assert.assertEquals(Status.SUCCESS, lastRestoreStatus.getStatus());
         Assert.assertEquals("Version should be the same", version, lastRestoreStatus.getDesiredVersion());
+    }
+
+    @Test
+    public void testHeaderPublish() throws IOException {
+        HollowProducer producer = createProducer(tmpFolder, schema);
+        long version = testPublishV1(producer, 2, 10);
+        HollowConsumer.HeaderBlob headerBlob = blobRetriever.retrieveHeaderBlob(version);
+        Assert.assertNotNull(headerBlob);
+        Assert.assertEquals(version, headerBlob.getVersion());
+        HollowBlobHeader header = new HollowBlobHeaderReader().readHeader(headerBlob.getInputStream());
+        Assert.assertNotNull(header);
+        Assert.assertEquals(1, header.getSchemas().size());
+        Assert.assertEquals(schema, header.getSchemas().get(0));
     }
 
     @Test
@@ -450,14 +468,21 @@ public class HollowProducerTest {
     }
 
     private class FakeBlobPublisher implements HollowProducer.Publisher {
-        @Override
-        public void publish(Blob blob) {
+        private void publishBlob(Blob blob) {
             File blobFile = blob.getFile();
-            if (!blobFile.exists()) throw new RuntimeException("File does not existis: " + blobFile);
-
             if (!blob.getType().equals(Type.SNAPSHOT)) {
-                return; // Only snapshot is needed for smoke Test
+                // Only snapshot is needed for smoke Test
+                return;
             }
+            File copiedFile = copyFile(blobFile);
+
+            blobMap.put(blob.getToVersion(), blob);
+            blobFileMap.put(blob.getToVersion(), copiedFile);
+            System.out.println("Published:" + copiedFile);
+        }
+
+        private File copyFile(File blobFile) {
+            if (!blobFile.exists()) throw new RuntimeException("File does not exists: " + blobFile);
 
             // Copy file
             File copiedFile = new File(tmpFolder, "copied_" + blobFile.getName());
@@ -466,10 +491,25 @@ public class HollowProducerTest {
             } catch (IOException e) {
                 throw new RuntimeException("Failed to publish:" + copiedFile, e);
             }
+            return copiedFile;
+        }
 
-            blobMap.put(blob.getToVersion(), blob);
-            blobFileMap.put(blob.getToVersion(), copiedFile);
-            System.out.println("Published:" + copiedFile);
+        private void publishHeader(HeaderBlob headerBlob) {
+            File headerBlobFile = headerBlob.getFile();
+            File copiedFile = copyFile(headerBlobFile);
+
+            headerBlobMap.put(headerBlob.getVersion(), headerBlob);
+            headerFileMap.put(headerBlob.getVersion(), copiedFile);
+            System.out.println("Published Header:" + copiedFile);
+        }
+
+        @Override
+        public void publish(HollowProducer.PublishArtifact publishArtifact) {
+            if (publishArtifact instanceof HeaderBlob) {
+                publishHeader((HeaderBlob) publishArtifact);
+            } else {
+                publishBlob((Blob) publishArtifact);
+            }
         }
     }
 
@@ -518,6 +558,18 @@ public class HollowProducerTest {
         @Override
         public HollowConsumer.Blob retrieveReverseDeltaBlob(long currentVersion) {
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HollowConsumer.HeaderBlob retrieveHeaderBlob(long currentVersion) {
+            final File blobFile = headerFileMap.get(currentVersion);
+            System.out.println("Restored: " + blobFile);
+            return new HollowConsumer.HeaderBlob(currentVersion) {
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return new FileInputStream(blobFile);
+                }
+            };
         }
     }
 }

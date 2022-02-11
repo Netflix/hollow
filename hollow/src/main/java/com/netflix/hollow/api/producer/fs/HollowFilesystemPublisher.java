@@ -44,7 +44,40 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     }
 
     @Override
+    // For backwards compatability.
     public void publish(HollowProducer.Blob blob) {
+        publishBlob(blob);
+    }
+
+    @Override
+    public void publish(HollowProducer.PublishArtifact publishArtifact) {
+        if (publishArtifact instanceof HollowProducer.HeaderBlob) {
+            publishHeader((HollowProducer.HeaderBlob) publishArtifact);
+        } else {
+            publishBlob((HollowProducer.Blob) publishArtifact);
+        }
+    }
+
+    private void publishContent(HollowProducer.PublishArtifact publishArtifact, Path destination) {
+        try (
+                InputStream is = publishArtifact.newInputStream();
+                OutputStream os = Files.newOutputStream(destination)
+        ) {
+            byte buf[] = new byte[4096];
+            int n;
+            while (-1 != (n = is.read(buf)))
+                os.write(buf, 0, n);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to publish file!", e);
+        }
+    }
+
+    private void publishHeader(HollowProducer.HeaderBlob headerBlob) {
+        Path destination = blobStorePath.resolve(String.format("header-%d", headerBlob.getVersion()));
+        publishContent(headerBlob, destination);
+    }
+
+    private void publishBlob(HollowProducer.Blob blob) {
         Path destination = null;
         
         switch(blob.getType()) {
@@ -57,17 +90,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
             break;
         }
 
-        try(
-                InputStream is = blob.newInputStream();
-                OutputStream os = Files.newOutputStream(destination)
-        ) {
-            byte buf[] = new byte[4096];
-            int n;
-            while (-1 != (n = is.read(buf)))
-                os.write(buf, 0, n);
-        } catch(IOException e) {
-            throw new RuntimeException("Unable to publish file!", e);
-        }
+        publishContent(blob, destination);
 
         ProducerOptionalBlobPartConfig optionalPartConfig = blob.getOptionalPartConfig();
         if(optionalPartConfig != null) {

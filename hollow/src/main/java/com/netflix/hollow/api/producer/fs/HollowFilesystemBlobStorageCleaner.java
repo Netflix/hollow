@@ -62,7 +62,6 @@ public class HollowFilesystemBlobStorageCleaner extends HollowProducer.BlobStora
         }
     }
 
-
     @Override
     public void cleanDeltas() { }
 

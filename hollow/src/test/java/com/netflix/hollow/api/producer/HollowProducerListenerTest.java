@@ -234,6 +234,7 @@ public class HollowProducerListenerTest {
                 Assert.fail();
             }
 
+
             @Override public void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed) {
                 if (status.getCause() instanceof AssertionError) {
                     return;
@@ -599,6 +600,7 @@ public class HollowProducerListenerTest {
                 Assert.fail();
             }
 
+
             @Override public void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed) {
                 if (status.getCause() instanceof AssertionError) {
                     return;
@@ -766,6 +768,7 @@ public class HollowProducerListenerTest {
 
             @Override public void onBlobStage(Status status, HollowProducer.Blob blob, Duration elapsed) {
             }
+
 
             @Override public void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed) {
                 Assert.assertNotEquals(HollowProducer.Blob.Type.SNAPSHOT, blob.getType());
