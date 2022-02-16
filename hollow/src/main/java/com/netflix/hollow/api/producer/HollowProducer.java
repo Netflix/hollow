@@ -589,16 +589,15 @@ public class HollowProducer extends AbstractHollowProducer {
          */
         @Deprecated
         default void publish(HollowProducer.Blob blob) {
-            throw new UnsupportedOperationException("publish(HollowProducer.Blob blob) is deprecated.");
+            publish((PublishArtifact)blob);
         }
 
         /**
          * Publish the blob specified to this publisher's blobstore.
          * <p>
          * It is guaranteed that {@code blob} was created by calling one of
-         * {@link BlobStager#openSnapshot(long)}, {@link BlobStager#openDelta(long, long)}, or
-         * {@link BlobStager#openDelta(long, long)} on this publisher, or
-         * {@link BlobStager#openReverseDelta(long, long)} on this publisher, or
+         * {@link BlobStager#openSnapshot(long)}, {@link BlobStager#openDelta(long, long)}, 
+         * {@link BlobStager#openReverseDelta(long, long)}, or
          * {@link BlobStager#openHeader(long)} on this publisher.
          *
          * @param publishArtifact the blob to publish
@@ -637,7 +636,7 @@ public class HollowProducer extends AbstractHollowProducer {
         }
     }
 
-    public static abstract class Blob implements PublishArtifact{
+    public static abstract class Blob implements PublishArtifact {
 
         protected final long fromVersion;
         protected final long toVersion;
