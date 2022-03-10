@@ -46,7 +46,7 @@ public class HistoryStateTypePage extends HistoryPage {
     @Override
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         long version = Long.parseLong(req.getParameter("version"));
-        HistoryStateTypeChanges typeChange = getStateTypeChanges(req, session, ui);
+        HistoryStateTypeChanges typeChange = getStateTypeChanges(req, session, ui);	// SNAP: issue was specific to session, ordinaals within typeChange being populated incorrectly
         HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(version);
         
         List<String> groupByOptions = new ArrayList<String>(Arrays.asList(historicalState.getKeyOrdinalMapping().getTypeMapping(req.getParameter("type")).getKeyIndex().getKeyFields()));
@@ -174,7 +174,7 @@ public class HistoryStateTypePage extends HistoryPage {
             HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(Long.parseLong(req.getParameter("version")));
             HollowHistoryRecordNamer recordNamer = ui.getHistoryRecordNamer(type);
             typeChanges = new HistoryStateTypeChanges(historicalState, type, recordNamer, groupedFieldNames);
-            session.setAttribute(STATE_TYPE_CHANGES_SESSION_ATTRIBUTE_NAME, typeChanges);
+            session.setAttribute(STATE_TYPE_CHANGES_SESSION_ATTRIBUTE_NAME, typeChanges);	// SNAP: once set incorrectly for a session, continues to be that way
         }
         
        return typeChanges;

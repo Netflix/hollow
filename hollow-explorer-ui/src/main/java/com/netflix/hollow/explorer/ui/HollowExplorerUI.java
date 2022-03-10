@@ -46,6 +46,7 @@ public class HollowExplorerUI extends HollowUIRouter {
     private final BrowseSelectedTypePage browseTypePage;
     private final BrowseSchemaPage browseSchemaPage;
     private final QueryPage queryPage;
+    private final HollowUISession uiSessions;
     
     public HollowExplorerUI(String baseUrlPath, HollowConsumer consumer) {
         this(baseUrlPath, consumer, null, null);
@@ -69,13 +70,14 @@ public class HollowExplorerUI extends HollowUIRouter {
         this.browseTypePage = new BrowseSelectedTypePage(this);
         this.browseSchemaPage = new BrowseSchemaPage(this);
         this.queryPage = new QueryPage(this);
+        this.uiSessions = new HollowUISession();
     }
 
     public boolean handle(String target, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         
         String pageName = getTargetRootPath(target);
         
-        HollowUISession session = HollowUISession.getSession(req, resp);
+        HollowUISession session = uiSessions.getSession(req, resp);
         
         if("".equals(pageName) || "home".equals(pageName)) {
             showAllTypesPage.render(req, resp, session);

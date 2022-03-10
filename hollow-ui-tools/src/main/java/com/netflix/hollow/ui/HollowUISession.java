@@ -31,10 +31,12 @@ public class HollowUISession {
 
     private static final long SESSION_ABANDONMENT_MILLIS = 60 * 60 * 1000;
 
+    private final ConcurrentHashMap<Long, HollowUISession> sessions;
     private final Map<String, Object> sessionParams;
     private long lastAccessed;
 
     public HollowUISession() {
+        this.sessions = new ConcurrentHashMap<>();
         this.sessionParams = new ConcurrentHashMap<String, Object>();
     }
 
@@ -54,14 +56,17 @@ public class HollowUISession {
         lastAccessed = System.currentTimeMillis();
     }
 
-    private static final ConcurrentHashMap<Long, HollowUISession> sessions = new ConcurrentHashMap<Long, HollowUISession>();
+    // SNAP: Having this static means it gets reused across different webservers on the same VM - so it could lead to inconsistent state
+    //       when hosting multiple servers
 
-    public static HollowUISession getSession(HttpServletRequest req, HttpServletResponse resp) {
+    // SNAP: Cookie is host-specific, and not host + port specific!
+    //       So the session updated with data for rev delta was overwriting the links to be generated for fwd delta on the same host
+    public HollowUISession getSession(HttpServletRequest req, HttpServletResponse resp) {
         Long sessionId = null;
 
         if(req.getCookies() != null) {
             for(Cookie cookie : req.getCookies()) {
-                if("hollowUISessionId".equals(cookie.getName())) {
+                if("hollowUISessionId".equals(cookie.getName())) {  // TODO: session has to do with cookies, maybe thats why
                     sessionId = Long.valueOf(cookie.getValue());
                 }
             }

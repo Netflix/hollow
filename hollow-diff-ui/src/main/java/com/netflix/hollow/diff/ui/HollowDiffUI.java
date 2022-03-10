@@ -16,8 +16,6 @@
  */
 package com.netflix.hollow.diff.ui;
 
-import static com.netflix.hollow.ui.HollowUISession.getSession;
-
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.diff.ui.pages.DiffFieldPage;
 import com.netflix.hollow.diff.ui.pages.DiffObjectPage;
@@ -37,10 +35,13 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.netflix.hollow.ui.HollowUISession;
 import org.apache.velocity.app.VelocityEngine;
 
 public class HollowDiffUI implements HollowRecordDiffUI {
 
+    private final HollowUISession uiSessions;
     private final String baseURLPath;
     private final String diffUIPath;
     private final HollowDiff diff;
@@ -61,6 +62,7 @@ public class HollowDiffUI implements HollowRecordDiffUI {
     private final ExactRecordMatcher exactRecordMatcher;
 
     HollowDiffUI(String baseURLPath, String diffUIPath, HollowDiff diff, String fromBlobName, String toBlobName, VelocityEngine ve) {
+        this.uiSessions = new HollowUISession();
         this.baseURLPath = baseURLPath;
         this.diffUIPath = baseURLPath + "/" + diffUIPath;
         this.diff = diff;
@@ -80,10 +82,10 @@ public class HollowDiffUI implements HollowRecordDiffUI {
     
     public boolean serveRequest(String pageName, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         if("diffrowdata".equals(pageName)) {
-            diffViewOutputGenerator.uncollapseRow(req, resp);
+            diffViewOutputGenerator.uncollapseRow(req, resp, uiSessions);
             return true;
         } else if("collapsediffrow".equals(pageName)) {
-            diffViewOutputGenerator.collapseRow(req, resp);
+            diffViewOutputGenerator.collapseRow(req, resp, uiSessions);
             return true;
         }
 
@@ -160,7 +162,7 @@ public class HollowDiffUI implements HollowRecordDiffUI {
     }
 
     private void render(DiffPage page, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        page.render(req, getSession(req, resp), resp.getWriter());
+        page.render(req, uiSessions.getSession(req, resp), resp.getWriter());
     }
 
 }

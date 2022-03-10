@@ -16,8 +16,6 @@
  */
 package com.netflix.hollow.history.ui;
 
-import static com.netflix.hollow.ui.HollowUISession.getSession;
-
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.diffview.DiffViewOutputGenerator;
@@ -36,6 +34,8 @@ import com.netflix.hollow.history.ui.pages.HistoryStateTypeExpandGroupPage;
 import com.netflix.hollow.history.ui.pages.HistoryStateTypePage;
 import com.netflix.hollow.tools.history.HollowHistory;
 import com.netflix.hollow.ui.HollowUIRouter;
+import com.netflix.hollow.ui.HollowUISession;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffUI {
 
     private final HollowHistory history;
+    private final HollowUISession uiSessions;
 
     private final HistoryOverviewPage overviewPage;
     private final HistoryStatePage statePage;
@@ -94,6 +95,7 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     public HollowHistoryUI(String baseUrlPath, HollowHistory history, TimeZone timeZone) {
         super(baseUrlPath);
         this.history = history;
+        this.uiSessions = new HollowUISession();
 
         this.overviewPage = new HistoryOverviewPage(this);
         this.statePage = new HistoryStatePage(this);
@@ -120,10 +122,10 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
         String pageName = getTargetRootPath(target);
 
         if("diffrowdata".equals(pageName)) {
-            diffViewOutputGenerator.uncollapseRow(req, resp);
+            diffViewOutputGenerator.uncollapseRow(req, resp, uiSessions);
             return true;
         } else if("collapsediffrow".equals(pageName)) {
-            diffViewOutputGenerator.collapseRow(req, resp);
+            diffViewOutputGenerator.collapseRow(req, resp, uiSessions);
             return true;
         }
 
@@ -138,30 +140,30 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
         		overviewPage.sendJson(req, resp);
         		return true;
         	}
-            overviewPage.render(req, getSession(req, resp), resp.getWriter());
+            overviewPage.render(req, uiSessions.getSession(req, resp), resp.getWriter());
             return true;
         } else if("state".equals(pageName)) {
         	if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
         		statePage.sendJson(req, resp);
         		return true;
         	}
-            statePage.render(req, getSession(req, resp), resp.getWriter());
+            statePage.render(req, uiSessions.getSession(req, resp), resp.getWriter());
             return true;
         } else if("statetype".equals(pageName)) {
         	if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
-        		stateTypePage.sendJson(req, getSession(req, resp),  resp);
+        		stateTypePage.sendJson(req, uiSessions.getSession(req, resp),  resp);
         		return true;
         	}
-            stateTypePage.render(req, getSession(req, resp), resp.getWriter());
+            stateTypePage.render(req, uiSessions.getSession(req, resp), resp.getWriter());
             return true;
         } else if("statetypeexpand".equals(pageName)) {
-            stateTypeExpandPage.render(req, getSession(req, resp), resp.getWriter());
+            stateTypeExpandPage.render(req, uiSessions.getSession(req, resp), resp.getWriter());
             return true;
         } else if("query".equals(pageName)) {
-            queryPage.render(req, getSession(req, resp), resp.getWriter());
+            queryPage.render(req, uiSessions.getSession(req, resp), resp.getWriter());
             return true;
         } else if("historicalObject".equals(pageName)) {
-            objectDiffPage.render(req, getSession(req, resp), resp.getWriter());
+            objectDiffPage.render(req, uiSessions.getSession(req, resp), resp.getWriter());
             return true;
         }
 

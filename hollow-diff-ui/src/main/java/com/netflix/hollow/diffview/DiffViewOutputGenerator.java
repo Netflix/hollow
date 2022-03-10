@@ -31,8 +31,8 @@ public class DiffViewOutputGenerator {
         this.viewProvider = viewProvider;
     }
 
-    public void collapseRow(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        HollowDiffViewRow row = findRow(req, resp);
+    public void collapseRow(HttpServletRequest req, HttpServletResponse resp, HollowUISession uiSessions) throws IOException {
+        HollowDiffViewRow row = findRow(req, resp, uiSessions);
         
         for(HollowDiffViewRow child : row.getChildren())
             child.setVisibility(false);
@@ -40,8 +40,8 @@ public class DiffViewOutputGenerator {
         resp.getWriter().write("ok");
     }
 
-    public void uncollapseRow(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        HollowDiffViewRow row = findRow(req, resp);
+    public void uncollapseRow(HttpServletRequest req, HttpServletResponse resp, HollowUISession uiSessions) throws IOException {
+        HollowDiffViewRow row = findRow(req, resp, uiSessions);
         
         for(HollowDiffViewRow child : row.getChildren())
             child.setVisibility(true);
@@ -49,8 +49,8 @@ public class DiffViewOutputGenerator {
         buildChildRowDisplayData(row, resp.getWriter());
     }
     
-    private HollowDiffViewRow findRow(HttpServletRequest req, HttpServletResponse resp) {
-        HollowUISession session = HollowUISession.getSession(req, resp);
+    private HollowDiffViewRow findRow(HttpServletRequest req, HttpServletResponse resp, HollowUISession uiSessions) {
+        HollowUISession session = uiSessions.getSession(req, resp);
         HollowObjectView objectView = viewProvider.getObjectView(req, session);
 
         int rowPath[] = getRowPath(req.getParameter("row"));
