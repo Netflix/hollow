@@ -53,7 +53,7 @@ public class HistoryStateTypePage extends HistoryPage {
         groupByOptions.removeAll(Arrays.asList(typeChange.getGroupedFieldNames()));
         
         ctx.put("typeChange", typeChange);
-        ctx.put("headerEntries", getHeaderEntries(historicalState));
+        ctx.put("headerEntries", getHeaderEntries(historicalState, ui.getHistory().getReverse()));
         ctx.put("groupBy", req.getParameter("groupBy") == null ? "" : req.getParameter("groupBy"));
         ctx.put("groupByOptions", groupByOptions);
     }
