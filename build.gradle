@@ -8,7 +8,7 @@ plugins {
 
 subprojects {
   apply plugin: 'nebula.netflixoss'
-  apply plugin: 'checkstyle'
+  // apply plugin: 'checkstyle'
 
   sourceCompatibility = 1.8
   targetCompatibility = 1.8
@@ -26,9 +26,9 @@ subprojects {
   }
 
   group = 'com.netflix.hollow'
-  checkstyle {
-    configFile = file("$rootProject.projectDir/config/checkstyle/checkstyle.xml")
-  }
+  // checkstyle {
+  //   configFile = file("$rootProject.projectDir/config/checkstyle/checkstyle.xml")
+  // }
 
   repositories {
     mavenCentral()
