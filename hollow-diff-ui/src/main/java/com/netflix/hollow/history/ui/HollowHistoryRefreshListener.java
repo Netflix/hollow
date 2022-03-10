@@ -25,10 +25,18 @@ import com.netflix.hollow.tools.history.HollowHistory;
 public class HollowHistoryRefreshListener extends HollowConsumer.AbstractRefreshListener {
 
     private final HollowHistory history;
-    
+	private boolean reverse;
+
+
     public HollowHistoryRefreshListener(HollowHistory history) {
         this.history = history;
+		this.reverse = false;
     }
+
+	public HollowHistoryRefreshListener(HollowHistory history, boolean reverse) {
+		this(history);
+		this.reverse = reverse;
+	}
 
     @Override
 	public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception { 
@@ -37,7 +45,11 @@ public class HollowHistoryRefreshListener extends HollowConsumer.AbstractRefresh
 	
 	@Override
 	public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-		history.deltaOccurred(version);
+		if(!reverse){
+			history.deltaOccurred(version);
+		} else {
+			history.reverseDeltaOccurred(version);
+		}
 	}
 	
 	@Override public void refreshStarted(long currentVersion, long requestedVersion) { }

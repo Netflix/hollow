@@ -46,9 +46,16 @@ public class HistoryStatePage extends HistoryPage {
     @Override
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(Long.parseLong(req.getParameter("version")));
-        
+
         long nextStateVersion = getNextStateVersion(historicalState);
         long prevStateVersion = getPreviousStateVersion(historicalState);
+        // SNAP: need to reverse these based on ui.getHistory().getReverse()?
+        //       maybe for navigation?
+        // if(historicalState.IsReverseDelta()){
+        //            long temp = nextStateVersion;
+        //            nextStateVersion = prevStateVersion;
+        //            prevStateVersion = temp;
+        //        }
 
         List<HistoryStateTypeChangeSummary> typeChanges = new ArrayList<HistoryStateTypeChangeSummary>();
 
@@ -59,7 +66,7 @@ public class HistoryStatePage extends HistoryPage {
         }
 
         ctx.put("typeChanges", typeChanges);
-        ctx.put("headerEntries", getHeaderEntries(historicalState));
+        ctx.put("headerEntries", getHeaderEntries(historicalState, ui.getHistory().getReverse()));
         ctx.put("currentStateVersion", historicalState.getVersion());
         ctx.put("nextStateVersion", nextStateVersion);
         ctx.put("prevStateVersion", prevStateVersion);
@@ -67,7 +74,7 @@ public class HistoryStatePage extends HistoryPage {
     
     public void sendJson(HttpServletRequest req, HttpServletResponse resp) {
     	HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(Long.parseLong(req.getParameter("version")));
-    	
+
     	List<HistoryStateTypeChangeSummary> typeChanges = new ArrayList<HistoryStateTypeChangeSummary>();
     	
     	for(Map.Entry<String, HollowHistoricalStateTypeKeyOrdinalMapping> entry : historicalState.getKeyOrdinalMapping().getTypeMappings().entrySet()) {
@@ -76,7 +83,7 @@ public class HistoryStatePage extends HistoryPage {
     			typeChanges.add(typeChange);
     	}
     	
-    	List<HollowHeaderEntry> headerEntries = getHeaderEntries(historicalState);
+    	List<HollowHeaderEntry> headerEntries = getHeaderEntries(historicalState, ui.getHistory().getReverse());
     	
     	Map<String, String> params = new HashMap<String, String>();
     	for(HollowHeaderEntry headerEntry : headerEntries) {

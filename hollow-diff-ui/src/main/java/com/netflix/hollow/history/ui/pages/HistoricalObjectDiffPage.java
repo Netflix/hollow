@@ -54,7 +54,7 @@ public class HistoricalObjectDiffPage extends HistoryPage {
 
         ctx.put("initialHtml", htmlKickstarter.initialHtmlRows(objectView));
         ctx.put("changeVersions", getChangeVersions(type, keyOrdinal, history));
-        ctx.put("headerEntries", getHeaderEntries(history.getHistoricalState(version)));
+        ctx.put("headerEntries", getHeaderEntries(history.getHistoricalState(version), history.getReverse()));
     }
 
     private List<HistoricalObjectChangeVersion> getChangeVersions(String type, int keyOrdinal, HollowHistory history) {

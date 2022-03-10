@@ -66,11 +66,21 @@ public abstract class HistoryPage {
 
     protected abstract void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx);
 
-    protected List<HollowHeaderEntry> getHeaderEntries(HollowHistoricalState state) {
-        Map<String, String> fromTags = state.getHeaderEntries();
-        Map<String, String> toTags = ui.getHistory().getLatestState().getHeaderTags();
-        if(state.getNextState() != null) {
-            toTags = state.getNextState().getHeaderEntries();
+    protected List<HollowHeaderEntry> getHeaderEntries(HollowHistoricalState state, boolean isReverse) {
+        Map<String, String> fromTags;
+        Map<String, String> toTags;
+        if (!isReverse) {
+            fromTags = state.getHeaderEntries();
+            toTags = ui.getHistory().getLatestState().getHeaderTags();
+            if(state.getNextState() != null) {
+                toTags = state.getNextState().getHeaderEntries();
+            }
+        } else {
+            toTags = state.getHeaderEntries();
+            fromTags = ui.getHistory().getLatestState().getHeaderTags();
+            if(state.getNextState() != null) {
+                fromTags = state.getNextState().getHeaderEntries();
+            }
         }
 
         Set<String> allKeys = new HashSet<String>();
