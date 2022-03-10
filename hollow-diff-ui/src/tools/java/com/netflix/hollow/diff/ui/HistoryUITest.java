@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.BitSet;
 
 public class HistoryUITest {
+    private final int MAX_STATES = 3;   // SNAP: reverse history doesnt work for max_states == 1. It drops v3 instead and shows diff between v2 and v4
 
     @Test
     public void startServerOnPorts7777And7778() throws Exception {
@@ -156,7 +157,7 @@ public class HistoryUITest {
             //load snapshot from output stream to read state engine
             reader.readSnapshot(HollowBlobInput.serial(baos_v1.toByteArray()));
             //>>>do not init history with the snapshot
-            history = new HollowHistory(readStateEngine, 1L, 10);
+            history = new HollowHistory(readStateEngine, 1L, MAX_STATES);
             history.getKeyIndex().addTypeIndex("TypeA", "a1");
             reader.applyDelta(HollowBlobInput.serial(baos_v1_to_v2.toByteArray()));
             history.deltaOccurred(2L);
@@ -279,19 +280,31 @@ public class HistoryUITest {
             reader.readSnapshot(HollowBlobInput.serial(baos_v4.toByteArray()));
             exploreOrdinals(readStateEngine);
             //>>>do not init history with the snapshot
-            history = new HollowHistory(readStateEngine, 4L, 10, true, true);
+            history = new HollowHistory(readStateEngine, 4L, MAX_STATES, true, true);
             history.getKeyIndex().addTypeIndex("TypeA", "a1");
 
             reader.applyDelta(HollowBlobInput.serial(baos_v4_to_v3.toByteArray()));
             exploreOrdinals(readStateEngine);
-            history.reverseDeltaOccurred(3L);
+            try {
+                history.reverseDeltaOccurred(3L);
+            } catch (IllegalStateException e) {
+                throw e;
+            }
 
             reader.applyDelta(HollowBlobInput.serial(baos_v3_to_v2.toByteArray()));
             exploreOrdinals(readStateEngine);
-            history.reverseDeltaOccurred(2L);
+            try {
+                history.reverseDeltaOccurred(2L);
+            } catch (IllegalStateException e) {
+                throw e;
+            }
 
            reader.applyDelta(HollowBlobInput.serial(baos_v2_to_v1.toByteArray()));
-           history.reverseDeltaOccurred(1L);
+           try {
+               history.reverseDeltaOccurred(1L);
+           } catch (IllegalStateException e) {
+               throw e;
+           }
         }
 
         return history;

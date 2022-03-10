@@ -78,7 +78,7 @@ public class HollowHistory {
     // The state engine and version corresponding to the current read state.
     // When traversing deltas from v1 to v2 this is the state corresponding to v2, and when traversing reverse
     // delta from v2 to v1 this is the state corresponding to v1.
-    private HollowReadStateEngine latestHollowReadStateEngine;
+    private HollowReadStateEngine latestHollowReadStateEngine;  // SNAP: may need 2 read states, latest and oldest to build history in both directions
     private long latestVersion;
 
     private boolean ignoreListOrderingOnDoubleSnapshot = false;
@@ -212,7 +212,7 @@ public class HollowHistory {
         //
         // For parity in UI, we want to display to user the same "directionality" in the diff irrespective of whether History
         // was building using fwd or reverse deltas. So although the construction of a HollowHistoricalState using fwd/reverse
-        // deltas is identical, the significant of added vs removed is flipped when it is queried by the user.
+        // deltas is identical, the significance of added vs removed is flipped when it is queried by the user.
         //
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
@@ -233,6 +233,12 @@ public class HollowHistory {
      * @param newVersion The version of the new state
      */
     public void reverseDeltaOccurred(long newVersion) {
+        if(historicalStates.size() >= maxHistoricalStatesToKeep) {
+            throw new IllegalStateException("No. of history states reached max states capacity. HollowHistory will not " +
+                    "compute history for this state and recommends that consumer not transition to newVersion for " +
+                    "or other older versions or else the history might contain distant versions");
+        }
+
         keyIndex.update(latestHollowReadStateEngine, true);
 
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
@@ -456,14 +462,11 @@ public class HollowHistory {
 
         historicalStates.add(historicalState);
         historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
-
-        if(historicalStates.size() > maxHistoricalStatesToKeep) {
-            removeHistoricalStatesForReverseDelta(1);
-        }
     }
 
     /**
-     * Removes the last {@code n} historical states.
+     * Removes the oldest {@code n} historical states. Works alike for whether history was built using fwd deltas
+     * or reverse deltas or a combination of both.
      *
      * @param n the number of historical states to remove
      * @throws IllegalArgumentException if the {@code n} is less than {@code 0} or
@@ -482,32 +485,8 @@ public class HollowHistory {
         }
 
         while (n-- > 0) {
-            HollowHistoricalState removedState = historicalStates.remove(historicalStates.size() - 1);
-            historicalStateLookupMap.remove(removedState.getVersion());
-        }
-    }
-
-    /**
-     * Removes the last {@code n} historical states.
-     *
-     * @param n the number of historical states to remove
-     * @throws IllegalArgumentException if the {@code n} is less than {@code 0} or
-     * greater than the {@link #getNumberOfHistoricalStates() number} of historical
-     * states.
-     */
-    public void removeHistoricalStatesForReverseDelta(int n) {
-        if (n < 0) {
-            throw new IllegalArgumentException(String.format(
-                    "Number of states to remove is negative: %d", n));
-        }
-        if (n > historicalStates.size()) {
-            throw new IllegalArgumentException(String.format(
-                    "Number of states to remove, %d, is greater than the number of states. %d",
-                    n, historicalStates.size()));
-        }
-
-        while (n-- > 0) {
-            HollowHistoricalState removedState = historicalStates.remove(0);
+            HollowHistoricalState removedState;
+            removedState = historicalStates.remove(historicalStates.size() - 1);
             historicalStateLookupMap.remove(removedState.getVersion());
         }
     }

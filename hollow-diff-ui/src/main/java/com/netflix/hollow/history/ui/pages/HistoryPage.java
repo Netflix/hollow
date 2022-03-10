@@ -77,7 +77,15 @@ public abstract class HistoryPage {
             }
         } else {
             toTags = state.getHeaderEntries();
-            fromTags = ui.getHistory().getLatestState().getHeaderTags();
+            // NOTE: There is an edge case here when computing history with reverse delta that if the latest state
+            //       in HollowHistory does not correspond to state.getNextState() (which could happen when the
+            //       number of historic states reached capacity and the history update with reverse delta failed with
+            //       an exception but the consumer chose to ignore that exception and transition to old versions) then
+            //       the history row corresponding to the oldest diff will contain the diff of non-adjacent states and
+            //       as a result some ordinals referenced in that diff could be corrupt. Hence, it is recommended that
+            //       consumer fail the transition to a version if history computation for that version failed. This
+            //       edge case doesn't occur with building history using fwd deltas because
+            fromTags = ui.getHistory().getLatestState().getHeaderTags();    // SNAP: May need oldest state here if latest (newest) is different from oldest
             if(state.getNextState() != null) {
                 fromTags = state.getNextState().getHeaderEntries();
             }
