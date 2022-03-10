@@ -98,7 +98,25 @@ public class DiffViewOutputGenerator {
             }
         }
     }
-    
+
+    public static void buildChildRowDisplayDataSimple(HollowDiffViewRow parentRow, Writer writer, boolean firstRow, String str) throws IOException {
+
+        for(HollowDiffViewRow row : parentRow.getChildren()) {
+            if(row.isVisible()) {
+                if(firstRow) {
+                    firstRow = false;
+                } else {
+                    writer.write("|");
+                }
+
+                writer.write(fromContent(row));                           writer.write("|");
+                writer.write(toContent(row));
+
+                buildChildRowDisplayDataSimple(row, writer, false,  str);
+            }
+        }
+    }
+
     private static void writeRowPathString(HollowDiffViewRow row, Writer writer) throws IOException {
         for(int i=0;i<row.getRowPath().length;i++) {
             if(i > 0)

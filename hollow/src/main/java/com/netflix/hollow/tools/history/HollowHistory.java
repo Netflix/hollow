@@ -218,7 +218,7 @@ public class HollowHistory {
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(false);
-        HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
+        HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries, reverse);
 
         addHistoricalState(historicalState);
         this.latestVersion = newVersion;
@@ -254,10 +254,10 @@ public class HollowHistory {
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(true);
         // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity with
         // reporting history using fwd deltas
-        HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries, true);
+        HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries, reverse);
         addReverseHistoricalState(newVersion, historicalState);
 
-        this.latestVersion = historicalStates.get(0).getVersion();;
+        this.latestVersion = historicalStates.get(0).getVersion();
         log.info("Reverse delta to latestVersion :"+this.latestVersion);
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
     }
@@ -301,7 +301,7 @@ public class HollowHistory {
 
             remappedDataAccess.setNextState(nextRemappedDataAccess);
             nextRemappedDataAccess = remappedDataAccess;
-            HollowHistoricalState remappedState = new HollowHistoricalState(historicalStateToRemap.getVersion(), remappedKeyOrdinalMapping, remappedDataAccess, historicalStateToRemap.getHeaderEntries());
+            HollowHistoricalState remappedState = new HollowHistoricalState(historicalStateToRemap.getVersion(), remappedKeyOrdinalMapping, remappedDataAccess, historicalStateToRemap.getHeaderEntries(), reverse);
             remappedState.setNextState(nextRemappedState);
             nextRemappedState = remappedState;
             historicalStates.set(i, remappedState);
@@ -311,9 +311,12 @@ public class HollowHistory {
         historicalDataAccess.setNextState(newHollowStateEngine);
 
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDoubleSnapshot(newHollowStateEngine, remapper);
-        HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
-
-        addHistoricalState(historicalState);
+        HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries, reverse);
+        if(reverse) {
+            addReverseHistoricalState(newVersion, historicalState);
+        } else {
+            addHistoricalState(historicalState);
+        }
         this.latestVersion = newVersion;
         this.latestHollowReadStateEngine = newHollowStateEngine;
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
@@ -385,7 +388,7 @@ public class HollowHistory {
     }
 
     private HollowHistoricalStateKeyOrdinalMapping createKeyOrdinalMappingFromDoubleSnapshot(HollowReadStateEngine newStateEngine, DiffEqualityMappingOrdinalRemapper ordinalRemapper) {
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = new HollowHistoricalStateKeyOrdinalMapping(keyIndex);
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = new HollowHistoricalStateKeyOrdinalMapping(keyIndex, reverse);
         DiffEqualityMapping mapping = ordinalRemapper.getDiffEqualityMapping();
 
         for(String keyType : keyIndex.getTypeKeyIndexes().keySet()) {
