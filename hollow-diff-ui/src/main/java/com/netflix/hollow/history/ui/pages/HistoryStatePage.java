@@ -23,15 +23,16 @@ import com.netflix.hollow.history.ui.model.HistoryStateTypeChangeSummary;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
 import com.netflix.hollow.ui.HollowUISession;
+import org.apache.velocity.VelocityContext;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.velocity.VelocityContext;
 
 public class HistoryStatePage extends HistoryPage {
 
@@ -47,15 +48,15 @@ public class HistoryStatePage extends HistoryPage {
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(Long.parseLong(req.getParameter("version")));
 
-        long nextStateVersion = getNextStateVersion(historicalState);
-        long prevStateVersion = getPreviousStateVersion(historicalState);
-        // SNAP: need to reverse these based on ui.getHistory().getReverse()?
-        //       maybe for navigation?
-        // if(historicalState.IsReverseDelta()){
-        //            long temp = nextStateVersion;
-        //            nextStateVersion = prevStateVersion;
-        //            prevStateVersion = temp;
-        //        }
+        long nextStateVersion;
+        long prevStateVersion;
+        if (!ui.getHistory().getReverse()) {    // prev/next version navigation links depending on history directionality
+            nextStateVersion = getNextStateVersion(historicalState);
+            prevStateVersion = getPreviousStateVersion(historicalState);
+        } else {
+            nextStateVersion = getPreviousStateVersion(historicalState);
+            prevStateVersion = getNextStateVersion(historicalState);
+        }
 
         List<HistoryStateTypeChangeSummary> typeChanges = new ArrayList<HistoryStateTypeChangeSummary>();
 
