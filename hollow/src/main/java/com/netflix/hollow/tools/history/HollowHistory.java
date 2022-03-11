@@ -233,9 +233,6 @@ public class HollowHistory {
      * @param newVersion The version of the new state
      */
     public void reverseDeltaOccurred(long newVersion) throws Exception {
-        if(historicalStates.size() == maxHistoricalStatesToKeep) {
-            throw new Exception("Reached max Historical States.");
-        }
         keyIndex.update(latestHollowReadStateEngine, true);
 
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
@@ -465,7 +462,9 @@ public class HollowHistory {
         historicalState.setVersion(newVersion);
         historicalState.getDataAccess().setVersion(0L);
         historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
-
+        if(historicalStates.size() > maxHistoricalStatesToKeep) {
+            removeHistoricalStates(1);
+        }
     }
 
     /**
