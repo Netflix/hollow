@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.history.ui.pages;
 
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.diff.ui.model.HollowHeaderEntry;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
@@ -69,6 +70,7 @@ public abstract class HistoryPage {
     protected List<HollowHeaderEntry> getHeaderEntries(HollowHistoricalState state) {
         Map<String, String> fromTags;
         Map<String, String> toTags;
+
         if(state.IsReverseDelta()){
             toTags = state.getHeaderEntries();
             fromTags = ui.getHistory().getLatestState().getHeaderTags();
@@ -80,6 +82,8 @@ public abstract class HistoryPage {
         if(state.getNextState() != null) {
             if(!state.IsReverseDelta()) {
                 toTags = state.getNextState().getHeaderEntries();
+            }else{
+                fromTags = state.getNextState().getHeaderEntries();
             }
         }
 
