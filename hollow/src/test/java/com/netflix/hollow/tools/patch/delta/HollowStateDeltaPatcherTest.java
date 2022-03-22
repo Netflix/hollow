@@ -16,6 +16,9 @@
  */
 package com.netflix.hollow.tools.patch.delta;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -27,7 +30,6 @@ import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowStateDeltaPatcherTest {
@@ -44,27 +46,43 @@ public class HollowStateDeltaPatcherTest {
         ByteArrayOutputStream delta1 = new ByteArrayOutputStream();
         HollowBlobWriter writer = new HollowBlobWriter(patcher.getStateEngine());
         writer.writeDelta(delta1);
+        ByteArrayOutputStream reverseDelta1 = new ByteArrayOutputStream();
+        writer.writeReverseDelta(reverseDelta1);
         
         patcher.prepareFinalTransition();
 
         ByteArrayOutputStream delta2 = new ByteArrayOutputStream();
         writer = new HollowBlobWriter(patcher.getStateEngine());
         writer.writeDelta(delta2);
+        ByteArrayOutputStream reverseDelta2 = new ByteArrayOutputStream();
+        writer.writeReverseDelta(reverseDelta2);
         
         patcher.getStateEngine().prepareForNextCycle();
         
         HollowBlobReader reader = new HollowBlobReader(state1);
         reader.applyDelta(HollowBlobInput.serial(delta1.toByteArray()));
         reader.applyDelta(HollowBlobInput.serial(delta2.toByteArray()));
+        // state1 corresponds to final state
+        assertEquals("true", state1.getHeaderTags().get("final_state"));
+        assertNull(state1.getHeaderTag("origin_state"));
 
         HollowChecksum checksum1 = HollowChecksum.forStateEngineWithCommonSchemas(state1, state2);
         HollowChecksum checksum2 = HollowChecksum.forStateEngineWithCommonSchemas(state2, state1);
         
-        Assert.assertEquals(checksum1, checksum2);
+        assertEquals(checksum1, checksum2);
+
+        // reverse deltas to back to original state
+        reader.applyDelta(HollowBlobInput.serial(reverseDelta2.toByteArray()));
+        reader.applyDelta(HollowBlobInput.serial(reverseDelta1.toByteArray()));
+
+        // state1 corresponds to origin state so the origin state header tag is present
+        assertEquals("true", state1.getHeaderTag("origin_state"));
+        assertNull(state1.getHeaderTag("final_state"));
     }
     
     private HollowReadStateEngine constructState1() throws IOException {
         HollowWriteStateEngine stateEngine = new HollowWriteStateEngine();
+        stateEngine.getHeaderTags().put("origin_state", "true");
         HollowObjectMapper mapper = new HollowObjectMapper(stateEngine);
         
         mapper.add(new TypeB1(1, 0));
@@ -89,6 +107,7 @@ public class HollowStateDeltaPatcherTest {
     
     private HollowReadStateEngine constructState2() throws IOException {
         HollowWriteStateEngine stateEngine = new HollowWriteStateEngine();
+        stateEngine.getHeaderTags().put("final_state", "true");
         HollowObjectMapper mapper = new HollowObjectMapper(stateEngine);
 
         mapper.add(new TypeB2(1, 100));

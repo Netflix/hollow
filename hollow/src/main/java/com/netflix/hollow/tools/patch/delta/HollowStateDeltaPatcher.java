@@ -104,6 +104,7 @@ public class HollowStateDeltaPatcher {
      */
     public void prepareInitialTransition() {
         writeEngine.overridePreviousStateRandomizedTag(from.getCurrentRandomizedTag());
+        writeEngine.overridePreviousHeaderTags(from.getHeaderTags());
         copyUnchangedDataToIntermediateState();
         remapTheChangedDataToUnusedOrdinals();
     }
@@ -114,6 +115,7 @@ public class HollowStateDeltaPatcher {
     public void prepareFinalTransition() {
         writeEngine.prepareForNextCycle();
         writeEngine.overrideNextStateRandomizedTag(to.getCurrentRandomizedTag());
+        writeEngine.addHeaderTags(to.getHeaderTags());
         copyUnchangedDataToDestinationState();
         remapTheChangedDataToDestinationOrdinals();
     }

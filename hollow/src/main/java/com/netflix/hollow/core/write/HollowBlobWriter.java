@@ -293,11 +293,12 @@ public class HollowBlobWriter {
             }
         }
         /// write main header
-        header.setHeaderTags(stateEngine.getHeaderTags());
         if(isReverseDelta) {
+            header.setHeaderTags(stateEngine.getPreviousHeaderTags());  // header tags corresponding to destination state
             header.setOriginRandomizedTag(stateEngine.getNextStateRandomizedTag());
             header.setDestinationRandomizedTag(stateEngine.getPreviousStateRandomizedTag());
         } else {
+            header.setHeaderTags(stateEngine.getHeaderTags());
             header.setOriginRandomizedTag(stateEngine.getPreviousStateRandomizedTag());
             header.setDestinationRandomizedTag(stateEngine.getNextStateRandomizedTag());
         }
