@@ -145,7 +145,6 @@ public class TestHollowConsumer extends HollowConsumer {
         // create a new write state for delta application, restore from current state
         HollowWriteStateEngine deltaState = HollowWriteStateCreator.createWithSchemas(getStateEngine().getSchemas());
         deltaState.restoreFrom(getStateEngine());
-        deltaState.overridePreviousStateRandomizedTag(this.getStateEngine().getCurrentRandomizedTag());
 
         // add all records from passed in {@code state} to delta write state
         HollowCombiner combiner = new HollowCombiner(HollowCombinerCopyDirector.DEFAULT_DIRECTOR,

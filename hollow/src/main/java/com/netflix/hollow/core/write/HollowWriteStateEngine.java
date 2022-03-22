@@ -64,7 +64,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private final Map<String, HollowTypeWriteState> writeStates;
     private final Map<String, HollowSchema> hollowSchemas;
     private final List<HollowTypeWriteState> orderedTypeStates;
-    private final Map<String,String> headerTags = new ConcurrentHashMap<String, String>();
+    private final Map<String,String> headerTags = new ConcurrentHashMap<>();
+    private final Map<String,String> previousHeaderTags = new ConcurrentHashMap<>();
     private final HollowObjectHashCodeFinder hashCodeFinder;
     
     //// target a maximum shard size to reduce excess memory pool requirement 
@@ -170,6 +171,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
         previousStateRandomizedTag = readStateEngine.getCurrentRandomizedTag();
         nextStateRandomizedTag = mintNewRandomizedStateTag();
+        overridePreviousHeaderTags(readStateEngine.getHeaderTags());
 
         try {
             executor.awaitSuccessfulCompletion();
@@ -216,6 +218,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
         previousStateRandomizedTag = nextStateRandomizedTag;
         nextStateRandomizedTag = mintNewRandomizedStateTag();
+        overridePreviousHeaderTags(headerTags);
 
         try {
             SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "prepare-for-next-cycle");
@@ -369,6 +372,10 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         this.headerTags.putAll(headerTags);
     }
 
+    public Map<String, String> getPreviousHeaderTags() {
+        return previousHeaderTags;
+    }
+
     @Override
     public String getHeaderTag(String name) {
         return headerTags.get(name);
@@ -385,6 +392,11 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     
     public void overridePreviousStateRandomizedTag(long previousStateRandomizedTag) {
         this.previousStateRandomizedTag = previousStateRandomizedTag;
+    }
+
+    public void overridePreviousHeaderTags(Map<String, String> previousHeaderTags) {
+        this.previousHeaderTags.clear();
+        this.previousHeaderTags.putAll(previousHeaderTags);
     }
     
     public long getNextStateRandomizedTag() {
