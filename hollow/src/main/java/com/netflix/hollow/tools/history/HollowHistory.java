@@ -222,7 +222,6 @@ public class HollowHistory {
 
         addHistoricalState(historicalState);
         this.latestVersion = newVersion;
-        log.info("Delta to latestVersion :"+this.latestVersion);
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
     }
 
@@ -251,8 +250,8 @@ public class HollowHistory {
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(true);
         // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity with
         // reporting history using fwd deltas
-        HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries, reverse);
-        addReverseHistoricalState(newVersion, historicalState);
+        HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess,  latestHollowReadStateEngine.getHeaderTags(), reverse);
+        addReverseHistoricalState(newVersion, latestVersion, historicalState);
 
         this.latestVersion = historicalStates.get(0).getVersion();
         log.info("Reverse delta to latestVersion :"+this.latestVersion);
@@ -310,7 +309,7 @@ public class HollowHistory {
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDoubleSnapshot(newHollowStateEngine, remapper);
         HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries, reverse);
         if(reverse) {
-            addReverseHistoricalState(newVersion, historicalState);
+            addReverseHistoricalState(newVersion, 0L,  historicalState);
         } else {
             addHistoricalState(historicalState);
         }
@@ -451,7 +450,7 @@ public class HollowHistory {
         }
     }
 
-    private void addReverseHistoricalState(long newVersion, HollowHistoricalState historicalState) {
+    private void addReverseHistoricalState(long newVersion, long oldVersion, HollowHistoricalState historicalState) {
         if(historicalStates.size() > 0) {
             historicalStates.get(historicalStates.size()-1).getDataAccess().setNextState(historicalState.getDataAccess());
             historicalStates.get(historicalStates.size()-1).getDataAccess().setVersion(newVersion);
@@ -460,7 +459,7 @@ public class HollowHistory {
 
         historicalStates.add(historicalState);
         historicalState.setVersion(newVersion);
-        historicalState.getDataAccess().setVersion(0L);
+        historicalState.getDataAccess().setVersion(oldVersion);
         historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
         if(historicalStates.size() > maxHistoricalStatesToKeep) {
             removeHistoricalStates(1);
