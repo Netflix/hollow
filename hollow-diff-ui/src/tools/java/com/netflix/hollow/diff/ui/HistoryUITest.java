@@ -223,8 +223,6 @@ public class HistoryUITest {
 
             //write delta based on new records
             writer.writeDelta(baos_v1_to_v2);
-            // due to unrelated bug in reverse delta header behavior, modify header after writing snapshot
-            stateEngine.addHeaderTag("snapversion", "v1");
             writer.writeReverseDelta(baos_v2_to_v1);
 
             stateEngine.prepareForNextCycle();
@@ -244,8 +242,6 @@ public class HistoryUITest {
 
             //write delta based on new records
             writer.writeDelta(baos_v2_to_v3);
-            // due to unrelated bug in reverse delta header behavior, modify header after writing snapshot
-            stateEngine.addHeaderTag("snapversion", "v2");
             writer.writeReverseDelta(baos_v3_to_v2);
 
             //v4
@@ -268,9 +264,6 @@ public class HistoryUITest {
             //write snapshot to output stream
             ByteArrayOutputStream baos_v4 = new ByteArrayOutputStream();
             writer.writeSnapshot(baos_v4);
-
-            // due to unrelated bug in reverse delta header behavior, modify header after writing snapshot
-            stateEngine.addHeaderTag("snapversion", "v3");
             writer.writeReverseDelta(baos_v4_to_v3);
 
 
