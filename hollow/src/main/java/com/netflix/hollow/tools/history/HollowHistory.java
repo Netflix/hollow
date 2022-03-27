@@ -68,18 +68,21 @@ public class HollowHistory {
      *  {@code historicalStates} ordered like: V3 -> V2 -> V1 (as displayed to user)
      *  however internally the states are linked like:
      *      V1.nextState = V2; V2.nextState = V3; etc. if building using fwd deltas, but
-     *      V3.nextState = V2; V2.nextState = V1; etc. if building using reverse deltas
+     *      V3.nextState = V2; V2.nextState = V1; etc. if building using reverse deltas // SNAP: alter this
      */
     private final List<HollowHistoricalState> historicalStates;
 
     // A map of version to HollowHistoricalState for quick retrieval
     private final Map<Long, HollowHistoricalState> historicalStateLookupMap;
 
-    // The state engine and version corresponding to the current read state.
+    // StateEngines and versions corresponding to the latest and oldest read states.
     // When traversing deltas from v1 to v2 this is the state corresponding to v2, and when traversing reverse
     // delta from v2 to v1 this is the state corresponding to v1.
-    private HollowReadStateEngine latestHollowReadStateEngine;  // SNAP: may need 2 read states, latest and oldest to build history in both directions
+    private HollowReadStateEngine latestHollowReadStateEngine;
+    private HollowReadStateEngine oldestHollowReadStateEngine;
     private long latestVersion;
+    private long oldestVersion;
+    private boolean buildUsingRevDeltaSupported = true;
 
     private boolean ignoreListOrderingOnDoubleSnapshot = false;
 
@@ -99,23 +102,27 @@ public class HollowHistory {
      * @param isAutoDiscoverTypeIndex true if scheme types are auto-discovered from the initiate state engine
      */
     public HollowHistory(HollowReadStateEngine initialHollowStateEngine, long initialVersion, int maxHistoricalStatesToKeep, boolean isAutoDiscoverTypeIndex) {
-        this(initialHollowStateEngine, initialVersion, maxHistoricalStatesToKeep, isAutoDiscoverTypeIndex, false);
+        this(initialHollowStateEngine, null, initialVersion, maxHistoricalStatesToKeep, isAutoDiscoverTypeIndex);
     }
 
-    public HollowHistory(HollowReadStateEngine initialHollowStateEngine, long initialVersion, int maxHistoricalStatesToKeep,
-                         boolean isAutoDiscoverTypeIndex, boolean reverse) {
+    public HollowHistory(HollowReadStateEngine fwdMovingHollowReadStateEngine,
+                         HollowReadStateEngine revMovingHollowReadStateEngine,
+                         long initialVersion, int maxHistoricalStatesToKeep, boolean isAutoDiscoverTypeIndex) {
         this.keyIndex = new HollowHistoryKeyIndex(this);
         this.creator = new HollowHistoricalStateCreator(this);
-        this.latestHollowReadStateEngine = initialHollowStateEngine;
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
         this.historicalStates = new ArrayList<HollowHistoricalState>();
         this.historicalStateLookupMap = new HashMap<Long, HollowHistoricalState>();
         this.maxHistoricalStatesToKeep = maxHistoricalStatesToKeep;
+
+        // SNAP: Assert two read state engines are "equal"
+        this.latestHollowReadStateEngine = fwdMovingHollowReadStateEngine;
+        this.oldestHollowReadStateEngine = revMovingHollowReadStateEngine;
         this.latestVersion = initialVersion;
-        this.reverse = reverse;
+        this.oldestVersion = initialVersion;
 
         if (isAutoDiscoverTypeIndex) {
-            for (HollowSchema schema : initialHollowStateEngine.getSchemas()) {
+            for (HollowSchema schema : fwdMovingHollowReadStateEngine.getSchemas()) {
                 if (schema instanceof HollowObjectSchema) {
                     PrimaryKey pKey = ((HollowObjectSchema) schema).getPrimaryKey();
                     if (pKey == null) continue;
@@ -125,10 +132,10 @@ public class HollowHistory {
                 }
             }
         }
-    }
 
-    public boolean getReverse() {
-        return this.reverse;
+        if (revMovingHollowReadStateEngine == null) {
+            buildUsingRevDeltaSupported = false;
+        }
     }
 
     /**
@@ -151,6 +158,21 @@ public class HollowHistory {
      */
     public HollowReadStateEngine getLatestState() {
         return latestHollowReadStateEngine;
+    }
+
+    /**
+     * @return The {@link HollowReadStateEngine} backing the oldest state.
+     */
+    public HollowReadStateEngine getOldestState() {
+        return oldestHollowReadStateEngine;
+    }
+
+    public long getLatestVersion() {
+        return latestVersion;
+    }
+
+    public long getOldestVersion() {
+        return oldestVersion;
     }
 
     /**
@@ -195,7 +217,7 @@ public class HollowHistory {
         keyIndex.update(latestHollowReadStateEngine, true);
 
         // A {@code HollowHistoricalStateDataAccess} is used to save data that won't exist in future states so it needs to
-        // be stashed away somewhere for makeing it accessible in the history view. It achieves this by copying over
+        // be stashed away somewhere for making it accessible in the history view. It achieves this by copying over
         // data corresponding to ghost records in the latest state (i.e. ordinals were previously populated but are not
         // populated in the latest state) into a new state engine where it assigns new ordinals (0, 1, 2, etc.) to each
         // removed record. This mapping of original ordinal in the read state to its new ordinal position in the historical
@@ -227,7 +249,7 @@ public class HollowHistory {
     }
 
     /**
-     * Call this method after each time a delta occurs in the backing {@link HollowReadStateEngine}.  This
+     * Call this method after each time a reverse delta occurs in the backing {@link HollowReadStateEngine}.  This
      * is how the HollowHistory knows how to create a new {@link HollowHistoricalState}.
      *
      * @param newVersion The version of the new state
@@ -239,8 +261,11 @@ public class HollowHistory {
                     "or other older versions or else the history might contain distant versions");
         }
 
+        // SNAP: keyIndex indexes all records ever seen by primary key (as defined in data model or added using custom config).
+        // It maintains an ever-growing state engine and  when a delta update occurs we add any newly introduced records to keyIndex
         keyIndex.update(latestHollowReadStateEngine, true);
 
+        // SNAP: creates a DataAccess for the prior state with records that won't be available again
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
@@ -251,7 +276,7 @@ public class HollowHistory {
          * historic version it lists all keys that were added/removed/modified in that version, and can then retrieve the
          * data for those keys.
          * There is a difference in how fwd and reverse deltas are handled here in that the significance of added vs removed
-         * ordinals is flipped (but only when querying) depending on delta directionality. For computating purposes they are
+         * ordinals is flipped (but only when querying) depending on delta directionality. For computing purposes they are
          * identical.
          */
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(true);

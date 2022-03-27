@@ -38,8 +38,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
- * A {@code HollowHistoryKeyIndex} index is used to track all secords seen in all knwon states.
- * It achieves this by maintaining a growing readStateEngine. A delta transition applies incoming keys tot his
+ * A {@code HollowHistoryKeyIndex} index is used to track all records seen in all known states.
+ * It achieves this by maintaining a growing readStateEngine. A delta transition applies incoming keys to this
  * readStateEngine, and a snapshot transition applies all the existing keys in readStateEngine and new keys
  * in the incoming snapshot into a new readStateEngine that is used moving forward.
  */
@@ -121,7 +121,7 @@ public class HollowHistoryKeyIndex {
 
         HollowReadStateEngine newIndexReadState = roundTripStateEngine(isInitialUpdate, !isDelta);
 
-        // if snapshot update then a new read state was generated, udpate the types in the history index to point to this
+        // if snapshot update then a new read state was generated, update the types in the history index to point to this
         // new read state
         if (newIndexReadState != indexReadStateEngine) {
             // New ReadState was created so let's update references to old one
