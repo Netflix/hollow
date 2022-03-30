@@ -94,14 +94,14 @@ public class HollowHistoryTypeKeyIndex {
         readStateEngine=readEngine;
     }
 
-    public void update(HollowObjectTypeReadState latestTypeState, boolean isDeltaAndIndexInitialized) {
+    public void update(HollowObjectTypeReadState latestTypeState, boolean isDeltaAndIndexInitialized, boolean reverse) {
         // copies over keys corresponding to previously populated ordinals AND currently populated ordinals
-        copyExistingKeys(); // only popylates the ordianl map (to be the OR of previous and current ordinals)
+        copyExistingKeys(); // only populates the ordianl map (to be the OR of previous and current ordinals)
         if (latestTypeState == null) return;
 
         if (isDeltaAndIndexInitialized) {
             // For fwd delta transition: write all key objects that were added when going from v1 -> v2 to the history type key index
-            populateNewCurrentRecordKeysIntoIndex(latestTypeState);
+            populateNewCurrentRecordKeysIntoIndex(latestTypeState, reverse);
         }
         else {
             // when index is not yet initialized with data (usually on first fwd delta transition) or on  double snapshot
@@ -382,13 +382,13 @@ public class HollowHistoryTypeKeyIndex {
         }
     }
 
-    private void populateNewCurrentRecordKeysIntoIndex(HollowObjectTypeReadState typeState) {
+    private void populateNewCurrentRecordKeysIntoIndex(HollowObjectTypeReadState typeState, boolean reverse) {   // SNAP: reverse should always be false, because this is used to populate newly seen records in key index
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(keySchema);
         PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
         BitSet populatedOrdinals = listener.getPopulatedOrdinals();
         BitSet previousOrdinals = listener.getPreviousOrdinals();
 
-        RemovedOrdinalIterator iter = new RemovedOrdinalIterator(populatedOrdinals, previousOrdinals);
+        RemovedOrdinalIterator iter = new RemovedOrdinalIterator(populatedOrdinals, previousOrdinals, reverse);
         int ordinal = iter.next();
         while(ordinal != ORDINAL_NONE) {
             writeKeyObject(typeState, ordinal, rec);

@@ -17,6 +17,58 @@ import java.io.IOException;
 import java.util.BitSet;
 import org.junit.Test;
 
+/**
+ * Ordinal maps
+ *
+ * 
+ * V0
+ *
+ * 0: 3, 13
+ * 1: 4, 44
+ * 2: 15, 150
+ * 3: 16, 160
+ *
+ *
+ * V1
+ *
+ * 4: 1, 1
+ * 5: 2, 2
+ * 6: 3, 3
+ * 7: 4, 4
+ * 8: 5, 5
+ * 9: 6, 6
+ *
+ *
+ * V2
+ *
+ * 0: 2, 7
+ * 1: 5, 8
+ * 2: 7, 9
+ * 3: 8, 10
+ * 6: 3, 3
+ * 9: 6, 6
+ *
+ *
+ * V3
+ *
+ * 0: 2, 7
+ * 3: 8, 10
+ * 4: 1, 1
+ * 5: 3, 11
+ * 7: 6, 12
+ * 8: 7, 13
+ *
+ *
+ * V4
+ * 0: 2, 7
+ * 1: 1, 18
+ * 2: 3, 19
+ * 3: 8, 10
+ * 6: 15, 13
+ * 7: 6, 12
+ * 9: 18, 10
+ * 10: 28, 90
+ */
 public class HistoryUIV2Test {
 
     private final int MAX_STATES = 10;
@@ -51,6 +103,23 @@ public class HistoryUIV2Test {
 
             //attach schema to write state engine
             stateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
+
+            // v0
+            stateEngine.addHeaderTag("snapversion", "v0");
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 13 });
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 4, 44 });
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 15, 150 });
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 16, 160 });
+
+            stateEngine.prepareForWrite();
+            ByteArrayOutputStream baos_v0 = new ByteArrayOutputStream();
+            HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
+            //write snapshot to output stream
+            writer.writeSnapshot(baos_v0);
+
+            stateEngine.prepareForNextCycle();
+
+            // v1
             stateEngine.addHeaderTag("snapversion", "v1");
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 1 });
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 2 });
@@ -61,16 +130,19 @@ public class HistoryUIV2Test {
 
             //add rec to write phase
             stateEngine.prepareForWrite();
+            ByteArrayOutputStream baos_v0_to_v1 = new ByteArrayOutputStream();
+            ByteArrayOutputStream baos_v1_to_v0 = new ByteArrayOutputStream();
             ByteArrayOutputStream baos_v1 = new ByteArrayOutputStream();
-            HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
-            //write snapshot to output stream
+            writer = new HollowBlobWriter(stateEngine);
+            //write blobs to output stream
             writer.writeSnapshot(baos_v1);
+            writer.writeDelta(baos_v0_to_v1);
+            writer.writeReverseDelta(baos_v1_to_v0);
 
             stateEngine.prepareForNextCycle();
 
-            //2) add new set of records
+            // v2
             stateEngine.addHeaderTag("snapversion", "v2");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 1 });
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 3 });
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 5, 8 });
@@ -92,6 +164,8 @@ public class HistoryUIV2Test {
             writer.writeReverseDelta(baos_v2_to_v1);
 
             stateEngine.prepareForNextCycle();
+
+            // v3
             stateEngine.addHeaderTag("snapversion", "v3");
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 1 });
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });
@@ -110,7 +184,7 @@ public class HistoryUIV2Test {
             writer.writeDelta(baos_v2_to_v3);
             writer.writeReverseDelta(baos_v3_to_v2);
 
-            //v4
+            // v4
             stateEngine.prepareForNextCycle();
             stateEngine.addHeaderTag("snapversion", "v4");
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 18 });  // 0
@@ -176,6 +250,15 @@ public class HistoryUIV2Test {
             } catch (IllegalStateException e) {
                 throw e;
             }
+            exploreOrdinals(fwdReadStateEngine);
+
+            revReader.applyDelta(HollowBlobInput.serial(baos_v1_to_v0.toByteArray()));
+            exploreOrdinals(revReadStateEngine);
+            try {
+                history.reverseDeltaOccurred(0L);
+            } catch (IllegalStateException e) {
+                throw e;
+            }
         }
 
         return history;
@@ -219,8 +302,24 @@ public class HistoryUIV2Test {
 
             //attach schema to write state engine
             stateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
-            stateEngine.addHeaderTag("snapversion", "v1");
 
+            // v0
+            stateEngine.addHeaderTag("snapversion", "v0");
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 13 });
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 4, 44 });
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 15, 150 });
+            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 16, 160 });
+
+            stateEngine.prepareForWrite();
+            ByteArrayOutputStream baos_v0 = new ByteArrayOutputStream();
+            HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
+            //write snapshot to output stream
+            writer.writeSnapshot(baos_v0);
+
+            stateEngine.prepareForNextCycle();
+
+            // v1
+            stateEngine.addHeaderTag("snapversion", "v1");
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 1 });
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 2 });
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 3 });
@@ -230,16 +329,19 @@ public class HistoryUIV2Test {
 
             //add rec to write phase
             stateEngine.prepareForWrite();
+            ByteArrayOutputStream baos_v0_to_v1 = new ByteArrayOutputStream();
+            ByteArrayOutputStream baos_v1_to_v0 = new ByteArrayOutputStream();
             ByteArrayOutputStream baos_v1 = new ByteArrayOutputStream();
-            HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
-            //write snapshot to output stream
+            writer = new HollowBlobWriter(stateEngine);
+            //write blobs to output stream
             writer.writeSnapshot(baos_v1);
+            writer.writeDelta(baos_v0_to_v1);
+            writer.writeReverseDelta(baos_v1_to_v0);
 
             stateEngine.prepareForNextCycle();
 
             //2) add new set of records
             stateEngine.addHeaderTag("snapversion", "v2");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 1 });
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 3 });
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 5, 8 });
@@ -313,10 +415,12 @@ public class HistoryUIV2Test {
             readStateEngine = new HollowReadStateEngine();
             reader = new HollowBlobReader(readStateEngine);
             //load snapshot from output stream to read state engine
-            reader.readSnapshot(HollowBlobInput.serial(baos_v1.toByteArray()));
+            reader.readSnapshot(HollowBlobInput.serial(baos_v0.toByteArray()));
             //>>>do not init history with the snapshot
-            history = new HollowHistory(readStateEngine, 1L, MAX_STATES);
+            history = new HollowHistory(readStateEngine, 0L, MAX_STATES);
             history.getKeyIndex().addTypeIndex("TypeA", "a1");
+            reader.applyDelta(HollowBlobInput.serial(baos_v0_to_v1.toByteArray()));
+            history.deltaOccurred(1L);
             reader.applyDelta(HollowBlobInput.serial(baos_v1_to_v2.toByteArray()));
             history.deltaOccurred(2L);
             reader.applyDelta(HollowBlobInput.serial(baos_v2_to_v3.toByteArray()));

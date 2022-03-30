@@ -259,7 +259,7 @@ public class HollowHistory {
         // instance i.e. all keys seen in initial load/double-snapshot or added/removed in deltas/reversedeltas are added to
         // this index monolithic index. Don't worry, it doesnt store a copy of the actual data, just the primary key values
         // for each type that has a primary key defined.
-        keyIndex.update(latestHollowReadStateEngine, true);
+        keyIndex.update(latestHollowReadStateEngine, true, false);
 
         // A {@code HollowHistoricalStateDataAccess} is used to save data that won't exist in future states so it needs to
         // be stashed away somewhere for making it accessible in the history view. It achieves this by copying over
@@ -277,7 +277,7 @@ public class HollowHistory {
         //   (which in the fwd delta sense is actually records that were removed in going from v1 to v2), then copies over data
         //   from v1 read state corresponding to these added ordinals.
         //
-            // SNAP: TODO: remove the "remove" logic when querying
+            // SNAP: TODO: remove the "reverse" logic when querying
         // For parity in UI, we want to display to user the same "directionality" in the diff irrespective of whether History
         // was building using fwd or reverse deltas. So although the construction of a HollowHistoricalState using fwd/reverse
         // deltas is different, the significance of added vs removed is the same when it is queried by the user.
@@ -309,10 +309,11 @@ public class HollowHistory {
 
         // indexes all records ever seen by primary key (as defined in data model or added using custom config).
         // It maintains an ever-growing state engine and  when a delta update occurs we add any newly introduced records to keyIndex
-        keyIndex.update(oldestHollowReadStateEngine, true); // SNAP: see how this responds
+        keyIndex.update(oldestHollowReadStateEngine, true, false);
 
-        // SNAP: create historical data access with records that were added going from v2->v1 (in effect, removed going from v1->v2)
-        HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, oldestHollowReadStateEngine, true);
+        // SNAP: create historical data access corresponding to newVersion with records that were removed when going in the fwd direction v1->v2
+        // (but since we're building in reverse here that corresponds to records that were added when going in the reverse direction v2->v1)
+        HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(oldestVersion, oldestHollowReadStateEngine, true);
         // historicalDataAccess.setNextState(oldestHollowReadStateEngine);  // SNAP: TODO: needed? its already being set in addHistoricalState
 
         /**
@@ -325,7 +326,7 @@ public class HollowHistory {
          * ordinals is flipped (but only when querying) depending on delta directionality. For computing purposes they are
          * identical.
          */
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(oldestHollowReadStateEngine, false);  // SNAP: always false here?
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(oldestHollowReadStateEngine, true);  // SNAP: always false here? This is for switchin on query only
         // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity with
         // reporting history using fwd deltas
         HollowHistoricalState historicalState = new HollowHistoricalState(oldestVersion, keyOrdinalMapping, historicalDataAccess, oldestHeaderEntries);
@@ -349,9 +350,9 @@ public class HollowHistory {
      */
     public void doubleSnapshotOccurred(HollowReadStateEngine newHollowStateEngine, long newVersion) {
         if(!keyIndex.isInitialized())
-            keyIndex.update(latestHollowReadStateEngine, false);
+            keyIndex.update(latestHollowReadStateEngine, false, false);
 
-        keyIndex.update(newHollowStateEngine, false);
+        keyIndex.update(newHollowStateEngine, false, false);
 
         HollowHistoricalStateDataAccess historicalDataAccess;
 
@@ -417,7 +418,7 @@ public class HollowHistory {
     }
 
     private HollowHistoricalStateKeyOrdinalMapping createKeyOrdinalMappingFromDelta(HollowReadStateEngine readStateEngine, boolean typeMappingsReverse) {
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = new HollowHistoricalStateKeyOrdinalMapping(keyIndex, typeMappingsReverse);
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = new HollowHistoricalStateKeyOrdinalMapping(keyIndex, false); // SNAP: always false, this controls the query only
 
         for(String keyType : keyIndex.getTypeKeyIndexes().keySet()) {
             HollowHistoricalStateTypeKeyOrdinalMapping typeMapping = keyOrdinalMapping.getTypeMapping(keyType);
@@ -435,8 +436,14 @@ public class HollowHistory {
             RemovedOrdinalIterator removalIterator;
             RemovedOrdinalIterator additionsIterator;
 
-            removalIterator = new RemovedOrdinalIterator(listener);
-            additionsIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
+            if (typeMappingsReverse) {
+                removalIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
+                additionsIterator = new RemovedOrdinalIterator(listener);
+
+            } else {
+                removalIterator = new RemovedOrdinalIterator(listener);
+                additionsIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
+            }
 
             typeMapping.prepare(additionsIterator.countTotal(), removalIterator.countTotal());
 

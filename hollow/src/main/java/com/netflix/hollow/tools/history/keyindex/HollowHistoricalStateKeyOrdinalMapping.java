@@ -30,7 +30,7 @@ public class HollowHistoricalStateKeyOrdinalMapping {
     }
 
     public HollowHistoricalStateKeyOrdinalMapping(HollowHistoryKeyIndex keyIndex, boolean typeMappingsReverse) {
-        this.typeMappings = new HashMap<String, HollowHistoricalStateTypeKeyOrdinalMapping>();
+        this.typeMappings = new HashMap<>();
         this.typeMappingsReverse = typeMappingsReverse;
 
         for(Map.Entry<String, HollowHistoryTypeKeyIndex> entry : keyIndex.getTypeKeyIndexes().entrySet()) {
