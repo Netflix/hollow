@@ -66,6 +66,7 @@ public class HollowHistory {
     }
 
     private Map<String, String> latestHeaderEntries;
+    private Map<String, String> oldestHeaderEntries;
 
     /**
      * A list of historical states in decreasing order of version i.e. index 0 holds the highest version
@@ -138,6 +139,7 @@ public class HollowHistory {
 
         if (oldestHollowReadStateEngine != null) {
             // SNAP: TODO: Assert that the two read state engines are "equal"
+            oldestHeaderEntries = oldestHollowReadStateEngine.getHeaderTags();
         }
 
         if (isAutoDiscoverTypeIndex) {
@@ -177,6 +179,7 @@ public class HollowHistory {
 
         this.oldestHollowReadStateEngine = revReadStateEngine;
         this.oldestVersion = version;   // NOP
+        this.oldestHeaderEntries = oldestHollowReadStateEngine.getHeaderTags();
         buildUsingRevDeltaSupported = true;
     }
 
@@ -282,7 +285,7 @@ public class HollowHistory {
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine); // SNAP: TODO: needed? its already being set in addHistoricalState
 
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(false);
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(latestHollowReadStateEngine, false);
         HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
 
         addHistoricalState(historicalState);
@@ -309,7 +312,7 @@ public class HollowHistory {
         keyIndex.update(oldestHollowReadStateEngine, true); // SNAP: see how this responds
 
         // SNAP: create historical data access with records that were added going from v2->v1 (in effect, removed going from v1->v2)
-        HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine, true);
+        HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, oldestHollowReadStateEngine, true);
         // historicalDataAccess.setNextState(oldestHollowReadStateEngine);  // SNAP: TODO: needed? its already being set in addHistoricalState
 
         /**
@@ -322,15 +325,15 @@ public class HollowHistory {
          * ordinals is flipped (but only when querying) depending on delta directionality. For computing purposes they are
          * identical.
          */
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(false);  // SNAP: always false here?
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(oldestHollowReadStateEngine, false);  // SNAP: always false here?
         // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity with
         // reporting history using fwd deltas
-        HollowHistoricalState historicalState = new HollowHistoricalState(latestVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
+        HollowHistoricalState historicalState = new HollowHistoricalState(oldestVersion, keyOrdinalMapping, historicalDataAccess, oldestHeaderEntries);
         addReverseHistoricalState(historicalState);
 
-        this.latestVersion = newVersion;
-        log.info("Reverse delta to latestVersion :" + this.latestVersion);
-        this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
+        this.oldestVersion = newVersion;
+        log.info("Reverse delta to oldestVersion :" + this.oldestVersion);
+        this.oldestHeaderEntries = oldestHollowReadStateEngine.getHeaderTags();
     }
 
     /**
@@ -413,12 +416,12 @@ public class HollowHistory {
         }
     }
 
-    private HollowHistoricalStateKeyOrdinalMapping createKeyOrdinalMappingFromDelta(boolean typeMappingsReverse) {
+    private HollowHistoricalStateKeyOrdinalMapping createKeyOrdinalMappingFromDelta(HollowReadStateEngine readStateEngine, boolean typeMappingsReverse) {
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = new HollowHistoricalStateKeyOrdinalMapping(keyIndex, typeMappingsReverse);
 
         for(String keyType : keyIndex.getTypeKeyIndexes().keySet()) {
             HollowHistoricalStateTypeKeyOrdinalMapping typeMapping = keyOrdinalMapping.getTypeMapping(keyType);
-            HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestHollowReadStateEngine.getTypeState(keyType);
+            HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(keyType);
             if (typeState==null) {
                 // The type is present in the history's primary key index but is not present
                 // in the latest read state; ensure the mapping is initialized to the default state

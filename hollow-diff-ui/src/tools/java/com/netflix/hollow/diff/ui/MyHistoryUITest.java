@@ -496,7 +496,7 @@ public class MyHistoryUITest {
             //stitch history with double snap
             //history.doubleSnapshotOccurred(readStateEngine, 20021231235959999L);
             //>>>do not init history with the snapshot
-            history = new HollowHistory(readStateEngine, 0, 10, true, true);
+            history = new HollowHistory(readStateEngine, 0L, 10, true);
             history.getKeyIndex().addTypeIndex("TypeA", "a1");
             System.out.println("RDelta version 0");
             exploreOrdinals(readStateEngine);

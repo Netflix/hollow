@@ -45,10 +45,6 @@ public class HollowObjectDeltaHistoricalStateCreator {
     private int nextOrdinal;
     private final long currentWriteVarLengthDataPointers[];
 
-    public HollowObjectDeltaHistoricalStateCreator(HollowObjectTypeReadState typeState) {
-        this(typeState, false);
-    }
-
     public HollowObjectDeltaHistoricalStateCreator(HollowObjectTypeReadState typeState, boolean reverse) {
         this.typeState = typeState;
         this.stateEngineDataElements = typeState.currentDataElements();

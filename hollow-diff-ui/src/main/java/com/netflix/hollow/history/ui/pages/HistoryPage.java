@@ -66,7 +66,7 @@ public abstract class HistoryPage {
 
     protected abstract void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx);
 
-    protected List<HollowHeaderEntry> getHeaderEntries(HollowHistoricalState state, boolean isReverse) {
+    protected List<HollowHeaderEntry> getHeaderEntries(HollowHistoricalState state, boolean isReverse) {    // SNAP: remove reverse stuff
         Map<String, String> fromTags;
         Map<String, String> toTags;
         if (!isReverse) {

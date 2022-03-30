@@ -32,17 +32,27 @@ public class RemovedOrdinalIterator {
     private int ordinal = ORDINAL_NONE;
 
     public RemovedOrdinalIterator(PopulatedOrdinalListener listener) {
-        this(listener.getPreviousOrdinals(), listener.getPopulatedOrdinals());
+        this(listener, false);
     }
 
     public RemovedOrdinalIterator(PopulatedOrdinalListener listener, boolean reverse) {
-        this(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
+        this(listener.getPreviousOrdinals(), listener.getPopulatedOrdinals(), reverse);
     }
 
     public RemovedOrdinalIterator(BitSet previousOrdinals, BitSet populatedOrdinals) {
-        this.previousOrdinals = previousOrdinals;
-        this.populatedOrdinals = populatedOrdinals;
-        this.previousOrdinalsLength = previousOrdinals.length();
+        this(previousOrdinals, populatedOrdinals, false);
+    }
+
+    public RemovedOrdinalIterator(BitSet previousOrdinals, BitSet populatedOrdinals, boolean reverse) {
+        if (!reverse) {
+            this.previousOrdinals = previousOrdinals;
+            this.populatedOrdinals = populatedOrdinals;
+            this.previousOrdinalsLength = previousOrdinals.length();
+        } else {
+            this.previousOrdinals = populatedOrdinals;
+            this.populatedOrdinals = previousOrdinals;
+            this.previousOrdinalsLength = populatedOrdinals.length();
+        }
     }
 
     public int next() {
