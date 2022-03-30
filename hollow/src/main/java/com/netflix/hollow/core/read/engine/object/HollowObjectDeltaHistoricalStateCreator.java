@@ -46,10 +46,14 @@ public class HollowObjectDeltaHistoricalStateCreator {
     private final long currentWriteVarLengthDataPointers[];
 
     public HollowObjectDeltaHistoricalStateCreator(HollowObjectTypeReadState typeState) {
+        this(typeState, false);
+    }
+
+    public HollowObjectDeltaHistoricalStateCreator(HollowObjectTypeReadState typeState, boolean reverse) {
         this.typeState = typeState;
         this.stateEngineDataElements = typeState.currentDataElements();
         this.historicalDataElements = new HollowObjectTypeDataElements(typeState.getSchema(), WastefulRecycler.DEFAULT_INSTANCE);
-        this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class));
+        this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class), reverse);
         this.currentWriteVarLengthDataPointers = new long[typeState.getSchema().numFields()];
         this.shardNumberMask = stateEngineDataElements.length - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(stateEngineDataElements.length);

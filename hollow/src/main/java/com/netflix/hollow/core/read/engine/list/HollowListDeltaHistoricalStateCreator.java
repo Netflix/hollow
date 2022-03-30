@@ -44,11 +44,11 @@ public class HollowListDeltaHistoricalStateCreator {
     private int nextOrdinal = 0;
     private long nextStartElement = 0;
 
-    public HollowListDeltaHistoricalStateCreator(HollowListTypeReadState typeState) {
+    public HollowListDeltaHistoricalStateCreator(HollowListTypeReadState typeState, boolean reverse) {
         this.typeState = typeState;
         this.stateEngineDataElements = typeState.currentDataElements();
         this.historicalDataElements = new HollowListTypeDataElements(WastefulRecycler.DEFAULT_INSTANCE);
-        this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class));
+        this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class), reverse);
         this.shardNumberMask = stateEngineDataElements.length - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(stateEngineDataElements.length);
     }

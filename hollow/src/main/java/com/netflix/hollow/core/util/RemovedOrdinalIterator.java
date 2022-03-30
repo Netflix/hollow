@@ -35,6 +35,10 @@ public class RemovedOrdinalIterator {
         this(listener.getPreviousOrdinals(), listener.getPopulatedOrdinals());
     }
 
+    public RemovedOrdinalIterator(PopulatedOrdinalListener listener, boolean reverse) {
+        this(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
+    }
+
     public RemovedOrdinalIterator(BitSet previousOrdinals, BitSet populatedOrdinals) {
         this.previousOrdinals = previousOrdinals;
         this.populatedOrdinals = populatedOrdinals;

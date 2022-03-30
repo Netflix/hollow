@@ -32,7 +32,7 @@ public class HistoryUITest {
         HollowHistoryUIServer serverD = new HollowHistoryUIServer(historyD, 7777);
         serverD.start();
 
-        HollowHistory historyR = createHistoryBiDirectional();
+        HollowHistory historyR = createHistoryReverse();
         HollowHistoryUIServer serverR = new HollowHistoryUIServer(historyR, 7778);
         serverR.start();
 
@@ -171,7 +171,7 @@ public class HistoryUITest {
     }
 
 
-    private HollowHistory createHistoryBiDirectional() throws IOException {
+    private HollowHistory createHistoryReverse() throws IOException {
         ByteArrayOutputStream baos_v2_to_v1, baos_v3_to_v2;
         HollowHistory history;
         HollowReadStateEngine readStateEngine;
