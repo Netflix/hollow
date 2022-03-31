@@ -301,10 +301,15 @@ public class HollowHistory {
      * @param newVersion The version of the new state
      */
     public void reverseDeltaOccurred(long newVersion) {
+        if (oldestHollowReadStateEngine == null) {
+            throw new IllegalStateException("Read state engine for reverse direction history computation isn't initialized. " +
+                    "This could occur if the required hollow history init sequence isn't followed, or if oldestHollowReadStateEngine " +
+                    "was discarded after history was initialized to max old versions");
+        }
         if(historicalStates.size() >= maxHistoricalStatesToKeep) {
-            throw new IllegalStateException("No. of history states reached max states capacity. HollowHistory will not " +
-                    "compute history for this state and recommends that consumer not transition to newVersion for " +
-                    "or other older versions or else the history might contain distant versions");
+            throw new IllegalStateException("No. of history states reached max states capacity. HollowHistory does not " +
+                    "support reaching this state when building history in reverse because older states would need to be " +
+                    "evicted and history past here wouldn't be of contiguous versions");
         }
 
         // indexes all records ever seen by primary key (as defined in data model or added using custom config).
@@ -545,6 +550,12 @@ public class HollowHistory {
 
         historicalStates.add(historicalState);
         historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
+
+        // SNAP: TODO: check max states
+        if (historicalStates.size() >= maxHistoricalStatesToKeep - 1) {
+            // drop old read state because we wont be traversing in reverse any more
+            oldestHollowReadStateEngine = null;
+        }
     }
 
     /**
@@ -566,6 +577,9 @@ public class HollowHistory {
                     "Number of states to remove, %d, is greater than the number of states. %d",
                     n, historicalStates.size()));
         }
+
+        // drop oldest HollowReadStateEngine
+        oldestHollowReadStateEngine = null;
 
         while (n-- > 0) {
             HollowHistoricalState removedState;

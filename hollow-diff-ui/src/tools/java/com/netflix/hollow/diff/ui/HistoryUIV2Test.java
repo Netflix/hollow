@@ -20,7 +20,7 @@ import org.junit.Test;
 /**
  * Ordinal maps
  *
- * 
+ *
  * V0
  *
  * 0: 3, 13
@@ -84,6 +84,8 @@ public class HistoryUIV2Test {
         HollowHistory historyR = createHistoryBidirectional();
         HollowHistoryUIServer serverR = new HollowHistoryUIServer(historyR, 7778);
         serverR.start();
+
+        historyR.removeHistoricalStates(1);
 
         serverD.join();
         serverR.join();
