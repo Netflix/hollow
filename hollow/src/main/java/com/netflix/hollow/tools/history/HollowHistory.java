@@ -16,8 +16,6 @@
  */
 package com.netflix.hollow.tools.history;
 
-import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
-
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -33,7 +31,6 @@ import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateKeyOrdinalMapping;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -61,9 +58,6 @@ public class HollowHistory {
     private final HollowHistoryKeyIndex keyIndex;
     private final HollowHistoricalStateCreator creator;
     private final int maxHistoricalStatesToKeep;
-    public boolean getReverse() {   // SNAP: always false
-        return false;
-    }
 
     private Map<String, String> latestHeaderEntries;
 
@@ -78,14 +72,16 @@ public class HollowHistory {
     // A map of version to HollowHistoricalState for quick retrieval
     private final Map<Long, HollowHistoricalState> historicalStateLookupMap;
 
-    // StateEngines and versions corresponding to the latest and oldest read states.
-    // When traversing deltas from v1 to v2 this is the state corresponding to v2, and when traversing reverse
-    // delta from v2 to v1 this is the state corresponding to v1.
+    // StateEngines and versions corresponding to the latest and oldest read states. Two are required when building
+    // history in fwd and rev directions simultaneously, then once there is sufficient history built
+    // oldestHollowReadStateEngine can be dropped.
+    // For history v1->v2->v3,
+    //  latestHollowReadStateEngine will be at v3, and
+    //  oldestHollowReadStateEngine will be at v0 (since the v1 historical state represents the v0->v1 diff)
     private HollowReadStateEngine latestHollowReadStateEngine;
     private HollowReadStateEngine oldestHollowReadStateEngine;
-    private long latestVersion = VERSION_NONE;
-    private long oldestVersion = VERSION_NONE;
-    private boolean buildUsingRevDeltaSupported = true;
+    private long latestVersion;
+    private long oldestVersion;
 
     private boolean ignoreListOrderingOnDoubleSnapshot = false;
 
@@ -109,6 +105,10 @@ public class HollowHistory {
     }
 
     /**
+     * When building history bi-directionally, 2 state engines moving in opposite directions need to be maintained. They
+     * must be at the same version, or {@code revMovingHollowReadStateEngine} can be null now but later initialized with
+     * a snapshot for the same version as {@code fwdMovingHollowReadStateEngine} passed here before any reverse deltas are applied.
+     *
      * @param fwdMovingHollowReadStateEngine The HollowReadStateEngine that will incur application of fwd deltas
      * @param revMovingHollowReadStateEngine The HollowReadStateEngine that will incur application of reverse deltas
      * @param initialVersion The initial version of the HollowReadStateEngine
@@ -120,6 +120,17 @@ public class HollowHistory {
         this(fwdMovingHollowReadStateEngine, revMovingHollowReadStateEngine, initialVersion, maxHistoricalStatesToKeep, true);
     }
 
+    /**
+     * When building history bi-directionally, 2 state engines moving in opposite directions need to be maintained. They
+     * must be at the same version, or {@code revMovingHollowReadStateEngine} can be null now but later initialized with
+     * a snapshot for the same version as {@code fwdMovingHollowReadStateEngine} passed here before any reverse deltas are applied.
+     *
+     * @param fwdMovingHollowReadStateEngine The HollowReadStateEngine that will incur application of fwd deltas
+     * @param revMovingHollowReadStateEngine The HollowReadStateEngine that will incur application of reverse deltas
+     * @param initialVersion The initial version of the HollowReadStateEngine
+     * @param maxHistoricalStatesToKeep The number of historical states to keep in memory
+     * @param isAutoDiscoverTypeIndex true if scheme types are auto-discovered from the initiate state engine
+     */
     public HollowHistory(HollowReadStateEngine fwdMovingHollowReadStateEngine,
                          HollowReadStateEngine revMovingHollowReadStateEngine,
                          long initialVersion, int maxHistoricalStatesToKeep, boolean isAutoDiscoverTypeIndex) {
@@ -151,33 +162,25 @@ public class HollowHistory {
                 }
             }
         }
-
-        if (revMovingHollowReadStateEngine == null) {
-            buildUsingRevDeltaSupported = false;
-        }
     }
 
     public void initializeReverseStateEngine(HollowReadStateEngine revReadStateEngine, long version) {
         // initialize rev direction read state engine
         if (latestHollowReadStateEngine == null) {
-            // so that history key index can track unchanged records in latestReadStateEngine (the one that wont be dropped
-            // once max history has been built)
+            // so that history key index is initialized to latestReadStateEngine    // SNAP: is this necessary?
+            // (the one that won't be dropped once max history has been built)
             throw new IllegalStateException("Initialize fwd direction read state engine before initializing rev direction read state engine");
         }
-
         if (oldestHollowReadStateEngine != null) {
-            throw new UnsupportedOperationException("Both (fwd and rev) read state engines have been initialized, further " +
-                    "snapshot updates are not supported");
+            throw new IllegalStateException("oldestHollowReadStateEngine has already been initialized");
         }
-
         if (version != oldestVersion) {
-            throw new IllegalStateException("Reverse state engine version and oldest fwd state engine version should " +
-                    "be equal for a contiguous bidirectional history to be built");
+            throw new IllegalStateException("Reverse state engine version should correspond to the version that fwd state engine" +
+                    "initialized to for a contiguous history chain");
         }
 
         this.oldestHollowReadStateEngine = revReadStateEngine;
         this.oldestVersion = version;   // NOP
-        buildUsingRevDeltaSupported = true;
     }
 
     /**
@@ -248,39 +251,37 @@ public class HollowHistory {
      * @param newVersion The version of the new state
      */
     public void deltaOccurred(long newVersion) {
-        // At this point the delta update has been already applied to latestHollowReadStateEngine, but {@code latestVersion}
-        // is still the version from before the delta transition. {@code latestVersion} gets updated in this method.
+        // When invoked in a listener the delta update has been already applied to latestHollowReadStateEngine, but
+        // {@code latestVersion} is still the version from before the delta transition. {@code latestVersion} is
+        // updated in this method.
 
-        // This updates the state stored in keyIndex (in its member readStateEngine) with the passed read state engine.
-        // The {@code readStateEngine} in keyIndex stores an ever growing record of all keys ever seen by this HollowHistory
-        // instance i.e. all keys seen in initial load/double-snapshot or added/removed in deltas/reversedeltas are added to
-        // this index monolithic index. Don't worry, it doesnt store a copy of the actual data, just the primary key values
-        // for each type that has a primary key defined.
-        keyIndex.update(latestHollowReadStateEngine, true, false);
+        // Update the state stored in keyIndex (in its member readStateEngine) with the passed read state engine.
+        // The readStateEngine within keyIndex stores an ever-growing state of all keys ever seen by this HollowHistory
+        // instance i.e. all keys seen in initial load or a successive double-snapshot and all keys added/removed in
+        // deltas and reversedeltas. It doesn't store a copy of the keyed records, instead just the primary key values
+        // for each type that has a primary key defined (in schema or custom via history helpers).
+        keyIndex.update(latestHollowReadStateEngine, true);
 
-        // A {@code HollowHistoricalStateDataAccess} is used to save data that won't exist in future states so it needs to
-        // be stashed away somewhere for making it accessible in the history view. It achieves this by copying over
-        // data corresponding to ghost records in the latest state (i.e. ordinals were previously populated but are not
-        // populated in the latest state) into a new state engine where it assigns new ordinals (0, 1, 2, etc.) to each
-        // removed record. This mapping of original ordinal in the read state to its new ordinal position in the historical
-        // state data access for all removed records in each type is stored in the member {@code typeRemovedOrdinalMapping}.
+        // A HollowHistoricalStateDataAccess is used to save data that won't exist in future states so it needs to
+        // be stashed away for making those records accessible in the history view. It achieves this by copying over
+        // data corresponding to ghost records in the "to" state in any state transition (i.e. records corresponding to
+        // ordinals were populated in the "from" state but are not populated in the "to" state) into a new state engine
+        // where it assigns new ordinals serially(0, 1, 2, etc.) to each such record. A mapping of original ordinal
+        // in the read state to its new ordinal position in the historical state data access for all such records in
+        // each type is stored in the member typeRemovedOrdinalMapping.
         //
-        // The behavior for building history using reverse deltas is logically reverse that with fwd deltas, in that it needs to
-        // track data corresponding to ordinals added in reverse delta transition instead of removed in the delta direction, because
-        // that is the data which will not be present in the latestReadStateEngine (and oldestReadStateEngine will be dropped). So,
-        //   When building history using fwd deltas for e.g. v1->v2 it looks up ordinals removed in v2, then copies over
-        //   data corresponding to the removed ordinal from v2's read state into an internal read state under ordinals 0,1,2,etc.
-        //   When building history using rev delta for e.g. v2->v1: it looks up ordinals added in going from v2 to v1
-        //   (which in the fwd delta sense is actually records that were removed in going from v1 to v2), then copies over data
-        //   from v1 read state corresponding to these added ordinals.
-        //
-            // SNAP: TODO: remove the "reverse" logic when querying
-        // For parity in UI, we want to display to user the same "directionality" in the diff irrespective of whether History
-        // was building using fwd or reverse deltas. So although the construction of a HollowHistoricalState using fwd/reverse
-        // deltas is different, the significance of added vs removed is the same when it is queried by the user.
+        // The behavior for building history using reverse deltas is logically flipped i.e. it needs to track data
+        // corresponding to ordinals that were added in reverse delta transition instead of removed in the delta direction,
+        // because those will not be present in the latestReadStateEngine (oldestReadStateEngine is discarded eventually). So,
+        // When building history using fwd deltas for e.g. v1->v2
+        //  look up ordinals removed in v2, copy over data at those ordinals from v2's read state into a new data access
+        //  under ordinals 0,1,2,etc. - this comprises the historical state corresponding to v2
+        // When building history using rev delta for e.g. v2->v1:
+        //  look up ordinals added in v1, copy over data at those ordinals from v1 read state a new data access under
+        //  ordinals 0,1,2,etc. - this comprises the historical state corresponding to v2
         //
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
-        historicalDataAccess.setNextState(latestHollowReadStateEngine); // SNAP: TODO: needed? its already being set in addHistoricalState
+        historicalDataAccess.setNextState(latestHollowReadStateEngine);
 
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(latestHollowReadStateEngine, false);
         HollowHistoricalState historicalState = new HollowHistoricalState(newVersion, keyOrdinalMapping, historicalDataAccess, latestHeaderEntries);
@@ -300,21 +301,21 @@ public class HollowHistory {
     public void reverseDeltaOccurred(long newVersion) {
         if (oldestHollowReadStateEngine == null) {
             throw new IllegalStateException("Read state engine for reverse direction history computation isn't initialized. " +
-                    "This could occur if the required hollow history init sequence isn't followed, or if oldestHollowReadStateEngine " +
+                    "This can occur if the required hollow history init sequence isn't followed or if oldestHollowReadStateEngine " +
                     "was discarded after history was initialized to max old versions");
         }
         if(historicalStates.size() >= maxHistoricalStatesToKeep) {
             throw new IllegalStateException("No. of history states reached max states capacity. HollowHistory does not " +
-                    "support reaching this state when building history in reverse because older states would need to be " +
-                    "evicted and history past here wouldn't be of contiguous versions");
+                    "support reaching this state when building history in reverse because older states would be evicted " +
+                    "and history past here wouldn't be of contiguous versions");
         }
 
-        // indexes all records ever seen by primary key (as defined in data model or added using custom config).
-        // It maintains an ever-growing state engine and  when a delta update occurs we add any newly introduced records to keyIndex
-        keyIndex.update(oldestHollowReadStateEngine, true, false);
+        // keyIndex is an ever-growing stat that maintains all primary key values ever seen, and when a reverse delta
+        // update occurs we add any newly seen keys to it
+        keyIndex.update(oldestHollowReadStateEngine, true);
 
-        // SNAP: create historical data access corresponding to newVersion with records that were removed when going in the fwd direction v1->v2
-        // (but since we're building in reverse here that corresponds to records that were added when going in the reverse direction v2->v1)
+        // Apllying reverse delta from v2->v1 builds a historical data access state for v2,
+        // SNAP: TODO: and logic for adds/removes flip
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(oldestVersion, oldestHollowReadStateEngine, true);
         // historicalDataAccess.setNextState(oldestHollowReadStateEngine);  // SNAP: TODO: needed? its already being set in addHistoricalState
 
@@ -324,9 +325,7 @@ public class HollowHistory {
          * This mapping is done for each type under each historical state. It is used to power the UI view where given a
          * historic version it lists all keys that were added/removed/modified in that version, and can then retrieve the
          * data for those keys.
-         * There is a difference in how fwd and reverse deltas are handled here in that the significance of added vs removed
-         * ordinals is flipped (but only when querying) depending on delta directionality. For computing purposes they are
-         * identical.
+         * Depending on directionalily (delta or reverse delta) the additions/removal tracking is flipped.
          */
         HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(oldestHollowReadStateEngine, true);
         // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity with
@@ -340,7 +339,7 @@ public class HollowHistory {
     }
 
     /**
-     * Call this method after each time a double snapshot occurs.
+     * Call this method after each time a double snapshot occurs that advances the latest version.
      * <p>
      * This method will replace the previous backing {@link HollowReadStateEngine} with the newly
      * supplied one, stitch together all of the existing history with the new state currently in the
@@ -351,10 +350,14 @@ public class HollowHistory {
      * @param newVersion the new version
      */
     public void doubleSnapshotOccurred(HollowReadStateEngine newHollowStateEngine, long newVersion) {
-        if(!keyIndex.isInitialized())
-            keyIndex.update(latestHollowReadStateEngine, false, false);
+        if (newVersion <= latestVersion) {
+            throw new UnsupportedOperationException("Double snapshot only supports advancing the latest version");
+        }
 
-        keyIndex.update(newHollowStateEngine, false, false);
+        if(!keyIndex.isInitialized())
+            keyIndex.update(latestHollowReadStateEngine, false);
+
+        keyIndex.update(newHollowStateEngine, false);
 
         HollowHistoricalStateDataAccess historicalDataAccess;
 

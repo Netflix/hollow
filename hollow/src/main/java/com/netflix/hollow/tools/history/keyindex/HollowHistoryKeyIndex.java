@@ -108,10 +108,6 @@ public class HollowHistoryKeyIndex {
     }
 
     public void update(HollowReadStateEngine latestStateEngine, boolean isDelta) {
-        update(latestStateEngine, isDelta, false);
-    }
-
-    public void update(HollowReadStateEngine latestStateEngine, boolean isDelta, boolean reverse) {
         boolean isInitialUpdate = !isInitialized();
 
         // For all the types in the key index make sure a {@code HollowHistoryTypeKeyIndex} index is initialized (and
@@ -121,7 +117,7 @@ public class HollowHistoryKeyIndex {
         initializeTypeIndexes(latestStateEngine);
 
         // This call updates the type key indexes of all types in this history key index.
-        updateTypeIndexes(latestStateEngine, isDelta && !isInitialUpdate, reverse);
+        updateTypeIndexes(latestStateEngine, isDelta && !isInitialUpdate);
 
         HollowReadStateEngine newIndexReadState = roundTripStateEngine(isInitialUpdate, !isDelta);
 
@@ -155,13 +151,13 @@ public class HollowHistoryKeyIndex {
         }
     }
 
-    private void updateTypeIndexes(final HollowReadStateEngine latestStateEngine, final boolean isDelta, boolean reverse) {
+    private void updateTypeIndexes(final HollowReadStateEngine latestStateEngine, final boolean isDelta) {
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "update-type-indexes");
 
         for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
             executor.execute(() -> {
                 HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestStateEngine.getTypeState(entry.getKey());
-                entry.getValue().update(typeState, isDelta, reverse);
+                entry.getValue().update(typeState, isDelta);
             });
         }
 

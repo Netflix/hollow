@@ -50,14 +50,9 @@ public class HistoryStatePage extends HistoryPage {
 
         long nextStateVersion;
         long prevStateVersion;
-        if (!ui.getHistory().getReverse()) {    // prev/next version navigation links depending on history directionality
-            nextStateVersion = getNextStateVersion(historicalState);
-            prevStateVersion = getPreviousStateVersion(historicalState);
-        } else {
-            nextStateVersion = getPreviousStateVersion(historicalState);
-            prevStateVersion = getNextStateVersion(historicalState);
-        }
-
+        nextStateVersion = getNextStateVersion(historicalState);
+        prevStateVersion = getPreviousStateVersion(historicalState);
+        
         List<HistoryStateTypeChangeSummary> typeChanges = new ArrayList<HistoryStateTypeChangeSummary>();
 
         for(Map.Entry<String, HollowHistoricalStateTypeKeyOrdinalMapping>entry : historicalState.getKeyOrdinalMapping().getTypeMappings().entrySet()) {
@@ -67,7 +62,7 @@ public class HistoryStatePage extends HistoryPage {
         }
 
         ctx.put("typeChanges", typeChanges);
-        ctx.put("headerEntries", getHeaderEntries(historicalState, ui.getHistory().getReverse()));
+        ctx.put("headerEntries", getHeaderEntries(historicalState));
         ctx.put("currentStateVersion", historicalState.getVersion());
         ctx.put("nextStateVersion", nextStateVersion);
         ctx.put("prevStateVersion", prevStateVersion);
@@ -84,7 +79,7 @@ public class HistoryStatePage extends HistoryPage {
     			typeChanges.add(typeChange);
     	}
     	
-    	List<HollowHeaderEntry> headerEntries = getHeaderEntries(historicalState, ui.getHistory().getReverse());
+    	List<HollowHeaderEntry> headerEntries = getHeaderEntries(historicalState);
     	
     	Map<String, String> params = new HashMap<String, String>();
     	for(HollowHeaderEntry headerEntry : headerEntries) {

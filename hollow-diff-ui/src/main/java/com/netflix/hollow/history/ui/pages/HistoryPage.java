@@ -66,32 +66,16 @@ public abstract class HistoryPage {
 
     protected abstract void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx);
 
-    protected List<HollowHeaderEntry> getHeaderEntries(HollowHistoricalState state, boolean isReverse) {    // SNAP: remove reverse stuff
+    protected List<HollowHeaderEntry> getHeaderEntries(HollowHistoricalState state) {
         Map<String, String> fromTags;
         Map<String, String> toTags;
-        if (!isReverse) {
-            fromTags = state.getHeaderEntries();
-            toTags = ui.getHistory().getLatestState().getHeaderTags();
-            if(state.getNextState() != null) {
-                toTags = state.getNextState().getHeaderEntries();
-            }
-        } else {
-            toTags = state.getHeaderEntries();
-            // NOTE: There is an edge case here when computing history with reverse delta that if the latest state
-            //       in HollowHistory does not correspond to state.getNextState() (which could happen when the
-            //       number of historic states reached capacity and the history update with reverse delta failed with
-            //       an exception but the consumer chose to ignore that exception and transition to old versions) then
-            //       the history row corresponding to the oldest diff will contain the diff of non-adjacent states and
-            //       as a result some ordinals referenced in that diff could be corrupt. Hence, it is recommended that
-            //       consumer fail the transition to a version if history computation for that version failed. This
-            //       edge case doesn't occur with building history using fwd deltas because
-            fromTags = ui.getHistory().getLatestState().getHeaderTags();    // SNAP: May need oldest state here if latest (newest) is different from oldest
-            if(state.getNextState() != null) {
-                fromTags = state.getNextState().getHeaderEntries();
-            }
+        fromTags = state.getHeaderEntries();
+        toTags = ui.getHistory().getLatestState().getHeaderTags();
+        if(state.getNextState() != null) {
+            toTags = state.getNextState().getHeaderEntries();
         }
 
-        Set<String> allKeys = new HashSet<String>();
+        Set<String> allKeys = new HashSet<>();
         allKeys.addAll(fromTags.keySet());
         allKeys.addAll(toTags.keySet());
 
