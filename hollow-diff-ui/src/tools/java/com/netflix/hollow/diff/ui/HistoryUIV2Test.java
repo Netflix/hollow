@@ -85,7 +85,7 @@ public class HistoryUIV2Test {
         HollowHistoryUIServer serverR = new HollowHistoryUIServer(historyR, 7778);
         serverR.start();
 
-        historyR.removeHistoricalStates(1);
+        // historyR.removeHistoricalStates(1);
 
         serverD.join();
         serverR.join();

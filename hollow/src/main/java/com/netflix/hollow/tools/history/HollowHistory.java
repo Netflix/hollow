@@ -66,7 +66,6 @@ public class HollowHistory {
     }
 
     private Map<String, String> latestHeaderEntries;
-    private Map<String, String> oldestHeaderEntries;
 
     /**
      * A list of historical states in decreasing order of version i.e. index 0 holds the highest version
@@ -139,7 +138,6 @@ public class HollowHistory {
 
         if (oldestHollowReadStateEngine != null) {
             // SNAP: TODO: Assert that the two read state engines are "equal"
-            oldestHeaderEntries = oldestHollowReadStateEngine.getHeaderTags();
         }
 
         if (isAutoDiscoverTypeIndex) {
@@ -179,7 +177,6 @@ public class HollowHistory {
 
         this.oldestHollowReadStateEngine = revReadStateEngine;
         this.oldestVersion = version;   // NOP
-        this.oldestHeaderEntries = oldestHollowReadStateEngine.getHeaderTags();
         buildUsingRevDeltaSupported = true;
     }
 
@@ -331,15 +328,15 @@ public class HollowHistory {
          * ordinals is flipped (but only when querying) depending on delta directionality. For computing purposes they are
          * identical.
          */
-        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(oldestHollowReadStateEngine, true);  // SNAP: always false here? This is for switchin on query only
+        HollowHistoricalStateKeyOrdinalMapping keyOrdinalMapping = createKeyOrdinalMappingFromDelta(oldestHollowReadStateEngine, true);
         // For reverse delta need to pass {@code latestVersion} here (the version before transition) for parity with
         // reporting history using fwd deltas
-        HollowHistoricalState historicalState = new HollowHistoricalState(oldestVersion, keyOrdinalMapping, historicalDataAccess, oldestHeaderEntries);
+        HollowHistoricalState historicalState = new HollowHistoricalState(oldestVersion, keyOrdinalMapping, historicalDataAccess,
+                oldestHollowReadStateEngine.getHeaderTags());
         addReverseHistoricalState(historicalState);
 
         this.oldestVersion = newVersion;
         log.info("Reverse delta to oldestVersion :" + this.oldestVersion);
-        this.oldestHeaderEntries = oldestHollowReadStateEngine.getHeaderTags();
     }
 
     /**
