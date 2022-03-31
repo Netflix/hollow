@@ -23,16 +23,15 @@ import com.netflix.hollow.history.ui.model.HistoryStateTypeChangeSummary;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
 import com.netflix.hollow.ui.HollowUISession;
-import org.apache.velocity.VelocityContext;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.velocity.VelocityContext;
 
 public class HistoryStatePage extends HistoryPage {
 
@@ -48,11 +47,9 @@ public class HistoryStatePage extends HistoryPage {
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(Long.parseLong(req.getParameter("version")));
 
-        long nextStateVersion;
-        long prevStateVersion;
-        nextStateVersion = getNextStateVersion(historicalState);
-        prevStateVersion = getPreviousStateVersion(historicalState);
-        
+        long nextStateVersion = getNextStateVersion(historicalState);
+        long prevStateVersion = getPreviousStateVersion(historicalState);
+
         List<HistoryStateTypeChangeSummary> typeChanges = new ArrayList<HistoryStateTypeChangeSummary>();
 
         for(Map.Entry<String, HollowHistoricalStateTypeKeyOrdinalMapping>entry : historicalState.getKeyOrdinalMapping().getTypeMappings().entrySet()) {
@@ -72,7 +69,7 @@ public class HistoryStatePage extends HistoryPage {
     	HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(Long.parseLong(req.getParameter("version")));
 
     	List<HistoryStateTypeChangeSummary> typeChanges = new ArrayList<HistoryStateTypeChangeSummary>();
-    	
+
     	for(Map.Entry<String, HollowHistoricalStateTypeKeyOrdinalMapping> entry : historicalState.getKeyOrdinalMapping().getTypeMappings().entrySet()) {
     		HistoryStateTypeChangeSummary typeChange = new HistoryStateTypeChangeSummary(historicalState.getVersion(), entry.getKey(), entry.getValue());
     		if(!typeChange.isEmpty())

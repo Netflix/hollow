@@ -99,11 +99,11 @@ public class HollowHistoryTypeKeyIndex {
         if (latestTypeState == null) return;
 
         if (isDeltaAndIndexInitialized) {
-            // For fwd delta transition: write all key objects that were added when going from v1 -> v2 to the history type key index
+            // record all newly seen keys when going from v1->v2 or v2->v1 to the history type key index
             populateNewCurrentRecordKeysIntoIndex(latestTypeState);
         }
         else {
-            // when index is not yet initialized with data (usually on first fwd delta transition) or on  double snapshot
+            // usually on the first fwd delta transition, or on  double snapshot
             populateAllCurrentRecordKeysIntoIndex(latestTypeState);
         }
     }

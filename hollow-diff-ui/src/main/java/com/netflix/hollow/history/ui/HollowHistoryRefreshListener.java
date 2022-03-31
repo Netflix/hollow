@@ -37,7 +37,7 @@ public class HollowHistoryRefreshListener extends HollowConsumer.AbstractRefresh
 	
 	@Override
 	public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-			history.deltaOccurred(version);
+		history.deltaOccurred(version);
 	}
 	
 	@Override public void refreshStarted(long currentVersion, long requestedVersion) { }

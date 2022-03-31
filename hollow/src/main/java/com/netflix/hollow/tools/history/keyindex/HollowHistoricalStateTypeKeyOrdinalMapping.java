@@ -39,7 +39,7 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
         this.keyIndex = keyIndex;
     }
 
-    // double snapshot only
+    // invoked for double snapshot only
     private HollowHistoricalStateTypeKeyOrdinalMapping(String typeName, HollowHistoryTypeKeyIndex keyIndex, IntMap addedOrdinalMap, IntMap removedOrdinalMap) {
         this.typeName = typeName;
         this.keyIndex = keyIndex;
@@ -66,7 +66,7 @@ public class HollowHistoricalStateTypeKeyOrdinalMapping {
         removedOrdinalMap.put(recordKeyOrdinal, mappedOrdinal);
     }
 
-    // double snapshot only
+    // invoked for double snapshot only
     public HollowHistoricalStateTypeKeyOrdinalMapping remap(OrdinalRemapper remapper) {
         IntMap newAddedOrdinalMap = new IntMap(addedOrdinalMap.size());
         IntMapEntryIterator addedIter = addedOrdinalMap.iterator();

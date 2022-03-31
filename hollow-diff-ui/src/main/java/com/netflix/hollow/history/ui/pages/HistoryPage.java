@@ -67,15 +67,13 @@ public abstract class HistoryPage {
     protected abstract void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx);
 
     protected List<HollowHeaderEntry> getHeaderEntries(HollowHistoricalState state) {
-        Map<String, String> fromTags;
-        Map<String, String> toTags;
-        fromTags = state.getHeaderEntries();
-        toTags = ui.getHistory().getLatestState().getHeaderTags();
+        Map<String, String> fromTags = state.getHeaderEntries();
+        Map<String, String> toTags = ui.getHistory().getLatestState().getHeaderTags();
         if(state.getNextState() != null) {
             toTags = state.getNextState().getHeaderEntries();
         }
 
-        Set<String> allKeys = new HashSet<>();
+        Set<String> allKeys = new HashSet<String>();
         allKeys.addAll(fromTags.keySet());
         allKeys.addAll(toTags.keySet());
 
