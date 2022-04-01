@@ -99,7 +99,7 @@ public class DiffViewOutputGenerator {
         }
     }
 
-    public static void buildChildRowDisplayDataSimple(HollowDiffViewRow parentRow, Writer writer, boolean firstRow, String str) throws IOException {
+    public static void buildChildRowDisplayDataSimple(HollowDiffViewRow parentRow, Writer writer, boolean firstRow) throws IOException {
 
         for(HollowDiffViewRow row : parentRow.getChildren()) {
             if(row.isVisible()) {
@@ -112,7 +112,7 @@ public class DiffViewOutputGenerator {
                 writer.write(fromContent(row));                           writer.write("|");
                 writer.write(toContent(row));
 
-                buildChildRowDisplayDataSimple(row, writer, false,  str);
+                buildChildRowDisplayDataSimple(row, writer, false);
             }
         }
     }
