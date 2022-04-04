@@ -54,6 +54,8 @@ import java.util.logging.Logger;
  * Each retained state is accessible via a {@link HollowHistoricalState}, from which a {@link HollowDataAccess} can
  * be obtained and used interchangeably with a (current) {@link HollowReadStateEngine} for many operations.
  *
+ * This class is not thread safe.
+ *
  */
 public class HollowHistory {
 
@@ -551,8 +553,6 @@ public class HollowHistory {
     // however internally the states are linked like: V1.nextState = V2; V2.nextState = V3; etc.
     private void addHistoricalState(HollowHistoricalState historicalState) {
         if(historicalStates.size() > 0) {
-            log.info("addHistoricalState==> "+historicalState.getVersion()+" -> end => "+historicalStates.get(historicalStates.size()-1).getVersion()+" -> start => "+historicalStates.get(0).getVersion());
-
             historicalStates.get(0).getDataAccess().setNextState(historicalState.getDataAccess());
             historicalStates.get(0).setNextState(historicalState);
         }
@@ -598,7 +598,7 @@ public class HollowHistory {
         }
         if (n > historicalStates.size()) {
             throw new IllegalArgumentException(String.format(
-                    "Number of states to remove, %d, is greater than the number of states. %d",
+                     "Number of states to remove, %d, is greater than the number of states. %d",
                     n, historicalStates.size()));
         }
 
