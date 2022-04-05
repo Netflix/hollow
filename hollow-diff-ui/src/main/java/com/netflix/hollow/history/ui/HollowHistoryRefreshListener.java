@@ -22,6 +22,11 @@ import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.tools.history.HollowHistory;
 
+/**
+ * For building HollowHistory bidirectionally this listener will be attached to two consumers- one that traverses fwd
+ * deltas and another that traverses reverse deltas. The methods of this class are {@code sycnchronized} so that both
+ * consumers don't modify HollowHistory concurrently.
+ */
 public class HollowHistoryRefreshListener extends HollowConsumer.AbstractRefreshListener {
 
     private final HollowHistory history;
@@ -31,13 +36,19 @@ public class HollowHistoryRefreshListener extends HollowConsumer.AbstractRefresh
     }
 
     @Override
-	public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception { 
+	public synchronized void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
 		history.doubleSnapshotOccurred(stateEngine, version);
 	}
 	
 	@Override
-	public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-		history.deltaOccurred(version);
+	public synchronized void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+		if (version > history.getLatestVersion()) {
+			history.deltaOccurred(version);
+		} else if (version < history.getOldestVersion()) {
+			history.reverseDeltaOccurred(version);
+		} else {
+			throw new IllegalStateException("History has already seen this version before");
+		}
 	}
 	
 	@Override public void refreshStarted(long currentVersion, long requestedVersion) { }

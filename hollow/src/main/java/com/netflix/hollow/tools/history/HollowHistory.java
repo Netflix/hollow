@@ -63,8 +63,6 @@ public class HollowHistory {
     private final HollowHistoryKeyIndex keyIndex;
     private final HollowHistoricalStateCreator creator;
     private final int maxHistoricalStatesToKeep;
-
-    private Map<String, String> latestHeaderEntries;
     private final long fwdInitialVersion;
 
     /**
@@ -89,6 +87,7 @@ public class HollowHistory {
     private long latestVersion = VERSION_NONE;
     private long oldestVersion = VERSION_NONE;
 
+    private Map<String, String> latestHeaderEntries;
     private boolean ignoreListOrderingOnDoubleSnapshot = false;
 
     /**

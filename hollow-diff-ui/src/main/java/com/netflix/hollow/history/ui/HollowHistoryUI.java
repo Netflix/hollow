@@ -77,17 +77,52 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     }
     
     private static HollowHistory createHistory(HollowConsumer consumer, int numStatesToTrack) {
-        consumer.getRefreshLock().lock();
-        try {
-            HollowHistory history = new HollowHistory(consumer.getStateEngine(), consumer.getCurrentVersionId(), numStatesToTrack);
-            consumer.addRefreshListener(new HollowHistoryRefreshListener(history));
-            return history;
-        } finally {
-            consumer.getRefreshLock().unlock();
+        return createHistory(consumer, null, numStatesToTrack);
+    }
+
+    private static HollowHistory createHistory(HollowConsumer consumerFwd, HollowConsumer consumerRev, int numStatesToTrack) {
+        if (consumerRev == null) {
+            consumerFwd.getRefreshLock().lock();
+            try {
+                HollowHistory history = new HollowHistory(consumerFwd.getStateEngine(), consumerFwd.getCurrentVersionId(), numStatesToTrack);
+                consumerFwd.addRefreshListener(new HollowHistoryRefreshListener(history));
+                return history;
+            } finally {
+                consumerFwd.getRefreshLock().unlock();
+            }
+        } else {
+            consumerFwd.getRefreshLock().lock();
+            consumerRev.getRefreshLock().lock();
+            try {
+                HollowHistory history = new HollowHistory(consumerFwd.getStateEngine(), consumerRev.getStateEngine(),
+                        consumerFwd.getCurrentVersionId(), consumerRev.getCurrentVersionId(), numStatesToTrack);
+                consumerFwd.addRefreshListener(new HollowHistoryRefreshListener(history));  // SNAP: TODO:
+                consumerRev.addRefreshListener(new HollowHistoryRefreshListener(history));  // SNAP: TODO:
+                return history;
+            } finally {
+                consumerFwd.getRefreshLock().unlock();
+                consumerRev.getRefreshLock().unlock();
+            }
+
         }
     }
 
-    // SNAP: TODO: createHistory that takes in 2 consumers here?
+    /**
+     * HollowHistoryUI that supports building history in both directions simultaneously.
+     * Note that fwd and rev consumers should be initialized to the same version before calling this constructor.
+     * This constructor defaults max states to 1024 and time zone to PST.
+     *
+     * @param baseUrlPath url path for history UI endpoint
+     * @param consumerFwd HollowConsumer (already initialized with data) that will be traversing forward deltas
+     * @param consumerRev HollowConsumer (also initialized to the same version as consumerFwd) that will be traversing reverse deltas
+     */
+    public HollowHistoryUI(String baseUrlPath, HollowConsumer consumerFwd, HollowConsumer consumerRev) {
+        this(baseUrlPath, consumerFwd, consumerRev, 1024, VersionTimestampConverter.PACIFIC_TIMEZONE);
+    }   // SNAP: TODO: add test/usage
+
+    public HollowHistoryUI(String baseUrlPath, HollowConsumer consumerFwd, HollowConsumer consumerRev, int numStatesToTrack, TimeZone timeZone) {
+        this(baseUrlPath, createHistory(consumerFwd, consumerRev, numStatesToTrack), timeZone);
+    }
 
     public HollowHistoryUI(String baseUrlPath, HollowHistory history) {
         this(baseUrlPath, history, VersionTimestampConverter.PACIFIC_TIMEZONE);
