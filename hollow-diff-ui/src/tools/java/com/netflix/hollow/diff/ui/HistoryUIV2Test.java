@@ -226,8 +226,10 @@ public class HistoryUIV2Test {
             System.out.println("-- Ordinals on revReadStateEngine");
             exploreOrdinals(revReadStateEngine);
 
+            // initialize bi directional history
             history = new HollowHistory(fwdReadStateEngine, 2L, MAX_STATES, true);
             history.getKeyIndex().addTypeIndex("TypeA", "a1");
+            history.getKeyIndex().indexTypeField("TypeA", "a1");
             history.initializeReverseStateEngine(revReadStateEngine, 2L);
 
             fwdReader.applyDelta(HollowBlobInput.serial(baos_v2_to_v3.toByteArray()));

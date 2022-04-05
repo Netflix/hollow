@@ -87,6 +87,8 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
         }
     }
 
+    // SNAP: TODO: createHistory that takes in 2 consumers here?
+
     public HollowHistoryUI(String baseUrlPath, HollowHistory history) {
         this(baseUrlPath, history, VersionTimestampConverter.PACIFIC_TIMEZONE);
     }

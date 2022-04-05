@@ -86,8 +86,8 @@ public class HollowHistory {
     //  oldestHollowReadStateEngine will be at v0 (since the v1 historical state represents the v0->v1 diff)
     private HollowReadStateEngine latestHollowReadStateEngine;
     private HollowReadStateEngine oldestHollowReadStateEngine;
-    private long latestVersion;
-    private long oldestVersion;
+    private long latestVersion = VERSION_NONE;
+    private long oldestVersion = VERSION_NONE;
 
     private boolean ignoreListOrderingOnDoubleSnapshot = false;
 
@@ -156,10 +156,8 @@ public class HollowHistory {
         this.maxHistoricalStatesToKeep = maxHistoricalStatesToKeep;
 
         this.latestHollowReadStateEngine = fwdMovingHollowReadStateEngine;
-        this.oldestHollowReadStateEngine = revMovingHollowReadStateEngine;
         this.fwdInitialVersion=  fwdInitialVersion;
         this.latestVersion = fwdInitialVersion;
-        this.oldestVersion = revInitialVersion;
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
 
         // validate fwd moving state initialization
@@ -175,12 +173,7 @@ public class HollowHistory {
                 throw new IllegalArgumentException("revMovingHollowReadStateEngine argument missing");
             }
         } else {
-            if (revInitialVersion == VERSION_NONE) {
-                throw new IllegalArgumentException("revInitialVersion should accompany revMovingHollowReadStateEngine");
-            } else if (revInitialVersion != fwdInitialVersion) {
-                throw new IllegalArgumentException("The fwd and rev direction read states should original at the same " +
-                        "version for contiguous history");
-            }
+            initializeReverseStateEngine(revMovingHollowReadStateEngine, revInitialVersion);
         }
 
         if (isAutoDiscoverTypeIndex) {
@@ -569,9 +562,11 @@ public class HollowHistory {
     // historicalStates is ordered like: V3 -> V2 -> V1 (as displayed to user)
     // however internally the states are linked like: V1.nextState = V2; V2.nextState = V3; etc.
     private void addReverseHistoricalState(HollowHistoricalState historicalState) {
-        if(historicalStates.size() > 0) {
+        if (historicalStates.size() > 0) {
             historicalState.getDataAccess().setNextState(historicalStates.get(historicalStates.size()-1).getDataAccess());
             historicalState.setNextState(historicalStates.get(historicalStates.size()-1));
+        } else { // if reverse delta occurs before any fwd deltas
+            historicalState.getDataAccess().setNextState(latestHollowReadStateEngine);
         }
 
         historicalStates.add(historicalState);

@@ -29,7 +29,7 @@ public class HistoryReverseParityTest {
         HollowHistoryUIServer serverD = new HollowHistoryUIServer(historyD, 7777);
         serverD.start();
 
-        HollowHistory historyR = createHistoryReverse(historyD.getLatestState(), historyD.getLatestVersion());
+        HollowHistory historyR = createHistoryReverse();
         HollowHistoryUIServer serverR = new HollowHistoryUIServer(historyR, 7778);
         serverR.start();
 
@@ -166,7 +166,7 @@ public class HistoryReverseParityTest {
     }
 
 
-    private HollowHistory createHistoryReverse(HollowReadStateEngine fwdReadStateEngine, long fwdVersion) throws IOException {
+    private HollowHistory createHistoryReverse() throws IOException {
         ByteArrayOutputStream baos_v2_to_v1, baos_v3_to_v2;
         HollowHistory history;
         HollowReadStateEngine readStateEngine;
@@ -211,16 +211,14 @@ public class HistoryReverseParityTest {
 
             //add rec to write phase
             stateEngine.prepareForWrite();
-
-            //reinit output stream
             ByteArrayOutputStream baos_v1_to_v2 = new ByteArrayOutputStream();
             baos_v2_to_v1 = new ByteArrayOutputStream();
 
             //write delta based on new records
             writer.writeDelta(baos_v1_to_v2);
             writer.writeReverseDelta(baos_v2_to_v1);
-
             stateEngine.prepareForNextCycle();
+
             stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v3");
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 1 });
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });
@@ -230,17 +228,15 @@ public class HistoryReverseParityTest {
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 8, 10 });
 
             stateEngine.prepareForWrite();
-
-            //reinit output stream
             ByteArrayOutputStream baos_v2_to_v3 = new ByteArrayOutputStream();
+            ByteArrayOutputStream baos_v3 = new ByteArrayOutputStream();
             baos_v3_to_v2 = new ByteArrayOutputStream();
-
-            //write delta based on new records
             writer.writeDelta(baos_v2_to_v3);
+            writer.writeSnapshot(baos_v3);
             writer.writeReverseDelta(baos_v3_to_v2);
-
-            //v4
             stateEngine.prepareForNextCycle();
+
+            // v4
             stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v4");
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 18 });  // 0
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });   // 1
@@ -252,42 +248,40 @@ public class HistoryReverseParityTest {
             addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 28, 90 }); // 7
 
             stateEngine.prepareForWrite();
-
-            //reinit output stream
             ByteArrayOutputStream baos_v4_to_v3 = new ByteArrayOutputStream();
-
-            //write snapshot to output stream
             ByteArrayOutputStream baos_v4 = new ByteArrayOutputStream();
             writer.writeSnapshot(baos_v4);
             writer.writeReverseDelta(baos_v4_to_v3);
 
 
-            readStateEngine = new HollowReadStateEngine();
-            reader = new HollowBlobReader(readStateEngine);
-            //load snapshot from output stream to read state engine
-            reader.readSnapshot(HollowBlobInput.serial(baos_v4.toByteArray()));
-            exploreOrdinals(readStateEngine);
-            //>>>do not init history with the snapshot
-            history = new HollowHistory(fwdReadStateEngine, readStateEngine, fwdVersion, 4L, MAX_STATES, true);
+            HollowReadStateEngine readStateEngineRev = new HollowReadStateEngine();
+            HollowReadStateEngine readStateEngineFwd = new HollowReadStateEngine();
+            HollowBlobReader readerFwd = new HollowBlobReader(readStateEngineFwd);
+            HollowBlobReader readerRev = new HollowBlobReader(readStateEngineRev);
+
+            readerFwd.readSnapshot(HollowBlobInput.serial(baos_v4.toByteArray()));
+            readerRev.readSnapshot(HollowBlobInput.serial(baos_v4.toByteArray()));
+            exploreOrdinals(readStateEngineFwd);
+            history = new HollowHistory(readStateEngineFwd, readStateEngineRev, 4l, 4l, MAX_STATES, true);
             history.getKeyIndex().addTypeIndex("TypeA", "a1");
 
-            reader.applyDelta(HollowBlobInput.serial(baos_v4_to_v3.toByteArray()));
-            exploreOrdinals(readStateEngine);
+            readerRev.applyDelta(HollowBlobInput.serial(baos_v4_to_v3.toByteArray()));
+            // exploreOrdinals(readStateEngineFwd);
             try {
                 history.reverseDeltaOccurred(3L);
             } catch (IllegalStateException e) {
                 throw e;
             }
 
-            reader.applyDelta(HollowBlobInput.serial(baos_v3_to_v2.toByteArray()));
-            exploreOrdinals(readStateEngine);
+            readerRev.applyDelta(HollowBlobInput.serial(baos_v3_to_v2.toByteArray()));
+            // exploreOrdinals(readStateEngine);
             try {
                 history.reverseDeltaOccurred(2L);
             } catch (IllegalStateException e) {
                 throw e;
             }
 
-           reader.applyDelta(HollowBlobInput.serial(baos_v2_to_v1.toByteArray()));
+           readerRev.applyDelta(HollowBlobInput.serial(baos_v2_to_v1.toByteArray()));
            try {
                history.reverseDeltaOccurred(1L);
            } catch (IllegalStateException e) {
