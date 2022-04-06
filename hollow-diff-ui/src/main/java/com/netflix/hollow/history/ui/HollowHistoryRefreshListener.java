@@ -23,9 +23,11 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.tools.history.HollowHistory;
 
 /**
- * For building HollowHistory bidirectionally this listener will be attached to two consumers- one that traverses fwd
- * deltas and another that traverses reverse deltas. This class synchronizes modifications to HollowHistory to prevent
- * the consumers from concurrently invoking modifications on the underlying HollowHistory object.
+ * This can listener can be attached to a consumer for building HollowHistory in the forward direction (v1, v2, v3, etc.),
+ * or to 2 consumers for building history in both directions simultaneously. It is expected that the consumer(s) will be
+ * initialized to the history start version before the listener is attached.
+ * This class synchronizes modifications to HollowHistory to prevent the two consumers (if applicable) from concurrently
+ * invoking modifications on the underlying HollowHistory object.
  */
 public class HollowHistoryRefreshListener extends HollowConsumer.AbstractRefreshListener {
 
