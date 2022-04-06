@@ -83,8 +83,10 @@ public class HollowHistory {
     //  latestHollowReadStateEngine will be at v3, and
     //  oldestHollowReadStateEngine will be at v0 (since the v1 historical state represents the v0->v1 diff)
     private HollowReadStateEngine latestHollowReadStateEngine;
-    private HollowReadStateEngine oldestHollowReadStateEngine;
     private long latestVersion = VERSION_NONE;
+
+    // reverse facing read state is optional at initialization
+    private HollowReadStateEngine oldestHollowReadStateEngine;
     private long oldestVersion = VERSION_NONE;
 
     private Map<String, String> latestHeaderEntries;
@@ -133,10 +135,13 @@ public class HollowHistory {
      * When building history bi-directionally, 2 state engines moving in opposite directions need to be maintained. They
      * must be at the same version, or {@code revMovingHollowReadStateEngine} can be null now but later initialized by
      * calling {@code initializeReverseStateEngine} with a snapshot for the same version as {@code fwdMovingHollowReadStateEngine}
-     * passed here, before any reverse deltas are applied.
+     * passed here.
      *
-     * @param fwdMovingHollowReadStateEngine The HollowReadStateEngine that will incur application of fwd deltas
-     * @param revMovingHollowReadStateEngine The HollowReadStateEngine that will incur application of reverse deltas
+     * @param fwdMovingHollowReadStateEngine The HollowReadStateEngine that will incur application of fwd deltas.
+     *                                       This is required to be initialized before calling this constructor.
+     * @param revMovingHollowReadStateEngine The HollowReadStateEngine that will incur application of reverse deltas.
+     *                                       This can optionally be initialized before calling this constructor, or
+     *                                       anytime before applying the first reverse delta.
      * @param fwdInitialVersion The version of {@code fwdMovingHollowReadStateEngine}
      * @param revInitialVersion The version of {@code revMovingHollowReadStateEngine}
      * @param maxHistoricalStatesToKeep The number of historical states to keep in memory
@@ -154,24 +159,20 @@ public class HollowHistory {
         this.historicalStateLookupMap = new HashMap<>();
         this.maxHistoricalStatesToKeep = maxHistoricalStatesToKeep;
 
-        this.latestHollowReadStateEngine = fwdMovingHollowReadStateEngine;
-        this.fwdInitialVersion=  fwdInitialVersion;
-        this.latestVersion = fwdInitialVersion;
-        this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
-
+        // SNAP: TODO: validate that this is backwards compatible
         // validate fwd moving state initialization
         requireNonNull(fwdMovingHollowReadStateEngine, "Fwd direction read state engine should be initialized");
         if (fwdInitialVersion == VERSION_NONE) {
             throw new IllegalArgumentException("Valid version corresponding to fwdMovingHollowReadStateEngine should be specified" +
                     "during HollowHistory initialization");
         }
+        this.latestHollowReadStateEngine = fwdMovingHollowReadStateEngine;
+        this.fwdInitialVersion=  fwdInitialVersion;
+        this.latestVersion = fwdInitialVersion;
+        this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
 
-        // validate rev moving state, may or may not be specified at initialization
-        if (revMovingHollowReadStateEngine == null) {
-            if (revInitialVersion != VERSION_NONE) {
-                throw new IllegalArgumentException("revMovingHollowReadStateEngine argument missing");
-            }
-        } else {
+        // rev moving state, may or may not be specified at initialization
+        if (revMovingHollowReadStateEngine != null || revInitialVersion != VERSION_NONE) {
             initializeReverseStateEngine(revMovingHollowReadStateEngine, revInitialVersion);
         }
 
@@ -204,7 +205,6 @@ public class HollowHistory {
         if (oldestHollowReadStateEngine != null || oldestVersion != VERSION_NONE) {
             throw new IllegalStateException("oldestHollowReadStateEngine has already been initialized");
         }
-
         this.oldestHollowReadStateEngine = revReadStateEngine;
         this.oldestVersion = version;
     }
@@ -284,7 +284,7 @@ public class HollowHistory {
         // Update the state stored in keyIndex (in its member readStateEngine) with the passed read state engine.
         // The readStateEngine within keyIndex stores an ever-growing state of all keys ever seen by this HollowHistory
         // instance i.e. all keys seen in initial load or a successive double-snapshot and all keys added/removed in
-        // deltas and reversedeltas. It doesn't store a copy of the keyed records, instead just the primary key values
+        // deltas and reverse deltas. It doesn't store a copy of the keyed records, instead just the primary key values
         // for each type that has a primary key defined (in schema or custom via history helpers).
         keyIndex.update(latestHollowReadStateEngine, true);
 

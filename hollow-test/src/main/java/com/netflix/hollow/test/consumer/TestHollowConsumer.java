@@ -114,15 +114,15 @@ public class TestHollowConsumer extends HollowConsumer {
 
     public TestHollowConsumer addSnapshot(long version, HollowWriteStateEngine state) throws IOException {
         // if consumer has state then restore it
-        if (getStateEngine() != null) {
-            HollowWriteStateEngine snapshotState = HollowWriteStateCreator.createWithSchemas(getStateEngine().getSchemas());
-            snapshotState.restoreFrom(getStateEngine());
-
-            HollowCombiner combiner = new HollowCombiner(HollowCombinerCopyDirector.DEFAULT_DIRECTOR,
-                    snapshotState,      // output
-                    roundTrip(state));  // input
-            combiner.combine();
-        }
+        // if (getStateEngine() != null) {
+        //     HollowWriteStateEngine snapshotState = HollowWriteStateCreator.createWithSchemas(getStateEngine().getSchemas());
+        //     snapshotState.restoreFrom(getStateEngine());
+        //
+        //     HollowCombiner combiner = new HollowCombiner(HollowCombinerCopyDirector.DEFAULT_DIRECTOR,
+        //             snapshotState,      // output
+        //             roundTrip(state));  // input
+        //     combiner.combine();
+        // }
 
         if (blobRetriever instanceof TestBlobRetriever) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -154,10 +154,15 @@ public class TestHollowConsumer extends HollowConsumer {
 
         // apply delta write state to consumer
         if (blobRetriever instanceof TestBlobRetriever) {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            new HollowBlobWriter(deltaState).writeDelta(outputStream);
+            ByteArrayOutputStream outputStreamDelta = new ByteArrayOutputStream();
+            new HollowBlobWriter(deltaState).writeDelta(outputStreamDelta);
             ((TestBlobRetriever) blobRetriever).addDelta(fromVersion, new TestBlob(fromVersion, toVersion,
-                    new ByteArrayInputStream(outputStream.toByteArray())));
+                    new ByteArrayInputStream(outputStreamDelta.toByteArray())));
+
+            ByteArrayOutputStream outputStreamReverseDelta = new ByteArrayOutputStream();
+            new HollowBlobWriter(deltaState).writeReverseDelta(outputStreamReverseDelta);
+            ((TestBlobRetriever) blobRetriever).addReverseDelta(toVersion, new TestBlob(toVersion, fromVersion,
+                    new ByteArrayInputStream(outputStreamReverseDelta.toByteArray())));
         } else {
             throw new IllegalStateException("Cannot add delta if not using TestBlobRetriever");
         }

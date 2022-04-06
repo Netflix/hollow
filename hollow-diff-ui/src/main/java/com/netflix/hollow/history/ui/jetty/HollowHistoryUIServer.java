@@ -45,7 +45,7 @@ public class HollowHistoryUIServer {
      * @param port server port
      */
     public HollowHistoryUIServer(HollowConsumer consumerFwd, HollowConsumer consumerRev, int port) {
-        this(new HollowHistoryUI("", consumerFwd, consumerRev), port);  // SNAP: TODO: add test/usage
+        this(new HollowHistoryUI("", consumerFwd, consumerRev), port);  // SNAP: TODO: add test/usage   historyUsingOnlyFwdAndRevConsumer_onlyRevDeltas
     }
 
     public HollowHistoryUIServer(HollowConsumer consumer, int numStatesToTrack, int port, TimeZone timeZone) {

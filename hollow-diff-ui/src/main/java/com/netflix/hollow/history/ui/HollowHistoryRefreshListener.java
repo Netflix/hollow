@@ -24,8 +24,8 @@ import com.netflix.hollow.tools.history.HollowHistory;
 
 /**
  * For building HollowHistory bidirectionally this listener will be attached to two consumers- one that traverses fwd
- * deltas and another that traverses reverse deltas. The methods of this class are {@code sycnchronized} so that both
- * consumers don't modify HollowHistory concurrently.
+ * deltas and another that traverses reverse deltas. This class synchronizes modifications to HollowHistory to prevent
+ * the consumers from concurrently invoking modifications on the underlying HollowHistory object.
  */
 public class HollowHistoryRefreshListener extends HollowConsumer.AbstractRefreshListener {
 
@@ -47,7 +47,7 @@ public class HollowHistoryRefreshListener extends HollowConsumer.AbstractRefresh
 		} else if (version < history.getOldestVersion()) {
 			history.reverseDeltaOccurred(version);
 		} else {
-			throw new IllegalStateException("History has already seen this version before");
+			// do nothing, version already seen by history
 		}
 	}
 	
