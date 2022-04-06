@@ -198,23 +198,9 @@ public class FakeHollowHistoryUtil {
                             str1 = getDiffViewOutput(state2, key, addedDiffs1.get(i), currentRandomizedTag1, ui1);
                             str2 = getDiffViewOutput(state1, key, addedDiffs2.get(i), currentRandomizedTag2, ui2);
                             displayMapDiffView1.put(addedDiffs1.get(i).getIdentifierString(), str1);
-                            displayMapDiffView2.put(addedDiffs2.get(i).getIdentifierString(), str2);    // SNAP: TODO: map equals wokrs for map<string, string>
+                            displayMapDiffView2.put(addedDiffs2.get(i).getIdentifierString(), str2);
                         }
-                        assertEquals("Add Record Diff view missing keys " + key + " " + state2.getVersion() + "<##############> " +
-                                state1.getVersion(), displayMapDiffView1.keySet(), displayMapDiffView2.keySet());
-
-                        for (String idKey: displayMapDiffView2.keySet()) {
-                            msg = "Add Record Diff view key list does not match " + key + " "+state2.getVersion() + "<##############> "+
-                                    state1.getVersion();
-                            assertTrue(msg, displayMapDiffView1.containsKey(idKey) && displayMapDiffView1.get(idKey) != null);
-
-                            str1 = displayMapDiffView1.get(idKey);
-                            str2 = displayMapDiffView2.get(idKey);
-
-                            assertEquals("Add Record Diff view len does not match", str1.length(), str2.length());
-                            assertEquals("Add Record Diff view does not match", str1, str2);
-
-                        }
+                        assertEquals(displayMapDiffView1, displayMapDiffView2);
                     } else {    // SNAP: TODO: to test with subgroups, or remove
                         assertEquals("Added records of sub groups size", typeChanges1.getAddedRecords().getSubGroups().size(),
                                 typeChanges2.getAddedRecords().getSubGroups().size());
@@ -242,18 +228,7 @@ public class FakeHollowHistoryUtil {
                             displayMapDiffView1.put(modifiedDiffs1.get(i).getIdentifierString(), str1);
                             displayMapDiffView2.put(modifiedDiffs2.get(i).getIdentifierString(), str2);
                         }
-                        assertEquals("Modified Record Diff view missing keys " + key + " " + state2.getVersion() + "<##############> " +
-                                state1.getVersion(), displayMapDiffView1.keySet(), displayMapDiffView2.keySet());
-
-                        for (String idKey: displayMapDiffView2.keySet()) {
-                            msg = "Modified Record Diff view key list does not match " + key + " " + state2.getVersion() + "<##############> " +
-                                    state1.getVersion();
-                            assertTrue(msg,displayMapDiffView1.containsKey(idKey) && displayMapDiffView1.get(idKey) != null);
-                            str1 = displayMapDiffView1.get(idKey);
-                            str2 = displayMapDiffView2.get(idKey);
-                            assertEquals("Modified Record Diff view len", str1.length(), str2.length());
-                            assertEquals("Modified Record Diff view", str1, str2);
-                        }
+                        assertEquals(displayMapDiffView1, displayMapDiffView2);
                     } else {
                         assertEquals("Modified records of sub groups size", typeChanges1.getModifiedRecords().getSubGroups().size(),
                                 typeChanges2.getModifiedRecords().getSubGroups().size());
@@ -281,17 +256,7 @@ public class FakeHollowHistoryUtil {
                             displayMapDiffView1.put(removedDiffs1.get(i).getIdentifierString(), str1);
                             displayMapDiffView2.put(removedDiffs1.get(i).getIdentifierString(), str2);
                         }
-
-                        assertEquals("Removed Record Diff view missing keys " + key + " " + state2.getVersion() + "<##############> " +
-                                state1.getVersion(), displayMapDiffView1.keySet(), displayMapDiffView2.keySet());
-                        for (String idKey : displayMapDiffView2.keySet()) {
-                            msg = "Removed Record Diff view key list does not match " + key + " " + state2.getVersion() + "<##############> " + state1.getVersion();
-                            assertTrue(msg, displayMapDiffView1.containsKey(idKey) && displayMapDiffView1.get(idKey) != null);
-                            str1 = displayMapDiffView1.get(idKey);
-                            str2 = displayMapDiffView2.get(idKey);
-                            assertEquals("Removed Record Diff view len", str1.length(), str2.length());
-                            assertEquals("Removed Record Diff view", str1, str2);
-                        }
+                        assertEquals(displayMapDiffView1, displayMapDiffView2);
                     } else {
                         assertEquals("Removed records of sub groups size", typeChanges1.getRemovedRecords().getSubGroups().size(),
                                 typeChanges2.getRemovedRecords().getSubGroups().size());
