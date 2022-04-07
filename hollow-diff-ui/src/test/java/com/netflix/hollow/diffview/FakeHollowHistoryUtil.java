@@ -193,15 +193,8 @@ public class FakeHollowHistoryUtil {
                 Set<HollowEffigy> addedEffigies1 = new HashSet<>();
                 Set<HollowEffigy> addedEffigies2 = new HashSet<>();
                 if (!typeChanges1.getAddedRecords().isEmpty()) {
-                    for (int i = 0; i < addedDiffs1.size(); i++) {
-                        RecordDiff recordDiff1 = addedDiffs1.get(i);    // need to add to map or a set maybe?
-                        HollowEffigy toEffigy1 = effigyFactory.effigy(state1.getDataAccess(), "Movie", recordDiff1.getToOrdinal());
-                        addedEffigies1.add(toEffigy1);
-
-                        RecordDiff recordDiff2 = addedDiffs1.get(i);
-                        HollowEffigy toEffigy2 = effigyFactory.effigy(state1.getDataAccess(), "Movie", recordDiff2.getToOrdinal());
-                        addedEffigies2.add(toEffigy2);
-                    }
+                    addedEffigies1 = toEffigies(addedDiffs1, effigyFactory, state1);
+                    addedEffigies2 = toEffigies(addedDiffs2, effigyFactory, state2);
                 }
                 assertEquals(addedEffigies1, addedEffigies2);
 
@@ -210,19 +203,11 @@ public class FakeHollowHistoryUtil {
                 Set<HollowEffigy> modifiedFromEffigies2 = new HashSet<>();
                 Set<HollowEffigy> modifiedToEffigies2 = new HashSet<>();
                 if (!typeChanges1.getModifiedRecords().isEmpty()) {
-                    for (int i = 0; i < modifiedDiffs1.size(); i++) {
-                        RecordDiff recordDiff1 = modifiedDiffs1.get(i);
-                        HollowEffigy fromEffigy1 = effigyFactory.effigy(state1.getDataAccess(), "Movie", recordDiff1.getFromOrdinal());
-                        modifiedFromEffigies1.add(fromEffigy1);
-                        HollowEffigy toEffigy1 = effigyFactory.effigy(state1.getDataAccess(), "Movie", recordDiff1.getToOrdinal());
-                        modifiedToEffigies1.add(toEffigy1);
+                    modifiedFromEffigies1 = fromEffigies(modifiedDiffs1, effigyFactory, state1);
+                    modifiedFromEffigies2 = fromEffigies(modifiedDiffs2, effigyFactory, state2);
 
-                        RecordDiff recordDiff2 = modifiedDiffs1.get(i);
-                        HollowEffigy fromEffigy2 = effigyFactory.effigy(state2.getDataAccess(), "Movie", recordDiff2.getFromOrdinal());
-                        modifiedFromEffigies2.add(fromEffigy2);
-                        HollowEffigy toEffigy2 = effigyFactory.effigy(state2.getDataAccess(), "Movie", recordDiff2.getToOrdinal());
-                        modifiedToEffigies2.add(toEffigy2);
-                    }
+                    modifiedToEffigies1 = toEffigies(modifiedDiffs1, effigyFactory, state1);
+                    modifiedToEffigies2 = toEffigies(modifiedDiffs2, effigyFactory, state2);
                 }
                 assertEquals(modifiedFromEffigies1, modifiedFromEffigies2);
                 assertEquals(modifiedToEffigies1, modifiedToEffigies2);
@@ -230,19 +215,34 @@ public class FakeHollowHistoryUtil {
                 Set<HollowEffigy> removedEffigies1 = new HashSet<>();
                 Set<HollowEffigy> removedEffigies2 = new HashSet<>();
                 if (!typeChanges1.getRemovedRecords().isEmpty()) {
-                    for (int i = 0; i < removedDiffs1.size(); i++) {
-                        RecordDiff recordDiff1 = removedDiffs1.get(i);
-                        HollowEffigy fromEffigy1 = effigyFactory.effigy(state1.getDataAccess(), "Movie", recordDiff1.getFromOrdinal());
-                        removedEffigies1.add(fromEffigy1);
-
-                        RecordDiff recordDiff2 = removedDiffs1.get(i);
-                        HollowEffigy fromEffigy2 = effigyFactory.effigy(state2.getDataAccess(), "Movie", recordDiff2.getFromOrdinal());
-                        removedEffigies2.add(fromEffigy2);
-                    }
+                    removedEffigies1 = fromEffigies(removedDiffs1, effigyFactory, state1);
+                    removedEffigies2 = fromEffigies(removedDiffs2, effigyFactory, state2);
                 }
                 assertEquals(removedEffigies1, removedEffigies2);
             }
         }
+    }
+
+    private static Set<HollowEffigy> fromEffigies(List<RecordDiff> recordDiffs, HollowEffigyFactory effigyFactory, HollowHistoricalState historicalState) {
+        Set<HollowEffigy> fromEffigies = new HashSet<>();
+        for (int i = 0; i < recordDiffs.size(); i++) {
+            RecordDiff recordDiff = recordDiffs.get(i);
+            HollowEffigy fromEffigy = effigyFactory.effigy(historicalState.getDataAccess(),
+                    "Movie", recordDiff.getFromOrdinal());
+            fromEffigies.add(fromEffigy);
+        }
+        return fromEffigies;
+    }
+
+    private static Set<HollowEffigy> toEffigies(List<RecordDiff> recordDiffs, HollowEffigyFactory effigyFactory, HollowHistoricalState historicalState) {
+        Set<HollowEffigy> toEffigies = new HashSet<>();
+        for (int i = 0; i < recordDiffs.size(); i++) {
+            RecordDiff recordDiff = recordDiffs.get(i);
+            HollowEffigy toEffigy = effigyFactory.effigy(historicalState.getDataAccess(),
+                    "Movie", recordDiff.getToOrdinal());
+            toEffigies.add(toEffigy);
+        }
+        return toEffigies;
     }
 
     private static long getNextStateVersion(HollowHistoricalState currentHistoricalState) {

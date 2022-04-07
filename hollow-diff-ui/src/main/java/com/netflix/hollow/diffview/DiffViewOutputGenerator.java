@@ -204,8 +204,6 @@ public class DiffViewOutputGenerator {
             }
         }
         return builder.toString();
-
-
     }
 
     private static String populatedContent(boolean moreRows[], int indentation, boolean leafNode, String fieldName, String value) {
@@ -236,4 +234,6 @@ public class DiffViewOutputGenerator {
 
         return builder.toString();
     }
+
+
 }

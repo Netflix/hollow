@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.diffview.effigy;
 
+import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import java.util.ArrayList;
 import java.util.List;
@@ -136,7 +137,7 @@ public class HollowEffigy {
 
     @Override
     public int hashCode() {
-        int hashcode = 31 + (fields == null ? 0 : fields.hashCode());
+        int hashcode = 31 + getFields().hashCode();
         return hashcode;
     }
 
@@ -147,10 +148,7 @@ public class HollowEffigy {
 
         if(other instanceof HollowEffigy) {
             HollowEffigy otherEffigy = (HollowEffigy) other;
-            if (this.fields == null && otherEffigy.fields == null) {
-                return true;
-            }
-            return this.fields.equals(otherEffigy.fields);
+            return this.getFields().equals(otherEffigy.getFields());
         }
 
         return false;
