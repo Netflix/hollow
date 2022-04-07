@@ -32,12 +32,12 @@ public class HollowHistoryUITest {
         consumerExpected = new TestHollowConsumer.Builder()
                 .withBlobRetriever(testBlobRetriever)
                 .build();
-        consumerExpected.triggerRefreshTo(1);    // snapshot
+        consumerExpected.triggerRefreshTo(1);
         historyUIServerExpected = new HollowHistoryUIServer(consumerExpected, PORT_EXPECTED);
-        consumerExpected.triggerRefreshTo(2);    // delta
-        consumerExpected.triggerRefreshTo(3);    // delta
-        consumerExpected.triggerRefreshTo(4);    // delta
-        consumerExpected.triggerRefreshTo(5);    // delta
+        consumerExpected.triggerRefreshTo(2);
+        consumerExpected.triggerRefreshTo(3);
+        consumerExpected.triggerRefreshTo(4);
+        consumerExpected.triggerRefreshTo(5);
         historyUiExpected = historyUIServerExpected.getUI();
 
         consumerFwd = new TestHollowConsumer.Builder()
@@ -128,7 +128,7 @@ public class HollowHistoryUITest {
         hostUisIfPairtyCheckFails();
     }
 
-    // @Test
+    @Test
     public void historyUsingFwdAndRevConsumer_doubleSnapshotInFwd() throws Exception {
         consumerFwd.triggerRefreshTo(3);
         consumerRev.triggerRefreshTo(3);
@@ -140,9 +140,9 @@ public class HollowHistoryUITest {
         consumerRev.triggerRefreshTo(1);
         consumerFwd.triggerRefreshTo(5);
 
-        consumerFwd.triggerRefreshTo(6);    // double snapshot for bidirectional history
+        consumerFwd.triggerRefreshTo(6);    // double snapshot on fwd consumer in bidirectional history (supported)
+        consumerExpected.triggerRefreshTo(6);   // double snapshot for fwd-only history (supported)
 
-        consumerExpected.triggerRefreshTo(6);   // double snapshot for fwd only history
         hostUisIfPairtyCheckFails();
     }
 
@@ -158,7 +158,36 @@ public class HollowHistoryUITest {
         consumerRev.triggerRefreshTo(1);
         consumerFwd.triggerRefreshTo(5);
 
-        consumerRev.triggerRefreshTo(0);   // double snapshot in rev direction
+        consumerRev.triggerRefreshTo(0);   // double snapshot in rev direction (not supported)
+    }
+
+    @Test
+    public void historyUsingFwdAndRevConsumer_removeOldestState() throws Exception {
+        consumerFwd.triggerRefreshTo(3);
+        consumerRev.triggerRefreshTo(3);
+
+        historyUIServerActual = new HollowHistoryUIServer(consumerFwd, consumerRev, PORT_ACTUAL);
+
+        consumerRev.triggerRefreshTo(2);
+        consumerFwd.triggerRefreshTo(4);
+        consumerRev.triggerRefreshTo(1);
+        consumerFwd.triggerRefreshTo(5);
+
+        // drop 1 state
+        historyUIServerActual.getUI().getHistory().removeHistoricalStates(1);
+
+        // expected history is built for versions 2 through 5
+        consumerExpected = new TestHollowConsumer.Builder()
+                .withBlobRetriever(testBlobRetriever)
+                .build();
+        consumerExpected.triggerRefreshTo(2);
+        historyUIServerExpected = new HollowHistoryUIServer(consumerExpected, PORT_EXPECTED);
+        consumerExpected.triggerRefreshTo(3);
+        consumerExpected.triggerRefreshTo(4);
+        consumerExpected.triggerRefreshTo(5);
+        historyUiExpected = historyUIServerExpected.getUI();
+
+        hostUisIfPairtyCheckFails();
     }
 
     @Test(expected=NullPointerException.class)

@@ -20,7 +20,6 @@ import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.api.consumer.HollowConsumer.HeaderBlob;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +59,7 @@ public class TestBlobRetriever implements BlobRetriever {
         return b;
     }
 
+    // so blob can be reused
     private void resetStream(Blob b) {
         try {
             if (b!= null && b.getInputStream() != null) {

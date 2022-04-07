@@ -9,7 +9,6 @@ import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.diffview.effigy.HollowEffigy;
 import com.netflix.hollow.diffview.effigy.HollowEffigyFactory;
-import com.netflix.hollow.diffview.effigy.pairer.exact.HistoryExactRecordMatcher;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.model.HistoryStateTypeChanges;
 import com.netflix.hollow.history.ui.model.RecordDiff;
@@ -22,7 +21,6 @@ import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrd
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -145,31 +143,18 @@ public class FakeHollowHistoryUtil {
     public static void assertUiParity(HollowHistoryUI hui1, HollowHistoryUI hui2) {
         HollowHistory h1 = hui1.getHistory();
         HollowHistory h2 = hui2.getHistory();
-        List<RecordDiff> addedDiffs1;
-        List<RecordDiff> addedDiffs2;
-        List<RecordDiff> removedDiffs1;
-        List<RecordDiff> removedDiffs2;
-        List<RecordDiff> modifiedDiffs1;
-        List<RecordDiff> modifiedDiffs2;
-        HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping1;
-        HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping2;
+        List<RecordDiff> addedDiffs1, addedDiffs2, removedDiffs1, removedDiffs2, modifiedDiffs1, modifiedDiffs2;
         HollowHistoricalState state1, state2;
 
         //OverviewPage
         assertEquals("Should have same number of Historical States", h1.getHistoricalStates().length, h2.getHistoricalStates().length);
-        long prev1, next1, prev2, next2, ver1, ver2;
         for (int j = 0; j < h1.getHistoricalStates().length; j++) {
             state1 = h1.getHistoricalStates()[j];
             state2 = h2.getHistoricalStates()[j];
 
-            next1 = getNextStateVersion(state1);
-            prev1 = getPreviousStateVersion(state1, h1);
-            next2 = getNextStateVersion(state2);
-            prev2 = getPreviousStateVersion(state2, h2);
-
             // make sure traversal is in the right order
-            assertEquals("Prev state should be the same", prev1, prev2);
-            assertEquals("Next state should be the same", next1, next2);
+            assertEquals("Prev state should be the same", getPreviousStateVersion(state1, h1), getPreviousStateVersion(state2, h2));
+            assertEquals("Next state should be the same", getNextStateVersion(state1), getNextStateVersion(state2));
             assertEquals("Same size of type mappings for historical state", state1.getKeyOrdinalMapping().getTypeMappings().size(), state2.getKeyOrdinalMapping().getTypeMappings().size());
             assertEquals("Not same key set of type mappings for historical state", state1.getKeyOrdinalMapping().getTypeMappings().keySet(), state2.getKeyOrdinalMapping().getTypeMappings().keySet());
 
@@ -179,8 +164,8 @@ public class FakeHollowHistoryUtil {
 
             for (String key : state2.getKeyOrdinalMapping().getTypeMappings().keySet()) {
 
-                typeKeyMapping1 = state1.getKeyOrdinalMapping().getTypeMappings().get(key);
-                typeKeyMapping2 = state2.getKeyOrdinalMapping().getTypeMappings().get(key);
+                HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping1 = state1.getKeyOrdinalMapping().getTypeMappings().get(key);
+                HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping2 = state2.getKeyOrdinalMapping().getTypeMappings().get(key);
 
                 assertEquals("No. of added records", typeKeyMapping1.getNumberOfNewRecords(), typeKeyMapping2.getNumberOfNewRecords());
                 assertEquals("No. of removed records", typeKeyMapping1.getNumberOfRemovedRecords(), typeKeyMapping2.getNumberOfRemovedRecords());
@@ -273,27 +258,6 @@ public class FakeHollowHistoryUtil {
             }
         }
         return -1;
-    }
-
-    public static String getDiffViewOutput(HollowHistoricalState state, String key, RecordDiff addedDiff, long currentRandomizedTagD, HollowHistoryUI historyUI) {
-        HollowDiffViewRow rootRow = new HollowObjectDiffViewGenerator(state.getDataAccess(), state.getDataAccess(),
-                historyUI, key,
-                addedDiff.getFromOrdinal(),
-                addedDiff.getToOrdinal()).getHollowDiffViewRows();
-        HollowHistoryView objectView = new HollowHistoryView(state.getVersion(), key,
-                addedDiff.getKeyOrdinal(), currentRandomizedTagD,
-                rootRow, HistoryExactRecordMatcher.INSTANCE);
-        objectView.resetView();
-
-        String diffViewOutputD = null;
-        try {
-            StringWriter writer = new StringWriter();
-            DiffViewOutputGenerator.buildChildRowDisplayData(objectView.getRootRow(), writer);
-            diffViewOutputD = writer.toString();
-        } catch(IOException unexpected) {
-            throw new RuntimeException(unexpected);
-        }
-        return diffViewOutputD;
     }
 
     private static void addMovie(HollowWriteStateEngine stateEngine, int id, String name) {

@@ -457,9 +457,7 @@ public class HollowHistory {
 
             PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
 
-            RemovedOrdinalIterator removalIterator;
-            RemovedOrdinalIterator additionsIterator;
-
+            RemovedOrdinalIterator additionsIterator, removalIterator;
             if (reverse) {
                 removalIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
                 additionsIterator = new RemovedOrdinalIterator(listener);
@@ -591,7 +589,7 @@ public class HollowHistory {
         }
         if (n > historicalStates.size()) {
             throw new IllegalArgumentException(String.format(
-                     "Number of states to remove, %d, is greater than the number of states. %d",
+                    "Number of states to remove, %d, is greater than the number of states. %d",
                     n, historicalStates.size()));
         }
 

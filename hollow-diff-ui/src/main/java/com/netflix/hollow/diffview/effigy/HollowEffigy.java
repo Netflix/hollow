@@ -19,7 +19,6 @@ package com.netflix.hollow.diffview.effigy;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * The HollowEffigy is an Object-based representation of a Hollow record,

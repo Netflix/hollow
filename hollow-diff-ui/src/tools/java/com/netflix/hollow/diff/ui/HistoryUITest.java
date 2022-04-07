@@ -68,8 +68,9 @@ import org.junit.Test;
  * 7: 6, 12
  * 9: 18, 10
  * 10: 28, 90
+ *
  */
-public class HistoryUIV2Test {
+public class HistoryUITest {
 
     private final int MAX_STATES = 10;
     private HollowObjectSchema schema;
@@ -85,6 +86,7 @@ public class HistoryUIV2Test {
         HollowHistoryUIServer serverR = new HollowHistoryUIServer(historyR, 7778);
         serverR.start();
 
+        // optionally, test dropping the oldest state
         // historyR.removeHistoricalStates(1);
 
         serverD.join();
