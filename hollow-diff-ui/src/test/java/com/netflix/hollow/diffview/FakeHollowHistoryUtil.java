@@ -26,6 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Utility to help create a delta chain (with reverse deltas) containing some history UI friendly fake data,
+ * and utilities to help compare outputs of HollowHistoryUIs for parity.
+ */
 public class FakeHollowHistoryUtil {
     private static final String CUSTOM_VERSION_TAG = "myVersion";
 

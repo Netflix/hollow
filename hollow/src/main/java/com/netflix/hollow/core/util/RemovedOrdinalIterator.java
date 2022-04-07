@@ -39,12 +39,12 @@ public class RemovedOrdinalIterator {
         this(previousOrdinals, populatedOrdinals, false);
     }
 
-    public RemovedOrdinalIterator(PopulatedOrdinalListener listener, boolean reverse) {
-        this(listener.getPreviousOrdinals(), listener.getPopulatedOrdinals(), reverse);
+    public RemovedOrdinalIterator(PopulatedOrdinalListener listener, boolean flip) {
+        this(listener.getPreviousOrdinals(), listener.getPopulatedOrdinals(), flip);
     }
 
-    public RemovedOrdinalIterator(BitSet previousOrdinals, BitSet populatedOrdinals, boolean reverse) {
-        if (!reverse) {
+    public RemovedOrdinalIterator(BitSet previousOrdinals, BitSet populatedOrdinals, boolean flip) {
+        if (!flip) {
             this.previousOrdinals = previousOrdinals;
             this.populatedOrdinals = populatedOrdinals;
             this.previousOrdinalsLength = previousOrdinals.length();

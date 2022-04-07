@@ -16,7 +16,6 @@
  */
 package com.netflix.hollow.diffview.effigy;
 
-import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import java.util.ArrayList;
 import java.util.List;
