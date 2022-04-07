@@ -62,7 +62,9 @@ public class TestBlobRetriever implements BlobRetriever {
 
     private void resetStream(Blob b) {
         try {
-            b.getInputStream().reset();
+            if (b!= null && b.getInputStream() != null) {
+                b.getInputStream().reset();
+            }
         } catch (IOException e) {
             throw new RuntimeException("Unable to get and reset stream", e);
         }

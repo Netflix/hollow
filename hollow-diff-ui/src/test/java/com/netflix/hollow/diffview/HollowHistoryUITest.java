@@ -1,8 +1,7 @@
-package com.netflix.hollow.diff.ui;
+package com.netflix.hollow.diffview;
 
 import static com.netflix.hollow.diffview.FakeHollowHistoryUtil.assertUiParity;
 
-import com.netflix.hollow.diffview.FakeHollowHistoryUtil;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
 import com.netflix.hollow.test.consumer.TestBlobRetriever;
@@ -16,6 +15,7 @@ public class HollowHistoryUITest {
     private final int PORT_ACTUAL = 7778;
 
     private TestBlobRetriever testBlobRetriever;
+    private TestHollowConsumer consumerExpected;    // builds history using only deltas
     private TestHollowConsumer consumerFwd;
     private TestHollowConsumer consumerRev;
     private HollowHistoryUIServer historyUIServerExpected;
@@ -25,21 +25,21 @@ public class HollowHistoryUITest {
     public HollowHistoryUITest() throws Exception {
         testBlobRetriever = new TestBlobRetriever();
         FakeHollowHistoryUtil.createDeltaChain(testBlobRetriever);
-        TestHollowConsumer consumerFwdOnly = new TestHollowConsumer.Builder()
-                .withBlobRetriever(testBlobRetriever)
-                .build();
-        consumerFwdOnly.triggerRefreshTo(1);    // snapshot
-
-        historyUIServerExpected = new HollowHistoryUIServer(consumerFwdOnly, PORT_EXPECTED);
-        consumerFwdOnly.triggerRefreshTo(2);    // delta
-        consumerFwdOnly.triggerRefreshTo(3);    // delta
-        consumerFwdOnly.triggerRefreshTo(4);    // delta
-        consumerFwdOnly.triggerRefreshTo(5);    // delta
-        historyUiExpected = historyUIServerExpected.getUI();
     }
 
     @Before
     public void init() {
+        consumerExpected = new TestHollowConsumer.Builder()
+                .withBlobRetriever(testBlobRetriever)
+                .build();
+        consumerExpected.triggerRefreshTo(1);    // snapshot
+        historyUIServerExpected = new HollowHistoryUIServer(consumerExpected, PORT_EXPECTED);
+        consumerExpected.triggerRefreshTo(2);    // delta
+        consumerExpected.triggerRefreshTo(3);    // delta
+        consumerExpected.triggerRefreshTo(4);    // delta
+        consumerExpected.triggerRefreshTo(5);    // delta
+        historyUiExpected = historyUIServerExpected.getUI();
+
         consumerFwd = new TestHollowConsumer.Builder()
                 .withBlobRetriever(testBlobRetriever)
                 .build();
@@ -93,6 +93,27 @@ public class HollowHistoryUITest {
     }
 
     @Test
+    public void historyUsingFwdAndRevConsumer_traversingStatesAlreadyVisited() throws Exception {
+        consumerFwd.triggerRefreshTo(3);
+        consumerRev.triggerRefreshTo(3);
+
+        historyUIServerActual = new HollowHistoryUIServer(consumerFwd, consumerRev, PORT_ACTUAL);
+
+        consumerFwd.triggerRefreshTo(4);
+            consumerRev.triggerRefreshTo(2);
+        consumerFwd.triggerRefreshTo(5);
+        consumerFwd.triggerRefreshTo(4);
+        consumerFwd.triggerRefreshTo(3);
+        consumerFwd.triggerRefreshTo(4);
+        consumerFwd.triggerRefreshTo(5);
+            consumerRev.triggerRefreshTo(1);
+            consumerRev.triggerRefreshTo(2);
+            consumerRev.triggerRefreshTo(1);
+
+        hostUisIfPairtyCheckFails();
+    }
+
+    @Test
     public void historyUsingFwdAndRevConsumer_bothFwdAndRevDeltasApplied_RevFirst() throws Exception  {
         consumerFwd.triggerRefreshTo(3);
         consumerRev.triggerRefreshTo(3);
@@ -105,6 +126,45 @@ public class HollowHistoryUITest {
             consumerFwd.triggerRefreshTo(5);
 
         hostUisIfPairtyCheckFails();
+    }
+
+    @Test
+    public void historyUsingFwdAndRevConsumer_doubleSnapshotInFwd() throws Exception {
+        consumerFwd.triggerRefreshTo(3);
+        consumerRev.triggerRefreshTo(3);
+
+        historyUIServerActual = new HollowHistoryUIServer(consumerFwd, consumerRev, PORT_ACTUAL);
+
+        consumerRev.triggerRefreshTo(2);
+        consumerFwd.triggerRefreshTo(4);
+        consumerRev.triggerRefreshTo(1);
+        consumerFwd.triggerRefreshTo(5);
+
+        consumerFwd.triggerRefreshTo(6);    // double snapshot for bidirectional history
+
+        consumerExpected.triggerRefreshTo(6);   // double snapshot for fwd only history
+        hostUisIfPairtyCheckFails();
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void historyUsingFwdAndRevConsumer_doubleSnapshotInRev() {
+        consumerFwd.triggerRefreshTo(3);
+        consumerRev.triggerRefreshTo(3);
+
+        historyUIServerActual = new HollowHistoryUIServer(consumerFwd, consumerRev, PORT_ACTUAL);
+
+        consumerRev.triggerRefreshTo(2);
+        consumerFwd.triggerRefreshTo(4);
+        consumerRev.triggerRefreshTo(1);
+        consumerFwd.triggerRefreshTo(5);
+
+        consumerRev.triggerRefreshTo(0);   // double snapshot in rev direction
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void historyUsingFwdAndRevConsumer_noPastVersionsAvailableAtInit()  {
+        // consumerFwd and consumerRev haven't incurred snapshot load yet
+        historyUIServerActual = new HollowHistoryUIServer(consumerFwd, consumerRev, PORT_ACTUAL);
     }
 
     @Test(expected=UnsupportedOperationException.class)
@@ -125,7 +185,7 @@ public class HollowHistoryUITest {
     }
 
     @Test(expected=IllegalStateException.class)
-    public void historyUsingFwdAndRevConsumer_revAndFwdConsumersMustBeOnSameVersionAtInit() throws Exception  {
+    public void historyUsingFwdAndRevConsumer_revAndFwdConsumersMustBeOnSameVersionAtInit()  {
 
         TestHollowConsumer consumerFwd = new TestHollowConsumer.Builder()
                 .withBlobRetriever(testBlobRetriever)
@@ -135,14 +195,14 @@ public class HollowHistoryUITest {
                 .build();
 
         consumerFwd.triggerRefreshTo(5);
-        consumerRev.triggerRefreshTo(4);
+        consumerRev.triggerRefreshTo(3);
         historyUIServerActual = new HollowHistoryUIServer(consumerFwd, consumerRev, PORT_ACTUAL);
     }
 
     private void hostUisIfPairtyCheckFails() throws Exception {
         try {
             assertUiParity(historyUiExpected, historyUIServerActual.getUI());
-        } catch (Exception e) {
+        } catch (AssertionError | Exception e) {
             System.out.println(String.format("Error when comparing expected and actual history UIs for parity. " +
                             "Expected and actual history UIs are hosted at ports %s and %s respectively. " +
                             "Be sure to open in different browsers for isolated sessions state stored in cookie which " +

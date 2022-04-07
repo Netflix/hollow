@@ -39,7 +39,6 @@ import com.netflix.hollow.tools.diff.HollowTypeDiff;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-// SNAP: TODO: SOMETHING SIMILAR FOR REV HISTORY?
 public class FakeHollowDiffGenerator {
 
     HollowObjectSchema typeASchema;

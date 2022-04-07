@@ -1,7 +1,6 @@
 package com.netflix.hollow.diffview;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -39,6 +38,7 @@ public class FakeHollowHistoryUtil {
         HollowObjectSchema movieSchema = new HollowObjectSchema("Movie", 2, "id");
         movieSchema.addField("id", HollowObjectSchema.FieldType.INT);
         movieSchema.addField("name", HollowObjectSchema.FieldType.STRING);
+
         HollowWriteStateEngine stateEngine = new HollowWriteStateEngine();
         stateEngine.addTypeState(new HollowObjectTypeWriteState(movieSchema));
 
@@ -109,7 +109,7 @@ public class FakeHollowHistoryUtil {
         stateEngine.prepareForNextCycle();
         stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v5");
         addMovie(stateEngine, 4, "movie4-added-in-v2-modified-in-v4");
-        addMovie(stateEngine, 6, "movie6-added-in-v6");
+        addMovie(stateEngine, 6, "movie6-added-in-v5-removed-in-v6");   // SNAP: TODO: add a modification to v5
         stateEngine.prepareForWrite();
         ByteArrayOutputStream baos_v5 = new ByteArrayOutputStream();
         ByteArrayOutputStream baos_v4_to_v5 = new ByteArrayOutputStream();
@@ -120,6 +120,25 @@ public class FakeHollowHistoryUtil {
         testBlobRetriever.addSnapshot(5, new TestBlob(5,new ByteArrayInputStream(baos_v5.toByteArray())));
         testBlobRetriever.addDelta(4, new TestBlob(4, 5, new ByteArrayInputStream(baos_v4_to_v5.toByteArray())));
         testBlobRetriever.addReverseDelta(5, new TestBlob(5, 4, new ByteArrayInputStream(baos_v5_to_v4.toByteArray())));
+
+        // v6 - only snapshot artifact, to test double snapshots
+        stateEngine.prepareForNextCycle();
+        stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v6");
+        addMovie(stateEngine, 4, "movie4-added-in-v2-modified-in-v4-also-modified-in-v6");
+        addMovie(stateEngine, 7, "movie7-added-in-v6");
+        stateEngine.prepareForWrite();
+        ByteArrayOutputStream baos_v6 = new ByteArrayOutputStream();
+        writer.writeSnapshot(baos_v6);
+        testBlobRetriever.addSnapshot(6, new TestBlob(6,new ByteArrayInputStream(baos_v6.toByteArray())));
+
+        // v0 - snapshot only - just to test that double snapshot can not be applied in reverse direction
+        HollowWriteStateEngine stateEngineV0 = new HollowWriteStateEngine();
+        stateEngineV0.addTypeState(new HollowObjectTypeWriteState(movieSchema));
+        addMovie(stateEngineV0, 0, "movie0-never-shows-up-in-ui");
+        stateEngineV0.prepareForWrite();
+        ByteArrayOutputStream baos_v0 = new ByteArrayOutputStream();
+        writer.writeSnapshot(baos_v0);
+        testBlobRetriever.addSnapshot(0, new TestBlob(0,new ByteArrayInputStream(baos_v0.toByteArray())));
     }
 
     public static void assertUiParity(HollowHistoryUI hui1, HollowHistoryUI hui2) {
