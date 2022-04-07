@@ -234,24 +234,4 @@ public class DiffViewOutputGenerator {
 
         return builder.toString();
     }
-
-    // SNAP: TODO: remove?
-    public static void buildChildRowDisplayDataSimple(HollowDiffViewRow parentRow, Writer writer, boolean firstRow) throws IOException {
-        for (HollowDiffViewRow row : parentRow.getChildren()) {
-            if (row.isVisible()) {
-                if (firstRow) {
-                    firstRow = false;
-                } else {
-                    writer.write("|");
-                }
-
-                writer.write(fromContent(row));
-                writer.write("|");
-                writer.write(toContent(row));
-
-                buildChildRowDisplayDataSimple(row, writer, false);
-            }
-        }
-    }
-
 }

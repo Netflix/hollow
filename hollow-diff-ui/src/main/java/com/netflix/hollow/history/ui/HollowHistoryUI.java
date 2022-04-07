@@ -96,8 +96,8 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
             try {
                 HollowHistory history = new HollowHistory(consumerFwd.getStateEngine(), consumerRev.getStateEngine(),
                         consumerFwd.getCurrentVersionId(), consumerRev.getCurrentVersionId(), numStatesToTrack);
-                consumerFwd.addRefreshListener(new HollowHistoryRefreshListener(history));  // SNAP: TODO:
-                consumerRev.addRefreshListener(new HollowHistoryRefreshListener(history));  // SNAP: TODO:
+                consumerFwd.addRefreshListener(new HollowHistoryRefreshListener(history));
+                consumerRev.addRefreshListener(new HollowHistoryRefreshListener(history));
                 return history;
             } finally {
                 consumerFwd.getRefreshLock().unlock();
@@ -118,7 +118,7 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
      */
     public HollowHistoryUI(String baseUrlPath, HollowConsumer consumerFwd, HollowConsumer consumerRev) {
         this(baseUrlPath, consumerFwd, consumerRev, 1024, VersionTimestampConverter.PACIFIC_TIMEZONE);
-    }   // SNAP: TODO: add test/usage
+    }
 
     public HollowHistoryUI(String baseUrlPath, HollowConsumer consumerFwd, HollowConsumer consumerRev, int numStatesToTrack, TimeZone timeZone) {
         this(baseUrlPath, createHistory(consumerFwd, consumerRev, numStatesToTrack), timeZone);

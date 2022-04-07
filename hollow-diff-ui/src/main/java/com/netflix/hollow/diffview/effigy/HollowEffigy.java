@@ -19,6 +19,7 @@ package com.netflix.hollow.diffview.effigy;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The HollowEffigy is an Object-based representation of a Hollow record,
@@ -134,4 +135,25 @@ public class HollowEffigy {
         COLLECTION
     }
 
+    @Override
+    public int hashCode() {
+        int hashcode = 31 + (fields == null ? 0 : fields.hashCode());
+        return hashcode;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if(this == other)
+            return true;
+
+        if(other instanceof HollowEffigy) {
+            HollowEffigy otherEffigy = (HollowEffigy) other;
+            if (this.fields == null && otherEffigy.fields == null) {
+                return true;
+            }
+            return this.fields.equals(otherEffigy.fields);
+        }
+
+        return false;
+    }
 }

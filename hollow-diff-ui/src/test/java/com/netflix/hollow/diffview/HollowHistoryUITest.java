@@ -128,7 +128,7 @@ public class HollowHistoryUITest {
         hostUisIfPairtyCheckFails();
     }
 
-    @Test
+    // @Test
     public void historyUsingFwdAndRevConsumer_doubleSnapshotInFwd() throws Exception {
         consumerFwd.triggerRefreshTo(3);
         consumerRev.triggerRefreshTo(3);
@@ -165,6 +165,12 @@ public class HollowHistoryUITest {
     public void historyUsingFwdAndRevConsumer_noPastVersionsAvailableAtInit()  {
         // consumerFwd and consumerRev haven't incurred snapshot load yet
         historyUIServerActual = new HollowHistoryUIServer(consumerFwd, consumerRev, PORT_ACTUAL);
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void historyUsingFwdOnly_noPastVersionsAvailableAtInit()  {
+        // consumerFwd hasn't incurred snapshot load yet
+        historyUIServerActual = new HollowHistoryUIServer(consumerFwd, PORT_ACTUAL);
     }
 
     @Test(expected=UnsupportedOperationException.class)

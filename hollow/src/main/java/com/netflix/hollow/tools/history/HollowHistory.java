@@ -133,9 +133,9 @@ public class HollowHistory {
 
     /**
      * When building history bi-directionally, 2 state engines moving in opposite directions need to be maintained. They
-     * must be at the same version, or {@code revMovingHollowReadStateEngine} can be null now but later initialized by
-     * calling {@code initializeReverseStateEngine} with a snapshot for the same version as {@code fwdMovingHollowReadStateEngine}
-     * passed here.
+     * must start at the same version for contiguous history. {@code revMovingHollowReadStateEngine} can be null now and
+     * initialized later by calling {@code initializeReverseStateEngine} with the same version as
+     * {@code fwdMovingHollowReadStateEngine} passed here.
      *
      * @param fwdMovingHollowReadStateEngine The HollowReadStateEngine that will incur application of fwd deltas.
      *                                       This is required to be initialized before calling this constructor.
@@ -159,7 +159,6 @@ public class HollowHistory {
         this.historicalStateLookupMap = new HashMap<>();
         this.maxHistoricalStatesToKeep = maxHistoricalStatesToKeep;
 
-        // SNAP: TODO: validate that this is backwards compatible
         // validate fwd moving state initialization
         requireNonNull(fwdMovingHollowReadStateEngine, "Fwd direction read state engine should be initialized");
         if (fwdInitialVersion == VERSION_NONE) {

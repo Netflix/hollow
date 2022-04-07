@@ -2,19 +2,17 @@ package com.netflix.hollow.diffview;
 
 import static org.junit.Assert.assertEquals;
 
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.read.engine.HollowTypeReadState;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.diffview.effigy.HollowEffigy;
+import com.netflix.hollow.diffview.effigy.HollowEffigyFactory;
 import com.netflix.hollow.diffview.effigy.pairer.exact.HistoryExactRecordMatcher;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.model.HistoryStateTypeChanges;
 import com.netflix.hollow.history.ui.model.RecordDiff;
-import com.netflix.hollow.history.ui.model.RecordDiffTreeNode;
 import com.netflix.hollow.history.ui.naming.HollowHistoryRecordNamer;
 import com.netflix.hollow.test.consumer.TestBlob;
 import com.netflix.hollow.test.consumer.TestBlobRetriever;
@@ -25,10 +23,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.BitSet;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class FakeHollowHistoryUtil {
     private static final String CUSTOM_VERSION_TAG = "myVersion";
@@ -94,6 +92,8 @@ public class FakeHollowHistoryUtil {
         addMovie(stateEngine, 2, "movie2-added-in-v1-modified-in-v2-removed-in-v5");
         addMovie(stateEngine, 4, "movie4-added-in-v2-modified-in-v4");
         addMovie(stateEngine, 5, "movie5-added-in-v3-removed-in-v5");
+        addMovie(stateEngine, 6, "movie6-added-in-v4");
+
         stateEngine.prepareForWrite();
         ByteArrayOutputStream baos_v4 = new ByteArrayOutputStream();
         ByteArrayOutputStream baos_v3_to_v4 = new ByteArrayOutputStream();
@@ -109,7 +109,8 @@ public class FakeHollowHistoryUtil {
         stateEngine.prepareForNextCycle();
         stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v5");
         addMovie(stateEngine, 4, "movie4-added-in-v2-modified-in-v4");
-        addMovie(stateEngine, 6, "movie6-added-in-v5-removed-in-v6");   // SNAP: TODO: add a modification to v5
+        addMovie(stateEngine, 6, "movie6-added-in-v4-modified-in-v5");
+        addMovie(stateEngine, 7, "movie7-added-in-v5-removed-in-v6");
         stateEngine.prepareForWrite();
         ByteArrayOutputStream baos_v5 = new ByteArrayOutputStream();
         ByteArrayOutputStream baos_v4_to_v5 = new ByteArrayOutputStream();
@@ -125,7 +126,7 @@ public class FakeHollowHistoryUtil {
         stateEngine.prepareForNextCycle();
         stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v6");
         addMovie(stateEngine, 4, "movie4-added-in-v2-modified-in-v4-also-modified-in-v6");
-        addMovie(stateEngine, 7, "movie7-added-in-v6");
+        addMovie(stateEngine, 8, "movie8-added-in-v6");
         stateEngine.prepareForWrite();
         ByteArrayOutputStream baos_v6 = new ByteArrayOutputStream();
         writer.writeSnapshot(baos_v6);
@@ -144,11 +145,6 @@ public class FakeHollowHistoryUtil {
     public static void assertUiParity(HollowHistoryUI hui1, HollowHistoryUI hui2) {
         HollowHistory h1 = hui1.getHistory();
         HollowHistory h2 = hui2.getHistory();
-        HollowHistoryUI ui1 = new HollowHistoryUI("", h1);
-        HollowHistoryUI ui2 = new HollowHistoryUI("", h2);
-        long currentRandomizedTag1 = h1.getLatestState().getCurrentRandomizedTag();
-        long currentRandomizedTag2 = h2.getLatestState().getCurrentRandomizedTag();
-        String str1, str2, msg;
         List<RecordDiff> addedDiffs1;
         List<RecordDiff> addedDiffs2;
         List<RecordDiff> removedDiffs1;
@@ -158,7 +154,6 @@ public class FakeHollowHistoryUtil {
         HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping1;
         HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping2;
         HollowHistoricalState state1, state2;
-        HashMap<String, String> displayMapDiffView1, displayMapDiffView2;
 
         //OverviewPage
         assertEquals("Should have same number of Historical States", h1.getHistoricalStates().length, h2.getHistoricalStates().length);
@@ -172,7 +167,7 @@ public class FakeHollowHistoryUtil {
             next2 = getNextStateVersion(state2);
             prev2 = getPreviousStateVersion(state2, h2);
 
-            //make sure traversal is in the right order
+            // make sure traversal is in the right order
             assertEquals("Prev state should be the same", prev1, prev2);
             assertEquals("Next state should be the same", next1, next2);
             assertEquals("Same size of type mappings for historical state", state1.getKeyOrdinalMapping().getTypeMappings().size(), state2.getKeyOrdinalMapping().getTypeMappings().size());
@@ -205,93 +200,62 @@ public class FakeHollowHistoryUtil {
                 assertEquals("Remove Diffs size", removedDiffs1.size(), removedDiffs2.size());
                 assertEquals("Modified Diffs size", modifiedDiffs1.size(), modifiedDiffs2.size());
 
-                assertEquals("Added subgroups does not match", typeChanges1.getAddedRecords().hasSubGroups(), typeChanges2.getAddedRecords().hasSubGroups());
-                assertEquals("Removed subgroups does not match", typeChanges1.getRemovedRecords().hasSubGroups(), typeChanges2.getRemovedRecords().hasSubGroups());
-                assertEquals("Added subgroups does not match", typeChanges1.getModifiedRecords().hasSubGroups(), typeChanges2.getModifiedRecords().hasSubGroups());
+                assertEquals("Added subgroups (if any)", typeChanges1.getAddedRecords().hasSubGroups(), typeChanges2.getAddedRecords().hasSubGroups());
+                assertEquals("Removed subgroups (if any)", typeChanges1.getRemovedRecords().hasSubGroups(), typeChanges2.getRemovedRecords().hasSubGroups());
+                assertEquals("Added subgroups (if any)", typeChanges1.getModifiedRecords().hasSubGroups(), typeChanges2.getModifiedRecords().hasSubGroups());
+                HollowEffigyFactory effigyFactory = new HollowEffigyFactory();
 
+                Set<HollowEffigy> addedEffigies1 = new HashSet<>();
+                Set<HollowEffigy> addedEffigies2 = new HashSet<>();
                 if (!typeChanges1.getAddedRecords().isEmpty()) {
-                    if (!typeChanges1.getAddedRecords().hasSubGroups()) {
-                        displayMapDiffView1 = new HashMap<>();
-                        displayMapDiffView2= new HashMap<>();
-                        for (int i = 0; i < addedDiffs1.size(); i++) {
-                            str1 = getDiffViewOutput(state2, key, addedDiffs1.get(i), currentRandomizedTag1, ui1);
-                            str2 = getDiffViewOutput(state1, key, addedDiffs2.get(i), currentRandomizedTag2, ui2);
-                            displayMapDiffView1.put(addedDiffs1.get(i).getIdentifierString(), str1);
-                            displayMapDiffView2.put(addedDiffs2.get(i).getIdentifierString(), str2);
-                        }
-                        assertEquals(displayMapDiffView1, displayMapDiffView2);
-                    } else {    // SNAP: TODO: to test with subgroups, or remove
-                        assertEquals("Added records of sub groups size", typeChanges1.getAddedRecords().getSubGroups().size(),
-                                typeChanges2.getAddedRecords().getSubGroups().size());
-                        for (int i = 0; i < typeChanges1.getAddedRecords().getSubGroups().size(); i++) {
-                            assertEquals("Added Record group name",
-                                    ((RecordDiffTreeNode) typeChanges1.getAddedRecords().getSubGroups().toArray()[i]).getGroupName(),
-                                    ((RecordDiffTreeNode) typeChanges2.getAddedRecords().getSubGroups().toArray()[i]).getGroupName());
-                            assertEquals("Added Record group name",
-                                    ((RecordDiffTreeNode) typeChanges1.getAddedRecords().getSubGroups().toArray()[i]).getDiffCount(),
-                                    ((RecordDiffTreeNode) typeChanges2.getAddedRecords().getSubGroups().toArray()[i]).getDiffCount());
-                            assertEquals("Added Record group name",
-                                    ((RecordDiffTreeNode) typeChanges1.getAddedRecords().getSubGroups().toArray()[i]).getHierarchicalFieldName(),
-                                    ((RecordDiffTreeNode) typeChanges2.getAddedRecords().getSubGroups().toArray()[i]).getHierarchicalFieldName());
-                        }
+                    for (int i = 0; i < addedDiffs1.size(); i++) {
+                        RecordDiff recordDiff1 = addedDiffs1.get(i);    // need to add to map or a set maybe?
+                        HollowEffigy toEffigy1 = effigyFactory.effigy(state1.getDataAccess(), "Movie", recordDiff1.getToOrdinal());
+                        addedEffigies1.add(toEffigy1);
+
+                        RecordDiff recordDiff2 = addedDiffs1.get(i);
+                        HollowEffigy toEffigy2 = effigyFactory.effigy(state1.getDataAccess(), "Movie", recordDiff2.getToOrdinal());
+                        addedEffigies2.add(toEffigy2);
                     }
                 }
+                assertEquals(addedEffigies1, addedEffigies2);
 
+                Set<HollowEffigy> modifiedFromEffigies1 = new HashSet<>();
+                Set<HollowEffigy> modifiedToEffigies1 = new HashSet<>();
+                Set<HollowEffigy> modifiedFromEffigies2 = new HashSet<>();
+                Set<HollowEffigy> modifiedToEffigies2 = new HashSet<>();
                 if (!typeChanges1.getModifiedRecords().isEmpty()) {
-                    if (!typeChanges1.getModifiedRecords().hasSubGroups()) {
-                        displayMapDiffView1 = new HashMap<>();
-                        displayMapDiffView2= new HashMap<>();
-                        for (int i = 0; i < modifiedDiffs1.size(); i++) {
-                            str1 = getDiffViewOutput(state1, key, modifiedDiffs1.get(i), currentRandomizedTag1, ui1);
-                            str2 = getDiffViewOutput(state2, key, modifiedDiffs2.get(i), currentRandomizedTag2, ui2);
-                            displayMapDiffView1.put(modifiedDiffs1.get(i).getIdentifierString(), str1);
-                            displayMapDiffView2.put(modifiedDiffs2.get(i).getIdentifierString(), str2);
-                        }
-                        assertEquals(displayMapDiffView1, displayMapDiffView2);
-                    } else {
-                        assertEquals("Modified records of sub groups size", typeChanges1.getModifiedRecords().getSubGroups().size(),
-                                typeChanges2.getModifiedRecords().getSubGroups().size());
-                        for (int i = 0; i < typeChanges1.getModifiedRecords().getSubGroups().size(); i++) {
-                            assertEquals("Modified Record group name",
-                                    ((RecordDiffTreeNode) typeChanges1.getModifiedRecords().getSubGroups().toArray()[i]).getGroupName(),
-                                    ((RecordDiffTreeNode) typeChanges2.getModifiedRecords().getSubGroups().toArray()[i]).getGroupName());
-                            assertEquals("Modified Record group name",
-                                    ((RecordDiffTreeNode) typeChanges1.getModifiedRecords().getSubGroups().toArray()[i]).getDiffCount(),
-                                    ((RecordDiffTreeNode) typeChanges2.getModifiedRecords().getSubGroups().toArray()[i]).getDiffCount());
-                            assertEquals("Modified Record group name",
-                                    ((RecordDiffTreeNode) typeChanges1.getModifiedRecords().getSubGroups().toArray()[i]).getHierarchicalFieldName(),
-                                    ((RecordDiffTreeNode) typeChanges2.getModifiedRecords().getSubGroups().toArray()[i]).getHierarchicalFieldName());
-                        }
-                    }
-                }
+                    for (int i = 0; i < modifiedDiffs1.size(); i++) {
+                        RecordDiff recordDiff1 = modifiedDiffs1.get(i);
+                        HollowEffigy fromEffigy1 = effigyFactory.effigy(state1.getDataAccess(), "Movie", recordDiff1.getFromOrdinal());
+                        modifiedFromEffigies1.add(fromEffigy1);
+                        HollowEffigy toEffigy1 = effigyFactory.effigy(state1.getDataAccess(), "Movie", recordDiff1.getToOrdinal());
+                        modifiedToEffigies1.add(toEffigy1);
 
-                if (!typeChanges1.getRemovedRecords().isEmpty()) {
-                    if (!typeChanges1.getRemovedRecords().hasSubGroups()) {
-                        displayMapDiffView1 = new HashMap<>();
-                        displayMapDiffView2= new HashMap<>();
-                        for (int i = 0; i < removedDiffs1.size(); i++) {
-                            str1 = getDiffViewOutput(state1, key, removedDiffs1.get(i), currentRandomizedTag1, ui1);
-                            str2 = getDiffViewOutput(state2, key, removedDiffs2.get(i), currentRandomizedTag2, ui2);
-                            displayMapDiffView1.put(removedDiffs1.get(i).getIdentifierString(), str1);
-                            displayMapDiffView2.put(removedDiffs1.get(i).getIdentifierString(), str2);
-                        }
-                        assertEquals(displayMapDiffView1, displayMapDiffView2);
-                    } else {
-                        assertEquals("Removed records of sub groups size", typeChanges1.getRemovedRecords().getSubGroups().size(),
-                                typeChanges2.getRemovedRecords().getSubGroups().size());
-                        for (int i = 0; i < typeChanges1.getRemovedRecords().getSubGroups().size(); i++) {
-                            assertEquals("Removed Record group name",
-                                    ((RecordDiffTreeNode) typeChanges1.getRemovedRecords().getSubGroups().toArray()[i]).getGroupName(),
-                                    ((RecordDiffTreeNode) typeChanges2.getRemovedRecords().getSubGroups().toArray()[i]).getGroupName());
-                            assertEquals("Removed Record group name",
-                                    ((RecordDiffTreeNode) typeChanges1.getRemovedRecords().getSubGroups().toArray()[i]).getDiffCount(),
-                                    ((RecordDiffTreeNode) typeChanges2.getRemovedRecords().getSubGroups().toArray()[i]).getDiffCount());
-                            assertEquals("Removed Record group name",
-                                    ((RecordDiffTreeNode) typeChanges1.getRemovedRecords().getSubGroups().toArray()[i]).getHierarchicalFieldName(),
-                                    ((RecordDiffTreeNode) typeChanges2.getRemovedRecords().getSubGroups().toArray()[i]).getHierarchicalFieldName());
-                        }
+                        RecordDiff recordDiff2 = modifiedDiffs1.get(i);
+                        HollowEffigy fromEffigy2 = effigyFactory.effigy(state2.getDataAccess(), "Movie", recordDiff2.getFromOrdinal());
+                        modifiedFromEffigies2.add(fromEffigy2);
+                        HollowEffigy toEffigy2 = effigyFactory.effigy(state2.getDataAccess(), "Movie", recordDiff2.getToOrdinal());
+                        modifiedToEffigies2.add(toEffigy2);
                     }
                 }
+                assertEquals(modifiedFromEffigies1, modifiedFromEffigies2);
+                assertEquals(modifiedToEffigies1, modifiedToEffigies2);
+
+                Set<HollowEffigy> removedEffigies1 = new HashSet<>();
+                Set<HollowEffigy> removedEffigies2 = new HashSet<>();
+                if (!typeChanges1.getRemovedRecords().isEmpty()) {
+                    for (int i = 0; i < removedDiffs1.size(); i++) {
+                        RecordDiff recordDiff1 = removedDiffs1.get(i);
+                        HollowEffigy fromEffigy1 = effigyFactory.effigy(state1.getDataAccess(), "Movie", recordDiff1.getFromOrdinal());
+                        removedEffigies1.add(fromEffigy1);
+
+                        RecordDiff recordDiff2 = removedDiffs1.get(i);
+                        HollowEffigy fromEffigy2 = effigyFactory.effigy(state2.getDataAccess(), "Movie", recordDiff2.getFromOrdinal());
+                        removedEffigies2.add(fromEffigy2);
+                    }
+                }
+                assertEquals(removedEffigies1, removedEffigies2);
             }
         }
     }
@@ -311,20 +275,20 @@ public class FakeHollowHistoryUtil {
         return -1;
     }
 
-    public static String getDiffViewOutput(HollowHistoricalState stateD, String key, RecordDiff addedDiff, long currentRandomizedTagD, HollowHistoryUI historyUI) {
-        HollowDiffViewRow rootRowD = new HollowObjectDiffViewGenerator(stateD.getDataAccess(), stateD.getDataAccess(),
+    public static String getDiffViewOutput(HollowHistoricalState state, String key, RecordDiff addedDiff, long currentRandomizedTagD, HollowHistoryUI historyUI) {
+        HollowDiffViewRow rootRow = new HollowObjectDiffViewGenerator(state.getDataAccess(), state.getDataAccess(),
                 historyUI, key,
                 addedDiff.getFromOrdinal(),
                 addedDiff.getToOrdinal()).getHollowDiffViewRows();
-        HollowHistoryView objectViewD = new HollowHistoryView(stateD.getVersion(), key,
+        HollowHistoryView objectView = new HollowHistoryView(state.getVersion(), key,
                 addedDiff.getKeyOrdinal(), currentRandomizedTagD,
-                rootRowD, HistoryExactRecordMatcher.INSTANCE);
-        objectViewD.resetView();
+                rootRow, HistoryExactRecordMatcher.INSTANCE);
+        objectView.resetView();
 
         String diffViewOutputD = null;
         try {
             StringWriter writer = new StringWriter();
-            DiffViewOutputGenerator.buildChildRowDisplayData(objectViewD.getRootRow(), writer);
+            DiffViewOutputGenerator.buildChildRowDisplayData(objectView.getRootRow(), writer);
             diffViewOutputD = writer.toString();
         } catch(IOException unexpected) {
             throw new RuntimeException(unexpected);
@@ -337,20 +301,5 @@ public class FakeHollowHistoryUtil {
         rec.setInt("id", id);
         rec.setString("name", name);
         stateEngine.add("Movie", rec);
-    }
-
-    private void exploreOrdinals(HollowReadStateEngine readStateEngine, long v) {
-        System.out.println("readStateEngine= " + readStateEngine + ", v= " + v);
-        for (HollowTypeReadState typeReadState : readStateEngine.getTypeStates()) {
-            BitSet populatedOrdinals = typeReadState.getPopulatedOrdinals();
-            System.out.println("Type= " + typeReadState.getSchema().getName() + ", PopulatedOrdinals= " + populatedOrdinals);
-            int ordinal = populatedOrdinals.nextSetBit(0);
-            while (ordinal != -1) {
-
-                HollowObjectTypeReadState o = (HollowObjectTypeReadState) typeReadState;
-                // SNAP: System.out.println(String.format("%s: %s, %s", ordinal, o.readInt(ordinal, 0), o.readInt(ordinal, 1)));
-                ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
-            }
-        }
     }
 }
