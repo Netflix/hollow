@@ -124,7 +124,7 @@ public class FakeHollowHistoryUtil {
         testBlobRetriever.addDelta(4, new TestBlob(4, 5, new ByteArrayInputStream(baos_v4_to_v5.toByteArray())));
         testBlobRetriever.addReverseDelta(5, new TestBlob(5, 4, new ByteArrayInputStream(baos_v5_to_v4.toByteArray())));
 
-        // v6 - only snapshot artifact, to test double snapshots
+        // v6 - only snapshot artifact, also contains new type in schema- to test double snapshots
         stateEngine.prepareForNextCycle();
         stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v6");
         addMovie(stateEngine, 4, "movie4-added-in-v2-modified-in-v4-also-modified-in-v6");
@@ -133,6 +133,26 @@ public class FakeHollowHistoryUtil {
         ByteArrayOutputStream baos_v6 = new ByteArrayOutputStream();
         writer.writeSnapshot(baos_v6);
         testBlobRetriever.addSnapshot(6, new TestBlob(6,new ByteArrayInputStream(baos_v6.toByteArray())));
+
+
+        // v7 - introduces schema change
+        stateEngine.prepareForNextCycle();
+        HollowObjectSchema actorSchema = new HollowObjectSchema("Actor", 1, "id");
+        actorSchema.addField("id", HollowObjectSchema.FieldType.INT);
+        stateEngine.addTypeState(new HollowObjectTypeWriteState(actorSchema));
+        stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v7");
+        addMovie(stateEngine, 4, "movie4-added-in-v2-modified-in-v4-also-modified-in-v6");
+        addActor(stateEngine, 1);
+        stateEngine.prepareForWrite();
+        ByteArrayOutputStream baos_v7 = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos_v6_to_v7 = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos_v7_to_v6 = new ByteArrayOutputStream();
+        writer.writeSnapshot(baos_v7);
+        writer.writeDelta(baos_v6_to_v7);
+        writer.writeReverseDelta(baos_v7_to_v6);
+        testBlobRetriever.addSnapshot(7, new TestBlob(7, new ByteArrayInputStream(baos_v7.toByteArray())));
+        testBlobRetriever.addDelta(6, new TestBlob(6, 7, new ByteArrayInputStream(baos_v6_to_v7.toByteArray())));
+        testBlobRetriever.addReverseDelta(7, new TestBlob(7, 6, new ByteArrayInputStream(baos_v7_to_v6.toByteArray())));
 
         // v0 - snapshot only - just to test that double snapshot can not be applied in reverse direction
         HollowWriteStateEngine stateEngineV0 = new HollowWriteStateEngine();
@@ -269,5 +289,11 @@ public class FakeHollowHistoryUtil {
         rec.setInt("id", id);
         rec.setString("name", name);
         stateEngine.add("Movie", rec);
+    }
+
+    private static void addActor(HollowWriteStateEngine stateEngine, int id) {
+        HollowObjectWriteRecord rec = new HollowObjectWriteRecord((HollowObjectSchema) stateEngine.getSchema("Actor"));
+        rec.setInt("id", id);
+        stateEngine.add("Actor", rec);
     }
 }

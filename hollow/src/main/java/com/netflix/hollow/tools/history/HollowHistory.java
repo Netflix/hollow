@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Logger;
 
 /**
  * Retains, in memory, the changes in a dataset over many states.  Indexes data for efficient retrieval from any
@@ -59,7 +58,6 @@ import java.util.logging.Logger;
  */
 public class HollowHistory {
 
-    private final Logger log = Logger.getLogger(HollowHistory.class.getName());
     private final HollowHistoryKeyIndex keyIndex;
     private final HollowHistoricalStateCreator creator;
     private final int maxHistoricalStatesToKeep;
@@ -308,7 +306,6 @@ public class HollowHistory {
         addHistoricalState(historicalState);
         this.latestVersion = newVersion;
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
-        log.info("Delta to version: " + this.latestVersion);
     }
 
     /**
@@ -353,7 +350,6 @@ public class HollowHistory {
 
         addReverseHistoricalState(historicalState);
         this.oldestVersion = newVersion;
-        log.info("Reverse delta to version:" + this.oldestVersion);
     }
 
     /**

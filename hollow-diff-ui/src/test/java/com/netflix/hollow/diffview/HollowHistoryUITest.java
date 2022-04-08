@@ -1,6 +1,7 @@
 package com.netflix.hollow.diffview;
 
 import static com.netflix.hollow.diffview.FakeHollowHistoryUtil.assertUiParity;
+import static org.junit.Assert.assertNotNull;
 
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
@@ -159,6 +160,19 @@ public class HollowHistoryUITest {
         consumerFwd.triggerRefreshTo(5);
 
         consumerRev.triggerRefreshTo(0);   // double snapshot in rev direction (not supported)
+    }
+
+    @Test
+    public void historyUsingFwdAndRevConsumer_backwardsCompatbileSchemaChange() throws Exception {
+        consumerFwd.triggerRefreshTo(7);    // version in whcih actor type was introduced
+        consumerRev.triggerRefreshTo(7);
+
+        historyUIServerActual = new HollowHistoryUIServer(consumerFwd, consumerRev, PORT_ACTUAL);
+
+        consumerRev.triggerRefreshTo(6);
+
+        assertNotNull(historyUIServerActual.getUI().getHistory().getHistoricalState(7).getDataAccess()
+                .getTypeDataAccess("Actor").getDataAccess());
     }
 
     @Test
