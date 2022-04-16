@@ -85,7 +85,7 @@ public class FakeHollowHistoryUtil {
         writer.writeDelta(baos_v2_to_v3);
         writer.writeReverseDelta(baos_v3_to_v2);
         testBlobRetriever.addSnapshot(3, new TestBlob(3,new ByteArrayInputStream(baos_v3.toByteArray())));
-        testBlobRetriever.addDelta(2, new TestBlob(2, 2, new ByteArrayInputStream(baos_v2_to_v3.toByteArray())));
+        testBlobRetriever.addDelta(2, new TestBlob(2, 3, new ByteArrayInputStream(baos_v2_to_v3.toByteArray())));
         testBlobRetriever.addReverseDelta(3, new TestBlob(3, 2, new ByteArrayInputStream(baos_v3_to_v2.toByteArray())));
 
         // v4

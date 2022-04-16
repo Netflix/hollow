@@ -47,13 +47,18 @@ public class HollowHistoryUIServer {
      * Serves HollowHistoryUI that supports building history in both directions simultaneously.
      * Fwd and rev consumers should be initialized to the same version before calling this constructor.
      * Attempting double snapshots or forward version transitions on consumerRev will have unintended consequences on history.
+     * This constructor defaults max states to 1024 and time zone to PST.
      *
      * @param consumerFwd HollowConsumer (already initialized with data) that will be traversing forward deltas
      * @param consumerRev HollowConsumer (also initialized to the same version as consumerFwd) that will be traversing reverse deltas
      * @param port server port
      */
     public HollowHistoryUIServer(HollowConsumer consumerFwd, HollowConsumer consumerRev, int port) {
-        this(new HollowHistoryUI("", consumerFwd, consumerRev), port);
+        this(consumerFwd, consumerRev, 1024, port, VersionTimestampConverter.PACIFIC_TIMEZONE);
+    }
+
+    public HollowHistoryUIServer(HollowConsumer consumerFwd, HollowConsumer consumerRev, int numStatesToTrack, int port, TimeZone timeZone) {
+        this(new HollowHistoryUI("", consumerFwd, consumerRev, numStatesToTrack, timeZone), port);
     }
 
     public HollowHistoryUIServer(HollowConsumer consumer, int numStatesToTrack, int port, TimeZone timeZone) {

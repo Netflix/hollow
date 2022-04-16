@@ -145,8 +145,9 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
             try {
                 HollowHistory history = new HollowHistory(consumerFwd.getStateEngine(), consumerRev.getStateEngine(),
                         consumerFwd.getCurrentVersionId(), consumerRev.getCurrentVersionId(), numStatesToTrack);
-                consumerFwd.addRefreshListener(new HollowHistoryRefreshListener(history));
-                consumerRev.addRefreshListener(new HollowHistoryRefreshListener(history));
+                HollowHistoryRefreshListener listener = new HollowHistoryRefreshListener(history);
+                consumerFwd.addRefreshListener(listener);
+                consumerRev.addRefreshListener(listener);
                 return history;
             } finally {
                 consumerFwd.getRefreshLock().unlock();
