@@ -13,3 +13,4 @@ venv
 
 # publishing secrets
 secrets/signing-key
+.DS_Store

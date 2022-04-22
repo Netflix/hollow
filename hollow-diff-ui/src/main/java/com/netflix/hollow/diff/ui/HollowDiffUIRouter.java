@@ -44,16 +44,16 @@ public class HollowDiffUIRouter extends HollowUIRouter {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String diffUIKey = getTargetRootPath(req.getPathInfo());
+        String diffUIKey = getTargetRootPath(req);
 
         if ("resource".equals(diffUIKey)) {
-             if (serveResource(req, resp, getResourceName(req.getPathInfo())))
+             if (serveResource(req, resp, getResourceName(req)))
                   return;
         } else {
              HollowDiffUI ui = diffUIs.get(diffUIKey);
 
              if (ui != null) {
-                 if (ui.serveRequest(getResourceName(req.getPathInfo()), req, resp))
+                 if (ui.serveRequest(getResourceName(req), req, resp))
                      return;
              }
         }

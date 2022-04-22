@@ -78,7 +78,7 @@ public class HollowExplorerUI extends HollowUIRouter {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String pageName = getTargetRootPath(req.getPathInfo());
+        String pageName = getTargetRootPath(req);
         
         HollowUISession session = HollowUISession.getSession(req, resp);
         

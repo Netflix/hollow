@@ -53,7 +53,11 @@ public abstract class HollowUIRouter extends HttpServlet {
         return baseUrlPath;
     }
 
-    protected String getTargetRootPath(String target) {
+    protected String getTargetRootPath(HttpServletRequest req) {
+        String target = req.getPathInfo();
+        if (target == null) { // Spring MVC returns null.
+            target = req.getServletPath();
+        }
         int baseLength = baseUrlPath.length() + 1;
 
         if(target.length() < baseLength)
@@ -67,7 +71,11 @@ public abstract class HollowUIRouter extends HttpServlet {
         return target.substring(baseLength, secondSlashIndex);
     }
 
-    protected String getResourceName(String target) {
+    protected String getResourceName(HttpServletRequest req) {
+        String target = req.getPathInfo();
+        if (target == null) { // Spring MVC returns null.
+            target = req.getServletPath();
+        }
         int baseLength = baseUrlPath.length() + 1;
 
         int secondSlashIndex = target.indexOf('/', baseLength);

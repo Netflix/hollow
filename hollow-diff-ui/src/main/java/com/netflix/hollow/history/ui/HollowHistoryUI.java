@@ -123,7 +123,7 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String pageName = getTargetRootPath(req.getPathInfo());
+        String pageName = getTargetRootPath(req);
 
         if("diffrowdata".equals(pageName)) {
             diffViewOutputGenerator.uncollapseRow(req, resp);
@@ -137,7 +137,7 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
 
 
         if("resource".equals(pageName)) {
-            if(serveResource(req, resp, getResourceName(req.getPathInfo())))
+            if(serveResource(req, resp, getResourceName(req)))
                 return;
         } else if("".equals(pageName) || "overview".equals(pageName)) {
         	if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
