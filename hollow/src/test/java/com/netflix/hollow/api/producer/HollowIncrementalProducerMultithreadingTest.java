@@ -119,7 +119,7 @@ public class HollowIncrementalProducerMultithreadingTest {
 
     private GenericHollowObject getHollowObject(HollowPrimaryKeyIndex idx, Object... keys) {
         int ordinal = getOrdinal(idx, keys);
-        return new GenericHollowObject(idx.getTypeState(), ordinal);
+        return new GenericHollowObject(idx.getObjectTypeDataAccess(), ordinal);
     }
 
     private int getOrdinal(HollowPrimaryKeyIndex idx, Object... keys) {
