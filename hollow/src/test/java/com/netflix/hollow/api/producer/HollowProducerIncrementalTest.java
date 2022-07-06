@@ -581,7 +581,7 @@ public class HollowProducerIncrementalTest {
         } else {
             Assert.assertNotEquals(-1, ordinal);
             GenericHollowObject obj = new GenericHollowObject(
-                    typeAIdx.getObjectTypeDataAccess(), ordinal);
+                    typeAIdx.getTypeState(), ordinal);
             Assert.assertEquals(expectedValue.longValue(), obj.getLong("value"));
         }
     }
@@ -596,7 +596,7 @@ public class HollowProducerIncrementalTest {
         } else {
             Assert.assertNotEquals(-1, ordinal);
             GenericHollowObject obj = new GenericHollowObject(
-                    typeBIdx.getObjectTypeDataAccess(), ordinal);
+                    typeBIdx.getTypeState(), ordinal);
             Assert.assertEquals(expectedValue, obj.getObject("value")
                     .getString("value"));
         }

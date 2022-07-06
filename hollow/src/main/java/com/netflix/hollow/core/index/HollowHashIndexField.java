@@ -22,11 +22,11 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
 public class HollowHashIndexField {
     private final int baseIteratorFieldIdx;
-    private final FieldPathElement[] schemaFieldPositionPath;
+    private final FieldPathSegment[] schemaFieldPositionPath;
     private final HollowTypeDataAccess baseDataAccess;
     private final FieldType fieldType;
 
-    public HollowHashIndexField(int baseIteratorFieldIdx, FieldPathElement[] remainingPath, HollowTypeDataAccess baseDataAccess, FieldType fieldType) {
+    public HollowHashIndexField(int baseIteratorFieldIdx, FieldPathSegment[] remainingPath, HollowTypeDataAccess baseDataAccess, FieldType fieldType) {
         this.baseIteratorFieldIdx = baseIteratorFieldIdx;
         this.schemaFieldPositionPath = remainingPath;
         this.baseDataAccess = baseDataAccess;
@@ -41,11 +41,11 @@ public class HollowHashIndexField {
         return baseIteratorFieldIdx;
     }
 
-    public FieldPathElement[] getSchemaFieldPositionPath() {
+    public FieldPathSegment[] getSchemaFieldPositionPath() {
         return schemaFieldPositionPath;
     }
 
-    FieldPathElement getLastFieldPositionPathElement() {
+    FieldPathSegment getLastFieldPositionPathElement() {
         return schemaFieldPositionPath[schemaFieldPositionPath.length - 1];
     }
 
@@ -53,9 +53,9 @@ public class HollowHashIndexField {
         return fieldType;
     }
 
-    static class FieldPathElement {
+    static class FieldPathSegment {
         /**
-         * Field position for this element of the path. For path {@code actor.name},
+         * Field position for this segment of the path. For path {@code actor.name},
          * {@code actor} is 0 and {@code name} is 1.
          */
         private final int fieldPosition;
@@ -67,7 +67,7 @@ public class HollowHashIndexField {
          */
         private final HollowObjectTypeDataAccess objectTypeDataAccess;
 
-        FieldPathElement(int fieldPosition, HollowObjectTypeDataAccess objectTypeDataAccess) {
+        FieldPathSegment(int fieldPosition, HollowObjectTypeDataAccess objectTypeDataAccess) {
             this.fieldPosition = fieldPosition;
             this.objectTypeDataAccess = objectTypeDataAccess;
         }
@@ -80,7 +80,7 @@ public class HollowHashIndexField {
             return this.objectTypeDataAccess.readOrdinal(ordinal, fieldPosition);
         }
 
-        int getFieldPosition() {
+        int getSegmentFieldPosition() {
             return fieldPosition;
         }
 

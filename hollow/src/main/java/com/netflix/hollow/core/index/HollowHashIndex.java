@@ -16,8 +16,10 @@
  */
 package com.netflix.hollow.core.index;
 
+import static java.util.Objects.requireNonNull;
+
 import com.netflix.hollow.core.HollowConstants;
-import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathElement;
+import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathSegment;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
@@ -25,8 +27,6 @@ import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * A HollowHashIndex is used for indexing non-primary-key data.  This type of index can map multiple keys to a single matching record, and/or
@@ -154,7 +154,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
             HollowHashIndexField field = hashState.getMatchFields()[i];
             int hashOrdinal = (int)matchHashTable.getElementValue(hashBucketBit + hashState.getOffsetPerTraverserField()[field.getBaseIteratorFieldIdx()], hashState.getBitsPerTraverserField()[field.getBaseIteratorFieldIdx()]) - 1;
 
-            FieldPathElement[] fieldPath = field.getSchemaFieldPositionPath();
+            FieldPathSegment[] fieldPath = field.getSchemaFieldPositionPath();
 
             if(fieldPath.length == 0) {
                 if (!query[i].equals(hashOrdinal))
@@ -168,8 +168,8 @@ public class HollowHashIndex implements HollowTypeStateListener {
                     }
                 }
 
-                FieldPathElement lastPathElement = fieldPath[fieldPath.length - 1];
-                if(hashOrdinal == HollowConstants.ORDINAL_NONE || !HollowReadFieldUtils.fieldValueEquals(lastPathElement.getObjectTypeDataAccess(), hashOrdinal, lastPathElement.getFieldPosition(), query[i])) {
+                FieldPathSegment lastPathElement = fieldPath[fieldPath.length - 1];
+                if(hashOrdinal == HollowConstants.ORDINAL_NONE || !HollowReadFieldUtils.fieldValueEquals(lastPathElement.getObjectTypeDataAccess(), hashOrdinal, lastPathElement.getSegmentFieldPosition(), query[i])) {
                     return false;
                 }
             }

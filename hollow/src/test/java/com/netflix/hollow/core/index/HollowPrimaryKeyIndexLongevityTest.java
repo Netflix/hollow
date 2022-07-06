@@ -47,8 +47,8 @@ public class HollowPrimaryKeyIndexLongevityTest {
         //simulate that.
 
         //Auto discover the keys
-        HollowPrimaryKeyIndex longSnapshot0 = new HollowPrimaryKeyIndex(longConsumer.getAPI().getDataAccess(), "TypeA");
-        HollowPrimaryKeyIndex shortSnapshot0 = new HollowPrimaryKeyIndex(shortConsumer.getAPI().getDataAccess(), "TypeA");
+        HollowUniqueKeyIndex longSnapshot0 = new HollowUniqueKeyIndex(longConsumer.getAPI().getDataAccess(), "TypeA");
+        HollowUniqueKeyIndex shortSnapshot0 = new HollowUniqueKeyIndex(shortConsumer.getAPI().getDataAccess(), "TypeA");
         int longOrd0 = longSnapshot0.getMatchingOrdinal(0);
         int longOrd1 = longSnapshot0.getMatchingOrdinal(1);
         int longOrd2 = longSnapshot0.getMatchingOrdinal(2);
@@ -67,8 +67,8 @@ public class HollowPrimaryKeyIndexLongevityTest {
         HollowWriteStateEngine delta1Engine = createSnapshot(0,5, "delta1");
         longConsumer.applyDelta(1, delta1Engine);
         shortConsumer.applyDelta(1, delta1Engine);
-        HollowPrimaryKeyIndex longDelta1 = new HollowPrimaryKeyIndex(longConsumer.getAPI().getDataAccess(), "TypeA");
-        HollowPrimaryKeyIndex shortDelta1 = new HollowPrimaryKeyIndex(shortConsumer.getAPI().getDataAccess(), "TypeA");
+        HollowUniqueKeyIndex longDelta1 = new HollowUniqueKeyIndex(longConsumer.getAPI().getDataAccess(), "TypeA");
+        HollowUniqueKeyIndex shortDelta1 = new HollowUniqueKeyIndex(shortConsumer.getAPI().getDataAccess(), "TypeA");
         assertThat(longConsumer.getAPI()).isNotSameAs(longSnapshotApi);
         //The ordinals should all change because every record was updated.
         assertThat(longDelta1.getMatchingOrdinal(0)).isNotEqualTo(longOrd0).isNotEqualTo(-1);
@@ -90,8 +90,8 @@ public class HollowPrimaryKeyIndexLongevityTest {
         HollowWriteStateEngine delta2Engine = createSnapshot(4,10, "delta1");
         longConsumer.applyDelta(2, delta2Engine);
         shortConsumer.applyDelta(2, delta2Engine);
-        HollowPrimaryKeyIndex longDelta2 = new HollowPrimaryKeyIndex(longConsumer.getAPI().getDataAccess(), "TypeA");
-        HollowPrimaryKeyIndex shortDelta2 = new HollowPrimaryKeyIndex(shortConsumer.getAPI().getDataAccess(), "TypeA");
+        HollowUniqueKeyIndex longDelta2 = new HollowUniqueKeyIndex(longConsumer.getAPI().getDataAccess(), "TypeA");
+        HollowUniqueKeyIndex shortDelta2 = new HollowUniqueKeyIndex(shortConsumer.getAPI().getDataAccess(), "TypeA");
         assertThat(longConsumer.getAPI()).isNotSameAs(longSnapshotApi);
         assertThat(longDelta2.getMatchingOrdinal(0)).isEqualTo(-1);
         assertThat(longDelta2.getMatchingOrdinal(1)).isEqualTo(-1);

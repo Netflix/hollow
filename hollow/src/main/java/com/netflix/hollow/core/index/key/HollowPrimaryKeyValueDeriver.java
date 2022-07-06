@@ -17,9 +17,7 @@
 package com.netflix.hollow.core.index.key;
 
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
-import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -31,30 +29,30 @@ import java.util.Arrays;
  */
 public class HollowPrimaryKeyValueDeriver {
 
-    private final HollowObjectTypeDataAccess typeDataAccess;
+    private final HollowObjectTypeReadState typeState;
     private final int[][] fieldPathIndexes;
     private final FieldType[] fieldTypes;
 
     /**
      * Create a new deriver.
      *
-     * @param primaryKey    The primary key spec
-     * @param hollowDataset The state engine to retrieve data from
+     * @param primaryKey The primary key spec
+     * @param stateEngine The state engine to retrieve data from
      */
-    public HollowPrimaryKeyValueDeriver(PrimaryKey primaryKey, HollowDataAccess hollowDataset) {
+    public HollowPrimaryKeyValueDeriver(PrimaryKey primaryKey, HollowReadStateEngine stateEngine) {
         this.fieldPathIndexes = new int[primaryKey.numFields()][];
         this.fieldTypes = new FieldType[primaryKey.numFields()];
 
-        for (int i = 0; i < primaryKey.numFields(); i++) {
-            fieldPathIndexes[i] = primaryKey.getFieldPathIndex(hollowDataset, i);
-            fieldTypes[i] = primaryKey.getFieldType(hollowDataset, i);
+        for(int i=0;i<primaryKey.numFields();i++) {
+            fieldPathIndexes[i] = primaryKey.getFieldPathIndex(stateEngine, i);
+            fieldTypes[i] = primaryKey.getFieldType(stateEngine, i);
         }
 
-        this.typeDataAccess = (HollowObjectTypeReadState) hollowDataset.getTypeDataAccess(primaryKey.getType());
+        this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
     }
 
-    public HollowPrimaryKeyValueDeriver(HollowObjectTypeDataAccess typeDataAccess, int[][] fieldPathIndexes,  FieldType[] fieldTypes) {
-        this.typeDataAccess = typeDataAccess;
+    public HollowPrimaryKeyValueDeriver(HollowObjectTypeReadState typeState, int[][] fieldPathIndexes, FieldType[] fieldTypes) {
+        this.typeState = typeState;
         this.fieldPathIndexes = fieldPathIndexes;
         this.fieldTypes = fieldTypes;
     }
@@ -63,61 +61,65 @@ public class HollowPrimaryKeyValueDeriver {
      * Determine whether or not the specified ordinal contains the provided primary key value.
      *
      * @param ordinal the oridinal
-     * @param keys    the primary keys
+     * @param keys the primary keys
      * @return true if the ordinal contains the primary keys
      */
     public boolean keyMatches(int ordinal, Object... keys) {
-        if (keys.length != fieldPathIndexes.length)
+        if(keys.length != fieldPathIndexes.length)
             return false;
 
-        for (int i = 0; i < keys.length; i++) {
-            if (!keyMatches(keys[i], ordinal, i))
+        for(int i=0;i<keys.length;i++) {
+            if(!keyMatches(keys[i], ordinal, i))
                 return false;
         }
 
         return true;
     }
 
-    @SuppressWarnings("UnnecessaryUnboxing")
     public boolean keyMatches(Object key, int ordinal, int fieldIdx) {
-        HollowObjectTypeDataAccess typeDataAccess = this.typeDataAccess;
-        HollowObjectSchema schema = typeDataAccess.getSchema();
+        HollowObjectTypeReadState typeState = this.typeState;
+        HollowObjectSchema schema = typeState.getSchema();
 
         int lastFieldPath = fieldPathIndexes[fieldIdx].length - 1;
-        for (int i = 0; i < lastFieldPath; i++) {
+        for(int i=0;i<lastFieldPath;i++) {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
-            ordinal = typeDataAccess.readOrdinal(ordinal, fieldPosition);
-            typeDataAccess = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition);
-            schema = typeDataAccess.getSchema();
+            ordinal = typeState.readOrdinal(ordinal, fieldPosition);
+            typeState = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition);
+            schema = typeState.getSchema();
         }
 
         int lastFieldIdx = fieldPathIndexes[fieldIdx][lastFieldPath];
 
-        switch (fieldTypes[fieldIdx]) {
+        return keyMatches(key, fieldTypes[fieldIdx], lastFieldIdx, ordinal, typeState);
+    }
+
+    @SuppressWarnings("UnnecessaryUnboxing")
+    public static boolean keyMatches(Object key, FieldType fieldType, int lastFieldIdx, int ordinal, HollowObjectTypeDataAccess dataAccess) {
+        switch(fieldType) {
             case BOOLEAN:
-                Boolean b = typeDataAccess.readBoolean(ordinal, lastFieldIdx);
-                if (b == key)
+                Boolean b = dataAccess.readBoolean(ordinal, lastFieldIdx);
+                if(b == key)
                     return true;
-                if (b == null)
+                if(b == null || key == null)
                     return false;
-                return b.booleanValue() == ((Boolean) key).booleanValue();
+                return b.booleanValue() == ((Boolean)key).booleanValue();
             case BYTES:
-                return Arrays.equals(typeDataAccess.readBytes(ordinal, lastFieldIdx), (byte[]) key);
+                return Arrays.equals(dataAccess.readBytes(ordinal, lastFieldIdx), (byte[])key);
             case DOUBLE:
-                return typeDataAccess.readDouble(ordinal, lastFieldIdx) == ((Double) key).doubleValue();
+                return dataAccess.readDouble(ordinal, lastFieldIdx) == ((Double)key).doubleValue();
             case FLOAT:
-                return typeDataAccess.readFloat(ordinal, lastFieldIdx) == ((Float) key).floatValue();
+                return dataAccess.readFloat(ordinal, lastFieldIdx) == ((Float)key).floatValue();
             case INT:
-                return typeDataAccess.readInt(ordinal, lastFieldIdx) == ((Integer) key).intValue();
+                return dataAccess.readInt(ordinal, lastFieldIdx) == ((Integer)key).intValue();
             case LONG:
-                return typeDataAccess.readLong(ordinal, lastFieldIdx) == ((Long) key).longValue();
+                return dataAccess.readLong(ordinal, lastFieldIdx) == ((Long)key).longValue();
             case REFERENCE:
-                return typeDataAccess.readOrdinal(ordinal, lastFieldIdx) == ((Integer) key).intValue();
+                return dataAccess.readOrdinal(ordinal, lastFieldIdx) == ((Integer)key).intValue();
             case STRING:
-                return typeDataAccess.isStringFieldEqual(ordinal, lastFieldIdx, (String) key);
+                return dataAccess.isStringFieldEqual(ordinal, lastFieldIdx, (String)key);
         }
 
-        throw new IllegalArgumentException("I don't know how to compare a " + fieldTypes[fieldIdx]);
+        throw new IllegalArgumentException("I don't know how to compare a " + fieldType);
     }
 
     /**
@@ -136,15 +138,14 @@ public class HollowPrimaryKeyValueDeriver {
     }
 
     private Object readValue(int ordinal, int fieldIdx) {
-        HollowObjectTypeDataAccess typeState = this.typeDataAccess;
+        HollowObjectTypeReadState typeState = this.typeState;
         HollowObjectSchema schema = typeState.getSchema();
 
         int lastFieldPath = fieldPathIndexes[fieldIdx].length - 1;
         for (int i = 0; i < lastFieldPath; i++) {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
             ordinal = typeState.readOrdinal(ordinal, fieldPosition);
-            String refTypeName = schema.getReferencedType(fieldPosition);
-            typeState = (HollowObjectTypeDataAccess) typeState.getDataAccess().getTypeDataAccess(refTypeName);
+            typeState = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition);
             schema = typeState.getSchema();
         }
 
@@ -158,4 +159,5 @@ public class HollowPrimaryKeyValueDeriver {
     public FieldType[] getFieldTypes() {
         return fieldTypes;
     }
+
 }

@@ -25,19 +25,20 @@ import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
+
 @SuppressWarnings("unused")
-public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
+public class HollowUniqueKeyIndexTest extends HollowPrimaryKeyIndexTest {
 
     protected UniqueKeyIndex createIndex(String type, String ... fieldPaths) {
-        return new HollowPrimaryKeyIndex(readStateEngine, type, fieldPaths);
+        return new HollowUniqueKeyIndex(readStateEngine, type, fieldPaths);
     }
 
     protected UniqueKeyIndex createIndex(ArraySegmentRecycler memoryRecycler, String type, String ... fieldPaths) {
-        return new HollowPrimaryKeyIndex(readStateEngine, memoryRecycler, type, fieldPaths);
+        return new HollowUniqueKeyIndex(readStateEngine, memoryRecycler, type, fieldPaths);
     }
 
     @Test

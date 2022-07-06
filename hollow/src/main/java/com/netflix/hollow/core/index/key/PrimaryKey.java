@@ -18,8 +18,11 @@ package com.netflix.hollow.core.index.key;
 
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.FieldPaths;
+import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSchema;
+
 import java.util.Arrays;
 
 /**
@@ -30,6 +33,30 @@ import java.util.Arrays;
  * record referenced by the field <i>country</i>, and finally the country's field <i>id</i>.
  */
 public class PrimaryKey {
+
+    /**
+     * Creates a primary key instance from the type and field paths. If no fields are specified, then this uses the
+     * the schema attached to the HollowDataAccess to generate a primary key instance based on the
+     * {@link com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey} defined for the type.
+     *
+     * This method is typically used for building indexes.
+     *
+     * @param hollowDataAccess hollow data access or state engine
+     * @param type             hollow type
+     * @param fieldPaths       field paths for fields that make up the primary key. If no fields are passed in, then create using schema definition of primary key
+     * @return populated primary key
+     */
+    public static PrimaryKey create(HollowDataAccess hollowDataAccess, String type, String... fieldPaths) {
+        if (fieldPaths != null && fieldPaths.length != 0) {
+            return new PrimaryKey(type, fieldPaths);
+        }
+
+        HollowSchema schema = hollowDataAccess.getSchema(type);
+        if (schema instanceof HollowObjectSchema) {
+            return ((HollowObjectSchema) schema).getPrimaryKey();
+        }
+        return null;
+    }
 
     private final String type;
     private final String[] fieldPaths;

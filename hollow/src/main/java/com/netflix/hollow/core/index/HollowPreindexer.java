@@ -18,7 +18,7 @@ package com.netflix.hollow.core.index;
 
 import static java.util.stream.Collectors.joining;
 
-import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathElement;
+import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathSegment;
 import com.netflix.hollow.core.index.traversal.HollowIndexerValueTraverser;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
@@ -85,7 +85,7 @@ public class HollowPreindexer {
         int baseFieldPathIdx = 0;
 
         List<FieldPaths.FieldSegment> segments = path.getSegments();
-        FieldPathElement[] fieldPathIndexes = new FieldPathElement[segments.size()];
+        FieldPathSegment[] fieldPathIndexes = new FieldPathSegment[segments.size()];
         FieldType fieldType = FieldType.REFERENCE;
 
         for (int i = 0; i < segments.size(); i++) {
@@ -98,7 +98,7 @@ public class HollowPreindexer {
                     fieldType = objectSegment.getType();
                     int fieldPosition = objectSegment.getIndex();
                     HollowTypeDataAccess typeDataAccess = originalDataAccess.getDataAccess().getTypeDataAccess(objectSegment.getEnclosingSchema().getName());
-                    fieldPathIndexes[i] = new FieldPathElement(fieldPosition, (HollowObjectTypeDataAccess) typeDataAccess);
+                    fieldPathIndexes[i] = new FieldPathSegment(fieldPosition, (HollowObjectTypeDataAccess) typeDataAccess);
 
                     if(!truncate)
                         baseFieldPathIdx = i + 1;

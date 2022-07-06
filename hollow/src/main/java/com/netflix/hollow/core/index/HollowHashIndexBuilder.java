@@ -17,7 +17,7 @@
 package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.HollowConstants;
-import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathElement;
+import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathSegment;
 import com.netflix.hollow.core.index.traversal.HollowIndexerValueTraverser;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
@@ -344,27 +344,27 @@ public class HollowHashIndexBuilder {
             int matchOrdinal = preindexer.getTraverser().getMatchOrdinal(matchIdx, field.getBaseIteratorFieldIdx());
             int hashOrdinal = (int)intermediateMatchHashTable.getElementValue(hashBucketBit + offsetPerTraverserField[field.getBaseIteratorFieldIdx()], bitsPerTraverserField[field.getBaseIteratorFieldIdx()]) - 1;
 
-            FieldPathElement[] fieldPath = field.getSchemaFieldPositionPath();
+            FieldPathSegment[] fieldPath = field.getSchemaFieldPositionPath();
 
             if(fieldPath.length == 0) {
                 if(matchOrdinal != hashOrdinal)
                     return false;
             } else {
                 for(int j=0;j<fieldPath.length - 1;j++) {
-                    FieldPathElement fieldPathElement = fieldPath[j];
+                    FieldPathSegment fieldPathSegment = fieldPath[j];
                     if(matchOrdinal != HollowConstants.ORDINAL_NONE) {
-                        matchOrdinal = fieldPathElement.getOrdinalForField(matchOrdinal);
+                        matchOrdinal = fieldPathSegment.getOrdinalForField(matchOrdinal);
                     }
                     if(hashOrdinal != HollowConstants.ORDINAL_NONE) {
-                        hashOrdinal = fieldPathElement.getOrdinalForField(hashOrdinal);
+                        hashOrdinal = fieldPathSegment.getOrdinalForField(hashOrdinal);
                     }
                 }
 
                 if(matchOrdinal != hashOrdinal) {
-                    FieldPathElement lastPathElement = fieldPath[fieldPath.length - 1];
+                    FieldPathSegment lastPathElement = fieldPath[fieldPath.length - 1];
                     if(isAnyFieldNull(matchOrdinal, hashOrdinal) || !HollowReadFieldUtils.fieldsAreEqual(
-                            lastPathElement.getObjectTypeDataAccess(), matchOrdinal, lastPathElement.getFieldPosition(),
-                            lastPathElement.getObjectTypeDataAccess(), hashOrdinal, lastPathElement.getFieldPosition()))
+                            lastPathElement.getObjectTypeDataAccess(), matchOrdinal, lastPathElement.getSegmentFieldPosition(),
+                            lastPathElement.getObjectTypeDataAccess(), hashOrdinal, lastPathElement.getSegmentFieldPosition()))
                         return false;
                 }
             }
@@ -383,7 +383,7 @@ public class HollowHashIndexBuilder {
         for(int i=0;i<preindexer.getMatchFieldSpecs().length;i++) {
             HollowHashIndexField field = preindexer.getMatchFieldSpecs()[i];
             int ordinal = preindexer.getTraverser().getMatchOrdinal(matchIdx, field.getBaseIteratorFieldIdx());
-            FieldPathElement[] fieldPath = field.getSchemaFieldPositionPath();
+            FieldPathSegment[] fieldPath = field.getSchemaFieldPositionPath();
 
             if(fieldPath.length == 0) {
                 matchHash ^= HashCodes.hashInt(ordinal);
@@ -396,8 +396,8 @@ public class HollowHashIndexBuilder {
                     }
                 }
 
-                FieldPathElement lastPathElement = field.getLastFieldPositionPathElement();
-                int fieldHashCode = ordinal == HollowConstants.ORDINAL_NONE ? HollowConstants.ORDINAL_NONE : HollowReadFieldUtils.fieldHashCode(lastPathElement.getObjectTypeDataAccess(), ordinal, lastPathElement.getFieldPosition());
+                FieldPathSegment lastPathElement = field.getLastFieldPositionPathElement();
+                int fieldHashCode = ordinal == HollowConstants.ORDINAL_NONE ? HollowConstants.ORDINAL_NONE : HollowReadFieldUtils.fieldHashCode(lastPathElement.getObjectTypeDataAccess(), ordinal, lastPathElement.getSegmentFieldPosition());
                 matchHash ^= HashCodes.hashInt(fieldHashCode);
             }
         }
