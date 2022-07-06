@@ -16,23 +16,24 @@
  */
 package com.netflix.hollow.core.index;
 
-import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
 public class HollowHashIndexField {
     private final int baseIteratorFieldIdx;
-    private final int schemaFieldPositionPath[];
-    private final HollowTypeReadState baseDataAccess;
+    private final FieldPathElement[] schemaFieldPositionPath;
+    private final HollowTypeDataAccess baseDataAccess;
     private final FieldType fieldType;
 
-    public HollowHashIndexField(int baseIteratorFieldIdx, int[] remainingPath, HollowTypeReadState baseDataAccess, FieldType fieldType) {
+    public HollowHashIndexField(int baseIteratorFieldIdx, FieldPathElement[] remainingPath, HollowTypeDataAccess baseDataAccess, FieldType fieldType) {
         this.baseIteratorFieldIdx = baseIteratorFieldIdx;
         this.schemaFieldPositionPath = remainingPath;
         this.baseDataAccess = baseDataAccess;
         this.fieldType = fieldType;
     }
 
-    public HollowTypeReadState getBaseDataAccess() {
+    public HollowTypeDataAccess getBaseDataAccess() {
         return baseDataAccess;
     }
 
@@ -40,12 +41,52 @@ public class HollowHashIndexField {
         return baseIteratorFieldIdx;
     }
 
-    public int[] getSchemaFieldPositionPath() {
+    public FieldPathElement[] getSchemaFieldPositionPath() {
         return schemaFieldPositionPath;
+    }
+
+    FieldPathElement getLastFieldPositionPathElement() {
+        return schemaFieldPositionPath[schemaFieldPositionPath.length - 1];
     }
 
     public FieldType getFieldType() {
         return fieldType;
+    }
+
+    static class FieldPathElement {
+        /**
+         * Field position for this element of the path. For path {@code actor.name},
+         * {@code actor} is 0 and {@code name} is 1.
+         */
+        private final int fieldPosition;
+
+        /**
+         * For the path {@code actor.name}, position 0 is {@code actor} and the data access is
+         * {@code ThingThatReferencesActorDataAccess}. For {@code name}, position is 1 and data access
+         * is {@code ActorTypeDataAccess}.
+         */
+        private final HollowObjectTypeDataAccess objectTypeDataAccess;
+
+        FieldPathElement(int fieldPosition, HollowObjectTypeDataAccess objectTypeDataAccess) {
+            this.fieldPosition = fieldPosition;
+            this.objectTypeDataAccess = objectTypeDataAccess;
+        }
+
+        /**
+         * @param ordinal ordinal of record containing the desired field.
+         * @return ordinal of the record referenced by the field
+         */
+        int getOrdinalForField(int ordinal) {
+            return this.objectTypeDataAccess.readOrdinal(ordinal, fieldPosition);
+        }
+
+        int getFieldPosition() {
+            return fieldPosition;
+        }
+
+        HollowObjectTypeDataAccess getObjectTypeDataAccess() {
+            return objectTypeDataAccess;
+        }
     }
 
 }

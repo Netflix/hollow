@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.index;
 
+import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathElement;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
@@ -24,7 +25,6 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 /**
  * A HollowPrimaryKeyIndex is the go-to mechanism for indexing and querying data in a Hollow blob.
@@ -56,14 +57,9 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     private final HollowObjectTypeDataAccess objectTypeDataAccess;
 
     /**
-     * Path of each field.
+     * Each field that is part of this index.
      */
-    private final FieldPathElement[][] fieldPaths;
-
-    /**
-     * FieldType of the last element in each {@link #fieldPaths}.
-     */
-    private final FieldType[] fieldTypes;
+    private final HollowHashIndexField[] fields;
 
     private final PrimaryKey primaryKey;
     private final HollowPrimaryKeyValueDeriver2 keyDeriver;
@@ -105,19 +101,18 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
         this.primaryKey = primaryKey;
         this.objectTypeDataAccess = (HollowObjectTypeDataAccess) hollowDataAccess.getTypeDataAccess(primaryKey.getType());
-        this.fieldPaths = new FieldPathElement[primaryKey.numFields()][];
-        this.fieldTypes = new FieldType[primaryKey.numFields()];
+        this.fields = new HollowHashIndexField[primaryKey.numFields()];
 
         this.memoryRecycler = memoryRecycler;
 
         for (int fieldIdx = 0; fieldIdx < primaryKey.numFields(); fieldIdx++) {
-            fieldTypes[fieldIdx] = primaryKey.getFieldType(hollowDataAccess, fieldIdx);
+            FieldType fieldType = primaryKey.getFieldType(hollowDataAccess, fieldIdx);
 
             //This always starts at the "root" object that's being indexed
             HollowObjectTypeDataAccess currentDataAccess = this.objectTypeDataAccess;
 
             int[] fieldPathPositions = primaryKey.getFieldPathIndex(hollowDataAccess, fieldIdx);
-            FieldPathElement[] fieldPathElements = fieldPaths[fieldIdx] = new FieldPathElement[fieldPathPositions.length];
+            FieldPathElement[] fieldPathElements = new FieldPathElement[fieldPathPositions.length];
 
             for (int posIdx = 0; posIdx < fieldPathPositions.length; posIdx++) {
                 if (currentDataAccess == null) {
@@ -137,9 +132,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
                     currentDataAccess = null;
                 }
             }
+            fields[fieldIdx] = new HollowHashIndexField(fieldIdx, fieldPathElements, currentDataAccess, fieldType);
         }
 
-        this.keyDeriver = new HollowPrimaryKeyValueDeriver2(fieldPaths, fieldTypes);
+        this.keyDeriver = new HollowPrimaryKeyValueDeriver2(fields);
         this.specificOrdinalsToIndex = specificOrdinalsToIndex;
 
         reindex();
@@ -198,7 +194,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     public List<FieldType> getFieldTypes() {
-        return Arrays.asList(fieldTypes);
+        return Arrays.stream(fields).map(HollowHashIndexField::getFieldType).collect(toList());
     }
 
     /**
@@ -211,7 +207,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      */
     public int getMatchingOrdinal(Object key) {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
-        if (fieldPaths.length != 1 || hashTable.bitsPerElement == 0)
+        if (fields.length != 1 || hashTable.bitsPerElement == 0)
             return -1;
 
         int hashCode = keyHashCode(key, 0);
@@ -246,7 +242,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      */
     public int getMatchingOrdinal(Object key1, Object key2) {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
-        if (fieldPaths.length != 2 || hashTable.bitsPerElement == 0)
+        if (fields.length != 2 || hashTable.bitsPerElement == 0)
             return -1;
 
         int hashCode = keyHashCode(key1, 0);
@@ -283,7 +279,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      */
     public int getMatchingOrdinal(Object key1, Object key2, Object key3) {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
-        if (fieldPaths.length != 3 || hashTable.bitsPerElement == 0)
+        if (fields.length != 3 || hashTable.bitsPerElement == 0)
             return -1;
 
         int hashCode = keyHashCode(key1, 0);
@@ -319,7 +315,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      */
     public int getMatchingOrdinal(Object... keys) {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
-        if (fieldPaths.length != keys.length || hashTable.bitsPerElement == 0)
+        if (fields.length != keys.length || hashTable.bitsPerElement == 0)
             return -1;
 
         int hashCode = 0;
@@ -351,7 +347,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
     @SuppressWarnings("UnnecessaryUnboxing")
     private int keyHashCode(Object key, int fieldIdx) {
-        switch(fieldTypes[fieldIdx]) {
+        switch(fields[fieldIdx].getFieldType()) {
             case BOOLEAN:
                 return HashCodes.hashInt(HollowReadFieldUtils.booleanHashCode((Boolean)key));
             case DOUBLE:
@@ -370,7 +366,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
                 return HashCodes.hashCode((String)key);
         }
 
-        throw new IllegalArgumentException("I don't know how to hash a " + fieldTypes[fieldIdx]);
+        throw new IllegalArgumentException("I don't know how to hash a " + fields[fieldIdx].getFieldType());
     }
 
     private void setHashTable(PrimaryKeyIndexHashTable hashTable) {
@@ -615,7 +611,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
     private int recordHash(int ordinal) {
         int hashCode = 0;
-        for (int i = 0; i < fieldPaths.length; i++) {
+        for (int i = 0; i < fields.length; i++) {
             hashCode ^= fieldHash(ordinal, i);
             // hashCode ^= HashCodes.hashInt(hashCode);
         }
@@ -624,18 +620,18 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
 
     private int fieldHash(int ordinal, int fieldIdx) {
-        int lastPathIdx = fieldPaths[fieldIdx].length - 1;
+        HollowHashIndexField field = fields[fieldIdx];
+        int lastPathIdx = field.getSchemaFieldPositionPath().length - 1;
         for (int pathIdx = 0; pathIdx < lastPathIdx; pathIdx++) {
-            FieldPathElement pathElement = fieldPaths[fieldIdx][pathIdx];
-            pathElement.objectTypeDataAccess.readOrdinal(ordinal, pathElement.fieldPosition);
+            FieldPathElement pathElement = field.getSchemaFieldPositionPath()[pathIdx];
             ordinal = pathElement.getOrdinalForField(ordinal);
         }
         //When the loop finishes, we should have the ordinal of the object containing the last field.
-        FieldPathElement lastPathElement = fieldPaths[fieldIdx][lastPathIdx];
+        FieldPathElement lastPathElement = field.getLastFieldPositionPathElement();
 
-        int hashCode = HollowReadFieldUtils.fieldHashCode(lastPathElement.objectTypeDataAccess, ordinal, lastPathElement.fieldPosition);
+        int hashCode = HollowReadFieldUtils.fieldHashCode(lastPathElement.getObjectTypeDataAccess(), ordinal, lastPathElement.getFieldPosition());
 
-        switch(fieldTypes[fieldIdx]) {
+        switch(field.getFieldType()) {
             case STRING:
             case BYTES:
                 return hashCode;
@@ -649,7 +645,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     private boolean recordsHaveEqualKeys(int ordinal1, int ordinal2) {
-        for (int i = 0; i < fieldPaths.length; i++) {
+        for (int i = 0; i < fields.length; i++) {
             if(!fieldsAreEqual(ordinal1, ordinal2, i))
                 return false;
         }
@@ -657,8 +653,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     private boolean fieldsAreEqual(int ordinal1, int ordinal2, int fieldIdx) {
-        for (int posIdx = 0; posIdx < fieldPaths[fieldIdx].length - 1; posIdx++) {
-            FieldPathElement pathElement = fieldPaths[fieldIdx][posIdx];
+        HollowHashIndexField field = fields[fieldIdx];
+        FieldPathElement[] fieldPathElements = field.getSchemaFieldPositionPath();
+        for (int posIdx = 0; posIdx < fieldPathElements.length - 1; posIdx++) {
+            FieldPathElement pathElement = fieldPathElements[posIdx];
             ordinal1 = pathElement.getOrdinalForField(ordinal1);
             ordinal2 = pathElement.getOrdinalForField(ordinal2);
         }
@@ -667,13 +665,13 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         //ordinal will refer to the record for the first element. Using that ordinal, you can
         //then invoke lastPathElement.getOrdinal(ordinal) to get the final element.
 
-        if (fieldTypes[fieldIdx] == FieldType.REFERENCE)
+        if (field.getFieldType() == FieldType.REFERENCE)
             return ordinal1 == ordinal2;
 
-        FieldPathElement lastPathElement = fieldPaths[fieldIdx][fieldPaths[fieldIdx].length - 1];
+        FieldPathElement lastPathElement = field.getLastFieldPositionPathElement();
         return HollowReadFieldUtils.fieldsAreEqual(
-                lastPathElement.objectTypeDataAccess, ordinal1, lastPathElement.fieldPosition,
-                lastPathElement.objectTypeDataAccess, ordinal2, lastPathElement.fieldPosition);
+                lastPathElement.getObjectTypeDataAccess(), ordinal1, lastPathElement.getFieldPosition(),
+                lastPathElement.getObjectTypeDataAccess(), ordinal2, lastPathElement.getFieldPosition());
     }
 
     private boolean shouldPerformDeltaUpdate() {
@@ -707,42 +705,6 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
             this.hashTableSize = hashTableSize;
             this.hashMask = hashMask;
             this.bitsPerElement = bitsPerElement;
-        }
-    }
-
-    static class FieldPathElement {
-        /**
-         * Field position for this element of the path. For path {@code actor.name},
-         * {@code actor} is 0 and {@code name} is 1.
-         */
-        private final int fieldPosition;
-
-        /**
-         * For the path {@code actor.name}, position 0 is {@code actor} and the data access is
-         * {@code ThingThatReferencesActorDataAccess}. For {@code name}, position is 1 and data access
-         * is {@code ActorTypeDataAccess}.
-         */
-        private final HollowObjectTypeDataAccess objectTypeDataAccess;
-
-        private FieldPathElement(int fieldPosition, HollowObjectTypeDataAccess objectTypeDataAccess) {
-            this.fieldPosition = fieldPosition;
-            this.objectTypeDataAccess = objectTypeDataAccess;
-        }
-
-        /**
-         * @param ordinal ordinal of record containing the desired field.
-         * @return ordinal of the record referenced by the field
-         */
-        int getOrdinalForField(int ordinal) {
-            return this.objectTypeDataAccess.readOrdinal(ordinal, fieldPosition);
-        }
-
-        int getFieldPosition() {
-            return fieldPosition;
-        }
-
-        HollowObjectTypeDataAccess getObjectTypeDataAccess() {
-            return objectTypeDataAccess;
         }
     }
 }

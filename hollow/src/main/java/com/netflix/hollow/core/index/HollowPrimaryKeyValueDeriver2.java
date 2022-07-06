@@ -16,7 +16,7 @@
  */
 package com.netflix.hollow.core.index;
 
-import com.netflix.hollow.core.index.HollowPrimaryKeyIndex.FieldPathElement;
+import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathElement;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
@@ -33,37 +33,27 @@ class HollowPrimaryKeyValueDeriver2 {
     /**
      * Path for each field that is indexed.
      */
-    private final FieldPathElement[][] fieldPaths;
-
-    /**
-     * The type of the final element of each field path.
-     */
-    private final FieldType[] fieldTypes;
+    private final HollowHashIndexField[] fields;
 
 
-    public HollowPrimaryKeyValueDeriver2(FieldPathElement[][] fieldPaths, FieldType[] fieldTypes) {
-        this.fieldPaths = fieldPaths;
-        this.fieldTypes = fieldTypes;
+
+    public HollowPrimaryKeyValueDeriver2(HollowHashIndexField[] fields) {
+        this.fields = fields;
     }
 
     /**
      * @param ordinal  ordinal of root object
-     * @param fieldIdx field index to traverse
-     * @return the ordinal of the second-to-last element. This ordinal can be used with {@link #getLastPathElement(int)}
+     * @param field    field to traverse
+     * @return the ordinal of the second-to-last element. This ordinal can be used with the last path element
      * to retrieve the final ordinal
      */
-    private int getOrdinalForFieldPath(int ordinal, int fieldIdx) {
-        FieldPathElement[] fieldPath = fieldPaths[fieldIdx];
-        for (int posIdx = 0; posIdx < fieldPath.length - 1; posIdx++) {
-            FieldPathElement fieldPathElement = fieldPath[posIdx];
+    private int getOrdinalForFieldPath(HollowHashIndexField field, int ordinal) {
+        FieldPathElement[] pathElements = field.getSchemaFieldPositionPath();
+        for (int posIdx = 0; posIdx < pathElements.length - 1; posIdx++) {
+            FieldPathElement fieldPathElement = pathElements[posIdx];
             ordinal = fieldPathElement.getOrdinalForField(ordinal);
         }
         return ordinal;
-    }
-
-    private FieldPathElement getLastPathElement(int fieldIdx) {
-        FieldPathElement[] path = fieldPaths[fieldIdx];
-        return path[path.length - 1];
     }
 
     /**
@@ -74,7 +64,7 @@ class HollowPrimaryKeyValueDeriver2 {
      * @return true if the ordinal contains the primary keys
      */
     public boolean keyMatches(int ordinal, Object... keys) {
-        if (keys.length != fieldPaths.length)
+        if (keys.length != fields.length)
             return false;
 
         for (int i = 0; i < keys.length; i++) {
@@ -87,14 +77,16 @@ class HollowPrimaryKeyValueDeriver2 {
 
     @SuppressWarnings("UnnecessaryUnboxing")
     public boolean keyMatches(Object key, int recordOrdinal, int fieldIdx) {
-        //ordinal of the last element of the path, starting from the recordOrdinal.
-        int lastElementOrdinal = getOrdinalForFieldPath(recordOrdinal, fieldIdx);
+        HollowHashIndexField field = fields[fieldIdx];
 
-        FieldPathElement lastPathElement = getLastPathElement(fieldIdx);
+        //ordinal of the last element of the path, starting from the recordOrdinal.
+        int lastElementOrdinal = getOrdinalForFieldPath(field, recordOrdinal);
+
+        FieldPathElement lastPathElement = field.getLastFieldPositionPathElement();
         int lastPathPosition = lastPathElement.getFieldPosition();
         HollowObjectTypeDataAccess typeDataAccess = lastPathElement.getObjectTypeDataAccess();
 
-        switch (fieldTypes[fieldIdx]) {
+        switch (field.getFieldType()) {
             case BOOLEAN:
                 Boolean b = typeDataAccess.readBoolean(lastElementOrdinal, lastPathPosition);
                 if (b == key)
@@ -118,7 +110,7 @@ class HollowPrimaryKeyValueDeriver2 {
                 return typeDataAccess.isStringFieldEqual(lastElementOrdinal, lastPathPosition, (String) key);
         }
 
-        throw new IllegalArgumentException("I don't know how to compare a " + fieldTypes[fieldIdx]);
+        throw new IllegalArgumentException("I don't know how to compare a " + field.getFieldType());
     }
 
     /**
@@ -128,18 +120,15 @@ class HollowPrimaryKeyValueDeriver2 {
      * @return the primary keys
      */
     public Object[] getRecordKey(int ordinal) {
-        Object[] results = new Object[fieldPaths.length];
+        Object[] results = new Object[fields.length];
 
-        for (int i = 0; i < fieldPaths.length; i++) {
-            results[i] = readValue(ordinal, i);
+        for (int i = 0; i < fields.length; i++) {
+            HollowHashIndexField field = fields[i];
+            int lastPathOrdinal = getOrdinalForFieldPath(field, ordinal);
+            FieldPathElement lastElement = field.getLastFieldPositionPathElement();
+            results[i] = HollowReadFieldUtils.fieldValueObject(lastElement.getObjectTypeDataAccess(), lastPathOrdinal, lastElement.getFieldPosition());
         }
         return results;
-    }
-
-    private Object readValue(int ordinal, int fieldIdx) {
-        ordinal = getOrdinalForFieldPath(ordinal, fieldIdx);
-        FieldPathElement lastPathElement = getLastPathElement(fieldIdx);
-        return HollowReadFieldUtils.fieldValueObject(lastPathElement.getObjectTypeDataAccess(), ordinal, lastPathElement.getFieldPosition());
     }
 
 }
