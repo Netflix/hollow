@@ -20,12 +20,18 @@ import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.Test;
+import java.util.stream.IntStream;
+
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 
 public class HollowHashIndexTest extends AbstractStateEngineTest {
@@ -204,6 +210,53 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         assertIteratorContainsAll(index.findMatches("one").iterator(), 2);
     }
 
+    @Test
+    public void testIndexingListTypeField() throws Exception {
+        mapper.add(new TypeList("A", "B", "C", "D", "A", "B", "C", "D"));
+        mapper.add(new TypeList("B", "C", "D", "E"));
+        mapper.add(new TypeList("X", "Y", "Z"));
+        mapper.add(new TypeList());
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeList", "", "data.element.value");
+
+        Assert.assertNull(index.findMatches("M"));
+        Assert.assertNull(index.findMatches(""));
+        assertIteratorContainsAll(index.findMatches("A").iterator(), 0);
+        assertIteratorContainsAll(index.findMatches("B").iterator(), 0, 1);
+        assertIteratorContainsAll(index.findMatches("X").iterator(), 2);
+    }
+
+    @Test
+    public void testIndexingSetTypeField() throws Exception {
+        mapper.add(new TypeSet("A", "B", "C", "D"));
+        mapper.add(new TypeSet("B", "C", "D", "E"));
+        mapper.add(new TypeSet("X", "Y", "Z"));
+        mapper.add(new TypeSet());
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeSet", "", "data.element.value");
+
+        Assert.assertNull(index.findMatches("M"));
+        Assert.assertNull(index.findMatches(""));
+        assertIteratorContainsAll(index.findMatches("A").iterator(), 0);
+        assertIteratorContainsAll(index.findMatches("B").iterator(), 0, 1);
+        assertIteratorContainsAll(index.findMatches("X").iterator(), 2);
+    }
+
+    @Test
+    public void testIndexingListOfIntTypeField() throws Exception {
+        mapper.add(new TypeListOfTypeString(10, 20, 30, 40, 10, 12));
+        mapper.add(new TypeListOfTypeString(10, 20, 30));
+        mapper.add(new TypeListOfTypeString(50, 51, 52));
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeListOfTypeString", "", "data.element.data.value");
+
+        Assert.assertNull(index.findMatches(10000));
+        Assert.assertNull(index.findMatches(-1));
+        assertIteratorContainsAll(index.findMatches(40).iterator(), 0);
+        assertIteratorContainsAll(index.findMatches(10).iterator(), 0, 1);
+        assertIteratorContainsAll(index.findMatches(50).iterator(), 2);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testFindingMatchForNullQueryValue() throws Exception {
         mapper.add(new TypeB("one:"));
@@ -271,21 +324,18 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
     }
 
     private void assertIteratorContainsAll(HollowOrdinalIterator iter, int... expectedOrdinals) {
-        Set<Integer> ordinalSet = new HashSet<Integer>();
+        Set<Integer> ordinalSet = new HashSet<>();
         int ordinal = iter.next();
         while (ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
             ordinalSet.add(ordinal);
             ordinal = iter.next();
         }
 
-        for (int ord : expectedOrdinals) {
-            Assert.assertTrue(ordinalSet.contains(ord));
-        }
-        Assert.assertTrue(ordinalSet.size() == expectedOrdinals.length);
-
+        Set<Integer> expectedSet = IntStream.of(expectedOrdinals).boxed().collect(toSet());
+        Assert.assertEquals(expectedSet, ordinalSet);
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class TypeA {
         private final int a1;
         private final double a2;
@@ -298,7 +348,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class TypeB {
         private final String b1;
         private final boolean isDuplicate;
@@ -313,7 +363,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class TypeC {
         private final TypeD cd;
 
@@ -322,7 +372,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class TypeD {
         private final String d1;
 
@@ -331,7 +381,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class TypeTwoStrings {
         private final String b1;
         private final String b2;
@@ -342,7 +392,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class TypeBoolean {
         private final Boolean data;
 
@@ -351,7 +401,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class TypeInlinedString {
         @HollowInline
         private final String data;
@@ -361,7 +411,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class TypeLong {
         private final Long data;
 
@@ -370,7 +420,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class TypeDouble {
         private final Double data;
 
@@ -379,7 +429,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class TypeInteger {
         private final Integer data;
 
@@ -388,7 +438,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class TypeFloat {
         private final Float data;
 
@@ -397,12 +447,39 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static class TypeBytes {
         private final byte[] data;
 
         public TypeBytes(byte[] data) {
             this.data = data;
+        }
+    }
+
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
+    private static class TypeList {
+        private final List<String> data;
+
+        public TypeList(String ... data) {
+            this.data = Arrays.asList(data);
+        }
+    }
+
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
+    private static class TypeListOfTypeString {
+        private final List<TypeInteger> data;
+
+        public TypeListOfTypeString(Integer ... data) {
+            this.data = stream(data).map(TypeInteger::new).collect(toList());
+        }
+    }
+
+    @SuppressWarnings({"unused", "FieldCanBeLocal", "MismatchedQueryAndUpdateOfCollection"})
+    private static class TypeSet {
+        private final Set<String> data;
+
+        public TypeSet(String ... data) {
+            this.data = new HashSet<>(Arrays.asList(data));
         }
     }
 }
