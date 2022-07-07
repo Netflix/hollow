@@ -22,7 +22,6 @@ import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
-
 import java.util.Arrays;
 
 /**

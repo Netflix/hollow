@@ -16,6 +16,11 @@
  */
 package com.netflix.hollow.core.index;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static java.util.Arrays.stream;
+import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathSegment;
@@ -32,7 +37,6 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -40,11 +44,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-import static java.util.Arrays.stream;
-import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 
 /**
  * A HollowUniqueKeyIndex is a helper class for indexing and querying data in a Hollow Blob.
@@ -124,6 +123,7 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
      * @param hollowDataAccess hollow data access. <b>For object longevity, this must be from {@link HollowAPI#getDataAccess()}</b>
      * @param type             type of object being indexed
      * @param fieldPaths       paths to fields being indexed
+     * @param memoryRecycler   memory recycler implementation
      */
     public HollowUniqueKeyIndex(HollowDataAccess hollowDataAccess, ArraySegmentRecycler memoryRecycler, String type, String... fieldPaths) {
         this(hollowDataAccess, PrimaryKey.create(hollowDataAccess, type, fieldPaths), memoryRecycler);
@@ -138,6 +138,7 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
      *
      * @param hollowDataAccess hollow data access. <b>For object longevity, this must be from {@link HollowAPI#getDataAccess()}</b>
      * @param primaryKey       primary key definition. This does not have to match the primary key defined in the type.
+     * @param memoryRecycler   memory recycler implementation
      */
     public HollowUniqueKeyIndex(HollowDataAccess hollowDataAccess, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler) {
         this(hollowDataAccess, primaryKey, memoryRecycler, null);

@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.index;
 
+import static com.netflix.hollow.core.memory.FixedLengthData.bitsRequiredToRepresentValue;
+
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathSegment;
 import com.netflix.hollow.core.index.traversal.HollowIndexerValueTraverser;
@@ -26,10 +28,8 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
-
 import java.util.BitSet;
 
-import static com.netflix.hollow.core.memory.FixedLengthData.bitsRequiredToRepresentValue;
 
 public class HollowHashIndexBuilder {
 
