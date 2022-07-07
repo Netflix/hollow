@@ -32,11 +32,11 @@ import org.junit.Test;
 @SuppressWarnings("unused")
 public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
 
-    protected UniqueKeyIndex createIndex(String type, String ... fieldPaths) {
+    protected TestableUniqueKeyIndex createIndex(String type, String ... fieldPaths) {
         return new HollowPrimaryKeyIndex(readStateEngine, type, fieldPaths);
     }
 
-    protected UniqueKeyIndex createIndex(ArraySegmentRecycler memoryRecycler, String type, String ... fieldPaths) {
+    protected TestableUniqueKeyIndex createIndex(ArraySegmentRecycler memoryRecycler, String type, String ... fieldPaths) {
         return new HollowPrimaryKeyIndex(readStateEngine, memoryRecycler, type, fieldPaths);
     }
 
@@ -52,7 +52,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
 
         // Auto Discover fieldPaths from @HollowPrimaryKey
         // UniqueKeyIndex idx = createIndex("TypeA", "a1", "a2", "ab.b1.value");
-        UniqueKeyIndex idx = createIndex("TypeA");
+        TestableUniqueKeyIndex idx = createIndex("TypeA");
         idx.listenForDeltaUpdates();
 
         int ord1 = idx.getMatchingOrdinal(1, 1.1d, "1");
@@ -101,7 +101,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
 
         // Auto Discover fieldPaths from @HollowPrimaryKey
         //UniqueKeyIndex idx = createIndex("TypeA", "a1", "a2", "ab.b1.value");
-        UniqueKeyIndex idx = createIndex("TypeA");
+        TestableUniqueKeyIndex idx = createIndex("TypeA");
         idx.listenForDeltaUpdates();
 
         Assert.assertFalse(idx.containsDuplicates());
@@ -126,7 +126,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
 
         roundTripSnapshot();
 
-        UniqueKeyIndex idx = createIndex("Test", "test1");
+        TestableUniqueKeyIndex idx = createIndex("Test", "test1");
 
         Assert.assertEquals(-1, idx.getMatchingOrdinal(100));
         Assert.assertFalse(idx.containsDuplicates());
@@ -142,7 +142,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
 
         roundTripSnapshot();
 
-        UniqueKeyIndex idx = createIndex(readStateEngine.getMemoryRecycler(), "TypeA", "a1", "a2", "ab.b1.value");
+        TestableUniqueKeyIndex idx = createIndex(readStateEngine.getMemoryRecycler(), "TypeA", "a1", "a2", "ab.b1.value");
         idx.listenForDeltaUpdates();
 
         int ord1 = idx.getMatchingOrdinal(1, 1.1d, "1");
@@ -189,7 +189,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
 
         int a1Pos = ((HollowObjectSchema) readStateEngine.getTypeState(typeA).getSchema()).getPosition("a1");
         int a2Pos = ((HollowObjectSchema) readStateEngine.getTypeState(typeA).getSchema()).getPosition("a2");
-        UniqueKeyIndex idx = createIndex("TypeA", "a1");
+        TestableUniqueKeyIndex idx = createIndex("TypeA", "a1");
         idx.listenForDeltaUpdates();
         Assert.assertFalse(idx.containsDuplicates());
 

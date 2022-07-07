@@ -9,13 +9,12 @@ import java.util.Collection;
  * merge {@link HollowPrimaryKeyIndex} and {@link HollowUniqueKeyIndex}, then this
  * interface won't be necessary.
  */
-interface UniqueKeyIndex {
+interface TestableUniqueKeyIndex {
     void listenForDeltaUpdates();
 
     int getMatchingOrdinal(Object key);
     int getMatchingOrdinal(Object key1, Object key2);
     int getMatchingOrdinal(Object key1, Object key2, Object key3);
-    int getMatchingOrdinal(Object ... keys);
 
     Object[] getRecordKey(int ordinal);
 
