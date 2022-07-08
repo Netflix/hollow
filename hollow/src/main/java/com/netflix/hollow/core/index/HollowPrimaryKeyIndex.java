@@ -54,6 +54,7 @@ import java.util.logging.Logger;
  * If you need an index that will survive 2 or more deltas (without being updated), then use {@link HollowUniqueKeyIndex}
  * or {@link HollowHashIndex}.
  */
+@SuppressWarnings("override")
 public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableUniqueKeyIndex {
     private static final Logger LOG = Logger.getLogger(HollowPrimaryKeyIndex.class.getName());
 

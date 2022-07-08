@@ -40,7 +40,7 @@ public class PrimaryKey {
      *
      * This method is typically used for building indexes.
      *
-     * @param hollowDataAccess hollow data access or state engine
+     * @param hollowDataAccess hollow data access or state engine (can be null if fieldPaths are provided)
      * @param type             hollow type
      * @param fieldPaths       field paths for fields that make up the primary key. If no fields are passed in, then create using schema definition of primary key
      * @return populated primary key

@@ -25,6 +25,7 @@ import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 
@@ -217,7 +218,16 @@ public class HollowHashIndex implements HollowTypeStateListener {
        reindexHashIndex();
     }
 
-    public HollowDataAccess getStateEngine() {
+    /**
+     * @return state engine.
+     * @throws ClassCastException thrown if the underlying hollowDataAccess is not a state engine. This occurs if the
+     * index was created from a consumer with hollow object longevity enabled.
+     */
+    public HollowReadStateEngine getStateEngine() {
+        return (HollowReadStateEngine) hollowDataAccess;
+    }
+
+    public HollowDataAccess getHollowDataAccess() {
         return hollowDataAccess;
     }
 

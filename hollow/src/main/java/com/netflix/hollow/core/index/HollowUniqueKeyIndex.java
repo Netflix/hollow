@@ -62,6 +62,7 @@ import java.util.logging.Logger;
  * a data accessor of an outdated version. This limitation is caused by the getPopulatedOrdinals method that does not
  * work against old versions.</b>
  */
+@SuppressWarnings("override")
 public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUniqueKeyIndex {
     private static final Logger LOG = Logger.getLogger(HollowUniqueKeyIndex.class.getName());
 

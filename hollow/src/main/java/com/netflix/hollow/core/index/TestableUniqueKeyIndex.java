@@ -9,6 +9,8 @@ import java.util.Collection;
  * merge {@link HollowPrimaryKeyIndex} and {@link HollowUniqueKeyIndex}, then this
  * interface won't be necessary.
  */
+@SuppressWarnings({"DeprecatedIsStillUsed", "override"})
+@Deprecated
 interface TestableUniqueKeyIndex {
     void listenForDeltaUpdates();
 
