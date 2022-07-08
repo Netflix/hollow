@@ -24,10 +24,10 @@ import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
+import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
 
 @SuppressWarnings("unused")
 public class HollowUniqueKeyIndexTest extends HollowPrimaryKeyIndexTest {

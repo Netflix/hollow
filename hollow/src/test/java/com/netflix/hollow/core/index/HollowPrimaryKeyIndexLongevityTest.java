@@ -16,6 +16,9 @@
  */
 package com.netflix.hollow.core.index;
 
+import static java.util.concurrent.TimeUnit.HOURS;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -23,14 +26,10 @@ import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.test.HollowWriteStateEngineBuilder;
 import com.netflix.hollow.test.consumer.TestBlobRetriever;
 import com.netflix.hollow.test.consumer.TestHollowConsumer;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.stream.IntStream;
-
-import static java.util.concurrent.TimeUnit.HOURS;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
 
 @SuppressWarnings("unused")
 public class HollowPrimaryKeyIndexLongevityTest {
