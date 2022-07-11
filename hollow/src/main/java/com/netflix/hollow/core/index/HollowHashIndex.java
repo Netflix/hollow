@@ -19,11 +19,13 @@ package com.netflix.hollow.core.index;
 import static java.util.Objects.requireNonNull;
 
 import com.netflix.hollow.core.HollowConstants;
+import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathSegment;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
+import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
+import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 
@@ -39,8 +41,8 @@ public class HollowHashIndex implements HollowTypeStateListener {
 
     private volatile HollowHashIndexState hashStateVolatile;
 
-    private final HollowReadStateEngine stateEngine;
-    private final HollowObjectTypeReadState typeState;
+    private final HollowDataAccess hollowDataAccess;
+    private final HollowObjectTypeDataAccess typeState;
     private final String type;
     private final String selectField;
     private final String[] matchFields;
@@ -48,20 +50,20 @@ public class HollowHashIndex implements HollowTypeStateListener {
     /**
      * Define a {@link HollowHashIndex}.
      *
-     * @param stateEngine The state engine to index
+     * @param hollowDataAccess The state engine to index
      * @param type The query starts with the specified type
      * @param selectField The query will select records at this field (specify "" to select the specified type).
      * The selectField may span collection elements and/or map keys or values, which can result in multiple matches per record of the specified start type.
      * @param matchFields The query will match on the specified match fields.  The match fields may span collection elements and/or map keys or values.
      */
-    public HollowHashIndex(HollowReadStateEngine stateEngine, String type, String selectField, String... matchFields) {
+    public HollowHashIndex(HollowDataAccess hollowDataAccess, String type, String selectField, String... matchFields) {
         requireNonNull(type, "Hollow Hash Index creation failed because type was null");
-        requireNonNull(stateEngine, "Hollow Hash Index creation on type [" + type
+        requireNonNull(hollowDataAccess, "Hollow Hash Index creation on type [" + type
                 + "] failed because read state wasn't initialized");
 
-        this.stateEngine = stateEngine;
+        this.hollowDataAccess = hollowDataAccess;
         this.type = type;
-        this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(type);
+        this.typeState = (HollowObjectTypeDataAccess) hollowDataAccess.getTypeDataAccess(type);
         this.selectField = selectField;
         this.matchFields = matchFields;
         
@@ -72,7 +74,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
      * Recreate the hash index entirely
      */
     private void reindexHashIndex() {
-        HollowHashIndexBuilder builder = new HollowHashIndexBuilder(stateEngine, type, selectField, matchFields);
+        HollowHashIndexBuilder builder = new HollowHashIndexBuilder(hollowDataAccess, type, selectField, matchFields);
 
         builder.buildIndex();
 
@@ -153,26 +155,22 @@ public class HollowHashIndex implements HollowTypeStateListener {
             HollowHashIndexField field = hashState.getMatchFields()[i];
             int hashOrdinal = (int)matchHashTable.getElementValue(hashBucketBit + hashState.getOffsetPerTraverserField()[field.getBaseIteratorFieldIdx()], hashState.getBitsPerTraverserField()[field.getBaseIteratorFieldIdx()]) - 1;
 
-            HollowTypeReadState readState = field.getBaseDataAccess();
-            int[] fieldPath = field.getSchemaFieldPositionPath();
+            FieldPathSegment[] fieldPath = field.getSchemaFieldPositionPath();
 
             if(fieldPath.length == 0) {
                 if (!query[i].equals(hashOrdinal))
                     return false;
             } else {
                 for(int j=0;j<fieldPath.length - 1;j++) {
-                    HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
-                    readState = objectAccess.getSchema().getReferencedTypeState(fieldPath[j]);
-                    hashOrdinal = objectAccess.readOrdinal(hashOrdinal, fieldPath[j]);
+                    hashOrdinal = fieldPath[j].getOrdinalForField(hashOrdinal);
                     // Cannot find nested ordinal for null parent
                     if(hashOrdinal == HollowConstants.ORDINAL_NONE) {
                         break;
                     }
                 }
 
-                HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
-                int fieldIdx = fieldPath[fieldPath.length-1];
-                if(hashOrdinal == HollowConstants.ORDINAL_NONE || !HollowReadFieldUtils.fieldValueEquals(objectAccess, hashOrdinal, fieldIdx, query[i])) {
+                FieldPathSegment lastPathElement = fieldPath[fieldPath.length - 1];
+                if(hashOrdinal == HollowConstants.ORDINAL_NONE || !HollowReadFieldUtils.fieldValueEquals(lastPathElement.getObjectTypeDataAccess(), hashOrdinal, lastPathElement.getSegmentFieldPosition(), query[i])) {
                     return false;
                 }
             }
@@ -190,7 +188,10 @@ public class HollowHashIndex implements HollowTypeStateListener {
      * discarding the index.
      */
     public void listenForDeltaUpdates() {
-        typeState.addListener(this);
+        if (!(typeState instanceof HollowObjectTypeReadState))
+            throw new IllegalStateException("Cannot listen for delta updates when objectTypeDataAccess is a " + typeState.getClass().getSimpleName() + ". Is this index participating in object longevity?");
+
+        ((HollowObjectTypeReadState) typeState).addListener(this);
     }
 
     /**
@@ -199,7 +200,8 @@ public class HollowHashIndex implements HollowTypeStateListener {
      * Call this method before discarding indexes which are currently listening for delta updates.
      */
     public void detachFromDeltaUpdates() {
-        typeState.removeListener(this);
+        if ((typeState instanceof HollowObjectTypeReadState))
+            ((HollowObjectTypeReadState) typeState).removeListener(this);
     }
 
     @Override
@@ -216,8 +218,17 @@ public class HollowHashIndex implements HollowTypeStateListener {
        reindexHashIndex();
     }
 
+    /**
+     * @return state engine.
+     * @throws ClassCastException thrown if the underlying hollowDataAccess is not a state engine. This occurs if the
+     * index was created from a consumer with hollow object longevity enabled.
+     */
     public HollowReadStateEngine getStateEngine() {
-        return stateEngine;
+        return (HollowReadStateEngine) hollowDataAccess;
+    }
+
+    public HollowDataAccess getHollowDataAccess() {
+        return hollowDataAccess;
     }
 
     public String getType() {

@@ -19,19 +19,17 @@ package com.netflix.hollow.core.index;
 import static com.netflix.hollow.core.memory.FixedLengthData.bitsRequiredToRepresentValue;
 
 import com.netflix.hollow.core.HollowConstants;
+import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathSegment;
 import com.netflix.hollow.core.index.traversal.HollowIndexerValueTraverser;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
-import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.read.engine.HollowTypeReadState;
-import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import java.util.BitSet;
+
 
 public class HollowHashIndexBuilder {
 
@@ -53,7 +51,6 @@ public class HollowHashIndexBuilder {
 
     private GrowingSegmentedLongArray matchIndexHashAndSizeArray;
     private FixedLengthElementArray intermediateMatchHashTable;
-    private MultiLinkedElementArray intermediateSelectLists;
     private int intermediateMatchHashTableSize;
     private int bitsPerIntermediateListIdentifier;
     private int bitsPerIntermediateMatchHashEntry;
@@ -65,7 +62,7 @@ public class HollowHashIndexBuilder {
     ///TODO: Optimization, make the matchFields[].schemaFieldPositionPath as short as possible, to reduce iteration
     /// this means merging the common roots of path from the same base field, and pushing all unique base fields down
     /// to the leaves.
-    public HollowHashIndexBuilder(HollowReadStateEngine stateEngine, String type, String selectField, String... matchFields) {
+    public HollowHashIndexBuilder(HollowDataAccess stateEngine, String type, String selectField, String... matchFields) {
         this.preindexer = new HollowPreindexer(stateEngine, type, selectField, matchFields);
         preindexer.buildFieldSpecifications();
 
@@ -78,7 +75,7 @@ public class HollowHashIndexBuilder {
 
         int bitsPerMatchHashKey = 0;
         for(int i=0;i<traverser.getNumFieldPaths();i++) {
-            int maxOrdinalForTypeState = ((HollowTypeReadState)traverser.getFieldTypeDataAccess(i)).maxOrdinal();
+            int maxOrdinalForTypeState = traverser.getFieldTypeDataAccess(i).getTypeState().maxOrdinal();
             bitsPerTraverserField[i] = bitsRequiredToRepresentValue(maxOrdinalForTypeState + 1);
             offsetPerTraverserField[i] = bitsPerMatchHashKey;
             if(i < preindexer.getNumMatchTraverserFields())
@@ -92,7 +89,7 @@ public class HollowHashIndexBuilder {
     public void buildIndex() {
         matchIndexHashAndSizeArray = new GrowingSegmentedLongArray(memoryRecycler);
 
-        BitSet populatedOrdinals = preindexer.getTypeState().getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
+        BitSet populatedOrdinals = preindexer.getHollowTypeDataAccess().getTypeState().getPopulatedOrdinals();
 
         /// an initial guess at how big this table might be -- one match per top-level element.
         int guessNumberOfMatches = populatedOrdinals.cardinality();
@@ -108,7 +105,7 @@ public class HollowHashIndexBuilder {
         intermediateMatchHashTable = new FixedLengthElementArray(memoryRecycler, (long)intermediateMatchHashTableSize * bitsPerIntermediateMatchHashEntry);
 
         /// a data structure which tracks lists of matches under canonical matches.
-        intermediateSelectLists = new MultiLinkedElementArray(memoryRecycler);
+        MultiLinkedElementArray intermediateSelectLists = new MultiLinkedElementArray(memoryRecycler);
 
         HollowIndexerValueTraverser traverser = preindexer.getTraverser();
 
@@ -347,28 +344,27 @@ public class HollowHashIndexBuilder {
             int matchOrdinal = preindexer.getTraverser().getMatchOrdinal(matchIdx, field.getBaseIteratorFieldIdx());
             int hashOrdinal = (int)intermediateMatchHashTable.getElementValue(hashBucketBit + offsetPerTraverserField[field.getBaseIteratorFieldIdx()], bitsPerTraverserField[field.getBaseIteratorFieldIdx()]) - 1;
 
-            HollowTypeReadState readState = field.getBaseDataAccess();
-            int[] fieldPath = field.getSchemaFieldPositionPath();
+            FieldPathSegment[] fieldPath = field.getSchemaFieldPositionPath();
 
             if(fieldPath.length == 0) {
                 if(matchOrdinal != hashOrdinal)
                     return false;
             } else {
                 for(int j=0;j<fieldPath.length - 1;j++) {
-                    HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
-                    readState = objectAccess.getSchema().getReferencedTypeState(fieldPath[j]);
+                    FieldPathSegment fieldPathSegment = fieldPath[j];
                     if(matchOrdinal != HollowConstants.ORDINAL_NONE) {
-                        matchOrdinal = objectAccess.readOrdinal(matchOrdinal, fieldPath[j]);
+                        matchOrdinal = fieldPathSegment.getOrdinalForField(matchOrdinal);
                     }
                     if(hashOrdinal != HollowConstants.ORDINAL_NONE) {
-                        hashOrdinal = objectAccess.readOrdinal(hashOrdinal, fieldPath[j]);
+                        hashOrdinal = fieldPathSegment.getOrdinalForField(hashOrdinal);
                     }
                 }
 
                 if(matchOrdinal != hashOrdinal) {
-                    HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
-                    int fieldIdx = fieldPath[fieldPath.length-1];
-                    if(isAnyFieldNull(matchOrdinal, hashOrdinal) || !HollowReadFieldUtils.fieldsAreEqual(objectAccess, matchOrdinal, fieldIdx, objectAccess, hashOrdinal, fieldIdx))
+                    FieldPathSegment lastPathElement = fieldPath[fieldPath.length - 1];
+                    if(isAnyFieldNull(matchOrdinal, hashOrdinal) || !HollowReadFieldUtils.fieldsAreEqual(
+                            lastPathElement.getObjectTypeDataAccess(), matchOrdinal, lastPathElement.getSegmentFieldPosition(),
+                            lastPathElement.getObjectTypeDataAccess(), hashOrdinal, lastPathElement.getSegmentFieldPosition()))
                         return false;
                 }
             }
@@ -387,23 +383,21 @@ public class HollowHashIndexBuilder {
         for(int i=0;i<preindexer.getMatchFieldSpecs().length;i++) {
             HollowHashIndexField field = preindexer.getMatchFieldSpecs()[i];
             int ordinal = preindexer.getTraverser().getMatchOrdinal(matchIdx, field.getBaseIteratorFieldIdx());
-            HollowTypeReadState readState = field.getBaseDataAccess();
-            int[] fieldPath = field.getSchemaFieldPositionPath();
+            FieldPathSegment[] fieldPath = field.getSchemaFieldPositionPath();
 
             if(fieldPath.length == 0) {
                 matchHash ^= HashCodes.hashInt(ordinal);
             } else {
                 for(int j=0;j<fieldPath.length-1;j++) {
-                    HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
-                    readState = objectAccess.getSchema().getReferencedTypeState(fieldPath[j]);
-                    ordinal = objectAccess.readOrdinal(ordinal, fieldPath[j]);
+                    ordinal = fieldPath[j].getOrdinalForField(ordinal);
                     // Cannot find nested ordinal for null parent
                     if(ordinal == HollowConstants.ORDINAL_NONE) {
                         break;
                     }
                 }
 
-                int fieldHashCode = ordinal == HollowConstants.ORDINAL_NONE ? HollowConstants.ORDINAL_NONE : HollowReadFieldUtils.fieldHashCode((HollowObjectTypeDataAccess) readState, ordinal, fieldPath[fieldPath.length-1]);
+                FieldPathSegment lastPathElement = field.getLastFieldPositionPathElement();
+                int fieldHashCode = ordinal == HollowConstants.ORDINAL_NONE ? HollowConstants.ORDINAL_NONE : HollowReadFieldUtils.fieldHashCode(lastPathElement.getObjectTypeDataAccess(), ordinal, lastPathElement.getSegmentFieldPosition());
                 matchHash ^= HashCodes.hashInt(fieldHashCode);
             }
         }

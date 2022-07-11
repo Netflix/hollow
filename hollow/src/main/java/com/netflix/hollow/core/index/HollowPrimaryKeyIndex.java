@@ -32,7 +32,6 @@ import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.core.schema.HollowSchema;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -47,8 +46,16 @@ import java.util.logging.Logger;
  * <p>
  * A primary key index can be used to index and query a type by a {@link PrimaryKey}.  The provided {@link PrimaryKey} does
  * not have to be the same as declared as the default in the data model.
+ *
+ * <b>This class is not safe to use with object longevity if the index is not being updated for each delta. The internal
+ * implementation of this class uses the type state retrieved through the schema. That resutls in certain operations
+ * always being performed against the current version. As such, this class is only valid for up to 2 updates.</b>
+ *
+ * If you need an index that will survive 2 or more deltas (without being updated), then use {@link HollowUniqueKeyIndex}
+ * or {@link HollowHashIndex}.
  */
-public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
+@SuppressWarnings("override")
+public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableUniqueKeyIndex {
     private static final Logger LOG = Logger.getLogger(HollowPrimaryKeyIndex.class.getName());
 
     private final HollowObjectTypeReadState typeState;
@@ -72,7 +79,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, ArraySegmentRecycler memoryRecycler, String type, String... fieldPaths) {
-        this(stateEngine, createPrimaryKey(stateEngine, type, fieldPaths), memoryRecycler);
+        this(stateEngine, PrimaryKey.create(stateEngine, type, fieldPaths), memoryRecycler);
     }
 
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler) {
@@ -108,18 +115,6 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         this.specificOrdinalsToIndex = specificOrdinalsToIndex;
 
         reindex();
-    }
-
-    private static PrimaryKey createPrimaryKey(HollowReadStateEngine stateEngine, String type, String... fieldPaths) {
-        if (fieldPaths != null && fieldPaths.length != 0) {
-            return new PrimaryKey(type, fieldPaths);
-        }
-
-        HollowSchema schema = stateEngine.getSchema(type);
-        if (schema instanceof HollowObjectSchema) {
-            return ((HollowObjectSchema) schema).getPrimaryKey();
-        }
-        return null;
     }
 
     /**
@@ -586,7 +581,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         for(int i=0;i<lastFieldPath;i++) {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
             ordinal = typeState.readOrdinal(ordinal, fieldPosition);
-            typeState = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition);
+            typeState = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition); //This causes an incompatibility with object longevity.
             schema = typeState.getSchema();
         }
 
@@ -622,7 +617,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
             ordinal1 = typeState.readOrdinal(ordinal1, fieldPosition);
             ordinal2 = typeState.readOrdinal(ordinal2, fieldPosition);
-            typeState = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition);
+            typeState = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition);  //This causes an incompatibility with object longevity.
             schema = typeState.getSchema();
         }
 
@@ -653,11 +648,11 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         return true;
     }
 
-    private static class PrimaryKeyIndexHashTable {
-        private final FixedLengthElementArray hashTable;
-        private final int hashTableSize;
-        private final int hashMask;
-        private final int bitsPerElement;
+    static class PrimaryKeyIndexHashTable {
+        final FixedLengthElementArray hashTable;
+        final int hashTableSize;
+        final int hashMask;
+        final int bitsPerElement;
 
         public PrimaryKeyIndexHashTable(FixedLengthElementArray hashTable, int hashTableSize, int hashMask, int bitsPerElement) {
             this.hashTable = hashTable;

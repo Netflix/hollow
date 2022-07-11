@@ -16,7 +16,6 @@
  */
 package com.netflix.hollow.core.index;
 
-import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -29,15 +28,16 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
+
 @SuppressWarnings("unused")
-public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
+public class HollowUniqueKeyIndexTest extends HollowPrimaryKeyIndexTest {
 
     protected TestableUniqueKeyIndex createIndex(String type, String ... fieldPaths) {
-        return new HollowPrimaryKeyIndex(readStateEngine, type, fieldPaths);
+        return new HollowUniqueKeyIndex(readStateEngine, type, fieldPaths);
     }
 
     protected TestableUniqueKeyIndex createIndex(ArraySegmentRecycler memoryRecycler, String type, String ... fieldPaths) {
-        return new HollowPrimaryKeyIndex(readStateEngine, memoryRecycler, type, fieldPaths);
+        return new HollowUniqueKeyIndex(readStateEngine, memoryRecycler, type, fieldPaths);
     }
 
     @Test
