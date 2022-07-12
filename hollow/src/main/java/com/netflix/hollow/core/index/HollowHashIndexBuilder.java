@@ -27,6 +27,7 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import java.util.BitSet;
 
@@ -58,6 +59,22 @@ public class HollowHashIndexBuilder {
     private int intermediateMatchHashTableSizeBeforeGrow;
     private int matchCount;
 
+
+    /**
+     * This constructor is for binary-compatibility for code compiled against
+     * older builds.
+     *
+     * @param stateEngine state engine
+     * @param type The query starts with the specified type
+     * @param selectField The query will select records at this field (specify "" to select the specified type).
+     * The selectField may span collection elements and/or map keys or values, which can result in multiple matches per record of the specified start type.
+     * @param matchFields The query will match on the specified match fields.  The match fields may span collection elements and/or map keys or values.
+     * @deprecated Use {@link #HollowHashIndexBuilder(HollowDataAccess, String, String, String...)}
+     */
+    @Deprecated
+    public HollowHashIndexBuilder(HollowReadStateEngine stateEngine, String type, String selectField, String... matchFields) {
+        this((HollowDataAccess) stateEngine, type, selectField, matchFields);
+    }
 
     ///TODO: Optimization, make the matchFields[].schemaFieldPositionPath as short as possible, to reduce iteration
     /// this means merging the common roots of path from the same base field, and pushing all unique base fields down

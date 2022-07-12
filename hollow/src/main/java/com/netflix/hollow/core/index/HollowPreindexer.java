@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// Should this class be package private? It appears to be internal
 public class HollowPreindexer {
     
     private final HollowDataAccess stateEngine;
