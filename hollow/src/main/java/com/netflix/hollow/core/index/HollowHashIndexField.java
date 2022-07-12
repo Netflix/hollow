@@ -20,6 +20,7 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
+// Should this class be package private? It appears to be internal
 public class HollowHashIndexField {
     private final int baseIteratorFieldIdx;
     private final FieldPathSegment[] schemaFieldPositionPath;

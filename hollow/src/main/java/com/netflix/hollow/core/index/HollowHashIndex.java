@@ -48,6 +48,22 @@ public class HollowHashIndex implements HollowTypeStateListener {
     private final String[] matchFields;
 
     /**
+     * This constructor is for binary-compatibility for code compiled against
+     * older builds. 
+     *
+     * @param stateEngine The state engine to index
+     * @param type The query starts with the specified type
+     * @param selectField The query will select records at this field (specify "" to select the specified type).
+     * The selectField may span collection elements and/or map keys or values, which can result in multiple matches per record of the specified start type.
+     * @param matchFields The query will match on the specified match fields.  The match fields may span collection elements and/or map keys or values.
+     * @deprecated Use {@link HollowHashIndex#HollowHashIndex(HollowDataAccess, String, String, String...)}
+     */
+    @Deprecated
+    public HollowHashIndex(HollowReadStateEngine stateEngine, String type, String selectField, String... matchFields) {
+        this((HollowDataAccess) stateEngine, type, selectField, matchFields);
+    }
+
+    /**
      * Define a {@link HollowHashIndex}.
      *
      * @param hollowDataAccess The state engine to index
@@ -66,7 +82,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
         this.typeState = (HollowObjectTypeDataAccess) hollowDataAccess.getTypeDataAccess(type);
         this.selectField = selectField;
         this.matchFields = matchFields;
-        
+
         reindexHashIndex();
     }
 
