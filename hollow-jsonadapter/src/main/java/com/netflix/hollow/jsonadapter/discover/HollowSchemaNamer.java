@@ -37,7 +37,7 @@ public class HollowSchemaNamer {
         if(typeNamesMap == null) {
             synchronized (subNamesMap) {
                 typeNamesMap = subNamesMap.get(typeName);
-                if (typeNamesMap == null) {
+                if(typeNamesMap == null) {
                     typeNamesMap = new ConcurrentHashMap<String, String>();
                     Map<String, String> existingMap = subNamesMap.putIfAbsent(typeName, typeNamesMap);
                     if(existingMap != null)
@@ -50,7 +50,7 @@ public class HollowSchemaNamer {
         if(name == null) {
             synchronized (typeNamesMap) {
                 name = typeNamesMap.get(fieldName);
-                if (name == null) {
+                if(name == null) {
                     name = typeName + prefix + uppercaseFirstCharacter(fieldName);
                     name = name.intern();
                     typeNamesMap.put(fieldName, name);
@@ -75,7 +75,7 @@ public class HollowSchemaNamer {
     }
 
     private String uppercaseFirstCharacter(String value) {
-        if (value == null) return "";
+        if(value == null) return "";
         return value.substring(0, 1).toUpperCase() + value.substring(1);
     }
 

@@ -55,13 +55,13 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
     @Override
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         HollowTypeReadState typeState = getTypeState(req);
-        
+
         int page = req.getParameter("page") == null ? 0 : Integer.parseInt(req.getParameter("page"));
         int pageSize = req.getParameter("pageSize") == null ? 20 : Integer.parseInt(req.getParameter("pageSize"));
         int startRec = page * pageSize;
-        
+
         String displayFormat = "json".equals(req.getParameter("display")) ? "json" : "text";
-        
+
         BitSet selectedOrdinals = typeState.getPopulatedOrdinals();
 
         if("true".equals(req.getParameter("clearQuery")))
@@ -69,44 +69,44 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
 
         if(session.getAttribute(SESSION_ATTR_QUERY_RESULT) != null) {
             QueryResult queryResult =
-                (QueryResult) session.getAttribute(SESSION_ATTR_QUERY_RESULT);
+                    (QueryResult) session.getAttribute(SESSION_ATTR_QUERY_RESULT);
             queryResult.recalculateIfNotCurrent(ui.getStateEngine());
-            
+
             selectedOrdinals = queryResult.getQueryMatches().get(typeState.getSchema().getName());
             if(selectedOrdinals == null)
                 selectedOrdinals = new BitSet();
-            
+
             ctx.put("filteredByQuery", queryResult.getQueryDisplayString());
         }
-        
+
         int currentOrdinal = selectedOrdinals.nextSetBit(0);
-        for(int i=0;i<startRec;i++) {
-            currentOrdinal = selectedOrdinals.nextSetBit(currentOrdinal+1);
+        for(int i = 0; i < startRec; i++) {
+            currentOrdinal = selectedOrdinals.nextSetBit(currentOrdinal + 1);
         }
-        
+
         PrimaryKey primaryKey = getPrimaryKey(typeState.getSchema());
         int fieldPathIndexes[][] = getFieldPathIndexes(ui.getStateEngine(), primaryKey);
-        
+
         List<TypeKey> keys = new ArrayList<>(pageSize);
-        
-        for(int i = 0; i < pageSize && currentOrdinal != ORDINAL_NONE; i ++) {
+
+        for(int i = 0; i < pageSize && currentOrdinal != ORDINAL_NONE; i++) {
             keys.add(getKey(startRec + i, typeState, currentOrdinal, fieldPathIndexes));
             currentOrdinal = selectedOrdinals.nextSetBit(currentOrdinal + 1);
         }
 
-        
+
         String key = req.getParameter("key") == null ? "" : req.getParameter("key");
         Object parsedKey[] = null;
         try {
             parsedKey = parseKey(ui.getStateEngine(), primaryKey, key);
-        } catch(Exception e) {
+        } catch (Exception e) {
             key = "";
         }
 
         HollowTypeReadState readTypeState = getTypeState(req);
         int ordinal = req.getParameter("ordinal") == null ? ORDINAL_NONE : Integer.parseInt(req.getParameter("ordinal"));
         ordinal = getOrdinalToDisplay(ui.getStateEngine(), key, parsedKey, ordinal, selectedOrdinals, fieldPathIndexes, readTypeState);
-        if (ordinal != ORDINAL_NONE && "".equals(key)
+        if(ordinal != ORDINAL_NONE && "".equals(key)
                 && fieldPathIndexes != null) {
             // set key for the case where it was unset previously
             key = getKey(ORDINAL_NONE, typeState, ordinal, fieldPathIndexes).getKey();
@@ -132,13 +132,13 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         ui.getVelocityEngine().getTemplate("browse-selected-type-top.vm").merge(ctx, writer);
         try {
             Writer htmlEscapingWriter = new HtmlEscapingWriter(writer);
-            if (!"".equals(key) && ordinal != null && ordinal.equals(ORDINAL_NONE)) {
+            if(!"".equals(key) && ordinal != null && ordinal.equals(ORDINAL_NONE)) {
                 htmlEscapingWriter.append("ERROR: Key " + key + " was not found!");
-            } else if (ordinal != null && !ordinal.equals(ORDINAL_NONE)) {
+            } else if(ordinal != null && !ordinal.equals(ORDINAL_NONE)) {
                 HollowStringifier stringifier = "json".equals(req.getParameter("display"))
-                    ? new HollowRecordJsonStringifier() : new HollowRecordStringifier();
+                        ? new HollowRecordJsonStringifier() : new HollowRecordStringifier();
                 stringifier.stringify(htmlEscapingWriter, ui.getStateEngine(),
-                    getTypeState(req).getSchema().getName(), ordinal);
+                        getTypeState(req).getSchema().getName(), ordinal);
             }
         } catch (IOException e) {
             throw new RuntimeException("Error streaming response", e);
@@ -151,13 +151,13 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
             StringBuilder keyBuilder = new StringBuilder();
             StringBuilder delimiterEscapedKeyBuilder = new StringBuilder();
 
-            HollowObjectTypeReadState objState = (HollowObjectTypeReadState)typeState;
+            HollowObjectTypeReadState objState = (HollowObjectTypeReadState) typeState;
 
-            for(int i=0;i<fieldPathIndexes.length;i++) {
+            for(int i = 0; i < fieldPathIndexes.length; i++) {
                 int curOrdinal = ordinal;
                 HollowObjectTypeReadState curState = objState;
 
-                for(int j=0;j<fieldPathIndexes[i].length - 1;j++) {
+                for(int j = 0; j < fieldPathIndexes[i].length - 1; j++) {
                     curOrdinal = curState.readOrdinal(curOrdinal, fieldPathIndexes[i][j]);
                     curState = (HollowObjectTypeReadState) curState.getSchema().getReferencedTypeState(fieldPathIndexes[i][j]);
                 }
@@ -169,7 +169,7 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
 
                 Object fieldValueObject = HollowReadFieldUtils.fieldValueObject(curState, curOrdinal, fieldPathIndexes[i][fieldPathIndexes[i].length - 1]);
                 keyBuilder.append(fieldValueObject);
-                if (fieldValueObject instanceof String) {
+                if(fieldValueObject instanceof String) {
                     // escape delimiters if present in the value
                     delimiterEscapedKeyBuilder.append(((String) fieldValueObject)
                             .replaceAll(REGEX_MATCH_DELIMITER, ESCAPED_MULTI_FIELD_KEY_DELIMITER));

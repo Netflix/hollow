@@ -41,7 +41,7 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
     private final HollowMapTypeWriteState writeState;
 
     private final HollowObjectHashCodeFinder hashCodeFinder;
-    
+
     private HollowTypeMapper keyMapper;
     private HollowTypeMapper valueMapper;
 
@@ -49,10 +49,10 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
         this.keyMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], null, null, -1, visited);
         this.valueMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[1], null, null, -1, visited);
         String typeName = declaredName != null ? declaredName : getDefaultTypeName(type);
-        
+
         if(hashKeyFieldPaths == null && useDefaultHashKeys && (keyMapper instanceof HollowObjectTypeMapper))
-            hashKeyFieldPaths = ((HollowObjectTypeMapper)keyMapper).getDefaultElementHashKey();
-        
+            hashKeyFieldPaths = ((HollowObjectTypeMapper) keyMapper).getDefaultElementHashKey();
+
         this.schema = new HollowMapSchema(typeName, keyMapper.getTypeName(), valueMapper.getTypeName(), hashKeyFieldPaths);
         this.hashCodeFinder = stateEngine.getHashCodeFinder();
 
@@ -68,45 +68,45 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
     @Override
     protected int write(Object obj) {
         if(obj instanceof MemoizedMap) {
-            long assignedOrdinal = ((MemoizedMap<?, ?>)obj).__assigned_ordinal;
-            
+            long assignedOrdinal = ((MemoizedMap<?, ?>) obj).__assigned_ordinal;
+
             if((assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
-                return (int)assignedOrdinal & Integer.MAX_VALUE;
+                return (int) assignedOrdinal & Integer.MAX_VALUE;
         }
 
-        Map<?, ?> m = (Map<?, ?>)obj;
+        Map<?, ?> m = (Map<?, ?>) obj;
 
         HollowMapWriteRecord rec = copyToWriteRecord(m, null);
 
         int assignedOrdinal = writeState.add(rec);
-        
+
         if(obj instanceof MemoizedMap) {
-            ((MemoizedMap<?, ?>)obj).__assigned_ordinal = (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits();
+            ((MemoizedMap<?, ?>) obj).__assigned_ordinal = (long) assignedOrdinal | cycleSpecificAssignedOrdinalBits();
         }
-        
+
         return assignedOrdinal;
     }
-    
+
     @Override
     protected int writeFlat(Object obj, FlatRecordWriter flatRecordWriter) {
-    	HollowMapWriteRecord rec = copyToWriteRecord((Map<?,?>)obj, flatRecordWriter);
-    	return flatRecordWriter.write(schema, rec);
+        HollowMapWriteRecord rec = copyToWriteRecord((Map<?, ?>) obj, flatRecordWriter);
+        return flatRecordWriter.write(schema, rec);
     }
 
     private HollowMapWriteRecord copyToWriteRecord(Map<?, ?> m, FlatRecordWriter flatRecordWriter) {
         HollowMapWriteRecord rec = (HollowMapWriteRecord) writeRecord();
-        for (Map.Entry<?, ?> entry : m.entrySet()) {
+        for(Map.Entry<?, ?> entry : m.entrySet()) {
             Object key = entry.getKey();
-            if (key == null) {
+            if(key == null) {
                 throw new NullPointerException(String.format(NULL_KEY_MESSAGE, schema));
             }
             Object value = entry.getValue();
-            if (value == null) {
+            if(value == null) {
                 throw new NullPointerException(String.format(NULL_VALUE_MESSAGE, schema));
             }
 
             int keyOrdinal, valueOrdinal;
-            if (flatRecordWriter == null) {
+            if(flatRecordWriter == null) {
                 keyOrdinal = keyMapper.write(key);
                 valueOrdinal = valueMapper.write(value);
             } else {

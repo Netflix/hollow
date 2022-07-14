@@ -78,13 +78,13 @@ public class HollowIndexerValueTraverserTest extends AbstractStateEngineTest {
                         d("1", true),
                         d("2", false),
                         d("3", true)
-                 ),
+                ),
                 c(
                         e("one"), f(g(1.1f), g(1.2f), g(1.3f)),
                         e("two"), f(g(2.1f)),
                         e("three"), f(g(3.1f))
-                 )
-          );
+                )
+        );
 
         roundTripSnapshot();
 
@@ -92,8 +92,8 @@ public class HollowIndexerValueTraverserTest extends AbstractStateEngineTest {
 
         traverser.traverse(0);
 
-        for(int i=0;i<traverser.getNumMatches();i++) {
-            for(int j=0;j<traverser.getNumFieldPaths();j++) {
+        for(int i = 0; i < traverser.getNumMatches(); i++) {
+            for(int j = 0; j < traverser.getNumFieldPaths(); j++) {
                 System.out.print(traverser.getMatchedValue(i, j) + ", ");
             }
             System.out.println();
@@ -110,9 +110,9 @@ public class HollowIndexerValueTraverserTest extends AbstractStateEngineTest {
     }
 
     private void assertValueTraverserContainsEntry(HollowIndexerValueTraverser traverser, Object... values) {
-        for(int i=0;i<traverser.getNumMatches();i++) {
+        for(int i = 0; i < traverser.getNumMatches(); i++) {
             boolean allMatched = true;
-            for(int j=0;j<traverser.getNumFieldPaths();j++) {
+            for(int j = 0; j < traverser.getNumFieldPaths(); j++) {
                 if(!values[j].equals(traverser.getMatchedValue(i, j)))
                     allMatched = false;
             }
@@ -131,7 +131,7 @@ public class HollowIndexerValueTraverserTest extends AbstractStateEngineTest {
 
     private int b(int... values) {
         HollowListWriteRecord rec = new HollowListWriteRecord();
-        for(int i=0;i<values.length;i++) {
+        for(int i = 0; i < values.length; i++) {
             rec.addElement(values[i]);
         }
         return writeStateEngine.add("B", rec);
@@ -139,8 +139,8 @@ public class HollowIndexerValueTraverserTest extends AbstractStateEngineTest {
 
     private int c(int... keyValuePairs) {
         HollowMapWriteRecord rec = new HollowMapWriteRecord();
-        for(int i=0;i<keyValuePairs.length;i+=2) {
-            rec.addEntry(keyValuePairs[i], keyValuePairs[i+1]);
+        for(int i = 0; i < keyValuePairs.length; i += 2) {
+            rec.addEntry(keyValuePairs[i], keyValuePairs[i + 1]);
         }
         return writeStateEngine.add("C", rec);
     }
@@ -160,7 +160,7 @@ public class HollowIndexerValueTraverserTest extends AbstractStateEngineTest {
 
     private int f(int... values) {
         HollowSetWriteRecord rec = new HollowSetWriteRecord();
-        for(int i=0;i<values.length;i++) {
+        for(int i = 0; i < values.length; i++) {
             rec.addElement(values[i]);
         }
         return writeStateEngine.add("F", rec);

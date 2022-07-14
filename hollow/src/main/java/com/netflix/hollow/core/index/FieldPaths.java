@@ -55,7 +55,7 @@ public final class FieldPaths {
         // Erasure trick to avoid copying when it is known the list only contains
         // instances of ObjectFieldSegment
         assert fp.segments.stream().allMatch(o -> o instanceof ObjectFieldSegment);
-        @SuppressWarnings( {"unchecked", "raw"})
+        @SuppressWarnings({"unchecked", "raw"})
         FieldPath<ObjectFieldSegment> result = (FieldPath<ObjectFieldSegment>) (FieldPath) fp;
         return result;
     }
@@ -120,44 +120,44 @@ public final class FieldPaths {
         List<FieldSegment> fieldSegments = new ArrayList<>();
 
         String segmentType = type;
-        for (int i = 0; i < segments.length; i++) {
+        for(int i = 0; i < segments.length; i++) {
             HollowSchema schema = dataset.getSchema(segmentType);
             // @@@ Can this only occur for anything other than the root `type`?
-            if (schema == null) {
+            if(schema == null) {
                 throw new FieldPathException(FieldPathException.ErrorKind.NOT_BINDABLE, dataset, type, segments,
                         fieldSegments, null, i);
             }
 
             String segment = segments[i];
             HollowSchema.SchemaType schemaType = schema.getSchemaType();
-            if (schemaType == HollowSchema.SchemaType.OBJECT) {
+            if(schemaType == HollowSchema.SchemaType.OBJECT) {
                 HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
 
                 int index = objectSchema.getPosition(segment);
-                if (index == -1) {
+                if(index == -1) {
                     throw new FieldPathException(FieldPathException.ErrorKind.NOT_FOUND, dataset, type, segments,
                             fieldSegments, schema, i);
                 }
 
                 segmentType = objectSchema.getReferencedType(index);
                 fieldSegments.add(new ObjectFieldSegment(objectSchema, segment, segmentType, index));
-            } else if (traverseSequences && (schemaType == HollowSchema.SchemaType.SET
+            } else if(traverseSequences && (schemaType == HollowSchema.SchemaType.SET
                     || schemaType == HollowSchema.SchemaType.LIST)) {
                 HollowCollectionSchema collectionSchema = (HollowCollectionSchema) schema;
 
-                if (!segment.equals("element")) {
+                if(!segment.equals("element")) {
                     throw new FieldPathException(FieldPathException.ErrorKind.NOT_FOUND, dataset, type, segments,
                             fieldSegments, schema, i);
                 }
 
                 segmentType = collectionSchema.getElementType();
                 fieldSegments.add(new FieldSegment(collectionSchema, segment, segmentType));
-            } else if (traverseSequences && schemaType == HollowSchema.SchemaType.MAP) {
+            } else if(traverseSequences && schemaType == HollowSchema.SchemaType.MAP) {
                 HollowMapSchema mapSchema = (HollowMapSchema) schema;
 
-                if (segment.equals("key")) {
+                if(segment.equals("key")) {
                     segmentType = mapSchema.getKeyType();
-                } else if (segment.equals("value")) {
+                } else if(segment.equals("value")) {
                     segmentType = mapSchema.getValueType();
                 } else {
                     throw new FieldPathException(FieldPathException.ErrorKind.NOT_FOUND, dataset, type, segments,
@@ -165,31 +165,31 @@ public final class FieldPaths {
                 }
 
                 fieldSegments.add(new FieldSegment(mapSchema, segment, segmentType));
-            } else if (!traverseSequences) {
+            } else if(!traverseSequences) {
                 throw new FieldPathException(FieldPathException.ErrorKind.NOT_TRAVERSABLE, dataset, type, segments,
                         fieldSegments, schema, i);
             }
 
-            if (i < segments.length - 1 && segmentType == null) {
+            if(i < segments.length - 1 && segmentType == null) {
                 throw new FieldPathException(FieldPathException.ErrorKind.NOT_TRAVERSABLE, dataset, type, segments,
                         fieldSegments, schema, i);
             }
         }
 
-        if (autoExpand) {
-            while (segmentType != null) {
+        if(autoExpand) {
+            while(segmentType != null) {
                 HollowSchema schema = dataset.getSchema(segmentType);
 
-                if (schema.getSchemaType() == HollowSchema.SchemaType.OBJECT) {
+                if(schema.getSchemaType() == HollowSchema.SchemaType.OBJECT) {
                     HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
 
-                    if (objectSchema.numFields() == 1) {
+                    if(objectSchema.numFields() == 1) {
                         segmentType = objectSchema.getReferencedType(0);
 
                         fieldSegments.add(
                                 new ObjectFieldSegment(objectSchema, objectSchema.getFieldName(0), segmentType,
                                         0));
-                    } else if (objectSchema.getPrimaryKey() != null && objectSchema.getPrimaryKey().numFields() == 1) {
+                    } else if(objectSchema.getPrimaryKey() != null && objectSchema.getPrimaryKey().numFields() == 1) {
                         PrimaryKey key = objectSchema.getPrimaryKey();
 
                         FieldPath<ObjectFieldSegment> expandedFieldSegments;
@@ -216,7 +216,7 @@ public final class FieldPaths {
                             fieldSegments, schema);
                 }
             }
-        } else if (requireFullPath && segmentType != null) {
+        } else if(requireFullPath && segmentType != null) {
             throw new FieldPathException(FieldPathException.ErrorKind.NOT_FULL, dataset, type, segments,
                     fieldSegments);
         }
@@ -276,29 +276,29 @@ public final class FieldPaths {
         static String message(
                 ErrorKind error, HollowDataset dataset, String rootType, String[] segments,
                 List<FieldSegment> fieldSegments, HollowSchema enclosingSchema, int segmentIndex) {
-            switch (error) {
+            switch(error) {
                 case NOT_BINDABLE:
                     return String.format("Field path \"%s\" cannot be bound to data set %s. " +
-                                    "A schema of type named \"%s\" cannot be found for the last segment of the path prefix \"%s\".",
+                            "A schema of type named \"%s\" cannot be found for the last segment of the path prefix \"%s\".",
                             toPathString(segments), dataset,
                             getLastTypeName(rootType, fieldSegments), toPathString(segments, segmentIndex + 1));
                 case NOT_FOUND:
                     return String.format("Field path \"%s\" not found in data set %s. " +
-                                    "A schema of type named \"%s\" does not contain a field for the last segment of the path prefix \"%s\".",
+                            "A schema of type named \"%s\" does not contain a field for the last segment of the path prefix \"%s\".",
                             toPathString(segments), dataset,
                             enclosingSchema.getName(), toPathString(segments, segmentIndex + 1));
                 case NOT_TRAVERSABLE: {
-                    if (enclosingSchema.getSchemaType() != HollowSchema.SchemaType.OBJECT) {
+                    if(enclosingSchema.getSchemaType() != HollowSchema.SchemaType.OBJECT) {
                         return String.format("Field path \"%s\" is not traversable in data set %s. " +
-                                        "A non-object schema of type named \"%s\" and of schema type %s cannot be traversed for the last segment of the path prefix \"%s\".",
+                                "A non-object schema of type named \"%s\" and of schema type %s cannot be traversed for the last segment of the path prefix \"%s\".",
                                 toPathString(segments), dataset,
                                 enclosingSchema.getName(), enclosingSchema.getSchemaType(),
                                 toPathString(segments, segmentIndex + 1));
                     } else {
                         return String.format("Field path \"%s\" is not traversable in data set %s. " +
-                                        "An object schema of type named \"%s\" cannot be traversed for the last segment of the path prefix \"%s\". "
-                                        +
-                                        "The last segment of the path prefix refers to a value (non-reference) field.",
+                                "An object schema of type named \"%s\" cannot be traversed for the last segment of the path prefix \"%s\". "
+                                +
+                                "The last segment of the path prefix refers to a value (non-reference) field.",
                                 toPathString(segments), dataset,
                                 enclosingSchema.getName(),
                                 toPathString(segments, segmentIndex + 1));
@@ -306,25 +306,25 @@ public final class FieldPaths {
                 }
                 case NOT_FULL:
                     return String.format("Field path \"%s\" is not a full path in data set %s. " +
-                                    "The last segment of the path is not a value (non-reference) field and refers to a reference field whose schema is of type named \"%s\"",
+                            "The last segment of the path is not a value (non-reference) field and refers to a reference field whose schema is of type named \"%s\"",
                             toPathString(segments), dataset,
                             fieldSegments.get(fieldSegments.size() - 1).getTypeName());
                 case NOT_EXPANDABLE: {
-                    if (enclosingSchema.getSchemaType() == HollowSchema.SchemaType.OBJECT) {
+                    if(enclosingSchema.getSchemaType() == HollowSchema.SchemaType.OBJECT) {
                         HollowObjectSchema objectSchema = (HollowObjectSchema) enclosingSchema;
-                        if (objectSchema.numFields() != 1 || objectSchema.getPrimaryKey() == null
+                        if(objectSchema.numFields() != 1 || objectSchema.getPrimaryKey() == null
                                 || objectSchema.getPrimaryKey().numFields() != 1) {
                             return String.format("Field path \"%s\" is not expandable in data set %s. " +
-                                            "An object schema of type named \"%s\" cannot be traversed for the last segment of the partially expanded path \"%s\". "
-                                            +
-                                            "The schema contains more than one field, or has no primary key, or has a primary key with more than one field path.",
+                                    "An object schema of type named \"%s\" cannot be traversed for the last segment of the partially expanded path \"%s\". "
+                                    +
+                                    "The schema contains more than one field, or has no primary key, or has a primary key with more than one field path.",
                                     toPathString(segments), dataset,
                                     enclosingSchema.getName(),
                                     toPathString(fieldSegments));
                         }
                     }
                     return String.format("Field path \"%s\" is not expandable in data set %s. " +
-                                    "A non-object schema of type named \"%s\" and of schema type %s cannot be traversed for the last segment of the partially expanded path \"%s\".",
+                            "A non-object schema of type named \"%s\" and of schema type %s cannot be traversed for the last segment of the partially expanded path \"%s\".",
                             toPathString(segments), dataset,
                             enclosingSchema.getName(), enclosingSchema.getSchemaType(),
                             toPathString(fieldSegments));
@@ -398,11 +398,12 @@ public final class FieldPaths {
             return noAutoExpand ? path + "!" : path;
         }
 
-        @Override public boolean equals(Object o) {
-            if (this == o) {
+        @Override
+        public boolean equals(Object o) {
+            if(this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
+            if(o == null || getClass() != o.getClass()) {
                 return false;
             }
             FieldPath<?> fieldPath = (FieldPath<?>) o;
@@ -411,7 +412,8 @@ public final class FieldPaths {
                     segments.equals(fieldPath.segments);
         }
 
-        @Override public int hashCode() {
+        @Override
+        public int hashCode() {
             return Objects.hash(rootType, segments, noAutoExpand);
         }
     }
@@ -457,11 +459,12 @@ public final class FieldPaths {
             return typeName;
         }
 
-        @Override public boolean equals(Object o) {
-            if (this == o) {
+        @Override
+        public boolean equals(Object o) {
+            if(this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
+            if(o == null || getClass() != o.getClass()) {
                 return false;
             }
             FieldSegment that = (FieldSegment) o;
@@ -470,7 +473,8 @@ public final class FieldPaths {
                     Objects.equals(typeName, that.typeName);
         }
 
-        @Override public int hashCode() {
+        @Override
+        public int hashCode() {
             return Objects.hash(enclosingSchema, name, typeName);
         }
     }
@@ -515,14 +519,15 @@ public final class FieldPaths {
             return type;
         }
 
-        @Override public boolean equals(Object o) {
-            if (this == o) {
+        @Override
+        public boolean equals(Object o) {
+            if(this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
+            if(o == null || getClass() != o.getClass()) {
                 return false;
             }
-            if (!super.equals(o)) {
+            if(!super.equals(o)) {
                 return false;
             }
             ObjectFieldSegment that = (ObjectFieldSegment) o;
@@ -530,7 +535,8 @@ public final class FieldPaths {
                     type == that.type;
         }
 
-        @Override public int hashCode() {
+        @Override
+        public int hashCode() {
             return Objects.hash(super.hashCode(), index, type);
         }
     }

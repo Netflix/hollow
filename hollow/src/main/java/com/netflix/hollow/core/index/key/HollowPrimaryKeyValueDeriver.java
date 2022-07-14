@@ -41,15 +41,15 @@ public class HollowPrimaryKeyValueDeriver {
     public HollowPrimaryKeyValueDeriver(PrimaryKey primaryKey, HollowReadStateEngine stateEngine) {
         this.fieldPathIndexes = new int[primaryKey.numFields()][];
         this.fieldTypes = new FieldType[primaryKey.numFields()];
-        
-        for(int i=0;i<primaryKey.numFields();i++) {
+
+        for(int i = 0; i < primaryKey.numFields(); i++) {
             fieldPathIndexes[i] = primaryKey.getFieldPathIndex(stateEngine, i);
             fieldTypes[i] = primaryKey.getFieldType(stateEngine, i);
         }
-        
+
         this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
     }
-    
+
     public HollowPrimaryKeyValueDeriver(HollowObjectTypeReadState typeState, int[][] fieldPathIndexes, FieldType[] fieldTypes) {
         this.typeState = typeState;
         this.fieldPathIndexes = fieldPathIndexes;
@@ -66,21 +66,21 @@ public class HollowPrimaryKeyValueDeriver {
     public boolean keyMatches(int ordinal, Object... keys) {
         if(keys.length != fieldPathIndexes.length)
             return false;
-        
-        for(int i=0;i<keys.length;i++) {
+
+        for(int i = 0; i < keys.length; i++) {
             if(!keyMatches(keys[i], ordinal, i))
                 return false;
         }
-        
+
         return true;
     }
-    
+
     public boolean keyMatches(Object key, int ordinal, int fieldIdx) {
         HollowObjectTypeReadState typeState = this.typeState;
         HollowObjectSchema schema = typeState.getSchema();
 
         int lastFieldPath = fieldPathIndexes[fieldIdx].length - 1;
-        for(int i=0;i<lastFieldPath;i++) {
+        for(int i = 0; i < lastFieldPath; i++) {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
             ordinal = typeState.readOrdinal(ordinal, fieldPosition);
             typeState = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition);
@@ -96,26 +96,26 @@ public class HollowPrimaryKeyValueDeriver {
                     return true;
                 if(b == null || key == null)
                     return false;
-                return b.booleanValue() == ((Boolean)key).booleanValue();
+                return b.booleanValue() == ((Boolean) key).booleanValue();
             case BYTES:
-                return Arrays.equals(typeState.readBytes(ordinal, lastFieldIdx), (byte[])key);
+                return Arrays.equals(typeState.readBytes(ordinal, lastFieldIdx), (byte[]) key);
             case DOUBLE:
-                return typeState.readDouble(ordinal, lastFieldIdx) == ((Double)key).doubleValue();
+                return typeState.readDouble(ordinal, lastFieldIdx) == ((Double) key).doubleValue();
             case FLOAT:
-                return typeState.readFloat(ordinal, lastFieldIdx) == ((Float)key).floatValue();
+                return typeState.readFloat(ordinal, lastFieldIdx) == ((Float) key).floatValue();
             case INT:
-                return typeState.readInt(ordinal, lastFieldIdx) == ((Integer)key).intValue();
+                return typeState.readInt(ordinal, lastFieldIdx) == ((Integer) key).intValue();
             case LONG:
-                return typeState.readLong(ordinal, lastFieldIdx) == ((Long)key).longValue();
+                return typeState.readLong(ordinal, lastFieldIdx) == ((Long) key).longValue();
             case REFERENCE:
-                return typeState.readOrdinal(ordinal, lastFieldIdx) == ((Integer)key).intValue();
+                return typeState.readOrdinal(ordinal, lastFieldIdx) == ((Integer) key).intValue();
             case STRING:
-                return typeState.isStringFieldEqual(ordinal, lastFieldIdx, (String)key);
+                return typeState.isStringFieldEqual(ordinal, lastFieldIdx, (String) key);
         }
 
         throw new IllegalArgumentException("I don't know how to compare a " + fieldTypes[fieldIdx]);
     }
-    
+
     /**
      * Retrieve the primary key value for the specified ordinal.
      *
@@ -125,7 +125,7 @@ public class HollowPrimaryKeyValueDeriver {
     public Object[] getRecordKey(int ordinal) {
         Object[] results = new Object[fieldPathIndexes.length];
 
-        for (int i = 0; i < fieldPathIndexes.length; i++) {
+        for(int i = 0; i < fieldPathIndexes.length; i++) {
             results[i] = readValue(ordinal, i);
         }
         return results;
@@ -136,7 +136,7 @@ public class HollowPrimaryKeyValueDeriver {
         HollowObjectSchema schema = typeState.getSchema();
 
         int lastFieldPath = fieldPathIndexes[fieldIdx].length - 1;
-        for (int i = 0; i < lastFieldPath; i++) {
+        for(int i = 0; i < lastFieldPath; i++) {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
             ordinal = typeState.readOrdinal(ordinal, fieldPosition);
             typeState = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition);
@@ -145,7 +145,7 @@ public class HollowPrimaryKeyValueDeriver {
 
         return HollowReadFieldUtils.fieldValueObject(typeState, ordinal, fieldPathIndexes[fieldIdx][lastFieldPath]);
     }
-    
+
     public int[][] getFieldPathIndexes() {
         return fieldPathIndexes;
     }

@@ -90,7 +90,7 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
 
         private byte[] data;
         private Map<String, byte[]> optionalParts;
-        
+
         protected InMemoryBlob(long fromVersion, long toVersion, Type type) {
             super(fromVersion, toVersion, type);
         }
@@ -116,15 +116,15 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
             }
 
             switch(type) {
-            case SNAPSHOT:
-                writer.writeSnapshot(baos, optionalPartStreams);
-                break;
-            case DELTA:
-                writer.writeDelta(baos, optionalPartStreams);
-                break;
-            case REVERSE_DELTA:
-                writer.writeReverseDelta(baos, optionalPartStreams);
-                break;
+                case SNAPSHOT:
+                    writer.writeSnapshot(baos, optionalPartStreams);
+                    break;
+                case DELTA:
+                    writer.writeDelta(baos, optionalPartStreams);
+                    break;
+                case REVERSE_DELTA:
+                    writer.writeReverseDelta(baos, optionalPartStreams);
+                    break;
             }
 
             data = baos.toByteArray();
@@ -153,7 +153,8 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
         }
 
         @Override
-        public void cleanup() { }
+        public void cleanup() {
+        }
 
     }
 

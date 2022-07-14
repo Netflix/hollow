@@ -43,20 +43,20 @@ class HollowIndexerCollectionTraversalNode extends HollowIndexerTraversalNode {
             return 1;
 
         HollowOrdinalIterator iter = dataAccess().ordinalIterator(ordinal);
-        
+
         int numMatches = 0;
 
         int elementOrdinal = iter.next();
         while(elementOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
             prepareMultiply();
-            
+
             child.traverse(elementOrdinal);
-            
+
             numMatches += doMultiply();
-            
+
             elementOrdinal = iter.next();
         }
-        
+
         return numMatches;
     }
 

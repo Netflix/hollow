@@ -25,12 +25,12 @@ public class LongHollowFactory extends HollowFactory<HLong> {
 
     @Override
     public HLong newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HLong(((LongTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return new HLong(((LongTypeAPI) typeAPI).getDelegateLookupImpl(), ordinal);
     }
 
     @Override
     public HLong newCachedHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HLong(new LongDelegateCachedImpl((LongTypeAPI)typeAPI, ordinal), ordinal);
+        return new HLong(new LongDelegateCachedImpl((LongTypeAPI) typeAPI, ordinal), ordinal);
     }
 
 }

@@ -35,4 +35,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {CONSTRUCTOR, METHOD, TYPE})
 @Documented
-public @interface PublicApi {}
+public @interface PublicApi {
+}

@@ -344,7 +344,7 @@ public class FieldPathTest {
         values = fieldPath.findValues(0);
         Assert.assertEquals(3, values.length);
         valuesAsSet = new HashSet<>();
-        for (Object v : values) valuesAsSet.add((int) v);
+        for(Object v : values) valuesAsSet.add((int) v);
 
         Assert.assertTrue(valuesAsSet.contains(1));
         Assert.assertTrue(valuesAsSet.contains(2));
@@ -355,7 +355,7 @@ public class FieldPathTest {
         values = fieldPath.findValues(0);
         Assert.assertEquals(3, values.length);
         valuesAsSet = new HashSet<>();
-        for (Object v : values) valuesAsSet.add((int) v);
+        for(Object v : values) valuesAsSet.add((int) v);
 
         Assert.assertTrue(valuesAsSet.contains(1));
         Assert.assertTrue(valuesAsSet.contains(2));
@@ -387,7 +387,7 @@ public class FieldPathTest {
         Object[] values = fieldPath.findValues(0);
         Assert.assertEquals(2, values.length);
         Set<String> valuesAsSet = new HashSet<>();
-        for (Object v : values) valuesAsSet.add((String) v);
+        for(Object v : values) valuesAsSet.add((String) v);
         Assert.assertTrue(valuesAsSet.contains("one"));
         Assert.assertTrue(valuesAsSet.contains("two"));
     }
@@ -422,7 +422,7 @@ public class FieldPathTest {
         Object[] values = fieldPath.findValues(0);
         Assert.assertEquals(2, values.length);
         Set<String> valuesAsSet = new HashSet<>();
-        for (Object v : values) valuesAsSet.add((String) v);
+        for(Object v : values) valuesAsSet.add((String) v);
         Assert.assertTrue(valuesAsSet.contains("one"));
         Assert.assertTrue(valuesAsSet.contains("two"));
 
@@ -431,7 +431,7 @@ public class FieldPathTest {
         values = fieldPath.findValues(0);
         Assert.assertEquals(2, values.length);
         Set<Integer> keysAsSet = new HashSet<>();
-        for (Object v : values) keysAsSet.add((int) v);
+        for(Object v : values) keysAsSet.add((int) v);
         Assert.assertTrue(keysAsSet.contains(1));
         Assert.assertTrue(keysAsSet.contains(2));
     }

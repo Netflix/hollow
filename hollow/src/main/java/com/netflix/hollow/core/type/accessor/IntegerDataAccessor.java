@@ -28,7 +28,7 @@ public class IntegerDataAccessor extends AbstractHollowDataAccessor<Integer> {
     private HollowConsumerAPI.IntegerRetriever api;
 
     public IntegerDataAccessor(HollowConsumer consumer) {
-        this(consumer.getStateEngine(), (HollowConsumerAPI.IntegerRetriever)consumer.getAPI());
+        this(consumer.getStateEngine(), (HollowConsumerAPI.IntegerRetriever) consumer.getAPI());
     }
 
     public IntegerDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.IntegerRetriever api) {
@@ -36,7 +36,8 @@ public class IntegerDataAccessor extends AbstractHollowDataAccessor<Integer> {
         this.api = api;
     }
 
-    @Override public Integer getRecord(int ordinal){
+    @Override
+    public Integer getRecord(int ordinal) {
         HInteger val = api.getHInteger(ordinal);
         return val == null ? null : val.getValueBoxed();
     }

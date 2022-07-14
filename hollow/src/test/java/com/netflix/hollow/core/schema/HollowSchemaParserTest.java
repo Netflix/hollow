@@ -202,9 +202,9 @@ public class HollowSchemaParserTest {
                         "    int a1;\n" +
                         "    \tstring a2; //This is a comment\n" +
                         "    String a3;\n" +
-                        "}\n\n"+
-                        "MapOfStringToTypeA Map<String, TypeA>;\n"+
-                        "ListOfTypeA List<TypeA>;\n"+
+                        "}\n\n" +
+                        "MapOfStringToTypeA Map<String, TypeA>;\n" +
+                        "ListOfTypeA List<TypeA>;\n" +
                         "TypeB { float b1; double b2; boolean b3; }";
 
 
@@ -224,7 +224,7 @@ public class HollowSchemaParserTest {
             Assert.assertEquals("Should have Minion schema", "Minion", schemas.get(0).getName());
             Assert.assertEquals("Should have String schema", "String", schemas.get(1).getName());
         } finally {
-            if (input != null) {
+            if(input != null) {
                 input.close();
             }
         }

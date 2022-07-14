@@ -26,8 +26,10 @@ import java.util.concurrent.TimeUnit;
 @Deprecated
 public class AbstractIncrementalCycleListener implements IncrementalCycleListener {
     @Override
-    public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit) { }
+    public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit) {
+    }
 
     @Override
-    public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit) { }
+    public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit) {
+    }
 }

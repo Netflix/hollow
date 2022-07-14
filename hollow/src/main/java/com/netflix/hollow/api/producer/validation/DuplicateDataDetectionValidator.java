@@ -55,8 +55,8 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
 
     private static final String NO_SCHEMA_FOUND_MSG_FORMAT =
             "DuplicateDataDetectionValidator defined for data type %s but schema not found."
-            + "Please check that the HollowProducer is initialized with the data type's schema "
-            + "(see initializeDataModel)";
+                    + "Please check that the HollowProducer is initialized with the data type's schema "
+                    + "(see initializeDataModel)";
     private static final String NOT_AN_OBJECT_ERROR_MSG_FORMAT =
             "DuplicateDataDetectionValidator is defined but schema type of %s "
                     + "is not Object. This validation cannot be done.";
@@ -79,7 +79,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
     public DuplicateDataDetectionValidator(Class<?> dataType) {
         Objects.requireNonNull(dataType);
 
-        if (!dataType.isAnnotationPresent(HollowPrimaryKey.class)) {
+        if(!dataType.isAnnotationPresent(HollowPrimaryKey.class)) {
             throw new IllegalArgumentException("The data class " +
                     dataType.getName() +
                     " must be annotated with @HollowPrimaryKey");
@@ -128,18 +128,18 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         vrb.detail(DATA_TYPE_NAME, dataTypeName);
 
         PrimaryKey primaryKey;
-        if (fieldPathNames == null) {
+        if(fieldPathNames == null) {
             HollowSchema schema = readState.getStateEngine().getSchema(dataTypeName);
-            if (schema == null) {
+            if(schema == null) {
                 return vrb.failed(String.format(NO_SCHEMA_FOUND_MSG_FORMAT, dataTypeName));
             }
-            if (schema.getSchemaType() != SchemaType.OBJECT) {
+            if(schema.getSchemaType() != SchemaType.OBJECT) {
                 return vrb.failed(String.format(NOT_AN_OBJECT_ERROR_MSG_FORMAT, dataTypeName));
             }
 
             HollowObjectSchema oSchema = (HollowObjectSchema) schema;
             primaryKey = oSchema.getPrimaryKey();
-            if (primaryKey == null) {
+            if(primaryKey == null) {
                 return vrb.failed(String.format(NO_PRIMARY_KEY_ERROR_MSG_FORMAT, dataTypeName));
             }
         } else {
@@ -150,7 +150,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         vrb.detail(FIELD_PATH_NAME, fieldPaths);
 
         Collection<Object[]> duplicateKeys = getDuplicateKeys(readState.getStateEngine(), primaryKey);
-        if (!duplicateKeys.isEmpty()) {
+        if(!duplicateKeys.isEmpty()) {
             String message = String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths,
                     duplicateKeysToString(duplicateKeys));
             return vrb.failed(message);
@@ -162,7 +162,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
     private Collection<Object[]> getDuplicateKeys(HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
         HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
         HollowPrimaryKeyIndex hollowPrimaryKeyIndex = typeState.getListener(HollowPrimaryKeyIndex.class);
-        if (hollowPrimaryKeyIndex == null) {
+        if(hollowPrimaryKeyIndex == null) {
             hollowPrimaryKeyIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
         }
         return hollowPrimaryKeyIndex.getDuplicateKeys();
@@ -170,10 +170,10 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
+        if(this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if(o == null || getClass() != o.getClass()) {
             return false;
         }
         DuplicateDataDetectionValidator that = (DuplicateDataDetectionValidator) o;

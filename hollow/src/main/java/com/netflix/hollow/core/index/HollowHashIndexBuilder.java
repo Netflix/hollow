@@ -77,8 +77,8 @@ public class HollowHashIndexBuilder {
         this.offsetPerTraverserField = new int[traverser.getNumFieldPaths()];
 
         int bitsPerMatchHashKey = 0;
-        for(int i=0;i<traverser.getNumFieldPaths();i++) {
-            int maxOrdinalForTypeState = ((HollowTypeReadState)traverser.getFieldTypeDataAccess(i)).maxOrdinal();
+        for(int i = 0; i < traverser.getNumFieldPaths(); i++) {
+            int maxOrdinalForTypeState = ((HollowTypeReadState) traverser.getFieldTypeDataAccess(i)).maxOrdinal();
             bitsPerTraverserField[i] = bitsRequiredToRepresentValue(maxOrdinalForTypeState + 1);
             offsetPerTraverserField[i] = bitsPerMatchHashKey;
             if(i < preindexer.getNumMatchTraverserFields())
@@ -105,7 +105,7 @@ public class HollowHashIndexBuilder {
         matchCount = 0;
 
         /// a data structure which keeps canonical matches for comparison (the matchHashTable)
-        intermediateMatchHashTable = new FixedLengthElementArray(memoryRecycler, (long)intermediateMatchHashTableSize * bitsPerIntermediateMatchHashEntry);
+        intermediateMatchHashTable = new FixedLengthElementArray(memoryRecycler, (long) intermediateMatchHashTableSize * bitsPerIntermediateMatchHashEntry);
 
         /// a data structure which tracks lists of matches under canonical matches.
         intermediateSelectLists = new MultiLinkedElementArray(memoryRecycler);
@@ -117,28 +117,28 @@ public class HollowHashIndexBuilder {
         while(ordinal != HollowConstants.ORDINAL_NONE) {
             traverser.traverse(ordinal);
 
-            for(int i=0;i<traverser.getNumMatches();i++) {
+            for(int i = 0; i < traverser.getNumMatches(); i++) {
                 int matchHash = getMatchHash(i);
 
                 long bucket = matchHash & intermediateMatchHashMask;
                 long hashBucketBit = bucket * bitsPerIntermediateMatchHashEntry;
                 boolean bucketIsEmpty = intermediateMatchHashTable.getElementValue(hashBucketBit, bitsPerTraverserField[0]) == 0;
                 long bucketMatchListIdx = intermediateMatchHashTable.getElementValue(hashBucketBit + bitsPerMatchHashKey, bitsPerIntermediateListIdentifier);
-                int bucketMatchHashCode = (int)matchIndexHashAndSizeArray.get(bucketMatchListIdx);
+                int bucketMatchHashCode = (int) matchIndexHashAndSizeArray.get(bucketMatchListIdx);
 
                 while(!bucketIsEmpty && (bucketMatchHashCode != (matchHash & Integer.MAX_VALUE) || !intermediateMatchIsEqual(i, hashBucketBit))) {
                     bucket = (bucket + 1) & intermediateMatchHashMask;
                     hashBucketBit = bucket * bitsPerIntermediateMatchHashEntry;
                     bucketIsEmpty = intermediateMatchHashTable.getElementValue(hashBucketBit, bitsPerTraverserField[0]) == 0;
                     bucketMatchListIdx = intermediateMatchHashTable.getElementValue(hashBucketBit + bitsPerMatchHashKey, bitsPerIntermediateListIdentifier);
-                    bucketMatchHashCode = (int)matchIndexHashAndSizeArray.get(bucketMatchListIdx);
+                    bucketMatchHashCode = (int) matchIndexHashAndSizeArray.get(bucketMatchListIdx);
                 }
 
                 int matchListIdx;
 
                 if(bucketIsEmpty) {
                     matchListIdx = intermediateSelectLists.newList();
-                    for(int j=0;j<preindexer.getNumMatchTraverserFields();j++)
+                    for(int j = 0; j < preindexer.getNumMatchTraverserFields(); j++)
                         intermediateMatchHashTable.setElementValue(hashBucketBit + offsetPerTraverserField[j], bitsPerTraverserField[j], traverser.getMatchOrdinal(i, j) + 1);
 
                     intermediateMatchHashTable.setElementValue(hashBucketBit + bitsPerMatchHashKey, bitsPerIntermediateListIdentifier, matchListIdx);
@@ -152,13 +152,11 @@ public class HollowHashIndexBuilder {
                     }
 
                 } else {
-                    matchListIdx = (int)intermediateMatchHashTable.getElementValue(hashBucketBit + bitsPerMatchHashKey, bitsPerIntermediateListIdentifier);
+                    matchListIdx = (int) intermediateMatchHashTable.getElementValue(hashBucketBit + bitsPerMatchHashKey, bitsPerIntermediateListIdentifier);
                 }
 
                 intermediateSelectLists.add(matchListIdx, traverser.getMatchOrdinal(i, preindexer.getSelectFieldSpec().getBaseIteratorFieldIdx()));
             }
-
-
 
 
             ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
@@ -171,7 +169,7 @@ public class HollowHashIndexBuilder {
         long totalNumberOfMatchBuckets = HashCodes.hashTableSize(matchCount);
 
         int bitsPerFinalSelectBucketPointer = bitsRequiredToRepresentValue(totalNumberOfSelectBuckets);
-        int bitsPerSelectTableSize = (int)(totalNumberOfSelectBucketsAndBitsRequiredForSelectTableSize >>> 56);
+        int bitsPerSelectTableSize = (int) (totalNumberOfSelectBucketsAndBitsRequiredForSelectTableSize >>> 56);
         int finalBitsPerMatchHashEntry = bitsPerMatchHashKey + bitsPerSelectTableSize + bitsPerFinalSelectBucketPointer;
 
         FixedLengthElementArray finalMatchArray = new FixedLengthElementArray(memoryRecycler, totalNumberOfMatchBuckets * finalBitsPerMatchHashEntry);
@@ -181,9 +179,9 @@ public class HollowHashIndexBuilder {
 
         long currentSelectArrayBucket = 0;
 
-        for(int i=0;i<matchCount;i++) {
+        for(int i = 0; i < matchCount; i++) {
             long matchIndexHashAndSize = matchIndexHashAndSizeArray.get(i);
-            int matchIndexSize = (int)(matchIndexHashAndSize >> 32);
+            int matchIndexSize = (int) (matchIndexHashAndSize >> 32);
             int matchIndexTableSize = HashCodes.hashTableSize(matchIndexSize);
             int matchIndexBucketMask = matchIndexTableSize - 1;
 
@@ -191,12 +189,12 @@ public class HollowHashIndexBuilder {
             int selectOrdinal = selectOrdinalIter.next();
             while(selectOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                 int selectBucket = HashCodes.hashInt(selectOrdinal) & matchIndexBucketMask;
-                int bucketOrdinal = (int)finalSelectArray.getElementValue((currentSelectArrayBucket + selectBucket) * bitsPerSelectHashEntry, bitsPerSelectHashEntry) - 1;
+                int bucketOrdinal = (int) finalSelectArray.getElementValue((currentSelectArrayBucket + selectBucket) * bitsPerSelectHashEntry, bitsPerSelectHashEntry) - 1;
                 while(bucketOrdinal != HollowConstants.ORDINAL_NONE && bucketOrdinal != selectOrdinal) {
                     ///TODO: If select field type is not REFERENCE, then we should dedup -- unless we are reference counting for delta application
                     ///ordinals here with the same value for the specified field.
                     selectBucket = (selectBucket + 1) & matchIndexBucketMask;
-                    bucketOrdinal = (int)finalSelectArray.getElementValue((currentSelectArrayBucket + selectBucket) * bitsPerSelectHashEntry, bitsPerSelectHashEntry) - 1;
+                    bucketOrdinal = (int) finalSelectArray.getElementValue((currentSelectArrayBucket + selectBucket) * bitsPerSelectHashEntry, bitsPerSelectHashEntry) - 1;
                 }
 
                 if(bucketOrdinal == HollowConstants.ORDINAL_NONE)
@@ -246,15 +244,15 @@ public class HollowHashIndexBuilder {
         int newMatchHashMask = newMatchHashTableSize - 1;
         int newBitsForListIdentifier = bitsRequiredToRepresentValue(newMatchHashTableSize - 1);
         int newBitsPerMatchHashEntry = bitsPerMatchHashKey + newBitsForListIdentifier;
-        FixedLengthElementArray newMatchHashTable = new FixedLengthElementArray(memoryRecycler, (long)newMatchHashTableSize * newBitsPerMatchHashEntry);
+        FixedLengthElementArray newMatchHashTable = new FixedLengthElementArray(memoryRecycler, (long) newMatchHashTableSize * newBitsPerMatchHashEntry);
 
-        for(int j=0;j<matchCount;j++) {
-            int rehashCode = (int)matchIndexHashAndSizeArray.get(j);
+        for(int j = 0; j < matchCount; j++) {
+            int rehashCode = (int) matchIndexHashAndSizeArray.get(j);
             long oldHashBucket = rehashCode & intermediateMatchHashMask;
             long oldHashBucketBit = oldHashBucket * bitsPerIntermediateMatchHashEntry;
 
             while(intermediateMatchHashTable.getElementValue(oldHashBucketBit + bitsPerMatchHashKey, bitsPerIntermediateListIdentifier) != j) {
-                oldHashBucket = (oldHashBucket+1) & intermediateMatchHashMask;
+                oldHashBucket = (oldHashBucket + 1) & intermediateMatchHashMask;
                 oldHashBucketBit = oldHashBucket * bitsPerIntermediateMatchHashEntry;
             }
 
@@ -274,7 +272,7 @@ public class HollowHashIndexBuilder {
                 newMatchHashTable.copyBits(intermediateMatchHashTable, oldHashBucketBit, rehashBucketBit, bitsPerMatchHashKey);
             }
 
-            int listIdx = (int)intermediateMatchHashTable.getElementValue(oldHashBucketBit + bitsPerMatchHashKey, bitsPerIntermediateListIdentifier);
+            int listIdx = (int) intermediateMatchHashTable.getElementValue(oldHashBucketBit + bitsPerMatchHashKey, bitsPerIntermediateListIdentifier);
             newMatchHashTable.setElementValue(rehashBucketBit + bitsPerMatchHashKey, bitsPerIntermediateListIdentifier, listIdx);
         }
 
@@ -298,14 +296,14 @@ public class HollowHashIndexBuilder {
         long maxSize = 0;
         int[] selectArray = new int[8];
 
-        for(int i=0;i<elementArray.numLists();i++) {
+        for(int i = 0; i < elementArray.numLists(); i++) {
             int listSize = elementArray.listSize(i);
             int setSize = 0;
             int predictedBuckets = HashCodes.hashTableSize(listSize);
             int hashMask = predictedBuckets - 1;
             if(predictedBuckets > selectArray.length)
                 selectArray = new int[predictedBuckets];
-            for(int j=0;j<predictedBuckets;j++)
+            for(int j = 0; j < predictedBuckets; j++)
                 selectArray[j] = -1;
 
             HollowOrdinalIterator iter = elementArray.iterator(i);
@@ -323,14 +321,14 @@ public class HollowHashIndexBuilder {
                         break;
                     }
 
-                    bucket = (bucket+1) & hashMask;
+                    bucket = (bucket + 1) & hashMask;
                 }
 
                 selectOrdinal = iter.next();
             }
 
             long matchIndexHashAndSize = matchIndexHashAndSizeArray.get(i);
-            matchIndexHashAndSize |= (long)setSize << 32;
+            matchIndexHashAndSize |= (long) setSize << 32;
             matchIndexHashAndSizeArray.set(i, matchIndexHashAndSize);
 
             totalBuckets += HashCodes.hashTableSize(setSize);
@@ -338,14 +336,14 @@ public class HollowHashIndexBuilder {
                 maxSize = setSize;
         }
 
-        return totalBuckets | (long)bitsRequiredToRepresentValue(maxSize) << 56;
+        return totalBuckets | (long) bitsRequiredToRepresentValue(maxSize) << 56;
     }
 
     private boolean intermediateMatchIsEqual(int matchIdx, long hashBucketBit) {
-        for(int i=0;i<preindexer.getMatchFieldSpecs().length;i++) {
+        for(int i = 0; i < preindexer.getMatchFieldSpecs().length; i++) {
             HollowHashIndexField field = preindexer.getMatchFieldSpecs()[i];
             int matchOrdinal = preindexer.getTraverser().getMatchOrdinal(matchIdx, field.getBaseIteratorFieldIdx());
-            int hashOrdinal = (int)intermediateMatchHashTable.getElementValue(hashBucketBit + offsetPerTraverserField[field.getBaseIteratorFieldIdx()], bitsPerTraverserField[field.getBaseIteratorFieldIdx()]) - 1;
+            int hashOrdinal = (int) intermediateMatchHashTable.getElementValue(hashBucketBit + offsetPerTraverserField[field.getBaseIteratorFieldIdx()], bitsPerTraverserField[field.getBaseIteratorFieldIdx()]) - 1;
 
             HollowTypeReadState readState = field.getBaseDataAccess();
             int[] fieldPath = field.getSchemaFieldPositionPath();
@@ -354,8 +352,8 @@ public class HollowHashIndexBuilder {
                 if(matchOrdinal != hashOrdinal)
                     return false;
             } else {
-                for(int j=0;j<fieldPath.length - 1;j++) {
-                    HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
+                for(int j = 0; j < fieldPath.length - 1; j++) {
+                    HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState) readState;
                     readState = objectAccess.getSchema().getReferencedTypeState(fieldPath[j]);
                     if(matchOrdinal != HollowConstants.ORDINAL_NONE) {
                         matchOrdinal = objectAccess.readOrdinal(matchOrdinal, fieldPath[j]);
@@ -366,8 +364,8 @@ public class HollowHashIndexBuilder {
                 }
 
                 if(matchOrdinal != hashOrdinal) {
-                    HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
-                    int fieldIdx = fieldPath[fieldPath.length-1];
+                    HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState) readState;
+                    int fieldIdx = fieldPath[fieldPath.length - 1];
                     if(isAnyFieldNull(matchOrdinal, hashOrdinal) || !HollowReadFieldUtils.fieldsAreEqual(objectAccess, matchOrdinal, fieldIdx, objectAccess, hashOrdinal, fieldIdx))
                         return false;
                 }
@@ -384,7 +382,7 @@ public class HollowHashIndexBuilder {
     private int getMatchHash(int matchIdx) {
         int matchHash = 0;
 
-        for(int i=0;i<preindexer.getMatchFieldSpecs().length;i++) {
+        for(int i = 0; i < preindexer.getMatchFieldSpecs().length; i++) {
             HollowHashIndexField field = preindexer.getMatchFieldSpecs()[i];
             int ordinal = preindexer.getTraverser().getMatchOrdinal(matchIdx, field.getBaseIteratorFieldIdx());
             HollowTypeReadState readState = field.getBaseDataAccess();
@@ -393,8 +391,8 @@ public class HollowHashIndexBuilder {
             if(fieldPath.length == 0) {
                 matchHash ^= HashCodes.hashInt(ordinal);
             } else {
-                for(int j=0;j<fieldPath.length-1;j++) {
-                    HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
+                for(int j = 0; j < fieldPath.length - 1; j++) {
+                    HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState) readState;
                     readState = objectAccess.getSchema().getReferencedTypeState(fieldPath[j]);
                     ordinal = objectAccess.readOrdinal(ordinal, fieldPath[j]);
                     // Cannot find nested ordinal for null parent
@@ -403,7 +401,7 @@ public class HollowHashIndexBuilder {
                     }
                 }
 
-                int fieldHashCode = ordinal == HollowConstants.ORDINAL_NONE ? HollowConstants.ORDINAL_NONE : HollowReadFieldUtils.fieldHashCode((HollowObjectTypeDataAccess) readState, ordinal, fieldPath[fieldPath.length-1]);
+                int fieldHashCode = ordinal == HollowConstants.ORDINAL_NONE ? HollowConstants.ORDINAL_NONE : HollowReadFieldUtils.fieldHashCode((HollowObjectTypeDataAccess) readState, ordinal, fieldPath[fieldPath.length - 1]);
                 matchHash ^= HashCodes.hashInt(fieldHashCode);
             }
         }

@@ -22,7 +22,8 @@ import static java.util.Objects.requireNonNull;
  * Internal API.
  */
 public final class Threads {
-    private Threads() {}
+    private Threads() {
+    }
 
     public static Thread daemonThread(Runnable r, Class<?> context, String description) {
         return daemonThread(r, "hollow", context, description);

@@ -124,21 +124,21 @@ public class HollowFilterConfig implements TypeFilter {
         addType(type);
         HollowSchema schema = schemas.get(type);
         switch(schema.getSchemaType()) {
-        case OBJECT:
-            HollowObjectSchema objSchema = (HollowObjectSchema)schema;
-            for(int i=0;i<objSchema.numFields();i++) {
-                if(objSchema.getFieldType(i) == FieldType.REFERENCE)
-                    addTypeRecursive(objSchema.getReferencedType(i), schemas);
-            }
-            break;
-        case MAP:
-            addTypeRecursive(((HollowMapSchema)schema).getKeyType(), schemas);
-            addTypeRecursive(((HollowMapSchema)schema).getValueType(), schemas);
-            break;
-        case LIST:
-        case SET:
-            addTypeRecursive(((HollowCollectionSchema)schema).getElementType(), schemas);
-            break;
+            case OBJECT:
+                HollowObjectSchema objSchema = (HollowObjectSchema) schema;
+                for(int i = 0; i < objSchema.numFields(); i++) {
+                    if(objSchema.getFieldType(i) == FieldType.REFERENCE)
+                        addTypeRecursive(objSchema.getReferencedType(i), schemas);
+                }
+                break;
+            case MAP:
+                addTypeRecursive(((HollowMapSchema) schema).getKeyType(), schemas);
+                addTypeRecursive(((HollowMapSchema) schema).getValueType(), schemas);
+                break;
+            case LIST:
+            case SET:
+                addTypeRecursive(((HollowCollectionSchema) schema).getElementType(), schemas);
+                break;
         }
     }
 
@@ -180,7 +180,7 @@ public class HollowFilterConfig implements TypeFilter {
      */
     public void addFieldRecursive(String type, String objectField, Map<String, HollowSchema> schemas) {
         addField(type, objectField);
-        HollowObjectSchema schema = (HollowObjectSchema)schemas.get(type);
+        HollowObjectSchema schema = (HollowObjectSchema) schemas.get(type);
         if(schema.getFieldType(objectField) == FieldType.REFERENCE) {
             addTypeRecursive(schema.getReferencedType(objectField), schemas);
         }
@@ -207,7 +207,7 @@ public class HollowFilterConfig implements TypeFilter {
     public int numSpecifiedTypes() {
         return specifiedTypes.size();
     }
-    
+
     public Set<String> getSpecifiedTypes() {
         return specifiedTypes;
     }
@@ -314,13 +314,13 @@ public class HollowFilterConfig implements TypeFilter {
 
         HollowFilterConfig config = new HollowFilterConfig("EXCLUDE".equals(lines[0]));
 
-        for(int i=1;i<lines.length;i++) {
+        for(int i = 1; i < lines.length; i++) {
             int delimiterIdx = lines[i].indexOf('.');
             if(delimiterIdx == -1) {
                 config.addType(lines[i]);
             } else {
                 String type = lines[i].substring(0, delimiterIdx);
-                String field = lines[i].substring(delimiterIdx+1);
+                String field = lines[i].substring(delimiterIdx + 1);
                 config.addField(type, field);
             }
         }

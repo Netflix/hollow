@@ -35,15 +35,19 @@ public class TypeB {
     public short getB1() {
         return b1;
     }
+
     public long getB2() {
         return b2;
     }
+
     public float getB3() {
         return b3;
     }
+
     public char[] getB4() {
         return b4;
     }
+
     public byte[] getB5() {
         return b5;
     }

@@ -64,7 +64,7 @@ public class CustomConsumerBuilderTest {
                     .withAugmentation()
                     .withFilterConfig(new HollowFilterConfig(true))
                     .withTypeFilter(TypeFilter.newTypeFilter().build())
-            .build();
+                    .build();
             fail();
         } catch (IllegalStateException ex) {
             assertThat(ex.getMessage()).startsWith("Only one of typeFilter");
@@ -101,7 +101,7 @@ public class CustomConsumerBuilderTest {
         public HollowConsumer build() {
             checkArguments();
             HollowConsumer consumer;
-            switch (augmentation) {
+            switch(augmentation) {
                 case none:
                     consumer = super.build();
                     break;

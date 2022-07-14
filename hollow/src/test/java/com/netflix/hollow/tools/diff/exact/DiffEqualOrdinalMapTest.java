@@ -72,7 +72,7 @@ public class DiffEqualOrdinalMapTest {
     }
 
     private void assertMatchIterator(MatchIterator iter, int... values) {
-        for(int i=0;i<values.length;i++) {
+        for(int i = 0; i < values.length; i++) {
             Assert.assertTrue(iter.hasNext());
             Assert.assertEquals(values[i], iter.next());
         }
@@ -84,7 +84,7 @@ public class DiffEqualOrdinalMapTest {
     private IntList list(int... values) {
         IntList list = new IntList(values.length);
 
-        for(int i=0;i<values.length;i++) {
+        for(int i = 0; i < values.length; i++) {
             list.add(values[i]);
         }
 

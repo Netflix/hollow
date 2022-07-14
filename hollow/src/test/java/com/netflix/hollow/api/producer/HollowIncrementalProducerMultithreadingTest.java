@@ -34,7 +34,7 @@ public class HollowIncrementalProducerMultithreadingTest {
     @Test
     public void updateAndPublishUsingMultithreading() {
         // run within a loop to increase the likelihood of a race condition to occur
-        for (int iterationCounter = 0; iterationCounter < ITERATIONS; ++iterationCounter) {
+        for(int iterationCounter = 0; iterationCounter < ITERATIONS; ++iterationCounter) {
             HollowProducer producer = createInMemoryProducer();
 
             /// initialize the data -- classic producer creates the first state in the delta chain.
@@ -55,20 +55,20 @@ public class HollowIncrementalProducerMultithreadingTest {
             HollowPrimaryKeyIndex idx = createPrimaryKeyIndex(versionAfterUpdate);
             Assert.assertFalse(idx.containsDuplicates());
             Assert.assertTrue(Arrays.stream(notModifiedElementIds)
-                                      .boxed()
-                                      .map(elementId -> getHollowObject(idx, elementId))
-                                      .allMatch(obj -> obj.getInt("value") == obj.getInt("id")));
+                    .boxed()
+                    .map(elementId -> getHollowObject(idx, elementId))
+                    .allMatch(obj -> obj.getInt("value") == obj.getInt("id")));
             Assert.assertTrue(Arrays.stream(modifiedElementIds)
-                                      .boxed()
-                                      .map(elementId -> getHollowObject(idx, elementId))
-                                      .allMatch(obj -> obj.getInt("value") != obj.getInt("id")));
+                    .boxed()
+                    .map(elementId -> getHollowObject(idx, elementId))
+                    .allMatch(obj -> obj.getInt("value") != obj.getInt("id")));
         }
     }
 
     @Test
     public void removeAndPublishUsingMultithreading() {
         // run within a loop to increase the likelihood of a race condition to occur
-        for (int iterationCounter = 0; iterationCounter < ITERATIONS; ++iterationCounter) {
+        for(int iterationCounter = 0; iterationCounter < ITERATIONS; ++iterationCounter) {
             HollowProducer producer = createInMemoryProducer();
 
             /// initialize the data -- classic producer creates the first state in the delta chain.
@@ -88,13 +88,13 @@ public class HollowIncrementalProducerMultithreadingTest {
             /// now we read the changes and assert
             HollowPrimaryKeyIndex idx = createPrimaryKeyIndex(versionAfterDelete);
             Assert.assertTrue(Arrays.stream(notModifiedElementIds)
-                                      .boxed()
-                                      .map(elementId -> getHollowObject(idx, elementId))
-                                      .allMatch(obj -> obj.getInt("value") == obj.getInt("id")));
+                    .boxed()
+                    .map(elementId -> getHollowObject(idx, elementId))
+                    .allMatch(obj -> obj.getInt("value") == obj.getInt("id")));
             Assert.assertTrue(Arrays.stream(deletedElementIds)
-                                      .boxed()
-                                      .map(elementId -> getOrdinal(idx, elementId))
-                                      .allMatch(ordinal -> ordinal == -1));
+                    .boxed()
+                    .map(elementId -> getOrdinal(idx, elementId))
+                    .allMatch(ordinal -> ordinal == -1));
         }
     }
 
@@ -104,7 +104,7 @@ public class HollowIncrementalProducerMultithreadingTest {
 
     private void initializeData(HollowProducer producer) {
         producer.runCycle(state -> {
-            for (int i = 0; i < ELEMENTS; ++i) {
+            for(int i = 0; i < ELEMENTS; ++i) {
                 state.add(new SimpleType(i, i));
             }
         });

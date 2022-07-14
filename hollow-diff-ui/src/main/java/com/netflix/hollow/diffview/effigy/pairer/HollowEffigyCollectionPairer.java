@@ -45,81 +45,81 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
             return pairByMatchHint();
         return pairByMinDifference();
     }
-    
-    
+
+
     private List<EffigyFieldPair> pairByMatchHint() {
         List<EffigyFieldPair> fieldPairs = new ArrayList<EffigyFieldPair>();
-        
+
         if(from.getFields().size() == 0) {
-            for(int i=0;i<to.getFields().size();i++)
+            for(int i = 0; i < to.getFields().size(); i++)
                 fieldPairs.add(new EffigyFieldPair(null, to.getFields().get(i), -1, i));
             return fieldPairs;
         } else if(to.getFields().size() == 0) {
-            for(int i=0;i<from.getFields().size();i++)
+            for(int i = 0; i < from.getFields().size(); i++)
                 fieldPairs.add(new EffigyFieldPair(from.getFields().get(i), null, i, -1));
         }
 
         int toFieldPathIndexes[][] = new int[matchHint.numFields()][];
         int fromFieldPathIndexes[][] = new int[matchHint.numFields()][];
-        
-        for(int i=0;i<matchHint.numFields();i++) {
+
+        for(int i = 0; i < matchHint.numFields(); i++) {
             toFieldPathIndexes[i] = matchHint.getFieldPathIndex(to.getDataAccess().getDataAccess(), i);
             fromFieldPathIndexes[i] = matchHint.getFieldPathIndex(from.getDataAccess().getDataAccess(), i);
         }
-        
+
         int hashedToFieldIndexes[] = new int[HashCodes.hashTableSize(to.getFields().size())];
         Arrays.fill(hashedToFieldIndexes, -1);
-        
-        for(int i=0;i<to.getFields().size();i++) {
+
+        for(int i = 0; i < to.getFields().size(); i++) {
             HollowEffigy comparisonEffigy = getComparisonEffigy((HollowEffigy) to.getFields().get(i).getValue());
             int hash = hashCode(comparisonEffigy, toFieldPathIndexes);
-            hash &= hashedToFieldIndexes.length-1;
+            hash &= hashedToFieldIndexes.length - 1;
             while(hashedToFieldIndexes[hash] != -1) {
                 hash++;
                 hash &= hashedToFieldIndexes.length - 1;
             }
-            
+
             hashedToFieldIndexes[hash] = i;
         }
-        
+
         BitSet matchedToElements = new BitSet(to.getFields().size());
         BitSet matchedFromElements = new BitSet(from.getFields().size());
-        
-        for(int i=0;i<from.getFields().size();i++) {
+
+        for(int i = 0; i < from.getFields().size(); i++) {
             HollowEffigy fromEffigy = getComparisonEffigy((HollowEffigy) from.getFields().get(i).getValue());
             int hash = hashCode(fromEffigy, fromFieldPathIndexes);
-            hash &= hashedToFieldIndexes.length-1;
+            hash &= hashedToFieldIndexes.length - 1;
             while(hashedToFieldIndexes[hash] != -1) {
                 int toIdx = hashedToFieldIndexes[hash];
                 if(!matchedToElements.get(toIdx)) {
                     HollowEffigy toEffigy = getComparisonEffigy((HollowEffigy) to.getFields().get(toIdx).getValue());
                     if(recordsMatch(fromEffigy, toEffigy, fromFieldPathIndexes, toFieldPathIndexes)) {
                         fieldPairs.add(new EffigyFieldPair(from.getFields().get(i), to.getFields().get(toIdx), i, toIdx));
-                        
+
                         matchedFromElements.set(i);
                         matchedToElements.set(toIdx);
                     }
                 }
-                
+
                 hash++;
                 hash &= hashedToFieldIndexes.length - 1;
             }
         }
-        
+
         addUnmatchedElements(fieldPairs, matchedFromElements, matchedToElements);
-        
+
         return fieldPairs;
     }
-    
+
     private boolean recordsMatch(HollowEffigy fromElement, HollowEffigy toElement, int[][] fromFieldPathIndexes, int[][] toFieldPathIndexes) {
-        for(int i=0;i<fromFieldPathIndexes.length;i++) {
+        for(int i = 0; i < fromFieldPathIndexes.length; i++) {
             if(!fieldsAreEqual(fromElement, toElement, fromFieldPathIndexes[i], toFieldPathIndexes[i]))
                 return false;
         }
-        
+
         return true;
     }
-    
+
     private boolean fieldsAreEqual(HollowEffigy fromElement, HollowEffigy toElement, int[] fromFieldPath, int[] toFieldPath) {
         HollowObjectTypeDataAccess fromDataAccess = (HollowObjectTypeDataAccess) fromElement.getDataAccess();
         int fromOrdinal = fromElement.getOrdinal();
@@ -128,7 +128,7 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
         HollowObjectSchema fromSchema = fromDataAccess.getSchema();
         HollowObjectSchema toSchema = toDataAccess.getSchema();
 
-        for (int i = 0; i < fromFieldPath.length - 1; i++) {
+        for(int i = 0; i < fromFieldPath.length - 1; i++) {
             int fromFieldPosition = fromFieldPath[i];
             int toFieldPosition = toFieldPath[i];
             fromOrdinal = fromDataAccess.readOrdinal(fromOrdinal, fromFieldPosition);
@@ -139,36 +139,36 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
             toSchema = toDataAccess.getSchema();
         }
 
-        return HollowReadFieldUtils.fieldsAreEqual(fromDataAccess, fromOrdinal, fromFieldPath[fromFieldPath.length-1], toDataAccess, toOrdinal, toFieldPath[toFieldPath.length-1]);
+        return HollowReadFieldUtils.fieldsAreEqual(fromDataAccess, fromOrdinal, fromFieldPath[fromFieldPath.length - 1], toDataAccess, toOrdinal, toFieldPath[toFieldPath.length - 1]);
     }
-    
+
     private int hashCode(HollowEffigy element, int[][] fieldPathIndexes) {
         int hash = 0;
-        
-        for(int i=0;i<fieldPathIndexes.length;i++) {
+
+        for(int i = 0; i < fieldPathIndexes.length; i++) {
             hash = hash * 31;
             hash ^= fieldHashCode(element, fieldPathIndexes[i]);
         }
-        
+
         return hash;
     }
-    
+
     private int fieldHashCode(HollowEffigy element, int[] fieldPath) {
         HollowObjectTypeDataAccess dataAccess = (HollowObjectTypeDataAccess) element.getDataAccess();
         HollowObjectSchema schema = dataAccess.getSchema();
         int ordinal = element.getOrdinal();
 
-        for (int i = 0; i < fieldPath.length - 1; i++) {
+        for(int i = 0; i < fieldPath.length - 1; i++) {
             int fieldPosition = fieldPath[i];
             ordinal = dataAccess.readOrdinal(ordinal, fieldPosition);
             dataAccess = (HollowObjectTypeDataAccess) dataAccess.getDataAccess().getTypeDataAccess(schema.getReferencedType(fieldPosition));
             schema = dataAccess.getSchema();
         }
 
-        int fieldHash = HollowReadFieldUtils.fieldHashCode(dataAccess, ordinal, fieldPath[fieldPath.length-1]);
+        int fieldHash = HollowReadFieldUtils.fieldHashCode(dataAccess, ordinal, fieldPath[fieldPath.length - 1]);
         return HashCodes.hashInt(fieldHash);
     }
-    
+
     /**
      * Finds the element pairings which have the minimum number of differences between them.
      */
@@ -178,11 +178,11 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
         BitSet pairedFromIndices = new BitSet(from.getFields().size());
         BitSet pairedToIndices = new BitSet(to.getFields().size());
 
-        int maxDiffBackoff[] = new int[] {1, 2, 4, 8, Integer.MAX_VALUE};
+        int maxDiffBackoff[] = new int[]{1, 2, 4, 8, Integer.MAX_VALUE};
 
         int maxPairs = Math.min(from.getFields().size(), to.getFields().size());
 
-        for(int i=0;i<maxDiffBackoff.length && fieldPairs.size() < maxPairs;i++) {
+        for(int i = 0; i < maxDiffBackoff.length && fieldPairs.size() < maxPairs; i++) {
 
             long diffMatrixElements[] = pair(pairedFromIndices, pairedToIndices, maxDiffBackoff[i]);
 
@@ -218,12 +218,12 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
     }
 
     private void addUnmatchedElements(List<EffigyFieldPair> fieldPairs, BitSet pairedFromIndices, BitSet pairedToIndices) {
-        for(int i=0;i<from.getFields().size();i++) {
+        for(int i = 0; i < from.getFields().size(); i++) {
             if(!pairedFromIndices.get(i))
                 fieldPairs.add(new EffigyFieldPair(from.getFields().get(i), null, i, -1));
         }
 
-        for(int i=0;i<to.getFields().size();i++) {
+        for(int i = 0; i < to.getFields().size(); i++) {
             if(!pairedToIndices.get(i))
                 fieldPairs.add(new EffigyFieldPair(null, to.getFields().get(i), -1, i));
         }
@@ -234,18 +234,18 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
 
         int matrixElementIdx = 0;
 
-        for(int i=0;i<from.getFields().size();i++) {
+        for(int i = 0; i < from.getFields().size(); i++) {
             final int fromIdx = i;
 
             if(pairedFromIndices.get(fromIdx)) {
-                for(int j=0;j<to.getFields().size();j++) {
+                for(int j = 0; j < to.getFields().size(); j++) {
                     diffMatrixElements[matrixElementIdx++] = getDiffMatrixElement(fromIdx, j, MAX_MATRIX_ELEMENT_FIELD_VALUE);
                 }
             } else {
                 HollowEffigy fromElement = getComparisonEffigy((HollowEffigy) from.getFields().get(fromIdx).getValue());
                 HollowEffigyDiffRecord diffRecord = new HollowEffigyDiffRecord(fromElement);
 
-                for(int j=0;j<to.getFields().size();j++) {
+                for(int j = 0; j < to.getFields().size(); j++) {
                     if(pairedToIndices.get(j)) {
                         diffMatrixElements[matrixElementIdx++] = getDiffMatrixElement(fromIdx, j, MAX_MATRIX_ELEMENT_FIELD_VALUE);
                     } else {
@@ -266,19 +266,19 @@ public class HollowEffigyCollectionPairer extends HollowEffigyFieldPairer {
     }
 
     private long getDiffMatrixElement(int fromIndex, int toIndex, int diffScore) {
-        return ((long)diffScore << 42) | ((long)fromIndex << 21) | ((long)toIndex);
+        return ((long) diffScore << 42) | ((long) fromIndex << 21) | ((long) toIndex);
     }
 
     private int getDiffScore(long diffMatrixElement) {
-        return (int)((diffMatrixElement >> 42) & MAX_MATRIX_ELEMENT_FIELD_VALUE);
+        return (int) ((diffMatrixElement >> 42) & MAX_MATRIX_ELEMENT_FIELD_VALUE);
     }
 
     private int getFromIndex(long diffMatrixElement) {
-        return (int)((diffMatrixElement >> 21) & MAX_MATRIX_ELEMENT_FIELD_VALUE);
+        return (int) ((diffMatrixElement >> 21) & MAX_MATRIX_ELEMENT_FIELD_VALUE);
     }
 
     private int getToIndex(long diffMatrixElement) {
-        return (int)(diffMatrixElement & MAX_MATRIX_ELEMENT_FIELD_VALUE);
+        return (int) (diffMatrixElement & MAX_MATRIX_ELEMENT_FIELD_VALUE);
     }
 
 }

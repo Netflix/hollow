@@ -29,7 +29,8 @@ public class HollowSetDisabledDataAccess implements HollowSetTypeDataAccess {
 
     public static final HollowSetDisabledDataAccess INSTANCE = new HollowSetDisabledDataAccess();
 
-    private HollowSetDisabledDataAccess() { }
+    private HollowSetDisabledDataAccess() {
+    }
 
     @Override
     public int size(int ordinal) {
@@ -50,12 +51,12 @@ public class HollowSetDisabledDataAccess implements HollowSetTypeDataAccess {
     public void setSamplingDirector(HollowSamplingDirector director) {
         throw new IllegalStateException("Data Access is Disabled");
     }
-    
+
     @Override
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         throw new IllegalStateException("Data Access is Disabled");
     }
-    
+
     @Override
     public void ignoreUpdateThreadForSampling(Thread t) {
         throw new IllegalStateException("DataAccess is Disabled");
@@ -85,7 +86,7 @@ public class HollowSetDisabledDataAccess implements HollowSetTypeDataAccess {
     public boolean contains(int ordinal, int value, int hashCode) {
         throw new IllegalStateException("Data Access is Disabled");
     }
-    
+
     @Override
     public int findElement(int ordinal, Object... hashKey) {
         throw new IllegalStateException("Data Access is Disabled");
@@ -100,5 +101,5 @@ public class HollowSetDisabledDataAccess implements HollowSetTypeDataAccess {
     public HollowOrdinalIterator potentialMatchOrdinalIterator(int ordinal, int hashCode) {
         throw new IllegalStateException("Data Access is Disabled");
     }
-    
+
 }

@@ -32,7 +32,7 @@ public class HistoryStateTypeExpandGroupPage extends HistoryPage {
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         HistoryStateTypeChanges typeChange = HistoryStateTypePage.getStateTypeChanges(req, session, ui);
         String expandGroupId = req.getParameter("expandGroupId");
-        
+
         ctx.put("expandedNode", typeChange.findTreeNode(expandGroupId));
         ctx.put("version", req.getParameter("version"));
         ctx.put("type", req.getParameter("type"));

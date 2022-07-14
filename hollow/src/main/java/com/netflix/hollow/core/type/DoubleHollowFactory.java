@@ -25,12 +25,12 @@ public class DoubleHollowFactory extends HollowFactory<HDouble> {
 
     @Override
     public HDouble newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HDouble(((DoubleTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return new HDouble(((DoubleTypeAPI) typeAPI).getDelegateLookupImpl(), ordinal);
     }
 
     @Override
     public HDouble newCachedHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HDouble(new DoubleDelegateCachedImpl((DoubleTypeAPI)typeAPI, ordinal), ordinal);
+        return new HDouble(new DoubleDelegateCachedImpl((DoubleTypeAPI) typeAPI, ordinal), ordinal);
     }
 
 }

@@ -89,6 +89,7 @@ public interface IncrementalCycleListener extends EventListener {
         public Status getStatus() {
             return status;
         }
+
         /**
          *
          * @return the number of records that potentially were added/modified from the dataset.

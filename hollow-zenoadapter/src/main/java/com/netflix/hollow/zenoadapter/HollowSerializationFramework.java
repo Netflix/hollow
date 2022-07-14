@@ -63,7 +63,7 @@ public class HollowSerializationFramework extends SerializationFramework {
     }
 
     public HollowObjectHashCodeFinder getHollowObjectHasher() {
-        return ((HollowFrameworkSerializer)getFrameworkSerializer()).hasher;
+        return ((HollowFrameworkSerializer) getFrameworkSerializer()).hasher;
     }
 
     public void prepareForNextCycle() {
@@ -96,28 +96,28 @@ public class HollowSerializationFramework extends SerializationFramework {
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private int addList(String type, Object o, NFTypeSerializer<Object> serializer) {
         int ordinal;
-        String elementType = ((TypedFieldDefinition)serializer.getFastBlobSchema().getFieldDefinition(0)).getSubType();
-        ordinal = frameworkSerializer().serializeList(getRec(type), elementType, (Collection)o);
+        String elementType = ((TypedFieldDefinition) serializer.getFastBlobSchema().getFieldDefinition(0)).getSubType();
+        ordinal = frameworkSerializer().serializeList(getRec(type), elementType, (Collection) o);
         return ordinal;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private int addSet(String type, Object o, NFTypeSerializer<Object> serializer) {
         int ordinal;
-        String elementType = ((TypedFieldDefinition)serializer.getFastBlobSchema().getFieldDefinition(0)).getSubType();
-        ordinal = frameworkSerializer().serializeSet(getRec(type), elementType, (Set)o);
+        String elementType = ((TypedFieldDefinition) serializer.getFastBlobSchema().getFieldDefinition(0)).getSubType();
+        ordinal = frameworkSerializer().serializeSet(getRec(type), elementType, (Set) o);
         return ordinal;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private int addMap(String type, Object o, NFTypeSerializer<Object> serializer) {
         int ordinal;
-        String keyType = ((MapFieldDefinition)serializer.getFastBlobSchema().getFieldDefinition(0)).getKeyType();
-        String valueType = ((MapFieldDefinition)serializer.getFastBlobSchema().getFieldDefinition(0)).getValueType();
-        ordinal = frameworkSerializer().serializeMap(getRec(type), keyType, valueType, (Map)o);
+        String keyType = ((MapFieldDefinition) serializer.getFastBlobSchema().getFieldDefinition(0)).getKeyType();
+        String valueType = ((MapFieldDefinition) serializer.getFastBlobSchema().getFieldDefinition(0)).getValueType();
+        ordinal = frameworkSerializer().serializeMap(getRec(type), keyType, valueType, (Map) o);
         return ordinal;
     }
 
@@ -136,7 +136,7 @@ public class HollowSerializationFramework extends SerializationFramework {
     }
 
     private HollowFrameworkSerializer frameworkSerializer() {
-        return (HollowFrameworkSerializer)frameworkSerializer;
+        return (HollowFrameworkSerializer) frameworkSerializer;
     }
 
     public HollowWriteStateEngine getStateEngine() {
@@ -150,20 +150,20 @@ public class HollowSerializationFramework extends SerializationFramework {
     private void populateStateEngineTypes() {
         for(NFTypeSerializer<?> serializer : getOrderedSerializers()) {
             if(serializer instanceof ListSerializer) {
-                ListSerializer<?> listSerializer = (ListSerializer<?>)serializer;
-                TypedFieldDefinition elementFieldDef = (TypedFieldDefinition)listSerializer.getFastBlobSchema().getFieldDefinition(0);
+                ListSerializer<?> listSerializer = (ListSerializer<?>) serializer;
+                TypedFieldDefinition elementFieldDef = (TypedFieldDefinition) listSerializer.getFastBlobSchema().getFieldDefinition(0);
                 HollowListSchema listSchema = new HollowListSchema(serializer.getName(), elementFieldDef.getSubType());
                 HollowTypeWriteState writeState = new HollowListTypeWriteState(listSchema);
                 stateEngine.addTypeState(writeState);
             } else if(serializer instanceof SetSerializer) {
-                SetSerializer<?> setSerializer = (SetSerializer<?>)serializer;
-                TypedFieldDefinition elementFieldDef = (TypedFieldDefinition)setSerializer.getFastBlobSchema().getFieldDefinition(0);
+                SetSerializer<?> setSerializer = (SetSerializer<?>) serializer;
+                TypedFieldDefinition elementFieldDef = (TypedFieldDefinition) setSerializer.getFastBlobSchema().getFieldDefinition(0);
                 HollowSetSchema setSchema = new HollowSetSchema(serializer.getName(), elementFieldDef.getSubType());
                 HollowTypeWriteState writeState = new HollowSetTypeWriteState(setSchema);
                 stateEngine.addTypeState(writeState);
             } else if(serializer instanceof MapSerializer) {
-                MapSerializer<?, ?> mapSerializer = (MapSerializer<?, ?>)serializer;
-                MapFieldDefinition fieldDef = (MapFieldDefinition)mapSerializer.getFastBlobSchema().getFieldDefinition(0);
+                MapSerializer<?, ?> mapSerializer = (MapSerializer<?, ?>) serializer;
+                MapFieldDefinition fieldDef = (MapFieldDefinition) mapSerializer.getFastBlobSchema().getFieldDefinition(0);
                 HollowMapSchema mapSchema = new HollowMapSchema(serializer.getName(), fieldDef.getKeyType(), fieldDef.getValueType());
                 HollowTypeWriteState writeState = new HollowMapTypeWriteState(mapSchema);
                 stateEngine.addTypeState(writeState);
@@ -178,60 +178,60 @@ public class HollowSerializationFramework extends SerializationFramework {
     private HollowObjectSchema getHollowObjectSchema(FastBlobSchema schema) {
         HollowObjectSchema hollowSchema = new HollowObjectSchema(schema.getName(), schema.numFields());
 
-        for(int i=0;i<schema.numFields();i++) {
+        for(int i = 0; i < schema.numFields(); i++) {
             FieldDefinition def = schema.getFieldDefinition(i);
             switch(def.getFieldType()) {
-            case OBJECT:
-                hollowSchema.addField(schema.getFieldName(i), FieldType.REFERENCE, ((TypedFieldDefinition)def).getSubType());
-                break;
-            case LIST:
-                String listTypeName = schema.getName() + "_" + schema.getFieldName(i);
-                String listElementType = ((TypedFieldDefinition)def).getSubType();
-                hollowSchema.addField(schema.getFieldName(i), FieldType.REFERENCE, listTypeName);
-                HollowListSchema listSchema = new HollowListSchema(listTypeName, listElementType);
-                HollowTypeWriteState listWriteState = new HollowListTypeWriteState(listSchema);
-                stateEngine.addTypeState(listWriteState);
-                break;
-            case SET:
-                String setTypeName = schema.getName() + "_" + schema.getFieldName(i);
-                String setElementType = ((TypedFieldDefinition)def).getSubType();
-                hollowSchema.addField(schema.getFieldName(i), FieldType.REFERENCE, setTypeName);
-                HollowSetSchema setSchema = new HollowSetSchema(setTypeName, setElementType);
-                HollowTypeWriteState setWriteState = new HollowSetTypeWriteState(setSchema);
-                stateEngine.addTypeState(setWriteState);
-                break;
-            case MAP:
-                String mapTypeName = schema.getName() + "_" + schema.getFieldName(i);
-                String keyType = ((MapFieldDefinition)def).getKeyType();
-                String valueType = ((MapFieldDefinition)def).getValueType();
-                hollowSchema.addField(schema.getFieldName(i), FieldType.REFERENCE, mapTypeName);
-                HollowMapSchema mapSchema = new HollowMapSchema(mapTypeName, keyType, valueType);
-                HollowTypeWriteState mapWriteState = new HollowMapTypeWriteState(mapSchema);
-                stateEngine.addTypeState(mapWriteState);
-                break;
-            case BOOLEAN:
-                hollowSchema.addField(schema.getFieldName(i), FieldType.BOOLEAN);
-                break;
-            case BYTES:
-                hollowSchema.addField(schema.getFieldName(i), FieldType.BYTES);
-                break;
-            case DOUBLE:
-                hollowSchema.addField(schema.getFieldName(i), FieldType.DOUBLE);
-                break;
-            case FLOAT:
-                hollowSchema.addField(schema.getFieldName(i), FieldType.FLOAT);
-                break;
-            case INT:
-                hollowSchema.addField(schema.getFieldName(i), FieldType.INT);
-                break;
-            case LONG:
-                hollowSchema.addField(schema.getFieldName(i), FieldType.LONG);
-                break;
-            case STRING:
-                hollowSchema.addField(schema.getFieldName(i), FieldType.STRING);
-                break;
-            default:
-                throw new IllegalArgumentException("Field " + schema.getName() + "." + schema.getFieldName(i) + " is declared with illegal type " + schema.getFieldType(i));
+                case OBJECT:
+                    hollowSchema.addField(schema.getFieldName(i), FieldType.REFERENCE, ((TypedFieldDefinition) def).getSubType());
+                    break;
+                case LIST:
+                    String listTypeName = schema.getName() + "_" + schema.getFieldName(i);
+                    String listElementType = ((TypedFieldDefinition) def).getSubType();
+                    hollowSchema.addField(schema.getFieldName(i), FieldType.REFERENCE, listTypeName);
+                    HollowListSchema listSchema = new HollowListSchema(listTypeName, listElementType);
+                    HollowTypeWriteState listWriteState = new HollowListTypeWriteState(listSchema);
+                    stateEngine.addTypeState(listWriteState);
+                    break;
+                case SET:
+                    String setTypeName = schema.getName() + "_" + schema.getFieldName(i);
+                    String setElementType = ((TypedFieldDefinition) def).getSubType();
+                    hollowSchema.addField(schema.getFieldName(i), FieldType.REFERENCE, setTypeName);
+                    HollowSetSchema setSchema = new HollowSetSchema(setTypeName, setElementType);
+                    HollowTypeWriteState setWriteState = new HollowSetTypeWriteState(setSchema);
+                    stateEngine.addTypeState(setWriteState);
+                    break;
+                case MAP:
+                    String mapTypeName = schema.getName() + "_" + schema.getFieldName(i);
+                    String keyType = ((MapFieldDefinition) def).getKeyType();
+                    String valueType = ((MapFieldDefinition) def).getValueType();
+                    hollowSchema.addField(schema.getFieldName(i), FieldType.REFERENCE, mapTypeName);
+                    HollowMapSchema mapSchema = new HollowMapSchema(mapTypeName, keyType, valueType);
+                    HollowTypeWriteState mapWriteState = new HollowMapTypeWriteState(mapSchema);
+                    stateEngine.addTypeState(mapWriteState);
+                    break;
+                case BOOLEAN:
+                    hollowSchema.addField(schema.getFieldName(i), FieldType.BOOLEAN);
+                    break;
+                case BYTES:
+                    hollowSchema.addField(schema.getFieldName(i), FieldType.BYTES);
+                    break;
+                case DOUBLE:
+                    hollowSchema.addField(schema.getFieldName(i), FieldType.DOUBLE);
+                    break;
+                case FLOAT:
+                    hollowSchema.addField(schema.getFieldName(i), FieldType.FLOAT);
+                    break;
+                case INT:
+                    hollowSchema.addField(schema.getFieldName(i), FieldType.INT);
+                    break;
+                case LONG:
+                    hollowSchema.addField(schema.getFieldName(i), FieldType.LONG);
+                    break;
+                case STRING:
+                    hollowSchema.addField(schema.getFieldName(i), FieldType.STRING);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Field " + schema.getName() + "." + schema.getFieldName(i) + " is declared with illegal type " + schema.getFieldType(i));
             }
         }
 

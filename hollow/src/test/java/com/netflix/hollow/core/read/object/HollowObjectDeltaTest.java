@@ -123,7 +123,8 @@ public class HollowObjectDeltaTest extends AbstractStateEngineTest {
         try {
             assertObject(typeState, 0, 0, null);
             Assert.fail("Should have thrown Exception");
-        } catch(NullPointerException expected) { }
+        } catch (NullPointerException expected) {
+        }
     }
 
     private void addRecord(int intVal, String strVal) {

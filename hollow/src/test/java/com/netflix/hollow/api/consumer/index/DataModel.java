@@ -49,7 +49,7 @@ public class DataModel {
                 this._long = 1L;
                 this._float = 1.0f;
                 this._double = 1.0d;
-                this._bytes = new byte[] {1};
+                this._bytes = new byte[]{1};
                 this._chars = "1".toCharArray();
             }
         }
@@ -79,15 +79,24 @@ public class DataModel {
         }
 
         public static class InlineBoxes {
-            @HollowInline final Boolean _boolean;
-            @HollowInline final Byte _byte;
-            @HollowInline final Short _short;
-            @HollowInline final Character _char;
-            @HollowInline final Integer _int;
-            @HollowInline final Long _long;
-            @HollowInline final Float _float;
-            @HollowInline final Double _double;
-            @HollowInline final String _string;
+            @HollowInline
+            final Boolean _boolean;
+            @HollowInline
+            final Byte _byte;
+            @HollowInline
+            final Short _short;
+            @HollowInline
+            final Character _char;
+            @HollowInline
+            final Integer _int;
+            @HollowInline
+            final Long _long;
+            @HollowInline
+            final Float _float;
+            @HollowInline
+            final Double _double;
+            @HollowInline
+            final String _string;
 
             public InlineBoxes() {
                 this._boolean = true;
@@ -121,7 +130,8 @@ public class DataModel {
         public static class ReferenceWithStrings {
             final String _string1;
 
-            @HollowTypeName(name = "FieldOfStringRenamed") final String _string2;
+            @HollowTypeName(name = "FieldOfStringRenamed")
+            final String _string2;
 
             public ReferenceWithStrings() {
                 this._string1 = "1";

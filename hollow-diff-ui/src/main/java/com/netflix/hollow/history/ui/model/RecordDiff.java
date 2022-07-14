@@ -22,7 +22,7 @@ import com.netflix.hollow.tools.history.HollowHistoricalState;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
 
 
-public class RecordDiff implements Comparable<RecordDiff>{
+public class RecordDiff implements Comparable<RecordDiff> {
     private final HollowHistoryRecordNamer recordNamer;
     private final HollowHistoricalState historicalState;
     private final HollowHistoricalStateTypeKeyOrdinalMapping typeKeyOrdinalMapping;

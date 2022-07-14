@@ -58,17 +58,17 @@ public class HollowListSchema extends HollowCollectionSchema {
     public SchemaType getSchemaType() {
         return SchemaType.LIST;
     }
-    
+
     @Override
     public boolean equals(Object other) {
-        if (this == other)
+        if(this == other)
             return true;
         if(!(other instanceof HollowListSchema))
             return false;
-        HollowListSchema otherSchema = (HollowListSchema)other;
+        HollowListSchema otherSchema = (HollowListSchema) other;
         if(!getName().equals(otherSchema.getName()))
             return false;
-        
+
         return getElementType().equals(otherSchema.getElementType());
     }
 
@@ -84,7 +84,7 @@ public class HollowListSchema extends HollowCollectionSchema {
     public String toString() {
         return getName() + " List<" + getElementType() + ">;";
     }
-    
+
     @Override
     public void writeTo(OutputStream os) throws IOException {
         DataOutputStream dos = new DataOutputStream(os);

@@ -86,7 +86,7 @@ public class HollowCombiner {
 
     static HollowReadStateEngine[] validateInputs(HollowReadStateEngine... inputs) {
         Objects.requireNonNull(inputs);
-        if (inputs.length == 0) {
+        if(inputs.length == 0) {
             throw new IllegalArgumentException("No input read state engines");
         }
         return inputs;
@@ -152,23 +152,23 @@ public class HollowCombiner {
      */
     public void setPrimaryKeys(PrimaryKey... newKeys) {
         Objects.requireNonNull(newKeys);
-        if (newKeys.length == 0) {
+        if(newKeys.length == 0) {
             return;
         }
 
-        if (inputs.length == 1) {
+        if(inputs.length == 1) {
             return;
         }
 
         /// deduplicate new keys with existing keys
         //process existing ones first
         Map<String, PrimaryKey> keysByType = new HashMap<>();
-        for (PrimaryKey primaryKey : primaryKeys) {
+        for(PrimaryKey primaryKey : primaryKeys) {
             keysByType.put(primaryKey.getType(), primaryKey);
         }
 
         // allow override
-        for (PrimaryKey primaryKey : newKeys) {
+        for(PrimaryKey primaryKey : newKeys) {
             keysByType.put(primaryKey.getType(), primaryKey);
         }
 
@@ -178,25 +178,25 @@ public class HollowCombiner {
     public List<PrimaryKey> getPrimaryKeys() {
         return this.primaryKeys;
     }
-    
+
     private void initializePrimaryKeys() {
-        if (inputs.length == 1) {
+        if(inputs.length == 1) {
             this.primaryKeys = new ArrayList<>();
             return;
         }
 
         List<PrimaryKey> keys = new ArrayList<>();
-        for (HollowSchema schema : output.getSchemas()) {
-            if (schema.getSchemaType() == SchemaType.OBJECT && !ignoredTypes.contains(schema.getName())) {
+        for(HollowSchema schema : output.getSchemas()) {
+            if(schema.getSchemaType() == SchemaType.OBJECT && !ignoredTypes.contains(schema.getName())) {
                 PrimaryKey pk = ((HollowObjectSchema) schema).getPrimaryKey();
-                if (pk != null)
+                if(pk != null)
                     keys.add(pk);
             }
         }
-        
+
         this.primaryKeys = sortPrimaryKeys(keys);
     }
-    
+
     private List<PrimaryKey> sortPrimaryKeys(List<PrimaryKey> primaryKeys) {
         final List<HollowSchema> dependencyOrderedSchemas = HollowSchemaSorter.dependencyOrderedSchemaList(output.getSchemas());
         primaryKeys.sort(new Comparator<PrimaryKey>() {
@@ -205,14 +205,14 @@ public class HollowCombiner {
             }
 
             private int schemaDependencyIdx(PrimaryKey key) {
-                for (int i = 0; i < dependencyOrderedSchemas.size(); i++) {
-                    if (dependencyOrderedSchemas.get(i).getName().equals(key.getType()))
+                for(int i = 0; i < dependencyOrderedSchemas.size(); i++) {
+                    if(dependencyOrderedSchemas.get(i).getName().equals(key.getType()))
                         return i;
                 }
                 throw new IllegalArgumentException("Primary key defined for non-existent type: " + key.getType());
             }
         });
-        
+
         return primaryKeys;
     }
 
@@ -241,11 +241,11 @@ public class HollowCombiner {
         final Set<PrimaryKey> processedPrimaryKeys = new HashSet<>();
         final Set<PrimaryKey> selectedPrimaryKeys = new HashSet<>();
 
-        while(processedTypes.size() < output.getOrderedTypeStates().size()){
+        while(processedTypes.size() < output.getOrderedTypeStates().size()) {
 
             /// find the next primary keys
             for(PrimaryKey key : primaryKeys) {
-                if (!processedPrimaryKeys.contains(key) && !ignoredTypes.contains(key.getType())) {
+                if(!processedPrimaryKeys.contains(key) && !ignoredTypes.contains(key.getType())) {
                     if(!isAnySelectedPrimaryKeyADependencyOf(key.getType(), selectedPrimaryKeys)) {
                         selectedPrimaryKeys.add(key);
                     }
@@ -262,26 +262,26 @@ public class HollowCombiner {
                         for(PrimaryKey pk : selectedPrimaryKeys) {
                             if(pk.getType().equals(schema.getName())) {
                                 HollowPrimaryKeyIndex[] indexes = new HollowPrimaryKeyIndex[inputs.length];
-                                for(int i=0;i<indexes.length;i++) {
+                                for(int i = 0; i < indexes.length; i++) {
                                     if(inputs[i].getTypeState(pk.getType()) != null)
                                         indexes[i] = new HollowPrimaryKeyIndex(inputs[i], pk);
                                 }
 
-                                for(int i=0;i<indexes.length;i++) {
+                                for(int i = 0; i < indexes.length; i++) {
                                     HollowTypeReadState typeState = inputs[i].getTypeState(pk.getType());
                                     if(typeState != null) {
                                         BitSet populatedOrdinals = typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
-    
+
                                         int ordinal = populatedOrdinals.nextSetBit(0);
                                         while(ordinal != -1) {
                                             if(primaryKeyCopyDirector.shouldCopy(typeState, ordinal)) {
                                                 Object[] recordKey = indexes[i].getRecordKey(ordinal);
-    
-                                                for(int j=i+1;j<indexes.length;j++) {
+
+                                                for(int j = i + 1; j < indexes.length; j++) {
                                                     primaryKeyCopyDirector.excludeKey(indexes[j], recordKey);
                                                 }
                                             }
-    
+
                                             ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
                                         }
                                     }
@@ -299,10 +299,10 @@ public class HollowCombiner {
             if(typesToProcessThisIteration.isEmpty())
                 break;
 
-            for(int i=0;i<numThreads;i++) {
+            for(int i = 0; i < numThreads; i++) {
                 final int threadNumber = i;
                 executor.execute(() -> {
-                    for(int i1 =0; i1 <inputs.length; i1++) {
+                    for(int i1 = 0; i1 < inputs.length; i1++) {
                         HollowCombinerCopyDirector copyDirector = selectedPrimaryKeys.isEmpty()
                                 ? HollowCombiner.this.copyDirector
                                 : primaryKeyCopyDirector;
@@ -318,7 +318,7 @@ public class HollowCombiner {
                         for(String typeName : typesToProcessThisIteration) {
                             HollowTypeReadState readState = inputEngine.getTypeState(typeName);
                             HollowTypeWriteState writeState = output.getTypeState(typeName);
-                            if (readState != null && writeState != null) {
+                            if(readState != null && writeState != null) {
                                 HollowCombinerCopier copier = new HollowCombinerCopier(readState, writeState, ordinalRemapper);
                                 copierList.add(copier);
                                 copierMap.put(typeName, copier);
@@ -328,7 +328,7 @@ public class HollowCombiner {
                         for(String typeName : processedTypes) {
                             HollowTypeReadState readState = inputEngine.getTypeState(typeName);
                             HollowTypeWriteState writeState = output.getTypeState(typeName);
-                            if (readState != null && writeState != null) {
+                            if(readState != null && writeState != null) {
                                 HollowCombinerCopier copier = new HollowCombinerCopier(readState, writeState, ordinalRemappers[i1]);
                                 copierMap.put(typeName, copier);
                             }
@@ -350,7 +350,7 @@ public class HollowCombiner {
 
             try {
                 executor.awaitSuccessfulCompletionOfCurrentTasks();
-            } catch(Throwable th) {
+            } catch (Throwable th) {
                 throw new RuntimeException(th);
             }
 
@@ -410,7 +410,7 @@ public class HollowCombiner {
     }
 
     private OrdinalRemapper[] createOrdinalRemappers() {
-        for(int i=0;i<ordinalRemappers.length;i++)
+        for(int i = 0; i < ordinalRemappers.length; i++)
             ordinalRemappers[i] = new HollowCombinerOrdinalRemapper(this, inputs[i]);
 
         return ordinalRemappers;
@@ -426,9 +426,9 @@ public class HollowCombiner {
 
     private boolean isDefinedHashCode(HollowSchema schema) {
         if(schema instanceof HollowSetSchema)
-            return typeNamesWithDefinedHashCodes.contains(((HollowSetSchema)schema).getElementType());
+            return typeNamesWithDefinedHashCodes.contains(((HollowSetSchema) schema).getElementType());
         if(schema instanceof HollowMapSchema)
-            return typeNamesWithDefinedHashCodes.contains(((HollowMapSchema)schema).getKeyType());
+            return typeNamesWithDefinedHashCodes.contains(((HollowMapSchema) schema).getKeyType());
         return false;
     }
 
@@ -460,12 +460,12 @@ public class HollowCombiner {
                         return outputOrdinal;
                     } else {
                         scratch.reset();
-                        ((HollowHashableWriteRecord)rec).writeDataTo(scratch, HashBehavior.IGNORED_HASHES);
+                        ((HollowHashableWriteRecord) rec).writeDataTo(scratch, HashBehavior.IGNORED_HASHES);
                         int outputOrdinal = hashOrderIndependentOrdinalMap.get(scratch);
                         if(outputOrdinal != -1)
                             return outputOrdinal;
 
-                        synchronized(hashOrderIndependentOrdinalMap) {
+                        synchronized (hashOrderIndependentOrdinalMap) {
                             outputOrdinal = hashOrderIndependentOrdinalMap.get(scratch);
                             if(outputOrdinal != -1)
                                 return outputOrdinal;

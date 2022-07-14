@@ -66,13 +66,13 @@ class HollowSetDeltaApplicator {
         target.emptyBucketValue = delta.emptyBucketValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
-        target.setPointerAndSizeData = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion);
+        target.setPointerAndSizeData = new FixedLengthElementArray(target.memoryRecycler, ((long) target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion);
         target.elementData = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfBuckets * target.bitsPerElement);
 
         if(target.bitsPerSetPointer == from.bitsPerSetPointer
                 && target.bitsPerSetSizeValue == from.bitsPerSetSizeValue
                 && target.bitsPerElement == from.bitsPerElement)
-                    fastDelta();
+            fastDelta();
         else
             slowDelta();
 
@@ -83,13 +83,13 @@ class HollowSetDeltaApplicator {
     }
 
     private void slowDelta() {
-        for(int i=0; i<=target.maxOrdinal; i++) {
+        for(int i = 0; i <= target.maxOrdinal; i++) {
             mergeOrdinal(i);
         }
     }
 
     private void fastDelta() {
-        int i=0;
+        int i = 0;
         int bulkCopyEndOrdinal = Math.min(from.maxOrdinal, target.maxOrdinal);
 
         while(i <= target.maxOrdinal) {
@@ -110,7 +110,7 @@ class HollowSetDeltaApplicator {
     }
 
     private void fastCopyRecords(int recordsToCopy) {
-        long setPointerAndSizeBitsToCopy = (long)recordsToCopy * target.bitsPerFixedLengthSetPortion;
+        long setPointerAndSizeBitsToCopy = (long) recordsToCopy * target.bitsPerFixedLengthSetPortion;
         long eachSetPointerDifference = currentWriteStartBucket - currentFromStateStartBucket;
 
         target.setPointerAndSizeData.copyBits(from.setPointerAndSizeData, currentFromStateCopyStartBit, currentWriteStartBit, setPointerAndSizeBitsToCopy);
@@ -140,7 +140,7 @@ class HollowSetDeltaApplicator {
         if(i <= from.maxOrdinal) {
             long fromDataEndBucket = from.setPointerAndSizeData.getElementValue(currentFromStateCopyStartBit, from.bitsPerSetPointer);
             if(!removeData) {
-                for(long bucketIdx=currentFromStateStartBucket; bucketIdx<fromDataEndBucket; bucketIdx++) {
+                for(long bucketIdx = currentFromStateStartBucket; bucketIdx < fromDataEndBucket; bucketIdx++) {
                     long bucketValue = from.elementData.getElementValue(bucketIdx * from.bitsPerElement, from.bitsPerElement);
                     if(bucketValue == from.emptyBucketValue)
                         bucketValue = target.emptyBucketValue;
@@ -162,10 +162,9 @@ class HollowSetDeltaApplicator {
     }
 
 
-
     private void addFromDelta(GapEncodedVariableLengthIntegerReader additionsReader) {
         long deltaDataEndBucket = delta.setPointerAndSizeData.getElementValue(currentDeltaCopyStartBit, delta.bitsPerSetPointer);
-        for(long bucketIdx=currentDeltaStartBucket; bucketIdx<deltaDataEndBucket; bucketIdx++) {
+        for(long bucketIdx = currentDeltaStartBucket; bucketIdx < deltaDataEndBucket; bucketIdx++) {
             long bucketValue = delta.elementData.getElementValue(bucketIdx * delta.bitsPerElement, delta.bitsPerElement);
             target.elementData.setElementValue(currentWriteStartBucket * target.bitsPerElement, target.bitsPerElement, bucketValue);
             currentWriteStartBucket++;

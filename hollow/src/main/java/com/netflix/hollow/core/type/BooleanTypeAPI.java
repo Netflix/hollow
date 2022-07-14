@@ -26,8 +26,8 @@ public class BooleanTypeAPI extends HollowObjectTypeAPI {
     private final BooleanDelegateLookupImpl delegateLookupImpl;
 
     public BooleanTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
-        super(api, typeDataAccess, new String[] {
-            "value"
+        super(api, typeDataAccess, new String[]{
+                "value"
         });
         this.delegateLookupImpl = new BooleanDelegateLookupImpl(this);
     }

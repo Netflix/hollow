@@ -50,16 +50,16 @@ public abstract class AbstractFieldProcessor implements FieldProcessor {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if(this == obj) return true;
+        if(obj == null) return false;
+        if(getClass() != obj.getClass()) return false;
         AbstractFieldProcessor other = (AbstractFieldProcessor) obj;
-        if (entityName == null) {
-            if (other.entityName != null) return false;
-        } else if (!entityName.equals(other.entityName)) return false;
-        if (fieldName == null) {
-            if (other.fieldName != null) return false;
-        } else if (!fieldName.equals(other.fieldName)) return false;
+        if(entityName == null) {
+            if(other.entityName != null) return false;
+        } else if(!entityName.equals(other.entityName)) return false;
+        if(fieldName == null) {
+            if(other.fieldName != null) return false;
+        } else if(!fieldName.equals(other.fieldName)) return false;
         return true;
     }
 

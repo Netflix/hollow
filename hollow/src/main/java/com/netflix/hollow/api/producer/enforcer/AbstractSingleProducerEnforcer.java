@@ -43,7 +43,7 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
 
     @Override
     public void enable() {
-        if (_isPrimary()) {
+        if(_isPrimary()) {
             return;
         }
         lock.lock();
@@ -56,7 +56,7 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
 
     @Override
     public void disable() {
-        if (!hasCycleStarted) {
+        if(!hasCycleStarted) {
             disableNow();
         } else {
             doStopUponCycleComplete = true;
@@ -66,8 +66,8 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
     @Override
     public boolean isPrimary() {
         final boolean primary = _isPrimary();
-        if (!primary) {
-            if (wasPrimary) {
+        if(!primary) {
+            if(wasPrimary) {
                 logger.log(Level.WARNING, "SingleProducerEnforcer: lost primary producer status");
             }
         } else {
@@ -78,7 +78,7 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
 
     @Override
     public void force() {
-        if (_isPrimary()) {
+        if(_isPrimary()) {
             return;
         }
         _force();
@@ -89,10 +89,12 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
         lock.lock();
     }
 
-    @Override public void unlock() {
+    @Override
+    public void unlock() {
         lock.unlock();
 
     }
+
     @Override
     public void onCycleStart(long version) {
         hasCycleStarted = true;
@@ -101,13 +103,13 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
     @Override
     public void onCycleComplete(ProducerStatus status, long elapsed, TimeUnit unit) {
         hasCycleStarted = false;
-        if (doStopUponCycleComplete) {
+        if(doStopUponCycleComplete) {
             disableNow();
         }
     }
 
     private void disableNow() {
-        if (_isPrimary()) {
+        if(_isPrimary()) {
             lock.lock();
             try {
                 _disable();

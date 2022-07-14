@@ -47,26 +47,40 @@ public interface HollowClientMemoryConfig extends HollowConsumer.ObjectLongevity
         private final long usageDetectionPeriodMillis;
 
         public SpecifiedConfig(boolean enableLongLivedObjectSupport, boolean dropDataAutomatically,
-                                           long gracePeriodMillis, long usageDetectionPeriodMillis) {
+                long gracePeriodMillis, long usageDetectionPeriodMillis) {
             this.enableLongLivedObjectSupport = enableLongLivedObjectSupport;
             this.dropDataAutomatically = dropDataAutomatically;
             this.gracePeriodMillis = gracePeriodMillis;
             this.usageDetectionPeriodMillis = usageDetectionPeriodMillis;
         }
 
-        public boolean enableLongLivedObjectSupport() { return enableLongLivedObjectSupport; }
+        public boolean enableLongLivedObjectSupport() {
+            return enableLongLivedObjectSupport;
+        }
 
-        public boolean dropDataAutomatically() { return dropDataAutomatically; }
+        public boolean dropDataAutomatically() {
+            return dropDataAutomatically;
+        }
 
-        public long gracePeriodMillis() { return gracePeriodMillis; }
+        public long gracePeriodMillis() {
+            return gracePeriodMillis;
+        }
 
-        public long usageDetectionPeriodMillis() { return usageDetectionPeriodMillis; }
+        public long usageDetectionPeriodMillis() {
+            return usageDetectionPeriodMillis;
+        }
 
-        public boolean enableExpiredUsageStackTraces() { return false; }
+        public boolean enableExpiredUsageStackTraces() {
+            return false;
+        }
 
-        public boolean forceDropData() { return false; }
-        
-        public boolean allowDoubleSnapshot() { return true; }
+        public boolean forceDropData() {
+            return false;
+        }
+
+        public boolean allowDoubleSnapshot() {
+            return true;
+        }
 
     }
 }

@@ -42,13 +42,13 @@ public class FakeHollowSchemaIdentifierMapper implements HollowSchemaIdentifierM
     @Override
     public FieldType[] getPrimaryKeyFieldTypes(int identifier) {
         HollowSchema schema = getSchema(identifier);
-        if (schema.getSchemaType() == SchemaType.OBJECT) {
+        if(schema.getSchemaType() == SchemaType.OBJECT) {
             PrimaryKey primaryKey = ((HollowObjectSchema) schema).getPrimaryKey();
 
-            if (primaryKey != null) {
+            if(primaryKey != null) {
                 FieldType fieldTypes[] = new FieldType[primaryKey.numFields()];
 
-                for (int i = 0; i < fieldTypes.length; i++) {
+                for(int i = 0; i < fieldTypes.length; i++) {
                     fieldTypes[i] = primaryKey.getFieldType(dataset, i);
                 }
 
@@ -62,10 +62,10 @@ public class FakeHollowSchemaIdentifierMapper implements HollowSchemaIdentifierM
     @Override
     public int getSchemaId(HollowSchema forSchema) {
 
-        for (int i = 0; i < schemas.size(); i++) {
+        for(int i = 0; i < schemas.size(); i++) {
             HollowSchema datasetSchema = schemas.get(i);
 
-            if (forSchema.equals(datasetSchema)) {
+            if(forSchema.equals(datasetSchema)) {
                 return i;
             }
         }

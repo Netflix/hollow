@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  * from the name of a {@code Field} declared by a POJO.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target( {ElementType.TYPE, ElementType.FIELD})
+@Target({ElementType.TYPE, ElementType.FIELD})
 public @interface HollowTypeName {
 
     /**

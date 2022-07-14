@@ -64,16 +64,16 @@ public abstract class AbstractHollowDataAccessor<T> {
         this.typeState = requireNonNull(rStateEngine.getTypeState(type),
                 "type not loaded or does not exist in dataset; type=" + type);
         HollowSchema schema = typeState.getSchema();
-        if (schema instanceof HollowObjectSchema) {
+        if(schema instanceof HollowObjectSchema) {
             this.type = type;
 
-            if (primaryKey == null) {
+            if(primaryKey == null) {
                 HollowObjectSchema oSchema = ((HollowObjectSchema) schema);
                 this.primaryKey = oSchema.getPrimaryKey();
             } else {
                 this.primaryKey = primaryKey;
             }
-            if (this.primaryKey == null)
+            if(this.primaryKey == null)
                 throw new RuntimeException(String.format("Unsupported DataType=%s with SchemaType=%s : %s", type, schema.getSchemaType(), "PrimaryKey is missing"));
 
         } else {
@@ -96,7 +96,7 @@ public abstract class AbstractHollowDataAccessor<T> {
      * Compute Data Change
      */
     public synchronized void computeDataChange() {
-        if (isDataChangeComputed) return;
+        if(isDataChangeComputed) return;
 
         computeDataChange(type, rStateEngine, primaryKey);
         isDataChangeComputed = true;
@@ -132,11 +132,11 @@ public abstract class AbstractHollowDataAccessor<T> {
 
         { // Determine updated records (removed records and added back with different value)
             int addedOrdinal = addedOrdinals.nextSetBit(0);
-            while (addedOrdinal != -1) {
+            while(addedOrdinal != -1) {
                 Object[] key = keyDeriver.getRecordKey(addedOrdinal);
                 int removedOrdinal = removalsIndex.getMatchingOrdinal(key);
 
-                if (removedOrdinal != -1) { // record was re-added after being removed = update
+                if(removedOrdinal != -1) { // record was re-added after being removed = update
                     updatedRecords.add(new UpdatedRecordOrdinal(removedOrdinal, addedOrdinal));
 
                     // removedOrdinal && addedOrdinal is from an UPDATE so clear it from explicit tracking
@@ -186,11 +186,14 @@ public abstract class AbstractHollowDataAccessor<T> {
      * @see #getUpdatedRecords()
      */
     public Collection<T> getAddedRecords() {
-        if (!isDataChangeComputed) computeDataChange();
+        if(!isDataChangeComputed) computeDataChange();
 
-        return new HollowRecordCollection<T>(addedOrdinals) { @Override protected T getForOrdinal(int ordinal) {
+        return new HollowRecordCollection<T>(addedOrdinals) {
+            @Override
+            protected T getForOrdinal(int ordinal) {
                 return getRecord(ordinal);
-            }};
+            }
+        };
     }
 
     /**
@@ -198,10 +201,13 @@ public abstract class AbstractHollowDataAccessor<T> {
      * @see #getUpdatedRecords()
      */
     public Collection<T> getRemovedRecords() {
-        if (!isDataChangeComputed) computeDataChange();
-        return new HollowRecordCollection<T>(removedOrdinals) { @Override protected T getForOrdinal(int ordinal) {
-            return getRecord(ordinal);
-        }};
+        if(!isDataChangeComputed) computeDataChange();
+        return new HollowRecordCollection<T>(removedOrdinals) {
+            @Override
+            protected T getForOrdinal(int ordinal) {
+                return getRecord(ordinal);
+            }
+        };
     }
 
     /**
@@ -209,11 +215,11 @@ public abstract class AbstractHollowDataAccessor<T> {
      * @see UpdatedRecord
      */
     public Collection<UpdatedRecord<T>> getUpdatedRecords() {
-        if (!isDataChangeComputed) computeDataChange();
+        if(!isDataChangeComputed) computeDataChange();
         return updatedRecords;
     }
 
-    private class UpdatedRecordOrdinal extends UpdatedRecord<T>{
+    private class UpdatedRecordOrdinal extends UpdatedRecord<T> {
         private final int before;
         private final int after;
 
@@ -227,13 +233,15 @@ public abstract class AbstractHollowDataAccessor<T> {
             return getRecord(before);
         }
 
-        public T getAfter() { return getRecord(after);}
+        public T getAfter() {
+            return getRecord(after);
+        }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
+            if(this == o) return true;
+            if(o == null || getClass() != o.getClass()) return false;
+            if(!super.equals(o)) return false;
             UpdatedRecordOrdinal that = (UpdatedRecordOrdinal) o;
             return before == that.before &&
                     after == that.after;
@@ -276,22 +284,22 @@ public abstract class AbstractHollowDataAccessor<T> {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if(this == obj)
                 return true;
-            if (obj == null)
+            if(obj == null)
                 return false;
-            if (getClass() != obj.getClass())
+            if(getClass() != obj.getClass())
                 return false;
             UpdatedRecord<?> other = (UpdatedRecord<?>) obj;
-            if (after == null) {
-                if (other.after != null)
+            if(after == null) {
+                if(other.after != null)
                     return false;
-            } else if (!after.equals(other.after))
+            } else if(!after.equals(other.after))
                 return false;
-            if (before == null) {
-                if (other.before != null)
+            if(before == null) {
+                if(other.before != null)
                     return false;
-            } else if (!before.equals(other.before))
+            } else if(!before.equals(other.before))
                 return false;
             return true;
         }

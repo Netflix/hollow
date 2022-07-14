@@ -28,7 +28,7 @@ import com.netflix.hollow.core.schema.HollowSetSchema;
  * 
  * @see HollowProxyDataAccess
  */
-public class HollowSetProxyDataAccess extends HollowTypeProxyDataAccess implements HollowSetTypeDataAccess{
+public class HollowSetProxyDataAccess extends HollowTypeProxyDataAccess implements HollowSetTypeDataAccess {
 
     public HollowSetProxyDataAccess(HollowProxyDataAccess dataAccess) {
         super(dataAccess);
@@ -67,7 +67,7 @@ public class HollowSetProxyDataAccess extends HollowTypeProxyDataAccess implemen
     public int findElement(int ordinal, Object... hashKey) {
         return currentDataAccess().findElement(ordinal, hashKey);
     }
-    
+
     @Override
     public int relativeBucketValue(int ordinal, int bucketIndex) {
         return currentDataAccess().relativeBucketValue(ordinal, bucketIndex);
@@ -79,7 +79,7 @@ public class HollowSetProxyDataAccess extends HollowTypeProxyDataAccess implemen
     }
 
     private HollowSetTypeDataAccess currentDataAccess() {
-        return (HollowSetTypeDataAccess)currentDataAccess;
+        return (HollowSetTypeDataAccess) currentDataAccess;
     }
 
 }

@@ -85,7 +85,7 @@ class HollowPerformanceAPIClassGenerator {
         for(HollowSchema schema : schemas) {
             String schemaName = schema.getName();
 
-            switch (schema.getSchemaType()) {
+            switch(schema.getSchemaType()) {
                 case OBJECT:
                     builder.append("        this." + schemaName + " = new " + schemaName + "PerfAPI(dataAccess, \"" + schemaName + "\", this);\n");
                     break;

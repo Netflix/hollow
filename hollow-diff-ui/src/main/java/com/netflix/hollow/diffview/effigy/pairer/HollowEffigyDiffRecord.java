@@ -64,7 +64,7 @@ public class HollowEffigyDiffRecord {
             if(field.isLeafNode()) {
                 FieldDiffCount fieldCount = map.get(field);
                 if(fieldCount == null) {
-                    if(simDiffCount.diffCount+1 >= maxDiff) {
+                    if(simDiffCount.diffCount + 1 >= maxDiff) {
                         simDiffCount.diffCount++;
                         return;
                     }

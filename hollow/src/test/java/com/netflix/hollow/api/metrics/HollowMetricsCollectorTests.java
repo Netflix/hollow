@@ -20,8 +20,8 @@ public class HollowMetricsCollectorTests {
     @Test
     public void testNullMetricsCollector() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
-                                                .withBlobStager(new HollowInMemoryBlobStager())
-                                                .build();
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .build();
 
         long version = producer.runCycle(new HollowProducer.Populator() {
             public void populate(HollowProducer.WriteState state) throws Exception {
@@ -30,8 +30,8 @@ public class HollowMetricsCollectorTests {
         });
 
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
-                                                .withMetricsCollector(null)
-                                                .build();
+                .withMetricsCollector(null)
+                .build();
         consumer.triggerRefreshTo(version);
     }
 

@@ -68,11 +68,11 @@ public abstract class DiffPage {
         HollowDiff diff = diffUI.getDiff();
         long heapFrom = diff.getFromStateEngine().calcApproxDataSize();
         long heapTo = diff.getToStateEngine().calcApproxDataSize();
-        long heapDiff = heapTo-heapFrom;
+        long heapDiff = heapTo - heapFrom;
         ctx.put("fromHeap", formatBytes(heapFrom));
         ctx.put("toHeap", formatBytes(heapTo));
         ctx.put("diffHeap", (heapDiff > 0 ? "+" : "") + formatBytes(heapDiff));
-        ctx.put("diffHeap_cssClass", heapDiff<=0 ? "heap_dec" : "heap_inc");
+        ctx.put("diffHeap_cssClass", heapDiff <= 0 ? "heap_dec" : "heap_inc");
 
         setUpContext(req, session, ctx);
 
@@ -86,13 +86,13 @@ public abstract class DiffPage {
 
     private void processCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
+        if(cookies != null) {
+            for(Cookie cookie : cookies) {
                 String name = cookie.getName();
                 String value = cookie.getValue();
-                if ("env".equals(name)) {
+                if("env".equals(name)) {
                     env = value;
-                } else if ("isHeaderEnabled".equals(name)) {
+                } else if("isHeaderEnabled".equals(name)) {
                     isHeaderEnabled = Boolean.valueOf(value);
                 }
             }
@@ -147,7 +147,7 @@ public abstract class DiffPage {
 
         List<HollowHeaderEntry> entries = new ArrayList<HollowHeaderEntry>();
 
-        int i=0;
+        int i = 0;
 
         for(String key : allKeys) {
             entries.add(new HollowHeaderEntry(i++, key, fromTags.get(key), toTags.get(key)));

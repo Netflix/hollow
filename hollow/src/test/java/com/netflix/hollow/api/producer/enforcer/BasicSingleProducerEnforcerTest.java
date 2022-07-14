@@ -34,7 +34,7 @@ public class BasicSingleProducerEnforcerTest {
     public void testMultiCycle() {
         BasicSingleProducerEnforcer se = new BasicSingleProducerEnforcer();
 
-        for (int i = 0; i < 10; i++) {
+        for(int i = 0; i < 10; i++) {
             se.enable();
             Assert.assertTrue(se.isPrimary());
 

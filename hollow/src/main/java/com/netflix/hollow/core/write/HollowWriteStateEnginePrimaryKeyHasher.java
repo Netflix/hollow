@@ -31,28 +31,28 @@ class HollowWriteStateEnginePrimaryKeyHasher {
 
     public HollowWriteStateEnginePrimaryKeyHasher(PrimaryKey primaryKey, HollowWriteStateEngine writeEngine) {
         HollowWriteStateEngine stateEngine = writeEngine;
-        HollowObjectTypeWriteState rootTypeWriteState = (HollowObjectTypeWriteState)writeEngine.getTypeState(primaryKey.getType());
-        
+        HollowObjectTypeWriteState rootTypeWriteState = (HollowObjectTypeWriteState) writeEngine.getTypeState(primaryKey.getType());
+
         this.fieldPathIndexes = new int[primaryKey.numFields()][];
         this.typeStates = new HollowObjectTypeWriteState[primaryKey.numFields()][];
-        
-        for(int i=0;i<primaryKey.numFields();i++) {
+
+        for(int i = 0; i < primaryKey.numFields(); i++) {
             fieldPathIndexes[i] = primaryKey.getFieldPathIndex(stateEngine, i);
             typeStates[i] = new HollowObjectTypeWriteState[fieldPathIndexes[i].length];
-            
+
             typeStates[i][0] = rootTypeWriteState;
-            
-            for(int j=1;j<typeStates[i].length;j++) {
-                 String referencedType = typeStates[i][j-1].getSchema().getReferencedType(fieldPathIndexes[i][j-1]);
-                 typeStates[i][j] = (HollowObjectTypeWriteState) stateEngine.getTypeState(referencedType);
+
+            for(int j = 1; j < typeStates[i].length; j++) {
+                String referencedType = typeStates[i][j - 1].getSchema().getReferencedType(fieldPathIndexes[i][j - 1]);
+                typeStates[i][j] = (HollowObjectTypeWriteState) stateEngine.getTypeState(referencedType);
             }
         }
     }
-    
+
     public int getRecordHash(int ordinal) {
         int hash = 0;
 
-        for (int i = 0; i < fieldPathIndexes.length; i++) {
+        for(int i = 0; i < fieldPathIndexes.length; i++) {
             hash *= 31;
             hash ^= hashValue(ordinal, i);
         }
@@ -62,12 +62,12 @@ class HollowWriteStateEnginePrimaryKeyHasher {
 
     private int hashValue(int ordinal, int fieldIdx) {
         int lastFieldPath = fieldPathIndexes[fieldIdx].length - 1;
-        for (int i = 0; i < lastFieldPath; i++) {
+        for(int i = 0; i < lastFieldPath; i++) {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
             ByteArrayOrdinalMap ordinalMap = typeStates[fieldIdx][i].ordinalMap;
             long offset = ordinalMap.getPointerForData(ordinal);
             SegmentedByteArray recordDataArray = ordinalMap.getByteData().getUnderlyingArray();
-            
+
             offset = navigateToField(typeStates[fieldIdx][i].getSchema(), fieldPosition, recordDataArray, offset);
             ordinal = VarInt.readVInt(recordDataArray, offset);
         }
@@ -81,84 +81,84 @@ class HollowWriteStateEnginePrimaryKeyHasher {
         offset = navigateToField(schema, fieldPosition, recordDataArray, offset);
         return HashCodes.hashInt(fieldHashCode(schema, fieldPosition, recordDataArray, offset));
     }
-    
+
     private long navigateToField(HollowObjectSchema schema, int fieldIdx, SegmentedByteArray data, long offset) {
-        for(int i=0;i<fieldIdx;i++) {
+        for(int i = 0; i < fieldIdx; i++) {
             switch(schema.getFieldType(i)) {
-            case INT:
-            case LONG:
-            case REFERENCE:
-                offset += VarInt.nextVLongSize(data, offset);
-                break;
-            case BYTES:
-            case STRING:
-                int fieldLength = VarInt.readVInt(data, offset);
-                offset += VarInt.sizeOfVInt(fieldLength);
-                offset += fieldLength;
-                break;
-            case BOOLEAN:
-                offset++;
-                break;
-            case DOUBLE:
-                offset += 8;
-                break;
-            case FLOAT:
-                offset += 4;
-                break;
+                case INT:
+                case LONG:
+                case REFERENCE:
+                    offset += VarInt.nextVLongSize(data, offset);
+                    break;
+                case BYTES:
+                case STRING:
+                    int fieldLength = VarInt.readVInt(data, offset);
+                    offset += VarInt.sizeOfVInt(fieldLength);
+                    offset += fieldLength;
+                    break;
+                case BOOLEAN:
+                    offset++;
+                    break;
+                case DOUBLE:
+                    offset += 8;
+                    break;
+                case FLOAT:
+                    offset += 4;
+                    break;
             }
         }
-        
+
         return offset;
     }
-    
+
     private int fieldHashCode(HollowObjectSchema schema, int fieldIdx, SegmentedByteArray data, long offset) {
         switch(schema.getFieldType(fieldIdx)) {
-        case INT:
-            if(VarInt.readVNull(data, offset))
-                return 0;
-            int intVal = VarInt.readVInt(data, offset);
-            intVal = ZigZag.decodeInt(intVal);
-            return intVal;
-        case LONG:
-            if(VarInt.readVNull(data, offset))
-                return 0;
-            long longVal = VarInt.readVLong(data, offset);
-            longVal = ZigZag.decodeLong(longVal);
-            return (int)(longVal ^ (longVal >>> 32));
-        case REFERENCE:
-            return VarInt.readVInt(data, offset);
-        case BYTES:
-            int byteLen = VarInt.readVInt(data, offset);
-            offset += VarInt.sizeOfVInt(byteLen);
-            return HashCodes.hashCode(data, offset, byteLen);
-        case STRING:
-            int strByteLen = VarInt.readVInt(data, offset);
-            offset += VarInt.sizeOfVInt(strByteLen);
-            return getNaturalStringHashCode(data, offset, strByteLen);
-        case BOOLEAN:
-            if(VarInt.readVNull(data, offset))
-                return 0;
-            return data.get(offset) == 1 ? 1231 : 1237;
-        case DOUBLE:
-            long longBits = data.readLongBits(offset);
-            return (int)(longBits ^ (longBits >>> 32));
-        case FLOAT:
-            return data.readIntBits(offset);
-        default:
-            throw new IllegalArgumentException("Schema "+schema.getName()+" has unknown field type for field " + schema.getFieldName(fieldIdx) + ": " + schema.getFieldType(fieldIdx));
+            case INT:
+                if(VarInt.readVNull(data, offset))
+                    return 0;
+                int intVal = VarInt.readVInt(data, offset);
+                intVal = ZigZag.decodeInt(intVal);
+                return intVal;
+            case LONG:
+                if(VarInt.readVNull(data, offset))
+                    return 0;
+                long longVal = VarInt.readVLong(data, offset);
+                longVal = ZigZag.decodeLong(longVal);
+                return (int) (longVal ^ (longVal >>> 32));
+            case REFERENCE:
+                return VarInt.readVInt(data, offset);
+            case BYTES:
+                int byteLen = VarInt.readVInt(data, offset);
+                offset += VarInt.sizeOfVInt(byteLen);
+                return HashCodes.hashCode(data, offset, byteLen);
+            case STRING:
+                int strByteLen = VarInt.readVInt(data, offset);
+                offset += VarInt.sizeOfVInt(strByteLen);
+                return getNaturalStringHashCode(data, offset, strByteLen);
+            case BOOLEAN:
+                if(VarInt.readVNull(data, offset))
+                    return 0;
+                return data.get(offset) == 1 ? 1231 : 1237;
+            case DOUBLE:
+                long longBits = data.readLongBits(offset);
+                return (int) (longBits ^ (longBits >>> 32));
+            case FLOAT:
+                return data.readIntBits(offset);
+            default:
+                throw new IllegalArgumentException("Schema " + schema.getName() + " has unknown field type for field " + schema.getFieldName(fieldIdx) + ": " + schema.getFieldType(fieldIdx));
         }
     }
-    
+
     private int getNaturalStringHashCode(SegmentedByteArray data, long offset, int len) {
         int hashCode = 0;
         long endOffset = len + offset;
-        
+
         while(offset < endOffset) {
             int ch = VarInt.readVInt(data, offset);
             hashCode = hashCode * 31 + ch;
             offset += VarInt.sizeOfVInt(ch);
         }
-        
+
         return hashCode;
     }
 

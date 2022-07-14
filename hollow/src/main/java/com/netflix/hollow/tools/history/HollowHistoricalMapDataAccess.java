@@ -30,11 +30,11 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 public class HollowHistoricalMapDataAccess extends HollowHistoricalTypeDataAccess implements HollowMapTypeDataAccess {
 
     private HistoricalPrimaryKeyMatcher keyMatcher;
-    
+
     public HollowHistoricalMapDataAccess(HollowHistoricalStateDataAccess dataAccess, HollowTypeReadState typeState) {
         super(dataAccess, typeState, new HollowMapSampler(typeState.getSchema().getName(), DisabledSamplingDirector.INSTANCE));
     }
-    
+
     @Override
     public HollowMapSchema getSchema() {
         return (HollowMapSchema) removedRecords.getSchema();
@@ -46,7 +46,7 @@ public class HollowHistoricalMapDataAccess extends HollowHistoricalTypeDataAcces
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowMapTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).size(ordinal);
+            return ((HollowMapTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).size(ordinal);
         return removedRecords().size(getMappedOrdinal(ordinal));
     }
 
@@ -56,7 +56,7 @@ public class HollowHistoricalMapDataAccess extends HollowHistoricalTypeDataAcces
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowMapTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).get(ordinal, keyOrdinal);
+            return ((HollowMapTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).get(ordinal, keyOrdinal);
         return removedRecords().get(getMappedOrdinal(ordinal), keyOrdinal);
     }
 
@@ -66,53 +66,53 @@ public class HollowHistoricalMapDataAccess extends HollowHistoricalTypeDataAcces
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowMapTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).get(ordinal, keyOrdinal, hashCode);
+            return ((HollowMapTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).get(ordinal, keyOrdinal, hashCode);
         return removedRecords().get(getMappedOrdinal(ordinal), keyOrdinal, hashCode);
     }
-    
+
     @Override
     public int findKey(int ordinal, Object... hashKey) {
-        return (int)(findEntry(ordinal, hashKey) >> 32);
+        return (int) (findEntry(ordinal, hashKey) >> 32);
     }
 
     @Override
     public int findValue(int ordinal, Object... hashKey) {
-        return (int)findEntry(ordinal, hashKey);
+        return (int) findEntry(ordinal, hashKey);
     }
 
     @Override
     public long findEntry(int ordinal, Object... hashKey) {
         sampler().recordGet();
         recordStackTrace();
-        
+
         if(keyMatcher == null)
             return -1L;
-        
+
         if(!ordinalIsPresent(ordinal))
-            return ((HollowMapTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).findEntry(ordinal, hashKey);
-        
-        
+            return ((HollowMapTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).findEntry(ordinal, hashKey);
+
+
         ordinal = ordinalRemap.get(ordinal);
-        
-        HollowMapTypeReadState removedRecords = (HollowMapTypeReadState)getRemovedRecords();
+
+        HollowMapTypeReadState removedRecords = (HollowMapTypeReadState) getRemovedRecords();
 
         int hashTableSize = HashCodes.hashTableSize(removedRecords.size(ordinal));
         int hash = SetMapKeyHasher.hash(hashKey, keyMatcher.getFieldTypes());
-        
+
         int bucket = hash & (hashTableSize - 1);
         long bucketOrdinals = removedRecords.relativeBucket(ordinal, bucket);
         while(bucketOrdinals != -1L) {
-            if(keyMatcher.keyMatches((int)(bucketOrdinals >> 32), hashKey))
+            if(keyMatcher.keyMatches((int) (bucketOrdinals >> 32), hashKey))
                 return bucketOrdinals;
-         
+
             bucket++;
             bucket &= (hashTableSize - 1);
             bucketOrdinals = removedRecords.relativeBucket(ordinal, bucket);
         }
-        
+
         return -1L;
     }
-    
+
 
     @Override
     public HollowMapEntryOrdinalIterator potentialMatchOrdinalIterator(int ordinal, int hashCode) {
@@ -120,7 +120,7 @@ public class HollowHistoricalMapDataAccess extends HollowHistoricalTypeDataAcces
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowMapTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).potentialMatchOrdinalIterator(ordinal, hashCode);
+            return ((HollowMapTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).potentialMatchOrdinalIterator(ordinal, hashCode);
         return removedRecords().potentialMatchOrdinalIterator(getMappedOrdinal(ordinal), hashCode);
     }
 
@@ -130,7 +130,7 @@ public class HollowHistoricalMapDataAccess extends HollowHistoricalTypeDataAcces
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowMapTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).ordinalIterator(ordinal);
+            return ((HollowMapTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).ordinalIterator(ordinal);
         return removedRecords().ordinalIterator(getMappedOrdinal(ordinal));
     }
 
@@ -140,7 +140,7 @@ public class HollowHistoricalMapDataAccess extends HollowHistoricalTypeDataAcces
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowMapTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).relativeBucket(ordinal, bucketIndex);
+            return ((HollowMapTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).relativeBucket(ordinal, bucketIndex);
         return removedRecords().relativeBucket(getMappedOrdinal(ordinal), bucketIndex);
     }
 
@@ -151,7 +151,7 @@ public class HollowHistoricalMapDataAccess extends HollowHistoricalTypeDataAcces
     private HollowMapSampler sampler() {
         return (HollowMapSampler) sampler;
     }
-    
+
     void buildKeyMatcher() {
         PrimaryKey hashKey = getSchema().getHashKey();
         if(hashKey != null)

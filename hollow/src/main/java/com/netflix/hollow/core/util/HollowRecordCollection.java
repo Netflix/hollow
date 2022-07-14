@@ -55,7 +55,7 @@ public abstract class HollowRecordCollection<T> extends AbstractCollection<T> {
     public int size() {
         return populatedOrdinals.cardinality();
     }
-    
+
     protected abstract T getForOrdinal(int ordinal);
 
 }

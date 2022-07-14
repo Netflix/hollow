@@ -44,7 +44,7 @@ public class HollowHistoryViewProvider implements HollowObjectViewProvider {
         HollowHistoryView objectView = (HollowHistoryView) session.getAttribute("hollow-history-view");
 
         long currentRandomizedTag = historyUI.getHistory().getLatestState().getCurrentRandomizedTag();
-        
+
         if(objectView != null
                 && objectView.getHistoricalVersion() == version
                 && objectView.getType().equals(type)

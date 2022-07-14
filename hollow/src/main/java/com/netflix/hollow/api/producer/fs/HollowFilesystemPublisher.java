@@ -25,7 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class HollowFilesystemPublisher implements HollowProducer.Publisher {
-    
+
     private final Path blobStorePath;
 
     /**
@@ -35,7 +35,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     public HollowFilesystemPublisher(Path blobStorePath) {
         this.blobStorePath = blobStorePath;
         try {
-            if (!Files.exists(this.blobStorePath)){
+            if(!Files.exists(this.blobStorePath)) {
                 Files.createDirectories(this.blobStorePath);
             }
         } catch (IOException e) {
@@ -51,7 +51,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
 
     @Override
     public void publish(HollowProducer.PublishArtifact publishArtifact) {
-        if (publishArtifact instanceof HollowProducer.HeaderBlob) {
+        if(publishArtifact instanceof HollowProducer.HeaderBlob) {
             publishHeader((HollowProducer.HeaderBlob) publishArtifact);
         } else {
             publishBlob((HollowProducer.Blob) publishArtifact);
@@ -62,10 +62,10 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
         try (
                 InputStream is = publishArtifact.newInputStream();
                 OutputStream os = Files.newOutputStream(destination)
-        ) {
+                ) {
             byte buf[] = new byte[4096];
             int n;
-            while (-1 != (n = is.read(buf)))
+            while(-1 != (n = is.read(buf)))
                 os.write(buf, 0, n);
         } catch (IOException e) {
             throw new RuntimeException("Unable to publish file!", e);
@@ -79,15 +79,15 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
 
     private void publishBlob(HollowProducer.Blob blob) {
         Path destination = null;
-        
+
         switch(blob.getType()) {
-        case SNAPSHOT:
-            destination = blobStorePath.resolve(String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
-            break;
-        case DELTA:
-        case REVERSE_DELTA:
-            destination = blobStorePath.resolve(String.format("%s-%d-%d", blob.getType().prefix, blob.getFromVersion(), blob.getToVersion()));
-            break;
+            case SNAPSHOT:
+                destination = blobStorePath.resolve(String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
+                break;
+            case DELTA:
+            case REVERSE_DELTA:
+                destination = blobStorePath.resolve(String.format("%s-%d-%d", blob.getType().prefix, blob.getFromVersion(), blob.getToVersion()));
+                break;
         }
 
         publishContent(blob, destination);
@@ -98,27 +98,27 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
                 Path partDestination = null;
 
                 switch(blob.getType()) {
-                case SNAPSHOT:
-                    partDestination = blobStorePath.resolve(String.format("%s_%s-%d", blob.getType().prefix, partName, blob.getToVersion()));
-                    break;
-                case DELTA:
-                case REVERSE_DELTA:
-                    partDestination = blobStorePath.resolve(String.format("%s_%s-%d-%d", blob.getType().prefix, partName, blob.getFromVersion(), blob.getToVersion()));
-                    break;
+                    case SNAPSHOT:
+                        partDestination = blobStorePath.resolve(String.format("%s_%s-%d", blob.getType().prefix, partName, blob.getToVersion()));
+                        break;
+                    case DELTA:
+                    case REVERSE_DELTA:
+                        partDestination = blobStorePath.resolve(String.format("%s_%s-%d-%d", blob.getType().prefix, partName, blob.getFromVersion(), blob.getToVersion()));
+                        break;
                 }
 
-                try(
+                try (
                         InputStream is = blob.newOptionalPartInputStream(partName);
                         OutputStream os = Files.newOutputStream(partDestination)
-                ) {
+                        ) {
                     byte buf[] = new byte[4096];
                     int n;
-                    while (-1 != (n = is.read(buf)))
+                    while(-1 != (n = is.read(buf)))
                         os.write(buf, 0, n);
-                } catch(IOException e) {
+                } catch (IOException e) {
                     throw new RuntimeException("Unable to publish optional part file: " + partName, e);
                 }
-                
+
             }
         }
     }

@@ -24,10 +24,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
-    
+
     public static final String ANNOUNCEMENT_FILENAME = "announced.version";
     public static final String ANNOUNCEMENT_FILENAME_TEMPORARY = "announced.version.tmp";
-    
+
     private final Path publishPath;
 
     /**

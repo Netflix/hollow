@@ -33,9 +33,9 @@ public class TypeFilterTest {
             c("include all: disjoint",    l(Charlie.class, Echo.class), f -> f, l("Charlie", "Echo")),
             c("include all: collections", l(Omega.class),               f -> f,
                     l("Omega",
-                      "ListOfLE", "LE", "LERef",
-                      "SetOfSE", "SE", "SERef",
-                      "MapOfKToV", "K", "KRef", "V", "VRef")),
+                            "ListOfLE", "LE", "LERef",
+                            "SetOfSE", "SE", "SERef",
+                            "MapOfKToV", "K", "KRef", "V", "VRef")),
 
             c("exclude all: hierarchy",   l(Alpha.class), f -> f.excludeAll(), none()),
             c("exclude all: collections", l(Omega.class), f -> f.excludeAll(), none()),
@@ -46,16 +46,16 @@ public class TypeFilterTest {
             c("recursive include: hierarchy",
                     l(Alpha.class),
                     f -> f.excludeAll()
-                          .includeRecursive("Alpha"),
+                            .includeRecursive("Alpha"),
                     l("Alpha", "Beta", "Charlie", "Long")),
             c("recursive include: collections",
                     l(Omega.class),
                     f -> f.excludeAll()
-                          .includeRecursive("Omega"),
+                            .includeRecursive("Omega"),
                     l("Omega",
-                      "ListOfLE", "LE", "LERef",
-                      "SetOfSE", "SE", "SERef",
-                      "MapOfKToV", "K", "KRef", "V", "VRef")),
+                            "ListOfLE", "LE", "LERef",
+                            "SetOfSE", "SE", "SERef",
+                            "MapOfKToV", "K", "KRef", "V", "VRef")),
 
             c("exclude: hierarchy",
                     l(Alpha.class),
@@ -70,12 +70,12 @@ public class TypeFilterTest {
             c("exclude: collections #2",
                     l(Omega.class),
                     f -> f.exclude("ListOfLE")
-                          .exclude("SetOfSE")
-                          .exclude("MapOfKToV"),
+                            .exclude("SetOfSE")
+                            .exclude("MapOfKToV"),
                     l("Omega",
-                      "LE", "LERef",
-                      "SE", "SERef",
-                      "K", "KRef", "V", "VRef")),
+                            "LE", "LERef",
+                            "SE", "SERef",
+                            "K", "KRef", "V", "VRef")),
 
             c("recursive exclude: hierarchy",
                     l(Alpha.class),
@@ -88,32 +88,32 @@ public class TypeFilterTest {
             c("recursive exclude: collections #2",
                     l(Omega.class),
                     f -> f.excludeRecursive("ListOfLE")
-                          .excludeRecursive("SetOfSE")
-                          .excludeRecursive("MapOfKToV"),
+                            .excludeRecursive("SetOfSE")
+                            .excludeRecursive("MapOfKToV"),
                     l("Omega")),
 
             c("re-include: hierarchy",
                     l(Alpha.class),
                     f -> f.excludeRecursive("Beta")
-                          .include("Long"),
+                            .include("Long"),
                     l("Alpha", "Long")),
             c("re-include: collections",
                     l(Omega.class),
                     f -> f.excludeRecursive("Omega")
-                          .include("ListOfLE")
-                          .include("SetOfSE")
-                          .include("MapOfKToV"),
+                            .include("ListOfLE")
+                            .include("SetOfSE")
+                            .include("MapOfKToV"),
                     l("ListOfLE", "SetOfSE", "MapOfKToV")),
 
             c("recursive re-include: collections",
                     l(Omega.class),
                     f -> f.excludeRecursive("Omega")
-                          .includeRecursive("ListOfLE")
-                          .includeRecursive("SetOfSE")
-                          .includeRecursive("MapOfKToV"),
+                            .includeRecursive("ListOfLE")
+                            .includeRecursive("SetOfSE")
+                            .includeRecursive("MapOfKToV"),
                     l("ListOfLE", "LE", "LERef",
-                      "SetOfSE", "SE", "SERef",
-                      "MapOfKToV", "K", "KRef", "V", "VRef"))
+                            "SetOfSE", "SE", "SERef",
+                            "MapOfKToV", "K", "KRef", "V", "VRef"))
     );
     private static final Collection<Object[]> typeAndFieldCases = asList(
             /*
@@ -129,38 +129,38 @@ public class TypeFilterTest {
             c("type include",
                     l(Charlie.class),
                     f -> f.excludeAll()
-                          .include("Charlie"),
+                            .include("Charlie"),
                     l("Charlie", "Charlie.i", "Charlie.l", "Charlie.s")),
             c("type exclude",
                     l(Beta.class),
                     f -> f.exclude("Beta")
-                          .exclude("Long"),
+                            .exclude("Long"),
                     l("Charlie", "Charlie.i", "Charlie.l", "Charlie.s")),
 
             c("include inline fields",
                     l(Charlie.class),
                     f -> f.excludeAll()
-                          .include("Charlie", "l"),
+                            .include("Charlie", "l"),
                     l("Charlie", "Charlie.l")),
             c("include scalar ref field",
                     l(Beta.class),
                     f -> f.excludeAll()
-                          .include("Beta", "l"),
+                            .include("Beta", "l"),
                     l("Beta", "Beta.l")),
             c("include object ref field",
                     l(Beta.class),
                     f -> f.excludeAll()
-                          .include("Beta", "charlie"),
+                            .include("Beta", "charlie"),
                     l("Beta", "Beta.charlie")),
             c("recursive include scalar ref field",
                     l(Beta.class),
                     f -> f.excludeAll()
-                          .includeRecursive("Beta", "l"),
+                            .includeRecursive("Beta", "l"),
                     l("Beta", "Beta.l", "Long", "Long.value")),
             c("recursive include object ref field",
                     l(Beta.class),
                     f -> f.excludeAll()
-                          .includeRecursive("Beta", "charlie"),
+                            .includeRecursive("Beta", "charlie"),
                     l("Beta", "Beta.charlie", "Charlie", "Charlie.i", "Charlie.l", "Charlie.s"))
     );
 
@@ -176,8 +176,8 @@ public class TypeFilterTest {
         }
 
         public TypeOnly(String skip, String msg, List<Class<?>> models,
-                        UnaryOperator<TypeFilter.Builder> filteredBy,
-                        List<String> expected) {
+                UnaryOperator<TypeFilter.Builder> filteredBy,
+                List<String> expected) {
             super(skip);
             this.models = models;
             this.filteredBy = filteredBy;
@@ -186,7 +186,7 @@ public class TypeFilterTest {
 
         @Test
         public void verify() {
-            if (skip) return;
+            if(skip) return;
 
             List<HollowSchema> schemas = generateSchema(models);
 
@@ -198,7 +198,7 @@ public class TypeFilterTest {
                     .map(HollowSchema::getName)
                     .filter(name -> subject.includes(name))
                     .collect(toSet());
-            if (expected.isEmpty()) {
+            if(expected.isEmpty()) {
                 assertThat(included).isEmpty();
             } else {
                 assertThat(included).containsOnly(expected.toArray(new String[0]));
@@ -218,8 +218,8 @@ public class TypeFilterTest {
         }
 
         public TypeAndField(String skip, String msg, List<Class<?>> models,
-                            UnaryOperator<TypeFilter.Builder> filteredBy,
-                            List<String> expected) {
+                UnaryOperator<TypeFilter.Builder> filteredBy,
+                List<String> expected) {
             super(skip);
             this.models = models;
             this.filteredBy = filteredBy;
@@ -228,7 +228,7 @@ public class TypeFilterTest {
 
         @Test
         public void verify() {
-            if (skip) return;
+            if(skip) return;
             List<HollowSchema> schemas = generateSchema(models);
 
             TypeFilter subject = filteredBy
@@ -240,13 +240,13 @@ public class TypeFilterTest {
                     .flatMap(schema -> {
                         String typeName = schema.getName();
                         Stream<String> typeStream = subject.includes(typeName) ? Stream.of(typeName) : Stream.empty();
-                        if (schema.getSchemaType() == OBJECT) {
+                        if(schema.getSchemaType() == OBJECT) {
                             HollowObjectSchema os = (HollowObjectSchema) schema;
                             Set<String> fields = IntStream.range(0, os.numFields())
-                                                          .mapToObj(os::getFieldName)
-                                                          .filter(f -> subject.includes(typeName, f))
-                                                          .map(f -> typeName + "." + f)
-                                                          .collect(toSet());
+                                    .mapToObj(os::getFieldName)
+                                    .filter(f -> subject.includes(typeName, f))
+                                    .map(f -> typeName + "." + f)
+                                    .collect(toSet());
                             return fields.isEmpty() ? Stream.empty() : Stream.concat(typeStream, fields.stream());
                         } else {
                             return typeStream;
@@ -254,7 +254,7 @@ public class TypeFilterTest {
                     })
                     .collect(toSet());
 
-            if (this.expected.isEmpty()) {
+            if(this.expected.isEmpty()) {
                 assertThat(included).isEmpty();
             } else {
                 assertThat(included).containsOnly(this.expected.toArray(new String[0]));
@@ -272,11 +272,11 @@ public class TypeFilterTest {
     }
 
     private static Object[] c(String msg, List<Class<?>> models, UnaryOperator<TypeFilter.Builder> filteredBy, List<String> expected) {
-        return new Object[] { "", msg, models, filteredBy, expected };
+        return new Object[]{"", msg, models, filteredBy, expected};
     }
 
     private static Object[] skip(String msg, List<Class<?>> models, UnaryOperator<TypeFilter.Builder> filteredBy, List<String> expected) {
-        return new Object[] { AbstractTypeFilterTest.SKIP, msg, models, filteredBy, expected };
+        return new Object[]{AbstractTypeFilterTest.SKIP, msg, models, filteredBy, expected};
     }
 
     private static <T> List<T> none() {
@@ -292,7 +292,7 @@ public class TypeFilterTest {
         HollowWriteStateEngine wse = new HollowWriteStateEngine();
         HollowObjectMapper om = new HollowObjectMapper(wse);
 
-        for (Class<?> model : models) {
+        for(Class<?> model : models) {
             om.initializeTypeState(model);
         }
 
@@ -331,29 +331,36 @@ class Echo {
 class Omega {
     List<LE> list;
     Set<SE> set;
-    Map<K,V> map;
+    Map<K, V> map;
 
     static class LE {
         LERef ref;
     }
+
     static class LERef {
         int i;
     }
+
     static class SE {
         SERef ref;
     }
+
     static class SERef {
         int i;
     }
+
     static class K {
         KRef ref;
     }
+
     static class KRef {
         int i;
     }
+
     static class V {
         VRef ref;
     }
+
     static class VRef {
         int i;
     }

@@ -20,17 +20,17 @@ import com.netflix.hollow.api.objects.HollowRecord;
 import java.util.Iterator;
 
 class GenericHollowIterable<T extends HollowRecord> implements Iterable<T> {
-    
+
     private final Iterable<HollowRecord> wrappedIterable;
-    
+
     GenericHollowIterable(Iterable<HollowRecord> wrap) {
         this.wrappedIterable = wrap;
     }
-    
+
     @Override
     public Iterator<T> iterator() {
         final Iterator<HollowRecord> iter = wrappedIterable.iterator();
-        
+
         return new Iterator<T>() {
             @Override
             public boolean hasNext() {
@@ -42,7 +42,7 @@ class GenericHollowIterable<T extends HollowRecord> implements Iterable<T> {
             public T next() {
                 return (T) iter.next();
             }
-            
+
             @Override
             public void remove() {
                 throw new UnsupportedOperationException();

@@ -15,6 +15,7 @@
  *
  */
 package com.netflix.hollow.jsonadapter;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
 
 
 public abstract class AbstractHollowJsonAdaptorTask {
@@ -49,7 +49,7 @@ public abstract class AbstractHollowJsonAdaptorTask {
     public AbstractHollowJsonAdaptorTask(String typeName, String actionName) {
         this.typeName = typeName;
         this.actionName = actionName;
-        this.fieldProcessors = new HashMap<String, Map<String,FieldProcessor>>();
+        this.fieldProcessors = new HashMap<String, Map<String, FieldProcessor>>();
     }
 
     public String getTypeName() {
@@ -57,7 +57,7 @@ public abstract class AbstractHollowJsonAdaptorTask {
     }
 
     public void addFieldProcessor(FieldProcessor... processors) {
-        for (FieldProcessor p : processors) {
+        for(FieldProcessor p : processors) {
             Map<String, FieldProcessor> entityFieldProcessors = fieldProcessors.get(p.getEntityName());
             if(entityFieldProcessors == null) {
                 entityFieldProcessors = new HashMap<String, FieldProcessor>();
@@ -97,7 +97,7 @@ public abstract class AbstractHollowJsonAdaptorTask {
                         JsonFactory factory = new JsonFactory();
                         JsonParser parser = factory.createParser(currentObject);
                         processRecord(parser);
-                    } catch(Exception e){
+                    } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -120,7 +120,7 @@ public abstract class AbstractHollowJsonAdaptorTask {
 
     protected boolean wait(List<Future<?>> futureList) throws Exception {
         boolean isSuccess = false;
-        for (final Future<?> f : futureList) {
+        for(final Future<?> f : futureList) {
             try {
                 f.get();
                 isSuccess = true;

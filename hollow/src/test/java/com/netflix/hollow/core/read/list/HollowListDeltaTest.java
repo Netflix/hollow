@@ -109,13 +109,14 @@ public class HollowListDeltaTest extends AbstractStateEngineTest {
         try {
             assertList(typeState, 0, 0);
             Assert.fail("Should have thrown Exception");
-        } catch(NullPointerException expected) { }
+        } catch (NullPointerException expected) {
+        }
     }
 
     private void addRecord(int... ordinals) {
         HollowListWriteRecord rec = new HollowListWriteRecord();
 
-        for(int i=0;i<ordinals.length;i++) {
+        for(int i = 0; i < ordinals.length; i++) {
             rec.addElement(ordinals[i]);
         }
 
@@ -125,7 +126,7 @@ public class HollowListDeltaTest extends AbstractStateEngineTest {
     private void assertList(HollowListTypeReadState readState, int ordinal, int... elements) {
         HollowOrdinalIterator iter = readState.ordinalIterator(ordinal);
 
-        for(int i=0;i<elements.length;i++) {
+        for(int i = 0; i < elements.length; i++) {
             Assert.assertEquals(elements[i], iter.next());
         }
 

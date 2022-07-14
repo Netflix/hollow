@@ -28,21 +28,21 @@ import java.util.Map;
  * Not intended for external consumption.
  */
 public class PartialOrdinalRemapper implements OrdinalRemapper {
-    
+
     private final Map<String, IntMap> ordinalMappings;
-    
+
     public PartialOrdinalRemapper() {
         this.ordinalMappings = new HashMap<String, IntMap>();
     }
-    
+
     public void addOrdinalRemapping(String typeName, IntMap mapping) {
         ordinalMappings.put(typeName, mapping);
     }
-    
+
     public IntMap getOrdinalRemapping(String typeName) {
         return ordinalMappings.get(typeName);
     }
-    
+
     @Override
     public int getMappedOrdinal(String type, int originalOrdinal) {
         IntMap mapping = ordinalMappings.get(type);
@@ -58,7 +58,7 @@ public class PartialOrdinalRemapper implements OrdinalRemapper {
     public boolean ordinalIsMapped(String type, int originalOrdinal) {
         return true;
     }
-    
+
     @Override
     public void remapOrdinal(String type, int originalOrdinal, int mappedOrdinal) {
         throw new UnsupportedOperationException("Cannot explicitly remap an ordinal in an IntMapOrdinalRemapper");

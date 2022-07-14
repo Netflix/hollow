@@ -53,13 +53,13 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
     protected void genFindMatchAPI(StringBuilder builder) {
         List<String> params = new ArrayList<>();
         List<String> fieldNames = new ArrayList<>();
-        for (int i = 0; i < pk.numFields(); i++) {
+        for(int i = 0; i < pk.numFields(); i++) {
             String fp = pk.getFieldPath(i);
             String fn = HollowCodeGenerationUtils.normalizeFieldPathToParamName(fp);
             fieldNames.add(fn);
 
             FieldType ft = pk.getFieldType(dataset, i);
-            if (FieldType.REFERENCE.equals(ft)) {
+            if(FieldType.REFERENCE.equals(ft)) {
                 HollowObjectSchema refSchema = pk.getFieldSchema(dataset, i);
                 params.add(refSchema.getName() + " " + fn);
             } else {
@@ -69,8 +69,8 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
 
         StringBuilder paramsAsStr = new StringBuilder();
         StringBuilder fieldNamesAsStr = new StringBuilder();
-        for (int i = 0; i < params.size(); i++) {
-            if (i > 0) {
+        for(int i = 0; i < params.size(); i++) {
+            if(i > 0) {
                 paramsAsStr.append(", ");
                 fieldNamesAsStr.append(", ");
             }
@@ -92,14 +92,14 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
 
         builder.append(" * @deprecated see {@link com.netflix.hollow.api.consumer.index.UniqueKeyIndex} which can be created as follows:\n");
         builder.append(" * <pre>{@code\n");
-        if (pk.numFields() > 1) {
+        if(pk.numFields() > 1) {
             builder.append(String.format(" *     UniqueKeyIndex<%s, %1$s.Key> uki = %1$s.uniqueIndex(consumer);\n", typeName));
             builder.append(String.format(" *     %s.Key k = new %1$s.Key(...);\n", typeName));
             builder.append(String.format(" *     %s m = uki.findMatch(k);\n", typeName));
         } else {
             FieldType ft = pk.getFieldType(dataset, 0);
             String keyName;
-            if (FieldType.REFERENCE.equals(ft)) {
+            if(FieldType.REFERENCE.equals(ft)) {
                 HollowObjectSchema refSchema = pk.getFieldSchema(dataset, 0);
                 keyName = hollowImplClassname(refSchema.getName());
             } else {

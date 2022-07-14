@@ -31,12 +31,12 @@ public class HollowListCopier extends HollowRecordCopier {
     public HollowWriteRecord copy(int ordinal) {
         HollowListWriteRecord rec = rec();
         rec.reset();
-        
+
         String elementType = readState().getSchema().getElementType();
 
         int size = readState().size(ordinal);
 
-        for(int i=0;i<size;i++) {
+        for(int i = 0; i < size; i++) {
             int elementOrdinal = readState().getElementOrdinal(ordinal, i);
             int remappedElementOrdinal = ordinalRemapper.getMappedOrdinal(elementType, elementOrdinal);
             rec.addElement(remappedElementOrdinal);
@@ -46,10 +46,10 @@ public class HollowListCopier extends HollowRecordCopier {
     }
 
     private HollowListTypeReadState readState() {
-        return (HollowListTypeReadState)readTypeState;
+        return (HollowListTypeReadState) readTypeState;
     }
-    
+
     private HollowListWriteRecord rec() {
-        return (HollowListWriteRecord)writeRecord;
+        return (HollowListWriteRecord) writeRecord;
     }
 }

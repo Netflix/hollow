@@ -83,7 +83,7 @@ public class UniqueKeyUpdatesTest {
                     new DataModel.Producer.SubTypeOfTypeWithPrimaryKey("1", 1),
                     new DataModel.Producer.SubTypeOfTypeWithPrimaryKey("2", 2)));
         });
-        if (doubleSnapshot) {
+        if(doubleSnapshot) {
             consumer.forceDoubleSnapshotNextUpdate();
         }
         consumer.triggerRefreshTo(v2);
@@ -109,7 +109,7 @@ public class UniqueKeyUpdatesTest {
                     new DataModel.Producer.SubTypeOfTypeWithPrimaryKey("1", 1),
                     new DataModel.Producer.SubTypeOfTypeWithPrimaryKey("2", 2)));
         });
-        if (doubleSnapshot) {
+        if(doubleSnapshot) {
             consumer.forceDoubleSnapshotNextUpdate();
         }
         consumer.triggerRefreshTo(v3);

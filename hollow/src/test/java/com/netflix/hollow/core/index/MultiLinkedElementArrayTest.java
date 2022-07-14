@@ -26,49 +26,49 @@ public class MultiLinkedElementArrayTest {
     @Test
     public void testIterators() {
         MultiLinkedElementArray arr = new MultiLinkedElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER);
-        
+
         Assert.assertEquals(0, arr.newList());
-        
+
         arr.add(0, 100);
         arr.add(0, 200);
         arr.add(0, 300);
-        
+
         Assert.assertEquals(1, arr.newList());
-        
+
         arr.add(1, 101);
-        
+
         Assert.assertEquals(2, arr.newList());
-        
+
         arr.add(2, 102);
-        
+
         Assert.assertEquals(3, arr.newList());
-        
+
         arr.add(0, 400);
         arr.add(0, 500);
-        
+
         arr.add(2, 202);
-        
+
         arr.add(3, 103);
         arr.add(3, 203);
         arr.add(3, 303);
-        
+
         Assert.assertEquals(4, arr.newList());
-        
+
         arr.add(4, 0);
-        
+
         Assert.assertEquals(5, arr.newList());
-        
+
         arr.add(5, 0);
         arr.add(5, 0);
-        
+
         Assert.assertEquals(6, arr.newList());
-        
+
         arr.add(6, 0);
         arr.add(6, 0);
         arr.add(6, 0);
 
         arr.add(0, 600);
-        
+
         assertIteratorContents(arr.iterator(0), 600, 500, 400, 300, 200, 100);
         assertIteratorContents(arr.iterator(1), 101);
         assertIteratorContents(arr.iterator(2), 202, 102);
@@ -77,12 +77,12 @@ public class MultiLinkedElementArrayTest {
         assertIteratorContents(arr.iterator(5), 0, 0);
         assertIteratorContents(arr.iterator(6), 0, 0, 0);
     }
-    
+
     private void assertIteratorContents(HollowOrdinalIterator iter, int... expectedOrdinals) {
-        for(int i=0;i<expectedOrdinals.length;i++) {
+        for(int i = 0; i < expectedOrdinals.length; i++) {
             Assert.assertEquals(expectedOrdinals[i], iter.next());
         }
-        
+
         Assert.assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iter.next());
     }
 

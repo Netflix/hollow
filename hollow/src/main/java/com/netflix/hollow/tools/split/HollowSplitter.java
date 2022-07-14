@@ -39,7 +39,7 @@ public class HollowSplitter {
 
         List<HollowSchema> schemas = inputStateEngine.getSchemas();
 
-        for(int i=0;i<director.getNumShards();i++)
+        for(int i = 0; i < director.getNumShards(); i++)
             outputStateEngines[i] = HollowWriteStateCreator.createWithSchemas(schemas);
     }
 
@@ -48,7 +48,7 @@ public class HollowSplitter {
 
         SimultaneousExecutor executor = new SimultaneousExecutor(getNumberOfShards(), getClass(), "split");
 
-        for(int i=0;i<getNumberOfShards();i++) {
+        for(int i = 0; i < getNumberOfShards(); i++) {
             final int shardNumber = i;
 
             executor.execute(new Runnable() {
@@ -61,7 +61,7 @@ public class HollowSplitter {
 
         try {
             executor.awaitSuccessfulCompletion();
-        } catch(Throwable th) {
+        } catch (Throwable th) {
             throw new RuntimeException(th);
         }
     }
@@ -79,10 +79,9 @@ public class HollowSplitter {
     }
 
     private void prepareForNextCycle() {
-        for(int i=0;i<outputStateEngines.length;i++)
+        for(int i = 0; i < outputStateEngines.length; i++)
             outputStateEngines[i].prepareForNextCycle();
     }
-
 
 
 }

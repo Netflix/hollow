@@ -62,9 +62,9 @@ public class SegmentedByteArray implements VariableLengthData {
      * @param value the byte value
      */
     public void set(long index, byte value) {
-        int segmentIndex = (int)(index >> log2OfSegmentSize);
+        int segmentIndex = (int) (index >> log2OfSegmentSize);
         ensureCapacity(segmentIndex);
-        segments[segmentIndex][(int)(index & bitmask)] = value;
+        segments[segmentIndex][(int) (index & bitmask)] = value;
     }
 
     /**
@@ -74,12 +74,12 @@ public class SegmentedByteArray implements VariableLengthData {
      */
     @Override
     public byte get(long index) {
-        return segments[(int)(index >>> log2OfSegmentSize)][(int)(index & bitmask)];
+        return segments[(int) (index >>> log2OfSegmentSize)][(int) (index & bitmask)];
     }
 
     @Override
     public void copy(ByteData src, long srcPos, long destPos, long length) {
-        for(long i=0;i<length;i++) {
+        for(long i = 0; i < length; i++) {
             set(destPos++, src.get(srcPos++));
         }
     }
@@ -94,8 +94,8 @@ public class SegmentedByteArray implements VariableLengthData {
      */
     public void copy(SegmentedByteArray src, long srcPos, long destPos, long length) {
         int segmentLength = 1 << log2OfSegmentSize;
-        int currentSegment = (int)(destPos >>> log2OfSegmentSize);
-        int segmentStartPos = (int)(destPos & bitmask);
+        int currentSegment = (int) (destPos >>> log2OfSegmentSize);
+        int segmentStartPos = (int) (destPos & bitmask);
         int remainingBytesInSegment = segmentLength - segmentStartPos;
 
         while(length > 0) {
@@ -122,25 +122,25 @@ public class SegmentedByteArray implements VariableLengthData {
      */
     public int copy(long srcPos, byte[] data, int destPos, int length) {
         int segmentSize = 1 << log2OfSegmentSize;
-        int remainingBytesInSegment = (int)(segmentSize - (srcPos & bitmask));
+        int remainingBytesInSegment = (int) (segmentSize - (srcPos & bitmask));
         int dataPosition = destPos;
 
         while(length > 0) {
-            byte[] segment = segments[(int)(srcPos >>> log2OfSegmentSize)];
+            byte[] segment = segments[(int) (srcPos >>> log2OfSegmentSize)];
 
             int bytesToCopyFromSegment = Math.min(remainingBytesInSegment, length);
 
-            System.arraycopy(segment, (int)(srcPos & bitmask), data, dataPosition, bytesToCopyFromSegment);
+            System.arraycopy(segment, (int) (srcPos & bitmask), data, dataPosition, bytesToCopyFromSegment);
 
             dataPosition += bytesToCopyFromSegment;
             srcPos += bytesToCopyFromSegment;
-            remainingBytesInSegment = segmentSize - (int)(srcPos & bitmask);
+            remainingBytesInSegment = segmentSize - (int) (srcPos & bitmask);
             length -= bytesToCopyFromSegment;
         }
 
         return dataPosition - destPos;
     }
-    
+
     /**
      * checks equality for a specified range of bytes in two arrays
      * 
@@ -151,17 +151,17 @@ public class SegmentedByteArray implements VariableLengthData {
      * @return
      */
     public boolean rangeEquals(long rangeStart, SegmentedByteArray compareTo, long cmpStart, int length) {
-    	for(int i=0;i<length;i++)
-    		if(get(rangeStart + i) != compareTo.get(cmpStart + i))
-    			return false;
-    	return true;
+        for(int i = 0; i < length; i++)
+            if(get(rangeStart + i) != compareTo.get(cmpStart + i))
+                return false;
+        return true;
     }
 
     @Override
     public void orderedCopy(VariableLengthData src, long srcPos, long destPos, long length) {
         int segmentLength = 1 << log2OfSegmentSize;
-        int currentSegment = (int)(destPos >>> log2OfSegmentSize);
-        int segmentStartPos = (int)(destPos & bitmask);
+        int currentSegment = (int) (destPos >>> log2OfSegmentSize);
+        int segmentStartPos = (int) (destPos & bitmask);
         int remainingBytesInSegment = segmentLength - segmentStartPos;
 
         while(length > 0) {
@@ -190,19 +190,19 @@ public class SegmentedByteArray implements VariableLengthData {
      */
     private int orderedCopy(long srcPos, byte[] data, int destPos, int length) {
         int segmentSize = 1 << log2OfSegmentSize;
-        int remainingBytesInSegment = (int)(segmentSize - (srcPos & bitmask));
+        int remainingBytesInSegment = (int) (segmentSize - (srcPos & bitmask));
         int dataPosition = destPos;
 
         while(length > 0) {
-            byte[] segment = segments[(int)(srcPos >>> log2OfSegmentSize)];
+            byte[] segment = segments[(int) (srcPos >>> log2OfSegmentSize)];
 
             int bytesToCopyFromSegment = Math.min(remainingBytesInSegment, length);
 
-            orderedCopy(segment, (int)(srcPos & bitmask), data, dataPosition, bytesToCopyFromSegment);
+            orderedCopy(segment, (int) (srcPos & bitmask), data, dataPosition, bytesToCopyFromSegment);
 
             dataPosition += bytesToCopyFromSegment;
             srcPos += bytesToCopyFromSegment;
-            remainingBytesInSegment = segmentSize - (int)(srcPos & bitmask);
+            remainingBytesInSegment = segmentSize - (int) (srcPos & bitmask);
             length -= bytesToCopyFromSegment;
         }
 
@@ -221,9 +221,9 @@ public class SegmentedByteArray implements VariableLengthData {
             long bytesToCopy = Math.min(segmentSize, length);
             long bytesCopied = 0;
             while(bytesCopied < bytesToCopy) {
-                bytesCopied += is.read(scratch, (int)bytesCopied, (int)(bytesToCopy - bytesCopied));
+                bytesCopied += is.read(scratch, (int) bytesCopied, (int) (bytesToCopy - bytesCopied));
             }
-            orderedCopy(scratch, 0, segments[segment++], 0, (int)bytesCopied);
+            orderedCopy(scratch, 0, segments[segment++], 0, (int) bytesCopied);
             length -= bytesCopied;
         }
     }
@@ -238,16 +238,16 @@ public class SegmentedByteArray implements VariableLengthData {
      */
     public void writeTo(OutputStream os, long startPosition, long len) throws IOException {
         int segmentSize = 1 << log2OfSegmentSize;
-        int remainingBytesInSegment = segmentSize - (int)(startPosition & bitmask);
+        int remainingBytesInSegment = segmentSize - (int) (startPosition & bitmask);
         long remainingBytesInCopy = len;
 
         while(remainingBytesInCopy > 0) {
             long bytesToCopyFromSegment = Math.min(remainingBytesInSegment, remainingBytesInCopy);
 
-            os.write(segments[(int)(startPosition >>> log2OfSegmentSize)], (int)(startPosition & bitmask), (int)bytesToCopyFromSegment);
+            os.write(segments[(int) (startPosition >>> log2OfSegmentSize)], (int) (startPosition & bitmask), (int) bytesToCopyFromSegment);
 
             startPosition += bytesToCopyFromSegment;
-            remainingBytesInSegment = segmentSize - (int)(startPosition & bitmask);
+            remainingBytesInSegment = segmentSize - (int) (startPosition & bitmask);
             remainingBytesInCopy -= bytesToCopyFromSegment;
         }
     }
@@ -277,7 +277,7 @@ public class SegmentedByteArray implements VariableLengthData {
     }
 
     public void destroy() {
-        for(int i=0;i<segments.length;i++) {
+        for(int i = 0; i < segments.length; i++) {
             if(segments[i] != null)
                 memoryRecycler.recycleByteArray(segments[i]);
         }
@@ -286,7 +286,7 @@ public class SegmentedByteArray implements VariableLengthData {
     @Override
     public long size() {
         long size = 0;
-        for(int i=0;i<segments.length;i++) {
+        for(int i = 0; i < segments.length; i++) {
             if(segments[i] != null)
                 size += segments[i].length;
         }

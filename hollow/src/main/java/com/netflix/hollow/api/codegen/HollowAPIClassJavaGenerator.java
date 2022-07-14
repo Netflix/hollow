@@ -102,11 +102,11 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
         builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class ").append(className).append(" extends HollowAPI ");
         Set<String> primitiveTypes = HollowCodeGenerationUtils.getPrimitiveTypes(schemaList); // Implement Primitive Type Retriever(s)
-        if (config.isUseHollowPrimitiveTypes() && !primitiveTypes.isEmpty()) {
+        if(config.isUseHollowPrimitiveTypes() && !primitiveTypes.isEmpty()) {
             builder.append("implements ");
             int itemCount = 0;
             for(String pType : primitiveTypes) {
-                if (itemCount++ > 0) builder.append(",");
+                if(itemCount++ > 0) builder.append(",");
 
                 builder.append(" HollowConsumerAPI.").append(HollowCodeGenerationUtils.upperFirstChar(pType)).append("Retriever");
             }
@@ -115,7 +115,7 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
 
         builder.append("    private final HollowObjectCreationSampler objectCreationSampler;\n\n");
 
-        for (HollowSchema schema : schemaList) {
+        for(HollowSchema schema : schemaList) {
             builder.append("    private final " + typeAPIClassname(schema.getName())).append(" ").append(lowercase(typeAPIClassname(schema.getName()))).append(";\n");
         }
 
@@ -145,14 +145,14 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
         builder.append("        HollowTypeDataAccess typeDataAccess;\n");
         builder.append("        HollowFactory factory;\n\n");
         builder.append("        objectCreationSampler = new HollowObjectCreationSampler(");
-        for(int i=0;i<schemaList.size();i++) {
+        for(int i = 0; i < schemaList.size(); i++) {
             builder.append("\"").append(schemaList.get(i).getName()).append("\"");
             if(i < schemaList.size() - 1)
                 builder.append(",");
         }
         builder.append(");\n\n");
 
-        for (HollowSchema schema : schemaList) {
+        for(HollowSchema schema : schemaList) {
             builder.append("        typeDataAccess = dataAccess.getTypeDataAccess(\"").append(schema.getName()).append("\");\n");
             builder.append("        if(typeDataAccess != null) {\n");
             builder.append("            ").append(lowercase(typeAPIClassname(schema.getName()))).append(" = new ").append(typeAPIClassname(schema.getName())).append("(this, (Hollow").append(schemaType(schema)).append("TypeDataAccess)typeDataAccess);\n");
@@ -184,13 +184,13 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
         builder.append("    }\n\n");
 
 
-        for (HollowSchema schema : schemaList) {
+        for(HollowSchema schema : schemaList) {
             builder.append("    public ").append(typeAPIClassname(schema.getName())).append(" get" + typeAPIClassname(schema.getName())).append("() {\n");
             builder.append("        return ").append(lowercase(typeAPIClassname(schema.getName()))).append(";\n");
             builder.append("    }\n");
         }
 
-        for(int i=0;i<schemaList.size();i++) {
+        for(int i = 0; i < schemaList.size(); i++) {
             HollowSchema schema = schemaList.get(i);
             if(parameterizeClassNames) {
                 builder.append("    public <T> Collection<T> getAll").append(hollowImplClassname(schema.getName())).append("() {\n");
@@ -209,10 +209,10 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
             } else {
                 String hollowImplClassname = hollowImplClassname(schema.getName());
 
-                builder.append("    public Collection<"+hollowImplClassname+"> getAll").append(hollowImplClassname).append("() {\n");
+                builder.append("    public Collection<" + hollowImplClassname + "> getAll").append(hollowImplClassname).append("() {\n");
                 builder.append("        HollowTypeDataAccess tda = Objects.requireNonNull(getDataAccess().getTypeDataAccess(\"").append(schema.getName()).append("\"), \"type not loaded or does not exist in dataset; type=").append(schema.getName()).append("\");\n");
-                builder.append("        return new AllHollowRecordCollection<"+hollowImplClassname+">(tda.getTypeState()) {\n");
-                builder.append("            protected "+hollowImplClassname+" getForOrdinal(int ordinal) {\n");
+                builder.append("        return new AllHollowRecordCollection<" + hollowImplClassname + ">(tda.getTypeState()) {\n");
+                builder.append("            protected " + hollowImplClassname + " getForOrdinal(int ordinal) {\n");
                 builder.append("                return get").append(hollowImplClassname).append("(ordinal);\n");
                 builder.append("            }\n");
                 builder.append("        };\n");
@@ -241,16 +241,16 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
 
     private String schemaType(HollowSchema schema) {
         switch(schema.getSchemaType()) {
-        case OBJECT:
-            return "Object";
-        case LIST:
-            return "List";
-        case SET:
-            return "Set";
-        case MAP:
-            return "Map";
-        default:
-            throw new IllegalArgumentException();
+            case OBJECT:
+                return "Object";
+            case LIST:
+                return "List";
+            case SET:
+                return "Set";
+            case MAP:
+                return "Map";
+            default:
+                throw new IllegalArgumentException();
         }
     }
 

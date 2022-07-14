@@ -32,6 +32,7 @@ public class TypeC {
     public char getC1() {
         return c1;
     }
+
     public Map<String, List<Integer>> getMap() {
         return map;
     }

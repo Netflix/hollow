@@ -65,7 +65,7 @@ public class FieldStatistics {
     }
 
     public void completeCalculations() {
-        for(int i=0;i<schema.numFields();i++) {
+        for(int i = 0; i < schema.numFields(); i++) {
             if(schema.getFieldType(i) == FieldType.STRING || schema.getFieldType(i) == FieldType.BYTES) {
                 maxBitsForField[i] = bitsRequiredForRepresentation(totalSizeOfVarLengthField[i]) + 1; // one extra bit for null.
             }
@@ -76,10 +76,10 @@ public class FieldStatistics {
             numBitsPerRecord += maxBitsForField[i];
         }
     }
-    
+
     public long getTotalSizeOfAllVarLengthData() {
         long totalVarLengthDataSize = 0;
-        for(int i=0;i<totalSizeOfVarLengthField.length;i++) 
+        for(int i = 0; i < totalSizeOfVarLengthField.length; i++)
             totalVarLengthDataSize += totalSizeOfVarLengthField[i];
         return totalVarLengthDataSize;
     }

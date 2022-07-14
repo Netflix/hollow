@@ -26,8 +26,8 @@ public class StringTypeAPI extends HollowObjectTypeAPI {
     private final StringDelegateLookupImpl delegateLookupImpl;
 
     public StringTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
-        super(api, typeDataAccess, new String[] {
-            "value"
+        super(api, typeDataAccess, new String[]{
+                "value"
         });
         this.delegateLookupImpl = new StringDelegateLookupImpl(this);
     }

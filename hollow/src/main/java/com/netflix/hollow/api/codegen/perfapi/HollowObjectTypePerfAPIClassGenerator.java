@@ -46,7 +46,7 @@ class HollowObjectTypePerfAPIClassGenerator {
         builder.append("public class " + schema.getName() + "PerfAPI extends HollowObjectTypePerfAPI {\n\n");
 
         builder.append("    public static final String fieldNames[] = { ");
-        for(int i=0;i<schema.numFields();i++) {
+        for(int i = 0; i < schema.numFields(); i++) {
             if(i > 0)
                 builder.append(", ");
             builder.append("\"" + schema.getFieldName(i) + "\"");
@@ -58,7 +58,7 @@ class HollowObjectTypePerfAPIClassGenerator {
         builder.append("        super(dataAccess, typeName, api, fieldNames);\n");
         builder.append("    }\n\n");
 
-        for(int i=0;i<schema.numFields();i++) {
+        for(int i = 0; i < schema.numFields(); i++) {
             FieldType fieldType = schema.getFieldType(i);
             String fieldName = schema.getFieldName(i);
             String referencedType = schema.getReferencedType(i);
@@ -76,7 +76,7 @@ class HollowObjectTypePerfAPIClassGenerator {
             type += " (" + referencedType + ")";
 
         builder.append("    /**\n" +
-                "     * <i>"+schema.getName() + "." + fieldName +"</i><br/>\n" +
+                "     * <i>" + schema.getName() + "." + fieldName + "</i><br/>\n" +
                 "     * <b>" + type + "</b>\n" +
                 "     */\n");
 
@@ -158,7 +158,7 @@ class HollowObjectTypePerfAPIClassGenerator {
                 builder.append("    }\n\n");
                 break;
         }
-        
+
         if(checkFieldExistsMethods.contains(schema.getName() + "." + fieldName)) {
             builder.append("    public boolean " + fieldName + "FieldExists() {\n");
             builder.append("        return fieldIdx[" + fieldIdx + "] != -1;\n");

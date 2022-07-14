@@ -28,7 +28,8 @@ public class HollowObjectDisabledDataAccess implements HollowObjectTypeDataAcces
 
     public static final HollowObjectDisabledDataAccess INSTANCE = new HollowObjectDisabledDataAccess();
 
-    private HollowObjectDisabledDataAccess() { }
+    private HollowObjectDisabledDataAccess() {
+    }
 
     @Override
     public HollowDataAccess getDataAccess() {
@@ -44,7 +45,7 @@ public class HollowObjectDisabledDataAccess implements HollowObjectTypeDataAcces
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         throw new IllegalStateException("Data Access is Disabled");
     }
-    
+
     @Override
     public void ignoreUpdateThreadForSampling(Thread t) {
         throw new IllegalStateException("DataAccess is Disabled");

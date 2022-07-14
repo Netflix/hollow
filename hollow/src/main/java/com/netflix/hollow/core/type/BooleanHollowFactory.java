@@ -25,12 +25,12 @@ public class BooleanHollowFactory extends HollowFactory<HBoolean> {
 
     @Override
     public HBoolean newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HBoolean(((BooleanTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return new HBoolean(((BooleanTypeAPI) typeAPI).getDelegateLookupImpl(), ordinal);
     }
 
     @Override
     public HBoolean newCachedHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HBoolean(new BooleanDelegateCachedImpl((BooleanTypeAPI)typeAPI, ordinal), ordinal);
+        return new HBoolean(new BooleanDelegateCachedImpl((BooleanTypeAPI) typeAPI, ordinal), ordinal);
     }
 
 }

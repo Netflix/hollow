@@ -36,7 +36,7 @@ public class HollowPerformanceAPI extends HollowAPI {
 
     public PerfAPITypeIdentifiers getTypeIdentifiers() {
         return types;
-    };
+    }
 
     public static class PerfAPITypeIdentifiers {
         private final String[] typeNames;
@@ -47,7 +47,7 @@ public class HollowPerformanceAPI extends HollowAPI {
 
             this.typeIdxMap = new HashMap<>();
             String[] typeNames = new String[schemas.size()];
-            for (int i = 0; i < schemas.size(); i++) {
+            for(int i = 0; i < schemas.size(); i++) {
                 typeNames[i] = schemas.get(i).getName();
                 typeIdxMap.put(typeNames[i], i);
             }
@@ -57,7 +57,7 @@ public class HollowPerformanceAPI extends HollowAPI {
 
         public int getIdx(String typeName) {
             Integer idx = typeIdxMap.get(typeName);
-            if (idx == null) {
+            if(idx == null) {
                 return Ref.TYPE_ABSENT;
             }
 
@@ -65,7 +65,7 @@ public class HollowPerformanceAPI extends HollowAPI {
         }
 
         public String getTypeName(int idx) {
-            if (idx >= 0 && idx < typeNames.length) {
+            if(idx >= 0 && idx < typeNames.length) {
                 return typeNames[idx];
             }
             return "INVALID (" + idx + ")";

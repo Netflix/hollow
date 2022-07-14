@@ -499,7 +499,7 @@ public interface HollowProducerListener extends
         // This is currently only used to report skipping of a validator
         // with SingleValidationStatusBuilder and SingleValidationStatus
         @Deprecated
-        SKIP;
+                SKIP;
 
         static Status of(com.netflix.hollow.api.producer.Status.StatusType st) {
             return st == com.netflix.hollow.api.producer.Status.StatusType.SUCCESS

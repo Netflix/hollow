@@ -30,52 +30,52 @@ import org.junit.Test;
 public class HollowObjectReverseDeltaVarLengthFieldTest extends AbstractStateEngineTest {
 
 
-	@Test
-	public void test() throws IOException {
-		HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-		
-		mapper.add("one");
-		mapper.add("two");
-		mapper.add("three");
-		mapper.add("four");
-		
-		roundTripSnapshot();
-		
-		mapper.add("one");
-		mapper.add("four");
-		
-		roundTripSnapshot();
-		
-		mapper.add("one");
-		
-		byte reverseDelta1[] = getReverseDelta();
+    @Test
+    public void test() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
-		roundTripDelta();
-		
-		mapper.add("one");
-		mapper.add("two");
-		
-		byte reverseDelta2[] = getReverseDelta();
-		
-		roundTripDelta();
+        mapper.add("one");
+        mapper.add("two");
+        mapper.add("three");
+        mapper.add("four");
 
-		HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-		reader.applyDelta(HollowBlobInput.serial(reverseDelta2));
-		reader.applyDelta(HollowBlobInput.serial(reverseDelta1));
-		
-		Assert.assertEquals("four", ((HollowObjectTypeReadState)readStateEngine.getTypeState("String")).readString(3, 0));
-	}
+        roundTripSnapshot();
 
-	private byte[] getReverseDelta() throws IOException {
-		ByteArrayOutputStream reverseDelta = new ByteArrayOutputStream();
-		HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
-		writer.writeReverseDelta(reverseDelta);
-		return reverseDelta.toByteArray();
-	}
-	
-	@Override
-	protected void initializeTypeStates() {
-		new HollowObjectMapper(writeStateEngine).initializeTypeState(String.class);
-	}
-	
+        mapper.add("one");
+        mapper.add("four");
+
+        roundTripSnapshot();
+
+        mapper.add("one");
+
+        byte reverseDelta1[] = getReverseDelta();
+
+        roundTripDelta();
+
+        mapper.add("one");
+        mapper.add("two");
+
+        byte reverseDelta2[] = getReverseDelta();
+
+        roundTripDelta();
+
+        HollowBlobReader reader = new HollowBlobReader(readStateEngine);
+        reader.applyDelta(HollowBlobInput.serial(reverseDelta2));
+        reader.applyDelta(HollowBlobInput.serial(reverseDelta1));
+
+        Assert.assertEquals("four", ((HollowObjectTypeReadState) readStateEngine.getTypeState("String")).readString(3, 0));
+    }
+
+    private byte[] getReverseDelta() throws IOException {
+        ByteArrayOutputStream reverseDelta = new ByteArrayOutputStream();
+        HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
+        writer.writeReverseDelta(reverseDelta);
+        return reverseDelta.toByteArray();
+    }
+
+    @Override
+    protected void initializeTypeStates() {
+        new HollowObjectMapper(writeStateEngine).initializeTypeState(String.class);
+    }
+
 }

@@ -50,7 +50,7 @@ final class CloseableIncrementalWriteState implements HollowProducer.Incremental
     }
 
     private RecordPrimaryKey getKey(Object o) {
-        if (o instanceof FlatRecord) {
+        if(o instanceof FlatRecord) {
             FlatRecord fr = (FlatRecord) o;
             return fr.getRecordPrimaryKey();
         } else {
@@ -59,13 +59,14 @@ final class CloseableIncrementalWriteState implements HollowProducer.Incremental
     }
 
     private void ensureNotClosed() {
-        if (closed) {
+        if(closed) {
             throw new IllegalStateException(
                     "Write state operated on after the incremental population stage of a cycle");
         }
     }
 
-    @Override public void close() {
+    @Override
+    public void close() {
         closed = true;
     }
 }

@@ -32,6 +32,7 @@ public class CustomProducerBuilderTest {
 
     private static class AugmentedBuilder extends HollowProducer.Builder<AugmentedBuilder> {
         private boolean shouldAugment = false;
+
         AugmentedBuilder withAugmentation() {
             shouldAugment = true;
             return this;
@@ -54,7 +55,8 @@ public class CustomProducerBuilderTest {
                 HollowProducer.Publisher publisher,
                 HollowProducer.Announcer announcer
         ) {
-            super(publisher, announcer);        }
+            super(publisher, announcer);
+        }
 
         @Override
         public String toString() {

@@ -34,7 +34,7 @@ public class HollowDataAccessorAPIGeneratorTest extends AbstractHollowAPIGenerat
                 builder -> builder.withClassPostfix("Generated").withPackageGrouping());
     }
 
-    @HollowPrimaryKey(fields="id")
+    @HollowPrimaryKey(fields = "id")
     static class Movie {
         int id;
 

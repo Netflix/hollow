@@ -24,8 +24,8 @@ import java.util.Map;
 public interface HollowRecordDiffUI {
 
     public Map<String, PrimaryKey> getMatchHints();
-    
+
     public CustomHollowEffigyFactory getCustomHollowEffigyFactory(String typeName);
-    
+
     public ExactRecordMatcher getExactRecordMatcher();
 }

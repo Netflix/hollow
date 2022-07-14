@@ -29,55 +29,55 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class HollowChecksumTest {
-    
+
     HollowReadStateEngine readEngine1;
     HollowReadStateEngine readEngine2;
-    
+
     @Before
     public void setUp() throws IOException {
         HollowObjectSchema schema1 = new HollowObjectSchema("TypeA", 3);
         HollowObjectSchema schema2 = new HollowObjectSchema("TypeA", 3);
-        
+
         schema1.addField("a1", FieldType.INT);
         schema2.addField("a1", FieldType.INT);
         schema1.addField("a4", FieldType.FLOAT);
         schema2.addField("a4", FieldType.FLOAT);
         schema1.addField("a2", FieldType.STRING);
         schema2.addField("a3", FieldType.LONG);
-       
+
         readEngine1 = createStateEngine(schema1);
         readEngine2 = createStateEngine(schema2);
     }
-    
+
     @Test
     public void checksumsCanBeEvaluatedAcrossObjectTypesWithDifferentSchemas() {
         HollowChecksum cksum1 = HollowChecksum.forStateEngineWithCommonSchemas(readEngine1, readEngine2);
         HollowChecksum cksum2 = HollowChecksum.forStateEngineWithCommonSchemas(readEngine2, readEngine1);
-        
+
         Assert.assertEquals(cksum1, cksum2);
     }
 
-    
+
     private HollowReadStateEngine createStateEngine(HollowObjectSchema schema) throws IOException {
         HollowWriteStateEngine writeState = new HollowWriteStateEngine();
         writeState.addTypeState(new HollowObjectTypeWriteState(schema));
-        
+
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
-        
-        for(int i=0;i<100;i++) {
+
+        for(int i = 0; i < 100; i++) {
             rec.reset();
             rec.setInt("a1", i);
-            rec.setFloat("a4", (float)i);
+            rec.setFloat("a4", (float) i);
             if(schema.getPosition("a2") != -1)
                 rec.setString("a2", String.valueOf(i));
             if(schema.getPosition("a3") != -1)
                 rec.setLong("a3", i);
-            
+
             writeState.add(schema.getName(), rec);
         }
-        
+
         return StateEngineRoundTripper.roundTripSnapshot(writeState);
     }
-    
-    
+
+
 }

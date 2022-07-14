@@ -144,6 +144,6 @@ public class ObjectModificationValidatorTest {
             BiPredicate<GenericHollowObject, GenericHollowObject> filter) {
         return new ObjectModificationValidator<>(TypeA.class.getSimpleName(), filter,
                 HollowAPI::new, (api, ordinal) -> new GenericHollowObject(api.getDataAccess(),
-                TypeA.class.getSimpleName(), ordinal));
+                        TypeA.class.getSimpleName(), ordinal));
     }
 }

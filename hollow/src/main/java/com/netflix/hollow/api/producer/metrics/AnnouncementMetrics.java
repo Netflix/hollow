@@ -29,12 +29,15 @@ public class AnnouncementMetrics {
     public long getDataSizeBytes() {
         return dataSizeBytes;
     }
+
     public long getAnnouncementDurationMillis() {
         return announcementDurationMillis;
     }
+
     public boolean getIsAnnouncementSuccess() {
         return isAnnouncementSuccess;
     }
+
     public OptionalLong getLastAnnouncementSuccessTimeNano() {
         return lastAnnouncementSuccessTimeNano;
     }
@@ -60,14 +63,17 @@ public class AnnouncementMetrics {
             this.dataSizeBytes = dataSizeBytes;
             return this;
         }
+
         public Builder setAnnouncementDurationMillis(long announcementDurationMillis) {
             this.announcementDurationMillis = announcementDurationMillis;
             return this;
         }
+
         public Builder setIsAnnouncementSuccess(boolean isAnnouncementSuccess) {
             this.isAnnouncementSuccess = isAnnouncementSuccess;
             return this;
         }
+
         public Builder setLastAnnouncementSuccessTimeNano(long lastAnnouncementSuccessTimeNano) {
             this.lastAnnouncementSuccessTimeNano = OptionalLong.of(lastAnnouncementSuccessTimeNano);
             return this;

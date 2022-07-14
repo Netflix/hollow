@@ -109,15 +109,15 @@ public class ThreadSafeBitSetTest {
     @Test
     public void testBasicAPIs() {
         ThreadSafeBitSet tsbSet = new ThreadSafeBitSet();
-        int[] ordinals = new int[] { 1, 5, 10 };
+        int[] ordinals = new int[]{1, 5, 10};
 
         // init
-        for (int ordinal : ordinals) {
+        for(int ordinal : ordinals) {
             tsbSet.set(ordinal);
         }
 
         // validate content
-        for (int ordinal : ordinals) {
+        for(int ordinal : ordinals) {
             Assert.assertTrue(tsbSet.get(ordinal));
         }
         Assert.assertEquals(ordinals.length, tsbSet.cardinality());
@@ -131,16 +131,16 @@ public class ThreadSafeBitSetTest {
     public void testToBitSet() {
         BitSet bSet = new BitSet();
         ThreadSafeBitSet tsbSet = new ThreadSafeBitSet();
-        int[] ordinals = new int[] { 1, 5, 10 };
+        int[] ordinals = new int[]{1, 5, 10};
 
         // init
-        for (int ordinal : ordinals) {
+        for(int ordinal : ordinals) {
             bSet.set(ordinal);
             tsbSet.set(ordinal);
         }
 
         // validate content
-        for (int ordinal : ordinals) {
+        for(int ordinal : ordinals) {
             Assert.assertEquals(bSet.get(ordinal), tsbSet.get(ordinal));
         }
         Assert.assertEquals(bSet.cardinality(), tsbSet.cardinality());
@@ -158,11 +158,11 @@ public class ThreadSafeBitSetTest {
         BitSet bSet = new BitSet();
 
         ThreadSafeBitSet[] tsbSets = new ThreadSafeBitSet[3];
-        int[] ordinals = new int[] { 1, 5, 10 };
+        int[] ordinals = new int[]{1, 5, 10};
 
         // init
         int i = 0;
-        for (int ordinal : ordinals) {
+        for(int ordinal : ordinals) {
             tsbSets[i] = new ThreadSafeBitSet();
             tsbSets[i].set(ordinal);
             i++;
@@ -180,7 +180,7 @@ public class ThreadSafeBitSetTest {
     public void testAndNot() {
         ThreadSafeBitSet tsbSet1 = new ThreadSafeBitSet();
         ThreadSafeBitSet tsbSet2 = new ThreadSafeBitSet();
-        for (int i = 0; i < 3; i++) {
+        for(int i = 0; i < 3; i++) {
             tsbSet1.set(i);
             tsbSet2.set(i * 2);
         }
@@ -190,8 +190,8 @@ public class ThreadSafeBitSetTest {
         ThreadSafeBitSet andNot_tsbSet = new ThreadSafeBitSet();
 
         int ordinal = tsbSet1.nextSetBit(0);
-        while (ordinal != -1) {
-            if (!tsbSet2.get(ordinal)) {
+        while(ordinal != -1) {
+            if(!tsbSet2.get(ordinal)) {
                 andNot_bSet.set(ordinal);
                 andNot_tsbSet.set(ordinal);
             }

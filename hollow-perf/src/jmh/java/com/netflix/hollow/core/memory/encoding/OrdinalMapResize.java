@@ -37,9 +37,9 @@ public class OrdinalMapResize {
         SplittableRandom r = new SplittableRandom(0);
 
         content = new ByteDataArray[n];
-        for (int i = 0; i < n; i++) {
+        for(int i = 0; i < n; i++) {
             ByteDataArray buf = new ByteDataArray();
-            for (int j = 0; j < contentSize; j++) {
+            for(int j = 0; j < contentSize; j++) {
                 buf.write((byte) r.nextInt(0, 256));
             }
             content[i] = buf;
@@ -49,7 +49,7 @@ public class OrdinalMapResize {
     @Benchmark
     public ByteArrayOrdinalMap defaultGet() {
         ByteArrayOrdinalMap map = new ByteArrayOrdinalMap();
-        for (int i = 0; i < n; i++) {
+        for(int i = 0; i < n; i++) {
             map.getOrAssignOrdinal(content[i]);
         }
         return map;
@@ -58,7 +58,7 @@ public class OrdinalMapResize {
     @Benchmark
     public ByteArrayOrdinalMap sizedGet() {
         ByteArrayOrdinalMap map = new ByteArrayOrdinalMap(n << 1);
-        for (int i = 0; i < n; i++) {
+        for(int i = 0; i < n; i++) {
             map.getOrAssignOrdinal(content[i]);
         }
         return map;

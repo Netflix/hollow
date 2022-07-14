@@ -37,7 +37,7 @@ final class ReadStateHelper {
     static ReadStateHelper restored(ReadState state) {
         return new ReadStateHelper(state, null);
     }
-    
+
     static ReadState newReadState(final long version, final HollowReadStateEngine stateEngine) {
         return new HollowProducer.ReadState() {
             @Override

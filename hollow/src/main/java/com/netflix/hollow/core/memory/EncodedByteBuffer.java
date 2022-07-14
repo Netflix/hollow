@@ -34,7 +34,7 @@ public class EncodedByteBuffer implements VariableLengthData {
 
     @Override
     public byte get(long index) {
-        if (index >= this.size) {
+        if(index >= this.size) {
             throw new IllegalStateException();
         }
 

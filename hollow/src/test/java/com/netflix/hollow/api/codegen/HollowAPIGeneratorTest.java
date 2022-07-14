@@ -28,7 +28,7 @@ public class HollowAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
     public void testGenerateWithPostfixAndPrimitiveTypes() throws Exception {
         runGenerator("MyClassTestAPI", "codegen.api", MyClass.class,
                 builder -> builder.withClassPostfix("Generated").withPackageGrouping()
-                .withHollowPrimitiveTypes(true));
+                        .withHollowPrimitiveTypes(true));
         assertFileDoesNotExist("codegen/api/core/StringGenerated.java");
         assertFileDoesNotExist("codegen/api/StringGenerated.java");
     }
@@ -37,7 +37,7 @@ public class HollowAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
     public void testGenerateWithPostfixAndAggressiveSubstitutions() throws Exception {
         runGenerator("MyClassTestAPI", "codegen.api", MyClass.class,
                 builder -> builder.withClassPostfix("Generated").withPackageGrouping()
-                .withHollowPrimitiveTypes(true).withAggressiveSubstitutions(true));
+                        .withHollowPrimitiveTypes(true).withAggressiveSubstitutions(true));
         assertFileDoesNotExist("codegen/api/core/StringGenerated.java");
         assertFileDoesNotExist("codegen/api/StringGenerated.java");
     }

@@ -20,11 +20,12 @@ import com.netflix.hollow.ui.jetty.AbstractOptionalDependencyHelper;
 
 final class OptionalDependencyHelper extends AbstractOptionalDependencyHelper {
     HollowHistoryUIServer.UIServer.Factory historyUIServerFactory() {
-        return (HollowHistoryUIServer.UIServer.Factory)newFactory(
+        return (HollowHistoryUIServer.UIServer.Factory) newFactory(
                 "com.netflix.hollow.history.ui.jetty.JettyBasedUIServer$Factory",
                 "org.eclipse.jetty.server.Server",
                 "please add jetty-server (org.eclipse.jetty:jetty-server) to your dependencies");
     }
 
-    OptionalDependencyHelper() {}
+    OptionalDependencyHelper() {
+    }
 }

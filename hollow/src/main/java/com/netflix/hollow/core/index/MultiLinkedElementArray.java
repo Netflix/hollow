@@ -42,7 +42,7 @@ public class MultiLinkedElementArray {
         long listPtr = listPointersAndSizes.get(listIdx);
 
         if(listPtr == 0) {
-            listPointersAndSizes.set(listIdx, Long.MIN_VALUE | (long)value << 32);
+            listPointersAndSizes.set(listIdx, Long.MIN_VALUE | (long) value << 32);
             return;
         }
 
@@ -54,21 +54,21 @@ public class MultiLinkedElementArray {
         if((listPtr & Long.MIN_VALUE) != 0) {
             linkedElements.set(nextLinkedElement, listPtr);
 
-            long newLink = (long)value << 32 | nextLinkedElement;
+            long newLink = (long) value << 32 | nextLinkedElement;
 
             linkedElements.set(++nextLinkedElement, newLink);
 
-            listPtr = (long)(nextLinkedElement++) << 32 | 3;
+            listPtr = (long) (nextLinkedElement++) << 32 | 3;
             listPointersAndSizes.set(listIdx, listPtr);
         } else {
             long linkedElement = listPtr >> 32;
             long size = listPtr & Integer.MAX_VALUE;
 
-            long newLink = (long)value << 32 | linkedElement;
+            long newLink = (long) value << 32 | linkedElement;
 
             linkedElements.set(nextLinkedElement, newLink);
 
-            listPtr = (long)(nextLinkedElement++) << 32 | (size + 1);
+            listPtr = (long) (nextLinkedElement++) << 32 | (size + 1);
 
             listPointersAndSizes.set(listIdx, listPtr);
         }
@@ -88,7 +88,7 @@ public class MultiLinkedElementArray {
             return 0;
         if((listPtr & Long.MIN_VALUE) != 0)
             return (listPtr & 0xFFFFFFFFL) == 0 ? 1 : 2;
-        return (int)(listPtr & Integer.MAX_VALUE);
+        return (int) (listPtr & Integer.MAX_VALUE);
     }
 
     public void destroy() {
@@ -103,7 +103,7 @@ public class MultiLinkedElementArray {
         private boolean finished;
 
         private LinkedElementIterator(int listIdx) {
-            this.currentElement = (int)(listPointersAndSizes.get(listIdx) >> 32);
+            this.currentElement = (int) (listPointersAndSizes.get(listIdx) >> 32);
         }
 
         @Override
@@ -111,17 +111,17 @@ public class MultiLinkedElementArray {
             if(finished)
                 return NO_MORE_ORDINALS;
             if(lastElement) {
-                int value = (int)(linkedElements.get(currentElement) >>> 32) & Integer.MAX_VALUE;
+                int value = (int) (linkedElements.get(currentElement) >>> 32) & Integer.MAX_VALUE;
                 finished = true;
                 return value;
             } else {
                 long element = linkedElements.get(currentElement);
                 if(element < 0) {
                     lastElement = true;
-                    return (int)element & Integer.MAX_VALUE;
+                    return (int) element & Integer.MAX_VALUE;
                 } else {
-                    currentElement = (int)element;
-                    return (int)(element >> 32);
+                    currentElement = (int) element;
+                    return (int) (element >> 32);
                 }
             }
         }
@@ -145,12 +145,12 @@ public class MultiLinkedElementArray {
 
             if(currentElement++ == 0) {
                 if((element & 0xFFFFFFFFL) != 0)
-                    return (int)element & Integer.MAX_VALUE;
+                    return (int) element & Integer.MAX_VALUE;
             }
 
             currentElement++;
 
-            return (int)(element >>> 32) & Integer.MAX_VALUE;
+            return (int) (element >>> 32) & Integer.MAX_VALUE;
         }
 
     }

@@ -72,23 +72,26 @@ public abstract class HollowMap<K, V> extends AbstractMap<K, V> implements Hollo
     public final boolean containsValue(Object value) {
         return delegate.containsValue(this, ordinal, value);
     }
-    
+
     public final K findKey(Object... hashKey) {
         return delegate.findKey(this, ordinal, hashKey);
     }
-    
+
     public final V findValue(Object... hashKey) {
         return delegate.findValue(this, ordinal, hashKey);
     }
-    
+
     public final Map.Entry<K, V> findEntry(Object... hashKey) {
         return delegate.findEntry(this, ordinal, hashKey);
     }
-    
+
 
     public abstract K instantiateKey(int keyOrdinal);
+
     public abstract V instantiateValue(int valueOrdinal);
+
     public abstract boolean equalsKey(int keyOrdinal, Object testObject);
+
     public abstract boolean equalsValue(int valueOrdinal, Object testObject);
 
     @Override
@@ -110,14 +113,14 @@ public abstract class HollowMap<K, V> extends AbstractMap<K, V> implements Hollo
     public boolean equals(Object o) {
         // Note: hashCode is computed from the map's contents, see AbstractMap.hashCode
 
-        if (this == o) {
+        if(this == o) {
             return true;
         }
 
         // If type state is the same then compare ordinals
-        if (o instanceof HollowMap) {
+        if(o instanceof HollowMap) {
             HollowMap<?, ?> that = (HollowMap<?, ?>) o;
-            if (delegate.getTypeDataAccess() == that.delegate.getTypeDataAccess()) {
+            if(delegate.getTypeDataAccess() == that.delegate.getTypeDataAccess()) {
                 return ordinal == that.ordinal;
             }
         }
@@ -156,7 +159,7 @@ public abstract class HollowMap<K, V> extends AbstractMap<K, V> implements Hollo
 
         @Override
         public Map.Entry<K, V> next() {
-            if (!hasNext()) {
+            if(!hasNext()) {
                 throw new NoSuchElementException();
             }
 
@@ -207,25 +210,25 @@ public abstract class HollowMap<K, V> extends AbstractMap<K, V> implements Hollo
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
+            if(this == o) {
                 return true;
             }
 
-            if (!(o instanceof Map.Entry)) {
+            if(!(o instanceof Map.Entry)) {
                 return false;
             }
 
-            if (o instanceof OrdinalEntry) {
+            if(o instanceof OrdinalEntry) {
                 OrdinalEntry<?, ?> that = (OrdinalEntry) o;
-                if (map.delegate.getTypeDataAccess() == that.map.delegate.getTypeDataAccess()) {
+                if(map.delegate.getTypeDataAccess() == that.map.delegate.getTypeDataAccess()) {
                     return keyOrdinal == that.keyOrdinal &&
                             valueOrdinal == that.valueOrdinal;
                 }
             }
 
             Map.Entry<?, ?> that = (Map.Entry) o;
-            return Objects.equals(getKey(),that.getKey()) &&
-                    Objects.equals(getValue(),that.getValue());
+            return Objects.equals(getKey(), that.getKey()) &&
+                    Objects.equals(getValue(), that.getValue());
         }
     }
 }

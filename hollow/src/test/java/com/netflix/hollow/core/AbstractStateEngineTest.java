@@ -36,7 +36,7 @@ public abstract class AbstractStateEngineTest {
     public void setUp() {
         initWriteStateEngine();
     }
-    
+
     protected void initWriteStateEngine() {
         writeStateEngine = new HollowWriteStateEngine();
 

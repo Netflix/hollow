@@ -383,11 +383,11 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
         int i = 0;
 
-        while (i < keyValues.length) {
+        while(i < keyValues.length) {
             String key = (String) keyValues[i];
             List<Integer> values = new ArrayList<Integer>();
             i++;
-            while (i < keyValues.length && keyValues[i] instanceof Integer) {
+            while(i < keyValues.length && keyValues[i] instanceof Integer) {
                 values.add((Integer) keyValues[i]);
                 i++;
             }
@@ -523,7 +523,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
 
         TypeWithMap(String... kv) {
             m = new HashMap<>();
-            for (int i = 0; i < kv.length; i += 2) {
+            for(int i = 0; i < kv.length; i += 2) {
                 m.put(kv[i], kv[i + 1]);
             }
         }
@@ -540,7 +540,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
 
         TypeWithFinalAssignedOrdinal() {
             this.__assigned_ordinal = HollowConstants.ORDINAL_NONE;
-        };
+        }
     }
 
     static class TypeWithIntAssignedOrdinal {

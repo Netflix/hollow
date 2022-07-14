@@ -22,7 +22,8 @@ public class EmptyMapOrdinalIterator implements HollowMapEntryOrdinalIterator {
 
     public static final EmptyMapOrdinalIterator INSTANCE = new EmptyMapOrdinalIterator();
 
-    private EmptyMapOrdinalIterator() { }
+    private EmptyMapOrdinalIterator() {
+    }
 
     @Override
     public boolean next() {
@@ -38,9 +39,6 @@ public class EmptyMapOrdinalIterator implements HollowMapEntryOrdinalIterator {
     public int getValue() {
         throw new NoSuchElementException("This MapEntryOrdinalIterator is empty");
     }
-
-
-
 
 
 }

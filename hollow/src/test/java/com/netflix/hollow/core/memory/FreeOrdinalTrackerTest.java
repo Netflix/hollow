@@ -24,7 +24,7 @@ public class FreeOrdinalTrackerTest {
     @Test
     public void minimizeNumberOfUpdatedShards() {
         FreeOrdinalTracker tracker = new FreeOrdinalTracker();
-        for(int i=0;i<100;i++)
+        for(int i = 0; i < 100; i++)
             tracker.getFreeOrdinal();
 
         // shard 3

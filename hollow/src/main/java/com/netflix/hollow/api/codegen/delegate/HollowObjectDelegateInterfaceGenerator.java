@@ -54,62 +54,62 @@ public class HollowObjectDelegateInterfaceGenerator extends HollowObjectDelegate
         classBuilder.append("\n@SuppressWarnings(\"all\")\n");
         classBuilder.append("public interface ").append(className).append(" extends HollowObjectDelegate {\n\n");
 
-        for(int i=0;i<schema.numFields();i++) {
+        for(int i = 0; i < schema.numFields(); i++) {
             String methodFieldName = substituteInvalidChars(uppercase(schema.getFieldName(i)));
             switch(schema.getFieldType(i)) {
-            case BOOLEAN:
-                classBuilder.append("    public boolean get").append(methodFieldName).append("(int ordinal);\n\n");
-                classBuilder.append("    public Boolean get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
-                break;
-            case BYTES:
-                classBuilder.append("    public byte[] get").append(methodFieldName).append("(int ordinal);\n\n");
-                break;
-            case DOUBLE:
-                classBuilder.append("    public double get").append(methodFieldName).append("(int ordinal);\n\n");
-                classBuilder.append("    public Double get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
-                break;
-            case FLOAT:
-                classBuilder.append("    public float get").append(methodFieldName).append("(int ordinal);\n\n");
-                classBuilder.append("    public Float get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
-                break;
-            case INT:
-                classBuilder.append("    public int get").append(methodFieldName).append("(int ordinal);\n\n");
-                classBuilder.append("    public Integer get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
-                break;
-            case LONG:
-                classBuilder.append("    public long get").append(methodFieldName).append("(int ordinal);\n\n");
-                classBuilder.append("    public Long get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
-                break;
-            case REFERENCE:
-                Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
-                if(shortcut != null) {
-                    switch(shortcut.getType()) {
-                    case BOOLEAN:
-                    case DOUBLE:
-                    case FLOAT:
-                    case INT:
-                    case LONG:
-                        classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType()) + " get").append(methodFieldName).append("(int ordinal);\n\n");
-                        classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType()) + " get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
-                        break;
-                    case BYTES:
-                        classBuilder.append("    public byte[] get").append(methodFieldName).append("(int ordinal);\n\n");
-                        break;
-                    case STRING:
-                        classBuilder.append("    public String get").append(methodFieldName).append("(int ordinal);\n\n");
-                        classBuilder.append("    public boolean is").append(methodFieldName).append("Equal(int ordinal, String testValue);\n\n");
-                        break;
-                    case REFERENCE:
-                    default:
+                case BOOLEAN:
+                    classBuilder.append("    public boolean get").append(methodFieldName).append("(int ordinal);\n\n");
+                    classBuilder.append("    public Boolean get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
+                    break;
+                case BYTES:
+                    classBuilder.append("    public byte[] get").append(methodFieldName).append("(int ordinal);\n\n");
+                    break;
+                case DOUBLE:
+                    classBuilder.append("    public double get").append(methodFieldName).append("(int ordinal);\n\n");
+                    classBuilder.append("    public Double get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
+                    break;
+                case FLOAT:
+                    classBuilder.append("    public float get").append(methodFieldName).append("(int ordinal);\n\n");
+                    classBuilder.append("    public Float get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
+                    break;
+                case INT:
+                    classBuilder.append("    public int get").append(methodFieldName).append("(int ordinal);\n\n");
+                    classBuilder.append("    public Integer get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
+                    break;
+                case LONG:
+                    classBuilder.append("    public long get").append(methodFieldName).append("(int ordinal);\n\n");
+                    classBuilder.append("    public Long get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
+                    break;
+                case REFERENCE:
+                    Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
+                    if(shortcut != null) {
+                        switch(shortcut.getType()) {
+                            case BOOLEAN:
+                            case DOUBLE:
+                            case FLOAT:
+                            case INT:
+                            case LONG:
+                                classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType()) + " get").append(methodFieldName).append("(int ordinal);\n\n");
+                                classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType()) + " get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
+                                break;
+                            case BYTES:
+                                classBuilder.append("    public byte[] get").append(methodFieldName).append("(int ordinal);\n\n");
+                                break;
+                            case STRING:
+                                classBuilder.append("    public String get").append(methodFieldName).append("(int ordinal);\n\n");
+                                classBuilder.append("    public boolean is").append(methodFieldName).append("Equal(int ordinal, String testValue);\n\n");
+                                break;
+                            case REFERENCE:
+                            default:
+                        }
                     }
-                }
 
-                classBuilder.append("    public int get").append(methodFieldName).append("Ordinal(int ordinal);\n\n");
-                break;
-            case STRING:
-                classBuilder.append("    public String get").append(methodFieldName).append("(int ordinal);\n\n");
-                classBuilder.append("    public boolean is").append(methodFieldName).append("Equal(int ordinal, String testValue);\n\n");
-                break;
+                    classBuilder.append("    public int get").append(methodFieldName).append("Ordinal(int ordinal);\n\n");
+                    break;
+                case STRING:
+                    classBuilder.append("    public String get").append(methodFieldName).append("(int ordinal);\n\n");
+                    classBuilder.append("    public boolean is").append(methodFieldName).append("Equal(int ordinal, String testValue);\n\n");
+                    break;
             }
         }
 

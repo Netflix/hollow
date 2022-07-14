@@ -47,10 +47,12 @@ public interface SingleProducerEnforcer {
     /**
      * Lock local changes to primary status i.e. block enable or disable until unlock is called
      */
-    default void lock() {}
+    default void lock() {
+    }
 
     /**
      * Unlock local changes to producer primary status i.e. enable/disable are unblocked
      */
-    default void unlock() {}
+    default void unlock() {
+    }
 }

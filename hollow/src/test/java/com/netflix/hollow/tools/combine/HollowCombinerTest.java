@@ -101,7 +101,7 @@ public class HollowCombinerTest {
         Assert.assertEquals(3, combinedResult.getTypeState("B").maxOrdinal());
         Assert.assertEquals(5, combinedResult.getTypeState("C").maxOrdinal());
 
-        HollowSetTypeReadState bTypeState = (HollowSetTypeReadState)combinedResult.getTypeState("B");
+        HollowSetTypeReadState bTypeState = (HollowSetTypeReadState) combinedResult.getTypeState("B");
 
         Assert.assertTrue(setOrderingExists(bTypeState, "C1", "C2", "C3"));
         Assert.assertTrue(setOrderingExists(bTypeState, "C2", "C3", "C4"));
@@ -167,15 +167,15 @@ public class HollowCombinerTest {
     }
 
     private boolean setOrderingExists(HollowSetTypeReadState bTypeState, String... orderedCValues) {
-        for(int i=0;i<=bTypeState.maxOrdinal();i++) {
+        for(int i = 0; i <= bTypeState.maxOrdinal(); i++) {
             GenericHollowSet set = new GenericHollowSet(bTypeState, i);
 
             Iterator<HollowRecord> iter = set.iterator();
 
-            for(int j=0;j<orderedCValues.length;j++) {
+            for(int j = 0; j < orderedCValues.length; j++) {
                 if(!iter.hasNext())
                     break;
-                HollowObject obj = (HollowObject)iter.next();
+                HollowObject obj = (HollowObject) iter.next();
                 String cValue = obj.getString("c1");
                 if(!cValue.equals(orderedCValues[j]))
                     break;
@@ -194,7 +194,7 @@ public class HollowCombinerTest {
 
         HollowObjectWriteRecord cRec = new HollowObjectWriteRecord(cSchema);
 
-        for(int i=0;i<cVals.length;i++) {
+        for(int i = 0; i < cVals.length; i++) {
             cRec.reset();
             cRec.setString("c1", cVals[i]);
             cOrdinals[i] = shardEngine.add("C", cRec);
@@ -202,7 +202,7 @@ public class HollowCombinerTest {
 
         HollowSetWriteRecord bRec = new HollowSetWriteRecord(HashBehavior.UNMIXED_HASHES);
 
-        for(int i=0;i<cOrdinals.length;i++) {
+        for(int i = 0; i < cOrdinals.length; i++) {
             bRec.addElement(cOrdinals[i], i);   /// hash code is ordering here
         }
 
@@ -234,17 +234,17 @@ public class HollowCombinerTest {
         stateEngine.addTypeState(new HollowObjectTypeWriteState(cSchema));
         return stateEngine;
     }
-    
+
     private List<PrimaryKey> extractPrimaryKeys(HollowDataset dataset) {
         List<PrimaryKey> keys = new ArrayList<PrimaryKey>();
-        for (HollowSchema schema : dataset.getSchemas()) {
-            if (schema.getSchemaType() == SchemaType.OBJECT) {
+        for(HollowSchema schema : dataset.getSchemas()) {
+            if(schema.getSchemaType() == SchemaType.OBJECT) {
                 PrimaryKey pk = ((HollowObjectSchema) schema).getPrimaryKey();
-                if (pk != null)
+                if(pk != null)
                     keys.add(pk);
             }
         }
-        
+
         return keys;
     }
 

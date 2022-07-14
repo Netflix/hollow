@@ -73,7 +73,7 @@ public class HollowIncrementalProducer {
         this.cycleMetadata = new HashMap<String, Object>();
         this.threadsPerCpu = threadsPerCpu;
 
-        for (IncrementalCycleListener listener : listeners)
+        for(IncrementalCycleListener listener : listeners)
             this.listeners.add(listener);
     }
 
@@ -83,7 +83,7 @@ public class HollowIncrementalProducer {
     public void restoreFromLastState() {
         producer.initializeDataModel(dataModel);
         long latestAnnouncedVersion = announcementWatcher.getLatestVersion();
-        if (latestAnnouncedVersion == HollowFilesystemAnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE || latestAnnouncedVersion < 0) {
+        if(latestAnnouncedVersion == HollowFilesystemAnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE || latestAnnouncedVersion < 0) {
             return;
         }
 
@@ -98,7 +98,7 @@ public class HollowIncrementalProducer {
         RecordPrimaryKey pk = extractRecordPrimaryKey(obj);
         mutations.put(pk, obj);
     }
-    
+
     public void addIfAbsent(Object obj) {
         RecordPrimaryKey pk = extractRecordPrimaryKey(obj);
         mutations.putIfAbsent(pk, new AddIfAbsent(obj));
@@ -109,12 +109,12 @@ public class HollowIncrementalProducer {
             addOrModify(obj);
         }
     }
-    
+
     public void addOrModify(FlatRecord flatRecord) {
         RecordPrimaryKey pk = flatRecord.getRecordPrimaryKey();
         mutations.put(pk, flatRecord);
     }
-    
+
     public void addIfAbsent(FlatRecord flatRecord) {
         RecordPrimaryKey pk = flatRecord.getRecordPrimaryKey();
         mutations.putIfAbsent(pk, new AddIfAbsent(flatRecord));
@@ -228,8 +228,8 @@ public class HollowIncrementalProducer {
     private long countRecordsToRemove() {
         long recordsToRemove = 0L;
         Collection<Object> records = mutations.values();
-        for (Object record : records) {
-            if (record == HollowIncrementalCyclePopulator.DELETE_RECORD) recordsToRemove++;
+        for(Object record : records) {
+            if(record == HollowIncrementalCyclePopulator.DELETE_RECORD) recordsToRemove++;
         }
         return recordsToRemove;
     }
@@ -284,13 +284,13 @@ public class HollowIncrementalProducer {
         }
 
         public B withListeners(IncrementalCycleListener... listeners) {
-            for (IncrementalCycleListener listener : listeners)
+            for(IncrementalCycleListener listener : listeners)
                 this.listeners.add(listener);
             return (B) this;
         }
 
         protected void checkArguments() {
-            if (producer == null)
+            if(producer == null)
                 throw new IllegalArgumentException("HollowProducer must be specified.");
         }
 
@@ -316,7 +316,7 @@ public class HollowIncrementalProducer {
 
         try {
             executor.awaitSuccessfulCompletion();
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

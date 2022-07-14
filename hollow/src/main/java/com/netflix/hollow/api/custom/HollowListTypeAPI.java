@@ -29,15 +29,15 @@ public class HollowListTypeAPI extends HollowTypeAPI {
     public HollowListTypeAPI(HollowAPI api, HollowListTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess);
     }
-    
+
     public int size(int ordinal) {
         return getTypeDataAccess().size(ordinal);
     }
-    
+
     public int getElementOrdinal(int ordinal, int listIdx) {
         return getTypeDataAccess().getElementOrdinal(ordinal, listIdx);
     }
-    
+
     public HollowOrdinalIterator getOrdinalIterator(int ordinal) {
         return getTypeDataAccess().ordinalIterator(ordinal);
     }

@@ -56,8 +56,11 @@ public class HollowDiffUIServer {
 
     static interface UIServer {
         void start() throws Exception;
+
         void stop() throws Exception;
+
         void join() throws InterruptedException;
+
         public HollowDiffUI addDiff(String diffPath, HollowDiff diff, String fromBlobName, String toBlobName);
 
         static interface Factory {

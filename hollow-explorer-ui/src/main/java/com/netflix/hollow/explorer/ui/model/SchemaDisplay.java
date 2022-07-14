@@ -24,74 +24,74 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SchemaDisplay {
-    
+
     private final HollowSchema schema;
     private final List<SchemaDisplayField> displayFields;
     private final String fieldPath;
-    
+
     private boolean isExpanded;
-    
+
     public SchemaDisplay(HollowSchema schema) {
         this(schema, "");
     }
-    
+
     public SchemaDisplay(HollowSchema schema, String fieldPath) {
         this.schema = schema;
         this.fieldPath = fieldPath;
         this.displayFields = createDisplayFields();
         this.isExpanded = false;
     }
-    
+
     private List<SchemaDisplayField> createDisplayFields() {
         List<SchemaDisplayField> displayFields = new ArrayList<SchemaDisplayField>();
-        
-        switch(schema.getSchemaType()) {
-        case OBJECT:
-            HollowObjectSchema objSchema = (HollowObjectSchema)schema;
-            
-            for(int i=0;i<objSchema.numFields();i++)
-                displayFields.add(new SchemaDisplayField(fieldPath + "." + objSchema.getFieldName(i), objSchema, i));
 
-            return displayFields;
-            
-        case LIST:
-        case SET:
-            HollowCollectionSchema collSchema = (HollowCollectionSchema)schema;
-            
-            displayFields.add(new SchemaDisplayField(fieldPath + ".element", collSchema));
-            
-            return displayFields;
-            
-        case MAP:
-            HollowMapSchema mapSchema = (HollowMapSchema)schema;
-            
-            displayFields.add(new SchemaDisplayField(fieldPath + ".key", mapSchema, 0));
-            displayFields.add(new SchemaDisplayField(fieldPath + ".value", mapSchema, 1));
-            
-            return displayFields;
+        switch(schema.getSchemaType()) {
+            case OBJECT:
+                HollowObjectSchema objSchema = (HollowObjectSchema) schema;
+
+                for(int i = 0; i < objSchema.numFields(); i++)
+                    displayFields.add(new SchemaDisplayField(fieldPath + "." + objSchema.getFieldName(i), objSchema, i));
+
+                return displayFields;
+
+            case LIST:
+            case SET:
+                HollowCollectionSchema collSchema = (HollowCollectionSchema) schema;
+
+                displayFields.add(new SchemaDisplayField(fieldPath + ".element", collSchema));
+
+                return displayFields;
+
+            case MAP:
+                HollowMapSchema mapSchema = (HollowMapSchema) schema;
+
+                displayFields.add(new SchemaDisplayField(fieldPath + ".key", mapSchema, 0));
+                displayFields.add(new SchemaDisplayField(fieldPath + ".value", mapSchema, 1));
+
+                return displayFields;
         }
-        
+
         throw new IllegalArgumentException();
     }
-    
+
     public String getTypeName() {
         return schema.getName();
     }
-    
+
     public HollowSchema getSchema() {
         return schema;
     }
-    
+
     public List<SchemaDisplayField> getFields() {
         return displayFields;
     }
-    
+
     public void setExpanded(boolean isExpanded) {
         this.isExpanded = isExpanded;
     }
-    
+
     public boolean isExpanded() {
         return isExpanded;
     }
-    
+
 }

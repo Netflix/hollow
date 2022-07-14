@@ -25,9 +25,10 @@ package com.netflix.hollow.tools.combine;
 public class IdentityOrdinalRemapper implements OrdinalRemapper {
 
     public static IdentityOrdinalRemapper INSTANCE = new IdentityOrdinalRemapper();
-    
-    private IdentityOrdinalRemapper() { }
-    
+
+    private IdentityOrdinalRemapper() {
+    }
+
     @Override
     public int getMappedOrdinal(String type, int originalOrdinal) {
         return originalOrdinal;
@@ -37,7 +38,7 @@ public class IdentityOrdinalRemapper implements OrdinalRemapper {
     public void remapOrdinal(String type, int originalOrdinal, int mappedOrdinal) {
         throw new UnsupportedOperationException("Cannot remap ordinals in an IdentityOrdinalRemapper");
     }
-    
+
     @Override
     public boolean ordinalIsMapped(String type, int originalOrdinal) {
         return true;

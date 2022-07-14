@@ -55,22 +55,22 @@ public interface HollowAPIFactory {
         }
 
     };
-    
+
     public static class ForGeneratedAPI<T extends HollowAPI> implements HollowAPIFactory {
 
         private final Class<T> generatedAPIClass;
         private final Set<String> cachedTypes;
-        
+
         public ForGeneratedAPI(Class<T> generatedAPIClass) {
             this(generatedAPIClass, new String[0]);
         }
-        
+
         public ForGeneratedAPI(Class<T> generatedAPIClass, String... cachedTypes) {
             this.generatedAPIClass = generatedAPIClass;
             this.cachedTypes = new HashSet<String>(Arrays.asList(cachedTypes));
         }
 
-        
+
         @Override
         public T createAPI(HollowDataAccess dataAccess) {
             try {
@@ -80,7 +80,7 @@ public interface HollowAPIFactory {
                 try {
                     Constructor<T> constructor = generatedAPIClass.getConstructor(HollowDataAccess.class);
                     return constructor.newInstance(dataAccess);
-                } catch(Exception e2) {
+                } catch (Exception e2) {
                     throw new RuntimeException(e2);
                 }
             }
@@ -91,11 +91,11 @@ public interface HollowAPIFactory {
             try {
                 Constructor<T> constructor = generatedAPIClass.getConstructor(HollowDataAccess.class, Set.class, Map.class, generatedAPIClass);
                 return constructor.newInstance(dataAccess, cachedTypes, Collections.emptyMap(), previousCycleAPI);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 try {
                     Constructor<T> constructor = generatedAPIClass.getConstructor(HollowDataAccess.class);
                     return constructor.newInstance(dataAccess);
-                } catch(Exception e2) {
+                } catch (Exception e2) {
                     throw new RuntimeException(e2);
                 }
             }

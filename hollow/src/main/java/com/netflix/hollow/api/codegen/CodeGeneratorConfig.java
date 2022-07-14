@@ -28,7 +28,8 @@ public class CodeGeneratorConfig {
     private boolean restrictApiToFieldType = false;
     private boolean useVerboseToString = false;
 
-    public CodeGeneratorConfig() {}
+    public CodeGeneratorConfig() {
+    }
 
     public CodeGeneratorConfig(String classPostfix, String getterPrefix) {
         this.classPostfix = classPostfix;
@@ -139,36 +140,36 @@ public class CodeGeneratorConfig {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if(this == obj)
             return true;
-        if (obj == null)
+        if(obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if(getClass() != obj.getClass())
             return false;
         CodeGeneratorConfig other = (CodeGeneratorConfig) obj;
-        if (classPostfix == null) {
-            if (other.classPostfix != null)
+        if(classPostfix == null) {
+            if(other.classPostfix != null)
                 return false;
-        } else if (!classPostfix.equals(other.classPostfix))
+        } else if(!classPostfix.equals(other.classPostfix))
             return false;
-        if (getterPrefix == null) {
-            if (other.getterPrefix != null)
+        if(getterPrefix == null) {
+            if(other.getterPrefix != null)
                 return false;
-        } else if (!getterPrefix.equals(other.getterPrefix))
+        } else if(!getterPrefix.equals(other.getterPrefix))
             return false;
-        if (reservePrimaryKeyIndexForTypeWithPrimaryKey != other.reservePrimaryKeyIndexForTypeWithPrimaryKey)
+        if(reservePrimaryKeyIndexForTypeWithPrimaryKey != other.reservePrimaryKeyIndexForTypeWithPrimaryKey)
             return false;
-        if (restrictApiToFieldType != other.restrictApiToFieldType)
+        if(restrictApiToFieldType != other.restrictApiToFieldType)
             return false;
-        if (useAggressiveSubstitutions != other.useAggressiveSubstitutions)
+        if(useAggressiveSubstitutions != other.useAggressiveSubstitutions)
             return false;
-        if (useBooleanFieldErgonomics != other.useBooleanFieldErgonomics)
+        if(useBooleanFieldErgonomics != other.useBooleanFieldErgonomics)
             return false;
-        if (useHollowPrimitiveTypes != other.useHollowPrimitiveTypes)
+        if(useHollowPrimitiveTypes != other.useHollowPrimitiveTypes)
             return false;
-        if (usePackageGrouping != other.usePackageGrouping)
+        if(usePackageGrouping != other.usePackageGrouping)
             return false;
-        if (useVerboseToString != other.useVerboseToString)
+        if(useVerboseToString != other.useVerboseToString)
             return false;
         return true;
     }

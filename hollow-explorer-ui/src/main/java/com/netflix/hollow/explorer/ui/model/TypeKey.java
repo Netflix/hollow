@@ -17,12 +17,12 @@
 package com.netflix.hollow.explorer.ui.model;
 
 public class TypeKey {
-    
+
     private final int idx;
     private final String keyStr;
     private final String keyDisplayStr;
     private final int ordinal;
-    
+
     public TypeKey(int idx, int ordinal, String keyStr, String keyDisplayStr) {
         this.idx = idx;
         this.ordinal = ordinal;
@@ -41,7 +41,7 @@ public class TypeKey {
     public String getKey() {
         return keyStr;
     }
-    
+
     public String getKeyDisplay() {
         return keyDisplayStr;
     }

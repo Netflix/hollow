@@ -35,16 +35,16 @@ public class RestoreWriteStateEngineMapTest extends AbstractStateEngineTest {
         addRecord(70, 80, 90, 100);
 
         roundTripSnapshot();
-        
+
         restoreWriteStateEngineFromReadStateEngine();
-        
+
         addRecord(10, 20, 30, 40);
         addRecord(70, 80, 90, 100);
         addRecord(100, 200, 300, 400, 500, 600, 700, 800);
         addRecord(1, 2, 3, 4);
 
         roundTripDelta();
-        
+
         restoreWriteStateEngineFromReadStateEngine();
 
         assertMap(0, 10, 20, 30, 40);
@@ -75,11 +75,11 @@ public class RestoreWriteStateEngineMapTest extends AbstractStateEngineTest {
         assertMap(1, 1, 2, 3, 4);  /// even though 1, 2, 3 had an equivalent map in the previous cycle at ordinal "4", it is now assigned to recycled ordinal "1".
 
     }
-    
+
     @Test
     public void restoreFailsIfShardConfigurationChanges() throws IOException {
         roundTripSnapshot();
-        
+
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
         HollowMapTypeWriteState misconfiguredTypeState = new HollowMapTypeWriteState(new HollowMapSchema("TestMap", "TestKey", "TestValue"), 16);
         writeStateEngine.addTypeState(misconfiguredTypeState);
@@ -87,14 +87,15 @@ public class RestoreWriteStateEngineMapTest extends AbstractStateEngineTest {
         try {
             writeStateEngine.restoreFrom(readStateEngine);
             Assert.fail("Should have thrown IllegalStateException because shard configuration has changed");
-        } catch(IllegalStateException expected) { }
+        } catch (IllegalStateException expected) {
+        }
     }
 
     private void addRecord(int... ordinals) {
         HollowMapWriteRecord rec = new HollowMapWriteRecord();
 
-        for(int i=0;i<ordinals.length;i+=2) {
-            rec.addEntry(ordinals[i], ordinals[i+1], ordinals[i] + 100);
+        for(int i = 0; i < ordinals.length; i += 2) {
+            rec.addEntry(ordinals[i], ordinals[i + 1], ordinals[i] + 100);
         }
 
         writeStateEngine.add("TestMap", rec);
@@ -102,14 +103,14 @@ public class RestoreWriteStateEngineMapTest extends AbstractStateEngineTest {
 
     private void assertMap(int ordinal, int... elements) {
         HollowMapTypeReadState readState = (HollowMapTypeReadState) readStateEngine.getTypeState("TestMap");
-        
+
         Assert.assertEquals(elements.length / 2, readState.size(ordinal));
 
-        for(int i=0;i<elements.length;i+=2) {
-            Assert.assertEquals(elements[i+1], readState.get(ordinal, elements[i], elements[i] + 100));
+        for(int i = 0; i < elements.length; i += 2) {
+            Assert.assertEquals(elements[i + 1], readState.get(ordinal, elements[i], elements[i] + 100));
         }
     }
-    
+
     private int maxOrdinal() {
         HollowMapTypeReadState readState = (HollowMapTypeReadState) readStateEngine.getTypeState("TestMap");
         return readState.maxOrdinal();

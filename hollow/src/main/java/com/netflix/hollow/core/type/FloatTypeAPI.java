@@ -26,8 +26,8 @@ public class FloatTypeAPI extends HollowObjectTypeAPI {
     private final FloatDelegateLookupImpl delegateLookupImpl;
 
     public FloatTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
-        super(api, typeDataAccess, new String[] {
-            "value"
+        super(api, typeDataAccess, new String[]{
+                "value"
         });
         this.delegateLookupImpl = new FloatDelegateLookupImpl(this);
     }
@@ -45,7 +45,8 @@ public class FloatTypeAPI extends HollowObjectTypeAPI {
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[0]);
             f = getTypeDataAccess().readFloat(ordinal, fieldIndex[0]);
-        }        return Float.isNaN(f) ? null : Float.valueOf(f);
+        }
+        return Float.isNaN(f) ? null : Float.valueOf(f);
     }
 
     public FloatDelegateLookupImpl getDelegateLookupImpl() {

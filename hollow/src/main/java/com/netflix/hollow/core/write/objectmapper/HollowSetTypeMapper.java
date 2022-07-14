@@ -43,10 +43,10 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
     public HollowSetTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, String[] hashKeyFieldPaths, int numShards, HollowWriteStateEngine stateEngine, boolean useDefaultHashKeys, Set<Type> visited) {
         this.elementMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], null, null, -1, visited);
         String typeName = declaredName != null ? declaredName : getDefaultTypeName(type);
-        
+
         if(hashKeyFieldPaths == null && useDefaultHashKeys && (elementMapper instanceof HollowObjectTypeMapper))
-            hashKeyFieldPaths = ((HollowObjectTypeMapper)elementMapper).getDefaultElementHashKey();
-        
+            hashKeyFieldPaths = ((HollowObjectTypeMapper) elementMapper).getDefaultElementHashKey();
+
         this.schema = new HollowSetSchema(typeName, elementMapper.getTypeName(), hashKeyFieldPaths);
         this.hashCodeFinder = stateEngine.getHashCodeFinder();
 
@@ -62,33 +62,33 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
     @Override
     protected int write(Object obj) {
         if(obj instanceof MemoizedSet) {
-            long assignedOrdinal = ((MemoizedSet<?>)obj).__assigned_ordinal;
-            
+            long assignedOrdinal = ((MemoizedSet<?>) obj).__assigned_ordinal;
+
             if((assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
-                return (int)assignedOrdinal & Integer.MAX_VALUE;
+                return (int) assignedOrdinal & Integer.MAX_VALUE;
         }
-        
-        Set<?> s = (Set<?>)obj;
+
+        Set<?> s = (Set<?>) obj;
 
         HollowSetWriteRecord rec = copyToWriteRecord(s, null);
 
         int assignedOrdinal = writeState.add(rec);
-        
+
         if(obj instanceof MemoizedSet) {
-            ((MemoizedSet<?>)obj).__assigned_ordinal = (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits();
+            ((MemoizedSet<?>) obj).__assigned_ordinal = (long) assignedOrdinal | cycleSpecificAssignedOrdinalBits();
         }
-        
+
         return assignedOrdinal;
     }
-    
+
     @Override
     protected int writeFlat(Object obj, FlatRecordWriter flatRecordWriter) {
-    	HollowSetWriteRecord rec = copyToWriteRecord((Set<?>)obj, flatRecordWriter);
-    	return flatRecordWriter.write(schema, rec);
+        HollowSetWriteRecord rec = copyToWriteRecord((Set<?>) obj, flatRecordWriter);
+        return flatRecordWriter.write(schema, rec);
     }
 
     private HollowSetWriteRecord copyToWriteRecord(Set<?> s, FlatRecordWriter flatRecordWriter) {
-        HollowSetWriteRecord rec = (HollowSetWriteRecord)writeRecord();
+        HollowSetWriteRecord rec = (HollowSetWriteRecord) writeRecord();
         for(Object o : s) {
             if(o == null) {
                 throw new NullPointerException(String.format(NULL_ELEMENT_MESSAGE, schema));

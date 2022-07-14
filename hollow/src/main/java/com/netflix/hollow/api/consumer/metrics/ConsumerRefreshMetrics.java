@@ -45,12 +45,15 @@ public class ConsumerRefreshMetrics {
         public long getBeforeVersion() {
             return beforeVersion;
         }
+
         public long getDesiredVersion() {
             return desiredVersion;
         }
+
         public List<BlobType> getTransitionSequence() {
             return transitionSequence;
         }
+
         public int getNumSuccessfulTransitions() {
             return numSuccessfulTransitions;
         }
@@ -59,27 +62,35 @@ public class ConsumerRefreshMetrics {
     public long getDurationMillis() {
         return durationMillis;
     }
+
     public boolean getIsRefreshSuccess() {
         return isRefreshSuccess;
     }
+
     public boolean getIsInitialLoad() {
         return isInitialLoad;
     }
+
     public BlobType getOverallRefreshType() {
         return overallRefreshType;
     }
+
     public UpdatePlanDetails getUpdatePlanDetails() {
         return updatePlanDetails;
     }
+
     public long getConsecutiveFailures() {
         return consecutiveFailures;
     }
+
     public OptionalLong getRefreshSuccessAgeMillisOptional() {
         return refreshSuccessAgeMillisOptional;
     }
+
     public long getRefreshEndTimeNano() {
         return refreshEndTimeNano;
     }
+
     public OptionalLong getCycleStartTimestamp() {
         return cycleStartTimestamp;
     }
@@ -116,35 +127,43 @@ public class ConsumerRefreshMetrics {
             this.durationMillis = durationMillis;
             return this;
         }
+
         public Builder setIsRefreshSuccess(boolean isRefreshSuccess) {
             this.isRefreshSuccess = isRefreshSuccess;
             return this;
         }
+
         public Builder setIsInitialLoad(boolean isInitialLoad) {
             this.isInitialLoad = isInitialLoad;
             return this;
         }
+
         public Builder setOverallRefreshType(BlobType overallRefreshType) {
             this.overallRefreshType = overallRefreshType;
             return this;
         }
+
         public Builder setUpdatePlanDetails(
                 UpdatePlanDetails updatePlanDetails) {
             this.updatePlanDetails = updatePlanDetails;
             return this;
         }
+
         public Builder setConsecutiveFailures(long consecutiveFailures) {
             this.consecutiveFailures = consecutiveFailures;
             return this;
         }
+
         public Builder setRefreshSuccessAgeMillisOptional(long refreshSuccessAgeMillis) {
             this.refreshSuccessAgeMillisOptional = OptionalLong.of(refreshSuccessAgeMillis);
             return this;
         }
+
         public Builder setRefreshEndTimeNano(long refreshEndTimeNano) {
             this.refreshEndTimeNano = refreshEndTimeNano;
             return this;
         }
+
         public Builder setCycleStartTimestamp(long cycleStartTimestamp) {
             this.cycleStartTimestamp = OptionalLong.of(cycleStartTimestamp);
             return this;

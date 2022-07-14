@@ -27,7 +27,7 @@ import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 /**
  * Not intended for external consumption.
  */
-public class DiffEqualityObjectMapper extends DiffEqualityTypeMapper{
+public class DiffEqualityObjectMapper extends DiffEqualityTypeMapper {
 
     private final HollowObjectSchema commonSchema;
     private final int[] toSchemaCommonFieldMapping;
@@ -42,7 +42,7 @@ public class DiffEqualityObjectMapper extends DiffEqualityTypeMapper{
 
         this.commonReferenceFieldEqualOrdinalMaps = new DiffEqualOrdinalMap[commonSchema.numFields()];
 
-        for(int i=0;i<commonReferenceFieldEqualOrdinalMaps.length;i++) {
+        for(int i = 0; i < commonReferenceFieldEqualOrdinalMaps.length; i++) {
             if(commonSchema.getFieldType(i) == FieldType.REFERENCE)
                 this.commonReferenceFieldEqualOrdinalMaps[i] = mapping.getEqualOrdinalMap(commonSchema.getReferencedType(i));
         }
@@ -52,9 +52,9 @@ public class DiffEqualityObjectMapper extends DiffEqualityTypeMapper{
 
         boolean requiresTraversalForMissingFields =
                 fromState().getSchema().numFields() != commonSchema.numFields()
-                || toState().getSchema().numFields() != commonSchema.numFields();
+                        || toState().getSchema().numFields() != commonSchema.numFields();
 
-        for(int i=0;i<commonSchema.numFields();i++) {
+        for(int i = 0; i < commonSchema.numFields(); i++) {
             if(commonSchema.getFieldType(i) == FieldType.REFERENCE
                     && mapping.requiresMissingFieldTraversal(commonSchema.getReferencedType(i))) {
                 requiresTraversalForMissingFields = true;
@@ -67,7 +67,7 @@ public class DiffEqualityObjectMapper extends DiffEqualityTypeMapper{
 
     private int[] buildCommonSchemaFieldMapping(HollowObjectTypeReadState state) {
         int[] commonFieldMapping = new int[commonSchema.numFields()];
-        for(int i=0;i<commonFieldMapping.length;i++) {
+        for(int i = 0; i < commonFieldMapping.length; i++) {
             String fieldName = commonSchema.getFieldName(i);
             commonFieldMapping[i] = state.getSchema().getPosition(fieldName);
         }
@@ -88,7 +88,7 @@ public class DiffEqualityObjectMapper extends DiffEqualityTypeMapper{
 
     private int recordHashCode(HollowObjectTypeReadState typeState, int ordinal, int[] commonSchemaFieldMapping, boolean fromState) {
         int hashCode = 0;
-        for(int i=0;i<commonSchemaFieldMapping.length;i++) {
+        for(int i = 0; i < commonSchemaFieldMapping.length; i++) {
             int typeStateFieldIndex = commonSchemaFieldMapping[i];
             if(commonSchema.getFieldType(i) == FieldType.REFERENCE) {
                 int referencedOrdinal = typeState.readOrdinal(ordinal, typeStateFieldIndex);
@@ -111,7 +111,7 @@ public class DiffEqualityObjectMapper extends DiffEqualityTypeMapper{
     public EqualityDeterminer getEqualityDeterminer() {
         return new EqualityDeterminer() {
             public boolean recordsAreEqual(int fromOrdinal, int toOrdinal) {
-                for(int i=0;i<fromSchemaCommonFieldMapping.length;i++) {
+                for(int i = 0; i < fromSchemaCommonFieldMapping.length; i++) {
                     if(commonSchema.getFieldType(i) == FieldType.REFERENCE) {
                         int fromReferenceOrdinal = fromState().readOrdinal(fromOrdinal, fromSchemaCommonFieldMapping[i]);
                         int toReferenceOrdinal = toState().readOrdinal(toOrdinal, toSchemaCommonFieldMapping[i]);

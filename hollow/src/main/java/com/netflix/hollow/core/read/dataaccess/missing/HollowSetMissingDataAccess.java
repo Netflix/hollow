@@ -97,7 +97,7 @@ public class HollowSetMissingDataAccess implements HollowSetTypeDataAccess {
     @Override
     public void setSamplingDirector(HollowSamplingDirector director) {
     }
-    
+
     @Override
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
     }

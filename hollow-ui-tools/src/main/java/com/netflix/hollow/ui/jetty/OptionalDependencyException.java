@@ -18,6 +18,12 @@ package com.netflix.hollow.ui.jetty;
 
 public class OptionalDependencyException extends RuntimeException {
     private static final long serialVersionUID = -6846312004135030988L;
-    public OptionalDependencyException(String message) { super(message); }
-    public OptionalDependencyException(String message, Throwable cause) { super(message, cause); }
+
+    public OptionalDependencyException(String message) {
+        super(message);
+    }
+
+    public OptionalDependencyException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

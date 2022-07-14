@@ -19,15 +19,15 @@ package com.netflix.hollow.tools.split;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 
 public class HollowSplitterOrdinalCopyDirector implements HollowSplitterCopyDirector {
-    
+
     private final int numShards;
     private final String[] topLevelTypes;
-    
+
     public HollowSplitterOrdinalCopyDirector(int numShards, String... topLevelTypes) {
         this.numShards = numShards;
         this.topLevelTypes = topLevelTypes;
     }
-    
+
     @Override
     public String[] getTopLevelTypes() {
         return topLevelTypes;

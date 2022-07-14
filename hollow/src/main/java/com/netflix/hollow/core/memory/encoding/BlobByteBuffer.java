@@ -39,7 +39,7 @@ public final class BlobByteBuffer {
 
     private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, long position) {
 
-        if (!spine[0].order().equals(ByteOrder.BIG_ENDIAN)) {
+        if(!spine[0].order().equals(ByteOrder.BIG_ENDIAN)) {
             throw new UnsupportedOperationException("Little endian memory layout is not supported");
         }
 
@@ -74,10 +74,10 @@ public final class BlobByteBuffer {
      */
     public static BlobByteBuffer mmapBlob(FileChannel channel, int singleBufferCapacity) throws IOException {
         long size = channel.size();
-        if (size == 0) {
+        if(size == 0) {
             throw new IllegalStateException("File to be mmap-ed has no data");
         }
-        if ((singleBufferCapacity & (singleBufferCapacity - 1)) != 0) { // should be a power of 2
+        if((singleBufferCapacity & (singleBufferCapacity - 1)) != 0) { // should be a power of 2
             throw new IllegalArgumentException("singleBufferCapacity must be a power of 2");
         }
 
@@ -86,18 +86,18 @@ public final class BlobByteBuffer {
                 ? singleBufferCapacity
                 : Integer.highestOneBit((int) size);
         long bufferCount = size % bufferCapacity == 0
-                ? size / (long)bufferCapacity
-                : (size / (long)bufferCapacity) + 1;
-        if (bufferCount > Integer.MAX_VALUE)
+                ? size / (long) bufferCapacity
+                : (size / (long) bufferCapacity) + 1;
+        if(bufferCount > Integer.MAX_VALUE)
             throw new IllegalArgumentException("file too large; size=" + size);
 
         int shift = 31 - Integer.numberOfLeadingZeros(bufferCapacity); // log2
         int mask = (1 << shift) - 1;
-        ByteBuffer[] spine = new MappedByteBuffer[(int)bufferCount];
-        for (int i = 0; i < bufferCount; i++) {
-            long pos = (long)i * bufferCapacity;
+        ByteBuffer[] spine = new MappedByteBuffer[(int) bufferCount];
+        for(int i = 0; i < bufferCount; i++) {
+            long pos = (long) i * bufferCapacity;
             int cap = i == (bufferCount - 1)
-                    ? (int)(size - pos)
+                    ? (int) (size - pos)
                     : bufferCapacity;
             ByteBuffer buffer = channel.map(READ_ONLY, pos, cap);
             /*
@@ -124,7 +124,7 @@ public final class BlobByteBuffer {
      * @return new position in bytes
      */
     public BlobByteBuffer position(long position) {
-        if (position > capacity || position < 0)
+        if(position > capacity || position < 0)
             throw new IllegalArgumentException("invalid position; position=" + position + " capacity=" + capacity);
         this.position = position;
         return this;
@@ -137,9 +137,9 @@ public final class BlobByteBuffer {
      * @throws IndexOutOfBoundsException if index out of bounds of the backing buffer
      */
     public byte getByte(long index) throws BufferUnderflowException {
-        if (index < capacity) {
-            int spineIndex = (int)(index >>> (shift));
-            int bufferIndex = (int)(index & mask);
+        if(index < capacity) {
+            int spineIndex = (int) (index >>> (shift));
+            int bufferIndex = (int) (index & mask);
             return spine[spineIndex].get(bufferIndex);
         }
         else {
@@ -159,11 +159,11 @@ public final class BlobByteBuffer {
      */
     public long getLong(long startByteIndex) throws BufferUnderflowException {
 
-        int alignmentOffset = (int)(startByteIndex - this.position()) % Long.BYTES;
+        int alignmentOffset = (int) (startByteIndex - this.position()) % Long.BYTES;
         long nextAlignedPos = startByteIndex - alignmentOffset + Long.BYTES;
 
         byte[] bytes = new byte[Long.BYTES];
-        for (int i = 0; i < Long.BYTES; i ++ ) {
+        for(int i = 0; i < Long.BYTES; i++) {
             bytes[i] = getByte(bigEndian(startByteIndex + i, nextAlignedPos));
         }
 
@@ -186,7 +186,7 @@ public final class BlobByteBuffer {
      */
     private long bigEndian(long index, long boundary) {
         long result;
-        if (index < boundary) {
+        if(index < boundary) {
             result = (boundary - Long.BYTES) + (boundary - index) - 1;
         } else {
             result = boundary + (boundary + Long.BYTES - index) - 1;

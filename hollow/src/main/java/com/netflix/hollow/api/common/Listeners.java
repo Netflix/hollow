@@ -34,7 +34,7 @@ public abstract class Listeners {
             } catch (VetoableListener.ListenerVetoException e) {
                 throw e;
             } catch (RuntimeException e) {
-                if (l instanceof VetoableListener) {
+                if(l instanceof VetoableListener) {
                     throw e;
                 }
                 LOG.log(Level.WARNING, "Error executing listener", e);

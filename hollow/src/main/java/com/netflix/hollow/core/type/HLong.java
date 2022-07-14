@@ -43,7 +43,7 @@ public class HLong extends HollowObject {
     }
 
     protected LongDelegate delegate() {
-        return (LongDelegate)delegate;
+        return (LongDelegate) delegate;
     }
 
 }

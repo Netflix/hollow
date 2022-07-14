@@ -23,10 +23,13 @@ import org.junit.Test;
 public class HollowMapAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
     private static class Weapon {
     }
+
     private static class Minion {
     }
+
     private static class Frank {
     }
+
     private static class Kevin {
     }
 

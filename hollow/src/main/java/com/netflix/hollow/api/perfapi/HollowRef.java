@@ -29,10 +29,10 @@ public abstract class HollowRef {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
+        if(this == o) {
             return true;
         }
-        if (!(o instanceof HollowRef)) {
+        if(!(o instanceof HollowRef)) {
             return false;
         }
 

@@ -80,7 +80,7 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
         boolean isAnnouncementSuccess = false;
         long dataSizeBytes = 0l;
 
-        if (status.getType() == com.netflix.hollow.api.producer.Status.StatusType.SUCCESS) {
+        if(status.getType() == com.netflix.hollow.api.producer.Status.StatusType.SUCCESS) {
             isAnnouncementSuccess = true;
             lastAnnouncementSuccessTimeNanoOptional = OptionalLong.of(System.nanoTime());
         }
@@ -109,13 +109,13 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
         boolean isCycleSuccess;
         long cycleEndTimeNano = System.nanoTime();
 
-        if (status.getType() == com.netflix.hollow.api.producer.Status.StatusType.SUCCESS) {
+        if(status.getType() == com.netflix.hollow.api.producer.Status.StatusType.SUCCESS) {
             isCycleSuccess = true;
             consecutiveFailures = 0l;
             lastCycleSuccessTimeNanoOptional = OptionalLong.of(cycleEndTimeNano);
         } else {
             isCycleSuccess = false;
-            consecutiveFailures ++;
+            consecutiveFailures++;
         }
 
         CycleMetrics.Builder cycleMetricsBuilder = new CycleMetrics.Builder()

@@ -40,17 +40,17 @@ public class HollowObjectStringEqualityTest extends AbstractStateEngineTest {
     @Test
     public void testStringEquality() throws Exception {
         addRecord("test");
-        
+
         roundTripSnapshot();
-        
-        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState)readStateEngine.getTypeState("TestObject");
-        
+
+        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
+
         Assert.assertFalse(typeState.isStringFieldEqual(0, 0, "tes"));
         Assert.assertTrue(typeState.isStringFieldEqual(0, 0, "test"));
         Assert.assertFalse(typeState.isStringFieldEqual(0, 0, "testt"));
-        
+
     }
-    
+
     private void addRecord(String strVal) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
 
@@ -58,7 +58,7 @@ public class HollowObjectStringEqualityTest extends AbstractStateEngineTest {
 
         writeStateEngine.add("TestObject", rec);
     }
-    
+
     @Override
     protected void initializeTypeStates() {
         HollowObjectTypeWriteState writeState = new HollowObjectTypeWriteState(schema);

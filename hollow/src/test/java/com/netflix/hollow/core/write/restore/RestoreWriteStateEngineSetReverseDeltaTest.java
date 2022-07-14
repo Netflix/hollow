@@ -33,52 +33,51 @@ public class RestoreWriteStateEngineSetReverseDeltaTest extends AbstractStateEng
     @Test
     public void test() throws IOException {
         addRecord(1, 3,
-                  2, 2);
-        
+                2, 2);
+
         roundTripSnapshot();
-        
+
         assertSetContains(0, 1, 3);
         assertSetContains(0, 2, 2);
-        
+
         restoreWriteStateEngineFromReadStateEngine();
-        
+
         addRecord(3, 3,
-                  4, 4);
-        
+                4, 4);
+
         writeStateEngine.prepareForWrite();
         ByteArrayOutputStream reverseDeltaStream = new ByteArrayOutputStream();
         ByteArrayOutputStream deltaStream = new ByteArrayOutputStream();
         HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
         writer.writeReverseDelta(reverseDeltaStream);
         writer.writeDelta(deltaStream);
-        
+
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
         reader.applyDelta(HollowBlobInput.serial(deltaStream.toByteArray()));
         reader.applyDelta(HollowBlobInput.serial(reverseDeltaStream.toByteArray()));
-        
+
         assertSetContains(0, 1, 3);
         assertSetContains(0, 2, 2);
     }
-    
+
     private void assertSetContains(int setOrdinal, int valueOrdinal, int hashCode) {
         HollowSetTypeReadState typeState = (HollowSetTypeReadState) readStateEngine.getTypeState("TestSet");
-        
+
         Assert.assertTrue(typeState.contains(setOrdinal, valueOrdinal, hashCode));
     }
 
-    
+
     private void addRecord(int... ordinalsAndHashCodes) {
         HollowSetWriteRecord rec = new HollowSetWriteRecord();
 
-        for(int i=0;i<ordinalsAndHashCodes.length;i+=2) {
-            rec.addElement(ordinalsAndHashCodes[i], ordinalsAndHashCodes[i+1]);
+        for(int i = 0; i < ordinalsAndHashCodes.length; i += 2) {
+            rec.addElement(ordinalsAndHashCodes[i], ordinalsAndHashCodes[i + 1]);
         }
 
         writeStateEngine.add("TestSet", rec);
     }
 
 
-    
     @Override
     protected void initializeTypeStates() {
         HollowSetTypeWriteState writeState = new HollowSetTypeWriteState(new HollowSetSchema("TestSet", "TestObject"));

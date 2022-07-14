@@ -22,9 +22,9 @@ import java.util.Collection;
 public interface HollowSampler {
 
     public void setSamplingDirector(HollowSamplingDirector director);
-    
+
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director);
-    
+
     public void setUpdateThread(Thread t);
 
     public boolean hasSampleResults();

@@ -24,13 +24,13 @@ import org.openjdk.jmh.annotations.Warmup;
 @Fork(1)
 public class ReadWriteFixedLengthElementArrayTest {
 
-    @Param( {"4096"})
+    @Param({"4096"})
     private int bitSize;
 
-    @Param( {"32"})
+    @Param({"32"})
     private int bitsPerElement;
 
-    @Param( {"1"})
+    @Param({"1"})
     private int bitsPerStep;
 
     FixedLengthElementArray f;
@@ -50,7 +50,7 @@ public class ReadWriteFixedLengthElementArrayTest {
     @Benchmark
     public int read() {
         int sum = 0;
-        for (int i = 0; i < (bitSize - bitsPerElement); i++) {
+        for(int i = 0; i < (bitSize - bitsPerElement); i++) {
             sum += f.getElementValue(i, bitsPerElement);
         }
         return sum;
@@ -59,7 +59,7 @@ public class ReadWriteFixedLengthElementArrayTest {
     @Benchmark
     public int readLarge() {
         int sum = 0;
-        for (int i = 0; i < (bitSize - bitsPerElement); i++) {
+        for(int i = 0; i < (bitSize - bitsPerElement); i++) {
             sum += f.getLargeElementValue(i, bitsPerElement);
         }
         return sum;
@@ -70,7 +70,7 @@ public class ReadWriteFixedLengthElementArrayTest {
     @Benchmark
     public Object writeOrdered() {
         int sum = 0;
-        for (int i = 0; i < (bitSize - bitsPerElement); i += bitsPerStep) {
+        for(int i = 0; i < (bitSize - bitsPerElement); i += bitsPerStep) {
             f.setElementValue(i, bitsPerElement, value);
         }
         return f;
@@ -79,7 +79,7 @@ public class ReadWriteFixedLengthElementArrayTest {
     @Benchmark
     public Object writePlain() {
         int sum = 0;
-        for (int i = 0; i < (bitSize - bitsPerElement); i += bitsPerStep) {
+        for(int i = 0; i < (bitSize - bitsPerElement); i += bitsPerStep) {
             fm.setElementValue(i, bitsPerElement, value);
         }
         return f;

@@ -19,27 +19,27 @@ package com.netflix.hollow.api.perfapi;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 
 public class HollowPerfMapEntryIterator {
-    
+
     private final long keyMaskedTypeIdx;
     private final long valueMaskedTypeIdx;
     private final HollowMapEntryOrdinalIterator iter;
-    
+
     public HollowPerfMapEntryIterator(HollowMapEntryOrdinalIterator iter, long keyMaskedTypeIdx, long valueMaskedTypeIdx) {
         this.iter = iter;
         this.keyMaskedTypeIdx = keyMaskedTypeIdx;
         this.valueMaskedTypeIdx = valueMaskedTypeIdx;
     }
-    
+
     public boolean next() {
         return iter.next();
     }
-    
+
     public long getKey() {
         return Ref.toRefWithTypeMasked(keyMaskedTypeIdx, iter.getKey());
     }
-    
+
     public long getValue() {
         return Ref.toRefWithTypeMasked(valueMaskedTypeIdx, iter.getValue());
     }
-    
+
 }

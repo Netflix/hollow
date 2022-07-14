@@ -40,92 +40,92 @@ public class HollowDiffMatcherTest {
     private HollowObjectSchema fromSchema;
     private HollowObjectSchema toSchema;
     private HollowObjectSchema subObjectSchema;
-    
+
     private HollowWriteStateEngine fromStateEngine;
     private HollowWriteStateEngine toStateEngine;
-    
+
     @Before
     public void setUp() {
         fromSchema = new HollowObjectSchema("TestObject", 3);
         fromSchema.addField("int", FieldType.INT);
         fromSchema.addField("ref", FieldType.REFERENCE, "TestSubObject");
         fromSchema.addField("str", FieldType.STRING);
-        
+
         toSchema = new HollowObjectSchema("TestObject", 2);
         toSchema.addField("ref", FieldType.REFERENCE, "TestSubObject");
         toSchema.addField("str", FieldType.STRING);
-        
+
         subObjectSchema = new HollowObjectSchema("TestSubObject", 2);
         subObjectSchema.addField("int", FieldType.INT);
         subObjectSchema.addField("double", FieldType.DOUBLE);
-        
+
         fromStateEngine = new HollowWriteStateEngine();
         fromStateEngine.addTypeState(new HollowObjectTypeWriteState(fromSchema));
         fromStateEngine.addTypeState(new HollowObjectTypeWriteState(subObjectSchema));
-        
+
         toStateEngine = new HollowWriteStateEngine();
         toStateEngine.addTypeState(new HollowObjectTypeWriteState(toSchema));
-        toStateEngine.addTypeState(new HollowObjectTypeWriteState(subObjectSchema));     
+        toStateEngine.addTypeState(new HollowObjectTypeWriteState(subObjectSchema));
     }
-    
+
     @Test
     public void findsObjectMatches() throws IOException {
         int from1 = addFromRecord(1, "one", 1, 1.1d);
         int from2 = addFromRecord(2, "two", 2, 2.2d);
         int from3 = addFromRecord(3, "three", 3, 3.3d);
         int from4 = addFromRecord(4, "four", 1, 1.1d);
-        
+
         int to4 = addToRecord("four", 4, 4.4d);
         int to3 = addToRecord("three", 3, 3.3d);
         int to2 = addToRecord("two", 2, 2.2d);
         int to1 = addToRecord("one", 1, 1.1d);
-        
+
         HollowObjectTypeReadState fromState = roundTripAndGetTypeState(fromStateEngine);
         HollowObjectTypeReadState toState = roundTripAndGetTypeState(toStateEngine);
-        
+
         HollowDiffMatcher matcher = new HollowDiffMatcher(fromState, toState);
         matcher.addMatchPath("ref.double");
         matcher.addMatchPath("str");
-        
+
         matcher.calculateMatches();
-        
+
         LongList matches = matcher.getMatchedOrdinals();
         IntList fromExtra = matcher.getExtraInFrom();
         IntList toExtra = matcher.getExtraInTo();
-        
-        Assert.assertEquals((long)from3 << 32 | to3, matches.get(0));
-        Assert.assertEquals((long)from2 << 32 | to2, matches.get(1));
-        Assert.assertEquals((long)from1 << 32 | to1, matches.get(2));
+
+        Assert.assertEquals((long) from3 << 32 | to3, matches.get(0));
+        Assert.assertEquals((long) from2 << 32 | to2, matches.get(1));
+        Assert.assertEquals((long) from1 << 32 | to1, matches.get(2));
         Assert.assertEquals(3, matches.size());
-        
+
         Assert.assertEquals(from4, fromExtra.get(0));
         Assert.assertEquals(1, fromExtra.size());
-        
+
         Assert.assertEquals(to4, toExtra.get(0));
         Assert.assertEquals(1, toExtra.size());
     }
-    
+
     @Test
     public void retrievesDisplayStringsForRecords() throws IOException {
         int from1 = addFromRecord(1, "one", 1, 1.1d);
         int from2 = addFromRecord(2, "two", 2, 2.2d);
         int from3 = addFromRecord(3, "three", 3, 3.3d);
         int from4 = addFromRecord(4, "four", 1, 1.1d);
-        
+
         int to4 = addToRecord("four", 4, 4.4d);
         int to3 = addToRecord("three", 3, 3.3d);
         int to2 = addToRecord("two", 2, 2.2d);
         int to1 = addToRecord("one", 1, 1.1d);
-        
+
         HollowObjectTypeReadState fromState = roundTripAndGetTypeState(fromStateEngine);
         HollowObjectTypeReadState toState = roundTripAndGetTypeState(toStateEngine);
-        
+
         HollowDiffMatcher matcher = new HollowDiffMatcher(fromState, toState);
         matcher.addMatchPath("ref.double");
         matcher.addMatchPath("str");
-        
+
         matcher.calculateMatches();
-        
+
         Assert.assertEquals("1.1 one", matcher.getKeyDisplayString(fromState, from1));
         Assert.assertEquals("2.2 two", matcher.getKeyDisplayString(fromState, from2));
         Assert.assertEquals("3.3 three", matcher.getKeyDisplayString(fromState, from3));
@@ -136,7 +136,7 @@ public class HollowDiffMatcherTest {
         Assert.assertEquals("3.3 three", matcher.getKeyDisplayString(toState, to3));
         Assert.assertEquals("4.4 four", matcher.getKeyDisplayString(toState, to4));
     }
-    
+
     private HollowObjectTypeReadState roundTripAndGetTypeState(HollowWriteStateEngine stateEngine) throws IOException {
         HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -147,7 +147,7 @@ public class HollowDiffMatcherTest {
         reader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
         return (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
     }
-    
+
     private int addFromRecord(int i, String str, int subi, double subd) {
         int subOrdinal = addSubRecord(fromStateEngine, subi, subd);
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(fromSchema);
@@ -156,7 +156,7 @@ public class HollowDiffMatcherTest {
         rec.setReference("ref", subOrdinal);
         return fromStateEngine.add("TestObject", rec);
     }
-    
+
     private int  addToRecord(String str, int subi, double subd) {
         int subOrdinal = addSubRecord(toStateEngine, subi, subd);
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(toSchema);
@@ -164,12 +164,12 @@ public class HollowDiffMatcherTest {
         rec.setReference("ref", subOrdinal);
         return toStateEngine.add("TestObject", rec);
     }
-    
+
     private int addSubRecord(HollowWriteStateEngine stateEngine, int subi, double subd) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(subObjectSchema);
         rec.setInt("int", subi);
         rec.setDouble("double", subd);
-        
+
         return stateEngine.add("TestSubObject", rec);
     }
 }

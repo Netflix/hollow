@@ -18,7 +18,7 @@ package com.netflix.hollow.api.perfapi;
 
 @FunctionalInterface
 public interface POJOInstantiator<T> {
-    
+
     T instantiate(long ref);
 
 }

@@ -304,7 +304,6 @@ final class ProducerListenerSupport extends ListenerSupport {
     }
 
 
-
     // @@@ This is used only by HollowIncrementalProducer, and should be
     // separated out
 

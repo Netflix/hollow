@@ -29,7 +29,8 @@ public class HollowMapDisabledDataAccess implements HollowMapTypeDataAccess {
 
     public static final HollowMapDisabledDataAccess INSTANCE = new HollowMapDisabledDataAccess();
 
-    private HollowMapDisabledDataAccess() { }
+    private HollowMapDisabledDataAccess() {
+    }
 
     @Override
     public HollowDataAccess getDataAccess() {
@@ -40,12 +41,12 @@ public class HollowMapDisabledDataAccess implements HollowMapTypeDataAccess {
     public void setSamplingDirector(HollowSamplingDirector director) {
         throw new IllegalStateException("Data Access is Disabled");
     }
-    
+
     @Override
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         throw new IllegalStateException("Data Access is Disabled");
     }
-    
+
     @Override
     public void ignoreUpdateThreadForSampling(Thread t) {
         throw new IllegalStateException("DataAccess is Disabled");
@@ -80,7 +81,7 @@ public class HollowMapDisabledDataAccess implements HollowMapTypeDataAccess {
     public int get(int ordinal, int keyOrdinal, int hashCode) {
         throw new IllegalStateException("Data Access is Disabled");
     }
-    
+
     @Override
     public int findKey(int ordinal, Object... hashKey) {
         throw new IllegalStateException("Data Access is Disabled");
@@ -110,5 +111,5 @@ public class HollowMapDisabledDataAccess implements HollowMapTypeDataAccess {
     public long relativeBucket(int ordinal, int bucketIndex) {
         throw new IllegalStateException("Data Access is Disabled");
     }
-    
+
 }

@@ -91,7 +91,7 @@ public class RecyclingRecycler implements ArraySegmentRecycler {
         }
 
         T get() {
-            if (!currentSegments.isEmpty()) {
+            if(!currentSegments.isEmpty()) {
                 return currentSegments.removeFirst();
             }
 
@@ -104,7 +104,7 @@ public class RecyclingRecycler implements ArraySegmentRecycler {
 
         void swap() {
             // Swap the deque references to reduce addition and clearing cost
-            if (nextSegments.size() > currentSegments.size()) {
+            if(nextSegments.size() > currentSegments.size()) {
                 Deque<T> tmp = nextSegments;
                 nextSegments = currentSegments;
                 currentSegments = tmp;

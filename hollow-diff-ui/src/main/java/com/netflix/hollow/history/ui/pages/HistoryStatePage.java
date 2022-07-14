@@ -46,7 +46,7 @@ public class HistoryStatePage extends HistoryPage {
     @Override
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(Long.parseLong(req.getParameter("version")));
-        
+
         long nextStateVersion = getNextStateVersion(historicalState);
         long prevStateVersion = getPreviousStateVersion(historicalState);
 
@@ -64,49 +64,49 @@ public class HistoryStatePage extends HistoryPage {
         ctx.put("nextStateVersion", nextStateVersion);
         ctx.put("prevStateVersion", prevStateVersion);
     }
-    
+
     public void sendJson(HttpServletRequest req, HttpServletResponse resp) {
-    	HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(Long.parseLong(req.getParameter("version")));
-    	
-    	List<HistoryStateTypeChangeSummary> typeChanges = new ArrayList<HistoryStateTypeChangeSummary>();
-    	
-    	for(Map.Entry<String, HollowHistoricalStateTypeKeyOrdinalMapping> entry : historicalState.getKeyOrdinalMapping().getTypeMappings().entrySet()) {
-    		HistoryStateTypeChangeSummary typeChange = new HistoryStateTypeChangeSummary(historicalState.getVersion(), entry.getKey(), entry.getValue());
-    		if(!typeChange.isEmpty())
-    			typeChanges.add(typeChange);
-    	}
-    	
-    	List<HollowHeaderEntry> headerEntries = getHeaderEntries(historicalState);
-    	
-    	Map<String, String> params = new HashMap<String, String>();
-    	for(HollowHeaderEntry headerEntry : headerEntries) {
-    		String key = headerEntry.getKey();
-    		if(key.equals("VIP")) {
-    			params.put("fromVip", headerEntry.getFromValue());
-    			params.put("toVip", headerEntry.getToValue());
-    		}
-    		if(key.equals("dataVersion")) {
-    			params.put("fromVersion", headerEntry.getFromValue());
-    			params.put("toVersion", headerEntry.getToValue());
-    		}
-    	}
-    	
-    	Map<String, Object> data = new HashMap<String, Object>();
-    	data.put("params", params);
-    	data.put("objectTypes", typeChanges);
-    	
-    	//resp.setContentType("application/json");
-    	try {
-			PrintWriter out = resp.getWriter();
-			Gson gson = new Gson();
-			String json = gson.toJson(data);
-			out.println(json);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    	
+        HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(Long.parseLong(req.getParameter("version")));
+
+        List<HistoryStateTypeChangeSummary> typeChanges = new ArrayList<HistoryStateTypeChangeSummary>();
+
+        for(Map.Entry<String, HollowHistoricalStateTypeKeyOrdinalMapping> entry : historicalState.getKeyOrdinalMapping().getTypeMappings().entrySet()) {
+            HistoryStateTypeChangeSummary typeChange = new HistoryStateTypeChangeSummary(historicalState.getVersion(), entry.getKey(), entry.getValue());
+            if(!typeChange.isEmpty())
+                typeChanges.add(typeChange);
+        }
+
+        List<HollowHeaderEntry> headerEntries = getHeaderEntries(historicalState);
+
+        Map<String, String> params = new HashMap<String, String>();
+        for(HollowHeaderEntry headerEntry : headerEntries) {
+            String key = headerEntry.getKey();
+            if(key.equals("VIP")) {
+                params.put("fromVip", headerEntry.getFromValue());
+                params.put("toVip", headerEntry.getToValue());
+            }
+            if(key.equals("dataVersion")) {
+                params.put("fromVersion", headerEntry.getFromValue());
+                params.put("toVersion", headerEntry.getToValue());
+            }
+        }
+
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("params", params);
+        data.put("objectTypes", typeChanges);
+
+        //resp.setContentType("application/json");
+        try {
+            PrintWriter out = resp.getWriter();
+            Gson gson = new Gson();
+            String json = gson.toJson(data);
+            out.println(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
-    
+
     private long getNextStateVersion(HollowHistoricalState currentHistoricalState) {
         if(currentHistoricalState.getNextState() != null)
             return currentHistoricalState.getNextState().getVersion();
@@ -122,10 +122,10 @@ public class HistoryStatePage extends HistoryPage {
         return -1;
     }
 
-	@Override
-	protected boolean includeHeaderAndFooter() {
-		return false;
-	}
-    
+    @Override
+    protected boolean includeHeaderAndFooter() {
+        return false;
+    }
+
 
 }

@@ -86,23 +86,23 @@ public class HollowDiffFieldCountingNode extends HollowDiffCountingNode {
 
         clearHashTable();
 
-        for(int i=0;i<fromOrdinals.size();i++) {
+        for(int i = 0; i < fromOrdinals.size(); i++) {
             indexFromOrdinal(fromOrdinals.get(i));
         }
 
-        for(int i=0;i<toOrdinals.size();i++) {
+        for(int i = 0; i < toOrdinals.size(); i++) {
             compareToOrdinal(toOrdinals.get(i));
         }
 
         int score = unmatchedToFields;
-        for(int i=0;i<ordinalHashCounts.length;i++) {
+        for(int i = 0; i < ordinalHashCounts.length; i++) {
             score += ordinalHashCounts[i];
         }
 
         if(score != 0) {
             fieldDiff.addDiff(currentTopLevelFromOrdinal, currentTopLevelToOrdinal, score);
         }
-        
+
         return score;
     }
 
@@ -112,12 +112,12 @@ public class HollowDiffFieldCountingNode extends HollowDiffCountingNode {
             fieldDiff.addDiff(currentTopLevelFromOrdinal, currentTopLevelToOrdinal, toOrdinals.size());
             return toOrdinals.size();
         }
-        
+
         if(toFieldIndex == -1) {
             fieldDiff.addDiff(currentTopLevelFromOrdinal, currentTopLevelToOrdinal, fromOrdinals.size());
             return fromOrdinals.size();
         }
-        
+
         return 0;
     }
 
@@ -170,9 +170,9 @@ public class HollowDiffFieldCountingNode extends HollowDiffCountingNode {
 
         long ordinalsAndHashCodes[] = ordinalsAndHashCodes();
 
-        for(int i=0;i<ordinalsAndHashCodes.length;i++) {
-            int hashOrdinal = (int)(ordinalsAndHashCodes[i] >> 32);
-            int hashCode = (int)ordinalsAndHashCodes[i];
+        for(int i = 0; i < ordinalsAndHashCodes.length; i++) {
+            int hashOrdinal = (int) (ordinalsAndHashCodes[i] >> 32);
+            int hashCode = (int) ordinalsAndHashCodes[i];
             int hashCount = findOrdinalCount(hashOrdinal, hashCode);
             hashIntoArray(hashOrdinal, hashCode, hashCount, newHashedOrdinals, newOrdinalHashCodes, newOrdinalHashCodeCounts);
         }
@@ -188,9 +188,9 @@ public class HollowDiffFieldCountingNode extends HollowDiffCountingNode {
 
         int count = 0;
 
-        for(int i=0;i<hashedOrdinals.length;i++) {
+        for(int i = 0; i < hashedOrdinals.length; i++) {
             if(hashedOrdinals[i] != -1)
-                ordinalsAndHashCodes[count++] = ((long)hashedOrdinals[i] << 32) | (ordinalHashCodes[i] & 0xFFFFFFFFL);
+                ordinalsAndHashCodes[count++] = ((long) hashedOrdinals[i] << 32) | (ordinalHashCodes[i] & 0xFFFFFFFFL);
         }
 
         Arrays.sort(ordinalsAndHashCodes);

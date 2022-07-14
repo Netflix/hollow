@@ -33,60 +33,60 @@ public class HollowMapShardedTest extends AbstractStateEngineTest {
     public void setUp() {
         super.setUp();
     }
-    
+
     @Test
     public void testShardedData() throws IOException {
-    
+
         HollowMapWriteRecord rec = new HollowMapWriteRecord();
-        
-        for(int i=0;i<2000;i++) {
+
+        for(int i = 0; i < 2000; i++) {
             rec.reset();
-            rec.addEntry(i, i+1);
-            rec.addEntry(i+2, i+3);
-            rec.addEntry(i+4, i+5);
-            
+            rec.addEntry(i, i + 1);
+            rec.addEntry(i + 2, i + 3);
+            rec.addEntry(i + 4, i + 5);
+
             writeStateEngine.add("TestMap", rec);
-        }
-        
-        roundTripSnapshot();
-        
-        Assert.assertEquals(8, readStateEngine.getTypeState("TestMap").numShards());
-        
-        HollowMapTypeDataAccess mapDataAccess = (HollowMapTypeDataAccess) readStateEngine.getTypeDataAccess("TestMap");
-        for(int i=0;i<1000;i++) {
-            Assert.assertEquals(3, mapDataAccess.size(i));
-            Assert.assertEquals(i+1, mapDataAccess.get(i, i));
-            Assert.assertEquals(i+3, mapDataAccess.get(i, i+2));
-            Assert.assertEquals(i+5, mapDataAccess.get(i, i+4));
         }
 
-        for(int i=0;i<2000;i++) {
+        roundTripSnapshot();
+
+        Assert.assertEquals(8, readStateEngine.getTypeState("TestMap").numShards());
+
+        HollowMapTypeDataAccess mapDataAccess = (HollowMapTypeDataAccess) readStateEngine.getTypeDataAccess("TestMap");
+        for(int i = 0; i < 1000; i++) {
+            Assert.assertEquals(3, mapDataAccess.size(i));
+            Assert.assertEquals(i + 1, mapDataAccess.get(i, i));
+            Assert.assertEquals(i + 3, mapDataAccess.get(i, i + 2));
+            Assert.assertEquals(i + 5, mapDataAccess.get(i, i + 4));
+        }
+
+        for(int i = 0; i < 2000; i++) {
             rec.reset();
-            rec.addEntry(i*2, i*2+1);
-            rec.addEntry(i*2+2, i*2+3);
-            rec.addEntry(i*2+4, i*2+5);
-            
+            rec.addEntry(i * 2, i * 2 + 1);
+            rec.addEntry(i * 2 + 2, i * 2 + 3);
+            rec.addEntry(i * 2 + 4, i * 2 + 5);
+
             writeStateEngine.add("TestMap", rec);
         }
-        
+
         roundTripDelta();
-        
+
         int expectedValue = 0;
-        
+
         BitSet populatedOrdinals = readStateEngine.getTypeState("TestMap").getPopulatedOrdinals();
-        
+
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != -1) {
             Assert.assertEquals(3, mapDataAccess.size(ordinal));
-            Assert.assertEquals(expectedValue+1, mapDataAccess.get(ordinal, expectedValue));
-            Assert.assertEquals(expectedValue+3, mapDataAccess.get(ordinal, expectedValue+2));
-            Assert.assertEquals(expectedValue+5, mapDataAccess.get(ordinal, expectedValue+4));
-            
+            Assert.assertEquals(expectedValue + 1, mapDataAccess.get(ordinal, expectedValue));
+            Assert.assertEquals(expectedValue + 3, mapDataAccess.get(ordinal, expectedValue + 2));
+            Assert.assertEquals(expectedValue + 5, mapDataAccess.get(ordinal, expectedValue + 4));
+
             expectedValue += 2;
-            ordinal = populatedOrdinals.nextSetBit(ordinal+1);
+            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
         }
     }
-    
+
     @Override
     protected void initializeTypeStates() {
         writeStateEngine.setTargetMaxTypeShardSize(4096);

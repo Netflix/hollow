@@ -49,7 +49,7 @@ public abstract class HollowSchema {
     private final String name;
 
     public HollowSchema(String name) {
-        if (name == null || name.isEmpty()) {
+        if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Type name in Hollow Schema was " + (name == null ? "null" : "an empty string"));
         }
         this.name = name;
@@ -62,21 +62,21 @@ public abstract class HollowSchema {
     public abstract SchemaType getSchemaType();
 
     public abstract void writeTo(OutputStream os) throws IOException;
-    
+
     public static HollowSchema withoutKeys(HollowSchema schema) {
         switch(schema.getSchemaType()) {
-        case SET:
-            HollowSetSchema setSchema = (HollowSetSchema)schema;
-            if(setSchema.getHashKey() != null)
-                setSchema = new HollowSetSchema(setSchema.getName(), setSchema.getElementType());
-            return setSchema;
-        case MAP:
-            HollowMapSchema mapSchema = (HollowMapSchema)schema;
-            if(mapSchema.getHashKey() != null)
-                mapSchema = new HollowMapSchema(mapSchema.getName(), mapSchema.getKeyType(), mapSchema.getValueType());
-            return mapSchema;
-        default:
-            return schema;
+            case SET:
+                HollowSetSchema setSchema = (HollowSetSchema) schema;
+                if(setSchema.getHashKey() != null)
+                    setSchema = new HollowSetSchema(setSchema.getName(), setSchema.getElementType());
+                return setSchema;
+            case MAP:
+                HollowMapSchema mapSchema = (HollowMapSchema) schema;
+                if(mapSchema.getHashKey() != null)
+                    mapSchema = new HollowMapSchema(mapSchema.getName(), mapSchema.getKeyType(), mapSchema.getValueType());
+                return mapSchema;
+            default:
+                return schema;
         }
     }
 
@@ -106,10 +106,10 @@ public abstract class HollowSchema {
 
     private static HollowObjectSchema readObjectSchemaFrom(HollowBlobInput in, String schemaName, boolean hasPrimaryKey) throws IOException {
         String[] keyFieldPaths = null;
-        if (hasPrimaryKey) {
+        if(hasPrimaryKey) {
             int numFields = VarInt.readVInt(in);
             keyFieldPaths = new String[numFields];
-            for(int i=0;i<numFields;i++) {
+            for(int i = 0; i < numFields; i++) {
                 keyFieldPaths[i] = in.readUTF();
             }
         }
@@ -117,7 +117,7 @@ public abstract class HollowSchema {
         int numFields = in.readShort();
         HollowObjectSchema schema = new HollowObjectSchema(schemaName, numFields, keyFieldPaths);
 
-        for(int i=0;i<numFields;i++) {
+        for(int i = 0; i < numFields; i++) {
             String fieldName = in.readUTF();
             FieldType fieldType = FieldType.valueOf(in.readUTF());
             String referencedType = fieldType == FieldType.REFERENCE ? in.readUTF() : null;
@@ -135,7 +135,7 @@ public abstract class HollowSchema {
         if(hasHashKey) {
             int numFields = VarInt.readVInt(in);
             hashKeyFields = new String[numFields];
-            for(int i=0;i<numFields;i++) {
+            for(int i = 0; i < numFields; i++) {
                 hashKeyFields[i] = in.readUTF();
             }
         }
@@ -158,7 +158,7 @@ public abstract class HollowSchema {
         if(hasHashKey) {
             int numFields = VarInt.readVInt(in);
             hashKeyFields = new String[numFields];
-            for(int i=0;i<numFields;i++) {
+            for(int i = 0; i < numFields; i++) {
                 hashKeyFields[i] = in.readUTF();
             }
         }
@@ -167,9 +167,9 @@ public abstract class HollowSchema {
     }
 
     protected static <T> boolean isNullableObjectEquals(T o1, T o2) {
-        if (o1==o2) return true;
-        if (o1==null && o2==null) return true;
-        if (o1!=null && o1.equals(o2)) return true;
+        if(o1 == o2) return true;
+        if(o1 == null && o2 == null) return true;
+        if(o1 != null && o1.equals(o2)) return true;
         return false;
     }
 

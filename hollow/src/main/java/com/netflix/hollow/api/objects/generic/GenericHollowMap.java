@@ -32,12 +32,12 @@ import java.util.Map;
  * The Generic Hollow Object API can be used to programmatically inspect a dataset (referenced by a {@link HollowDataAccess})
  * without a custom-generated API. 
  */
-public class GenericHollowMap extends HollowMap<HollowRecord, HollowRecord>{
+public class GenericHollowMap extends HollowMap<HollowRecord, HollowRecord> {
 
     public GenericHollowMap(HollowDataAccess dataAccess, String type, int ordinal) {
-        this((HollowMapTypeDataAccess)dataAccess.getTypeDataAccess(type, ordinal), ordinal);
+        this((HollowMapTypeDataAccess) dataAccess.getTypeDataAccess(type, ordinal), ordinal);
     }
-    
+
     public GenericHollowMap(HollowMapTypeDataAccess dataAccess, int ordinal) {
         this(new HollowMapLookupDelegate<HollowRecord, HollowRecord>(dataAccess), ordinal);
     }
@@ -45,7 +45,7 @@ public class GenericHollowMap extends HollowMap<HollowRecord, HollowRecord>{
     public GenericHollowMap(HollowMapDelegate<HollowRecord, HollowRecord> typeState, int ordinal) {
         super(typeState, ordinal);
     }
-    
+
     @Override
     public HollowRecord instantiateKey(int keyOrdinal) {
         return GenericHollowRecordHelper.instantiate(getTypeDataAccess().getDataAccess(), getSchema().getKeyType(), keyOrdinal);
@@ -65,7 +65,7 @@ public class GenericHollowMap extends HollowMap<HollowRecord, HollowRecord>{
     public boolean equalsValue(int valueOrdinal, Object testObject) {
         return GenericHollowRecordHelper.equalObject(getSchema().getValueType(), valueOrdinal, testObject);
     }
-    
+
     public <K extends HollowRecord, V extends HollowRecord> Iterable<Map.Entry<K, V>>entries() {
         return new GenericHollowMapEntryIterable<K, V>(entrySet());
     }
@@ -78,16 +78,16 @@ public class GenericHollowMap extends HollowMap<HollowRecord, HollowRecord>{
     static class GenericHollowMapEntryIterable<K extends HollowRecord, V extends HollowRecord> implements Iterable<Map.Entry<K, V>> {
 
         private final Iterable<Map.Entry<HollowRecord, HollowRecord>> wrappedIterable;
-        
+
         public GenericHollowMapEntryIterable(Iterable<Map.Entry<HollowRecord, HollowRecord>> wrap) {
             this.wrappedIterable = wrap;
         }
-        
+
         @Override
         public Iterator<Map.Entry<K, V>> iterator() {
             final Iterator<Map.Entry<HollowRecord, HollowRecord>> iter = wrappedIterable.iterator();
 
-            return new Iterator<Map.Entry<K,V>>() {
+            return new Iterator<Map.Entry<K, V>>() {
 
                 @Override
                 public boolean hasNext() {
@@ -100,25 +100,25 @@ public class GenericHollowMap extends HollowMap<HollowRecord, HollowRecord>{
                     Map.Entry<HollowRecord, HollowRecord> entry = iter.next();
                     return new GenericHollowMapEntry((K) entry.getKey(), (V) entry.getValue());
                 }
-                
+
                 @Override
                 public void remove() {
                     throw new UnsupportedOperationException();
                 }
             };
         }
-        
-        
+
+
         private class GenericHollowMapEntry implements Map.Entry<K, V> {
 
             private final K key;
             private final V value;
-            
+
             public GenericHollowMapEntry(K key, V value) {
                 this.key = key;
                 this.value = value;
             }
-            
+
             @Override
             public K getKey() {
                 return key;
@@ -133,7 +133,7 @@ public class GenericHollowMap extends HollowMap<HollowRecord, HollowRecord>{
             public V setValue(V value) {
                 throw new UnsupportedOperationException();
             }
-            
+
         }
 
     }

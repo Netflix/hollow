@@ -46,7 +46,7 @@ public interface HollowDataset {
      * @throws SchemaNotFoundException if the schema is not found
      */
     HollowSchema getNonNullSchema(String typeName) throws SchemaNotFoundException;
-    
+
     /**
      * @param other another HollowDataset
      * @return true iff the other HollowDataset has an identical set of schemas.
@@ -54,13 +54,13 @@ public interface HollowDataset {
     default boolean hasIdenticalSchemas(HollowDataset other) {
         List<HollowSchema> thisSchemas = getSchemas();
         List<HollowSchema> otherSchemas = other.getSchemas();
-        
+
         if(thisSchemas.size() != otherSchemas.size())
             return false;
-        
-        for (HollowSchema thisSchema : thisSchemas) {
+
+        for(HollowSchema thisSchema : thisSchemas) {
             HollowSchema otherSchema = other.getSchema(thisSchema.getName());
-            
+
             if(otherSchema == null || !thisSchema.equals(otherSchema))
                 return false;
         }

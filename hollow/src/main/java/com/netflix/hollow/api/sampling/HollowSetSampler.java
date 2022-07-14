@@ -48,7 +48,7 @@ public class HollowSetSampler implements HollowSampler {
         if(!"".equals(typeName) && fieldSpec.doesIncludeType(typeName))
             this.director = director;
     }
-    
+
 
     @Override
     public void setUpdateThread(Thread t) {

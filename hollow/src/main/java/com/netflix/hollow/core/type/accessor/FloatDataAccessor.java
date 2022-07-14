@@ -28,7 +28,7 @@ public class FloatDataAccessor extends AbstractHollowDataAccessor<Float> {
     private HollowConsumerAPI.FloatRetriever api;
 
     public FloatDataAccessor(HollowConsumer consumer) {
-        this(consumer.getStateEngine(), (HollowConsumerAPI.FloatRetriever)consumer.getAPI());
+        this(consumer.getStateEngine(), (HollowConsumerAPI.FloatRetriever) consumer.getAPI());
     }
 
     public FloatDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.FloatRetriever api) {
@@ -36,7 +36,8 @@ public class FloatDataAccessor extends AbstractHollowDataAccessor<Float> {
         this.api = api;
     }
 
-    @Override public Float getRecord(int ordinal){
+    @Override
+    public Float getRecord(int ordinal) {
         HFloat val = api.getHFloat(ordinal);
         return val == null ? null : val.getValueBoxed();
     }

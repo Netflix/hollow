@@ -25,17 +25,17 @@ public class ObjectIdentityOrdinalMapTest {
 
     @Test
     public void test() {
-        for(int i=0;i<obj.length;i++) {
+        for(int i = 0; i < obj.length; i++) {
             obj[i] = new Object();
         }
 
         ObjectIdentityOrdinalMap ordinalMap = new ObjectIdentityOrdinalMap();
 
-        for(int i=0;i<obj.length;i++) {
+        for(int i = 0; i < obj.length; i++) {
             ordinalMap.put(obj[i], i);
         }
 
-        for(int i=0;i<obj.length;i++) {
+        for(int i = 0; i < obj.length; i++) {
             Assert.assertEquals(ordinalMap.getEntry(obj[i]).getOrdinal(), i);
         }
     }

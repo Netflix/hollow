@@ -70,11 +70,11 @@ public class RestoreWriteStateEngineListTest extends AbstractStateEngineTest {
 
         Assert.assertEquals(3, readStateEngine.getTypeState("TestList").maxOrdinal());
     }
-    
+
     @Test
     public void restoreFailsIfShardConfigurationChanges() throws IOException {
         roundTripSnapshot();
-        
+
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
         HollowListTypeWriteState misconfiguredTypeState = new HollowListTypeWriteState(new HollowListSchema("TestList", "TestObject"), 16);
         writeStateEngine.addTypeState(misconfiguredTypeState);
@@ -82,13 +82,14 @@ public class RestoreWriteStateEngineListTest extends AbstractStateEngineTest {
         try {
             writeStateEngine.restoreFrom(readStateEngine);
             Assert.fail("Should have thrown IllegalStateException because shard configuration has changed");
-        } catch(IllegalStateException expected) { }
+        } catch (IllegalStateException expected) {
+        }
     }
 
     private void addRecord(int... ordinals) {
         HollowListWriteRecord rec = new HollowListWriteRecord();
 
-        for(int i=0;i<ordinals.length;i++) {
+        for(int i = 0; i < ordinals.length; i++) {
             rec.addElement(ordinals[i]);
         }
 
@@ -99,7 +100,7 @@ public class RestoreWriteStateEngineListTest extends AbstractStateEngineTest {
         HollowListTypeReadState readState = (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
         HollowOrdinalIterator iter = readState.ordinalIterator(ordinal);
 
-        for(int i=0;i<elements.length;i++) {
+        for(int i = 0; i < elements.length; i++) {
             Assert.assertEquals(elements[i], iter.next());
         }
 

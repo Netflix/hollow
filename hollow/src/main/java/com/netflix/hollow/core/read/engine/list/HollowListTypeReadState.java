@@ -46,11 +46,11 @@ import java.util.BitSet;
 public class HollowListTypeReadState extends HollowCollectionTypeReadState implements HollowListTypeDataAccess {
 
     private final HollowListSampler sampler;
-    
+
     private final int shardNumberMask;
     private final int shardOrdinalShift;
     private final HollowListTypeReadStateShard shards[];
-    
+
     private int maxOrdinal;
 
     public HollowListTypeReadState(HollowReadStateEngine stateEngine, HollowListSchema schema, int numShards) {
@@ -62,14 +62,14 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
         this.sampler = new HollowListSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         this.shardNumberMask = numShards - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
-        
+
         if(numShards < 1 || 1 << shardOrdinalShift != numShards)
             throw new IllegalArgumentException("Number of shards must be a power of 2!");
-        
+
         HollowListTypeReadStateShard shards[] = new HollowListTypeReadStateShard[numShards];
-        for(int i=0;i<shards.length;i++)
+        for(int i = 0; i < shards.length; i++)
             shards[i] = new HollowListTypeReadStateShard();
-        
+
         this.shards = shards;
     }
 
@@ -77,16 +77,16 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
-        
-        for(int i=0;i<shards.length;i++) {
+
+        for(int i = 0; i < shards.length; i++) {
             HollowListTypeDataElements snapshotData = new HollowListTypeDataElements(memoryMode, memoryRecycler);
             snapshotData.readSnapshot(in);
             shards[i].setCurrentData(snapshotData);
         }
-        
+
         if(shards.length == 1)
             maxOrdinal = shards[0].currentDataElements().maxOrdinal;
-        
+
         SnapshotPopulatedOrdinalsReader.readOrdinals(in, stateListeners);
     }
 
@@ -95,7 +95,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
-        for(int i=0; i<shards.length; i++) {
+        for(int i = 0; i < shards.length; i++) {
             HollowListTypeDataElements deltaData = new HollowListTypeDataElements(memoryMode, memoryRecycler);
             deltaData.readDelta(in);
             if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
@@ -185,7 +185,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     public void setSamplingDirector(HollowSamplingDirector director) {
         sampler.setSamplingDirector(director);
     }
-    
+
     @Override
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         sampler.setFieldSpecificSamplingDirector(fieldSpec, director);
@@ -199,16 +199,16 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     @Override
     protected void invalidate() {
         stateListeners = EMPTY_LISTENERS;
-        for(int i=0;i<shards.length;i++)
+        for(int i = 0; i < shards.length; i++)
             shards[i].invalidate();
     }
 
     HollowListTypeDataElements[] currentDataElements() {
         HollowListTypeDataElements currentDataElements[] = new HollowListTypeDataElements[shards.length];
-        
-        for(int i=0; i<shards.length; i++)
+
+        for(int i = 0; i < shards.length; i++)
             currentDataElements[i] = shards[i].currentDataElements();
-        
+
         return currentDataElements;
     }
 
@@ -223,32 +223,32 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     protected void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema) {
         if(!getSchema().equals(withSchema))
             throw new IllegalArgumentException("HollowListTypeReadState cannot calculate checksum with unequal schemas: " + getSchema().getName());
-        
+
         BitSet populatedOrdinals = getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
-        for(int i=0; i<shards.length; i++)
+        for(int i = 0; i < shards.length; i++)
             shards[i].applyToChecksum(checksum, populatedOrdinals, i, shards.length);
     }
 
-	@Override
-	public long getApproximateHeapFootprintInBytes() {
+    @Override
+    public long getApproximateHeapFootprintInBytes() {
         long totalApproximateHeapFootprintInBytes = 0;
-        
-        for(int i=0; i<shards.length; i++)
+
+        for(int i = 0; i < shards.length; i++)
             totalApproximateHeapFootprintInBytes += shards[i].getApproximateHeapFootprintInBytes();
-        
+
         return totalApproximateHeapFootprintInBytes;
-	}
-	
-	@Override
+    }
+
+    @Override
     public long getApproximateHoleCostInBytes() {
         long totalApproximateHoleCostInBytes = 0;
-        
+
         BitSet populatedOrdinals = getPopulatedOrdinals();
 
-        for(int i=0; i<shards.length; i++)
+        for(int i = 0; i < shards.length; i++)
             totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, shards.length);
-        
+
         return totalApproximateHoleCostInBytes;
     }
 

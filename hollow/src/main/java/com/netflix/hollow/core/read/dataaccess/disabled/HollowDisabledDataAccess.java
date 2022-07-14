@@ -35,7 +35,8 @@ public class HollowDisabledDataAccess implements HollowDataAccess {
 
     public static final HollowDisabledDataAccess INSTANCE = new HollowDisabledDataAccess();
 
-    private HollowDisabledDataAccess() { }
+    private HollowDisabledDataAccess() {
+    }
 
     @Override
     public HollowTypeDataAccess getTypeDataAccess(String typeName) {
@@ -78,7 +79,8 @@ public class HollowDisabledDataAccess implements HollowDataAccess {
     }
 
     @Override
-    public void resetSampling() { }
+    public void resetSampling() {
+    }
 
     @Override
     public boolean hasSampleResults() {

@@ -13,59 +13,78 @@ public class HollowProducerFakeListener implements HollowProducerListener {
     }
 
     @Override
-    public void onProducerInit(long elapsed, TimeUnit unit) { }
+    public void onProducerInit(long elapsed, TimeUnit unit) {
+    }
 
     @Override
-    public void onProducerRestoreStart(long restoreVersion) { }
+    public void onProducerRestoreStart(long restoreVersion) {
+    }
 
     @Override
-    public void onProducerRestoreComplete(RestoreStatus status, long elapsed, TimeUnit unit) { }
+    public void onProducerRestoreComplete(RestoreStatus status, long elapsed, TimeUnit unit) {
+    }
 
     @Override
-    public void onNewDeltaChain(long version) { }
+    public void onNewDeltaChain(long version) {
+    }
 
     @Override
-    public void onCycleStart(long version) { }
+    public void onCycleStart(long version) {
+    }
 
     @Override
-    public void onCycleComplete(ProducerStatus status, long elapsed, TimeUnit unit) { }
+    public void onCycleComplete(ProducerStatus status, long elapsed, TimeUnit unit) {
+    }
 
     @Override
-    public void onNoDeltaAvailable(long version) { }
+    public void onNoDeltaAvailable(long version) {
+    }
 
     @Override
-    public void onPopulateStart(long version) { }
+    public void onPopulateStart(long version) {
+    }
 
     @Override
-    public void onPopulateComplete(ProducerStatus status, long elapsed, TimeUnit unit) { }
+    public void onPopulateComplete(ProducerStatus status, long elapsed, TimeUnit unit) {
+    }
 
     @Override
-    public void onPublishStart(long version) { }
+    public void onPublishStart(long version) {
+    }
 
     @Override
-    public void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit) { }
+    public void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit) {
+    }
 
     @Override
-    public void onArtifactPublish(PublishStatus publishStatus, long elapsed, TimeUnit unit) { }
+    public void onArtifactPublish(PublishStatus publishStatus, long elapsed, TimeUnit unit) {
+    }
 
     @Override
-    public void onIntegrityCheckStart(long version) { }
+    public void onIntegrityCheckStart(long version) {
+    }
 
     @Override
-    public void onIntegrityCheckComplete(ProducerStatus status, long elapsed, TimeUnit unit) { }
+    public void onIntegrityCheckComplete(ProducerStatus status, long elapsed, TimeUnit unit) {
+    }
 
     @Override
-    public void onValidationStart(long version) { }
+    public void onValidationStart(long version) {
+    }
 
     @Override
-    public void onValidationComplete(ProducerStatus status, long elapsed, TimeUnit unit) { }
+    public void onValidationComplete(ProducerStatus status, long elapsed, TimeUnit unit) {
+    }
 
     @Override
-    public void onAnnouncementStart(long version) { }
+    public void onAnnouncementStart(long version) {
+    }
 
     @Override
-    public void onAnnouncementStart(HollowProducer.ReadState readState) { }
+    public void onAnnouncementStart(HollowProducer.ReadState readState) {
+    }
 
     @Override
-    public void onAnnouncementComplete(ProducerStatus status, long elapsed, TimeUnit unit) { }
+    public void onAnnouncementComplete(ProducerStatus status, long elapsed, TimeUnit unit) {
+    }
 }

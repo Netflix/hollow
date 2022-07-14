@@ -65,7 +65,7 @@ public interface MissingDataHandler {
     public HollowOrdinalIterator handleSetPotentialMatchIterator(String type, int ordinal, int hashCode);
 
     public boolean handleSetContainsElement(String type, int ordinal, int elementOrdinal, int elementOrdinalHashCode);
-    
+
     public int handleSetFindElement(String type, int ordinal, Object... keys);
 
     ///// MAP /////
@@ -77,7 +77,7 @@ public interface MissingDataHandler {
     public HollowMapEntryOrdinalIterator handleMapPotentialMatchOrdinalIterator(String type, int ordinal, int keyHashCode);
 
     public int handleMapGet(String type, int ordinal, int keyOrdinal, int keyOrdinalHashCode);
-    
+
     public int handleMapFindKey(String type, int ordinal, Object... keys);
 
     public int handleMapFindValue(String type, int ordinal, Object... keys);

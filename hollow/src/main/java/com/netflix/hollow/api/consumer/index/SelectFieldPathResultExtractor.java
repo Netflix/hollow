@@ -77,12 +77,12 @@ final class SelectFieldPathResultExtractor<T> {
                 FieldPaths.createFieldPathForHashIndex(dataset, rootTypeName, fieldPath);
 
         String typeName;
-        if (!fp.getSegments().isEmpty()) {
+        if(!fp.getSegments().isEmpty()) {
             // @@@ Method on FieldPath
             FieldPaths.FieldSegment lastSegment = fp.getSegments().get(fp.getSegments().size() - 1);
             HollowSchema.SchemaType schemaType = lastSegment.getEnclosingSchema().getSchemaType();
             HollowObjectSchema.FieldType schemaFieldType;
-            if (schemaType == HollowSchema.SchemaType.OBJECT) {
+            if(schemaType == HollowSchema.SchemaType.OBJECT) {
                 FieldPaths.ObjectFieldSegment os = (FieldPaths.ObjectFieldSegment) lastSegment;
                 schemaFieldType = os.getType();
             } else {
@@ -90,32 +90,32 @@ final class SelectFieldPathResultExtractor<T> {
             }
             typeName = lastSegment.getTypeName();
 
-            if (schemaFieldType != HollowObjectSchema.FieldType.REFERENCE) {
+            if(schemaFieldType != HollowObjectSchema.FieldType.REFERENCE) {
                 // The field path must reference a field of a reference type
                 // This is contrary to the underlying HollowHashIndex which selects
                 // the enclosing reference type for a field of a value type.
                 // It is considered better to be consistent and literal with field path
                 // expressions
                 throw incompatibleSelectType(selectType, fieldPath, schemaFieldType);
-            } else if (typeName.equals("String")) {
-                if (!HollowObject.class.isAssignableFrom(selectType)) {
+            } else if(typeName.equals("String")) {
+                if(!HollowObject.class.isAssignableFrom(selectType)) {
                     throw incompatibleSelectType(selectType, fieldPath, typeName);
                 }
                 // @@@ Check that object schema has single value field of String type such as HString
-            } else if (!HollowObjectTypeMapper.getDefaultTypeName(selectType).equals(typeName)) {
-                if (schemaType != HollowSchema.SchemaType.OBJECT && !GenericHollowObject.class.isAssignableFrom(
+            } else if(!HollowObjectTypeMapper.getDefaultTypeName(selectType).equals(typeName)) {
+                if(schemaType != HollowSchema.SchemaType.OBJECT && !GenericHollowObject.class.isAssignableFrom(
                         selectType)) {
                     throw incompatibleSelectType(selectType, fieldPath, typeName);
                 }
                 // @@@ GenericHollow{List, Set, Map} based on schemaType
-            } else if (!HollowRecord.class.isAssignableFrom(selectType)) {
+            } else if(!HollowRecord.class.isAssignableFrom(selectType)) {
                 throw incompatibleSelectType(selectType, fieldPath, typeName);
             }
         } else {
             typeName = rootTypeName;
         }
 
-        if (GenericHollowObject.class.isAssignableFrom(selectType)) {
+        if(GenericHollowObject.class.isAssignableFrom(selectType)) {
             BiObjectIntFunction<HollowAPI, T> extractor =
                     (a, o) -> {
                         @SuppressWarnings("unchecked")

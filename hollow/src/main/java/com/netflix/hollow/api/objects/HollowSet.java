@@ -55,7 +55,7 @@ public abstract class HollowSet<T> extends AbstractSet<T> implements HollowRecor
     public boolean contains(Object o) {
         return delegate.contains(this, ordinal, o);
     }
-    
+
     /**
      * Find an element with the specified hash key. 
      * 
@@ -67,6 +67,7 @@ public abstract class HollowSet<T> extends AbstractSet<T> implements HollowRecor
     }
 
     public abstract T instantiateElement(int elementOrdinal);
+
     public abstract boolean equalsElement(int elementOrdinal, Object testObject);
 
     @Override
@@ -93,14 +94,14 @@ public abstract class HollowSet<T> extends AbstractSet<T> implements HollowRecor
     public boolean equals(Object o) {
         // Note: hashCode is computed from the set's contents, see AbstractSet.hashCode
 
-        if (this == o) {
+        if(this == o) {
             return true;
         }
 
         // If type state is the same then compare ordinals
-        if (o instanceof HollowSet) {
+        if(o instanceof HollowSet) {
             HollowSet<?> that = (HollowSet<?>) o;
-            if (delegate.getTypeDataAccess() == that.delegate.getTypeDataAccess()) {
+            if(delegate.getTypeDataAccess() == that.delegate.getTypeDataAccess()) {
                 return ordinal == that.ordinal;
             }
         }
@@ -126,7 +127,7 @@ public abstract class HollowSet<T> extends AbstractSet<T> implements HollowRecor
 
         @Override
         public T next() {
-            if (!hasNext()) {
+            if(!hasNext()) {
                 throw new NoSuchElementException();
             }
 

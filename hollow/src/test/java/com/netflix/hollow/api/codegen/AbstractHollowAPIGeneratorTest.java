@@ -37,7 +37,7 @@ public class AbstractHollowAPIGeneratorTest {
     void runGenerator(String apiClassName, String packageName, Class<?> clazz,
             UnaryOperator<HollowAPIGenerator.Builder> generatorCustomizer) throws Exception {
         System.out.println(String.format("Folders (%s) : \n\tsource=%s \n\tclasses=%s",
-                    getClass().getSimpleName(), sourceFolder, clazzFolder));
+                getClass().getSimpleName(), sourceFolder, clazzFolder));
 
         // Setup Folders
         HollowCodeGenerationCompileUtil.cleanupFolder(new File(sourceFolder), null);
@@ -54,7 +54,7 @@ public class AbstractHollowAPIGeneratorTest {
     }
 
     void assertNonEmptyFileExists(String relativePath) throws IOException {
-        if (relativePath.startsWith("/")) {
+        if(relativePath.startsWith("/")) {
             throw new IllegalArgumentException("Relative paths should not start with /");
         }
         File f = new File(sourceFolder + "/" + relativePath);
@@ -70,7 +70,7 @@ public class AbstractHollowAPIGeneratorTest {
     }
 
     void assertFileDoesNotExist(String relativePath) {
-        if (relativePath.startsWith("/")) {
+        if(relativePath.startsWith("/")) {
             throw new IllegalArgumentException("Relative paths should not start with /");
         }
         assertFalse("File should not exist at " + relativePath,

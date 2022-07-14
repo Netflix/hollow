@@ -165,8 +165,8 @@ public class HollowMapFastDeltaTest extends AbstractStateEngineTest {
     private void addRecord(int... ordinals) {
         HollowMapWriteRecord rec = new HollowMapWriteRecord();
 
-        for(int i=0;i<ordinals.length;i+=2) {
-            rec.addEntry(ordinals[i], ordinals[i+1]);
+        for(int i = 0; i < ordinals.length; i += 2) {
+            rec.addEntry(ordinals[i], ordinals[i + 1]);
         }
 
         writeStateEngine.add("TestMap", rec);
@@ -175,8 +175,8 @@ public class HollowMapFastDeltaTest extends AbstractStateEngineTest {
     private void assertMap(HollowMapTypeReadState readState, int ordinal, int... elements) {
         Assert.assertEquals(elements.length / 2, readState.size(ordinal));
 
-        for(int i=0;i<elements.length;i+=2) {
-            Assert.assertEquals(elements[i+1], readState.get(ordinal, elements[i]));
+        for(int i = 0; i < elements.length; i += 2) {
+            Assert.assertEquals(elements[i + 1], readState.get(ordinal, elements[i]));
         }
     }
 

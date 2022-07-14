@@ -46,14 +46,14 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     public HollowObjectTypeWriteState(HollowObjectSchema schema) {
         this(schema, -1);
     }
-    
+
     public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards) {
         super(schema, numShards);
     }
 
     @Override
     public HollowObjectSchema getSchema() {
-        return (HollowObjectSchema)schema;
+        return (HollowObjectSchema) schema;
     }
 
     /**
@@ -70,25 +70,25 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         fieldStats = new FieldStatistics(getSchema());
 
         int maxOrdinal = ordinalMap.maxOrdinal();
-        
-        for(int i=0;i<=maxOrdinal;i++) {
+
+        for(int i = 0; i <= maxOrdinal; i++) {
             discoverObjectFieldStatisticsForRecord(fieldStats, i);
         }
 
         fieldStats.completeCalculations();
-        
+
         if(numShards == -1) {
-            long projectedSizeOfType = ((long)fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
+            long projectedSizeOfType = ((long) fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
             projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
-            
+
             numShards = 1;
-            while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType) 
+            while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType)
                 numShards *= 2;
         }
-        
+
         maxShardOrdinal = new int[numShards];
-        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards; 
-        for(int i=0;i<numShards;i++)
+        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards;
+        for(int i = 0; i < numShards; i++)
             maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
     }
 
@@ -96,7 +96,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         if(currentCyclePopulated.get(ordinal) || previousCyclePopulated.get(ordinal)) {
             long pointer = ordinalMap.getPointerForData(ordinal);
 
-            for(int fieldIndex=0; fieldIndex<((HollowObjectSchema)schema).numFields(); fieldIndex++) {
+            for(int fieldIndex = 0; fieldIndex < ((HollowObjectSchema) schema).numFields(); fieldIndex++) {
                 pointer = discoverObjectFieldStatisticsForField(fieldStats, pointer, fieldIndex);
             }
         }
@@ -106,42 +106,42 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
         switch(getSchema().getFieldType(fieldIndex)) {
-        case BOOLEAN:
-            addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 2);
-            pointer += 1;
-            break;
-        case FLOAT:
-            addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 32);
-            pointer += 4;
-            break;
-        case DOUBLE:
-            addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 64);
-            pointer += 8;
-            break;
-        case LONG:
-        case INT:
-        case REFERENCE:
-            if(VarInt.readVNull(data, pointer)) {
-               addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 1);
-               pointer += 1;
-            } else {
-                long vLong = VarInt.readVLong(data, pointer);
-                int requiredBitsForFieldValue = 64 - Long.numberOfLeadingZeros(vLong + 1);
-                addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, requiredBitsForFieldValue);
-                pointer += VarInt.sizeOfVLong(vLong);
-            }
-            break;
-        case BYTES:
-        case STRING:
-            if(VarInt.readVNull(data, pointer)) {
-                addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 1);
+            case BOOLEAN:
+                addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 2);
                 pointer += 1;
-            } else {
-                int length = VarInt.readVInt(data, pointer);
-                addVarLengthFieldSizeInBytes(fieldStats, fieldIndex, length);
-                pointer += length + VarInt.sizeOfVInt(length);
-            }
-            break;
+                break;
+            case FLOAT:
+                addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 32);
+                pointer += 4;
+                break;
+            case DOUBLE:
+                addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 64);
+                pointer += 8;
+                break;
+            case LONG:
+            case INT:
+            case REFERENCE:
+                if(VarInt.readVNull(data, pointer)) {
+                    addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 1);
+                    pointer += 1;
+                } else {
+                    long vLong = VarInt.readVLong(data, pointer);
+                    int requiredBitsForFieldValue = 64 - Long.numberOfLeadingZeros(vLong + 1);
+                    addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, requiredBitsForFieldValue);
+                    pointer += VarInt.sizeOfVLong(vLong);
+                }
+                break;
+            case BYTES:
+            case STRING:
+                if(VarInt.readVNull(data, pointer)) {
+                    addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 1);
+                    pointer += 1;
+                } else {
+                    int length = VarInt.readVInt(data, pointer);
+                    addVarLengthFieldSizeInBytes(fieldStats, fieldIndex, length);
+                    pointer += length + VarInt.sizeOfVInt(length);
+                }
+                break;
         }
         return pointer;
     }
@@ -165,19 +165,19 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     public void calculateSnapshot() {
         maxOrdinal = ordinalMap.maxOrdinal();
         int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
-        
+
         fixedLengthLongArray = new FixedLengthElementArray[numShards];
         varLengthByteArrays = new ByteDataArray[numShards][];
         recordBitOffset = new long[numShards];
-        
-        for(int i=0;i<numShards;i++) {
-            fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numBitsPerRecord * (maxShardOrdinal[i] + 1));
+
+        for(int i = 0; i < numShards; i++) {
+            fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long) numBitsPerRecord * (maxShardOrdinal[i] + 1));
             varLengthByteArrays[i] = new ByteDataArray[getSchema().numFields()];
         }
-        
+
         int shardMask = numShards - 1;
-    
-        for(int i=0;i<=maxOrdinal;i++) {
+
+        for(int i = 0; i <= maxOrdinal; i++) {
             int shardNumber = i & shardMask;
             if(currentCyclePopulated.get(i)) {
                 addRecord(i, recordBitOffset[shardNumber], fixedLengthLongArray[shardNumber], varLengthByteArrays[shardNumber]);
@@ -187,7 +187,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             recordBitOffset[shardNumber] += numBitsPerRecord;
         }
     }
-    
+
     @Override
     public void writeSnapshot(DataOutputStream os) throws IOException {
         /// for unsharded blobs, support pre v2.1.0 clients
@@ -196,15 +196,15 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         } else {
             /// overall max ordinal
             VarInt.writeVInt(os, maxOrdinal);
-            
-            for(int i=0;i<numShards;i++) {
+
+            for(int i = 0; i < numShards; i++) {
                 writeSnapshotShard(os, i);
             }
         }
 
         /// Populated bits
         currentCyclePopulated.serializeBitsTo(os);
-        
+
         fixedLengthLongArray = null;
         varLengthByteArrays = null;
         recordBitOffset = null;
@@ -215,7 +215,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         VarInt.writeVInt(os, maxShardOrdinal[shardNumber]);
 
         /// 2) FixedLength field sizes
-        for(int i=0;i<getSchema().numFields();i++) {
+        for(int i = 0; i < getSchema().numFields(); i++) {
             VarInt.writeVInt(os, fieldStats.getMaxBitsForField(i));
         }
 
@@ -225,7 +225,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         fixedLengthLongArray[shardNumber].writeTo(os, numLongsRequired);
 
         /// 4) VarLength data
-        for(int i=0;i<varLengthByteArrays[shardNumber].length;i++) {
+        for(int i = 0; i < varLengthByteArrays[shardNumber].length; i++) {
             if(varLengthByteArrays[shardNumber][i] == null) {
                 VarInt.writeVLong(os, 0);
             } else {
@@ -267,17 +267,17 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         varLengthByteArrays = new ByteDataArray[numShards][];
         recordBitOffset = new long[numShards];
         int numAddedRecordsInShard[] = new int[numShards];
-        
+
         int shardMask = numShards - 1;
-        
+
         int addedOrdinal = deltaAdditions.nextSetBit(0);
         while(addedOrdinal != -1) {
             numAddedRecordsInShard[addedOrdinal & shardMask]++;
             addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
         }
-        
-        for(int i=0;i<numShards;i++) {
-            fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numAddedRecordsInShard[i] * numBitsPerRecord);
+
+        for(int i = 0; i < numShards; i++) {
+            fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long) numAddedRecordsInShard[i] * numBitsPerRecord);
             deltaAddedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
             deltaRemovedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
             varLengthByteArrays[i] = new ByteDataArray[getSchema().numFields()];
@@ -286,7 +286,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         int previousRemovedOrdinal[] = new int[numShards];
         int previousAddedOrdinal[] = new int[numShards];
 
-        for(int i=0;i<=maxOrdinal;i++) {
+        for(int i = 0; i <= maxOrdinal; i++) {
             int shardNumber = i & shardMask;
             if(deltaAdditions.get(i)) {
                 addRecord(i, recordBitOffset[shardNumber], fixedLengthLongArray[shardNumber], varLengthByteArrays[shardNumber]);
@@ -309,12 +309,12 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         } else {
             /// overall max ordinal
             VarInt.writeVInt(os, maxOrdinal);
-            
-            for(int i=0;i<numShards;i++) {
+
+            for(int i = 0; i < numShards; i++) {
                 writeCalculatedDeltaShard(os, i);
             }
         }
-        
+
         fixedLengthLongArray = null;
         varLengthByteArrays = null;
         deltaAddedOrdinals = null;
@@ -334,7 +334,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         deltaAddedOrdinals[shardNumber].getUnderlyingArray().writeTo(os, 0, deltaAddedOrdinals[shardNumber].length());
 
         /// 3) FixedLength field sizes
-        for(int i=0;i<getSchema().numFields();i++) {
+        for(int i = 0; i < getSchema().numFields(); i++) {
             VarInt.writeVInt(os, fieldStats.getMaxBitsForField(i));
         }
 
@@ -344,7 +344,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         fixedLengthLongArray[shardNumber].writeTo(os, numLongsRequired);
 
         /// 5) VarLength data
-        for(int i=0;i<varLengthByteArrays[shardNumber].length;i++) {
+        for(int i = 0; i < varLengthByteArrays[shardNumber].length; i++) {
             if(varLengthByteArrays[shardNumber][i] == null) {
                 VarInt.writeVLong(os, 0);
             } else {
@@ -356,7 +356,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     /// here we need to add the offsets for the variable-length field endings, as they will be read as the start position for the following record.
     private void addNullRecord(int ordinal, long recordBitOffset, FixedLengthElementArray fixedLengthLongArray, ByteDataArray varLengthByteArrays[]) {
-        for(int fieldIndex=0; fieldIndex < getSchema().numFields(); fieldIndex++) {
+        for(int fieldIndex = 0; fieldIndex < getSchema().numFields(); fieldIndex++) {
             if(getSchema().getFieldType(fieldIndex) == FieldType.STRING || getSchema().getFieldType(fieldIndex) == FieldType.BYTES) {
                 long fieldBitOffset = recordBitOffset + fieldStats.getFieldBitOffset(fieldIndex);
                 int bitsPerElement = fieldStats.getMaxBitsForField(fieldIndex);
@@ -369,7 +369,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     private void addRecord(int ordinal, long recordBitOffset, FixedLengthElementArray fixedLengthLongArray, ByteDataArray varLengthByteArrays[]) {
         long pointer = ordinalMap.getPointerForData(ordinal);
 
-        for(int fieldIndex=0; fieldIndex < getSchema().numFields(); fieldIndex++) {
+        for(int fieldIndex = 0; fieldIndex < getSchema().numFields(); fieldIndex++) {
             pointer = addRecordField(pointer, recordBitOffset, fieldIndex, fixedLengthLongArray, varLengthByteArrays);
         }
     }
@@ -381,56 +381,56 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
         switch(fieldType) {
-        case BOOLEAN:
-            if(VarInt.readVNull(data, readPointer)) {
-                fixedLengthLongArray.setElementValue(fieldBitOffset, 2, 3);
-            } else {
-                fixedLengthLongArray.setElementValue(fieldBitOffset, 2, data.get(readPointer));
-            }
-            readPointer += 1;
-            break;
-        case FLOAT:
-            long intValue = data.readIntBits(readPointer) & 0xFFFFFFFFL;
-            fixedLengthLongArray.setElementValue(fieldBitOffset, 32, intValue);
-            readPointer += 4;
-            break;
-        case DOUBLE:
-            long longValue = data.readLongBits(readPointer);
-            fixedLengthLongArray.setElementValue(fieldBitOffset, 64, longValue);
-            readPointer += 8;
-            break;
-        case LONG:
-        case INT:
-        case REFERENCE:
-            if(VarInt.readVNull(data, readPointer)) {
-               fixedLengthLongArray.setElementValue(fieldBitOffset, bitsPerElement, fieldStats.getNullValueForField(fieldIndex));
-               readPointer += 1;
-            } else {
-                long vLong = VarInt.readVLong(data, readPointer);
-                fixedLengthLongArray.setElementValue(fieldBitOffset, bitsPerElement, vLong);
-                readPointer += VarInt.sizeOfVLong(vLong);
-            }
-            break;
-        case BYTES:
-        case STRING:
-            ByteDataArray varLengthBuf = getByteArray(varLengthByteArrays, fieldIndex);
-
-            if(VarInt.readVNull(data, readPointer)) {
-                long offset = varLengthBuf.length();
-
-                fixedLengthLongArray.setElementValue(fieldBitOffset, bitsPerElement, offset | (1L << (bitsPerElement - 1))); // write offset with set null bit
+            case BOOLEAN:
+                if(VarInt.readVNull(data, readPointer)) {
+                    fixedLengthLongArray.setElementValue(fieldBitOffset, 2, 3);
+                } else {
+                    fixedLengthLongArray.setElementValue(fieldBitOffset, 2, data.get(readPointer));
+                }
                 readPointer += 1;
-            } else {
-                int length = VarInt.readVInt(data, readPointer);
-                readPointer += VarInt.sizeOfVInt(length);
-                varLengthBuf.copyFrom(data, readPointer, length);
+                break;
+            case FLOAT:
+                long intValue = data.readIntBits(readPointer) & 0xFFFFFFFFL;
+                fixedLengthLongArray.setElementValue(fieldBitOffset, 32, intValue);
+                readPointer += 4;
+                break;
+            case DOUBLE:
+                long longValue = data.readLongBits(readPointer);
+                fixedLengthLongArray.setElementValue(fieldBitOffset, 64, longValue);
+                readPointer += 8;
+                break;
+            case LONG:
+            case INT:
+            case REFERENCE:
+                if(VarInt.readVNull(data, readPointer)) {
+                    fixedLengthLongArray.setElementValue(fieldBitOffset, bitsPerElement, fieldStats.getNullValueForField(fieldIndex));
+                    readPointer += 1;
+                } else {
+                    long vLong = VarInt.readVLong(data, readPointer);
+                    fixedLengthLongArray.setElementValue(fieldBitOffset, bitsPerElement, vLong);
+                    readPointer += VarInt.sizeOfVLong(vLong);
+                }
+                break;
+            case BYTES:
+            case STRING:
+                ByteDataArray varLengthBuf = getByteArray(varLengthByteArrays, fieldIndex);
 
-                long offset = varLengthBuf.length();
+                if(VarInt.readVNull(data, readPointer)) {
+                    long offset = varLengthBuf.length();
 
-                fixedLengthLongArray.setElementValue(fieldBitOffset, bitsPerElement, offset);
-                readPointer += length;
-            }
-            break;
+                    fixedLengthLongArray.setElementValue(fieldBitOffset, bitsPerElement, offset | (1L << (bitsPerElement - 1))); // write offset with set null bit
+                    readPointer += 1;
+                } else {
+                    int length = VarInt.readVInt(data, readPointer);
+                    readPointer += VarInt.sizeOfVInt(length);
+                    varLengthBuf.copyFrom(data, readPointer, length);
+
+                    long offset = varLengthBuf.length();
+
+                    fixedLengthLongArray.setElementValue(fieldBitOffset, bitsPerElement, offset);
+                    readPointer += length;
+                }
+                break;
         }
         return readPointer;
     }

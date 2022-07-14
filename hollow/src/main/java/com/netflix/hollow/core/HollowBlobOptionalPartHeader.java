@@ -23,7 +23,7 @@ import java.util.List;
 public class HollowBlobOptionalPartHeader {
 
     public static final int HOLLOW_BLOB_PART_VERSION_HEADER = 1031;
-    
+
     private final String partName;
     private List<HollowSchema> schemas = Collections.emptyList();
     private long originRandomizedTag;
@@ -60,5 +60,5 @@ public class HollowBlobOptionalPartHeader {
     public String getPartName() {
         return partName;
     }
-    
+
 }

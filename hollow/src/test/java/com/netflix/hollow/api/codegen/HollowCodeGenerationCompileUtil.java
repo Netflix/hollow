@@ -52,13 +52,13 @@ public class HollowCodeGenerationCompileUtil {
 
         // argList.toArray() for large size had trouble
         String[] args = new String[argList.size()];
-        for (int i = 0; i < argList.size(); i++) {
+        for(int i = 0; i < argList.size(); i++) {
             args[i] = argList.get(i);
         }
 
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         int err = compiler.run(null, System.out, System.out, args);
-        if (err != 0)
+        if(err != 0)
             throw new RuntimeException("compiler errors, see system.out");
         runFindbugs(classDir);
     }
@@ -74,23 +74,23 @@ public class HollowCodeGenerationCompileUtil {
                 new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream(FILENAME_FINDBUGS)));
         String line = "";
         String foundBug = null;
-        while ((line = reader.readLine()) != null) { // poor man's xml parser
-            if (line.contains("<BugInstance")) {
+        while((line = reader.readLine()) != null) { // poor man's xml parser
+            if(line.contains("<BugInstance")) {
                 foundBug = line;
-            } else if (foundBug != null) {
+            } else if(foundBug != null) {
                 foundBug += "\n" + line;
             }
-            if (line.contains("</BugInstance>")) {
+            if(line.contains("</BugInstance>")) {
                 throw new Exception("Findbugs found an error:\n" + foundBug);
             }
         }
     }
 
     private static void addAllJavaFiles(File folder, List<String> result) throws IOException {
-        for (File f : folder.listFiles()) {
-            if (f.isDirectory()) {
+        for(File f : folder.listFiles()) {
+            if(f.isDirectory()) {
                 addAllJavaFiles(f, result);
-            } else if (f.getName().endsWith(".java")) {
+            } else if(f.getName().endsWith(".java")) {
                 result.add(f.toString());
 
                 System.out.println("Java file: " + f.getName());
@@ -110,12 +110,12 @@ public class HollowCodeGenerationCompileUtil {
      */
     public static void cleanupFolder(File folder, Long timestamp) {
         System.out.println("Cleaning up folder: " + folder.getAbsolutePath());
-        if (folder.exists()) {
-            for (File file : folder.listFiles()) {
-                if (file.isDirectory()) {
+        if(folder.exists()) {
+            for(File file : folder.listFiles()) {
+                if(file.isDirectory()) {
                     cleanupFolder(file, timestamp);
                     file.delete();
-                } else if (timestamp == null || (timestamp.longValue() - file.lastModified() >= 5000)) { // cleanup file if it is older than specified timestamp with some buffer time
+                } else if(timestamp == null || (timestamp.longValue() - file.lastModified() >= 5000)) { // cleanup file if it is older than specified timestamp with some buffer time
                     System.out.println(String.format("\t deleting file: %s, lastModified=%s", file.getName(), new Date(file.lastModified())));
                     file.delete();
                 }

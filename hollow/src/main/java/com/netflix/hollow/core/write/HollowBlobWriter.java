@@ -134,12 +134,12 @@ public class HollowBlobWriter {
             partStreamsByType = partStreams.getStreamsByType();
 
         stateEngine.prepareForWrite();
-        
+
         if(stateEngine.isRestored())
             stateEngine.ensureAllNecessaryStatesRestored();
 
         List<HollowSchema> changedTypes = changedTypes();
-        
+
         DataOutputStream dos = new DataOutputStream(os);
         HollowBlobHeaderWrapper hollowBlobHeaderWrapper = buildHeader(partStreams, changedTypes, false);
         writeHeaders(dos, partStreams, false, hollowBlobHeaderWrapper);
@@ -202,10 +202,10 @@ public class HollowBlobWriter {
             partStreamsByType = partStreams.getStreamsByType();
 
         stateEngine.prepareForWrite();
-        
+
         if(stateEngine.isRestored())
             stateEngine.ensureAllNecessaryStatesRestored();
-        
+
         List<HollowSchema> changedTypes = changedTypes();
 
         DataOutputStream dos = new DataOutputStream(os);
@@ -251,9 +251,9 @@ public class HollowBlobWriter {
 
     private List<HollowSchema> changedTypes() {
         List<HollowSchema> changedTypes = new ArrayList<HollowSchema>();
-        
+
         List<HollowTypeWriteState> orderedTypeStates = stateEngine.getOrderedTypeStates();
-        for(int i=0;i<orderedTypeStates.size();i++) {
+        for(int i = 0; i < orderedTypeStates.size(); i++) {
             HollowTypeWriteState writeState = orderedTypeStates.get(i);
             if(writeState.hasChangedSinceLastCycle())
                 changedTypes.add(writeState.getSchema());
@@ -261,10 +261,10 @@ public class HollowBlobWriter {
 
         return changedTypes;
     }
-    
+
     private void writeNumShards(DataOutputStream dos, int numShards) throws IOException {
         VarInt.writeVInt(dos, 1 + VarInt.sizeOfVInt(numShards)); /// pre 2.1.0 forwards compatibility:
-                                                                 /// skip new forwards-compatibility and num shards
+        /// skip new forwards-compatibility and num shards
         
         VarInt.writeVInt(dos, 0); /// 2.1.0 forwards-compatibility, can write number of bytes for older readers to skip here.
         

@@ -75,7 +75,7 @@ public class HollowPrefixIndexTest {
     @Test
     public void testCustomPrefixIndex() throws Exception {
 
-        for (Movie movie : getSimpleList()) {
+        for(Movie movie : getSimpleList()) {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
@@ -97,7 +97,7 @@ public class HollowPrefixIndexTest {
         List<Movie> movies = getSimpleList();
         ((SimpleMovie) movies.get(0)).updateName("007 James Bond");// test numbers
         ((SimpleMovie) movies.get(1)).updateName("龍爭虎鬥");// "Enter The Dragon"
-        for (Movie movie : movies) {
+        for(Movie movie : movies) {
             objectMapper.add(movie);
         }
 
@@ -123,7 +123,7 @@ public class HollowPrefixIndexTest {
         movies.add(m);
         m = new SimpleMovie(6, "0 dark thirty", 1997);
         movies.add(m);
-        for (Movie movie : movies) {
+        for(Movie movie : movies) {
             objectMapper.add(movie);
         }
 
@@ -191,7 +191,7 @@ public class HollowPrefixIndexTest {
         int numMovies = 10;
         IntStream.range(0, numMovies).mapToObj(index ->
                 new MovieActorReference(index, 1999 + index, "The Matrix " + index, actors))
-            .forEach(objectMapper::add);
+                .forEach(objectMapper::add);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
         HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieActorReference", "actors.element");
         Assert.assertEquals(numMovies, toSet(prefixIndex.findKeysWithPrefix("kea")).size());
@@ -229,7 +229,7 @@ public class HollowPrefixIndexTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidType() throws Exception {
-        for (Movie movie : getSimpleList()) {
+        for(Movie movie : getSimpleList()) {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
@@ -240,7 +240,7 @@ public class HollowPrefixIndexTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidFieldPath() throws Exception {
-        for (Movie movie : getSimpleList()) {
+        for(Movie movie : getSimpleList()) {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
@@ -251,7 +251,7 @@ public class HollowPrefixIndexTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidFieldPathReference() throws Exception {
-        for (Movie movie : getReferenceList()) {
+        for(Movie movie : getReferenceList()) {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
@@ -263,7 +263,7 @@ public class HollowPrefixIndexTest {
 
     @Test
     public void testAutoExpandFieldPath() throws Exception {
-        for (Movie movie : getReferenceList()) {
+        for(Movie movie : getReferenceList()) {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
@@ -274,7 +274,7 @@ public class HollowPrefixIndexTest {
     }
 
     private void test(List<Movie> movies, String type, String fieldPath) throws Exception {
-        for (Movie movie : movies) {
+        for(Movie movie : movies) {
             objectMapper.add(movie);
         }
 
@@ -340,7 +340,7 @@ public class HollowPrefixIndexTest {
     private Set<Integer> toSet(HollowOrdinalIterator iterator) {
         Set<Integer> ordinals = new HashSet<>();
         int ordinal = iterator.next();
-        while (ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        while(ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
             ordinals.add(ordinal);
             ordinal = iterator.next();
         }
@@ -353,7 +353,7 @@ public class HollowPrefixIndexTest {
         HollowObjectTypeReadState nameReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState("String");
         int nameField = movieReadState.getSchema().getPosition(field);
         int valueField = nameReadState.getSchema().getPosition("value");
-        for (int ordinal : ordinals) {
+        for(int ordinal : ordinals) {
             int nameOrdinal = movieReadState.readOrdinal(ordinal, nameField);
             movieNames.add(nameReadState.readString(nameOrdinal, valueField));
         }
@@ -374,9 +374,9 @@ public class HollowPrefixIndexTest {
             // split the key by " ";
             String[] keys = super.getKeys(ordinal);
             List<String> tokens = new ArrayList<>();
-            for (String key : keys) {
+            for(String key : keys) {
                 String[] splits = key.split(" ");
-                for (String split : splits)
+                for(String split : splits)
                     tokens.add(split.toLowerCase());
             }
             return tokens.toArray(new String[tokens.size()]);

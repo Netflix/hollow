@@ -25,12 +25,12 @@ public class IntegerHollowFactory extends HollowFactory<HInteger> {
 
     @Override
     public HInteger newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HInteger(((IntegerTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return new HInteger(((IntegerTypeAPI) typeAPI).getDelegateLookupImpl(), ordinal);
     }
 
     @Override
     public HInteger newCachedHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HInteger(new IntegerDelegateCachedImpl((IntegerTypeAPI)typeAPI, ordinal), ordinal);
+        return new HInteger(new IntegerDelegateCachedImpl((IntegerTypeAPI) typeAPI, ordinal), ordinal);
     }
 
 }

@@ -28,7 +28,7 @@ import org.openjdk.jmh.runner.options.TimeValue;
 public class HashCodesBenchmark {
     private ThreadLocalRandom random = ThreadLocalRandom.current();
 
-    @Param( {"1", "10", "1000"})
+    @Param({"1", "10", "1000"})
     int length;
 
     byte[] charData;
@@ -42,7 +42,7 @@ public class HashCodesBenchmark {
     public void setup() {
         charData = new byte[length];
         multibyteCharData = new byte[length];
-        for (int i = 0; i < length; i++) {
+        for(int i = 0; i < length; i++) {
             charData[i] = (byte) random.nextInt(0x80);
             multibyteCharData[i] = (byte) random.nextInt(Character.MAX_VALUE);
         }

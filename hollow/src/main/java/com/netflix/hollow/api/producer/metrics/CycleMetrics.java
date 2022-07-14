@@ -29,12 +29,15 @@ public class CycleMetrics {
     public long getConsecutiveFailures() {
         return consecutiveFailures;
     }
+
     public OptionalLong getCycleDurationMillis() {
         return cycleDurationMillis;
     }
+
     public Optional<Boolean> getIsCycleSuccess() {
         return isCycleSuccess;
     }
+
     public OptionalLong getLastCycleSuccessTimeNano() {
         return lastCycleSuccessTimeNano;
     }
@@ -62,14 +65,17 @@ public class CycleMetrics {
             this.consecutiveFailures = consecutiveFailures;
             return this;
         }
+
         public Builder setCycleDurationMillis(long cycleDurationMillis) {
             this.cycleDurationMillis = OptionalLong.of(cycleDurationMillis);
             return this;
         }
+
         public Builder setIsCycleSuccess(boolean isCycleSuccess) {
             this.isCycleSuccess = Optional.of(isCycleSuccess);
             return this;
         }
+
         public Builder setLastCycleSuccessTimeNano(long lastCycleSuccessTimeNano) {
             this.lastCycleSuccessTimeNano = OptionalLong.of(lastCycleSuccessTimeNano);
             return this;

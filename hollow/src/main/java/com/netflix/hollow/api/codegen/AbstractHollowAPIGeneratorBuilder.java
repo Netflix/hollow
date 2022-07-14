@@ -142,11 +142,11 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
     }
 
     public G build() {
-        if (apiClassname == null)
+        if(apiClassname == null)
             throw new IllegalStateException("Please specify an API classname (.withAPIClassname()) before calling .build()");
-        if (packageName == null)
+        if(packageName == null)
             throw new IllegalStateException("Please specify a package name (.withPackageName()) before calling .build()");
-        if (dataset == null)
+        if(dataset == null)
             throw new IllegalStateException("Please specify a data model (.withDataModel()) before calling .build()");
 
         if(config.isRestrictApiToFieldType() && !useErgonomicShortcuts) {

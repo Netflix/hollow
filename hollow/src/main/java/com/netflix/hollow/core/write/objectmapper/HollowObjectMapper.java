@@ -72,14 +72,14 @@ public class HollowObjectMapper {
         HollowTypeMapper typeMapper = getTypeMapper(o.getClass(), null, null);
         return typeMapper.write(o);
     }
-    
+
     /**
      * Warning: Experimental.  the FlatRecord feature is subject to breaking changes.
      */
     @Deprecated
     public void writeFlat(Object o, FlatRecordWriter flatRecordWriter) {
-    	HollowTypeMapper typeMapper = getTypeMapper(o.getClass(), null, null);
-    	typeMapper.writeFlat(o, flatRecordWriter);
+        HollowTypeMapper typeMapper = getTypeMapper(o.getClass(), null, null);
+        typeMapper.writeFlat(o, flatRecordWriter);
     }
 
     /**
@@ -134,24 +134,24 @@ public class HollowObjectMapper {
                 : findTypeName(type);
         HollowTypeMapper typeMapper = typeMappers.get(typeName);
 
-        if (typeMapper == null) {
-            if (visited == null) {
+        if(typeMapper == null) {
+            if(visited == null) {
                 // Used to detect circular references in the model
                 // See HollowObjectTypeMapper and MappedField
                 visited = new HashSet<>();
             }
 
-            if (type instanceof ParameterizedType) {
+            if(type instanceof ParameterizedType) {
                 ParameterizedType parameterizedType = (ParameterizedType) type;
                 Class<?> clazz = (Class<?>) parameterizedType.getRawType();
 
-                if (List.class.isAssignableFrom(clazz)) {
+                if(List.class.isAssignableFrom(clazz)) {
                     typeMapper = new HollowListTypeMapper(this, parameterizedType, typeName, numShards,
                             ignoreListOrdering, visited);
-                } else if (Set.class.isAssignableFrom(clazz)) {
+                } else if(Set.class.isAssignableFrom(clazz)) {
                     typeMapper = new HollowSetTypeMapper(this, parameterizedType, typeName, hashKeyFieldPaths,
                             numShards, stateEngine, useDefaultHashKeys, visited);
-                } else if (Map.class.isAssignableFrom(clazz)) {
+                } else if(Map.class.isAssignableFrom(clazz)) {
                     typeMapper = new HollowMapTypeMapper(this, parameterizedType, typeName, hashKeyFieldPaths,
                             numShards, stateEngine, useDefaultHashKeys, visited);
                 } else {
@@ -162,7 +162,7 @@ public class HollowObjectMapper {
             }
 
             HollowTypeMapper existing = typeMappers.putIfAbsent(typeName, typeMapper);
-            if (existing != null) {
+            if(existing != null) {
                 typeMapper = existing;
             } else {
                 typeMapper.addTypeState(stateEngine);

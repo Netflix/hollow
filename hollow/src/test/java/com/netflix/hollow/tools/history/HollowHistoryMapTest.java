@@ -111,26 +111,26 @@ public class HollowHistoryMapTest extends AbstractStateEngineTest {
     }
 
     private void assertRecord(HollowDataAccess dataAccess, int ordinal, int... expectedEntries) {
-        HollowMapTypeDataAccess typeDataAccess = (HollowMapTypeDataAccess)dataAccess.getTypeDataAccess("TestMap");
+        HollowMapTypeDataAccess typeDataAccess = (HollowMapTypeDataAccess) dataAccess.getTypeDataAccess("TestMap");
 
         test:
-        for(int i=0;i<expectedEntries.length;i+=2) {
+        for(int i = 0; i < expectedEntries.length; i += 2) {
             HollowMapEntryOrdinalIterator iter = typeDataAccess.potentialMatchOrdinalIterator(ordinal, expectedEntries[i]);
 
             while(iter.next()) {
-                if(iter.getKey() == expectedEntries[i] && iter.getValue() == expectedEntries[i+1])
+                if(iter.getKey() == expectedEntries[i] && iter.getValue() == expectedEntries[i + 1])
                     continue test;
             }
 
-            Assert.fail("Did not find expected entry (" + expectedEntries[i] + "," + expectedEntries[i+1] + ") for ordinal " + ordinal);
+            Assert.fail("Did not find expected entry (" + expectedEntries[i] + "," + expectedEntries[i + 1] + ") for ordinal " + ordinal);
         }
     }
 
     private void addRecord(int... entries) {
         HollowMapWriteRecord rec = new HollowMapWriteRecord();
 
-        for(int i=0;i<entries.length;i+=2) {
-            rec.addEntry(entries[i], entries[i+1]);
+        for(int i = 0; i < entries.length; i += 2) {
+            rec.addEntry(entries[i], entries[i + 1]);
         }
 
         writeStateEngine.add("TestMap", rec);

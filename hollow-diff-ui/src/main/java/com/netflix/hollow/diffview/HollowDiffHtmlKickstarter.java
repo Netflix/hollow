@@ -30,13 +30,13 @@ public class HollowDiffHtmlKickstarter {
     }
 
     public String initialHtmlRows(HollowObjectView objectView) {
-        
+
         String diffViewOutput = null;
         try {
             StringWriter writer = new StringWriter();
             DiffViewOutputGenerator.buildChildRowDisplayData(objectView.getRootRow(), writer);
             diffViewOutput = writer.toString();
-        } catch(IOException unexpected) {
+        } catch (IOException unexpected) {
             throw new RuntimeException(unexpected);
         }
 
@@ -65,11 +65,11 @@ public class HollowDiffHtmlKickstarter {
             initialHtml.append(">");
 
             if(action == Action.PARTIAL_UNCOLLAPSE) {
-                initialHtml.append("<td class=\"margin\">").append("<img src=\""+baseURL+"/resource/partial_expand.png\"/>").append("</td>");
+                initialHtml.append("<td class=\"margin\">").append("<img src=\"" + baseURL + "/resource/partial_expand.png\"/>").append("</td>");
             } else if(action == Action.UNCOLLAPSE) {
-                initialHtml.append("<td class=\"margin\">").append("<img src=\""+baseURL+"/resource/expand.png\"/>").append("</td>");
+                initialHtml.append("<td class=\"margin\">").append("<img src=\"" + baseURL + "/resource/expand.png\"/>").append("</td>");
             } else if(action == Action.COLLAPSE) {
-                initialHtml.append("<td class=\"margin\">").append("<img src=\""+baseURL+"/resource/collapse.png\"/>").append("</td>");
+                initialHtml.append("<td class=\"margin\">").append("<img src=\"" + baseURL + "/resource/collapse.png\"/>").append("</td>");
             } else {
                 initialHtml.append("<td class=\"margin\"/>");
             }
@@ -83,11 +83,11 @@ public class HollowDiffHtmlKickstarter {
             initialHtml.append("<td class=\"").append(fromCellClassname).append("\">").append(fromCellContent).append("</td>");
 
             if(action == Action.PARTIAL_UNCOLLAPSE) {
-                initialHtml.append("<td class=\"margin\">").append("<img src=\""+baseURL+"/resource/partial_expand.png\"/>").append("</td>");
+                initialHtml.append("<td class=\"margin\">").append("<img src=\"" + baseURL + "/resource/partial_expand.png\"/>").append("</td>");
             } else if(action == Action.UNCOLLAPSE) {
-                initialHtml.append("<td class=\"margin\">").append("<img src=\""+baseURL+"/resource/expand.png\"/>").append("</td>");
+                initialHtml.append("<td class=\"margin\">").append("<img src=\"" + baseURL + "/resource/expand.png\"/>").append("</td>");
             } else if(action == Action.COLLAPSE) {
-                initialHtml.append("<td class=\"margin\">").append("<img src=\""+baseURL+"/resource/collapse.png\"/>").append("</td>");
+                initialHtml.append("<td class=\"margin\">").append("<img src=\"" + baseURL + "/resource/collapse.png\"/>").append("</td>");
             } else {
                 initialHtml.append("<td class=\"margin\"/>");
             }
@@ -118,7 +118,7 @@ public class HollowDiffHtmlKickstarter {
 
             if(endIdx != -1) {
                 token = str.substring(cursor, endIdx);
-                cursor = endIdx+1;
+                cursor = endIdx + 1;
             } else {
                 token = str.substring(cursor);
                 cursor = -1;

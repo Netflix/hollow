@@ -1,9 +1,9 @@
 apply plugin: 'java-library'
- 
-dependencies {
-    api project(':hollow')
 
-    implementation 'com.netflix.zeno:netflix-zeno:2.22.3'
+dependencies{
+    apiproject(':hollow')
 
-    testImplementation 'junit:junit:4.11'
+    implementation'com.netflix.zeno:netflix-zeno:2.22.3'
+
+    testImplementation'junit:junit:4.11'
 }

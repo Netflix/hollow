@@ -31,6 +31,7 @@ public class IndirectCircularReference {
             this.f = f;
         }
     }
+
     class TypeF {
         private final TypeG g;
 
@@ -38,6 +39,7 @@ public class IndirectCircularReference {
             this.g = g;
         }
     }
+
     class TypeG {
         private final TypeE e;
 

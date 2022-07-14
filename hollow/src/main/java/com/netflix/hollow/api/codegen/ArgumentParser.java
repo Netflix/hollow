@@ -43,9 +43,9 @@ public class ArgumentParser<T extends Enum> {
     private final List<ParsedArgument> parsedArguments = new ArrayList<>();
 
     public ArgumentParser(Class<T> validArguments, String[] args) {
-        for (String arg : args) {
+        for(String arg : args) {
             Matcher matcher = COMMAND_LINE_ARG_PATTERN.matcher(arg);
-            if (!matcher.matches()) {
+            if(!matcher.matches()) {
                 throw new IllegalArgumentException("Invalid argument " + arg);
             }
             String argK = matcher.group(1);

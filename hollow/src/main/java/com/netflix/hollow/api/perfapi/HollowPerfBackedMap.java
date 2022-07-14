@@ -53,16 +53,16 @@ public class HollowPerfBackedMap<K, V> extends AbstractMap<K, V> {
     @Override
     public boolean containsKey(Object o) {
         Object[] hashKey = hashKeyExtractor.extractArray(o);
-        
+
         return dataAccess.findValue(ordinal, hashKey) != -1;
     }
 
     @Override
     public V get(Object o) {
         Object[] hashKey = hashKeyExtractor.extractArray(o);
-        
+
         int valueOrdinal = dataAccess.findValue(ordinal, hashKey);
-        
+
         return valueOrdinal == -1 ? null : valueInstantiator.instantiate(valueMaskedTypeIdx | valueOrdinal);
     }
 
@@ -83,7 +83,7 @@ public class HollowPerfBackedMap<K, V> extends AbstractMap<K, V> {
 
                     @Override
                     public Entry<K, V> next() {
-                        if (!hasNext()) {
+                        if(!hasNext()) {
                             throw new NoSuchElementException();
                         }
 
@@ -103,20 +103,20 @@ public class HollowPerfBackedMap<K, V> extends AbstractMap<K, V> {
 
             @Override
             public boolean contains(Object o) {
-                if (!(o instanceof Map.Entry)) {
+                if(!(o instanceof Map.Entry)) {
                     return false;
                 }
 
                 Entry<?, ?> e = (Entry<?, ?>) o;
                 Object[] hashKey = hashKeyExtractor.extractArray(e.getKey());
                 int valueOrdinal = dataAccess.findValue(ordinal, hashKey);
-                
+
                 if(valueOrdinal != -1) {
                     V iV = valueInstantiator.instantiate(valueMaskedTypeIdx | valueOrdinal);
                     if(Objects.equals(iV, e.getValue()))
                         return true;
                 }
-                
+
                 return false;
             }
         };
@@ -144,7 +144,7 @@ public class HollowPerfBackedMap<K, V> extends AbstractMap<K, V> {
 
         @Override
         public K getKey() {
-            if (!kInstantiated) {
+            if(!kInstantiated) {
                 kInstantiated = true;
                 k = keyInstantiator.instantiate(kRef);
             }
@@ -153,7 +153,7 @@ public class HollowPerfBackedMap<K, V> extends AbstractMap<K, V> {
 
         @Override
         public V getValue() {
-            if (!vInstantiated) {
+            if(!vInstantiated) {
                 vInstantiated = true;
                 v = valueInstantiator.instantiate(vRef);
             }
@@ -167,7 +167,7 @@ public class HollowPerfBackedMap<K, V> extends AbstractMap<K, V> {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof Map.Entry)) {
+            if(!(o instanceof Map.Entry)) {
                 return false;
             }
             Entry<?, ?> e = (Entry<?, ?>) o;
@@ -186,5 +186,5 @@ public class HollowPerfBackedMap<K, V> extends AbstractMap<K, V> {
             return getKey() + "=" + getValue();
         }
     }
-    
+
 }

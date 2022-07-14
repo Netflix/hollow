@@ -36,7 +36,7 @@ public interface HollowCollectionTypeDataAccess extends HollowTypeDataAccess {
      * @return the number of elements contained in the set at the specified ordinal.
      */
     int size(int ordinal);
-    
+
     /**
      * @param ordinal the ordinal
      * @return an iterator over all elements in the collection.

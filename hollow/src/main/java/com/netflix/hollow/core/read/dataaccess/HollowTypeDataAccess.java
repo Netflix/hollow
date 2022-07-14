@@ -39,9 +39,9 @@ public interface HollowTypeDataAccess {
     HollowSchema getSchema();
 
     void setSamplingDirector(HollowSamplingDirector director);
-    
+
     void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director);
-    
+
     void ignoreUpdateThreadForSampling(Thread t);
 
     HollowSampler getSampler();

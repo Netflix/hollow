@@ -28,7 +28,7 @@ public class VersionTimestampConverter {
     private static final TimeZone UTC_TIMEZONE = TimeZone.getTimeZone("UTC");
 
     private static long ADD_MILLIS_TO_TIMESTAMP = 0;
-    
+
     public static void addMillisToTimestamps(long millis) {
         ADD_MILLIS_TO_TIMESTAMP = millis;
     }
@@ -47,7 +47,8 @@ public class VersionTimestampConverter {
             sdf.setTimeZone(timeZone);
 
             return sdf.format(adjustedDate);
-        } catch (ParseException ignore) { }
+        } catch (ParseException ignore) {
+        }
 
         return String.valueOf(versionLong);
     }

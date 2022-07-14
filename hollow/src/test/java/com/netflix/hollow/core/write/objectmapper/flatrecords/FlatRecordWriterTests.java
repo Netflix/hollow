@@ -39,7 +39,7 @@ import org.junit.Test;
 
 public class FlatRecordWriterTests {
 
-    
+
     private HollowObjectMapper mapper;
     private HollowSchemaIdentifierMapper schemaIdMapper;
 
@@ -66,10 +66,10 @@ public class FlatRecordWriterTests {
     public void flatRecordsDedupRedundantDataWithinRecords() {
         int recSize1 = flatRecordSize(new TypeA(1, "two", "three", "four"));
         int recSize2 = flatRecordSize(new TypeA(1, "two", "three", "four", "three"));
-        
+
         Assert.assertTrue(recSize2 - recSize1 == 1);
     }
-    
+
     @Test
     public void flatRecordsCanBeDumpedToStateEngineWithIdenticalSchemas() throws IOException {
         producer.initializeDataModel(TypeA.class, TypeC.class);
@@ -83,10 +83,10 @@ public class FlatRecordWriterTests {
 
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
         consumer.triggerRefresh();
-        
+
         GenericHollowObject typeA0 = new GenericHollowObject(consumer.getStateEngine(), "TypeA", 0);
         GenericHollowObject typeA1 = new GenericHollowObject(consumer.getStateEngine(), "TypeA", 1);
-        
+
         Assert.assertEquals(1, typeA0.getInt("a1"));
         Assert.assertEquals("two", typeA0.getString("a2"));
         Assert.assertEquals("three", typeA0.getObject("a3").getString("b1"));
@@ -107,10 +107,10 @@ public class FlatRecordWriterTests {
 
         Assert.assertEquals("one", typeC0.getString("c1"));
         Assert.assertEquals("four", typeC0.getObject("c2").getString("b1"));
-        
+
         Assert.assertEquals(typeC0.getObject("c2").getOrdinal(), typeA0.getSet("a4").findElement("four").getOrdinal());
     }
-    
+
     @Test
     public void flatRecordsCanBeDumpedToStateEnginesWithDifferentButCompatibleSchemas() {
         HollowObjectSchema typeASchema = new HollowObjectSchema("TypeA", 4, new PrimaryKey("TypeA", "a1", "a3.b1"));
@@ -118,7 +118,7 @@ public class FlatRecordWriterTests {
         typeASchema.addField("a2", FieldType.STRING);
         typeASchema.addField("a3", FieldType.REFERENCE, "TypeB");
         typeASchema.addField("a5", FieldType.BYTES);
-        
+
         HollowObjectSchema typeBSchema = new HollowObjectSchema("TypeB", 2);
         typeBSchema.addField("b1", FieldType.STRING);
         typeBSchema.addField("b2", FieldType.INT);
@@ -126,9 +126,9 @@ public class FlatRecordWriterTests {
         HollowObjectSchema typeCSchema = new HollowObjectSchema("TypeC", 2);
         typeCSchema.addField("c2", FieldType.REFERENCE, "TypeB");
         typeCSchema.addField("c3", FieldType.FLOAT);
-        
+
         producer.initializeDataModel(typeASchema, typeBSchema, typeCSchema);
-        
+
         producer.runCycle(state -> {
             FlatRecordDumper dumper = new FlatRecordDumper(state.getStateEngine());
             dumper.dump(flatten(new TypeA(1, "two", "three", "four", "five")));
@@ -141,7 +141,7 @@ public class FlatRecordWriterTests {
 
         GenericHollowObject typeA0 = new GenericHollowObject(consumer.getStateEngine(), "TypeA", 0);
         GenericHollowObject typeA1 = new GenericHollowObject(consumer.getStateEngine(), "TypeA", 1);
-        
+
         Assert.assertEquals(1, typeA0.getInt("a1"));
         Assert.assertEquals("two", typeA0.getString("a2"));
         Assert.assertEquals("three", typeA0.getObject("a3").getString("b1"));
@@ -159,34 +159,34 @@ public class FlatRecordWriterTests {
         Assert.assertTrue(typeC0.isNull("c1"));
         Assert.assertEquals("three", typeC0.getObject("c2").getString("b1"));
         Assert.assertTrue(typeC0.isNull("c3"));
-        
+
         Assert.assertEquals(typeC0.getObject("c2").getOrdinal(), typeA0.getObject("a3").getOrdinal());
     }
-    
+
     private FlatRecord flatten(Object obj) {
         flatRecordWriter.reset();
         mapper.writeFlat(obj, flatRecordWriter);
         return flatRecordWriter.generateFlatRecord();
     }
-    
+
     private int flatRecordSize(Object obj) {
         flatRecordWriter.reset();
         mapper.writeFlat(obj, flatRecordWriter);
-        try(ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             flatRecordWriter.writeTo(baos);
             return baos.size();
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @HollowPrimaryKey(fields = { "a1", "a3" })
+    @HollowPrimaryKey(fields = {"a1", "a3"})
     public static class TypeA {
         int a1;
         @HollowInline
         String a2;
         TypeB a3;
-        @HollowHashKey(fields="b1")
+        @HollowHashKey(fields = "b1")
         Set<TypeB> a4;
         @HollowInline
         Integer nullablePrimitiveInt;
@@ -196,7 +196,7 @@ public class FlatRecordWriterTests {
             this.a2 = a2;
             this.a3 = new TypeB(a3);
             this.a4 = new HashSet<>(b1s.length);
-            for (int i = 0; i < b1s.length; i++) {
+            for(int i = 0; i < b1s.length; i++) {
                 this.a4.add(new TypeB(b1s[i]));
             }
             this.nullablePrimitiveInt = null;

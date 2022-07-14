@@ -96,14 +96,30 @@ public interface HollowUpdateListener extends HollowConsumer.ObjectLongevityDete
     void transitionApplied(HollowBlob transition);
 
     HollowUpdateListener DEFAULT_LISTENER = new HollowUpdateListener() {
-        @Override public void dataInitialized(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception { }
-        @Override public void dataUpdated(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception { }
-        @Override public void transitionApplied(HollowBlob transition) { }
-        @Override public void refreshStarted(long currentVersion, long requestedVersion) { }
-        @Override public void refreshCompleted(long beforeVersion, long afterVersion, long requestedVersion) { }
-        @Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }
-        @Override public void staleReferenceExistenceDetected(int count) { }
-        @Override public void staleReferenceUsageDetected(int count) { }
+        @Override
+        public void dataInitialized(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+        }
+        @Override
+        public void dataUpdated(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+        }
+        @Override
+        public void transitionApplied(HollowBlob transition) {
+        }
+        @Override
+        public void refreshStarted(long currentVersion, long requestedVersion) {
+        }
+        @Override
+        public void refreshCompleted(long beforeVersion, long afterVersion, long requestedVersion) {
+        }
+        @Override
+        public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
+        }
+        @Override
+        public void staleReferenceExistenceDetected(int count) {
+        }
+        @Override
+        public void staleReferenceUsageDetected(int count) {
+        }
     };
-    
+
 }

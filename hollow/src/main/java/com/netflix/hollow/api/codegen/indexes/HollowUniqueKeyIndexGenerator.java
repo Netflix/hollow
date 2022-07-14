@@ -62,7 +62,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
         builder.append("import " + HollowConsumer.class.getName() + ";\n");
         builder.append("import " + AbstractHollowUniqueKeyIndex.class.getName() + ";\n");
         builder.append("import " + HollowUniqueKeyIndex.class.getName() + ";\n");
-        if (isGenSimpleConstructor)
+        if(isGenSimpleConstructor)
             builder.append("import " + HollowObjectSchema.class.getName() + ";\n");
 
         builder.append("\n/**\n");
@@ -71,7 +71,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
         builder.append("@Deprecated\n");
         builder.append("@SuppressWarnings(\"all\")\n");
         builder.append("public class " + className + " extends " + AbstractHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + hollowImplClassname(type) + "> ");
-        if (isImplementsUniqueKeyIndex) {
+        if(isImplementsUniqueKeyIndex) {
             builder.append("implements " + HollowUniqueKeyIndex.class.getSimpleName() + "<" + hollowImplClassname(type) + "> ");
         }
         builder.append("{\n\n");
@@ -86,7 +86,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
     }
 
     protected void genConstructors(StringBuilder builder) {
-        if (isGenSimpleConstructor)
+        if(isGenSimpleConstructor)
             genSimpleConstructor(builder);
 
         genParameterizedConstructor(builder);
@@ -94,7 +94,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
 
     protected void genSimpleConstructor(StringBuilder builder) {
         builder.append("    public " + className + "(HollowConsumer consumer) {\n");
-        builder.append("        this(consumer, "+ isAutoListenToDataRefresh + ");\n");
+        builder.append("        this(consumer, " + isAutoListenToDataRefresh + ");\n");
         builder.append("    }\n\n");
 
         builder.append("    public " + className + "(HollowConsumer consumer, boolean isListenToDataRefresh) {\n");
@@ -105,7 +105,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
 
     protected void genParameterizedConstructor(StringBuilder builder) {
         builder.append("    " + (isParameterizedConstructorPublic ? "public " : "private ") + className + "(HollowConsumer consumer, String... fieldPaths) {\n");
-        builder.append("        this(consumer, "+ isAutoListenToDataRefresh + ", fieldPaths);\n");
+        builder.append("        this(consumer, " + isAutoListenToDataRefresh + ", fieldPaths);\n");
         builder.append("    }\n\n");
 
         builder.append("    " + (isParameterizedConstructorPublic ? "public " : "private ") + className + "(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {\n");
@@ -119,7 +119,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
     }
 
     protected void genFindMatchAPI(StringBuilder builder) {
-        if (isImplementsUniqueKeyIndex)
+        if(isImplementsUniqueKeyIndex)
             builder.append("    @Override\n");
         builder.append("    public " + hollowImplClassname(type) + " findMatch(Object... keys) {\n");
         builder.append("        int ordinal = idx.getMatchingOrdinal(keys);\n");

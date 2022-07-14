@@ -30,14 +30,14 @@ import java.util.Set;
 
 /// This InMemoryBlobStore is both a HollowProducer.Publisher and HollowConsumer.BlobRetriever!
 public class InMemoryBlobStore implements BlobRetriever, Publisher {
-    
+
     private final Set<String> optionalPartsToRetrieve;
 
     private Map<Long, Blob> snapshots;
     private Map<Long, Blob> deltas;
     private Map<Long, Blob> reverseDeltas;
     private Map<Long, HeaderBlob> headers;
-    
+
     public InMemoryBlobStore() {
         this(null);
     }
@@ -93,7 +93,7 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
 
     @Override
     public void publish(HollowProducer.PublishArtifact publishArtifact) {
-        if (publishArtifact instanceof HollowProducer.HeaderBlob) {
+        if(publishArtifact instanceof HollowProducer.HeaderBlob) {
             publishHeader((HollowProducer.HeaderBlob) publishArtifact);
         } else {
             publishBlob((HollowProducer.Blob) publishArtifact);
@@ -134,22 +134,22 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
                 return parts;
             }
         };
-        
+
         switch(blob.getType()) {
-        case SNAPSHOT:
-            snapshots.put(blob.getToVersion(), consumerBlob);
-            break;
-        case DELTA:
-            deltas.put(blob.getFromVersion(), consumerBlob);
-            break;
-        case REVERSE_DELTA:
-            reverseDeltas.put(blob.getFromVersion(), consumerBlob);
-            break;
+            case SNAPSHOT:
+                snapshots.put(blob.getToVersion(), consumerBlob);
+                break;
+            case DELTA:
+                deltas.put(blob.getFromVersion(), consumerBlob);
+                break;
+            case REVERSE_DELTA:
+                reverseDeltas.put(blob.getFromVersion(), consumerBlob);
+                break;
         }
     }
-    
+
     public void removeSnapshot(long version) {
         snapshots.remove(version);
     }
-    
+
 }

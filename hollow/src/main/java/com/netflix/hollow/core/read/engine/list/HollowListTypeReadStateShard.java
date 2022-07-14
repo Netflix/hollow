@@ -37,11 +37,11 @@ class HollowListTypeReadStateShard {
             do {
                 currentData = this.currentDataVolatile;
 
-                if (ordinal == 0) {
+                if(ordinal == 0) {
                     startElement = 0;
                     endElement = currentData.listPointerData.getElementValue(0, currentData.bitsPerListPointer);
                 } else {
-                    long endFixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
+                    long endFixedLengthOffset = (long) ordinal * currentData.bitsPerListPointer;
                     long startFixedLengthOffset = endFixedLengthOffset - currentData.bitsPerListPointer;
                     startElement = currentData.listPointerData.getElementValue(startFixedLengthOffset, currentData.bitsPerListPointer);
                     endElement = currentData.listPointerData.getElementValue(endFixedLengthOffset, currentData.bitsPerListPointer);
@@ -53,7 +53,7 @@ class HollowListTypeReadStateShard {
             if(elementIndex >= endElement)
                 throw new ArrayIndexOutOfBoundsException("Array index out of bounds: " + listIndex + ", list size: " + (endElement - startElement));
 
-            elementOrdinal = (int)currentData.elementData.getElementValue(elementIndex * currentData.bitsPerElement, currentData.bitsPerElement);
+            elementOrdinal = (int) currentData.elementData.getElementValue(elementIndex * currentData.bitsPerElement, currentData.bitsPerElement);
         } while(readWasUnsafe(currentData));
 
         return elementOrdinal;
@@ -68,17 +68,17 @@ class HollowListTypeReadStateShard {
 
             long startElement;
             long endElement;
-            if (ordinal == 0) {
+            if(ordinal == 0) {
                 startElement = 0;
                 endElement = currentData.listPointerData.getElementValue(0, currentData.bitsPerListPointer);
             } else {
-                long endFixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
+                long endFixedLengthOffset = (long) ordinal * currentData.bitsPerListPointer;
                 long startFixedLengthOffset = endFixedLengthOffset - currentData.bitsPerListPointer;
                 startElement = currentData.listPointerData.getElementValue(startFixedLengthOffset, currentData.bitsPerListPointer);
                 endElement = currentData.listPointerData.getElementValue(endFixedLengthOffset, currentData.bitsPerListPointer);
             }
 
-            size = (int)(endElement - startElement);
+            size = (int) (endElement - startElement);
         } while(readWasUnsafe(currentData));
 
         return size;
@@ -107,9 +107,9 @@ class HollowListTypeReadStateShard {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
                 int size = size(shardOrdinal);
-    
+
                 checksum.applyInt(ordinal);
-                for(int i=0;i<size;i++)
+                for(int i = 0; i < size; i++)
                     checksum.applyInt(getElementOrdinal(shardOrdinal, i));
 
                 ordinal = ordinal + numShards;
@@ -124,24 +124,24 @@ class HollowListTypeReadStateShard {
 
     public long getApproximateHeapFootprintInBytes() {
         HollowListTypeDataElements currentData = currentDataVolatile;
-        long requiredListPointerBits = ((long)currentData.maxOrdinal + 1) * currentData.bitsPerListPointer;
+        long requiredListPointerBits = ((long) currentData.maxOrdinal + 1) * currentData.bitsPerListPointer;
         long requiredElementBits = currentData.totalNumberOfElements * currentData.bitsPerElement;
         long requiredBits = requiredListPointerBits + requiredElementBits;
         return requiredBits / 8;
     }
-    
+
     public long getApproximateHoleCostInBytes(BitSet populatedOrdinals, int shardNumber, int numShards) {
         HollowListTypeDataElements currentData = currentDataVolatile;
         long holeBits = 0;
-        
+
         int holeOrdinal = populatedOrdinals.nextClearBit(0);
         while(holeOrdinal <= currentData.maxOrdinal) {
             if((holeOrdinal & (numShards - 1)) == shardNumber)
                 holeBits += currentData.bitsPerListPointer;
-            
+
             holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
         }
-        
+
         return holeBits / 8;
     }
 }

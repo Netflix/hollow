@@ -43,7 +43,7 @@ public class DiffEqualOrdinalMap {
     }
 
     public void putEqualOrdinal(int fromOrdinal, int toOrdinal) {
-        long fromOrdinalMapEntry = (long)toOrdinal << 32 | fromOrdinal;
+        long fromOrdinalMapEntry = (long) toOrdinal << 32 | fromOrdinal;
 
         int hashCode = HashCodes.hashInt(fromOrdinal);
 
@@ -56,12 +56,12 @@ public class DiffEqualOrdinalMap {
     }
 
     public void putEqualOrdinals(int fromOrdinal, IntList toOrdinals) {
-        long fromOrdinalMapEntry = (long)toOrdinals.get(0) << 32 | fromOrdinal;
+        long fromOrdinalMapEntry = (long) toOrdinals.get(0) << 32 | fromOrdinal;
 
         if(toOrdinals.size() > 1) {
-            fromOrdinalMapEntry = Long.MIN_VALUE | (long)pivotedToOrdinalClusters.size() << 32 | fromOrdinal;
+            fromOrdinalMapEntry = Long.MIN_VALUE | (long) pivotedToOrdinalClusters.size() << 32 | fromOrdinal;
 
-            for(int i=0;i<toOrdinals.size();i++) {
+            for(int i = 0; i < toOrdinals.size(); i++) {
                 int valueToAdd = toOrdinals.get(i);
                 if(i == toOrdinals.size() - 1)
                     valueToAdd |= Integer.MIN_VALUE;
@@ -80,9 +80,9 @@ public class DiffEqualOrdinalMap {
     }
 
     public void buildToOrdinalIdentityMapping() {
-        for(int i=0;i<fromOrdinalsMap.length;i++) {
+        for(int i = 0; i < fromOrdinalsMap.length; i++) {
             if(fromOrdinalsMap[i] >= 0) {
-                int toOrdinal = (int)(fromOrdinalsMap[i] >> 32);
+                int toOrdinal = (int) (fromOrdinalsMap[i] >> 32);
                 addToOrdinalIdentity(toOrdinal, toOrdinal);
             }
         }
@@ -90,7 +90,7 @@ public class DiffEqualOrdinalMap {
         boolean newCluster = true;
         int currentIdentity = 0;
 
-        for(int i=0;i<pivotedToOrdinalClusters.size();i++) {
+        for(int i = 0; i < pivotedToOrdinalClusters.size(); i++) {
             if(newCluster)
                 currentIdentity = pivotedToOrdinalClusters.get(i);
             addToOrdinalIdentity(pivotedToOrdinalClusters.get(i) & Integer.MAX_VALUE, currentIdentity);
@@ -106,7 +106,7 @@ public class DiffEqualOrdinalMap {
             bucket = (bucket + 1) & (toOrdinalsIdentityMap.length - 1);
         }
 
-        toOrdinalsIdentityMap[bucket] = ((long)identity << 32) | toOrdinal;
+        toOrdinalsIdentityMap[bucket] = ((long) identity << 32) | toOrdinal;
     }
 
     public MatchIterator getEqualOrdinals(int fromOrdinal) {
@@ -115,10 +115,10 @@ public class DiffEqualOrdinalMap {
         int bucket = hashCode & (fromOrdinalsMap.length - 1);
 
         while(fromOrdinalsMap[bucket] != -1L) {
-            if((int)fromOrdinalsMap[bucket] == fromOrdinal) {
+            if((int) fromOrdinalsMap[bucket] == fromOrdinal) {
                 if((fromOrdinalsMap[bucket] & Long.MIN_VALUE) != 0L)
-                    return new PivotedMatchIterator((int)((fromOrdinalsMap[bucket] & Long.MAX_VALUE) >> 32));
-                return new SingleMatchIterator((int)(fromOrdinalsMap[bucket] >> 32));
+                    return new PivotedMatchIterator((int) ((fromOrdinalsMap[bucket] & Long.MAX_VALUE) >> 32));
+                return new SingleMatchIterator((int) (fromOrdinalsMap[bucket] >> 32));
             }
             bucket = (bucket + 1) & (fromOrdinalsMap.length - 1);
         }
@@ -132,10 +132,10 @@ public class DiffEqualOrdinalMap {
         int bucket = hashCode & (fromOrdinalsMap.length - 1);
 
         while(fromOrdinalsMap[bucket] != -1L) {
-            if((int)fromOrdinalsMap[bucket] == fromOrdinal) {
+            if((int) fromOrdinalsMap[bucket] == fromOrdinal) {
                 if((fromOrdinalsMap[bucket] & Long.MIN_VALUE) != 0L)
-                    return pivotedToOrdinalClusters.get((int)((fromOrdinalsMap[bucket] & Long.MAX_VALUE) >> 32));
-                return (int)(fromOrdinalsMap[bucket] >> 32);
+                    return pivotedToOrdinalClusters.get((int) ((fromOrdinalsMap[bucket] & Long.MAX_VALUE) >> 32));
+                return (int) (fromOrdinalsMap[bucket] >> 32);
             }
             bucket = (bucket + 1) & (fromOrdinalsMap.length - 1);
         }
@@ -149,8 +149,8 @@ public class DiffEqualOrdinalMap {
         int bucket = hashCode & (toOrdinalsIdentityMap.length - 1);
 
         while(toOrdinalsIdentityMap[bucket] != -1L) {
-            if((int)toOrdinalsIdentityMap[bucket] == toOrdinal)
-                return (int)(toOrdinalsIdentityMap[bucket] >> 32);
+            if((int) toOrdinalsIdentityMap[bucket] == toOrdinal)
+                return (int) (toOrdinalsIdentityMap[bucket] >> 32);
             bucket = (bucket + 1) & (toOrdinalsIdentityMap.length - 1);
         }
 
@@ -183,15 +183,20 @@ public class DiffEqualOrdinalMap {
 
     public static interface MatchIterator {
         public boolean hasNext();
+
         public int next();
     }
 
     public static class EmptyMatchIterator implements MatchIterator {
         static EmptyMatchIterator INSTANCE = new EmptyMatchIterator();
 
-        public boolean hasNext() { return false; }
+        public boolean hasNext() {
+            return false;
+        }
 
-        public int next() { return -1; }
+        public int next() {
+            return -1;
+        }
     }
 
     public static class SingleMatchIterator implements MatchIterator {

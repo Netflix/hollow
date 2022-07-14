@@ -23,41 +23,41 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import java.util.Set;
 
 public class HollowSetTypePerfAPI extends HollowTypePerfAPI {
-    
+
     private final HollowSetTypeDataAccess typeAccess;
     final long elementMaskedTypeIdx;
-    
+
     public HollowSetTypePerfAPI(HollowDataAccess dataAccess, String typeName, HollowPerformanceAPI api) {
         super(typeName, api);
-        
+
         HollowSetTypeDataAccess typeAccess = (HollowSetTypeDataAccess) dataAccess.getTypeDataAccess(typeName);
-        
+
         int elementTypeIdx = typeAccess == null ? Ref.TYPE_ABSENT : api.types.getIdx(typeAccess.getSchema().getElementType());
         this.elementMaskedTypeIdx = Ref.toTypeMasked(elementTypeIdx);
-        
+
         if(typeAccess == null)
             typeAccess = new HollowSetMissingDataAccess(dataAccess, typeName);
         this.typeAccess = typeAccess;
     }
-    
+
     public int size(long ref) {
         return typeAccess.size(ordinal(ref));
     }
-    
+
     public HollowPerfReferenceIterator iterator(long ref) {
         HollowOrdinalIterator iter = typeAccess.ordinalIterator(ordinal(ref));
         return new HollowPerfReferenceIterator(iter, elementMaskedTypeIdx);
     }
-    
+
     public long findElement(long ref, Object... hashKey) {
         int ordinal = typeAccess.findElement(ordinal(ref), hashKey);
         return Ref.toRefWithTypeMasked(elementMaskedTypeIdx, ordinal);
     }
-    
+
     public <T> Set<T> backedSet(long ref, POJOInstantiator<T> instantiator, HashKeyExtractor hashKeyExtractor) {
         return new HollowPerfBackedSet<>(this, ref, instantiator, hashKeyExtractor);
     }
-    
+
     public HollowSetTypeDataAccess typeAccess() {
         return typeAccess;
     }

@@ -43,7 +43,7 @@ public class HInteger extends HollowObject {
     }
 
     protected IntegerDelegate delegate() {
-        return (IntegerDelegate)delegate;
+        return (IntegerDelegate) delegate;
     }
 
 }

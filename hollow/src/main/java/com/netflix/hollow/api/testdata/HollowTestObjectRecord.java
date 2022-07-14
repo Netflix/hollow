@@ -24,14 +24,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class HollowTestObjectRecord<T> extends HollowTestRecord<T> {
-    
+
     private final Map<String, Field> fields;
-    
+
     protected HollowTestObjectRecord(T parent) {
         super(parent);
         this.fields = new HashMap<>();
     }
-    
+
     protected void addField(String fieldName, Object value) {
         if(value == null) {
             fields.remove(fieldName);
@@ -39,53 +39,53 @@ public abstract class HollowTestObjectRecord<T> extends HollowTestRecord<T> {
             addField(new Field(fieldName, value));
         }
     }
-    
+
     protected void addField(Field field) {
         if(field.value == null)
             this.fields.remove(field.name);
         else
             this.fields.put(field.name, field);
     }
-    
+
     protected Field getField(String name) {
         return fields.get(name);
     }
-    
+
     @SuppressWarnings("rawtypes")
     @Override
     protected HollowWriteRecord toWriteRecord(HollowWriteStateEngine writeEngine) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(getSchema());
-        
+
         for(Map.Entry<String, Field> entry : fields.entrySet()) {
             Field field = entry.getValue();
             if(field.value instanceof Integer) {
-                rec.setInt(field.name, (Integer)field.value);
+                rec.setInt(field.name, (Integer) field.value);
             } else if(field.value instanceof Long) {
-                rec.setLong(field.name, (Long)field.value);
+                rec.setLong(field.name, (Long) field.value);
             } else if(field.value instanceof Float) {
-                rec.setFloat(field.name, (Float)field.value);
+                rec.setFloat(field.name, (Float) field.value);
             } else if(field.value instanceof Boolean) {
-                rec.setBoolean(field.name, (Boolean)field.value);
+                rec.setBoolean(field.name, (Boolean) field.value);
             } else if(field.value instanceof String) {
-                rec.setString(field.name, (String)field.value);
+                rec.setString(field.name, (String) field.value);
             } else if(field.value instanceof byte[]) {
-                rec.setBytes(field.name, (byte[])field.value);
+                rec.setBytes(field.name, (byte[]) field.value);
             } else if(field.value instanceof HollowTestRecord) {
-                rec.setReference(field.name, ((HollowTestRecord)field.value).addTo(writeEngine));
+                rec.setReference(field.name, ((HollowTestRecord) field.value).addTo(writeEngine));
             } else {
                 throw new IllegalStateException("Unknown field type: " + field.value.getClass());
             }
         }
-        
+
         return rec;
     }
-    
+
     protected abstract HollowObjectSchema getSchema();
-    
+
     protected static class Field {
         public final String name;
         public final Object value;
-        
+
         public Field(String name, Object value) {
             this.name = name;
             this.value = value;

@@ -25,16 +25,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SchemaSolidifier {
-    
+
     public static Collection<HollowSchema> convertDiscoveredSchemas(Collection<HollowDiscoveredSchema> discoveredSchemas) {
         Map<String, HollowSchema> schemaMap = new HashMap<String, HollowSchema>();
-        
+
         for(HollowDiscoveredSchema discoveredSchema : discoveredSchemas) {
             HollowSchema schema = discoveredSchema.toHollowSchema();
             schemaMap.put(schema.getName(), schema);
-            
+
             if(schema instanceof HollowMapSchema) {
-                String keyType = ((HollowMapSchema)schema).getKeyType();
+                String keyType = ((HollowMapSchema) schema).getKeyType();
                 if(!schemaMap.containsKey(keyType))
                     schemaMap.put(keyType, getStringSchema(keyType));
             } else if(referencesGenericStringSchema(schema)) {
@@ -42,14 +42,14 @@ public class SchemaSolidifier {
                     schemaMap.put("String", getStringSchema("String"));
             }
         }
-        
+
         return schemaMap.values();
     }
-    
+
     private static boolean referencesGenericStringSchema(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
-            HollowObjectSchema objSchema = (HollowObjectSchema)schema;
-            for(int i=0;i<objSchema.numFields();i++) {
+            HollowObjectSchema objSchema = (HollowObjectSchema) schema;
+            for(int i = 0; i < objSchema.numFields(); i++) {
                 if("String".equals(objSchema.getReferencedType(i))) {
                     return true;
                 }
@@ -57,7 +57,7 @@ public class SchemaSolidifier {
         }
         return false;
     }
-    
+
     private static HollowObjectSchema getStringSchema(String schemaName) {
         HollowObjectSchema schema = new HollowObjectSchema(schemaName, 1);
         schema.addField("value", FieldType.STRING);

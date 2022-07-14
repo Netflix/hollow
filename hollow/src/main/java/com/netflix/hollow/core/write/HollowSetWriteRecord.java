@@ -32,7 +32,7 @@ public class HollowSetWriteRecord implements HollowHashableWriteRecord {
     public HollowSetWriteRecord() {
         this(HashBehavior.MIXED_HASHES);
     }
-    
+
     public HollowSetWriteRecord(HashBehavior defaultHashBehavior) {
         this.elementsAndHashes = new LongList();
         this.defaultHashBehavior = defaultHashBehavior;
@@ -43,7 +43,7 @@ public class HollowSetWriteRecord implements HollowHashableWriteRecord {
     }
 
     public void addElement(int ordinal, int hashCode) {
-        long elementAndHash = (long)ordinal << 32 | (hashCode & 0xFFFFFFFFL);
+        long elementAndHash = (long) ordinal << 32 | (hashCode & 0xFFFFFFFFL);
         elementsAndHashes.add(elementAndHash);
     }
 
@@ -62,12 +62,12 @@ public class HollowSetWriteRecord implements HollowHashableWriteRecord {
         VarInt.writeVInt(buf, elementsAndHashes.size());
         int previousOrdinal = 0;
 
-        for(int i=0;i<elementsAndHashes.size();i++) {
-            int ordinal = (int)(elementsAndHashes.get(i) >>> 32);
+        for(int i = 0; i < elementsAndHashes.size(); i++) {
+            int ordinal = (int) (elementsAndHashes.get(i) >>> 32);
             VarInt.writeVInt(buf, ordinal - previousOrdinal);
 
             if(hashBehavior != IGNORED_HASHES) {
-                int hashCode = (int)elementsAndHashes.get(i);
+                int hashCode = (int) elementsAndHashes.get(i);
                 if(hashBehavior == MIXED_HASHES)
                     hashCode = HashCodes.hashInt(hashCode);
                 int bucketToHashTo = hashCode & bucketMask;

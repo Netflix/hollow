@@ -21,21 +21,21 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowObjectMapperPrimaryKeyExtractionTests {
-    
+
     @Test
     public void extractsPrimaryKey() {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
-        
+
         Object[] key1 = mapper.extractPrimaryKey(new TypeA(1, "one")).getKey();
         Object[] key2 = mapper.extractPrimaryKey(new TypeA(2, "two")).getKey();
         Object[] key3 = mapper.extractPrimaryKey(new TypeA(3, "three")).getKey();
-        
-        Assert.assertArrayEquals(new Object[] { 1, "one" }, key1);
-        Assert.assertArrayEquals(new Object[] { 2, "two" }, key2);
-        Assert.assertArrayEquals(new Object[] { 3, "three" }, key3);
+
+        Assert.assertArrayEquals(new Object[]{1, "one"}, key1);
+        Assert.assertArrayEquals(new Object[]{2, "two"}, key2);
+        Assert.assertArrayEquals(new Object[]{3, "three"}, key3);
     }
-    
+
     @Test
     public void willReturnNullFields() {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
@@ -45,53 +45,56 @@ public class HollowObjectMapperPrimaryKeyExtractionTests {
         Object[] key2 = mapper.extractPrimaryKey(new TypeA(null)).getKey();
         Object[] key3 = mapper.extractPrimaryKey(new TypeA(2, null)).getKey();
         Object[] key4 = mapper.extractPrimaryKey(new TypeA(null, null)).getKey();
-        
-        Assert.assertArrayEquals(new Object[] { 1, null }, key1);
-        Assert.assertArrayEquals(new Object[] { null, null }, key2);
-        Assert.assertArrayEquals(new Object[] { 2, null }, key3);
-        Assert.assertArrayEquals(new Object[] { null, null }, key4);
+
+        Assert.assertArrayEquals(new Object[]{1, null}, key1);
+        Assert.assertArrayEquals(new Object[]{null, null}, key2);
+        Assert.assertArrayEquals(new Object[]{2, null}, key3);
+        Assert.assertArrayEquals(new Object[]{null, null}, key4);
     }
-    
+
     @Test
     public void failsIfPrimaryKeyIncludesReferenceField() {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
-        
+
         try {
             mapper.extractPrimaryKey(new TypeAWithReferenceTypeForPrimaryKeyField(1, "asdf"));
             Assert.fail();
-        } catch(IllegalArgumentException expected) { 
+        } catch (IllegalArgumentException expected) {
             Assert.assertEquals("Cannot extract POJO primary key from a REFERENCE mapped field type", expected.getMessage());
         }
     }
-    
-    
+
+
     @SuppressWarnings("unused")
-    @HollowPrimaryKey(fields={"id", "name"})
+    @HollowPrimaryKey(fields = {"id", "name"})
     private static class TypeA {
         Str name;
-        @HollowInline Integer id;
-        
+        @HollowInline
+        Integer id;
+
         public TypeA(Integer id) {
             this.id = id;
             this.name = null;
         }
-        
+
         public TypeA(Integer id, String name) {
             this.id = id;
             this.name = new Str(name);
         }
     }
-    
+
     @SuppressWarnings("unused")
     private static class Str {
         String value;
-        
-        public Str(String value) { this.value = value; }
+
+        public Str(String value) {
+            this.value = value;
+        }
     }
-    
+
     @SuppressWarnings("unused")
-    @HollowPrimaryKey(fields={"id", "name!"})
+    @HollowPrimaryKey(fields = {"id", "name!"})
     private static class TypeAWithReferenceTypeForPrimaryKeyField {
         int id;
         String name;
@@ -101,6 +104,6 @@ public class HollowObjectMapperPrimaryKeyExtractionTests {
             this.name = name;
         }
     }
-    
+
 
 }

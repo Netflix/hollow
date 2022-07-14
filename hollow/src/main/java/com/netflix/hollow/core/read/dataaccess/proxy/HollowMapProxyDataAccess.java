@@ -28,7 +28,7 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
  * 
  * @see HollowProxyDataAccess
  */
-public class HollowMapProxyDataAccess extends HollowTypeProxyDataAccess implements HollowMapTypeDataAccess{
+public class HollowMapProxyDataAccess extends HollowTypeProxyDataAccess implements HollowMapTypeDataAccess {
 
     public HollowMapProxyDataAccess(HollowProxyDataAccess dataAccess) {
         super(dataAccess);
@@ -57,7 +57,7 @@ public class HollowMapProxyDataAccess extends HollowTypeProxyDataAccess implemen
     public int get(int ordinal, int keyOrdinal, int hashCode) {
         return currentDataAccess().get(ordinal, keyOrdinal, hashCode);
     }
-    
+
     @Override
     public int findKey(int ordinal, Object... hashKey) {
         return currentDataAccess().findKey(ordinal, hashKey);
@@ -89,7 +89,7 @@ public class HollowMapProxyDataAccess extends HollowTypeProxyDataAccess implemen
     }
 
     private HollowMapTypeDataAccess currentDataAccess() {
-        return (HollowMapTypeDataAccess)currentDataAccess;
+        return (HollowMapTypeDataAccess) currentDataAccess;
     }
 
 }

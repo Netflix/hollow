@@ -111,10 +111,10 @@ public class HistoryUITest {
 
             // v0
             stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v0");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 13 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 4, 44 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 15, 150 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 16, 160 });
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{3, 13});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{4, 44});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{15, 150});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{16, 160});
             stateEngine.prepareForWrite();
             ByteArrayOutputStream baos_v0 = new ByteArrayOutputStream();
             HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
@@ -123,12 +123,12 @@ public class HistoryUITest {
 
             // v1
             stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v1");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 1 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 2 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 3 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 4, 4 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 5, 5 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 6, 6 });
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{1, 1});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{2, 2});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{3, 3});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{4, 4});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{5, 5});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{6, 6});
             stateEngine.prepareForWrite();
             ByteArrayOutputStream baos_v1 = new ByteArrayOutputStream();
             ByteArrayOutputStream baos_v0_to_v1 = new ByteArrayOutputStream();
@@ -141,12 +141,12 @@ public class HistoryUITest {
 
             // v2
             stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v2");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 3 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 5, 8 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 6, 6 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 7, 9 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 8, 10 });
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{2, 7});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{3, 3});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{5, 8});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{6, 6});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{7, 9});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{8, 10});
             stateEngine.prepareForWrite();
             ByteArrayOutputStream baos_v2 = new ByteArrayOutputStream();
             ByteArrayOutputStream baos_v1_to_v2 = new ByteArrayOutputStream();
@@ -158,12 +158,12 @@ public class HistoryUITest {
 
             // v3
             stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v3");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 1 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 11 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 6, 12 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 7, 13 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 8, 10 });
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{1, 1});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{2, 7});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{3, 11});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{6, 12});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{7, 13});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{8, 10});
             stateEngine.prepareForWrite();
             ByteArrayOutputStream baos_v2_to_v3 = new ByteArrayOutputStream();
             ByteArrayOutputStream baos_v3_to_v2 = new ByteArrayOutputStream();
@@ -173,14 +173,14 @@ public class HistoryUITest {
             // v4
             stateEngine.prepareForNextCycle();
             stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v4");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 18 });  // 0
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });   // 1
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 19 });  // 2
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 6, 12 });  // 3
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 15, 13 }); // 4
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 8, 10 });  // 5
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 18, 10 }); // 6
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 28, 90 }); // 7
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{1, 18});  // 0
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{2, 7});   // 1
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{3, 19});  // 2
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{6, 12});  // 3
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{15, 13}); // 4
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{8, 10});  // 5
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{18, 10}); // 6
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{28, 90}); // 7
             stateEngine.prepareForWrite();
             ByteArrayOutputStream baos_v4 = new ByteArrayOutputStream();
             ByteArrayOutputStream baos_v4_to_v3 = new ByteArrayOutputStream();
@@ -227,11 +227,11 @@ public class HistoryUITest {
 
     private void exploreOrdinals(HollowReadStateEngine readStateEngine) {
         System.out.println("CUSTOM_VERSION_TAG= " + readStateEngine.getHeaderTags().get(CUSTOM_VERSION_TAG));
-        for (HollowTypeReadState typeReadState : readStateEngine.getTypeStates()) {
+        for(HollowTypeReadState typeReadState : readStateEngine.getTypeStates()) {
             BitSet populatedOrdinals = typeReadState.getPopulatedOrdinals();
             System.out.println("SNAP: PopulatedOrdinals= " + populatedOrdinals);
             int ordinal = populatedOrdinals.nextSetBit(0);
-            while (ordinal != -1) {
+            while(ordinal != -1) {
                 HollowObjectTypeReadState o = (HollowObjectTypeReadState) typeReadState;
                 System.out.println(String.format("%s: %s, %s", ordinal, o.readInt(ordinal, 0), o.readInt(ordinal, 1)));
                 ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
@@ -241,7 +241,7 @@ public class HistoryUITest {
 
     private static void addRec(HollowWriteStateEngine stateEngine, HollowObjectSchema schema, String[] names, int[] vals) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
-        for (int i = 0; i < names.length; i++) {
+        for(int i = 0; i < names.length; i++) {
             rec.setInt(names[i], vals[i]);
         }
         stateEngine.add(schema.getName(), rec);
@@ -264,10 +264,10 @@ public class HistoryUITest {
 
             // v0
             stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v0");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 13 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 4, 44 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 15, 150 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 16, 160 });
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{3, 13});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{4, 44});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{15, 150});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{16, 160});
             stateEngine.prepareForWrite();
             ByteArrayOutputStream baos_v0 = new ByteArrayOutputStream();
             HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
@@ -276,12 +276,12 @@ public class HistoryUITest {
 
             // v1
             stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v1");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 1 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 2 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 3 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 4, 4 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 5, 5 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 6, 6 });
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{1, 1});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{2, 2});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{3, 3});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{4, 4});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{5, 5});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{6, 6});
             stateEngine.prepareForWrite();
             ByteArrayOutputStream baos_v0_to_v1 = new ByteArrayOutputStream();
             ByteArrayOutputStream baos_v1_to_v0 = new ByteArrayOutputStream();
@@ -295,12 +295,12 @@ public class HistoryUITest {
 
             // v2
             stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v2");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 3 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 5, 8 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 6, 6 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 7, 9 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 8, 10 });
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{2, 7});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{3, 3});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{5, 8});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{6, 6});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{7, 9});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{8, 10});
             stateEngine.prepareForWrite();
             ByteArrayOutputStream baos_v2 = new ByteArrayOutputStream();
             ByteArrayOutputStream baos_v1_to_v2 = new ByteArrayOutputStream();
@@ -312,12 +312,12 @@ public class HistoryUITest {
 
             // v3
             stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v3");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 1 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 11 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 6, 12 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 7, 13 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 8, 10 });
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{1, 1});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{2, 7});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{3, 11});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{6, 12});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{7, 13});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{8, 10});
             stateEngine.prepareForWrite();
             ByteArrayOutputStream baos_v3 = new ByteArrayOutputStream();
             ByteArrayOutputStream baos_v2_to_v3 = new ByteArrayOutputStream();
@@ -329,14 +329,14 @@ public class HistoryUITest {
 
             // v4
             stateEngine.addHeaderTag(CUSTOM_VERSION_TAG, "v4");
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 1, 18 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 2, 7 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 3, 19 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 6, 12 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 15, 13 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 8, 10 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 18, 10 });
-            addRec(stateEngine, schema, new String[] { "a1", "a2" }, new int[] { 28, 90 });
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{1, 18});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{2, 7});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{3, 19});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{6, 12});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{15, 13});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{8, 10});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{18, 10});
+            addRec(stateEngine, schema, new String[]{"a1", "a2"}, new int[]{28, 90});
             stateEngine.prepareForWrite();
             ByteArrayOutputStream baos_v4 = new ByteArrayOutputStream();
             ByteArrayOutputStream baos_v3_to_v4 = new ByteArrayOutputStream();

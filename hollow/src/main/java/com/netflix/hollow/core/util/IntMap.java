@@ -40,11 +40,11 @@ public class IntMap {
 
     public int get(int key) {
         int bucket = hashKey(key) % keys.length;
-        while (keys[bucket] != -1) {
-            if (keys[bucket] == key)
+        while(keys[bucket] != -1) {
+            if(keys[bucket] == key)
                 return values[bucket];
             bucket++;
-            if (bucket == keys.length)
+            if(bucket == keys.length)
                 bucket = 0;
         }
         return -1;
@@ -52,13 +52,13 @@ public class IntMap {
 
     public void put(int key, int value) {
         int bucket = hashKey(key) % keys.length;
-        while (keys[bucket] != -1) {
-            if (keys[bucket] == key) {
+        while(keys[bucket] != -1) {
+            if(keys[bucket] == key) {
                 values[bucket] = value;
                 return;
             }
             bucket++;
-            if (bucket == keys.length)
+            if(bucket == keys.length)
                 bucket = 0;
         }
 
@@ -68,13 +68,13 @@ public class IntMap {
     }
 
     private int hashKey(int key) {
-      key = ~key + (key << 15);
-      key = key ^ (key >>> 12);
-      key = key + (key << 2);
-      key = key ^ (key >>> 4);
-      key = key * 2057;
-      key = key ^ (key >>> 16);
-      return key & Integer.MAX_VALUE;
+        key = ~key + (key << 15);
+        key = key ^ (key >>> 12);
+        key = key + (key << 2);
+        key = key ^ (key >>> 4);
+        key = key * 2057;
+        key = key ^ (key >>> 16);
+        return key & Integer.MAX_VALUE;
     }
 
     public IntMapEntryIterator iterator() {

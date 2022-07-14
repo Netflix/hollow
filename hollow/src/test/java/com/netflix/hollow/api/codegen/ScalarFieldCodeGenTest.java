@@ -33,7 +33,7 @@ public class ScalarFieldCodeGenTest extends AbstractHollowAPIGeneratorTest {
     }
 
     @SuppressWarnings("unused")
-    @HollowPrimaryKey(fields = { "id" })
+    @HollowPrimaryKey(fields = {"id"})
     private static class Movie {
         int id;
 
@@ -44,20 +44,20 @@ public class ScalarFieldCodeGenTest extends AbstractHollowAPIGeneratorTest {
 
         Integer intObj;
         int intPrimitive;
-        
+
         Long longObj;
         long longPrimitive;
-        
+
         Boolean boolObj;
         boolean boolPrimitive;
 
         Float floatObj;
         float floatPrimitive;
-        
+
         Double doubleObj;
         double doublePrimitive;
-        
-        
+
+
         byte bytePrimitive; // -> INT
         byte[] byteArray;   // -> BYTES
         char[] charArray;   // -> STRING

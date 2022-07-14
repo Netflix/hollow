@@ -39,13 +39,18 @@ public class HollowDiffMissingCountingNode extends HollowDiffCountingNode {
     }
 
     @Override
-    public void prepare(int topLevelFromOrdinal, int topLevelToOrdinal) { }
+    public void prepare(int topLevelFromOrdinal, int topLevelToOrdinal) {
+    }
 
     @Override
-    public int traverseDiffs(IntList fromOrdinals, IntList toOrdinals) { return 0; }
+    public int traverseDiffs(IntList fromOrdinals, IntList toOrdinals) {
+        return 0;
+    }
 
     @Override
-    public int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) { return 0; }
+    public int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
+        return 0;
+    }
 
     @Override
     public List<HollowFieldDiff> getFieldDiffs() {

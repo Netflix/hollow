@@ -73,17 +73,21 @@ public class ProducerListenerSupportTest {
             int cycleStart;
             int cycleComplete;
 
-            @Override public void onCycleSkip(CycleSkipReason reason) {
+            @Override
+            public void onCycleSkip(CycleSkipReason reason) {
             }
 
-            @Override public void onNewDeltaChain(long version) {
+            @Override
+            public void onNewDeltaChain(long version) {
             }
 
-            @Override public void onCycleStart(long version) {
+            @Override
+            public void onCycleStart(long version) {
                 cycleStart++;
             }
 
-            @Override public void onCycleComplete(Status status, HollowProducer.ReadState rs, long version, Duration elapsed) {
+            @Override
+            public void onCycleComplete(Status status, HollowProducer.ReadState rs, long version, Duration elapsed) {
                 cycleComplete++;
             }
         }
@@ -91,7 +95,8 @@ public class ProducerListenerSupportTest {
         class FirstCycleListener extends SecondCycleListener {
             private SecondCycleListener scl = new SecondCycleListener();
 
-            @Override public void onCycleStart(long version) {
+            @Override
+            public void onCycleStart(long version) {
                 super.onCycleStart(version);
                 ls.addListener(scl);
             }
@@ -127,17 +132,21 @@ public class ProducerListenerSupportTest {
             int cycleStart;
             int cycleComplete;
 
-            @Override public void onCycleSkip(CycleSkipReason reason) {
+            @Override
+            public void onCycleSkip(CycleSkipReason reason) {
             }
 
-            @Override public void onNewDeltaChain(long version) {
+            @Override
+            public void onNewDeltaChain(long version) {
             }
 
-            @Override public void onCycleStart(long version) {
+            @Override
+            public void onCycleStart(long version) {
                 cycleStart++;
             }
 
-            @Override public void onCycleComplete(Status status, HollowProducer.ReadState rs, long version, Duration elapsed) {
+            @Override
+            public void onCycleComplete(Status status, HollowProducer.ReadState rs, long version, Duration elapsed) {
                 cycleComplete++;
             }
         }
@@ -149,7 +158,8 @@ public class ProducerListenerSupportTest {
                 this.scl = scl;
             }
 
-            @Override public void onCycleStart(long version) {
+            @Override
+            public void onCycleStart(long version) {
                 super.onCycleStart(version);
                 ls.removeListener(scl);
             }

@@ -36,7 +36,7 @@ public class HollowListWriteRecord implements HollowWriteRecord {
     public void writeDataTo(ByteDataArray buf) {
         VarInt.writeVInt(buf, elementOrdinals.size());
 
-        for(int i=0;i<elementOrdinals.size();i++) {
+        for(int i = 0; i < elementOrdinals.size(); i++) {
             VarInt.writeVInt(buf, elementOrdinals.get(i));
         }
     }

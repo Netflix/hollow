@@ -94,22 +94,22 @@ public class HollowDiff {
         this.toStateEngine = to;
         this.equalityMapping = new DiffEqualityMapping(from, to);
 
-        if (isAutoDiscoverTypeDiff) { // Auto Discover TypeDiff from both from and to StateEngine
+        if(isAutoDiscoverTypeDiff) { // Auto Discover TypeDiff from both from and to StateEngine
             List<HollowSchema> schemas = new ArrayList<>();
             schemas.addAll(fromStateEngine.getSchemas());
             schemas.addAll(toStateEngine.getSchemas());
-            for (HollowSchema schema : schemas) {
-                if (schema instanceof HollowObjectSchema) {
+            for(HollowSchema schema : schemas) {
+                if(schema instanceof HollowObjectSchema) {
                     HollowObjectSchema objectSchema = ((HollowObjectSchema) schema);
                     PrimaryKey pKey = objectSchema.getPrimaryKey();
-                    if (pKey==null && !isIncludeNonPrimaryKeyTypes) continue;
+                    if(pKey == null && !isIncludeNonPrimaryKeyTypes) continue;
 
                     // Support basic Single Field Types
-                    if (pKey==null && objectSchema.numFields()==1 && SINGLE_FIELD_SUPPORTED_TYPES.contains(objectSchema.getFieldType(0))) {
+                    if(pKey == null && objectSchema.numFields() == 1 && SINGLE_FIELD_SUPPORTED_TYPES.contains(objectSchema.getFieldType(0))) {
                         pKey = new PrimaryKey(schema.getName(), objectSchema.getFieldName(0));
                     }
 
-                    addTypeDiff(schema.getName(), pKey==null? null : pKey.getFieldPaths());
+                    addTypeDiff(schema.getName(), pKey == null ? null : pKey.getFieldPaths());
                 }
             }
         }

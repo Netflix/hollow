@@ -28,9 +28,9 @@ import org.junit.Test;
 
 @SuppressWarnings("unused")
 public class PrimaryKeyTest {
-    
+
     HollowWriteStateEngine writeEngine;
-    
+
     @Before
     public void setUp() {
         writeEngine = new HollowWriteStateEngine();
@@ -43,24 +43,24 @@ public class PrimaryKeyTest {
     public void automaticallyTraversesSomeIncompletelyDefinedFieldPaths() {
         HollowObjectSchema schema = (HollowObjectSchema) writeEngine.getTypeState("TypeWithTraversablePrimaryKey").getSchema();
         PrimaryKey traversablePrimaryKey = schema.getPrimaryKey();
-        
+
         Assert.assertEquals(2, traversablePrimaryKey.getFieldPathIndex(writeEngine, 0).length);
         Assert.assertEquals(3, traversablePrimaryKey.getFieldPathIndex(writeEngine, 1).length);
         Assert.assertEquals(1, traversablePrimaryKey.getFieldPathIndex(writeEngine, 2).length);
-        
+
         PrimaryKey anotherTraversablePrimaryKey = new PrimaryKey("TypeWithTraversablePrimaryKey", "subType.id");
         Assert.assertEquals(3, anotherTraversablePrimaryKey.getFieldPathIndex(writeEngine, 0).length);
-        
+
         PrimaryKey hardStopPrimaryKey = new PrimaryKey("TypeWithTraversablePrimaryKey", "subType.id!");
         Assert.assertEquals(2, hardStopPrimaryKey.getFieldPathIndex(writeEngine, 0).length);
-        
+
         PrimaryKey hardStopPrimaryKey2 = new PrimaryKey("TypeWithTraversablePrimaryKey", "subType2!");
         Assert.assertEquals(1, hardStopPrimaryKey2.getFieldPathIndex(writeEngine, 0).length);
-        
+
         PrimaryKey hardStopPrimaryKey3 = new PrimaryKey("TypeWithTraversablePrimaryKey", "strList!");
         Assert.assertEquals(1, hardStopPrimaryKey3.getFieldPathIndex(writeEngine, 0).length);
     }
-    
+
     @Test
     public void throwsMeaningfulExceptions() {
         try {
@@ -73,7 +73,7 @@ public class PrimaryKeyTest {
             Assert.assertEquals(1, expected.segmentIndex);
             Assert.assertEquals("SubTypeWithTraversablePrimaryKey", expected.enclosingSchema.getName());
         }
-        
+
         try {
             PrimaryKey invalidFieldDefinition = new PrimaryKey("TypeWithTraversablePrimaryKey", "subType.id.value.alldone");
             invalidFieldDefinition.getFieldPathIndex(writeEngine, 0);
@@ -85,7 +85,7 @@ public class PrimaryKeyTest {
             Assert.assertEquals("value", expected.fieldSegments.get(2).getName());
             Assert.assertEquals("String", expected.enclosingSchema.getName());
         }
-        
+
         try {
             PrimaryKey invalidFieldDefinition = new PrimaryKey("TypeWithTraversablePrimaryKey", "subType2");
             invalidFieldDefinition.getFieldPathIndex(writeEngine, 0);
@@ -96,7 +96,7 @@ public class PrimaryKeyTest {
             Assert.assertEquals("subType2", expected.fieldSegments.get(0).getName());
             Assert.assertEquals("SubTypeWithNonTraversablePrimaryKey", expected.enclosingSchema.getName());
         }
-        
+
         try {
             PrimaryKey invalidFieldDefinition = new PrimaryKey("TypeWithTraversablePrimaryKey", "strList.element.value");
             invalidFieldDefinition.getFieldPathIndex(writeEngine, 0);
@@ -108,7 +108,7 @@ public class PrimaryKeyTest {
             Assert.assertEquals("element", expected.segments[expected.segmentIndex]);
             Assert.assertEquals("ListOfString", expected.enclosingSchema.getName());
         }
-        
+
         try {
             PrimaryKey invalidFieldDefinition = new PrimaryKey("UnknownType", "id");
             invalidFieldDefinition.getFieldPathIndex(writeEngine, 0);
@@ -120,8 +120,8 @@ public class PrimaryKeyTest {
             Assert.assertEquals("UnknownType", expected.rootType);
         }
     }
-    
-    
+
+
     @Test
     public void testAutoExpand() {
         { // verify fieldPath auto expand
@@ -137,9 +137,9 @@ public class PrimaryKeyTest {
             Assert.assertEquals("SubTypeWithTraversablePrimaryKey", autoExpandPK.getFieldSchema(writeEngine, 0).getName());
         }
     }
-    
-    
-    @HollowPrimaryKey(fields={"pk1", "subType", "intId"})
+
+
+    @HollowPrimaryKey(fields = {"pk1", "subType", "intId"})
     private static class TypeWithTraversablePrimaryKey {
         String pk1;
         SubTypeWithTraversablePrimaryKey subType;
@@ -147,14 +147,14 @@ public class PrimaryKeyTest {
         int intId;
         List<String> strList;
     }
-    
-    @HollowPrimaryKey(fields="id")
+
+    @HollowPrimaryKey(fields = "id")
     private static class SubTypeWithTraversablePrimaryKey {
         String id;
         int anotherField;
     }
-    
-    @HollowPrimaryKey(fields={"id1", "id2"})
+
+    @HollowPrimaryKey(fields = {"id1", "id2"})
     private static class SubTypeWithNonTraversablePrimaryKey {
         long id1;
         float id2;

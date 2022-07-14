@@ -38,66 +38,66 @@ import org.junit.Test;
 @SuppressWarnings("unused")
 public class RestoreWriteStateEngineHierarchyScenario {
 
-    @HollowTypeName(name="TypeA")
+    @HollowTypeName(name = "TypeA")
     private static class TypeA1 {
         int id;
         List<TypeB1> b = Collections.singletonList(new TypeB1());
     }
-    
-    @HollowTypeName(name="TypeB")
+
+    @HollowTypeName(name = "TypeB")
     private static class TypeB1 {
         String val;
         float removedData;
     }
-    
-    @HollowTypeName(name="TypeA")
+
+    @HollowTypeName(name = "TypeA")
     private static class TypeA2 {
         int id;
         int idEcho;
         List<TypeB2> b = Collections.singletonList(new TypeB2());
     }
-    
-    @HollowTypeName(name="TypeB")
+
+    @HollowTypeName(name = "TypeB")
     private static class TypeB2 {
         String val;
         int idEcho;
     }
-    
+
     @Test
     public void testAddition() throws IOException {
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        
+
         TypeA1 a11 = new TypeA1();
         a11.id = 1;
         a11.b.get(0).val = "A";
         a11.b.get(0).removedData = 1.0f;
         mapper.add(a11);
-        
+
         TypeA1 a12 = new TypeA1();
         a12.id = 2;
         a12.b.get(0).val = "B";
         a12.b.get(0).removedData = 2.0f;
         mapper.add(a12);
-        
+
         TypeA1 a13 = new TypeA1();
         a13.id = 3;
         a13.b.get(0).val = "A";
         a13.b.get(0).removedData = 1.0f;
         mapper.add(a13);
-        
+
         HollowReadStateEngine readStateEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
-        
+
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
-        
+
         writeStateEngine = new HollowWriteStateEngine();
         mapper = new HollowObjectMapper(writeStateEngine);
         mapper.initializeTypeState(TypeA2.class);
         mapper.initializeTypeState(TypeB2.class);
         writeStateEngine.restoreFrom(readStateEngine);
-        
+
         TypeA2 a22 = new TypeA2();
         a22.id = 2;
         a22.idEcho = 2;
@@ -121,7 +121,7 @@ public class RestoreWriteStateEngineHierarchyScenario {
 
         ///reset after restore
         writeStateEngine.resetToLastPrepareForNextCycle();
-        
+
         a22 = new TypeA2();
         a22.id = 2;
         a22.idEcho = 2;
@@ -145,28 +145,28 @@ public class RestoreWriteStateEngineHierarchyScenario {
 
         writeStateEngine.prepareForWrite();
         HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
-        
+
         ByteArrayOutputStream delta = new ByteArrayOutputStream();
         ByteArrayOutputStream reverseDelta = new ByteArrayOutputStream();
         ByteArrayOutputStream snapshot = new ByteArrayOutputStream();
-        
+
         writer.writeDelta(delta);
         writer.writeReverseDelta(reverseDelta);
         writer.writeSnapshot(snapshot);
-        
+
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
         reader.applyDelta(HollowBlobInput.serial(delta.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
-        
+
         reader.applyDelta(HollowBlobInput.serial(reverseDelta.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
-        
+
         readStateEngine = new HollowReadStateEngine();
         reader = new HollowBlobReader(readStateEngine);
         reader.readSnapshot(HollowBlobInput.serial(snapshot.toByteArray()));
@@ -174,20 +174,20 @@ public class RestoreWriteStateEngineHierarchyScenario {
         assertA(readStateEngine, 1, "A", true);
         assertA(readStateEngine, 2, "B", true);
         assertA(readStateEngine, 3, "A", true);
-        
+
         reader.applyDelta(HollowBlobInput.serial(reverseDelta.toByteArray()));
-        
+
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
-        
+
         reader.applyDelta(HollowBlobInput.serial(delta.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
     }
-    
+
     @Test
     public void testRemoval() throws IOException {
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
@@ -213,37 +213,37 @@ public class RestoreWriteStateEngineHierarchyScenario {
         a21.b.get(0).val = "A";
         a21.b.get(0).idEcho = 1;
         mapper.add(a21);
-        
+
         HollowReadStateEngine readStateEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
 
         assertA(readStateEngine, 1, "A", true);
         assertA(readStateEngine, 2, "B", true);
         assertA(readStateEngine, 3, "A", true);
-        
+
         writeStateEngine = new HollowWriteStateEngine();
         mapper = new HollowObjectMapper(writeStateEngine);
         mapper.initializeTypeState(TypeA1.class);
         mapper.initializeTypeState(TypeB1.class);
         writeStateEngine.restoreFrom(readStateEngine);
-        
+
         TypeA1 a11 = new TypeA1();
         a11.id = 1;
         a11.b.get(0).val = "A";
         a11.b.get(0).removedData = 1.0f;
         mapper.add(a11);
-        
+
         TypeA1 a12 = new TypeA1();
         a12.id = 2;
         a12.b.get(0).val = "B";
         a12.b.get(0).removedData = 2.0f;
         mapper.add(a12);
-        
+
         TypeA1 a13 = new TypeA1();
         a13.id = 3;
         a13.b.get(0).val = "A";
         a13.b.get(0).removedData = 3.0f;
         mapper.add(a13);
-        
+
         writeStateEngine.prepareForWrite();
         writeStateEngine.resetToLastPrepareForNextCycle();
 
@@ -252,13 +252,13 @@ public class RestoreWriteStateEngineHierarchyScenario {
         a11.b.get(0).val = "A";
         a11.b.get(0).removedData = 1.0f;
         mapper.add(a11);
-        
+
         a12 = new TypeA1();
         a12.id = 2;
         a12.b.get(0).val = "B";
         a12.b.get(0).removedData = 2.0f;
         mapper.add(a12);
-        
+
         a13 = new TypeA1();
         a13.id = 3;
         a13.b.get(0).val = "A";
@@ -267,28 +267,28 @@ public class RestoreWriteStateEngineHierarchyScenario {
 
         //writeStateEngine.prepareForWrite();
         HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
-        
+
         ByteArrayOutputStream delta = new ByteArrayOutputStream();
         ByteArrayOutputStream reverseDelta = new ByteArrayOutputStream();
         ByteArrayOutputStream snapshot = new ByteArrayOutputStream();
-        
+
         writer.writeDelta(delta);
         writer.writeReverseDelta(reverseDelta);
         writer.writeSnapshot(snapshot);
-        
+
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
         reader.applyDelta(HollowBlobInput.serial(delta.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
-        
+
         reader.applyDelta(HollowBlobInput.serial(reverseDelta.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
-        
+
         readStateEngine = new HollowReadStateEngine();
         reader = new HollowBlobReader(readStateEngine);
         reader.readSnapshot(HollowBlobInput.serial(snapshot.toByteArray()));
@@ -296,38 +296,38 @@ public class RestoreWriteStateEngineHierarchyScenario {
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
-        
+
         reader.applyDelta(HollowBlobInput.serial(reverseDelta.toByteArray()));
-        
+
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
-        
+
         reader.applyDelta(HollowBlobInput.serial(delta.toByteArray()));
 
         assertA(readStateEngine, 1, "A", false);
         assertA(readStateEngine, 2, "B", false);
         assertA(readStateEngine, 3, "A", false);
     }
-    
+
     private void assertA(HollowReadStateEngine stateEngine, int id, String val, boolean verifyEchoes) {
         HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(stateEngine, "TypeA", "id");
         int ordinal = idx.getMatchingOrdinal(id);
-        
+
         GenericHollowObject a = (GenericHollowObject) GenericHollowRecordHelper.instantiate(stateEngine, "TypeA", ordinal);
 
-        GenericHollowList bList = (GenericHollowList)a.getReferencedGenericRecord("b");
-        
-        GenericHollowObject b = (GenericHollowObject)bList.get(0);
+        GenericHollowList bList = (GenericHollowList) a.getReferencedGenericRecord("b");
 
-        GenericHollowObject str = (GenericHollowObject)b.getReferencedGenericRecord("val");
+        GenericHollowObject b = (GenericHollowObject) bList.get(0);
+
+        GenericHollowObject str = (GenericHollowObject) b.getReferencedGenericRecord("val");
         Assert.assertEquals(val, str.getString("value"));
-        
+
         if(verifyEchoes) {
             Assert.assertEquals(id, a.getInt("idEcho"));
             Assert.assertEquals(id, b.getInt("idEcho"));
         }
     }
-    
+
 
 }

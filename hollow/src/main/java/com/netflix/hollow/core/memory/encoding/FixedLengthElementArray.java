@@ -80,7 +80,7 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
 
         int bitsRemaining = 64 - whichBit;
 
-        if (bitsRemaining < bitsPerElement)
+        if(bitsRemaining < bitsPerElement)
             set(whichLong + 1, get(whichLong + 1) & ~(mask >>> bitsRemaining));
     }
 
@@ -93,7 +93,7 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
 
         int bitsRemaining = 64 - whichBit;
 
-        if (bitsRemaining < bitsPerElement)
+        if(bitsRemaining < bitsPerElement)
             set(whichLong + 1, get(whichLong + 1) | (value >>> bitsRemaining));
     }
 
@@ -132,7 +132,7 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
 
         int bitsRemaining = 64 - whichBit;
 
-        if (bitsRemaining < bitsPerElement) {
+        if(bitsRemaining < bitsPerElement) {
             whichLong++;
             l |= get(whichLong) << bitsRemaining;
         }
@@ -144,8 +144,8 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
     public void copyBits(FixedLengthData copyFrom, long sourceStartBit, long destStartBit, long numBits) {
         if(numBits == 0)
             return;
-        
-        if ((destStartBit & 63) != 0) {
+
+        if((destStartBit & 63) != 0) {
             int fillBits = (int) Math.min(64 - (destStartBit & 63), numBits);
             long fillValue = copyFrom.getLargeElementValue(sourceStartBit, fillBits);
             setElementValue(destStartBit, fillBits, fillValue);
@@ -157,7 +157,7 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
 
         long currentWriteLong = destStartBit >>> 6;
 
-        while (numBits >= 64) {
+        while(numBits >= 64) {
             long l = copyFrom.getLargeElementValue(sourceStartBit, 64, -1);
             set(currentWriteLong, l);
             numBits -= 64;
@@ -165,7 +165,7 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
             currentWriteLong++;
         }
 
-        if (numBits != 0) {
+        if(numBits != 0) {
             destStartBit = currentWriteLong << 6;
 
             long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) numBits);
@@ -176,7 +176,7 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
     @Override
     public void incrementMany(long startBit, long increment, long bitsBetweenIncrements, int numIncrements) {
         long endBit = startBit + (bitsBetweenIncrements * numIncrements);
-        for(; startBit<endBit; startBit += bitsBetweenIncrements) {
+        for(; startBit < endBit; startBit += bitsBetweenIncrements) {
             increment(startBit, increment);
         }
     }

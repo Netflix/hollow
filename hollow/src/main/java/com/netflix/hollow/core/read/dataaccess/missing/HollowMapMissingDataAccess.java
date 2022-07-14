@@ -64,7 +64,7 @@ public class HollowMapMissingDataAccess implements HollowMapTypeDataAccess {
     public int get(int ordinal, int keyOrdinal, int hashCode) {
         return missingDataHandler().handleMapGet(typeName, ordinal, keyOrdinal, hashCode);
     }
-    
+
     @Override
     public int findKey(int ordinal, Object... hashKey) {
         return missingDataHandler().handleMapFindKey(typeName, ordinal, hashKey);
@@ -107,7 +107,7 @@ public class HollowMapMissingDataAccess implements HollowMapTypeDataAccess {
     @Override
     public void setSamplingDirector(HollowSamplingDirector director) {
     }
-    
+
     @Override
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
     }

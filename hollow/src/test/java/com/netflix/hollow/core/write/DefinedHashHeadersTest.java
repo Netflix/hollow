@@ -33,33 +33,33 @@ public class DefinedHashHeadersTest {
     @Test
     public void definedHashTypesAreSentInHollowHeader() throws IOException {
         DefaultHashCodeFinder hasher = new DefaultHashCodeFinder("DefinedHash1", "DefinedHash2", "DefinedHash3");
-        
+
         HollowWriteStateEngine stateEngine = new HollowWriteStateEngine(hasher);
-        
+
         stateEngine.prepareForWrite();
-        
+
         HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writer.writeSnapshot(baos);
-        
+
         HollowReadStateEngine readEngine = new HollowReadStateEngine(true);
         HollowBlobReader reader = new HollowBlobReader(readEngine);
         reader.readSnapshot(HollowBlobInput.serial(baos.toByteArray()));
-        
+
         String headerTag = readEngine.getHeaderTag(HollowObjectHashCodeFinder.DEFINED_HASH_CODES_HEADER_NAME);
-        
+
         String types[] = headerTag.split(",");
-        
+
         Set<String> definedHashTypes = new HashSet<String>();
-        
+
         for(String type : types) {
             definedHashTypes.add(type);
         }
-        
+
         Assert.assertEquals(3, definedHashTypes.size());
         Assert.assertTrue(definedHashTypes.contains("DefinedHash1"));
         Assert.assertTrue(definedHashTypes.contains("DefinedHash2"));
         Assert.assertTrue(definedHashTypes.contains("DefinedHash3"));
     }
-    
+
 }

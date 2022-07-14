@@ -37,12 +37,12 @@ public final class ValidationResult {
             Throwable ex,
             String message,
             Map<String, String> details) {
-        if (type == ValidationResultType.ERROR && ex == null) {
+        if(type == ValidationResultType.ERROR && ex == null) {
             throw new IllegalArgumentException();
         }
         // @@@ For the moment allow a throwable to be associated with FAILED state
         // This is for compatibility with HollowProducer.Validator.ValidationException
-        if (type == ValidationResultType.PASSED && ex != null) {
+        if(type == ValidationResultType.PASSED && ex != null) {
             throw new IllegalArgumentException();
         }
 
@@ -117,7 +117,7 @@ public final class ValidationResult {
                 .append("name=\"").append(name).append("\" ")
                 .append("result=").append(type).append(" ");
 
-        if (message == null) {
+        if(message == null) {
             sb.append("message=null ");
         } else {
             sb.append("message=\"").append(message).append("\" ");

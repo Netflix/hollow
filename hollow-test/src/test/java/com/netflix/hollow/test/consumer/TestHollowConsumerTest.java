@@ -42,9 +42,9 @@ public class TestHollowConsumerTest {
     public void testAddSnapshot_version() throws Exception {
         long latestVersion = 1L;
         TestHollowConsumer consumer = new TestHollowConsumer.Builder()
-            .withAnnouncementWatcher(new TestAnnouncementWatcher().setLatestVersion(latestVersion))
-            .withBlobRetriever(new TestBlobRetriever())
-            .build();
+                .withAnnouncementWatcher(new TestAnnouncementWatcher().setLatestVersion(latestVersion))
+                .withBlobRetriever(new TestBlobRetriever())
+                .build();
         consumer.addSnapshot(latestVersion, new HollowWriteStateEngineBuilder().build());
         assertEquals("Should be no version", AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE, consumer.getCurrentVersionId());
         consumer.triggerRefresh();
@@ -55,9 +55,9 @@ public class TestHollowConsumerTest {
     public void testAddSnapshot_data() throws Exception {
         long latestVersion = 1L;
         TestHollowConsumer consumer = new TestHollowConsumer.Builder()
-            .withAnnouncementWatcher(new TestAnnouncementWatcher().setLatestVersion(1L))
-            .withBlobRetriever(new TestBlobRetriever())
-            .build();
+                .withAnnouncementWatcher(new TestAnnouncementWatcher().setLatestVersion(1L))
+                .withBlobRetriever(new TestBlobRetriever())
+                .build();
         consumer.addSnapshot(latestVersion,
                 new HollowWriteStateEngineBuilder().add("foo").add(2).build());
         consumer.triggerRefresh();
@@ -74,8 +74,8 @@ public class TestHollowConsumerTest {
     public void testAddSnapshot_triggerRefreshTo() throws Exception {
         long version = 2;
         TestHollowConsumer consumer = new TestHollowConsumer.Builder()
-            .withBlobRetriever(new TestBlobRetriever())
-            .build();
+                .withBlobRetriever(new TestBlobRetriever())
+                .build();
         consumer.addSnapshot(version, new HollowWriteStateEngineBuilder().build());
         try {
             consumer.triggerRefreshTo(version - 1);
@@ -90,11 +90,11 @@ public class TestHollowConsumerTest {
         long version1 = 1L;
         long version2 = 2L;
         TestAnnouncementWatcher announcementWatcher =
-            new TestAnnouncementWatcher().setLatestVersion(version1);
+                new TestAnnouncementWatcher().setLatestVersion(version1);
         TestHollowConsumer consumer = new TestHollowConsumer.Builder()
-            .withAnnouncementWatcher(announcementWatcher)
-            .withBlobRetriever(new TestBlobRetriever())
-            .build();
+                .withAnnouncementWatcher(announcementWatcher)
+                .withBlobRetriever(new TestBlobRetriever())
+                .build();
         consumer.addSnapshot(version1, new HollowWriteStateEngineBuilder().build());
         consumer.triggerRefresh();
         assertEquals(version1, consumer.getCurrentVersionId());
@@ -191,7 +191,7 @@ public class TestHollowConsumerTest {
         assertEquals(actualMovie, m);
     }
 
-    @HollowPrimaryKey(fields="id")
+    @HollowPrimaryKey(fields = "id")
     static class Movie {
         int id;
         String name;

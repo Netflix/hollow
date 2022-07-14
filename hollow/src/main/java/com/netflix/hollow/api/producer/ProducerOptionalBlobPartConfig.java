@@ -39,30 +39,30 @@ import java.util.function.Function;
 public class ProducerOptionalBlobPartConfig {
 
     private final Map<String, Set<String>> parts;
-    
+
     public ProducerOptionalBlobPartConfig() {
         this.parts = new HashMap<>();
     }
-    
+
     public void addTypesToPart(String partName, String... types) {
         if(types.length == 0)
             return;
-        
+
         Set<String> typeSet = parts.computeIfAbsent(partName, n -> new HashSet<>());
-        
+
         for(String type : types) {
             typeSet.add(type);
         }
     }
-    
+
     public Set<String> getParts() {
         return parts.keySet();
     }
-    
+
     public OptionalBlobPartOutputStreams newStreams() {
         return new OptionalBlobPartOutputStreams();
     }
-    
+
     public OptionalBlobPartOutputStreams newStreams(Function<String, OutputStream> streamCreator) {
         OptionalBlobPartOutputStreams s = newStreams();
         for(String part : getParts()) {
@@ -72,96 +72,96 @@ public class ProducerOptionalBlobPartConfig {
     }
 
     public class OptionalBlobPartOutputStreams {
-        
+
         private final Map<String, ConfiguredOutputStream> partStreams;
-        
+
         private OptionalBlobPartOutputStreams() {
             this.partStreams = new HashMap<>();
         }
-        
+
         public void addOutputStream(String partName, OutputStream os) {
             Set<String> types = parts.get(partName);
-            
+
             if(types == null)
                 throw new IllegalArgumentException("There is no blob part named " + partName + " in this configuration");
-            
+
             partStreams.put(partName, new ConfiguredOutputStream(partName, types, new DataOutputStream(os)));
         }
-        
+
         public Map<String, DataOutputStream> getStreamsByType() {
             if(!allPartsHaveStreams())
                 throw new IllegalStateException("Not all configured parts have streams!");
-            
+
             Map<String, DataOutputStream> streamsByType = new HashMap<>();
-            
+
             for(Map.Entry<String, ConfiguredOutputStream> entry : partStreams.entrySet()) {
                 ConfiguredOutputStream cos = entry.getValue();
-                
+
                 for(String type : cos.getTypes()) {
                     streamsByType.put(type, cos.getStream());
                 }
             }
-            
+
             return streamsByType;
         }
-        
+
         public Map<String, String> getPartNameByType() {
             if(!allPartsHaveStreams())
                 throw new IllegalStateException("Not all configured parts have streams!");
-            
+
             Map<String, String> streamsByType = new HashMap<>();
-            
+
             for(Map.Entry<String, ConfiguredOutputStream> entry : partStreams.entrySet()) {
                 ConfiguredOutputStream cos = entry.getValue();
-                
+
                 for(String type : cos.getTypes()) {
                     streamsByType.put(type, cos.getPartName());
                 }
             }
-            
+
             return streamsByType;
         }
-        
+
         public Map<String, ConfiguredOutputStream> getPartStreams() {
             return Collections.unmodifiableMap(partStreams);
         }
-        
+
         public void flush() throws IOException {
             for(Map.Entry<String, ConfiguredOutputStream> entry : partStreams.entrySet()) {
                 entry.getValue().getStream().flush();
             }
         }
-        
+
         public void close() throws IOException {
             for(Map.Entry<String, ConfiguredOutputStream> entry : partStreams.entrySet()) {
                 entry.getValue().getStream().close();
             }
         }
-        
+
         private boolean allPartsHaveStreams() {
             return parts.keySet().equals(partStreams.keySet());
         }
     }
-    
+
     public static class ConfiguredOutputStream {
         private final String partName;
         private final Set<String> types;
         private final DataOutputStream stream;
-        
+
         public ConfiguredOutputStream(String partName, Set<String> types, DataOutputStream stream) {
             this.partName = partName;
             this.types = Collections.unmodifiableSet(types);
             this.stream = stream;
         }
-        
+
         public String getPartName() {
             return partName;
         }
-        
+
         public Set<String> getTypes() {
             return types;
         }
-        
+
         public DataOutputStream getStream() {
             return stream;
         }

@@ -52,7 +52,7 @@ public class HollowObjectDiffViewGenerator {
 
         if(diffUI != null && diffUI.getCustomHollowEffigyFactory(typeName) != null) {
             CustomHollowEffigyFactory effigyFactory = diffUI.getCustomHollowEffigyFactory(typeName);
-            synchronized(effigyFactory) {
+            synchronized (effigyFactory) {
                 effigyFactory.setFromHollowRecord(fromDataAccess.getTypeDataAccess(typeName), fromOrdinal);
                 effigyFactory.setToHollowRecord(toDataAccess.getTypeDataAccess(typeName), toOrdinal);
                 effigyFactory.generateEffigies();
@@ -74,28 +74,28 @@ public class HollowObjectDiffViewGenerator {
     List<HollowDiffViewRow> traverseEffigyToCreateViewRows(HollowDiffViewRow parent) {
         if(parent.getFieldPair().isLeafNode())
             return Collections.emptyList();
-        
+
         Field fromField = parent.getFieldPair().getFrom();
         Field toField = parent.getFieldPair().getTo();
-        
+
         HollowEffigy from = fromField == null ? null : (HollowEffigy) fromField.getValue();
         HollowEffigy to = toField == null ? null : (HollowEffigy) toField.getValue();
-        
+
         List<EffigyFieldPair> pairs = HollowEffigyFieldPairer.pair(from, to, diffUI.getMatchHints());
-        
+
         List<HollowDiffViewRow> childRows = new ArrayList<HollowDiffViewRow>();
 
-        for(int i=0;i<pairs.size();i++) {
+        for(int i = 0; i < pairs.size(); i++) {
             EffigyFieldPair pair = pairs.get(i);
 
             int indentation = parent.getRowPath().length + 1;
-            
-            int rowPath[] = Arrays.copyOf(parent.getRowPath(), indentation); 
-            rowPath[rowPath.length - 1] = i; 
-            
+
+            int rowPath[] = Arrays.copyOf(parent.getRowPath(), indentation);
+            rowPath[rowPath.length - 1] = i;
+
             childRows.add(new HollowDiffViewRow(pair, rowPath, parent, this));
         }
-        
+
         return childRows;
     }
 

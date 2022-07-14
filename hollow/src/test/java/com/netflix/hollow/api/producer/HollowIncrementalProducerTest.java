@@ -126,7 +126,7 @@ public class HollowIncrementalProducerTest {
         assertTypeA(idx, 4, "five", 6L);
         assertTypeA(idx, 5, "five", null);
     }
-    
+
     @Test
     public void addIfAbsentWillInitializeNewRecordsButNotOverwriteExistingRecords() {
         HollowProducer producer = createInMemoryProducer();
@@ -147,13 +147,13 @@ public class HollowIncrementalProducerTest {
         incrementalProducer.addOrModify(new TypeA(103, "one hundred and three", 9992)); // overwrites prior call to addIfAbsent
         
         long version = incrementalProducer.runCycle();
-        
+
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
         consumer.triggerRefreshTo(version);
-        
+
         HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
         Assert.assertFalse(idx.containsDuplicates());
-        
+
         assertTypeA(idx, 100, "one hundred", 9999L);
         assertTypeA(idx, 101, "one hundred and one", 9998L);
         assertTypeA(idx, 1, "one", 1L);
@@ -245,7 +245,7 @@ public class HollowIncrementalProducerTest {
         incrementalProducer.addOrModify(new TypeB(4, "four"));
         incrementalProducer.addOrModify(new TypeB(5, "6"));
         incrementalProducer.addOrModify(new TypeB(5, "5"));
-        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[] { 4 }));
+        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[]{4}));
         incrementalProducer.addOrModify(new TypeB(6, "6"));
 
         /// .runCycle() flushes the changes to a new data state.
@@ -403,8 +403,8 @@ public class HollowIncrementalProducerTest {
         incrementalProducer.addOrModify(new TypeB(4, "four"));
 
         incrementalProducer.runCycle();
-        
-        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
+
+        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[]{3}));
         incrementalProducer.addOrModify(new TypeB(4, "four!"));
 
         long version2 = incrementalProducer.runCycle();
@@ -947,7 +947,7 @@ public class HollowIncrementalProducerTest {
         incrementalProducer.delete(new TypeB(2, "3"));
         incrementalProducer.addOrModify(new TypeB(5, "5"));
         incrementalProducer.addOrModify(new TypeB(5, "6"));
-        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
+        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[]{3}));
 
         Assert.assertTrue(incrementalProducer.hasChanges());
 
@@ -1040,7 +1040,7 @@ public class HollowIncrementalProducerTest {
 
         Collection<HollowObject> allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
         List<String> typeDNames = new ArrayList<>();
-        for (HollowObject hollowObject : allHollowObjectsTypeD) {
+        for(HollowObject hollowObject : allHollowObjectsTypeD) {
             typeDNames.add(((GenericHollowObject) hollowObject).getObject("value").toString());
         }
 
@@ -1058,7 +1058,7 @@ public class HollowIncrementalProducerTest {
 
         allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
         List<String> finalTypeDNames = new ArrayList<>();
-        for (HollowObject hollowObject : allHollowObjectsTypeD) {
+        for(HollowObject hollowObject : allHollowObjectsTypeD) {
             finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("value").toString());
         }
 
@@ -1099,7 +1099,7 @@ public class HollowIncrementalProducerTest {
 
         Collection<HollowObject> allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
         List<String> finalTypeDNames = new ArrayList<>();
-        for (HollowObject hollowObject : allHollowObjectsTypeD) {
+        for(HollowObject hollowObject : allHollowObjectsTypeD) {
             finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("value").toString());
         }
 
@@ -1373,6 +1373,7 @@ public class HollowIncrementalProducerTest {
             });
         }
     }
+
     private static class FakeAnnouncer implements HollowProducer.Announcer {
         @Override
         public void announce(long stateVersion) {
@@ -1403,10 +1404,10 @@ public class HollowIncrementalProducerTest {
     }
 
     private void assertTypeA(HollowPrimaryKeyIndex typeAIdx, int id1,
-                             String id2, Long expectedValue) {
+            String id2, Long expectedValue) {
         int ordinal = typeAIdx.getMatchingOrdinal(id1, id2);
 
-        if (expectedValue == null) {
+        if(expectedValue == null) {
             Assert.assertEquals(-1, ordinal);
         } else {
             Assert.assertNotEquals(-1, ordinal);
@@ -1417,10 +1418,10 @@ public class HollowIncrementalProducerTest {
     }
 
     private void assertTypeB(HollowPrimaryKeyIndex typeBIdx, int id1,
-                             String expectedValue) {
+            String expectedValue) {
         int ordinal = typeBIdx.getMatchingOrdinal(id1);
 
-        if (expectedValue == null) {
+        if(expectedValue == null) {
             Assert.assertEquals(-1, ordinal);
         } else {
             Assert.assertNotEquals(-1, ordinal);
@@ -1518,6 +1519,7 @@ public class HollowIncrementalProducerTest {
 
     private static class FakeSingleProducerEnforcer implements SingleProducerEnforcer {
         private boolean primary = false;
+
         @Override
         public void enable() {
             primary = true;

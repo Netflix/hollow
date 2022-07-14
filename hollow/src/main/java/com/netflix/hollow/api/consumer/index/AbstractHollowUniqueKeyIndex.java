@@ -43,7 +43,7 @@ public abstract class AbstractHollowUniqueKeyIndex<API, T> {
 
             this.refreshListener = new RefreshListener();
 
-            if (isListenToDataRefresh) {
+            if(isListenToDataRefresh) {
                 listenToDataRefresh();
             }
         } catch (ClassCastException cce) {
@@ -73,7 +73,7 @@ public abstract class AbstractHollowUniqueKeyIndex<API, T> {
     }
 
     public void listenToDataRefresh() {
-        if (isListenToDataRefresh) return;
+        if(isListenToDataRefresh) return;
 
         isListenToDataRefresh = true;
         idx.listenForDeltaUpdates();
@@ -101,9 +101,20 @@ public abstract class AbstractHollowUniqueKeyIndex<API, T> {
             api = castAPI(refreshAPI);
         }
 
-        @Override public void refreshStarted(long currentVersion, long requestedVersion) { }
-        @Override public void blobLoaded(HollowConsumer.Blob transition) { }
-        @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) { }
-        @Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }
+        @Override
+        public void refreshStarted(long currentVersion, long requestedVersion) {
+        }
+
+        @Override
+        public void blobLoaded(HollowConsumer.Blob transition) {
+        }
+
+        @Override
+        public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+        }
+
+        @Override
+        public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
+        }
     }
 }

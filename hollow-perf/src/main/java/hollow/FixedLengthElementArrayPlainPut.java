@@ -62,7 +62,7 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
 
         int bitsRemaining = 64 - whichBit;
 
-        if (bitsRemaining < bitsPerElement) {
+        if(bitsRemaining < bitsPerElement) {
             set(whichLong + 1, get(whichLong + 1) & ~(mask >>> bitsRemaining));
         }
     }
@@ -75,7 +75,7 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
 
         int bitsRemaining = 64 - whichBit;
 
-        if (bitsRemaining < bitsPerElement) {
+        if(bitsRemaining < bitsPerElement) {
             set(whichLong + 1, get(whichLong + 1) | (value >>> bitsRemaining));
         }
     }
@@ -110,7 +110,7 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
 
         int bitsRemaining = 64 - whichBit;
 
-        if (bitsRemaining < bitsPerElement) {
+        if(bitsRemaining < bitsPerElement) {
             whichLong++;
             l |= get(whichLong) << bitsRemaining;
         }
@@ -121,11 +121,11 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
     public void copyBits(
             com.netflix.hollow.core.memory.encoding.FixedLengthElementArray copyFrom, long sourceStartBit,
             long destStartBit, long numBits) {
-        if (numBits == 0) {
+        if(numBits == 0) {
             return;
         }
 
-        if ((destStartBit & 63) != 0) {
+        if((destStartBit & 63) != 0) {
             int fillBits = (int) Math.min(64 - (destStartBit & 63), numBits);
             long fillValue = copyFrom.getLargeElementValue(sourceStartBit, fillBits);
             setElementValue(destStartBit, fillBits, fillValue);
@@ -137,7 +137,7 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
 
         long currentWriteLong = destStartBit >>> 6;
 
-        while (numBits >= 64) {
+        while(numBits >= 64) {
             long l = copyFrom.getLargeElementValue(sourceStartBit, 64, -1);
             set(currentWriteLong, l);
             numBits -= 64;
@@ -145,7 +145,7 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
             currentWriteLong++;
         }
 
-        if (numBits != 0) {
+        if(numBits != 0) {
             destStartBit = currentWriteLong << 6;
 
             long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) numBits);
@@ -155,7 +155,7 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
 
     public void incrementMany(long startBit, long increment, long bitsBetweenIncrements, int numIncrements) {
         long endBit = startBit + (bitsBetweenIncrements * numIncrements);
-        for (; startBit < endBit; startBit += bitsBetweenIncrements) {
+        for(; startBit < endBit; startBit += bitsBetweenIncrements) {
             increment(startBit, increment);
         }
     }
@@ -173,18 +173,18 @@ public class FixedLengthElementArrayPlainPut extends SegmentedLongArrayPlainPut 
         unsafe.putLong(segment, elementByteOffset, l + (increment << whichBit));
 
         /// update the fencepost longs
-        if ((whichByte & byteBitmask) > bitmask * 8 && (whichSegment + 1) < segments.length) {
+        if((whichByte & byteBitmask) > bitmask * 8 && (whichSegment + 1) < segments.length) {
             unsafe.putLong(segments[whichSegment + 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET,
                     segments[whichSegment][bitmask + 1]);
         }
-        if ((whichByte & byteBitmask) < 8 && whichSegment > 0) {
+        if((whichByte & byteBitmask) < 8 && whichSegment > 0) {
             unsafe.putLong(segments[whichSegment - 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (bitmask + 1)),
                     segments[whichSegment][0]);
         }
     }
 
     public static int bitsRequiredToRepresentValue(long value) {
-        if (value == 0) {
+        if(value == 0) {
             return 1;
         }
         return 64 - Long.numberOfLeadingZeros(value);

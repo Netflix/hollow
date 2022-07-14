@@ -28,6 +28,6 @@ import java.lang.annotation.Target;
  * The field's type must a be boxed primitive type or {@code String}.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target( {ElementType.FIELD})
+@Target({ElementType.FIELD})
 public @interface HollowInline {
 }

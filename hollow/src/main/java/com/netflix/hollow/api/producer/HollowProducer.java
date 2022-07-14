@@ -251,10 +251,10 @@ public class HollowProducer extends AbstractHollowProducer {
      * @return the version identifier of the produced state, or AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE if compaction was unnecessary.
      */
     public long runCompactionCycle(HollowCompactor.CompactionConfig config) {
-        if (config != null && readStates.hasCurrent()) {
+        if(config != null && readStates.hasCurrent()) {
             final HollowCompactor compactor = new HollowCompactor(getWriteEngine(),
                     readStates.current().getStateEngine(), config);
-            if (compactor.needsCompaction()) {
+            if(compactor.needsCompaction()) {
                 return runCycle(newState -> compactor.compact());
             }
         }
@@ -333,6 +333,7 @@ public class HollowProducer extends AbstractHollowProducer {
             super(type.name() + " checksum invalid");
         }
     }
+
     /**
      * This exception is thrown when a publishing producer for the current cycle is not primary.
      * */
@@ -589,7 +590,7 @@ public class HollowProducer extends AbstractHollowProducer {
          */
         @Deprecated
         default void publish(HollowProducer.Blob blob) {
-            publish((PublishArtifact)blob);
+            publish((PublishArtifact) blob);
         }
 
         /**
@@ -603,15 +604,17 @@ public class HollowProducer extends AbstractHollowProducer {
          * @param publishArtifact the blob to publish
          */
         default void publish(HollowProducer.PublishArtifact publishArtifact) {
-            if (publishArtifact instanceof HollowProducer.Blob) {
-                publish((HollowProducer.Blob)publishArtifact);
+            if(publishArtifact instanceof HollowProducer.Blob) {
+                publish((HollowProducer.Blob) publishArtifact);
             }
         }
     }
 
     public interface PublishArtifact {
         void cleanup();
+
         void write(HollowBlobWriter blobWriter) throws IOException;
+
         InputStream newInputStream() throws IOException;
 
         @Deprecated
@@ -624,7 +627,7 @@ public class HollowProducer extends AbstractHollowProducer {
         }
     }
 
-    public static abstract class HeaderBlob implements PublishArtifact{
+    public static abstract class HeaderBlob implements PublishArtifact {
         protected final long version;
 
         protected HeaderBlob(long version) {
@@ -767,7 +770,7 @@ public class HollowProducer extends AbstractHollowProducer {
          * @throws IllegalArgumentException if the listener does not implement a recognized event listener type
          */
         public B withListener(HollowProducerEventListener listener) {
-            if (!ProducerListenerSupport.isValidListener(listener)) {
+            if(!ProducerListenerSupport.isValidListener(listener)) {
                 throw new IllegalArgumentException(
                         "Listener does not implement a recognized event listener type: " + listener);
             }
@@ -784,8 +787,8 @@ public class HollowProducer extends AbstractHollowProducer {
          * @throws IllegalArgumentException if the listener does not implement a recognized event listener type
          */
         public B withListeners(HollowProducerEventListener... listeners) {
-            for (HollowProducerEventListener listener : listeners) {
-                if (!ProducerListenerSupport.isValidListener(listener)) {
+            for(HollowProducerEventListener listener : listeners) {
+                if(!ProducerListenerSupport.isValidListener(listener)) {
                     throw new IllegalArgumentException(
                             "Listener does not implement a recognized event listener type: " + listener);
                 }
@@ -880,27 +883,27 @@ public class HollowProducer extends AbstractHollowProducer {
             this.hashCodeFinder = hashCodeFinder;
             return (B) this;
         }
-        
+
         public B noIntegrityCheck() {
             this.doIntegrityCheck = false;
             return (B) this;
         }
 
         protected void checkArguments() {
-            if (stager != null && compressor != null) {
+            if(stager != null && compressor != null) {
                 throw new IllegalArgumentException(
                         "Both a custom BlobStager and BlobCompressor were specified -- please specify only one of these.");
             }
-            if (stager != null && stagingDir != null) {
+            if(stager != null && stagingDir != null) {
                 throw new IllegalArgumentException(
                         "Both a custom BlobStager and a staging directory were specified -- please specify only one of these.");
             }
-            if (stager != null && optionalPartConfig != null) {
+            if(stager != null && optionalPartConfig != null) {
                 throw new IllegalArgumentException(
                         "Both a custom BlobStager and an optional blob part config were specified -- please specify only one of these.");
             }
 
-            if (this.stager == null) {
+            if(this.stager == null) {
                 BlobCompressor compressor = this.compressor != null ? this.compressor : BlobCompressor.NO_COMPRESSION;
                 File stagingDir = this.stagingDir != null ? this.stagingDir : new File(System.getProperty("java.io.tmpdir"));
                 this.stager = new HollowFilesystemBlobStager(stagingDir.toPath(), compressor, optionalPartConfig);
@@ -935,7 +938,7 @@ public class HollowProducer extends AbstractHollowProducer {
      */
     public static abstract class BlobStorageCleaner {
         public void clean(Blob.Type blobType) {
-            switch (blobType) {
+            switch(blobType) {
                 case SNAPSHOT:
                     cleanSnapshots();
                     break;

@@ -77,7 +77,7 @@ public class HollowDiffUI implements HollowRecordDiffUI {
         this.matchHints = new HashMap<String, PrimaryKey>();
         this.exactRecordMatcher = new DiffExactRecordMatcher(diff.getEqualityMapping());
     }
-    
+
     public boolean serveRequest(String pageName, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         if("diffrowdata".equals(pageName)) {
             diffViewOutputGenerator.uncollapseRow(req, resp);
@@ -136,7 +136,7 @@ public class HollowDiffUI implements HollowRecordDiffUI {
     public CustomHollowEffigyFactory getCustomHollowEffigyFactory(String typeName) {
         return customHollowEffigyFactories.get(typeName);
     }
-    
+
     public void addMatchHint(PrimaryKey matchHint) {
         this.matchHints.put(matchHint.getType(), matchHint);
     }
@@ -145,7 +145,7 @@ public class HollowDiffUI implements HollowRecordDiffUI {
     public Map<String, PrimaryKey> getMatchHints() {
         return matchHints;
     }
-    
+
     @Override
     public ExactRecordMatcher getExactRecordMatcher() {
         return exactRecordMatcher;

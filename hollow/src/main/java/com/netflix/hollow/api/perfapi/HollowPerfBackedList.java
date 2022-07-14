@@ -21,12 +21,12 @@ import java.util.AbstractList;
 import java.util.RandomAccess;
 
 public class HollowPerfBackedList<T> extends AbstractList<T> implements RandomAccess {
-    
+
     private final int ordinal;
     private final HollowListTypeDataAccess dataAccess;
     private final long elementMaskedTypeIdx;
     private final POJOInstantiator<T> instantiator;
-    
+
     public HollowPerfBackedList(HollowListTypePerfAPI typeAPI, int ordinal,
             POJOInstantiator<T> instantiator) {
         this.dataAccess = typeAPI.typeAccess();

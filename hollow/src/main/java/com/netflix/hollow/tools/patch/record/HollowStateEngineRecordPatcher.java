@@ -89,14 +89,14 @@ public class HollowStateEngineRecordPatcher {
                 while(ordinal != -1) {
                     traverser.traverse(ordinal);
 
-                    for(int i=0;i<traverser.getNumMatches();i++) {
+                    for(int i = 0; i < traverser.getNumMatches(); i++) {
 
                         boolean foundMatch = false;
 
-                        for(int j=0;j<spec.getKeyMatchingValues().size();j++) {
+                        for(int j = 0; j < spec.getKeyMatchingValues().size(); j++) {
                             boolean matched = true;
 
-                            for(int k=0;k<traverser.getNumFieldPaths();k++) {
+                            for(int k = 0; k < traverser.getNumFieldPaths(); k++) {
                                 if(!traverser.isMatchedValueEqual(i, k, spec.getKeyMatchingValues().get(j)[k])) {
                                     matched = false;
                                     break;

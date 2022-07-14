@@ -43,7 +43,7 @@ public class HString extends HollowObject {
     }
 
     protected StringDelegate delegate() {
-        return (StringDelegate)delegate;
+        return (StringDelegate) delegate;
     }
 
 }

@@ -32,10 +32,10 @@ public class HollowObjectCreationSampler implements HollowSampler {
     public HollowObjectCreationSampler(String... typeNames) {
         this.typeNames = typeNames;
         this.creationSamples = new long[typeNames.length];
-        
+
         HollowSamplingDirector[] typeDirectors = new HollowSamplingDirector[typeNames.length];
         Arrays.fill(typeDirectors, DisabledSamplingDirector.INSTANCE);
-        
+
         this.typeDirectors = typeDirectors;
     }
 
@@ -51,21 +51,21 @@ public class HollowObjectCreationSampler implements HollowSampler {
 
     @Override
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
-        for(int i=0;i<typeNames.length;i++) {
+        for(int i = 0; i < typeNames.length; i++) {
             if(fieldSpec.doesIncludeType(typeNames[i]))
                 typeDirectors[i] = director;
         }
     }
-    
+
     @Override
     public void setUpdateThread(Thread t) {
-        for(int i=0;i<typeDirectors.length;i++)
+        for(int i = 0; i < typeDirectors.length; i++)
             typeDirectors[i].setUpdateThread(t);
     }
 
     @Override
     public boolean hasSampleResults() {
-        for(int i=0;i<creationSamples.length;i++)
+        for(int i = 0; i < creationSamples.length; i++)
             if(creationSamples[i] > 0)
                 return true;
         return false;
@@ -75,7 +75,7 @@ public class HollowObjectCreationSampler implements HollowSampler {
     public Collection<SampleResult> getSampleResults() {
         List<SampleResult> results = new ArrayList<SampleResult>(typeNames.length);
 
-        for(int i=0;i<typeNames.length;i++) {
+        for(int i = 0; i < typeNames.length; i++) {
             results.add(new SampleResult(typeNames[i], creationSamples[i]));
         }
 

@@ -42,12 +42,12 @@ public class HollowListSampler implements HollowSampler {
         if(!"".equals(typeName))
             this.director = director;
     }
-    
+
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         if(!"".equals(typeName) && fieldSpec.doesIncludeType(typeName))
             this.director = director;
     }
-    
+
     @Override
     public void setUpdateThread(Thread t) {
         director.setUpdateThread(t);

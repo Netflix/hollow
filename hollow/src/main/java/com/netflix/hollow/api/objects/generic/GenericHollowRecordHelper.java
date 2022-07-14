@@ -47,13 +47,13 @@ public class GenericHollowRecordHelper {
 
         if(typeState != null) {
             if(typeState instanceof HollowObjectTypeDataAccess)
-                return new GenericHollowObject(new HollowObjectGenericDelegate((HollowObjectTypeDataAccess)typeState), ordinal);
+                return new GenericHollowObject(new HollowObjectGenericDelegate((HollowObjectTypeDataAccess) typeState), ordinal);
             if(typeState instanceof HollowListTypeDataAccess)
-                return new GenericHollowList(new HollowListLookupDelegate<HollowRecord>((HollowListTypeDataAccess)typeState), ordinal);
+                return new GenericHollowList(new HollowListLookupDelegate<HollowRecord>((HollowListTypeDataAccess) typeState), ordinal);
             if(typeState instanceof HollowSetTypeDataAccess)
-                return new GenericHollowSet(new HollowSetLookupDelegate<HollowRecord>((HollowSetTypeDataAccess)typeState), ordinal);
+                return new GenericHollowSet(new HollowSetLookupDelegate<HollowRecord>((HollowSetTypeDataAccess) typeState), ordinal);
             if(typeState instanceof HollowMapTypeDataAccess)
-                return new GenericHollowMap(new HollowMapLookupDelegate<HollowRecord, HollowRecord>((HollowMapTypeDataAccess)typeState), ordinal);
+                return new GenericHollowMap(new HollowMapLookupDelegate<HollowRecord, HollowRecord>((HollowMapTypeDataAccess) typeState), ordinal);
         } else {
             HollowSchema schema = dataAccess.getMissingDataHandler().handleSchema(typeName);
 
@@ -72,7 +72,7 @@ public class GenericHollowRecordHelper {
 
     public static boolean equalObject(String typeName, int ordinal, Object testObject) {
         if(testObject instanceof HollowRecord) {
-            HollowRecord testRec = (HollowRecord)testObject;
+            HollowRecord testRec = (HollowRecord) testObject;
             if(testRec.getOrdinal() == ordinal) {
                 String otherType = testRec.getSchema().getName();
 

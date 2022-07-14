@@ -81,7 +81,7 @@ public class HollowProducerMetrics extends HollowMetrics {
 
     public void updateBlobTypeMetrics(Status status, HollowProducer.Blob blob) {
         HollowProducer.Blob.Type blobType = blob.getType();
-        switch (blobType) {
+        switch(blobType) {
             case SNAPSHOT:
                 if(status.getType() == Status.StatusType.SUCCESS)
                     snapshotsCompleted.incrementAndGet();

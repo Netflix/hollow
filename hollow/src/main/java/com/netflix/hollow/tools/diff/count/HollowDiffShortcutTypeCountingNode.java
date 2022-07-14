@@ -32,7 +32,7 @@ public class HollowDiffShortcutTypeCountingNode extends HollowDiffCountingNode {
 
     public HollowDiffShortcutTypeCountingNode(HollowDiff diff, HollowTypeDiff topLevelTypeDiff, HollowDiffNodeIdentifier nodeId) {
         super(diff, topLevelTypeDiff, nodeId);
-        
+
         this.fieldDiff = new HollowFieldDiff(nodeId);
     }
 
@@ -51,13 +51,13 @@ public class HollowDiffShortcutTypeCountingNode extends HollowDiffCountingNode {
     public int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
         return addResultToFieldDiff(fromOrdinals, toOrdinals);
     }
-    
+
     private int addResultToFieldDiff(IntList fromOrdinals, IntList toOrdinals) {
         int score = fromOrdinals.size() + toOrdinals.size();
-        
+
         if(score != 0)
             fieldDiff.addDiff(currentTopLevelFromOrdinal, currentTopLevelToOrdinal, score);
-        
+
         return score;
     }
 

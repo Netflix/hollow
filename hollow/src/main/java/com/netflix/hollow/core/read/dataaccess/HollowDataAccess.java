@@ -49,10 +49,10 @@ public interface HollowDataAccess extends HollowDataset {
      * @return The names of all types in this dataset
      */
     Collection<String> getAllTypes();
-    
+
     @Override
     List<HollowSchema> getSchemas();
-    
+
     @Override
     HollowSchema getSchema(String name);
 

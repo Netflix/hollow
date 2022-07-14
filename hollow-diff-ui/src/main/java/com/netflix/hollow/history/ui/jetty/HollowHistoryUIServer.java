@@ -98,7 +98,9 @@ public class HollowHistoryUIServer {
 
     static interface UIServer {
         void start() throws Exception;
+
         void stop() throws Exception;
+
         void join() throws InterruptedException;
 
         static interface Factory {

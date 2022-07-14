@@ -35,9 +35,11 @@ public class HollowDiffView extends HollowObjectView {
     public String getType() {
         return type;
     }
+
     public int getFromOrdinal() {
         return fromOrdinal;
     }
+
     public int getToOrdinal() {
         return toOrdinal;
     }

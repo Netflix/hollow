@@ -132,9 +132,9 @@ public class HollowDataAccessorTest extends AbstractStateEngineTest {
 
         Assert.assertEquals(1, typeState.maxOrdinal());
         assertObject(typeState, 0, 634, "six hundred thirty four"); /// now, since all records were removed, we can recycle the ordinal "0", even
-                                                                    /// though it was a "ghost" in the last cycle.
+        /// though it was a "ghost" in the last cycle.
         assertObject(typeState, 1, 0, "zero"); /// even though "zero" had an equivalent record in the previous cycle at ordinal "4", it is now
-                                               /// assigned to recycled ordinal "1".
+        /// assigned to recycled ordinal "1".
     }
 
     @Test
@@ -176,11 +176,14 @@ public class HollowDataAccessorTest extends AbstractStateEngineTest {
         String typeName = "ThisTypeDoesNotExist";
         assertThatThrownBy(() -> {
             new AbstractHollowDataAccessor<Object>(readStateEngine, typeName) {
-                @Override public Object getRecord(int ordinal) { return null; }
+                @Override
+                public Object getRecord(int ordinal) {
+                    return null;
+                }
             };
         }).isInstanceOf(NullPointerException.class)
-          .hasMessageContaining(typeName)
-          .hasMessageContaining("not loaded");
+                .hasMessageContaining(typeName)
+                .hasMessageContaining("not loaded");
     }
 
     private void addRecord(int intVal, String strVal) {
@@ -201,7 +204,7 @@ public class HollowDataAccessorTest extends AbstractStateEngineTest {
 
     private void assertList(Collection<GenericHollowObject> listOfObj, List<Integer> listOfIds) {
         int i = 0;
-        for (GenericHollowObject obj : listOfObj) {
+        for(GenericHollowObject obj : listOfObj) {
             int id = listOfIds.get(i++);
             Assert.assertEquals(id, obj.getInt("f1"));
         }
@@ -209,7 +212,7 @@ public class HollowDataAccessorTest extends AbstractStateEngineTest {
 
     private void assertUpdatedList(Collection<UpdatedRecord<GenericHollowObject>> listOfObj, List<String> beforeValues, List<String> afterValues) {
         int i = 0;
-        for (UpdatedRecord<GenericHollowObject> obj : listOfObj) {
+        for(UpdatedRecord<GenericHollowObject> obj : listOfObj) {
             int beforeId = obj.getBefore().getInt("f1");
             int afterId = obj.getAfter().getInt("f1");
             Assert.assertEquals(beforeId, afterId);

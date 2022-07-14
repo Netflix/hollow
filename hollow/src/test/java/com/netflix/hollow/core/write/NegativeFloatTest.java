@@ -15,6 +15,7 @@
  *
  */
 package com.netflix.hollow.core.write;
+
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
@@ -30,13 +31,13 @@ public class NegativeFloatTest {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
 
-        for(int i=0;i<10;i++) {
+        for(int i = 0; i < 10; i++) {
             mapper.add(new TypeWithFloat(-200f, i));
         }
 
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
 
-        for(int i=0;i<10;i++) {
+        for(int i = 0; i < 10; i++) {
             GenericHollowObject obj = new GenericHollowObject(readEngine, "TypeWithFloat", i);
             Assert.assertEquals(i, obj.getInt("i"));
         }

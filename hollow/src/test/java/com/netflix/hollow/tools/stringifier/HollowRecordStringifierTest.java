@@ -74,14 +74,14 @@ public class HollowRecordStringifierTest extends AbstractHollowRecordStringifier
         Assert.assertEquals(msg, NEWLINE + INDENT + "value: 42.0" + NEWLINE
                 + INDENT + "nestedType: 42",
                 stringifyType(TypeWithNestedPrimitive.class, false,
-                    new TypeWithNestedPrimitive(42.0, new TypeWithPrimitive(42))));
+                        new TypeWithNestedPrimitive(42.0, new TypeWithPrimitive(42))));
         Assert.assertEquals(msg, "(TypeWithNestedPrimitive) (ordinal 0)" + NEWLINE
                 + INDENT + "value: (Double) (ordinal 0)" + NEWLINE
                 + INDENT + INDENT + "value: 42.0" + NEWLINE
                 + INDENT + "nestedType: (TypeWithPrimitive) (ordinal 0)" + NEWLINE
                 + INDENT + INDENT + "value: 42",
                 stringifyType(TypeWithNestedPrimitive.class, true,
-                    new TypeWithNestedPrimitive(42.0, new TypeWithPrimitive(42))));
+                        new TypeWithNestedPrimitive(42.0, new TypeWithPrimitive(42))));
     }
 
     @Test
@@ -90,7 +90,7 @@ public class HollowRecordStringifierTest extends AbstractHollowRecordStringifier
         Assert.assertEquals(msg, NEWLINE + INDENT + "value: 42.0" + NEWLINE
                 + INDENT + "nestedType: 42",
                 stringifyType(TypeWithNestedNonPrimitive.class, false,
-                    new TypeWithNestedNonPrimitive(42.0, new TypeWithNonPrimitive(42))));
+                        new TypeWithNestedNonPrimitive(42.0, new TypeWithNonPrimitive(42))));
         Assert.assertEquals(msg, "(TypeWithNestedNonPrimitive) (ordinal 0)" + NEWLINE
                 + INDENT + "value: (Double) (ordinal 0)" + NEWLINE
                 + INDENT + INDENT
@@ -99,7 +99,7 @@ public class HollowRecordStringifierTest extends AbstractHollowRecordStringifier
                 + INDENT + INDENT + "value: (Integer) (ordinal 0)" + NEWLINE
                 + INDENT + INDENT + INDENT + "value: 42",
                 stringifyType(TypeWithNestedNonPrimitive.class, true,
-                    new TypeWithNestedNonPrimitive(42.0, new TypeWithNonPrimitive(42))));
+                        new TypeWithNestedNonPrimitive(42.0, new TypeWithNonPrimitive(42))));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class HollowRecordStringifierTest extends AbstractHollowRecordStringifier
         Assert.assertEquals("Multiple records should be printed correctly",
                 "foo" + NEWLINE + "bar",
                 stringifyType(TypeWithString.class, false,
-                    new TypeWithString("foo"), new TypeWithString("bar")));
+                        new TypeWithString("foo"), new TypeWithString("bar")));
     }
 
     @Test
@@ -137,7 +137,7 @@ public class HollowRecordStringifierTest extends AbstractHollowRecordStringifier
 
     private static <T> String stringifyType(Class<T> clazz, boolean expanded, T... instances) throws IOException {
         HollowRecordStringifier stringifier = expanded
-            ? new HollowRecordStringifier(true, true, false) : new HollowRecordStringifier();
+                ? new HollowRecordStringifier(true, true, false) : new HollowRecordStringifier();
         return stringifyType(clazz, stringifier, instances);
     }
 }

@@ -30,19 +30,19 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowSetHashKeyTest {
-    
+
     @Test
     public void testSetHashKeys() throws IOException {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
         mapper.useDefaultHashKeys();
-        
+
         mapper.add(new TestTopLevelObject(1, new Obj(1, "US", 100), new Obj(2, "CA", 200), new Obj(3, "IT", 300), new Obj(4, "GB", 400), new Obj(5, "IT", 500)));
-        
+
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
-        
-        GenericHollowObject obj = new GenericHollowObject(readEngine, "TestTopLevelObject", 0); 
-        
+
+        GenericHollowObject obj = new GenericHollowObject(readEngine, "TestTopLevelObject", 0);
+
         GenericHollowObject element = (GenericHollowObject) obj.getSet("setById").findElement(1);
         Assert.assertEquals("US", element.getObject("country").getString("value"));
         element = (GenericHollowObject) obj.getSet("setById").findElement(2);
@@ -54,65 +54,65 @@ public class HollowSetHashKeyTest {
         element = (GenericHollowObject) obj.getSet("setById").findElement(5);
         Assert.assertEquals("IT", element.getObject("country").getString("value"));
 
-        element = (GenericHollowObject)obj.getSet("setByIdCountry").findElement(1, "US");
+        element = (GenericHollowObject) obj.getSet("setByIdCountry").findElement(1, "US");
         Assert.assertEquals(1, element.getInt("id"));
-        element = (GenericHollowObject)obj.getSet("setByIdCountry").findElement(2, "CA");
+        element = (GenericHollowObject) obj.getSet("setByIdCountry").findElement(2, "CA");
         Assert.assertEquals(2, element.getInt("id"));
-        element = (GenericHollowObject)obj.getSet("setByIdCountry").findElement(3, "IT");
+        element = (GenericHollowObject) obj.getSet("setByIdCountry").findElement(3, "IT");
         Assert.assertEquals(3, element.getInt("id"));
-        element = (GenericHollowObject)obj.getSet("setByIdCountry").findElement(4, "GB");
+        element = (GenericHollowObject) obj.getSet("setByIdCountry").findElement(4, "GB");
         Assert.assertEquals(4, element.getInt("id"));
-        element = (GenericHollowObject)obj.getSet("setByIdCountry").findElement(5, "IT");
+        element = (GenericHollowObject) obj.getSet("setByIdCountry").findElement(5, "IT");
         Assert.assertEquals(5, element.getInt("id"));
-        
-        element = (GenericHollowObject)obj.getSet("intSet").findElement(100);
+
+        element = (GenericHollowObject) obj.getSet("intSet").findElement(100);
         Assert.assertEquals(100, element.getInt("value"));
-        element = (GenericHollowObject)obj.getSet("intSet").findElement(200);
+        element = (GenericHollowObject) obj.getSet("intSet").findElement(200);
         Assert.assertEquals(200, element.getInt("value"));
-        element = (GenericHollowObject)obj.getSet("intSet").findElement(300);
+        element = (GenericHollowObject) obj.getSet("intSet").findElement(300);
         Assert.assertEquals(300, element.getInt("value"));
-        element = (GenericHollowObject)obj.getSet("intSet").findElement(400);
+        element = (GenericHollowObject) obj.getSet("intSet").findElement(400);
         Assert.assertEquals(400, element.getInt("value"));
-        element = (GenericHollowObject)obj.getSet("intSet").findElement(500);
+        element = (GenericHollowObject) obj.getSet("intSet").findElement(500);
         Assert.assertEquals(500, element.getInt("value"));
     }
-    
-    
+
+
     @SuppressWarnings("unused")
     private static class TestTopLevelObject {
         int id;
-        
-        @HollowTypeName(name="SetById")
-        @HollowHashKey(fields="id")
+
+        @HollowTypeName(name = "SetById")
+        @HollowHashKey(fields = "id")
         Set<Obj> setById;
-        
-        @HollowTypeName(name="SetByIdCountry")
-        @HollowHashKey(fields={"id", "country.value"})
+
+        @HollowTypeName(name = "SetByIdCountry")
+        @HollowHashKey(fields = {"id", "country.value"})
         Set<Obj> setByIdCountry;
-        
+
         Set<Integer> intSet;
-        
+
         public TestTopLevelObject(int id, Obj... elements) {
             this.id = id;
             this.setById = new HashSet<Obj>();
             this.setByIdCountry = new HashSet<Obj>();
             this.intSet = new HashSet<Integer>();
-            
-            for(int i=0;i<elements.length;i++) {
+
+            for(int i = 0; i < elements.length; i++) {
                 setById.add(elements[i]);
                 setByIdCountry.add(elements[i]);
-                intSet.add((int)elements[i].extraValue);
+                intSet.add((int) elements[i].extraValue);
             }
-                
+
         }
     }
-    
+
     @SuppressWarnings("unused")
     private static class Obj {
         int id;
         String country;
         long extraValue;
-        
+
         public Obj(int id, String country, long extraValue) {
             this.id = id;
             this.country = country;

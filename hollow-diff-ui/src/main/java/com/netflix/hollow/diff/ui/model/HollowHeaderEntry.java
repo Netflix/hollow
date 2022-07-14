@@ -41,7 +41,7 @@ public class HollowHeaderEntry {
     }
 
     public boolean isSame() {
-        return fromValue==null ? toValue==null : fromValue.equals(toValue);
+        return fromValue == null ? toValue == null : fromValue.equals(toValue);
     }
 
     public String getKey() {

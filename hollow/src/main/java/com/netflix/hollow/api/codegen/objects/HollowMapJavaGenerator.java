@@ -123,11 +123,11 @@ public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
 
             classBuilder.append("    public " + valueReturnType + " get(");
             classBuilder.append(getKeyFieldType(schema.getHashKey().getFieldPath(0))).append(" k0");
-            for(int i=1;i<schema.getHashKey().numFields();i++)
+            for(int i = 1; i < schema.getHashKey().numFields(); i++)
                 classBuilder.append(", ").append(getKeyFieldType(schema.getHashKey().getFieldPath(i))).append(" k").append(i);
             classBuilder.append(") {\n");
             classBuilder.append("        return findValue(k0");
-            for(int i=1;i<schema.getHashKey().numFields();i++)
+            for(int i = 1; i < schema.getHashKey().numFields(); i++)
                 classBuilder.append(", k").append(i);
             classBuilder.append(");\n");
             classBuilder.append("    }\n\n");
@@ -161,20 +161,21 @@ public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
 
     private String getKeyFieldType(String fieldPath) {
         try {
-            HollowObjectSchema keySchema = (HollowObjectSchema)dataset.getSchema(schema.getKeyType());
+            HollowObjectSchema keySchema = (HollowObjectSchema) dataset.getSchema(schema.getKeyType());
 
             String fieldPathElements[] = fieldPath.split("\\.");
             int idx = 0;
 
-            while(idx < fieldPathElements.length-1) {
-                keySchema = (HollowObjectSchema)dataset.getSchema(keySchema.getReferencedType(fieldPathElements[idx]));
+            while(idx < fieldPathElements.length - 1) {
+                keySchema = (HollowObjectSchema) dataset.getSchema(keySchema.getReferencedType(fieldPathElements[idx]));
                 idx++;
             }
 
             FieldType fieldType = keySchema.getFieldType(keySchema.getPosition(fieldPathElements[idx]));
 
             return HollowCodeGenerationUtils.getJavaBoxedType(fieldType);
-        } catch(Throwable th) { }
+        } catch (Throwable th) {
+        }
         throw new IllegalArgumentException("Field path '" + fieldPath + "' specified incorrectly for type: " + schema.getName());
     }
 

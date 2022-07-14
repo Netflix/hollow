@@ -82,7 +82,7 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     public HollowHistoryUI(String baseUrlPath, HollowConsumer consumer, int numStatesToTrack, TimeZone timeZone) {
         this(baseUrlPath, createHistory(consumer, numStatesToTrack), timeZone);
     }
-    
+
     /**
      * HollowHistoryUI that supports building history in both directions simultaneously.
      * Fwd and rev consumers should be initialized to the same version before calling this constructor.
@@ -130,7 +130,7 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     }
 
     private static HollowHistory createHistory(HollowConsumer consumerFwd, HollowConsumer consumerRev, int numStatesToTrack) {
-        if (consumerRev == null) {
+        if(consumerRev == null) {
             consumerFwd.getRefreshLock().lock();
             try {
                 HollowHistory history = new HollowHistory(consumerFwd.getStateEngine(), consumerFwd.getCurrentVersionId(), numStatesToTrack);
@@ -179,24 +179,24 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
             if(serveResource(req, resp, getResourceName(target)))
                 return true;
         } else if("".equals(pageName) || "overview".equals(pageName)) {
-        	if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
-        		overviewPage.sendJson(req, resp);
-        		return true;
-        	}
+            if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
+                overviewPage.sendJson(req, resp);
+                return true;
+            }
             overviewPage.render(req, getSession(req, resp), resp.getWriter());
             return true;
         } else if("state".equals(pageName)) {
-        	if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
-        		statePage.sendJson(req, resp);
-        		return true;
-        	}
+            if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
+                statePage.sendJson(req, resp);
+                return true;
+            }
             statePage.render(req, getSession(req, resp), resp.getWriter());
             return true;
         } else if("statetype".equals(pageName)) {
-        	if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
-        		stateTypePage.sendJson(req, getSession(req, resp),  resp);
-        		return true;
-        	}
+            if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
+                stateTypePage.sendJson(req, getSession(req, resp),  resp);
+                return true;
+            }
             stateTypePage.render(req, getSession(req, resp), resp.getWriter());
             return true;
         } else if("statetypeexpand".equals(pageName)) {
@@ -212,7 +212,7 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
 
         return false;
     }
-    
+
     public void addCustomHollowRecordNamer(String typeName, HollowHistoryRecordNamer recordNamer) {
         customHollowRecordNamers.put(typeName, recordNamer);
     }
@@ -220,12 +220,12 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     public void addCustomHollowEffigyFactory(String typeName, CustomHollowEffigyFactory factory) {
         customHollowEffigyFactories.put(typeName, factory);
     }
-    
+
     @Override
     public CustomHollowEffigyFactory getCustomHollowEffigyFactory(String typeName) {
         return customHollowEffigyFactories.get(typeName);
     }
-    
+
     public void addMatchHint(PrimaryKey matchHint) {
         this.matchHints.put(matchHint.getType(), matchHint);
     }
@@ -234,7 +234,7 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     public Map<String, PrimaryKey> getMatchHints() {
         return matchHints;
     }
-    
+
     public ExactRecordMatcher getExactRecordMatcher() {
         return HistoryExactRecordMatcher.INSTANCE;
     }
@@ -242,14 +242,14 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     public void setOverviewDisplayHeaders(String... displayHeaders) {
         this.overviewDisplayHeaders = displayHeaders;
     }
-    
+
     public HollowHistoryRecordNamer getHistoryRecordNamer(String typeName) {
-         HollowHistoryRecordNamer recordNamer = customHollowRecordNamers.get(typeName);
-         if(recordNamer == null)
-             return HollowHistoryRecordNamer.DEFAULT_RECORD_NAMER;
-         return recordNamer;
+        HollowHistoryRecordNamer recordNamer = customHollowRecordNamers.get(typeName);
+        if(recordNamer == null)
+            return HollowHistoryRecordNamer.DEFAULT_RECORD_NAMER;
+        return recordNamer;
     }
-    
+
     public String[] getOverviewDisplayHeaders() {
         return overviewDisplayHeaders;
     }

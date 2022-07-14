@@ -36,7 +36,7 @@ public class HollowRefreshListenerTests {
 
     private InMemoryBlobStore blobStore;
     private RecordingRefreshListener listener;
-    
+
     private HollowProducer producer;
     private HollowConsumer consumer;
 
@@ -45,21 +45,39 @@ public class HollowRefreshListenerTests {
         blobStore = new InMemoryBlobStore();
         listener = new RecordingRefreshListener();
         producer = HollowProducer.withPublisher(blobStore)
-                                 .withBlobStager(new HollowInMemoryBlobStager())
-                                 .withNumStatesBetweenSnapshots(Integer.MAX_VALUE)
-                                 .build();
-        
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withNumStatesBetweenSnapshots(Integer.MAX_VALUE)
+                .build();
+
         consumer = HollowConsumer.withBlobRetriever(blobStore)
-                                 .withRefreshListener(listener)
-                                 .withObjectLongevityConfig(new ObjectLongevityConfig() {
-                                        @Override public long usageDetectionPeriodMillis() { return 100L; }
-                                        @Override public long gracePeriodMillis() { return 100L; }
-                                        @Override public boolean forceDropData() { return false; }
-                                        @Override public boolean enableLongLivedObjectSupport() { return true; }
-                                        @Override public boolean enableExpiredUsageStackTraces() { return false; }
-                                        @Override public boolean dropDataAutomatically() { return true; }
-                                 })
-                                 .build();
+                .withRefreshListener(listener)
+                .withObjectLongevityConfig(new ObjectLongevityConfig() {
+                    @Override
+                    public long usageDetectionPeriodMillis() {
+                        return 100L;
+                    }
+                    @Override
+                    public long gracePeriodMillis() {
+                        return 100L;
+                    }
+                    @Override
+                    public boolean forceDropData() {
+                        return false;
+                    }
+                    @Override
+                    public boolean enableLongLivedObjectSupport() {
+                        return true;
+                    }
+                    @Override
+                    public boolean enableExpiredUsageStackTraces() {
+                        return false;
+                    }
+                    @Override
+                    public boolean dropDataAutomatically() {
+                        return true;
+                    }
+                })
+                .build();
     }
 
     @Test
@@ -70,7 +88,7 @@ public class HollowRefreshListenerTests {
                 .build();
 
         long v1 = runCycle(producer, 1);
-        consumer.triggerRefreshTo(v1+1);
+        consumer.triggerRefreshTo(v1 + 1);
 
         Assert.assertEquals(1, listener.cycles);
 
@@ -79,7 +97,7 @@ public class HollowRefreshListenerTests {
         long v2 = runCycle(producer, 2);
 
         consumer.addRefreshListener(listener);
-        consumer.triggerRefreshTo(v2+1);
+        consumer.triggerRefreshTo(v2 + 1);
 
         Assert.assertEquals(1, listener.cycles);
     }
@@ -110,7 +128,7 @@ public class HollowRefreshListenerTests {
 
         long v1 = runCycle(producer, 1);
         listeners.clear();
-        consumer.triggerRefreshTo(v1+1);
+        consumer.triggerRefreshTo(v1 + 1);
 
         Assert.assertEquals(1, listener.cycles);
     }
@@ -122,25 +140,25 @@ public class HollowRefreshListenerTests {
         long v3 = runCycle(producer, 3);
         long v4 = runCycle(producer, 4);
         long v5 = runCycle(producer, 5);
-        
-        consumer.triggerRefreshTo(v5+1);
-        
+
+        consumer.triggerRefreshTo(v5 + 1);
+
         /// update occurred semantics
         Assert.assertEquals(1, listener.snapshotUpdateOccurredVersions.size());
         Assert.assertEquals(v5, listener.snapshotUpdateOccurredVersions.get(0).longValue());
-        
+
         Assert.assertTrue(listener.deltaUpdateOccurredVersions.isEmpty());
-        
+
         /// applied semantics
         Assert.assertEquals(1, listener.snapshotAppliedVersions.size());
         Assert.assertEquals(v1, listener.snapshotAppliedVersions.get(0).longValue());
-        
+
         Assert.assertEquals(4, listener.deltaAppliedVersions.size());
         Assert.assertEquals(v2, listener.deltaAppliedVersions.get(0).longValue());
         Assert.assertEquals(v3, listener.deltaAppliedVersions.get(1).longValue());
         Assert.assertEquals(v4, listener.deltaAppliedVersions.get(2).longValue());
         Assert.assertEquals(v5, listener.deltaAppliedVersions.get(3).longValue());
-        
+
         /// blobs loaded semantics
         Assert.assertEquals(5, listener.blobsLoadedVersions.size());
         Assert.assertEquals(v1, listener.blobsLoadedVersions.get(0).longValue());
@@ -148,15 +166,15 @@ public class HollowRefreshListenerTests {
         Assert.assertEquals(v3, listener.blobsLoadedVersions.get(2).longValue());
         Assert.assertEquals(v4, listener.blobsLoadedVersions.get(3).longValue());
         Assert.assertEquals(v5, listener.blobsLoadedVersions.get(4).longValue());
-        
+
         Assert.assertEquals(Long.MIN_VALUE, listener.refreshStartCurrentVersion);
-        Assert.assertEquals(v5+1, listener.refreshStartRequestedVersion);
-        
+        Assert.assertEquals(v5 + 1, listener.refreshStartRequestedVersion);
+
         Assert.assertEquals(Long.MIN_VALUE, listener.refreshSuccessBeforeVersion);
         Assert.assertEquals(v5, listener.refreshSuccessAfterVersion);
-        Assert.assertEquals(v5+1, listener.refreshSuccessRequestedVersion);
+        Assert.assertEquals(v5 + 1, listener.refreshSuccessRequestedVersion);
     }
-    
+
     @Test
     public void testMethodSemanticsOnSubsequentRefreshes() {
         long v0 = runCycle(producer, 0);
@@ -174,7 +192,7 @@ public class HollowRefreshListenerTests {
         Assert.assertEquals(v1, listener.deltaUpdateOccurredVersions.get(0).longValue());
         Assert.assertEquals(v2, listener.deltaUpdateOccurredVersions.get(1).longValue());
         Assert.assertEquals(v3, listener.deltaUpdateOccurredVersions.get(2).longValue());
-        
+
         /// applied semantics
         Assert.assertEquals(0, listener.snapshotAppliedVersions.size());
 
@@ -196,7 +214,7 @@ public class HollowRefreshListenerTests {
         Assert.assertEquals(v3, listener.refreshSuccessAfterVersion);
         Assert.assertEquals(v3, listener.refreshSuccessRequestedVersion);
     }
-    
+
     @Test
     public void testObjectLongevityOnInitialUpdateCallbacks() {
         runCycle(producer, 1);
@@ -204,7 +222,7 @@ public class HollowRefreshListenerTests {
         runCycle(producer, 3);
         runCycle(producer, 4);
         long v5 = runCycle(producer, 5);
-        
+
         final List<GenericHollowObject> snapshotOrdinal0Objects = new ArrayList<GenericHollowObject>();
         final List<GenericHollowObject> deltaOrdinal0Objects = new ArrayList<GenericHollowObject>();
         final List<GenericHollowObject> deltaOrdinal1Objects = new ArrayList<GenericHollowObject>();
@@ -213,15 +231,15 @@ public class HollowRefreshListenerTests {
             public void snapshotApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
                 snapshotOrdinal0Objects.add(new GenericHollowObject(api.getDataAccess(), "Integer", 0));
             }
-            
+
             public void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
                 deltaOrdinal0Objects.add(new GenericHollowObject(api.getDataAccess(), "Integer", 0));
                 deltaOrdinal1Objects.add(new GenericHollowObject(api.getDataAccess(), "Integer", 1));
             }
         };
-        
+
         consumer.addRefreshListener(longevityListener);
-        
+
         consumer.triggerRefreshTo(v5);
 
         Assert.assertEquals(1, snapshotOrdinal0Objects.get(0).getInt("value"));
@@ -239,30 +257,36 @@ public class HollowRefreshListenerTests {
         class SecondRefreshListener extends AbstractRefreshListener {
             int refreshStarted;
             int refreshSuccessful;
-            @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+
+            @Override
+            public void refreshStarted(long currentVersion, long requestedVersion) {
                 refreshStarted++;
             }
 
-            @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+            @Override
+            public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
                 refreshSuccessful++;
             }
-        };
+        }
+        ;
 
         class FirstRefreshListener extends SecondRefreshListener {
             SecondRefreshListener srl = new SecondRefreshListener();
 
-            @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+            @Override
+            public void refreshStarted(long currentVersion, long requestedVersion) {
                 super.refreshStarted(currentVersion, requestedVersion);
                 // Add the second listener concurrently during a refresh
                 consumer.addRefreshListener(srl);
             }
-        };
+        }
+        ;
 
         FirstRefreshListener frl = new FirstRefreshListener();
         consumer.addRefreshListener(frl);
 
         long v1 = runCycle(producer, 1);
-        consumer.triggerRefreshTo(v1+1);
+        consumer.triggerRefreshTo(v1 + 1);
 
         Assert.assertEquals(1, frl.refreshStarted);
         Assert.assertEquals(1, frl.refreshSuccessful);
@@ -270,7 +294,7 @@ public class HollowRefreshListenerTests {
         Assert.assertEquals(0, frl.srl.refreshSuccessful);
 
         long v2 = runCycle(producer, 2);
-        consumer.triggerRefreshTo(v2+1);
+        consumer.triggerRefreshTo(v2 + 1);
 
         Assert.assertEquals(2, frl.refreshStarted);
         Assert.assertEquals(2, frl.refreshSuccessful);
@@ -286,14 +310,18 @@ public class HollowRefreshListenerTests {
         class SecondRefreshListener extends AbstractRefreshListener {
             int refreshStarted;
             int refreshSuccessful;
-            @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+
+            @Override
+            public void refreshStarted(long currentVersion, long requestedVersion) {
                 refreshStarted++;
             }
 
-            @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+            @Override
+            public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
                 refreshSuccessful++;
             }
-        };
+        }
+        ;
 
         class FirstRefreshListener extends SecondRefreshListener {
             SecondRefreshListener srl;
@@ -302,12 +330,14 @@ public class HollowRefreshListenerTests {
                 this.srl = srl;
             }
 
-            @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+            @Override
+            public void refreshStarted(long currentVersion, long requestedVersion) {
                 super.refreshStarted(currentVersion, requestedVersion);
                 // Remove the second listener concurrently during a refresh
                 consumer.removeRefreshListener(srl);
             }
-        };
+        }
+        ;
 
         SecondRefreshListener srl = new SecondRefreshListener();
         FirstRefreshListener frl = new FirstRefreshListener(srl);
@@ -315,7 +345,7 @@ public class HollowRefreshListenerTests {
         consumer.addRefreshListener(srl);
 
         long v1 = runCycle(producer, 1);
-        consumer.triggerRefreshTo(v1+1);
+        consumer.triggerRefreshTo(v1 + 1);
 
         Assert.assertEquals(1, frl.refreshStarted);
         Assert.assertEquals(1, frl.refreshSuccessful);
@@ -323,7 +353,7 @@ public class HollowRefreshListenerTests {
         Assert.assertEquals(1, frl.srl.refreshSuccessful);
 
         long v2 = runCycle(producer, 2);
-        consumer.triggerRefreshTo(v2+1);
+        consumer.triggerRefreshTo(v2 + 1);
 
         Assert.assertEquals(2, frl.refreshStarted);
         Assert.assertEquals(2, frl.refreshSuccessful);
@@ -338,25 +368,25 @@ public class HollowRefreshListenerTests {
             }
         });
     }
-    
+
     private class RecordingRefreshListener extends AbstractRefreshListener {
         long cycles;
 
         long refreshStartCurrentVersion;
         long refreshStartRequestedVersion;
-        
+
         long refreshSuccessBeforeVersion;
         long refreshSuccessAfterVersion;
-        long refreshSuccessRequestedVersion; 
-        
+        long refreshSuccessRequestedVersion;
+
         List<Long> snapshotUpdateOccurredVersions = new ArrayList<Long>();
         List<Long> deltaUpdateOccurredVersions = new ArrayList<Long>();
 
         List<Long> blobsLoadedVersions = new ArrayList<Long>();
-        
+
         List<Long> snapshotAppliedVersions = new ArrayList<Long>();
         List<Long> deltaAppliedVersions = new ArrayList<Long>();
-        
+
         @Override
         public void refreshStarted(long currentVersion, long requestedVersion) {
             cycles++;
@@ -399,7 +429,7 @@ public class HollowRefreshListenerTests {
         public void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
             deltaAppliedVersions.add(version);
         }
-        
+
         public void clear() {
             cycles = 0;
             snapshotUpdateOccurredVersions.clear();

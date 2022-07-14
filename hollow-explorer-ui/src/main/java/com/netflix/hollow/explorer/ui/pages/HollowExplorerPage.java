@@ -27,13 +27,13 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
 public abstract class HollowExplorerPage {
-    
+
     protected final HollowExplorerUI ui;
-    
+
     private final Template headerTemplate;
     private final Template footerTemplate;
 
-    
+
     public HollowExplorerPage(HollowExplorerUI ui) {
         this.ui = ui;
         this.headerTemplate = ui.getVelocityEngine().getTemplate("explorer-header.vm");
@@ -42,12 +42,12 @@ public abstract class HollowExplorerPage {
 
     public void render(HttpServletRequest req, HttpServletResponse resp, HollowUISession session) throws IOException {
         VelocityContext ctx = new VelocityContext();
-        
-        if (ui.getCurrentStateVersion() != Long.MIN_VALUE)
+
+        if(ui.getCurrentStateVersion() != Long.MIN_VALUE)
             ctx.put("stateVersion", ui.getCurrentStateVersion());
 
         String headerDisplayString = ui.getHeaderDisplayString();
-        if (headerDisplayString != null) {
+        if(headerDisplayString != null) {
             ctx.put("headerDisplayString", headerDisplayString);
             String headerDisplayURL = (ui.getFromHeaderDisplayMap(headerDisplayString) != null)
                     ? ui.getFromHeaderDisplayMap(headerDisplayString) : "";

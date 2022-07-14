@@ -127,7 +127,7 @@ public class HollowObjectMissingDataAccess implements HollowObjectTypeDataAccess
     @Override
     public void setSamplingDirector(HollowSamplingDirector director) {
     }
-    
+
     @Override
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
     }

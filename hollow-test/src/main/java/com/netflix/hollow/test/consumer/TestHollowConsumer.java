@@ -114,7 +114,7 @@ public class TestHollowConsumer extends HollowConsumer {
 
     public TestHollowConsumer addSnapshot(long version, HollowWriteStateEngine state) throws IOException {
         // if consumer has state then restore it
-        if (getStateEngine() != null) {
+        if(getStateEngine() != null) {
             HollowWriteStateEngine snapshotState = HollowWriteStateCreator.createWithSchemas(getStateEngine().getSchemas());
             snapshotState.restoreFrom(getStateEngine());
 
@@ -124,7 +124,7 @@ public class TestHollowConsumer extends HollowConsumer {
             combiner.combine();
         }
 
-        if (blobRetriever instanceof TestBlobRetriever) {
+        if(blobRetriever instanceof TestBlobRetriever) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             new HollowBlobWriter(state).writeSnapshot(outputStream);
             ((TestBlobRetriever) blobRetriever).addSnapshot(version, new TestBlob(version,
@@ -138,7 +138,7 @@ public class TestHollowConsumer extends HollowConsumer {
     public TestHollowConsumer addDelta(long fromVersion, long toVersion, HollowWriteStateEngine state)
             throws IOException {
 
-        if (getStateEngine() == null) {
+        if(getStateEngine() == null) {
             throw new UnsupportedOperationException("Delta can not be applied without first applying a snapshot");
         }
 
@@ -153,7 +153,7 @@ public class TestHollowConsumer extends HollowConsumer {
         combiner.combine();
 
         // apply delta write state to consumer
-        if (blobRetriever instanceof TestBlobRetriever) {
+        if(blobRetriever instanceof TestBlobRetriever) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             new HollowBlobWriter(deltaState).writeDelta(outputStream);
             ((TestBlobRetriever) blobRetriever).addDelta(fromVersion, new TestBlob(fromVersion, toVersion,

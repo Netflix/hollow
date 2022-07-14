@@ -23,41 +23,41 @@ import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import java.util.Map;
 
 public class HollowMapTypePerfAPI extends HollowTypePerfAPI {
-    
+
     private final HollowMapTypeDataAccess typeAccess;
     final long keyMaskedTypeIdx;
     final long valueMaskedTypeIdx;
-    
+
     public HollowMapTypePerfAPI(HollowDataAccess dataAccess, String typeName, HollowPerformanceAPI api) {
         super(typeName, api);
-        
+
         HollowMapTypeDataAccess typeAccess = (HollowMapTypeDataAccess) dataAccess.getTypeDataAccess(typeName);
-        
+
         int keyTypeIdx = typeAccess == null ? Ref.TYPE_ABSENT : api.types.getIdx(typeAccess.getSchema().getKeyType());
         int valueTypeIdx = typeAccess == null ? Ref.TYPE_ABSENT : api.types.getIdx(typeAccess.getSchema().getValueType());
-        
+
         this.keyMaskedTypeIdx = Ref.toTypeMasked(keyTypeIdx);
         this.valueMaskedTypeIdx = Ref.toTypeMasked(valueTypeIdx);
-        
+
         if(typeAccess == null)
             typeAccess = new HollowMapMissingDataAccess(dataAccess, typeName);
         this.typeAccess = typeAccess;
     }
-    
+
     public int size(long ref) {
         return typeAccess.size(ordinal(ref));
     }
-    
+
     public HollowPerfMapEntryIterator possibleMatchIter(long ref, int hashCode) {
         HollowMapEntryOrdinalIterator iter = typeAccess.potentialMatchOrdinalIterator(ordinal(ref), hashCode);
-        return new HollowPerfMapEntryIterator(iter, keyMaskedTypeIdx, valueMaskedTypeIdx); 
+        return new HollowPerfMapEntryIterator(iter, keyMaskedTypeIdx, valueMaskedTypeIdx);
     }
-    
+
     public HollowPerfMapEntryIterator iterator(long ref) {
         HollowMapEntryOrdinalIterator iter = typeAccess.ordinalIterator(ordinal(ref));
         return new HollowPerfMapEntryIterator(iter, keyMaskedTypeIdx, valueMaskedTypeIdx);
     }
-    
+
     public long findKey(long ref, Object... hashKey) {
         int ordinal = typeAccess.findKey(ordinal(ref), hashKey);
         return Ref.toRefWithTypeMasked(keyMaskedTypeIdx, ordinal);
@@ -68,8 +68,8 @@ public class HollowMapTypePerfAPI extends HollowTypePerfAPI {
         return Ref.toRefWithTypeMasked(valueMaskedTypeIdx, ordinal);
     }
 
-    public <K,V> Map<K,V> backedMap(long ref, POJOInstantiator<K> keyInstantiator, POJOInstantiator<V> valueInstantiator, HashKeyExtractor hashKeyExtractor) {
-        return new HollowPerfBackedMap<K,V>(this, ordinal(ref), keyInstantiator, valueInstantiator, hashKeyExtractor);
+    public <K, V> Map<K, V> backedMap(long ref, POJOInstantiator<K> keyInstantiator, POJOInstantiator<V> valueInstantiator, HashKeyExtractor hashKeyExtractor) {
+        return new HollowPerfBackedMap<K, V>(this, ordinal(ref), keyInstantiator, valueInstantiator, hashKeyExtractor);
     }
 
     public HollowMapTypeDataAccess typeAccess() {

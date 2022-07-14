@@ -31,13 +31,13 @@ public class BitSetIteratorTest {
     @Test
     public void testNormal() {
         BitSet bs = new BitSet();
-        for (int i = 0; i < 5; i++) {
+        for(int i = 0; i < 5; i++) {
             bs.set(i * 2);
         }
 
         int count = 0;
         BitSetIterator it = new BitSetIterator(bs);
-        while (it.hasNext()) {
+        while(it.hasNext()) {
             Integer value = it.next();
             Assert.assertTrue(bs.get(value));
             count++;
@@ -49,7 +49,7 @@ public class BitSetIteratorTest {
     @Test
     public void testRange() {
         BitSet bs = new BitSet();
-        for (int i = 0; i < 20; i++) {
+        for(int i = 0; i < 20; i++) {
             bs.set(i * 2);
         }
         assertRange(bs, null, null);
@@ -66,19 +66,19 @@ public class BitSetIteratorTest {
     private void assertRange(BitSet bs, Integer start, Integer limit) {
         int count = 0;
         BitSetIterator it = new BitSetIterator(bs, start, limit);
-        while (it.hasNext()) {
+        while(it.hasNext()) {
             Integer value = it.next();
             Assert.assertTrue(bs.get(value));
             count++;
         }
 
-        if (limit == null) {
-            int expected = (start == null || start==0) ? bs.cardinality() : (bs.cardinality() - start)+1;
+        if(limit == null) {
+            int expected = (start == null || start == 0) ? bs.cardinality() : (bs.cardinality() - start) + 1;
             Assert.assertEquals(expected, count);
         } else {
             int max = Math.min(limit, bs.cardinality());
-            int expected =  (start == null || start==0) ? max : Math.min((bs.cardinality() - start)+1, max);
-            if (expected<0) expected=0;
+            int expected =  (start == null || start == 0) ? max : Math.min((bs.cardinality() - start) + 1, max);
+            if(expected < 0) expected = 0;
             Assert.assertEquals(expected, count);
         }
     }

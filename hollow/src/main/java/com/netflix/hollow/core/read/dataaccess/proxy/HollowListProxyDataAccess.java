@@ -53,6 +53,6 @@ public class HollowListProxyDataAccess extends HollowTypeProxyDataAccess impleme
     }
 
     private HollowListTypeDataAccess currentDataAccess() {
-        return (HollowListTypeDataAccess)currentDataAccess;
+        return (HollowListTypeDataAccess) currentDataAccess;
     }
 }

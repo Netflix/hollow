@@ -1,7 +1,7 @@
 apply plugin: 'java-library'
 
-dependencies {
-  implementation project(':hollow')
+dependencies{
+    implementationproject(':hollow')
 
-  testImplementation 'junit:junit:4.11'
+    testImplementation'junit:junit:4.11'
 }

@@ -37,7 +37,7 @@ public class MemoizedSet<E> extends HashSet<E> {
     public MemoizedSet(int initialCapacity) {
         super(initialCapacity);
     }
-    
+
     public MemoizedSet(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
     }

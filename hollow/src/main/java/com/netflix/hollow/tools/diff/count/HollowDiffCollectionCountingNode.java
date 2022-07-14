@@ -75,7 +75,7 @@ public class HollowDiffCollectionCountingNode extends HollowDiffCountingNode {
         fillTraversalLists(fromOrdinals, toOrdinals);
 
         referenceFilter.filter(traversalFromOrdinals, traversalToOrdinals);
-        
+
         int score = 0;
 
         if(referenceFilter.getUnmatchedFromOrdinals().size() != 0 || referenceFilter.getUnmatchedToOrdinals().size() != 0)
@@ -83,7 +83,7 @@ public class HollowDiffCollectionCountingNode extends HollowDiffCountingNode {
         if(requiresTraversalForMissingFields)
             if(referenceFilter.getMatchedFromOrdinals().size() != 0 || referenceFilter.getMatchedToOrdinals().size() != 0)
                 score += elementNode.traverseMissingFields(referenceFilter.getMatchedFromOrdinals(), referenceFilter.getMatchedToOrdinals());
-        
+
         return score;
     }
 
@@ -98,13 +98,13 @@ public class HollowDiffCollectionCountingNode extends HollowDiffCountingNode {
         traversalToOrdinals.clear();
 
         if(fromState != null) {
-            for(int i=0;i<fromOrdinals.size();i++) {
+            for(int i = 0; i < fromOrdinals.size(); i++) {
                 fillListWithReferencedOrdinals(fromState, fromOrdinals.get(i), traversalFromOrdinals);
             }
         }
 
         if(toState != null) {
-            for(int i=0;i<toOrdinals.size();i++) {
+            for(int i = 0; i < toOrdinals.size(); i++) {
                 fillListWithReferencedOrdinals(toState, toOrdinals.get(i), traversalToOrdinals);
             }
         }

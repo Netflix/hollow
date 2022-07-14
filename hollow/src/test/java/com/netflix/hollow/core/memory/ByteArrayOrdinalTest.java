@@ -26,14 +26,14 @@ public class ByteArrayOrdinalTest {
         ByteArrayOrdinalMap m = new ByteArrayOrdinalMap();
 
         int[] ordinals = new int[179];
-        for (int i = 0; i < ordinals.length; i++) {
+        for(int i = 0; i < ordinals.length; i++) {
             ordinals[i] = m.getOrAssignOrdinal(createBuffer("TEST" + i));
         }
 
         m.resize(4096);
 
         int[] newOrdinals = new int[ordinals.length];
-        for (int i = 0; i < ordinals.length; i++) {
+        for(int i = 0; i < ordinals.length; i++) {
             newOrdinals[i] = m.get(createBuffer("TEST" + i));
         }
 
@@ -46,14 +46,14 @@ public class ByteArrayOrdinalTest {
         m.resize(4096);
 
         int[] ordinals = new int[179];
-        for (int i = 0; i < ordinals.length; i++) {
+        for(int i = 0; i < ordinals.length; i++) {
             ordinals[i] = m.getOrAssignOrdinal(createBuffer("TEST" + i));
         }
 
         m.resize(16384);
 
         int[] newOrdinals = new int[ordinals.length];
-        for (int i = 0; i < ordinals.length; i++) {
+        for(int i = 0; i < ordinals.length; i++) {
             newOrdinals[i] = m.get(createBuffer("TEST" + i));
         }
 
@@ -65,7 +65,7 @@ public class ByteArrayOrdinalTest {
     }
 
     static ByteDataArray write(ByteDataArray bdb, String s) {
-        for (byte b : s.getBytes()) {
+        for(byte b : s.getBytes()) {
             bdb.write(b);
         }
         return bdb;

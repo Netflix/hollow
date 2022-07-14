@@ -38,7 +38,7 @@ public class HollowSchemaSorter {
     public static List<HollowSchema> dependencyOrderedSchemaList(HollowDataset dataset) {
         return dependencyOrderedSchemaList(dataset.getSchemas());
     }
-        
+
     /**
      * Dependency types come before dependent types
      *
@@ -62,7 +62,6 @@ public class HollowSchemaSorter {
     }
 
 
-
     private static class DependencyIndex {
         private final Map<String, Set<String>> dependencyIndex;
         private final Map<String, Set<String>> reverseDependencyIndex;
@@ -78,7 +77,7 @@ public class HollowSchemaSorter {
                     return true;
                 }
             }
-            
+
             return false;
         }
 
@@ -92,7 +91,7 @@ public class HollowSchemaSorter {
 
             String firstAvailableType = availableTypes.get(0);
 
-            for(int i=1;i<availableTypes.size();i++) {
+            for(int i = 1; i < availableTypes.size(); i++) {
                 if(availableTypes.get(i).compareTo(firstAvailableType) < 0)
                     firstAvailableType = availableTypes.get(i);
             }
@@ -106,14 +105,14 @@ public class HollowSchemaSorter {
                 String elementType = ((HollowCollectionSchema) schema).getElementType();
                 addDependency(schema.getName(), elementType, allSchemas);
             } else if(schema instanceof HollowMapSchema) {
-                String keyType = ((HollowMapSchema)schema).getKeyType();
-                String valueType = ((HollowMapSchema)schema).getValueType();
+                String keyType = ((HollowMapSchema) schema).getKeyType();
+                String valueType = ((HollowMapSchema) schema).getValueType();
 
                 addDependency(schema.getName(), keyType, allSchemas);
                 addDependency(schema.getName(), valueType, allSchemas);
             } else if(schema instanceof HollowObjectSchema) {
                 HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
-                for(int i=0;i<objectSchema.numFields();i++) {
+                for(int i = 0; i < objectSchema.numFields(); i++) {
                     if(objectSchema.getFieldType(i) == FieldType.REFERENCE) {
                         String refType = objectSchema.getReferencedType(i);
                         addDependency(schema.getName(), refType, allSchemas);
@@ -158,7 +157,7 @@ public class HollowSchemaSorter {
             return list;
         }
     }
-    
+
     /**
      * @param stateEngine the state engine
      * @param dependentType the dependent type name
@@ -168,32 +167,32 @@ public class HollowSchemaSorter {
     public static boolean typeIsTransitivelyDependent(HollowStateEngine stateEngine, String dependentType, String dependencyType) {
         if(dependentType.equals(dependencyType))
             return true;
-        
+
         HollowSchema dependentTypeSchema = stateEngine.getSchema(dependentType);
-        
+
         if(dependentTypeSchema == null)
             return false;
-            
+
         switch(dependentTypeSchema.getSchemaType()) {
-        case OBJECT:
-            HollowObjectSchema objectSchema = (HollowObjectSchema)dependentTypeSchema;
-            
-            for(int i=0;i<objectSchema.numFields();i++) {
-                if(objectSchema.getFieldType(i) == FieldType.REFERENCE) {
-                    if(typeIsTransitivelyDependent(stateEngine, objectSchema.getReferencedType(i), dependencyType))
-                        return true;
+            case OBJECT:
+                HollowObjectSchema objectSchema = (HollowObjectSchema) dependentTypeSchema;
+
+                for(int i = 0; i < objectSchema.numFields(); i++) {
+                    if(objectSchema.getFieldType(i) == FieldType.REFERENCE) {
+                        if(typeIsTransitivelyDependent(stateEngine, objectSchema.getReferencedType(i), dependencyType))
+                            return true;
+                    }
                 }
-            }
-            
-            break;
-        case LIST:
-        case SET:
-            return typeIsTransitivelyDependent(stateEngine, ((HollowCollectionSchema)dependentTypeSchema).getElementType(), dependencyType);
-        case MAP:
-            return typeIsTransitivelyDependent(stateEngine, ((HollowMapSchema)dependentTypeSchema).getKeyType(), dependencyType) 
-                    || typeIsTransitivelyDependent(stateEngine, ((HollowMapSchema)dependentTypeSchema).getValueType(), dependencyType);
+
+                break;
+            case LIST:
+            case SET:
+                return typeIsTransitivelyDependent(stateEngine, ((HollowCollectionSchema) dependentTypeSchema).getElementType(), dependencyType);
+            case MAP:
+                return typeIsTransitivelyDependent(stateEngine, ((HollowMapSchema) dependentTypeSchema).getKeyType(), dependencyType)
+                        || typeIsTransitivelyDependent(stateEngine, ((HollowMapSchema) dependentTypeSchema).getValueType(), dependencyType);
         }
-        
+
         return false;
     }
 

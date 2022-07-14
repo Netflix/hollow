@@ -29,7 +29,7 @@ public class EscapingTool {
     }
 
     public String url(Object string) {
-        if (string == null) {
+        if(string == null) {
             return null;
         } else {
             try {

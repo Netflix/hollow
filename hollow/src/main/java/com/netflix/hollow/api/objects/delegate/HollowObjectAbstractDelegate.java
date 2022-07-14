@@ -36,7 +36,7 @@ public abstract class HollowObjectAbstractDelegate implements HollowObjectDelega
                 return missingDataHandler().handleIsNull(getSchema().getName(), ordinal, fieldName);
 
             return dataAccess.isNull(ordinal, fieldIndex);
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(String.format("Unable to handle ordinal=%s, fieldName=%s", ordinal, fieldName), ex);
         }
     }

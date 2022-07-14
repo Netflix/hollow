@@ -31,9 +31,9 @@ import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
  * without a custom-generated API. 
  */
 public class GenericHollowList extends HollowList<HollowRecord> {
-    
+
     public GenericHollowList(HollowDataAccess dataAccess, String type, int ordinal) {
-        this((HollowListTypeDataAccess)dataAccess.getTypeDataAccess(type, ordinal), ordinal);
+        this((HollowListTypeDataAccess) dataAccess.getTypeDataAccess(type, ordinal), ordinal);
     }
 
     public GenericHollowList(HollowListTypeDataAccess dataAccess, int ordinal) {
@@ -43,27 +43,27 @@ public class GenericHollowList extends HollowList<HollowRecord> {
     public GenericHollowList(HollowListDelegate<HollowRecord> delegate, int ordinal) {
         super(delegate, ordinal);
     }
-    
+
     public GenericHollowObject getObject(int idx) {
-        return (GenericHollowObject)get(idx);
+        return (GenericHollowObject) get(idx);
     }
-    
+
     public Iterable<GenericHollowObject> objects() {
         return new GenericHollowIterable<GenericHollowObject>(this);
     }
-    
+
     public Iterable<GenericHollowList> lists() {
         return new GenericHollowIterable<GenericHollowList>(this);
     }
-    
+
     public Iterable<GenericHollowSet> sets() {
         return new GenericHollowIterable<GenericHollowSet>(this);
     }
-    
+
     public Iterable<GenericHollowMap> maps() {
         return new GenericHollowIterable<GenericHollowMap>(this);
     }
-    
+
     @Override
     public HollowRecord instantiateElement(int elementOrdinal) {
         return GenericHollowRecordHelper.instantiate(getTypeDataAccess().getDataAccess(), getSchema().getElementType(), elementOrdinal);
@@ -73,10 +73,10 @@ public class GenericHollowList extends HollowList<HollowRecord> {
     public boolean equalsElement(int elementOrdinal, Object testObject) {
         return GenericHollowRecordHelper.equalObject(getSchema().getElementType(), elementOrdinal, testObject);
     }
-    
+
     @Override
     public String toString() {
         return new HollowRecordStringifier().stringify(this);
     }
-    
+
 }

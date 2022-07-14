@@ -36,12 +36,12 @@ public class BitSetIterator implements Iterator<Integer> {
         this.limit = limit == null ? Integer.MAX_VALUE : limit.intValue();
 
         // advance next to start
-        if (start == null || start.intValue() <= 1) {
+        if(start == null || start.intValue() <= 1) {
             next = bitset.nextSetBit(0);
         } else {
-            for (int i = 0; i < start; i++) {
+            for(int i = 0; i < start; i++) {
                 next = bitset.nextSetBit(next + 1);
-                if (next == -1)
+                if(next == -1)
                     break;
             }
         }
@@ -54,12 +54,12 @@ public class BitSetIterator implements Iterator<Integer> {
 
     @Override
     public Integer next() {
-        if (!hasNext())
+        if(!hasNext())
             return null;
 
         int returnValue = next;
         next = bitset.nextSetBit(next + 1);
-        if (++count >= limit)
+        if(++count >= limit)
             next = -1;
 
         return returnValue;

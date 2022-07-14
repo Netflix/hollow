@@ -33,7 +33,7 @@ public class HollowSetTypeAPI extends HollowTypeAPI {
     public int size(int ordinal) {
         return getTypeDataAccess().size(ordinal);
     }
-    
+
     public boolean contains(int ordinal, int value) {
         return getTypeDataAccess().contains(ordinal, value);
     }
@@ -41,7 +41,7 @@ public class HollowSetTypeAPI extends HollowTypeAPI {
     public boolean contains(int ordinal, int value, int hashCode) {
         return getTypeDataAccess().contains(ordinal, value, hashCode);
     }
-    
+
     public int findElement(int ordinal, Object... hashKey) {
         return getTypeDataAccess().findElement(ordinal, hashKey);
     }
@@ -49,7 +49,7 @@ public class HollowSetTypeAPI extends HollowTypeAPI {
     public HollowOrdinalIterator potentialMatchOrdinalIterator(int ordinal, int hashCode) {
         return getTypeDataAccess().potentialMatchOrdinalIterator(ordinal, hashCode);
     }
-    
+
     public HollowOrdinalIterator getOrdinalIterator(int ordinal) {
         return getTypeDataAccess().ordinalIterator(ordinal);
     }

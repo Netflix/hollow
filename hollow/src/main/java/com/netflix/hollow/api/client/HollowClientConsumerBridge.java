@@ -26,7 +26,7 @@ import java.io.InputStream;
 
 @SuppressWarnings("deprecation")
 class HollowClientConsumerBridge {
-    
+
     static HollowConsumer.BlobRetriever consumerBlobRetrieverFor(final HollowBlobRetriever blobRetriever) {
         return new HollowConsumer.BlobRetriever() {
 
@@ -40,7 +40,7 @@ class HollowClientConsumerBridge {
                 final HollowBlob blob = blobRetriever.retrieveSnapshotBlob(desiredVersion);
                 if(blob == null)
                     return null;
-                
+
                 return new HollowConsumer.Blob(blob.getFromVersion(), blob.getToVersion()) {
                     @Override
                     public InputStream getInputStream() throws IOException {
@@ -59,7 +59,7 @@ class HollowClientConsumerBridge {
                 final HollowBlob blob = blobRetriever.retrieveDeltaBlob(currentVersion);
                 if(blob == null)
                     return null;
-                
+
                 return new HollowConsumer.Blob(blob.getFromVersion(), blob.getToVersion()) {
                     @Override
                     public InputStream getInputStream() throws IOException {
@@ -72,13 +72,13 @@ class HollowClientConsumerBridge {
                     }
                 };
             }
-            
+
             @Override
             public Blob retrieveReverseDeltaBlob(long currentVersion) {
                 final HollowBlob blob = blobRetriever.retrieveReverseDeltaBlob(currentVersion);
                 if(blob == null)
                     return null;
-                
+
                 return new HollowConsumer.Blob(blob.getFromVersion(), blob.getToVersion()) {
                     @Override
                     public InputStream getInputStream() throws IOException {
@@ -94,9 +94,9 @@ class HollowClientConsumerBridge {
 
         };
     }
-    
+
     static HollowConsumer.RefreshListener consumerRefreshListenerFor(final HollowUpdateListener listener) {
-            
+
         return new HollowConsumer.AbstractRefreshListener() {
 
             @Override
@@ -108,7 +108,7 @@ class HollowClientConsumerBridge {
             public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
                 listener.dataInitialized(api, stateEngine, version);
             }
-            
+
             @Override
             public void blobLoaded(final HollowConsumer.Blob transition) {
                 listener.transitionApplied(new HollowBlob(transition.getFromVersion(), transition.getToVersion()) {
@@ -132,27 +132,27 @@ class HollowClientConsumerBridge {
             public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
                 listener.refreshCompleted(beforeVersion, afterVersion, requestedVersion);
             }
-            
+
             @Override
             public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
                 listener.refreshFailed(beforeVersion, afterVersion, requestedVersion, failureCause);
             }
         };
     }
-    
+
     static HollowClientDoubleSnapshotConfig doubleSnapshotConfigFor(HollowClientMemoryConfig memoryConfig) {
         return new HollowClientDoubleSnapshotConfig(memoryConfig);
     }
 
     static class HollowClientDoubleSnapshotConfig implements HollowConsumer.DoubleSnapshotConfig {
-        
+
         private final HollowClientMemoryConfig clientMemCfg;
         private int maxDeltasBeforeDoubleSnapshot = 32;
-        
+
         private HollowClientDoubleSnapshotConfig(HollowClientMemoryConfig clientMemCfg) {
             this.clientMemCfg = clientMemCfg;
         }
-        
+
         @Override
         public boolean allowDoubleSnapshot() {
             return clientMemCfg.allowDoubleSnapshot();
@@ -162,11 +162,11 @@ class HollowClientConsumerBridge {
         public int maxDeltasBeforeDoubleSnapshot() {
             return maxDeltasBeforeDoubleSnapshot;
         }
-        
+
         public void setMaxDeltasBeforeDoubleSnapshot(int maxDeltas) {
             this.maxDeltasBeforeDoubleSnapshot = maxDeltas;
         }
-        
+
     }
 
 }

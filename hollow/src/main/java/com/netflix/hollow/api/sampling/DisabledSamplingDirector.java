@@ -20,7 +20,8 @@ public class DisabledSamplingDirector extends HollowSamplingDirector {
 
     public static final DisabledSamplingDirector INSTANCE = new DisabledSamplingDirector();
 
-    private DisabledSamplingDirector() { }
+    private DisabledSamplingDirector() {
+    }
 
     @Override
     public boolean shouldRecord() {
@@ -28,6 +29,7 @@ public class DisabledSamplingDirector extends HollowSamplingDirector {
     }
 
     @Override
-    public void setUpdateThread(Thread t) { }
+    public void setUpdateThread(Thread t) {
+    }
 
 }

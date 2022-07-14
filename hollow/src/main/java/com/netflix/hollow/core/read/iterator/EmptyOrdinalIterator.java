@@ -20,7 +20,8 @@ public class EmptyOrdinalIterator implements HollowOrdinalIterator {
 
     public static final EmptyOrdinalIterator INSTANCE = new EmptyOrdinalIterator();
 
-    private EmptyOrdinalIterator() { }
+    private EmptyOrdinalIterator() {
+    }
 
     @Override
     public int next() {

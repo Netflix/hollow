@@ -64,18 +64,18 @@ public class HollowDiffMatcher {
     }
 
     public void calculateMatches() {
-        if (fromTypeState==null) {
+        if(fromTypeState == null) {
             toTypeState.getPopulatedOrdinals().stream().forEach(i -> extraInTo.add(i));
             return;
         }
 
-        if (toTypeState==null) {
+        if(toTypeState == null) {
             fromTypeState.getPopulatedOrdinals().stream().forEach(i -> extraInFrom.add(i));
             return;
         }
 
         // No Primary Key so no matching will be done
-        if (matchPaths==null || matchPaths.isEmpty()) {
+        if(matchPaths == null || matchPaths.isEmpty()) {
             toTypeState.getPopulatedOrdinals().stream().forEach(i -> extraInTo.add(i));
             fromTypeState.getPopulatedOrdinals().stream().forEach(i -> extraInFrom.add(i));
             return;
@@ -96,14 +96,14 @@ public class HollowDiffMatcher {
             int matchedOrdinal = HollowConstants.ORDINAL_NONE;
             try {
                 matchedOrdinal = fromIdx.getMatchingOrdinal(key);
-            } catch(NullPointerException ex) {
+            } catch (NullPointerException ex) {
                 throw new RuntimeException("Error fetching matching ordinal for null type " + toTypeState.getSchema().getName()
                         + " with key field values " + Arrays.asList(key) + " at ordinal : " + candidateToMatchOrdinal
                         + "with stack trace ", ex);
             }
 
             if(matchedOrdinal != -1) {
-                matchedOrdinals.add(((long)matchedOrdinal << 32) | candidateToMatchOrdinal);
+                matchedOrdinals.add(((long) matchedOrdinal << 32) | candidateToMatchOrdinal);
                 fromUnmatchedOrdinals.clear(matchedOrdinal);
             } else {
                 extraInTo.add(candidateToMatchOrdinal);
@@ -134,9 +134,9 @@ public class HollowDiffMatcher {
     public String getKeyDisplayString(HollowObjectTypeReadState state, int ordinal) {
         Object[] key = null;
 
-        if(state == fromTypeState && fromIdx!=null) {
+        if(state == fromTypeState && fromIdx != null) {
             key = fromIdx.getRecordKey(ordinal);
-        } else if(state == toTypeState && toIdx!=null) {
+        } else if(state == toTypeState && toIdx != null) {
             key = toIdx.getRecordKey(ordinal);
         }
 
@@ -150,7 +150,7 @@ public class HollowDiffMatcher {
     private String keyDisplayString(Object[] key) {
         StringBuilder sb = new StringBuilder(key[0].toString());
 
-        for(int i=1;i<key.length;i++) {
+        for(int i = 1; i < key.length; i++) {
             sb.append(" ");
             sb.append(key[i].toString());
         }

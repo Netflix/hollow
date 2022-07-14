@@ -50,7 +50,8 @@ public class PopulatedOrdinalListener implements HollowTypeStateListener {
     }
 
     @Override
-    public void endUpdate() { }
+    public void endUpdate() {
+    }
 
     public boolean updatedLastCycle() {
         return !populatedOrdinals.equals(previousOrdinals);

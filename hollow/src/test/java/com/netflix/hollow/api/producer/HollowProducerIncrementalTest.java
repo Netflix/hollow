@@ -74,7 +74,7 @@ public class HollowProducerIncrementalTest {
             iws.delete(new TypeB(2, "3"));
             iws.addOrModify(new TypeB(5, "5"));
             iws.addOrModify(new TypeB(5, "6"));
-            iws.delete(new RecordPrimaryKey("TypeB", new Object[] {3}));
+            iws.delete(new RecordPrimaryKey("TypeB", new Object[]{3}));
         });
 
         long finalVersion = producer.runIncrementalCycle(iws -> {
@@ -165,7 +165,7 @@ public class HollowProducerIncrementalTest {
             iws.addOrModify(new TypeB(4, "four"));
             iws.addOrModify(new TypeB(5, "6"));
             iws.addOrModify(new TypeB(5, "5"));
-            iws.delete(new RecordPrimaryKey("TypeB", new Object[] {4}));
+            iws.delete(new RecordPrimaryKey("TypeB", new Object[]{4}));
             iws.addOrModify(new TypeB(6, "6"));
         });
 
@@ -279,7 +279,7 @@ public class HollowProducerIncrementalTest {
 
         assertTypeB(idx, 3, "three");
     }
-    
+
     @Test
     public void canRemoveAndModifyNewTypesFromRestoredState() {
         HollowProducer genesisProducer = createInMemoryProducer();
@@ -308,7 +308,7 @@ public class HollowProducerIncrementalTest {
         });
 
         long version2 = restoringProducer.runIncrementalCycle(iws -> {
-            iws.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
+            iws.delete(new RecordPrimaryKey("TypeB", new Object[]{3}));
             iws.addOrModify(new TypeB(4, "four!"));
         });
 
@@ -328,7 +328,7 @@ public class HollowProducerIncrementalTest {
 
         idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeB", "id");
         Assert.assertFalse(idx.containsDuplicates());
-        
+
         assertEquals(-1, idx.getMatchingOrdinal(3));
         assertTypeB(idx, 4, "four!");
     }
@@ -353,7 +353,7 @@ public class HollowProducerIncrementalTest {
 
         Collection<HollowObject> allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
         List<String> typeDNames = new ArrayList<>();
-        for (HollowObject hollowObject : allHollowObjectsTypeD) {
+        for(HollowObject hollowObject : allHollowObjectsTypeD) {
             typeDNames.add(((GenericHollowObject) hollowObject).getObject("value").toString());
         }
 
@@ -371,7 +371,7 @@ public class HollowProducerIncrementalTest {
 
         allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
         List<String> finalTypeDNames = new ArrayList<>();
-        for (HollowObject hollowObject : allHollowObjectsTypeD) {
+        for(HollowObject hollowObject : allHollowObjectsTypeD) {
             finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("value").toString());
         }
 
@@ -406,7 +406,7 @@ public class HollowProducerIncrementalTest {
 
         Collection<HollowObject> allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
         List<String> finalTypeDNames = new ArrayList<>();
-        for (HollowObject hollowObject : allHollowObjectsTypeD) {
+        for(HollowObject hollowObject : allHollowObjectsTypeD) {
             finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("value").toString());
         }
 
@@ -576,7 +576,7 @@ public class HollowProducerIncrementalTest {
             String id2, Long expectedValue) {
         int ordinal = typeAIdx.getMatchingOrdinal(id1, id2);
 
-        if (expectedValue == null) {
+        if(expectedValue == null) {
             Assert.assertEquals(-1, ordinal);
         } else {
             Assert.assertNotEquals(-1, ordinal);
@@ -591,7 +591,7 @@ public class HollowProducerIncrementalTest {
             String expectedValue) {
         int ordinal = typeBIdx.getMatchingOrdinal(id1);
 
-        if (expectedValue == null) {
+        if(expectedValue == null) {
             Assert.assertEquals(-1, ordinal);
         } else {
             Assert.assertNotEquals(-1, ordinal);

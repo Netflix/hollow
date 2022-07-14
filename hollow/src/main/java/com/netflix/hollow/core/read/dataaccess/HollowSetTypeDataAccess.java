@@ -50,7 +50,7 @@ public interface HollowSetTypeDataAccess extends HollowCollectionTypeDataAccess 
      * @return whether or not the set at the specified ordinal contains the specified element ordinal with the specified hashCode.
      */
     boolean contains(int ordinal, int value, int hashCode);
-    
+
     /**
      * Returns The matching ordinal of the element from the set at the specified ordinal which matches the provided hash key.
      *

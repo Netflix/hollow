@@ -34,7 +34,7 @@ public class HollowMapCachedDelegateTest extends AbstractStateEngineTest {
 
         roundTripSnapshot();
 
-        HollowMapCachedDelegate<Integer, Integer> delegate = new HollowMapCachedDelegate<Integer, Integer>((HollowMapTypeReadState)readStateEngine.getTypeState("TestMap"), 0);
+        HollowMapCachedDelegate<Integer, Integer> delegate = new HollowMapCachedDelegate<Integer, Integer>((HollowMapTypeReadState) readStateEngine.getTypeState("TestMap"), 0);
         HollowMap<Integer, Integer> map = new HollowMap<Integer, Integer>(delegate, 0) {
             public Integer instantiateKey(int keyOrdinal) {
                 return keyOrdinal;
@@ -43,10 +43,10 @@ public class HollowMapCachedDelegateTest extends AbstractStateEngineTest {
                 return valueOrdinal;
             }
             public boolean equalsKey(int keyOrdinal, Object testObject) {
-                return keyOrdinal == (Integer)testObject;
+                return keyOrdinal == (Integer) testObject;
             }
             public boolean equalsValue(int valueOrdinal, Object testObject) {
-                return valueOrdinal == (Integer)testObject;
+                return valueOrdinal == (Integer) testObject;
             }
 
         };
@@ -58,8 +58,8 @@ public class HollowMapCachedDelegateTest extends AbstractStateEngineTest {
     private void addRecord(int... ordinals) {
         HollowMapWriteRecord rec = new HollowMapWriteRecord();
 
-        for(int i=0;i<ordinals.length;i+=2) {
-            rec.addEntry(ordinals[i], ordinals[i+1]);
+        for(int i = 0; i < ordinals.length; i += 2) {
+            rec.addEntry(ordinals[i], ordinals[i + 1]);
         }
 
         writeStateEngine.add("TestMap", rec);

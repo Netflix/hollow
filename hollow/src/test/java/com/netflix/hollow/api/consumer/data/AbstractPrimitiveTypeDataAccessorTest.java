@@ -47,7 +47,7 @@ public abstract class AbstractPrimitiveTypeDataAccessorTest<T> extends AbstractS
 
     protected void assertList(Collection<T> listOfObj, List<T> expectedObjs) {
         int i = 0;
-        for (T obj : listOfObj) {
+        for(T obj : listOfObj) {
             Object expectedObj = expectedObjs.get(i++);
             Assert.assertEquals(expectedObj, obj);
         }

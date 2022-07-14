@@ -39,7 +39,7 @@ public class HollowPackageErgonomicsAPIGeneratorTest extends AbstractHollowAPIGe
     }
 
     @SuppressWarnings("unused")
-    @HollowPrimaryKey(fields = { "id" })
+    @HollowPrimaryKey(fields = {"id"})
     static class Movie {
         int id;
 

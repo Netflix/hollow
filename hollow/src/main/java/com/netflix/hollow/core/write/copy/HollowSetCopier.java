@@ -45,7 +45,7 @@ public class HollowSetCopier extends HollowRecordCopier {
 
         while(elementOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
             int remappedElementOrdinal = ordinalRemapper.getMappedOrdinal(elementType, elementOrdinal);
-            int hashCode = preserveHashPositions ? ((HollowSetOrdinalIterator)ordinalIterator).getCurrentBucket() : remappedElementOrdinal;
+            int hashCode = preserveHashPositions ? ((HollowSetOrdinalIterator) ordinalIterator).getCurrentBucket() : remappedElementOrdinal;
             rec.addElement(remappedElementOrdinal, hashCode);
             elementOrdinal = ordinalIterator.next();
         }
@@ -58,7 +58,7 @@ public class HollowSetCopier extends HollowRecordCopier {
     }
 
     private HollowSetWriteRecord rec() {
-        return (HollowSetWriteRecord)writeRecord;
+        return (HollowSetWriteRecord) writeRecord;
     }
 
 }

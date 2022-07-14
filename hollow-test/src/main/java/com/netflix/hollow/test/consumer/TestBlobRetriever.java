@@ -62,7 +62,7 @@ public class TestBlobRetriever implements BlobRetriever {
     // so blob can be reused
     private void resetStream(Blob b) {
         try {
-            if (b!= null && b.getInputStream() != null) {
+            if(b != null && b.getInputStream() != null) {
                 b.getInputStream().reset();
             }
         } catch (IOException e) {

@@ -89,7 +89,7 @@ public class TransitiveSetTraverser {
             }
         }
     }
-    
+
     /**
      * Remove any records from the given selection which are referenced by other records not in the selection.
      * @param stateEngine the state engine
@@ -112,7 +112,7 @@ public class TransitiveSetTraverser {
             }
         }
     }
-    
+
     /**
      * Augment the given selection with any records outside the selection which reference 
      * (or transitively reference) any records in the selection. 
@@ -132,21 +132,21 @@ public class TransitiveSetTraverser {
             }
         }
     }
-    
+
     private static void addTransitiveMatches(HollowReadStateEngine stateEngine, String type, Map<String, BitSet> matches) {
         HollowTypeReadState typeState = stateEngine.getTypeState(type);
 
         switch(typeState.getSchema().getSchemaType()) {
-        case OBJECT:
-            addTransitiveMatches(stateEngine, (HollowObjectTypeReadState)typeState, matches);
-            break;
-        case LIST:
-        case SET:
-            addTransitiveMatches(stateEngine, (HollowCollectionTypeReadState)typeState, matches);
-            break;
-        case MAP:
-            addTransitiveMatches(stateEngine, (HollowMapTypeReadState)typeState, matches);
-            break;
+            case OBJECT:
+                addTransitiveMatches(stateEngine, (HollowObjectTypeReadState) typeState, matches);
+                break;
+            case LIST:
+            case SET:
+                addTransitiveMatches(stateEngine, (HollowCollectionTypeReadState) typeState, matches);
+                break;
+            case MAP:
+                addTransitiveMatches(stateEngine, (HollowMapTypeReadState) typeState, matches);
+                break;
         }
     }
 
@@ -156,7 +156,7 @@ public class TransitiveSetTraverser {
 
         BitSet childOrdinals[] = new BitSet[schema.numFields()];
 
-        for(int i=0;i<schema.numFields();i++) {
+        for(int i = 0; i < schema.numFields(); i++) {
             if(schema.getFieldType(i) == FieldType.REFERENCE) {
                 HollowTypeReadState childTypeState = stateEngine.getTypeState(schema.getReferencedType(i));
                 if(childTypeState != null && childTypeState.maxOrdinal() >= 0)
@@ -166,7 +166,7 @@ public class TransitiveSetTraverser {
 
         int ordinal = matchingOrdinals.nextSetBit(0);
         while(ordinal != -1) {
-            for(int i=0;i<childOrdinals.length;i++) {
+            for(int i = 0; i < childOrdinals.length; i++) {
                 if(childOrdinals[i] != null) {
                     int childOrdinal = typeState.readOrdinal(ordinal, i);
                     if(childOrdinal != -1) {
@@ -194,7 +194,7 @@ public class TransitiveSetTraverser {
                     childOrdinals.set(elementOrdinal);
                     elementOrdinal = iter.next();
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 log.log(Level.SEVERE, "Add transitive matches failed", e);
             }
 
@@ -232,16 +232,16 @@ public class TransitiveSetTraverser {
         HollowTypeReadState referencerTypeState = stateEngine.getTypeState(referencerType);
 
         switch(referencerTypeState.getSchema().getSchemaType()) {
-        case OBJECT:
-            traverseReferencesOutsideClosure(stateEngine, (HollowObjectTypeReadState)referencerTypeState, referencedType, matches, action);
-            break;
-        case LIST:
-        case SET:
-            traverseReferencesOutsideClosure(stateEngine, (HollowCollectionTypeReadState)referencerTypeState, referencedType, matches, action);
-            break;
-        case MAP:
-            traverseReferencesOutsideClosure(stateEngine, (HollowMapTypeReadState)referencerTypeState, referencedType, matches, action);
-            break;
+            case OBJECT:
+                traverseReferencesOutsideClosure(stateEngine, (HollowObjectTypeReadState) referencerTypeState, referencedType, matches, action);
+                break;
+            case LIST:
+            case SET:
+                traverseReferencesOutsideClosure(stateEngine, (HollowCollectionTypeReadState) referencerTypeState, referencedType, matches, action);
+                break;
+            case MAP:
+                traverseReferencesOutsideClosure(stateEngine, (HollowMapTypeReadState) referencerTypeState, referencedType, matches, action);
+                break;
         }
     }
 
@@ -250,7 +250,7 @@ public class TransitiveSetTraverser {
         BitSet referencedClosureMatches = getOrCreateBitSet(closureMatches, referencedType, stateEngine.getTypeState(referencedType).maxOrdinal());
         BitSet referencerClosureMatches = getOrCreateBitSet(closureMatches, schema.getName(), referencerTypeState.maxOrdinal());
 
-        for(int i=0;i<schema.numFields();i++) {
+        for(int i = 0; i < schema.numFields(); i++) {
             if(schema.getFieldType(i) == FieldType.REFERENCE && referencedType.equals(schema.getReferencedType(i))) {
                 BitSet allReferencerOrdinals = getPopulatedOrdinals(referencerTypeState);
 
@@ -351,25 +351,25 @@ public class TransitiveSetTraverser {
         }
         return bs;
     }
-    
+
     public static interface TransitiveSetTraverserAction {
-        
+
         public void foundReference(BitSet referencerClosureMatches, int referencerOrdinal, BitSet referencedClosureMatches, int referencedOrdinal);
-        
+
         public static final TransitiveSetTraverserAction REMOVE_REFERENCED_OUTSIDE_CLOSURE = new TransitiveSetTraverserAction() {
             @Override
             public void foundReference(BitSet referencerClosureMatches, int referencerOrdinal, BitSet referencedClosureMatches, int referencedOrdinal) {
                 referencedClosureMatches.clear(referencedOrdinal);
             }
         };
-        
+
         public static final TransitiveSetTraverserAction ADD_REFERENCING_OUTSIDE_CLOSURE = new TransitiveSetTraverserAction() {
             @Override
             public void foundReference(BitSet referencerClosureMatches, int referencerOrdinal, BitSet referencedClosureMatches, int referencedOrdinal) {
                 referencerClosureMatches.set(referencerOrdinal);
             }
         };
-        
+
     }
 
 }

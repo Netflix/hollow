@@ -24,7 +24,7 @@ public class GrowingSegmentedLongArray {
     private long[][] segments;
     private final int log2OfSegmentSize;
     private final int bitmask;
-    
+
     private final ArraySegmentRecycler memoryRecycler;
 
     public GrowingSegmentedLongArray(ArraySegmentRecycler memoryRecycler) {
@@ -40,18 +40,18 @@ public class GrowingSegmentedLongArray {
      * @param value the byte
      */
     public void set(long index, long value) {
-        int segmentIndex = (int)(index >> log2OfSegmentSize);
-        
+        int segmentIndex = (int) (index >> log2OfSegmentSize);
+
         if(segmentIndex >= segments.length) {
             int nextPowerOfTwo = 1 << (32 - Integer.numberOfLeadingZeros(segmentIndex));
             segments = Arrays.copyOf(segments, nextPowerOfTwo);
         }
-        
+
         if(segments[segmentIndex] == null) {
             segments[segmentIndex] = memoryRecycler.getLongArray();
         }
-        
-        int longInSegment = (int)(index & bitmask);
+
+        int longInSegment = (int) (index & bitmask);
         segments[segmentIndex][longInSegment] = value;
     }
 
@@ -61,18 +61,18 @@ public class GrowingSegmentedLongArray {
      * @return the byte value
      */
     public long get(long index) {
-        int segmentIndex = (int)(index >> log2OfSegmentSize);
+        int segmentIndex = (int) (index >> log2OfSegmentSize);
 
         if(segmentIndex >= segments.length || segments[segmentIndex] == null)
             return 0;
-        
-        int longInSegment = (int)(index & bitmask);
+
+        int longInSegment = (int) (index & bitmask);
         return segments[segmentIndex][longInSegment];
     }
-    
-    
+
+
     public void destroy() {
-        for(int i=0;i<segments.length;i++) {
+        for(int i = 0; i < segments.length; i++) {
             if(segments[i] != null)
                 memoryRecycler.recycleLongArray(segments[i]);
         }

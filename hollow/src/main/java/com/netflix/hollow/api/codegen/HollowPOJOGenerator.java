@@ -91,7 +91,7 @@ public class HollowPOJOGenerator {
      * @throws ClassNotFoundException if the class for a data type cannot be loaded
      */
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        if (args.length == 0) {
+        if(args.length == 0) {
             System.out.println("Usage:\n"
                     + "java " + HollowPOJOGenerator.class.getName() + " --arg1=value1 --arg2=value2\n"
                     + "see " + GeneratorArguments.class.getName() + " for available arguments.");
@@ -103,8 +103,8 @@ public class HollowPOJOGenerator {
         String pathToGeneratedFiles = null;
         HollowObjectMapper mapper = new HollowObjectMapper(engine);
         ArgumentParser<GeneratorArguments> argumentParser = new ArgumentParser(GeneratorArguments.class, args);
-        for (ArgumentParser<GeneratorArguments>.ParsedArgument arg : argumentParser.getParsedArguments()) {
-            switch (arg.getKey()) {
+        for(ArgumentParser<GeneratorArguments>.ParsedArgument arg : argumentParser.getParsedArguments()) {
+            switch(arg.getKey()) {
                 case addToDataModel:
                     mapper.initializeTypeState(HollowPOJOGenerator.class.getClassLoader().loadClass(arg.getValue()));
                     break;
@@ -134,13 +134,13 @@ public class HollowPOJOGenerator {
     public void generateFiles(File directory) throws IOException {
         Path destinationPath = directory.toPath();
         Path packagePath = Paths.get(packageName.replace(".", File.separator));
-        if (!destinationPath.toAbsolutePath().endsWith(packagePath)) {
+        if(!destinationPath.toAbsolutePath().endsWith(packagePath)) {
             destinationPath = destinationPath.resolve(packagePath);
         }
         directory = destinationPath.toFile();
-        if (!directory.exists()) directory.mkdirs();
-        for (HollowSchema schema : dataset.getSchemas()) {
-            if (schema instanceof HollowObjectSchema && !isPrimitiveType(schema.getName())) {
+        if(!directory.exists()) directory.mkdirs();
+        for(HollowSchema schema : dataset.getSchemas()) {
+            if(schema instanceof HollowObjectSchema && !isPrimitiveType(schema.getName())) {
                 HollowPOJOClassGenerator generator = new HollowPOJOClassGenerator(dataset, (HollowObjectSchema) schema,
                         packageName, pojoClassNameSuffix);
                 FileWriter writer = new FileWriter(new File(directory, generator.getClassName() + ".java"));

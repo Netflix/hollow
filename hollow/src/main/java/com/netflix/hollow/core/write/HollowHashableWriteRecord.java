@@ -21,8 +21,8 @@ import com.netflix.hollow.core.memory.ByteDataArray;
 public interface HollowHashableWriteRecord extends HollowWriteRecord {
 
     public void writeDataTo(ByteDataArray buf, HashBehavior hashBehavior);
-    
-    
+
+
     public enum HashBehavior {
         IGNORED_HASHES,
         UNMIXED_HASHES,

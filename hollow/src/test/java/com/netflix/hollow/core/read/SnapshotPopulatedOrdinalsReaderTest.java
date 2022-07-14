@@ -35,15 +35,15 @@ public class SnapshotPopulatedOrdinalsReaderTest {
     public void test() throws IOException {
         PopulatedOrdinalListener listener = new PopulatedOrdinalListener();
         ThreadSafeBitSet bitSet = new ThreadSafeBitSet();
-        for(int i=0;i<10000;i+=10)
+        for(int i = 0; i < 10000; i += 10)
             bitSet.set(i);
 
         DataInputStream dis = serializeToStream(bitSet);
-        SnapshotPopulatedOrdinalsReader.readOrdinals(HollowBlobInput.serial(dis), new HollowTypeStateListener[] { listener });
+        SnapshotPopulatedOrdinalsReader.readOrdinals(HollowBlobInput.serial(dis), new HollowTypeStateListener[]{listener});
 
         BitSet populatedOrdinals = listener.getPopulatedOrdinals();
         Assert.assertEquals(1000, populatedOrdinals.cardinality());
-        for(int i=0;i<10000;i+=10)
+        for(int i = 0; i < 10000; i += 10)
             Assert.assertTrue(populatedOrdinals.get(i));
     }
 

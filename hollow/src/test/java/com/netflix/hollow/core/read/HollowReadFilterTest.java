@@ -253,8 +253,8 @@ public class HollowReadFilterTest extends AbstractStateEngineTest {
 
     private void addTestMap(int... keyAndValueOrdinals) {
         HollowMapWriteRecord rec = new HollowMapWriteRecord();
-        for(int i=0;i<keyAndValueOrdinals.length; i+= 2)
-            rec.addEntry(keyAndValueOrdinals[i], keyAndValueOrdinals[i+1]);
+        for(int i = 0; i < keyAndValueOrdinals.length; i += 2)
+            rec.addEntry(keyAndValueOrdinals[i], keyAndValueOrdinals[i + 1]);
         writeStateEngine.add(mapSchema.getName(), rec);
     }
 

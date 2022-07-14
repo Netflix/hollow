@@ -67,7 +67,7 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
         this.fieldRequiresMissingFieldTraversal = new boolean[unionSchema.numFields()];
         this.fieldEqualOrdinalFilters = new DiffEqualOrdinalFilter[unionSchema.numFields()];
 
-        for(int i=0;i<unionSchema.numFields();i++) {
+        for(int i = 0; i < unionSchema.numFields(); i++) {
             int fromFieldIndex = fromSchema.getPosition(unionSchema.getFieldName(i));
             int toFieldIndex = toSchema.getPosition(unionSchema.getFieldName(i));
 
@@ -91,7 +91,7 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
     }
 
     public void prepare(int topLevelFromOrdinal, int topLevelToOrdinal) {
-        for(int i=0;i<fieldNodes.length;i++) {
+        for(int i = 0; i < fieldNodes.length; i++) {
             fieldNodes[i].prepare(topLevelFromOrdinal, topLevelToOrdinal);
         }
     }
@@ -102,8 +102,8 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
     @Override
     public int traverseDiffs(IntList fromOrdinals, IntList toOrdinals) {
         int score = 0;
-        
-        for(int i=0;i<fieldNodes.length;i++) {
+
+        for(int i = 0; i < fieldNodes.length; i++) {
             int fromFieldIdx = fromFieldMapping[i];
             int toFieldIdx = toFieldMapping[i];
 
@@ -112,7 +112,7 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
                 traversalToOrdinals.clear();
 
                 if(fromFieldIdx != -1) {
-                    for(int j=0;j<fromOrdinals.size();j++) {
+                    for(int j = 0; j < fromOrdinals.size(); j++) {
                         int fromOrdinal = fromOrdinals.get(j);
                         int refOrdinal = fromState.readOrdinal(fromOrdinal, fromFieldIdx);
                         if(refOrdinal != -1)
@@ -121,7 +121,7 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
                 }
 
                 if(toFieldIdx != -1) {
-                    for(int j=0;j<toOrdinals.size();j++) {
+                    for(int j = 0; j < toOrdinals.size(); j++) {
                         int toOrdinal = toOrdinals.get(j);
                         int refOrdinal = toState.readOrdinal(toOrdinal, toFieldIdx);
                         if(refOrdinal != -1)
@@ -148,20 +148,20 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
                     score += fieldNodes[i].traverseDiffs(fromOrdinals, toOrdinals);
             }
         }
-        
+
         return score;
     }
 
     public int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
         int score = 0;
-        
-        for(int i=0;i<fieldNodes.length;i++) {
+
+        for(int i = 0; i < fieldNodes.length; i++) {
             if(fieldRequiresMissingFieldTraversal[i]) {
                 traversalFromOrdinals.clear();
                 traversalToOrdinals.clear();
 
                 if(fromFieldMapping[i] != -1) {
-                    for(int j=0;j<fromOrdinals.size();j++) {
+                    for(int j = 0; j < fromOrdinals.size(); j++) {
                         int fromOrdinal = fromState.readOrdinal(fromOrdinals.get(j), fromFieldMapping[i]);
                         if(fromOrdinal != -1)
                             traversalFromOrdinals.add(fromOrdinal);
@@ -169,7 +169,7 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
                 }
 
                 if(toFieldMapping[i] != -1) {
-                    for(int j=0;j<toOrdinals.size();j++) {
+                    for(int j = 0; j < toOrdinals.size(); j++) {
                         int toOrdinal = toState.readOrdinal(toOrdinals.get(j), toFieldMapping[i]);
                         if(toOrdinal != -1)
                             traversalToOrdinals.add(toOrdinal);
@@ -181,13 +181,13 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
                 score += fieldNodes[i].traverseMissingFields(fromOrdinals, toOrdinals);
             }
         }
-        
+
         return score;
     }
 
     private int[] createFieldMapping(HollowObjectSchema unionSchema, HollowObjectSchema individualSchema) {
         int mapping[] = new int[unionSchema.numFields()];
-        for(int i=0;i<unionSchema.numFields();i++) {
+        for(int i = 0; i < unionSchema.numFields(); i++) {
             String fieldName = unionSchema.getFieldName(i);
             mapping[i] = individualSchema.getPosition(fieldName);
         }

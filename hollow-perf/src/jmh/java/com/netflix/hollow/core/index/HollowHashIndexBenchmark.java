@@ -35,7 +35,7 @@ public class HollowHashIndexBenchmark {
 
     public static class AbstractHollowHashIndexBenchmark extends AbstractHollowIndexBenchmark<HollowHashIndex> {
         //@Param( {"1", "1000", "10000", "100000"})
-        @Param( {"1000"})
+        @Param({"1000"})
         public int cardinality;
 
         @Override

@@ -42,7 +42,7 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
                 + INDENT + "\"value\": {" + NEWLINE
                 + INDENT + INDENT + "\"value\": \"foo\"" + NEWLINE
                 + INDENT + "}" + NEWLINE
-                + "}", 
+                + "}",
                 stringifyType(TypeWithString.class, true, true, new TypeWithString("foo")));
     }
 
@@ -76,9 +76,9 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
         Assert.assertEquals(msg, "{" + NEWLINE
                 + INDENT + "\"value\": 42.0," + NEWLINE
                 + INDENT + "\"nestedType\": 42" + NEWLINE
-                + "}", 
+                + "}",
                 stringifyType(TypeWithNestedPrimitive.class, true, false,
-                    new TypeWithNestedPrimitive(42.0, new TypeWithPrimitive(42))));
+                        new TypeWithNestedPrimitive(42.0, new TypeWithPrimitive(42))));
         Assert.assertEquals(msg, "{" + NEWLINE
                 + INDENT + "\"value\": {" + NEWLINE
                 + INDENT + INDENT + "\"value\": 42.0" + NEWLINE
@@ -88,7 +88,7 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
                 + INDENT + "}" + NEWLINE
                 + "}",
                 stringifyType(TypeWithNestedPrimitive.class, true, true,
-                    new TypeWithNestedPrimitive(42.0, new TypeWithPrimitive(42))));
+                        new TypeWithNestedPrimitive(42.0, new TypeWithPrimitive(42))));
     }
 
     @Test
@@ -98,9 +98,9 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
         Assert.assertEquals(msg, "{" + NEWLINE
                 + INDENT + "\"value\": 42.0," + NEWLINE
                 + INDENT + "\"nestedType\": 42" + NEWLINE
-                + "}", 
+                + "}",
                 stringifyType(TypeWithNestedNonPrimitive.class, true, false,
-                    new TypeWithNestedNonPrimitive(42.0, new TypeWithNonPrimitive(42))));
+                        new TypeWithNestedNonPrimitive(42.0, new TypeWithNonPrimitive(42))));
         Assert.assertEquals(msg, "{" + NEWLINE
                 + INDENT + "\"value\": {" + NEWLINE
                 + INDENT + INDENT + "\"value\": 42.0" + NEWLINE
@@ -112,7 +112,7 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
                 + INDENT + "}" + NEWLINE
                 + "}",
                 stringifyType(TypeWithNestedNonPrimitive.class, true, true,
-                    new TypeWithNestedNonPrimitive(42.0, new TypeWithNonPrimitive(42))));
+                        new TypeWithNestedNonPrimitive(42.0, new TypeWithNonPrimitive(42))));
     }
 
     @Test
@@ -120,21 +120,21 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
         String msg = "Types should be printed correctly without prettyPrint";
         // without prettyPrint
         Assert.assertEquals(msg, "{"
-                        + "\"value\": 42.0,"
-                        + "\"nestedType\": 42"
-                        + "}",
+                + "\"value\": 42.0,"
+                + "\"nestedType\": 42"
+                + "}",
                 stringifyType(TypeWithNestedNonPrimitive.class, false, false,
                         new TypeWithNestedNonPrimitive(42.0, new TypeWithNonPrimitive(42))));
         Assert.assertEquals(msg, "{"
-                        + "\"value\": {"
-                        + "\"value\": 42.0"
-                        + "},"
-                        + "\"nestedType\": {"
-                        + "\"value\": {"
-                        + "\"value\": 42"
-                        + "}"
-                        + "}"
-                        + "}",
+                + "\"value\": {"
+                + "\"value\": 42.0"
+                + "},"
+                + "\"nestedType\": {"
+                + "\"value\": {"
+                + "\"value\": 42"
+                + "}"
+                + "}"
+                + "}",
                 stringifyType(TypeWithNestedNonPrimitive.class, false, true,
                         new TypeWithNestedNonPrimitive(42.0, new TypeWithNonPrimitive(42))));
     }
@@ -144,7 +144,7 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
         Assert.assertEquals("Multiple records should be printed correctly",
                 "\"foo\"" + NEWLINE + "\"bar\"",
                 stringifyType(TypeWithString.class, true, false,
-                    new TypeWithString("foo"), new TypeWithString("bar")));
+                        new TypeWithString("foo"), new TypeWithString("bar")));
     }
 
     @Test

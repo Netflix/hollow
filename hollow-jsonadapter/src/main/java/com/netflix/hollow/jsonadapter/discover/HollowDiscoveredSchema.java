@@ -35,14 +35,14 @@ public class HollowDiscoveredSchema {
         this.schemaName = schemaName;
         this.type = schemaType;
         this.subType = subType;
-        this.fields = schemaType == DiscoveredSchemaType.OBJECT ? new ConcurrentHashMap<String, HollowDiscoveredField>() : Collections.<String, HollowDiscoveredField> emptyMap();
+        this.fields = schemaType == DiscoveredSchemaType.OBJECT ? new ConcurrentHashMap<String, HollowDiscoveredField>() : Collections.<String, HollowDiscoveredField>emptyMap();
         // System.out.println(String.format("[new] HollowDiscoveredSchema: schemaName=%s, type=%s, subType=%s", schemaName, schemaType, subType));
     }
-    
+
     public String getName() {
         return schemaName;
     }
-    
+
     public Map<String, HollowDiscoveredField> getFields() {
         return fields;
     }
@@ -96,24 +96,24 @@ public class HollowDiscoveredSchema {
 
     public HollowSchema toHollowSchema() {
         switch(type) {
-        case LIST:
-            return new HollowListSchema(schemaName, subType);
-        case MAP:
-            return new HollowMapSchema(schemaName, "MapKey", subType);
-        case OBJECT:
-            HollowObjectSchema schema = new HollowObjectSchema(schemaName, fields.size());
-            
-            for(Map.Entry<String, HollowDiscoveredField> entry : fields.entrySet()) {
-                if(entry.getValue().fieldType == FieldType.STRING) {
-                    schema.addField(entry.getKey(), FieldType.REFERENCE, "String");
-                } else {
-                    schema.addField(entry.getKey(), entry.getValue().fieldType, entry.getValue().referencedType);
+            case LIST:
+                return new HollowListSchema(schemaName, subType);
+            case MAP:
+                return new HollowMapSchema(schemaName, "MapKey", subType);
+            case OBJECT:
+                HollowObjectSchema schema = new HollowObjectSchema(schemaName, fields.size());
+
+                for(Map.Entry<String, HollowDiscoveredField> entry : fields.entrySet()) {
+                    if(entry.getValue().fieldType == FieldType.STRING) {
+                        schema.addField(entry.getKey(), FieldType.REFERENCE, "String");
+                    } else {
+                        schema.addField(entry.getKey(), entry.getValue().fieldType, entry.getValue().referencedType);
+                    }
                 }
-            }
-            
-            return schema;
+
+                return schema;
         }
-        
+
         throw new IllegalStateException("HollowDiscoveredSchema type must be one of LIST,MAP,OBJECT.  Was " + type);
     }
 }

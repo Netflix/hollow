@@ -113,7 +113,7 @@ public final class HashIndex<T extends HollowRecord, Q> extends HashIndexSelect<
          */
         public <Q> HashIndex<T, Q> usingPath(String queryFieldPath, Class<Q> queryFieldType) {
             Objects.requireNonNull(queryFieldPath);
-            if (queryFieldPath.isEmpty()) {
+            if(queryFieldPath.isEmpty()) {
                 throw new IllegalArgumentException("queryFieldPath argument is an empty String");
             }
             Objects.requireNonNull(queryFieldType);

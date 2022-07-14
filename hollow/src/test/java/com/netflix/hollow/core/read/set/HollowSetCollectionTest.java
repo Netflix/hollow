@@ -71,7 +71,8 @@ public class HollowSetCollectionTest {
         Assert.assertEquals(Arrays.asList(1, 2, 3), keys);
 
         Iterator<HollowRecord> iterator = s.iterator();
-        iterator.forEachRemaining(e -> {});
+        iterator.forEachRemaining(e -> {
+        });
         Assert.assertFalse(iterator.hasNext());
         try {
             iterator.next();
@@ -110,7 +111,7 @@ public class HollowSetCollectionTest {
     }
 
     static void assertSetEquals(Set<?> a, Set<?> b, boolean equal) {
-        if (equal) {
+        if(equal) {
             Assert.assertEquals(a.hashCode(), b.hashCode());
             Assert.assertEquals(a, b);
             Assert.assertTrue(equalsUsingContains(a, b));
@@ -127,7 +128,7 @@ public class HollowSetCollectionTest {
     }
 
     static boolean equalsUsingContains(Set<?> a, Set<?> b) {
-        if (a.size() != b.size()) {
+        if(a.size() != b.size()) {
             return false;
         }
 

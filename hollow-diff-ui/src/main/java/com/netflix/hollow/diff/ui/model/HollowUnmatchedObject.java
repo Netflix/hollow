@@ -29,6 +29,7 @@ public class HollowUnmatchedObject {
     public String getDisplayKey() {
         return displayKey;
     }
+
     public int getOrdinal() {
         return ordinal;
     }

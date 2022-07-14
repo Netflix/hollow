@@ -197,11 +197,13 @@ public class FailedTransitionTest {
 
 
     static class NoDoubleSnapshotConfig implements HollowConsumer.DoubleSnapshotConfig {
-        @Override public boolean allowDoubleSnapshot() {
+        @Override
+        public boolean allowDoubleSnapshot() {
             return false;
         }
 
-        @Override public int maxDeltasBeforeDoubleSnapshot() {
+        @Override
+        public int maxDeltasBeforeDoubleSnapshot() {
             return 32;
         }
     }
@@ -222,7 +224,7 @@ public class FailedTransitionTest {
 
                 @Override
                 public InputStream getInputStream() throws IOException {
-                    if (failer.getAsBoolean()) {
+                    if(failer.getAsBoolean()) {
                         throw new IOException("FAILED");
                     }
                     return blob.getInputStream();
@@ -230,11 +232,13 @@ public class FailedTransitionTest {
             };
         }
 
-        @Override public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion) {
+        @Override
+        public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion) {
             HollowConsumer.Blob blob = br.retrieveSnapshotBlob(desiredVersion);
             return new HollowConsumer.Blob(desiredVersion) {
-                @Override public InputStream getInputStream() throws IOException {
-                    if (failer.getAsBoolean()) {
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    if(failer.getAsBoolean()) {
                         throw new IOException("FAILED");
                     }
                     return blob.getInputStream();
@@ -242,11 +246,13 @@ public class FailedTransitionTest {
             };
         }
 
-        @Override public HollowConsumer.Blob retrieveDeltaBlob(long currentVersion) {
+        @Override
+        public HollowConsumer.Blob retrieveDeltaBlob(long currentVersion) {
             HollowConsumer.Blob blob = br.retrieveDeltaBlob(currentVersion);
             return new HollowConsumer.Blob(blob.getFromVersion(), blob.getToVersion()) {
-                @Override public InputStream getInputStream() throws IOException {
-                    if (failer.getAsBoolean()) {
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    if(failer.getAsBoolean()) {
                         throw new IOException("FAILED");
                     }
                     return blob.getInputStream();
@@ -254,11 +260,13 @@ public class FailedTransitionTest {
             };
         }
 
-        @Override public HollowConsumer.Blob retrieveReverseDeltaBlob(long currentVersion) {
+        @Override
+        public HollowConsumer.Blob retrieveReverseDeltaBlob(long currentVersion) {
             HollowConsumer.Blob blob = br.retrieveReverseDeltaBlob(currentVersion);
             return new HollowConsumer.Blob(blob.getFromVersion(), blob.getToVersion()) {
-                @Override public InputStream getInputStream() throws IOException {
-                    if (failer.getAsBoolean()) {
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    if(failer.getAsBoolean()) {
                         throw new IOException("FAILED");
                     }
                     return blob.getInputStream();

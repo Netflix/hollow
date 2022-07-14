@@ -29,10 +29,10 @@ public class IOUtils {
         while(numBytes > 0) {
             int numBytesToRead = 4096;
             if(numBytes < 4096)
-                numBytesToRead = (int)numBytes;
+                numBytesToRead = (int) numBytes;
             int bytesRead = in.read(buf, 0, numBytesToRead);
 
-            for(int i=0;i<os.length;i++) {
+            for(int i = 0; i < os.length; i++) {
                 os[i].write(buf, 0, bytesRead);
             }
 
@@ -42,7 +42,7 @@ public class IOUtils {
 
     public static void copySegmentedLongArray(HollowBlobInput in, DataOutputStream[] os) throws IOException {
         long numLongsToWrite = VarInt.readVLong(in);
-        for(int i=0;i<os.length;i++)
+        for(int i = 0; i < os.length; i++)
             VarInt.writeVLong(os[i], numLongsToWrite);
 
         copyBytes(in, os, numLongsToWrite * 8);
@@ -50,14 +50,14 @@ public class IOUtils {
 
     public static int copyVInt(HollowBlobInput in, DataOutputStream[] os) throws IOException {
         int value = VarInt.readVInt(in);
-        for(int i=0;i<os.length;i++)
+        for(int i = 0; i < os.length; i++)
             VarInt.writeVInt(os[i], value);
         return value;
     }
 
     public static long copyVLong(HollowBlobInput in, DataOutputStream[] os) throws IOException {
         long value = VarInt.readVLong(in);
-        for(int i=0;i<os.length;i++)
+        for(int i = 0; i < os.length; i++)
             VarInt.writeVLong(os[i], value);
         return value;
     }

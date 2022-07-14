@@ -37,7 +37,7 @@ public class MemoizedMap<K, V> extends HashMap<K, V> {
     public MemoizedMap(int initialCapacity) {
         super(initialCapacity);
     }
-    
+
     public MemoizedMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
     }
@@ -45,6 +45,6 @@ public class MemoizedMap<K, V> extends HashMap<K, V> {
     public MemoizedMap(Map<? extends K, ? extends V> m) {
         super(m);
     }
-    
-    transient long __assigned_ordinal = -1L;  
+
+    transient long __assigned_ordinal = -1L;
 }

@@ -46,8 +46,8 @@ import java.util.Set;
 public class HollowCodeGenerationUtils {
 
     private static final Set<String> PRIMITIVE_TYPES = new HashSet<>();
-    private static final Map<String,String> DEFAULT_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
-    private static final Map<String,String> AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
+    private static final Map<String, String> DEFAULT_CLASS_NAME_SUBSTITUTIONS = new HashMap<String, String>();
+    private static final Map<String, String> AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS = new HashMap<String, String>();
 
     static {
         for(Class<?> clzz : Arrays.asList(Boolean.class, Integer.class, Long.class, Float.class, Double.class, String.class)) {
@@ -175,13 +175,13 @@ public class HollowCodeGenerationUtils {
     public static String hollowImplClassname(String typeName, String classPostfix,
             boolean useAggressiveSubstitutions, boolean useHollowPrimitives) {
         String classname = substituteInvalidChars(uppercase(typeName));
-        if (!useHollowPrimitives && !"".equals(classPostfix)) {
+        if(!useHollowPrimitives && !"".equals(classPostfix)) {
             // skip substitutions here to preserve legacy behaviour
             return classname + classPostfix;
         }
         String sub = useAggressiveSubstitutions ?
-            AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.get(classname) :
-            DEFAULT_CLASS_NAME_SUBSTITUTIONS.get(classname);
+                AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.get(classname) :
+                DEFAULT_CLASS_NAME_SUBSTITUTIONS.get(classname);
         return sub == null ? classname + classPostfix : sub;
     }
 
@@ -311,7 +311,10 @@ public class HollowCodeGenerationUtils {
 
     private static final Set<String> booleanMethodPrefixes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             "is", "has", "do", "should", "was", "contains", "enable", "disable", "get")));
-    public static Set<String> getBooleanMethodPrefixes() { return booleanMethodPrefixes; }
+
+    public static Set<String> getBooleanMethodPrefixes() {
+        return booleanMethodPrefixes;
+    }
 
     /**
      * Rules: prepend "get" / "is" + upper case first char of field name
@@ -336,11 +339,11 @@ public class HollowCodeGenerationUtils {
      */
     public static String generateAccessortMethodName(String fieldName, Class<?> clazz) {
         String prefix = "get";
-        if (boolean.class.equals(clazz) || Boolean.class.equals(clazz)) {
-            for (String booleanPrefix : booleanMethodPrefixes) {
-                if (fieldName.startsWith(booleanPrefix) && fieldName.length() > booleanPrefix.length()) {
+        if(boolean.class.equals(clazz) || Boolean.class.equals(clazz)) {
+            for(String booleanPrefix : booleanMethodPrefixes) {
+                if(fieldName.startsWith(booleanPrefix) && fieldName.length() > booleanPrefix.length()) {
                     char firstCharAfterBooleanPrefix = fieldName.charAt(booleanPrefix.length());
-                    if (Character.isUpperCase(firstCharAfterBooleanPrefix)) {
+                    if(Character.isUpperCase(firstCharAfterBooleanPrefix)) {
                         return fieldName;
                     }
                 }
@@ -366,11 +369,11 @@ public class HollowCodeGenerationUtils {
      */
     public static String normalizeFieldPathToParamName(String fieldPath) {
         String result = null;
-        if (fieldPath.contains(".")) {
+        if(fieldPath.contains(".")) {
             String[] parts = fieldPath.split("\\.");
             StringBuilder sb = new StringBuilder();
             sb.append(lowercase(parts[0]));
-            for (int i = 1; i < parts.length; i++) {
+            for(int i = 1; i < parts.length; i++) {
                 sb.append(uppercase(parts[i]));
             }
             result = sb.toString();
@@ -378,7 +381,7 @@ public class HollowCodeGenerationUtils {
             result = lowercase(fieldPath);
         }
 
-        if (result.endsWith("!")) {
+        if(result.endsWith("!")) {
             return result.substring(0, result.length() - 1);
         }
         return result;
@@ -390,9 +393,9 @@ public class HollowCodeGenerationUtils {
 
     public static Set<String> getPrimitiveTypes(Collection<HollowSchema> schemaList) {
         Set<String> primitiveTypes = new HashSet<>();
-        for (HollowSchema schema : schemaList) {
+        for(HollowSchema schema : schemaList) {
             String type = schema.getName();
-            if (!isPrimitiveType(type)) continue;
+            if(!isPrimitiveType(type)) continue;
 
             primitiveTypes.add(type);
         }

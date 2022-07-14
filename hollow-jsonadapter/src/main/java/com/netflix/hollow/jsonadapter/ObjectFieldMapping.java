@@ -44,7 +44,7 @@ public class ObjectFieldMapping {
         this.mappedFieldPaths = new HashMap<String, ObjectMappedFieldPath>();
         this.writeRecords = new HashMap<String, HollowObjectWriteRecord>();
 
-        mapAllPaths((HollowObjectSchema)stateEngine.getSchema(typeName));
+        mapAllPaths((HollowObjectSchema) stateEngine.getSchema(typeName));
     }
 
     private ObjectFieldMapping(String typeName, HollowJsonAdapter populator, Map<String, ObjectMappedFieldPath> mappedFieldPaths, RemappingBuilderInstruction rootInstruction, Map<String, HollowObjectWriteRecord> writeRecords) {
@@ -66,7 +66,7 @@ public class ObjectFieldMapping {
     }
 
     private void mapAllPaths(HollowObjectSchema schema) {
-        for(int i=0;i<schema.numFields();i++) {
+        for(int i = 0; i < schema.numFields(); i++) {
             if(!mappedFieldPaths.containsKey(schema.getFieldName(i))) {
                 HollowObjectWriteRecord rec = getWriteRecord(schema);
                 mappedFieldPaths.put(schema.getFieldName(i), new ObjectMappedFieldPath(rec, schema.getFieldName(i), schema.getName(), schema.getFieldName(i), i, populator.getFieldProcessor(schema.getName(), schema.getFieldName(i))));
@@ -117,7 +117,7 @@ public class ObjectFieldMapping {
                 instruction.addChildInstruction(fieldPaths[idx], childInstruction);
             }
 
-            return addPathMapping(fieldName, fieldPaths, childInstruction, idx+1);
+            return addPathMapping(fieldName, fieldPaths, childInstruction, idx + 1);
         }
 
         HollowObjectSchema schema = instruction.rec.getSchema();

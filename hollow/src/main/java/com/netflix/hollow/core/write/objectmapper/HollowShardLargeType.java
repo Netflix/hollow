@@ -53,7 +53,7 @@ import java.lang.annotation.Target;
  * @see <a href="https://hollow.how/advanced-topics/#type-sharding">Type-sharding documentation</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target( {ElementType.TYPE, ElementType.FIELD})
+@Target({ElementType.TYPE, ElementType.FIELD})
 public @interface HollowShardLargeType {
 
     /**

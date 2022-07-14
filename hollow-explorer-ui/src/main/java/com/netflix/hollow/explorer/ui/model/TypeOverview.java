@@ -30,7 +30,7 @@ public class TypeOverview {
     private final long approxHeapFootprint;
     private final PrimaryKey primaryKey;
     private final HollowSchema schema;
-    
+
     public TypeOverview(String typeName, int numRecords, int numHoles, long approxHoleFootprint,  long approxHeapFootprint, PrimaryKey primaryKey, HollowSchema schema) {
         this.typeName = typeName;
         this.numRecords = numRecords;
@@ -44,22 +44,38 @@ public class TypeOverview {
     public String getTypeName() {
         return typeName;
     }
-    
+
     public int getNumRecordsInt() {
         return numRecords;
     }
+
     public String getNumRecords() {
         return NumberFormat.getIntegerInstance().format(numRecords);
     }
 
-    public int getNumHolesInt() { return numHoles; }
-    public String getNumHoles() { return NumberFormat.getIntegerInstance().format(numHoles); }
+    public int getNumHolesInt() {
+        return numHoles;
+    }
 
-    public long getApproxHoleFootprintLong() { return approxHoleFootprint; }
-    public String getApproxHoleFootprint() {  return formatBytes(approxHoleFootprint); }
+    public String getNumHoles() {
+        return NumberFormat.getIntegerInstance().format(numHoles);
+    }
 
-    public long getApproxHeapFootprintLong() { return approxHeapFootprint; }
-    public String getApproxHeapFootprint() { return formatBytes(approxHeapFootprint); }
+    public long getApproxHoleFootprintLong() {
+        return approxHoleFootprint;
+    }
+
+    public String getApproxHoleFootprint() {
+        return formatBytes(approxHoleFootprint);
+    }
+
+    public long getApproxHeapFootprintLong() {
+        return approxHeapFootprint;
+    }
+
+    public String getApproxHeapFootprint() {
+        return formatBytes(approxHeapFootprint);
+    }
 
     public String getPrimaryKey() {
         return primaryKey == null ? "" : primaryKey.toString();

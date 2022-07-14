@@ -37,13 +37,13 @@ public class HollowDiffOverviewTypeEntry {
     }
 
     public HollowDiffOverviewTypeEntry(String typeName, long totalDiffScore, int unmatchedInFrom, int unmatchedInTo, int totalInFrom, int totalInTo,
-                                       long heapInFrom, long heapInTo, long holeInFrom, long holeInTo) {
+            long heapInFrom, long heapInTo, long holeInFrom, long holeInTo) {
         this(typeName, false, totalDiffScore, unmatchedInFrom, unmatchedInTo, totalInFrom, totalInTo, heapInFrom, heapInTo, holeInFrom, holeInTo);
 
     }
 
     public HollowDiffOverviewTypeEntry(String typeName, boolean hasUniqueKey, long totalDiffScore, int unmatchedInFrom, int unmatchedInTo, int totalInFrom, int totalInTo,
-                                       long heapInFrom, long heapInTo, long holeInFrom, long holeInTo) {
+            long heapInFrom, long heapInTo, long holeInFrom, long holeInTo) {
         this.typeName = typeName;
         this.hasUniqueKey = hasUniqueKey;
         this.totalDiffScore = totalDiffScore;
@@ -61,43 +61,79 @@ public class HollowDiffOverviewTypeEntry {
         return typeName;
     }
 
-    public boolean hasUniqueKey() { return hasUniqueKey;}
-    public boolean hasUnmatched() { return unmatchedInFrom > 0 || unmatchedInTo > 0; }
-    public boolean hasData() { return totalInFrom!=0 || totalInTo!=0; }
+    public boolean hasUniqueKey() {
+        return hasUniqueKey;
+    }
+
+    public boolean hasUnmatched() {
+        return unmatchedInFrom > 0 || unmatchedInTo > 0;
+    }
+
+    public boolean hasData() {
+        return totalInFrom != 0 || totalInTo != 0;
+    }
 
     public long getTotalDiffScore() {
         return totalDiffScore;
     }
+
     public int getUnmatchedInFrom() {
         return unmatchedInFrom;
     }
+
     public int getUnmatchedInTo() {
         return unmatchedInTo;
     }
+
     public int getTotalInFrom() {
         return totalInFrom;
     }
+
     public int getTotalInTo() {
         return totalInTo;
     }
 
-    public int getDeltaSize() { return Math.abs(totalInFrom - totalInTo); }
+    public int getDeltaSize() {
+        return Math.abs(totalInFrom - totalInTo);
+    }
 
-    public long getHeapInFrom() { return heapInFrom; }
-    public long getHeapInTo() { return heapInTo; }
-    public long getHoleInFrom() { return holeInFrom; }
-    public long getHoleInTo() { return holeInTo; }
+    public long getHeapInFrom() {
+        return heapInFrom;
+    }
 
-    public String getHeapInFromFormatted() { return formatBytes(heapInFrom); }
-    public String getHeapInToFormatted() { return formatBytes(heapInTo); }
-    public String getHoleInFromFormatted() { return formatBytes(holeInFrom); }
-    public String getHoleInToFormatted() { return formatBytes(holeInTo); }
+    public long getHeapInTo() {
+        return heapInTo;
+    }
+
+    public long getHoleInFrom() {
+        return holeInFrom;
+    }
+
+    public long getHoleInTo() {
+        return holeInTo;
+    }
+
+    public String getHeapInFromFormatted() {
+        return formatBytes(heapInFrom);
+    }
+
+    public String getHeapInToFormatted() {
+        return formatBytes(heapInTo);
+    }
+
+    public String getHoleInFromFormatted() {
+        return formatBytes(holeInFrom);
+    }
+
+    public String getHoleInToFormatted() {
+        return formatBytes(holeInTo);
+    }
 
     public String getBgColor() {
-        if (totalInFrom == 0 && totalInTo == 0)
+        if(totalInFrom == 0 && totalInTo == 0)
             return "#D0D0D0"; // No Data
-        else if (!hasUniqueKey) {
-            if (totalInFrom!=totalInTo) return "#F0E592";
+        else if(!hasUniqueKey) {
+            if(totalInFrom != totalInTo) return "#F0E592";
             return "#FFFBDB"; // No Unique Key
         } else if  (totalDiffScore > 0 || unmatchedInFrom > 0 || unmatchedInTo > 0)
             return "#FFCC99"; // Has Diff

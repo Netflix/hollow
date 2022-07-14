@@ -32,7 +32,7 @@ public class RecordDiffTreeNode {
     private final String groupName;
     private final Map<Object, RecordDiffTreeNode> childNodes;
     private final List<RecordDiff> recordDiffs;
-    
+
     public RecordDiffTreeNode(String parentHierarchicalFieldName, Object groupIdentifier, String groupName, HollowHistoricalState historicalState, HollowHistoryRecordNamer recordNamer) {
         this.hierarchicalFieldName = parentHierarchicalFieldName + "." + String.valueOf(groupIdentifier);
         this.historicalState = historicalState;
@@ -41,19 +41,19 @@ public class RecordDiffTreeNode {
         this.childNodes = new HashMap<Object, RecordDiffTreeNode>();
         this.recordDiffs = new ArrayList<RecordDiff>();
     }
-    
+
     public String getHierarchicalFieldName() {
         return hierarchicalFieldName;
     }
-    
+
     public String getGroupName() {
         return groupName;
     }
-    
+
     public boolean hasSubGroups() {
         return !childNodes.isEmpty();
     }
-    
+
     public RecordDiffTreeNode getChildNode(Object value, int keyFieldIdx) {
         RecordDiffTreeNode child = childNodes.get(value);
         if(child == null) {
@@ -62,31 +62,31 @@ public class RecordDiffTreeNode {
         }
         return child;
     }
-    
+
     public void addRecordDiff(RecordDiff diff) {
         recordDiffs.add(diff);
     }
-    
+
     public List<RecordDiff> getRecordDiffs() {
         return recordDiffs;
     }
-    
+
     public boolean isEmpty() {
         return recordDiffs.isEmpty() && childNodes.isEmpty();
     }
-    
+
     public int getDiffCount() {
         int totalCount = 0;
-        
+
         for(Map.Entry<Object, RecordDiffTreeNode> entry : childNodes.entrySet()) {
             totalCount += entry.getValue().getDiffCount();
         }
-        
+
         totalCount += recordDiffs.size();
-        
+
         return totalCount;
     }
-    
+
     public Collection<RecordDiffTreeNode> getSubGroups() {
         return childNodes.values();
     }

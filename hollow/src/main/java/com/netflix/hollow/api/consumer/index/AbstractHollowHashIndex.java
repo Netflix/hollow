@@ -49,10 +49,10 @@ public abstract class AbstractHollowHashIndex<API> {
             this.idx = new HollowHashIndex(consumer.getStateEngine(), queryType, selectFieldPath, matchFieldPaths);
             this.refreshListener = new RefreshListener();
 
-            if (isListenToDataRefreah) {
+            if(isListenToDataRefreah) {
                 listenToDataRefresh();
             }
-        } catch(ClassCastException cce) {
+        } catch (ClassCastException cce) {
             throw new ClassCastException("The HollowConsumer provided was not created with the PackageErgoTestAPI generated API class.");
         } finally {
             consumer.getRefreshLock().unlock();
@@ -80,7 +80,7 @@ public abstract class AbstractHollowHashIndex<API> {
     }
 
     public void listenToDataRefresh() {
-        if (isListenToDataRefresh) return;
+        if(isListenToDataRefresh) return;
 
         isListenToDataRefresh = true;
         idx.listenForDeltaUpdates();
@@ -108,9 +108,20 @@ public abstract class AbstractHollowHashIndex<API> {
             api = castAPI(refreshAPI);
         }
 
-        @Override public void refreshStarted(long currentVersion, long requestedVersion) { }
-        @Override public void blobLoaded(HollowConsumer.Blob transition) { }
-        @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) { }
-        @Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }
+        @Override
+        public void refreshStarted(long currentVersion, long requestedVersion) {
+        }
+
+        @Override
+        public void blobLoaded(HollowConsumer.Blob transition) {
+        }
+
+        @Override
+        public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+        }
+
+        @Override
+        public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
+        }
     }
 }

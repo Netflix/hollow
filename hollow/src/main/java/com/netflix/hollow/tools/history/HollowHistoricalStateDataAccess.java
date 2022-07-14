@@ -69,18 +69,18 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
             String typeName = typeState.getSchema().getName();
 
             switch(typeState.getSchema().getSchemaType()) {
-            case OBJECT:
-                typeDataAccessMap.put(typeName, new HollowHistoricalObjectDataAccess(this, typeState));
-                break;
-            case LIST:
-                typeDataAccessMap.put(typeName, new HollowHistoricalListDataAccess(this, typeState));
-                break;
-            case SET:
-                typeDataAccessMap.put(typeName, new HollowHistoricalSetDataAccess(this, typeState));
-                break;
-            case MAP: 
-                typeDataAccessMap.put(typeName, new HollowHistoricalMapDataAccess(this, typeState));
-                break;
+                case OBJECT:
+                    typeDataAccessMap.put(typeName, new HollowHistoricalObjectDataAccess(this, typeState));
+                    break;
+                case LIST:
+                    typeDataAccessMap.put(typeName, new HollowHistoricalListDataAccess(this, typeState));
+                    break;
+                case SET:
+                    typeDataAccessMap.put(typeName, new HollowHistoricalSetDataAccess(this, typeState));
+                    break;
+                case MAP:
+                    typeDataAccessMap.put(typeName, new HollowHistoricalMapDataAccess(this, typeState));
+                    break;
             }
         }
 
@@ -89,13 +89,13 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
         for(Map.Entry<String, HollowHistoricalTypeDataAccess> entry : typeDataAccessMap.entrySet()) {
             HollowHistoricalTypeDataAccess typeDataAccess = entry.getValue();
             switch(typeDataAccess.getSchema().getSchemaType()) {
-            case MAP:
-                ((HollowHistoricalMapDataAccess)typeDataAccess).buildKeyMatcher();
-                break;
-            case SET:
-                ((HollowHistoricalSetDataAccess)typeDataAccess).buildKeyMatcher();
-                break;
-            default:
+                case MAP:
+                    ((HollowHistoricalMapDataAccess) typeDataAccess).buildKeyMatcher();
+                    break;
+                case SET:
+                    ((HollowHistoricalSetDataAccess) typeDataAccess).buildKeyMatcher();
+                    break;
+                default:
             }
         }
     }
@@ -133,7 +133,7 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
             return typeDataAccess;
 
         while(state instanceof HollowHistoricalStateDataAccess) {
-            HollowHistoricalStateDataAccess historicalState = (HollowHistoricalStateDataAccess)state;
+            HollowHistoricalStateDataAccess historicalState = (HollowHistoricalStateDataAccess) state;
             typeDataAccess = historicalState.typeDataAccessMap.get(typeName);
             if(typeDataAccess != null)
                 return typeDataAccess;
@@ -153,7 +153,7 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
         HollowDataAccess state = this;
 
         while(state instanceof HollowHistoricalStateDataAccess) {
-            HollowHistoricalStateDataAccess historicalState = (HollowHistoricalStateDataAccess)state;
+            HollowHistoricalStateDataAccess historicalState = (HollowHistoricalStateDataAccess) state;
             if(historicalState.getOrdinalMapping().ordinalIsMapped(typeName, ordinal))
                 return state.getTypeDataAccess(typeName);
             state = historicalState.getNextState();
@@ -200,7 +200,7 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
             schemas.add(entry.getValue().getSchema());
         return schemas;
     }
-    
+
     @Override
     public HollowSchema getSchema(String name) {
         return getTypeDataAccess(name).getSchema();
@@ -209,7 +209,7 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
     @Override
     public HollowSchema getNonNullSchema(String name) {
         HollowSchema schema = getSchema(name);
-        if (schema == null) {
+        if(schema == null) {
             throw new SchemaNotFoundException(name, getAllTypes());
         }
         return schema;

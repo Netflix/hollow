@@ -48,13 +48,13 @@ import java.util.Map;
  * </pre>
  */
 public class HollowFieldMatchQuery {
-    
+
     private final HollowReadStateEngine readEngine;
-    
+
     public HollowFieldMatchQuery(HollowReadStateEngine readEngine) {
         this.readEngine = readEngine;
     }
-    
+
     /**
      * Match any records which include a field with the provided fieldName and value.
      *
@@ -64,14 +64,14 @@ public class HollowFieldMatchQuery {
      */
     public Map<String, BitSet> findMatchingRecords(String fieldName, String fieldValue) {
         Map<String, BitSet> matches = new HashMap<String, BitSet>();
-        
+
         for(HollowTypeReadState typeState : readEngine.getTypeStates()) {
             augmentMatchingRecords(typeState, fieldName, fieldValue, matches);
         }
 
         return matches;
     }
-    
+
     /**
      * Match any records of the specified type, which have the specified field set to the specified value.
      * 
@@ -86,44 +86,44 @@ public class HollowFieldMatchQuery {
         HollowTypeReadState typeState = readEngine.getTypeState(typeName);
         if(typeState != null)
             augmentMatchingRecords(typeState, fieldName, fieldValue, matches);
-        
+
         return matches;
     }
 
     private void augmentMatchingRecords(HollowTypeReadState typeState, String fieldName, String fieldValue, Map<String, BitSet> matches) {
         if(typeState.getSchema().getSchemaType() == SchemaType.OBJECT) {
-            HollowObjectSchema schema = (HollowObjectSchema)typeState.getSchema();
-            
-            for(int i=0;i<schema.numFields();i++) {
+            HollowObjectSchema schema = (HollowObjectSchema) typeState.getSchema();
+
+            for(int i = 0; i < schema.numFields(); i++) {
                 if(schema.getFieldName(i).equals(fieldName)) {
-                    HollowObjectTypeReadState objState = (HollowObjectTypeReadState)typeState;
-                    
+                    HollowObjectTypeReadState objState = (HollowObjectTypeReadState) typeState;
+
                     BitSet typeQueryMatches = null;
-                    
+
                     if(schema.getFieldType(i) == FieldType.REFERENCE) {
                         typeQueryMatches = attemptReferenceTraversalQuery(objState, i, fieldValue);
                     } else {
                         Object queryValue = castQueryValue(fieldValue, schema.getFieldType(i));
-                        
+
                         if(queryValue != null) {
                             typeQueryMatches = queryBasedOnValueMatches(objState, i, queryValue);
                         }
                     }
-                    
+
                     if(typeQueryMatches != null && typeQueryMatches.cardinality() > 0)
                         matches.put(typeState.getSchema().getName(), typeQueryMatches);
                 }
             }
         }
     }
-    
+
     private BitSet attemptReferenceTraversalQuery(HollowObjectTypeReadState typeState, int fieldIdx, String fieldValue) {
         HollowTypeReadState referencedTypeState = typeState.getSchema().getReferencedTypeState(fieldIdx);
-        
+
         if(referencedTypeState.getSchema().getSchemaType() == SchemaType.OBJECT) {
-            HollowObjectTypeReadState refObjTypeState = (HollowObjectTypeReadState)referencedTypeState;
+            HollowObjectTypeReadState refObjTypeState = (HollowObjectTypeReadState) referencedTypeState;
             HollowObjectSchema refSchema = refObjTypeState.getSchema();
-            
+
             if(refSchema.numFields() == 1) {
                 if(refSchema.getFieldType(0) == FieldType.REFERENCE) {
                     BitSet refQueryMatches = attemptReferenceTraversalQuery(refObjTypeState, 0, fieldValue);
@@ -131,7 +131,7 @@ public class HollowFieldMatchQuery {
                         return queryBasedOnMatchedReferences(typeState, fieldIdx, refQueryMatches);
                 } else {
                     Object queryValue = castQueryValue(fieldValue, refSchema.getFieldType(0));
-                    
+
                     if(queryValue != null) {
                         BitSet refQueryMatches = queryBasedOnValueMatches(refObjTypeState, 0, queryValue);
                         if(refQueryMatches.cardinality() > 0)
@@ -140,57 +140,57 @@ public class HollowFieldMatchQuery {
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     private BitSet queryBasedOnMatchedReferences(HollowObjectTypeReadState typeState, int referenceFieldPosition, BitSet matchedReferences) {
         BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
         BitSet typeQueryMatches = new BitSet(populatedOrdinals.length());
-      
+
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != -1) {
             int refOrdinal = typeState.readOrdinal(ordinal, referenceFieldPosition);
             if(refOrdinal != -1 && matchedReferences.get(refOrdinal))
                 typeQueryMatches.set(ordinal);
-            ordinal = populatedOrdinals.nextSetBit(ordinal+1);
+            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
         }
         return typeQueryMatches;
     }
-    
+
     private BitSet queryBasedOnValueMatches(HollowObjectTypeReadState typeState, int fieldPosition, Object queryValue) {
         BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
         BitSet typeQueryMatches = new BitSet(populatedOrdinals.length());
-      
+
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != -1) {
             if(HollowReadFieldUtils.fieldValueEquals(typeState, ordinal, fieldPosition, queryValue))
                 typeQueryMatches.set(ordinal);
-            ordinal = populatedOrdinals.nextSetBit(ordinal+1);
+            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
         }
         return typeQueryMatches;
     }
 
     private Object castQueryValue(String fieldValue, FieldType fieldType) {
-        
+
         try {
             switch(fieldType) {
-            case BOOLEAN:
-                return Boolean.valueOf(fieldValue);
-            case DOUBLE:
-                return Double.parseDouble(fieldValue);
-            case FLOAT:
-                return Float.parseFloat(fieldValue);
-            case INT:
-                return Integer.parseInt(fieldValue);
-            case LONG:
-                return Long.parseLong(fieldValue);
-            case STRING:
-                return fieldValue;
-            default:
-                return null;
+                case BOOLEAN:
+                    return Boolean.valueOf(fieldValue);
+                case DOUBLE:
+                    return Double.parseDouble(fieldValue);
+                case FLOAT:
+                    return Float.parseFloat(fieldValue);
+                case INT:
+                    return Integer.parseInt(fieldValue);
+                case LONG:
+                    return Long.parseLong(fieldValue);
+                case STRING:
+                    return fieldValue;
+                default:
+                    return null;
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             return null;
         }
     }

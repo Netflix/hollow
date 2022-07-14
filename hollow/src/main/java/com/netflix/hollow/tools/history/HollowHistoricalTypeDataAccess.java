@@ -36,7 +36,7 @@ public abstract class HollowHistoricalTypeDataAccess implements HollowTypeDataAc
     public HollowHistoricalTypeDataAccess(HollowHistoricalStateDataAccess dataAccess, HollowTypeReadState removedRecords, HollowSampler sampler) {
         IntMap ordinalRemap = null;
         if(dataAccess.getOrdinalMapping() instanceof IntMapOrdinalRemapper) {
-            ordinalRemap = ((IntMapOrdinalRemapper)dataAccess.getOrdinalMapping()).getOrdinalRemapping(removedRecords.getSchema().getName());
+            ordinalRemap = ((IntMapOrdinalRemapper) dataAccess.getOrdinalMapping()).getOrdinalRemapping(removedRecords.getSchema().getName());
         }
         this.dataAccess = dataAccess;
         this.ordinalRemap = ordinalRemap;
@@ -76,7 +76,7 @@ public abstract class HollowHistoricalTypeDataAccess implements HollowTypeDataAc
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         sampler.setFieldSpecificSamplingDirector(fieldSpec, director);
     }
-    
+
     @Override
     public void ignoreUpdateThreadForSampling(Thread t) {
         sampler.setUpdateThread(t);

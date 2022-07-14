@@ -67,7 +67,7 @@ public class HollowMapTypeDataElements {
     }
 
     void readDelta(HollowBlobInput in) throws IOException {
-        readFromInput(in,true);
+        readFromInput(in, true);
     }
 
     private void readFromInput(HollowBlobInput in, boolean isDelta) throws IOException {
@@ -95,7 +95,7 @@ public class HollowMapTypeDataElements {
         if(numShards > 1)
             VarInt.readVInt(in); /// max ordinal
 
-        for(int i=0; i<numShards; i++) {
+        for(int i = 0; i < numShards; i++) {
             VarInt.readVInt(in); /// max ordinal
 
             if(isDelta) {
@@ -103,14 +103,14 @@ public class HollowMapTypeDataElements {
                 GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(in);
                 GapEncodedVariableLengthIntegerReader.discardEncodedDeltaOrdinals(in);
             }
-    
+
             /// statistics
             VarInt.readVInt(in);
             VarInt.readVInt(in);
             VarInt.readVInt(in);
             VarInt.readVInt(in);
             VarInt.readVLong(in);
-    
+
             /// fixed length data
             FixedLengthData.discardFrom(in);
             FixedLengthData.discardFrom(in);

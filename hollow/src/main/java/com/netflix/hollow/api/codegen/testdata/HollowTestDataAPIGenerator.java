@@ -30,7 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class HollowTestDataAPIGenerator {
-    
+
     private HollowDataset dataset;
     private String apiClassname;
     private String packageName;
@@ -40,7 +40,7 @@ public class HollowTestDataAPIGenerator {
         HollowTestDataAPIGenerator gen = new HollowTestDataAPIGenerator();
         return gen.theBuilder();
     }
-    
+
     private Builder theBuilder() {
         return new Builder();
     }
@@ -50,17 +50,17 @@ public class HollowTestDataAPIGenerator {
             HollowTestDataAPIGenerator.this.dataset = dataset;
             return this;
         }
-        
+
         public Builder withAPIClassname(String apiClassname) {
             HollowTestDataAPIGenerator.this.apiClassname = apiClassname;
             return this;
         }
-        
+
         public Builder withPackageName(String packageName) {
             HollowTestDataAPIGenerator.this.packageName = packageName;
             return this;
         }
-        
+
         public Builder withDestination(String destinationPath) {
             return withDestination(Paths.get(destinationPath));
         }
@@ -69,23 +69,23 @@ public class HollowTestDataAPIGenerator {
             HollowTestDataAPIGenerator.this.destinationPath = destinationPath;
             return this;
         }
-        
+
         public HollowTestDataAPIGenerator build() {
             return HollowTestDataAPIGenerator.this;
         }
     }
-    
+
     public void generateSourceFiles() throws IOException {
         generate(dataset, packageName, apiClassname, destinationPath);
     }
 
-    
+
     private void generate(HollowDataset dataset, String packageName, String apiClassName, Path destination) throws IOException {
         Path apiClassDestination = destination.resolve(apiClassName + ".java");
         Files.createDirectories(destination);
 
         String apiClassContent = new HollowTestDataAPIClassGenerator(dataset, apiClassName, packageName).generate();
-        try(FileWriter writer = new FileWriter(apiClassDestination.toFile())) {
+        try (FileWriter writer = new FileWriter(apiClassDestination.toFile())) {
             writer.write(apiClassContent);
         }
 
@@ -93,26 +93,26 @@ public class HollowTestDataAPIGenerator {
             File classDestination = destination.resolve(schema.getName() + "TestData.java").toFile();
             String classContent = null;
             switch(schema.getSchemaType()) {
-            case OBJECT:
-                classContent = new HollowObjectTypeTestDataAPIClassGenerator(dataset, (HollowObjectSchema) schema, packageName).generate();
-                break;
-            case LIST:
-                classContent = new HollowListTypeTestDataAPIClassGenerator(dataset, (HollowListSchema) schema, packageName).generate();
-                break;
-            case SET:
-                classContent = new HollowSetTypeTestDataAPIClassGenerator(dataset, (HollowSetSchema) schema, packageName).generate();
-                break;
-            case MAP:
-                classContent = new HollowMapTypeTestDataAPIClassGenerator(dataset, (HollowMapSchema) schema, packageName).generate();
-                break;
+                case OBJECT:
+                    classContent = new HollowObjectTypeTestDataAPIClassGenerator(dataset, (HollowObjectSchema) schema, packageName).generate();
+                    break;
+                case LIST:
+                    classContent = new HollowListTypeTestDataAPIClassGenerator(dataset, (HollowListSchema) schema, packageName).generate();
+                    break;
+                case SET:
+                    classContent = new HollowSetTypeTestDataAPIClassGenerator(dataset, (HollowSetSchema) schema, packageName).generate();
+                    break;
+                case MAP:
+                    classContent = new HollowMapTypeTestDataAPIClassGenerator(dataset, (HollowMapSchema) schema, packageName).generate();
+                    break;
             }
-            
+
             if(classContent != null)
-            try(FileWriter writer = new FileWriter(classDestination)) {
-                writer.write(classContent);
-            }
+                try (FileWriter writer = new FileWriter(classDestination)) {
+                    writer.write(classContent);
+                }
         }
     }
-    
-        
+
+
 }

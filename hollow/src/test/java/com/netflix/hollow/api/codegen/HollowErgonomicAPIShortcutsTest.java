@@ -35,17 +35,17 @@ public class HollowErgonomicAPIShortcutsTest {
         HollowErgonomicAPIShortcuts shortcuts = new HollowErgonomicAPIShortcuts(writeEngine);
 
         Assert.assertEquals(5, shortcuts.numShortcuts());
-        
-        Assert.assertArrayEquals(new String[] { "value" }, shortcuts.getShortcut("StringReferenceReference.ref").getPath());
-        Assert.assertArrayEquals(new String[] { "StringReference" }, shortcuts.getShortcut("StringReferenceReference.ref").getPathTypes());
-        Assert.assertArrayEquals(new String[] { "value" }, shortcuts.getShortcut("TypeA.a2").getPath());
-        Assert.assertArrayEquals(new String[] { "StringReference" }, shortcuts.getShortcut("TypeA.a2").getPathTypes());
-        Assert.assertArrayEquals(new String[] { "value" }, shortcuts.getShortcut("TypeB.b1").getPath());
-        Assert.assertArrayEquals(new String[] { "StringReference" }, shortcuts.getShortcut("TypeB.b1").getPathTypes());
-        Assert.assertArrayEquals(new String[] { "ref", "value" }, shortcuts.getShortcut("TypeA.a3").getPath());
-        Assert.assertArrayEquals(new String[] { "StringReferenceReference", "StringReference" }, shortcuts.getShortcut("TypeA.a3").getPathTypes());
-        Assert.assertArrayEquals(new String[] { "ref", "value" }, shortcuts.getShortcut("TypeB.b2").getPath());
-        Assert.assertArrayEquals(new String[] { "StringReferenceReference", "StringReference" }, shortcuts.getShortcut("TypeB.b2").getPathTypes());
+
+        Assert.assertArrayEquals(new String[]{"value"}, shortcuts.getShortcut("StringReferenceReference.ref").getPath());
+        Assert.assertArrayEquals(new String[]{"StringReference"}, shortcuts.getShortcut("StringReferenceReference.ref").getPathTypes());
+        Assert.assertArrayEquals(new String[]{"value"}, shortcuts.getShortcut("TypeA.a2").getPath());
+        Assert.assertArrayEquals(new String[]{"StringReference"}, shortcuts.getShortcut("TypeA.a2").getPathTypes());
+        Assert.assertArrayEquals(new String[]{"value"}, shortcuts.getShortcut("TypeB.b1").getPath());
+        Assert.assertArrayEquals(new String[]{"StringReference"}, shortcuts.getShortcut("TypeB.b1").getPathTypes());
+        Assert.assertArrayEquals(new String[]{"ref", "value"}, shortcuts.getShortcut("TypeA.a3").getPath());
+        Assert.assertArrayEquals(new String[]{"StringReferenceReference", "StringReference"}, shortcuts.getShortcut("TypeA.a3").getPathTypes());
+        Assert.assertArrayEquals(new String[]{"ref", "value"}, shortcuts.getShortcut("TypeB.b2").getPath());
+        Assert.assertArrayEquals(new String[]{"StringReferenceReference", "StringReference"}, shortcuts.getShortcut("TypeB.b2").getPathTypes());
 
         Assert.assertEquals(FieldType.STRING, shortcuts.getShortcut("StringReferenceReference.ref").getType());
         Assert.assertEquals(FieldType.STRING, shortcuts.getShortcut("TypeA.a2").getType());
@@ -66,7 +66,8 @@ public class HollowErgonomicAPIShortcutsTest {
     private static class TypeB {
         StringReference b1;
         StringReferenceReference b2;
-        @HollowInline String b3;
+        @HollowInline
+        String b3;
     }
 
     @SuppressWarnings("unused")
@@ -75,7 +76,8 @@ public class HollowErgonomicAPIShortcutsTest {
     }
 
     private static class StringReference {
-        @HollowInline String value;
+        @HollowInline
+        String value;
     }
 
 }

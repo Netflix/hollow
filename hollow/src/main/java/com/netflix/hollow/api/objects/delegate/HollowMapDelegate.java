@@ -37,11 +37,11 @@ public interface HollowMapDelegate<K, V> extends HollowRecordDelegate {
     public boolean containsKey(HollowMap<K, V> map, int ordinal, Object key);
 
     public boolean containsValue(HollowMap<K, V> map, int ordinal, Object value);
-    
+
     public K findKey(HollowMap<K, V> map, int ordinal, Object... hashKey);
-    
+
     public V findValue(HollowMap<K, V> map, int ordinal, Object... hashKey);
-    
+
     public Map.Entry<K, V> findEntry(HollowMap<K, V> map, int ordinal, Object... hashKey);
 
     public HollowMapEntryOrdinalIterator iterator(int ordinal);

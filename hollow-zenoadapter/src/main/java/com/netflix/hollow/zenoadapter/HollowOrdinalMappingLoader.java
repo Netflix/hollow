@@ -31,10 +31,10 @@ public class HollowOrdinalMappingLoader {
 
         Map<String, int[]> idx = new HashMap<String, int[]>(size);
 
-        for (int i = 0; i < size; i++) {
+        for(int i = 0; i < size; i++) {
             String type = dis.readUTF();
             int typeIdx[] = new int[dis.readInt()];
-            for (int j = 0; j < typeIdx.length; j++) {
+            for(int j = 0; j < typeIdx.length; j++) {
                 typeIdx[j] = dis.readInt();
             }
             idx.put(type, typeIdx);

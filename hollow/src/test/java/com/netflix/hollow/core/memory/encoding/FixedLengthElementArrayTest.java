@@ -32,13 +32,13 @@ public class FixedLengthElementArrayTest {
 
         FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 17000000);
 
-        for(int i=0;i<1000000;i++) {
-            arr.setElementValue(i*numBitsPerElement, numBitsPerElement, testValue);
+        for(int i = 0; i < 1000000; i++) {
+            arr.setElementValue(i * numBitsPerElement, numBitsPerElement, testValue);
         }
 
-        for(int j=0;j<100;j++) {
-            for(int i=0;i<1000000;i++) {
-                if(testValue != arr.getElementValue(i*numBitsPerElement, numBitsPerElement, bitMask))
+        for(int j = 0; j < 100; j++) {
+            for(int i = 0; i < 1000000; i++) {
+                if(testValue != arr.getElementValue(i * numBitsPerElement, numBitsPerElement, bitMask))
                     Assert.fail();
             }
         }
@@ -55,9 +55,9 @@ public class FixedLengthElementArrayTest {
         int numBitsPerElement = 59;
 
         // Populate ordinals 0-7
-        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 64*10);
-        for(int i=0;i<8;i++) {
-            arr.setElementValue(i*numBitsPerElement, numBitsPerElement, testValue);
+        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 64 * 10);
+        for(int i = 0; i < 8; i++) {
+            arr.setElementValue(i * numBitsPerElement, numBitsPerElement, testValue);
         }
 
         // Validate address of ordinal 2 is unaligned by 6 bits
@@ -85,10 +85,10 @@ public class FixedLengthElementArrayTest {
         }
 
         // Show value is correct when reading other ordinals
-        for(int i=0; i<8; i++) {
-            if(i!=2 && i!=5) {
+        for(int i = 0; i < 8; i++) {
+            if(i != 2 && i != 5) {
                 long value = arr.getElementValue(i * numBitsPerElement, numBitsPerElement);
-                if (value != testValue) {
+                if(value != testValue) {
                     Assert.fail();
                 }
             }
@@ -106,9 +106,9 @@ public class FixedLengthElementArrayTest {
         int numBitsPerElement = 29;
 
         // Populate ordinals 0-5
-        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 64*10);
-        for(int i=0;i<6;i++) {
-            arr.setElementValue(i*numBitsPerElement, numBitsPerElement, testValue);
+        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 64 * 10);
+        for(int i = 0; i < 6; i++) {
+            arr.setElementValue(i * numBitsPerElement, numBitsPerElement, testValue);
         }
 
         // Validate address of ordinal 3 is unaligned by 7 bits
@@ -118,7 +118,7 @@ public class FixedLengthElementArrayTest {
         }
 
         // Read 2 values at once (ordinals 3 and 4)
-        long multiValue = arr.getElementValue(bitOffset, numBitsPerElement*2);
+        long multiValue = arr.getElementValue(bitOffset, numBitsPerElement * 2);
 
         // Show second value is incorrect due to overflow when reading 2 values
         long secondValue = multiValue >> numBitsPerElement;
@@ -133,7 +133,7 @@ public class FixedLengthElementArrayTest {
         }
 
         // Show second value is correct when reading single value
-        secondValue = arr.getElementValue(bitOffset+numBitsPerElement, numBitsPerElement);
+        secondValue = arr.getElementValue(bitOffset + numBitsPerElement, numBitsPerElement);
         if(secondValue != testValue) {
             Assert.fail();
         }
@@ -150,9 +150,9 @@ public class FixedLengthElementArrayTest {
         int numBitsPerElement = 27;
 
         // Populate ordinals 0-7
-        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 64*10);
-        for(int i=0;i<8;i++) {
-            arr.setElementValue(i*numBitsPerElement, numBitsPerElement, testValue);
+        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 64 * 10);
+        for(int i = 0; i < 8; i++) {
+            arr.setElementValue(i * numBitsPerElement, numBitsPerElement, testValue);
         }
 
         // Validate address of ordinal 5 is unaligned by 7 bits
@@ -162,7 +162,7 @@ public class FixedLengthElementArrayTest {
         }
 
         // Read 2 values at once (ordinals 5 and 6)
-        long multiValue = arr.getElementValue(bitOffset, numBitsPerElement*2);
+        long multiValue = arr.getElementValue(bitOffset, numBitsPerElement * 2);
 
         // Validate second value is correct (no overflow)
         long secondValue = multiValue >> numBitsPerElement;
@@ -185,13 +185,13 @@ public class FixedLengthElementArrayTest {
 
         FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 610000);
 
-        for(int i=0;i<10000;i++) {
-            arr.setElementValue(i*numBitsPerElement, numBitsPerElement, testValue);
+        for(int i = 0; i < 10000; i++) {
+            arr.setElementValue(i * numBitsPerElement, numBitsPerElement, testValue);
         }
 
-        for(int j=0;j<100;j++) {
-            for(int i=0;i<10000;i++) {
-                if(testValue != arr.getLargeElementValue(i*numBitsPerElement, numBitsPerElement))
+        for(int j = 0; j < 100; j++) {
+            for(int i = 0; i < 10000; i++) {
+                if(testValue != arr.getLargeElementValue(i * numBitsPerElement, numBitsPerElement))
                     Assert.fail();
             }
         }
@@ -199,7 +199,7 @@ public class FixedLengthElementArrayTest {
 
     @Test
     public void testCopyBitRange() {
-        for(int iteration = 0;iteration < 100;iteration++) {
+        for(int iteration = 0; iteration < 100; iteration++) {
             if(iteration % 1024 == 1023)
                 System.out.println(iteration);
 
@@ -215,7 +215,7 @@ public class FixedLengthElementArrayTest {
 
             int numLongs = (totalBitsInArray >>> 6);
 
-            for(int i=0;i<=numLongs;i++) {
+            for(int i = 0; i <= numLongs; i++) {
                 source.set(i, rand.nextLong());
             }
 
@@ -264,21 +264,21 @@ public class FixedLengthElementArrayTest {
         long startVal = rand.nextInt(Integer.MAX_VALUE);
         int elementCount = 0;
 
-        for(int i=0;i<1000000;i+=65) {
-            arr.setElementValue(i, 60, startVal+i);
+        for(int i = 0; i < 1000000; i += 65) {
+            arr.setElementValue(i, 60, startVal + i);
             elementCount++;
         }
 
         arr.incrementMany(0, 1000, 65, elementCount);
 
-        for(int i=0;i<1000000;i+=65) {
+        for(int i = 0; i < 1000000; i += 65) {
             long val = arr.getElementValue(i, 60);
             Assert.assertEquals(startVal + i + 1000, val);
         }
 
         arr.incrementMany(0, -2000, 65, elementCount);
 
-        for(int i=0;i<1000000;i+=65) {
+        for(int i = 0; i < 1000000; i += 65) {
             long val = arr.getElementValue(i, 60);
             Assert.assertEquals(startVal + i - 1000, val);
         }
@@ -289,17 +289,18 @@ public class FixedLengthElementArrayTest {
     public void doesNotThrowSIGSEGV() {
         FixedLengthElementArray arr = new FixedLengthElementArray(new WastefulRecycler(2, 2), 1793);
 
-        for(int i=0;i<2500;i++) {
+        for(int i = 0; i < 2500; i++) {
             try {
                 arr.setElementValue(i, 2, 3);
-            } catch(ArrayIndexOutOfBoundsException acceptable) { }
+            } catch (ArrayIndexOutOfBoundsException acceptable) {
+            }
         }
     }
-    
+
     @Test
     public void testArrayIndexOutOfBoundsEdgeCase() {
         FixedLengthElementArray arr = new FixedLengthElementArray(new WastefulRecycler(2, 2), 256);
-        
+
         arr.copyBits(arr, 256, 10, 0);
     }
 

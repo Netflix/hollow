@@ -26,11 +26,11 @@ import java.util.Map;
  *
  */
 class HollowCombinerPrimaryKeyOrdinalRemapper implements OrdinalRemapper {
-    
+
     private final Map<String, HollowPrimaryKeyIndex[]> primaryKeyIndexes;
     private final OrdinalRemapper baseRemappers[];
     private final int stateEngineIdx;
-    
+
     public HollowCombinerPrimaryKeyOrdinalRemapper(OrdinalRemapper[] baseRemappers, Map<String, HollowPrimaryKeyIndex[]> primaryKeyIndexes, int stateEngineIdx) {
         this.primaryKeyIndexes = primaryKeyIndexes;
         this.baseRemappers = baseRemappers;
@@ -45,12 +45,12 @@ class HollowCombinerPrimaryKeyOrdinalRemapper implements OrdinalRemapper {
     @Override
     public void remapOrdinal(String type, int originalOrdinal, int mappedOrdinal) {
         baseRemappers[stateEngineIdx].remapOrdinal(type, originalOrdinal, mappedOrdinal);
-        
+
         HollowPrimaryKeyIndex[] typeKeyIndexes = this.primaryKeyIndexes.get(type);
         if(typeKeyIndexes != null) {
             Object primaryKey[] = typeKeyIndexes[stateEngineIdx].getRecordKey(originalOrdinal);
-            
-            for(int i=0;i<baseRemappers.length;i++) {
+
+            for(int i = 0; i < baseRemappers.length; i++) {
                 if(i != stateEngineIdx) {
                     if(typeKeyIndexes[i] != null) {
                         int matchOrdinal = typeKeyIndexes[i].getMatchingOrdinal(primaryKey);
@@ -67,7 +67,6 @@ class HollowCombinerPrimaryKeyOrdinalRemapper implements OrdinalRemapper {
     public boolean ordinalIsMapped(String type, int originalOrdinal) {
         return baseRemappers[stateEngineIdx].ordinalIsMapped(type, originalOrdinal);
     }
-    
-    
+
 
 }

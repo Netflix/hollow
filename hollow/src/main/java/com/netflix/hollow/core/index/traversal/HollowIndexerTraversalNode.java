@@ -80,7 +80,7 @@ abstract class HollowIndexerTraversalNode {
 
             this.childFirstFieldMap[childCounter] = childBranchFieldPositions.get(0);
 
-            for(int i=0;i<childBranchFieldPositions.size();i++) {
+            for(int i = 0; i < childBranchFieldPositions.size(); i++) {
                 this.fieldChildMap[childBranchFieldPositions.get(i)] = childCounter;
                 branchFieldPositions.add(childBranchFieldPositions.get(i));
             }
@@ -100,7 +100,7 @@ abstract class HollowIndexerTraversalNode {
             int childMatchSize = doTraversal(ordinal);
 
             if(indexedFieldPosition != -1) {
-                for(int i=0;i<childMatchSize;i++)
+                for(int i = 0; i < childMatchSize; i++)
                     fieldMatches[indexedFieldPosition].add(ordinal);
             }
         }
@@ -115,14 +115,14 @@ abstract class HollowIndexerTraversalNode {
         if(shouldMultiplyBranchResults) {
 
             int nextRepeatCount = 1;
-            for(int i=0;i<childrenMatchCounts.length;i++) {
+            for(int i = 0; i < childrenMatchCounts.length; i++) {
                 childrenMatchCounts[i] = fieldMatches[childFirstFieldMap[i]].size() - currentMultiplyFieldMatchListPosition;
                 childrenRepeatCounts[i] = nextRepeatCount;
                 nextRepeatCount *= childrenMatchCounts[i];
             }
 
             if(nextRepeatCount == 0) {
-                for(int i=0;i<childrenMatchCounts.length;i++) {
+                for(int i = 0; i < childrenMatchCounts.length; i++) {
                     fieldMatches[childFirstFieldMap[i]].expandTo(currentMultiplyFieldMatchListPosition);
                 }
 
@@ -131,7 +131,7 @@ abstract class HollowIndexerTraversalNode {
 
             int newFieldMatchListPosition = currentMultiplyFieldMatchListPosition + nextRepeatCount;
 
-            for(int i=0;i<fieldMatches.length;i++) {
+            for(int i = 0; i < fieldMatches.length; i++) {
                 if(fieldChildMap[i] != -1) {
                     fieldMatches[i].expandTo(newFieldMatchListPosition);
 
@@ -139,7 +139,7 @@ abstract class HollowIndexerTraversalNode {
                     int startCopyFromIdx = currentMultiplyFieldMatchListPosition + childrenMatchCounts[fieldChildMap[i]] - 1;
                     int currentCopyFromIdx = startCopyFromIdx;
                     while(currentCopyToIdx > currentMultiplyFieldMatchListPosition) {
-                        for(int j=0;j<childrenRepeatCounts[fieldChildMap[i]];j++) {
+                        for(int j = 0; j < childrenRepeatCounts[fieldChildMap[i]]; j++) {
                             fieldMatches[i].set(currentCopyToIdx, fieldMatches[i].get(currentCopyFromIdx));
                             currentCopyToIdx--;
                         }

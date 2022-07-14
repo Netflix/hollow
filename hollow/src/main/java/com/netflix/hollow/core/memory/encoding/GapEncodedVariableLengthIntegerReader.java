@@ -76,7 +76,7 @@ public class GapEncodedVariableLengthIntegerReader {
         nextElement = 0;
         advance();
     }
-    
+
     public int remainingElements() {
         int remainingElementCount = 0;
         while(nextElement != Integer.MAX_VALUE) {
@@ -90,7 +90,7 @@ public class GapEncodedVariableLengthIntegerReader {
         if(data != null)
             data.destroy();
     }
-    
+
     public void writeTo(OutputStream os) throws IOException {
         VarInt.writeVInt(os, numBytes);
         data.writeTo(os, 0, numBytes);
@@ -100,7 +100,7 @@ public class GapEncodedVariableLengthIntegerReader {
         SegmentedByteArray arr = new SegmentedByteArray(memoryRecycler);
         long numBytesEncodedOrdinals = VarInt.readVLong(in);
         arr.loadFrom(in, numBytesEncodedOrdinals);
-        return new GapEncodedVariableLengthIntegerReader(arr, (int)numBytesEncodedOrdinals);
+        return new GapEncodedVariableLengthIntegerReader(arr, (int) numBytesEncodedOrdinals);
     }
 
     public static void copyEncodedDeltaOrdinals(HollowBlobInput in, DataOutputStream... os) throws IOException {
@@ -138,6 +138,6 @@ public class GapEncodedVariableLengthIntegerReader {
             }
         }
 
-        return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingArray(), (int)arr.length());
+        return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingArray(), (int) arr.length());
     }
 }

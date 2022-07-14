@@ -93,14 +93,15 @@ public class HollowSetTest extends AbstractStateEngineTest {
         try {
             Assert.assertEquals(0, typeState.size(100));
             Assert.fail("Should have thrown Exception");
-        } catch(NullPointerException expected) { }
+        } catch (NullPointerException expected) {
+        }
     }
 
 
     private void addRecord(int... ordinals) {
         HollowSetWriteRecord rec = new HollowSetWriteRecord();
 
-        for(int i=0;i<ordinals.length;i++) {
+        for(int i = 0; i < ordinals.length; i++) {
             rec.addElement(ordinals[i]);
         }
 

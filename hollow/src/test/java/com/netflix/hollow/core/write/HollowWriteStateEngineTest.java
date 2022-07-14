@@ -11,6 +11,7 @@ import org.junit.Test;
 public class HollowWriteStateEngineTest {
 
     private static final String TEST_TAG = "test";
+
     @Test
     public void testHeaderTagsOnDeltaAndReverseDelta() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();

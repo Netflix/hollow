@@ -119,8 +119,8 @@ public class FilteredHollowBlobWriter {
         FilteredHollowBlobWriterStreamAndFilter allStreamAndFilters[] = FilteredHollowBlobWriterStreamAndFilter.combine(out, configs);
 
         HollowBlobHeader header = headerReader.readHeader(in);
-        
-        List<HollowSchema> unfilteredSchemaList = header.getSchemas(); 
+
+        List<HollowSchema> unfilteredSchemaList = header.getSchemas();
 
         for(FilteredHollowBlobWriterStreamAndFilter streamAndFilter : allStreamAndFilters) {
             List<HollowSchema> filteredSchemaList = getFilteredSchemaList(unfilteredSchemaList, streamAndFilter.getConfig());
@@ -128,14 +128,14 @@ public class FilteredHollowBlobWriter {
             headerWriter.writeHeader(header, streamAndFilter.getStream());
             VarInt.writeVInt(streamAndFilter.getStream(), filteredSchemaList.size());
         }
-        
+
         int numStates = VarInt.readVInt(in);
-        
+
         Set<String> encounteredTypes = new HashSet<String>();
 
-        for(int i=0;i<numStates;i++) {
+        for(int i = 0; i < numStates; i++) {
             HollowSchema schema = HollowSchema.readFrom(in);
-            
+
             encounteredTypes.add(schema.getName());
 
             int numShards = readNumShards(in);
@@ -144,18 +144,18 @@ public class FilteredHollowBlobWriter {
 
             if(schema instanceof HollowObjectSchema) {
                 if(streamsWithType.length == 0)
-                    HollowObjectTypeReadState.discardType(in, (HollowObjectSchema)schema, numShards, delta);
+                    HollowObjectTypeReadState.discardType(in, (HollowObjectSchema) schema, numShards, delta);
                 else
-                    copyFilteredObjectState(delta, in, streamsWithType, (HollowObjectSchema)schema, numShards);
+                    copyFilteredObjectState(delta, in, streamsWithType, (HollowObjectSchema) schema, numShards);
             } else {
-                for(int j=0;j<streamsWithType.length;j++) {
+                for(int j = 0; j < streamsWithType.length; j++) {
                     schema.writeTo(streamsWithType[j].getStream());
                     VarInt.writeVInt(streamsWithType[j].getStream(), 1 + VarInt.sizeOfVInt(numShards));
                     VarInt.writeVInt(streamsWithType[j].getStream(), 0); /// forwards compatibility
                     VarInt.writeVInt(streamsWithType[j].getStream(), numShards);
                 }
 
-                if (schema instanceof HollowListSchema) {
+                if(schema instanceof HollowListSchema) {
                     if(streamsWithType.length == 0)
                         HollowListTypeReadState.discardType(in, numShards, delta);
                     else
@@ -177,19 +177,19 @@ public class FilteredHollowBlobWriter {
 
     private int readNumShards(HollowBlobInput in) throws IOException {
         int backwardsCompatibilityBytes = VarInt.readVInt(in);
-        
+
         if(backwardsCompatibilityBytes == 0)
             return 1;  /// produced by a version of hollow prior to 2.1.0, always only 1 shard.
         
         skipForwardsCompatibilityBytes(in);
-        
+
         return VarInt.readVInt(in);
     }
-    
+
     private void skipForwardsCompatibilityBytes(HollowBlobInput in) throws IOException {
         int bytesToSkip = VarInt.readVInt(in);
         while(bytesToSkip > 0) {
-            int skippedBytes = (int)in.skipBytes(bytesToSkip);
+            int skippedBytes = (int) in.skipBytes(bytesToSkip);
             if(skippedBytes < 0)
                 throw new EOFException();
             bytesToSkip -= skippedBytes;
@@ -201,11 +201,11 @@ public class FilteredHollowBlobWriter {
         DataOutputStream[] os = streamsOnly(streamAndFilters);
         HollowObjectSchema[] filteredObjectSchemas = new HollowObjectSchema[os.length];
 
-        for(int i=0;i<streamAndFilters.length;i++) {
+        for(int i = 0; i < streamAndFilters.length; i++) {
             HollowObjectSchema filteredObjectSchema = getFilteredObjectSchema(schema, streamAndFilters[i].getConfig());
             filteredObjectSchemas[i] = filteredObjectSchema;
             filteredObjectSchema.writeTo(streamAndFilters[i].getStream());
-            
+
             VarInt.writeVInt(streamAndFilters[i].getStream(), 1 + VarInt.sizeOfVInt(numShards));
             VarInt.writeVInt(streamAndFilters[i].getStream(), 0); /// forwards compatibility
             VarInt.writeVInt(streamAndFilters[i].getStream(), numShards);
@@ -213,11 +213,11 @@ public class FilteredHollowBlobWriter {
 
         if(numShards > 1)
             copyVInt(in, os);
-        
-        for(int shard=0;shard<numShards;shard++) {
+
+        for(int shard = 0; shard < numShards; shard++) {
             int maxShardOrdinal = copyVInt(in, os);
             int numRecordsToCopy = maxShardOrdinal + 1;
-    
+
             if(delta) {
                 GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
                 GapEncodedVariableLengthIntegerReader addedOrdinals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
@@ -225,26 +225,26 @@ public class FilteredHollowBlobWriter {
                 for(DataOutputStream stream : os)
                     addedOrdinals.writeTo(stream);
             }
-    
+
             /// SETUP ///
             int bitsPerField[] = new int[schema.numFields()];
-            for(int i=0;i<schema.numFields();i++)
+            for(int i = 0; i < schema.numFields(); i++)
                 bitsPerField[i] = VarInt.readVInt(in);
-    
+
             FixedLengthElementArray fixedLengthArraysPerStream[] = new FixedLengthElementArray[os.length];
             long bitsRequiredPerStream[] = new long[os.length];
-            List<FixedLengthArrayWriter> fixedLengthArraysPerField[] = (List<FixedLengthArrayWriter>[])new List[schema.numFields()];
-            for(int i=0;i<fixedLengthArraysPerField.length;i++)
+            List<FixedLengthArrayWriter> fixedLengthArraysPerField[] = (List<FixedLengthArrayWriter>[]) new List[schema.numFields()];
+            for(int i = 0; i < fixedLengthArraysPerField.length; i++)
                 fixedLengthArraysPerField[i] = new ArrayList<FixedLengthArrayWriter>();
-    
-            for(int i=0;i<streamAndFilters.length;i++) {
+
+            for(int i = 0; i < streamAndFilters.length; i++) {
                 long bitsPerRecord = writeBitsPerField(schema, bitsPerField, filteredObjectSchemas[i], streamAndFilters[i].getStream());
-    
+
                 bitsRequiredPerStream[i] = bitsPerRecord * numRecordsToCopy;
                 fixedLengthArraysPerStream[i] = new FixedLengthElementArray(memoryRecycler,  bitsRequiredPerStream[i]);
                 FixedLengthArrayWriter filteredArrayWriter = new FixedLengthArrayWriter(fixedLengthArraysPerStream[i]);
-    
-                for(int j=0;j<schema.numFields();j++) {
+
+                for(int j = 0; j < schema.numFields(); j++) {
                     if(filteredObjectSchemas[i].getPosition(schema.getFieldName(j)) != -1) {
                         fixedLengthArraysPerField[j].add(filteredArrayWriter);
                     }
@@ -254,50 +254,50 @@ public class FilteredHollowBlobWriter {
     
             /// read the unfiltered long array into memory
             FixedLengthElementArray unfilteredFixedLengthFields = FixedLengthElementArray.newFrom(in, memoryRecycler);
-    
+
             /// populate the filtered arrays (each field just gets written to all FixedLengthArrayWriters assigned to its field index)
             long bitsPerRecord = 0;
             for(int fieldBits : bitsPerField)
                 bitsPerRecord += fieldBits;
-    
+
             long stopBit = bitsPerRecord * numRecordsToCopy;
             long bitCursor = 0;
             int fieldCursor = 0;
-    
+
             while(bitCursor < stopBit) {
                 if(!fixedLengthArraysPerField[fieldCursor].isEmpty()) {
                     long fieldValue = bitsPerField[fieldCursor] > 56 ?
                             unfilteredFixedLengthFields.getLargeElementValue(bitCursor, bitsPerField[fieldCursor])
                             : unfilteredFixedLengthFields.getElementValue(bitCursor, bitsPerField[fieldCursor]);
-    
-                            for(int i=0;i<fixedLengthArraysPerField[fieldCursor].size();i++)
-                                fixedLengthArraysPerField[fieldCursor].get(i).writeField(fieldValue, bitsPerField[fieldCursor]);
+
+                    for(int i = 0; i < fixedLengthArraysPerField[fieldCursor].size(); i++)
+                        fixedLengthArraysPerField[fieldCursor].get(i).writeField(fieldValue, bitsPerField[fieldCursor]);
                 }
-    
+
                 bitCursor += bitsPerField[fieldCursor];
                 if(++fieldCursor == schema.numFields())
                     fieldCursor = 0;
-    
+
             }
-    
+
             /// write the filtered arrays
-            for(int i=0;i<os.length;i++) {
+            for(int i = 0; i < os.length; i++) {
                 long numLongsRequired = bitsRequiredPerStream[i] == 0 ? 0 : ((bitsRequiredPerStream[i] - 1) / 64) + 1;
                 fixedLengthArraysPerStream[i].writeTo(os[i], numLongsRequired);
             }
-    
+
             /// copy the var length arrays for populated fields
-            for(int i=0;i<schema.numFields();i++) {
+            for(int i = 0; i < schema.numFields(); i++) {
                 List<DataOutputStream> streamsWithFieldList = new ArrayList<DataOutputStream>();
-                for(int j=0;j<streamAndFilters.length;j++) {
+                for(int j = 0; j < streamAndFilters.length; j++) {
                     ObjectFilterConfig objectTypeConfig = streamAndFilters[j].getConfig().getObjectTypeConfig(schema.getName());
                     if(objectTypeConfig.includesField(schema.getFieldName(i)))
                         streamsWithFieldList.add(streamAndFilters[j].getStream());
                 }
-    
+
                 DataOutputStream streamsWithField[] = new DataOutputStream[streamsWithFieldList.size()];
                 streamsWithField = streamsWithFieldList.toArray(streamsWithField);
-    
+
                 long numBytesInVarLengthData = IOUtils.copyVLong(in, streamsWithField);
                 IOUtils.copyBytes(in, streamsWithField, numBytesInVarLengthData);
             }
@@ -310,7 +310,7 @@ public class FilteredHollowBlobWriter {
     private long writeBitsPerField(HollowObjectSchema unfilteredSchema, int bitsPerField[], HollowObjectSchema filteredSchema, DataOutputStream os) throws IOException {
         long bitsPerRecord = 0;
 
-        for(int i=0;i<unfilteredSchema.numFields();i++) {
+        for(int i = 0; i < unfilteredSchema.numFields(); i++) {
             if(filteredSchema.getPosition(unfilteredSchema.getFieldName(i)) != -1) {
                 VarInt.writeVInt(os, bitsPerField[i]);
                 bitsPerRecord += bitsPerField[i];
@@ -319,26 +319,26 @@ public class FilteredHollowBlobWriter {
 
         return bitsPerRecord;
     }
-    
+
     private List<HollowSchema> getFilteredSchemaList(List<HollowSchema> schemaList, HollowFilterConfig filterConfig) {
         List<HollowSchema> filteredList = new ArrayList<HollowSchema>();
-        
+
         for(HollowSchema schema : schemaList) {
             HollowSchema filteredSchema = getFilteredSchema(schema, filterConfig);
             if(filteredSchema != null)
                 filteredList.add(filteredSchema);
         }
-        
+
         return filteredList;
     }
-    
+
     private HollowSchema getFilteredSchema(HollowSchema schema, HollowFilterConfig filterConfig) {
         if(filterConfig.doesIncludeType(schema.getName())) {
             if(schema.getSchemaType() == SchemaType.OBJECT)
                 return getFilteredObjectSchema((HollowObjectSchema) schema, filterConfig);
             return schema;
         }
-        
+
         return null;
     }
 
@@ -347,17 +347,17 @@ public class FilteredHollowBlobWriter {
 
         int numIncludedFields = 0;
 
-        for(int i=0;i<schema.numFields();i++) {
+        for(int i = 0; i < schema.numFields(); i++) {
             if(typeConfig.includesField(schema.getFieldName(i)))
                 numIncludedFields++;
         }
 
         if(numIncludedFields == schema.numFields())
             return schema;
-        
+
         HollowObjectSchema filteredSchema = new HollowObjectSchema(schema.getName(), numIncludedFields, schema.getPrimaryKey());
 
-        for(int i=0;i<schema.numFields();i++) {
+        for(int i = 0; i < schema.numFields(); i++) {
             if(typeConfig.includesField(schema.getFieldName(i)))
                 filteredSchema.addField(schema.getFieldName(i), schema.getFieldType(i), schema.getReferencedType(i));
         }
@@ -368,15 +368,15 @@ public class FilteredHollowBlobWriter {
     private void copyListState(boolean delta, HollowBlobInput in, DataOutputStream[] os, int numShards) throws IOException {
         if(numShards > 1)
             copyVInt(in, os);
-        
-        for(int shard=0;shard<numShards;shard++) {
+
+        for(int shard = 0; shard < numShards; shard++) {
             copyVInt(in, os);  /// maxOrdinal
     
             if(delta) {
                 GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
                 GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
             }
-    
+
             copyVInt(in, os);  /// bitsPerListPointer
             copyVInt(in, os);  /// bitsPerElement
             copyVLong(in, os); /// totalNumberOfElements
@@ -392,15 +392,15 @@ public class FilteredHollowBlobWriter {
     private void copySetState(boolean delta, HollowBlobInput in, DataOutputStream[] os, int numShards) throws IOException {
         if(numShards > 1)
             copyVInt(in, os);
-        
-        for(int shard=0;shard<numShards;shard++) {
+
+        for(int shard = 0; shard < numShards; shard++) {
             copyVInt(in, os);  /// max ordinal
     
             if(delta) {
                 GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
                 GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
             }
-    
+
             copyVInt(in, os);  /// bitsPerSetPointer
             copyVInt(in, os);  /// bitsPerSetSizeValue
             copyVInt(in, os);  /// bitsPerElement
@@ -417,15 +417,15 @@ public class FilteredHollowBlobWriter {
     private void copyMapState(boolean delta, HollowBlobInput in, DataOutputStream[] os, int numShards) throws IOException {
         if(numShards > 1)
             copyVInt(in, os);
-        
-        for(int shard=0;shard<numShards;shard++) {
+
+        for(int shard = 0; shard < numShards; shard++) {
             copyVInt(in, os);  /// max ordinal
     
             if(delta) {
                 GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
                 GapEncodedVariableLengthIntegerReader.copyEncodedDeltaOrdinals(in, os);
             }
-    
+
             copyVInt(in, os);  /// bitsPerMapPointer
             copyVInt(in, os);  /// bitsPerMapSizeValue
             copyVInt(in, os);  /// bitsPerKeyElement
@@ -442,10 +442,10 @@ public class FilteredHollowBlobWriter {
 
     private void copySnapshotPopulatedOrdinals(HollowBlobInput in, DataOutputStream[] os) throws IOException {
         int numLongs = in.readInt();
-        for(int i=0;i<os.length;i++)
+        for(int i = 0; i < os.length; i++)
             os[i].writeInt(numLongs);
 
         IOUtils.copyBytes(in, os, numLongs * 8);
     }
-    
+
 }

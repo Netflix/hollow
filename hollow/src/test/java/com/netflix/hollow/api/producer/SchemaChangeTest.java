@@ -71,7 +71,7 @@ public class SchemaChangeTest {
             long fromVersion, long toVersion, boolean present) throws IOException {
         testChangeHeader(getHeader(br, r -> r.retrieveSnapshotBlob(toVersion)), present);
 
-        if (fromVersion != Long.MIN_VALUE) {
+        if(fromVersion != Long.MIN_VALUE) {
             testChangeHeader(getHeader(br, r -> r.retrieveDeltaBlob(fromVersion)), present);
         }
     }
@@ -80,7 +80,7 @@ public class SchemaChangeTest {
         Assert.assertEquals(
                 present,
                 header.getHeaderTags().containsKey(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE));
-        if (present) {
+        if(present) {
             String v = header.getHeaderTags().get(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE);
             Assert.assertTrue(Boolean.parseBoolean(v));
         }

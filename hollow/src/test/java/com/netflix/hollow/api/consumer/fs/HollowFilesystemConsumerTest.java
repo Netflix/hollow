@@ -52,7 +52,7 @@ public class HollowFilesystemConsumerTest {
         return localDir;
     }
 
-    @HollowPrimaryKey(fields="id")
+    @HollowPrimaryKey(fields = "id")
     public static class Entity {
         @SuppressWarnings("unused")
         private final int id;

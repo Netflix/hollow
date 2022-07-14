@@ -159,7 +159,7 @@ public interface TypeFilter {
          */
         public Builder include(String type) {
             requireNonNull(type, "type required");
-            rules.add((t,f) -> type.equals(t) ? include : next);
+            rules.add((t, f) -> type.equals(t) ? include : next);
             return this;
         }
 
@@ -174,7 +174,7 @@ public interface TypeFilter {
          */
         public Builder includeRecursive(String type) {
             requireNonNull(type, "type required");
-            rules.add((t,f) -> type.equals(t) ? includeRecursive : next);
+            rules.add((t, f) -> type.equals(t) ? includeRecursive : next);
             return this;
         }
 
@@ -185,7 +185,7 @@ public interface TypeFilter {
         public Builder include(String type, String field) {
             requireNonNull(type, "type required");
             requireNonNull(field, "field name required");
-            rules.add((t,f) -> type.equals(t) && field.equals(f) ? include : next);
+            rules.add((t, f) -> type.equals(t) && field.equals(f) ? include : next);
             return this;
         }
 
@@ -198,7 +198,7 @@ public interface TypeFilter {
         public Builder includeRecursive(String type, String field) {
             requireNonNull(type, "type required");
             requireNonNull(field, "field name required");
-            rules.add((t,f) -> type.equals(t) && field.equals(f) ? includeRecursive : next);
+            rules.add((t, f) -> type.equals(t) && field.equals(f) ? includeRecursive : next);
             return this;
         }
 
@@ -212,7 +212,7 @@ public interface TypeFilter {
          */
         public Builder exclude(String type) {
             requireNonNull(type, "type required");
-            rules.add((t,f) -> type.equals(t) ? exclude : next);
+            rules.add((t, f) -> type.equals(t) ? exclude : next);
             return this;
         }
 
@@ -227,7 +227,7 @@ public interface TypeFilter {
          */
         public Builder excludeRecursive(String type) {
             requireNonNull(type, "type required");
-            rules.add((t,f) -> type.equals(t) ? excludeRecursive : next);
+            rules.add((t, f) -> type.equals(t) ? excludeRecursive : next);
             return this;
         }
 
@@ -237,7 +237,7 @@ public interface TypeFilter {
         public Builder exclude(String type, String field) {
             requireNonNull(type, "type required");
             requireNonNull(field, "field name required");
-            rules.add((t,f) -> type.equals(t) && field.equals(f) ? exclude : next);
+            rules.add((t, f) -> type.equals(t) && field.equals(f) ? exclude : next);
             return this;
         }
 
@@ -249,7 +249,7 @@ public interface TypeFilter {
         public Builder excludeRecursive(String type, String field) {
             requireNonNull(type, "type required");
             requireNonNull(field, "field name required");
-            rules.add((t,f) -> type.equals(t) && field.equals(f) ? excludeRecursive : next);
+            rules.add((t, f) -> type.equals(t) && field.equals(f) ? excludeRecursive : next);
             return this;
         }
 
@@ -263,7 +263,7 @@ public interface TypeFilter {
 
         @FunctionalInterface
         @com.netflix.hollow.Internal
-        interface Rule extends BiFunction<String,String, Action> {
+        interface Rule extends BiFunction<String, String, Action> {
             @Override
             Action apply(String type, String field);
         }
@@ -373,7 +373,7 @@ class UnresolvedTypeFilter implements TypeFilter {
 
 @com.netflix.hollow.Internal
 final class Resolver {
-    private final Map<String,HollowSchema> schemas;
+    private final Map<String, HollowSchema> schemas;
     private final List<Rule> rules;
 
     Resolver(List<Rule> rules, List<HollowSchema> schemas) {
@@ -400,7 +400,7 @@ final class Resolver {
         Action action = rule.apply(type, null);
         TypeActions parent = TypeActions.newTypeActions(type, action);
 
-        switch (schema.getSchemaType()) {
+        switch(schema.getSchemaType()) {
             case OBJECT:
                 HollowObjectSchema os = (HollowObjectSchema) schema;
                 return IntStream
@@ -409,14 +409,14 @@ final class Resolver {
                         .flatMap(i -> {
                             String field = os.getFieldName(i);
                             Action fa = rule.apply(type, field);
-                            if (fa == next) return Stream.empty();
+                            if(fa == next) return Stream.empty();
                             TypeActions child = newTypeActions(type, field, fa);
                             Action descendantAction = fa.recursive ? fa : action;
-                            if (descendantAction.recursive && os.getFieldType(i) == REFERENCE) {
+                            if(descendantAction.recursive && os.getFieldType(i) == REFERENCE) {
                                 String refType = os.getReferencedType(i);
                                 HollowSchema refSchema = schemas.get(refType);
                                 assert refSchema != null;
-                                Stream<TypeActions> descendants = descendants((t,f) -> descendantAction, refSchema);
+                                Stream<TypeActions> descendants = descendants((t, f) -> descendantAction, refSchema);
                                 return Stream.concat(Stream.of(parent, child), descendants);
                             } else {
                                 return Stream.of(parent, child);
@@ -425,9 +425,9 @@ final class Resolver {
 
             case SET:
             case LIST:
-                if (action == next) {
+                if(action == next) {
                     return Stream.empty();
-                } else if (action.recursive) {
+                } else if(action.recursive) {
                     HollowCollectionSchema cs = (HollowCollectionSchema) schema;
 
                     HollowSchema elemSchema = schemas.get(cs.getElementType());
@@ -440,9 +440,9 @@ final class Resolver {
                 }
 
             case MAP:
-                if (action == next) {
+                if(action == next) {
                     return Stream.empty();
-                } else if (action.recursive) {
+                } else if(action.recursive) {
                     HollowMapSchema ms = (HollowMapSchema) schema;
                     HollowSchema kSchema = schemas.get(ms.getKeyType());
                     HollowSchema vSchema = schemas.get(ms.getValueType());
@@ -463,6 +463,7 @@ final class Resolver {
 @com.netflix.hollow.Internal
 class TypeActions {
     private static final String ALL = new String("*"); // avoid interning
+
     static TypeActions newTypeActions(String type, Action action) {
         return new TypeActions(type, singletonMap(ALL, action));
     }
@@ -503,8 +504,8 @@ class TypeActions {
 
         Action all = m.get(ALL);
         m = m.entrySet().stream()
-             .filter(entry -> entry.getKey() == ALL || entry.getValue() != all)
-             .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .filter(entry -> entry.getKey() == ALL || entry.getValue() != all)
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         return new TypeActions(type, m);
     }

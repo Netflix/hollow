@@ -86,9 +86,9 @@ public class HollowHistoryUITest {
         historyUIServerActual = new HollowHistoryUIServer(consumerFwd, consumerRev, PORT_ACTUAL);
 
         consumerFwd.triggerRefreshTo(4);
-            consumerRev.triggerRefreshTo(2);
+        consumerRev.triggerRefreshTo(2);
         consumerFwd.triggerRefreshTo(5);
-            consumerRev.triggerRefreshTo(1);
+        consumerRev.triggerRefreshTo(1);
 
         hostUisIfPairtyCheckFails();
     }
@@ -101,13 +101,13 @@ public class HollowHistoryUITest {
         historyUIServerActual = new HollowHistoryUIServer(consumerFwd, consumerRev, PORT_ACTUAL);
 
         consumerFwd.triggerRefreshTo(4);
-            consumerRev.triggerRefreshTo(2);
+        consumerRev.triggerRefreshTo(2);
         consumerFwd.triggerRefreshTo(5);
         consumerFwd.triggerRefreshTo(4);
         consumerFwd.triggerRefreshTo(3);
         consumerFwd.triggerRefreshTo(4);
         consumerFwd.triggerRefreshTo(5);
-            consumerRev.triggerRefreshTo(1);
+        consumerRev.triggerRefreshTo(1);
 
         consumerExpected.triggerRefreshTo(4);
         consumerExpected.triggerRefreshTo(3);
@@ -125,9 +125,9 @@ public class HollowHistoryUITest {
         historyUIServerActual = new HollowHistoryUIServer(consumerFwd, consumerRev, PORT_ACTUAL);
 
         consumerRev.triggerRefreshTo(2);
-            consumerFwd.triggerRefreshTo(4);
+        consumerFwd.triggerRefreshTo(4);
         consumerRev.triggerRefreshTo(1);
-            consumerFwd.triggerRefreshTo(5);
+        consumerFwd.triggerRefreshTo(5);
 
         hostUisIfPairtyCheckFails();
     }
@@ -207,19 +207,19 @@ public class HollowHistoryUITest {
         hostUisIfPairtyCheckFails();
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void historyUsingFwdAndRevConsumer_noPastVersionsAvailableAtInit()  {
         // consumerFwd and consumerRev haven't incurred snapshot load yet
         historyUIServerActual = new HollowHistoryUIServer(consumerFwd, consumerRev, PORT_ACTUAL);
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void historyUsingFwdOnly_noPastVersionsAvailableAtInit()  {
         // consumerFwd hasn't incurred snapshot load yet
         historyUIServerActual = new HollowHistoryUIServer(consumerFwd, PORT_ACTUAL);
     }
 
-    @Test(expected=UnsupportedOperationException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void historyUsingFwdAndRevConsumer_revConsumerMustBeInitialized() throws Exception  {
 
         TestHollowConsumer consumerFwd = new TestHollowConsumer.Builder()
@@ -236,7 +236,7 @@ public class HollowHistoryUITest {
         consumerRev.triggerRefreshTo(5);
     }
 
-    @Test(expected=IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void historyUsingFwdAndRevConsumer_revAndFwdConsumersMustBeOnSameVersionAtInit()  {
 
         TestHollowConsumer consumerFwd = new TestHollowConsumer.Builder()
@@ -256,9 +256,9 @@ public class HollowHistoryUITest {
             assertUiParity(historyUiExpected, historyUIServerActual.getUI());
         } catch (AssertionError | Exception e) {
             System.out.println(String.format("Error when comparing expected and actual history UIs for parity. " +
-                            "Expected and actual history UIs are hosted at ports %s and %s respectively. " +
-                            "Be sure to open in different browsers for isolated sessions state stored in cookie which " +
-                            "could affect the links generated in the output html",
+                    "Expected and actual history UIs are hosted at ports %s and %s respectively. " +
+                    "Be sure to open in different browsers for isolated sessions state stored in cookie which " +
+                    "could affect the links generated in the output html",
                     PORT_EXPECTED, PORT_ACTUAL));
             e.printStackTrace();
             historyUIServerExpected.start();

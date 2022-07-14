@@ -169,7 +169,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
 
         String fieldName = null;
         try {
-            while (token != JsonToken.END_OBJECT) {
+            while(token != JsonToken.END_OBJECT) {
                 if(token != JsonToken.FIELD_NAME) {
                     fieldName = parser.getCurrentName();
                     ObjectMappedFieldPath mappedFieldPath = objectMapping.getMappedFieldPath(fieldName);
@@ -372,7 +372,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
             if(arrayRec instanceof HollowListWriteRecord) {
                 ((HollowListWriteRecord) arrayRec).addElement(elementOrdinal);
             } else {
-                ((HollowSetWriteRecord)arrayRec).addElement(elementOrdinal);
+                ((HollowSetWriteRecord) arrayRec).addElement(elementOrdinal);
             }
 
             token = parser.nextToken();
@@ -476,7 +476,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
         JsonToken token = parser.nextToken();
 
         try {
-            while (token != JsonToken.END_OBJECT) {
+            while(token != JsonToken.END_OBJECT) {
                 skipObjectField(parser, token);
                 token = parser.nextToken();
             }
@@ -527,9 +527,9 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
     }
 
     private void initHollowWriteRecordsIfNecessary() {
-        if (hollowWriteRecordsHolder.get() == null) {
+        if(hollowWriteRecordsHolder.get() == null) {
             synchronized (this) {
-                if (hollowWriteRecordsHolder.get() == null) {
+                if(hollowWriteRecordsHolder.get() == null) {
                     Map<String, HollowWriteRecord> lookupMap = createWriteRecords(stateEngine);
                     hollowWriteRecordsHolder.set(lookupMap);
                     objectFieldMappingHolder.set(cloneFieldMappings());
@@ -541,8 +541,8 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
     private static Map<String, HollowWriteRecord> createWriteRecords(HollowWriteStateEngine stateEngine) {
         Map<String, HollowWriteRecord> hollowWriteRecords = new HashMap<>();
 
-        for (HollowSchema schema : stateEngine.getSchemas()) {
-            switch (schema.getSchemaType()) {
+        for(HollowSchema schema : stateEngine.getSchemas()) {
+            switch(schema.getSchemaType()) {
                 case LIST:
                     hollowWriteRecords.put(schema.getName(), new HollowListWriteRecord());
                     break;
@@ -550,7 +550,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
                     hollowWriteRecords.put(schema.getName(), new HollowMapWriteRecord());
                     break;
                 case OBJECT:
-                    hollowWriteRecords.put(schema.getName(), new HollowObjectWriteRecord((HollowObjectSchema)schema));
+                    hollowWriteRecords.put(schema.getName(), new HollowObjectWriteRecord((HollowObjectSchema) schema));
                     break;
                 case SET:
                     hollowWriteRecords.put(schema.getName(), new HollowSetWriteRecord());
@@ -582,7 +582,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
     HollowWriteRecord getWriteRecord(String type) throws IOException {
         Map<String, HollowWriteRecord> hollowWriteRecords = hollowWriteRecordsHolder.get();
         HollowWriteRecord wRec = hollowWriteRecords.get(type);
-        if (wRec == null) {
+        if(wRec == null) {
             throw new IOException("WriteRecord for " + type + " not found.  Make sure Schema Discovery is done correctly.");
         }
         return wRec;
@@ -613,9 +613,9 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
 
         public PassthroughWriteRecords() {
             ////TODO: Special 'passthrough' processing.
-            this.passthroughRec = hollowSchemas.get("PassthroughData") != null ? new HollowObjectWriteRecord((HollowObjectSchema)hollowSchemas.get("PassthroughData")) : null;
-            this.passthroughMapKeyWriteRecord = hollowSchemas.get("MapKey") != null ? new HollowObjectWriteRecord((HollowObjectSchema)hollowSchemas.get("MapKey")) : null;
-            this.passthroughMapValueWriteRecord = hollowSchemas.get("String") != null ? new HollowObjectWriteRecord((HollowObjectSchema)hollowSchemas.get("String")) : null;
+            this.passthroughRec = hollowSchemas.get("PassthroughData") != null ? new HollowObjectWriteRecord((HollowObjectSchema) hollowSchemas.get("PassthroughData")) : null;
+            this.passthroughMapKeyWriteRecord = hollowSchemas.get("MapKey") != null ? new HollowObjectWriteRecord((HollowObjectSchema) hollowSchemas.get("MapKey")) : null;
+            this.passthroughMapValueWriteRecord = hollowSchemas.get("String") != null ? new HollowObjectWriteRecord((HollowObjectSchema) hollowSchemas.get("String")) : null;
             this.singleValuePassthroughMapRec = new HollowMapWriteRecord();
             this.multiValuePassthroughMapRec = new HollowMapWriteRecord();
             this.multiValuePassthroughListRec = new HollowListWriteRecord();

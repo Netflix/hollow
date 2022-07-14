@@ -31,11 +31,11 @@ public class HollowEffigyNullPartnerPairer extends HollowEffigyFieldPairer {
         List<EffigyFieldPair> pairs = new ArrayList<EffigyFieldPair>();
 
         if(from != null) {
-            for(int i=0;i<from.getFields().size();i++) {
+            for(int i = 0; i < from.getFields().size(); i++) {
                 pairs.add(new EffigyFieldPair(from.getFields().get(i), null, i, -1));
             }
         } else if(to != null) {
-            for(int i=0;i<to.getFields().size();i++) {
+            for(int i = 0; i < to.getFields().size(); i++) {
                 pairs.add(new EffigyFieldPair(null, to.getFields().get(i), -1, i));
             }
         }

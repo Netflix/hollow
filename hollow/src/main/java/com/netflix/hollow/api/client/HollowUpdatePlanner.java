@@ -27,19 +27,19 @@ public class HollowUpdatePlanner {
 
     private final HollowConsumer.BlobRetriever transitionCreator;
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
-    
+
     @Deprecated
     public HollowUpdatePlanner(HollowBlobRetriever blobRetriever) {
         this(HollowClientConsumerBridge.consumerBlobRetrieverFor(blobRetriever));
     }
-    
+
     public HollowUpdatePlanner(HollowConsumer.BlobRetriever blobRetriever) {
         this(blobRetriever, new HollowConsumer.DoubleSnapshotConfig() {
             @Override
             public int maxDeltasBeforeDoubleSnapshot() {
                 return 32;
             }
-            
+
             @Override
             public boolean allowDoubleSnapshot() {
                 return true;
@@ -72,7 +72,7 @@ public class HollowUpdatePlanner {
         if(desiredVersion == currentVersion)
             return HollowUpdatePlan.DO_NOTHING;
 
-        if (currentVersion == HollowConstants.VERSION_NONE)
+        if(currentVersion == HollowConstants.VERSION_NONE)
             return snapshotPlan(desiredVersion);
 
         HollowUpdatePlan deltaPlan = deltaPlan(currentVersion, desiredVersion, doubleSnapshotConfig.maxDeltasBeforeDoubleSnapshot());
@@ -139,15 +139,15 @@ public class HollowUpdatePlanner {
             transitionCounter++;
         }
         return currentVersion;
-    };
+    }
 
     private long applyReverseDeltasToPlan(long currentVersion, long desiredVersion, HollowUpdatePlan plan, int maxDeltas) {
         long achievedVersion = currentVersion;
         int transitionCounter = 0;
 
-        while (currentVersion > desiredVersion && transitionCounter < maxDeltas) {
+        while(currentVersion > desiredVersion && transitionCounter < maxDeltas) {
             currentVersion = includeNextReverseDelta(plan, currentVersion);
-            if (currentVersion != HollowConstants.VERSION_NONE)
+            if(currentVersion != HollowConstants.VERSION_NONE)
                 achievedVersion = currentVersion;
             transitionCounter++;
         }

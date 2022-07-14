@@ -67,6 +67,7 @@ public abstract class HollowList<T> extends AbstractList<T> implements HollowRec
     }
 
     public abstract T instantiateElement(int elementOrdinal);
+
     public abstract boolean equalsElement(int elementOrdinal, Object testObject);
 
     @Override
@@ -88,14 +89,14 @@ public abstract class HollowList<T> extends AbstractList<T> implements HollowRec
     public boolean equals(Object o) {
         // Note: hashCode is computed from the list's contents, see AbstractList.hashCode
 
-        if (this == o) {
+        if(this == o) {
             return true;
         }
 
         // If type state is the same then compare ordinals
-        if (o instanceof HollowList) {
+        if(o instanceof HollowList) {
             HollowList<?> that = (HollowList<?>) o;
-            if (delegate.getTypeDataAccess() == that.delegate.getTypeDataAccess()) {
+            if(delegate.getTypeDataAccess() == that.delegate.getTypeDataAccess()) {
                 return ordinal == that.ordinal;
             }
         }

@@ -48,30 +48,30 @@ public class HollowObjectExactBitBoundaryEdgeCaseTest extends AbstractStateEngin
 
     @Test
     public void unpopulatedFieldOnSegmentBoundary() throws IOException {
-        for(int i=0;i<4094;i++) {
-            addRecord((float)i);
+        for(int i = 0; i < 4094; i++) {
+            addRecord((float) i);
         }
 
-        for(int i=0;i<992;i++) {
+        for(int i = 0; i < 992; i++) {
             addRecord(i);
         }
 
         roundTripSnapshot();
 
-        for(int i=0;i<4096;i++) {
-            addRecord((float)i);
+        for(int i = 0; i < 4096; i++) {
+            addRecord((float) i);
         }
 
-        for(int i=0;i<993;i++) {
+        for(int i = 0; i < 993; i++) {
             addRecord(i);
         }
 
         roundTripDelta();
 
-        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState)readStateEngine.getTypeDataAccess("TestObject");
+        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeDataAccess("TestObject");
         typeState.readInt(4096, 2);
 
-        typeState = (HollowObjectTypeReadState)readStateEngine.getTypeDataAccess("TestObject2");
+        typeState = (HollowObjectTypeReadState) readStateEngine.getTypeDataAccess("TestObject2");
         typeState.readInt(992, 2);
 
     }

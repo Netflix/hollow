@@ -38,7 +38,7 @@ public class HollowUpdatePlannerTest {
             public int maxDeltasBeforeDoubleSnapshot() {
                 return 3;
             }
-            
+
             @Override
             public boolean allowDoubleSnapshot() {
                 return true;
@@ -100,7 +100,7 @@ public class HollowUpdatePlannerTest {
         assertTransition(plan.getTransition(1), 4, 5);
         assertTransition(plan.getTransition(2), 5, 6);
     }
-    
+
     @Test
     public void doesNotattemptDoubleSnapshotIfNotAllowed() throws Exception {
         addMockDelta(1, 2);
@@ -118,7 +118,7 @@ public class HollowUpdatePlannerTest {
         assertTransition(plan.getTransition(1), 2, 3);
         assertTransition(plan.getTransition(2), 3, 4);
     }
-    
+
 
     @Test
     public void followsReverseDeltas() throws Exception {
@@ -149,7 +149,7 @@ public class HollowUpdatePlannerTest {
         assertTransition(plan.getTransition(0), Long.MIN_VALUE, 0);
         assertTransition(plan.getTransition(1), 0, 1);
     }
-    
+
     @Test
     public void doesNotFollowDoubleSnapshotForLongReverseDeltaChainIfNotAllowed() throws Exception {
         addMockReverseDelta(5, 4);
@@ -167,7 +167,7 @@ public class HollowUpdatePlannerTest {
         assertTransition(plan.getTransition(1), 4, 3);
         assertTransition(plan.getTransition(2), 3, 2);
     }
-    
+
 
     @Test
     public void deltaChainStopsBeforeDesiredStateIfDesiredStateDoesNotExist() throws Exception {

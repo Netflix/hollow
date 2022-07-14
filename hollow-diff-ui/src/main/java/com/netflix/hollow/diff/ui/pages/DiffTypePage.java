@@ -101,16 +101,16 @@ public class DiffTypePage extends DiffPage {
         List<HollowFieldDiff> fieldDiffs = typeDiff.getFieldDiffs();
         List<HollowFieldDiffScore> displayDiffs = new ArrayList<HollowFieldDiffScore>();
 
-        for(int i=0;i<fieldDiffs.size();i++) {
+        for(int i = 0; i < fieldDiffs.size(); i++) {
             HollowFieldDiff fieldDiff = fieldDiffs.get(i);
             displayDiffs.add(
-                new HollowFieldDiffScore(
-                        typeDiff.getTypeName(),
-                        i,
-                        fieldDiff.getFieldIdentifier().toString(),
-                        fieldDiff.getNumDiffs(),
-                        typeDiff.getTotalNumberOfMatches(),
-                        fieldDiff.getTotalDiffScore())
+                    new HollowFieldDiffScore(
+                            typeDiff.getTypeName(),
+                            i,
+                            fieldDiff.getFieldIdentifier().toString(),
+                            fieldDiff.getNumDiffs(),
+                            typeDiff.getTotalNumberOfMatches(),
+                            fieldDiff.getTotalDiffScore())
             );
         }
 
@@ -134,7 +134,7 @@ public class DiffTypePage extends DiffPage {
 
     private List<HollowObjectPairDiffScore> aggregateFieldDiffScores(HollowTypeDiff typeDiff) {
         // Handle from State missing Type
-        if (typeDiff.getFromTypeState()==null) return Collections.emptyList();
+        if(typeDiff.getFromTypeState() == null) return Collections.emptyList();
 
         List<HollowObjectPairDiffScore> scores;
         int maxFromOrdinal = typeDiff.getFromTypeState().maxOrdinal();
@@ -142,7 +142,7 @@ public class DiffTypePage extends DiffPage {
         int diffPairCounts = 0;
 
         for(HollowFieldDiff fieldDiff : typeDiff.getFieldDiffs()) {
-            for(int i=0;i<fieldDiff.getNumDiffs();i++) {
+            for(int i = 0; i < fieldDiff.getNumDiffs(); i++) {
                 int fromOrdinal = fieldDiff.getFromOrdinal(i);
                 if(allDiffPairsIndexedByFromOrdinal[fromOrdinal] == null) {
                     String displayKey = typeDiff.getMatcher().getKeyDisplayString(typeDiff.getFromTypeState(), fromOrdinal);
@@ -178,14 +178,14 @@ public class DiffTypePage extends DiffPage {
             HollowObjectTypeReadState typeState,
             IntList unmatchedOrdinals) {
         // Handle typeState missing from either from or to
-        if (typeState==null) return Collections.emptyList();
+        if(typeState == null) return Collections.emptyList();
 
         List<HollowUnmatchedObject> list = cache.get(typeDiff.getTypeName());
         if(list != null)
             return list;
 
         list = new ArrayList<HollowUnmatchedObject>();
-        for(int i=0;i<unmatchedOrdinals.size();i++) {
+        for(int i = 0; i < unmatchedOrdinals.size(); i++) {
             int ordinal = unmatchedOrdinals.get(i);
             String keyDisplay = typeDiff.getMatcher().getKeyDisplayString(typeState, ordinal);
             list.add(new HollowUnmatchedObject(keyDisplay, ordinal));

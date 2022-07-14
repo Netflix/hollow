@@ -34,17 +34,17 @@ class HollowIndexerListTraversalNode extends HollowIndexerCollectionTraversalNod
             return 1;
 
         int size = dataAccess().size(ordinal);
-        
+
         int numMatches = 0;
 
-        for(int i=0;i<size;i++) {
+        for(int i = 0; i < size; i++) {
             prepareMultiply();
-            
+
             child.traverse(dataAccess().getElementOrdinal(ordinal, i));
-            
+
             numMatches += doMultiply();
         }
-        
+
         return numMatches;
     }
 

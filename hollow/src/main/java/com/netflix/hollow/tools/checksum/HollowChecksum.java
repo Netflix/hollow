@@ -33,7 +33,8 @@ public class HollowChecksum {
 
     private int currentChecksum = 0;
 
-    public HollowChecksum() { }
+    public HollowChecksum() {
+    }
 
     public void applyInt(int value) {
         currentChecksum ^= HashCodes.hashInt(value);
@@ -68,7 +69,7 @@ public class HollowChecksum {
     public static HollowChecksum forStateEngine(HollowReadStateEngine stateEngine) {
         return forStateEngineWithCommonSchemas(stateEngine, stateEngine);
     }
-    
+
     public static HollowChecksum forStateEngineWithCommonSchemas(HollowReadStateEngine stateEngine, HollowReadStateEngine commonSchemasWithState) {
         final Vector<TypeChecksum> typeChecksums = new Vector<TypeChecksum>();
         SimultaneousExecutor executor = new SimultaneousExecutor(HollowChecksum.class, "checksum-common-schemas");
@@ -104,7 +105,7 @@ public class HollowChecksum {
     }
 
 
-    private static class TypeChecksum implements Comparable<TypeChecksum>{
+    private static class TypeChecksum implements Comparable<TypeChecksum> {
         private final String type;
         private final int checksum;
 

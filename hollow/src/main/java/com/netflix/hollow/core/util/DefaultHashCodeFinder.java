@@ -26,15 +26,15 @@ public class DefaultHashCodeFinder implements HollowObjectHashCodeFinder {
     public static final DefaultHashCodeFinder INSTANCE = new DefaultHashCodeFinder();
 
     private final Set<String> typesWithDefinedHashCodes;
-    
-    public DefaultHashCodeFinder(String... typesWithDefinedHashCodes) { 
+
+    public DefaultHashCodeFinder(String... typesWithDefinedHashCodes) {
         this.typesWithDefinedHashCodes = new HashSet<String>(typesWithDefinedHashCodes.length);
-        
+
         for(String type : typesWithDefinedHashCodes) {
             this.typesWithDefinedHashCodes.add(type);
         }
     }
-    
+
     @Deprecated
     @Override
     public int hashCode(int ordinal, Object objectToHash) {
@@ -46,17 +46,17 @@ public class DefaultHashCodeFinder implements HollowObjectHashCodeFinder {
     public int hashCode(Object objectToHash) {
         return hashCode(null, objectToHash);
     }
-   
+
     public int hashCode(String typeName, int ordinal, Object objectToHash) {
         if(!typesWithDefinedHashCodes.contains(typeName))
             return ordinal;
-        
+
         return objectToHash.hashCode();
     }
 
     public int hashCode(String typeName, Object objectToHash) {
         if(objectToHash instanceof HollowRecord)
-            return ((HollowRecord)objectToHash).getOrdinal();
+            return ((HollowRecord) objectToHash).getOrdinal();
         return objectToHash.hashCode();
     }
 

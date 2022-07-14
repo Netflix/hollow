@@ -84,7 +84,7 @@ public abstract class HollowUIRouter {
 
             IOUtils.copy(is, resp.getOutputStream());
             return true;
-        } catch(Exception e){
+        } catch (Exception e) {
             return false;
         }
     }

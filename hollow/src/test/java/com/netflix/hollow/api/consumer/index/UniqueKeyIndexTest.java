@@ -41,6 +41,7 @@ import org.junit.runners.Parameterized;
 public class UniqueKeyIndexTest {
     // Map of primitive class to box class
     static final Map<Class<?>, Class<?>> primitiveClasses;
+
     static {
         primitiveClasses = new HashMap<>();
         primitiveClasses.put(boolean.class, Boolean.class);
@@ -68,7 +69,7 @@ public class UniqueKeyIndexTest {
         long v1 = producer.runCycle(ws -> {
             ws.add(new DataModel.Producer.References());
 
-            for (int i = 0; i < 100; i++) {
+            for(int i = 0; i < 100; i++) {
                 ws.add(new DataModel.Producer.TypeA(1, "TypeA" + i));
             }
             ws.add(new DataModel.Producer.TypeWithPrimaryKey2(1));
@@ -122,10 +123,10 @@ public class UniqueKeyIndexTest {
                         throw new InternalError();
                     }
 
-                    Object[] args = new Object[] {path, type, value};
-                    if (type.isPrimitive()) {
+                    Object[] args = new Object[]{path, type, value};
+                    if(type.isPrimitive()) {
                         return Stream.of(args,
-                                new Object[] {path, primitiveClasses.get(type), value}
+                                new Object[]{path, primitiveClasses.get(type), value}
                         );
                     } else {
                         return Stream.<Object[]>of(args);
@@ -335,7 +336,7 @@ public class UniqueKeyIndexTest {
                         throw new InternalError();
                     }
 
-                    return new Object[] {path, type, value};
+                    return new Object[]{path, type, value};
                 })
                 .collect(toList());
     }
@@ -367,7 +368,7 @@ public class UniqueKeyIndexTest {
                         throw new InternalError();
                     }
 
-                    return new Object[] {path, type, value};
+                    return new Object[]{path, type, value};
                 })
                 .collect(toList());
     }
@@ -393,8 +394,8 @@ public class UniqueKeyIndexTest {
         @Parameterized.Parameters(name = "{index}: {0}[{1}] = {2}")
         public static Collection<Object[]> data() {
             return Arrays.<Object[]>asList(
-                    new Object[] {"date.value", long.class, 0L},
-                    new Object[] {"number._name", String.class, "ONE"}
+                    new Object[]{"date.value", long.class, 0L},
+                    new Object[]{"number._name", String.class, "ONE"}
             );
         }
 
@@ -422,7 +423,7 @@ public class UniqueKeyIndexTest {
         }
 
         static <Q extends HollowRecord> Object[] args(String path, Class<Q> type, Supplier<Q> s) {
-            return new Object[] {path, type, s};
+            return new Object[]{path, type, s};
         }
 
         final String path;

@@ -42,7 +42,8 @@ public class SimultaneousExecutorTest {
         try {
             subject.awaitSuccessfulCompletion();
             fail("Should have thrown Exception");
-        } catch(Exception expected) { }
+        } catch (Exception expected) {
+        }
     }
 
     @Test
@@ -59,7 +60,7 @@ public class SimultaneousExecutorTest {
         } catch (final Exception e) {
         }
     }
-    
+
     @Test
     public void canBeReused() throws Exception {
         subject.execute(new Job(false));
@@ -68,7 +69,7 @@ public class SimultaneousExecutorTest {
         subject.execute(new Job(false));
 
         subject.awaitSuccessfulCompletionOfCurrentTasks();
-        
+
         subject.execute(new Job(false));
         subject.execute(new Job(false));
         subject.execute(new Job(false));
@@ -102,7 +103,7 @@ public class SimultaneousExecutorTest {
 
         @Override
         public Void call() throws Exception {
-            if (shouldSucceed) {
+            if(shouldSucceed) {
                 return null;
             } else {
                 throw new RuntimeException("Failing as configured");

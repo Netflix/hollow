@@ -58,12 +58,12 @@ public class PotentialMatchHollowMapEntryOrdinalIteratorImpl implements HollowMa
     public boolean next() {
         long currentBucketValue = dataAccess.relativeBucket(mapOrdinal, currentBucket);
 
-        int currentBucketKey = (int)(currentBucketValue >>> 32);
+        int currentBucketKey = (int) (currentBucketValue >>> 32);
         if(currentBucketKey == ORDINAL_NONE)
             return false;
 
         key = currentBucketKey;
-        value = (int)currentBucketValue;
+        value = (int) currentBucketValue;
 
         currentBucket++;
         currentBucket &= numBuckets - 1;

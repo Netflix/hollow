@@ -67,21 +67,27 @@ public abstract class HollowEffigyFieldPairer {
         public HollowEffigy.Field getFrom() {
             return from;
         }
+
         public HollowEffigy.Field getTo() {
             return to;
         }
+
         public int getFromIdx() {
             return fromIdx;
         }
+
         public int getToIdx() {
             return toIdx;
         }
+
         public boolean isLeafNode() {
             return (from != null && from.getValue() != null) ? from.isLeafNode() : to == null ? true : to.isLeafNode();
         }
+
         public boolean isDiff() {
             return isDiff;
         }
+
         public boolean isOrderingDiff() {
             return fromIdx != toIdx;
         }
@@ -93,21 +99,21 @@ public abstract class HollowEffigyFieldPairer {
 
         if(from.getDataAccess() == null)
             return new HollowEffigyObjectPairer(from, to).pair();
-        
+
         HollowSchema schema = from.getDataAccess().getSchema();
-        
+
         switch(schema.getSchemaType()) {
-        case OBJECT:
-            return new HollowEffigyObjectPairer(from, to).pair();
-        case MAP:
-            String keyType = ((HollowMapSchema)schema).getKeyType();
-            return new HollowEffigyMapPairer(from, to, matchHints.get(keyType)).pair();
-        case LIST:
-        case SET:
-            String elementType = ((HollowCollectionSchema)schema).getElementType();
-            return new HollowEffigyCollectionPairer(from, to, matchHints.get(elementType)).pair();
+            case OBJECT:
+                return new HollowEffigyObjectPairer(from, to).pair();
+            case MAP:
+                String keyType = ((HollowMapSchema) schema).getKeyType();
+                return new HollowEffigyMapPairer(from, to, matchHints.get(keyType)).pair();
+            case LIST:
+            case SET:
+                String elementType = ((HollowCollectionSchema) schema).getElementType();
+                return new HollowEffigyCollectionPairer(from, to, matchHints.get(elementType)).pair();
         }
-        
+
         throw new IllegalArgumentException("I don't know how to pair fields for type " + schema.getName() + "(" + schema.getSchemaType() + ")");
     }
 }

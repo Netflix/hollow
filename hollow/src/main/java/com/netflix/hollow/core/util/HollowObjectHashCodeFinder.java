@@ -44,7 +44,7 @@ public interface HollowObjectHashCodeFinder {
      * @return the hash code
      */
     int hashCode(Object objectToHash);
-    
+
     /**
      * For serialization.
      * <p>
@@ -59,12 +59,12 @@ public interface HollowObjectHashCodeFinder {
      * @return the hash code
      */
     int hashCode(String typeName, int ordinal, Object objectToHash);
-    
+
     /**
      * @return the set of types which have hash codes defined (i.e. hash codes which are not simply each record's ordinal)
      */
     Set<String> getTypesWithDefinedHashCodes();
-    
+
 
     @Deprecated
     int hashCode(int ordinal, Object objectToHash);

@@ -44,7 +44,8 @@ public class HollowProducerValidationListenerTest {
             public void publish(HollowProducer.PublishArtifact publishArtifact) {
             }
         };
-        announcer = version -> {};
+        announcer = version -> {
+        };
     }
 
     @Test
@@ -97,12 +98,12 @@ public class HollowProducerValidationListenerTest {
                 .withListener(validationListener)
                 .withListener(cycleAndValidationListener)
                 .withListener(countValidator);
-        if (addPrimaryKeyValidator) {
+        if(addPrimaryKeyValidator) {
             builder = builder.withListener(dupeValidator);
         }
 
         HollowProducer hollowProducer = builder.build();
-        if (typeName.equals("MovieWithPrimaryKey")) {
+        if(typeName.equals("MovieWithPrimaryKey")) {
             hollowProducer.initializeDataModel(MovieWithPrimaryKey.class);
         } else {
             hollowProducer.initializeDataModel(MovieWithoutPrimaryKey.class);
@@ -110,7 +111,7 @@ public class HollowProducerValidationListenerTest {
 
         hollowProducer.runCycle(newState -> {
             List<String> actors = Arrays.asList("Angelina Jolie", "Brad Pitt");
-            if (typeName.equals("MovieWithPrimaryKey")) {
+            if(typeName.equals("MovieWithPrimaryKey")) {
                 newState.add(new MovieWithPrimaryKey(123, "someTitle1", actors));
                 newState.add(new MovieWithPrimaryKey(123, "someTitle1", actors));
             } else {
@@ -197,7 +198,8 @@ public class HollowProducerValidationListenerTest {
         private long version;
         private ValidationStatus status;
 
-        @Override public void onCycleStart(long version) {
+        @Override
+        public void onCycleStart(long version) {
             this.cycleVersion = version;
         }
 

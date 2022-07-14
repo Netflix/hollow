@@ -93,11 +93,11 @@ public class HollowHistoryKeyIndex {
     public void indexTypeField(PrimaryKey primaryKey, HollowDataset dataModel) {
         String type = primaryKey.getType();
         HollowHistoryTypeKeyIndex typeIndex = typeKeyIndexes.get(type);
-        if (typeIndex==null) {
+        if(typeIndex == null) {
             typeIndex = addTypeIndex(primaryKey, dataModel);
         }
 
-        for (String fieldPath : primaryKey.getFieldPaths()) {
+        for(String fieldPath : primaryKey.getFieldPaths()) {
             typeIndex.addFieldIndex(fieldPath, dataModel);
         }
     }
@@ -122,7 +122,7 @@ public class HollowHistoryKeyIndex {
 
         // if snapshot update then a new read state was generated, update the types in the history index to point to this
         // new read state
-        if (newIndexReadState != indexReadStateEngine) {
+        if(newIndexReadState != indexReadStateEngine) {
             // New ReadState was created so let's update references to old one
             indexReadStateEngine = newIndexReadState;
             for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
@@ -141,10 +141,10 @@ public class HollowHistoryKeyIndex {
         for(Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
             String type = entry.getKey();
             HollowHistoryTypeKeyIndex index = entry.getValue();
-            if (index.isInitialized()) continue;
+            if(index.isInitialized()) continue;
 
             HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestStateEngine.getTypeState(type);
-            if (typeState == null) continue;
+            if(typeState == null) continue;
 
             index.initialize(typeState);
         }
@@ -191,7 +191,7 @@ public class HollowHistoryKeyIndex {
             executor.execute(() -> {
                 // Ensure write-side is closed after completion of write
                 try (Closeable ac = out) {
-                    if (isInitialUpdate || isSnapshot) {
+                    if(isInitialUpdate || isSnapshot) {
                         writer.writeSnapshot(out);
                     } else {
                         writer.writeDelta(out);
@@ -202,7 +202,7 @@ public class HollowHistoryKeyIndex {
             });
 
             HollowBlobInput in = HollowBlobInput.serial(new BufferedInputStream(is));
-            if (isInitialUpdate || isSnapshot) {
+            if(isInitialUpdate || isSnapshot) {
                 reader.readSnapshot(in);
             } else {
                 reader.applyDelta(in);
@@ -216,13 +216,13 @@ public class HollowHistoryKeyIndex {
         try {
             executor.awaitSuccessfulCompletion();
         } catch (InterruptedException | ExecutionException e) {
-            if (pipeException == null) {
+            if(pipeException == null) {
                 throw new RuntimeException(e);
             }
 
             pipeException.addSuppressed(e);
         }
-        if (pipeException != null)
+        if(pipeException != null)
             throw new RuntimeException(pipeException);
 
         indexWriteStateEngine.prepareForNextCycle();

@@ -32,7 +32,7 @@ public class HollowPrimitiveTypesAPIGeneratorTest extends AbstractHollowAPIGener
     }
 
     @SuppressWarnings("unused")
-    @HollowPrimaryKey(fields = { "id" })
+    @HollowPrimaryKey(fields = {"id"})
     static class Movie {
         int id;
 

@@ -28,7 +28,7 @@ public class DoubleDataAccessor extends AbstractHollowDataAccessor<Double> {
     private HollowConsumerAPI.DoubleRetriever api;
 
     public DoubleDataAccessor(HollowConsumer consumer) {
-        this(consumer.getStateEngine(), (HollowConsumerAPI.DoubleRetriever)consumer.getAPI());
+        this(consumer.getStateEngine(), (HollowConsumerAPI.DoubleRetriever) consumer.getAPI());
     }
 
     public DoubleDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.DoubleRetriever api) {
@@ -36,7 +36,8 @@ public class DoubleDataAccessor extends AbstractHollowDataAccessor<Double> {
         this.api = api;
     }
 
-    @Override public Double getRecord(int ordinal){
+    @Override
+    public Double getRecord(int ordinal) {
         HDouble val = api.getHDouble(ordinal);
         return val == null ? null : val.getValueBoxed();
     }

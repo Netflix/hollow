@@ -52,7 +52,7 @@ public class DiffEqualityMapping {
 
     private final Map<String, DiffEqualOrdinalMap> map = new HashMap<String, DiffEqualOrdinalMap>();
     private final Set<String> typesWhichRequireMissingFieldTraversal = new HashSet<String>();
-    
+
     private boolean isPrepared;
 
     public DiffEqualityMapping(HollowReadStateEngine fromState, HollowReadStateEngine toState) {
@@ -76,7 +76,7 @@ public class DiffEqualityMapping {
             return ordinalMap;
         return isPrepared ? DiffEqualOrdinalMap.EMPTY_MAP : buildMap(type);
     }
-    
+
     public void markPrepared() {
         this.isPrepared = true;
     }
@@ -109,13 +109,13 @@ public class DiffEqualityMapping {
 
     private DiffEqualityTypeMapper getTypeMapper(HollowTypeReadState fromState, HollowTypeReadState toState) {
         if(fromState instanceof HollowObjectTypeReadState)
-            return new DiffEqualityObjectMapper(this, (HollowObjectTypeReadState)fromState, (HollowObjectTypeReadState)toState, oneToOne);
+            return new DiffEqualityObjectMapper(this, (HollowObjectTypeReadState) fromState, (HollowObjectTypeReadState) toState, oneToOne);
         if(listOrderingIsImportant && fromState instanceof HollowListTypeReadState)
-            return new DiffEqualityOrderedListMapper(this, (HollowListTypeReadState)fromState, (HollowListTypeReadState)toState, oneToOne);
+            return new DiffEqualityOrderedListMapper(this, (HollowListTypeReadState) fromState, (HollowListTypeReadState) toState, oneToOne);
         if(fromState instanceof HollowCollectionTypeReadState)
-            return new DiffEqualityCollectionMapper(this, (HollowCollectionTypeReadState)fromState, (HollowCollectionTypeReadState)toState, oneToOne);
+            return new DiffEqualityCollectionMapper(this, (HollowCollectionTypeReadState) fromState, (HollowCollectionTypeReadState) toState, oneToOne);
         if(fromState instanceof HollowMapTypeReadState)
-            return new DiffEqualityMapMapper(this, (HollowMapTypeReadState)fromState, (HollowMapTypeReadState)toState, oneToOne);
+            return new DiffEqualityMapMapper(this, (HollowMapTypeReadState) fromState, (HollowMapTypeReadState) toState, oneToOne);
 
         throw new IllegalArgumentException("I don't know how to map equality for a " + fromState.getClass().getName());
     }

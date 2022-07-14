@@ -70,8 +70,8 @@ public class DiffObjectPage extends DiffPage {
 
         String displayKey =
                 fromOrdinal != -1 ?
-                    typeDiff.getMatcher().getKeyDisplayString(typeDiff.getFromTypeState(), fromOrdinal)
-                    : typeDiff.getMatcher().getKeyDisplayString(typeDiff.getToTypeState(), toOrdinal);
+                        typeDiff.getMatcher().getKeyDisplayString(typeDiff.getFromTypeState(), fromOrdinal)
+                        : typeDiff.getMatcher().getKeyDisplayString(typeDiff.getToTypeState(), toOrdinal);
         breadcrumbs.add(new HollowDiffUIBreadcrumbs(null, displayKey));
 
         return breadcrumbs;

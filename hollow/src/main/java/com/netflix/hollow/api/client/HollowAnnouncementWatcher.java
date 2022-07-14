@@ -131,7 +131,7 @@ public abstract class HollowAnnouncementWatcher {
                     if(delay > 0)
                         Thread.sleep(delay);
                     client.triggerRefresh();
-                } catch(Throwable th) {
+                } catch (Throwable th) {
                     log.log(Level.SEVERE, "Async refresh failed", th);
                 }
             }
@@ -140,8 +140,10 @@ public abstract class HollowAnnouncementWatcher {
 
 
     private HollowClient client;
-    
-    protected HollowClient getClientToNotify() { return client; } 
+
+    protected HollowClient getClientToNotify() {
+        return client;
+    }
 
     void setClientToNotify(HollowClient client) {
         this.client = client;
@@ -175,6 +177,6 @@ public abstract class HollowAnnouncementWatcher {
         public void setLatestVersion(long latestVersion) {
             this.latestVersion = latestVersion;
         }
-    };
+    }
 
 }

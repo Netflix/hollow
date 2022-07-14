@@ -43,7 +43,7 @@ import org.openjdk.jmh.annotations.Warmup;
 public class ReadWriteStateEngineTest {
 
     //@Param( {"1000", "10000", "100000", "1000000"})
-    @Param( {"1000000"})
+    @Param({"1000000"})
     private int n;
 
     private HollowWriteStateEngine writeEngine;
@@ -65,7 +65,7 @@ public class ReadWriteStateEngineTest {
         this.typeWriteState = new HollowObjectTypeWriteState(schema);
         writeEngine.addTypeState(typeWriteState);
 
-        for (int i = 0; i < n; i++) {
+        for(int i = 0; i < n; i++) {
             addRecord(1, Integer.toString(i));
         }
     }
@@ -131,13 +131,13 @@ public class ReadWriteStateEngineTest {
         try {
             executor.awaitSuccessfulCompletion();
         } catch (InterruptedException | ExecutionException e) {
-            if (pipeException == null) {
+            if(pipeException == null) {
                 throw new RuntimeException(e);
             }
 
             pipeException.addSuppressed(e);
         }
-        if (pipeException != null) {
+        if(pipeException != null) {
             throw new RuntimeException(pipeException);
         }
 
@@ -176,13 +176,13 @@ public class ReadWriteStateEngineTest {
         try {
             executor.awaitSuccessfulCompletion();
         } catch (InterruptedException | ExecutionException e) {
-            if (pipeException == null) {
+            if(pipeException == null) {
                 throw new RuntimeException(e);
             }
 
             pipeException.addSuppressed(e);
         }
-        if (pipeException != null) {
+        if(pipeException != null) {
             throw new RuntimeException(pipeException);
         }
 

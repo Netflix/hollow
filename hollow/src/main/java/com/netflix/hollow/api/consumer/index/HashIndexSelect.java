@@ -137,7 +137,7 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
         Object[] queryArray = matchFields.stream().map(mf -> mf.extract(query)).toArray();
 
         HollowHashIndexResult matches = hhi.findMatches(queryArray);
-        if (matches == null) {
+        if(matches == null) {
             return Stream.empty();
         }
 
@@ -146,10 +146,12 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
 
     // HollowConsumer.RefreshListener
 
-    @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+    @Override
+    public void refreshStarted(long currentVersion, long requestedVersion) {
     }
 
-    @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
+    @Override
+    public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
         HollowHashIndex hhi = this.hhi;
         hhi.detachFromDeltaUpdates();
         hhi = new HollowHashIndex(consumer.getStateEngine(), rootTypeName, selectFieldPath, matchFieldPaths);
@@ -158,30 +160,36 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
         this.api = api;
     }
 
-    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
+    @Override
+    public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
         this.api = api;
     }
 
-    @Override public void blobLoaded(HollowConsumer.Blob transition) {
+    @Override
+    public void blobLoaded(HollowConsumer.Blob transition) {
     }
 
-    @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+    @Override
+    public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
     }
 
-    @Override public void refreshFailed(
+    @Override
+    public void refreshFailed(
             long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
     }
 
     // HollowConsumer.RefreshRegistrationListener
 
-    @Override public void onBeforeAddition(HollowConsumer c) {
-        if (c != consumer) {
+    @Override
+    public void onBeforeAddition(HollowConsumer c) {
+        if(c != consumer) {
             throw new IllegalStateException("The index's consumer and the listener's consumer are not the same");
         }
         hhi.listenForDeltaUpdates();
     }
 
-    @Override public void onAfterRemoval(HollowConsumer c) {
+    @Override
+    public void onAfterRemoval(HollowConsumer c) {
         hhi.detachFromDeltaUpdates();
     }
 
@@ -239,7 +247,7 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
          */
         public <Q> HashIndexSelect<T, S, Q> usingPath(String queryFieldPath, Class<Q> queryFieldType) {
             Objects.requireNonNull(queryFieldPath);
-            if (queryFieldPath.isEmpty()) {
+            if(queryFieldPath.isEmpty()) {
                 throw new IllegalArgumentException("selectFieldPath argument is an empty String");
             }
             Objects.requireNonNull(queryFieldType);

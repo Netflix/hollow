@@ -38,7 +38,7 @@ public class ProducerValidationTests {
     public void duplicateDetectionFailureTest() {
         duplicateDetectionFailureTest(new DuplicateDataDetectionValidator("TypeWithPrimaryKey"));
         duplicateDetectionFailureTest(
-                new DuplicateDataDetectionValidator("TypeWithPrimaryKey", new String[] {"id", "name"}));
+                new DuplicateDataDetectionValidator("TypeWithPrimaryKey", new String[]{"id", "name"}));
 
         duplicateDetectionFailureTest(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class));
         duplicateDetectionFailureTest(new DuplicateDataDetectionValidator(TypeWithPrimaryKey2.class));
@@ -54,12 +54,12 @@ public class ProducerValidationTests {
     void duplicateDetectionFailureTest(DuplicateDataDetectionValidator v, boolean auto) {
         HollowProducer.Builder<?> b = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager());
-        if (v != null) {
+        if(v != null) {
             b.withListener(v);
         }
         HollowProducer producer = b.build();
 
-        if (auto) {
+        if(auto) {
             producer.initializeDataModel(TypeWithPrimaryKey.class);
             DuplicateDataDetectionValidator.addValidatorsForSchemaWithPrimaryKey(producer);
         }

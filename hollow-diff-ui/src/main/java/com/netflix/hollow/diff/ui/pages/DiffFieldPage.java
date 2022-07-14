@@ -64,7 +64,7 @@ public class DiffFieldPage extends DiffPage {
     private List<HollowObjectPairDiffScore> getObjectDiffScores(HollowTypeDiff typeDiff, HollowFieldDiff fieldDiff, int beginRecord, int pageSize) {
         List<HollowObjectPairDiffScore> list = new ArrayList<HollowObjectPairDiffScore>();
 
-        for(int i=0;i<fieldDiff.getNumDiffs();i++) {
+        for(int i = 0; i < fieldDiff.getNumDiffs(); i++) {
             int fromOrdinal = fieldDiff.getFromOrdinal(i);
             int toOrdinal = fieldDiff.getToOrdinal(i);
             String displayKey = typeDiff.getMatcher().getKeyDisplayString(typeDiff.getFromTypeState(), fieldDiff.getFromOrdinal(i));

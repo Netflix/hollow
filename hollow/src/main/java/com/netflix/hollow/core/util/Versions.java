@@ -25,12 +25,13 @@ public final class Versions {
     static final String PRETTY_VERSION_NONE = "none";
     static final String PRETTY_VERSION_LATEST = "latest";
 
-    private Versions() {}
+    private Versions() {
+    }
 
     public static String prettyVersion(long version) {
-        if (version == VERSION_NONE) {
+        if(version == VERSION_NONE) {
             return PRETTY_VERSION_NONE;
-        } else if (version == VERSION_LATEST) {
+        } else if(version == VERSION_LATEST) {
             return PRETTY_VERSION_LATEST;
         } else {
             return String.valueOf(version);

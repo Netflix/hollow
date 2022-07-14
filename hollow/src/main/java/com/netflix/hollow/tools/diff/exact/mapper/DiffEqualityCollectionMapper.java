@@ -120,11 +120,11 @@ public class DiffEqualityCollectionMapper extends DiffEqualityTypeMapper {
     }
 
     private HollowCollectionTypeReadState fromState() {
-        return (HollowCollectionTypeReadState)fromState;
+        return (HollowCollectionTypeReadState) fromState;
     }
 
     private HollowCollectionTypeReadState toState() {
-        return (HollowCollectionTypeReadState)toState;
+        return (HollowCollectionTypeReadState) toState;
     }
 
 }

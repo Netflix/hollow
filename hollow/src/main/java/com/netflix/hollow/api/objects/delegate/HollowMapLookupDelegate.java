@@ -55,14 +55,14 @@ public class HollowMapLookupDelegate<K, V> implements HollowMapDelegate<K, V> {
     @Override
     public V get(HollowMap<K, V> map, int ordinal, Object key) {
         HollowMapEntryOrdinalIterator iter;
-        
+
         if(getSchema().getHashKey() != null) {
             iter = dataAccess.ordinalIterator(ordinal);
         } else {
             int hashCode = dataAccess.getDataAccess().getHashCodeFinder().hashCode(key);
             iter = dataAccess.potentialMatchOrdinalIterator(ordinal, hashCode);
         }
-        
+
         while(iter.next()) {
             if(map.equalsKey(iter.getKey(), key))
                 return map.instantiateValue(iter.getValue());
@@ -73,7 +73,7 @@ public class HollowMapLookupDelegate<K, V> implements HollowMapDelegate<K, V> {
     @Override
     public boolean containsKey(HollowMap<K, V> map, int ordinal, Object key) {
         HollowMapEntryOrdinalIterator iter;
-        
+
         if(getSchema().getHashKey() != null) {
             iter = dataAccess.ordinalIterator(ordinal);
         } else {
@@ -97,7 +97,7 @@ public class HollowMapLookupDelegate<K, V> implements HollowMapDelegate<K, V> {
         }
         return false;
     }
-    
+
     @Override
     public K findKey(HollowMap<K, V> map, int ordinal, Object... hashKey) {
         int keyOrdinal = dataAccess.findKey(ordinal, hashKey);
@@ -121,12 +121,12 @@ public class HollowMapLookupDelegate<K, V> implements HollowMapDelegate<K, V> {
             return new Map.Entry<K, V>() {
                 @Override
                 public K getKey() {
-                    return map.instantiateKey((int)(entryOrdinals >> 32));
+                    return map.instantiateKey((int) (entryOrdinals >> 32));
                 }
 
                 @Override
                 public V getValue() {
-                    return map.instantiateValue((int)entryOrdinals);
+                    return map.instantiateValue((int) entryOrdinals);
                 }
 
                 @Override
@@ -134,10 +134,10 @@ public class HollowMapLookupDelegate<K, V> implements HollowMapDelegate<K, V> {
                     throw new UnsupportedOperationException();
                 }
             };
-        
+
         return null;
     }
-    
+
 
     @Override
     public HollowMapEntryOrdinalIterator iterator(int ordinal) {

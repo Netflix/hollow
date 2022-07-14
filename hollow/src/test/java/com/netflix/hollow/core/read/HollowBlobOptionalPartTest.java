@@ -55,9 +55,9 @@ public class HollowBlobOptionalPartTest {
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
         mapper.initializeTypeState(TypeA.class);
 
-        mapper.add(new TypeA("1", 1, new TypeB((short)1, 1L, 1f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('1', null))));
-        mapper.add(new TypeA("2", 2, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
-        mapper.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
+        mapper.add(new TypeA("1", 1, new TypeB((short) 1, 1L, 1f, new char[]{'1'}, new byte[]{1}), Collections.singleton(new TypeC('1', null))));
+        mapper.add(new TypeA("2", 2, new TypeB((short) 2, 2L, 2f, new char[]{'2'}, new byte[]{2}), Collections.singleton(new TypeC('2', null))));
+        mapper.add(new TypeA("3", 3, new TypeB((short) 3, 3L, 3f, new char[]{'3'}, new byte[]{3}), Collections.singleton(new TypeC('3', null))));
 
         ByteArrayOutputStream mainPart = new ByteArrayOutputStream();
         ByteArrayOutputStream bPart = new ByteArrayOutputStream();
@@ -107,22 +107,22 @@ public class HollowBlobOptionalPartTest {
         producer.initializeDataModel(TypeA.class);
 
         producer.runCycle(state -> {
-            state.add(new TypeA("1", 1, new TypeB((short)1, 1L, 1f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('1', null))));
-            state.add(new TypeA("2", 2, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
-            state.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
+            state.add(new TypeA("1", 1, new TypeB((short) 1, 1L, 1f, new char[]{'1'}, new byte[]{1}), Collections.singleton(new TypeC('1', null))));
+            state.add(new TypeA("2", 2, new TypeB((short) 2, 2L, 2f, new char[]{'2'}, new byte[]{2}), Collections.singleton(new TypeC('2', null))));
+            state.add(new TypeA("3", 3, new TypeB((short) 3, 3L, 3f, new char[]{'3'}, new byte[]{3}), Collections.singleton(new TypeC('3', null))));
         });
 
         producer.runCycle(state -> {
-            state.add(new TypeA("1", 1, new TypeB((short)1, 1L, 1f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('1', null))));
+            state.add(new TypeA("1", 1, new TypeB((short) 1, 1L, 1f, new char[]{'1'}, new byte[]{1}), Collections.singleton(new TypeC('1', null))));
             // state.add(new TypeA("2", 2, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
-            state.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
-            state.add(new TypeA("4", 4, new TypeB((short)4, 4L, 4f, new char[] {'4'}, new byte[] { 4 }), Collections.singleton(new TypeC('4', null))));
+            state.add(new TypeA("3", 3, new TypeB((short) 3, 3L, 3f, new char[]{'3'}, new byte[]{3}), Collections.singleton(new TypeC('3', null))));
+            state.add(new TypeA("4", 4, new TypeB((short) 4, 4L, 4f, new char[]{'4'}, new byte[]{4}), Collections.singleton(new TypeC('4', null))));
         });
 
         HollowConsumer consumer = HollowConsumer.newHollowConsumer()
                 .withBlobRetriever(blobStore)
                 .build();
-        
+
         consumer.triggerRefresh();
 
         GenericHollowObject obj = new GenericHollowObject(consumer.getStateEngine(), "TypeA", 3);
@@ -134,16 +134,16 @@ public class HollowBlobOptionalPartTest {
         Assert.assertFalse(consumer.getStateEngine().getTypeState("TypeB").getPopulatedOrdinals().get(1));
         Assert.assertNull(consumer.getStateEngine().getTypeState("TypeC"));
     }
-    
+
     @Test
     public void refusesToApplyIncorrectPartSnapshot() throws IOException {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
         mapper.initializeTypeState(TypeA.class);
 
-        mapper.add(new TypeA("1", 1, new TypeB((short)1, 1L, 1f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('1', null))));
-        mapper.add(new TypeA("2", 2, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
-        mapper.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
+        mapper.add(new TypeA("1", 1, new TypeB((short) 1, 1L, 1f, new char[]{'1'}, new byte[]{1}), Collections.singleton(new TypeC('1', null))));
+        mapper.add(new TypeA("2", 2, new TypeB((short) 2, 2L, 2f, new char[]{'2'}, new byte[]{2}), Collections.singleton(new TypeC('2', null))));
+        mapper.add(new TypeA("3", 3, new TypeB((short) 3, 3L, 3f, new char[]{'3'}, new byte[]{3}), Collections.singleton(new TypeC('3', null))));
 
         ByteArrayOutputStream mainPart = new ByteArrayOutputStream();
         ByteArrayOutputStream bPart = new ByteArrayOutputStream();
@@ -157,12 +157,12 @@ public class HollowBlobOptionalPartTest {
 
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
         writer.writeSnapshot(mainPart, partStreams);
-        
+
         writeEngine.prepareForNextCycle();
 
-        mapper.add(new TypeA("1", 1, new TypeB((short)1, 1L, 1f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('1', null))));
-        mapper.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
-        mapper.add(new TypeA("4", 4, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
+        mapper.add(new TypeA("1", 1, new TypeB((short) 1, 1L, 1f, new char[]{'1'}, new byte[]{1}), Collections.singleton(new TypeC('1', null))));
+        mapper.add(new TypeA("3", 3, new TypeB((short) 3, 3L, 3f, new char[]{'3'}, new byte[]{3}), Collections.singleton(new TypeC('3', null))));
+        mapper.add(new TypeA("4", 4, new TypeB((short) 2, 2L, 2f, new char[]{'2'}, new byte[]{2}), Collections.singleton(new TypeC('2', null))));
 
         ByteArrayOutputStream mainPart2 = new ByteArrayOutputStream();
         ByteArrayOutputStream bPart2 = new ByteArrayOutputStream();
@@ -189,39 +189,45 @@ public class HollowBlobOptionalPartTest {
         try {
             reader.readSnapshot(mainPartInput, optionalPartInput, TypeFilter.newTypeFilter().build());
             Assert.fail("Should have thrown Exception");
-        } catch(IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             Assert.assertEquals("Optional blob part C does not appear to be matched with the main input", ex.getMessage());
         }
     }
-    
+
     @Test
     public void testFilesystemBlobRetriever() throws IOException {
         File localBlobStore = createLocalDir();
         HollowFilesystemPublisher publisher = new HollowFilesystemPublisher(localBlobStore.toPath());
         HollowInMemoryBlobStager stager = new HollowInMemoryBlobStager(newPartConfig());
-        
+
         HollowProducer producer = HollowProducer.withPublisher(publisher).withBlobStager(stager).build();
         producer.initializeDataModel(TypeA.class);
-        
+
         long v1 = producer.runCycle(state -> {
-            state.add(new TypeA("1", 1, new TypeB((short)1, 1L, 1f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('1', null))));
-            state.add(new TypeA("2", 2, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
-            state.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
+            state.add(new TypeA("1", 1, new TypeB((short) 1, 1L, 1f, new char[]{'1'}, new byte[]{1}), Collections.singleton(new TypeC('1', null))));
+            state.add(new TypeA("2", 2, new TypeB((short) 2, 2L, 2f, new char[]{'2'}, new byte[]{2}), Collections.singleton(new TypeC('2', null))));
+            state.add(new TypeA("3", 3, new TypeB((short) 3, 3L, 3f, new char[]{'3'}, new byte[]{3}), Collections.singleton(new TypeC('3', null))));
         });
-        
+
         long v2 = producer.runCycle(state -> {
-            state.add(new TypeA("1", 1, new TypeB((short)1, 1L, 1f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('1', null))));
-            state.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
-            state.add(new TypeA("4", 4, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
+            state.add(new TypeA("1", 1, new TypeB((short) 1, 1L, 1f, new char[]{'1'}, new byte[]{1}), Collections.singleton(new TypeC('1', null))));
+            state.add(new TypeA("3", 3, new TypeB((short) 3, 3L, 3f, new char[]{'3'}, new byte[]{3}), Collections.singleton(new TypeC('3', null))));
+            state.add(new TypeA("4", 4, new TypeB((short) 2, 2L, 2f, new char[]{'2'}, new byte[]{2}), Collections.singleton(new TypeC('2', null))));
         });
-        
+
         HollowFilesystemBlobRetriever blobRetriever = new HollowFilesystemBlobRetriever(localBlobStore.toPath(), new HashSet<>(Arrays.asList("B", "C")));
-        
+
         HollowConsumer consumer = HollowConsumer.newHollowConsumer()
                 .withBlobRetriever(blobRetriever)
                 .withDoubleSnapshotConfig(new DoubleSnapshotConfig() {
-                    @Override public int maxDeltasBeforeDoubleSnapshot() { return Integer.MAX_VALUE; }
-                    @Override public boolean allowDoubleSnapshot() { return false; }
+                    @Override
+                    public int maxDeltasBeforeDoubleSnapshot() {
+                        return Integer.MAX_VALUE;
+                    }
+                    @Override
+                    public boolean allowDoubleSnapshot() {
+                        return false;
+                    }
                 }).build();
 
         consumer.triggerRefreshTo(v1);
@@ -235,9 +241,9 @@ public class HollowBlobOptionalPartTest {
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
         mapper.initializeTypeState(TypeA.class);
 
-        mapper.add(new TypeA("1", 1, new TypeB((short)1, 1L, 1f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('1', null))));
-        mapper.add(new TypeA("2", 2, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
-        mapper.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
+        mapper.add(new TypeA("1", 1, new TypeB((short) 1, 1L, 1f, new char[]{'1'}, new byte[]{1}), Collections.singleton(new TypeC('1', null))));
+        mapper.add(new TypeA("2", 2, new TypeB((short) 2, 2L, 2f, new char[]{'2'}, new byte[]{2}), Collections.singleton(new TypeC('2', null))));
+        mapper.add(new TypeA("3", 3, new TypeB((short) 3, 3L, 3f, new char[]{'3'}, new byte[]{3}), Collections.singleton(new TypeC('3', null))));
 
         ByteArrayOutputStream mainPart = new ByteArrayOutputStream();
         ByteArrayOutputStream bPart = new ByteArrayOutputStream();
@@ -251,12 +257,12 @@ public class HollowBlobOptionalPartTest {
 
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
         writer.writeSnapshot(mainPart, partStreams);
-        
+
         writeEngine.prepareForNextCycle();
 
-        mapper.add(new TypeA("1", 1, new TypeB((short)1, 1L, 1f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('1', null))));
-        mapper.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
-        mapper.add(new TypeA("4", 4, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
+        mapper.add(new TypeA("1", 1, new TypeB((short) 1, 1L, 1f, new char[]{'1'}, new byte[]{1}), Collections.singleton(new TypeC('1', null))));
+        mapper.add(new TypeA("3", 3, new TypeB((short) 3, 3L, 3f, new char[]{'3'}, new byte[]{3}), Collections.singleton(new TypeC('3', null))));
+        mapper.add(new TypeA("4", 4, new TypeB((short) 2, 2L, 2f, new char[]{'2'}, new byte[]{2}), Collections.singleton(new TypeC('2', null))));
 
         ByteArrayOutputStream mainPart2 = new ByteArrayOutputStream();
         ByteArrayOutputStream bPart2 = new ByteArrayOutputStream();
@@ -268,17 +274,17 @@ public class HollowBlobOptionalPartTest {
 
         writer = new HollowBlobWriter(writeEngine);
         writer.writeDelta(mainPart2, partStreams);
-        
+
         writeEngine.prepareForNextCycle();
 
-        mapper.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
-        mapper.add(new TypeA("4", 4, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
-        mapper.add(new TypeA("5", 5, new TypeB((short)5, 5L, 5f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('5', null))));
+        mapper.add(new TypeA("3", 3, new TypeB((short) 3, 3L, 3f, new char[]{'3'}, new byte[]{3}), Collections.singleton(new TypeC('3', null))));
+        mapper.add(new TypeA("4", 4, new TypeB((short) 2, 2L, 2f, new char[]{'2'}, new byte[]{2}), Collections.singleton(new TypeC('2', null))));
+        mapper.add(new TypeA("5", 5, new TypeB((short) 5, 5L, 5f, new char[]{'1'}, new byte[]{1}), Collections.singleton(new TypeC('5', null))));
 
         ByteArrayOutputStream mainPart3 = new ByteArrayOutputStream();
         ByteArrayOutputStream bPart3 = new ByteArrayOutputStream();
         ByteArrayOutputStream cPart3 = new ByteArrayOutputStream();
-        
+
         partStreams = partConfig.newStreams();
         partStreams.addOutputStream("B", bPart3);
         partStreams.addOutputStream("C", cPart3);
@@ -304,19 +310,19 @@ public class HollowBlobOptionalPartTest {
         mainPartInput = HollowBlobInput.serial(new ByteArrayInputStream(mainPart2.toByteArray()));
         bPartInput = new ByteArrayInputStream(bPart3.toByteArray()); /// wrong part state
         cPartInput = new ByteArrayInputStream(cPart2.toByteArray());
-        
+
         optionalPartInput = new OptionalBlobPartInput();
         optionalPartInput.addInput("B", bPartInput);
         optionalPartInput.addInput("C", cPartInput);
-        
+
         try {
             reader.applyDelta(mainPartInput, optionalPartInput);
             Assert.fail("Should have thrown Exception");
-        } catch(IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             Assert.assertEquals("Optional blob part B does not appear to be matched with the main input", ex.getMessage());
         }
     }
-    
+
     @Test
     public void optionalPartsWithSharedMemoryLazy() throws IOException {
         File localBlobStore = createLocalDir();
@@ -332,16 +338,16 @@ public class HollowBlobOptionalPartTest {
         producer.initializeDataModel(TypeA.class);
 
         producer.runCycle(state -> {
-            state.add(new TypeA("1", 1, new TypeB((short)1, 1L, 1f, new char[] {'1'}, new byte[] { 1 }), Collections.singleton(new TypeC('1', null))));
-            state.add(new TypeA("2", 2, new TypeB((short)2, 2L, 2f, new char[] {'2'}, new byte[] { 2 }), Collections.singleton(new TypeC('2', null))));
-            state.add(new TypeA("3", 3, new TypeB((short)3, 3L, 3f, new char[] {'3'}, new byte[] { 3 }), Collections.singleton(new TypeC('3', null))));
+            state.add(new TypeA("1", 1, new TypeB((short) 1, 1L, 1f, new char[]{'1'}, new byte[]{1}), Collections.singleton(new TypeC('1', null))));
+            state.add(new TypeA("2", 2, new TypeB((short) 2, 2L, 2f, new char[]{'2'}, new byte[]{2}), Collections.singleton(new TypeC('2', null))));
+            state.add(new TypeA("3", 3, new TypeB((short) 3, 3L, 3f, new char[]{'3'}, new byte[]{3}), Collections.singleton(new TypeC('3', null))));
         });
 
         HollowConsumer consumer = HollowConsumer.newHollowConsumer()
                 .withBlobRetriever(new HollowFilesystemBlobRetriever(localBlobStore.toPath(), Collections.singleton("B")))
                 .withMemoryMode(MemoryMode.SHARED_MEMORY_LAZY)
                 .build();
-        
+
         consumer.triggerRefresh();
 
         GenericHollowObject obj = new GenericHollowObject(consumer.getStateEngine(), "TypeA", 1);
@@ -354,18 +360,17 @@ public class HollowBlobOptionalPartTest {
     }
 
 
-
     private ProducerOptionalBlobPartConfig newPartConfig() {
         ProducerOptionalBlobPartConfig partConfig = new ProducerOptionalBlobPartConfig();
         partConfig.addTypesToPart("B", "TypeB");
         partConfig.addTypesToPart("C", "SetOfTypeC", "TypeC", "MapOfStringToListOfInteger", "ListOfInteger", "Integer");
         return partConfig;
     }
-    
+
     static File createLocalDir() throws IOException {
         File localDir = Files.createTempDirectory("hollow").toFile();
         localDir.deleteOnExit();
         return localDir;
     }
-    
+
 }

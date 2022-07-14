@@ -59,8 +59,8 @@ public class HollowMapEntryOrdinalIteratorImpl implements HollowMapEntryOrdinalI
                 return false;
 
             long bucketVal = dataAccess.relativeBucket(mapOrdinal, currentBucket);
-            this.key = (int)(bucketVal >>> 32);
-            this.value = (int)bucketVal;
+            this.key = (int) (bucketVal >>> 32);
+            this.value = (int) bucketVal;
         }
 
         return true;

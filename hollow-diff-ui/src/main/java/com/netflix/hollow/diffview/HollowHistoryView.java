@@ -45,7 +45,7 @@ public class HollowHistoryView extends HollowObjectView {
     public int getKeyOrdinal() {
         return keyOrdinal;
     }
-    
+
     public long getLatestStateEngineRandomizedTag() {
         return latestStateEngineRandomizedTag;
     }

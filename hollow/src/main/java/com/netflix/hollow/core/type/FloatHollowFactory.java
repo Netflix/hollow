@@ -25,12 +25,12 @@ public class FloatHollowFactory extends HollowFactory<HFloat> {
 
     @Override
     public HFloat newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HFloat(((FloatTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return new HFloat(((FloatTypeAPI) typeAPI).getDelegateLookupImpl(), ordinal);
     }
 
     @Override
     public HFloat newCachedHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HFloat(new FloatDelegateCachedImpl((FloatTypeAPI)typeAPI, ordinal), ordinal);
+        return new HFloat(new FloatDelegateCachedImpl((FloatTypeAPI) typeAPI, ordinal), ordinal);
     }
 
 }

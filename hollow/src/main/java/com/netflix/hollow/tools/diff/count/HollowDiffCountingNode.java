@@ -54,6 +54,7 @@ public abstract class HollowDiffCountingNode {
     public abstract void prepare(int topLevelFromOrdinal, int topLevelToOrdinal);
 
     public abstract int traverseDiffs(IntList fromOrdinals, IntList toOrdinals);
+
     public abstract int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals);
 
     public abstract List<HollowFieldDiff> getFieldDiffs();
@@ -68,15 +69,15 @@ public abstract class HollowDiffCountingNode {
 
         if(topLevelTypeDiff.isShortcutType(elementSchema.getName()))
             return new HollowDiffShortcutTypeCountingNode(diff, topLevelTypeDiff, childNodeId);
-        
+
         switch(elementSchema.getSchemaType()) {
-        case OBJECT:
-            return new HollowDiffObjectCountingNode(diff, topLevelTypeDiff, childNodeId, (HollowObjectTypeReadState)refFromState, (HollowObjectTypeReadState)refToState);
-        case LIST:
-        case SET:
-            return new HollowDiffCollectionCountingNode(diff, topLevelTypeDiff, childNodeId, (HollowCollectionTypeReadState)refFromState, (HollowCollectionTypeReadState)refToState);
-        case MAP:
-            return new HollowDiffMapCountingNode(diff, topLevelTypeDiff, childNodeId, (HollowMapTypeReadState)refFromState, (HollowMapTypeReadState)refToState);
+            case OBJECT:
+                return new HollowDiffObjectCountingNode(diff, topLevelTypeDiff, childNodeId, (HollowObjectTypeReadState) refFromState, (HollowObjectTypeReadState) refToState);
+            case LIST:
+            case SET:
+                return new HollowDiffCollectionCountingNode(diff, topLevelTypeDiff, childNodeId, (HollowCollectionTypeReadState) refFromState, (HollowCollectionTypeReadState) refToState);
+            case MAP:
+                return new HollowDiffMapCountingNode(diff, topLevelTypeDiff, childNodeId, (HollowMapTypeReadState) refFromState, (HollowMapTypeReadState) refToState);
         }
 
         throw new IllegalArgumentException("I don't know how to create a HollowDiffCountingNode for a " + elementSchema.getSchemaType());

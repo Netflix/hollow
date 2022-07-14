@@ -36,12 +36,12 @@ public class HollowPerformanceAPIGenerator {
     private String packageName;
     private Path destinationPath;
     private Set<String> checkFieldExistsMethods = new HashSet<>();
-    
+
     public static Builder newBuilder() {
         HollowPerformanceAPIGenerator gen = new HollowPerformanceAPIGenerator();
         return gen.theBuilder();
     }
-    
+
     private Builder theBuilder() {
         return new Builder();
     }
@@ -51,17 +51,17 @@ public class HollowPerformanceAPIGenerator {
             HollowPerformanceAPIGenerator.this.dataset = dataset;
             return this;
         }
-        
+
         public Builder withAPIClassname(String apiClassname) {
             HollowPerformanceAPIGenerator.this.apiClassname = apiClassname;
             return this;
         }
-        
+
         public Builder withPackageName(String packageName) {
             HollowPerformanceAPIGenerator.this.packageName = packageName;
             return this;
         }
-        
+
         public Builder withDestination(String destinationPath) {
             return withDestination(Paths.get(destinationPath));
         }
@@ -70,29 +70,29 @@ public class HollowPerformanceAPIGenerator {
             HollowPerformanceAPIGenerator.this.destinationPath = destinationPath;
             return this;
         }
-        
+
         public Builder withCheckFieldExistsMethods(Set<String> checkFieldExistsMethods) {
             HollowPerformanceAPIGenerator.this.checkFieldExistsMethods.addAll(checkFieldExistsMethods);
             return this;
         }
-        
+
         public Builder withCheckFieldExistsMethods(String... checkFieldExistsMethods) {
             HollowPerformanceAPIGenerator.this.checkFieldExistsMethods.addAll(Arrays.asList(checkFieldExistsMethods));
             return this;
         }
-        
+
         public HollowPerformanceAPIGenerator build() {
             return HollowPerformanceAPIGenerator.this;
         }
     }
-    
+
     public void generateSourceFiles() throws IOException {
         generate(dataset, packageName, apiClassname, destinationPath, checkFieldExistsMethods);
     }
-    
+
     private void generate(HollowDataset dataset, String packageName, String apiClassName, Path destination, Set<String> checkFieldExistsMethods) throws IOException {
         Path apiClassDestination = destination.resolve(apiClassName + ".java");
-        if (!Files.exists(apiClassDestination)) {
+        if(!Files.exists(apiClassDestination)) {
             Files.createDirectories(destination);
         }
 
@@ -101,8 +101,8 @@ public class HollowPerformanceAPIGenerator {
             writer.write(apiClassContent);
         }
 
-        for (HollowSchema schema : dataset.getSchemas()) {
-            if (schema.getSchemaType() == SchemaType.OBJECT) {
+        for(HollowSchema schema : dataset.getSchemas()) {
+            if(schema.getSchemaType() == SchemaType.OBJECT) {
                 Path objClassDestination = destination.resolve(schema.getName() + "PerfAPI.java");
                 String objClassContent = new HollowObjectTypePerfAPIClassGenerator((HollowObjectSchema) schema, packageName, checkFieldExistsMethods).generate();
                 try (FileWriter writer = new FileWriter(objClassDestination.toFile())) {

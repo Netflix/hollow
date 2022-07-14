@@ -80,7 +80,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
 
     private static String computeSubPackageName(HollowObjectSchema schema) {
         String type = schema.getName();
-        if (isPrimitiveType(type)) {
+        if(isPrimitiveType(type)) {
             return "core";
         }
         return SUB_PACKAGE_NAME;
@@ -93,24 +93,24 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         boolean requiresHollowTypeName = !className.equals(schema.getName());
 
         classBuilder.append("import " + HollowConsumer.class.getName() + ";\n");
-        if (schema.getPrimaryKey() != null && schema.getPrimaryKey().numFields() > 1) {
+        if(schema.getPrimaryKey() != null && schema.getPrimaryKey().numFields() > 1) {
             classBuilder.append("import " + FieldPath.class.getName() + ";\n");
         }
-        if (schema.getPrimaryKey() != null) {
+        if(schema.getPrimaryKey() != null) {
             classBuilder.append("import " + UniqueKeyIndex.class.getName() + ";\n");
         }
         classBuilder.append("import " + HollowObject.class.getName() + ";\n");
         classBuilder.append("import " + HollowObjectSchema.class.getName() + ";\n");
-        if (requiresHollowTypeName) {
+        if(requiresHollowTypeName) {
             classBuilder.append("import " + HollowTypeName.class.getName() + ";\n");
         }
-        if (config.isUseVerboseToString()) {
+        if(config.isUseVerboseToString()) {
             classBuilder.append("import " + HollowRecordStringifier.class.getName() + ";\n");
         }
         classBuilder.append("\n");
 
         classBuilder.append("@SuppressWarnings(\"all\")\n");
-        if (requiresHollowTypeName) {
+        if(requiresHollowTypeName) {
             classBuilder.append("@" + HollowTypeName.class.getSimpleName() + "(name=\"" + schema.getName() + "\")\n");
         }
         classBuilder.append("public class " + className + " extends HollowObject {\n\n");
@@ -123,11 +123,11 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         appendTypeAPIAccessor(classBuilder);
         appendDelegateAccessor(classBuilder);
 
-        if (config.isUseVerboseToString()) {
+        if(config.isUseVerboseToString()) {
             appendToString(classBuilder);
         }
 
-        if (schema.getPrimaryKey() != null) {
+        if(schema.getPrimaryKey() != null) {
             appendPrimaryKey(classBuilder, schema.getPrimaryKey());
         }
 
@@ -143,7 +143,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     }
 
     private void appendAccessors(StringBuilder classBuilder) {
-        for(int i=0;i<schema.numFields();i++) {
+        for(int i = 0; i < schema.numFields(); i++) {
             switch(schema.getFieldType(i)) {
                 case BOOLEAN:
                     classBuilder.append(generateBooleanFieldAccessor(i));
@@ -211,39 +211,39 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
 
         if(shortcut != null) {
             switch(shortcut.getType()) {
-            case BOOLEAN:
-            case DOUBLE:
-            case FLOAT:
-            case INT:
-            case LONG:
-                String methodName = (shortcut.getType()==FieldType.BOOLEAN) ? generateBooleanAccessorMethodName(fieldName, useBooleanFieldErgonomics) : "get" + uppercase(fieldName);
-                builder.append("    public ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName);
-                if(!restrictApiToFieldType) {
-                    builder.append("Boxed");
-                }
-                builder.append("() {\n");
-                builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
-                builder.append("    }\n\n");
-                if(!restrictApiToFieldType) {
-                    builder.append("    public ").append(HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName + "() {\n");
+                case BOOLEAN:
+                case DOUBLE:
+                case FLOAT:
+                case INT:
+                case LONG:
+                    String methodName = (shortcut.getType() == FieldType.BOOLEAN) ? generateBooleanAccessorMethodName(fieldName, useBooleanFieldErgonomics) : "get" + uppercase(fieldName);
+                    builder.append("    public ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName);
+                    if(!restrictApiToFieldType) {
+                        builder.append("Boxed");
+                    }
+                    builder.append("() {\n");
+                    builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
+                    builder.append("    }\n\n");
+                    if(!restrictApiToFieldType) {
+                        builder.append("    public ").append(HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName + "() {\n");
+                        builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
+                        builder.append("    }\n\n");
+                    }
+                    break;
+                case BYTES:
+                    builder.append("    public byte[] ").append(getterPrefix).append("get" + uppercase(fieldName) + "() {\n");
                     builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
                     builder.append("    }\n\n");
-                }
-                break;
-            case BYTES:
-                builder.append("    public byte[] ").append(getterPrefix).append("get" + uppercase(fieldName) + "() {\n");
-                builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
-                builder.append("    }\n\n");
-                break;
-            case STRING:
-                builder.append("    public String ").append(getterPrefix).append("get" + uppercase(fieldName) + "() {\n");
-                builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
-                builder.append("    }\n\n");
-                builder.append("    public boolean ").append(getterPrefix).append("is" + uppercase(fieldName) + "Equal(String testValue) {\n");
-                builder.append("        return delegate().is" + uppercase(fieldName) + "Equal(ordinal, testValue);\n");
-                builder.append("    }\n\n");
-                break;
-            default:
+                    break;
+                case STRING:
+                    builder.append("    public String ").append(getterPrefix).append("get" + uppercase(fieldName) + "() {\n");
+                    builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
+                    builder.append("    }\n\n");
+                    builder.append("    public boolean ").append(getterPrefix).append("is" + uppercase(fieldName) + "Equal(String testValue) {\n");
+                    builder.append("        return delegate().is" + uppercase(fieldName) + "Equal(ordinal, testValue);\n");
+                    builder.append("    }\n\n");
+                    break;
+                default:
             }
         }
 
@@ -252,7 +252,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         boolean parameterize = parameterizeClassNames || parameterizedTypes.contains(referencedType);
 
         String methodName = null;
-        if (shortcut != null) {
+        if(shortcut != null) {
             methodName = getterPrefix + "get" + uppercase(fieldName) + "HollowReference";
         } else {
             boolean isBooleanRefType = Boolean.class.getSimpleName().equals(referencedType);
@@ -391,11 +391,11 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     }
 
     private void appendPrimaryKey(StringBuilder classBuilder, PrimaryKey pk) {
-        if (pk.numFields() == 1) {
+        if(pk.numFields() == 1) {
             String fieldPath = pk.getFieldPath(0);
             FieldType fieldType = pk.getFieldType(dataset, 0);
             String type, boxedType;
-            if (FieldType.REFERENCE.equals(fieldType)) {
+            if(FieldType.REFERENCE.equals(fieldType)) {
                 HollowObjectSchema refSchema = pk.getFieldSchema(dataset, 0);
                 type = boxedType = hollowImplClassname(refSchema.getName());
             } else {
@@ -422,8 +422,8 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
 
             classBuilder.append("    public static class Key {\n");
             Map<String, String> parameterList = new LinkedHashMap<>();
-            for (int i = 0; i < pk.numFields(); i++) {
-                if (i > 0) {
+            for(int i = 0; i < pk.numFields(); i++) {
+                if(i > 0) {
                     classBuilder.append("\n");
                 }
 
@@ -431,7 +431,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
                 String name = HollowCodeGenerationUtils.normalizeFieldPathToParamName(fieldPath);
                 FieldType fieldType = pk.getFieldType(dataset, i);
                 String type;
-                if (FieldType.REFERENCE.equals(fieldType)) {
+                if(FieldType.REFERENCE.equals(fieldType)) {
                     HollowObjectSchema refSchema = pk.getFieldSchema(dataset, i);
                     type = hollowImplClassname(refSchema.getName());
                 } else {
@@ -448,7 +448,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
                     .collect(joining(", "));
             classBuilder.append("        public Key(" + parameters + ") {\n");
             parameterList.forEach((n, t) -> {
-                if (t.equals("byte[]")) {
+                if(t.equals("byte[]")) {
                     classBuilder.append("            this." + n + " = " + n + " == null ? null : " + n + ".clone();\n");
                 } else {
                     classBuilder.append("            this." + n + " = " + n + ";\n");
@@ -462,7 +462,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
 
     private void appendPrimaryKeyDoc(StringBuilder classBuilder, FieldType type, String keyTypeName) {
         String kindSnippet;
-        switch (type) {
+        switch(type) {
             case STRING:
             case REFERENCE:
                 kindSnippet = String.format("class {@link %s}", keyTypeName);

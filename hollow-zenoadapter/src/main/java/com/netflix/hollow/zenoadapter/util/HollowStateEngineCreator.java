@@ -49,14 +49,14 @@ public class HollowStateEngineCreator {
         hollowFramework.prepareForNextCycle();
         ordinalMappings.clear();
 
-        for (NFTypeSerializer<?> serializer : stateEngine.getOrderedSerializers()) {
+        for(NFTypeSerializer<?> serializer : stateEngine.getOrderedSerializers()) {
             FastBlobTypeDeserializationState<?> typeState = stateEngine.getTypeDeserializationState(serializer.getName());
             typeState.createIdentityOrdinalMap();
         }
 
         SimultaneousExecutor executor = new SimultaneousExecutor(8, getClass(), "copy-all");
 
-        for (final NFTypeSerializer<?> serializer : stateEngine.getOrderedSerializers()) {
+        for(final NFTypeSerializer<?> serializer : stateEngine.getOrderedSerializers()) {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -67,9 +67,9 @@ public class HollowStateEngineCreator {
                     int mapping[] = new int[maxOrdinal + 1];
                     Arrays.fill(mapping, -1);
 
-                    for (int i = 0; i <= maxOrdinal; i++) {
+                    for(int i = 0; i <= maxOrdinal; i++) {
                         Object obj = state.get(i);
-                        if (obj != null) {
+                        if(obj != null) {
                             int ordinal = hollowFramework.add(serializer.getName(), obj);
                             while(ordinal >= mapping.length) {
                                 int oldLength = mapping.length;
@@ -87,7 +87,7 @@ public class HollowStateEngineCreator {
 
         try {
             executor.awaitSuccessfulCompletion();
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -129,10 +129,10 @@ public class HollowStateEngineCreator {
 
         DataOutputStream dos = new DataOutputStream(os);
         dos.writeShort(ordinalMappings.size());
-        for (Map.Entry<String, int[]> entry : ordinalMappings.entrySet()) {
+        for(Map.Entry<String, int[]> entry : ordinalMappings.entrySet()) {
             dos.writeUTF(entry.getKey());
             dos.writeInt(entry.getValue().length);
-            for (int i = 0; i < entry.getValue().length; i++) {
+            for(int i = 0; i < entry.getValue().length; i++) {
                 dos.writeInt(entry.getValue()[i]);
             }
         }

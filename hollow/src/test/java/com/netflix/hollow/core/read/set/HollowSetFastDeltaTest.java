@@ -71,7 +71,7 @@ public class HollowSetFastDeltaTest extends AbstractStateEngineTest {
     private void assertSet(HollowSetTypeReadState readState, int ordinal, int... elements) {
         Assert.assertEquals(elements.length, readState.size(ordinal));
 
-        for(int i=0;i<elements.length;i++) {
+        for(int i = 0; i < elements.length; i++) {
             Assert.assertTrue(readState.contains(ordinal, elements[i]));
         }
     }
@@ -79,13 +79,12 @@ public class HollowSetFastDeltaTest extends AbstractStateEngineTest {
     private void addRecord(int... ordinals) {
         HollowSetWriteRecord rec = new HollowSetWriteRecord();
 
-        for(int i=0;i<ordinals.length;i++) {
+        for(int i = 0; i < ordinals.length; i++) {
             rec.addElement(ordinals[i]);
         }
 
         writeStateEngine.add("TestSet", rec);
     }
-
 
 
     @Override

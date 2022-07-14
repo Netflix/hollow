@@ -43,7 +43,7 @@ public class HistoryStateTypeChanges {
         HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping = historicalState.getKeyOrdinalMapping().getTypeMappings().get(typeName);
         HollowObjectTypeDataAccess dataAccess = (HollowObjectTypeDataAccess) historicalState.getDataAccess().getTypeDataAccess(typeName);
         int[] groupedFieldIndexes = getGroupedFieldIndexes(groupedFieldNames, typeKeyMapping.getKeyIndex().getKeyFields());
-        
+
         IntMapEntryIterator removedIter = typeKeyMapping.removedOrdinalMappingIterator();
         IntMapEntryIterator addedIter = typeKeyMapping.addedOrdinalMappingIterator();
 
@@ -64,9 +64,9 @@ public class HistoryStateTypeChanges {
             }
         }
     }
-    
+
     private void addRecordDiff(RecordDiffTreeNode node, HollowHistoricalState historicalState, HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping, HollowHistoryRecordNamer recordNamer, HollowObjectTypeDataAccess dataAccess, int keyOrdinal, int fromOrdinal, int toOrdinal, int[] fieldGroupIndexes) {
-        for(int i=0;i<fieldGroupIndexes.length;i++) {
+        for(int i = 0; i < fieldGroupIndexes.length; i++) {
             node = node.getChildNode(typeKeyMapping.getKeyIndex().getKeyFieldValue(fieldGroupIndexes[i], keyOrdinal), fieldGroupIndexes[i]);
         }
         node.addRecordDiff(new RecordDiff(historicalState, recordNamer, typeKeyMapping, dataAccess, keyOrdinal, fromOrdinal, toOrdinal));
@@ -79,7 +79,7 @@ public class HistoryStateTypeChanges {
     public String getTypeName() {
         return typeName;
     }
-    
+
     public String[] getGroupedFieldNames() {
         return groupedFieldNames;
     }
@@ -99,12 +99,12 @@ public class HistoryStateTypeChanges {
     public boolean isEmpty() {
         return modifiedRecords.isEmpty() && addedRecords.isEmpty() && removedRecords.isEmpty();
     }
-    
+
     private int[] getGroupedFieldIndexes(String groupedFieldNames[], String[] keyFields) {
         int[] groupedFieldIndexes = new int[groupedFieldNames.length];
         Arrays.fill(groupedFieldIndexes, -1);
-        for(int i=0;i<groupedFieldNames.length;i++) {
-            for(int j=0;j<keyFields.length;j++) {
+        for(int i = 0; i < groupedFieldNames.length; i++) {
+            for(int j = 0; j < keyFields.length; j++) {
                 if(groupedFieldNames[i].equals(keyFields[j])) {
                     groupedFieldIndexes[i] = j;
                 }
@@ -113,7 +113,7 @@ public class HistoryStateTypeChanges {
 
         return groupedFieldIndexes;
     }
-    
+
     public RecordDiffTreeNode findTreeNode(String hierarchicalFieldName) {
         RecordDiffTreeNode node = findTreeNode(modifiedRecords, hierarchicalFieldName);
         if(node != null)

@@ -69,7 +69,8 @@ public class HollowProducerMetricsTests {
                     state.add(null);
                 }
             });
-        } catch (Exception ignored){ }
+        } catch (Exception ignored) {
+        }
 
         HollowProducerMetrics hollowProducerMetrics = producer.getMetrics();
         Assert.assertEquals(hollowProducerMetrics.getCyclesSucceeded(), 0);

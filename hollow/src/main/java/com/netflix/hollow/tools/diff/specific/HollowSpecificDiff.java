@@ -52,7 +52,7 @@ public class HollowSpecificDiff {
     public HollowSpecificDiff(HollowReadStateEngine from, HollowReadStateEngine to, String type) {
         this.from = from;
         this.to = to;
-        this.matcher = new HollowDiffMatcher((HollowObjectTypeReadState)from.getTypeState(type), (HollowObjectTypeReadState)to.getTypeState(type));
+        this.matcher = new HollowDiffMatcher((HollowObjectTypeReadState) from.getTypeState(type), (HollowObjectTypeReadState) to.getTypeState(type));
         this.type = type;
         this.totalUnmatchedFromElements = new AtomicLong();
         this.totalUnmatchedToElements = new AtomicLong();
@@ -90,7 +90,7 @@ public class HollowSpecificDiff {
     public void setElementKeyPaths(String... paths) {
         resetResults();
         elementKeyPaths = new BitSet(elementPaths.length);
-        for(int i=0;i<paths.length;i++) {
+        for(int i = 0; i < paths.length; i++) {
             int elementPathIdx = getElementPathIdx(paths[i]);
             if(elementPathIdx == -1)
                 throw new IllegalArgumentException("Key path must have been specified as an element match path.  Offending path: " + paths[i]);
@@ -103,7 +103,7 @@ public class HollowSpecificDiff {
     }
 
     public int getElementPathIdx(String path) {
-        for(int i=0;i<elementPaths.length;i++) {
+        for(int i = 0; i < elementPaths.length; i++) {
             if(elementPaths[i].equals(path))
                 return i;
         }
@@ -125,7 +125,7 @@ public class HollowSpecificDiff {
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "calculate");
         final int numThreads = executor.getCorePoolSize();
 
-        for(int i=0;i<numThreads;i++) {
+        for(int i = 0; i < numThreads; i++) {
             final int threadNumber = i;
             executor.execute(new Runnable() {
                 public void run() {
@@ -134,10 +134,10 @@ public class HollowSpecificDiff {
 
                     int hashedResults[] = new int[16];
 
-                    for(int i=threadNumber;i<matcher.getMatchedOrdinals().size();i += numThreads) {
+                    for(int i = threadNumber; i < matcher.getMatchedOrdinals().size(); i += numThreads) {
                         long ordinalPair = matcher.getMatchedOrdinals().get(i);
-                        int fromOrdinal = (int)(ordinalPair >>> 32);
-                        int toOrdinal = (int)ordinalPair;
+                        int fromOrdinal = (int) (ordinalPair >>> 32);
+                        int toOrdinal = (int) ordinalPair;
 
                         fromTraverser.traverse(fromOrdinal);
                         toTraverser.traverse(toOrdinal);
@@ -150,12 +150,12 @@ public class HollowSpecificDiff {
                         countMatches(fromTraverser, toTraverser, hashedResults);
                     }
 
-                    for(int i=threadNumber;i<matcher.getExtraInFrom().size();i+=numThreads) {
+                    for(int i = threadNumber; i < matcher.getExtraInFrom().size(); i += numThreads) {
                         fromTraverser.traverse(matcher.getExtraInFrom().get(i));
                         totalUnmatchedFromElements.addAndGet(fromTraverser.getNumMatches());
                     }
 
-                    for(int i=threadNumber;i<matcher.getExtraInTo().size();i+=numThreads) {
+                    for(int i = threadNumber; i < matcher.getExtraInTo().size(); i += numThreads) {
                         toTraverser.traverse(matcher.getExtraInTo().get(i));
                         totalUnmatchedToElements.addAndGet(toTraverser.getNumMatches());
                     }
@@ -176,7 +176,7 @@ public class HollowSpecificDiff {
 
         int hashMask = hashedResults.length - 1;
 
-        for(int j=0;j<toTraverser.getNumMatches();j++) {
+        for(int j = 0; j < toTraverser.getNumMatches(); j++) {
             int hash = elementKeyPaths == null ? toTraverser.getMatchHash(j) : toTraverser.getMatchHash(j, elementKeyPaths);
             int bucket = hash & hashMask;
 
@@ -213,7 +213,7 @@ public class HollowSpecificDiff {
         Arrays.fill(hashedResults, -1);
         int hashMask = hashedResults.length - 1;
 
-        for(int j=0;j<fromTraverser.getNumMatches();j++) {
+        for(int j = 0; j < fromTraverser.getNumMatches(); j++) {
             int hash = elementKeyPaths == null ? fromTraverser.getMatchHash(j) : fromTraverser.getMatchHash(j, elementKeyPaths);
             int bucket = hash & hashMask;
 

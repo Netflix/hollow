@@ -61,7 +61,7 @@ public class HistoricalObjectDiffPage extends HistoryPage {
         List<HistoricalObjectChangeVersion> changeVersions = new ArrayList<HistoricalObjectChangeVersion>();
         for(HollowHistoricalState historicalState : history.getHistoricalStates()) {
             HollowHistoricalStateTypeKeyOrdinalMapping typeMapping = historicalState.getKeyOrdinalMapping().getTypeMapping(type);
-            if (typeMapping == null) continue;
+            if(typeMapping == null) continue;
 
             if(typeMapping.findAddedOrdinal(keyOrdinal) != -1 || typeMapping.findRemovedOrdinal(keyOrdinal) != -1) {
                 changeVersions.add(new HistoricalObjectChangeVersion(historicalState.getVersion(), VersionTimestampConverter.getTimestamp(historicalState.getVersion(),  ui.getTimeZone())));

@@ -21,16 +21,16 @@ import java.util.Arrays;
 public class RecordPrimaryKey {
     private final String type;
     private final Object[] key;
-    
+
     public RecordPrimaryKey(String type, Object[] key) {
         this.type = type;
         this.key = key;
     }
-    
+
     public String getType() {
         return type;
     }
-    
+
     public Object[] getKey() {
         return key;
     }
@@ -43,7 +43,7 @@ public class RecordPrimaryKey {
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof RecordPrimaryKey) {
-            return type.equals(((RecordPrimaryKey) obj).type) 
+            return type.equals(((RecordPrimaryKey) obj).type)
                     && Arrays.equals(key, ((RecordPrimaryKey) obj).key);
         }
         return false;

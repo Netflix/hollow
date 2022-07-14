@@ -25,6 +25,7 @@ public class JsonUtil {
     public static void print(JsonNode node) throws Exception {
         print(node.traverse());
     }
+
     public static void print(JsonParser parser) throws Exception {
         JsonToken token = parser.nextToken();
         print(parser, token, 0, System.out);
@@ -36,17 +37,17 @@ public class JsonUtil {
     }
 
     private static void print(int index, String value, PrintStream out) {
-        for (int i = 0; i < index; i++) {
+        for(int i = 0; i < index; i++) {
             out.print("\t");
         }
         out.println(value);
     }
 
     private static void print(JsonParser parser, JsonToken token, int index, PrintStream out) throws Exception {
-        if (index == 0) System.out.println("\n\n -----");
+        if(index == 0) System.out.println("\n\n -----");
         try {
-            while (token != null && token != JsonToken.END_OBJECT) {
-                switch (token) {
+            while(token != null && token != JsonToken.END_OBJECT) {
+                switch(token) {
                     case START_ARRAY:
                         print(index, String.format("fieldname=%s, token=%s", parser.getCurrentName(), token), out);
                         print(parser, parser.nextToken(), index + 1, out);

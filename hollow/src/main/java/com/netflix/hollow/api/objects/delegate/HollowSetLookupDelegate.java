@@ -53,7 +53,7 @@ public class HollowSetLookupDelegate<T> implements HollowSetDelegate<T> {
     @Override
     public boolean contains(HollowSet<T> set, int ordinal, Object o) {
         HollowOrdinalIterator iter;
-        
+
         if(getSchema().getHashKey() != null) {
             iter = dataAccess.ordinalIterator(ordinal);
         } else {
@@ -69,7 +69,7 @@ public class HollowSetLookupDelegate<T> implements HollowSetDelegate<T> {
         }
         return false;
     }
-    
+
     @Override
     public T findElement(HollowSet<T> set, int ordinal, Object... keys) {
         int elementOrdinal = dataAccess.findElement(ordinal, keys);

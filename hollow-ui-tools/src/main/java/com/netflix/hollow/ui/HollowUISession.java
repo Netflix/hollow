@@ -41,7 +41,7 @@ public class HollowUISession {
     public void clearAttribute(String param) {
         sessionParams.remove(param);
     }
-    
+
     public void setAttribute(String param, Object value) {
         sessionParams.put(param, value);
     }
@@ -92,12 +92,13 @@ public class HollowUISession {
     }
 
     private static void cleanupSessions() {
-        while (!Thread.currentThread().isInterrupted()) {
+        while(!Thread.currentThread().isInterrupted()) {
             sessions.values()
-                    .removeIf(s-> s.lastAccessed + SESSION_ABANDONMENT_MILLIS < System.currentTimeMillis());
+                    .removeIf(s -> s.lastAccessed + SESSION_ABANDONMENT_MILLIS < System.currentTimeMillis());
             try {
                 MINUTES.sleep(1);
-            } catch (InterruptedException e) { }
+            } catch (InterruptedException e) {
+            }
         }
     }
 }

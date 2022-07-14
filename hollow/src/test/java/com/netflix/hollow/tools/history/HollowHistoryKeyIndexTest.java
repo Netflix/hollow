@@ -133,7 +133,7 @@ public class HollowHistoryKeyIndexTest extends AbstractStateEngineTest {
 
         actualResults.sort();
 
-        for(int i=0;i<expectedResults.length;i++) {
+        for(int i = 0; i < expectedResults.length; i++) {
             Assert.assertEquals(expectedResults[i], actualResults.get(i));
         }
     }

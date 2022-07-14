@@ -57,7 +57,7 @@ public class HashCodeFinderTest {
 
         Top(int n) {
             this.m = new HashMap<>();
-            for (int i = 0; i < n; i++) {
+            for(int i = 0; i < n; i++) {
                 StringUsingHashCodeFinder s = new StringUsingHashCodeFinder(
                         Integer.toString(i));
                 m.put(s, s);
@@ -66,7 +66,8 @@ public class HashCodeFinderTest {
     }
 
     static class StringUsingHashCodeFinder {
-        @HollowInline final String s;
+        @HollowInline
+        final String s;
 
         StringUsingHashCodeFinder(String s) {
             this.s = s;
@@ -76,12 +77,14 @@ public class HashCodeFinderTest {
     private static class TestHollowObjectHashCodeFinder implements HollowObjectHashCodeFinder {
         final AtomicInteger i = new AtomicInteger();
 
-        @Override public int hashCode(Object objectToHash) {
+        @Override
+        public int hashCode(Object objectToHash) {
             throw new UnsupportedOperationException();
         }
 
-        @Override public int hashCode(String typeName, int ordinal, Object objectToHash) {
-            if (typeName.equals("StringUsingHashCodeFinder")) {
+        @Override
+        public int hashCode(String typeName, int ordinal, Object objectToHash) {
+            if(typeName.equals("StringUsingHashCodeFinder")) {
                 i.incrementAndGet();
                 String s = ((StringUsingHashCodeFinder) objectToHash).s;
                 return s.hashCode() ^ s.charAt(0);
@@ -90,11 +93,13 @@ public class HashCodeFinderTest {
             }
         }
 
-        @Override public Set<String> getTypesWithDefinedHashCodes() {
+        @Override
+        public Set<String> getTypesWithDefinedHashCodes() {
             return Collections.singleton("StringUsingHashCodeFinder");
         }
 
-        @Override public int hashCode(int ordinal, Object objectToHash) {
+        @Override
+        public int hashCode(int ordinal, Object objectToHash) {
             throw new UnsupportedOperationException();
         }
     }

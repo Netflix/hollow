@@ -44,7 +44,8 @@ public class HollowConsumerMetricsTests {
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
         try {
             consumer.triggerRefreshTo(0);
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
 
         HollowConsumerMetrics hollowConsumerMetrics = consumer.getMetrics();
         Assert.assertEquals(hollowConsumerMetrics.getRefreshFailed(), 1);
@@ -69,7 +70,8 @@ public class HollowConsumerMetricsTests {
 
         try {
             consumer.triggerRefreshTo(0);
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
 
         HollowConsumerMetrics hollowConsumerMetrics = consumer.getMetrics();
         Assert.assertEquals(hollowConsumerMetrics.getRefreshFailed(), 1);

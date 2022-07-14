@@ -70,7 +70,7 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
         this.uniqueTypeExtractor = SelectFieldPathResultExtractor
                 .from(consumer.getAPI().getClass(), consumer.getStateEngine(), uniqueType, "", uniqueType);
 
-        if (primaryTypeKey != null) {
+        if(primaryTypeKey != null) {
             matchFields = validatePrimaryKeyFieldPaths(consumer, uniqueSchemaName, primaryTypeKey, matchFields);
         }
 
@@ -78,7 +78,7 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
         this.matchFieldPaths = matchFields.stream()
                 .map(mf -> mf.fieldPath.toString())
                 .toArray(String[]::new);
-        
+
         this.hpki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), uniqueSchemaName, matchFieldPaths);
     }
 
@@ -103,7 +103,7 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
                     return mfe != null ? Stream.of(mfe) : null;
                 }).collect(toList());
 
-        if (orderedMatchFields.size() != paths.size()) {
+        if(orderedMatchFields.size() != paths.size()) {
             // @@@
             throw new IllegalArgumentException();
         }
@@ -160,27 +160,27 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
     public T findMatch(Q key) {
         Object[] keyArray = new Object[matchFields.size()];
         int keyArrayLogicalSize = 0;
-        for (int i = 0; i < matchFields.size(); i++)
+        for(int i = 0; i < matchFields.size(); i++)
         {
             Object matched = matchFields.get(i).extract(key);
-            if (matched != null) {
+            if(matched != null) {
                 keyArray[keyArrayLogicalSize++] = matched;
             }
         }
 
         int ordinal = -1;
-        if (keyArrayLogicalSize <= 0)
+        if(keyArrayLogicalSize <= 0)
             return null;
-        else if (keyArrayLogicalSize == 1)
+        else if(keyArrayLogicalSize == 1)
             ordinal = hpki.getMatchingOrdinal(keyArray[0]);
-        else if (keyArrayLogicalSize == 2)
+        else if(keyArrayLogicalSize == 2)
             ordinal = hpki.getMatchingOrdinal(keyArray[0], keyArray[1]);
-        else if (keyArrayLogicalSize == 3)
+        else if(keyArrayLogicalSize == 3)
             ordinal = hpki.getMatchingOrdinal(keyArray[0], keyArray[1], keyArray[2]);
         else
             ordinal = hpki.getMatchingOrdinal(keyArray);
 
-        if (ordinal == HollowConstants.ORDINAL_NONE) {
+        if(ordinal == HollowConstants.ORDINAL_NONE) {
             return null;
         }
         return uniqueTypeExtractor.extract(api, ordinal);
@@ -188,10 +188,12 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
 
     // HollowConsumer.RefreshListener
 
-    @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+    @Override
+    public void refreshStarted(long currentVersion, long requestedVersion) {
     }
 
-    @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
+    @Override
+    public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
         HollowPrimaryKeyIndex hpki = this.hpki;
         hpki.detachFromDeltaUpdates();
         hpki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), hpki.getPrimaryKey());
@@ -200,30 +202,36 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
         this.api = api;
     }
 
-    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
+    @Override
+    public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
         this.api = api;
     }
 
-    @Override public void blobLoaded(HollowConsumer.Blob transition) {
+    @Override
+    public void blobLoaded(HollowConsumer.Blob transition) {
     }
 
-    @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+    @Override
+    public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
     }
 
-    @Override public void refreshFailed(
+    @Override
+    public void refreshFailed(
             long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
     }
 
     // HollowConsumer.RefreshRegistrationListener
 
-    @Override public void onBeforeAddition(HollowConsumer c) {
-        if (c != consumer) {
+    @Override
+    public void onBeforeAddition(HollowConsumer c) {
+        if(c != consumer) {
             throw new IllegalStateException("The index's consumer and the listener's consumer are not the same");
         }
         hpki.listenForDeltaUpdates();
     }
 
-    @Override public void onAfterRemoval(HollowConsumer c) {
+    @Override
+    public void onAfterRemoval(HollowConsumer c) {
         hpki.detachFromDeltaUpdates();
     }
 
@@ -270,7 +278,7 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
             assert schema.getSchemaType() == HollowSchema.SchemaType.OBJECT;
 
             this.primaryTypeKey = ((HollowObjectSchema) schema).getPrimaryKey();
-            if (primaryTypeKey == null) {
+            if(primaryTypeKey == null) {
                 throw new IllegalArgumentException(
                         String.format("No primary key associated with primary type %s", uniqueType));
             }
@@ -310,7 +318,7 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
          */
         public <Q> UniqueKeyIndex<T, Q> usingPath(String keyFieldPath, Class<Q> keyFieldType) {
             Objects.requireNonNull(keyFieldPath);
-            if (keyFieldPath.isEmpty()) {
+            if(keyFieldPath.isEmpty()) {
                 throw new IllegalArgumentException("keyFieldPath argument is an empty String");
             }
             Objects.requireNonNull(keyFieldType);

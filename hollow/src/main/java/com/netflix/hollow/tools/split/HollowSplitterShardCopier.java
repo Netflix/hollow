@@ -90,9 +90,9 @@ public class HollowSplitterShardCopier {
 
     private boolean isDefinedHashCode(HollowTypeReadState typeState) {
         if(typeState instanceof HollowSetTypeReadState)
-            return input.getTypesWithDefinedHashCodes().contains(((HollowSetSchema)typeState.getSchema()).getElementType());
+            return input.getTypesWithDefinedHashCodes().contains(((HollowSetSchema) typeState.getSchema()).getElementType());
         if(typeState instanceof HollowMapTypeReadState)
-            return input.getTypesWithDefinedHashCodes().contains(((HollowMapSchema)typeState.getSchema()).getKeyType());
+            return input.getTypesWithDefinedHashCodes().contains(((HollowMapSchema) typeState.getSchema()).getKeyType());
         return false;
     }
 

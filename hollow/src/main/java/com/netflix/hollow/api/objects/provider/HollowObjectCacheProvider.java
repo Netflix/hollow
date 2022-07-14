@@ -63,8 +63,8 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
                     T cached = previous.getHollowObject(ordinal);
                     arr.set(ordinal, cached);
                     if(cached instanceof HollowRecord)
-                        ((HollowCachedDelegate)((HollowRecord)cached).getDelegate()).updateTypeAPI(typeAPI);
-                } else if(populatedOrdinals.get(ordinal)){
+                        ((HollowCachedDelegate) ((HollowRecord) cached).getDelegate()).updateTypeAPI(typeAPI);
+                } else if(populatedOrdinals.get(ordinal)) {
                     arr.set(ordinal, instantiateCachedObject(factory, typeDataAccess, typeAPI, ordinal));
                 }
             }
@@ -72,7 +72,7 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
             if(typeDataAccess instanceof HollowTypeReadState) {
                 this.factory = factory;
                 this.typeAPI = typeAPI;
-                this.typeReadState = (HollowTypeReadState)typeDataAccess;
+                this.typeReadState = (HollowTypeReadState) typeDataAccess;
                 this.typeReadState.addListener(this);
             }
 
@@ -97,10 +97,10 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
     @Override
     public void addedOrdinal(int ordinal) {
         // guard against being detached (or constructed without a HollowTypeReadState)
-        if (factory == null)
+        if(factory == null)
             return;
 
-        for (int i = cachedItems.size(); i <= ordinal; ++i)
+        for(int i = cachedItems.size(); i <= ordinal; ++i)
             cachedItems.add(null);
         cachedItems.set(ordinal, instantiateCachedObject(factory, typeReadState, typeAPI, ordinal));
     }
@@ -108,13 +108,21 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
     private T instantiateCachedObject(HollowFactory<T> factory, HollowTypeDataAccess typeDataAccess, HollowTypeAPI typeAPI, int ordinal) {
         try {
             return factory.newCachedHollowObject(typeDataAccess, typeAPI, ordinal);
-        } catch(Throwable th) {
+        } catch (Throwable th) {
             log.log(Level.SEVERE, "Cached object instantiation failed", th);
             return null;
         }
     }
 
-    @Override public void beginUpdate() { }
-    @Override public void removedOrdinal(int ordinal) { }
-    @Override public void endUpdate() { }
+    @Override
+    public void beginUpdate() {
+    }
+
+    @Override
+    public void removedOrdinal(int ordinal) {
+    }
+
+    @Override
+    public void endUpdate() {
+    }
 }

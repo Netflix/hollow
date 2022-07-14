@@ -38,10 +38,10 @@ import java.util.Set;
  *
  */
 public class HollowCombinerExcludePrimaryKeysCopyDirector implements HollowCombinerCopyDirector {
-    
+
     private final HollowCombinerCopyDirector baseDirector;
     private final Map<HollowTypeReadState, BitSet> excludedOrdinals;
-    
+
     public HollowCombinerExcludePrimaryKeysCopyDirector() {
         this(HollowCombinerCopyDirector.DEFAULT_DIRECTOR);
     }
@@ -53,7 +53,7 @@ public class HollowCombinerExcludePrimaryKeysCopyDirector implements HollowCombi
         this.excludedOrdinals = new HashMap<HollowTypeReadState, BitSet>();
         this.baseDirector = baseDirector;
     }
-    
+
     /**
      * Exclude the record which matches the specified key.
      * 
@@ -62,19 +62,19 @@ public class HollowCombinerExcludePrimaryKeysCopyDirector implements HollowCombi
      */
     public void excludeKey(HollowPrimaryKeyIndex idx, Object... key) {
         int excludeOrdinal = idx.getMatchingOrdinal(key);
-        
+
         if(excludeOrdinal >= 0) {
             BitSet excludedOrdinals = this.excludedOrdinals.get(idx.getTypeState());
-            
+
             if(excludedOrdinals == null) {
-                excludedOrdinals = new BitSet(idx.getTypeState().maxOrdinal()+1);
+                excludedOrdinals = new BitSet(idx.getTypeState().maxOrdinal() + 1);
                 this.excludedOrdinals.put(idx.getTypeState(), excludedOrdinals);
             }
-            
+
             excludedOrdinals.set(excludeOrdinal);
         }
     }
-    
+
     /**
      * Exclude any objects which are referenced by excluded objects.
      */
@@ -82,17 +82,17 @@ public class HollowCombinerExcludePrimaryKeysCopyDirector implements HollowCombi
         Set<HollowReadStateEngine> stateEngines = new HashSet<HollowReadStateEngine>();
         for(Map.Entry<HollowTypeReadState, BitSet> entry : excludedOrdinals.entrySet())
             stateEngines.add(entry.getKey().getStateEngine());
-        
+
         for(HollowReadStateEngine stateEngine : stateEngines) {
             Map<String, BitSet> typeBitSetsForStateEngine = new HashMap<String, BitSet>();
-            
+
             for(Map.Entry<HollowTypeReadState, BitSet> entry : excludedOrdinals.entrySet()) {
                 if(entry.getKey().getStateEngine() == stateEngine) {
                     String type = entry.getKey().getSchema().getName();
                     typeBitSetsForStateEngine.put(type, BitSet.valueOf(entry.getValue().toLongArray()));
                 }
             }
-            
+
             TransitiveSetTraverser.addTransitiveMatches(stateEngine, typeBitSetsForStateEngine);
 
             for(Map.Entry<String, BitSet> entry : typeBitSetsForStateEngine.entrySet())
@@ -107,5 +107,5 @@ public class HollowCombinerExcludePrimaryKeysCopyDirector implements HollowCombi
             return false;
         return baseDirector.shouldCopy(typeState, ordinal);
     }
-    
+
 }

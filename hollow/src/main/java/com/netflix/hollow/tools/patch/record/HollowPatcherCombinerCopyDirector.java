@@ -44,7 +44,7 @@ public class HollowPatcherCombinerCopyDirector implements HollowCombinerCopyDire
             if(bitSet == null)
                 return true;
             return !bitSet.get(ordinal);
-        } else if(typeState.getStateEngine() == patchFrom){
+        } else if(typeState.getStateEngine() == patchFrom) {
             BitSet bitSet = patchFromMatchesClosure.get(typeState.getSchema().getName());
             if(bitSet == null)
                 return false;

@@ -27,23 +27,23 @@ import java.util.List;
 import java.util.Map;
 
 public class HollowSplitterPrimaryKeyCopyDirector implements HollowSplitterCopyDirector {
-    
+
     private final int numShards;
     private final List<String> topLevelTypes;
     private final Map<String, HollowPrimaryKeyValueDeriver> primaryKeyDeriverByType;
-    
+
     public HollowSplitterPrimaryKeyCopyDirector(HollowReadStateEngine stateEngine, int numShards, PrimaryKey... keys) {
         this.numShards = numShards;
         this.topLevelTypes = new ArrayList<String>(keys.length);
         this.primaryKeyDeriverByType = new HashMap<String, HollowPrimaryKeyValueDeriver>();
-        
-        for(int i=0;i<keys.length;i++) {
+
+        for(int i = 0; i < keys.length; i++) {
             topLevelTypes.add(keys[i].getType());
             HollowPrimaryKeyValueDeriver deriver = new HollowPrimaryKeyValueDeriver(keys[i], stateEngine);
             primaryKeyDeriverByType.put(keys[i].getType(), deriver);
         }
     }
-    
+
     public void addReplicatedTypes(String... replicatedTypes) {
         topLevelTypes.addAll(Arrays.asList(replicatedTypes));
     }
@@ -61,15 +61,15 @@ public class HollowSplitterPrimaryKeyCopyDirector implements HollowSplitterCopyD
     @Override
     public int getShard(HollowTypeReadState topLevelType, int ordinal) {
         HollowPrimaryKeyValueDeriver deriver = primaryKeyDeriverByType.get(topLevelType.getSchema().getName());
-        
+
         if(deriver == null)
             return -1;
-        
+
         Object[] key = deriver.getRecordKey(ordinal);
-        
+
         return hashKey(topLevelType.getSchema().getName(), key) % numShards;
     }
-    
+
     public int hashKey(String type, Object[] key) {
         return Arrays.hashCode(key);
     }

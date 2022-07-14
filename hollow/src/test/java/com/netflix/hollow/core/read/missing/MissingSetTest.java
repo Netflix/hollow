@@ -101,6 +101,7 @@ public class MissingSetTest extends AbstractStateEngineTest {
 
 
     @Override
-    protected void initializeTypeStates() { }
+    protected void initializeTypeStates() {
+    }
 
 }

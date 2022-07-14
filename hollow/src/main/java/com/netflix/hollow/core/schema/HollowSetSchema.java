@@ -70,11 +70,11 @@ public class HollowSetSchema extends HollowCollectionSchema {
 
     @Override
     public boolean equals(Object other) {
-        if (this == other)
+        if(this == other)
             return true;
         if(!(other instanceof HollowSetSchema))
             return false;
-        HollowSetSchema otherSchema = (HollowSetSchema)other;
+        HollowSetSchema otherSchema = (HollowSetSchema) other;
         if(!getName().equals(otherSchema.getName()))
             return false;
         if(!getElementType().equals(otherSchema.getElementType()))
@@ -101,7 +101,7 @@ public class HollowSetSchema extends HollowCollectionSchema {
             builder.append(" @HashKey(");
             if(hashKey.numFields() > 0) {
                 builder.append(hashKey.getFieldPath(0));
-                for(int i=1;i<hashKey.numFields();i++) {
+                for(int i = 1; i < hashKey.numFields(); i++) {
                     builder.append(", ").append(hashKey.getFieldPath(i));
                 }
             }
@@ -126,7 +126,7 @@ public class HollowSetSchema extends HollowCollectionSchema {
 
         if(getHashKey() != null) {
             VarInt.writeVInt(dos, getHashKey().numFields());
-            for(int i=0;i<getHashKey().numFields();i++) {
+            for(int i = 0; i < getHashKey().numFields(); i++) {
                 dos.writeUTF(getHashKey().getFieldPath(i));
             }
         }

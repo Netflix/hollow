@@ -44,9 +44,9 @@ public class HollowBlobInput implements Closeable {
      * @throws IOException if the Hollow Blob Input couldn't be initialized
      */
     public static HollowBlobInput modeBasedSelector(MemoryMode mode, HollowConsumer.Blob blob) throws IOException {
-        if (mode.equals(ON_HEAP)) {
+        if(mode.equals(ON_HEAP)) {
             return serial(blob.getInputStream());
-        } else if (mode.equals(SHARED_MEMORY_LAZY)) {
+        } else if(mode.equals(SHARED_MEMORY_LAZY)) {
             return randomAccess(blob.getFile());
         } else {
             throw new UnsupportedOperationException();
@@ -64,9 +64,9 @@ public class HollowBlobInput implements Closeable {
      * @throws IOException if the Hollow Blob Input couldn't be initialized
      */
     public static HollowBlobInput modeBasedSelector(MemoryMode mode, OptionalBlobPartInput input, String partName) throws IOException {
-        if (mode.equals(ON_HEAP)) {
+        if(mode.equals(ON_HEAP)) {
             return serial(input.getInputStream(partName));
-        } else if (mode.equals(SHARED_MEMORY_LAZY)) {
+        } else if(mode.equals(SHARED_MEMORY_LAZY)) {
             return randomAccess(input.getFile(partName));
         } else {
             throw new UnsupportedOperationException();
@@ -88,7 +88,7 @@ public class HollowBlobInput implements Closeable {
     /**
      * Useful for testing with custom buffer capacity
      */
-    public static HollowBlobInput randomAccess(File f,int singleBufferCapacity) throws IOException {
+    public static HollowBlobInput randomAccess(File f, int singleBufferCapacity) throws IOException {
         HollowBlobInput hbi = new HollowBlobInput(SHARED_MEMORY_LAZY);
         RandomAccessFile raf = new RandomAccessFile(f, "r");
         hbi.input = raf;
@@ -127,9 +127,9 @@ public class HollowBlobInput implements Closeable {
      * @throws UnsupportedOperationException if the input type wasn't  one of {@code DataInputStream} or {@code RandomAccessFile}
      */
     public int read() throws IOException {
-        if (input instanceof RandomAccessFile) {
+        if(input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).read();
-        } else if (input instanceof DataInputStream) {
+        } else if(input instanceof DataInputStream) {
             return ((DataInputStream) input).read();
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
@@ -146,9 +146,9 @@ public class HollowBlobInput implements Closeable {
      * @throws UnsupportedOperationException if the input type wasn't  one of {@code DataInputStream} or {@code RandomAccessFile}
      */
     public int read(byte b[], int off, int len) throws IOException {
-        if (input instanceof RandomAccessFile) {
+        if(input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).read(b, off, len);
-        } else if (input instanceof DataInputStream) {
+        } else if(input instanceof DataInputStream) {
             return ((DataInputStream) input).read(b, off, len);
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
@@ -164,9 +164,9 @@ public class HollowBlobInput implements Closeable {
      * @exception UnsupportedOperationException if called when Hollow Blob Input is not a {@code RandomAccessFile}
      */
     public void seek(long pos) throws IOException {
-        if (input instanceof RandomAccessFile) {
+        if(input instanceof RandomAccessFile) {
             ((RandomAccessFile) input).seek(pos);
-        } else if (input instanceof DataInputStream) {
+        } else if(input instanceof DataInputStream) {
             throw new UnsupportedOperationException("Can not seek on Hollow Blob Input of type DataInputStream");
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
@@ -180,9 +180,9 @@ public class HollowBlobInput implements Closeable {
      * @exception IOException if an I/O error occurs.
      */
     public long getFilePointer() throws IOException {
-        if (input instanceof RandomAccessFile) {
+        if(input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).getFilePointer();
-        } else if (input instanceof DataInputStream) {
+        } else if(input instanceof DataInputStream) {
             throw new UnsupportedOperationException("Can not get file pointer for Hollow Blob Input of type DataInputStream");
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
@@ -197,9 +197,9 @@ public class HollowBlobInput implements Closeable {
      * @exception IOException if an I/O error occurs.
      */
     public final short readShort() throws IOException {
-        if (input instanceof RandomAccessFile) {
+        if(input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).readShort();
-        } else if (input instanceof DataInputStream) {
+        } else if(input instanceof DataInputStream) {
             return ((DataInputStream) input).readShort();
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
@@ -214,9 +214,9 @@ public class HollowBlobInput implements Closeable {
      * @exception IOException if an I/O error occurs.
      */
     public final int readInt() throws IOException {
-        if (input instanceof RandomAccessFile) {
+        if(input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).readInt();
-        } else if (input instanceof DataInputStream) {
+        } else if(input instanceof DataInputStream) {
             return ((DataInputStream) input).readInt();
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
@@ -231,9 +231,9 @@ public class HollowBlobInput implements Closeable {
      * @exception IOException if an I/O error occurs.
      */
     public final long readLong() throws IOException {
-        if (input instanceof RandomAccessFile) {
+        if(input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).readLong();
-        } else if (input instanceof DataInputStream) {
+        } else if(input instanceof DataInputStream) {
             return ((DataInputStream) input).readLong();
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
@@ -247,9 +247,9 @@ public class HollowBlobInput implements Closeable {
      * @exception IOException if an I/O error occurs.
      */
     public final String readUTF() throws IOException {
-        if (input instanceof RandomAccessFile) {
+        if(input instanceof RandomAccessFile) {
             return ((RandomAccessFile) input).readUTF();
-        } else if (input instanceof DataInputStream) {
+        } else if(input instanceof DataInputStream) {
             return ((DataInputStream) input).readUTF();
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
@@ -270,17 +270,17 @@ public class HollowBlobInput implements Closeable {
      * @throws IOException
      */
     public long skipBytes(long n) throws IOException {
-        if (input instanceof RandomAccessFile) {
+        if(input instanceof RandomAccessFile) {
             long total = 0;
             int expected = 0;
             int actual = 0;
             do {
-                expected = (n-total) > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) (n-total);
+                expected = (n - total) > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) (n - total);
                 actual = ((RandomAccessFile) input).skipBytes(expected);    // RandomAccessFile::skipBytes supports int
                 total = total + actual;
-            } while (total < n && actual > 0);
+            } while(total < n && actual > 0);
             return total;
-        } else if (input instanceof DataInputStream) {
+        } else if(input instanceof DataInputStream) {
             return ((DataInputStream) input).skip(n); // InputStream::skip supports long
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
@@ -293,9 +293,9 @@ public class HollowBlobInput implements Closeable {
      */
     @Override
     public void close() throws IOException {
-        if (input instanceof RandomAccessFile) {
+        if(input instanceof RandomAccessFile) {
             ((RandomAccessFile) input).close();
-        } else if (input instanceof DataInputStream) {
+        } else if(input instanceof DataInputStream) {
             ((DataInputStream) input).close();
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
@@ -307,9 +307,9 @@ public class HollowBlobInput implements Closeable {
     }
 
     public BlobByteBuffer getBuffer() {
-        if (input instanceof RandomAccessFile) {
+        if(input instanceof RandomAccessFile) {
             return buffer;
-        } else if (input instanceof DataInputStream) {
+        } else if(input instanceof DataInputStream) {
             throw new UnsupportedOperationException("No buffer associated with underlying DataInputStream");
         } else {
             throw new UnsupportedOperationException("Unknown Hollow Blob Input type");

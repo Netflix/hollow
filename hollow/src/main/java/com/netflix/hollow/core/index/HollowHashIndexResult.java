@@ -113,11 +113,11 @@ public class HollowHashIndexResult {
 
             @Override
             public boolean tryAdvance(IntConsumer action) {
-                while (currentBucket < endBucket) {
+                while(currentBucket < endBucket) {
                     int selectOrdinal = (int) hashIndexState.getSelectHashArray().getElementValue(
                             (currentBucket++) * hashIndexState.getBitsPerSelectHashEntry(),
                             hashIndexState.getBitsPerSelectHashEntry()) - 1;
-                    if (selectOrdinal != -1) {
+                    if(selectOrdinal != -1) {
                         action.accept(selectOrdinal);
                         return true;
                     }

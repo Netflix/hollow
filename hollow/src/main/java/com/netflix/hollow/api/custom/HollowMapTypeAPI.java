@@ -29,11 +29,11 @@ public class HollowMapTypeAPI extends HollowTypeAPI {
     public HollowMapTypeAPI(HollowAPI api, HollowMapTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess);
     }
-    
+
     public int size(int ordinal) {
         return getTypeDataAccess().size(ordinal);
     }
-    
+
     public int get(int ordinal, int keyOrdinal) {
         return getTypeDataAccess().get(ordinal, keyOrdinal);
     }
@@ -41,15 +41,15 @@ public class HollowMapTypeAPI extends HollowTypeAPI {
     public int get(int ordinal, int keyOrdinal, int hashCode) {
         return getTypeDataAccess().get(ordinal, keyOrdinal, hashCode);
     }
-    
+
     public int findKey(int ordinal, Object... hashKey) {
         return getTypeDataAccess().findKey(ordinal, hashKey);
     }
-    
+
     public int findValue(int ordinal, Object... hashKey) {
         return getTypeDataAccess().findValue(ordinal, hashKey);
     }
-    
+
     public long findEntry(int ordinal, Object... hashKey) {
         return getTypeDataAccess().findEntry(ordinal, hashKey);
     }
@@ -61,7 +61,7 @@ public class HollowMapTypeAPI extends HollowTypeAPI {
     public HollowMapEntryOrdinalIterator potentialMatchOrdinalIterator(int ordinal, int hashCode) {
         return getTypeDataAccess().potentialMatchOrdinalIterator(ordinal, hashCode);
     }
-    
+
     @Override
     public HollowMapTypeDataAccess getTypeDataAccess() {
         return (HollowMapTypeDataAccess) typeDataAccess;

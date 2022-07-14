@@ -99,7 +99,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
         this.memoryRecycler = memoryRecycler;
 
-        for(int i=0;i<primaryKey.numFields();i++) {
+        for(int i = 0; i < primaryKey.numFields(); i++) {
             fieldPathIndexes[i] = primaryKey.getFieldPathIndex(stateEngine, i);
             fieldTypes[i] = primaryKey.getFieldType(stateEngine, i);
         }
@@ -111,12 +111,12 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     private static PrimaryKey createPrimaryKey(HollowReadStateEngine stateEngine, String type, String... fieldPaths) {
-        if (fieldPaths != null && fieldPaths.length != 0) {
+        if(fieldPaths != null && fieldPaths.length != 0) {
             return new PrimaryKey(type, fieldPaths);
         }
 
         HollowSchema schema = stateEngine.getSchema(type);
-        if (schema instanceof HollowObjectSchema) {
+        if(schema instanceof HollowObjectSchema) {
             return ((HollowObjectSchema) schema).getPrimaryKey();
         }
         return null;
@@ -280,7 +280,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
             return -1;
 
         int hashCode = 0;
-        for(int i=0;i<keys.length;i++)
+        for(int i = 0; i < keys.length; i++)
             hashCode ^= keyHashCode(keys[i], i);
 
         int ordinal = -1;
@@ -303,27 +303,27 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     private int readOrdinal(PrimaryKeyIndexHashTable hashTable, int bucket) {
-        return (int)hashTable.hashTable.getElementValue((long)hashTable.bitsPerElement * (long)bucket, hashTable.bitsPerElement) - 1;
+        return (int) hashTable.hashTable.getElementValue((long) hashTable.bitsPerElement * (long) bucket, hashTable.bitsPerElement) - 1;
     }
 
     private int keyHashCode(Object key, int fieldIdx) {
         switch(fieldTypes[fieldIdx]) {
             case BOOLEAN:
-                return HashCodes.hashInt(HollowReadFieldUtils.booleanHashCode((Boolean)key));
+                return HashCodes.hashInt(HollowReadFieldUtils.booleanHashCode((Boolean) key));
             case DOUBLE:
-                return HashCodes.hashInt(HollowReadFieldUtils.doubleHashCode(((Double)key).doubleValue()));
+                return HashCodes.hashInt(HollowReadFieldUtils.doubleHashCode(((Double) key).doubleValue()));
             case FLOAT:
-                return HashCodes.hashInt(HollowReadFieldUtils.floatHashCode(((Float)key).floatValue()));
+                return HashCodes.hashInt(HollowReadFieldUtils.floatHashCode(((Float) key).floatValue()));
             case INT:
-                return HashCodes.hashInt(HollowReadFieldUtils.intHashCode(((Integer)key).intValue()));
+                return HashCodes.hashInt(HollowReadFieldUtils.intHashCode(((Integer) key).intValue()));
             case LONG:
-                return HashCodes.hashInt(HollowReadFieldUtils.longHashCode(((Long)key).longValue()));
+                return HashCodes.hashInt(HollowReadFieldUtils.longHashCode(((Long) key).longValue()));
             case REFERENCE:
-                return HashCodes.hashInt(((Integer)key).intValue());
+                return HashCodes.hashInt(((Integer) key).intValue());
             case BYTES:
-                return HashCodes.hashCode((byte[])key);
+                return HashCodes.hashCode((byte[]) key);
             case STRING:
-                return HashCodes.hashCode((String)key);
+                return HashCodes.hashCode((String) key);
         }
 
         throw new IllegalArgumentException("I don't know how to hash a " + fieldTypes[fieldIdx]);
@@ -350,18 +350,18 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
         List<Object[]> duplicateKeys = new ArrayList<Object[]>();
 
-        for(int i=0;i<hashTable.hashTableSize;i++) {
-            int ordinal = (int)hashTable.hashTable.getElementValue((long)i * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+        for(int i = 0; i < hashTable.hashTableSize; i++) {
+            int ordinal = (int) hashTable.hashTable.getElementValue((long) i * (long) hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
 
             if(ordinal != -1) {
-                int compareBucket = (i+1) & hashTable.hashMask;
-                int compareOrdinal = (int)hashTable.hashTable.getElementValue((long)compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+                int compareBucket = (i + 1) & hashTable.hashMask;
+                int compareOrdinal = (int) hashTable.hashTable.getElementValue((long) compareBucket * (long) hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
                 while(compareOrdinal != -1) {
                     if(recordsHaveEqualKeys(ordinal, compareOrdinal))
                         duplicateKeys.add(keyDeriver.getRecordKey(ordinal));
 
                     compareBucket = (compareBucket + 1) & hashTable.hashMask;
-                    compareOrdinal = (int)hashTable.hashTable.getElementValue((long)compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+                    compareOrdinal = (int) hashTable.hashTable.getElementValue((long) compareBucket * (long) hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
                 }
             }
         }
@@ -370,13 +370,16 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     @Override
-    public void beginUpdate() { }
+    public void beginUpdate() {
+    }
 
     @Override
-    public void addedOrdinal(int ordinal) { }
+    public void addedOrdinal(int ordinal) {
+    }
 
     @Override
-    public void removedOrdinal(int ordinal) { }
+    public void removedOrdinal(int ordinal) {
+    }
 
     private static final boolean ALLOW_DELTA_UPDATE =
             Boolean.getBoolean("com.netflix.hollow.core.index.HollowPrimaryKeyIndex.allowDeltaUpdate");
@@ -448,7 +451,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         int hashTableSize = HashCodes.hashTableSize(ordinals.cardinality());
         int bitsPerElement = (32 - Integer.numberOfLeadingZeros(typeState.maxOrdinal() + 1));
 
-        FixedLengthElementArray hashedArray = new FixedLengthElementArray(memoryRecycler, (long)hashTableSize * (long)bitsPerElement);
+        FixedLengthElementArray hashedArray = new FixedLengthElementArray(memoryRecycler, (long) hashTableSize * (long) bitsPerElement);
 
         int hashMask = hashTableSize - 1;
 
@@ -457,10 +460,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
             int hashCode = recordHash(ordinal);
             int bucket = hashCode & hashMask;
 
-            while(hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) != 0)
+            while(hashedArray.getElementValue((long) bucket * (long) bitsPerElement, bitsPerElement) != 0)
                 bucket = (bucket + 1) & hashMask;
 
-            hashedArray.setElementValue((long)bucket * (long)bitsPerElement, bitsPerElement, ordinal + 1);
+            hashedArray.setElementValue((long) bucket * (long) bitsPerElement, bitsPerElement, ordinal + 1);
 
             ordinal = ordinals.nextSetBit(ordinal + 1);
         }
@@ -479,7 +482,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         BitSet prevOrdinals = listener.getPreviousOrdinals();
         BitSet ordinals = listener.getPopulatedOrdinals();
 
-        long totalBitsInHashTable = (long)hashTableSize * (long)bitsPerElement;
+        long totalBitsInHashTable = (long) hashTableSize * (long) bitsPerElement;
         FixedLengthElementArray hashedArray = new FixedLengthElementArray(memoryRecycler, totalBitsInHashTable);
         hashedArray.copyBits(hashTable.hashTable, 0, 0, totalBitsInHashTable);
 
@@ -492,24 +495,24 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
                 int hashCode = recordHash(prevOrdinal);
                 int bucket = findOrdinalBucket(bitsPerElement, hashedArray, hashCode, hashMask, prevOrdinal);
 
-                hashedArray.clearElementValue((long)bucket * (long)bitsPerElement, bitsPerElement);
+                hashedArray.clearElementValue((long) bucket * (long) bitsPerElement, bitsPerElement);
                 int emptyBucket = bucket;
                 bucket = (bucket + 1) & hashMask;
-                int moveOrdinal = (int)hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) - 1;
+                int moveOrdinal = (int) hashedArray.getElementValue((long) bucket * (long) bitsPerElement, bitsPerElement) - 1;
 
                 while(moveOrdinal != ORDINAL_NONE) {
                     int naturalHash = recordHash(moveOrdinal);
                     int naturalBucket = naturalHash & hashMask;
 
                     if(!bucketInRange(emptyBucket, bucket, naturalBucket)) {
-                        hashedArray.setElementValue((long)emptyBucket * (long)bitsPerElement, bitsPerElement, moveOrdinal + 1);
-                        hashedArray.clearElementValue((long)bucket * (long)bitsPerElement, bitsPerElement);
+                        hashedArray.setElementValue((long) emptyBucket * (long) bitsPerElement, bitsPerElement, moveOrdinal + 1);
+                        hashedArray.clearElementValue((long) bucket * (long) bitsPerElement, bitsPerElement);
                         emptyBucket = bucket;
                     }
 
 
                     bucket = (bucket + 1) & hashMask;
-                    moveOrdinal = (int)hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) - 1;
+                    moveOrdinal = (int) hashedArray.getElementValue((long) bucket * (long) bitsPerElement, bitsPerElement) - 1;
                 }
 
             }
@@ -524,11 +527,11 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
                 int hashCode = recordHash(ordinal);
                 int bucket = hashCode & hashMask;
 
-                while(hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) != 0) {
+                while(hashedArray.getElementValue((long) bucket * (long) bitsPerElement, bitsPerElement) != 0) {
                     bucket = (bucket + 1) & hashMask;
                 }
 
-                hashedArray.setElementValue((long)bucket * (long)bitsPerElement, bitsPerElement, ordinal + 1);
+                hashedArray.setElementValue((long) bucket * (long) bitsPerElement, bitsPerElement, ordinal + 1);
             }
 
             ordinal = ordinals.nextSetBit(ordinal + 1);
@@ -544,14 +547,14 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         int bucket = startBucket;
         long value;
         do {
-            value = hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement);
-            if (prevOrdinal + 1 == value) {
+            value = hashedArray.getElementValue((long) bucket * (long) bitsPerElement, bitsPerElement);
+            if(prevOrdinal + 1 == value) {
                 return bucket;
             }
             bucket = (bucket + 1) & hashMask;
-        } while (value != 0 && bucket != startBucket);
+        } while(value != 0 && bucket != startBucket);
 
-        if (value == 0) {
+        if(value == 0) {
             throw new OrdinalNotFoundException(String.format("Ordinal not found (found empty entry): "
                     + "ordinal=%d startBucket=%d", prevOrdinal, startBucket));
         } else {
@@ -570,7 +573,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
     private int recordHash(int ordinal) {
         int hashCode = 0;
-        for(int i=0;i<fieldPathIndexes.length;i++) {
+        for(int i = 0; i < fieldPathIndexes.length; i++) {
             hashCode ^= fieldHash(ordinal, i);
             // hashCode ^= HashCodes.hashInt(hashCode);
         }
@@ -583,7 +586,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         HollowObjectSchema schema = typeState.getSchema();
 
         int lastFieldPath = fieldPathIndexes[fieldIdx].length - 1;
-        for(int i=0;i<lastFieldPath;i++) {
+        for(int i = 0; i < lastFieldPath; i++) {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
             ordinal = typeState.readOrdinal(ordinal, fieldPosition);
             typeState = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition);
@@ -606,7 +609,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     private boolean recordsHaveEqualKeys(int ordinal1, int ordinal2) {
-        for(int i=0;i<fieldPathIndexes.length;i++) {
+        for(int i = 0; i < fieldPathIndexes.length; i++) {
             if(!fieldsAreEqual(ordinal1, ordinal2, i))
                 return false;
         }
@@ -618,7 +621,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         HollowObjectSchema schema = typeState.getSchema();
 
         int lastFieldPath = fieldPathIndexes[fieldIdx].length - 1;
-        for(int i=0;i<lastFieldPath;i++) {
+        for(int i = 0; i < lastFieldPath; i++) {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
             ordinal1 = typeState.readOrdinal(ordinal1, fieldPosition);
             ordinal2 = typeState.readOrdinal(ordinal2, fieldPosition);

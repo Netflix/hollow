@@ -41,7 +41,7 @@ public class HollowMapWriteRecord implements HollowHashableWriteRecord {
     public HollowMapWriteRecord() {
         this(HashBehavior.MIXED_HASHES);
     }
-    
+
     public HollowMapWriteRecord(HashBehavior defaultHashBehavior) {
         this.entryList = new ArrayList<HollowMapEntry>();
         this.defaultHashBehavior = defaultHashBehavior;
@@ -71,7 +71,7 @@ public class HollowMapWriteRecord implements HollowHashableWriteRecord {
 
         int previousKeyOrdinal = 0;
 
-        for(int i=0;i<entryList.size();i++) {
+        for(int i = 0; i < entryList.size(); i++) {
             HollowMapEntry entry = entryList.get(i);
 
             VarInt.writeVInt(buf, entry.getKeyOrdinal() - previousKeyOrdinal);

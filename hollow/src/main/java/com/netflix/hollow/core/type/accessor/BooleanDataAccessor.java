@@ -28,7 +28,7 @@ public class BooleanDataAccessor extends AbstractHollowDataAccessor<Boolean> {
     private HollowConsumerAPI.BooleanRetriever api;
 
     public BooleanDataAccessor(HollowConsumer consumer) {
-        this(consumer.getStateEngine(), (HollowConsumerAPI.BooleanRetriever)consumer.getAPI());
+        this(consumer.getStateEngine(), (HollowConsumerAPI.BooleanRetriever) consumer.getAPI());
     }
 
     public BooleanDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.BooleanRetriever api) {
@@ -36,7 +36,8 @@ public class BooleanDataAccessor extends AbstractHollowDataAccessor<Boolean> {
         this.api = api;
     }
 
-    @Override public Boolean getRecord(int ordinal){
+    @Override
+    public Boolean getRecord(int ordinal) {
         HBoolean val = api.getHBoolean(ordinal);
         return val == null ? null : val.getValueBoxed();
     }

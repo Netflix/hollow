@@ -73,14 +73,14 @@ public class ObjectIdentityOrdinalMap {
         // dense, it should be increased
         private static final int LOAD_FACTOR_PERCENT = 75;
         private static final int MINIMUM_CAPACITY = 256;
-        private static final int MAXIMUM_CAPACITY = (1<<30);
+        private static final int MAXIMUM_CAPACITY = (1 << 30);
 
         private int count = 0;
         private int maxThreshold = 0;
         private int minThreshold = 0;
         private Entry[] entries;
 
-        public Segment(){
+        public Segment() {
             resize(MINIMUM_CAPACITY);
         }
 
@@ -88,14 +88,14 @@ public class ObjectIdentityOrdinalMap {
             int index = index(hashCode, entries.length);
             Entry current = entries[index];
             Entry prev = null;
-            while (current != null) {
-                if (current.hash() == hashCode) {
+            while(current != null) {
+                if(current.hash() == hashCode) {
                     Object currentObject = current.getKey();
-                    if( currentObject == null){
+                    if(currentObject == null) {
                         deleteEntry(index, current, prev);
                         current = current.next;
                         continue;
-                    } else if (currentObject == object) {
+                    } else if(currentObject == object) {
                         return;
                     }
                 }
@@ -115,14 +115,14 @@ public class ObjectIdentityOrdinalMap {
             int index = index(hashCode, entries.length);
             Entry current = entries[index];
             Entry prev = null;
-            while (current != null) {
-                if (current.hash() == hashCode) {
+            while(current != null) {
+                if(current.hash() == hashCode) {
                     Object currentObject = current.getKey();
-                    if( currentObject == null){
+                    if(currentObject == null) {
                         deleteEntry(index, current, prev);
                         current = current.next;
                         continue;
-                    } else if (currentObject == object) {
+                    } else if(currentObject == object) {
                         return current;
                     }
                 }
@@ -133,18 +133,18 @@ public class ObjectIdentityOrdinalMap {
         }
 
         private void checkSize() {
-            if( count >= minThreshold && count <= maxThreshold ){
+            if(count >= minThreshold && count <= maxThreshold) {
                 return;
             }
             int newCapacity;
-            if( count < minThreshold ) {
+            if(count < minThreshold) {
                 newCapacity = Math.max(MINIMUM_CAPACITY, entries.length >> 1);
             } else {
                 newCapacity = Math.min(MAXIMUM_CAPACITY, entries.length << 1);
             }
 
             // nothing should be done, since capacity is not changed
-            if (newCapacity == entries.length) {
+            if(newCapacity == entries.length) {
                 return;
             }
 
@@ -153,10 +153,10 @@ public class ObjectIdentityOrdinalMap {
 
         private void resize(int newCapacity) {
             Entry[] newEntries = new Entry[newCapacity];
-            if( entries != null){
-                for(Entry entry : entries){
+            if(entries != null) {
+                for(Entry entry : entries) {
                     Entry current = entry;
-                    while(current != null){
+                    while(current != null) {
                         Entry newEntry = current;
                         current = current.next;
                         int index = index(newEntry.hash(), newEntries.length);
@@ -172,7 +172,7 @@ public class ObjectIdentityOrdinalMap {
 
         private void deleteEntry(int index, Entry current, Entry prev) {
             count--;
-            if (prev != null) {
+            if(prev != null) {
                 prev.next = current.next;
             } else {
                 entries[index] = current.next;
@@ -204,11 +204,11 @@ public class ObjectIdentityOrdinalMap {
     }
 
     public ObjectIdentityOrdinalMap(int logOfSegmentNumber) {
-        if (logOfSegmentNumber < 1 && logOfSegmentNumber > 32) {
+        if(logOfSegmentNumber < 1 && logOfSegmentNumber > 32) {
             throw new RuntimeException("Invalid power level");
         }
         segments = new Segment[2 << logOfSegmentNumber];
-        for(int i=0; i<segments.length; i++){
+        for(int i = 0; i < segments.length; i++) {
             segments[i] = new Segment();
         }
         this.mask = (2 << logOfSegmentNumber) - 1;
@@ -237,15 +237,15 @@ public class ObjectIdentityOrdinalMap {
         return hashCode & mask;
     }
 
-    public void clear(){
-        for (Segment segment : segments) {
+    public void clear() {
+        for(Segment segment : segments) {
             segment.clear();
         }
     }
 
     public int size() {
         int size = 0;
-        for (Segment segment : segments) {
+        for(Segment segment : segments) {
             size += segment.size();
         }
         return size;

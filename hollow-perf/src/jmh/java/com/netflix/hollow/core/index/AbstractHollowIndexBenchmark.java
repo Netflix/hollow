@@ -41,40 +41,40 @@ public abstract class AbstractHollowIndexBenchmark<T> {
     protected String[] matchFields;
 
     //@Param( {"1", "10", "100", "1000", "10000", "100000", "1000000"})
-    @Param( {"1000"})
+    @Param({"1000"})
     public int size;
 
     //@Param( {"1", "2", "3", "5", "8"})
-    @Param( {"1"})
+    @Param({"1"})
     public int querySize = 1;
 
     //@Param( {"false", "true"})
-    @Param( {"false"})
+    @Param({"false"})
     public boolean nested = false;
 
     @SuppressWarnings("unchecked")
     @Setup
     public void setup() throws IOException {
         LogManager.getLogManager().reset();
-        for (int i = 0; i < size; i++) {
+        for(int i = 0; i < size; i++) {
             // Make field values unique for a given object, otherwise index build performance worsens significantly
             int key = getKey(8 * i);
             mapper.add(new IntType(key, new NestedIntType(key)));
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
         matchFields = new String[querySize];
-        for (int i = 0; i < querySize; i++) {
+        for(int i = 0; i < querySize; i++) {
             int fieldNum = i + 1;
             String fieldName = "field" + fieldNum;
             matchFields[i] = nested ? "nested." + fieldName : fieldName;
         }
-        if (!shouldCreateIndexes()) {
+        if(!shouldCreateIndexes()) {
             return;
         }
         int length = TARGET_SIZE_MB / (ENTRY_OVERHEAD_BYTES * size);
         T index = createIndex();
         indexes = (T[]) Array.newInstance(index.getClass(), length);
-        for (int i = 0; i < indexes.length; i++) {
+        for(int i = 0; i < indexes.length; i++) {
             indexes[i] = createIndex();
         }
     }
@@ -90,7 +90,7 @@ public abstract class AbstractHollowIndexBenchmark<T> {
     protected Object[] nextKeys() {
         int key = getKey(random.nextInt(size));
         Integer[] keys = new Integer[querySize];
-        for (int i = 0; i < querySize; i++) {
+        for(int i = 0; i < querySize; i++) {
             keys[i] = key + i;
         }
         return keys;
@@ -98,7 +98,7 @@ public abstract class AbstractHollowIndexBenchmark<T> {
 
     protected Object[] missingKeys() {
         Integer[] keys = new Integer[querySize];
-        for (int i = 0; i < querySize; i++) {
+        for(int i = 0; i < querySize; i++) {
             keys[i] = -1;
         }
         return keys;

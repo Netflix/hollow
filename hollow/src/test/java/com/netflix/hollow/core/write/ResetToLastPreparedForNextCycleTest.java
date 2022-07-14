@@ -40,7 +40,7 @@ public class ResetToLastPreparedForNextCycleTest extends AbstractStateEngineTest
 
         super.setUp();
     }
-    
+
     @Test
     public void resetWillReturnToPreviousStateEvenAfterWriting() throws IOException {
         addRecord(1, "one");
@@ -75,7 +75,7 @@ public class ResetToLastPreparedForNextCycleTest extends AbstractStateEngineTest
         assertObject(typeState, 3, 1000, "one thousand");
         assertObject(typeState, 4, 0, "zero");
     }
-    
+
     @Test
     public void resetWillReturnToInitialState() throws IOException {
         addRecord(1, "one");
@@ -83,16 +83,16 @@ public class ResetToLastPreparedForNextCycleTest extends AbstractStateEngineTest
         addRecord(3, "three");
 
         writeStateEngine.resetToLastPrepareForNextCycle();
-        
+
         addRecord(1, "one");
         addRecord(3, "three");
         addRecord(1000, "ten thousand");
         addRecord(0, "zero");
-        
+
         roundTripSnapshot();
 
         HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
-        
+
         Assert.assertEquals(3, typeState.maxOrdinal());
 
         assertObject(typeState, 0, 1, "one");
@@ -100,7 +100,7 @@ public class ResetToLastPreparedForNextCycleTest extends AbstractStateEngineTest
         assertObject(typeState, 2, 1000, "ten thousand");
         assertObject(typeState, 3, 0, "zero");
     }
-    
+
     @Test
     public void resetWillReturnToInitialStateEvenAfterWriting() throws IOException {
         addRecord(1, "one");
@@ -109,16 +109,16 @@ public class ResetToLastPreparedForNextCycleTest extends AbstractStateEngineTest
 
         writeSnapshot();
         writeStateEngine.resetToLastPrepareForNextCycle();
-        
+
         addRecord(1, "one");
         addRecord(3, "three");
         addRecord(1000, "ten thousand");
         addRecord(0, "zero");
-        
+
         roundTripSnapshot();
 
         HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
-        
+
         Assert.assertEquals(3, typeState.maxOrdinal());
 
         assertObject(typeState, 0, 1, "one");
@@ -126,22 +126,22 @@ public class ResetToLastPreparedForNextCycleTest extends AbstractStateEngineTest
         assertObject(typeState, 2, 1000, "ten thousand");
         assertObject(typeState, 3, 0, "zero");
     }
-    
+
     public void writeSnapshot() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
-        
+
         writer.writeSnapshot(baos);
-    }    
-    
+    }
+
     public void writeDelta() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
         writer.writeDelta(baos);
-        
+
         writer.writeSnapshot(baos);
     }
-    
+
     private void addRecord(int intVal, String strVal) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
 

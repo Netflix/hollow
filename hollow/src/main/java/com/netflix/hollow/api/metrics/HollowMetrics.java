@@ -44,12 +44,12 @@ public abstract class HollowMetrics {
      */
     void calculateTypeMetrics(HollowReadStateEngine hollowReadStateEngine) {
         Collection<HollowTypeReadState> typeStates = hollowReadStateEngine.getTypeStates();
-        if (typeStates == null)
+        if(typeStates == null)
             return;
 
         totalHeapFootprint = 0L;
         totalPopulatedOrdinals = 0;
-        for (HollowTypeReadState typeState : typeStates) {
+        for(HollowTypeReadState typeState : typeStates) {
             long heapCost = typeState.getApproximateHeapFootprintInBytes();
             totalHeapFootprint += heapCost;
 
@@ -81,5 +81,7 @@ public abstract class HollowMetrics {
         return this.totalPopulatedOrdinals;
     }
 
-    public void setCurrentVersion(long version) { this.currentVersion = version; }
+    public void setCurrentVersion(long version) {
+        this.currentVersion = version;
+    }
 }

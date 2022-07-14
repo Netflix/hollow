@@ -56,9 +56,9 @@ public class ThreadSafeBitSet {
         this.log2SegmentSize = log2SegmentSizeInBits;
         this.numLongsPerSegment = (1 << (log2SegmentSizeInBits - 6));
         this.segmentMask = numLongsPerSegment - 1;
-        
+
         long numBitsPerSegment = numLongsPerSegment * 64;
-        int numSegmentsToPreallocate = numBitsToPreallocate == 0 ? 1 : (int)(((numBitsToPreallocate - 1) / numBitsPerSegment) + 1);
+        int numSegmentsToPreallocate = numBitsToPreallocate == 0 ? 1 : (int) (((numBitsToPreallocate - 1) / numBitsPerSegment) + 1);
 
         segments = new AtomicReference<ThreadSafeBitSetSegments>();
         segments.set(new ThreadSafeBitSetSegments(numSegmentsToPreallocate, numLongsPerSegment));
@@ -123,9 +123,9 @@ public class ThreadSafeBitSet {
 
         int segmentIdx = segments.numSegments() - 1;
 
-        for(;segmentIdx >= 0; segmentIdx--) {
+        for(; segmentIdx >= 0; segmentIdx--) {
             AtomicLongArray segment = segments.getSegment(segmentIdx);
-            for(int longIdx=segment.length() - 1; longIdx >= 0; longIdx--) {
+            for(int longIdx = segment.length() - 1; longIdx >= 0; longIdx--) {
                 long l = segment.get(longIdx);
                 if(l != 0)
                     return (segmentIdx << log2SegmentSize) + (longIdx * 64) + (63 - Long.numberOfLeadingZeros(l));
@@ -136,7 +136,7 @@ public class ThreadSafeBitSet {
     }
 
     public int nextSetBit(int fromIndex) {
-        if (fromIndex < 0)
+        if(fromIndex < 0)
             throw new IndexOutOfBoundsException("fromIndex < 0: " + fromIndex);
 
         int segmentPosition = fromIndex >>> log2SegmentSize; /// which segment -- div by num bits per segment
@@ -152,10 +152,10 @@ public class ThreadSafeBitSet {
 
         long word = segment.get(longPosition) & (0xffffffffffffffffL << bitPosition);
 
-        while (true) {
-            if (word != 0)
+        while(true) {
+            if(word != 0)
                 return (segmentPosition << (log2SegmentSize)) + (longPosition << 6) + Long.numberOfTrailingZeros(word);
-            if (++longPosition > segmentMask) {
+            if(++longPosition > segmentMask) {
                 segmentPosition++;
                 if(segmentPosition >= segments.numSegments())
                     return -1;
@@ -176,9 +176,9 @@ public class ThreadSafeBitSet {
 
         int numSetBits = 0;
 
-        for(int i=0;i<segments.numSegments();i++) {
+        for(int i = 0; i < segments.numSegments(); i++) {
             AtomicLongArray segment = segments.getSegment(i);
-            for(int j=0;j<segment.length();j++) {
+            for(int j = 0; j < segment.length(); j++) {
                 numSetBits += Long.bitCount(segment.get(j));
             }
         }
@@ -200,10 +200,10 @@ public class ThreadSafeBitSet {
     public void clearAll() {
         ThreadSafeBitSetSegments segments = this.segments.get();
 
-        for(int i=0;i<segments.numSegments();i++) {
+        for(int i = 0; i < segments.numSegments(); i++) {
             AtomicLongArray segment = segments.getSegment(i);
 
-            for(int j=0;j<segment.length();j++) {
+            for(int j = 0; j < segment.length(); j++) {
                 segment.set(j, 0L);
             }
         }
@@ -225,12 +225,12 @@ public class ThreadSafeBitSet {
         ThreadSafeBitSetSegments otherSegments = other.segments.get();
         ThreadSafeBitSetSegments newSegments = new ThreadSafeBitSetSegments(thisSegments.numSegments(), numLongsPerSegment);
 
-        for(int i=0;i<thisSegments.numSegments();i++) {
+        for(int i = 0; i < thisSegments.numSegments(); i++) {
             AtomicLongArray thisArray = thisSegments.getSegment(i);
             AtomicLongArray otherArray = (i < otherSegments.numSegments()) ? otherSegments.getSegment(i) : null;
             AtomicLongArray newArray = newSegments.getSegment(i);
 
-            for(int j=0;j<thisArray.length();j++) {
+            for(int j = 0; j < thisArray.length(); j++) {
                 long thisLong = thisArray.get(j);
                 long otherLong = (otherArray == null) ? 0 : otherArray.get(j);
 
@@ -259,7 +259,7 @@ public class ThreadSafeBitSet {
         ThreadSafeBitSetSegments segments[] = new ThreadSafeBitSetSegments[bitSets.length];
         int maxNumSegments = 0;
 
-        for(int i=0;i<bitSets.length;i++) {
+        for(int i = 0; i < bitSets.length; i++) {
             if(bitSets[i].log2SegmentSize != log2SegmentSize)
                 throw new IllegalArgumentException("Segment sizes must be the same");
 
@@ -272,16 +272,16 @@ public class ThreadSafeBitSet {
 
         AtomicLongArray segment[] = new AtomicLongArray[segments.length];
 
-        for(int i=0;i<maxNumSegments;i++) {
-            for(int j=0;j<segments.length;j++) {
+        for(int i = 0; i < maxNumSegments; i++) {
+            for(int j = 0; j < segments.length; j++) {
                 segment[j] = i < segments[j].numSegments() ? segments[j].getSegment(i) : null;
             }
 
             AtomicLongArray newSegment = newSegments.getSegment(i);
 
-            for(int j=0;j<numLongsPerSegment;j++) {
+            for(int j = 0; j < numLongsPerSegment; j++) {
                 long value = 0;
-                for(int k=0;k<segments.length;k++) {
+                for(int k = 0; k < segments.length; k++) {
                     if(segment[k] != null)
                         value |= segment[k].get(j);
                 }
@@ -330,7 +330,7 @@ public class ThreadSafeBitSet {
         private ThreadSafeBitSetSegments(int numSegments, int segmentLength) {
             AtomicLongArray segments[] = new AtomicLongArray[numSegments];
 
-            for(int i=0;i<numSegments;i++) {
+            for(int i = 0; i < numSegments; i++) {
                 segments[i] = new AtomicLongArray(segmentLength);
             }
 
@@ -342,7 +342,7 @@ public class ThreadSafeBitSet {
         private ThreadSafeBitSetSegments(ThreadSafeBitSetSegments copyFrom, int numSegments, int segmentLength) {
             AtomicLongArray segments[] = new AtomicLongArray[numSegments];
 
-            for(int i=0;i<numSegments;i++) {
+            for(int i = 0; i < numSegments; i++) {
                 segments[i] = i < copyFrom.numSegments() ? copyFrom.getSegment(i) : new AtomicLongArray(segmentLength);
             }
 
@@ -365,10 +365,10 @@ public class ThreadSafeBitSet {
 
         os.writeInt(segments.numSegments() * numLongsPerSegment);
 
-        for(int i=0;i<segments.numSegments();i++) {
+        for(int i = 0; i < segments.numSegments(); i++) {
             AtomicLongArray arr = segments.getSegment(i);
 
-            for(int j=0;j<arr.length();j++) {
+            for(int j = 0; j < arr.length(); j++) {
                 os.writeLong(arr.get(j));
             }
         }
@@ -379,7 +379,7 @@ public class ThreadSafeBitSet {
         if(!(obj instanceof ThreadSafeBitSet))
             return false;
 
-        ThreadSafeBitSet other = (ThreadSafeBitSet)obj;
+        ThreadSafeBitSet other = (ThreadSafeBitSet) obj;
 
         if(other.log2SegmentSize != log2SegmentSize)
             throw new IllegalArgumentException("Segment sizes must be the same");
@@ -387,11 +387,11 @@ public class ThreadSafeBitSet {
         ThreadSafeBitSetSegments thisSegments = this.segments.get();
         ThreadSafeBitSetSegments otherSegments = other.segments.get();
 
-        for(int i=0;i<thisSegments.numSegments();i++) {
+        for(int i = 0; i < thisSegments.numSegments(); i++) {
             AtomicLongArray thisArray = thisSegments.getSegment(i);
             AtomicLongArray otherArray = (i < otherSegments.numSegments()) ? otherSegments.getSegment(i) : null;
 
-            for(int j=0;j<thisArray.length();j++) {
+            for(int j = 0; j < thisArray.length(); j++) {
                 long thisLong = thisArray.get(j);
                 long otherLong = (otherArray == null) ? 0 : otherArray.get(j);
 
@@ -400,10 +400,10 @@ public class ThreadSafeBitSet {
             }
         }
 
-        for(int i=thisSegments.numSegments();i<otherSegments.numSegments();i++) {
+        for(int i = thisSegments.numSegments(); i < otherSegments.numSegments(); i++) {
             AtomicLongArray otherArray = otherSegments.getSegment(i);
 
-            for(int j=0;j<otherArray.length();j++) {
+            for(int j = 0; j < otherArray.length(); j++) {
                 long l = otherArray.get(j);
 
                 if(l != 0)
@@ -427,7 +427,7 @@ public class ThreadSafeBitSet {
     public BitSet toBitSet() {
         BitSet resultSet = new BitSet();
         int ordinal = this.nextSetBit(0);
-        while(ordinal!=-1) {
+        while(ordinal != -1) {
             resultSet.set(ordinal);
             ordinal = this.nextSetBit(ordinal + 1);
         }

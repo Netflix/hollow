@@ -50,11 +50,11 @@ public abstract class HollowTypeAPI {
     public void setSamplingDirector(HollowSamplingDirector samplingDirector) {
         typeDataAccess.setSamplingDirector(samplingDirector);
     }
-    
+
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         typeDataAccess.setFieldSpecificSamplingDirector(fieldSpec, director);
     }
-    
+
     public void ignoreUpdateThreadForSampling(Thread t) {
         typeDataAccess.ignoreUpdateThreadForSampling(t);
     }

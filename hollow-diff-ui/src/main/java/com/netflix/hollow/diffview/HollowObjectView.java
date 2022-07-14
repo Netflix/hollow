@@ -41,10 +41,10 @@ public abstract class HollowObjectView {
     public void resetView() {
         totalVisibilityCount = 0;
         int totalVisibleRows = resetViewForDiff(rootRow, 0);
-        
+
         for(HollowDiffViewRow child : rootRow.getChildren())
             child.setVisibility(true);
-        
+
         if(totalVisibleRows > MAX_INITIAL_VISIBLE_ROWS_BEFORE_COLLAPSING_DIFFS) {
             collapseChildrenUnderRootDiffRows(rootRow);
         } else if(totalVisibleRows == 0) {
@@ -54,23 +54,23 @@ public abstract class HollowObjectView {
             }
         }
     }
-    
+
     private int resetViewForDiff(HollowDiffViewRow row, int runningVisibilityCount) {
         if(rowIsExactMatch(row))
             return 0;
-        
+
         int branchVisibilityCount = 0;
-        
+
         if(row.getFieldPair().isDiff()) {
             row.setVisibility(true);
             totalVisibilityCount++;
             branchVisibilityCount++;
-            
+
             branchVisibilityCount += makeAllChildrenVisible(row, branchVisibilityCount + runningVisibilityCount);
         } else {
             for(HollowDiffViewRow child : row.getChildren()) {
                 branchVisibilityCount += resetViewForDiff(child, branchVisibilityCount + runningVisibilityCount);
-                
+
                 if(branchVisibilityCount > 0) {
                     row.setVisibility(true);
                     totalVisibilityCount++;
@@ -78,27 +78,27 @@ public abstract class HollowObjectView {
                 }
             }
         }
-        
+
         return branchVisibilityCount;
     }
-    
+
     private int makeAllChildrenVisible(HollowDiffViewRow row, int runningVisibilityCount) {
         if(totalVisibilityCount > MAX_INITIAL_VISIBLE_ROWS_BEFORE_COLLAPSING_DIFFS)
             return 0;
 
         int branchVisibilityCount = 0;
-        
+
         for(HollowDiffViewRow child : row.getChildren()) {
             child.setVisibility(true);
             totalVisibilityCount++;
             branchVisibilityCount++;
-            
+
             branchVisibilityCount += makeAllChildrenVisible(child, branchVisibilityCount);
         }
-        
+
         return branchVisibilityCount;
     }
-    
+
     private void collapseChildrenUnderRootDiffRows(HollowDiffViewRow row) {
         if(row.areChildrenPopulated()) {
             for(HollowDiffViewRow child : row.getChildren()) {
@@ -114,7 +114,7 @@ public abstract class HollowObjectView {
     private int resetViewForOrderingChanges(HollowDiffViewRow row, int runningVisibilityCount) {
         if(rowIsExactMatch(row))
             return 0;
-        
+
         int branchVisibilityCount = 0;
 
         if(row.getFieldPair().isOrderingDiff()) {
@@ -123,17 +123,17 @@ public abstract class HollowObjectView {
         } else {
             for(HollowDiffViewRow child : row.getChildren()) {
                 int childBranchVisibilityCount = resetViewForOrderingChanges(child, runningVisibilityCount + branchVisibilityCount);
-                
+
                 if(childBranchVisibilityCount > 0) {
                     row.setVisibility(true);
                     branchVisibilityCount += childBranchVisibilityCount;
                 }
             }
         }
-        
+
         return branchVisibilityCount;
     }
-    
+
     private void collapseChildrenUnderRootOrderingDiffRows(HollowDiffViewRow row) {
         if(row.areChildrenPopulated()) {
             for(HollowDiffViewRow child : row.getChildren()) {
@@ -145,7 +145,7 @@ public abstract class HollowObjectView {
             }
         }
     }
-    
+
     private void makeAllChildrenInvisible(HollowDiffViewRow row) {
         if(row.areChildrenPopulated()) {
             for(HollowDiffViewRow child : row.getChildren()) {
@@ -154,14 +154,14 @@ public abstract class HollowObjectView {
             }
         }
     }
-    
+
     private boolean rowIsExactMatch(HollowDiffViewRow row) {
         EffigyFieldPair fieldPair = row.getFieldPair();
         if(fieldPair.getFrom() == null || fieldPair.getTo() == null || fieldPair.isLeafNode())
             return false;
-        
-        HollowEffigy fromEffigy = (HollowEffigy)fieldPair.getFrom().getValue();
-        HollowEffigy toEffigy = (HollowEffigy)fieldPair.getTo().getValue();
+
+        HollowEffigy fromEffigy = (HollowEffigy) fieldPair.getFrom().getValue();
+        HollowEffigy toEffigy = (HollowEffigy) fieldPair.getTo().getValue();
 
         if(fromEffigy == null || toEffigy == null)
             return false;

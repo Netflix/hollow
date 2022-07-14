@@ -33,7 +33,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowWriteStateCreatorTest {
-    
+
     @Test
     public void recreatesUsingReadEngine() throws IOException {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
@@ -42,119 +42,121 @@ public class HollowWriteStateCreatorTest {
         mapper.add(new Integer(1));
         writeEngine.addHeaderTag("CopyTag", "copied");
         writeEngine.addHeaderTag(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(System.currentTimeMillis()));
-        
+
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
         String cycleStartTime = readEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START);
         HollowWriteStateEngine recreatedWriteEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(readEngine);
         assertEquals(cycleStartTime, recreatedWriteEngine.getPreviousHeaderTags().get(HEADER_TAG_METRIC_CYCLE_START));
 
         HollowReadStateEngine recreatedReadEngine = StateEngineRoundTripper.roundTripSnapshot(recreatedWriteEngine);
-        
+
         assertEquals(HollowChecksum.forStateEngine(readEngine), HollowChecksum.forStateEngine(recreatedReadEngine));
         assertEquals("copied", recreatedReadEngine.getHeaderTag("CopyTag"));
         assertEquals(readEngine.getCurrentRandomizedTag(), recreatedReadEngine.getCurrentRandomizedTag());
     }
-    
+
     @Test
     public void throwsExceptionIfWriteStateIsPopulated() throws IOException {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
-        
+
         mapper.add(new Integer(1));
-        
+
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
-        
+
         try {
             HollowWriteStateCreator.populateUsingReadEngine(writeEngine, readEngine);
             Assert.fail();
-        } catch(IllegalStateException expected) { }
+        } catch (IllegalStateException expected) {
+        }
     }
-    
+
     @Test
     public void populatesOnlyPreviouslyExistingFieldsWhenSchemaIsAddedTo() throws IOException {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
-        
+
         mapper.add(new Integer(1));
         mapper.add(new Integer(2));
-        
+
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
-        
+
         HollowWriteStateEngine repopulatedWriteStateEngine = new HollowWriteStateEngine();
         new HollowObjectMapper(repopulatedWriteStateEngine).initializeTypeState(IntegerWithMoreThanOneField.class);
-        
+
         HollowWriteStateCreator.populateUsingReadEngine(repopulatedWriteStateEngine, readEngine);
-        
+
         repopulatedWriteStateEngine.prepareForNextCycle();
         repopulatedWriteStateEngine.addAllObjectsFromPreviousCycle();
         new HollowObjectMapper(repopulatedWriteStateEngine).add(new IntegerWithMoreThanOneField(3));
         HollowReadStateEngine recreatedReadEngine = StateEngineRoundTripper.roundTripSnapshot(repopulatedWriteStateEngine);
-        
+
         GenericHollowObject one = new GenericHollowObject(recreatedReadEngine, "Integer", 0);
         assertEquals(1, one.getInt("value"));
         Assert.assertNull(one.getString("anotherValue"));
-        
+
         GenericHollowObject two = new GenericHollowObject(recreatedReadEngine, "Integer", 1);
         assertEquals(2, two.getInt("value"));
         Assert.assertNull(two.getString("anotherValue"));
-        
+
         GenericHollowObject three = new GenericHollowObject(recreatedReadEngine, "Integer", 2);
         assertEquals(3, three.getInt("value"));
         assertEquals("3", three.getString("anotherValue"));
     }
-    
+
     @Test
     public void populatesPreviouslyExistingFieldsWhenSchemaFieldsAreRemoved() throws IOException {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
-        
+
         mapper.add(new IntegerWithMoreThanOneField(1));
         mapper.add(new IntegerWithMoreThanOneField(2));
-        
+
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
-        
+
         HollowWriteStateEngine repopulatedWriteStateEngine = new HollowWriteStateEngine();
         new HollowObjectMapper(repopulatedWriteStateEngine).initializeTypeState(Integer.class);
-        
+
         HollowWriteStateCreator.populateUsingReadEngine(repopulatedWriteStateEngine, readEngine);
-        
+
         repopulatedWriteStateEngine.prepareForNextCycle();
         repopulatedWriteStateEngine.addAllObjectsFromPreviousCycle();
         new HollowObjectMapper(repopulatedWriteStateEngine).add(new Integer(3));
         HollowReadStateEngine recreatedReadEngine = StateEngineRoundTripper.roundTripSnapshot(repopulatedWriteStateEngine);
 
-        HollowObjectSchema schema = (HollowObjectSchema)recreatedReadEngine.getSchema("Integer");
-        
+        HollowObjectSchema schema = (HollowObjectSchema) recreatedReadEngine.getSchema("Integer");
+
         assertEquals(1, schema.numFields());
         assertEquals("value", schema.getFieldName(0));
-        
+
         GenericHollowObject one = new GenericHollowObject(recreatedReadEngine, "Integer", 0);
         assertEquals(1, one.getInt("value"));
-        
+
         GenericHollowObject two = new GenericHollowObject(recreatedReadEngine, "Integer", 1);
         assertEquals(2, two.getInt("value"));
-        
+
         GenericHollowObject three = new GenericHollowObject(recreatedReadEngine, "Integer", 2);
         assertEquals(3, three.getInt("value"));
     }
-    
+
     @Test
     public void repopulationFailsIfShardsAreIncorrectlyPreconfigured() throws IOException {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
-        
+
         mapper.add(new Integer(1));
         mapper.add(new Integer(2));
-        
+
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
 
         HollowWriteStateEngine repopulatedWriteStateEngine = new HollowWriteStateEngine();
         new HollowObjectMapper(repopulatedWriteStateEngine).initializeTypeState(IntegerWithWrongShardConfiguration.class);
-        
+
         try {
             HollowWriteStateCreator.populateUsingReadEngine(repopulatedWriteStateEngine, readEngine);
             Assert.fail();
-        } catch(Exception expected) { }
+        } catch (Exception expected) {
+        }
     }
 
     @Test
@@ -164,22 +166,23 @@ public class HollowWriteStateCreatorTest {
         HollowWriteStateCreator.readSchemaFileIntoWriteState("schema1.txt", engine);
         assertEquals("Should now have types", 2, engine.getOrderedTypeStates().size());
     }
-    
+
     @SuppressWarnings("unused")
-    @HollowTypeName(name="Integer")
+    @HollowTypeName(name = "Integer")
     private static class IntegerWithMoreThanOneField {
         private final int value;
-        @HollowInline private final String anotherValue; 
-        
+        @HollowInline
+        private final String anotherValue;
+
         public IntegerWithMoreThanOneField(int value) {
             this.value = value;
             this.anotherValue = String.valueOf(value);
         }
     }
-    
+
     @SuppressWarnings("unused")
-    @HollowTypeName(name="Integer")
-    @HollowShardLargeType(numShards=4)
+    @HollowTypeName(name = "Integer")
+    @HollowShardLargeType(numShards = 4)
     private static class IntegerWithWrongShardConfiguration {
         private int value;
     }

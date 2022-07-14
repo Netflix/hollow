@@ -64,7 +64,7 @@ public class FlatRecordWriter {
 
         int recStart = (int) buf.length();
         VarInt.writeVInt(buf, schemaOrdinal);
-        if (rec instanceof HollowHashableWriteRecord)
+        if(rec instanceof HollowHashableWriteRecord)
             ((HollowHashableWriteRecord) rec).writeDataTo(buf, HashBehavior.IGNORED_HASHES);
         else
             rec.writeDataTo(buf);
@@ -74,7 +74,7 @@ public class FlatRecordWriter {
 
         List<RecordLocation> existingRecLocs = recordLocationsByHashCode.get(recordHashCode);
 
-        if (existingRecLocs == null) {
+        if(existingRecLocs == null) {
             RecordLocation newRecordLocation = new RecordLocation(nextRecordOrdinal, recStart, recLen);
             existingRecLocs = Collections.<RecordLocation>singletonList(newRecordLocation);
             recordLocationsByHashCode.put(recordHashCode, existingRecLocs);
@@ -82,8 +82,8 @@ public class FlatRecordWriter {
 
             return newRecordLocation.ordinal;
         } else {
-            for (RecordLocation existing : existingRecLocs) {
-                if (recLen == existing.len && buf.getUnderlyingArray().rangeEquals(recStart, buf.getUnderlyingArray(), existing.start, recLen)) {
+            for(RecordLocation existing : existingRecLocs) {
+                if(recLen == existing.len && buf.getUnderlyingArray().rangeEquals(recStart, buf.getUnderlyingArray(), existing.start, recLen)) {
                     buf.setPosition(recStart);
                     return existing.ordinal;
                 }
@@ -91,7 +91,7 @@ public class FlatRecordWriter {
 
             RecordLocation newRecordLocation = new RecordLocation(nextRecordOrdinal, recStart, recLen);
 
-            if (existingRecLocs.size() == 1) {
+            if(existingRecLocs.size() == 1) {
                 List<RecordLocation> newRecLocs = new ArrayList<>(2);
                 newRecLocs.add(existingRecLocs.get(0));
                 newRecLocs.add(newRecordLocation);
@@ -118,7 +118,7 @@ public class FlatRecordWriter {
     }
 
     public void writeTo(OutputStream os) throws IOException {
-        if (recordLocationsByOrdinal.size() == 0)
+        if(recordLocationsByOrdinal.size() == 0)
             throw new IOException("No data to write!");
 
         int locationOfTopRecord = recordLocationsByOrdinal.get(recordLocationsByOrdinal.size() - 1);
@@ -128,12 +128,12 @@ public class FlatRecordWriter {
         VarInt.writeVInt(os, locationOfTopRecord);
 
         int pkFieldValueLocations[] = null;
-        if (schemaOfTopRecord.getSchemaType() == SchemaType.OBJECT) {
+        if(schemaOfTopRecord.getSchemaType() == SchemaType.OBJECT) {
             PrimaryKey primaryKey = ((HollowObjectSchema) schemaOfTopRecord).getPrimaryKey();
-            if (primaryKey != null) {
+            if(primaryKey != null) {
                 pkFieldValueLocations = new int[primaryKey.numFields()];
                 /// encode the locations of the primary key fields
-                for (int i = 0; i < primaryKey.numFields(); i++) {
+                for(int i = 0; i < primaryKey.numFields(); i++) {
                     int[] fieldPathIndex = primaryKey.getFieldPathIndex(dataset, i);
 
                     pkFieldValueLocations[i] = locatePrimaryKeyField(locationOfTopRecord, fieldPathIndex, 0);
@@ -145,8 +145,8 @@ public class FlatRecordWriter {
 
         buf.getUnderlyingArray().writeTo(os, 0, buf.length());
 
-        if (pkFieldValueLocations != null) {
-            for (int i = 0; i < pkFieldValueLocations.length; i++) {
+        if(pkFieldValueLocations != null) {
+            for(int i = 0; i < pkFieldValueLocations.length; i++) {
                 VarInt.writeVInt(os, pkFieldValueLocations[i]);
             }
         }
@@ -159,7 +159,7 @@ public class FlatRecordWriter {
 
         int fieldOffset = navigateToField(recordSchema, fieldPathIndex[idx], locationOfCurrentRecord);
 
-        if (idx == fieldPathIndex.length - 1)
+        if(idx == fieldPathIndex.length - 1)
             return fieldOffset;
 
         int ordinalOfNextRecord = VarInt.readVInt(buf.getUnderlyingArray(), fieldOffset);
@@ -169,28 +169,28 @@ public class FlatRecordWriter {
     }
 
     private int navigateToField(HollowObjectSchema schema, int fieldIdx, int offset) {
-        for (int i = 0; i < fieldIdx; i++) {
-            switch (schema.getFieldType(i)) {
-            case INT:
-            case LONG:
-            case REFERENCE:
-                offset += VarInt.nextVLongSize(buf.getUnderlyingArray(), offset);
-                break;
-            case BYTES:
-            case STRING:
-                int fieldLength = VarInt.readVInt(buf.getUnderlyingArray(), offset);
-                offset += VarInt.sizeOfVInt(fieldLength);
-                offset += fieldLength;
-                break;
-            case BOOLEAN:
-                offset++;
-                break;
-            case DOUBLE:
-                offset += 8;
-                break;
-            case FLOAT:
-                offset += 4;
-                break;
+        for(int i = 0; i < fieldIdx; i++) {
+            switch(schema.getFieldType(i)) {
+                case INT:
+                case LONG:
+                case REFERENCE:
+                    offset += VarInt.nextVLongSize(buf.getUnderlyingArray(), offset);
+                    break;
+                case BYTES:
+                case STRING:
+                    int fieldLength = VarInt.readVInt(buf.getUnderlyingArray(), offset);
+                    offset += VarInt.sizeOfVInt(fieldLength);
+                    offset += fieldLength;
+                    break;
+                case BOOLEAN:
+                    offset++;
+                    break;
+                case DOUBLE:
+                    offset += 8;
+                    break;
+                case FLOAT:
+                    offset += 4;
+                    break;
             }
         }
 

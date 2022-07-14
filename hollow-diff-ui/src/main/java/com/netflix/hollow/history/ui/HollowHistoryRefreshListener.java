@@ -39,22 +39,33 @@ public class HollowHistoryRefreshListener extends HollowConsumer.AbstractRefresh
     }
 
     @Override
-	public synchronized void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-		history.doubleSnapshotOccurred(stateEngine, version);
-	}
-	
-	@Override
-	public synchronized void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-		if (stateEngine == history.getOldestState()) {
-			history.reverseDeltaOccurred(version);
-		} else {
-			history.deltaOccurred(version);
-		}
-	}
-	
-	@Override public void refreshStarted(long currentVersion, long requestedVersion) { }
-	@Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) { }
-	@Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }
-	@Override public void blobLoaded(Blob transition) { }
-	
+    public synchronized void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+        history.doubleSnapshotOccurred(stateEngine, version);
+    }
+
+    @Override
+    public synchronized void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+        if(stateEngine == history.getOldestState()) {
+            history.reverseDeltaOccurred(version);
+        } else {
+            history.deltaOccurred(version);
+        }
+    }
+
+    @Override
+    public void refreshStarted(long currentVersion, long requestedVersion) {
+    }
+
+    @Override
+    public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+    }
+
+    @Override
+    public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
+    }
+
+    @Override
+    public void blobLoaded(Blob transition) {
+    }
+
 }

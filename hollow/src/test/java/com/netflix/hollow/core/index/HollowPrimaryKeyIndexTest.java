@@ -197,7 +197,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
             Assert.assertEquals(true, idx.containsDuplicates()); // Make sure there is dups
 
             HollowObjectTypeReadState readTypeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(typeA);
-            for (int i = 0; i < readTypeState.maxOrdinal(); i++) {
+            for(int i = 0; i < readTypeState.maxOrdinal(); i++) {
                 int a1Val = readTypeState.readInt(i, a1Pos);
                 boolean isInDupRange = a1dupValueStart <= a1Val && a1Val < a1dupValueEnd;
 
@@ -205,7 +205,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
                 double a2Val = readTypeState.readDouble(ordinal, a2Pos);
                 //System.out.println("a1=" + a1Val + "\ta2=" + a2Val);
 
-                if (isInDupRange) {
+                if(isInDupRange) {
                     // Not deterministic
                     Assert.assertTrue(a2Val == a2Value || a2Val == a2dupValues);
                 } else {
@@ -220,7 +220,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
             Assert.assertFalse(idx.containsDuplicates()); // Make sure there is no dups
 
             HollowObjectTypeReadState readTypeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(typeA);
-            for (int i = 0; i < readTypeState.maxOrdinal(); i++) {
+            for(int i = 0; i < readTypeState.maxOrdinal(); i++) {
                 int a1Val = readTypeState.readInt(i, a1Pos);
                 boolean isInDupRange = a1dupValueStart <= a1Val && a1Val < a1dupValueEnd;
 
@@ -240,7 +240,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
             Assert.assertEquals(true, idx.containsDuplicates()); // Make sure there is dups
 
             HollowObjectTypeReadState readTypeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(typeA);
-            for (int i = 0; i < readTypeState.maxOrdinal(); i++) {
+            for(int i = 0; i < readTypeState.maxOrdinal(); i++) {
                 int a1Val = readTypeState.readInt(i, a1Pos);
                 boolean isInDupRange = a1dupValueStart <= a1Val && a1Val < a1dupValueEnd;
 
@@ -248,7 +248,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
                 double a2Val = readTypeState.readDouble(ordinal, a2Pos);
                 //System.out.println("a1=" + a1Val + "\ta2=" + a2Val);
 
-                if (isInDupRange) {
+                if(isInDupRange) {
                     // Not deterministic
                     Assert.assertTrue(a2Val == a2Value || a2Val == a2dupValues);
                 } else {
@@ -263,12 +263,12 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
             Assert.assertFalse(idx.containsDuplicates()); // Make sure there is no dups
 
             HollowObjectTypeReadState readTypeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(typeA);
-            for (int i = 0; i < readTypeState.maxOrdinal(); i++) {
+            for(int i = 0; i < readTypeState.maxOrdinal(); i++) {
                 int a1Val = readTypeState.readInt(i, a1Pos);
                 boolean isInDupRange = a1dupValueStart <= a1Val && a1Val < a1dupValueEnd;
 
                 int ordinal = idx.getMatchingOrdinal(a1Val);
-                if (!isInDupRange) {
+                if(!isInDupRange) {
                     // should not be found if not in dup range
                     Assert.assertTrue(ordinal < 0);
                     continue;
@@ -288,20 +288,20 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
         int max = a1Start + size;
-        for (int a1 = a1Start; a1 < max; a1++) {
+        for(int a1 = a1Start; a1 < max; a1++) {
             mapper.add(new TypeA(a1, a2, typeB));
         }
     }
 
     private static void assertEquals(Object[] actual, Object... expected) {
         Assert.assertEquals(actual.length, expected.length);
-        for (int i = 0; i < actual.length; i++) {
+        for(int i = 0; i < actual.length; i++) {
             Assert.assertEquals(expected[i], actual[i]);
         }
     }
 
 
-    @HollowPrimaryKey(fields = { "a1", "a2", "ab.b1" })
+    @HollowPrimaryKey(fields = {"a1", "a2", "ab.b1"})
     private static class TypeA {
         private final int a1;
         private final double a2;
@@ -329,6 +329,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
     }
 
     @Override
-    protected void initializeTypeStates() { }
+    protected void initializeTypeStates() {
+    }
 
 }

@@ -51,7 +51,7 @@ public abstract class HollowObjectTypeAPI extends HollowTypeAPI {
 
         if(!(typeDataAccess instanceof HollowObjectMissingDataAccess)) {
             HollowObjectSchema schema = typeDataAccess.getSchema();
-            for(int i=0;i<fieldNames.length;i++) {
+            for(int i = 0; i < fieldNames.length; i++) {
                 int fieldPosition = schema.getPosition(fieldNames[i]);
                 fieldIndex[i] = fieldPosition;
             }
@@ -82,13 +82,13 @@ public abstract class HollowObjectTypeAPI extends HollowTypeAPI {
         super.setSamplingDirector(samplingDirector);
         boxedFieldAccessSampler.setSamplingDirector(samplingDirector);
     }
-    
+
     @Override
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         super.setFieldSpecificSamplingDirector(fieldSpec, director);
         boxedFieldAccessSampler.setFieldSpecificSamplingDirector(fieldSpec, director);
     }
-    
+
     @Override
     public void ignoreUpdateThreadForSampling(Thread t) {
         super.ignoreUpdateThreadForSampling(t);

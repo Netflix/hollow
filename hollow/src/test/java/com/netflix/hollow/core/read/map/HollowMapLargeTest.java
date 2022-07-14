@@ -47,10 +47,10 @@ public class HollowMapLargeTest extends AbstractStateEngineTest {
     }
 
     void testSnapshot(int nMaps, int maxOrdinal, int initialValue) throws IOException {
-        for (int n = 0; n < nMaps; n++) {
+        for(int n = 0; n < nMaps; n++) {
             int v = initialValue - n;
             HollowMapWriteRecord rec = new HollowMapWriteRecord();
-            for (int i = 0; i < maxOrdinal; i++, v--) {
+            for(int i = 0; i < maxOrdinal; i++, v--) {
                 rec.addEntry(i, v);
             }
             writeStateEngine.add("TestMap", rec);
@@ -61,12 +61,12 @@ public class HollowMapLargeTest extends AbstractStateEngineTest {
         HollowMapTypeReadState typeState = (HollowMapTypeReadState)
                 readStateEngine.getTypeState("TestMap");
 
-        for (int n = 0; n < nMaps; n++) {
+        for(int n = 0; n < nMaps; n++) {
             int l = typeState.size(n);
             Assert.assertEquals(maxOrdinal, l);
 
             int v = initialValue - n;
-            for (int i = 0; i < maxOrdinal; i++, v--) {
+            for(int i = 0; i < maxOrdinal; i++, v--) {
                 Assert.assertEquals(n + " " + i, v, typeState.get(n, i));
             }
         }
@@ -88,17 +88,17 @@ public class HollowMapLargeTest extends AbstractStateEngineTest {
         {
             int v = initialValue;
             HollowMapWriteRecord rec = new HollowMapWriteRecord();
-            for (int i = 0; i < maxOrdinal; i++, v--) {
+            for(int i = 0; i < maxOrdinal; i++, v--) {
                 rec.addEntry(i, v);
             }
         }
 
         roundTripSnapshot();
 
-        for (int n = 0; n < nMaps; n++) {
+        for(int n = 0; n < nMaps; n++) {
             int v = initialValue - n;
             HollowMapWriteRecord rec = new HollowMapWriteRecord();
-            for (int i = 0; i < maxOrdinal; i++, v--) {
+            for(int i = 0; i < maxOrdinal; i++, v--) {
                 rec.addEntry(i, v);
             }
             writeStateEngine.add("TestMap", rec);
@@ -109,12 +109,12 @@ public class HollowMapLargeTest extends AbstractStateEngineTest {
         HollowMapTypeReadState typeState = (HollowMapTypeReadState)
                 readStateEngine.getTypeState("TestMap");
 
-        for (int n = 0; n < nMaps; n++) {
+        for(int n = 0; n < nMaps; n++) {
             int l = typeState.size(n);
             Assert.assertEquals(maxOrdinal, l);
 
             int v = initialValue - n;
-            for (int i = 0; i < maxOrdinal; i++, v--) {
+            for(int i = 0; i < maxOrdinal; i++, v--) {
                 Assert.assertEquals(n + " " + i, v, typeState.get(n, i));
             }
         }

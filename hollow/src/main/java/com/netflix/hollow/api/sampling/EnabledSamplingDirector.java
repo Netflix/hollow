@@ -18,7 +18,8 @@ package com.netflix.hollow.api.sampling;
 
 public class EnabledSamplingDirector extends HollowSamplingDirector {
 
-    public EnabledSamplingDirector() { }
+    public EnabledSamplingDirector() {
+    }
 
     @Override
     public boolean shouldRecord() {

@@ -47,7 +47,7 @@ public class StackTraceRecorder {
         StackTraceNode node = getNode(stackTrace[omitFirstNFrames], rootNodes);
         node.increment();
 
-        for(int i=omitFirstNFrames+1;i<maxFrameIndexToRecord;i++) {
+        for(int i = omitFirstNFrames + 1; i < maxFrameIndexToRecord; i++) {
             node = node.getChild(stackTrace[i]);
             node.increment();
         }
@@ -101,7 +101,7 @@ public class StackTraceRecorder {
     }
 
     private void append(StringBuilder builder, StackTraceNode node, int level) {
-        for(int i=0;i<level;i++)
+        for(int i = 0; i < level; i++)
             builder.append("  ");
         builder.append(node.getTraceLine()).append(" (").append(node.getCount()).append(")\n");
 

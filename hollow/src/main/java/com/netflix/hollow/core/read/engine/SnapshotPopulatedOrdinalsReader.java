@@ -34,7 +34,7 @@ public class SnapshotPopulatedOrdinalsReader {
 
         int currentOrdinal = 0;
 
-        for(int i=0;i<numLongs;i++) {
+        for(int i = 0; i < numLongs; i++) {
             long l = in.readLong();
             notifyPopulatedOrdinals(l, currentOrdinal, listeners);
             currentOrdinal += 64;
@@ -50,7 +50,7 @@ public class SnapshotPopulatedOrdinalsReader {
         while(ordinal < stopOrdinal) {
             long mask = 1L << ordinal;
             if((l & mask) != 0) {
-                for(int i=0; i<listeners.length; i++) {
+                for(int i = 0; i < listeners.length; i++) {
                     listeners[i].addedOrdinal(ordinal);
                 }
             }

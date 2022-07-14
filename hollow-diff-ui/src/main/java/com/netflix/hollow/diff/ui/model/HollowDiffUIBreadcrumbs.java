@@ -30,6 +30,7 @@ public class HollowDiffUIBreadcrumbs {
     public String getLink() {
         return link;
     }
+
     public String getDisplayText() {
         return displayText;
     }

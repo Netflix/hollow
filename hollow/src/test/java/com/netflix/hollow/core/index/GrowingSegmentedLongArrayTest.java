@@ -25,19 +25,19 @@ public class GrowingSegmentedLongArrayTest {
     @Test
     public void growsToFit() {
         GrowingSegmentedLongArray arr = new GrowingSegmentedLongArray(WastefulRecycler.SMALL_ARRAY_RECYCLER);
-        
-        for(int i=0;i<100000;i++) {
+
+        for(int i = 0; i < 100000; i++) {
             Assert.assertEquals(0, arr.get(i));
         }
-        
-        for(int i=0;i<100000;i++) {
+
+        for(int i = 0; i < 100000; i++) {
             arr.set(i, i);
         }
-        
-        for(int i=0;i<100000;i++) {
+
+        for(int i = 0; i < 100000; i++) {
             Assert.assertEquals(i, arr.get(i));
         }
-        
+
         arr.destroy();
     }
 

@@ -107,7 +107,7 @@ public class HollowMapDeltaTest extends AbstractStateEngineTest {
 
     @Test
     public void testSingleMapWith0KeyValueOrdinals() throws IOException {
-        addRecord(0,0);
+        addRecord(0, 0);
 
         roundTripSnapshot();
 
@@ -137,14 +137,15 @@ public class HollowMapDeltaTest extends AbstractStateEngineTest {
         try {
             assertMap(typeState, 0, 0, 0);
             Assert.fail("Should have thrown Exception");
-        } catch(NullPointerException expected) { }
+        } catch (NullPointerException expected) {
+        }
     }
 
     private void addRecord(int... ordinals) {
         HollowMapWriteRecord rec = new HollowMapWriteRecord();
 
-        for(int i=0;i<ordinals.length;i+=2) {
-            rec.addEntry(ordinals[i], ordinals[i+1]);
+        for(int i = 0; i < ordinals.length; i += 2) {
+            rec.addEntry(ordinals[i], ordinals[i + 1]);
         }
 
         writeStateEngine.add("TestMap", rec);
@@ -153,8 +154,8 @@ public class HollowMapDeltaTest extends AbstractStateEngineTest {
     private void assertMap(HollowMapTypeReadState readState, int ordinal, int... elements) {
         Assert.assertEquals(elements.length / 2, readState.size(ordinal));
 
-        for(int i=0;i<elements.length;i+=2) {
-            Assert.assertEquals(elements[i+1], readState.get(ordinal, elements[i]));
+        for(int i = 0; i < elements.length; i += 2) {
+            Assert.assertEquals(elements[i + 1], readState.get(ordinal, elements[i]));
         }
     }
 

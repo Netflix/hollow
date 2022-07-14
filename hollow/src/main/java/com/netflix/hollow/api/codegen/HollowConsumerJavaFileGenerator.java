@@ -40,7 +40,7 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
     protected final HollowDataset dataset;
 
     protected String className;
-    protected boolean useCollectionsImport=false;
+    protected boolean useCollectionsImport = false;
 
     public HollowConsumerJavaFileGenerator(String packageName, String subPackageName, HollowDataset dataset,
             CodeGeneratorConfig config) {
@@ -65,7 +65,7 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
     }
 
     public void useCollectionsImport() {
-        this.useCollectionsImport=true;
+        this.useCollectionsImport = true;
     }
 
     protected void appendPackageAndCommonImports(StringBuilder builder) {
@@ -80,21 +80,21 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
     protected void appendPackageAndCommonImports(StringBuilder builder,
             String apiClassname, List<HollowSchema> schemasToImport) {
         String fullPackageName =
-            createFullPackageName(packageName, subPackageName, config.isUsePackageGrouping());
-        if (!isEmpty(fullPackageName)) {
+                createFullPackageName(packageName, subPackageName, config.isUsePackageGrouping());
+        if(!isEmpty(fullPackageName)) {
             builder.append("package ").append(fullPackageName).append(";\n\n");
 
-            if (config.isUseHollowPrimitiveTypes()) {
+            if(config.isUseHollowPrimitiveTypes()) {
                 builder.append("import com.netflix.hollow.core.type.*;\n");
             }
 
-            if (config.isUsePackageGrouping()) {
-                if (apiClassname != null) {
+            if(config.isUsePackageGrouping()) {
+                if(apiClassname != null) {
                     appendImportFromBasePackage(builder, apiClassname);
                 }
                 Set<String> schemaNameSet = new HashSet<>();
-                for (HollowSchema schema : schemasToImport) {
-                    switch (schema.getSchemaType()) {
+                for(HollowSchema schema : schemasToImport) {
+                    switch(schema.getSchemaType()) {
                         case OBJECT:
                             addToSetIfNotPrimitiveOrCollection(schemaNameSet, schema.getName());
                             break;
@@ -117,11 +117,11 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
 
                     }
                 }
-                for (String schemaName : schemaNameSet) {
+                for(String schemaName : schemaNameSet) {
                     appendImportFromBasePackage(builder, schemaName + config.getClassPostfix());
                 }
                 appendImportFromBasePackage(builder, "core.*");
-                if (useCollectionsImport) {
+                if(useCollectionsImport) {
                     appendImportFromBasePackage(builder, HollowCollectionsGenerator.SUB_PACKAGE_NAME + ".*");
                 }
                 builder.append("\n");
@@ -130,7 +130,7 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
     }
 
     private String createFullPackageName(String packageName, String subPackageName, boolean usePackageGrouping) {
-        if (usePackageGrouping && !isEmpty(packageName) && !isEmpty(subPackageName)) {
+        if(usePackageGrouping && !isEmpty(packageName) && !isEmpty(subPackageName)) {
             return packageName + "."  + subPackageName;
         } else {
             return packageName;
@@ -152,9 +152,9 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
      * from.
      */
     private void addToSetIfNotPrimitiveOrCollection(Set<String> schemaNameSet, String... schemaNames) {
-        for (String schemaName : schemaNames) {
+        for(String schemaName : schemaNames) {
             // collections schemas get brought in by a star import
-            if (!HollowCodeGenerationUtils.isCollectionType(schemaName, dataset) &&
+            if(!HollowCodeGenerationUtils.isCollectionType(schemaName, dataset) &&
                     !HollowCodeGenerationUtils.isPrimitiveType(schemaName)) {
                 schemaNameSet.add(schemaName);
             }

@@ -48,22 +48,22 @@ public class HollowBlobHeaderWriter {
         for(HollowSchema schema : header.getSchemas())
             schema.writeTo(schemasStream);
         byte[] schemasData = schemasStream.toByteArray();
-        
+
         VarInt.writeVInt(dos, schemasData.length + 1); // plus one byte for new backwards compatibility envelope.
         dos.write(schemasData);
-        
+
         ///backwards compatibility -- new data can be added here by first indicating number of bytes used, will be skipped by existing readers.
         VarInt.writeVInt(dos, 0);
 
         /// write the header tags -- intended to include input source data versions
         dos.writeShort(header.getHeaderTags().size());
 
-        for (Map.Entry<String, String> headerTag : header.getHeaderTags().entrySet()) {
+        for(Map.Entry<String, String> headerTag : header.getHeaderTags().entrySet()) {
             dos.writeUTF(headerTag.getKey());
             dos.writeUTF(headerTag.getValue());
         }
     }
-    
+
     public void writePartHeader(HollowBlobOptionalPartHeader header, DataOutputStream dos) throws IOException {
         dos.writeInt(HollowBlobOptionalPartHeader.HOLLOW_BLOB_PART_VERSION_HEADER);
 

@@ -46,11 +46,11 @@ public class SegmentedLongArray {
 
     public SegmentedLongArray(ArraySegmentRecycler memoryRecycler, long numLongs) {
         this.log2OfSegmentSize = memoryRecycler.getLog2OfLongSegmentSize();
-        int numSegments = (int)((numLongs - 1) >>> log2OfSegmentSize) + 1;
+        int numSegments = (int) ((numLongs - 1) >>> log2OfSegmentSize) + 1;
         long[][] segments = new long[numSegments][];
         this.bitmask = (1 << log2OfSegmentSize) - 1;
 
-        for(int i=0;i<segments.length;i++) {
+        for(int i = 0; i < segments.length; i++) {
             segments[i] = memoryRecycler.getLongArray();
         }
 
@@ -70,8 +70,8 @@ public class SegmentedLongArray {
      * @param value the long value
      */
     public void set(long index, long value) {
-        int segmentIndex = (int)(index >> log2OfSegmentSize);
-        int longInSegment = (int)(index & bitmask);
+        int segmentIndex = (int) (index >> log2OfSegmentSize);
+        int longInSegment = (int) (index & bitmask);
         unsafe.putLong(segments[segmentIndex], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longInSegment), value);
 
         /// duplicate the longs here so that we can read faster.
@@ -87,16 +87,16 @@ public class SegmentedLongArray {
      * @return the long value
      */
     public long get(long index) {
-        int segmentIndex = (int)(index >>> log2OfSegmentSize);
-        long ret = segments[segmentIndex][(int)(index & bitmask)];
+        int segmentIndex = (int) (index >>> log2OfSegmentSize);
+        long ret = segments[segmentIndex][(int) (index & bitmask)];
 
         return ret;
     }
 
     public void fill(long value) {
-        for(int i=0;i<segments.length;i++) {
+        for(int i = 0; i < segments.length; i++) {
             long offset = Unsafe.ARRAY_LONG_BASE_OFFSET;
-            for(int j=0;j<segments[i].length;j++) {
+            for(int j = 0; j < segments[i].length; j++) {
                 unsafe.putLong(segments[i], offset, value);
                 offset += 8;
             }
@@ -106,13 +106,13 @@ public class SegmentedLongArray {
     public void writeTo(DataOutputStream dos, long numLongs) throws IOException {
         VarInt.writeVLong(dos, numLongs);
 
-        for(long i=0;i<numLongs;i++) {
+        for(long i = 0; i < numLongs; i++) {
             dos.writeLong(get(i));
         }
     }
 
     public void destroy(ArraySegmentRecycler memoryRecycler) {
-        for(int i=0;i<segments.length;i++) {
+        for(int i = 0; i < segments.length; i++) {
             if(segments[i] != null)
                 memoryRecycler.recycleLongArray(segments[i]);
         }

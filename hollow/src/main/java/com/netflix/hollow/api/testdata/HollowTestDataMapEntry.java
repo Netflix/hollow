@@ -21,22 +21,22 @@ public class HollowTestDataMapEntry<K extends HollowTestRecord, V extends Hollow
 
     private final K key;
     private final V value;
-    
+
     public HollowTestDataMapEntry(K key, V value) {
         this.key = key;
         this.value = value;
     }
-    
+
     public K key() {
         return key;
     }
-    
+
     public V value() {
         return value;
     }
-    
+
     public static <K extends HollowTestRecord, V extends HollowTestRecord> HollowTestDataMapEntry<K, V> entry(K key, V value) {
         return new HollowTestDataMapEntry<>(key, value);
     }
-    
+
 }

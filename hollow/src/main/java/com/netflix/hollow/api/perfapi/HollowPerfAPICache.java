@@ -46,9 +46,9 @@ public class HollowPerfAPICache<T> {
                     ? Arrays.copyOf(previous.cachedItems, length)
                     : new Object[length];
 
-            for (int ordinal = 0; ordinal < length; ordinal++) {
+            for(int ordinal = 0; ordinal < length; ordinal++) {
                 boolean previouslyPopulated = previous != null && previousOrdinals.get(ordinal);
-                if (!previouslyPopulated) {
+                if(!previouslyPopulated) {
                     // If not previously populated and currently populated then create a new cached instance.
                     // Otherwise, if not previously populated and not currently populated than null out any
                     // possibly present old cached value (create a hole)
@@ -71,7 +71,7 @@ public class HollowPerfAPICache<T> {
         T t = (T) cachedItems[typeAPI.ordinal(ref)];
         return t;
     }
-    
+
     public Object[] getCachedItems() {
         return Arrays.copyOf(cachedItems, cachedItems.length);
     }

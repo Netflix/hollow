@@ -42,28 +42,28 @@ public class HistoryOverviewPage extends HistoryPage {
     @Override
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
         List<HistoryOverviewRow> rows = getHistoryOverview();
-        
+
         ctx.put("overviewDisplayHeaders", ui.getOverviewDisplayHeaders());
         ctx.put("overviewRows", rows);
     }
-    
+
     public void sendJson(HttpServletRequest request, HttpServletResponse response) {
-    	List<HistoryOverviewRow> rows = getHistoryOverview();
-    	
-    	try {
-			PrintWriter out = response.getWriter();
-			Gson gson = new Gson();
-			String json = gson.toJson(rows);
-			out.println(json);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    	
+        List<HistoryOverviewRow> rows = getHistoryOverview();
+
+        try {
+            PrintWriter out = response.getWriter();
+            Gson gson = new Gson();
+            String json = gson.toJson(rows);
+            out.println(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
-    
+
     private List<HistoryOverviewRow> getHistoryOverview() {
-    	List<HistoryOverviewRow> rows = new ArrayList<HistoryOverviewRow>();
-    	
+        List<HistoryOverviewRow> rows = new ArrayList<HistoryOverviewRow>();
+
         for(HollowHistoricalState state : ui.getHistory().getHistoricalStates()) {
             ChangeBreakdown totalBreakdown = new ChangeBreakdown();
 
@@ -78,24 +78,24 @@ public class HistoryOverviewPage extends HistoryPage {
 
             rows.add(new HistoryOverviewRow(VersionTimestampConverter.getTimestamp(state.getVersion(), ui.getTimeZone()), state.getVersion(), totalBreakdown, topLevelChangesByType, overviewDisplayHeaderValues));
         }
-        
+
         return rows;
-    	
+
     }
-    
+
 
     private String[] getOverviewDisplayHeaderValues(HollowHistoricalState state, String[] overviewDisplayHeaders) {
         String values[] = new String[overviewDisplayHeaders.length];
-        
+
         Map<String, String> nextStateHeaders = getNextStateHeaderTags(state);
-        
-        for(int i=0;i<overviewDisplayHeaders.length;i++) {
+
+        for(int i = 0; i < overviewDisplayHeaders.length; i++) {
             values[i] = nextStateHeaders.get(overviewDisplayHeaders[i]);
         }
-        
+
         return values;
     }
-    
+
     private Map<String, String> getNextStateHeaderTags(HollowHistoricalState state) {
         Map<String, String> toTags = ui.getHistory().getLatestState().getHeaderTags();
         if(state.getNextState() != null) {
@@ -109,7 +109,8 @@ public class HistoryOverviewPage extends HistoryPage {
         private int addedRecords;
         private int removedRecords;
 
-        public ChangeBreakdown() { }
+        public ChangeBreakdown() {
+        }
 
         public ChangeBreakdown(HollowHistoricalStateTypeKeyOrdinalMapping keyMapping) {
             addTypeBreakown(keyMapping);

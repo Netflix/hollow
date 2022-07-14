@@ -30,19 +30,19 @@ import java.util.Map;
 public class IntMapOrdinalRemapper implements OrdinalRemapper {
 
     private final Map<String, IntMap> ordinalMappings;
-    
+
     public IntMapOrdinalRemapper() {
         this.ordinalMappings = new HashMap<String, IntMap>();
     }
-    
+
     public void addOrdinalRemapping(String typeName, IntMap mapping) {
         ordinalMappings.put(typeName, mapping);
     }
-    
+
     public IntMap getOrdinalRemapping(String typeName) {
         return ordinalMappings.get(typeName);
     }
-    
+
     @Override
     public int getMappedOrdinal(String type, int originalOrdinal) {
         IntMap mapping = ordinalMappings.get(type);
@@ -58,10 +58,10 @@ public class IntMapOrdinalRemapper implements OrdinalRemapper {
             return mapping.get(originalOrdinal) != -1;
         return false;
     }
-    
+
     @Override
     public void remapOrdinal(String type, int originalOrdinal, int mappedOrdinal) {
         throw new UnsupportedOperationException("Cannot explicitly remap an ordinal in an IntMapOrdinalRemapper");
     }
-    
+
 }

@@ -17,13 +17,15 @@
 package com.netflix.hollow.ui.jetty;
 
 public class AbstractOptionalDependencyHelper {
-    protected AbstractOptionalDependencyHelper() {}
+    protected AbstractOptionalDependencyHelper() {
+    }
 
     protected boolean isDependencyAvailable(String dependency) {
         try {
             Class.forName(dependency);
             return true;
-        } catch(Throwable th) {}
+        } catch (Throwable th) {
+        }
         return false;
     }
 
@@ -31,9 +33,9 @@ public class AbstractOptionalDependencyHelper {
         try {
             if(!isDependencyAvailable(dependency)) throw new OptionalDependencyException(message);
             return Class.forName(factory).newInstance();
-        } catch(OptionalDependencyException ex) {
+        } catch (OptionalDependencyException ex) {
             throw ex;
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw new OptionalDependencyException(message, ex);
         }
     }

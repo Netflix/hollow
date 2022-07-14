@@ -99,7 +99,7 @@ public class HollowObjectReverseDeltaTest {
         PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
         Assert.assertEquals(expectedValuesInOrdinalPosition.length, listener.getPopulatedOrdinals().length());
 
-        for(int i=0;i<expectedValuesInOrdinalPosition.length;i++) {
+        for(int i = 0; i < expectedValuesInOrdinalPosition.length; i++) {
             if(expectedValuesInOrdinalPosition[i] != -1) {
                 if(expectedValuesInOrdinalPosition[i] < 0)
                     Assert.assertFalse(listener.getPopulatedOrdinals().get(i));
@@ -132,7 +132,6 @@ public class HollowObjectReverseDeltaTest {
         writer.writeSnapshot(baos);
         return baos.toByteArray();
     }
-
 
 
 }

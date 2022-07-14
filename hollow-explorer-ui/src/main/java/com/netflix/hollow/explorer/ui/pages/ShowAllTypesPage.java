@@ -43,63 +43,63 @@ public class ShowAllTypesPage extends HollowExplorerPage {
 
     @Override
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
-        
+
         String sort = req.getParameter("sort") == null ? "primaryKey" : req.getParameter("sort");
-        
+
         List<TypeOverview> typeOverviews = new ArrayList<TypeOverview>();
-        
+
         for(HollowTypeReadState typeState : ui.getStateEngine().getTypeStates()) {
             String typeName = typeState.getSchema().getName();
             BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
             int numRecords = populatedOrdinals == null ? Integer.MIN_VALUE : populatedOrdinals.cardinality();
-            int numHoles = populatedOrdinals == null ? Integer.MIN_VALUE : populatedOrdinals.length()-populatedOrdinals.cardinality();
+            int numHoles = populatedOrdinals == null ? Integer.MIN_VALUE : populatedOrdinals.length() - populatedOrdinals.cardinality();
             long approxHoleFootprint = typeState.getApproximateHoleCostInBytes();
-            PrimaryKey primaryKey = typeState.getSchema().getSchemaType() == SchemaType.OBJECT ? ((HollowObjectSchema)typeState.getSchema()).getPrimaryKey() : null;
+            PrimaryKey primaryKey = typeState.getSchema().getSchemaType() == SchemaType.OBJECT ? ((HollowObjectSchema) typeState.getSchema()).getPrimaryKey() : null;
             long approxHeapFootprint = typeState.getApproximateHeapFootprintInBytes();
             HollowSchema schema = typeState.getSchema();
-            
+
             typeOverviews.add(new TypeOverview(typeName, numRecords, numHoles, approxHoleFootprint, approxHeapFootprint, primaryKey, schema));
         }
 
         switch(sort) {
-        case "typeName":
-            Collections.sort(typeOverviews, new Comparator<TypeOverview>() {
-                public int compare(TypeOverview o1, TypeOverview o2) {
-                    return o1.getTypeName().compareTo(o2.getTypeName());
-                }
-            });
-            break;
-        case "numRecords":
-            Collections.sort(typeOverviews, new Comparator<TypeOverview>() {
-                public int compare(TypeOverview o1, TypeOverview o2) {
-                    return Integer.compare(o2.getNumRecordsInt(), o1.getNumRecordsInt());
-                }
-            });
-            break;
+            case "typeName":
+                Collections.sort(typeOverviews, new Comparator<TypeOverview>() {
+                    public int compare(TypeOverview o1, TypeOverview o2) {
+                        return o1.getTypeName().compareTo(o2.getTypeName());
+                    }
+                });
+                break;
+            case "numRecords":
+                Collections.sort(typeOverviews, new Comparator<TypeOverview>() {
+                    public int compare(TypeOverview o1, TypeOverview o2) {
+                        return Integer.compare(o2.getNumRecordsInt(), o1.getNumRecordsInt());
+                    }
+                });
+                break;
             case "numHoles":
                 typeOverviews.sort((o1, o2) -> Integer.compare(o2.getNumHolesInt(), o1.getNumHolesInt()));
                 break;
             case "holeSize":
                 typeOverviews.sort((o1, o2) -> Long.compare(o2.getApproxHoleFootprintLong(), o1.getApproxHoleFootprintLong()));
                 break;
-        case "heapSize":
-            Collections.sort(typeOverviews, new Comparator<TypeOverview>() {
-                public int compare(TypeOverview o1, TypeOverview o2) {
-                    return Long.compare(o2.getApproxHeapFootprintLong(), o1.getApproxHeapFootprintLong());
-                }
-            });
-            break;
-        default:
-            Collections.sort(typeOverviews, new Comparator<TypeOverview>() {
-                public int compare(TypeOverview o1, TypeOverview o2) {
-                    if(!"".equals(o1.getPrimaryKey()) && "".equals(o2.getPrimaryKey()))
-                        return -1;
-                    if("".equals(o1.getPrimaryKey()) && !"".equals(o2.getPrimaryKey()))
-                        return 1;
-                    
-                    return o1.getTypeName().compareTo(o2.getTypeName()); 
-                }
-            });
+            case "heapSize":
+                Collections.sort(typeOverviews, new Comparator<TypeOverview>() {
+                    public int compare(TypeOverview o1, TypeOverview o2) {
+                        return Long.compare(o2.getApproxHeapFootprintLong(), o1.getApproxHeapFootprintLong());
+                    }
+                });
+                break;
+            default:
+                Collections.sort(typeOverviews, new Comparator<TypeOverview>() {
+                    public int compare(TypeOverview o1, TypeOverview o2) {
+                        if(!"".equals(o1.getPrimaryKey()) && "".equals(o2.getPrimaryKey()))
+                            return -1;
+                        if("".equals(o1.getPrimaryKey()) && !"".equals(o2.getPrimaryKey()))
+                            return 1;
+
+                        return o1.getTypeName().compareTo(o2.getTypeName());
+                    }
+                });
         }
 
         ctx.put("totalHoleFootprint", totalApproximateHoleFootprint(typeOverviews));
@@ -111,7 +111,7 @@ public class ShowAllTypesPage extends HollowExplorerPage {
     protected void renderPage(HttpServletRequest req, VelocityContext ctx, Writer writer) {
         ui.getVelocityEngine().getTemplate("show-all-types.vm").merge(ctx, writer);
     }
-    
+
     private String totalApproximateHeapFootprint(List<TypeOverview> allTypes) {
         long totalHeapFootprint = 0;
         for(TypeOverview type : allTypes)

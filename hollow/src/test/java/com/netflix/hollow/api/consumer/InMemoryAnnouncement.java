@@ -23,17 +23,17 @@ import java.util.List;
 
 /// This InMemoryAnnouncement is both a HollowProducer.Announcer and HollowConsumer.AnnouncementWatcher!
 public class InMemoryAnnouncement implements Announcer, AnnouncementWatcher {
-    
+
     private final List<HollowConsumer> subscribedConsumers;
-    
+
     long latestAnnouncedVersion = NO_ANNOUNCEMENT_AVAILABLE;
     long pinnedVersion = NO_ANNOUNCEMENT_AVAILABLE;
-        
-    
+
+
     public InMemoryAnnouncement() {
         this.subscribedConsumers = new ArrayList<HollowConsumer>();
     }
-            
+
     @Override
     public long getLatestVersion() {
         if(pinnedVersion != NO_ANNOUNCEMENT_AVAILABLE)
@@ -56,7 +56,7 @@ public class InMemoryAnnouncement implements Announcer, AnnouncementWatcher {
         pinnedVersion = stateVersion;
         notifyConsumers();
     }
-    
+
     public void unpin() {
         pinnedVersion = NO_ANNOUNCEMENT_AVAILABLE;
         notifyConsumers();
@@ -66,5 +66,5 @@ public class InMemoryAnnouncement implements Announcer, AnnouncementWatcher {
         for(HollowConsumer consumer : subscribedConsumers) {
             consumer.triggerRefresh(); // triggering a blocking refresh so we can make assertions
         }
-    };
+    }
 }

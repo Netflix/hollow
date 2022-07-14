@@ -29,7 +29,8 @@ public class HollowListDisabledDataAccess implements HollowListTypeDataAccess {
 
     public static final HollowListDisabledDataAccess INSTANCE = new HollowListDisabledDataAccess();
 
-    private HollowListDisabledDataAccess() { }
+    private HollowListDisabledDataAccess() {
+    }
 
     @Override
     public int size(int ordinal) {
@@ -55,7 +56,7 @@ public class HollowListDisabledDataAccess implements HollowListTypeDataAccess {
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         throw new IllegalStateException("DataAccess is Disabled");
     }
-    
+
     @Override
     public void ignoreUpdateThreadForSampling(Thread t) {
         throw new IllegalStateException("DataAccess is Disabled");

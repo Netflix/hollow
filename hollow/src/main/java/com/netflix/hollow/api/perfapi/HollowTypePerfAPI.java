@@ -28,7 +28,7 @@ public abstract class HollowTypePerfAPI {
         this.maskedTypeIdx = Ref.toTypeMasked(typeIdx);
         this.api = api;
     }
-    
+
     public long refForOrdinal(int ordinal) {
         return Ref.toRefWithTypeMasked(maskedTypeIdx, ordinal);
     }
@@ -46,10 +46,10 @@ public abstract class HollowTypePerfAPI {
      * @throws IllegalArgumentException if the reference's type differs
      */
     public int ordinal(long ref) {
-        if (!Ref.isRefOfTypeMasked(maskedTypeIdx, ref)) {
+        if(!Ref.isRefOfTypeMasked(maskedTypeIdx, ref)) {
             String expectedType = api.types.getTypeName(Ref.type(maskedTypeIdx));
 
-            if (Ref.isNull(ref)) {
+            if(Ref.isNull(ref)) {
                 throw new NullPointerException("Reference is null -- expected type " + expectedType);
             }
 
@@ -58,7 +58,7 @@ public abstract class HollowTypePerfAPI {
         }
         return Ref.ordinal(ref);
     }
-    
+
     public boolean isMissingType() {
         return maskedTypeIdx == Ref.toTypeMasked(Ref.TYPE_ABSENT);
     }

@@ -41,7 +41,7 @@ public class HollowObjectSampler implements HollowSampler {
         Arrays.fill(samplingDirectors, director);
 
         String fieldNames[] = new String[schema.numFields()];
-        for(int i=0;i<fieldNames.length;i++) {
+        for(int i = 0; i < fieldNames.length; i++) {
             fieldNames[i] = schema.getFieldName(i);
         }
         this.fieldNames = fieldNames;
@@ -58,7 +58,7 @@ public class HollowObjectSampler implements HollowSampler {
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         ObjectFilterConfig typeConfig = fieldSpec.getObjectTypeConfig(typeName);
 
-        for(int i=0;i<fieldNames.length;i++) {
+        for(int i = 0; i < fieldNames.length; i++) {
             if(typeConfig.includesField(fieldNames[i])) {
                 samplingDirectors[i] = director;
             }
@@ -66,7 +66,7 @@ public class HollowObjectSampler implements HollowSampler {
     }
 
     public void setUpdateThread(Thread t) {
-        for(int i=0;i<samplingDirectors.length;i++)
+        for(int i = 0; i < samplingDirectors.length; i++)
             samplingDirectors[i].setUpdateThread(t);
     }
 
@@ -76,7 +76,7 @@ public class HollowObjectSampler implements HollowSampler {
     }
 
     public boolean hasSampleResults() {
-        for(int i=0;i<sampleCounts.length;i++)
+        for(int i = 0; i < sampleCounts.length; i++)
             if(sampleCounts[i] > 0)
                 return true;
         return false;
@@ -86,7 +86,7 @@ public class HollowObjectSampler implements HollowSampler {
     public Collection<SampleResult> getSampleResults() {
         List<SampleResult> sampleResults = new ArrayList<SampleResult>(sampleCounts.length);
 
-        for(int i=0;i<sampleCounts.length;i++) {
+        for(int i = 0; i < sampleCounts.length; i++) {
             sampleResults.add(new SampleResult(typeName + "." + fieldNames[i], sampleCounts[i]));
         }
 

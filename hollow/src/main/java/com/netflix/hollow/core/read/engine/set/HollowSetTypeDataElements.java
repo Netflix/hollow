@@ -62,11 +62,11 @@ public class HollowSetTypeDataElements {
     }
 
     void readSnapshot(HollowBlobInput in) throws IOException {
-        readFromInput(in,false);
+        readFromInput(in, false);
     }
 
     void readDelta(HollowBlobInput in) throws IOException {
-        readFromInput(in,true);
+        readFromInput(in, true);
     }
 
     private void readFromInput(HollowBlobInput in, boolean isDelta) throws IOException {
@@ -92,7 +92,7 @@ public class HollowSetTypeDataElements {
         if(numShards > 1)
             VarInt.readVInt(in); // max ordinal
 
-        for(int i=0;i<numShards;i++) {
+        for(int i = 0; i < numShards; i++) {
             VarInt.readVInt(in); // max ordinal
 
             if(isDelta) {

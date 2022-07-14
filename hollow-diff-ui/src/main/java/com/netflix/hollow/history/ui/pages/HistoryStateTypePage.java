@@ -48,142 +48,142 @@ public class HistoryStateTypePage extends HistoryPage {
         long version = Long.parseLong(req.getParameter("version"));
         HistoryStateTypeChanges typeChange = getStateTypeChanges(req, session, ui);
         HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(version);
-        
+
         List<String> groupByOptions = new ArrayList<String>(Arrays.asList(historicalState.getKeyOrdinalMapping().getTypeMapping(req.getParameter("type")).getKeyIndex().getKeyFields()));
         groupByOptions.removeAll(Arrays.asList(typeChange.getGroupedFieldNames()));
-        
+
         ctx.put("typeChange", typeChange);
         ctx.put("headerEntries", getHeaderEntries(historicalState));
         ctx.put("groupBy", req.getParameter("groupBy") == null ? "" : req.getParameter("groupBy"));
         ctx.put("groupByOptions", groupByOptions);
     }
-    
-    public void sendJson(HttpServletRequest request, HollowUISession session, HttpServletResponse response) {
-    	long version = Long.parseLong(request.getParameter("version"));
-    	HistoryStateTypeChanges typeChange = getStateTypeChanges(request, session, ui);
-    	HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(version);
-    	
-    	List<String> groupByOptions = new ArrayList<String>(Arrays.asList(historicalState.getKeyOrdinalMapping().getTypeMapping(request.getParameter("type")).getKeyIndex().getKeyFields()));
-    	groupByOptions.removeAll(Arrays.asList(typeChange.getGroupedFieldNames()));
-    	
-    	Map<String, List<List<String>>> changes = new LinkedHashMap<String, List<List<String>>>();
-    	
-    	List<List<String>> groups = new ArrayList<List<String>>();
-    	groups.add(groupByOptions);
-    	changes.put("groups", groups);
-    	
-    	// handle additions
-    	if(typeChange.getAddedRecords().isEmpty()) {
-    		changes.put("additions", new ArrayList<List<String>>());
-    	} else if(!typeChange.getAddedRecords().hasSubGroups()){
-    		List<RecordDiff> addedDiffs = typeChange.getAddedRecords().getRecordDiffs();
-    		List<List<String>> idRecords = new ArrayList<List<String>>();
-    		for(RecordDiff diff : addedDiffs) {
-    			List<String> data = new ArrayList<String>();
-    			data.add(diff.getIdentifierString());
-    			data.add(new Integer(diff.getKeyOrdinal()).toString());
-    			idRecords.add(data);
-    		}
-    		changes.put("additions", idRecords);
-    	} else {
-    		// This has sub groups
-    		List<List<String>> idRecords = new ArrayList<List<String>>();
-    		for(RecordDiffTreeNode changeGroup : typeChange.getAddedRecords().getSubGroups()) {
-    			List<String> data = new ArrayList<String>();
-    			data.add(changeGroup.getGroupName() + "(" + changeGroup.getDiffCount() +  ")");
-    			data.add(changeGroup.getHierarchicalFieldName());
-    			idRecords.add(data);
-    		}
-    		changes.put("additions", idRecords);
-    	}
 
-    	// handle modifications
-    	if(typeChange.getModifiedRecords().isEmpty()) {
-    		changes.put("modifications", new ArrayList<List<String>>());
-    	} else if(!typeChange.getModifiedRecords().hasSubGroups()){
-    		List<RecordDiff> modifiedDiffs = typeChange.getModifiedRecords().getRecordDiffs();
-    		List<List<String>> idRecords = new ArrayList<List<String>>();
-    		for(RecordDiff diff : modifiedDiffs) {
-    			List<String> data = new ArrayList<String>();
-    			data.add(diff.getIdentifierString());
-    			data.add(new Integer(diff.getKeyOrdinal()).toString());
-    			idRecords.add(data);
-    		}
-    		changes.put("modifications", idRecords);
-    	} else {
-    		// This has sub groups
-    		List<List<String>> idRecords = new ArrayList<List<String>>();
-    		for(RecordDiffTreeNode changeGroup : typeChange.getModifiedRecords().getSubGroups()) {
-    			List<String> data = new ArrayList<String>();
-    			data.add(changeGroup.getGroupName() + "(" + changeGroup.getDiffCount() +  ")");
-    			data.add(changeGroup.getHierarchicalFieldName());
-    			idRecords.add(data);
-    		}
-    		changes.put("modifications", idRecords);    		
-    	}
-    	
-    	// handle removals
-    	if(typeChange.getRemovedRecords().isEmpty()) {
-    		changes.put("removals", new ArrayList<List<String>>());
-    	} else if(!typeChange.getRemovedRecords().hasSubGroups()){
-    		List<RecordDiff> removedDiffs = typeChange.getRemovedRecords().getRecordDiffs();
-    		List<List<String>> idRecords = new ArrayList<List<String>>();
-    		for(RecordDiff diff : removedDiffs) {
-    			List<String> data = new ArrayList<String>();
-    			data.add(diff.getIdentifierString());
-    			data.add(new Integer(diff.getKeyOrdinal()).toString());
-    			idRecords.add(data);
-    		}
-    		changes.put("removals", idRecords);
-    	} else {
-    		// This has sub groups
-    		List<List<String>> idRecords = new ArrayList<List<String>>();
-    		for(RecordDiffTreeNode changeGroup : typeChange.getRemovedRecords().getSubGroups()) {
-    			List<String> data = new ArrayList<String>();
-    			data.add(changeGroup.getGroupName() + "(" + changeGroup.getDiffCount() +  ")");
-    			data.add(changeGroup.getHierarchicalFieldName());
-    			idRecords.add(data);
-    		}
-    		changes.put("removals", idRecords);    		
-    	}
-    	
-    	
-    	try {
-        	PrintWriter out = response.getWriter();
-        	Gson gson = new Gson();
-        	String json = gson.toJson(changes, changes.getClass());
-        	out.println(json);
-    	} catch(IOException e) {
-    		e.printStackTrace();
-    	}
-    	
+    public void sendJson(HttpServletRequest request, HollowUISession session, HttpServletResponse response) {
+        long version = Long.parseLong(request.getParameter("version"));
+        HistoryStateTypeChanges typeChange = getStateTypeChanges(request, session, ui);
+        HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(version);
+
+        List<String> groupByOptions = new ArrayList<String>(Arrays.asList(historicalState.getKeyOrdinalMapping().getTypeMapping(request.getParameter("type")).getKeyIndex().getKeyFields()));
+        groupByOptions.removeAll(Arrays.asList(typeChange.getGroupedFieldNames()));
+
+        Map<String, List<List<String>>> changes = new LinkedHashMap<String, List<List<String>>>();
+
+        List<List<String>> groups = new ArrayList<List<String>>();
+        groups.add(groupByOptions);
+        changes.put("groups", groups);
+
+        // handle additions
+        if(typeChange.getAddedRecords().isEmpty()) {
+            changes.put("additions", new ArrayList<List<String>>());
+        } else if(!typeChange.getAddedRecords().hasSubGroups()) {
+            List<RecordDiff> addedDiffs = typeChange.getAddedRecords().getRecordDiffs();
+            List<List<String>> idRecords = new ArrayList<List<String>>();
+            for(RecordDiff diff : addedDiffs) {
+                List<String> data = new ArrayList<String>();
+                data.add(diff.getIdentifierString());
+                data.add(new Integer(diff.getKeyOrdinal()).toString());
+                idRecords.add(data);
+            }
+            changes.put("additions", idRecords);
+        } else {
+            // This has sub groups
+            List<List<String>> idRecords = new ArrayList<List<String>>();
+            for(RecordDiffTreeNode changeGroup : typeChange.getAddedRecords().getSubGroups()) {
+                List<String> data = new ArrayList<String>();
+                data.add(changeGroup.getGroupName() + "(" + changeGroup.getDiffCount() +  ")");
+                data.add(changeGroup.getHierarchicalFieldName());
+                idRecords.add(data);
+            }
+            changes.put("additions", idRecords);
+        }
+
+        // handle modifications
+        if(typeChange.getModifiedRecords().isEmpty()) {
+            changes.put("modifications", new ArrayList<List<String>>());
+        } else if(!typeChange.getModifiedRecords().hasSubGroups()) {
+            List<RecordDiff> modifiedDiffs = typeChange.getModifiedRecords().getRecordDiffs();
+            List<List<String>> idRecords = new ArrayList<List<String>>();
+            for(RecordDiff diff : modifiedDiffs) {
+                List<String> data = new ArrayList<String>();
+                data.add(diff.getIdentifierString());
+                data.add(new Integer(diff.getKeyOrdinal()).toString());
+                idRecords.add(data);
+            }
+            changes.put("modifications", idRecords);
+        } else {
+            // This has sub groups
+            List<List<String>> idRecords = new ArrayList<List<String>>();
+            for(RecordDiffTreeNode changeGroup : typeChange.getModifiedRecords().getSubGroups()) {
+                List<String> data = new ArrayList<String>();
+                data.add(changeGroup.getGroupName() + "(" + changeGroup.getDiffCount() +  ")");
+                data.add(changeGroup.getHierarchicalFieldName());
+                idRecords.add(data);
+            }
+            changes.put("modifications", idRecords);
+        }
+
+        // handle removals
+        if(typeChange.getRemovedRecords().isEmpty()) {
+            changes.put("removals", new ArrayList<List<String>>());
+        } else if(!typeChange.getRemovedRecords().hasSubGroups()) {
+            List<RecordDiff> removedDiffs = typeChange.getRemovedRecords().getRecordDiffs();
+            List<List<String>> idRecords = new ArrayList<List<String>>();
+            for(RecordDiff diff : removedDiffs) {
+                List<String> data = new ArrayList<String>();
+                data.add(diff.getIdentifierString());
+                data.add(new Integer(diff.getKeyOrdinal()).toString());
+                idRecords.add(data);
+            }
+            changes.put("removals", idRecords);
+        } else {
+            // This has sub groups
+            List<List<String>> idRecords = new ArrayList<List<String>>();
+            for(RecordDiffTreeNode changeGroup : typeChange.getRemovedRecords().getSubGroups()) {
+                List<String> data = new ArrayList<String>();
+                data.add(changeGroup.getGroupName() + "(" + changeGroup.getDiffCount() +  ")");
+                data.add(changeGroup.getHierarchicalFieldName());
+                idRecords.add(data);
+            }
+            changes.put("removals", idRecords);
+        }
+
+
+        try {
+            PrintWriter out = response.getWriter();
+            Gson gson = new Gson();
+            String json = gson.toJson(changes, changes.getClass());
+            out.println(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
-    
+
     public static HistoryStateTypeChanges getStateTypeChanges(HttpServletRequest req, HollowUISession session, HollowHistoryUI ui) {
         HistoryStateTypeChanges typeChanges = (HistoryStateTypeChanges) session.getAttribute(STATE_TYPE_CHANGES_SESSION_ATTRIBUTE_NAME);
         long version = Long.parseLong(req.getParameter("version"));
         String type = req.getParameter("type");
         String groupBy = req.getParameter("groupBy");
         String[] groupedFieldNames = getGroupedFieldNames(groupBy);
-        
-        if(typeChanges == null 
+
+        if(typeChanges == null
                 || version != typeChanges.getStateVersion()
                 || !type.equals(typeChanges.getTypeName())
                 || !Arrays.equals(groupedFieldNames, typeChanges.getGroupedFieldNames())) {
-            
+
             HollowHistoricalState historicalState = ui.getHistory().getHistoricalState(Long.parseLong(req.getParameter("version")));
             HollowHistoryRecordNamer recordNamer = ui.getHistoryRecordNamer(type);
             typeChanges = new HistoryStateTypeChanges(historicalState, type, recordNamer, groupedFieldNames);
             session.setAttribute(STATE_TYPE_CHANGES_SESSION_ATTRIBUTE_NAME, typeChanges);
         }
-        
-       return typeChanges;
+
+        return typeChanges;
     }
-    
+
     private static String[] getGroupedFieldNames(String groupBy) {
         if(groupBy == null)
             return new String[0];
-        
+
         return groupBy.split(",");
     }
 

@@ -19,7 +19,7 @@ package com.netflix.hollow.diffview.effigy.pairer.exact;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 
 public interface ExactRecordMatcher {
-    
+
     public boolean isExactMatch(HollowTypeDataAccess fromType, int fromOrdinal, HollowTypeDataAccess toType, int toOrdinal);
-    
+
 }

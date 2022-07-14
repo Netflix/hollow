@@ -11,7 +11,8 @@ import org.junit.Test;
 public class ThreadsTest {
     @Test
     public void named() {
-        Thread thread = daemonThread(() -> {}, "Thready McThreadson");
+        Thread thread = daemonThread(() -> {
+        }, "Thready McThreadson");
 
         assertEquals("Thready McThreadson", thread.getName());
         assertTrue(thread.isDaemon()); // TODO(timt): invariant
@@ -19,7 +20,8 @@ public class ThreadsTest {
 
     @Test
     public void described() {
-        Thread thread = daemonThread(() -> {}, getClass(), "howdy");
+        Thread thread = daemonThread(() -> {
+        }, getClass(), "howdy");
 
         assertEquals("hollow | ThreadsTest | howdy", thread.getName());
         assertTrue(thread.isDaemon());
@@ -27,7 +29,8 @@ public class ThreadsTest {
 
     @Test
     public void described_customPlatform() {
-        Thread thread = daemonThread(() -> {}, "solid", getClass(), "howdy");
+        Thread thread = daemonThread(() -> {
+        }, "solid", getClass(), "howdy");
 
         assertEquals("solid | ThreadsTest | howdy", thread.getName());
         assertTrue(thread.isDaemon());
@@ -36,7 +39,8 @@ public class ThreadsTest {
     @Test
     public void nullName() {
         try {
-            daemonThread(() -> {}, null);
+            daemonThread(() -> {
+            }, null);
             fail("expected an exception");
         } catch (NullPointerException e) {
             assertEquals("name required", e.getMessage());
@@ -46,7 +50,8 @@ public class ThreadsTest {
     @Test
     public void nullPlatform() {
         try {
-            daemonThread(() -> {}, null, getClass(), "boom");
+            daemonThread(() -> {
+            }, null, getClass(), "boom");
             fail("expected an exception");
         } catch (NullPointerException e) {
             assertEquals("platform required", e.getMessage());
@@ -66,7 +71,8 @@ public class ThreadsTest {
     @Test
     public void nullContext() {
         try {
-            daemonThread(() -> {}, null, "boom");
+            daemonThread(() -> {
+            }, null, "boom");
             fail("expected an exception");
         } catch (NullPointerException e) {
             assertEquals("context required", e.getMessage());
@@ -76,7 +82,8 @@ public class ThreadsTest {
     @Test
     public void nullDescription() {
         try {
-            daemonThread(() -> {}, getClass(), null);
+            daemonThread(() -> {
+            }, getClass(), null);
             fail("expected an exception");
         } catch (NullPointerException e) {
             assertEquals("description required", e.getMessage());

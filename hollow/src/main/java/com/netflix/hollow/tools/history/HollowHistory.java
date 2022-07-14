@@ -121,10 +121,10 @@ public class HollowHistory {
      * @param maxHistoricalStatesToKeep The number of historical states to keep in memory
      */
     public HollowHistory(HollowReadStateEngine fwdMovingHollowReadStateEngine,
-                         HollowReadStateEngine revMovingHollowReadStateEngine,
-                         long fwdInitialVersion,
-                         long revInitialVersion,
-                         int maxHistoricalStatesToKeep) {
+            HollowReadStateEngine revMovingHollowReadStateEngine,
+            long fwdInitialVersion,
+            long revInitialVersion,
+            int maxHistoricalStatesToKeep) {
         this(fwdMovingHollowReadStateEngine, revMovingHollowReadStateEngine, fwdInitialVersion, revInitialVersion,
                 maxHistoricalStatesToKeep, true);
     }
@@ -146,11 +146,11 @@ public class HollowHistory {
      * @param isAutoDiscoverTypeIndex true if scheme types are auto-discovered from the initiate state engine
      */
     public HollowHistory(HollowReadStateEngine fwdMovingHollowReadStateEngine,
-                         HollowReadStateEngine revMovingHollowReadStateEngine,
-                         long fwdInitialVersion,
-                         long revInitialVersion,
-                         int maxHistoricalStatesToKeep,
-                         boolean isAutoDiscoverTypeIndex) {
+            HollowReadStateEngine revMovingHollowReadStateEngine,
+            long fwdInitialVersion,
+            long revInitialVersion,
+            int maxHistoricalStatesToKeep,
+            boolean isAutoDiscoverTypeIndex) {
         this.keyIndex = new HollowHistoryKeyIndex(this);
         this.creator = new HollowHistoricalStateCreator(this);
         this.historicalStates = new ArrayList<>();
@@ -159,7 +159,7 @@ public class HollowHistory {
 
         // validate fwd moving state initialization
         requireNonNull(fwdMovingHollowReadStateEngine, "Fwd direction read state engine should be initialized");
-        if (fwdInitialVersion == VERSION_NONE) {
+        if(fwdInitialVersion == VERSION_NONE) {
             throw new IllegalArgumentException("Valid version corresponding to fwdMovingHollowReadStateEngine should be specified" +
                     "during HollowHistory initialization");
         }
@@ -169,15 +169,15 @@ public class HollowHistory {
         this.latestHeaderEntries = latestHollowReadStateEngine.getHeaderTags();
 
         // rev moving state, may or may not be specified at initialization
-        if (revMovingHollowReadStateEngine != null || revInitialVersion != VERSION_NONE) {
+        if(revMovingHollowReadStateEngine != null || revInitialVersion != VERSION_NONE) {
             initializeReverseStateEngine(revMovingHollowReadStateEngine, revInitialVersion);
         }
 
-        if (isAutoDiscoverTypeIndex) {
-            for (HollowSchema schema : fwdMovingHollowReadStateEngine.getSchemas()) {
-                if (schema instanceof HollowObjectSchema) {
+        if(isAutoDiscoverTypeIndex) {
+            for(HollowSchema schema : fwdMovingHollowReadStateEngine.getSchemas()) {
+                if(schema instanceof HollowObjectSchema) {
                     PrimaryKey pKey = ((HollowObjectSchema) schema).getPrimaryKey();
-                    if (pKey == null) continue;
+                    if(pKey == null) continue;
 
                     keyIndex.addTypeIndex(pKey);
                     keyIndex.indexTypeField(pKey);
@@ -188,18 +188,18 @@ public class HollowHistory {
 
     public void initializeReverseStateEngine(HollowReadStateEngine revReadStateEngine, long version) {
         requireNonNull(revReadStateEngine, "Non-null revReadStateEngine required");
-        if (version == VERSION_NONE) {
+        if(version == VERSION_NONE) {
             throw new IllegalArgumentException("Valid version corresponding to revReadStateEngine required");
         }
-        if (version != fwdInitialVersion) {
+        if(version != fwdInitialVersion) {
             throw new IllegalStateException("Reverse state engine version should correspond to the version that fwd state engine" +
                     "initialized to for a contiguous history chain");
         }
-        if (latestHollowReadStateEngine == null) {
+        if(latestHollowReadStateEngine == null) {
             // so that history key index is initialized to latestReadStateEngine, the one we're going to retain forever
             throw new IllegalStateException("Initialize fwd direction read state engine before initializing rev direction read state engine");
         }
-        if (oldestHollowReadStateEngine != null || oldestVersion != VERSION_NONE) {
+        if(oldestHollowReadStateEngine != null || oldestVersion != VERSION_NONE) {
             throw new IllegalStateException("oldestHollowReadStateEngine has already been initialized");
         }
         this.oldestHollowReadStateEngine = revReadStateEngine;
@@ -315,7 +315,7 @@ public class HollowHistory {
      * @param newVersion The version of the new state
      */
     public void reverseDeltaOccurred(long newVersion) {
-        if (oldestHollowReadStateEngine == null) {
+        if(oldestHollowReadStateEngine == null) {
             throw new IllegalStateException("Read state engine for reverse direction history computation isn't initialized. " +
                     "This can occur if the required hollow history init sequence isn't followed or if oldestHollowReadStateEngine " +
                     "was discarded after history was initialized to max old versions");
@@ -365,7 +365,7 @@ public class HollowHistory {
      * @param newVersion the new version
      */
     public void doubleSnapshotOccurred(HollowReadStateEngine newHollowStateEngine, long newVersion) {
-        if (newVersion <= latestVersion) {
+        if(newVersion <= latestVersion) {
             throw new UnsupportedOperationException("Double snapshot only supports advancing the latest version");
         }
 
@@ -389,7 +389,7 @@ public class HollowHistory {
 
         remapHistoricalStateOrdinals(remapper, remappedDataAccesses, remappedKeyOrdinalMappings);
 
-        for(int i=0;i<historicalStates.size();i++) {
+        for(int i = 0; i < historicalStates.size(); i++) {
             HollowHistoricalState historicalStateToRemap = historicalStates.get(i);
             HollowHistoricalStateDataAccess remappedDataAccess = remappedDataAccesses[i];
             HollowHistoricalStateKeyOrdinalMapping remappedKeyOrdinalMapping = remappedKeyOrdinalMappings[i];
@@ -419,10 +419,10 @@ public class HollowHistory {
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "remap");
         final int numThreads = executor.getCorePoolSize();
 
-        for(int i=0;i<executor.getCorePoolSize();i++) {
+        for(int i = 0; i < executor.getCorePoolSize(); i++) {
             final int threadNumber = i;
             executor.execute(() -> {
-                for(int t=threadNumber;t<historicalStates.size();t+=numThreads) {
+                for(int t = threadNumber; t < historicalStates.size(); t += numThreads) {
                     HollowHistoricalState historicalStateToRemap = historicalStates.get(t);
                     remappedDataAccesses[t] = creator.copyButRemapOrdinals(historicalStateToRemap.getDataAccess(), remapper);
                     remappedKeyOrdinalMappings[t] = historicalStateToRemap.getKeyOrdinalMapping().remap(remapper);
@@ -443,7 +443,7 @@ public class HollowHistory {
         for(String keyType : keyIndex.getTypeKeyIndexes().keySet()) {
             HollowHistoricalStateTypeKeyOrdinalMapping typeMapping = keyOrdinalMapping.getTypeMapping(keyType);
             HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(keyType);
-            if (typeState==null) {
+            if(typeState == null) {
                 // The type is present in the history's primary key index but is not present
                 // in the latest read state; ensure the mapping is initialized to the default state
                 typeMapping.prepare(0, 0);
@@ -454,7 +454,7 @@ public class HollowHistory {
             PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
 
             RemovedOrdinalIterator additionsIterator, removalIterator;
-            if (reverse) {
+            if(reverse) {
                 removalIterator = new RemovedOrdinalIterator(listener.getPopulatedOrdinals(), listener.getPreviousOrdinals());
                 additionsIterator = new RemovedOrdinalIterator(listener);
 
@@ -557,9 +557,9 @@ public class HollowHistory {
     // historicalStates is ordered like: V3 -> V2 -> V1
     // however internally the states are linked like: V1.nextState = V2; V2.nextState = V3; etc.
     private void addReverseHistoricalState(HollowHistoricalState historicalState) {
-        if (historicalStates.size() > 0) {
-            historicalState.getDataAccess().setNextState(historicalStates.get(historicalStates.size()-1).getDataAccess());
-            historicalState.setNextState(historicalStates.get(historicalStates.size()-1));
+        if(historicalStates.size() > 0) {
+            historicalState.getDataAccess().setNextState(historicalStates.get(historicalStates.size() - 1).getDataAccess());
+            historicalState.setNextState(historicalStates.get(historicalStates.size() - 1));
         } else { // if reverse delta occurs before any fwd deltas
             historicalState.getDataAccess().setNextState(latestHollowReadStateEngine);
         }
@@ -567,7 +567,7 @@ public class HollowHistory {
         historicalStates.add(historicalState);
         historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
 
-        if (historicalStates.size() >= maxHistoricalStatesToKeep) {
+        if(historicalStates.size() >= maxHistoricalStatesToKeep) {
             // drop old read state because we won't be building history in reverse after we get here
             oldestHollowReadStateEngine = null;
         }
@@ -582,11 +582,11 @@ public class HollowHistory {
      * states.
      */
     public void removeHistoricalStates(int n) {
-        if (n < 0) {
+        if(n < 0) {
             throw new IllegalArgumentException(String.format(
                     "Number of states to remove is negative: %d", n));
         }
-        if (n > historicalStates.size()) {
+        if(n > historicalStates.size()) {
             throw new IllegalArgumentException(String.format(
                     "Number of states to remove, %d, is greater than the number of states. %d",
                     n, historicalStates.size()));
@@ -595,7 +595,7 @@ public class HollowHistory {
         // drop oldest HollowReadStateEngine if it hasn't already been
         oldestHollowReadStateEngine = null;
 
-        while (n-- > 0) {
+        while(n-- > 0) {
             HollowHistoricalState removedState;
             removedState = historicalStates.remove(historicalStates.size() - 1);
             historicalStateLookupMap.remove(removedState.getVersion());

@@ -99,22 +99,22 @@ public class HollowDiffChangedSchemaTest {
     @Test
     @SuppressWarnings("unused")
     public void testDiffWithChangedSchemas() throws IOException {
-        int a1_0 = a1(new byte[] {1, 2, 3}, 1024L, 1020.3523d);
-        int a2_0 = a2(new byte[] {1, 2, 3}, 1024L,
+        int a1_0 = a1(new byte[]{1, 2, 3}, 1024L, 1020.3523d);
+        int a2_0 = a2(new byte[]{1, 2, 3}, 1024L,
                 list(c("list1"), c("list2")),
                 set(c("list1"), c("set1"), c("set2")),
                 map(c("key1"), c("val1"),
-                    c("key2"), c("val2"),
-                    c("key3"), c("val3")),
+                        c("key2"), c("val2"),
+                        c("key3"), c("val3")),
                 c("singleton1"));
 
 
-        int a1_1 = a1(new byte[] {2, 4, 6}, 12345678L, 1020.3523d);
-        int a2_1 = a2(new byte[] {2, 4, 6}, 123456L,
+        int a1_1 = a1(new byte[]{2, 4, 6}, 12345678L, 1020.3523d);
+        int a2_1 = a2(new byte[]{2, 4, 6}, 123456L,
                 list(c("list3")),
                 set(c("set4"), c("set5"), c("set6"), c("set7")),
                 map(c("key10"), c("val10"),
-                    c("key20"), c("val20")),
+                        c("key20"), c("val20")),
                 c("singleton2"));
 
         HollowDiff diff = diff();
@@ -122,7 +122,7 @@ public class HollowDiffChangedSchemaTest {
 
         for(HollowFieldDiff fieldDiff : typeDiff.getFieldDiffs()) {
             System.out.println(fieldDiff.getFieldIdentifier() + ": " + fieldDiff.getTotalDiffScore());
-            for(int i=0;i<fieldDiff.getNumDiffs();i++) {
+            for(int i = 0; i < fieldDiff.getNumDiffs(); i++) {
                 System.out.println("    " + fieldDiff.getFromOrdinal(i) + "," + fieldDiff.getToOrdinal(i) + ": " + fieldDiff.getPairScore(i));
             }
         }
@@ -174,8 +174,8 @@ public class HollowDiffChangedSchemaTest {
 
     private int map(int... cOrdinals) {
         HollowMapWriteRecord mapRec = new HollowMapWriteRecord();
-        for(int i=0;i<cOrdinals.length;i+=2) {
-            mapRec.addEntry(cOrdinals[i], cOrdinals[i+1]);
+        for(int i = 0; i < cOrdinals.length; i += 2) {
+            mapRec.addEntry(cOrdinals[i], cOrdinals[i + 1]);
         }
         return stateEngine2.add("MapOfTypeC", mapRec);
     }

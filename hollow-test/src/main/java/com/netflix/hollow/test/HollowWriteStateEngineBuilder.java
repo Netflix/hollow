@@ -48,7 +48,7 @@ public class HollowWriteStateEngineBuilder {
     public HollowWriteStateEngineBuilder(Collection<Class<?>> types) {
         writeEngine = new HollowWriteStateEngine();
         objectMapper = new HollowObjectMapper(writeEngine);
-        for (Class<?> type : types) {
+        for(Class<?> type : types) {
             objectMapper.initializeTypeState(type);
         }
     }
@@ -58,7 +58,7 @@ public class HollowWriteStateEngineBuilder {
      * objects after calling build().
      */
     public HollowWriteStateEngineBuilder add(Object... objects) {
-        if (built) {
+        if(built) {
             throw new IllegalArgumentException("Cannot add after building Hollow state engine");
         }
         Arrays.stream(objects).forEach(objectMapper::add);

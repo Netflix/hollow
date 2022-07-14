@@ -43,7 +43,7 @@ public class HBoolean extends HollowObject {
     }
 
     protected BooleanDelegate delegate() {
-        return (BooleanDelegate)delegate;
+        return (BooleanDelegate) delegate;
     }
 
 }

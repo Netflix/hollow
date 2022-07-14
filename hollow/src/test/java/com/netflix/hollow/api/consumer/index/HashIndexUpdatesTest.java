@@ -56,7 +56,7 @@ public class HashIndexUpdatesTest {
             ws.add(new DataModel.Producer.TypeA(1, "1"));
             ws.add(new DataModel.Producer.TypeA(1, "2"));
         });
-        if (doubleSnapshot) {
+        if(doubleSnapshot) {
             consumer.forceDoubleSnapshotNextUpdate();
         }
         consumer.triggerRefreshTo(v2);
@@ -70,7 +70,7 @@ public class HashIndexUpdatesTest {
             ws.add(new DataModel.Producer.TypeA(1, "2"));
             ws.add(new DataModel.Producer.TypeA(1, "3"));
         });
-        if (doubleSnapshot) {
+        if(doubleSnapshot) {
             consumer.forceDoubleSnapshotNextUpdate();
         }
         consumer.triggerRefreshTo(v3);

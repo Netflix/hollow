@@ -82,5 +82,5 @@ public interface HollowStringifier<T extends HollowStringifier> {
      * @throws IOException thrown if there is an error writing to the Writer
      */
     void stringify(Writer writer, HollowDataAccess dataAccess, String type, int ordinal)
-        throws IOException;
+            throws IOException;
 }

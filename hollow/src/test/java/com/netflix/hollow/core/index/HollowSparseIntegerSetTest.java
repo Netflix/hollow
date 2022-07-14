@@ -48,7 +48,7 @@ public class HollowSparseIntegerSetTest {
     public void testEmptyAndDelta() throws Exception {
         List<Movie> emptyMovies = new ArrayList<>();
         objectMapper.initializeTypeState(Movie.class);
-        for (Movie movie : emptyMovies)
+        for(Movie movie : emptyMovies)
             objectMapper.add(movie);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
 
@@ -57,7 +57,7 @@ public class HollowSparseIntegerSetTest {
 
         hollowIntSet.listenForDeltaUpdates();
 
-        for (Movie m : getMovies())
+        for(Movie m : getMovies())
             objectMapper.add(m);
         objectMapper.add(new Movie(new Video(8192), "Random", 2009));
         StateEngineRoundTripper.roundTripDelta(writeStateEngine, readStateEngine);
@@ -69,7 +69,7 @@ public class HollowSparseIntegerSetTest {
     @Test
     public void test() throws Exception {
         List<Movie> movies = getMovies();
-        for (Movie movie : movies)
+        for(Movie movie : movies)
             objectMapper.add(movie);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
 
@@ -96,7 +96,7 @@ public class HollowSparseIntegerSetTest {
         Movie movie = movies.get(5);// change the movie release year for Avatar to 1999
         movie.releaseYear = 1999;
 
-        for (Movie m : movies)
+        for(Movie m : movies)
             objectMapper.add(m);
         StateEngineRoundTripper.roundTripDelta(writeStateEngine, readStateEngine);
 
@@ -112,7 +112,7 @@ public class HollowSparseIntegerSetTest {
                 HollowObjectTypeDataAccess objectTypeDataAccess = (HollowObjectTypeDataAccess) readStateEngine.getTypeDataAccess("Movie");
                 int yearReleasedFieldPosition = objectTypeDataAccess.getSchema().getPosition("releaseYear");
                 int yearReleased = objectTypeDataAccess.readInt(ordinal, yearReleasedFieldPosition);
-                if (yearReleased == 2009)
+                if(yearReleased == 2009)
                     return true;
                 return false;
             }

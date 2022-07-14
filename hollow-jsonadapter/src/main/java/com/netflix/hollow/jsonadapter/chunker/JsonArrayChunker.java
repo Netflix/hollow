@@ -25,7 +25,7 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 
 public class JsonArrayChunker {
-    
+
     private static final int DEFAULT_SEGMENT_LENGTH = 262144;
     private static final int SEGMENT_QUEUE_SIZE = 32;
 
@@ -33,16 +33,16 @@ public class JsonArrayChunker {
     private final Queue<CompletableFuture<JsonArrayChunkerInputSegment>> bufferSegments;
     private final Executor executor;
     private final int segmentLength;
-    
+
     private JsonArrayChunkerInputSegment currentSegment;
     private long currentSegmentStartOffset;
-    
+
     private boolean eofReached;
-    
+
     public JsonArrayChunker(Reader reader, Executor executor) {
         this(reader, executor, DEFAULT_SEGMENT_LENGTH);
     }
-    
+
     JsonArrayChunker(Reader reader, Executor executor, int segmentLength) {
         this.reader = reader;
         this.bufferSegments = new ArrayDeque<>();
@@ -58,25 +58,25 @@ public class JsonArrayChunker {
      * locations of all special characters in the segment.
      */
     public void initialize() throws IOException {
-        while (!eofReached && bufferSegments.size() < SEGMENT_QUEUE_SIZE) {
+        while(!eofReached && bufferSegments.size() < SEGMENT_QUEUE_SIZE) {
             fillOneSegment();
         }
         nextSegment();
     }
-    
+
     @SuppressWarnings("resource")
     public Reader nextChunk() throws IOException {
         while(!currentSegment.nextSpecialCharacter()) {
             if(!nextSegment())
                 return null;
         }
-        
+
         if(currentSegment.specialCharacter() != '{')
             throw new IllegalStateException("Bad json");
-        
+
         int nestedObjectCount = 1;
         JsonArrayChunkReader chunkReader = new JsonArrayChunkReader(currentSegment, currentSegment.specialCharacterIteratorPosition());
-        
+
         boolean insideQuotes = false;
         long lastEscapeCharacterLocation = Long.MIN_VALUE;
 
@@ -86,38 +86,38 @@ public class JsonArrayChunker {
                     throw new IllegalStateException("Bad json");
                 chunkReader.addSegment(currentSegment);
             }
-            
+
             switch(currentSegment.specialCharacter()) {
-            case '{':
-                if(!insideQuotes)
-                    nestedObjectCount++;
-                break;
-            case '}':
-                if(!insideQuotes)
-                    nestedObjectCount--;
-                break;
-            case '\"':
-                long currentLocation = currentSegmentStartOffset + currentSegment.specialCharacterIteratorPosition();
-                if(lastEscapeCharacterLocation != (currentLocation - 1)) {
-                    insideQuotes = !insideQuotes;
-                }
-                break;
-            case '\\':
-                currentLocation = currentSegmentStartOffset + currentSegment.specialCharacterIteratorPosition();
-                if(lastEscapeCharacterLocation != (currentLocation - 1))
-                    lastEscapeCharacterLocation = currentLocation;
-                break;
+                case '{':
+                    if(!insideQuotes)
+                        nestedObjectCount++;
+                    break;
+                case '}':
+                    if(!insideQuotes)
+                        nestedObjectCount--;
+                    break;
+                case '\"':
+                    long currentLocation = currentSegmentStartOffset + currentSegment.specialCharacterIteratorPosition();
+                    if(lastEscapeCharacterLocation != (currentLocation - 1)) {
+                        insideQuotes = !insideQuotes;
+                    }
+                    break;
+                case '\\':
+                    currentLocation = currentSegmentStartOffset + currentSegment.specialCharacterIteratorPosition();
+                    if(lastEscapeCharacterLocation != (currentLocation - 1))
+                        lastEscapeCharacterLocation = currentLocation;
+                    break;
             }
         }
         chunkReader.setEndOffset(currentSegment.specialCharacterIteratorPosition() + 1);
         return chunkReader;
     }
-    
+
     private boolean nextSegment() throws IOException {
-        if (bufferSegments.isEmpty()) {
+        if(bufferSegments.isEmpty()) {
             return false;
         }
-        if (!eofReached) {
+        if(!eofReached) {
             fillOneSegment();
         }
         currentSegmentStartOffset += segmentLength;
@@ -125,7 +125,7 @@ public class JsonArrayChunker {
             currentSegment = bufferSegments.remove().join();
         } catch (CompletionException e) {
             Throwable t = e.getCause(); // unwrap
-            if (t instanceof IOException) {
+            if(t instanceof IOException) {
                 throw (IOException) t;
             } else {
                 throw t instanceof RuntimeException ? (RuntimeException) t : e;
@@ -133,7 +133,7 @@ public class JsonArrayChunker {
         }
         return true;
     }
-    
+
     private void fillOneSegment() throws IOException {
         JsonArrayChunkerInputSegment seg = new JsonArrayChunkerInputSegment(segmentLength);
         eofReached = seg.fill(reader);

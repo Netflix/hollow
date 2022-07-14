@@ -86,24 +86,24 @@ class HollowTestBlobRetriever implements BlobRetriever {
     }
 
     public static class TestBlob extends Blob {
-    	
-    	private final byte[] data;
-    	
-    	public TestBlob(long snapshotVersion, byte[] data) {
-    		super(snapshotVersion);
-    		this.data = data;
-    	}
-    	
-    	public TestBlob(long fromVersion, long toVersion, byte[] data) {
-    		super(fromVersion, toVersion);
-    		this.data = data;
-    	}
 
-		@Override
-		public InputStream getInputStream() throws IOException {
-			return new ByteArrayInputStream(data);
-		}
-    	
+        private final byte[] data;
+
+        public TestBlob(long snapshotVersion, byte[] data) {
+            super(snapshotVersion);
+            this.data = data;
+        }
+
+        public TestBlob(long fromVersion, long toVersion, byte[] data) {
+            super(fromVersion, toVersion);
+            this.data = data;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return new ByteArrayInputStream(data);
+        }
+
     }
 
 }

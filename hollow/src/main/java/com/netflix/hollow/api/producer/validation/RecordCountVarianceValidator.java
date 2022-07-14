@@ -59,7 +59,7 @@ public class RecordCountVarianceValidator implements ValidatorListener {
      */
     public RecordCountVarianceValidator(String typeName, float allowableVariancePercent) {
         this.typeName = typeName;
-        if (allowableVariancePercent < 0) {
+        if(allowableVariancePercent < 0) {
             throw new IllegalArgumentException("RecordCountVarianceValidator for type " + typeName
                     + ": cannot have allowableVariancePercent less than 0. Value provided: "
                     + allowableVariancePercent);
@@ -84,7 +84,7 @@ public class RecordCountVarianceValidator implements ValidatorListener {
         vrb.detail(LATEST_CARDINALITY_NAME, latestCardinality)
                 .detail(PREVIOUS_CARDINALITY_NAME, previousCardinality);
 
-        if (previousCardinality == 0) {
+        if(previousCardinality == 0) {
             return vrb.detail("skipped", Boolean.TRUE).
                     passed(String.format(ZERO_PREVIOUS_COUNT_WARN_MSG_FORMAT, typeName));
         }
@@ -92,7 +92,7 @@ public class RecordCountVarianceValidator implements ValidatorListener {
         float actualChangePercent = getChangePercent(latestCardinality, previousCardinality);
         vrb.detail(ACTUAL_CHANGE_PERCENT_NAME, actualChangePercent);
 
-        if (Float.compare(actualChangePercent, allowableVariancePercent) > 0) {
+        if(Float.compare(actualChangePercent, allowableVariancePercent) > 0) {
             String message = String.format(FAILED_RECORD_COUNT_VALIDATION, typeName, actualChangePercent,
                     allowableVariancePercent);
             return vrb.failed(message);
@@ -107,4 +107,4 @@ public class RecordCountVarianceValidator implements ValidatorListener {
         return (100.0f * diff) / previousCardinality;
     }
 }
-	
+

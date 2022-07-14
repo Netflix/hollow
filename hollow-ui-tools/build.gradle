@@ -1,20 +1,20 @@
 apply plugin: 'java-library'
 apply plugin: 'nebula.facet'
 
-facets {
-    tools {
+facets{
+    tools{
         parentSourceSet = 'test'
     }
 }
 
-dependencies {
-    api project(':hollow')
-    api 'org.apache.velocity:velocity:1.7'
-    api 'commons-codec:commons-codec:1.11'
-    implementation 'commons-io:commons-io:2.6'
-    implementation 'com.google.code.gson:gson:2.8.0'
+dependencies{
+    apiproject(':hollow')
+    api'org.apache.velocity:velocity:1.7'
+    api'commons-codec:commons-codec:1.11'
+    implementation'commons-io:commons-io:2.6'
+    implementation'com.google.code.gson:gson:2.8.0'
 
-    compileOnly 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'
+    compileOnly'org.eclipse.jetty:jetty-server:9.4.3.v20170317'
 
-    testImplementation 'junit:junit:4.11'
+    testImplementation'junit:junit:4.11'
 }

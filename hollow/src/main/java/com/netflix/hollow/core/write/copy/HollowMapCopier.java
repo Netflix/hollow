@@ -44,7 +44,7 @@ public class HollowMapCopier extends HollowRecordCopier {
         while(iter.next()) {
             int remappedKeyOrdinal = ordinalRemapper.getMappedOrdinal(keyType, iter.getKey());
             int remappedValueOrdinal = ordinalRemapper.getMappedOrdinal(valueType, iter.getValue());
-            int hashCode = preserveHashPositions ? ((HollowMapEntryOrdinalIteratorImpl)iter).getCurrentBucket() : remappedKeyOrdinal;
+            int hashCode = preserveHashPositions ? ((HollowMapEntryOrdinalIteratorImpl) iter).getCurrentBucket() : remappedKeyOrdinal;
             rec.addEntry(remappedKeyOrdinal, remappedValueOrdinal, hashCode);
         }
 
@@ -52,11 +52,11 @@ public class HollowMapCopier extends HollowRecordCopier {
     }
 
     private HollowMapTypeReadState readState() {
-        return (HollowMapTypeReadState)readTypeState;
+        return (HollowMapTypeReadState) readTypeState;
     }
 
     private HollowMapWriteRecord rec() {
-        return (HollowMapWriteRecord)writeRecord;
+        return (HollowMapWriteRecord) writeRecord;
     }
 
 }

@@ -118,12 +118,12 @@ public class ByteArrayOrdinalMap {
 
     /// acquire the lock before writing.
     private synchronized int assignOrdinal(ByteDataArray serializedRepresentation, int hash, int preferredOrdinal) {
-        if (preferredOrdinal < -1 || preferredOrdinal > ORDINAL_MASK) {
+        if(preferredOrdinal < -1 || preferredOrdinal > ORDINAL_MASK) {
             throw new IllegalArgumentException(String.format(
                     "The given preferred ordinal %s is out of bounds and not within the closed interval [-1, %s]",
                     preferredOrdinal, ORDINAL_MASK));
         }
-        if (size > sizeBeforeGrow) {
+        if(size > sizeBeforeGrow) {
             growKeyArray();
         }
 
@@ -136,8 +136,8 @@ public class ByteArrayOrdinalMap {
         int bucket = hash & modBitmask;
         long key = pao.get(bucket);
 
-        while (key != EMPTY_BUCKET_VALUE) {
-            if (compare(serializedRepresentation, key)) {
+        while(key != EMPTY_BUCKET_VALUE) {
+            if(compare(serializedRepresentation, key)) {
                 return (int) (key >>> BITS_PER_POINTER);
             }
 
@@ -148,7 +148,7 @@ public class ByteArrayOrdinalMap {
         /// the ordinal for this object still does not exist in the list, even after the lock has been acquired.
         /// it is up to this thread to add it at the current bucket position.
         int ordinal = findFreeOrdinal(preferredOrdinal);
-        if (ordinal > ORDINAL_MASK) {
+        if(ordinal > ORDINAL_MASK) {
             throw new IllegalStateException(String.format(
                     "Ordinal cannot be assigned. The to be assigned ordinal, %s, is greater than the maximum supported ordinal value of %s",
                     ordinal, ORDINAL_MASK));
@@ -161,7 +161,7 @@ public class ByteArrayOrdinalMap {
         /// A reading thread may observe a null value for a segment during the creation
         /// of a new segments array (see SegmentedByteArray.ensureCapacity).
         serializedRepresentation.copyTo(byteData);
-        if (byteData.length() > MAX_BYTE_DATA_LENGTH) {
+        if(byteData.length() > MAX_BYTE_DATA_LENGTH) {
             throw new IllegalStateException(String.format(
                     "The number of bytes for the serialized representations, %s, is too large and is greater than the maximum of %s bytes",
                     byteData.length(), MAX_BYTE_DATA_LENGTH));
@@ -184,7 +184,7 @@ public class ByteArrayOrdinalMap {
      * delegate to the FreeOrdinalTracker.
      */
     private int findFreeOrdinal(int preferredOrdinal) {
-        if (preferredOrdinal != -1 && unusedPreviousOrdinals.get(preferredOrdinal)) {
+        if(preferredOrdinal != -1 && unusedPreviousOrdinals.get(preferredOrdinal)) {
             unusedPreviousOrdinals.clear(preferredOrdinal);
             return preferredOrdinal;
         }
@@ -202,12 +202,12 @@ public class ByteArrayOrdinalMap {
      * @param ordinal the ordinal
      */
     public void put(ByteDataArray serializedRepresentation, int ordinal) {
-        if (ordinal < 0 || ordinal > ORDINAL_MASK) {
+        if(ordinal < 0 || ordinal > ORDINAL_MASK) {
             throw new IllegalArgumentException(String.format(
                     "The given ordinal %s is out of bounds and not within the closed interval [0, %s]",
                     ordinal, ORDINAL_MASK));
         }
-        if (size > sizeBeforeGrow) {
+        if(size > sizeBeforeGrow) {
             growKeyArray();
         }
 
@@ -219,7 +219,7 @@ public class ByteArrayOrdinalMap {
         int bucket = hash & modBitmask;
         long key = pao.get(bucket);
 
-        while (key != EMPTY_BUCKET_VALUE) {
+        while(key != EMPTY_BUCKET_VALUE) {
             bucket = (bucket + 1) & modBitmask;
             key = pao.get(bucket);
         }
@@ -228,7 +228,7 @@ public class ByteArrayOrdinalMap {
 
         VarInt.writeVInt(byteData, (int) serializedRepresentation.length());
         serializedRepresentation.copyTo(byteData);
-        if (byteData.length() > MAX_BYTE_DATA_LENGTH) {
+        if(byteData.length() > MAX_BYTE_DATA_LENGTH) {
             throw new IllegalStateException(String.format(
                     "The number of bytes for the serialized representations, %s, is too large and is greater than the maximum of %s bytes",
                     byteData.length(), MAX_BYTE_DATA_LENGTH));
@@ -245,9 +245,9 @@ public class ByteArrayOrdinalMap {
         BitSet populatedOrdinals = new BitSet();
         AtomicLongArray pao = pointersAndOrdinals;
 
-        for (int i = 0; i < pao.length(); i++) {
+        for(int i = 0; i < pao.length(); i++) {
             long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
+            if(key != EMPTY_BUCKET_VALUE) {
                 int ordinal = (int) (key >>> BITS_PER_POINTER);
                 populatedOrdinals.set(ordinal);
             }
@@ -268,7 +268,7 @@ public class ByteArrayOrdinalMap {
         int length = populatedOrdinals.length();
         int ordinal = populatedOrdinals.nextClearBit(0);
 
-        while (ordinal < length) {
+        while(ordinal < length) {
             freeOrdinalTracker.returnOrdinalToPool(ordinal);
             ordinal = populatedOrdinals.nextClearBit(ordinal + 1);
         }
@@ -305,8 +305,8 @@ public class ByteArrayOrdinalMap {
         // To ensure this is the case it is important that pointersAndOrdinals
         // is read into a local variable and thereafter used, otherwise a concurrent
         // size increase may break this invariant
-        while (key != EMPTY_BUCKET_VALUE) {
-            if (compare(serializedRepresentation, key)) {
+        while(key != EMPTY_BUCKET_VALUE) {
+            if(compare(serializedRepresentation, key)) {
                 return (int) (key >>> BITS_PER_POINTER);
             }
 
@@ -325,11 +325,11 @@ public class ByteArrayOrdinalMap {
         int maxOrdinal = 0;
         AtomicLongArray pao = pointersAndOrdinals;
 
-        for (int i = 0; i < pao.length(); i++) {
+        for(int i = 0; i < pao.length(); i++) {
             long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
+            if(key != EMPTY_BUCKET_VALUE) {
                 int ordinal = (int) (key >>> BITS_PER_POINTER);
-                if (ordinal > maxOrdinal) {
+                if(ordinal > maxOrdinal) {
                     maxOrdinal = ordinal;
                 }
             }
@@ -338,9 +338,9 @@ public class ByteArrayOrdinalMap {
         long[] pbo = new long[maxOrdinal + 1];
         Arrays.fill(pbo, -1);
 
-        for (int i = 0; i < pao.length(); i++) {
+        for(int i = 0; i < pao.length(); i++) {
             long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
+            if(key != EMPTY_BUCKET_VALUE) {
                 int ordinal = (int) (key >>> BITS_PER_POINTER);
                 pbo[ordinal] = key & POINTER_MASK;
             }
@@ -364,9 +364,9 @@ public class ByteArrayOrdinalMap {
         int counter = 0;
         AtomicLongArray pao = pointersAndOrdinals;
 
-        for (int i = 0; i < pao.length(); i++) {
+        for(int i = 0; i < pao.length(); i++) {
             long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
+            if(key != EMPTY_BUCKET_VALUE) {
                 populatedReverseKeys[counter++] = key << BITS_PER_ORDINAL | key >>> BITS_PER_POINTER;
             }
         }
@@ -376,15 +376,15 @@ public class ByteArrayOrdinalMap {
         SegmentedByteArray arr = byteData.getUnderlyingArray();
         long currentCopyPointer = 0;
 
-        for (int i = 0; i < populatedReverseKeys.length; i++) {
+        for(int i = 0; i < populatedReverseKeys.length; i++) {
             int ordinal = (int) (populatedReverseKeys[i] & ORDINAL_MASK);
 
-            if (usedOrdinals.get(ordinal)) {
+            if(usedOrdinals.get(ordinal)) {
                 long pointer = populatedReverseKeys[i] >>> BITS_PER_ORDINAL;
                 int length = VarInt.readVInt(arr, pointer);
                 length += VarInt.sizeOfVInt(length);
 
-                if (currentCopyPointer != pointer) {
+                if(currentCopyPointer != pointer) {
                     arr.copy(arr, pointer, currentCopyPointer, length);
                 }
 
@@ -407,7 +407,7 @@ public class ByteArrayOrdinalMap {
         // Reset the array then fill with compacted values
         // Volatile store not required, could use plain store
         // See VarHandles for JDK >= 9
-        for (int i = 0; i < pao.length(); i++) {
+        for(int i = 0; i < pao.length(); i++) {
             pao.lazySet(i, EMPTY_BUCKET_VALUE);
         }
         populateNewHashArray(pao, populatedReverseKeys);
@@ -438,11 +438,11 @@ public class ByteArrayOrdinalMap {
         int maxOrdinal = -1;
         AtomicLongArray pao = pointersAndOrdinals;
 
-        for (int i = 0; i < pao.length(); i++) {
+        for(int i = 0; i < pao.length(); i++) {
             long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
+            if(key != EMPTY_BUCKET_VALUE) {
                 int ordinal = (int) (key >>> BITS_PER_POINTER);
-                if (ordinal > maxOrdinal) {
+                if(ordinal > maxOrdinal) {
                     maxOrdinal = ordinal;
                 }
             }
@@ -459,14 +459,14 @@ public class ByteArrayOrdinalMap {
 
         int sizeOfData = VarInt.readVInt(byteData.getUnderlyingArray(), position);
 
-        if (sizeOfData != serializedRepresentation.length()) {
+        if(sizeOfData != serializedRepresentation.length()) {
             return false;
         }
 
         position += VarInt.sizeOfVInt(sizeOfData);
 
-        for (int i = 0; i < sizeOfData; i++) {
-            if (serializedRepresentation.get(i) != byteData.get(position++)) {
+        for(int i = 0; i < sizeOfData; i++) {
+            if(serializedRepresentation.get(i) != byteData.get(position++)) {
                 return false;
             }
         }
@@ -486,7 +486,7 @@ public class ByteArrayOrdinalMap {
     public void resize(int size) {
         size = bucketSize(size);
 
-        if (pointersAndOrdinals.length() < size) {
+        if(pointersAndOrdinals.length() < size) {
             growKeyArray(size);
         }
     }
@@ -496,7 +496,7 @@ public class ByteArrayOrdinalMap {
      */
     private void growKeyArray() {
         int newSize = pointersAndOrdinals.length() << 1;
-        if (newSize < 0) {
+        if(newSize < 0) {
             throw new IllegalStateException("New size computed to grow the underlying array for the map is negative. " +
                     "This is most likely due to the total number of keys added to map has exceeded the max capacity of the keys map can hold. "
                     +
@@ -518,9 +518,9 @@ public class ByteArrayOrdinalMap {
 
         /// do not iterate over these values in the same order in which they appear in the hashed array.
         /// if we do so, we cause large clusters of collisions to appear (because we resolve collisions with linear probing).
-        for (int i = 0; i < pao.length(); i++) {
+        for(int i = 0; i < pao.length(); i++) {
             long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
+            if(key != EMPTY_BUCKET_VALUE) {
                 valuesToAdd[counter++] = key;
             }
         }
@@ -547,12 +547,12 @@ public class ByteArrayOrdinalMap {
 
         int modBitmask = newKeys.length() - 1;
 
-        for (int i = 0; i < length; i++) {
+        for(int i = 0; i < length; i++) {
             long value = valuesToAdd[i];
-            if (value != EMPTY_BUCKET_VALUE) {
+            if(value != EMPTY_BUCKET_VALUE) {
                 int hash = rehashPreviouslyAddedData(value);
                 int bucket = hash & modBitmask;
-                while (newKeys.get(bucket) != EMPTY_BUCKET_VALUE) {
+                while(newKeys.get(bucket) != EMPTY_BUCKET_VALUE) {
                     bucket = (bucket + 1) & modBitmask;
                 }
                 // Volatile store not required, could use plain store
@@ -581,7 +581,7 @@ public class ByteArrayOrdinalMap {
         AtomicLongArray arr = new AtomicLongArray(size);
         // Volatile store not required, could use plain store
         // See VarHandles for JDK >= 9
-        for (int i = 0; i < arr.length(); i++) {
+        for(int i = 0; i < arr.length(); i++) {
             arr.lazySet(i, EMPTY_BUCKET_VALUE);
         }
         return arr;

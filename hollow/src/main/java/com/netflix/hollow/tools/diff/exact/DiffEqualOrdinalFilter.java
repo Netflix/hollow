@@ -63,7 +63,7 @@ public class DiffEqualOrdinalFilter {
         Arrays.fill(hashedIdentityOrdinalsCounts, 0);
         Arrays.fill(matchedOrdinalsCounts, 0);
 
-        for(int i=0;i<fromOrdinals.size();i++) {
+        for(int i = 0; i < fromOrdinals.size(); i++) {
             int identity = equalOrdinalMap.getIdentityFromOrdinal(fromOrdinals.get(i));
             if(identity != -1) {
                 int hashCode = HashCodes.hashInt(identity);
@@ -78,7 +78,7 @@ public class DiffEqualOrdinalFilter {
             }
         }
 
-        for(int i=0;i<toOrdinals.size();i++) {
+        for(int i = 0; i < toOrdinals.size(); i++) {
             int identity = equalOrdinalMap.getIdentityToOrdinal(toOrdinals.get(i));
             if(identity != -1) {
                 int hashCode = HashCodes.hashInt(identity);
@@ -99,7 +99,7 @@ public class DiffEqualOrdinalFilter {
             }
         }
 
-        for(int i=0;i<fromOrdinals.size();i++) {
+        for(int i = 0; i < fromOrdinals.size(); i++) {
             int identity = equalOrdinalMap.getIdentityFromOrdinal(fromOrdinals.get(i));
             if(identity != -1) {
                 int hashCode = HashCodes.hashInt(identity);

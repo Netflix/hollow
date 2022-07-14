@@ -31,15 +31,15 @@ import org.junit.Test;
 public class HashCodesTest {
 
     private Random rand = new Random();
-    
+
     @Test
     public void testStringHashCode() {
-        for(int i=0;i<10000;i++) {
+        for(int i = 0; i < 10000; i++) {
             String str = buildRandomString(true, 25);
             Assert.assertEquals(accurateStringHashCode(str), HashCodes.hashCode(str));
         }
-        
-        for(int i=0;i<10000;i++) {
+
+        for(int i = 0; i < 10000; i++) {
             String str = buildRandomString(false, 25);
             Assert.assertEquals(accurateStringHashCode(str), HashCodes.hashCode(str));
         }
@@ -78,30 +78,33 @@ public class HashCodesTest {
 
         // Note: technically these overflow conditions aren't reachable because max buckets is a lower
         //       threshold. Keeping the assertions to avoid regressions.
-        N = (int)((1L<<31) * 7L / 10L);
+        N = (int) ((1L << 31) * 7L / 10L);
         try {
             HashCodes.hashTableSize(N);
             Assert.fail("exception expected");
-        } catch (IllegalArgumentException ex) {}
+        } catch (IllegalArgumentException ex) {
+        }
         try {
             HashCodes.hashTableSize(N + 1);
             Assert.fail("exception expected");
-        } catch (IllegalArgumentException ex) {}
+        } catch (IllegalArgumentException ex) {
+        }
 
         // max int
         try {
             HashCodes.hashTableSize(Integer.MAX_VALUE);
             Assert.fail("exception expected");
-        } catch (IllegalArgumentException ex) {}
+        } catch (IllegalArgumentException ex) {
+        }
     }
 
     @Test
     @Ignore
     public void testHashTableSize_exhaustively() {
         int size = HashCodes.hashTableSize(2);
-        for (int N=3; N< HASH_TABLE_MAX_SIZE; ++N) {
+        for(int N = 3; N < HASH_TABLE_MAX_SIZE; ++N) {
             int s = HashCodes.hashTableSize(N);
-            if (s < size) {
+            if(s < size) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("expected size to grow or stay same; N=");
                 sb.append(N);
@@ -122,23 +125,23 @@ public class HashCodesTest {
 
     private String buildRandomString(boolean includeMultibyteCharacters, int strLen) {
         StringBuilder builder = new StringBuilder();
-        
-        for(int i=0;i<strLen;i++) {
-            builder.append((char)rand.nextInt(includeMultibyteCharacters ? (int)Character.MAX_VALUE : 0x80));
+
+        for(int i = 0; i < strLen; i++) {
+            builder.append((char) rand.nextInt(includeMultibyteCharacters ? (int) Character.MAX_VALUE : 0x80));
         }
-        
+
         return builder.toString();
     }
-    
-    
+
+
     private int accurateStringHashCode(String str) {
         ByteDataArray buf = new ByteDataArray(WastefulRecycler.SMALL_ARRAY_RECYCLER);
 
-        for(int i=0;i<str.length();i++) {
+        for(int i = 0; i < str.length(); i++) {
             VarInt.writeVInt(buf, str.charAt(i));
         }
 
-        return HashCodes.hashCode(buf.getUnderlyingArray(), 0, (int)buf.length());
+        return HashCodes.hashCode(buf.getUnderlyingArray(), 0, (int) buf.length());
     }
 
 }

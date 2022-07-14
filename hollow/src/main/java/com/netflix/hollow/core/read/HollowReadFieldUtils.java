@@ -208,7 +208,7 @@ public class HollowReadFieldUtils {
                 return testObject == null && typeAccess.readBoolean(ordinal, fieldPosition) == null;
             case BYTES:
                 if(testObject instanceof byte[])
-                    return Arrays.equals(typeAccess.readBytes(ordinal, fieldPosition), (byte[])testObject);
+                    return Arrays.equals(typeAccess.readBytes(ordinal, fieldPosition), (byte[]) testObject);
                 return testObject == null && typeAccess.readBytes(ordinal, fieldPosition) == null;
             case STRING:
                 if(testObject instanceof String)
@@ -269,7 +269,7 @@ public class HollowReadFieldUtils {
      * @return The hash code for a long which would be returned from {@link #fieldHashCode(HollowObjectTypeDataAccess, int, int)}
      */
     public static int longHashCode(long l) {
-        return (int)l ^ (int)(l >> 32);
+        return (int) l ^ (int) (l >> 32);
     }
 
     /**

@@ -26,7 +26,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAccess implements HollowObjectTypeDataAccess {
 
     public HollowHistoricalObjectDataAccess(HollowHistoricalStateDataAccess dataAccess, HollowTypeReadState removedRecords) {
-        super(dataAccess, removedRecords, new HollowObjectSampler((HollowObjectSchema)removedRecords.getSchema(), DisabledSamplingDirector.INSTANCE));
+        super(dataAccess, removedRecords, new HollowObjectSampler((HollowObjectSchema) removedRecords.getSchema(), DisabledSamplingDirector.INSTANCE));
     }
 
     @Override
@@ -40,7 +40,7 @@ public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAc
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowObjectTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).isNull(ordinal, fieldIndex);
+            return ((HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).isNull(ordinal, fieldIndex);
         return removedRecords().isNull(getMappedOrdinal(ordinal), fieldIndex);
     }
 
@@ -50,7 +50,7 @@ public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAc
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowObjectTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readOrdinal(ordinal, fieldIndex);
+            return ((HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readOrdinal(ordinal, fieldIndex);
         return removedRecords().readOrdinal(getMappedOrdinal(ordinal), fieldIndex);
     }
 
@@ -60,7 +60,7 @@ public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAc
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowObjectTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readInt(ordinal, fieldIndex);
+            return ((HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readInt(ordinal, fieldIndex);
         return removedRecords().readInt(getMappedOrdinal(ordinal), fieldIndex);
     }
 
@@ -70,7 +70,7 @@ public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAc
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowObjectTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readFloat(ordinal, fieldIndex);
+            return ((HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readFloat(ordinal, fieldIndex);
         return removedRecords().readFloat(getMappedOrdinal(ordinal), fieldIndex);
     }
 
@@ -80,7 +80,7 @@ public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAc
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowObjectTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readDouble(ordinal, fieldIndex);
+            return ((HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readDouble(ordinal, fieldIndex);
         return removedRecords().readDouble(getMappedOrdinal(ordinal), fieldIndex);
     }
 
@@ -90,7 +90,7 @@ public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAc
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowObjectTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readLong(ordinal, fieldIndex);
+            return ((HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readLong(ordinal, fieldIndex);
         return removedRecords().readLong(getMappedOrdinal(ordinal), fieldIndex);
     }
 
@@ -100,7 +100,7 @@ public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAc
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowObjectTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readBoolean(ordinal, fieldIndex);
+            return ((HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readBoolean(ordinal, fieldIndex);
         return removedRecords().readBoolean(getMappedOrdinal(ordinal), fieldIndex);
     }
 
@@ -110,7 +110,7 @@ public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAc
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowObjectTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readBytes(ordinal, fieldIndex);
+            return ((HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readBytes(ordinal, fieldIndex);
         return removedRecords().readBytes(getMappedOrdinal(ordinal), fieldIndex);
     }
 
@@ -120,7 +120,7 @@ public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAc
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowObjectTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readString(ordinal, fieldIndex);
+            return ((HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).readString(ordinal, fieldIndex);
         return removedRecords().readString(getMappedOrdinal(ordinal), fieldIndex);
     }
 
@@ -130,7 +130,7 @@ public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAc
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowObjectTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).isStringFieldEqual(ordinal, fieldIndex, testValue);
+            return ((HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).isStringFieldEqual(ordinal, fieldIndex, testValue);
         return removedRecords().isStringFieldEqual(getMappedOrdinal(ordinal), fieldIndex, testValue);
     }
 
@@ -140,7 +140,7 @@ public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAc
         recordStackTrace();
 
         if(!ordinalIsPresent(ordinal))
-            return ((HollowObjectTypeDataAccess)dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).findVarLengthFieldHashCode(ordinal, fieldIndex);
+            return ((HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(getSchema().getName(), ordinal)).findVarLengthFieldHashCode(ordinal, fieldIndex);
         return removedRecords().findVarLengthFieldHashCode(getMappedOrdinal(ordinal), fieldIndex);
     }
 

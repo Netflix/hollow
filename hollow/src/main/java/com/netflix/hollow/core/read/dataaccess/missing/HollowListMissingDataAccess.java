@@ -77,11 +77,11 @@ public class HollowListMissingDataAccess implements HollowListTypeDataAccess {
     @Override
     public void setSamplingDirector(HollowSamplingDirector director) {
     }
-    
+
     @Override
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
     }
-    
+
     @Override
     public void ignoreUpdateThreadForSampling(Thread t) {
     }

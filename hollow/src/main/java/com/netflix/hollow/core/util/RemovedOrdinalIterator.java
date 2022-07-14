@@ -44,7 +44,7 @@ public class RemovedOrdinalIterator {
     }
 
     public RemovedOrdinalIterator(BitSet previousOrdinals, BitSet populatedOrdinals, boolean flip) {
-        if (!flip) {
+        if(!flip) {
             this.previousOrdinals = previousOrdinals;
             this.populatedOrdinals = populatedOrdinals;
             this.previousOrdinalsLength = previousOrdinals.length();

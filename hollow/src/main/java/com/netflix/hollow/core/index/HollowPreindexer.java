@@ -31,18 +31,18 @@ import java.util.List;
 import java.util.Map;
 
 public class HollowPreindexer {
-    
+
     private final HollowReadStateEngine stateEngine;
     private final String type;
     private final String selectField;
     private final String[] matchFields;
-    
+
     private HollowTypeReadState typeState;
     private HollowHashIndexField[] matchFieldSpecs;
     private int numMatchTraverserFields;
     private HollowHashIndexField selectFieldSpec;
     private HollowIndexerValueTraverser traverser;
-    
+
     public HollowPreindexer(HollowReadStateEngine stateEngine, String type, String selectField, String... matchFields) {
         this.stateEngine = stateEngine;
         this.type = type;
@@ -57,7 +57,7 @@ public class HollowPreindexer {
 
         matchFieldSpecs = new HollowHashIndexField[matchFields.length];
 
-        for(int i=0;i<matchFields.length;i++) {
+        for(int i = 0; i < matchFields.length; i++) {
             matchFieldSpecs[i] = getHollowHashIndexField(typeState, matchFields[i], baseFieldToIndexMap, true);
         }
 
@@ -86,11 +86,11 @@ public class HollowPreindexer {
         int[] fieldPathIndexes = new int[segments.size()];
         FieldType fieldType = FieldType.REFERENCE;
 
-        for (int i = 0; i < segments.size(); i++) {
+        for(int i = 0; i < segments.size(); i++) {
             FieldPaths.FieldSegment segment = segments.get(i);
 
             HollowSchema schema = segment.enclosingSchema;
-            switch (schema.getSchemaType()) {
+            switch(schema.getSchemaType()) {
                 case OBJECT:
                     FieldPaths.ObjectFieldSegment objectSegment = (FieldPaths.ObjectFieldSegment) segment;
                     fieldType = objectSegment.getType();
@@ -149,5 +149,5 @@ public class HollowPreindexer {
     public HollowIndexerValueTraverser getTraverser() {
         return traverser;
     }
-    
+
 }

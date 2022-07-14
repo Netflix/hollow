@@ -37,17 +37,17 @@ public class HollowIndexTraversalTest extends AbstractStateEngineTest {
     public void test() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
-        mapper.add(new TypeA("two", 2, new TypeB((short)20, 20000000L, 2.2f, "two".toCharArray(), new byte[] { 2, 2, 2 }),
+        mapper.add(new TypeA("two", 2, new TypeB((short) 20, 20000000L, 2.2f, "two".toCharArray(), new byte[]{2, 2, 2}),
                 Collections.<TypeC>emptySet()));
-        mapper.add(new TypeA("one", 1, new TypeB((short)10, 10000000L, 1.1f, "one".toCharArray(), new byte[] { 1, 1, 1 }),
+        mapper.add(new TypeA("one", 1, new TypeB((short) 10, 10000000L, 1.1f, "one".toCharArray(), new byte[]{1, 1, 1}),
                 new HashSet<TypeC>(Arrays.asList(
                         new TypeC('d', map("one.1", 1, "one.2", 1, 1, "one.3", 1, 2, 3)),
                         new TypeC('e', map("one.x", 1, "one.y", 1, 1, "one.z", 1, 2, 3))
-                        ))));
+                ))));
 
         roundTripSnapshot();
 
-        TraversalTreeBuilder builder = new TraversalTreeBuilder(readStateEngine, "TypeA", new String[] {"a1.value", "b.b3", "cList.element.c1", "cList.element.map.value.element"});
+        TraversalTreeBuilder builder = new TraversalTreeBuilder(readStateEngine, "TypeA", new String[]{"a1.value", "b.b3", "cList.element.c1", "cList.element.map.value.element"});
 
         HollowIndexerTraversalNode root = builder.buildTree();
 
@@ -68,11 +68,11 @@ public class HollowIndexTraversalTest extends AbstractStateEngineTest {
         int i = 0;
 
         while(i < keyValues.length) {
-            String key = (String)keyValues[i];
+            String key = (String) keyValues[i];
             List<Integer> values = new ArrayList<Integer>();
             i++;
             while(i < keyValues.length && keyValues[i] instanceof Integer) {
-                values.add((Integer)keyValues[i]);
+                values.add((Integer) keyValues[i]);
                 i++;
             }
 
@@ -83,7 +83,8 @@ public class HollowIndexTraversalTest extends AbstractStateEngineTest {
     }
 
     @Override
-    protected void initializeTypeStates() {  }
+    protected void initializeTypeStates() {
+    }
 
 
 }

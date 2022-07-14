@@ -67,9 +67,9 @@ public class HollowClientTest {
         delta3.reset();
 
         client = new HollowClient.Builder()
-                              .withBlobRetriever(new FakeHollowBlobRetriever())
-                              .withMemoryConfig(new HollowClientMemoryConfig.SpecifiedConfig(true, false, 10000L, 10000L))
-                              .build();
+                .withBlobRetriever(new FakeHollowBlobRetriever())
+                .withMemoryConfig(new HollowClientMemoryConfig.SpecifiedConfig(true, false, 10000L, 10000L))
+                .build();
 
         createChain();
     }

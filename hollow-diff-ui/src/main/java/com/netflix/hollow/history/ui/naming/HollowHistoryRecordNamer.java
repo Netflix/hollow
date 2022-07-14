@@ -21,24 +21,24 @@ import com.netflix.hollow.tools.history.HollowHistoricalState;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
 
 public class HollowHistoryRecordNamer {
-    
+
     public static final HollowHistoryRecordNamer DEFAULT_RECORD_NAMER = new HollowHistoryRecordNamer();
 
     public String getRecordName(HollowHistoricalState historicalState, HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping, int keyOrdinal, HollowObjectTypeDataAccess dataAccess, int recordOrdinal) {
         String recordName = getRecordName(dataAccess, recordOrdinal);
-        
+
         if(recordName != null)
             return recordName;
-        
+
         return typeKeyMapping.getKeyIndex().getKeyDisplayString(keyOrdinal);
     }
-    
+
     public String getRecordName(HollowObjectTypeDataAccess dataAccess, int recordOrdinal) {
         return null;
     }
-    
+
     public String getKeyFieldName(HollowHistoricalState historicalState, Object o, int keyFieldIdx) {
         return String.valueOf(o);
     }
-    
+
 }

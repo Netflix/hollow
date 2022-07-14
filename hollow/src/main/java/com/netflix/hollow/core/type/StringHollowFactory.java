@@ -25,11 +25,11 @@ public class StringHollowFactory extends HollowFactory<HString> {
 
     @Override
     public HString newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HString(((StringTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return new HString(((StringTypeAPI) typeAPI).getDelegateLookupImpl(), ordinal);
     }
 
     @Override
     public HString newCachedHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HString(new StringDelegateCachedImpl((StringTypeAPI)typeAPI, ordinal), ordinal);
+        return new HString(new StringDelegateCachedImpl((StringTypeAPI) typeAPI, ordinal), ordinal);
     }
 }

@@ -34,7 +34,7 @@ public class HollowCombinerMissingTypeWithPrimaryKeyTest {
         HollowObjectMapper mapper = new HollowObjectMapper(combineInto);
         mapper.initializeTypeState(TypeA.class);
         mapper.initializeTypeState(TypeB.class);
-        
+
         HollowWriteStateEngine combineFromWriteEngine1 = new HollowWriteStateEngine();
         mapper = new HollowObjectMapper(combineFromWriteEngine1);
         mapper.add(new TypeB(1));
@@ -48,31 +48,31 @@ public class HollowCombinerMissingTypeWithPrimaryKeyTest {
 
         HollowCombiner combiner = new HollowCombiner(combineInto, combineFrom1, combineFrom2);
         combiner.combine();
-        
+
         HollowReadStateEngine combined = StateEngineRoundTripper.roundTripSnapshot(combineInto);
         assertEquals(2, combined.getTypeState("TypeB").getPopulatedOrdinals().cardinality());
         assertEquals(1, combined.getTypeState("TypeA").getPopulatedOrdinals().cardinality());
     }
-    
-    @HollowPrimaryKey(fields="id")
+
+    @HollowPrimaryKey(fields = "id")
     private static class TypeA {
         @SuppressWarnings("unused")
         int id;
-        
+
         private TypeA(int id) {
             this.id = id;
         }
     }
-    
-    @HollowPrimaryKey(fields="id")
+
+    @HollowPrimaryKey(fields = "id")
     private static class TypeB {
         @SuppressWarnings("unused")
         int id;
-        
+
         private TypeB(int id) {
             this.id = id;
         }
     }
-        
-    
+
+
 }

@@ -252,22 +252,26 @@ public class HollowProducerConsumerTests {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
                 .withListener(new ValidatorListener() {
-                    @Override public String getName() {
+                    @Override
+                    public String getName() {
                         return "Test validator";
                     }
 
-                    @Override public ValidationResult onValidate(ReadState readState) {
+                    @Override
+                    public ValidationResult onValidate(ReadState readState) {
                         return ValidationResult.from(this).failed("Expected to fail!");
                     }
                 })
                 .withListener(new ValidationStatusListener() {
                     boolean isStartCalled;
 
-                    @Override public void onValidationStatusStart(long version) {
+                    @Override
+                    public void onValidationStatusStart(long version) {
                         isStartCalled = true;
                     }
 
-                    @Override public void onValidationStatusComplete(
+                    @Override
+                    public void onValidationStatusComplete(
                             ValidationStatus status, long version, Duration elapsed) {
                         Assert.assertTrue(isStartCalled);
                         Assert.assertTrue(status.failed());
@@ -301,22 +305,26 @@ public class HollowProducerConsumerTests {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
                 .withListener(new ValidatorListener() {
-                    @Override public String getName() {
+                    @Override
+                    public String getName() {
                         return "Test validator";
                     }
 
-                    @Override public ValidationResult onValidate(ReadState readState) {
+                    @Override
+                    public ValidationResult onValidate(ReadState readState) {
                         throw new RuntimeException("Expected to fail!");
                     }
                 })
                 .withListener(new ValidationStatusListener() {
                     boolean isStartCalled;
 
-                    @Override public void onValidationStatusStart(long version) {
+                    @Override
+                    public void onValidationStatusStart(long version) {
                         isStartCalled = true;
                     }
 
-                    @Override public void onValidationStatusComplete(
+                    @Override
+                    public void onValidationStatusComplete(
                             ValidationStatus status, long version, Duration elapsed) {
                         Assert.assertTrue(isStartCalled);
                         Assert.assertTrue(status.failed());
@@ -358,7 +366,7 @@ public class HollowProducerConsumerTests {
 
                     @Override
                     public ValidationResult onValidate(ReadState readState) {
-                        if (counter.incrementAndGet() == 2) {
+                        if(counter.incrementAndGet() == 2) {
                             return ValidationResult.from(this).failed("Expected to fail!");
                         } else {
                             return ValidationResult.from(this).passed("Pass");
@@ -366,12 +374,14 @@ public class HollowProducerConsumerTests {
                     }
                 })
                 .withListener(new ValidationStatusListener() {
-                    @Override public void onValidationStatusStart(long version) {
+                    @Override
+                    public void onValidationStatusStart(long version) {
                     }
 
-                    @Override public void onValidationStatusComplete(
+                    @Override
+                    public void onValidationStatusComplete(
                             ValidationStatus status, long version, Duration elapsed) {
-                        if (counter.get() == 2) {
+                        if(counter.get() == 2) {
                             Assert.assertTrue(status.failed());
                             Assert.assertEquals(1, status.getResults().size());
 
@@ -418,13 +428,13 @@ public class HollowProducerConsumerTests {
                 .build();
 
         producer.runCycle(state -> {
-            for (int i = 0; i < 10000; i++) {
+            for(int i = 0; i < 10000; i++) {
                 state.add(i);
             }
         });
 
         long v2 = producer.runCycle(state -> {
-            for (int i = 10000; i < 20000; i++) {
+            for(int i = 10000; i < 20000; i++) {
                 state.add(i);
             }
         });
@@ -445,12 +455,12 @@ public class HollowProducerConsumerTests {
         Assert.assertEquals(10000, popOrdinalsLength);
 
         BitSet foundValues = new BitSet(20000);
-        for (int i = 0; i < popOrdinalsLength; i++) {
+        for(int i = 0; i < popOrdinalsLength; i++) {
             foundValues.set(((HollowObjectTypeReadState) consumer.getStateEngine().getTypeState("Integer"))
                     .readInt(i, 0));
         }
 
-        for (int i = 10000; i < 20000; i++) {
+        for(int i = 10000; i < 20000; i++) {
             Assert.assertTrue(foundValues.get(i));
         }
     }

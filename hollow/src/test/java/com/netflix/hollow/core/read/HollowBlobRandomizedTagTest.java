@@ -90,7 +90,8 @@ public class HollowBlobRandomizedTagTest {
         try {
             reader.applyDelta(HollowBlobInput.serial(delta1));
             Assert.fail("Should have refused to apply delta to incorrect state");
-        } catch(IOException expected) { }
+        } catch (IOException expected) {
+        }
 
         reader.applyDelta(HollowBlobInput.serial(delta2));
     }
@@ -105,7 +106,8 @@ public class HollowBlobRandomizedTagTest {
         try {
             reader.applyDelta(HollowBlobInput.serial(reversedelta1));
             Assert.fail("Should have refused to apply reverse delta to incorrect state");
-        } catch(IOException expected) { }
+        } catch (IOException expected) {
+        }
 
         reader.applyDelta(HollowBlobInput.serial(reversedelta2));
         reader.applyDelta(HollowBlobInput.serial(reversedelta1));
@@ -113,7 +115,8 @@ public class HollowBlobRandomizedTagTest {
         try {
             reader.applyDelta(HollowBlobInput.serial(delta2));
             Assert.fail("Should have refused to apply delta to incorrect state");
-        } catch(IOException expected) { }
+        } catch (IOException expected) {
+        }
 
         reader.applyDelta(HollowBlobInput.serial(delta1));
         reader.applyDelta(HollowBlobInput.serial(delta2));

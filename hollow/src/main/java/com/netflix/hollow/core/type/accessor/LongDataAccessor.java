@@ -28,7 +28,7 @@ public class LongDataAccessor extends AbstractHollowDataAccessor<Long> {
     private HollowConsumerAPI.LongRetriever api;
 
     public LongDataAccessor(HollowConsumer consumer) {
-        this(consumer.getStateEngine(), (HollowConsumerAPI.LongRetriever)consumer.getAPI());
+        this(consumer.getStateEngine(), (HollowConsumerAPI.LongRetriever) consumer.getAPI());
     }
 
     public LongDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.LongRetriever api) {
@@ -36,8 +36,9 @@ public class LongDataAccessor extends AbstractHollowDataAccessor<Long> {
         this.api = api;
     }
 
-    @Override public Long getRecord(int ordinal){
+    @Override
+    public Long getRecord(int ordinal) {
         HLong val = api.getHLong(ordinal);
-        return val==null ? null : val.getValueBoxed();
+        return val == null ? null : val.getValueBoxed();
     }
 }

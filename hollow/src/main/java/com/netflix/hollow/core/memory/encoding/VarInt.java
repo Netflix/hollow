@@ -38,7 +38,7 @@ public class VarInt {
      * @param buf the buffer to write to
      */
     public static void writeVNull(ByteDataArray buf) {
-        buf.write((byte)0x80);
+        buf.write((byte) 0x80);
         return;
     }
 
@@ -49,17 +49,17 @@ public class VarInt {
      * @param value the long value
      */
     public static void writeVLong(ByteDataArray buf, long value) {
-        if(value < 0)                                buf.write((byte)0x81);
-        if(value > 0xFFFFFFFFFFFFFFL || value < 0)   buf.write((byte)(0x80 | ((value >>> 56) & 0x7FL)));
-        if(value > 0x1FFFFFFFFFFFFL || value < 0)    buf.write((byte)(0x80 | ((value >>> 49) & 0x7FL)));
-        if(value > 0x3FFFFFFFFFFL || value < 0)      buf.write((byte)(0x80 | ((value >>> 42) & 0x7FL)));
-        if(value > 0x7FFFFFFFFL || value < 0)        buf.write((byte)(0x80 | ((value >>> 35) & 0x7FL)));
-        if(value > 0xFFFFFFFL || value < 0)          buf.write((byte)(0x80 | ((value >>> 28) & 0x7FL)));
-        if(value > 0x1FFFFFL || value < 0)           buf.write((byte)(0x80 | ((value >>> 21) & 0x7FL)));
-        if(value > 0x3FFFL || value < 0)             buf.write((byte)(0x80 | ((value >>> 14) & 0x7FL)));
-        if(value > 0x7FL || value < 0)               buf.write((byte)(0x80 | ((value >>>  7) & 0x7FL)));
+        if(value < 0)                                buf.write((byte) 0x81);
+        if(value > 0xFFFFFFFFFFFFFFL || value < 0)   buf.write((byte) (0x80 | ((value >>> 56) & 0x7FL)));
+        if(value > 0x1FFFFFFFFFFFFL || value < 0)    buf.write((byte) (0x80 | ((value >>> 49) & 0x7FL)));
+        if(value > 0x3FFFFFFFFFFL || value < 0)      buf.write((byte) (0x80 | ((value >>> 42) & 0x7FL)));
+        if(value > 0x7FFFFFFFFL || value < 0)        buf.write((byte) (0x80 | ((value >>> 35) & 0x7FL)));
+        if(value > 0xFFFFFFFL || value < 0)          buf.write((byte) (0x80 | ((value >>> 28) & 0x7FL)));
+        if(value > 0x1FFFFFL || value < 0)           buf.write((byte) (0x80 | ((value >>> 21) & 0x7FL)));
+        if(value > 0x3FFFL || value < 0)             buf.write((byte) (0x80 | ((value >>> 14) & 0x7FL)));
+        if(value > 0x7FL || value < 0)               buf.write((byte) (0x80 | ((value >>>  7) & 0x7FL)));
 
-        buf.write((byte)(value & 0x7FL));
+        buf.write((byte) (value & 0x7FL));
     }
 
     /**
@@ -70,17 +70,17 @@ public class VarInt {
      * @throws IOException if the value cannot be written to the output stream
      */
     public static void writeVLong(OutputStream out, long value) throws IOException {
-        if(value < 0)                                out.write((byte)0x81);
-        if(value > 0xFFFFFFFFFFFFFFL || value < 0)   out.write((byte)(0x80 | ((value >>> 56) & 0x7FL)));
-        if(value > 0x1FFFFFFFFFFFFL || value < 0)    out.write((byte)(0x80 | ((value >>> 49) & 0x7FL)));
-        if(value > 0x3FFFFFFFFFFL || value < 0)      out.write((byte)(0x80 | ((value >>> 42) & 0x7FL)));
-        if(value > 0x7FFFFFFFFL || value < 0)        out.write((byte)(0x80 | ((value >>> 35) & 0x7FL)));
-        if(value > 0xFFFFFFFL || value < 0)          out.write((byte)(0x80 | ((value >>> 28) & 0x7FL)));
-        if(value > 0x1FFFFFL || value < 0)           out.write((byte)(0x80 | ((value >>> 21) & 0x7FL)));
-        if(value > 0x3FFFL || value < 0)             out.write((byte)(0x80 | ((value >>> 14) & 0x7FL)));
-        if(value > 0x7FL || value < 0)               out.write((byte)(0x80 | ((value >>>  7) & 0x7FL)));
+        if(value < 0)                                out.write((byte) 0x81);
+        if(value > 0xFFFFFFFFFFFFFFL || value < 0)   out.write((byte) (0x80 | ((value >>> 56) & 0x7FL)));
+        if(value > 0x1FFFFFFFFFFFFL || value < 0)    out.write((byte) (0x80 | ((value >>> 49) & 0x7FL)));
+        if(value > 0x3FFFFFFFFFFL || value < 0)      out.write((byte) (0x80 | ((value >>> 42) & 0x7FL)));
+        if(value > 0x7FFFFFFFFL || value < 0)        out.write((byte) (0x80 | ((value >>> 35) & 0x7FL)));
+        if(value > 0xFFFFFFFL || value < 0)          out.write((byte) (0x80 | ((value >>> 28) & 0x7FL)));
+        if(value > 0x1FFFFFL || value < 0)           out.write((byte) (0x80 | ((value >>> 21) & 0x7FL)));
+        if(value > 0x3FFFL || value < 0)             out.write((byte) (0x80 | ((value >>> 14) & 0x7FL)));
+        if(value > 0x7FL || value < 0)               out.write((byte) (0x80 | ((value >>>  7) & 0x7FL)));
 
-        out.write((byte)(value & 0x7FL));
+        out.write((byte) (value & 0x7FL));
     }
 
     /**
@@ -90,12 +90,12 @@ public class VarInt {
      * @param value the int value
      */
     public static void writeVInt(ByteDataArray buf, int value) {
-        if(value > 0x0FFFFFFF || value < 0) buf.write((byte)(0x80 | ((value >>> 28))));
-        if(value > 0x1FFFFF || value < 0)   buf.write((byte)(0x80 | ((value >>> 21) & 0x7F)));
-        if(value > 0x3FFF || value < 0)     buf.write((byte)(0x80 | ((value >>> 14) & 0x7F)));
-        if(value > 0x7F || value < 0)       buf.write((byte)(0x80 | ((value >>>  7) & 0x7F)));
+        if(value > 0x0FFFFFFF || value < 0) buf.write((byte) (0x80 | ((value >>> 28))));
+        if(value > 0x1FFFFF || value < 0)   buf.write((byte) (0x80 | ((value >>> 21) & 0x7F)));
+        if(value > 0x3FFF || value < 0)     buf.write((byte) (0x80 | ((value >>> 14) & 0x7F)));
+        if(value > 0x7F || value < 0)       buf.write((byte) (0x80 | ((value >>>  7) & 0x7F)));
 
-        buf.write((byte)(value & 0x7F));
+        buf.write((byte) (value & 0x7F));
     }
 
     /**
@@ -106,14 +106,14 @@ public class VarInt {
      * @throws IOException if the value cannot be written to the output stream
      */
     public static void writeVInt(OutputStream out, int value) throws IOException {
-        if(value > 0x0FFFFFFF || value < 0) out.write((byte)(0x80 | ((value >>> 28))));
-        if(value > 0x1FFFFF || value < 0)   out.write((byte)(0x80 | ((value >>> 21) & 0x7F)));
-        if(value > 0x3FFF || value < 0)     out.write((byte)(0x80 | ((value >>> 14) & 0x7F)));
-        if(value > 0x7F || value < 0)       out.write((byte)(0x80 | ((value >>>  7) & 0x7F)));
+        if(value > 0x0FFFFFFF || value < 0) out.write((byte) (0x80 | ((value >>> 28))));
+        if(value > 0x1FFFFF || value < 0)   out.write((byte) (0x80 | ((value >>> 21) & 0x7F)));
+        if(value > 0x3FFF || value < 0)     out.write((byte) (0x80 | ((value >>> 14) & 0x7F)));
+        if(value > 0x7F || value < 0)       out.write((byte) (0x80 | ((value >>>  7) & 0x7F)));
 
-        out.write((byte)(value & 0x7F));
+        out.write((byte) (value & 0x7F));
     }
-    
+
     /**
      * Write the value as a VarInt into the array, starting at the specified position.
      *
@@ -123,13 +123,13 @@ public class VarInt {
      * @return the next position after the VarInt has been written.
      */
     public static int writeVInt(byte data[], int pos, int value) {
-        if(value > 0x0FFFFFFF || value < 0) data[pos++] = ((byte)(0x80 | ((value >>> 28))));
-        if(value > 0x1FFFFF || value < 0)   data[pos++] = ((byte)(0x80 | ((value >>> 21) & 0x7F)));
-        if(value > 0x3FFF || value < 0)     data[pos++] = ((byte)(0x80 | ((value >>> 14) & 0x7F)));
-        if(value > 0x7F || value < 0)       data[pos++] = ((byte)(0x80 | ((value >>>  7) & 0x7F)));
-        
-        data[pos++] = (byte)(value & 0x7F);
-        
+        if(value > 0x0FFFFFFF || value < 0) data[pos++] = ((byte) (0x80 | ((value >>> 28))));
+        if(value > 0x1FFFFF || value < 0)   data[pos++] = ((byte) (0x80 | ((value >>> 21) & 0x7F)));
+        if(value > 0x3FFF || value < 0)     data[pos++] = ((byte) (0x80 | ((value >>> 14) & 0x7F)));
+        if(value > 0x7F || value < 0)       data[pos++] = ((byte) (0x80 | ((value >>>  7) & 0x7F)));
+
+        data[pos++] = (byte) (value & 0x7F);
+
         return pos;
     }
 
@@ -142,7 +142,7 @@ public class VarInt {
      * @return true if the value is null
      */
     public static boolean readVNull(ByteData arr, long position) {
-        return arr.get(position) == (byte)0x80;
+        return arr.get(position) == (byte) 0x80;
     }
 
     /**
@@ -158,10 +158,10 @@ public class VarInt {
             throw new RuntimeException("Attempting to read null value as int");
 
         int value = b & 0x7F;
-        while ((b & 0x80) != 0) {
-          b = arr.get(position++);
-          value <<= 7;
-          value |= (b & 0x7F);
+        while((b & 0x80) != 0) {
+            b = arr.get(position++);
+            value <<= 7;
+            value |= (b & 0x7F);
         }
 
         return value;
@@ -180,7 +180,7 @@ public class VarInt {
             throw new RuntimeException("Attempting to read null value as int");
 
         int value = b & 0x7F;
-        while ((b & 0x80) != 0) {
+        while((b & 0x80) != 0) {
             b = readByteSafely(in);
             value <<= 7;
             value |= (b & 0x7F);
@@ -202,7 +202,7 @@ public class VarInt {
             throw new RuntimeException("Attempting to read null value as int");
 
         int value = b & 0x7F;
-        while ((b & 0x80) != 0) {
+        while((b & 0x80) != 0) {
             b = readByteSafely(in);
             value <<= 7;
             value |= (b & 0x7F);
@@ -224,10 +224,10 @@ public class VarInt {
             throw new RuntimeException("Attempting to read null value as long");
 
         long value = b & 0x7F;
-        while ((b & 0x80) != 0) {
-          b = arr.get(position++);
-          value <<= 7;
-          value |= (b & 0x7F);
+        while((b & 0x80) != 0) {
+            b = arr.get(position++);
+            value <<= 7;
+            value |= (b & 0x7F);
         }
 
         return value;
@@ -268,7 +268,7 @@ public class VarInt {
             throw new RuntimeException("Attempting to read null value as long");
 
         long value = b & 0x7F;
-        while ((b & 0x80) != 0) {
+        while((b & 0x80) != 0) {
             b = readByteSafely(in);
             value <<= 7;
             value |= (b & 0x7F);
@@ -290,7 +290,7 @@ public class VarInt {
             throw new RuntimeException("Attempting to read null value as long");
 
         long value = b & 0x7F;
-        while ((b & 0x80) != 0) {
+        while((b & 0x80) != 0) {
             b = readByteSafely(in);
             value <<= 7;
             value |= (b & 0x7F);
@@ -358,13 +358,13 @@ public class VarInt {
 
         boolean insideInt = false;
 
-        for(int i=0;i<length;i++) {
+        for(int i = 0; i < length; i++) {
             byte b = byteData.get(fieldPosition + i);
 
             if((b & 0x80) == 0) {
                 numInts++;
                 insideInt = false;
-            } else if(!insideInt && b == (byte)0x80) {
+            } else if(!insideInt && b == (byte) 0x80) {
                 numInts++;
             } else {
                 insideInt = true;
@@ -379,7 +379,7 @@ public class VarInt {
         if(i == -1) {
             throw new EOFException("Unexpected end of VarInt record");
         }
-        return (byte)i;
+        return (byte) i;
     }
 
     public static byte readByteSafely(HollowBlobInput in) throws IOException {
@@ -387,6 +387,6 @@ public class VarInt {
         if(i == -1) {
             throw new EOFException("Unexpected end of VarInt record");
         }
-        return (byte)i;
+        return (byte) i;
     }
 }

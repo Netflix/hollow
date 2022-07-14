@@ -76,7 +76,7 @@ public class HollowClient {
 
     protected final HollowAnnouncementWatcher announcementWatcher;
     protected final HollowClientUpdater updater;
-    
+
     private final HollowClientDoubleSnapshotConfig doubleSnapshotConfig;
 
     public HollowClient(HollowBlobRetriever blobRetriever) {
@@ -88,29 +88,29 @@ public class HollowClient {
             HollowUpdateListener updateListener,
             HollowAPIFactory apiFactory,
             HollowClientMemoryConfig memoryConfig) {
-        
+
         this(blobRetriever, announcementWatcher, updateListener, apiFactory, new DefaultHashCodeFinder(), memoryConfig);
     }
 
-    
+
     public HollowClient(HollowBlobRetriever blobRetriever,
-                        HollowAnnouncementWatcher announcementWatcher,
-                        HollowUpdateListener updateListener,
-                        HollowAPIFactory apiFactory,
-                        HollowObjectHashCodeFinder hashCodeFinder,
-                        HollowClientMemoryConfig memoryConfig) {
+            HollowAnnouncementWatcher announcementWatcher,
+            HollowUpdateListener updateListener,
+            HollowAPIFactory apiFactory,
+            HollowObjectHashCodeFinder hashCodeFinder,
+            HollowClientMemoryConfig memoryConfig) {
         this.doubleSnapshotConfig = HollowClientConsumerBridge.doubleSnapshotConfigFor(memoryConfig);
         HollowConsumerMetrics hollowConsumerMetrics = new HollowConsumerMetrics();
-        this.updater = new HollowClientUpdater(consumerBlobRetrieverFor(blobRetriever), 
-                                               Collections.singletonList(consumerRefreshListenerFor(updateListener)), 
-                                               apiFactory,
-                                               doubleSnapshotConfig, 
-                                               hashCodeFinder,
-                                               MemoryMode.ON_HEAP,
-                                               memoryConfig,
-                                               updateListener,
-                                               hollowConsumerMetrics,
-                                               null);
+        this.updater = new HollowClientUpdater(consumerBlobRetrieverFor(blobRetriever),
+                Collections.singletonList(consumerRefreshListenerFor(updateListener)),
+                apiFactory,
+                doubleSnapshotConfig,
+                hashCodeFinder,
+                MemoryMode.ON_HEAP,
+                memoryConfig,
+                updateListener,
+                hollowConsumerMetrics,
+                null);
         this.announcementWatcher = announcementWatcher;
         announcementWatcher.setClientToNotify(this);
     }
@@ -124,7 +124,7 @@ public class HollowClient {
     public void triggerRefresh() {
         try {
             updater.updateTo(announcementWatcher.getLatestVersion());
-        } catch(Throwable th) {
+        } catch (Throwable th) {
             throw new RuntimeException(th);
         }
     }
@@ -185,7 +185,7 @@ public class HollowClient {
     public void setMaxDeltas(int maxDeltas) {
         doubleSnapshotConfig.setMaxDeltasBeforeDoubleSnapshot(maxDeltas);
     }
-    
+
     /**
      * Clear any failed transitions from the {@link FailedTransitionTracker}, so that they may be reattempted when an update is triggered.
      */
@@ -217,48 +217,48 @@ public class HollowClient {
     public long getCurrentVersionId() {
         return updater.getCurrentVersionId();
     }
-    
+
     public static class Builder {
         private HollowBlobRetriever blobRetriever = null;
         private HollowAnnouncementWatcher announcementWatcher = new HollowAnnouncementWatcher.DefaultWatcher();
         private HollowUpdateListener updateListener = DEFAULT_LISTENER;
         private HollowAPIFactory apiFactory = DEFAULT_FACTORY;
         private HollowClientMemoryConfig memoryConfig = DEFAULT_CONFIG;
-        
+
         public HollowClient.Builder withBlobRetriever(HollowBlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
             return this;
         }
-        
+
         public HollowClient.Builder withAnnouncementWatcher(HollowAnnouncementWatcher announcementWatcher) {
             this.announcementWatcher = announcementWatcher;
             return this;
         }
-        
+
         public HollowClient.Builder withUpdateListener(HollowUpdateListener updateListener) {
             this.updateListener = updateListener;
             return this;
         }
-        
+
         public HollowClient.Builder withAPIFactory(HollowAPIFactory apiFactory) {
             this.apiFactory = apiFactory;
             return this;
         }
-        
+
         public <T extends HollowAPI> HollowClient.Builder withGeneratedAPIClass(Class<T> generatedAPIClass) {
             this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<T>(generatedAPIClass);
             return this;
         }
-        
+
         public HollowClient.Builder withMemoryConfig(HollowClientMemoryConfig memoryConfig) {
             this.memoryConfig = memoryConfig;
             return this;
         }
-        
+
         public HollowClient build() {
-            if(blobRetriever == null) 
+            if(blobRetriever == null)
                 throw new IllegalArgumentException("A HollowBlobRetriever must be specified when building a HollowClient");
-            
+
             return new HollowClient(blobRetriever, announcementWatcher, updateListener, apiFactory, memoryConfig);
         }
     }

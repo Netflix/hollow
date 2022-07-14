@@ -32,7 +32,7 @@ public interface HollowSetDelegate<T> extends HollowRecordDelegate {
     public int size(int ordinal);
 
     public boolean contains(HollowSet<T> set, int ordinal, Object o);
-    
+
     public T findElement(HollowSet<T> set, int ordinal, Object... keys);
 
     public HollowOrdinalIterator iterator(int ordinal);

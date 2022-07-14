@@ -32,9 +32,9 @@ public class HollowJsonToFlatRecordTask extends AbstractHollowJsonAdaptorTask {
 
     private final ThreadLocal<FlatRecordWriter> flatRecordWriter;
 
-    public HollowJsonToFlatRecordTask(HollowJsonAdapter adapter, 
-                                      HollowSchemaIdentifierMapper schemaIdMapper,
-                                      Consumer<FlatRecord> action) {
+    public HollowJsonToFlatRecordTask(HollowJsonAdapter adapter,
+            HollowSchemaIdentifierMapper schemaIdMapper,
+            Consumer<FlatRecord> action) {
         super(adapter.getTypeName());
         this.adapter = adapter;
         this.schemaIdMapper = schemaIdMapper;

@@ -240,12 +240,12 @@ public class AbstractHollowHashIndexTests {
     private void assertIteratorContainsAll(HollowOrdinalIterator iter, int... expectedOrdinals) {
         Set<Integer> ordinalSet = new HashSet<Integer>();
         int ordinal = iter.next();
-        while (ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        while(ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
             ordinalSet.add(ordinal);
             ordinal = iter.next();
         }
 
-        for (int ord : expectedOrdinals) {
+        for(int ord : expectedOrdinals) {
             Assert.assertTrue(ordinalSet.contains(ord));
         }
         Assert.assertEquals(expectedOrdinals.length, ordinalSet.size());

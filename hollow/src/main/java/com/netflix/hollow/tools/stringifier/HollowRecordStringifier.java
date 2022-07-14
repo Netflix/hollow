@@ -61,7 +61,7 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
 
     @Override
     public HollowRecordStringifier addExcludeObjectTypes(String... types) {
-        for (String type : types) {
+        for(String type : types) {
             this.excludeObjectTypes.add(type);
         }
         return this;
@@ -84,9 +84,9 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
     public void stringify(Writer writer, Iterable<HollowRecord> records) throws IOException {
         writer.write("[");
         Iterator<HollowRecord> iterator = records.iterator();
-        while (iterator.hasNext()) {
+        while(iterator.hasNext()) {
             stringify(writer, iterator.next());
-            if (iterator.hasNext()) {
+            if(iterator.hasNext()) {
                 writer.write(",");
             }
         }
@@ -111,7 +111,7 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
 
     private void appendStringify(Writer writer, HollowDataAccess dataAccess, String type, int ordinal,
             int indentation) throws IOException {
-        if (excludeObjectTypes.contains(type)) {
+        if(excludeObjectTypes.contains(type)) {
             writer.append("null");
             return;
         }
@@ -120,17 +120,17 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
 
         if(typeDataAccess == null) {
             writer.append("[missing type " + type + "]");
-        } else if (ordinal == -1) {
+        } else if(ordinal == -1) {
             writer.append("null");
         } else {
             if(typeDataAccess instanceof HollowObjectTypeDataAccess) {
-                appendObjectStringify(writer, dataAccess, (HollowObjectTypeDataAccess)typeDataAccess, ordinal, indentation);
+                appendObjectStringify(writer, dataAccess, (HollowObjectTypeDataAccess) typeDataAccess, ordinal, indentation);
             } else if(typeDataAccess instanceof HollowListTypeDataAccess) {
-                appendListStringify(writer, dataAccess, (HollowListTypeDataAccess)typeDataAccess, ordinal, indentation);
+                appendListStringify(writer, dataAccess, (HollowListTypeDataAccess) typeDataAccess, ordinal, indentation);
             } else if(typeDataAccess instanceof HollowSetTypeDataAccess) {
-                appendSetStringify(writer, dataAccess, (HollowSetTypeDataAccess)typeDataAccess, ordinal, indentation);
+                appendSetStringify(writer, dataAccess, (HollowSetTypeDataAccess) typeDataAccess, ordinal, indentation);
             } else if(typeDataAccess instanceof HollowMapTypeDataAccess) {
-                appendMapStringify(writer, dataAccess, (HollowMapTypeDataAccess)typeDataAccess, ordinal, indentation);
+                appendMapStringify(writer, dataAccess, (HollowMapTypeDataAccess) typeDataAccess, ordinal, indentation);
             }
         }
 
@@ -211,7 +211,7 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
 
         String elementType = schema.getElementType();
 
-        for(int i=0;i<size;i++) {
+        for(int i = 0; i < size; i++) {
             writer.append(NEWLINE);
 
             int elementOrdinal = typeDataAccess.getElementOrdinal(ordinal, i);
@@ -240,7 +240,7 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
 
             indentation++;
 
-            for(int i=0;i<schema.numFields();i++) {
+            for(int i = 0; i < schema.numFields(); i++) {
                 writer.append(NEWLINE);
 
                 String fieldName = schema.getFieldName(i);
@@ -289,7 +289,7 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
     }
 
     private void appendIndentation(Writer writer, int indentation) throws IOException {
-        for(int i=0;i<indentation;i++) {
+        for(int i = 0; i < indentation; i++) {
             writer.append(INDENT);
         }
     }

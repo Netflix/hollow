@@ -39,9 +39,9 @@ public class SparseBitSetTest {
 
         Random random = new Random();
         Set<Integer> intIndexed = new HashSet<>();
-        for (int i = 0; i < 100000; i++) {
+        for(int i = 0; i < 100000; i++) {
             int r = random.nextInt(maxValue);
-            while (intIndexed.contains(r)) r = random.nextInt(maxValue);
+            while(intIndexed.contains(r)) r = random.nextInt(maxValue);
             sparseBitSet.set(r);
             intIndexed.add(r);
         }
@@ -49,8 +49,8 @@ public class SparseBitSetTest {
         Assert.assertEquals(100000, sparseBitSet.cardinality());
         Assert.assertTrue(sparseBitSet.estimateBitsUsed() > 0);
 
-        for (int i = 0; i < maxValue; i++) {
-            if (intIndexed.contains(i))
+        for(int i = 0; i < maxValue; i++) {
+            if(intIndexed.contains(i))
                 Assert.assertTrue("Expected in set, but not found the int " + i, sparseBitSet.get(i));
             else Assert.assertFalse("Not expected in set, but found the int " + i, sparseBitSet.get(i));
         }
@@ -58,16 +58,16 @@ public class SparseBitSetTest {
 
     @Test
     public void testEvenNumbersMultipleThread() {
-        for (int j = 0; j < 10; j++) {
+        for(int j = 0; j < 10; j++) {
             int maxValue = 500000;
             sparseBitSet = new HollowSparseIntegerSet.SparseBitSet(maxValue);
             SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "test");
             int parallelism = executor.getMaximumPoolSize();
             int taskSize = maxValue / parallelism;
-            for (int i = 0; i < parallelism; i++) {
+            for(int i = 0; i < parallelism; i++) {
                 int from = i * taskSize;
                 int to = (from + taskSize) - 1;
-                if (i == (parallelism - 1)) to = maxValue;
+                if(i == (parallelism - 1)) to = maxValue;
                 executor.submit(new Task(sparseBitSet, from, to));
             }
             executor.awaitUninterruptibly();
@@ -90,8 +90,8 @@ public class SparseBitSetTest {
 
         @Override
         public void run() {
-            for (int i = from; i <= to; i++) {
-                if ((i % 2) == 0)
+            for(int i = from; i <= to; i++) {
+                if((i % 2) == 0)
                     set.set(i);
             }
         }
@@ -256,7 +256,7 @@ public class SparseBitSetTest {
             addedValueGreaterThanMax = false;
         }
 
-        if (addedValueGreaterThanMax)
+        if(addedValueGreaterThanMax)
             Assert.fail("Should not be ale to set a value greater than max value in compacted bit set.");
 
     }
@@ -285,7 +285,7 @@ public class SparseBitSetTest {
             addedValueGreaterThanMax = false;
         }
 
-        if (addedValueGreaterThanMax)
+        if(addedValueGreaterThanMax)
             Assert.fail("Should not be ale to set a value greater than max value in compacted bit set.");
 
         HollowSparseIntegerSet.SparseBitSet resizedSparsedBitSet = HollowSparseIntegerSet.SparseBitSet.resize(compactSparseBitSet, 8192);

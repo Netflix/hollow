@@ -23,11 +23,11 @@ import java.util.Comparator;
 import java.util.List;
 
 class HollowTestDataAPIClassGenerator {
-    
+
     private final HollowDataset dataset;
     private final String apiClassName;
     private final String packageName;
-    
+
     public HollowTestDataAPIClassGenerator(HollowDataset dataset, String apiClassName, String packageName) {
         this.dataset = dataset;
         this.apiClassName = apiClassName;
@@ -36,13 +36,13 @@ class HollowTestDataAPIClassGenerator {
 
     public String generate() {
         StringBuilder builder = new StringBuilder();
-        
+
         builder.append("package " + packageName + ";\n\n");
-        
+
         builder.append("import com.netflix.hollow.api.testdata.HollowTestDataset;\n\n");
-        
+
         builder.append("public class " + apiClassName + " extends HollowTestDataset {\n\n");
-        
+
         List<HollowSchema> schemas = new ArrayList<>(dataset.getSchemas());
         schemas.sort(Comparator.comparing(HollowSchema::getName));
 
@@ -53,9 +53,9 @@ class HollowTestDataAPIClassGenerator {
             builder.append("        return rec;\n");
             builder.append("    }\n\n");
         }
-        
+
         builder.append("}");
-        
+
         return builder.toString();
     }
 }

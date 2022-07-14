@@ -32,5 +32,6 @@ import java.lang.annotation.Target;
  * In general unnecessary changes will be avoided but you should not depend on internal classes being stable
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value={CONSTRUCTOR, METHOD, PACKAGE, TYPE})
-public @interface Internal {}
+@Target(value = {CONSTRUCTOR, METHOD, PACKAGE, TYPE})
+public @interface Internal {
+}

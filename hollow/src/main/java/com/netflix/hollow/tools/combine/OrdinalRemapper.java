@@ -28,7 +28,7 @@ public interface OrdinalRemapper {
      * @return the remapped ordinal
      */
     public int getMappedOrdinal(String type, int originalOrdinal);
-    
+
     /**
      * Remap an ordinal.
      * @param type the type name
@@ -36,12 +36,12 @@ public interface OrdinalRemapper {
      * @param mappedOrdinal the mapped ordinal
      */
     public void remapOrdinal(String type, int originalOrdinal, int mappedOrdinal);
-    
+
     /**
      * @return whether or not a mapping is already defined.
      * @param type the type name
      * @param originalOrdinal the original ordinal
      */
     public boolean ordinalIsMapped(String type, int originalOrdinal);
-    
+
 }

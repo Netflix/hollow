@@ -72,7 +72,7 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
         builder.append("public class " + className + " extends " + AbstractHollowHashIndex.class.getSimpleName() + "<" + apiClassname + "> {\n\n");
 
         builder.append("    public " + className + "(HollowConsumer consumer, String queryType, String selectFieldPath, String... matchFieldPaths) {\n");
-        builder.append("        super(consumer, " + isListenToDataRefreah +", queryType, selectFieldPath, matchFieldPaths);\n");
+        builder.append("        super(consumer, " + isListenToDataRefreah + ", queryType, selectFieldPath, matchFieldPaths);\n");
         builder.append("    }\n\n");
 
         builder.append("    public " + className + "(HollowConsumer consumer, boolean isListenToDataRefresh, String queryType, String selectFieldPath, String... matchFieldPaths) {\n");
@@ -96,7 +96,7 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
     }
 
     private void genDeprecatedJavaDoc(List<HollowSchema> schemaList, StringBuilder builder) {
-        if (schemaList.isEmpty()) return;
+        if(schemaList.isEmpty()) return;
 
         HollowSchema schema = schemaList.get(0);
         String typeName = hollowImplClassname(schema.getName());

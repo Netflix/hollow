@@ -43,7 +43,7 @@ public class HDouble extends HollowObject {
     }
 
     protected DoubleDelegate delegate() {
-        return (DoubleDelegate)delegate;
+        return (DoubleDelegate) delegate;
     }
 
 }

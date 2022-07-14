@@ -31,21 +31,21 @@ import java.util.Map;
 public class SimpleHollowDataset implements HollowDataset {
 
     private final Map<String, HollowSchema> schemas;
-    
+
     public SimpleHollowDataset(Map<String, HollowSchema> schemas) {
         this.schemas = schemas;
     }
-    
+
     public SimpleHollowDataset(List<HollowSchema> schemas) {
         Map<String, HollowSchema> schemaMap = new HashMap<>(schemas.size());
-        
+
         for(HollowSchema schema : schemas) {
             schemaMap.put(schema.getName(), schema);
         }
-        
+
         this.schemas = schemaMap;
     }
-    
+
     @Override
     public List<HollowSchema> getSchemas() {
         return new ArrayList<>(schemas.values());

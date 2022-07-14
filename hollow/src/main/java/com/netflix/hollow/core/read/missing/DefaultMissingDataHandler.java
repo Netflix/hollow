@@ -98,7 +98,7 @@ public class DefaultMissingDataHandler implements MissingDataHandler {
     public boolean handleSetContainsElement(String type, int ordinal, int elementOrdinal, int elementOrdinalHashCode) {
         return false;
     }
-    
+
     @Override
     public int handleSetFindElement(String type, int ordinal, Object... keys) {
         return -1;
@@ -148,7 +148,7 @@ public class DefaultMissingDataHandler implements MissingDataHandler {
     public long handleMapFindEntry(String type, int ordinal, Object... keys) {
         return -1L;
     }
-    
+
     @Override
     public HollowSchema handleSchema(String type) {
         throw new UnsupportedOperationException("By default, missing types are not handled.");

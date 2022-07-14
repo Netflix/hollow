@@ -30,27 +30,27 @@ public abstract class HollowTestDataset {
 
     private final HollowWriteStateEngine writeEngine;
     private final List<HollowTestRecord<Void>> recsToAdd;
-    
+
     private HollowTestBlobRetriever blobRetriever;
-    
+
     private long currentState = 0L;
-    
-    
+
+
     public HollowTestDataset() {
         this.writeEngine = new HollowWriteStateEngine();
         this.recsToAdd = new ArrayList<>();
     }
-    
+
     public void add(HollowTestRecord<Void> rec) {
         recsToAdd.add(rec);
     }
-    
+
     public HollowConsumer.Builder<?> newConsumerBuilder() {
-    	blobRetriever = new HollowTestBlobRetriever();
-    	
-    	return HollowConsumer
-    			.newHollowConsumer()
-    			.withBlobRetriever(blobRetriever);
+        blobRetriever = new HollowTestBlobRetriever();
+
+        return HollowConsumer
+                .newHollowConsumer()
+                .withBlobRetriever(blobRetriever);
     }
 
     public void buildHeader(HollowConsumer consumer) {
@@ -67,7 +67,7 @@ public abstract class HollowTestDataset {
         for(HollowTestRecord<Void> rec : recsToAdd) {
             rec.addTo(writeEngine);
         }
-        
+
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
@@ -76,16 +76,16 @@ public abstract class HollowTestDataset {
             blobRetriever.addSnapshot(currentState, new HollowTestBlobRetriever.TestBlob(currentState, baos.toByteArray()));
 
             consumer.triggerRefreshTo(currentState);
-        } catch(IOException rethrow) {
+        } catch (IOException rethrow) {
             throw new RuntimeException(rethrow);
         }
     }
-    
+
     public void buildDelta(HollowConsumer consumer) {
         for(HollowTestRecord<Void> rec : recsToAdd) {
             rec.addTo(writeEngine);
         }
-        
+
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
@@ -95,23 +95,23 @@ public abstract class HollowTestDataset {
             blobRetriever.addDelta(currentState, new HollowTestBlobRetriever.TestBlob(currentState, nextState, baos.toByteArray()));
             consumer.triggerRefreshTo(nextState);
             currentState = nextState;
-        } catch(IOException rethrow) {
+        } catch (IOException rethrow) {
             throw new RuntimeException(rethrow);
         }
     }
-    
+
     public HollowReadStateEngine buildSnapshot() {
         for(HollowTestRecord<Void> rec : recsToAdd) {
             rec.addTo(writeEngine);
         }
-        
+
         try {
             return StateEngineRoundTripper.roundTripSnapshot(writeEngine);
-        } catch(IOException rethrow) {
+        } catch (IOException rethrow) {
             throw new RuntimeException(rethrow);
         }
     }
-    
+
     public void buildDelta(HollowReadStateEngine readEngine) {
         for(HollowTestRecord<Void> rec : recsToAdd) {
             rec.addTo(writeEngine);
@@ -119,9 +119,9 @@ public abstract class HollowTestDataset {
 
         try {
             StateEngineRoundTripper.roundTripDelta(writeEngine, readEngine);
-        } catch(IOException rethrow) {
+        } catch (IOException rethrow) {
             throw new RuntimeException(rethrow);
         }
     }
-    
+
 }

@@ -111,7 +111,7 @@ public class HollowHistorySetTest extends AbstractStateEngineTest {
     }
 
     private void assertRecord(HollowDataAccess dataAccess, int ordinal, int... expectedElements) {
-        HollowSetTypeDataAccess typeDataAccess = (HollowSetTypeDataAccess)dataAccess.getTypeDataAccess("TestSet");
+        HollowSetTypeDataAccess typeDataAccess = (HollowSetTypeDataAccess) dataAccess.getTypeDataAccess("TestSet");
 
         test:
         for(int expected : expectedElements) {

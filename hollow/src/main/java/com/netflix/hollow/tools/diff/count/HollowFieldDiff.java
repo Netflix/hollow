@@ -116,7 +116,7 @@ public class HollowFieldDiff implements Comparable<HollowFieldDiff> {
      * @param otherFieldDiff the field diff to add
      */
     public void addResults(HollowFieldDiff otherFieldDiff) {
-        for(int i=0;i<otherFieldDiff.getNumDiffs();i++) {
+        for(int i = 0; i < otherFieldDiff.getNumDiffs(); i++) {
             addDiff(otherFieldDiff.getFromOrdinal(i), otherFieldDiff.getToOrdinal(i), otherFieldDiff.getPairScore(i));
         }
     }

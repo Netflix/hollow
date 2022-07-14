@@ -20,13 +20,13 @@ package com.netflix.hollow.api.perfapi;
 public interface HashKeyExtractor {
 
     public Object extract(Object extractFrom);
-    
+
     public default Object[] extractArray(Object extractFrom) {
         Object obj = extract(extractFrom);
         if(obj.getClass().isArray()) {
-            return (Object[])obj;
+            return (Object[]) obj;
         }
-        return new Object[] { obj };
+        return new Object[]{obj};
     }
-    
+
 }

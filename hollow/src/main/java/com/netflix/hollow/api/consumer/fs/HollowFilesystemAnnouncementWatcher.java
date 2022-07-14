@@ -87,7 +87,7 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
 
         watchFuture.cancel(true);
 
-        if (ownedExecutor) {
+        if(ownedExecutor) {
             executor.shutdownNow();
         }
     }
@@ -107,13 +107,13 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     }
 
     private long readLatestVersion() {
-        if (!Files.isReadable(announcePath))
+        if(!Files.isReadable(announcePath))
             return NO_ANNOUNCEMENT_AVAILABLE;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(announcePath.toFile()))) {
             return Long.parseLong(reader.readLine());
         } catch (IOException e) {
-        	throw new RuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -129,17 +129,17 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
         public void run() {
             try {
                 HollowFilesystemAnnouncementWatcher watcher = ref.get();
-                if (watcher != null) {
-                    if (!Files.isReadable(watcher.announcePath)) return;
+                if(watcher != null) {
+                    if(!Files.isReadable(watcher.announcePath)) return;
 
                     FileTime lastModifiedTime = getLastModifiedTime(watcher.announcePath);
-                    if (lastModifiedTime.compareTo(previousFileTime) > 0) {
+                    if(lastModifiedTime.compareTo(previousFileTime) > 0) {
                         previousFileTime = lastModifiedTime;
 
                         long currentVersion = watcher.readLatestVersion();
-                        if (watcher.latestVersion != currentVersion) {
+                        if(watcher.latestVersion != currentVersion) {
                             watcher.latestVersion = currentVersion;
-                            for (HollowConsumer consumer : watcher.subscribedConsumers)
+                            for(HollowConsumer consumer : watcher.subscribedConsumers)
                                 consumer.triggerAsyncRefresh();
                         }
                     }

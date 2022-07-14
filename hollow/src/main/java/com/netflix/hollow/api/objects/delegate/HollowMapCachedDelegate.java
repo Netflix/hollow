@@ -52,11 +52,11 @@ public class HollowMapCachedDelegate<K, V> implements HollowMapDelegate<K, V>, H
 
         int ordinals[] = new int[HashCodes.hashTableSize(size) * 2];
 
-        for(int i=0;i<ordinals.length;i+=2) {
-            long bucketData = dataAccess.relativeBucket(ordinal, i/2);
+        for(int i = 0; i < ordinals.length; i += 2) {
+            long bucketData = dataAccess.relativeBucket(ordinal, i / 2);
 
-            ordinals[i] = (int)(bucketData >> 32);
-            ordinals[i + 1] = (int)bucketData;
+            ordinals[i] = (int) (bucketData >> 32);
+            ordinals[i + 1] = (int) bucketData;
         }
 
         this.ordinals = ordinals;
@@ -74,19 +74,19 @@ public class HollowMapCachedDelegate<K, V> implements HollowMapDelegate<K, V>, H
     @Override
     public V get(HollowMap<K, V> map, int ordinal, Object key) {
         if(getSchema().getHashKey() != null) {
-            for(int i=0;i<ordinals.length;i+=2) {
+            for(int i = 0; i < ordinals.length; i += 2) {
                 if(ordinals[i] != -1 && map.equalsKey(ordinals[i], key))
-                    return map.instantiateValue(ordinals[i+1]);
+                    return map.instantiateValue(ordinals[i + 1]);
             }
         } else {
             int hashCode = dataAccess.getDataAccess().getHashCodeFinder().hashCode(key);
             int bucket = (HashCodes.hashInt(hashCode) & hashMask) * 2;
-    
+
             while(ordinals[bucket] != -1) {
                 if(map.equalsKey(ordinals[bucket], key)) {
                     return map.instantiateValue(ordinals[bucket + 1]);
                 }
-    
+
                 bucket += 2;
                 bucket &= ordinals.length - 1;
             }
@@ -98,19 +98,19 @@ public class HollowMapCachedDelegate<K, V> implements HollowMapDelegate<K, V>, H
     @Override
     public boolean containsKey(HollowMap<K, V> map, int ordinal, Object key) {
         if(getSchema().getHashKey() != null) {
-            for(int i=0;i<ordinals.length;i+=2) {
+            for(int i = 0; i < ordinals.length; i += 2) {
                 if(ordinals[i] != -1 && map.equalsKey(ordinals[i], key))
                     return true;
             }
         } else {
             int hashCode = dataAccess.getDataAccess().getHashCodeFinder().hashCode(key);
             int bucket = (HashCodes.hashInt(hashCode) & hashMask) * 2;
-    
+
             while(ordinals[bucket] != -1) {
                 if(map.equalsKey(ordinals[bucket], key)) {
                     return true;
                 }
-    
+
                 bucket += 2;
                 bucket &= ordinals.length - 1;
             }
@@ -128,7 +128,7 @@ public class HollowMapCachedDelegate<K, V> implements HollowMapDelegate<K, V>, H
         }
         return false;
     }
-    
+
     @Override
     public K findKey(HollowMap<K, V> map, int ordinal, Object... hashKey) {
         int keyOrdinal = dataAccess.findKey(ordinal, hashKey);
@@ -152,12 +152,12 @@ public class HollowMapCachedDelegate<K, V> implements HollowMapDelegate<K, V>, H
             return new Map.Entry<K, V>() {
                 @Override
                 public K getKey() {
-                    return map.instantiateKey((int)(entryOrdinals >> 32));
+                    return map.instantiateKey((int) (entryOrdinals >> 32));
                 }
 
                 @Override
                 public V getValue() {
-                    return map.instantiateValue((int)entryOrdinals);
+                    return map.instantiateValue((int) entryOrdinals);
                 }
 
                 @Override
@@ -165,7 +165,7 @@ public class HollowMapCachedDelegate<K, V> implements HollowMapDelegate<K, V>, H
                     throw new UnsupportedOperationException();
                 }
             };
-        
+
         return null;
     }
 

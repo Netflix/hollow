@@ -36,9 +36,9 @@ public class LocalBlobStoreTest {
 
         consumer = HollowConsumer.withBlobRetriever(bs)
                 .withLocalBlobStore(localDir).build();
-        
+
         consumer.triggerRefreshTo(v2);
-        
+
         Assert.assertEquals(v2, consumer.getCurrentVersionId());
         assertNSnapshots(2, localDir);
         assertNDeltas(0, localDir);
@@ -79,7 +79,7 @@ public class LocalBlobStoreTest {
         assertNDeltas(1, localDir);
         assertNDeltas(1, "LONG", localDir);
     }
-    
+
     @Test
     public void testBlobStoreOverrideOptionalPartNotLoaded() throws Exception {
         File localDir = createLocalDir();
@@ -114,8 +114,8 @@ public class LocalBlobStoreTest {
         assertNSnapshots(0, "LONG", localDir);
         assertNDeltas(1, localDir);
         assertNDeltas(0, "LONG", localDir);
-    }    
-    
+    }
+
     static ProducerOptionalBlobPartConfig optionalPartConfig() throws IOException {
         ProducerOptionalBlobPartConfig optionalPartConfig = new ProducerOptionalBlobPartConfig();
         optionalPartConfig.addTypesToPart("LONG", "Long");
@@ -145,10 +145,10 @@ public class LocalBlobStoreTest {
                 .count();
         Assert.assertEquals(n, nSnapshots);
     }
-    
+
     static void assertNDeltas(int n, String optionalPart, File localDir) throws IOException {
         long nDeltas = Files.list(localDir.toPath()).filter(p -> p.getFileName().toString().startsWith("delta_" + optionalPart + "-"))
                 .count();
         Assert.assertEquals(n, nDeltas);
-    }    
+    }
 }

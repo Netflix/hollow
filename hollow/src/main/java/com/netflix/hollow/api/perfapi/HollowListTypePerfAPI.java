@@ -23,27 +23,27 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import java.util.List;
 
 public class HollowListTypePerfAPI extends HollowTypePerfAPI {
-    
+
     private final HollowListTypeDataAccess typeAccess;
     final long elementMaskedTypeIdx;
-    
+
     public HollowListTypePerfAPI(HollowDataAccess dataAccess, String typeName, HollowPerformanceAPI api) {
         super(typeName, api);
-        
-        HollowListTypeDataAccess typeAccess = (HollowListTypeDataAccess) dataAccess.getTypeDataAccess(typeName); 
-        
+
+        HollowListTypeDataAccess typeAccess = (HollowListTypeDataAccess) dataAccess.getTypeDataAccess(typeName);
+
         int elementTypeIdx = typeAccess == null ? Ref.TYPE_ABSENT : api.types.getIdx(typeAccess.getSchema().getElementType());
         this.elementMaskedTypeIdx = Ref.toTypeMasked(elementTypeIdx);
-        
+
         if(typeAccess == null)
             typeAccess = new HollowListMissingDataAccess(dataAccess, typeName);
         this.typeAccess = typeAccess;
     }
-    
+
     public int size(long ref) {
         return typeAccess.size(ordinal(ref));
     }
-    
+
     public long get(long ref, int idx) {
         int ordinal = typeAccess.getElementOrdinal(ordinal(ref), idx);
         return Ref.toRefWithTypeMasked(elementMaskedTypeIdx, ordinal);
@@ -53,11 +53,11 @@ public class HollowListTypePerfAPI extends HollowTypePerfAPI {
         HollowOrdinalIterator iter = typeAccess.ordinalIterator(ordinal(ref));
         return new HollowPerfReferenceIterator(iter, elementMaskedTypeIdx);
     }
-    
+
     public <T> List<T> backedList(long ref, POJOInstantiator<T> instantiator) {
         return new HollowPerfBackedList<>(this, ordinal(ref), instantiator);
     }
-    
+
     public HollowListTypeDataAccess typeAccess() {
         return typeAccess;
     }

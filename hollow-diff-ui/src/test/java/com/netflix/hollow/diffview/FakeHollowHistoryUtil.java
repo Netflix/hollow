@@ -51,7 +51,7 @@ public class FakeHollowHistoryUtil {
         ByteArrayOutputStream baos_v1 = new ByteArrayOutputStream();
         HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
         writer.writeSnapshot(baos_v1);
-        testBlobRetriever.addSnapshot(1, new TestBlob(1,new ByteArrayInputStream(baos_v1.toByteArray())));
+        testBlobRetriever.addSnapshot(1, new TestBlob(1, new ByteArrayInputStream(baos_v1.toByteArray())));
 
         // v2
         stateEngine.prepareForNextCycle();
@@ -66,7 +66,7 @@ public class FakeHollowHistoryUtil {
         writer.writeSnapshot(baos_v2);
         writer.writeDelta(baos_v1_to_v2);
         writer.writeReverseDelta(baos_v2_to_v1);
-        testBlobRetriever.addSnapshot(2, new TestBlob(2,new ByteArrayInputStream(baos_v2.toByteArray())));
+        testBlobRetriever.addSnapshot(2, new TestBlob(2, new ByteArrayInputStream(baos_v2.toByteArray())));
         testBlobRetriever.addDelta(1, new TestBlob(1, 2, new ByteArrayInputStream(baos_v1_to_v2.toByteArray())));
         testBlobRetriever.addReverseDelta(2, new TestBlob(2, 1, new ByteArrayInputStream(baos_v2_to_v1.toByteArray())));
 
@@ -84,7 +84,7 @@ public class FakeHollowHistoryUtil {
         writer.writeSnapshot(baos_v3);
         writer.writeDelta(baos_v2_to_v3);
         writer.writeReverseDelta(baos_v3_to_v2);
-        testBlobRetriever.addSnapshot(3, new TestBlob(3,new ByteArrayInputStream(baos_v3.toByteArray())));
+        testBlobRetriever.addSnapshot(3, new TestBlob(3, new ByteArrayInputStream(baos_v3.toByteArray())));
         testBlobRetriever.addDelta(2, new TestBlob(2, 3, new ByteArrayInputStream(baos_v2_to_v3.toByteArray())));
         testBlobRetriever.addReverseDelta(3, new TestBlob(3, 2, new ByteArrayInputStream(baos_v3_to_v2.toByteArray())));
 
@@ -103,7 +103,7 @@ public class FakeHollowHistoryUtil {
         writer.writeSnapshot(baos_v4);
         writer.writeDelta(baos_v3_to_v4);
         writer.writeReverseDelta(baos_v4_to_v3);
-        testBlobRetriever.addSnapshot(4, new TestBlob(4,new ByteArrayInputStream(baos_v4.toByteArray())));
+        testBlobRetriever.addSnapshot(4, new TestBlob(4, new ByteArrayInputStream(baos_v4.toByteArray())));
         testBlobRetriever.addDelta(3, new TestBlob(3, 4, new ByteArrayInputStream(baos_v3_to_v4.toByteArray())));
         testBlobRetriever.addReverseDelta(4, new TestBlob(4, 3, new ByteArrayInputStream(baos_v4_to_v3.toByteArray())));
 
@@ -120,7 +120,7 @@ public class FakeHollowHistoryUtil {
         writer.writeSnapshot(baos_v5);
         writer.writeDelta(baos_v4_to_v5);
         writer.writeReverseDelta(baos_v5_to_v4);
-        testBlobRetriever.addSnapshot(5, new TestBlob(5,new ByteArrayInputStream(baos_v5.toByteArray())));
+        testBlobRetriever.addSnapshot(5, new TestBlob(5, new ByteArrayInputStream(baos_v5.toByteArray())));
         testBlobRetriever.addDelta(4, new TestBlob(4, 5, new ByteArrayInputStream(baos_v4_to_v5.toByteArray())));
         testBlobRetriever.addReverseDelta(5, new TestBlob(5, 4, new ByteArrayInputStream(baos_v5_to_v4.toByteArray())));
 
@@ -132,7 +132,7 @@ public class FakeHollowHistoryUtil {
         stateEngine.prepareForWrite();
         ByteArrayOutputStream baos_v6 = new ByteArrayOutputStream();
         writer.writeSnapshot(baos_v6);
-        testBlobRetriever.addSnapshot(6, new TestBlob(6,new ByteArrayInputStream(baos_v6.toByteArray())));
+        testBlobRetriever.addSnapshot(6, new TestBlob(6, new ByteArrayInputStream(baos_v6.toByteArray())));
 
 
         // v7 - introduces schema change
@@ -161,7 +161,7 @@ public class FakeHollowHistoryUtil {
         stateEngineV0.prepareForWrite();
         ByteArrayOutputStream baos_v0 = new ByteArrayOutputStream();
         writer.writeSnapshot(baos_v0);
-        testBlobRetriever.addSnapshot(0, new TestBlob(0,new ByteArrayInputStream(baos_v0.toByteArray())));
+        testBlobRetriever.addSnapshot(0, new TestBlob(0, new ByteArrayInputStream(baos_v0.toByteArray())));
     }
 
     public static void assertUiParity(HollowHistoryUI hui1, HollowHistoryUI hui2) {
@@ -172,7 +172,7 @@ public class FakeHollowHistoryUtil {
 
         //OverviewPage
         assertEquals("Should have same number of Historical States", h1.getHistoricalStates().length, h2.getHistoricalStates().length);
-        for (int j = 0; j < h1.getHistoricalStates().length; j++) {
+        for(int j = 0; j < h1.getHistoricalStates().length; j++) {
             state1 = h1.getHistoricalStates()[j];
             state2 = h2.getHistoricalStates()[j];
 
@@ -186,7 +186,7 @@ public class FakeHollowHistoryUtil {
             Map<String, String> headerTags2 = state2.getHeaderEntries();
             assertEquals(headerTags1, headerTags2);
 
-            for (String key : state2.getKeyOrdinalMapping().getTypeMappings().keySet()) {
+            for(String key : state2.getKeyOrdinalMapping().getTypeMappings().keySet()) {
 
                 HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping1 = state1.getKeyOrdinalMapping().getTypeMappings().get(key);
                 HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping2 = state2.getKeyOrdinalMapping().getTypeMappings().get(key);
@@ -216,7 +216,7 @@ public class FakeHollowHistoryUtil {
 
                 Set<HollowEffigy> addedEffigies1 = new HashSet<>();
                 Set<HollowEffigy> addedEffigies2 = new HashSet<>();
-                if (!typeChanges1.getAddedRecords().isEmpty()) {
+                if(!typeChanges1.getAddedRecords().isEmpty()) {
                     addedEffigies1 = toEffigies(addedDiffs1, effigyFactory, state1);
                     addedEffigies2 = toEffigies(addedDiffs2, effigyFactory, state2);
                 }
@@ -226,7 +226,7 @@ public class FakeHollowHistoryUtil {
                 Set<HollowEffigy> modifiedToEffigies1 = new HashSet<>();
                 Set<HollowEffigy> modifiedFromEffigies2 = new HashSet<>();
                 Set<HollowEffigy> modifiedToEffigies2 = new HashSet<>();
-                if (!typeChanges1.getModifiedRecords().isEmpty()) {
+                if(!typeChanges1.getModifiedRecords().isEmpty()) {
                     modifiedFromEffigies1 = fromEffigies(modifiedDiffs1, effigyFactory, state1);
                     modifiedFromEffigies2 = fromEffigies(modifiedDiffs2, effigyFactory, state2);
 
@@ -238,7 +238,7 @@ public class FakeHollowHistoryUtil {
 
                 Set<HollowEffigy> removedEffigies1 = new HashSet<>();
                 Set<HollowEffigy> removedEffigies2 = new HashSet<>();
-                if (!typeChanges1.getRemovedRecords().isEmpty()) {
+                if(!typeChanges1.getRemovedRecords().isEmpty()) {
                     removedEffigies1 = fromEffigies(removedDiffs1, effigyFactory, state1);
                     removedEffigies2 = fromEffigies(removedDiffs2, effigyFactory, state2);
                 }
@@ -249,7 +249,7 @@ public class FakeHollowHistoryUtil {
 
     private static Set<HollowEffigy> fromEffigies(List<RecordDiff> recordDiffs, HollowEffigyFactory effigyFactory, HollowHistoricalState historicalState) {
         Set<HollowEffigy> fromEffigies = new HashSet<>();
-        for (int i = 0; i < recordDiffs.size(); i++) {
+        for(int i = 0; i < recordDiffs.size(); i++) {
             RecordDiff recordDiff = recordDiffs.get(i);
             HollowEffigy fromEffigy = effigyFactory.effigy(historicalState.getDataAccess(),
                     "Movie", recordDiff.getFromOrdinal());
@@ -260,7 +260,7 @@ public class FakeHollowHistoryUtil {
 
     private static Set<HollowEffigy> toEffigies(List<RecordDiff> recordDiffs, HollowEffigyFactory effigyFactory, HollowHistoricalState historicalState) {
         Set<HollowEffigy> toEffigies = new HashSet<>();
-        for (int i = 0; i < recordDiffs.size(); i++) {
+        for(int i = 0; i < recordDiffs.size(); i++) {
             RecordDiff recordDiff = recordDiffs.get(i);
             HollowEffigy toEffigy = effigyFactory.effigy(historicalState.getDataAccess(),
                     "Movie", recordDiff.getToOrdinal());
@@ -270,7 +270,7 @@ public class FakeHollowHistoryUtil {
     }
 
     private static long getNextStateVersion(HollowHistoricalState currentHistoricalState) {
-        if (currentHistoricalState.getNextState() != null)
+        if(currentHistoricalState.getNextState() != null)
             return currentHistoricalState.getNextState().getVersion();
         return -1;
     }

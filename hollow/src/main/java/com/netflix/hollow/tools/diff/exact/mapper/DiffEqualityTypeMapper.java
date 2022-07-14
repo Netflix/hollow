@@ -55,17 +55,17 @@ public abstract class DiffEqualityTypeMapper {
         int hashedOrdinalsLength = 1 << (32 - Integer.numberOfLeadingZeros((toPopulatedOrdinals.cardinality() * 2) - 1));
 
         final AtomicIntegerArray hashedToOrdinals = new AtomicIntegerArray(hashedOrdinalsLength);
-        for(int i=0;i<hashedOrdinalsLength;i++)
+        for(int i = 0; i < hashedOrdinalsLength; i++)
             hashedToOrdinals.set(i, -1);
 
         SimultaneousExecutor executor = new SimultaneousExecutor(1.5d, getClass(), "hash-to-ordinals");
         final int numThreads = executor.getCorePoolSize();
 
-        for(int i=0;i<numThreads;i++) {
+        for(int i = 0; i < numThreads; i++) {
             final int threadNumber = i;
 
             executor.execute(() -> {
-                for(int t=threadNumber;t<ordinalSpaceLength;t+=numThreads) {
+                for(int t = threadNumber; t < ordinalSpaceLength; t += numThreads) {
                     if(toPopulatedOrdinals.get(t)) {
                         int hashCode = toRecordHashCode(t);
                         if(hashCode != -1) {
@@ -86,7 +86,7 @@ public abstract class DiffEqualityTypeMapper {
         }
 
         int arr[] = new int[hashedToOrdinals.length()];
-        for(int i=0;i<arr.length;i++) {
+        for(int i = 0; i < arr.length; i++) {
             arr[i] = hashedToOrdinals.get(i);
         }
         return arr;
@@ -101,13 +101,13 @@ public abstract class DiffEqualityTypeMapper {
         final int numThreads = executor.getCorePoolSize();
         final LongList[] matchPairResults = new LongList[numThreads];
 
-        for(int i=0;i<numThreads;i++) {
+        for(int i = 0; i < numThreads; i++) {
             final int threadNumber = i;
             matchPairResults[threadNumber] = new LongList();
             executor.execute(() -> {
                 EqualityDeterminer equalityDeterminer = getEqualityDeterminer();
 
-                for(int t=threadNumber;t <ordinalSpaceLength;t+=numThreads) {
+                for(int t = threadNumber; t < ordinalSpaceLength; t += numThreads) {
                     if(fromPopulatedOrdinals.get(t)) {
                         int hashCode = fromRecordHashCode(t);
                         if(hashCode != -1) {
@@ -131,7 +131,7 @@ public abstract class DiffEqualityTypeMapper {
         }
 
         int numMatches = 0;
-        for(int i=0;i<matchPairResults.length;i++) {
+        for(int i = 0; i < matchPairResults.length; i++) {
             numMatches += matchPairResults[i].size();
         }
 
@@ -144,7 +144,7 @@ public abstract class DiffEqualityTypeMapper {
             while(resultsIterator.next()) {
                 int fromOrdinal = resultsIterator.fromOrdinal();
                 IntList toOrdinals = resultsIterator.toOrdinals();
-                for(int i=0;i<toOrdinals.size();i++) {
+                for(int i = 0; i < toOrdinals.size(); i++) {
                     if(!alreadyMappedToOrdinals.get(toOrdinals.get(i))) {
                         alreadyMappedToOrdinals.set(toOrdinals.get(i));
                         ordinalMap.putEqualOrdinal(fromOrdinal, toOrdinals.get(i));
@@ -164,6 +164,7 @@ public abstract class DiffEqualityTypeMapper {
     public abstract boolean requiresTraversalForMissingFields();
 
     protected abstract int fromRecordHashCode(int ordinal);
+
     protected abstract int toRecordHashCode(int ordinal);
 
     protected abstract EqualityDeterminer getEqualityDeterminer();

@@ -63,7 +63,7 @@ public class HollowListLookupDelegate<T> implements HollowListDelegate<T> {
     @Override
     public final int indexOf(HollowList<T> list, int ordinal, Object o) {
         int size = size(ordinal);
-        for(int i=0;i<size;i++) {
+        for(int i = 0; i < size; i++) {
             int elementOrdinal = dataAccess.getElementOrdinal(ordinal, i);
             if(list.equalsElement(elementOrdinal, o))
                 return i;
@@ -74,7 +74,7 @@ public class HollowListLookupDelegate<T> implements HollowListDelegate<T> {
     @Override
     public final int lastIndexOf(HollowList<T> list, int ordinal, Object o) {
         int size = size(ordinal);
-        for(int i=size - 1; i>=0; i--) {
+        for(int i = size - 1; i >= 0; i--) {
             int elementOrdinal = dataAccess.getElementOrdinal(ordinal, i);
             if(list.equalsElement(elementOrdinal, o))
                 return i;

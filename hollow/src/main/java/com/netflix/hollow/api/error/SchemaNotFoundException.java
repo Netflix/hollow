@@ -40,7 +40,7 @@ public class SchemaNotFoundException extends HollowException {
     }
 
     private static String getMessageSuffix(Collection<String> availableTypes) {
-        if (availableTypes.isEmpty()) {
+        if(availableTypes.isEmpty()) {
             return "empty type state, make sure your namespace has published versions";
         } else {
             return "available schemas: " + availableTypes;

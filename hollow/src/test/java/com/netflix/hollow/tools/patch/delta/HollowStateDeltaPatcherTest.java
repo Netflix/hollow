@@ -38,17 +38,17 @@ public class HollowStateDeltaPatcherTest {
     public void test() throws IOException {
         HollowReadStateEngine state1 = constructState1();
         HollowReadStateEngine state2 = constructState2();
-        
+
         HollowStateDeltaPatcher patcher = new HollowStateDeltaPatcher(state1, state2);
-        
+
         patcher.prepareInitialTransition();
-        
+
         ByteArrayOutputStream delta1 = new ByteArrayOutputStream();
         HollowBlobWriter writer = new HollowBlobWriter(patcher.getStateEngine());
         writer.writeDelta(delta1);
         ByteArrayOutputStream reverseDelta1 = new ByteArrayOutputStream();
         writer.writeReverseDelta(reverseDelta1);
-        
+
         patcher.prepareFinalTransition();
 
         ByteArrayOutputStream delta2 = new ByteArrayOutputStream();
@@ -56,9 +56,9 @@ public class HollowStateDeltaPatcherTest {
         writer.writeDelta(delta2);
         ByteArrayOutputStream reverseDelta2 = new ByteArrayOutputStream();
         writer.writeReverseDelta(reverseDelta2);
-        
+
         patcher.getStateEngine().prepareForNextCycle();
-        
+
         HollowBlobReader reader = new HollowBlobReader(state1);
         reader.applyDelta(HollowBlobInput.serial(delta1.toByteArray()));
         reader.applyDelta(HollowBlobInput.serial(delta2.toByteArray()));
@@ -68,7 +68,7 @@ public class HollowStateDeltaPatcherTest {
 
         HollowChecksum checksum1 = HollowChecksum.forStateEngineWithCommonSchemas(state1, state2);
         HollowChecksum checksum2 = HollowChecksum.forStateEngineWithCommonSchemas(state2, state1);
-        
+
         assertEquals(checksum1, checksum2);
 
         // reverse deltas to back to original state
@@ -79,21 +79,21 @@ public class HollowStateDeltaPatcherTest {
         assertEquals("true", state1.getHeaderTag("origin_state"));
         assertNull(state1.getHeaderTag("final_state"));
     }
-    
+
     private HollowReadStateEngine constructState1() throws IOException {
         HollowWriteStateEngine stateEngine = new HollowWriteStateEngine();
         stateEngine.getHeaderTags().put("origin_state", "true");
         HollowObjectMapper mapper = new HollowObjectMapper(stateEngine);
-        
+
         mapper.add(new TypeB1(1, 0));
         mapper.add(new TypeA1(1, new TypeB1(2, 1)));
         mapper.add(new TypeA1(2, new TypeB1(3, 2)));
         mapper.add(new TypeA1(999, new TypeB1(999, 3)));
-        
+
         HollowReadStateEngine state1 = StateEngineRoundTripper.roundTripSnapshot(stateEngine);
-        
+
         stateEngine.prepareForNextCycle();
-        
+
         mapper.add(new TypeB1(1, 0));
         mapper.add(new TypeA1(1, new TypeB1(2, 1)));
         mapper.add(new TypeA1(2, new TypeB1(3, 2)));
@@ -101,10 +101,10 @@ public class HollowStateDeltaPatcherTest {
         mapper.add(new TypeB1(6, 7));
 
         StateEngineRoundTripper.roundTripDelta(stateEngine, state1);
-        
+
         return state1;
     }
-    
+
     private HollowReadStateEngine constructState2() throws IOException {
         HollowWriteStateEngine stateEngine = new HollowWriteStateEngine();
         stateEngine.getHeaderTags().put("final_state", "true");
@@ -117,11 +117,11 @@ public class HollowStateDeltaPatcherTest {
         mapper.add(new TypeA2(4, new TypeB2(5, 104)));
         mapper.add(new TypeA2(999, new TypeB2(999, 105)));
         mapper.add(new TypeA2(6, new TypeB2(9, 106)));
-        
+
         HollowReadStateEngine state2 = StateEngineRoundTripper.roundTripSnapshot(stateEngine);
-        
+
         stateEngine.prepareForNextCycle();
-        
+
         mapper.add(new TypeB2(1, 100));
         mapper.add(new TypeA2(1, new TypeB2(2, 101)));
         mapper.add(new TypeA2(2, new TypeB2(7, 102)));
@@ -130,29 +130,29 @@ public class HollowStateDeltaPatcherTest {
         mapper.add(new TypeA2(6, new TypeB2(9, 106)));
 
         StateEngineRoundTripper.roundTripDelta(stateEngine, state2);
-        
+
         return state2;
     }
-    
-    
+
+
     @SuppressWarnings("unused")
-    @HollowTypeName(name="TypeA")
+    @HollowTypeName(name = "TypeA")
     private static class TypeA1 {
         int a1;
         TypeB1 b;
-        
+
         public TypeA1(int a1, TypeB1 b) {
             this.a1 = a1;
             this.b = b;
         }
     }
-    
+
     @SuppressWarnings("unused")
-    @HollowTypeName(name="TypeB")
+    @HollowTypeName(name = "TypeB")
     private static class TypeB1 {
         int b1;
         int b2;
-        
+
         public TypeB1(int b1, int b2) {
             this.b1 = b1;
             this.b2 = b2;
@@ -160,23 +160,23 @@ public class HollowStateDeltaPatcherTest {
     }
 
     @SuppressWarnings("unused")
-    @HollowTypeName(name="TypeA")
+    @HollowTypeName(name = "TypeA")
     private static class TypeA2 {
         int a1;
         TypeB2 b;
-        
+
         public TypeA2(int a1, TypeB2 b) {
             this.a1 = a1;
             this.b = b;
         }
     }
-    
+
     @SuppressWarnings("unused")
-    @HollowTypeName(name="TypeB")
+    @HollowTypeName(name = "TypeB")
     private static class TypeB2 {
         int b1;
         float b3;
-        
+
         public TypeB2(int b1, float b3) {
             this.b1 = b1;
             this.b3 = b3;

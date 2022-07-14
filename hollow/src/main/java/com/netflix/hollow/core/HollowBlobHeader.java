@@ -53,11 +53,11 @@ public class HollowBlobHeader {
     public Map<String, String> getHeaderTags() {
         return headerTags;
     }
-    
+
     public void setSchemas(List<HollowSchema> schemas) {
         this.schemas = schemas;
     }
-    
+
     public List<HollowSchema> getSchemas() {
         return schemas;
     }
@@ -93,7 +93,7 @@ public class HollowBlobHeader {
     @Override
     public boolean equals(Object other) {
         if(other instanceof HollowBlobHeader) {
-            HollowBlobHeader oh = (HollowBlobHeader)other;
+            HollowBlobHeader oh = (HollowBlobHeader) other;
             return blobFormatVersion == oh.blobFormatVersion
                     && headerTags.equals(oh.getHeaderTags())
                     && originRandomizedTag == oh.originRandomizedTag

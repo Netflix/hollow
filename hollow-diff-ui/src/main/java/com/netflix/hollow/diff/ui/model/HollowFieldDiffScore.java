@@ -37,18 +37,23 @@ public class HollowFieldDiffScore implements Comparable<HollowFieldDiffScore> {
     public String getTypeName() {
         return typeName;
     }
+
     public int getTypeFieldIndex() {
         return typeFieldIndex;
     }
+
     public String getDisplayName() {
         return displayName;
     }
+
     public int getNumDiffObjects() {
         return numDiffObjects;
     }
+
     public int getNumTotalObjectPairs() {
         return numTotalObjectPairs;
     }
+
     public long getDiffScore() {
         return diffScore;
     }

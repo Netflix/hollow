@@ -37,7 +37,7 @@ class HollowObjectTypeReadStateShard {
     private volatile HollowObjectTypeDataElements currentDataVolatile;
 
     private final HollowObjectSchema schema;
-    
+
     HollowObjectTypeReadStateShard(HollowObjectSchema schema) {
         this.schema = schema;
     }
@@ -58,16 +58,16 @@ class HollowObjectTypeReadStateShard {
         } while(readWasUnsafe(currentData));
 
         switch(schema.getFieldType(fieldIndex)) {
-        case BYTES:
-        case STRING:
-            int numBits = currentData.bitsPerField[fieldIndex];
-            return (fixedLengthValue & (1 << (numBits - 1))) != 0;
-        case FLOAT:
-            return (int)fixedLengthValue == HollowObjectWriteRecord.NULL_FLOAT_BITS;
-        case DOUBLE:
-            return fixedLengthValue == HollowObjectWriteRecord.NULL_DOUBLE_BITS;
-        default:
-            return fixedLengthValue == currentData.nullValueForField[fieldIndex];
+            case BYTES:
+            case STRING:
+                int numBits = currentData.bitsPerField[fieldIndex];
+                return (fixedLengthValue & (1 << (numBits - 1))) != 0;
+            case FLOAT:
+                return (int) fixedLengthValue == HollowObjectWriteRecord.NULL_FLOAT_BITS;
+            case DOUBLE:
+                return fixedLengthValue == HollowObjectWriteRecord.NULL_DOUBLE_BITS;
+            default:
+                return fixedLengthValue == currentData.nullValueForField[fieldIndex];
         }
     }
 
@@ -82,7 +82,7 @@ class HollowObjectTypeReadStateShard {
 
         if(refOrdinal == currentData.nullValueForField[fieldIndex])
             return ORDINAL_NONE;
-        return (int)refOrdinal;
+        return (int) refOrdinal;
     }
 
     public int readInt(int ordinal, int fieldIndex) {
@@ -96,7 +96,7 @@ class HollowObjectTypeReadStateShard {
 
         if(value == currentData.nullValueForField[fieldIndex])
             return Integer.MIN_VALUE;
-        return ZigZag.decodeInt((int)value);
+        return ZigZag.decodeInt((int) value);
     }
 
     public float readFloat(int ordinal, int fieldIndex) {
@@ -105,7 +105,7 @@ class HollowObjectTypeReadStateShard {
 
         do {
             currentData = this.currentDataVolatile;
-            value = (int)readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
+            value = (int) readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
         } while(readWasUnsafe(currentData));
 
         if(value == HollowObjectWriteRecord.NULL_FLOAT_BITS)
@@ -190,9 +190,9 @@ class HollowObjectTypeReadStateShard {
 
             startByte &= (1L << numBitsForField - 1) - 1;
 
-            int length = (int)(endByte - startByte);
+            int length = (int) (endByte - startByte);
             result = new byte[length];
-            for(int i=0;i<length;i++)
+            for(int i = 0; i < length; i++)
                 result[i] = currentData.varLengthData[fieldIndex].get(startByte + i);
 
         } while(readWasUnsafe(currentData));
@@ -223,7 +223,7 @@ class HollowObjectTypeReadStateShard {
 
             startByte &= (1L << numBitsForField - 1) - 1;
 
-            int length = (int)(endByte - startByte);
+            int length = (int) (endByte - startByte);
 
             result = readString(currentData.varLengthData[fieldIndex], startByte, length);
         } while(readWasUnsafe(currentData));
@@ -257,7 +257,7 @@ class HollowObjectTypeReadStateShard {
 
             startByte &= (1L << numBitsForField - 1) - 1;
 
-            int length = (int)(endByte - startByte);
+            int length = (int) (endByte - startByte);
 
             result = testStringEquality(currentData.varLengthData[fieldIndex], startByte, length, testValue);
         } while(readWasUnsafe(currentData));
@@ -287,7 +287,7 @@ class HollowObjectTypeReadStateShard {
 
             startByte &= (1L << numBitsForField - 1) - 1;
 
-            int length = (int)(endByte - startByte);
+            int length = (int) (endByte - startByte);
 
             hashCode = HashCodes.hashCode(currentData.varLengthData[fieldIndex], startByte, length);
         } while(readWasUnsafe(currentData));
@@ -304,7 +304,7 @@ class HollowObjectTypeReadStateShard {
     }
 
     private long fieldOffset(HollowObjectTypeDataElements currentData, int ordinal, int fieldIndex) {
-        return ((long)currentData.bitsPerRecord * ordinal) + currentData.bitOffsetPerField[fieldIndex];
+        return ((long) currentData.bitsPerRecord * ordinal) + currentData.bitOffsetPerField[fieldIndex];
     }
 
     /**
@@ -328,7 +328,7 @@ class HollowObjectTypeReadStateShard {
 
         while(position < endPosition) {
             int c = VarInt.readVInt(data, position);
-            chararr[count++] = (char)c;
+            chararr[count++] = (char) c;
             position += VarInt.sizeOfVInt(c);
         }
 
@@ -346,7 +346,7 @@ class HollowObjectTypeReadStateShard {
 
         while(position < endPosition && count < testValue.length()) {
             int c = VarInt.readVInt(data, position);
-            if(testValue.charAt(count++) != (char)c)
+            if(testValue.charAt(count++) != (char) c)
                 return false;
             position += VarInt.sizeOfVInt(c);
         }
@@ -409,15 +409,15 @@ class HollowObjectTypeReadStateShard {
         if(!(withSchema instanceof HollowObjectSchema))
             throw new IllegalArgumentException("HollowObjectTypeReadState can only calculate checksum with a HollowObjectSchema: " + schema.getName());
 
-        HollowObjectSchema commonSchema = schema.findCommonSchema((HollowObjectSchema)withSchema);
+        HollowObjectSchema commonSchema = schema.findCommonSchema((HollowObjectSchema) withSchema);
 
         List<String> commonFieldNames = new ArrayList<String>();
-        for(int i=0;i<commonSchema.numFields();i++)
+        for(int i = 0; i < commonSchema.numFields(); i++)
             commonFieldNames.add(commonSchema.getFieldName(i));
         Collections.sort(commonFieldNames);
-        
+
         int fieldIndexes[] = new int[commonFieldNames.size()];
-        for(int i=0;i<commonFieldNames.size();i++) {
+        for(int i = 0; i < commonFieldNames.size(); i++) {
             fieldIndexes[i] = schema.getPosition(commonFieldNames.get(i));
         }
 
@@ -427,7 +427,7 @@ class HollowObjectTypeReadStateShard {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
                 checksum.applyInt(ordinal);
-                for(int i=0;i<fieldIndexes.length;i++) {
+                for(int i = 0; i < fieldIndexes.length; i++) {
                     int fieldIdx = fieldIndexes[i];
                     if(!schema.getFieldType(fieldIdx).isVariableLength()) {
                         long bitOffset = fieldOffset(currentData, shardOrdinal, fieldIdx);
@@ -435,7 +435,7 @@ class HollowObjectTypeReadStateShard {
                         long fixedLengthValue = numBitsForField <= 56 ?
                                 currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField)
                                 : currentData.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
-    
+
                         if(fixedLengthValue == currentData.nullValueForField[fieldIdx])
                             checksum.applyInt(Integer.MAX_VALUE);
                         else
@@ -452,31 +452,31 @@ class HollowObjectTypeReadStateShard {
 
     public long getApproximateHeapFootprintInBytes() {
         HollowObjectTypeDataElements currentData = currentDataVolatile;
-        long bitsPerFixedLengthData = (long)currentData.bitsPerRecord * (currentData.maxOrdinal + 1);
-        
+        long bitsPerFixedLengthData = (long) currentData.bitsPerRecord * (currentData.maxOrdinal + 1);
+
         long requiredBytes = bitsPerFixedLengthData / 8;
-        
-        for(int i=0;i<currentData.varLengthData.length;i++) {
+
+        for(int i = 0; i < currentData.varLengthData.length; i++) {
             if(currentData.varLengthData[i] != null)
                 requiredBytes += currentData.varLengthData[i].size();
         }
-        
+
         return requiredBytes;
     }
-    
+
     public long getApproximateHoleCostInBytes(BitSet populatedOrdinals, int shardNumber, int numShards) {
         HollowObjectTypeDataElements currentData = currentDataVolatile;
         long holeBits = 0;
-        
+
         int holeOrdinal = populatedOrdinals.nextClearBit(0);
         while(holeOrdinal <= currentData.maxOrdinal) {
             if((holeOrdinal & (numShards - 1)) == shardNumber)
                 holeBits += currentData.bitsPerRecord;
-            
+
             holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
         }
-        
+
         return holeBits / 8;
     }
-    
+
 }

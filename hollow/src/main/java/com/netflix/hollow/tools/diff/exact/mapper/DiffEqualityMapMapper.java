@@ -45,7 +45,7 @@ public class DiffEqualityMapMapper extends DiffEqualityTypeMapper {
 
         this.requiresTraversalForMissingFields =
                 mapping.requiresMissingFieldTraversal(schema.getKeyType())
-                || mapping.requiresMissingFieldTraversal(schema.getValueType());
+                        || mapping.requiresMissingFieldTraversal(schema.getValueType());
     }
 
     @Override

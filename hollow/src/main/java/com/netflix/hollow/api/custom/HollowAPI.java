@@ -56,13 +56,13 @@ public class HollowAPI {
             typeAPI.setSamplingDirector(samplingDirector);
         }
     }
-    
+
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         for(HollowTypeAPI typeAPI : typeAPIs) {
             typeAPI.setFieldSpecificSamplingDirector(fieldSpec, director);
         }
     }
-    
+
     public void ignoreUpdateThreadForSampling(Thread t) {
         for(HollowTypeAPI typeAPI : typeAPIs) {
             typeAPI.ignoreUpdateThreadForSampling(t);
@@ -84,7 +84,7 @@ public class HollowAPI {
         List<SampleResult> sampleResults = new ArrayList<SampleResult>();
         for(HollowTypeAPI typeAPI : typeAPIs) {
             if(typeAPI instanceof HollowObjectTypeAPI) {
-                sampleResults.addAll(((HollowObjectTypeAPI)typeAPI).getBoxedFieldAccessSampler().getSampleResults());
+                sampleResults.addAll(((HollowObjectTypeAPI) typeAPI).getBoxedFieldAccessSampler().getSampleResults());
             }
         }
 
@@ -93,7 +93,8 @@ public class HollowAPI {
         return sampleResults;
     }
 
-    public void detachCaches() { }
+    public void detachCaches() {
+    }
 
     protected void addTypeAPI(HollowTypeAPI typeAPI) {
         this.typeAPIs.add(typeAPI);

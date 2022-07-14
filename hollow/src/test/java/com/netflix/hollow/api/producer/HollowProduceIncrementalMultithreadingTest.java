@@ -32,7 +32,7 @@ public class HollowProduceIncrementalMultithreadingTest {
     @Test
     public void updateAndPublishUsingMultithreading() {
         // run within a loop to increase the likelihood of a race condition to occur
-        for (int iterationCounter = 0; iterationCounter < ITERATIONS; ++iterationCounter) {
+        for(int iterationCounter = 0; iterationCounter < ITERATIONS; ++iterationCounter) {
             HollowProducer.Incremental producer = createInMemoryIncrementalProducer();
             initializeData(producer);
 
@@ -62,7 +62,7 @@ public class HollowProduceIncrementalMultithreadingTest {
     @Test
     public void removeAndPublishUsingMultithreading() {
         // run within a loop to increase the likelihood of a race condition to occur
-        for (int iterationCounter = 0; iterationCounter < ITERATIONS; ++iterationCounter) {
+        for(int iterationCounter = 0; iterationCounter < ITERATIONS; ++iterationCounter) {
             HollowProducer.Incremental producer = createInMemoryIncrementalProducer();
             initializeData(producer);
 
@@ -97,7 +97,7 @@ public class HollowProduceIncrementalMultithreadingTest {
 
     private void initializeData(HollowProducer.Incremental producer) {
         producer.runIncrementalCycle(iws -> {
-            for (int i = 0; i < ELEMENTS; ++i) {
+            for(int i = 0; i < ELEMENTS; ++i) {
                 iws.addOrModify(new SimpleType(i, i));
             }
         });

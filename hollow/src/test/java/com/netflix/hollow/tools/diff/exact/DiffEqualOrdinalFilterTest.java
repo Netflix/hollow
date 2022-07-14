@@ -73,7 +73,7 @@ public class DiffEqualOrdinalFilterTest {
 
     private IntList list(int... ordinals) {
         IntList list = new IntList(ordinals.length);
-        for(int i=0;i<ordinals.length;i++) {
+        for(int i = 0; i < ordinals.length; i++) {
             list.add(ordinals[i]);
         }
         return list;
@@ -82,7 +82,7 @@ public class DiffEqualOrdinalFilterTest {
     private void assertList(IntList list, int... expectedEntries) {
         Assert.assertEquals(expectedEntries.length, list.size());
 
-        for(int i=0;i<list.size();i++) {
+        for(int i = 0; i < list.size(); i++) {
             Assert.assertEquals(expectedEntries[i], list.get(i));
         }
     }

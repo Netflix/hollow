@@ -39,8 +39,8 @@ public class PrimaryKeyIndexDeltaIndexTest {
         long version = p.runCycle(ws -> {
             IntStream.range(0, upper).parallel().
                     forEach(i -> {
-                        ws.add(new X(i));
-                    });
+                ws.add(new X(i));
+            });
         });
 
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
@@ -50,7 +50,7 @@ public class PrimaryKeyIndexDeltaIndexTest {
         index.listenForDeltaUpdates();
 
         List<Integer> indexes = IntStream.range(0, upper).boxed().collect(toList());
-        for (int j = 0; j < 10; j++) {
+        for(int j = 0; j < 10; j++) {
             Collections.shuffle(indexes);
 
             // Remove 8% of ordinals, selected randomly, to keep within the threshold for a delta update
@@ -59,8 +59,8 @@ public class PrimaryKeyIndexDeltaIndexTest {
             version = p.runCycle(ws -> {
                 IntStream.of(ordinalsToKeep).parallel().
                         forEach(i -> {
-                            ws.add(new X(i));
-                        });
+                    ws.add(new X(i));
+                });
             });
             consumer.triggerRefreshTo(version);
 
@@ -78,8 +78,8 @@ public class PrimaryKeyIndexDeltaIndexTest {
             version = p.runCycle(ws -> {
                 IntStream.range(0, upper).parallel().
                         forEach(i -> {
-                            ws.add(new X(i));
-                        });
+                    ws.add(new X(i));
+                });
             });
             consumer.triggerRefreshTo(version);
 

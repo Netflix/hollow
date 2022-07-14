@@ -93,7 +93,7 @@ public class CheckSumCollections {
         HollowTypeWriteState typeWriteState;
         IntFunction<Model> f;
         String schemaName;
-        switch (type) {
+        switch(type) {
             case List:
                 schemaName = "ListOfInteger";
                 typeWriteState = new HollowListTypeWriteState(
@@ -121,16 +121,16 @@ public class CheckSumCollections {
         w.addTypeState(typeWriteState);
         HollowObjectMapper m = new HollowObjectMapper(w);
 
-        for (int i = 0; i < n; i++) {
+        for(int i = 0; i < n; i++) {
             m.add(f.apply(i));
         }
 
         readState = new HollowReadStateEngine();
         StateEngineRoundTripper.roundTripSnapshot(w, readState);
 
-        if (remove) {
-            for (int i = 0; i < n; i++) {
-                if (i % 3 == 0) {
+        if(remove) {
+            for(int i = 0; i < n; i++) {
+                if(i % 3 == 0) {
                     m.add(f.apply(i));
                 }
             }

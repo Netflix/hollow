@@ -74,14 +74,14 @@ public class HistoryStateQueryMatches {
             this.removedRecords = new ArrayList<RecordDiff>();
             this.addedRecords = new ArrayList<RecordDiff>();
 
-            
+
             HollowHistoricalStateTypeKeyOrdinalMapping typeKeyMapping = historicalState.getKeyOrdinalMapping().getTypeMapping(type);
-            if (typeKeyMapping == null) {
+            if(typeKeyMapping == null) {
                 return;
             }
             HollowObjectTypeDataAccess typeDataAccess = (HollowObjectTypeDataAccess) historicalState.getDataAccess().getTypeDataAccess(type);
 
-            for(int i=0;i<queryMatchingKeys.size();i++) {
+            for(int i = 0; i < queryMatchingKeys.size(); i++) {
                 int matchingKey = queryMatchingKeys.get(i);
                 int removedOrdinal = typeKeyMapping.findRemovedOrdinal(matchingKey);
                 int addedOrdinal = typeKeyMapping.findAddedOrdinal(matchingKey);

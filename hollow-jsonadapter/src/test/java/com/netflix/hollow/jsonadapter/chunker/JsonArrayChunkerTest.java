@@ -24,17 +24,17 @@ import org.junit.Test;
 
 public class JsonArrayChunkerTest {
 
-    
+
     @Test
     public void test() throws Exception {
         String jsonArray = "[ { \"f1\\\"\" : \"value1\", \"f2\" : { \"f1.1\" : \"hel}}{{{{lo \\\"w{orld\\\"\" } } , { \"obj2\" : \"f2.1\" } ]";
-        
+
         JsonArrayChunker chunker = new JsonArrayChunker(new StringReader(jsonArray), new SimultaneousExecutor(getClass(), "test"), 4);
         chunker.initialize();
-        
+
         String obj1 = IOUtils.toString(chunker.nextChunk());
         String obj2 = IOUtils.toString(chunker.nextChunk());
-        
+
         Assert.assertEquals("{ \"f1\\\"\" : \"value1\", \"f2\" : { \"f1.1\" : \"hel}}{{{{lo \\\"w{orld\\\"\" } }", obj1);
         Assert.assertEquals("{ \"obj2\" : \"f2.1\" }", obj2);
     }

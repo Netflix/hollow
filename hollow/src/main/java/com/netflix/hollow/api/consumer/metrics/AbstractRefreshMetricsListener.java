@@ -88,7 +88,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         updatePlanDetails.beforeVersion = beforeVersion;
         updatePlanDetails.desiredVersion = desiredVersion;
         updatePlanDetails.transitionSequence = transitionSequence;
-        if (isSnapshotPlan) {
+        if(isSnapshotPlan) {
             overallRefreshType = BlobType.SNAPSHOT;
         } else {
             overallRefreshType = desiredVersion > beforeVersion ? BlobType.DELTA : BlobType.REVERSE_DELTA;
@@ -98,7 +98,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
     @Override
     public void blobLoaded(HollowConsumer.Blob transition) {
-        updatePlanDetails.numSuccessfulTransitions ++;
+        updatePlanDetails.numSuccessfulTransitions++;
     }
 
     /**
@@ -127,12 +127,12 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         lastRefreshTimeNanoOptional = OptionalLong.of(refreshEndTimeNano);
 
         refreshMetricsBuilder.setDurationMillis(durationMillis)
-            .setIsRefreshSuccess(true)
-            .setConsecutiveFailures(consecutiveFailures)
-            .setRefreshSuccessAgeMillisOptional(0l)
-            .setRefreshEndTimeNano(refreshEndTimeNano);
+                .setIsRefreshSuccess(true)
+                .setConsecutiveFailures(consecutiveFailures)
+                .setRefreshSuccessAgeMillisOptional(0l)
+                .setRefreshEndTimeNano(refreshEndTimeNano);
 
-        if (cycleVersionStartTimes.containsKey(afterVersion)) {
+        if(cycleVersionStartTimes.containsKey(afterVersion)) {
             refreshMetricsBuilder.setCycleStartTimestamp(cycleVersionStartTimes.get(afterVersion));
         }
 
@@ -143,18 +143,18 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
         long  refreshEndTimeNano = System.nanoTime();
         long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEndTimeNano - refreshStartTimeNano);
-        consecutiveFailures ++;
+        consecutiveFailures++;
 
         refreshMetricsBuilder.setDurationMillis(durationMillis)
                 .setIsRefreshSuccess(false)
                 .setConsecutiveFailures(consecutiveFailures)
                 .setRefreshEndTimeNano(refreshEndTimeNano);
-        if (lastRefreshTimeNanoOptional.isPresent()) {
+        if(lastRefreshTimeNanoOptional.isPresent()) {
             refreshMetricsBuilder.setRefreshSuccessAgeMillisOptional(TimeUnit.NANOSECONDS.toMillis(
                     refreshEndTimeNano - lastRefreshTimeNanoOptional.getAsLong()));
         }
 
-        if (cycleVersionStartTimes.containsKey(afterVersion)) {
+        if(cycleVersionStartTimes.containsKey(afterVersion)) {
             refreshMetricsBuilder.setCycleStartTimestamp(cycleVersionStartTimes.get(afterVersion));
         }
 
@@ -175,12 +175,12 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
      * If the blob header contains producer cycle start time tag then save its value in version to cycle start time map
      */
     private void trackCycleStartTime(long version, Map<String, String> headers) {
-        if (headers != null) {
+        if(headers != null) {
             String cycleStartMetric = headers.get(HEADER_TAG_METRIC_CYCLE_START);
-            if (cycleStartMetric != null && !cycleStartMetric.isEmpty()) {
+            if(cycleStartMetric != null && !cycleStartMetric.isEmpty()) {
                 try {
                     Long cycleStartTimestamp = Long.valueOf(cycleStartMetric);
-                    if (cycleStartTimestamp != null) {
+                    if(cycleStartTimestamp != null) {
                         cycleVersionStartTimes.put(version, cycleStartTimestamp);
                     }
                 } catch (NumberFormatException e) {

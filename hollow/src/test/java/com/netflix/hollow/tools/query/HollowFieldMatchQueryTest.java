@@ -28,33 +28,33 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class HollowFieldMatchQueryTest {
-    
+
     private HollowReadStateEngine stateEngine;
-    
+
     @Before
     public void setUp() throws IOException {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
-        
+
         mapper.add(new TypeA(1, 100));
         mapper.add(new TypeA(2, 200));
         mapper.add(new TypeA(3, 100));
         mapper.add(new TypeA(4, 200));
-        
+
         mapper.add(new TypeB("1", 1.1f));
         mapper.add(new TypeB("2", 2.2f));
         mapper.add(new TypeB("3", 3.3f));
         mapper.add(new TypeB("4", 4.4f));
-        
+
         stateEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
     }
-    
+
     @Test
     public void matchesRecordsOfAnyType() {
         HollowFieldMatchQuery query = new HollowFieldMatchQuery(stateEngine);
-        
+
         Map<String, BitSet> matches = query.findMatchingRecords("id", "2");
-        
+
         Assert.assertEquals(2, matches.size());
 
         Assert.assertEquals(1, matches.get("TypeA").cardinality());
@@ -67,20 +67,20 @@ public class HollowFieldMatchQueryTest {
     @Test
     public void matchesOnlyRecordsOfSpecifiedType() {
         HollowFieldMatchQuery query = new HollowFieldMatchQuery(stateEngine);
-        
+
         Map<String, BitSet> matches = query.findMatchingRecords("TypeA", "id", "2");
-        
+
         Assert.assertEquals(1, matches.size());
         Assert.assertEquals(1, matches.get("TypeA").cardinality());
         Assert.assertTrue(matches.get("TypeA").get(1));
     }
-    
+
     @Test
     public void matchesOnlyRecordsWithSpecifiedField() {
         HollowFieldMatchQuery query = new HollowFieldMatchQuery(stateEngine);
-        
+
         Map<String, BitSet> matches = query.findMatchingRecords("bValue", "4.4");
-        
+
         Assert.assertEquals(1, matches.size());
         Assert.assertEquals(1, matches.get("TypeB").cardinality());
         Assert.assertTrue(matches.get("TypeB").get(3));
@@ -90,16 +90,18 @@ public class HollowFieldMatchQueryTest {
     private static class TypeA {
         int id;
         int aValue;
+
         public TypeA(int id, int aValue) {
             this.id = id;
             this.aValue = aValue;
         }
     }
-    
+
     @SuppressWarnings("unused")
     private static class TypeB {
         String id;
         float bValue;
+
         public TypeB(String id, float bValue) {
             this.id = id;
             this.bValue = bValue;

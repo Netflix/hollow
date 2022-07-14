@@ -39,25 +39,25 @@ public class CombinedMatchPairResultsIterator {
 
     public boolean next() {
         list.clear();
-        
+
         while(currentShardList < shardedResults.length) {
             if(currentShardListPosition < shardedResults[currentShardList].size()) {
-                currentFromOrdinal = (int)(shardedResults[currentShardList].get(currentShardListPosition) >> 32);
+                currentFromOrdinal = (int) (shardedResults[currentShardList].get(currentShardListPosition) >> 32);
                 while(currentShardListPosition < shardedResults[currentShardList].size()
-                        && (int)(shardedResults[currentShardList].get(currentShardListPosition) >> 32) == currentFromOrdinal) {
-                    int toOrdinal = (int)shardedResults[currentShardList].get(currentShardListPosition);
+                        && (int) (shardedResults[currentShardList].get(currentShardListPosition) >> 32) == currentFromOrdinal) {
+                    int toOrdinal = (int) shardedResults[currentShardList].get(currentShardListPosition);
                     list.add(toOrdinal);
                     currentShardListPosition++;
                 }
                 return true;
             }
-            
+
             currentShardListPosition = 0;
             currentShardList++;
         }
-        
+
         return false;
-     }
+    }
 
     public int fromOrdinal() {
         return currentFromOrdinal;

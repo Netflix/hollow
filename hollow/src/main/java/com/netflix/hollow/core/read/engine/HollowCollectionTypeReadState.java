@@ -32,6 +32,7 @@ public abstract class HollowCollectionTypeReadState extends HollowTypeReadState 
     }
 
     public abstract int size(int ordinal);
+
     public abstract HollowOrdinalIterator ordinalIterator(int ordinal);
 
     public abstract HollowCollectionSchema getSchema();

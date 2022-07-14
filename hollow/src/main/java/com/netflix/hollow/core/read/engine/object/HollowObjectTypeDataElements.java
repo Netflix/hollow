@@ -98,14 +98,14 @@ public class HollowObjectTypeDataElements {
 
     private void removeExcludedFieldsFromFixedLengthData() {
         if(bitsPerField.length < bitsPerUnfilteredField.length) {
-            long numBitsRequired = (long)bitsPerRecord * (maxOrdinal + 1);
+            long numBitsRequired = (long) bitsPerRecord * (maxOrdinal + 1);
             FixedLengthElementArray filteredData = new FixedLengthElementArray(memoryRecycler, numBitsRequired);
 
             long currentReadBit = 0;
             long currentWriteBit = 0;
 
-            for(int i=0;i<=maxOrdinal;i++) {
-                for(int j=0;j<bitsPerUnfilteredField.length;j++) {
+            for(int i = 0; i <= maxOrdinal; i++) {
+                for(int j = 0; j < bitsPerUnfilteredField.length; j++) {
                     if(unfilteredFieldIsIncluded[j]) {
                         long value = bitsPerUnfilteredField[j] < 56 ?
                                 fixedLengthData.getElementValue(currentReadBit, bitsPerUnfilteredField[j]) :
@@ -132,7 +132,7 @@ public class HollowObjectTypeDataElements {
 
         int filteredFieldIdx = 0;
 
-        for(int i=0;i<unfilteredSchema.numFields();i++) {
+        for(int i = 0; i < unfilteredSchema.numFields(); i++) {
             int readBitsPerField = VarInt.readVInt(in);
             bitsPerUnfilteredField[i] = readBitsPerField;
             unfilteredFieldIsIncluded[i] = schema.getPosition(unfilteredSchema.getFieldName(i)) != -1;
@@ -151,7 +151,7 @@ public class HollowObjectTypeDataElements {
     private void readVarLengthData(HollowBlobInput in, HollowObjectSchema unfilteredSchema) throws IOException {
         int filteredFieldIdx = 0;
 
-        for(int i=0;i<unfilteredSchema.numFields();i++) {
+        for(int i = 0; i < unfilteredSchema.numFields(); i++) {
             long numBytesInVarLengthData = VarInt.readVLong(in);
 
             if(schema.getPosition(unfilteredSchema.getFieldName(i)) != -1) {
@@ -172,7 +172,7 @@ public class HollowObjectTypeDataElements {
         if(numShards > 1)
             VarInt.readVInt(in); // max ordinal
 
-        for(int i=0;i<numShards;i++) {
+        for(int i = 0; i < numShards; i++) {
             VarInt.readVInt(in); // max ordinal
 
             if(isDelta) {
@@ -182,7 +182,7 @@ public class HollowObjectTypeDataElements {
             }
 
             /// field statistics
-            for(int j=0;j<schema.numFields();j++) {
+            for(int j = 0; j < schema.numFields(); j++) {
                 VarInt.readVInt(in);
             }
 
@@ -190,7 +190,7 @@ public class HollowObjectTypeDataElements {
             FixedLengthData.discardFrom(in);
 
             /// variable length data
-            for(int j=0;j<schema.numFields();j++) {
+            for(int j = 0; j < schema.numFields(); j++) {
                 long numBytesInVarLengthData = VarInt.readVLong(in);
                 while(numBytesInVarLengthData > 0) {
                     numBytesInVarLengthData -= in.skipBytes(numBytesInVarLengthData);
@@ -205,7 +205,7 @@ public class HollowObjectTypeDataElements {
 
     public void destroy() {
         FixedLengthDataFactory.destroy(fixedLengthData, memoryRecycler);
-        for(int i=0;i<varLengthData.length;i++) {
+        for(int i = 0; i < varLengthData.length; i++) {
             if(varLengthData[i] != null)
                 VariableLengthDataFactory.destroy(varLengthData[i]);
         }

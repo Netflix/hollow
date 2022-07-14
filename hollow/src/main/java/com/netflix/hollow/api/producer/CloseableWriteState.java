@@ -66,7 +66,7 @@ final class CloseableWriteState implements HollowProducer.WriteState, AutoClosea
     }
 
     private void ensureNotClosed() {
-        if (closed) {
+        if(closed) {
             throw new IllegalStateException(
                     String.format("Write state operated on after the population stage of a cycle; version=%d",
                             version));

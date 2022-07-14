@@ -73,7 +73,7 @@ public class RestoreWriteStateEngineSetTest extends AbstractStateEngineTest {
     @Test
     public void restoreFailsIfShardConfigurationChanges() throws IOException {
         roundTripSnapshot();
-        
+
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
         HollowSetTypeWriteState misconfiguredTypeState = new HollowSetTypeWriteState(new HollowSetSchema("TestSet", "TestObject"), 16);
         writeStateEngine.addTypeState(misconfiguredTypeState);
@@ -81,13 +81,14 @@ public class RestoreWriteStateEngineSetTest extends AbstractStateEngineTest {
         try {
             writeStateEngine.restoreFrom(readStateEngine);
             Assert.fail("Should have thrown IllegalStateException because shard configuration has changed");
-        } catch(IllegalStateException expected) { }
+        } catch (IllegalStateException expected) {
+        }
     }
 
     private void addRecord(int... ordinals) {
         HollowSetWriteRecord rec = new HollowSetWriteRecord();
 
-        for(int i=0;i<ordinals.length;i++) {
+        for(int i = 0; i < ordinals.length; i++) {
             rec.addElement(ordinals[i], ordinals[i] + 10); // the hash code is deliberately specified here as different from the ordinal.
         }
 

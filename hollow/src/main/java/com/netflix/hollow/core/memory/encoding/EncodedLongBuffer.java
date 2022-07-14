@@ -48,7 +48,8 @@ public class EncodedLongBuffer implements FixedLengthData {
     private BlobByteBuffer bufferView;
     private long maxByteIndex = -1;
 
-    public EncodedLongBuffer() {}
+    public EncodedLongBuffer() {
+    }
 
     /**
      * Returns a new EncodedLongBuffer from deserializing the given input. The value of the first variable length integer
@@ -97,7 +98,7 @@ public class EncodedLongBuffer implements FixedLengthData {
         long whichByte = index >>> 3;
         int whichBit = (int) (index & 0x07);
 
-        if (whichByte + ceil((float) bitsPerElement/8) > this.maxByteIndex + 1) {
+        if(whichByte + ceil((float) bitsPerElement / 8) > this.maxByteIndex + 1) {
             throw new IllegalStateException();
         }
 
@@ -122,7 +123,7 @@ public class EncodedLongBuffer implements FixedLengthData {
 
         int bitsRemaining = 64 - whichBit;
 
-        if (bitsRemaining < bitsPerElement) {
+        if(bitsRemaining < bitsPerElement) {
             whichLong++;
             l |= this.bufferView.getLong(bufferView.position() + whichLong * Long.BYTES) << bitsRemaining;
         }
@@ -136,12 +137,12 @@ public class EncodedLongBuffer implements FixedLengthData {
     }
 
     @Override
-    public void copyBits(FixedLengthData copyFrom, long sourceStartBit, long destStartBit, long numBits){
+    public void copyBits(FixedLengthData copyFrom, long sourceStartBit, long destStartBit, long numBits) {
         throw new UnsupportedOperationException("Not supported in shared-memory mode");
     }
 
     @Override
-    public void incrementMany(long startBit, long increment, long bitsBetweenIncrements, int numIncrements){
+    public void incrementMany(long startBit, long increment, long bitsBetweenIncrements, int numIncrements) {
         throw new UnsupportedOperationException("Not supported in shared-memory mode");
     }
 

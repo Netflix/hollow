@@ -51,13 +51,13 @@ import java.util.Set;
  * 
  */
 public class HollowCompactor {
-    
+
     private final HollowWriteStateEngine writeEngine;
     private final HollowReadStateEngine readEngine;
-    
+
     private long minCandidateHoleCostInBytes;
     private int minCandidateHolePercentage;
-    
+
     /**
      * Provide the state engines on which to operate, and the criteria to identify when a compaction is necessary 
      * 
@@ -68,7 +68,7 @@ public class HollowCompactor {
     public HollowCompactor(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine, CompactionConfig config) {
         this(writeEngine, readEngine, config.getMinCandidateHoleCostInBytes(), config.getMinCandidateHolePercentage());
     }
-    
+
     /**
      * Provide the state engines on which to operate, and the criteria to identify when a compaction is necessary 
      * 
@@ -83,7 +83,7 @@ public class HollowCompactor {
         this.minCandidateHoleCostInBytes = minCandidateHoleCostInBytes;
         this.minCandidateHolePercentage = minCandidateHolePercentage;
     }
-    
+
     /**
      * Determine whether a compaction is necessary, based on the criteria specified in the constructor.
      * @return {@code true} if compaction is necessary, otherwise {@code false}
@@ -91,7 +91,7 @@ public class HollowCompactor {
     public boolean needsCompaction() {
         return !findCompactionTargets().isEmpty();
     }
-    
+
     /**
      * Perform a compaction.  It is expected that:
      * 
@@ -105,36 +105,36 @@ public class HollowCompactor {
      */
     public void compact() {
         Set<String> compactionTargets = findCompactionTargets();
-        
+
         Map<String, BitSet> relocatedOrdinals = new HashMap<String, BitSet>();
         PartialOrdinalRemapper remapper = new PartialOrdinalRemapper();
-        
+
         for(String compactionTarget : compactionTargets) {
             HollowTypeReadState typeState = readEngine.getTypeState(compactionTarget);
             HollowTypeWriteState writeState = writeEngine.getTypeState(compactionTarget);
             BitSet populatedOrdinals = typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
             BitSet typeRelocatedOrdinals = new BitSet(populatedOrdinals.length());
             int populatedCardinality = populatedOrdinals.cardinality();
-            
+
             writeState.addAllObjectsFromPreviousCycle();
-            
+
             int numRelocations = 0;
             int ordinalToRelocate = populatedOrdinals.nextSetBit(populatedCardinality);
             while(ordinalToRelocate != -1) {
                 numRelocations++;
-                ordinalToRelocate = populatedOrdinals.nextSetBit(ordinalToRelocate+1);
+                ordinalToRelocate = populatedOrdinals.nextSetBit(ordinalToRelocate + 1);
             }
-            
+
             HollowRecordCopier copier = HollowRecordCopier.createCopier(typeState);
             IntMap remappedOrdinals = new IntMap(numRelocations);
-            
+
             ordinalToRelocate = populatedOrdinals.length();
             int relocatePosition = -1;
-            
+
             try {
-                
-                for(int i=0;i<numRelocations;i++) {
-                    while(!populatedOrdinals.get(--ordinalToRelocate));
+
+                for(int i = 0; i < numRelocations; i++) {
+                    while(!populatedOrdinals.get(--ordinalToRelocate)) ;
                     relocatePosition = populatedOrdinals.nextClearBit(relocatePosition + 1);
                     typeRelocatedOrdinals.set(ordinalToRelocate);
                     writeState.removeOrdinalFromThisCycle(ordinalToRelocate);
@@ -142,49 +142,49 @@ public class HollowCompactor {
                     writeState.mapOrdinal(rec, relocatePosition, false, true);
                     remappedOrdinals.put(ordinalToRelocate, relocatePosition);
                 }
-                
+
             } finally {
                 writeState.recalculateFreeOrdinals();
             }
-            
+
             remapper.addOrdinalRemapping(compactionTarget, remappedOrdinals);
             relocatedOrdinals.put(compactionTarget, typeRelocatedOrdinals);
         }
-        
+
         /// find the referencing dependents
         TransitiveSetTraverser.addReferencingOutsideClosure(readEngine, relocatedOrdinals);
-        
+
         /// copy all forward except remapped and transitive dependents of remapped
         for(HollowSchema schema : HollowSchemaSorter.dependencyOrderedSchemaList(writeEngine.getSchemas())) {
             if(!compactionTargets.contains(schema.getName())) {
                 HollowTypeWriteState writeState = writeEngine.getTypeState(schema.getName());
-                
+
                 writeState.addAllObjectsFromPreviousCycle();
-                
+
                 BitSet typeRelocatedOrdinals = relocatedOrdinals.get(schema.getName());
                 if(typeRelocatedOrdinals != null) {
                     HollowTypeReadState readState = readEngine.getTypeState(schema.getName());
                     IntMap remappedOrdinals = new IntMap(typeRelocatedOrdinals.cardinality());
-                    
+
                     boolean preserveHashPositions = shouldPreserveHashPositions(schema);
                     HollowRecordCopier copier = HollowRecordCopier.createCopier(readState, remapper, preserveHashPositions);
-                    
+
                     int remapOrdinal = typeRelocatedOrdinals.nextSetBit(0);
                     while(remapOrdinal != -1) {
                         HollowWriteRecord rec = copier.copy(remapOrdinal);
                         int newOrdinal = writeState.add(rec);
                         remappedOrdinals.put(remapOrdinal, newOrdinal);
                         writeState.removeOrdinalFromThisCycle(remapOrdinal);
-                        
+
                         remapOrdinal = typeRelocatedOrdinals.nextSetBit(remapOrdinal + 1);
                     }
-                    
+
                     remapper.addOrdinalRemapping(schema.getName(), remappedOrdinals);
                 }
             }
         }
     }
-    
+
     /**
      * Find candidate types for compaction.  No two types in the returned set will have a dependency relationship, either
      * directly or transitively.  
@@ -199,10 +199,10 @@ public class HollowCompactor {
                     typesToCompact.add(schema.getName());
             }
         }
-        
+
         return typesToCompact;
     }
-    
+
     private boolean isCompactionCandidate(String typeName) {
         HollowTypeReadState typeState = readEngine.getTypeState(typeName);
         BitSet populatedOrdinals = typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
@@ -210,37 +210,37 @@ public class HollowCompactor {
         double numHoles = populatedOrdinals.length() - populatedOrdinals.cardinality();
         double holePercentage = numHoles / numOrdinals * 100d;
         long approximateHoleCostInBytes = typeState.getApproximateHoleCostInBytes();
-        boolean isCompactionCandidate = holePercentage > (double)minCandidateHolePercentage && approximateHoleCostInBytes > minCandidateHoleCostInBytes;
+        boolean isCompactionCandidate = holePercentage > (double) minCandidateHolePercentage && approximateHoleCostInBytes > minCandidateHoleCostInBytes;
         return isCompactionCandidate;
     }
-    
+
     private boolean candidateIsDependentOnAnyTargetedType(String type, Set<String> targetedTypes) {
         for(String targetedType : targetedTypes) {
             if(HollowSchemaSorter.typeIsTransitivelyDependent(readEngine, type, targetedType))
                 return true;
         }
-        
+
         return false;
     }
-    
+
     private boolean shouldPreserveHashPositions(HollowSchema schema) {
         switch(schema.getSchemaType()) {
-        case MAP:
-            return readEngine.getTypesWithDefinedHashCodes().contains(((HollowMapSchema)schema).getKeyType());
-        case SET:
-            return readEngine.getTypesWithDefinedHashCodes().contains(((HollowSetSchema)schema).getElementType());
-        default:
-            return false;
+            case MAP:
+                return readEngine.getTypesWithDefinedHashCodes().contains(((HollowMapSchema) schema).getKeyType());
+            case SET:
+                return readEngine.getTypesWithDefinedHashCodes().contains(((HollowSetSchema) schema).getElementType());
+            default:
+                return false;
         }
     }
-    
+
     /**
      * A configuration that specifies when a type is a candidate for compaction.
      */
     public static class CompactionConfig {
         private final long minCandidateHoleCostInBytes;
         private final int minCandidateHolePercentage;
-        
+
         /**
          * Create a new compaction.  Both of the criteria specified by the following parameters must be met in order for a type
          * to be considered a candidate for compaction.

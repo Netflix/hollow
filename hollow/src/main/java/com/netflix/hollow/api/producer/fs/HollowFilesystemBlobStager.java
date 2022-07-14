@@ -74,7 +74,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
         this.optionalPartConfig = optionalPartConfig;
 
         try {
-            if (!Files.exists(stagingPath))
+            if(!Files.exists(stagingPath))
                 Files.createDirectories(stagingPath);
         } catch (IOException e) {
             throw new RuntimeException("Could not create folder; path=" + this.stagingPath, e);
@@ -129,7 +129,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
 
         @Override
         public void cleanup() {
-            if (path != null) {
+            if(path != null) {
                 try {
                     Files.delete(path);
                 } catch (IOException e) {
@@ -141,10 +141,10 @@ public class HollowFilesystemBlobStager implements BlobStager {
         @Override
         public void write(HollowBlobWriter blobWriter) throws IOException {
             Path parent = this.path.getParent();
-            if (!Files.exists(parent))
+            if(!Files.exists(parent))
                 Files.createDirectories(parent);
 
-            if (!Files.exists(path))
+            if(!Files.exists(path))
                 Files.createFile(path);
 
             try (OutputStream os = new BufferedOutputStream(compressor.compress(Files.newOutputStream(path)))) {
@@ -183,31 +183,31 @@ public class HollowFilesystemBlobStager implements BlobStager {
 
             int randomExtension = new Random().nextInt() & Integer.MAX_VALUE;
 
-            switch (type) {
-            case SNAPSHOT:
-                this.path = dirPath.resolve(String.format("%s-%d.%s", type.prefix, toVersion, Integer.toHexString(randomExtension)));
-                break;
-            case DELTA:
-            case REVERSE_DELTA:
-                this.path = dirPath.resolve(String.format("%s-%d-%d.%s", type.prefix, fromVersion, toVersion, Integer.toHexString(randomExtension)));
-                break;
-            default:
-                throw new IllegalStateException("unknown blob type, type=" + type);
+            switch(type) {
+                case SNAPSHOT:
+                    this.path = dirPath.resolve(String.format("%s-%d.%s", type.prefix, toVersion, Integer.toHexString(randomExtension)));
+                    break;
+                case DELTA:
+                case REVERSE_DELTA:
+                    this.path = dirPath.resolve(String.format("%s-%d-%d.%s", type.prefix, fromVersion, toVersion, Integer.toHexString(randomExtension)));
+                    break;
+                default:
+                    throw new IllegalStateException("unknown blob type, type=" + type);
             }
 
-            if (optionalPartConfig != null) {
-                for (String part : optionalPartConfig.getParts()) {
+            if(optionalPartConfig != null) {
+                for(String part : optionalPartConfig.getParts()) {
                     Path partPath;
-                    switch (type) {
-                    case SNAPSHOT:
-                        partPath = dirPath.resolve(String.format("%s_%s-%d.%s", type.prefix, part, toVersion, Integer.toHexString(randomExtension)));
-                        break;
-                    case DELTA:
-                    case REVERSE_DELTA:
-                        partPath = dirPath.resolve(String.format("%s_%s-%d-%d.%s", type.prefix, part, fromVersion, toVersion, Integer.toHexString(randomExtension)));
-                        break;
-                    default:
-                        throw new IllegalStateException("unknown blob type, type=" + type);
+                    switch(type) {
+                        case SNAPSHOT:
+                            partPath = dirPath.resolve(String.format("%s_%s-%d.%s", type.prefix, part, toVersion, Integer.toHexString(randomExtension)));
+                            break;
+                        case DELTA:
+                        case REVERSE_DELTA:
+                            partPath = dirPath.resolve(String.format("%s_%s-%d-%d.%s", type.prefix, part, fromVersion, toVersion, Integer.toHexString(randomExtension)));
+                            break;
+                        default:
+                            throw new IllegalStateException("unknown blob type, type=" + type);
                     }
                     optionalPartPaths.put(part, partPath);
                 }
@@ -227,18 +227,18 @@ public class HollowFilesystemBlobStager implements BlobStager {
         @Override
         public void write(HollowBlobWriter writer) throws IOException {
             Path parent = this.path.getParent();
-            if (!Files.exists(parent))
+            if(!Files.exists(parent))
                 Files.createDirectories(parent);
 
-            if (!Files.exists(path))
+            if(!Files.exists(path))
                 Files.createFile(path);
 
             ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams optionalPartStreams = null;
 
-            if (optionalPartConfig != null) {
+            if(optionalPartConfig != null) {
                 optionalPartStreams = optionalPartConfig.newStreams();
 
-                for (Map.Entry<String, Path> partPathEntry : optionalPartPaths.entrySet()) {
+                for(Map.Entry<String, Path> partPathEntry : optionalPartPaths.entrySet()) {
                     String partName = partPathEntry.getKey();
                     Path partPath = partPathEntry.getValue();
                     optionalPartStreams.addOutputStream(partName, new BufferedOutputStream(compressor.compress(Files.newOutputStream(partPath))));
@@ -246,21 +246,21 @@ public class HollowFilesystemBlobStager implements BlobStager {
             }
 
             try (OutputStream os = new BufferedOutputStream(compressor.compress(Files.newOutputStream(path)))) {
-                switch (type) {
-                case SNAPSHOT:
-                    writer.writeSnapshot(os, optionalPartStreams);
-                    break;
-                case DELTA:
-                    writer.writeDelta(os, optionalPartStreams);
-                    break;
-                case REVERSE_DELTA:
-                    writer.writeReverseDelta(os, optionalPartStreams);
-                    break;
-                default:
-                    throw new IllegalStateException("unknown type, type=" + type);
+                switch(type) {
+                    case SNAPSHOT:
+                        writer.writeSnapshot(os, optionalPartStreams);
+                        break;
+                    case DELTA:
+                        writer.writeDelta(os, optionalPartStreams);
+                        break;
+                    case REVERSE_DELTA:
+                        writer.writeReverseDelta(os, optionalPartStreams);
+                        break;
+                    default:
+                        throw new IllegalStateException("unknown type, type=" + type);
                 }
             } finally {
-                if (optionalPartStreams != null)
+                if(optionalPartStreams != null)
                     optionalPartStreams.close();
             }
 
@@ -274,7 +274,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
         @Override
         public InputStream newOptionalPartInputStream(String partName) throws IOException {
             Path partPath = optionalPartPaths.get(partName);
-            if (partPath == null)
+            if(partPath == null)
                 throw new IllegalArgumentException("Path for part " + partName + " does not exist.");
 
             return new BufferedInputStream(compressor.decompress(Files.newInputStream(partPath)));
@@ -283,7 +283,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
         @Override
         public Path getOptionalPartPath(String partName) {
             Path partPath = optionalPartPaths.get(partName);
-            if (partPath == null)
+            if(partPath == null)
                 throw new IllegalArgumentException("Path for part " + partName + " does not exist.");
             return partPath;
         }
@@ -291,14 +291,14 @@ public class HollowFilesystemBlobStager implements BlobStager {
         @Override
         public void cleanup() {
             cleanupFile(path);
-            for (Map.Entry<String, Path> entry : optionalPartPaths.entrySet()) {
+            for(Map.Entry<String, Path> entry : optionalPartPaths.entrySet()) {
                 cleanupFile(entry.getValue());
             }
         }
 
         private void cleanupFile(Path path) {
             try {
-                if (path != null)
+                if(path != null)
                     Files.delete(path);
             } catch (IOException e) {
                 throw new RuntimeException("Could not cleanup file: " + this.path.toString(), e);

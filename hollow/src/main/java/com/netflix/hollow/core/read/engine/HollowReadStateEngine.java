@@ -57,7 +57,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     private final boolean listenToAllPopulatedOrdinals;
     private boolean skipTypeShardUpdateWithNoAdditions;
     private ArraySegmentRecycler memoryRecycler;
-    private Map<String,String> headerTags;
+    private Map<String, String> headerTags;
     private Set<String> typesWithDefinedHashCodes = new HashSet<String>();
 
     private long currentRandomizedTag;
@@ -136,28 +136,28 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     void wireTypeStatesToSchemas() {
         for(HollowTypeReadState state : typeStates.values()) {
             switch(state.getSchema().getSchemaType()) {
-            case OBJECT:
-                HollowObjectSchema objSchema = (HollowObjectSchema)state.getSchema();
-                for(int i=0;i<objSchema.numFields();i++) {
-                    if(objSchema.getReferencedType(i) != null)
-                        objSchema.setReferencedTypeState(i, typeStates.get(objSchema.getReferencedType(i)));
-                }
-                break;
-            case LIST:
-                HollowListSchema listSchema = (HollowListSchema)state.getSchema();
-                listSchema.setElementTypeState(typeStates.get(listSchema.getElementType()));
-                break;
-            case SET:
-                HollowSetSchema setSchema = (HollowSetSchema)state.getSchema();
-                setSchema.setElementTypeState(typeStates.get(setSchema.getElementType()));
-                ((HollowSetTypeReadState)state).buildKeyDeriver();
-                break;
-            case MAP:
-                HollowMapSchema mapSchema = (HollowMapSchema)state.getSchema();
-                mapSchema.setKeyTypeState(typeStates.get(mapSchema.getKeyType()));
-                mapSchema.setValueTypeState(typeStates.get(mapSchema.getValueType()));
-                ((HollowMapTypeReadState)state).buildKeyDeriver();
-                break;
+                case OBJECT:
+                    HollowObjectSchema objSchema = (HollowObjectSchema) state.getSchema();
+                    for(int i = 0; i < objSchema.numFields(); i++) {
+                        if(objSchema.getReferencedType(i) != null)
+                            objSchema.setReferencedTypeState(i, typeStates.get(objSchema.getReferencedType(i)));
+                    }
+                    break;
+                case LIST:
+                    HollowListSchema listSchema = (HollowListSchema) state.getSchema();
+                    listSchema.setElementTypeState(typeStates.get(listSchema.getElementType()));
+                    break;
+                case SET:
+                    HollowSetSchema setSchema = (HollowSetSchema) state.getSchema();
+                    setSchema.setElementTypeState(typeStates.get(setSchema.getElementType()));
+                    ((HollowSetTypeReadState) state).buildKeyDeriver();
+                    break;
+                case MAP:
+                    HollowMapSchema mapSchema = (HollowMapSchema) state.getSchema();
+                    mapSchema.setKeyTypeState(typeStates.get(mapSchema.getKeyType()));
+                    mapSchema.setValueTypeState(typeStates.get(mapSchema.getValueType()));
+                    ((HollowMapTypeReadState) state).buildKeyDeriver();
+                    break;
             }
         }
     }
@@ -227,7 +227,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
 
         return schemas;
     }
-    
+
     @Override
     public HollowSchema getSchema(String type) {
         HollowTypeReadState typeState = getTypeState(type);
@@ -237,13 +237,14 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     @Override
     public HollowSchema getNonNullSchema(String type) {
         HollowSchema schema = getSchema(type);
-        if (schema == null) {
+        if(schema == null) {
             throw new SchemaNotFoundException(type, getAllTypes());
         }
         return schema;
     }
 
-    protected void afterInitialization() { }
+    protected void afterInitialization() {
+    }
 
     public void setMissingDataHandler(MissingDataHandler handler) {
         this.missingDataHandler = handler;

@@ -47,15 +47,15 @@ public class HollowDiffRecordFieldExtractor {
             IntList childOrdinals = new IntList();
 
             if(typeDataAccess instanceof HollowObjectTypeDataAccess) {
-                HollowObjectTypeDataAccess objectAccess = (HollowObjectTypeDataAccess)typeDataAccess;
-                int fieldIdx = objectAccess.getSchema().getPosition(fieldIdentifier.getParents().get(level+1).getViaFieldName());
+                HollowObjectTypeDataAccess objectAccess = (HollowObjectTypeDataAccess) typeDataAccess;
+                int fieldIdx = objectAccess.getSchema().getPosition(fieldIdentifier.getParents().get(level + 1).getViaFieldName());
                 childDataAccess = typeDataAccess.getDataAccess().getTypeDataAccess(objectAccess.getSchema().getReferencedType(fieldIdx));
-                for(int i=0;i<ordinals.size();i++)
+                for(int i = 0; i < ordinals.size(); i++)
                     childOrdinals.add(objectAccess.readOrdinal(ordinals.get(i), fieldIdx));
             } else if(typeDataAccess instanceof HollowCollectionTypeDataAccess) {
-                HollowCollectionTypeDataAccess collectionAccess = (HollowCollectionTypeDataAccess)typeDataAccess;
+                HollowCollectionTypeDataAccess collectionAccess = (HollowCollectionTypeDataAccess) typeDataAccess;
                 childDataAccess = typeDataAccess.getDataAccess().getTypeDataAccess(collectionAccess.getSchema().getElementType());
-                for(int i=0;i<ordinals.size();i++) {
+                for(int i = 0; i < ordinals.size(); i++) {
                     HollowOrdinalIterator iter = collectionAccess.ordinalIterator(ordinals.get(i));
                     int childOrdinal = iter.next();
                     while(childOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
@@ -64,11 +64,11 @@ public class HollowDiffRecordFieldExtractor {
                     }
                 }
             } else if(typeDataAccess instanceof HollowMapTypeDataAccess) {
-                HollowMapTypeDataAccess mapAccess = (HollowMapTypeDataAccess)typeDataAccess;
+                HollowMapTypeDataAccess mapAccess = (HollowMapTypeDataAccess) typeDataAccess;
                 boolean isValue = fieldIdentifier.getParents().get(level + 1).getViaFieldName().equals("value");
                 String childType = isValue ? mapAccess.getSchema().getValueType() : mapAccess.getSchema().getKeyType();
                 childDataAccess = typeDataAccess.getDataAccess().getTypeDataAccess(childType);
-                for(int i=0;i<ordinals.size();i++) {
+                for(int i = 0; i < ordinals.size(); i++) {
                     HollowMapEntryOrdinalIterator iter = mapAccess.ordinalIterator(ordinals.get(i));
                     while(iter.next()) {
                         childOrdinals.add(isValue ? iter.getValue() : iter.getKey());
@@ -83,34 +83,34 @@ public class HollowDiffRecordFieldExtractor {
     private List<Object> extractValues(HollowTypeDataAccess typeDataAccess, IntList ordinals, HollowDiffNodeIdentifier fieldIdentifier) {
         List<Object> values = new ArrayList<Object>();
 
-        HollowObjectTypeDataAccess objectAccess = (HollowObjectTypeDataAccess)typeDataAccess;
+        HollowObjectTypeDataAccess objectAccess = (HollowObjectTypeDataAccess) typeDataAccess;
         int fieldIdx = objectAccess.getSchema().getPosition(fieldIdentifier.getViaFieldName());
 
-        for(int i=0;i<ordinals.size();i++) {
+        for(int i = 0; i < ordinals.size(); i++) {
             switch(objectAccess.getSchema().getFieldType(fieldIdx)) {
-            case BOOLEAN:
-                values.add(objectAccess.readBoolean(ordinals.get(i), fieldIdx));
-                break;
-            case BYTES:
-                values.add(objectAccess.readBytes(ordinals.get(i), fieldIdx));
-                break;
-            case DOUBLE:
-                values.add(objectAccess.readDouble(ordinals.get(i), fieldIdx));
-                break;
-            case FLOAT:
-                values.add(objectAccess.readFloat(ordinals.get(i), fieldIdx));
-                break;
-            case INT:
-                values.add(objectAccess.readInt(ordinals.get(i), fieldIdx));
-                break;
-            case LONG:
-                values.add(objectAccess.readLong(ordinals.get(i), fieldIdx));
-                break;
-            case STRING:
-                values.add(objectAccess.readString(ordinals.get(i), fieldIdx));
-                break;
-            case REFERENCE:
-                throw new IllegalArgumentException();
+                case BOOLEAN:
+                    values.add(objectAccess.readBoolean(ordinals.get(i), fieldIdx));
+                    break;
+                case BYTES:
+                    values.add(objectAccess.readBytes(ordinals.get(i), fieldIdx));
+                    break;
+                case DOUBLE:
+                    values.add(objectAccess.readDouble(ordinals.get(i), fieldIdx));
+                    break;
+                case FLOAT:
+                    values.add(objectAccess.readFloat(ordinals.get(i), fieldIdx));
+                    break;
+                case INT:
+                    values.add(objectAccess.readInt(ordinals.get(i), fieldIdx));
+                    break;
+                case LONG:
+                    values.add(objectAccess.readLong(ordinals.get(i), fieldIdx));
+                    break;
+                case STRING:
+                    values.add(objectAccess.readString(ordinals.get(i), fieldIdx));
+                    break;
+                case REFERENCE:
+                    throw new IllegalArgumentException();
             }
         }
 

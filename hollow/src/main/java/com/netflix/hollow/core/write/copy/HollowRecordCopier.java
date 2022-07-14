@@ -67,7 +67,7 @@ public abstract class HollowRecordCopier {
 
     public static HollowRecordCopier createCopier(HollowTypeReadState typeState, HollowSchema destinationSchema, OrdinalRemapper ordinalRemapper, boolean preserveHashPositions) {
         if(typeState instanceof HollowObjectTypeReadState)
-            return new HollowObjectCopier((HollowObjectTypeReadState) typeState, (HollowObjectSchema)destinationSchema, ordinalRemapper);
+            return new HollowObjectCopier((HollowObjectTypeReadState) typeState, (HollowObjectSchema) destinationSchema, ordinalRemapper);
         if(typeState instanceof HollowListTypeReadState)
             return new HollowListCopier((HollowListTypeReadState) typeState, ordinalRemapper);
         if(typeState instanceof HollowSetTypeReadState)

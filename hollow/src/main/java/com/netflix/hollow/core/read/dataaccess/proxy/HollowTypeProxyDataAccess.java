@@ -55,12 +55,12 @@ public abstract class HollowTypeProxyDataAccess implements HollowTypeDataAccess 
     public void setSamplingDirector(HollowSamplingDirector director) {
         currentDataAccess.setSamplingDirector(director);
     }
-    
+
     @Override
     public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         currentDataAccess.setFieldSpecificSamplingDirector(fieldSpec, director);
     }
-    
+
     @Override
     public void ignoreUpdateThreadForSampling(Thread t) {
         currentDataAccess.ignoreUpdateThreadForSampling(t);

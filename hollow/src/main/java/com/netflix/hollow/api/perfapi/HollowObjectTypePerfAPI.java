@@ -24,23 +24,23 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.Arrays;
 
 public abstract class HollowObjectTypePerfAPI extends HollowTypePerfAPI {
-    
+
     protected final HollowObjectTypeDataAccess typeAccess;
 
     protected final int[] fieldIdx;
     protected final long[] refMaskedTypeIdx;
-    
+
     public HollowObjectTypePerfAPI(HollowDataAccess dataAccess, String typeName, HollowPerformanceAPI api, String[] fieldNames) {
         super(typeName, api);
-        
+
         HollowObjectTypeDataAccess typeAccess = (HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(typeName);
-        
+
         this.fieldIdx = new int[fieldNames.length];
         this.refMaskedTypeIdx = new long[fieldNames.length];
-        
+
         if(typeAccess != null) {
             HollowObjectSchema schema = typeAccess.getSchema();
-            for(int i=0;i<fieldNames.length;i++) {
+            for(int i = 0; i < fieldNames.length; i++) {
                 fieldIdx[i] = schema.getPosition(fieldNames[i]);
                 if(fieldIdx[i] != -1 && schema.getFieldType(fieldIdx[i]) == FieldType.REFERENCE) {
                     refMaskedTypeIdx[i] = Ref.toTypeMasked(api.types.getIdx(schema.getReferencedType(fieldIdx[i])));

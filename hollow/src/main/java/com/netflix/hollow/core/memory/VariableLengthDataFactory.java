@@ -9,10 +9,10 @@ public class VariableLengthDataFactory {
 
     public static VariableLengthData get(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
 
-        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
+        if(memoryMode.equals(MemoryMode.ON_HEAP)) {
             return new SegmentedByteArray(memoryRecycler);
 
-        } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
+        } else if(memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
             /// list pointer array
             return new EncodedByteBuffer();
         } else {
@@ -21,9 +21,9 @@ public class VariableLengthDataFactory {
     }
 
     public static void destroy(VariableLengthData vld) {
-        if (vld instanceof SegmentedByteArray) {
+        if(vld instanceof SegmentedByteArray) {
             ((SegmentedByteArray) vld).destroy();
-        } else if (vld instanceof EncodedByteBuffer) {
+        } else if(vld instanceof EncodedByteBuffer) {
             LOG.warning("Destroy operation is a no-op in shared memory mode");
         } else {
             throw new UnsupportedOperationException("Unknown type");

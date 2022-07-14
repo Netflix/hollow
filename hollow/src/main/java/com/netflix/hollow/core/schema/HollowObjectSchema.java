@@ -77,7 +77,7 @@ public class HollowObjectSchema extends HollowSchema {
     }
 
     public int addField(String fieldName, FieldType fieldType, String referencedType) {
-        if (fieldType == FieldType.REFERENCE && referencedType == null) {
+        if(fieldType == FieldType.REFERENCE && referencedType == null) {
             throw new RuntimeException(
                     "When adding a REFERENCE field to a schema, the referenced type must be provided.  Check type: "
                             + getName() + " field: " + fieldName);
@@ -113,7 +113,7 @@ public class HollowObjectSchema extends HollowSchema {
      */
     public int getPosition(String fieldName) {
         Integer index = nameFieldIndexLookup.get(fieldName);
-        if (index == null) {
+        if(index == null) {
             return -1;
         }
         return index;
@@ -164,7 +164,7 @@ public class HollowObjectSchema extends HollowSchema {
 
         int commonFields = 0;
 
-        for (String fieldName : fieldNames) {
+        for(String fieldName : fieldNames) {
             if(otherSchema.getPosition(fieldName) != -1) {
                 commonFields++;
             }
@@ -173,16 +173,16 @@ public class HollowObjectSchema extends HollowSchema {
         PrimaryKey primaryKey = isNullableObjectEquals(this.primaryKey, otherSchema.getPrimaryKey()) ? this.primaryKey : null;
         HollowObjectSchema commonSchema = new HollowObjectSchema(getName(), commonFields, primaryKey);
 
-        for (int i = 0; i < fieldNames.length; i++) {
+        for(int i = 0; i < fieldNames.length; i++) {
             int otherFieldIndex = otherSchema.getPosition(fieldNames[i]);
-             if (otherFieldIndex != -1) {
-                if (fieldTypes[i] != otherSchema.getFieldType(otherFieldIndex)
+            if(otherFieldIndex != -1) {
+                if(fieldTypes[i] != otherSchema.getFieldType(otherFieldIndex)
                         || !referencedTypesEqual(referencedTypes[i], otherSchema.getReferencedType(otherFieldIndex))) {
                     String fieldType = fieldTypes[i] == FieldType.REFERENCE ? referencedTypes[i]
-                        : fieldTypes[i].toString().toLowerCase();
+                            : fieldTypes[i].toString().toLowerCase();
                     String otherFieldType = otherSchema.getFieldType(otherFieldIndex) == FieldType.REFERENCE
-                        ? otherSchema.getReferencedType(otherFieldIndex)
-                        : otherSchema.getFieldType(otherFieldIndex).toString().toLowerCase();
+                            ? otherSchema.getReferencedType(otherFieldIndex)
+                            : otherSchema.getFieldType(otherFieldIndex).toString().toLowerCase();
                     throw new IncompatibleSchemaException(getName(), fieldNames[i], fieldType, otherFieldType);
                 }
 
@@ -200,7 +200,7 @@ public class HollowObjectSchema extends HollowSchema {
 
         int totalFields = otherSchema.numFields();
 
-        for (String fieldName : fieldNames) {
+        for(String fieldName : fieldNames) {
             if(otherSchema.getPosition(fieldName) == -1)
                 totalFields++;
         }
@@ -208,11 +208,11 @@ public class HollowObjectSchema extends HollowSchema {
         PrimaryKey primaryKey = isNullableObjectEquals(this.primaryKey, otherSchema.getPrimaryKey()) ? this.primaryKey : null;
         HollowObjectSchema unionSchema = new HollowObjectSchema(getName(), totalFields, primaryKey);
 
-        for(int i=0;i<fieldNames.length;i++) {
+        for(int i = 0; i < fieldNames.length; i++) {
             unionSchema.addField(fieldNames[i], fieldTypes[i], referencedTypes[i]);
         }
 
-        for(int i=0;i<otherSchema.numFields();i++) {
+        for(int i = 0; i < otherSchema.numFields(); i++) {
             if(getPosition(otherSchema.getFieldName(i)) == -1) {
                 unionSchema.addField(otherSchema.getFieldName(i), otherSchema.getFieldType(i), otherSchema.getReferencedType(i));
             }
@@ -226,7 +226,7 @@ public class HollowObjectSchema extends HollowSchema {
          * This method is preserved for binary compat from before TypeFilter was introduced.
          */
 
-        return filterSchema((TypeFilter)config);
+        return filterSchema((TypeFilter) config);
     }
 
     public HollowObjectSchema filterSchema(TypeFilter filter) {
@@ -234,7 +234,7 @@ public class HollowObjectSchema extends HollowSchema {
 
         int includedFields = 0;
 
-        for(int i=0;i<numFields();i++) {
+        for(int i = 0; i < numFields(); i++) {
             String field = getFieldName(i);
             if(filter.includes(type, field))
                 includedFields++;
@@ -242,7 +242,7 @@ public class HollowObjectSchema extends HollowSchema {
 
         HollowObjectSchema filteredSchema = new HollowObjectSchema(getName(), includedFields, primaryKey);
 
-        for(int i=0;i<numFields();i++) {
+        for(int i = 0; i < numFields(); i++) {
             String field = getFieldName(i);
             if(filter.includes(type, field))
                 filteredSchema.addField(field, getFieldType(i), getReferencedType(i));
@@ -264,7 +264,7 @@ public class HollowObjectSchema extends HollowSchema {
 
     @Override
     public boolean equals(Object other) {
-        if (this == other)
+        if(this == other)
             return true;
         if(!(other instanceof HollowObjectSchema))
             return false;
@@ -274,10 +274,10 @@ public class HollowObjectSchema extends HollowSchema {
         if(otherSchema.numFields() != numFields())
             return false;
 
-        if (!isNullableObjectEquals(primaryKey, otherSchema.getPrimaryKey()))
+        if(!isNullableObjectEquals(primaryKey, otherSchema.getPrimaryKey()))
             return false;
 
-        for(int i=0;i<numFields();i++) {
+        for(int i = 0; i < numFields(); i++) {
             if(getFieldType(i) != otherSchema.getFieldType(i))
                 return false;
             if(getFieldType(i) == FieldType.REFERENCE && !getReferencedType(i).equals(otherSchema.getReferencedType(i)))
@@ -304,11 +304,11 @@ public class HollowObjectSchema extends HollowSchema {
         StringBuilder builder = new StringBuilder();
 
         builder.append(getName());
-        if (primaryKey != null) {
+        if(primaryKey != null) {
             builder.append(" @PrimaryKey(");
-            if (primaryKey.numFields() > 0) {
+            if(primaryKey.numFields() > 0) {
                 builder.append(primaryKey.getFieldPath(0));
-                for (int i = 1; i < primaryKey.numFields(); i++) {
+                for(int i = 1; i < primaryKey.numFields(); i++) {
                     builder.append(", ").append(primaryKey.getFieldPath(i));
                 }
             }
@@ -316,7 +316,7 @@ public class HollowObjectSchema extends HollowSchema {
         }
 
         builder.append(" {\n");
-        for(int i=0;i<numFields();i++) {
+        for(int i = 0; i < numFields(); i++) {
             builder.append("\t");
             if(getFieldType(i) == FieldType.REFERENCE) {
                 builder.append(getReferencedType(i));
@@ -334,21 +334,21 @@ public class HollowObjectSchema extends HollowSchema {
     public void writeTo(OutputStream os) throws IOException {
         DataOutputStream dos = new DataOutputStream(os);
 
-        if (primaryKey != null)
+        if(primaryKey != null)
             dos.write(SchemaType.OBJECT.getTypeIdWithPrimaryKey());
         else
             dos.write(SchemaType.OBJECT.getTypeId());
 
         dos.writeUTF(getName());
-        if (primaryKey != null) {
+        if(primaryKey != null) {
             VarInt.writeVInt(dos, primaryKey.numFields());
-            for (int i = 0; i < primaryKey.numFields(); i++) {
+            for(int i = 0; i < primaryKey.numFields(); i++) {
                 dos.writeUTF(primaryKey.getFieldPath(i));
             }
         }
 
         dos.writeShort(size);
-        for(int i=0;i<size;i++) {
+        for(int i = 0; i < size; i++) {
             dos.writeUTF(fieldNames[i]);
             dos.writeUTF(fieldTypes[i].name());
             if(fieldTypes[i] == FieldType.REFERENCE)

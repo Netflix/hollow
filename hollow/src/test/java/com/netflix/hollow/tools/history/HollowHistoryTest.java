@@ -46,7 +46,7 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
 
     private static final String B_TYPE = "B";
     private static final String B_FN_PREFIX = "b";
-    
+
     @Override
     @Before
     public void setUp() {
@@ -177,7 +177,7 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
             assertRecord(retrieveAddedRecord(history, 3L, B_TYPE, 2), B_FN_PREFIX, 2, 3);
         }
     }
-    
+
     @Test
     public void testRemoveType() throws IOException {
         addRecord(1, 2, 3);
@@ -376,14 +376,14 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
 
     private void setupKeyIndex(HollowReadStateEngine stateEngine, HollowHistory history) {
         HollowHistoryKeyIndex keyIndex = history.getKeyIndex();
-        for (String type : stateEngine.getAllTypes()) {
+        for(String type : stateEngine.getAllTypes()) {
 
             HollowTypeReadState typeState = stateEngine.getTypeState(type);
             HollowSchema schema = typeState.getSchema();
-            if (schema instanceof HollowObjectSchema) {
+            if(schema instanceof HollowObjectSchema) {
                 HollowObjectSchema oSchema = (HollowObjectSchema) schema;
                 PrimaryKey pKey = oSchema.getPrimaryKey();
-                if (pKey == null) continue;
+                if(pKey == null) continue;
 
                 keyIndex.indexTypeField(pKey, stateEngine);
                 System.out.println("Setup KeyIndex: type=" + type + "\t" + pKey);
@@ -444,9 +444,9 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
 
         writeStateEngine.add("A", rec);
     }
-    
+
     private void assertRecord(HollowObject obj, String fnPrefix, int... vals) {
-        for (int i = 0; i < vals.length; i++) {
+        for(int i = 0; i < vals.length; i++) {
             String fn = fnPrefix + (i + 1);
             Assert.assertEquals(vals[i], obj.getInt(fn));
         }
@@ -454,12 +454,12 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
 
     private void addRecord(HollowObjectSchema schema, String fnPrefix, int ... vals) {
         String bType = schema.getName();
-        if (writeStateEngine.getTypeState(bType) == null) {
+        if(writeStateEngine.getTypeState(bType) == null) {
             writeStateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
         }
 
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
-        for (int i = 0; i < vals.length; i++) {
+        for(int i = 0; i < vals.length; i++) {
             String fn = fnPrefix + (i + 1);
             rec.setInt(fn, vals[i]);
         }

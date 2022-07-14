@@ -50,7 +50,7 @@ public class HollowJsonAdapterPrimaryKeyFinder {
 
         this.keyElementArray = new Object[keyFieldPaths.length];
         this.keyFieldPathPositions = new HashMap<String, Integer>();
-        for(int i=0;i<keyFieldPaths.length;i++) {
+        for(int i = 0; i < keyFieldPaths.length; i++) {
             keyFieldPathPositions.put(keyFieldPaths[i], Integer.valueOf(i));
         }
     }
@@ -63,7 +63,7 @@ public class HollowJsonAdapterPrimaryKeyFinder {
 
     public Object[] findKey(JsonParser parser) throws IOException {
         parser.nextToken();
-        HollowObjectSchema schema = (HollowObjectSchema)hollowSchemas.get(typeName);
+        HollowObjectSchema schema = (HollowObjectSchema) hollowSchemas.get(typeName);
         addObject(parser, schema, new StringBuilder());
         return keyElementArray;
     }
@@ -73,7 +73,7 @@ public class HollowJsonAdapterPrimaryKeyFinder {
 
         String fieldName = null;
         try {
-            while (token != JsonToken.END_OBJECT) {
+            while(token != JsonToken.END_OBJECT) {
                 fieldName = parser.getCurrentName();
                 addObjectField(parser, token, schema, fieldName, currentFieldPath);
                 token = parser.nextToken();
@@ -105,7 +105,7 @@ public class HollowJsonAdapterPrimaryKeyFinder {
                         HollowSchema referencedSchema = hollowSchemas.get(referencedType);
 
                         if(referencedSchema.getSchemaType() == SchemaType.OBJECT)
-                            addObject(parser, (HollowObjectSchema)referencedSchema, currentFieldPath);
+                            addObject(parser, (HollowObjectSchema) referencedSchema, currentFieldPath);
                         else
                             skipObject(parser);
 
@@ -116,69 +116,69 @@ public class HollowJsonAdapterPrimaryKeyFinder {
                     case VALUE_NUMBER_FLOAT:
                     case VALUE_STRING:
                         switch(schema.getFieldType(fieldPosition)) {
-                        case BOOLEAN:
-                            if(keyFieldPosition != null)
-                                keyElementArray[keyFieldPosition.intValue()] = Boolean.valueOf(parser.getBooleanValue());
-                            break;
-                        case INT:
-                            if(keyFieldPosition != null)
-                                keyElementArray[keyFieldPosition.intValue()] = Integer.valueOf(parser.getIntValue());
-                            break;
-                        case LONG:
-                            if(keyFieldPosition != null)
-                                keyElementArray[keyFieldPosition.intValue()] = Long.valueOf(parser.getLongValue());
-                            break;
-                        case DOUBLE:
-                            if(keyFieldPosition != null)
-                                keyElementArray[keyFieldPosition.intValue()] = Double.valueOf(parser.getDoubleValue());
-                            break;
-                        case FLOAT:
-                            if(keyFieldPosition != null)
-                                keyElementArray[keyFieldPosition.intValue()] = Float.valueOf(parser.getFloatValue());
-                            break;
-                        case STRING:
-                            if(keyFieldPosition != null)
-                                keyElementArray[keyFieldPosition.intValue()] = parser.getValueAsString();
-                            break;
-                        case REFERENCE:
-                            if(keyFieldPosition != null)
-                                throw new IllegalStateException("Key elements must not be REFERENCE");
-                            HollowObjectSchema subSchema = (HollowObjectSchema) hollowSchemas.get(schema.getReferencedType(fieldPosition));
-                            currentFieldPath.append(".").append(subSchema.getFieldName(0));
-                            keyFieldPosition = keyFieldPathPositions.get(currentFieldPath.toString());
-                            if(keyFieldPosition != null) {
-                                switch(subSchema.getFieldType(0)) {
-                                case BOOLEAN:
-                                    if(keyFieldPosition != null)
-                                        keyElementArray[keyFieldPosition.intValue()] = Boolean.valueOf(parser.getBooleanValue());
-                                    break;
-                                case INT:
-                                    if(keyFieldPosition != null)
-                                        keyElementArray[keyFieldPosition.intValue()] = Integer.valueOf(parser.getIntValue());
-                                    break;
-                                case LONG:
-                                    if(keyFieldPosition != null)
-                                        keyElementArray[keyFieldPosition.intValue()] = Long.valueOf(parser.getLongValue());
-                                    break;
-                                case DOUBLE:
-                                    if(keyFieldPosition != null)
-                                        keyElementArray[keyFieldPosition.intValue()] = Double.valueOf(parser.getDoubleValue());
-                                    break;
-                                case FLOAT:
-                                    if(keyFieldPosition != null)
-                                        keyElementArray[keyFieldPosition.intValue()] = Float.valueOf(parser.getFloatValue());
-                                    break;
-                                case STRING:
-                                    if(keyFieldPosition != null)
-                                        keyElementArray[keyFieldPosition.intValue()] = parser.getValueAsString();
-                                    break;
-                                case REFERENCE:
+                            case BOOLEAN:
+                                if(keyFieldPosition != null)
+                                    keyElementArray[keyFieldPosition.intValue()] = Boolean.valueOf(parser.getBooleanValue());
+                                break;
+                            case INT:
+                                if(keyFieldPosition != null)
+                                    keyElementArray[keyFieldPosition.intValue()] = Integer.valueOf(parser.getIntValue());
+                                break;
+                            case LONG:
+                                if(keyFieldPosition != null)
+                                    keyElementArray[keyFieldPosition.intValue()] = Long.valueOf(parser.getLongValue());
+                                break;
+                            case DOUBLE:
+                                if(keyFieldPosition != null)
+                                    keyElementArray[keyFieldPosition.intValue()] = Double.valueOf(parser.getDoubleValue());
+                                break;
+                            case FLOAT:
+                                if(keyFieldPosition != null)
+                                    keyElementArray[keyFieldPosition.intValue()] = Float.valueOf(parser.getFloatValue());
+                                break;
+                            case STRING:
+                                if(keyFieldPosition != null)
+                                    keyElementArray[keyFieldPosition.intValue()] = parser.getValueAsString();
+                                break;
+                            case REFERENCE:
+                                if(keyFieldPosition != null)
                                     throw new IllegalStateException("Key elements must not be REFERENCE");
-                                default:
+                                HollowObjectSchema subSchema = (HollowObjectSchema) hollowSchemas.get(schema.getReferencedType(fieldPosition));
+                                currentFieldPath.append(".").append(subSchema.getFieldName(0));
+                                keyFieldPosition = keyFieldPathPositions.get(currentFieldPath.toString());
+                                if(keyFieldPosition != null) {
+                                    switch(subSchema.getFieldType(0)) {
+                                        case BOOLEAN:
+                                            if(keyFieldPosition != null)
+                                                keyElementArray[keyFieldPosition.intValue()] = Boolean.valueOf(parser.getBooleanValue());
+                                            break;
+                                        case INT:
+                                            if(keyFieldPosition != null)
+                                                keyElementArray[keyFieldPosition.intValue()] = Integer.valueOf(parser.getIntValue());
+                                            break;
+                                        case LONG:
+                                            if(keyFieldPosition != null)
+                                                keyElementArray[keyFieldPosition.intValue()] = Long.valueOf(parser.getLongValue());
+                                            break;
+                                        case DOUBLE:
+                                            if(keyFieldPosition != null)
+                                                keyElementArray[keyFieldPosition.intValue()] = Double.valueOf(parser.getDoubleValue());
+                                            break;
+                                        case FLOAT:
+                                            if(keyFieldPosition != null)
+                                                keyElementArray[keyFieldPosition.intValue()] = Float.valueOf(parser.getFloatValue());
+                                            break;
+                                        case STRING:
+                                            if(keyFieldPosition != null)
+                                                keyElementArray[keyFieldPosition.intValue()] = parser.getValueAsString();
+                                            break;
+                                        case REFERENCE:
+                                            throw new IllegalStateException("Key elements must not be REFERENCE");
+                                        default:
+                                    }
                                 }
-                            }
 
-                        default:
+                            default:
                         }
                     case VALUE_NULL:
                         break;
@@ -195,7 +195,7 @@ public class HollowJsonAdapterPrimaryKeyFinder {
         JsonToken token = parser.nextToken();
 
         try {
-            while (token != JsonToken.END_OBJECT) {
+            while(token != JsonToken.END_OBJECT) {
                 skipObjectField(parser, token);
                 token = parser.nextToken();
             }
@@ -221,19 +221,19 @@ public class HollowJsonAdapterPrimaryKeyFinder {
 
     private void skipObjectField(JsonParser parser, JsonToken token) throws IOException {
         switch(token) {
-        case START_ARRAY:
-            skipSubArray(parser);
-            break;
-        case START_OBJECT:
-            skipObject(parser);
-            break;
-        case VALUE_FALSE:
-        case VALUE_TRUE:
-        case VALUE_NUMBER_INT:
-        case VALUE_NUMBER_FLOAT:
-        case VALUE_STRING:
-        case VALUE_NULL:
-        default:
+            case START_ARRAY:
+                skipSubArray(parser);
+                break;
+            case START_OBJECT:
+                skipObject(parser);
+                break;
+            case VALUE_FALSE:
+            case VALUE_TRUE:
+            case VALUE_NUMBER_INT:
+            case VALUE_NUMBER_FLOAT:
+            case VALUE_STRING:
+            case VALUE_NULL:
+            default:
         }
     }
 

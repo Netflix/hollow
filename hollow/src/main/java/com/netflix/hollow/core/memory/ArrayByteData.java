@@ -32,7 +32,7 @@ public class ArrayByteData implements ByteData {
 
     @Override
     public byte get(long position) {
-        return data[(int)position];
+        return data[(int) position];
     }
 
     @Override

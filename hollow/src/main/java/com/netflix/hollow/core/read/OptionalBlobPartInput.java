@@ -38,7 +38,7 @@ public class OptionalBlobPartInput implements Closeable {
         this.inputsByPartName = new HashMap<>();
         this.streamsToClose = new ArrayList<>();
     }
-    
+
     public void addInput(String partName, File file) {
         inputsByPartName.put(partName, file);
     }
@@ -51,42 +51,42 @@ public class OptionalBlobPartInput implements Closeable {
     public File getFile(String partName) {
         Object f = inputsByPartName.get(partName);
         if(f instanceof File)
-            return (File)f;
+            return (File) f;
         throw new UnsupportedOperationException();
     }
-    
+
     public InputStream getInputStream(String partName) throws IOException {
         Object o = inputsByPartName.get(partName);
         if(o instanceof File) {
-            InputStream stream = new BufferedInputStream(new FileInputStream((File)o));
+            InputStream stream = new BufferedInputStream(new FileInputStream((File) o));
             streamsToClose.add(stream);
             return stream;
         }
-        return (InputStream)o;
+        return (InputStream) o;
     }
-    
+
     public Set<String> getPartNames() {
         return inputsByPartName.keySet();
     }
-    
+
     public Map<String, HollowBlobInput> getInputsByPartName(MemoryMode mode) throws IOException {
         Map<String, HollowBlobInput> map = new HashMap<>(inputsByPartName.size());
-        
+
         for(String part : getPartNames()) {
             map.put(part, HollowBlobInput.modeBasedSelector(mode, this, part));
         }
-        
+
         return map;
 
     }
-    
+
     public Map<String, InputStream> getInputStreamsByPartName() throws IOException {
         Map<String, InputStream> map = new HashMap<>(inputsByPartName.size());
-        
+
         for(String part : getPartNames()) {
             map.put(part, getInputStream(part));
         }
-        
+
         return map;
     }
 
@@ -96,11 +96,11 @@ public class OptionalBlobPartInput implements Closeable {
         for(InputStream is : streamsToClose) {
             try {
                 is.close();
-            } catch(IOException ex) {
+            } catch (IOException ex) {
                 thrownException = ex;
             }
         }
-        
+
         if(thrownException != null)
             throw thrownException;
     }

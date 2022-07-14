@@ -28,7 +28,8 @@ import java.lang.annotation.Target;
  * @see com.netflix.hollow.core.index.FieldPaths
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target( {ElementType.FIELD, ElementType.METHOD}) public @interface FieldPath {
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface FieldPath {
     /**
      * @return the field path, if empty then the path is derived from the field or method name.
      */

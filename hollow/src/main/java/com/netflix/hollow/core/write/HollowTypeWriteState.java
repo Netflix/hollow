@@ -42,7 +42,7 @@ public abstract class HollowTypeWriteState {
     protected final HollowSchema schema;
 
     protected final ByteArrayOrdinalMap ordinalMap;
-    
+
     protected int numShards;
 
     protected HollowSchema restoredSchema;
@@ -55,7 +55,7 @@ public abstract class HollowTypeWriteState {
     private final ThreadLocal<ByteDataArray> serializedScratchSpace;
 
     protected HollowWriteStateEngine stateEngine;
-    
+
     private boolean wroteData = false;
 
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
@@ -65,11 +65,11 @@ public abstract class HollowTypeWriteState {
         this.currentCyclePopulated = new ThreadSafeBitSet();
         this.previousCyclePopulated = new ThreadSafeBitSet();
         this.numShards = numShards;
-        
+
         if(numShards != -1 && ((numShards & (numShards - 1)) != 0 || numShards <= 0))
             throw new IllegalArgumentException("Number of shards must be a power of 2!  Check configuration for type " + schema.getName());
     }
-    
+
     /**
      * Add an object to this state.  We will create a serialized representation of this object, then
      * assign or retrieve the ordinal for this serialized representation in our {@link ByteArrayOrdinalMap}.
@@ -108,7 +108,7 @@ public abstract class HollowTypeWriteState {
         int ordinal;
 
         if(restoredSchema instanceof HollowObjectSchema) {
-            ((HollowObjectWriteRecord)rec).writeDataTo(scratch, (HollowObjectSchema)restoredSchema);
+            ((HollowObjectWriteRecord) rec).writeDataTo(scratch, (HollowObjectSchema) restoredSchema);
             int preferredOrdinal = restoredMap.get(scratch);
             scratch.reset();
             rec.writeDataTo(scratch);
@@ -155,14 +155,14 @@ public abstract class HollowTypeWriteState {
 
         currentCyclePopulated = ThreadSafeBitSet.orAll(previousCyclePopulated, currentCyclePopulated);
     }
-    
+
     public void addOrdinalFromPreviousCycle(int ordinal) {
         if(!ordinalMap.isReadyForAddingObjects())
             throw new RuntimeException("The HollowWriteStateEngine is not ready to add more Objects.  Did you remember to call stateEngine.prepareForNextCycle()?");
 
         if(!previousCyclePopulated.get(ordinal))
             throw new IllegalArgumentException("Ordinal " + ordinal + " was not present in the previous cycle");
-        
+
         currentCyclePopulated.set(ordinal);
     }
 
@@ -172,14 +172,14 @@ public abstract class HollowTypeWriteState {
 
         currentCyclePopulated.clear(ordinalToRemove);
     }
-    
+
     public void removeAllOrdinalsFromThisCycle() {
         if(!ordinalMap.isReadyForAddingObjects())
             throw new RuntimeException("The HollowWriteStateEngine is not ready to add more Objects.  Did you remember to call stateEngine.prepareForNextCycle()?");
 
         currentCyclePopulated.clearAll();
     }
-    
+
     /**
      * Put an object in this state with a specific ordinal, and update the currentCyclePopulated bitset.  
      * 
@@ -208,7 +208,7 @@ public abstract class HollowTypeWriteState {
             currentCyclePopulated.set(newOrdinal);
         scratch.reset();
     }
-    
+
     /**
      * Correct the free ordinal list after using mapOrdinal()
      */
@@ -223,20 +223,20 @@ public abstract class HollowTypeWriteState {
     public ThreadSafeBitSet getPreviousCyclePopulatedBitSet() {
         return previousCyclePopulated;
     }
-    
+
     public HollowSchema getSchema() {
         return schema;
     }
-    
+
     int getNumShards() {
         return numShards;
     }
-    
+
     public void setNumShards(int numShards) {
         if(this.numShards == -1) {
             this.numShards = numShards;
         } else if(this.numShards != numShards) {
-            throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + this.numShards + ".  Cannot reset to " + numShards + "."); 
+            throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + this.numShards + ".  Cannot reset to " + numShards + ".");
         }
     }
 
@@ -282,11 +282,11 @@ public abstract class HollowTypeWriteState {
         ordinalMap.prepareForWrite();
         wroteData = true;
     }
-    
+
     public boolean hasChangedSinceLastCycle() {
         return !currentCyclePopulated.equals(previousCyclePopulated);
     }
-    
+
     public boolean isRestored() {
         return ordinalMap.getUnusedPreviousOrdinals() != null;
     }
@@ -302,17 +302,17 @@ public abstract class HollowTypeWriteState {
     public abstract void calculateReverseDelta();
 
     public abstract void writeReverseDelta(DataOutputStream dos) throws IOException;
-    
+
     protected void restoreFrom(HollowTypeReadState readState) {
         if(previousCyclePopulated.cardinality() != 0 || currentCyclePopulated.cardinality() != 0)
             throw new IllegalStateException("Attempting to restore into a non-empty state (type " + schema.getName() + ")");
-        
+
         PopulatedOrdinalListener listener = readState.getListener(PopulatedOrdinalListener.class);
         BitSet populatedOrdinals = listener.getPopulatedOrdinals();
 
         restoredReadState = readState;
         if(schema instanceof HollowObjectSchema)
-            restoredSchema = ((HollowObjectSchema)schema).findCommonSchema((HollowObjectSchema)readState.getSchema());
+            restoredSchema = ((HollowObjectSchema) schema).findCommonSchema((HollowObjectSchema) readState.getSchema());
         else
             restoredSchema = readState.getSchema();
         HollowRecordCopier copier = HollowRecordCopier.createCopier(restoredReadState, restoredSchema);
@@ -337,7 +337,7 @@ public abstract class HollowTypeWriteState {
 
         ByteDataArray scratch = scratch();
         if(rec instanceof HollowHashableWriteRecord)
-            ((HollowHashableWriteRecord)rec).writeDataTo(scratch, hashBehavior);
+            ((HollowHashableWriteRecord) rec).writeDataTo(scratch, hashBehavior);
         else
             rec.writeDataTo(scratch);
 
@@ -358,11 +358,11 @@ public abstract class HollowTypeWriteState {
         }
         return scratch;
     }
-    
+
     void setStateEngine(HollowWriteStateEngine writeEngine) {
         this.stateEngine = writeEngine;
     }
-    
+
     public HollowWriteStateEngine getStateEngine() {
         return stateEngine;
     }

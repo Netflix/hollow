@@ -33,9 +33,9 @@ import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 public class GenericHollowSet extends HollowSet<HollowRecord> {
 
     public GenericHollowSet(HollowDataAccess dataAccess, String type, int ordinal) {
-        this((HollowSetTypeDataAccess)dataAccess.getTypeDataAccess(type, ordinal), ordinal);
+        this((HollowSetTypeDataAccess) dataAccess.getTypeDataAccess(type, ordinal), ordinal);
     }
-    
+
     public GenericHollowSet(HollowSetTypeDataAccess dataAccess, int ordinal) {
         this(new HollowSetLookupDelegate<HollowRecord>(dataAccess), ordinal);
     }
@@ -43,23 +43,23 @@ public class GenericHollowSet extends HollowSet<HollowRecord> {
     public GenericHollowSet(HollowSetDelegate<HollowRecord> delegate, int ordinal) {
         super(delegate, ordinal);
     }
-    
+
     public Iterable<GenericHollowObject> objects() {
         return new GenericHollowIterable<GenericHollowObject>(this);
     }
-    
+
     public Iterable<GenericHollowList> lists() {
         return new GenericHollowIterable<GenericHollowList>(this);
     }
-    
+
     public Iterable<GenericHollowSet> sets() {
         return new GenericHollowIterable<GenericHollowSet>(this);
     }
-    
+
     public Iterable<GenericHollowMap> maps() {
         return new GenericHollowIterable<GenericHollowMap>(this);
     }
-    
+
     @Override
     public HollowRecord instantiateElement(int elementOrdinal) {
         return GenericHollowRecordHelper.instantiate(getTypeDataAccess().getDataAccess(), getSchema().getElementType(), elementOrdinal);

@@ -83,8 +83,8 @@ public class MissingMapTest extends AbstractStateEngineTest {
         @Override
         public HollowMapEntryOrdinalIterator handleMapOrdinalIterator(String type, int ordinal) {
             return new HollowMapEntryOrdinalIterator() {
-                private final int keys[] = { 2, 3 };
-                private final int values[] = { 200, 300 };
+                private final int keys[] = {2, 3};
+                private final int values[] = {200, 300};
                 private int counter = -1;
 
                 @Override
@@ -122,6 +122,7 @@ public class MissingMapTest extends AbstractStateEngineTest {
 
 
     @Override
-    protected void initializeTypeStates() { }
+    protected void initializeTypeStates() {
+    }
 
 }

@@ -24,7 +24,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
  * in order to lookup matching records in these hashtable data structures.
  */
 public class SetMapKeyHasher {
-    
+
     /**
      * Hash a key
      * 
@@ -35,14 +35,14 @@ public class SetMapKeyHasher {
     public static int hash(Object key[], FieldType fieldType[]) {
         int hash = 0;
 
-        for (int i = 0; i < key.length; i++) {
+        for(int i = 0; i < key.length; i++) {
             hash *= 31;
             hash ^= hash(key[i], fieldType[i]);
         }
 
         return hash;
     }
-    
+
     /**
      * Hash a single key field
      *
@@ -52,26 +52,26 @@ public class SetMapKeyHasher {
      */
     public static int hash(Object key, FieldType fieldType) {
         switch(fieldType) {
-        case INT:
-            return HashCodes.hashInt(((Integer)key).intValue());
-        case LONG:
-            long longVal = ((Long)key).longValue();
-            return HashCodes.hashInt((int)(longVal ^ (longVal >>> 32)));
-        case REFERENCE:
-            return HashCodes.hashInt(((Integer)key).intValue());
-        case BYTES:
-            return HashCodes.hashInt(HashCodes.hashCode((byte[])key));
-        case STRING:
-            return HashCodes.hashInt(key.hashCode());
-        case BOOLEAN:
-            return HashCodes.hashInt(((Boolean)key).booleanValue() ? 1231 : 1237);
-        case DOUBLE:
-            long longBits = Double.doubleToRawLongBits(((Double)key).doubleValue());
-            return HashCodes.hashInt((int)(longBits ^ (longBits >>> 32)));
-        case FLOAT:
-            return HashCodes.hashInt(Float.floatToRawIntBits(((Float)key).floatValue()));
-        default:
-            throw new IllegalArgumentException("Unknown field type: " + fieldType);
+            case INT:
+                return HashCodes.hashInt(((Integer) key).intValue());
+            case LONG:
+                long longVal = ((Long) key).longValue();
+                return HashCodes.hashInt((int) (longVal ^ (longVal >>> 32)));
+            case REFERENCE:
+                return HashCodes.hashInt(((Integer) key).intValue());
+            case BYTES:
+                return HashCodes.hashInt(HashCodes.hashCode((byte[]) key));
+            case STRING:
+                return HashCodes.hashInt(key.hashCode());
+            case BOOLEAN:
+                return HashCodes.hashInt(((Boolean) key).booleanValue() ? 1231 : 1237);
+            case DOUBLE:
+                long longBits = Double.doubleToRawLongBits(((Double) key).doubleValue());
+                return HashCodes.hashInt((int) (longBits ^ (longBits >>> 32)));
+            case FLOAT:
+                return HashCodes.hashInt(Float.floatToRawIntBits(((Float) key).floatValue()));
+            default:
+                throw new IllegalArgumentException("Unknown field type: " + fieldType);
         }
     }
 

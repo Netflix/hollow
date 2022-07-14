@@ -65,7 +65,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      * @param listener the listener to remove
      */
     public void removeListener(HollowTypeStateListener listener) {
-        if (stateListeners.length == 0)
+        if(stateListeners.length == 0)
             return;
 
         stateListeners = Stream.of(stateListeners)
@@ -88,14 +88,14 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      */
     @SuppressWarnings("unchecked")
     public <T extends HollowTypeStateListener> T getListener(Class<T> listenerClazz) {
-        for (HollowTypeStateListener listener : stateListeners) {
-            if (listenerClazz.isAssignableFrom(listener.getClass())) {
+        for(HollowTypeStateListener listener : stateListeners) {
+            if(listenerClazz.isAssignableFrom(listener.getClass())) {
                 return (T) listener;
             }
         }
         return null;
     }
-    
+
     /**
      * Returns the BitSet containing the currently populated ordinals in this type state.
      * <p>
@@ -105,7 +105,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     public BitSet getPopulatedOrdinals() {
         return getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
     }
-    
+
     /**
      * Returns the BitSet containing the populated ordinals in this type state prior to the previous delta transition.
      * <p>
@@ -122,6 +122,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     public abstract int maxOrdinal();
 
     public abstract void readSnapshot(HollowBlobInput in, ArraySegmentRecycler recycler) throws IOException;
+
     public abstract void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException;
 
     public HollowSchema getSchema() {
@@ -176,17 +177,17 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     public HollowTypeReadState getTypeState() {
         return this;
     }
-    
+
     /**
      * @return an approximate accounting of the current heap footprint occupied by this type state.
      */
     public abstract long getApproximateHeapFootprintInBytes();
-    
+
     /**
      * @return an approximate accounting of the current cost of the "ordinal holes" in this type state.
      */
     public abstract long getApproximateHoleCostInBytes();
-    
+
     /**
      * @return The number of shards into which this type is split.  Sharding is transparent, so this has no effect on normal usage.
      */

@@ -85,7 +85,7 @@ public class HollowDiffMapCountingNode extends HollowDiffCountingNode {
 
         keyFilter.filter(traversalFromKeyOrdinals, traversalToKeyOrdinals);
         valueFilter.filter(traversalFromValueOrdinals, traversalToValueOrdinals);
-        
+
         int score = 0;
 
         if(keyFilter.getUnmatchedFromOrdinals().size() != 0 || keyFilter.getUnmatchedToOrdinals().size() != 0)
@@ -99,19 +99,19 @@ public class HollowDiffMapCountingNode extends HollowDiffCountingNode {
         if(valueRequiresTraversalForMissingFields)
             if(valueFilter.getMatchedFromOrdinals().size() != 0 || valueFilter.getMatchedToOrdinals().size() != 0)
                 score += valueNode.traverseMissingFields(valueFilter.getMatchedFromOrdinals(), valueFilter.getMatchedToOrdinals());
-        
+
         return score;
     }
 
     @Override
     public int traverseMissingFields(IntList fromOrdinals, IntList toOrdinals) {
         fillTraversalLists(fromOrdinals, toOrdinals);
-        
+
         int score = 0;
-        
+
         score += keyNode.traverseMissingFields(traversalFromKeyOrdinals, traversalToKeyOrdinals);
         score += valueNode.traverseMissingFields(traversalFromValueOrdinals, traversalToValueOrdinals);
-        
+
         return score;
     }
 
@@ -133,13 +133,13 @@ public class HollowDiffMapCountingNode extends HollowDiffCountingNode {
         traversalToValueOrdinals.clear();
 
         if(fromState != null) {
-            for(int i=0;i<fromOrdinals.size();i++) {
+            for(int i = 0; i < fromOrdinals.size(); i++) {
                 fillListsWithReferencedOrdinals(fromState, fromOrdinals.get(i), traversalFromKeyOrdinals, traversalFromValueOrdinals);
             }
         }
 
         if(toState != null) {
-            for(int i=0;i<toOrdinals.size();i++) {
+            for(int i = 0; i < toOrdinals.size(); i++) {
                 fillListsWithReferencedOrdinals(toState, toOrdinals.get(i), traversalToKeyOrdinals, traversalToValueOrdinals);
             }
         }

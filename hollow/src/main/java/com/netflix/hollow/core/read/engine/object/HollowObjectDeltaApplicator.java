@@ -66,22 +66,22 @@ class HollowObjectDeltaApplicator {
 
         deltaFieldIndexMapping = new int[target.bitsPerField.length];
 
-        for(int i=0;i<target.bitsPerField.length;i++) {
+        for(int i = 0; i < target.bitsPerField.length; i++) {
             deltaFieldIndexMapping[i] = delta.schema.getPosition(target.schema.getFieldName(i));
         }
 
-        for(int i=0;i<target.bitsPerField.length;i++) {
+        for(int i = 0; i < target.bitsPerField.length; i++) {
             target.bitsPerField[i] = deltaFieldIndexMapping[i] == -1 ? from.bitsPerField[i] : delta.bitsPerField[deltaFieldIndexMapping[i]];
             target.nullValueForField[i] = target.bitsPerField[i] == 64 ? -1L : (1L << target.bitsPerField[i]) - 1;
             target.bitOffsetPerField[i] = target.bitsPerRecord;
             target.bitsPerRecord += target.bitsPerField[i];
             if(target.bitsPerField[i] != 0)
-                numMergeFields = i+1;
+                numMergeFields = i + 1;
         }
 
-        target.fixedLengthData = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerRecord * (target.maxOrdinal + 1));
+        target.fixedLengthData = new FixedLengthElementArray(target.memoryRecycler, (long) target.bitsPerRecord * (target.maxOrdinal + 1));
 
-        for(int i=0;i<target.schema.numFields();i++) {
+        for(int i = 0; i < target.schema.numFields(); i++) {
             if(target.schema.getFieldType(i) == FieldType.STRING || target.schema.getFieldType(i) == FieldType.BYTES) {
                 target.varLengthData[i] = new SegmentedByteArray(target.memoryRecycler);
             }
@@ -102,7 +102,7 @@ class HollowObjectDeltaApplicator {
     }
 
     private boolean canDoFastDelta() {
-        for(int i=0;i<target.bitsPerField.length;i++) {
+        for(int i = 0; i < target.bitsPerField.length; i++) {
             if(target.bitsPerField[i] != from.bitsPerField[i])
                 return false;
         }
@@ -131,13 +131,13 @@ class HollowObjectDeltaApplicator {
     }
 
     private void fastCopyRecords(int recordsToCopy) {
-        long fixedLengthBitsToCopy = (long)from.bitsPerRecord * recordsToCopy;
+        long fixedLengthBitsToCopy = (long) from.bitsPerRecord * recordsToCopy;
 
         target.fixedLengthData.copyBits(from.fixedLengthData, currentFromStateReadFixedLengthStartBit, currentWriteFixedLengthStartBit, fixedLengthBitsToCopy);
 
         currentFromStateReadFixedLengthStartBit += fixedLengthBitsToCopy;
 
-        for(int i=0;i<from.schema.numFields();i++) {
+        for(int i = 0; i < from.schema.numFields(); i++) {
             if(target.varLengthData[i] != null) {
                 long fromEndByte = from.fixedLengthData.getElementValue(currentFromStateReadFixedLengthStartBit - from.bitsPerRecord + from.bitOffsetPerField[i], from.bitsPerField[i]);
                 fromEndByte &= (from.nullValueForField[i] >>> 1);
@@ -156,7 +156,7 @@ class HollowObjectDeltaApplicator {
     }
 
     private void slowDelta() {
-        for(int i=0;i<=target.maxOrdinal;i++) {
+        for(int i = 0; i <= target.maxOrdinal; i++) {
             mergeOrdinal(i);
         }
     }
@@ -165,7 +165,7 @@ class HollowObjectDeltaApplicator {
         boolean addFromDelta = additionsReader.nextElement() == i;
         boolean removeData = removalsReader.nextElement() == i;
 
-        for(int fieldIndex=0;fieldIndex<numMergeFields;fieldIndex++) {
+        for(int fieldIndex = 0; fieldIndex < numMergeFields; fieldIndex++) {
             int deltaFieldIndex = deltaFieldIndexMapping[fieldIndex];
 
             if(addFromDelta) {
@@ -176,7 +176,7 @@ class HollowObjectDeltaApplicator {
                     long readStartBit = currentFromStateReadFixedLengthStartBit + from.bitOffsetPerField[fieldIndex];
                     copyRecordField(fieldIndex, fieldIndex, from, readStartBit, currentWriteFixedLengthStartBit, currentFromStateReadVarLengthDataPointers, currentWriteVarLengthDataPointers, removeData);
                 } else if(target.varLengthData[fieldIndex] != null) {
-                	writeNullVarLengthField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+                    writeNullVarLengthField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
                 }
             }
             currentWriteFixedLengthStartBit += target.bitsPerField[fieldIndex];

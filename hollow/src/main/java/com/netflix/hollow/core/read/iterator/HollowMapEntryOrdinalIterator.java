@@ -35,6 +35,7 @@ public interface HollowMapEntryOrdinalIterator {
     public boolean next();
 
     public int getKey();
+
     public int getValue();
 
 }

@@ -47,9 +47,9 @@ public class HollowBlobInputTest {
         // The test file looks like:
         // First 8 bytes for testing reading byte, short, and long
         // Then to test reading UTF, 2 bytes for UTF length (containing unsigned short value of 1) and then the string "test"
-        leadingBytes = new byte[] {0, 1, 0, 1, 0, 1, 0, 1};
+        leadingBytes = new byte[]{0, 1, 0, 1, 0, 1, 0, 1};
         Files.write(testFile, leadingBytes);
-        byte[] utfLen = new byte[] {0, 1};   // bytes corresponding to a short of value 1
+        byte[] utfLen = new byte[]{0, 1};   // bytes corresponding to a short of value 1
         Files.write(testFile, utfLen, StandardOpenOption.APPEND);
         Files.write(testFile, "test".getBytes(), StandardOpenOption.APPEND);
         when(mockBlob.getInputStream()).thenReturn(new FileInputStream(testFile.toFile()));

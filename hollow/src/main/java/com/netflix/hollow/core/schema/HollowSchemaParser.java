@@ -47,7 +47,7 @@ public class HollowSchemaParser {
         List<HollowSchema> schemaList = new ArrayList<HollowSchema>();
 
         HollowSchema schema = parseSchema(tokenizer);
-        while (schema != null) {
+        while(schema != null) {
             schemaList.add(schema);
             schema = parseSchema(tokenizer);
         }
@@ -107,7 +107,7 @@ public class HollowSchemaParser {
 
     private static HollowObjectSchema parseObjectSchema(String typeName, StreamTokenizer tokenizer) throws IOException {
         String keyFieldPaths[] = parsePrimaryKey(tokenizer);
-        if (tokenizer.ttype != '{') {
+        if(tokenizer.ttype != '{') {
             throw new IOException("Invalid syntax: expecting '{' for '" + typeName + "'");
         }
 
@@ -134,25 +134,25 @@ public class HollowSchemaParser {
         }
 
         HollowObjectSchema schema = new HollowObjectSchema(typeName, tokens.size() / 2, keyFieldPaths);
-        for(int i=0;i<tokens.size();i+=2) {
+        for(int i = 0; i < tokens.size(); i += 2) {
             String fieldType = tokens.get(i);
 
             if("int".equals(fieldType)) {
-                schema.addField(tokens.get(i+1), FieldType.INT);
+                schema.addField(tokens.get(i + 1), FieldType.INT);
             } else if("long".equals(fieldType)) {
-                schema.addField(tokens.get(i+1), FieldType.LONG);
+                schema.addField(tokens.get(i + 1), FieldType.LONG);
             } else if("float".equals(fieldType)) {
-                schema.addField(tokens.get(i+1), FieldType.FLOAT);
+                schema.addField(tokens.get(i + 1), FieldType.FLOAT);
             } else if("double".equals(fieldType)) {
-                schema.addField(tokens.get(i+1), FieldType.DOUBLE);
+                schema.addField(tokens.get(i + 1), FieldType.DOUBLE);
             } else if("boolean".equals(fieldType)) {
-                schema.addField(tokens.get(i+1), FieldType.BOOLEAN);
+                schema.addField(tokens.get(i + 1), FieldType.BOOLEAN);
             } else if("string".equals(fieldType)) {
-                schema.addField(tokens.get(i+1), FieldType.STRING);
+                schema.addField(tokens.get(i + 1), FieldType.STRING);
             } else if("bytes".equals(fieldType)) {
-                schema.addField(tokens.get(i+1), FieldType.BYTES);
+                schema.addField(tokens.get(i + 1), FieldType.BYTES);
             } else {
-                schema.addField(tokens.get(i+1), FieldType.REFERENCE, fieldType);
+                schema.addField(tokens.get(i + 1), FieldType.REFERENCE, fieldType);
             }
         }
 

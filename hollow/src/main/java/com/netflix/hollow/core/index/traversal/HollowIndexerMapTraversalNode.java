@@ -42,20 +42,20 @@ class HollowIndexerMapTraversalNode extends HollowIndexerTraversalNode {
     @Override
     public int doTraversal(int ordinal) {
         int numMatches = 0;
-        
+
         HollowMapEntryOrdinalIterator ordinalIterator = dataAccess().ordinalIterator(ordinal);
 
         while(ordinalIterator.next()) {
             prepareMultiply();
-            
+
             if(keyNode != null)
                 keyNode.traverse(ordinalIterator.getKey());
             if(valueNode != null)
                 valueNode.traverse(ordinalIterator.getValue());
-        
+
             numMatches += doMultiply();
         }
-        
+
         return numMatches;
     }
 

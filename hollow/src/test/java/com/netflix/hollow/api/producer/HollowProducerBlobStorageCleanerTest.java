@@ -45,9 +45,9 @@ public class HollowProducerBlobStorageCleanerTest {
         HollowProducer.Publisher publisher = new HollowFilesystemPublisher(publishDir.toPath());
         HollowProducer.BlobStorageCleaner blobStorageCleaner = new HollowFilesystemBlobStorageCleaner(publishDir);
         HollowProducer producer = HollowProducer.withPublisher(publisher)
-                                                .withBlobStorageCleaner(blobStorageCleaner)
-                                                .withVersionMinter(new TestVersionMinter())
-                                                .build();
+                .withBlobStorageCleaner(blobStorageCleaner)
+                .withVersionMinter(new TestVersionMinter())
+                .build();
 
         /// initialize the data -- classic producer creates the first state in the delta chain. 
         producer.runCycle(state -> state.add(new TypeA(1, "one", 1)));
@@ -80,7 +80,7 @@ public class HollowProducerBlobStorageCleanerTest {
     }
 
     @SuppressWarnings("unused")
-    @HollowPrimaryKey(fields = { "id1", "id2" })
+    @HollowPrimaryKey(fields = {"id1", "id2"})
     private static class TypeA {
         int id1;
         String id2;

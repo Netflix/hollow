@@ -43,7 +43,7 @@ public class PrimaryKey {
      * its child record referenced by the field <i>country</i>, and finally the country's field <i>id</i>.
      */
     public PrimaryKey(String type, String... fieldPaths) {
-        if (fieldPaths == null || fieldPaths.length == 0) {
+        if(fieldPaths == null || fieldPaths.length == 0) {
             throw new IllegalArgumentException("fieldPaths can't not be null or empty");
         }
 
@@ -95,10 +95,10 @@ public class PrimaryKey {
      * @return the field type
      */
     public static FieldType getFieldType(HollowDataset dataAccess, String type, String fieldPath) {
-        HollowObjectSchema schema = (HollowObjectSchema)dataAccess.getSchema(type);
+        HollowObjectSchema schema = (HollowObjectSchema) dataAccess.getSchema(type);
         int pathIndexes[] = getFieldPathIndex(dataAccess, type, fieldPath);
-        for(int i=0;i<pathIndexes.length - 1;i++)
-            schema = (HollowObjectSchema)dataAccess.getSchema(schema.getReferencedType(pathIndexes[i]));
+        for(int i = 0; i < pathIndexes.length - 1; i++)
+            schema = (HollowObjectSchema) dataAccess.getSchema(schema.getReferencedType(pathIndexes[i]));
         return schema.getFieldType(pathIndexes[pathIndexes.length - 1]);
     }
 
@@ -111,10 +111,10 @@ public class PrimaryKey {
      * @return the field schema
      */
     public static HollowObjectSchema getFieldSchema(HollowDataset dataAccess, String type, String fieldPath) {
-        HollowObjectSchema schema = (HollowObjectSchema)dataAccess.getSchema(type);
+        HollowObjectSchema schema = (HollowObjectSchema) dataAccess.getSchema(type);
         int pathIndexes[] = getFieldPathIndex(dataAccess, type, fieldPath);
-        for (int i = 0; i < pathIndexes.length; i++)
-            schema = (HollowObjectSchema)dataAccess.getSchema(schema.getReferencedType(pathIndexes[i]));
+        for(int i = 0; i < pathIndexes.length; i++)
+            schema = (HollowObjectSchema) dataAccess.getSchema(schema.getReferencedType(pathIndexes[i]));
         return schema;
     }
 
@@ -132,7 +132,7 @@ public class PrimaryKey {
         String fieldPathParts[] = new String[fieldPathIdx.length];
 
         HollowObjectSchema schema = (HollowObjectSchema) dataset.getSchema(type);
-        for(int i=0;i<fieldPathParts.length;i++) {
+        for(int i = 0; i < fieldPathParts.length; i++) {
             fieldPathParts[i] = schema.getFieldName(fieldPathIdx[i]);
             schema = (HollowObjectSchema) dataset.getSchema(schema.getReferencedType(fieldPathIdx[i]));
         }
@@ -165,19 +165,19 @@ public class PrimaryKey {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if(this == obj)
             return true;
-        if (obj == null)
+        if(obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if(getClass() != obj.getClass())
             return false;
         PrimaryKey other = (PrimaryKey) obj;
-        if (!Arrays.equals(fieldPaths, other.fieldPaths))
+        if(!Arrays.equals(fieldPaths, other.fieldPaths))
             return false;
-        if (type == null) {
-            if (other.type != null)
+        if(type == null) {
+            if(other.type != null)
                 return false;
-        } else if (!type.equals(other.type))
+        } else if(!type.equals(other.type))
             return false;
         return true;
     }

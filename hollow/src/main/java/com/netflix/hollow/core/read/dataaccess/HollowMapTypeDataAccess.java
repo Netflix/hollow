@@ -35,11 +35,11 @@ public interface HollowMapTypeDataAccess extends HollowTypeDataAccess {
     public int get(int ordinal, int keyOrdinal);
 
     public int get(int ordinal, int keyOrdinal, int hashCode);
-    
+
     public int findKey(int ordinal, Object... hashKey);
-    
+
     public int findValue(int ordinal, Object... hashKey);
-    
+
     public long findEntry(int ordinal, Object... hashKey);
 
     public HollowMapEntryOrdinalIterator potentialMatchOrdinalIterator(int ordinal, int hashCode);

@@ -91,17 +91,17 @@ public class FakeHollowDiffGenerator {
                         c(1003, true)
                 ),
                 dSet(
-                        d(1.001f, 1.00001d, new byte[]{ 1, 1 }),
-                        d(1.002f, 1.00002d, new byte[]{ 1, 2 })
+                        d(1.001f, 1.00001d, new byte[]{1, 1}),
+                        d(1.002f, 1.00002d, new byte[]{1, 2})
                 ),
                 map(
                         entry(
                                 c(1001, true),
-                                d(1.001f, 1.00001d, new byte[]{ 1, 1 })
+                                d(1.001f, 1.00001d, new byte[]{1, 1})
                         ),
                         entry(
                                 c(1002, true),
-                                d(1.002f, 1.00002d, new byte[]{ 1, 2 })
+                                d(1.002f, 1.00002d, new byte[]{1, 2})
                         )
                 ));
 
@@ -113,17 +113,17 @@ public class FakeHollowDiffGenerator {
                         c(1003, false)  // now false instead of true
                 ),
                 dSet(
-                        d(1.001f, 1.00001d, new byte[]{ 1, 9 }), /// 9 instead of 1
-                        d(1.002f, 1.00002d, new byte[]{ 1, 2 })
+                        d(1.001f, 1.00001d, new byte[]{1, 9}), /// 9 instead of 1
+                        d(1.002f, 1.00002d, new byte[]{1, 2})
                 ),
                 map(
                         entry(
                                 c(1001, true),
-                                d(1.001f, 1.00001d, new byte[]{ 1, 9 }) /// 9 instead of 1
+                                d(1.001f, 1.00001d, new byte[]{1, 9}) /// 9 instead of 1
                         ),
                         entry(
                                 c(1002, true),
-                                d(1.002f, 1.00002d, new byte[]{ 1, 2 })
+                                d(1.002f, 1.00002d, new byte[]{1, 2})
                         )
                 ));
 
@@ -136,17 +136,17 @@ public class FakeHollowDiffGenerator {
                         c(2003, true)
                 ),
                 dSet(
-                        d(2.001f, 2.00001d, new byte[]{ 2, 1 }),
-                        d(2.002f, 2.00002d, new byte[]{ 2, 2 })
+                        d(2.001f, 2.00001d, new byte[]{2, 1}),
+                        d(2.002f, 2.00002d, new byte[]{2, 2})
                 ),
                 map(
                         entry(
                                 c(2001, true),
-                                d(2.001f, 2.00001d, new byte[]{ 2, 1 })
+                                d(2.001f, 2.00001d, new byte[]{2, 1})
                         ),
                         entry(
                                 c(2002, true),
-                                d(2.002f, 2.00002d, new byte[]{ 2, 2 })
+                                d(2.002f, 2.00002d, new byte[]{2, 2})
                         )
                 ));
 
@@ -158,17 +158,17 @@ public class FakeHollowDiffGenerator {
                         c(2003, true)
                 ),
                 dSet(
-                        d(2.001f, 2.00001d, new byte[]{ 2, 7 }), /// 7 instead of 1
-                        d(2.002f, 2.00002d, new byte[]{ 2, 2 })
+                        d(2.001f, 2.00001d, new byte[]{2, 7}), /// 7 instead of 1
+                        d(2.002f, 2.00002d, new byte[]{2, 2})
                 ),
                 map(
                         entry(
                                 c(2001, true),
-                                d(2.001f, 2.00001d, new byte[]{ 2, 7 }) /// 7 instead of 1
+                                d(2.001f, 2.00001d, new byte[]{2, 7}) /// 7 instead of 1
                         ),
                         entry(
                                 c(2002, true),
-                                d(2.002f, 2.00002d, new byte[]{ 2, 2 })
+                                d(2.002f, 2.00002d, new byte[]{2, 2})
                         )
                 ));
 
@@ -226,10 +226,10 @@ public class FakeHollowDiffGenerator {
     }
 
     private int addRec(HollowWriteStateEngine stateEngine,
-                            String a1, int b1,
-                            TypeCRec[] typeCs,
-                            TypeDRec[] typeDs,
-                            MapEntry[] mapEntries) {
+            String a1, int b1,
+            TypeCRec[] typeCs,
+            TypeDRec[] typeDs,
+            MapEntry[] mapEntries) {
         int listOrdinal = addListRec(stateEngine, typeCs);
         int setOrdinal = addSetRec(stateEngine, typeDs);
         int bOrdinal = addBRec(stateEngine, b1, listOrdinal, setOrdinal);

@@ -32,14 +32,14 @@ public class HashCodes {
     public static int hashCode(final String data) {
         if(data == null)
             return -1;
-        
+
         int arrayLen = calculateByteArrayLength(data);
-        
+
         if(arrayLen == data.length()) {
             return hashCode(new ByteData() {
                 @Override
                 public byte get(long position) {
-                    return (byte)(data.charAt((int)position) & 0x7F);
+                    return (byte) (data.charAt((int) position) & 0x7F);
                 }
             }, 0, data.length());
         } else {
@@ -48,14 +48,14 @@ public class HashCodes {
             return hashCode(array);
         }
     }
-    
+
     public static int hashCode(byte[] data) {
         return hashCode(new ArrayByteData(data), 0, data.length);
     }
 
     private static int calculateByteArrayLength(String data) {
         int length = data.length();
-        for(int i=0;i<data.length();i++) {
+        for(int i = 0; i < data.length(); i++) {
             if(data.charAt(i) > 0x7F)
                 length += VarInt.sizeOfVInt(data.charAt(i)) - 1;
         }
@@ -66,12 +66,12 @@ public class HashCodes {
         byte array[] = new byte[arrayLen];
 
         int pos = 0;
-        for(int i=0;i<data.length();i++) {
+        for(int i = 0; i < data.length(); i++) {
             pos = VarInt.writeVInt(array, pos, data.charAt(i));
         }
         return array;
     }
-    
+
     /**
      * MurmurHash3.  Adapted from:<p>
      *
@@ -106,9 +106,9 @@ public class HashCodes {
 
         int h1 = MURMURHASH_SEED;
         long roundedEnd = offset + (len & 0xfffffffffffffffcL); // round down to
-                                                                // 4 byte block
+        // 4 byte block
 
-        for (long i = offset; i < roundedEnd; i += 4) {
+        for(long i = offset; i < roundedEnd; i += 4) {
             // little endian load order
             int k1 = (data.get(i) & 0xff) | ((data.get(i + 1) & 0xff) << 8) | ((data.get(i + 2) & 0xff) << 16) | (data.get(i + 3) << 24);
             k1 *= c1;
@@ -123,19 +123,19 @@ public class HashCodes {
         // tail
         int k1 = 0;
 
-        switch (len & 0x03) {
-        case 3:
-            k1 = (data.get(roundedEnd + 2) & 0xff) << 16;
+        switch(len & 0x03) {
+            case 3:
+                k1 = (data.get(roundedEnd + 2) & 0xff) << 16;
             // fallthrough
         case 2:
-            k1 |= (data.get(roundedEnd + 1) & 0xff) << 8;
+                k1 |= (data.get(roundedEnd + 1) & 0xff) << 8;
             // fallthrough
         case 1:
-            k1 |= (data.get(roundedEnd) & 0xff);
-            k1 *= c1;
-            k1 = (k1 << 15) | (k1 >>> 17); // ROTL32(k1,15);
-            k1 *= c2;
-            h1 ^= k1;
+                k1 |= (data.get(roundedEnd) & 0xff);
+                k1 *= c1;
+                k1 = (k1 << 15) | (k1 >>> 17); // ROTL32(k1,15);
+                k1 *= c2;
+                h1 ^= k1;
         }
 
         // finalization
@@ -181,20 +181,20 @@ public class HashCodes {
      *                                  {@link com.netflix.hollow.core.HollowConstants#HASH_TABLE_MAX_SIZE}
      */
     public static int hashTableSize(int numElements) throws IllegalArgumentException {
-        if (numElements < 0) {
-            throw new IllegalArgumentException("cannot be negative; numElements="+numElements);
-        } else if (numElements > HASH_TABLE_MAX_SIZE) {
-            throw new IllegalArgumentException("exceeds maximum number of buckets; numElements="+numElements);
+        if(numElements < 0) {
+            throw new IllegalArgumentException("cannot be negative; numElements=" + numElements);
+        } else if(numElements > HASH_TABLE_MAX_SIZE) {
+            throw new IllegalArgumentException("exceeds maximum number of buckets; numElements=" + numElements);
         }
 
-        if (numElements == 0)
+        if(numElements == 0)
             return 1;
-        if (numElements < 3)
+        if(numElements < 3)
             return numElements * 2;
 
         // Apply load factor to number of elements and determine next
         // largest power of 2 that fits in an int
-        int sizeAfterLoadFactor = (int)((long)numElements * 10 / 7);
+        int sizeAfterLoadFactor = (int) ((long) numElements * 10 / 7);
         int bits = 32 - Integer.numberOfLeadingZeros(sizeAfterLoadFactor - 1);
         return 1 << bits;
     }

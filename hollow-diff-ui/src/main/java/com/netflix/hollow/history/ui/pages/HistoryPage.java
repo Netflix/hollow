@@ -79,7 +79,7 @@ public abstract class HistoryPage {
 
         List<HollowHeaderEntry> entries = new ArrayList<HollowHeaderEntry>();
 
-        int i=0;
+        int i = 0;
 
         for(String key : allKeys) {
             entries.add(new HollowHeaderEntry(i++, key, fromTags.get(key), toTags.get(key)));

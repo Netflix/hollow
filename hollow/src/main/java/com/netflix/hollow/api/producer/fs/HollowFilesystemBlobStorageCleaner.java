@@ -32,7 +32,7 @@ public class HollowFilesystemBlobStorageCleaner extends HollowProducer.BlobStora
     private final File blobStoreDir;
 
     public HollowFilesystemBlobStorageCleaner(File blobStoreDir) {
-        this(blobStoreDir,5);
+        this(blobStoreDir, 5);
     }
 
     public HollowFilesystemBlobStorageCleaner(File blobStoreDir, int numOfSnapshotsToKeep) {
@@ -53,7 +53,7 @@ public class HollowFilesystemBlobStorageCleaner extends HollowProducer.BlobStora
 
         sortByLastModified(files);
 
-        for(int i= numOfSnapshotsToKeep; i < files.length; i++){
+        for(int i = numOfSnapshotsToKeep; i < files.length; i++) {
             File file = files[i];
             boolean deleted = file.delete();
             if(!deleted) {
@@ -63,10 +63,12 @@ public class HollowFilesystemBlobStorageCleaner extends HollowProducer.BlobStora
     }
 
     @Override
-    public void cleanDeltas() { }
+    public void cleanDeltas() {
+    }
 
     @Override
-    public void cleanReverseDeltas() { }
+    public void cleanReverseDeltas() {
+    }
 
     private void sortByLastModified(File[] files) {
         Arrays.sort(files, new Comparator<File>() {

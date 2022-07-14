@@ -24,7 +24,7 @@ import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 public class DiffExactRecordMatcher implements ExactRecordMatcher {
 
     private final DiffEqualityMapping equalityMapping;
-    
+
     public DiffExactRecordMatcher(DiffEqualityMapping equalityMapping) {
         this.equalityMapping = equalityMapping;
     }
@@ -33,18 +33,18 @@ public class DiffExactRecordMatcher implements ExactRecordMatcher {
     public boolean isExactMatch(HollowTypeDataAccess fromType, int fromOrdinal, HollowTypeDataAccess toType, int toOrdinal) {
         if(fromType == null || toType == null)
             return false;
-        
+
         DiffEqualOrdinalMap typeMap = equalityMapping.getEqualOrdinalMap(fromType.getSchema().getName());
         if(typeMap != null) {
             MatchIterator matchingToOrdinals = typeMap.getEqualOrdinals(fromOrdinal);
-            
+
             while(matchingToOrdinals.hasNext()) {
                 if(toOrdinal == matchingToOrdinals.next())
                     return true;
             }
         }
-        
+
         return false;
     }
-    
+
 }

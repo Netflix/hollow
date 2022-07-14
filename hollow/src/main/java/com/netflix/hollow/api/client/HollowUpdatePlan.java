@@ -79,7 +79,7 @@ public class HollowUpdatePlan implements Iterable<HollowConsumer.Blob> {
 
     public long destinationVersion() {
         return transitions.isEmpty() ? HollowConstants.VERSION_NONE
-            : transitions.get(transitions.size() - 1).getToVersion();
+                : transitions.get(transitions.size() - 1).getToVersion();
     }
 
     public int numTransitions() {

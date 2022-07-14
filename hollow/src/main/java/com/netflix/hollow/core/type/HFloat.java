@@ -43,6 +43,6 @@ public class HFloat extends HollowObject {
     }
 
     protected FloatDelegate delegate() {
-        return (FloatDelegate)delegate;
+        return (FloatDelegate) delegate;
     }
 }

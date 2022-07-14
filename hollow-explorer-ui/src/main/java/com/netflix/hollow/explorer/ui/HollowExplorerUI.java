@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("deprecation")
 public class HollowExplorerUI extends HollowUIRouter {
-    
+
     private final HollowConsumer consumer;
     private final HollowClient client;
     private final HollowReadStateEngine stateEngine;
@@ -46,25 +46,25 @@ public class HollowExplorerUI extends HollowUIRouter {
     private final BrowseSelectedTypePage browseTypePage;
     private final BrowseSchemaPage browseSchemaPage;
     private final QueryPage queryPage;
-    
+
     public HollowExplorerUI(String baseUrlPath, HollowConsumer consumer) {
         this(baseUrlPath, consumer, null, null);
     }
-    
+
     public HollowExplorerUI(String baseUrlPath, HollowClient client) {
         this(baseUrlPath, null, client, null);
     }
-    
+
     public HollowExplorerUI(String baseUrlPath, HollowReadStateEngine stateEngine) {
         this(baseUrlPath, null, null, stateEngine);
     }
-    
+
     private HollowExplorerUI(String baseUrlPath, HollowConsumer consumer, HollowClient client, HollowReadStateEngine stateEngine) {
         super(baseUrlPath);
         this.consumer = consumer;
         this.client = client;
         this.stateEngine = stateEngine;
-        
+
         this.showAllTypesPage = new ShowAllTypesPage(this);
         this.browseTypePage = new BrowseSelectedTypePage(this);
         this.browseSchemaPage = new BrowseSchemaPage(this);
@@ -72,11 +72,11 @@ public class HollowExplorerUI extends HollowUIRouter {
     }
 
     public boolean handle(String target, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        
+
         String pageName = getTargetRootPath(target);
-        
+
         HollowUISession session = HollowUISession.getSession(req, resp);
-        
+
         if("".equals(pageName) || "home".equals(pageName)) {
             showAllTypesPage.render(req, resp, session);
             return true;
@@ -90,7 +90,7 @@ public class HollowExplorerUI extends HollowUIRouter {
             queryPage.render(req, resp, session);
             return true;
         }
-        
+
         return false;
     }
 
@@ -101,7 +101,7 @@ public class HollowExplorerUI extends HollowUIRouter {
             return client.getCurrentVersionId();
         return Long.MIN_VALUE;
     }
-    
+
     public HollowReadStateEngine getStateEngine() {
         if(consumer != null)
             return consumer.getStateEngine();
@@ -125,5 +125,5 @@ public class HollowExplorerUI extends HollowUIRouter {
     public String getFromHeaderDisplayMap(String key) {
         return headerDisplayMap.get(key);
     }
-    
+
 }

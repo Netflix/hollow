@@ -27,11 +27,11 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 public class HollowExplorerHandler extends AbstractHandler {
 
     private final HollowExplorerUI ui;
-    
+
     public HollowExplorerHandler(HollowExplorerUI ui) {
         this.ui = ui;
     }
-    
+
     @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         if(ui.handle(target, request, response))

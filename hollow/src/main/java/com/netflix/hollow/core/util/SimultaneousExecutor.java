@@ -209,10 +209,11 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
      */
     public void awaitUninterruptibly() {
         shutdown();
-        while (!isTerminated()) {
+        while(!isTerminated()) {
             try {
                 awaitTermination(1, TimeUnit.DAYS);
-            } catch (final InterruptedException e) { }
+            } catch (final InterruptedException e) {
+            }
         }
     }
 
@@ -243,7 +244,7 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
      */
     public void awaitSuccessfulCompletion() throws InterruptedException, ExecutionException {
         awaitUninterruptibly();
-        for (final Future<?> f : futures) {
+        for(final Future<?> f : futures) {
             f.get();
         }
     }

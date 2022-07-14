@@ -81,8 +81,8 @@ public class HollowProducerTest {
 
     private HollowProducer createProducer(File tmpFolder, HollowObjectSchema... schemas) {
         HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
-            .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath())).build();
-        if (schemas != null && schemas.length > 0) {
+                .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath())).build();
+        if(schemas != null && schemas.length > 0) {
             producer.initializeDataModel(schemas);
         }
         producer.addListener(new FakeProducerListener());
@@ -91,7 +91,7 @@ public class HollowProducerTest {
 
     @After
     public void tearDown() {
-        for (File file : blobFileMap.values()) {
+        for(File file : blobFileMap.values()) {
             System.out.println("\t deleting: " + file);
             file.delete();
         }
@@ -200,7 +200,8 @@ public class HollowProducerTest {
         try {
             producer.restore(fakeVersion, blobRetriever);
             Assert.fail();
-        } catch(Exception expected) { }
+        } catch (Exception expected) {
+        }
 
         Assert.assertNotNull(lastRestoreStatus);
         Assert.assertEquals(Status.FAIL, lastRestoreStatus.getStatus());
@@ -236,7 +237,7 @@ public class HollowProducerTest {
 
         System.out.println("\n\n------------ Publish a few versions ------------\n");
         List<Long> versions = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        for(int i = 0; i < 5; i++) {
             int size = i + 1;
             int valueMultiplier = i + 10;
             long version = testPublishV1(producer, size, valueMultiplier);
@@ -244,7 +245,7 @@ public class HollowProducerTest {
         }
 
         System.out.println("\n\n------------ Restore and validate ------------\n");
-        for (int i = 0; i < versions.size(); i++) {
+        for(int i = 0; i < versions.size(); i++) {
             long version = versions.get(i);
             int size = i + 1;
             int valueMultiplier = i + 10;
@@ -253,7 +254,7 @@ public class HollowProducerTest {
         }
 
         System.out.println("\n\n------------ Restore in reverse order and validate ------------\n");
-        for (int i = versions.size() - 1; i >= 0; i--) {
+        for(int i = versions.size() - 1; i >= 0; i--) {
             long version = versions.get(i);
             int size = i + 1;
             int valueMultiplier = i + 10;
@@ -267,7 +268,7 @@ public class HollowProducerTest {
         HollowProducer producer = createProducer(tmpFolder, schema);
 
         List<Long> versions = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        for(int i = 0; i < 5; i++) {
             int size = i + 10;
             int valueMultiplier = i + 10;
             long version = testPublishV1(producer, size, valueMultiplier);
@@ -351,7 +352,7 @@ public class HollowProducerTest {
 
     private long testPublishV1(HollowProducer producer, final int size, final int valueMultiplier) {
         producer.runCycle(newState -> {
-            for (int i = 1; i <= size; i++) {
+            for(int i = 1; i <= size; i++) {
                 newState.add(new TestPojoV1(i, i * valueMultiplier));
             }
         });
@@ -362,7 +363,7 @@ public class HollowProducerTest {
 
     private long testPublishV2(HollowProducer producer, final int size, final int valueMultiplier) {
         producer.runCycle(newState -> {
-            for (int i = 1; i <= size; i++) {
+            for(int i = 1; i <= size; i++) {
                 newState.add(new TestPojoV2(i, i * valueMultiplier, i * valueMultiplier));
             }
         });
@@ -386,12 +387,12 @@ public class HollowProducerTest {
         Assert.assertEquals(size, populatedOrdinals.cardinality());
 
         int ordinal = populatedOrdinals.nextSetBit(0);
-        while (ordinal != -1) {
+        while(ordinal != -1) {
             GenericHollowObject obj = new GenericHollowObject(new HollowObjectGenericDelegate(typeState), ordinal);
             System.out.println("ordinal=" + ordinal + obj);
 
             int id = obj.getInt("id");
-            for (int i = 0; i < valueFieldCount; i++) {
+            for(int i = 0; i < valueFieldCount; i++) {
                 String valueFN = "v" + (i + 1);
                 int value = id * valueMultiplier;
                 Assert.assertEquals(valueFN, value, obj.getInt(valueFN));
@@ -470,7 +471,7 @@ public class HollowProducerTest {
     private class FakeBlobPublisher implements HollowProducer.Publisher {
         private void publishBlob(Blob blob) {
             File blobFile = blob.getFile();
-            if (!blob.getType().equals(Type.SNAPSHOT)) {
+            if(!blob.getType().equals(Type.SNAPSHOT)) {
                 // Only snapshot is needed for smoke Test
                 return;
             }
@@ -482,7 +483,7 @@ public class HollowProducerTest {
         }
 
         private File copyFile(File blobFile) {
-            if (!blobFile.exists()) throw new RuntimeException("File does not exists: " + blobFile);
+            if(!blobFile.exists()) throw new RuntimeException("File does not exists: " + blobFile);
 
             // Copy file
             File copiedFile = new File(tmpFolder, "copied_" + blobFile.getName());
@@ -505,7 +506,7 @@ public class HollowProducerTest {
 
         @Override
         public void publish(HollowProducer.PublishArtifact publishArtifact) {
-            if (publishArtifact instanceof HeaderBlob) {
+            if(publishArtifact instanceof HeaderBlob) {
                 publishHeader((HeaderBlob) publishArtifact);
             } else {
                 publishBlob((Blob) publishArtifact);
@@ -527,12 +528,12 @@ public class HollowProducerTest {
         public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion) {
             long blobVersion = desiredVersion;
             File blobFile = blobFileMap.get(desiredVersion);
-            if (blobFile == null) {
+            if(blobFile == null) {
                 // find the closest one
                 blobVersion = blobFileMap.keySet().stream()
                         .filter(l -> l < desiredVersion)
                         .reduce(Long.MIN_VALUE, Math::max);
-                if (blobVersion == Long.MIN_VALUE) {
+                if(blobVersion == Long.MIN_VALUE) {
                     return null;
                 } else {
                     blobFile = blobFileMap.get(blobVersion);

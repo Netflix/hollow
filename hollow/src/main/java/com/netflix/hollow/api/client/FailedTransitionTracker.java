@@ -98,16 +98,16 @@ public class FailedTransitionTracker {
 
         @Override
         public int hashCode() {
-            return (int)fromState
-                    ^ (int)(fromState >> 32)
-                    ^ (int)toState
-                    ^ (int)(toState >> 32);
+            return (int) fromState
+                    ^ (int) (fromState >> 32)
+                    ^ (int) toState
+                    ^ (int) (toState >> 32);
         }
 
         @Override
         public boolean equals(Object obj) {
             if(obj instanceof DeltaTransition) {
-                DeltaTransition other = (DeltaTransition)obj;
+                DeltaTransition other = (DeltaTransition) obj;
                 return other.fromState == fromState && other.toState == toState;
             }
             return false;

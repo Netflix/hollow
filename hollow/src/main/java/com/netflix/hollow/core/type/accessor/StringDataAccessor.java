@@ -28,7 +28,7 @@ public class StringDataAccessor extends AbstractHollowDataAccessor<String> {
     private HollowConsumerAPI.StringRetriever api;
 
     public StringDataAccessor(HollowConsumer consumer) {
-        this(consumer.getStateEngine(), (HollowConsumerAPI.StringRetriever)consumer.getAPI());
+        this(consumer.getStateEngine(), (HollowConsumerAPI.StringRetriever) consumer.getAPI());
     }
 
     public StringDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.StringRetriever api) {
@@ -36,7 +36,8 @@ public class StringDataAccessor extends AbstractHollowDataAccessor<String> {
         this.api = api;
     }
 
-    @Override public String getRecord(int ordinal){
+    @Override
+    public String getRecord(int ordinal) {
         HString val = api.getHString(ordinal);
         return val == null ? null : val.getValue();
     }

@@ -30,58 +30,58 @@ import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 
 public abstract class HollowTestRecord<T> {
-    
+
     private final T parent;
     private int assignedOrdinal = -1;
-    
+
     protected HollowTestRecord(T parent) {
         this.parent = parent;
     }
-    
+
     public T up() {
         return parent;
     }
-    
-    @SuppressWarnings({ "hiding", "unchecked" })
+
+    @SuppressWarnings({"hiding", "unchecked"})
     public <T> T upTop() {
         HollowTestRecord<?> root = this;
         while(root.up() != null) {
             root = (HollowTestRecord<?>) root.up();
         }
-        return (T)root;
+        return (T) root;
     }
-    
+
     int addTo(HollowWriteStateEngine writeEngine) {
         HollowSchema schema = getSchema();
         HollowTypeWriteState typeState = writeEngine.getTypeState(schema.getName());
         if(typeState == null) {
             switch(schema.getSchemaType()) {
-            case OBJECT:
-                typeState = new HollowObjectTypeWriteState((HollowObjectSchema)schema);
-                break;
-            case LIST:
-                typeState = new HollowListTypeWriteState((HollowListSchema)schema);
-                break;
-            case SET:
-                typeState = new HollowSetTypeWriteState((HollowSetSchema)schema);
-                break;
-            case MAP:
-                typeState = new HollowMapTypeWriteState((HollowMapSchema)schema);
-                break;
+                case OBJECT:
+                    typeState = new HollowObjectTypeWriteState((HollowObjectSchema) schema);
+                    break;
+                case LIST:
+                    typeState = new HollowListTypeWriteState((HollowListSchema) schema);
+                    break;
+                case SET:
+                    typeState = new HollowSetTypeWriteState((HollowSetSchema) schema);
+                    break;
+                case MAP:
+                    typeState = new HollowMapTypeWriteState((HollowMapSchema) schema);
+                    break;
             }
             writeEngine.addTypeState(typeState);
         }
-        
+
         assignedOrdinal = typeState.add(toWriteRecord(writeEngine));
         return assignedOrdinal;
     }
-    
+
     public int getOrdinal() {
         return assignedOrdinal;
     }
-    
+
     protected abstract HollowSchema getSchema();
 
     protected abstract HollowWriteRecord toWriteRecord(HollowWriteStateEngine writeEngine);
-    
+
 }
