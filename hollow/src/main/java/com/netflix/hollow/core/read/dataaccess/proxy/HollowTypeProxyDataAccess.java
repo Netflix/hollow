@@ -41,6 +41,10 @@ public abstract class HollowTypeProxyDataAccess implements HollowTypeDataAccess 
         this.currentDataAccess = typeDataAccess;
     }
 
+    public HollowTypeDataAccess getCurrentDataAccess() {
+        return currentDataAccess;
+    }
+
     @Override
     public HollowDataAccess getDataAccess() {
         return dataAccess;
