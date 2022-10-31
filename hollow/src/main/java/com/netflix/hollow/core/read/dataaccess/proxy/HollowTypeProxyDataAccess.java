@@ -22,6 +22,7 @@ import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.tools.history.HollowHistoricalTypeDataAccess;
 
 /**
  * A {@link HollowTypeDataAccess} which delegates all calls to another {@link HollowTypeDataAccess}
@@ -30,8 +31,12 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
  */
 public abstract class HollowTypeProxyDataAccess implements HollowTypeDataAccess {
 
-    protected final HollowProxyDataAccess dataAccess;
-    protected HollowTypeDataAccess currentDataAccess;
+    protected final HollowProxyDataAccess dataAccess;   // parent state engine (see HollowProxyDataAccess::setDataAccess)
+    protected HollowTypeDataAccess currentDataAccess;   // type access within the parent state engine   // XXX tried commenting out the setter for unit test, no affect. SNAP: TODO: should this be volatile? maybe only affects if >1 refreshes occurred
+
+    public HollowTypeDataAccess getCurrentDataAccess() {
+        return this.currentDataAccess;
+    }
 
     public HollowTypeProxyDataAccess(HollowProxyDataAccess dataAccess) {
         this.dataAccess = dataAccess;
@@ -40,6 +45,7 @@ public abstract class HollowTypeProxyDataAccess implements HollowTypeDataAccess 
     public void setCurrentDataAccess(HollowTypeDataAccess typeDataAccess) {
         this.currentDataAccess = typeDataAccess;
     }
+
 
     @Override
     public HollowDataAccess getDataAccess() {

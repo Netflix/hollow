@@ -63,7 +63,7 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
                     T cached = previous.getHollowObject(ordinal);
                     arr.set(ordinal, cached);
                     if(cached instanceof HollowRecord)
-                        ((HollowCachedDelegate)((HollowRecord)cached).getDelegate()).updateTypeAPI(typeAPI);
+                        ((HollowCachedDelegate)((HollowRecord)cached).getDelegate()).updateTypeAPI(typeAPI);    // SNAP: updates typeAPI on the delegate
                 } else if(populatedOrdinals.get(ordinal)){
                     arr.set(ordinal, instantiateCachedObject(factory, typeDataAccess, typeAPI, ordinal));
                 }

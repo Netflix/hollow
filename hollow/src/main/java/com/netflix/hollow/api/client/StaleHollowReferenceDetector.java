@@ -48,7 +48,7 @@ public class StaleHollowReferenceDetector {
     /// b) any object in the DISABLE_TEST_PERIOD has been accessed
     /// c) any hollow objects are referenced which we expect to be unreferenced
     /// and do the appropriate disabling / send the appropriate signals to the update listener.
-    private static final long HOUSEKEEPING_INTERVAL = 30000L;
+    private static final long HOUSEKEEPING_INTERVAL = 30_000L;
     private static final EnabledSamplingDirector ENABLED_SAMPLING_DIRECTOR = new EnabledSamplingDirector();
 
     private final List<HollowWeakReferenceHandle> handles;

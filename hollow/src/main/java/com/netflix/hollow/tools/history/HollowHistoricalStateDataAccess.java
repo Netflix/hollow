@@ -132,7 +132,7 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
         if(typeDataAccess != null)
             return typeDataAccess;
 
-        while(state instanceof HollowHistoricalStateDataAccess) {
+        while(state instanceof HollowHistoricalStateDataAccess) {   // SNAP: Historical state: 2
             HollowHistoricalStateDataAccess historicalState = (HollowHistoricalStateDataAccess)state;
             typeDataAccess = historicalState.typeDataAccessMap.get(typeName);
             if(typeDataAccess != null)
@@ -152,7 +152,7 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
     public HollowTypeDataAccess getTypeDataAccess(String typeName, int ordinal) {
         HollowDataAccess state = this;
 
-        while(state instanceof HollowHistoricalStateDataAccess) {
+        while(state instanceof HollowHistoricalStateDataAccess) {   // SNAP: Historical state: 1    // SNAP: loops here
             HollowHistoricalStateDataAccess historicalState = (HollowHistoricalStateDataAccess)state;
             if(historicalState.getOrdinalMapping().ordinalIsMapped(typeName, ordinal))
                 return state.getTypeDataAccess(typeName);

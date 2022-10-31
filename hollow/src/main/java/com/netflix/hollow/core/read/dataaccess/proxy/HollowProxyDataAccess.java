@@ -47,7 +47,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class HollowProxyDataAccess implements HollowDataAccess {
 
-    private HollowDataAccess currentDataAccess;
+    private HollowDataAccess currentDataAccess; // XXX SNAP: should this be volatile?
+    // XXX no, currentDataAccess isnt used in the read path XXX  Could be that an update to this as historical state is not visible before underlying type state has been updated to contain only remove data
+
     private final ConcurrentHashMap<String, HollowTypeProxyDataAccess> typeDataAccessMap;
 
     public HollowProxyDataAccess() {
@@ -56,8 +58,9 @@ public class HollowProxyDataAccess implements HollowDataAccess {
 
     public void setDataAccess(HollowDataAccess currentDataAccess) {
         this.currentDataAccess = currentDataAccess;
+        // while this is updating, some types states could be pointing to latest state engine 's type state whilst others are updated to historical type state
         for(String type : currentDataAccess.getAllTypes()) {
-            HollowTypeDataAccess typeDataAccess = currentDataAccess.getTypeDataAccess(type);
+            HollowTypeDataAccess typeDataAccess = currentDataAccess.getTypeDataAccess(type);    // type in hollow historical state (containing removed data or empty)
             HollowTypeProxyDataAccess proxyDataAccess = typeDataAccessMap.get(type);
 
             if(proxyDataAccess == null) {
@@ -74,7 +77,17 @@ public class HollowProxyDataAccess implements HollowDataAccess {
                 typeDataAccessMap.put(type, proxyDataAccess);
             }
 
-            proxyDataAccess.setCurrentDataAccess(typeDataAccess);
+            try {
+                Thread.sleep(10);
+            } catch (Exception e) {
+            }
+
+            // SNAP: What if one type updated but not the other ???
+            proxyDataAccess.setCurrentDataAccess(typeDataAccess);   // sets the type data access to the hollow historical type data access (containing removals or empty). It used to be the type data access in the latest read state.
+                        // At time of query will serially check all historic states upto latest state engine
+            // SNAP: TODO: THREAD SAFETY?
+            // other threads may continue to see proxy data access for type (e.g. ProfileId) as the profile ID within latest state engine
+            // however the current thread is what calls refresh listeners so if processed in same thread it should be fine
         }
     }
 

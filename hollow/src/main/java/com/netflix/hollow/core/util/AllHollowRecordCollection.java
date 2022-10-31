@@ -22,6 +22,8 @@ import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 public abstract class AllHollowRecordCollection<T> extends HollowRecordCollection<T> {
 
     public AllHollowRecordCollection(HollowTypeReadState typeState) {
+        // SNAP: TODO: NOTE: This holds a reference to populatedOrdinals bitset which gets updated with refreshes so getAll* methods dont operate on a copy of Bitset
+        //             super((BitSet) typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals().clone());
         super(typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals());
     }
 }

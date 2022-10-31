@@ -1,6 +1,7 @@
 apply plugin: 'java-library'
 
 dependencies {
+
     testImplementation project(":hollow-test")
     testImplementation 'junit:junit:4.11'
     testImplementation 'org.mockito:mockito-core:2.15.0'

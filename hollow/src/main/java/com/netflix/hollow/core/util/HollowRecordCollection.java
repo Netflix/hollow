@@ -26,6 +26,7 @@ public abstract class HollowRecordCollection<T> extends AbstractCollection<T> {
 
     public HollowRecordCollection(BitSet populatedOrdinals) {
         this.populatedOrdinals = populatedOrdinals;
+        System.out.println("SNAP: populatedOrdinals= " + populatedOrdinals.toString());
     }
 
     @Override

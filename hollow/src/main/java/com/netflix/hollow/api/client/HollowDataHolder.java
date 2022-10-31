@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.api.client;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.TransitionAwareRefreshListener;
 import com.netflix.hollow.api.custom.HollowAPI;
@@ -187,7 +189,7 @@ class HollowDataHolder {
         if (objLongevityConfig.enableLongLivedObjectSupport()) {
             HollowProxyDataAccess dataAccess = new HollowProxyDataAccess();
             dataAccess.setDataAccess(stateEngine);
-            currentAPI = apiFactory.createAPI(dataAccess);
+            currentAPI = apiFactory.createAPI(dataAccess);  // SNAP: longevity: note that api is created using dataAccess not stateEngine
         } else {
             currentAPI = apiFactory.createAPI(stateEngine);
         }
@@ -215,17 +217,29 @@ class HollowDataHolder {
              OptionalBlobPartInput optionalPartIn = blob.getOptionalBlobPartInputs()) {
             applyStateEngineTransition(in, optionalPartIn, blob, refreshListeners);
 
-            if(objLongevityConfig.enableLongLivedObjectSupport()) {
-                HollowDataAccess previousDataAccess = currentAPI.getDataAccess();
-                HollowHistoricalStateDataAccess priorState = new HollowHistoricalStateCreator(null).createBasedOnNewDelta(currentVersion, stateEngine);
-                HollowProxyDataAccess newDataAccess = new HollowProxyDataAccess();
-                newDataAccess.setDataAccess(stateEngine);
+
+            if(objLongevityConfig.enableLongLivedObjectSupport()) { // SNAP: longevity tracking starts here
+                HollowDataAccess previousDataAccess = currentAPI.getDataAccess();   // instance of HollowProxyDataAccess was created during applySnapshotTransition or previous applyDeltaTransition
+                Thread.sleep(10);
+                HollowHistoricalStateDataAccess priorState = new HollowHistoricalStateCreator(null).createBasedOnNewDelta(currentVersion, stateEngine); // create a historical state with a copy of data removed by this transition
+                Thread.sleep(10);
+                HollowProxyDataAccess newDataAccess = new HollowProxyDataAccess();  // new data access is also proxy data access
+                Thread.sleep(10);
+                newDataAccess.setDataAccess(stateEngine);   // within newDataAccess, for each type in stateEngine create a proxy data access for that type, that references type state within statenEngine and also stateEngine itself
+                Thread.sleep(10);
                 currentAPI = apiFactory.createAPI(newDataAccess, currentAPI);
+                Thread.sleep(10);
 
-                if(previousDataAccess instanceof HollowProxyDataAccess)
-                    ((HollowProxyDataAccess)previousDataAccess).setDataAccess(priorState);
+                if(previousDataAccess instanceof HollowProxyDataAccess) // always true assuming longevity was enabled at startup
+                    ((HollowProxyDataAccess)previousDataAccess).setDataAccess(priorState);  // references to type with any removed records get updated to point an instance of hollow historical type state (in priorState)
+                    // NOTE that priorHistoricalDataAccess.nextState still points to stateEngine, not priorState's dataAccess
+                // XXX SNAP: TODO: THREAD SAFETY: this statement modifies per-type currentDataAccess
 
-                wireHistoricalStateChain(priorState);
+                Thread.sleep(10);
+                // SNAP: SMOKING GUN: could it be that this priorState chain isn't ready so historical state has nothing to point to???
+                // SNAP: should it be moved up to before the IF ???
+                wireHistoricalStateChain(priorState);   // assigns the previous latest historic state's nextState FROM stateEngine TO newly created historic state,
+                                                        // and updates the value of (latest) priorHistoricalDataAccess
             } else {
                 if(currentAPI.getDataAccess() != stateEngine)
                     currentAPI = apiFactory.createAPI(stateEngine);
@@ -249,9 +263,10 @@ class HollowDataHolder {
         }
     }
 
-    private void wireHistoricalStateChain(HollowHistoricalStateDataAccess nextPriorState) {
+    private void wireHistoricalStateChain(HollowHistoricalStateDataAccess nextPriorState) throws Exception {
         if(priorHistoricalDataAccess != null) {
             HollowHistoricalStateDataAccess dataAccess = priorHistoricalDataAccess.get();
+            Thread.sleep(10);
             if(dataAccess != null) {
                 dataAccess.setNextState(nextPriorState);
             }
