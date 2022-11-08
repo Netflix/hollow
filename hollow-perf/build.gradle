@@ -12,10 +12,8 @@ dependencies {
   compileOnly 'org.openjdk.jmh:jmh-generator-annprocess:1.21'
 }
 
-compileJava {
+tasks.withType(JavaCompile).configureEach {
   options.compilerArgs << '-XDignore.symbol.file'
-  options.fork = true
-  options.forkOptions.executable = 'javac'
 }
 
 jmh {

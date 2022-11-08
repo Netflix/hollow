@@ -8,12 +8,10 @@ dependencies {
     testImplementation 'org.assertj:assertj-core:3.15.0'
 }
 
-// quiet warnings about sun.misc.Unsafe
-compileJava {
-  options.compilerArgs << '-XDignore.symbol.file'
-  options.fork = true
-  options.forkOptions.executable = 'javac'
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << '-XDignore.symbol.file'
 }
+
 
 javadoc {
     options.addStringOption('XDignore.symbol.file', '-quiet')

@@ -1,5 +1,5 @@
 apply plugin: 'java-library'
-apply plugin: 'nebula.facet'
+apply plugin: 'com.netflix.nebula.facet'
 
 facets {
     tools {
