@@ -41,6 +41,7 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
     private final long version;
     private final OrdinalRemapper removedCopyOrdinalMapping;
     private final Map<String, HollowHistoricalSchemaChange> schemaChanges;
+
     private final Map<String, HollowHistoricalTypeDataAccess> typeDataAccessMap;
 
     private final HollowObjectHashCodeFinder hashCodeFinder;
@@ -122,6 +123,10 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
 
     public Map<String, HollowHistoricalSchemaChange> getSchemaChanges() {
         return schemaChanges;
+    }
+
+    Map<String, HollowHistoricalTypeDataAccess> getTypeDataAccessMap() {
+        return typeDataAccessMap;
     }
 
     @Override
