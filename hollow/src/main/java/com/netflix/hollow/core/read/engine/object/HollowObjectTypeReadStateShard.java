@@ -61,7 +61,7 @@ class HollowObjectTypeReadStateShard {
         case BYTES:
         case STRING:
             int numBits = currentData.bitsPerField[fieldIndex];
-            return (fixedLengthValue & (1 << (numBits - 1))) != 0;
+            return (fixedLengthValue & (1L << (numBits - 1))) != 0;
         case FLOAT:
             return (int)fixedLengthValue == HollowObjectWriteRecord.NULL_FLOAT_BITS;
         case DOUBLE:
