@@ -314,12 +314,12 @@ class HollowObjectTypeReadStateShard {
      * @param out
      * @return
      */
-    private static final ThreadLocal<char[]> chararr = new ThreadLocal<char[]>();
+    private static final ThreadLocal<char[]> chararr = ThreadLocal.withInitial(() -> new char[100]);
 
     private String readString(ByteData data, long position, int length) {
         long endPosition = position + length;
 
-        char chararr[] = getCharArray();
+        char chararr[] = HollowObjectTypeReadStateShard.chararr.get();
 
         if(length > chararr.length)
             chararr = new char[length];
@@ -353,15 +353,6 @@ class HollowObjectTypeReadStateShard {
 
         // The number of chars may be fewer than the number of bytes in the serialized data
         return position == endPosition && count == testValue.length();
-    }
-
-    private char[] getCharArray() {
-        char ch[] = chararr.get();
-        if(ch == null) {
-            ch = new char[100];
-            chararr.set(ch);
-        }
-        return ch;
     }
 
     void invalidate() {
