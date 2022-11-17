@@ -168,6 +168,46 @@ public class VarInt {
     }
 
     /**
+     * Read a series of variable length integers from the supplied {@link ByteData} starting at the specified position.
+     * @param arr the byte data to read from
+     * @param position the position in the byte data to read from
+     * @param length the number of bytes that should be read
+     * @param output an array where outputs will be placed, which should be at least {@code length} long and zero.
+     * @return the number of values written
+     */
+    public static int readVIntsInto(ByteData arr, long position, int length, int[] output) {
+        int count = 0;
+        for(int i = 0; i < length; i++) {
+            int b = arr.get(position + i);
+
+            output[count] = (output[count] << 7) | (b & 0x7f);
+            count += (~b >> 7) & 0x1;
+        }
+
+        return count;
+    }
+
+    /**
+     * Read a series of variable length integers (as chars) from the supplied {@link ByteData} starting at the specified position.
+     * @param arr the byte data to read from
+     * @param position the position in the byte data to read from
+     * @param length the number of bytes that should be read
+     * @param output an array where outputs will be placed, which should be at least {@code length} long and zero.
+     * @return the number of values written
+     */
+    public static int readVIntsInto(ByteData arr, long position, int length, char[] output) {
+        int count = 0;
+        for(int i = 0; i < length; i++) {
+            int b = arr.get(position + i);
+
+            output[count] = (char) ((output[count] << 7) | (b & 0x7f));
+            count += (~b >> 7) & 0x1;
+        }
+
+        return count;
+    }
+
+    /**
      * Read a variable length integer from the supplied InputStream
      * @param in the Hollow blob input to read from
      * @return the int value

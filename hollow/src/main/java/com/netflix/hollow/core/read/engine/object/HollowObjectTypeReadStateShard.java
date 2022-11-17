@@ -18,6 +18,12 @@ package com.netflix.hollow.core.read.engine.object;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.List;
+
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
@@ -27,10 +33,6 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.List;
 
 class HollowObjectTypeReadStateShard {
 
@@ -317,20 +319,14 @@ class HollowObjectTypeReadStateShard {
     private static final ThreadLocal<char[]> chararr = ThreadLocal.withInitial(() -> new char[100]);
 
     private String readString(ByteData data, long position, int length) {
-        long endPosition = position + length;
-
-        char chararr[] = HollowObjectTypeReadStateShard.chararr.get();
-
-        if(length > chararr.length)
+        char[] chararr = HollowObjectTypeReadStateShard.chararr.get();
+        if (length > chararr.length) {
             chararr = new char[length];
-
-        int count = 0;
-
-        while(position < endPosition) {
-            int c = VarInt.readVInt(data, position);
-            chararr[count++] = (char)c;
-            position += VarInt.sizeOfVInt(c);
+        } else {
+            Arrays.fill(chararr, 0, length, '\0');
         }
+
+        int count = VarInt.readVIntsInto(data, position, length, chararr);
 
         // The number of chars may be fewer than the number of bytes in the serialized data
         return new String(chararr, 0, count);
