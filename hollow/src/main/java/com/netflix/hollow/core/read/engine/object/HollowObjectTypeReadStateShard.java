@@ -18,12 +18,6 @@ package com.netflix.hollow.core.read.engine.object;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.List;
-
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
@@ -33,6 +27,11 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.List;
 
 class HollowObjectTypeReadStateShard {
 
