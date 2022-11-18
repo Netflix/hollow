@@ -32,6 +32,7 @@ import com.netflix.hollow.core.write.copy.HollowRecordCopier;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.OptionalInt;
 
 /**
  * The {@link HollowTypeWriteState} contains and is the root handle to all of the records of a specific type in
@@ -51,6 +52,18 @@ public abstract class HollowTypeWriteState {
 
     protected ThreadSafeBitSet currentCyclePopulated;
     protected ThreadSafeBitSet previousCyclePopulated;
+
+    /// a modification is counted as 1 ordinal added and 1 ordinal removed
+    protected OptionalInt deltaAddedOrdinalCount = OptionalInt.empty();
+    protected OptionalInt deltaRemovedOrdinalCount = OptionalInt.empty();
+
+    public OptionalInt getDeltaAddedOrdinalCount() {
+        return deltaAddedOrdinalCount;
+    }
+
+    public OptionalInt getDeltaRemovedOrdinalCount() {
+        return deltaRemovedOrdinalCount;
+    }
 
     private final ThreadLocal<ByteDataArray> serializedScratchSpace;
 
@@ -262,6 +275,9 @@ public abstract class HollowTypeWriteState {
         restoredMap = null;
         restoredSchema = null;
         restoredReadState = null;
+
+        deltaAddedOrdinalCount = OptionalInt.empty();
+        deltaRemovedOrdinalCount = OptionalInt.empty();
     }
 
     public void prepareForWrite() {

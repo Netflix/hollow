@@ -42,6 +42,7 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
@@ -50,8 +51,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -853,7 +857,12 @@ abstract class AbstractHollowProducer {
                                 "Fail the announcement because current producer is not primary (aka leader)");
                         throw new HollowProducer.NotPrimaryMidCycleException("Announcement failed primary (aka leader) check");
                     }
-                    announcer.announce(readState.getVersion(), readState.getStateEngine().getHeaderTags());
+
+                    Map<String, String> announceTags = new HashMap();
+                    announceTags.putAll(changeCounts(getWriteEngine()));                // change counts
+                    announceTags.putAll(readState.getStateEngine().getHeaderTags());    // blob headers
+
+                    announcer.announce(readState.getVersion(), announceTags);
                 } finally {
                     singleProducerEnforcer.unlock();
                 }
@@ -865,6 +874,35 @@ abstract class AbstractHollowProducer {
                 listeners.fireAnnouncementComplete(status);
             }
         }
+    }
+
+    public Map<String, String> changeCounts(HollowWriteStateEngine writeStateEngine) {
+        OptionalLong totalAdded = OptionalLong.empty();
+        OptionalLong totalRemoved = OptionalLong.empty();
+        Map<String, String> changeCounts = new HashMap();
+
+        for (HollowTypeWriteState typeState : writeStateEngine.getOrderedTypeStates()) {
+            if (typeState.getDeltaAddedOrdinalCount().isPresent()) {
+                int added = typeState.getDeltaAddedOrdinalCount().getAsInt();
+                changeCounts.put("hollow.ordinals.added.type." + typeState.getSchema().getName(),
+                        String.valueOf(added));
+                totalAdded = OptionalLong.of(totalAdded.isPresent()
+                        ? (totalAdded.getAsLong() + added)
+                        : added);
+            }
+            if (typeState.getDeltaRemovedOrdinalCount().isPresent()) {
+                int removed = typeState.getDeltaRemovedOrdinalCount().getAsInt();
+                changeCounts.put("hollow.ordinals.removed.type." + typeState.getSchema().getName(),
+                        String.valueOf(removed));
+                totalRemoved = OptionalLong.of(totalRemoved.isPresent()
+                        ? (totalRemoved.getAsLong() + removed)
+                        : removed);
+            }
+        }
+        totalAdded.ifPresent(v -> changeCounts.put("hollow.ordinals.added.total", String.valueOf(v)));
+        totalRemoved.ifPresent(v -> changeCounts.put("hollow.ordinals.removed.total", String.valueOf(v)));
+
+        return changeCounts;
     }
 
     static final class Artifacts {
