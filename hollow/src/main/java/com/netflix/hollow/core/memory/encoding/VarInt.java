@@ -176,8 +176,17 @@ public class VarInt {
      * @return the number of values written
      */
     public static int readVIntsInto(ByteData arr, long position, int length, int[] output) {
-        int count = 0;
-        for(int i = 0; i < length; i++) {
+        // two loops, first for single-byte encodes, falling back to second full-featured loop
+        int i = 0;
+        for(; i < length; i++) {
+            int b = arr.get(position + i);
+            if ((b & 0x80) != 0)
+                break;
+            output[i] = b;
+        }
+
+        int count = i;
+        for(; i < length; i++) {
             int b = arr.get(position + i);
 
             output[count] = (output[count] << 7) | (b & 0x7f);
@@ -196,8 +205,17 @@ public class VarInt {
      * @return the number of values written
      */
     public static int readVIntsInto(ByteData arr, long position, int length, char[] output) {
-        int count = 0;
-        for(int i = 0; i < length; i++) {
+        // two loops, first for single-byte encodes, falling back to second full-featured loop
+        int i = 0;
+        for(; i < length; i++) {
+            int b = arr.get(position + i);
+            if ((b & 0x80) != 0)
+                break;
+            output[i] = (char) b;
+        }
+
+        int count = i;
+        for(; i < length; i++) {
             int b = arr.get(position + i);
 
             output[count] = (char) ((output[count] << 7) | (b & 0x7f));
