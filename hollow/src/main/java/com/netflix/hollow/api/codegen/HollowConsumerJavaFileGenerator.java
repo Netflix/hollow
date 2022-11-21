@@ -118,7 +118,7 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
                     }
                 }
                 for (String schemaName : schemaNameSet) {
-                    appendImportFromBasePackage(builder, schemaName + config.getClassPostfix());
+                    appendImportFromBasePackage(builder, HollowCodeGenerationUtils.upperFirstChar(schemaName) + config.getClassPostfix());
                 }
                 appendImportFromBasePackage(builder, "core.*");
                 if (useCollectionsImport) {

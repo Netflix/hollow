@@ -132,7 +132,7 @@ Namespacing fields is also useful if some consumers don't need the contents of a
     Using an appropriately _namespaced_ type reduces the heap footprint cost of `REFERENCE` fields.
 
 !!! hint "Changing default _type names_"
-    The `@HollowTypeName` annotation can also be used at the class level to select a default type name for a class other than its simple name.
+    The `@HollowTypeName` annotation can also be used at the class level to select a default type name for a class other than its simple name. Custom type names should begin with an upper case character to avoid ambiguity in naming in the generated API, although this is not enforced by Hollow due to backwards compatibility reasons.
 
 ### Grouping Associated Fields
 
