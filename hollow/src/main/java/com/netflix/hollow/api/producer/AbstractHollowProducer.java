@@ -50,7 +50,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,6 +64,8 @@ import java.util.logging.Logger;
 abstract class AbstractHollowProducer {
 
     static final long DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE = 16L * 1024L * 1024L;
+    // An announcement metadata tag indicating the approx heap footprint of the corresponding read state engine
+    private static final String ANNOUNCE_TAG_HEAP_FOOTPRINT = "hollow.data.size.heap.bytes.approx";
 
     final Logger log = Logger.getLogger(AbstractHollowProducer.class.getName());
     final HollowProducer.BlobStager blobStager;
@@ -853,7 +857,10 @@ abstract class AbstractHollowProducer {
                                 "Fail the announcement because current producer is not primary (aka leader)");
                         throw new HollowProducer.NotPrimaryMidCycleException("Announcement failed primary (aka leader) check");
                     }
-                    announcer.announce(readState.getVersion(), readState.getStateEngine().getHeaderTags());
+                    Map<String, String> announcementMetadata = new HashMap<>();
+                    announcementMetadata.putAll(readState.getStateEngine().getHeaderTags());
+                    announcementMetadata.put(ANNOUNCE_TAG_HEAP_FOOTPRINT, String.valueOf(readState.getStateEngine().calcApproxDataSize()));
+                    announcer.announce(readState.getVersion(), announcementMetadata);
                 } finally {
                     singleProducerEnforcer.unlock();
                 }
