@@ -9,10 +9,11 @@ facets {
 
 dependencies {
     api project(':hollow')
-    api 'org.apache.velocity:velocity:1.7'
+    api 'org.apache.velocity:velocity-engine-core:2.3'
     api 'commons-codec:commons-codec:1.11'
     implementation 'commons-io:commons-io:2.6'
     implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'commons-lang:commons-lang:2.+'
 
     compileOnly 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'
 
