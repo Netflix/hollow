@@ -82,10 +82,13 @@ public class HollowPrefixIndexTest {
         HollowTokenizedPrefixIndex tokenizedPrefixIndex = new HollowTokenizedPrefixIndex(readStateEngine, "SimpleMovie", "name.value");
 
         Set<Integer> ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("th"));
-        Assert.assertTrue(ordinals.size() == 1);
+        Assert.assertTrue(ordinals.size() == 3);
 
         ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("matrix"));
-        Assert.assertTrue(ordinals.size() == 1);
+        Assert.assertTrue(ordinals.size() == 3);
+
+        ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("re"));
+        Assert.assertTrue(ordinals.size() == 2);
 
         ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("the "));// note the whitespace in findKeysWithPrefix string.
         // expected result ordinals size is 0, since entire movie is not indexed. movie name is split by whitespace.
@@ -269,7 +272,7 @@ public class HollowPrefixIndexTest {
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
         HollowPrefixIndex index = new HollowPrefixIndex(readStateEngine, "MovieWithReferenceName", "name.n");// no.value appended, it should work
         Set<Integer> ordinals = toSet(index.findKeysWithPrefix("the"));
-        Assert.assertTrue(ordinals.size() == 1);
+        Assert.assertTrue(ordinals.size() == 3);
 
     }
 
@@ -289,13 +292,13 @@ public class HollowPrefixIndexTest {
         Assert.assertEquals(ordinals.size(), 2);
 
         ordinals = toSet(prefixIndex.findKeysWithPrefix("th"));
-        Assert.assertEquals(ordinals.size(), 1);
+        Assert.assertEquals(ordinals.size(), 3);
 
         ordinals = toSet(prefixIndex.findKeysWithPrefix("ttt"));
         Assert.assertEquals(ordinals.size(), 0);
 
         ordinals = toSet(prefixIndex.findKeysWithPrefix("the"));
-        Assert.assertEquals(ordinals.size(), 1);
+        Assert.assertEquals(ordinals.size(), 3);
 
         ordinals = toSet(prefixIndex.findKeysWithPrefix("blOO"));
         Assert.assertEquals(ordinals.size(), 1);
@@ -307,6 +310,8 @@ public class HollowPrefixIndexTest {
         movies.add(new SimpleMovie(2, "Blood Diamond", 2006));
         movies.add(new SimpleMovie(3, "Rush", 2013));
         movies.add(new SimpleMovie(4, "Rocky", 1976));
+        movies.add(new SimpleMovie(5, "The Matrix Reloaded", 2003));
+        movies.add(new SimpleMovie(6, "The Matrix Resurrections", 2021));
         return movies;
     }
 
@@ -316,6 +321,8 @@ public class HollowPrefixIndexTest {
         movies.add(new MovieInlineName(2, "Blood Diamond", 2006));
         movies.add(new MovieInlineName(3, "Rush", 2013));
         movies.add(new MovieInlineName(4, "Rocky", 1976));
+        movies.add(new MovieInlineName(5, "The Matrix Reloaded", 2003));
+        movies.add(new MovieInlineName(6, "The Matrix Resurrections", 2021));
         return movies;
     }
 
@@ -325,6 +332,8 @@ public class HollowPrefixIndexTest {
         movies.add(new MovieWithReferenceName(2, "Blood Diamond", 2006));
         movies.add(new MovieWithReferenceName(3, "Rush", 2013));
         movies.add(new MovieWithReferenceName(4, "Rocky", 1976));
+        movies.add(new MovieWithReferenceName(5, "The Matrix Reloaded", 2003));
+        movies.add(new MovieWithReferenceName(6, "The Matrix Resurrections", 2021));
         return movies;
     }
 
@@ -334,6 +343,8 @@ public class HollowPrefixIndexTest {
         movies.add(new MovieWithReferenceToInlineName(2, "Blood Diamond", 2006));
         movies.add(new MovieWithReferenceToInlineName(3, "Rush", 2013));
         movies.add(new MovieWithReferenceToInlineName(4, "Rocky", 1976));
+        movies.add(new MovieWithReferenceToInlineName(5, "The Matrix Reloaded", 2003));
+        movies.add(new MovieWithReferenceToInlineName(6, "The Matrix Resurrections", 2021));
         return movies;
     }
 
