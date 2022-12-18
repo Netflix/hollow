@@ -277,7 +277,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         initialize();
     }
 
-    private static class TST {
+    private static class TST {  // ternary search tree
 
         private enum NodeType {
             Left, Right, Middle
@@ -293,7 +293,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         private long leftChildOffset;
         private long middleChildOffset;
         private long rightChildOffset;
-        private long isLeafNodeFlagOffset;
+        private long isEndFlagOffset;   // indicates end of a value stored in TST
 
         private long maxNodes;
         private FixedLengthElementArray nodes;
@@ -331,7 +331,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             leftChildOffset = bitsPerKey;// after first 16 bits in node is first left child offset.
             middleChildOffset = leftChildOffset + bitsForChildPointer;
             rightChildOffset = middleChildOffset + bitsForChildPointer;
-            isLeafNodeFlagOffset = rightChildOffset + bitsForChildPointer;
+            isEndFlagOffset = rightChildOffset + bitsForChildPointer;
         }
 
         // tell memory recycler to use these long array on next long array request from memory ONLY AFTER swap is called on memory recycler
@@ -366,13 +366,13 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             return nodes.getElementValue(nodeIndex * bitsPerNode, bitsPerKey);
         }
 
-        private boolean isLeafNode(long nodeIndex) {
-            return nodes.getElementValue((nodeIndex * bitsPerNode) + isLeafNodeFlagOffset, 1) == 1;
+        private boolean isEndNode(long nodeIndex) {
+            return nodes.getElementValue((nodeIndex * bitsPerNode) + isEndFlagOffset, 1) == 1;
         }
 
         private void addOrdinal(long nodeIndex, long ordinal) {
             ordinalSet.addElement(nodeIndex, ordinal);
-            nodes.setElementValue((nodeIndex * bitsPerNode) + isLeafNodeFlagOffset, 1, 1);
+            nodes.setElementValue((nodeIndex * bitsPerNode) + isEndFlagOffset, 1, 1);
         }
 
         private Set<Integer> getOrdinals(long nodeIndex) {
@@ -455,7 +455,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
         private boolean contains(String key) {
             long nodeIndex = findNodeWithKey(key);
-            return nodeIndex >= 0 && isLeafNode(nodeIndex);
+            return nodeIndex >= 0 && isEndNode(nodeIndex);
         }
 
         /**
@@ -468,7 +468,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
             if (currentNodeIndex >= 0) {
 
-                if (isLeafNode(currentNodeIndex))
+                if (isEndNode(currentNodeIndex))
                     ordinals.addAll(getOrdinals(currentNodeIndex));
 
                 // go to all leaf nodes from current node mid pointer
@@ -482,9 +482,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
                         long mid = getChildIndex(nodeIndex, NodeType.Middle);
                         long right = getChildIndex(nodeIndex, NodeType.Right);
 
-                        if (left == 0 && mid == 0 && right == 0) {
-                            if (isLeafNode(nodeIndex)) ordinals.addAll(getOrdinals(nodeIndex));
-                        }
+                        if (isEndNode(nodeIndex)) ordinals.addAll(getOrdinals(nodeIndex));
                         if (left != 0) queue.add(left);
                         if (mid != 0) queue.add(mid);
                         if (right != 0) queue.add(right);
