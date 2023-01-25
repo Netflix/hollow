@@ -21,6 +21,8 @@ import com.netflix.hollow.tools.diff.HollowDiff;
 /**
  * @deprecated
  * This class is replaced by {@link com.netflix.hollow.diff.ui.webserver.HollowDiffUIServer}
+ *
+ * It now acts as an adapter for the replacement, and no longer depends on jetty-server.
  */
 @Deprecated
 public class HollowDiffUIServer {

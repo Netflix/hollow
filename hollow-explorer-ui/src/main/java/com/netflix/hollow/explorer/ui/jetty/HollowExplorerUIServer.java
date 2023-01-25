@@ -25,8 +25,7 @@ import com.netflix.hollow.explorer.ui.HollowExplorerUI;
  * @deprecated
  * This class is replaced by {@link com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer}
  *
- * The replacement was motivated by the desire to move away from jetty-server. Implementation fo this class now simply
- * wraps the replacement class (and thus no longer depends on jetty-server).
+ * It now acts as an adapter for the replacement, and no longer depends on jetty-server.
  */
 @Deprecated
 public class HollowExplorerUIServer {

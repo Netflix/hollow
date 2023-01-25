@@ -24,6 +24,9 @@ import java.util.TimeZone;
 /**
  * @deprecated
  * This class is replaced by {@link com.netflix.hollow.history.ui.webserver.HollowHistoryUIServer}
+ *
+ * It now acts as an adapter for the replacement, and no longer depends on jetty-server.
+ *
  */
 @Deprecated
 public class HollowHistoryUIServer {
