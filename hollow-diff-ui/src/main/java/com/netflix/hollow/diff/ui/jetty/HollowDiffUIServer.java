@@ -21,9 +21,9 @@ import com.netflix.hollow.tools.diff.HollowDiff;
 /**
  * @deprecated
  *
- * Use {@link com.netflix.hollow.history.ui.HollowHistoryUIServer}. This is deprecated because package name
+ * Use {@link com.netflix.hollow.diff.ui.HollowDiffUIServer}. This is deprecated because package name
  * contains "jetty" but jetty-server dep is no longer required. Instead, this class lives on as an adapter
- * over {@link com.netflix.hollow.history.ui.HollowHistoryUIServer}.
+ * over {@link com.netflix.hollow.diff.ui.HollowDiffUIServer}.
  */
 @Deprecated
 public class HollowDiffUIServer {
