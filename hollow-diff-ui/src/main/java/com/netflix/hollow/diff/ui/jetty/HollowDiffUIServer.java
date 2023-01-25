@@ -20,9 +20,10 @@ import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.tools.diff.HollowDiff;
 /**
  * @deprecated
- * This class is replaced by {@link com.netflix.hollow.diff.ui.HollowDiffUIServer}
  *
- * It now acts as an adapter for the replacement, and no longer depends on jetty-server.
+ * Use {@link com.netflix.hollow.history.ui.HollowHistoryUIServer}. This is deprecated because package name
+ * contains "jetty" but jetty-server dep is no longer required. Instead, this class lives on as an adapter
+ * over {@link com.netflix.hollow.history.ui.HollowHistoryUIServer}.
  */
 @Deprecated
 public class HollowDiffUIServer {

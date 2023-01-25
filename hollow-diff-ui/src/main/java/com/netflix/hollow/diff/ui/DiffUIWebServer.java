@@ -9,7 +9,7 @@ class DiffUIWebServer extends HollowUIWebServer implements DiffUIServer {
 
     public DiffUIWebServer(HollowDiffUIRouter router, int port) {
         super(new HttpHandlerWithServletSupport(router), port);
-        this.router = (HollowDiffUIRouter) router;
+        this.router = router;
     }
 
     public HollowDiffUI addDiff(String diffPath, HollowDiff diff, String fromBlobName, String toBlobName) {

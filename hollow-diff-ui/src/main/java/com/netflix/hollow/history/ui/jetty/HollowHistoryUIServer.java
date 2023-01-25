@@ -18,15 +18,16 @@ package com.netflix.hollow.history.ui.jetty;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
+import com.netflix.hollow.history.ui.VersionTimestampConverter;
 import com.netflix.hollow.tools.history.HollowHistory;
 import java.util.TimeZone;
 
 /**
  * @deprecated
- * This class is replaced by {@link com.netflix.hollow.history.ui.HollowHistoryUIServer}
  *
- * It now acts as an adapter for the replacement, and no longer depends on jetty-server.
- *
+ * Use {@link com.netflix.hollow.history.ui.HollowHistoryUIServer}. This is deprecated because package name
+ * contains "jetty" but jetty-server dep is no longer required. Instead, this class lives on as an adapter
+ * over {@link com.netflix.hollow.history.ui.HollowHistoryUIServer}.
  */
 @Deprecated
 public class HollowHistoryUIServer {
@@ -55,7 +56,7 @@ public class HollowHistoryUIServer {
      * @param port server port
      */
     public HollowHistoryUIServer(HollowConsumer consumerFwd, HollowConsumer consumerRev, int port) {
-        this(consumerFwd, consumerRev, 1024, port, TimeZone.getTimeZone("America/Los_Angeles"));
+        this(consumerFwd, consumerRev, 1024, port, VersionTimestampConverter.PACIFIC_TIMEZONE);
     }
 
     public HollowHistoryUIServer(HollowConsumer consumerFwd, HollowConsumer consumerRev, int numStatesToTrack, int port, TimeZone timeZone) {

@@ -49,7 +49,7 @@ public class HollowHistoryUIServer {
      * @param port server port
      */
     public HollowHistoryUIServer(HollowConsumer consumerFwd, HollowConsumer consumerRev, int port) {
-        this(consumerFwd, consumerRev, 1024, port, TimeZone.getTimeZone("America/Los_Angeles"));
+        this(consumerFwd, consumerRev, 1024, port, VersionTimestampConverter.PACIFIC_TIMEZONE);
     }
 
     public HollowHistoryUIServer(HollowConsumer consumerFwd, HollowConsumer consumerRev, int numStatesToTrack, int port, TimeZone timeZone) {

@@ -160,11 +160,6 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     public HollowHistory getHistory() {
         return history;
     }
- 
-    public void handle(String target, HttpServletRequest request, HttpServletResponse response)
-        throws IOException {
-        doGet(request, response);
-    }
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
