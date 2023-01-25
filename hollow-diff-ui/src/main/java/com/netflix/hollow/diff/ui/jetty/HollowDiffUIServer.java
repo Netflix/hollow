@@ -20,21 +20,21 @@ import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.tools.diff.HollowDiff;
 /**
  * @deprecated
- * This class is replaced by {@link com.netflix.hollow.diff.ui.webserver.HollowDiffUIServer}
+ * This class is replaced by {@link com.netflix.hollow.diff.ui.HollowDiffUIServer}
  *
  * It now acts as an adapter for the replacement, and no longer depends on jetty-server.
  */
 @Deprecated
 public class HollowDiffUIServer {
 
-    private final com.netflix.hollow.diff.ui.webserver.HollowDiffUIServer server;
+    private final com.netflix.hollow.diff.ui.HollowDiffUIServer server;
 
     public HollowDiffUIServer() {
-        server = new com.netflix.hollow.diff.ui.webserver.HollowDiffUIServer();
+        server = new com.netflix.hollow.diff.ui.HollowDiffUIServer();
     }
 
     public HollowDiffUIServer(int port) {
-        server = new com.netflix.hollow.diff.ui.webserver.HollowDiffUIServer(port);
+        server = new com.netflix.hollow.diff.ui.HollowDiffUIServer(port);
     }
 
     public HollowDiffUI addDiff(String diffPath, HollowDiff diff) {

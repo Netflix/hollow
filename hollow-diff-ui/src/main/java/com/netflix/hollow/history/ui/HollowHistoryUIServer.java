@@ -14,11 +14,9 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.history.ui.webserver;
+package com.netflix.hollow.history.ui;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.history.ui.HollowHistoryUI;
-import com.netflix.hollow.history.ui.VersionTimestampConverter;
 import com.netflix.hollow.tools.history.HollowHistory;
 import com.netflix.hollow.ui.HollowUIWebServer;
 import com.netflix.hollow.ui.HttpHandlerWithServletSupport;

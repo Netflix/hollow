@@ -23,29 +23,29 @@ import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 
 /**
  * @deprecated
- * This class is replaced by {@link com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer}
+ * This class is replaced by {@link com.netflix.hollow.explorer.ui.HollowExplorerUIServer}
  *
  * It now acts as an adapter for the replacement, and no longer depends on jetty-server.
  */
 @Deprecated
 public class HollowExplorerUIServer {
 
-    private final com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer server;    
+    private final com.netflix.hollow.explorer.ui.HollowExplorerUIServer server;
 
     public HollowExplorerUIServer(HollowReadStateEngine readEngine, int port) {
-        server = new com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer( readEngine, port);
+        server = new com.netflix.hollow.explorer.ui.HollowExplorerUIServer( readEngine, port);
     }
 
     public HollowExplorerUIServer(HollowConsumer consumer, int port) {
-        server = new com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer( consumer, port);
+        server = new com.netflix.hollow.explorer.ui.HollowExplorerUIServer( consumer, port);
     }
 
     public HollowExplorerUIServer(HollowClient client, int port) {
-        server = new com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer( client, port);
+        server = new com.netflix.hollow.explorer.ui.HollowExplorerUIServer( client, port);
     }
 
     public HollowExplorerUIServer(HollowExplorerUI ui, int port) {
-        server = new com.netflix.hollow.explorer.ui.webserver.HollowExplorerUIServer(ui, port);
+        server = new com.netflix.hollow.explorer.ui.HollowExplorerUIServer(ui, port);
     }
 
     public HollowExplorerUIServer start() throws Exception {

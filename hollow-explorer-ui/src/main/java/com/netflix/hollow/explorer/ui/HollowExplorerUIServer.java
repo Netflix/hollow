@@ -14,12 +14,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.explorer.ui.webserver;
+package com.netflix.hollow.explorer.ui;
 
 import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.ui.HollowUIWebServer;
 import com.netflix.hollow.ui.HttpHandlerWithServletSupport;
 

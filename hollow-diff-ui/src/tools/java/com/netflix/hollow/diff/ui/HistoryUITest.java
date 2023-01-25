@@ -10,7 +10,7 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.history.ui.webserver.HollowHistoryUIServer;
+import com.netflix.hollow.history.ui.HollowHistoryUIServer;
 import com.netflix.hollow.tools.history.HollowHistory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

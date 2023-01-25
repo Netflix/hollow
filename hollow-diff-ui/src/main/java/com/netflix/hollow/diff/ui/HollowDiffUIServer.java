@@ -14,10 +14,8 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.diff.ui.webserver;
+package com.netflix.hollow.diff.ui;
 
-import com.netflix.hollow.diff.ui.HollowDiffUI;
-import com.netflix.hollow.diff.ui.HollowDiffUIRouter;
 import com.netflix.hollow.tools.diff.HollowDiff;
 
 public class HollowDiffUIServer {

@@ -23,7 +23,7 @@ import java.util.TimeZone;
 
 /**
  * @deprecated
- * This class is replaced by {@link com.netflix.hollow.history.ui.webserver.HollowHistoryUIServer}
+ * This class is replaced by {@link com.netflix.hollow.history.ui.HollowHistoryUIServer}
  *
  * It now acts as an adapter for the replacement, and no longer depends on jetty-server.
  *
@@ -31,7 +31,7 @@ import java.util.TimeZone;
 @Deprecated
 public class HollowHistoryUIServer {
 
-    private final com.netflix.hollow.history.ui.webserver.HollowHistoryUIServer server;
+    private final com.netflix.hollow.history.ui.HollowHistoryUIServer server;
 
     /**
      * HollowHistoryUIServer that builds history using a consumer that transitions forwards i.e. in increasing version
@@ -41,7 +41,7 @@ public class HollowHistoryUIServer {
      * @param port server port
      */
     public HollowHistoryUIServer(HollowConsumer consumer, int port) {
-        server = new com.netflix.hollow.history.ui.webserver.HollowHistoryUIServer(consumer, port);
+        server = new com.netflix.hollow.history.ui.HollowHistoryUIServer(consumer, port);
     }
 
     /**
@@ -63,23 +63,23 @@ public class HollowHistoryUIServer {
     }
 
     public HollowHistoryUIServer(HollowConsumer consumer, int port, TimeZone timeZone) {
-            server = new com.netflix.hollow.history.ui.webserver.HollowHistoryUIServer(consumer, port, timeZone);
+            server = new com.netflix.hollow.history.ui.HollowHistoryUIServer(consumer, port, timeZone);
         }
 
     public HollowHistoryUIServer(HollowConsumer consumer, int numStatesToTrack, int port, TimeZone timeZone) {
-        server = new com.netflix.hollow.history.ui.webserver.HollowHistoryUIServer( consumer, numStatesToTrack, port, timeZone);
+        server = new com.netflix.hollow.history.ui.HollowHistoryUIServer( consumer, numStatesToTrack, port, timeZone);
     }
 
     public HollowHistoryUIServer(HollowConsumer consumer, int numStatesToTrack, int port) {
-        server = new com.netflix.hollow.history.ui.webserver.HollowHistoryUIServer( consumer, numStatesToTrack, port);
+        server = new com.netflix.hollow.history.ui.HollowHistoryUIServer( consumer, numStatesToTrack, port);
     }
 
     public HollowHistoryUIServer(HollowHistory history, int port) {
-        server = new com.netflix.hollow.history.ui.webserver.HollowHistoryUIServer( history, port);
+        server = new com.netflix.hollow.history.ui.HollowHistoryUIServer( history, port);
     }
 
     public HollowHistoryUIServer(HollowHistoryUI ui, int port) {
-       server = new com.netflix.hollow.history.ui.webserver.HollowHistoryUIServer(ui, port);
+       server = new com.netflix.hollow.history.ui.HollowHistoryUIServer(ui, port);
     }
 
     public HollowHistoryUIServer start() throws Exception {

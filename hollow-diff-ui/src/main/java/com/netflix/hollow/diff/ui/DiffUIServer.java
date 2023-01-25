@@ -15,9 +15,8 @@
  *
  */
 
-package com.netflix.hollow.diff.ui.webserver;
+package com.netflix.hollow.diff.ui;
 
-import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.hollow.ui.UIServer;
 
