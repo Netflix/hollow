@@ -22,13 +22,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class UIBaseWebServer {
+public class HollowUIWebServer {
     private HttpServer server;
     private final HttpHandlerWithServletSupport handler;
     private final int port;
     private ExecutorService threadPool;
 
-    public UIBaseWebServer(HttpHandlerWithServletSupport handler, int port) {
+    public HollowUIWebServer(HttpHandlerWithServletSupport handler, int port) {
         this.port = port;
         this.handler = handler;
         this.threadPool = Executors.newCachedThreadPool();

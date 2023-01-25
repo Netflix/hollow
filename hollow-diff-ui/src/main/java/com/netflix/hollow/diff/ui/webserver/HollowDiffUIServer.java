@@ -29,7 +29,7 @@ public class HollowDiffUIServer {
     }
 
     public HollowDiffUIServer(int port) {
-        this.server = new UIWebServer(new HollowDiffUIRouter(), port);
+        this.server = new DiffUIWebServer(new HollowDiffUIRouter(), port);
     }
 
     public HollowDiffUI addDiff(String diffPath, HollowDiff diff) {

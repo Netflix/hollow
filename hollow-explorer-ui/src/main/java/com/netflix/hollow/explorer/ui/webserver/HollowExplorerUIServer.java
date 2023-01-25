@@ -20,10 +20,11 @@ import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
-import com.netflix.hollow.ui.UIServer;
+import com.netflix.hollow.ui.HollowUIWebServer;
+import com.netflix.hollow.ui.HttpHandlerWithServletSupport;
 
 public class HollowExplorerUIServer {
-    private final UIServer server;
+    private final HollowUIWebServer server;
     private final HollowExplorerUI ui;
 
     public HollowExplorerUIServer(HollowReadStateEngine readEngine, int port) {
@@ -39,7 +40,7 @@ public class HollowExplorerUIServer {
     }
 
     public HollowExplorerUIServer(HollowExplorerUI ui, int port) {
-        this.server = new UIWebServer(ui, port);
+        this.server = new HollowUIWebServer(new HttpHandlerWithServletSupport(ui), port);
         this.ui = ui;
     }
 

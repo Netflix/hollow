@@ -20,12 +20,13 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.VersionTimestampConverter;
 import com.netflix.hollow.tools.history.HollowHistory;
-import com.netflix.hollow.ui.UIServer;
+import com.netflix.hollow.ui.HollowUIWebServer;
+import com.netflix.hollow.ui.HttpHandlerWithServletSupport;
 import java.util.TimeZone;
 
 public class HollowHistoryUIServer {
 
-    private final UIServer server;
+    private final HollowUIWebServer server;
     private final HollowHistoryUI ui;
 
     /**
@@ -74,7 +75,7 @@ public class HollowHistoryUIServer {
     }
 
     public HollowHistoryUIServer(HollowHistoryUI ui, int port) {
-        this.server = new UIWebServer(ui, port);
+        this.server = new HollowUIWebServer(new HttpHandlerWithServletSupport(ui), port);
         this.ui = ui;
     }
 
