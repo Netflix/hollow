@@ -71,6 +71,11 @@ public class HollowExplorerUI extends HollowUIRouter {
         this.queryPage = new QueryPage(this);
     }
 
+    public void handle( String target, HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        doGet(request, response);
+    }
+
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String pageName = getTargetRootPath(req.getPathInfo());

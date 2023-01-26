@@ -37,6 +37,11 @@ public class HollowDiffUIRouter extends HollowUIRouter {
         this.diffUIs = new LinkedHashMap<>();
     }
 
+    public void handle(String target, HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        doGet(request, response);
+    }
+
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String diffUIKey = getTargetRootPath(req.getPathInfo());

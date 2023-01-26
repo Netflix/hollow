@@ -18,54 +18,73 @@ package com.netflix.hollow.ui;
 
 import com.sun.net.httpserver.HttpServer;
 import java.net.InetSocketAddress;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class HollowUIWebServer {
     private HttpServer server;
     private final HttpHandlerWithServletSupport handler;
     private final int port;
-    private ExecutorService threadPool;
+    private JoinableExecutorService executor;
+
+    /**
+     * Extends {@code ThreadPoolExecutor} to allow waiting indefinitely for termination of underlying threadpool
+     */
+    private static class JoinableExecutorService extends ThreadPoolExecutor {
+        private CountDownLatch countDownLatch;
+
+        JoinableExecutorService() {
+            super(0, Integer.MAX_VALUE,
+                    60L, TimeUnit.SECONDS,
+                    new SynchronousQueue<Runnable>());
+            countDownLatch = new CountDownLatch(1);
+        }
+
+        @Override
+        protected void terminated() {
+            super.terminated();
+            countDownLatch.countDown();
+        }
+
+        void join() throws InterruptedException {
+            countDownLatch.await();
+        }
+    }
 
     public HollowUIWebServer(HttpHandlerWithServletSupport handler, int port) {
         this.port = port;
         this.handler = handler;
-        this.threadPool = Executors.newCachedThreadPool();
+        this.executor = new JoinableExecutorService();
     }
 
     public void start() throws Exception {
         server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/", this.handler);
-        server.setExecutor(threadPool);
+        server.setExecutor(executor);
         server.start();
     }
 
     /* There is no native join facility available on the webserver, so wait for all the
        service threads in the webserver to complete*/
     public void join() throws InterruptedException {
-        while (!threadPool.isShutdown()) {
-            Thread.sleep(10);  // sleep for a few ms
-        }
-    }
-
-    private void shutdownAndAwaitTermination(ExecutorService pool) {
-       pool.shutdown(); // Disable new tasks from being submitted
-       try {
-         // Wait a while for existing tasks to terminate
-         if (!pool.awaitTermination(3, TimeUnit.SECONDS)) {
-           pool.shutdownNow(); // Cancel currently executing tasks
-           // Wait a while for tasks to respond to being cancelled
-           if (!pool.awaitTermination(3, TimeUnit.SECONDS))
-               System.err.println("Http Server ThreadPool did not terminate");
-         }
-       } catch (InterruptedException ie) {
-         pool.shutdownNow();
-       }
+        executor.join();
     }
 
     public void stop() throws Exception {
-        shutdownAndAwaitTermination(threadPool);
+        executor.shutdown(); // Disable new tasks from being submitted
+        try {
+            // Wait a while for existing tasks to terminate
+            if (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
+                executor.shutdownNow(); // Cancel currently executing tasks
+                // Wait a while for tasks to respond to being cancelled
+                if (!executor.awaitTermination(10, TimeUnit.SECONDS))
+                    System.err.println("Http Server ThreadPool did not terminate");
+            }
+        } catch (InterruptedException ie) {
+            executor.shutdownNow();
+        }
         server.stop(0);
     }
 
