@@ -66,19 +66,15 @@ public class HollowUIWebServer {
         server.start();
     }
 
-    /* There is no native join facility available on the webserver, so wait for all the
-       service threads in the webserver to complete*/
     public void join() throws InterruptedException {
         executor.join();
     }
 
     public void stop() throws Exception {
-        executor.shutdown(); // Disable new tasks from being submitted
+        executor.shutdown();
         try {
-            // Wait a while for existing tasks to terminate
             if (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
-                executor.shutdownNow(); // Cancel currently executing tasks
-                // Wait a while for tasks to respond to being cancelled
+                executor.shutdownNow();
                 if (!executor.awaitTermination(10, TimeUnit.SECONDS))
                     System.err.println("Http Server ThreadPool did not terminate");
             }
