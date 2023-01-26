@@ -1,0 +1,33 @@
+{
+    "checkstyle": {
+        "com.puppycrawl.tools:checkstyle": {
+            "locked": "8.45.1"
+        }
+    },
+    "compileClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        }
+    },
+    "runtimeClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        }
+    },
+    "testCompileClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        }
+    },
+    "testRuntimeClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        }
+    }
+}

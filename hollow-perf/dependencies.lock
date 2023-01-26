@@ -1,0 +1,75 @@
+{
+    "checkstyle": {
+        "com.puppycrawl.tools:checkstyle": {
+            "locked": "8.45.1"
+        }
+    },
+    "compileClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "org.openjdk.jmh:jmh-core": {
+            "locked": "1.21"
+        },
+        "org.openjdk.jmh:jmh-generator-annprocess": {
+            "locked": "1.21"
+        }
+    },
+    "jmh": {
+        "org.openjdk.jmh:jmh-core": {
+            "locked": "1.25"
+        },
+        "org.openjdk.jmh:jmh-generator-bytecode": {
+            "locked": "1.25"
+        }
+    },
+    "jmhCompileClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "org.openjdk.jmh:jmh-core": {
+            "locked": "1.25"
+        },
+        "org.openjdk.jmh:jmh-generator-annprocess": {
+            "locked": "1.21"
+        },
+        "org.openjdk.jmh:jmh-generator-bytecode": {
+            "locked": "1.25"
+        }
+    },
+    "jmhRuntimeClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "org.openjdk.jmh:jmh-core": {
+            "locked": "1.25"
+        },
+        "org.openjdk.jmh:jmh-generator-bytecode": {
+            "locked": "1.25"
+        }
+    },
+    "runtimeClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "org.openjdk.jmh:jmh-core": {
+            "locked": "1.21"
+        }
+    },
+    "testCompileClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "org.openjdk.jmh:jmh-core": {
+            "locked": "1.21"
+        }
+    },
+    "testRuntimeClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "org.openjdk.jmh:jmh-core": {
+            "locked": "1.21"
+        }
+    }
+}

@@ -1,0 +1,81 @@
+{
+    "checkstyle": {
+        "com.puppycrawl.tools:checkstyle": {
+            "locked": "8.45.1"
+        }
+    },
+    "compileClasspath": {
+        "com.fasterxml.jackson.core:jackson-core": {
+            "locked": "2.4.3"
+        },
+        "com.fasterxml.jackson.core:jackson-databind": {
+            "locked": "2.4.3"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6"
+        },
+        "commons-lang:commons-lang": {
+            "locked": "2.6"
+        }
+    },
+    "runtimeClasspath": {
+        "com.fasterxml.jackson.core:jackson-core": {
+            "locked": "2.4.3"
+        },
+        "com.fasterxml.jackson.core:jackson-databind": {
+            "locked": "2.4.3"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6"
+        },
+        "commons-lang:commons-lang": {
+            "locked": "2.6"
+        }
+    },
+    "testCompileClasspath": {
+        "com.fasterxml.jackson.core:jackson-core": {
+            "locked": "2.4.3"
+        },
+        "com.fasterxml.jackson.core:jackson-databind": {
+            "locked": "2.4.3"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6"
+        },
+        "commons-lang:commons-lang": {
+            "locked": "2.6"
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        }
+    },
+    "testRuntimeClasspath": {
+        "com.fasterxml.jackson.core:jackson-core": {
+            "locked": "2.4.3"
+        },
+        "com.fasterxml.jackson.core:jackson-databind": {
+            "locked": "2.4.3"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6"
+        },
+        "commons-lang:commons-lang": {
+            "locked": "2.6"
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        }
+    }
+}
