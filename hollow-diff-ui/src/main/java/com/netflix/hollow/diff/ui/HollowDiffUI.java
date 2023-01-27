@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.app.VelocityEngine;
 
 public class HollowDiffUI implements HollowRecordDiffUI {
@@ -62,7 +63,7 @@ public class HollowDiffUI implements HollowRecordDiffUI {
 
     HollowDiffUI(String baseURLPath, String diffUIPath, HollowDiff diff, String fromBlobName, String toBlobName, VelocityEngine ve) {
         this.baseURLPath = baseURLPath;
-        this.diffUIPath = baseURLPath + "/" + diffUIPath;
+        this.diffUIPath = StringUtils.isEmpty(diffUIPath) ? baseURLPath : baseURLPath + "/" + diffUIPath;
         this.diff = diff;
         this.velocity = ve;
         this.fromBlobName = fromBlobName;

@@ -25,6 +25,7 @@ import com.netflix.hollow.ui.HollowUISession;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 
 public class DiffObjectPage extends DiffPage {
@@ -62,10 +63,13 @@ public class DiffObjectPage extends DiffPage {
 
         List<HollowDiffUIBreadcrumbs> breadcrumbs = new ArrayList<HollowDiffUIBreadcrumbs>();
 
-        breadcrumbs.add(new HollowDiffUIBreadcrumbs(diffUI.getDiffUIPath(), "Overview"));
-        breadcrumbs.add(new HollowDiffUIBreadcrumbs(diffUI.getDiffUIPath() + "/typediff?type=" + type, type));
+        breadcrumbs.add(new HollowDiffUIBreadcrumbs(StringUtils.isEmpty(diffUI.getDiffUIPath()) ?
+                "/" : diffUI.getDiffUIPath(), "Overview"));
+        breadcrumbs.add(new HollowDiffUIBreadcrumbs(StringUtils.isEmpty(diffUI.getDiffUIPath()) ?
+                "typediff?type=" + type : diffUI.getDiffUIPath() + "/typediff?type=" + type, type));
         if(fieldIdx != -1) {
-            breadcrumbs.add(new HollowDiffUIBreadcrumbs(diffUI.getDiffUIPath() + "/fielddiff?type=" + type + "&fieldIdx=" + fieldIdx, typeDiff.getFieldDiffs().get(fieldIdx).getFieldIdentifier().toString()));
+            breadcrumbs.add(new HollowDiffUIBreadcrumbs(StringUtils.isEmpty(diffUI.getDiffUIPath()) ?
+                    "fielddiff?type=" + type + "&fieldIdx=" + fieldIdx : diffUI.getDiffUIPath() + "/fielddiff?type=" + type + "&fieldIdx=" + fieldIdx, typeDiff.getFieldDiffs().get(fieldIdx).getFieldIdentifier().toString()));
         }
 
         String displayKey =
