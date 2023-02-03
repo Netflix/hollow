@@ -1,0 +1,250 @@
+{
+    "checkstyle": {
+        "com.puppycrawl.tools:checkstyle": {
+            "locked": "8.45.1"
+        }
+    },
+    "compileClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-test": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.11"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "4.0.1"
+        },
+        "org.apache.velocity:velocity": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.7"
+        }
+    },
+    "runtimeClasspath": {
+        "com.google.code.gson:gson": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-test",
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-test": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.11"
+        },
+        "commons-io:commons-io": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.6"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "4.0.1"
+        },
+        "org.apache.velocity:velocity": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.7"
+        }
+    },
+    "testCompileClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-test": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.11"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "4.0.1"
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        },
+        "org.apache.velocity:velocity": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.7"
+        }
+    },
+    "testRuntimeClasspath": {
+        "com.google.code.gson:gson": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-test",
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-test": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.11"
+        },
+        "commons-io:commons-io": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.6"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "4.0.1"
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        },
+        "org.apache.velocity:velocity": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.7"
+        }
+    },
+    "toolsCompileClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-test": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.11"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "4.0.1"
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        },
+        "org.apache.velocity:velocity": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.7"
+        }
+    },
+    "toolsRuntimeClasspath": {
+        "com.google.code.gson:gson": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-test",
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-test": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.11"
+        },
+        "commons-io:commons-io": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.6"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "4.0.1"
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        },
+        "org.apache.velocity:velocity": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.7"
+        }
+    }
+}

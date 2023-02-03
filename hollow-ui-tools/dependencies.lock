@@ -1,0 +1,139 @@
+{
+    "checkstyle": {
+        "com.puppycrawl.tools:checkstyle": {
+            "locked": "8.45.1"
+        }
+    },
+    "compileClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "locked": "1.11"
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "4.0.1"
+        },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7"
+        }
+    },
+    "runtimeClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "locked": "1.11"
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "4.0.1"
+        },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7"
+        }
+    },
+    "testCompileClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "locked": "1.11"
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "4.0.1"
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7"
+        }
+    },
+    "testRuntimeClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "locked": "1.11"
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "4.0.1"
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7"
+        }
+    },
+    "toolsCompileClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "locked": "1.11"
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "4.0.1"
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7"
+        }
+    },
+    "toolsRuntimeClasspath": {
+        "com.google.code.gson:gson": {
+            "locked": "2.8.0"
+        },
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "commons-codec:commons-codec": {
+            "locked": "1.11"
+        },
+        "commons-io:commons-io": {
+            "locked": "2.6"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "4.0.1"
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        },
+        "org.apache.velocity:velocity": {
+            "locked": "1.7"
+        }
+    }
+}

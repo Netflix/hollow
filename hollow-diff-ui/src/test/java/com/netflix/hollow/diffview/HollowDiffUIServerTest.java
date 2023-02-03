@@ -1,10 +1,10 @@
-package com.netflix.hollow.diff.ui;
+package com.netflix.hollow.diffview;
 
-import com.netflix.hollow.diffview.FakeHollowDiffGenerator;
+import com.netflix.hollow.diff.ui.HollowDiffUIServer;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import org.junit.Test;
 
-public class DiffUITest {
+public class HollowDiffUIServerTest {
 
     @Test
     public void test() throws Exception {
@@ -15,7 +15,7 @@ public class DiffUITest {
         server.addDiff("diff", testDiff);
 
         server.start();
-        server.join();
+        server.stop();
     }
 
     @Test
@@ -27,7 +27,6 @@ public class DiffUITest {
         server.addDiff("diff", testDiff);
 
         server.start();
-        server.join();
+        server.stop();
     }
-
 }

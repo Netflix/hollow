@@ -1,0 +1,45 @@
+{
+    "checkstyle": {
+        "com.puppycrawl.tools:checkstyle": {
+            "locked": "8.45.1"
+        }
+    },
+    "compileClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "com.netflix.zeno:netflix-zeno": {
+            "locked": "2.22.3"
+        }
+    },
+    "runtimeClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "com.netflix.zeno:netflix-zeno": {
+            "locked": "2.22.3"
+        }
+    },
+    "testCompileClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "com.netflix.zeno:netflix-zeno": {
+            "locked": "2.22.3"
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        }
+    },
+    "testRuntimeClasspath": {
+        "com.netflix.hollow:hollow": {
+            "project": true
+        },
+        "com.netflix.zeno:netflix-zeno": {
+            "locked": "2.22.3"
+        },
+        "junit:junit": {
+            "locked": "4.11"
+        }
+    }
+}

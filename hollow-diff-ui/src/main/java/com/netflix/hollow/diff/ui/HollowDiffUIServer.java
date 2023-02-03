@@ -14,30 +14,24 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.diff.ui.jetty;
+package com.netflix.hollow.diff.ui;
 
-import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.tools.diff.HollowDiff;
-/**
- * @deprecated use {@link com.netflix.hollow.diff.ui.HollowDiffUIServer}. This is deprecated because package name
- * contains "jetty" but jetty-server dep is no longer required. Instead, this class lives on as an adapter
- * over {@link com.netflix.hollow.diff.ui.HollowDiffUIServer}.
- */
-@Deprecated
+
 public class HollowDiffUIServer {
 
-    private final com.netflix.hollow.diff.ui.HollowDiffUIServer server;
+    private final DiffUIServer server;
 
     public HollowDiffUIServer() {
-        server = new com.netflix.hollow.diff.ui.HollowDiffUIServer();
+        this(8080);
     }
 
     public HollowDiffUIServer(int port) {
-        server = new com.netflix.hollow.diff.ui.HollowDiffUIServer(port);
+        this.server = new DiffUIWebServer(new HollowDiffUIRouter(), port);
     }
 
     public HollowDiffUI addDiff(String diffPath, HollowDiff diff) {
-        return server.addDiff(diffPath, diff);
+        return addDiff(diffPath, diff, "FROM", "TO");
     }
 
     public HollowDiffUI addDiff(String diffPath, HollowDiff diff, String fromBlobName, String toBlobName) {
