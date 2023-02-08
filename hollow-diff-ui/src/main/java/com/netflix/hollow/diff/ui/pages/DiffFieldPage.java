@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 
 public class DiffFieldPage extends DiffPage {
@@ -80,9 +79,9 @@ public class DiffFieldPage extends DiffPage {
     private List<HollowDiffUIBreadcrumbs> getBreadcrumbs(HollowTypeDiff typeDiff, HollowFieldDiff fieldDiff) {
         List<HollowDiffUIBreadcrumbs> breadcrumbs = new ArrayList<HollowDiffUIBreadcrumbs>();
 
-        breadcrumbs.add(new HollowDiffUIBreadcrumbs(StringUtils.isEmpty(diffUI.getDiffUIPath()) ?
+        breadcrumbs.add(new HollowDiffUIBreadcrumbs((diffUI.getDiffUIPath() == null || diffUI.getDiffUIPath().length() == 0) ?
                 "/" : diffUI.getDiffUIPath(), "Overview"));
-        breadcrumbs.add(new HollowDiffUIBreadcrumbs(StringUtils.isEmpty(diffUI.getDiffUIPath()) ?
+        breadcrumbs.add(new HollowDiffUIBreadcrumbs((diffUI.getDiffUIPath() == null || diffUI.getDiffUIPath().length() == 0) ?
                 "typediff?type=" + typeDiff.getTypeName() : diffUI.getDiffUIPath() + "/typediff?type=" + typeDiff.getTypeName(), typeDiff.getTypeName()));
         breadcrumbs.add(new HollowDiffUIBreadcrumbs(null, fieldDiff.getFieldIdentifier().toString()));
 

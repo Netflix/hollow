@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 
 public class DiffTypePage extends DiffPage {
@@ -199,7 +198,7 @@ public class DiffTypePage extends DiffPage {
     private List<HollowDiffUIBreadcrumbs> getBreadcrumbs(HollowTypeDiff typeDiff) {
         List<HollowDiffUIBreadcrumbs> breadcrumbs = new ArrayList<HollowDiffUIBreadcrumbs>();
 
-        breadcrumbs.add(new HollowDiffUIBreadcrumbs(StringUtils.isEmpty(diffUI.getDiffUIPath()) ?
+        breadcrumbs.add(new HollowDiffUIBreadcrumbs((diffUI.getDiffUIPath() == null || diffUI.getDiffUIPath().length() == 0) ?
                 "/" : diffUI.getDiffUIPath(), "Overview"));
         breadcrumbs.add(new HollowDiffUIBreadcrumbs(null, typeDiff.getTypeName()));
 

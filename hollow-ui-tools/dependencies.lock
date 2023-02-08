@@ -20,8 +20,11 @@
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7"
+        "org.apache.commons:commons-text": {
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "locked": "2.3"
         }
     },
     "runtimeClasspath": {
@@ -40,8 +43,11 @@
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7"
+        "org.apache.commons:commons-text": {
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "locked": "2.3"
         }
     },
     "testCompileClasspath": {
@@ -63,8 +69,11 @@
         "junit:junit": {
             "locked": "4.11"
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7"
+        "org.apache.commons:commons-text": {
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "locked": "2.3"
         }
     },
     "testRuntimeClasspath": {
@@ -86,8 +95,11 @@
         "junit:junit": {
             "locked": "4.11"
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7"
+        "org.apache.commons:commons-text": {
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "locked": "2.3"
         }
     },
     "toolsCompileClasspath": {
@@ -109,8 +121,11 @@
         "junit:junit": {
             "locked": "4.11"
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7"
+        "org.apache.commons:commons-text": {
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "locked": "2.3"
         }
     },
     "toolsRuntimeClasspath": {
@@ -132,8 +147,11 @@
         "junit:junit": {
             "locked": "4.11"
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7"
+        "org.apache.commons:commons-text": {
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "locked": "2.3"
         }
     }
 }
