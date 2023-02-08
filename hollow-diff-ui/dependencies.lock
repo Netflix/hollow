@@ -24,7 +24,7 @@
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "1.11"
+            "locked": "1.15"
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
@@ -41,7 +41,7 @@
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "2.8.0"
+            "locked": "2.10.1"
         },
         "com.netflix.hollow:hollow": {
             "firstLevelTransitive": [
@@ -60,13 +60,13 @@
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "1.11"
+            "locked": "1.15"
         },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "2.6"
+            "locked": "2.11.0"
         },
         "javax.servlet:javax.servlet-api": {
             "firstLevelTransitive": [
@@ -101,7 +101,7 @@
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "1.11"
+            "locked": "1.15"
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
@@ -121,7 +121,7 @@
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "2.8.0"
+            "locked": "2.10.1"
         },
         "com.netflix.hollow:hollow": {
             "firstLevelTransitive": [
@@ -140,13 +140,13 @@
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "1.11"
+            "locked": "1.15"
         },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "2.6"
+            "locked": "2.11.0"
         },
         "javax.servlet:javax.servlet-api": {
             "firstLevelTransitive": [
@@ -184,7 +184,7 @@
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "1.11"
+            "locked": "1.15"
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
@@ -204,7 +204,7 @@
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "2.8.0"
+            "locked": "2.10.1"
         },
         "com.netflix.hollow:hollow": {
             "firstLevelTransitive": [
@@ -223,13 +223,13 @@
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "1.11"
+            "locked": "1.15"
         },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "2.6"
+            "locked": "2.11.0"
         },
         "javax.servlet:javax.servlet-api": {
             "firstLevelTransitive": [
