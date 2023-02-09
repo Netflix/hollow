@@ -9,14 +9,14 @@ facets {
 
 dependencies {
     api project(':hollow')
+
     api 'org.apache.velocity:velocity-engine-core:2.3'
     implementation 'org.apache.commons:commons-text:1.10.0'
 
-    api 'commons-codec:commons-codec:1.15'
     implementation 'commons-io:commons-io:2.11.0'
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation "javax.servlet:javax.servlet-api:4.0.1"
-
+    
     testImplementation 'junit:junit:4.11'
 }

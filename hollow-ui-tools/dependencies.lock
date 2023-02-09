@@ -11,9 +11,6 @@
         "com.netflix.hollow:hollow": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "locked": "1.15"
-        },
         "commons-io:commons-io": {
             "locked": "2.11.0"
         },
@@ -34,9 +31,6 @@
         "com.netflix.hollow:hollow": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "locked": "1.15"
-        },
         "commons-io:commons-io": {
             "locked": "2.11.0"
         },
@@ -56,9 +50,6 @@
         },
         "com.netflix.hollow:hollow": {
             "project": true
-        },
-        "commons-codec:commons-codec": {
-            "locked": "1.15"
         },
         "commons-io:commons-io": {
             "locked": "2.11.0"
@@ -83,9 +74,6 @@
         "com.netflix.hollow:hollow": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "locked": "1.15"
-        },
         "commons-io:commons-io": {
             "locked": "2.11.0"
         },
@@ -109,9 +97,6 @@
         "com.netflix.hollow:hollow": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "locked": "1.15"
-        },
         "commons-io:commons-io": {
             "locked": "2.11.0"
         },
@@ -134,9 +119,6 @@
         },
         "com.netflix.hollow:hollow": {
             "project": true
-        },
-        "commons-codec:commons-codec": {
-            "locked": "1.15"
         },
         "commons-io:commons-io": {
             "locked": "2.11.0"

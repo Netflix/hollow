@@ -14,12 +14,6 @@
         "com.netflix.hollow:hollow-ui-tools": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "firstLevelTransitive": [
-                "com.netflix.hollow:hollow-ui-tools"
-            ],
-            "locked": "1.15"
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
         },
@@ -45,12 +39,6 @@
         },
         "com.netflix.hollow:hollow-ui-tools": {
             "project": true
-        },
-        "commons-codec:commons-codec": {
-            "firstLevelTransitive": [
-                "com.netflix.hollow:hollow-ui-tools"
-            ],
-            "locked": "1.15"
         },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
@@ -87,12 +75,6 @@
         "com.netflix.hollow:hollow-ui-tools": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "firstLevelTransitive": [
-                "com.netflix.hollow:hollow-ui-tools"
-            ],
-            "locked": "1.15"
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
         },
@@ -121,12 +103,6 @@
         },
         "com.netflix.hollow:hollow-ui-tools": {
             "project": true
-        },
-        "commons-codec:commons-codec": {
-            "firstLevelTransitive": [
-                "com.netflix.hollow:hollow-ui-tools"
-            ],
-            "locked": "1.15"
         },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
@@ -166,12 +142,6 @@
         "com.netflix.hollow:hollow-ui-tools": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "firstLevelTransitive": [
-                "com.netflix.hollow:hollow-ui-tools"
-            ],
-            "locked": "1.15"
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
         },
@@ -200,12 +170,6 @@
         },
         "com.netflix.hollow:hollow-ui-tools": {
             "project": true
-        },
-        "commons-codec:commons-codec": {
-            "firstLevelTransitive": [
-                "com.netflix.hollow:hollow-ui-tools"
-            ],
-            "locked": "1.15"
         },
         "commons-io:commons-io": {
             "firstLevelTransitive": [
