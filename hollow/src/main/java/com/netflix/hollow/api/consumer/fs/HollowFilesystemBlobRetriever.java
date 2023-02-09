@@ -76,8 +76,8 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
      * @param fallbackBlobRetriever  The remote blob retriever from which to retrieve blobs if they are not already
      *                               available on the filesystem.
      * @param useExistingStaleSnapshot  If true and a snapshot blob is requested then if there exists a local snapshot
-     *                               blob present for the desired version then that snapshot blob is returned and
-     *                               the fallback blob retriever (if present) is not queried.
+     *                               blob present for a version older than the desired version then that snapshot blob is
+     *                               returned and the fallback blob retriever (if present) is not queried.
      */
     public HollowFilesystemBlobRetriever(Path blobStorePath, HollowConsumer.BlobRetriever fallbackBlobRetriever, boolean useExistingStaleSnapshot) {
         this.blobStorePath = blobStorePath;

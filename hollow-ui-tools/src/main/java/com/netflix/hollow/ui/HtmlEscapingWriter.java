@@ -18,7 +18,7 @@ package com.netflix.hollow.ui;
 
 import java.io.IOException;
 import java.io.Writer;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class HtmlEscapingWriter extends Writer {
 
@@ -30,7 +30,7 @@ public class HtmlEscapingWriter extends Writer {
 
     @Override
     public void write(char[] cbuf, int off, int len) throws IOException {
-        StringEscapeUtils.escapeHtml(wrappedWriter, new String(cbuf, off, len));
+        wrappedWriter.write(StringEscapeUtils.escapeHtml4(new String(cbuf, off, len)));
     }
 
     @Override

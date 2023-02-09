@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
@@ -69,7 +68,7 @@ public abstract class HollowUIRouter extends HttpServlet {
     }
 
     protected String getResourceName(String target, String diffUIKey) {
-        if (StringUtils.isEmpty(diffUIKey)) {   // for diff at path ""
+        if (diffUIKey == null || diffUIKey.length() == 0) {   // for diff at path ""
             int baseLength = baseUrlPath.length() + 1;
 
             int secondSlashIndex = target.indexOf('/', baseLength);

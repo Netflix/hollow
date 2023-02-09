@@ -6,56 +6,53 @@
     },
     "compileClasspath": {
         "com.google.code.gson:gson": {
-            "locked": "2.8.0"
+            "locked": "2.10.1"
         },
         "com.netflix.hollow:hollow": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "locked": "1.11"
-        },
         "commons-io:commons-io": {
-            "locked": "2.6"
+            "locked": "2.11.0"
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7"
+        "org.apache.commons:commons-text": {
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "locked": "2.3"
         }
     },
     "runtimeClasspath": {
         "com.google.code.gson:gson": {
-            "locked": "2.8.0"
+            "locked": "2.10.1"
         },
         "com.netflix.hollow:hollow": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "locked": "1.11"
-        },
         "commons-io:commons-io": {
-            "locked": "2.6"
+            "locked": "2.11.0"
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7"
+        "org.apache.commons:commons-text": {
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "locked": "2.3"
         }
     },
     "testCompileClasspath": {
         "com.google.code.gson:gson": {
-            "locked": "2.8.0"
+            "locked": "2.10.1"
         },
         "com.netflix.hollow:hollow": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "locked": "1.11"
-        },
         "commons-io:commons-io": {
-            "locked": "2.6"
+            "locked": "2.11.0"
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
@@ -63,22 +60,22 @@
         "junit:junit": {
             "locked": "4.11"
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7"
+        "org.apache.commons:commons-text": {
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "locked": "2.3"
         }
     },
     "testRuntimeClasspath": {
         "com.google.code.gson:gson": {
-            "locked": "2.8.0"
+            "locked": "2.10.1"
         },
         "com.netflix.hollow:hollow": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "locked": "1.11"
-        },
         "commons-io:commons-io": {
-            "locked": "2.6"
+            "locked": "2.11.0"
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
@@ -86,22 +83,22 @@
         "junit:junit": {
             "locked": "4.11"
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7"
+        "org.apache.commons:commons-text": {
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "locked": "2.3"
         }
     },
     "toolsCompileClasspath": {
         "com.google.code.gson:gson": {
-            "locked": "2.8.0"
+            "locked": "2.10.1"
         },
         "com.netflix.hollow:hollow": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "locked": "1.11"
-        },
         "commons-io:commons-io": {
-            "locked": "2.6"
+            "locked": "2.11.0"
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
@@ -109,22 +106,22 @@
         "junit:junit": {
             "locked": "4.11"
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7"
+        "org.apache.commons:commons-text": {
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "locked": "2.3"
         }
     },
     "toolsRuntimeClasspath": {
         "com.google.code.gson:gson": {
-            "locked": "2.8.0"
+            "locked": "2.10.1"
         },
         "com.netflix.hollow:hollow": {
             "project": true
         },
-        "commons-codec:commons-codec": {
-            "locked": "1.11"
-        },
         "commons-io:commons-io": {
-            "locked": "2.6"
+            "locked": "2.11.0"
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "4.0.1"
@@ -132,8 +129,11 @@
         "junit:junit": {
             "locked": "4.11"
         },
-        "org.apache.velocity:velocity": {
-            "locked": "1.7"
+        "org.apache.commons:commons-text": {
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "locked": "2.3"
         }
     }
 }

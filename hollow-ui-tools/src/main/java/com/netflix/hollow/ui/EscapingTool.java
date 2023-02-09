@@ -20,12 +20,13 @@ package com.netflix.hollow.ui;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
+
 
 public class EscapingTool {
 
     public String html(Object string) {
-        return string == null ? null : StringEscapeUtils.escapeHtml(String.valueOf(string));
+        return string == null ? null : StringEscapeUtils.escapeHtml4(String.valueOf(string));
     }
 
     public String url(Object string) {
