@@ -37,32 +37,32 @@ public class HollowDiffUIRouter extends HollowUIRouter {
         this.diffUIs = new LinkedHashMap<>();
     }
 
-    public void handle(String target, HttpServletRequest request, HttpServletResponse response)
+    public void handle(String target, HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
-        doGet(request, response);
+        String diffUIKey = getTargetRootPath(target);
+
+        if ("resource".equals(diffUIKey)) {
+            if (serveResource(req, resp, getResourceName(target, diffUIKey)))
+                return;
+        } else {
+            HollowDiffUI ui = diffUIs.get(diffUIKey);
+            if (ui == null) {
+                ui = diffUIs.get("");
+                if (ui != null) {  // if a diff was added at path ""
+                    diffUIKey = "";
+                }
+            }
+
+            if (ui != null) {
+                if (ui.serveRequest(getResourceName(target, diffUIKey), req, resp))
+                    return;
+            }
+        }
     }
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String diffUIKey = getTargetRootPath(req.getPathInfo());
-
-        if ("resource".equals(diffUIKey)) {
-             if (serveResource(req, resp, getResourceName(req.getPathInfo(), diffUIKey)))
-                  return;
-        } else {
-             HollowDiffUI ui = diffUIs.get(diffUIKey);
-             if (ui == null) {
-                 ui = diffUIs.get("");
-                 if (ui != null) {  // if a diff was added at path ""
-                     diffUIKey = "";
-                 }
-             }
-
-             if (ui != null) {
-                 if (ui.serveRequest(getResourceName(req.getPathInfo(), diffUIKey), req, resp))
-                     return;
-             }
-        }
+        handle(req.getPathInfo(), req, resp);
     }
 
     public Map<String, HollowDiffUI> getDiffUIs() {
