@@ -59,6 +59,10 @@ public abstract class HollowUIRouter extends HttpServlet {
         if(target.length() < baseLength)
             return "";
 
+        if (target == null) {
+            throw new IllegalStateException("target is null. It defaults to HttpServletRequest::getPathInfo() but can be " +
+                    "customized by invoking handle method on HollowExplorerUI HollowDiffUI et al classes.");
+        }
         int secondSlashIndex = target.indexOf('/', baseLength);
 
         if(secondSlashIndex == -1)
