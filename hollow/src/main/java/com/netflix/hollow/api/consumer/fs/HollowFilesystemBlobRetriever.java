@@ -34,9 +34,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 
 public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriever {
+    private static final Logger LOG = Logger.getLogger(HollowFilesystemBlobRetriever.class.getName());
+
     private final Path blobStorePath;
     private final HollowConsumer.BlobRetriever fallbackBlobRetriever;
     private final boolean useExistingStaleSnapshot;
@@ -165,7 +168,13 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
             for (Path path : directoryStream) {
                 String filename = path.getFileName().toString();
                 if(filename.startsWith("snapshot-")) {
-                    long version = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
+                    long version;
+                    try {
+                        version = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
+                    } catch (NumberFormatException ex) {    // for e.g. file snapshot-20230212155028322.133f8fdd
+                        LOG.info("Ignoring ineligible file in local blob store: " + path);
+                        continue;
+                    }
                     if(version < desiredVersion && version > maxVersionBeforeDesired && allRequestedPartsExist(BlobType.SNAPSHOT, -1L, version)) {
                         maxVersionBeforeDesired = version;
                     }
