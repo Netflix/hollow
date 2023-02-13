@@ -419,7 +419,12 @@ abstract class AbstractHollowProducer {
                 log.info("Populate stage completed with no delta in output state; skipping publish, announce, etc.");
             }
         } catch (Throwable th) {
-            writeEngine.resetToLastPrepareForNextCycle();
+            try {
+                writeEngine.resetToLastPrepareForNextCycle();
+            } catch (Throwable innerTh) {
+                log.log(Level.SEVERE, "resetToLastPrepareForNextCycle encountered an exception when attempting recovery:", innerTh);
+                // swallow the inner throwable to preserve the original
+            }
             cycleStatus.fail(th);
 
             if (th instanceof RuntimeException) {
