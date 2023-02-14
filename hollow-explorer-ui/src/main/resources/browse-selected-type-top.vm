@@ -1,5 +1,5 @@
 #**
- *  Copyright 2017 Netflix, Inc.
+ *  Copyright 2023 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$esc.h
 				<a href="$basePath/type?type=$esc.url($type)&key=$esc.url($key)&ordinal=$ordinal&display=$display&page=$nextPage&pageSize=$pageSize">NEXT</a>
 			#end
 		</td>
-		#if($ordinal)
+		#if($ordinal >= 0)
 			<td class="nav">
 				FORMAT: 
 				<a href="$basePath/type?type=$esc.url($type)&key=$esc.url($key)&ordinal=$ordinal&page=$page&pageSize=$pageSize&display=text">text</a> 
@@ -89,7 +89,7 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$esc.h
 						</form>
 					</td>
 				</tr>
-				#if($ordinal)
+				#if($ordinal >= 0)
 					<tr valign=top>
 						<th align=right nowrap>Showing Record: </th>
 						<td id="recLink">
@@ -106,4 +106,4 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$esc.h
 					</th>
 					<td>
 						<div style="min-height:400px">
-							#if($ordinal)<pre>#end
+							#if($ordinal >= 0)<pre>#end
