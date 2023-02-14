@@ -37,13 +37,13 @@ public class HollowDiffUIRouter extends HollowUIRouter {
         this.diffUIs = new LinkedHashMap<>();
     }
 
-    public void handle(String target, HttpServletRequest req, HttpServletResponse resp)
+    public boolean handle(String target, HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         String diffUIKey = getTargetRootPath(target);
 
         if ("resource".equals(diffUIKey)) {
             if (serveResource(req, resp, getResourceName(target, diffUIKey)))
-                return;
+                return true;
         } else {
             HollowDiffUI ui = diffUIs.get(diffUIKey);
             if (ui == null) {
@@ -55,14 +55,10 @@ public class HollowDiffUIRouter extends HollowUIRouter {
 
             if (ui != null) {
                 if (ui.serveRequest(getResourceName(target, diffUIKey), req, resp))
-                    return;
+                    return true;
             }
         }
-    }
-
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        handle(req.getPathInfo(), req, resp);
+        return false;
     }
 
     public Map<String, HollowDiffUI> getDiffUIs() {

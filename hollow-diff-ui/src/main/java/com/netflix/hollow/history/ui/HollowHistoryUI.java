@@ -161,56 +161,57 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
         return history;
     }
 
-    public void handle(String target, HttpServletRequest req, HttpServletResponse resp)
+    @Override
+    public boolean handle(String target, HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         String pageName = getTargetRootPath(target);
 
         if("diffrowdata".equals(pageName)) {
             diffViewOutputGenerator.uncollapseRow(req, resp);
-            return;
+            return true;
         } else if("collapsediffrow".equals(pageName)) {
             diffViewOutputGenerator.collapseRow(req, resp);
-            return;
+            return true;
         }
 
         resp.setContentType("text/html");
 
-
         if("resource".equals(pageName)) {
             if(serveResource(req, resp, getResourceName(target)))
-                return;
+                return true;
         } else if("".equals(pageName) || "overview".equals(pageName)) {
             if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
                 overviewPage.sendJson(req, resp);
-                return;
+                return true;
             }
             overviewPage.render(req, getSession(req, resp), resp.getWriter());
         } else if("state".equals(pageName)) {
             if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
                 statePage.sendJson(req, resp);
-                return;
+                return true;
             }
             statePage.render(req, getSession(req, resp), resp.getWriter());
+            return true;
         } else if("statetype".equals(pageName)) {
             if(req.getParameter("format") != null && req.getParameter("format").equals("json")) {
                 stateTypePage.sendJson(req, getSession(req, resp),  resp);
-                return;
+                return true;
             }
             stateTypePage.render(req, getSession(req, resp), resp.getWriter());
+            return true;
         } else if("statetypeexpand".equals(pageName)) {
             stateTypeExpandPage.render(req, getSession(req, resp), resp.getWriter());
+            return true;
         } else if("query".equals(pageName)) {
             queryPage.render(req, getSession(req, resp), resp.getWriter());
+            return true;
         } else if("historicalObject".equals(pageName)) {
             objectDiffPage.render(req, getSession(req, resp), resp.getWriter());
+            return true;
         }
+        return false;
     }
 
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        handle(req.getPathInfo(), req, resp);
-    }
-    
     public void addCustomHollowRecordNamer(String typeName, HollowHistoryRecordNamer recordNamer) {
         customHollowRecordNamers.put(typeName, recordNamer);
     }
