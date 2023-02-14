@@ -37,7 +37,7 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$esc.h
 				<a href="$basePath/type?type=$esc.url($type)&key=$esc.url($key)&ordinal=$ordinal&display=$display&page=$nextPage&pageSize=$pageSize">NEXT</a>
 			#end
 		</td>
-		#if($ordinal >= 0)
+		#if($ordinal != $null)
 			<td class="nav">
 				FORMAT: 
 				<a href="$basePath/type?type=$esc.url($type)&key=$esc.url($key)&ordinal=$ordinal&page=$page&pageSize=$pageSize&display=text">text</a> 
@@ -89,12 +89,12 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$esc.h
 						</form>
 					</td>
 				</tr>
-				#if($ordinal >= 0)
+				#if($ordinal != $null)
 					<tr valign=top>
 						<th align=right nowrap>Showing Record: </th>
 						<td id="recLink">
 							ordinal: $ordinal
-							#if($key && !$key.isEmpty())
+							#if($key)	<!-- not null and not empty -->
 								<br/>key: $esc.html($key)
 							#end
 						</td>
@@ -106,4 +106,4 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$esc.h
 					</th>
 					<td>
 						<div style="min-height:400px">
-							#if($ordinal >= 0)<pre>#end
+							#if($ordinal != $null)<pre>#end
