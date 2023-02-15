@@ -18,6 +18,8 @@ package com.netflix.hollow.ui;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,8 +34,18 @@ public abstract class HollowUIRouter extends HttpServlet {
     protected final VelocityEngine velocityEngine;
 
     @Override
-    public abstract void doGet(HttpServletRequest request,
-        HttpServletResponse response) throws IOException;
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            handle(request.getPathInfo(), request, response);
+        } catch (Exception ex) {
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter printWriter = new PrintWriter(stringWriter);
+            ex.printStackTrace(printWriter);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, stringWriter.toString());
+        }
+    }
+
+    public abstract boolean handle(String target, HttpServletRequest req, HttpServletResponse resp) throws IOException;
 
     public HollowUIRouter(String baseUrlPath) {
         if(!baseUrlPath.startsWith("/"))
