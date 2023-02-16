@@ -34,6 +34,7 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.tools.compact.HollowCompactor;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import sun.misc.IOUtils;
 
 /**
  * A HollowProducer is the top-level class used by producers of Hollow data to populate, publish, and announce data states.
@@ -621,6 +623,13 @@ public class HollowProducer extends AbstractHollowProducer {
 
         default Path getPath() {
             throw new UnsupportedOperationException("Path is not available");
+        }
+
+        default byte[] getData() throws IOException {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try (InputStream inputStream = newInputStream()){
+                return IOUtils.readAllBytes(inputStream);
+            }
         }
     }
 

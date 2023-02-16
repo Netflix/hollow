@@ -560,7 +560,7 @@ abstract class AbstractHollowProducer {
             if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
                 artifacts.snapshot = stageBlob(listeners, blobStager.openSnapshot(toVersion));
 
-            publishHeaderBlob(artifacts.header);
+            // publishHeaderBlob(artifacts.header);
             if (readStates.hasCurrent()) {
                 artifacts.delta = stageBlob(listeners,
                         blobStager.openDelta(readStates.current().getVersion(), toVersion));
