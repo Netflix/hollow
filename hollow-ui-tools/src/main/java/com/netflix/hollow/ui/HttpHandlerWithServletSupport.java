@@ -97,6 +97,9 @@ public class HttpHandlerWithServletSupport implements HttpHandler {
                          for (String token : tokens) {
                               String[] keyVal = token.split("\\s*=\\s*");
                               if(keyVal.length==2){
+                                 if (i >= cookies.length) {
+                                     break;
+                                 }
                                  cookies[i] = new Cookie(keyVal[0], keyVal[1]);
                                  i++;
                               }
