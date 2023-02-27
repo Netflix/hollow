@@ -19,6 +19,7 @@ package com.netflix.hollow.core.memory.encoding;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.LongStream;
 
 /**
@@ -38,6 +39,8 @@ import java.util.stream.LongStream;
  * bitsPerElement - it will not work for bitsPerElement greater than 60.
  */
 public class FixedLengthMultipleOccurrenceElementArray {
+    private static final Logger LOG = Logger.getLogger(FixedLengthMultipleOccurrenceElementArray.class.getName());
+
     private static final double RESIZE_MULTIPLE = 1.5;
     private static final long NO_ELEMENT = 0L;
 
@@ -52,8 +55,8 @@ public class FixedLengthMultipleOccurrenceElementArray {
 
     public FixedLengthMultipleOccurrenceElementArray(ArraySegmentRecycler memoryRecycler,
             long numNodes, int bitsPerElement, int maxElementsPerNodeEstimate) {
-        nodesWithOrdinalZero = new FixedLengthElementArray(memoryRecycler, numNodes);
-        storage = new FixedLengthElementArray(
+        this.nodesWithOrdinalZero = new FixedLengthElementArray(memoryRecycler, numNodes);
+        this.storage = new FixedLengthElementArray(
                 memoryRecycler, numNodes * bitsPerElement * maxElementsPerNodeEstimate);
         this.memoryRecycler = memoryRecycler;
         this.bitsPerElement = bitsPerElement;
@@ -94,8 +97,9 @@ public class FixedLengthMultipleOccurrenceElementArray {
         } while (storage.getElementValue(currentIndex, bitsPerElement, elementMask) != NO_ELEMENT
                 && offset < maxElementsPerNode);
         if (storage.getElementValue(currentIndex, bitsPerElement, elementMask) != NO_ELEMENT) {
+            LOG.fine("Invoking resizeElementsPerNode when adding element=" + element);
             // we're full at this index - resize, then figure out the new current index
-            resizeStorage();
+            resizeElementsPerNode();
             currentIndex = nodeIndex * maxElementsPerNode * bitsPerElement + offset * bitsPerElement;
         }
         /* we're adding to the first empty spot from the beginning of the bucket - this is
@@ -139,16 +143,19 @@ public class FixedLengthMultipleOccurrenceElementArray {
     }
 
     /**
-     * Resize the underlying storage to a multiple of what it currently is. This method is not
-     * thread-safe.
+     * Resize the underlying storage to a multiple of what it currently is. This method is not thread-safe.
      */
-    private void resizeStorage() {
+    private void resizeElementsPerNode() {
+        LOG.warning("Dynamically resizing no. of elements per node is an expensive operation, it can be avoided by specifying a better estimate upfront");
         int currentElementsPerNode = maxElementsPerNode;
         int newElementsPerNode = (int) Math.ceil((double) currentElementsPerNode * RESIZE_MULTIPLE);
         if (newElementsPerNode <= currentElementsPerNode) {
             throw new IllegalStateException("cannot resize fixed length array from "
                     + currentElementsPerNode + " to " + newElementsPerNode);
         }
+        long numBits = numNodes * bitsPerElement * newElementsPerNode;
+        LOG.fine(String.format("Resizing storage: oldStorage=%sbytes, newStorage=%sbits/%sbytes (numNodes=%s bitsPerElement=%s newElementsPerNode=%s)",
+                storage.approxHeapFootprintInBytes(), numBits, numBits/8, numNodes, bitsPerElement, newElementsPerNode));
         FixedLengthElementArray newStorage = new FixedLengthElementArray(memoryRecycler,
                 numNodes * bitsPerElement * newElementsPerNode);
         LongStream.range(0, numNodes).forEach(nodeIndex -> {
@@ -167,5 +174,14 @@ public class FixedLengthMultipleOccurrenceElementArray {
         storage.destroy(memoryRecycler);
         storage = newStorage;
         maxElementsPerNode = newElementsPerNode;
+    }
+
+    public int getMaxElementsPerNode() {
+        return maxElementsPerNode;
+    }
+
+    public long approxHeapFootprintInBytes() {
+        return storage.approxHeapFootprintInBytes()
+                + nodesWithOrdinalZero.approxHeapFootprintInBytes();
     }
 }

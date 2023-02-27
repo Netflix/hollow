@@ -62,11 +62,17 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
 
     private final int log2OfSegmentSizeInBytes;
     private final int byteBitmask;
+    private final long sizeBits;
 
     public FixedLengthElementArray(ArraySegmentRecycler memoryRecycler, long numBits) {
         super(memoryRecycler, ((numBits - 1) >>> 6) + 1);
         this.log2OfSegmentSizeInBytes = log2OfSegmentSize + 3;
         this.byteBitmask = (1 << log2OfSegmentSizeInBytes) - 1;
+        this.sizeBits = numBits;
+    }
+
+    public long approxHeapFootprintInBytes() {
+        return sizeBits / 8;
     }
 
     @Override
