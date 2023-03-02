@@ -92,7 +92,12 @@ public class HollowEffigyFactory {
                 fieldValue = typeDataAccess.readBoolean(effigy.ordinal, i);
                 break;
             case BYTES:
-                fieldValue = base64.encodeToString(typeDataAccess.readBytes(effigy.ordinal, i));
+                byte[] fieldValueBytes = typeDataAccess.readBytes(effigy.ordinal, i);
+                if (fieldValueBytes == null || fieldValueBytes.length == 0) {
+                    fieldValue = fieldValueBytes;
+                } else {
+                    fieldValue = base64.encodeToString(fieldValueBytes);
+                }
                 break;
             case DOUBLE:
                 fieldValue = Double.valueOf(typeDataAccess.readDouble(effigy.ordinal, i));
