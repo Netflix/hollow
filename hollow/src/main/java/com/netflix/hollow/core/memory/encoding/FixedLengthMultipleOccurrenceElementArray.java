@@ -144,7 +144,7 @@ public class FixedLengthMultipleOccurrenceElementArray {
      */
     private void resizeStorage() {
         int currentElementsPerNode = maxElementsPerNode;
-        int newElementsPerNode = (int) (currentElementsPerNode * RESIZE_MULTIPLE);
+        int newElementsPerNode = (int) Math.ceil((double) currentElementsPerNode * RESIZE_MULTIPLE);
         if (newElementsPerNode <= currentElementsPerNode) {
             throw new IllegalStateException("cannot resize fixed length array from "
                     + currentElementsPerNode + " to " + newElementsPerNode);
