@@ -5,8 +5,10 @@ import com.netflix.hollow.core.memory.encoding.FixedLengthMultipleOccurrenceElem
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -125,9 +127,12 @@ class TST {   // ternary search tree
         nodes.setElementValue((nodeIndex * bitsPerNode) + isEndFlagOffset, 1, 1);
     }
 
-    private Set<Integer> getOrdinals(long nodeIndex) {
+    List<Integer> getOrdinals(long nodeIndex) {
+        if (nodeIndex < 0) {    // SNAP: TODO: Test out nodeIndex == 0, should be valid
+            return Collections.EMPTY_LIST;
+        }
         return ordinalSet.getElements(nodeIndex).stream()
-                .map(Long::intValue).collect(Collectors.toSet());
+                .map(Long::intValue).collect(Collectors.toList());
     }
 
     /**
@@ -178,12 +183,55 @@ class TST {   // ternary search tree
     }
 
     /**
+     * Note that it will match the longest substring in {@code prefix} that was inserted as a key into the tree, and not
+     * match partial prefix with partial key.
+     * @return index of the node corresponding to longest match with a given prefix, -1 if no match
+     */
+    long findLongestMatch(String prefix) {
+        long index = -1;
+        if (prefix == null) {
+            return index;
+        }
+
+        boolean atRoot = true;
+        long currentNodeIndex = 0;
+        int keyIndex = 0;
+
+        while (true) {
+            if (currentNodeIndex == 0 && !atRoot) break;
+            long currentValue = getKey(currentNodeIndex);
+            char ch = prefix.charAt(keyIndex);
+            if (ch < currentValue) {
+                currentNodeIndex = getChildIndex(currentNodeIndex, NodeType.Left);
+            }
+            else if (ch > currentValue) {
+                currentNodeIndex = getChildIndex(currentNodeIndex, NodeType.Right);
+            }
+            else {
+                if (isEndNode(currentNodeIndex)) {
+                    index = currentNodeIndex;   // update longest prefix match
+                }
+                if (keyIndex == (prefix.length() - 1)) {
+                    break;
+                }
+                currentNodeIndex = getChildIndex(currentNodeIndex, NodeType.Middle);
+                keyIndex ++;
+            }
+            if (atRoot) atRoot = false;
+        }
+        return index;
+    }
+
+    /**
      * This functions checks if the given key exists in the trie.
      *
      * @return index of the node that findNodeWithKey the last character of the key, if not found then returns -1.
      */
-    long findNodeWithKey(String key) {
+    long findNodeWithKey(String key) {  // SNAP: TODO: input sanitization. empty string could be a valid indexed key.
         long index = -1;
+        if (key == null) {
+            return index;
+        }
 
         boolean atRoot = true;
         long currentNodeIndex = 0;

@@ -73,7 +73,7 @@ public class HollowPrefixIndexTest {
     }
 
     @Test
-    public void testCustomPrefixIndex() throws Exception {
+    public void testFindKeysWithPrefix() throws Exception {
 
         for (Movie movie : getSimpleList()) {
             objectMapper.add(movie);
@@ -93,6 +93,45 @@ public class HollowPrefixIndexTest {
         ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("the "));// note the whitespace in findKeysWithPrefix string.
         // expected result ordinals size is 0, since entire movie is not indexed. movie name is split by whitespace.
         Assert.assertTrue(ordinals.size() == 0);
+    }
+
+    @Test
+    public void testLongestPrefixMatch() throws Exception {
+
+        // "The Matrix"
+        // "Blood Diamond"
+        // "Rush"
+        // "Rocky"
+        // "The Matrix Reloaded"
+        // "The Matrix Resurrections"
+
+        for (Movie movie : getSimpleList()) {
+            objectMapper.add(movie);
+        }
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+        HollowTokenizedPrefixIndex tokenizedPrefixIndex = new HollowTokenizedPrefixIndex(readStateEngine, "SimpleMovie", "name.value");
+
+        List<Integer> match;
+        match = tokenizedPrefixIndex.findLongestMatch("rush");
+        Assert.assertTrue(match.get(0) > -1);
+
+        match = tokenizedPrefixIndex.findLongestMatch("rushing");
+        Assert.assertTrue(match.get(0) > -1);
+
+        match = tokenizedPrefixIndex.findLongestMatch("the");
+        Assert.assertTrue(match.get(0) > -1);
+
+        match = tokenizedPrefixIndex.findLongestMatch("doesnotexist");
+        Assert.assertTrue(match.size() == 0);
+
+        match = tokenizedPrefixIndex.findLongestMatch("resurrect");
+        Assert.assertTrue(match.size() == 0);
+
+        match = tokenizedPrefixIndex.findLongestMatch("");
+        Assert.assertTrue(match.size() == 0);   // only if empty string is indexed in tree
+
+        match = tokenizedPrefixIndex.findLongestMatch(null);
+        Assert.assertTrue(match == null);
     }
 
     @Test
