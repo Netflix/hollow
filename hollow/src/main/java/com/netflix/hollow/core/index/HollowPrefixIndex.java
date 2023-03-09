@@ -26,6 +26,7 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.util.BitSet;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -227,7 +228,6 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * @param prefix findKeysWithPrefix prefix.
      * @return An instance of HollowOrdinalIterator to iterate over ordinals that match the given findKeysWithPrefix.
      */
-    @SuppressWarnings("WeakerAccess")
     public HollowOrdinalIterator findKeysWithPrefix(String prefix) {
         TST current;
         HollowOrdinalIterator it;
@@ -236,6 +236,42 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             it = current.findKeysWithPrefix(prefix);
         } while (current != this.prefixIndexVolatile);
         return it;
+    }
+
+    /**
+     * Query the index to find the longest matching prefix of key that was indexed. Note that this matches against full
+     * tokens indexed in prefix index, and not against substrings of tokens for e.g. if "abc" and "abcd" were indexed
+     * then findLongestMatch("abce") will return a list containing only ordinal corresponding to "abc" and
+     * findLongestMatch("ab") will return no matches (in the form of an empty list).
+     * If the tokens indexed in the prefix index reference unique values then the result will contain upto one ordinal.
+     *
+     * <pre>{@code
+     *     List<Integer> matches = index.findLongestMatch("matrix");
+     *     // if each token indexed in the prefix index points to a unique value then
+     *     for (Integer ordinal : matches) {
+     *         // print the result using API for e.g. api.getMovie(ordinal)
+     *     }
+     * }</pre>
+     * <p>
+     *
+     * @param key a string of which the longest substring that was inserted into the prefix index must be returned.
+     * @return A list of ordinals that were referenced from the longest matching prefix
+     */
+    /**
+     * // SNAP: TODO: a note about default beahivor to index as lower case characters so when querying also query for lower case
+     */
+    public List<Integer> findLongestMatch(String key) {
+        if (key == null) {
+            return null;
+        }
+        TST current;
+        List<Integer> ordinals;
+        do {
+            current = prefixIndexVolatile;
+            long index = current.findLongestMatch(key);
+            ordinals = current.getOrdinals(index);
+        } while (current != this.prefixIndexVolatile);
+        return ordinals;
     }
 
     /**

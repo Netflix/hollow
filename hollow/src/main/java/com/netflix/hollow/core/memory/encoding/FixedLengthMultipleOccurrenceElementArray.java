@@ -118,6 +118,10 @@ public class FixedLengthMultipleOccurrenceElementArray {
      * @return a list of element at the node index
      */
     public List<Long> getElements(long nodeIndex) {
+        if (nodeIndex < 0) {
+            return null;
+        }
+
         long bucketStart = nodeIndex * maxElementsPerNode * bitsPerElement;
         List<Long> ret = new ArrayList<>();
         if (nodesWithOrdinalZero.getElementValue(nodeIndex, 1, 1) != NO_ELEMENT) {
