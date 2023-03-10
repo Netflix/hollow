@@ -42,7 +42,8 @@ class TST {   // ternary search tree
     private long rightChildOffset;
     private long isEndFlagOffset;   // indicates end of a value stored in TST
 
-    private long maxNodes;
+    private final long maxNodes;
+    private final boolean caseSensitive;
 
     // pre-allocated array to store all nodes in the TST
     // each node contains a data key, links to 3 child nodes, and one bit for indicating if this node marks the end of a value
@@ -59,11 +60,14 @@ class TST {   // ternary search tree
      * @param estimatedMaxNodes estimate number of max nodes that will be created. This is a hard limit.
      * @param estimatedMaxStringDuplicates estimated number string duplicates across all nodes
      * @param maxOrdinalValue  max ordinal that can be referenced
+     * @param caseSensitive controls whether indexing and querying should be case sensitive
      * @param memoryRecycler   to reuse arrays from memory pool
      */
-    TST(long estimatedMaxNodes, int estimatedMaxStringDuplicates, int maxOrdinalValue, ArraySegmentRecycler memoryRecycler) {
+    TST(long estimatedMaxNodes, int estimatedMaxStringDuplicates, int maxOrdinalValue, boolean caseSensitive,
+        ArraySegmentRecycler memoryRecycler) {
         // best guess, hard limit
         maxNodes = estimatedMaxNodes;
+        this.caseSensitive = caseSensitive;
 
         // bits for pointers in a single node:
         bitsPerKey = 16;// key
@@ -128,7 +132,7 @@ class TST {   // ternary search tree
     }
 
     List<Integer> getOrdinals(long nodeIndex) {
-        if (nodeIndex < 0) {    // SNAP: TODO: Test out nodeIndex == 0, should be valid
+        if (nodeIndex < 0) {
             return Collections.EMPTY_LIST;
         }
         return ordinalSet.getElements(nodeIndex).stream()
@@ -137,15 +141,19 @@ class TST {   // ternary search tree
 
     /**
      * Insert into ternary search tree for the given key and ordinal.
+     * Case sensitivity is specified at the time of index initialization.  nulls and empty strings are not supported.
      */
     void insert(String key, int ordinal) {
         if (key == null) throw new IllegalArgumentException("Null key cannot be indexed");
+        if (key.length() == 0) throw new IllegalArgumentException("Empty string cannot be indexed");
         long currentNodeIndex = 0;
         int keyIndex = 0;
         int depth = 0;
+        if (!caseSensitive) {
+            key = key.toLowerCase();
+        }
 
         while (keyIndex < key.length()) {
-
             char ch = key.charAt(keyIndex);
             if (getKey(currentNodeIndex) == 0) {
                 setKey(currentNodeIndex, ch);
@@ -184,13 +192,18 @@ class TST {   // ternary search tree
 
     /**
      * Note that it will match the longest substring in {@code prefix} that was inserted as a key into the tree, and not
-     * match partial prefix with partial key.
-     * @return index of the node corresponding to longest match with a given prefix, -1 if no match
+     * match partial prefix with partial key. Case sensitivity of matches is specified at the time of index initialization.
+     * Null values and empty strings are not indexed so those return ORDINAL_NONE (-1).
+     *
+     * @return index of the node corresponding to longest match with a given prefix, -1 if no match or input was null or empty string
      */
     long findLongestMatch(String prefix) {
-        long index = -1;
-        if (prefix == null) {
-            return index;
+        long nodeIndex = -1;
+        if (prefix == null || prefix.length() == 0) {
+            return nodeIndex;
+        }
+        if (!caseSensitive) {
+            prefix = prefix.toLowerCase();
         }
 
         boolean atRoot = true;
@@ -209,7 +222,7 @@ class TST {   // ternary search tree
             }
             else {
                 if (isEndNode(currentNodeIndex)) {
-                    index = currentNodeIndex;   // update longest prefix match
+                    nodeIndex = currentNodeIndex;   // update longest prefix match
                 }
                 if (keyIndex == (prefix.length() - 1)) {
                     break;
@@ -219,18 +232,22 @@ class TST {   // ternary search tree
             }
             if (atRoot) atRoot = false;
         }
-        return index;
+        return nodeIndex;
     }
 
     /**
-     * This functions checks if the given key exists in the trie.
+     * This functions checks if the given key exists in the TST. Case sensitivity of matches is specified at the time of
+     * index initialization.
      *
-     * @return index of the node that findNodeWithKey the last character of the key, if not found then returns -1.
+     * @return index of the node corresponding to the last character of the key, or -1 if not found or input was null or empty string.
      */
-    long findNodeWithKey(String key) {  // SNAP: TODO: input sanitization. empty string could be a valid indexed key.
+    long findNodeWithKey(String key) {
         long index = -1;
-        if (key == null) {
+        if (key == null || key.length() == 0) {
             return index;
+        }
+        if (!caseSensitive) {
+            key = key.toLowerCase();
         }
 
         boolean atRoot = true;
@@ -263,33 +280,49 @@ class TST {   // ternary search tree
 
     /**
      * Find all the ordinals that match the given prefix.
+     * Case sensitivity of matches is specified at the time of index initialization. A prefix of empty string "" will
+     * return all ordinals indexed in the tree.
      */
     HollowOrdinalIterator findKeysWithPrefix(String prefix) {
-        if (prefix == null) throw new IllegalArgumentException("Cannot findKeysWithPrefix null prefix");
+        if (prefix == null){
+            throw new IllegalArgumentException("Cannot findKeysWithPrefix null prefix");
+        }
+        if (!caseSensitive) {
+            prefix = prefix.toLowerCase();
+        }
+
         final Set<Integer> ordinals = new HashSet<>();
-        long currentNodeIndex = findNodeWithKey(prefix.toLowerCase());
+        long currentNodeIndex;
+        if (prefix.length() == 0) {
+            currentNodeIndex = 0;
+        } else {
+            currentNodeIndex = findNodeWithKey(prefix);
+        }
 
         if (currentNodeIndex >= 0) {
-
             if (isEndNode(currentNodeIndex))
                 ordinals.addAll(getOrdinals(currentNodeIndex));
 
             // go to all leaf nodes from current node mid pointer
-            long subTree = getChildIndex(currentNodeIndex, NodeType.Middle);
-            if (subTree != 0) {
-                Queue<Long> queue = new ArrayDeque<>();
-                queue.add(subTree);
-                while (!queue.isEmpty()) {
-                    long nodeIndex = queue.remove();
-                    long left = getChildIndex(nodeIndex, NodeType.Left);
-                    long mid = getChildIndex(nodeIndex, NodeType.Middle);
-                    long right = getChildIndex(nodeIndex, NodeType.Right);
-
-                    if (isEndNode(nodeIndex)) ordinals.addAll(getOrdinals(nodeIndex));
-                    if (left != 0) queue.add(left);
-                    if (mid != 0) queue.add(mid);
-                    if (right != 0) queue.add(right);
+            Queue<Long> queue = new ArrayDeque<>();
+            if (prefix.length() == 0) {
+                queue.add(0l);  // root node index
+            } else {
+                long subTree = getChildIndex(currentNodeIndex, NodeType.Middle);
+                if (subTree != 0) {
+                    queue.add(subTree);
                 }
+            }
+            while (!queue.isEmpty()) {
+                long nodeIndex = queue.remove();
+                long left = getChildIndex(nodeIndex, NodeType.Left);
+                long mid = getChildIndex(nodeIndex, NodeType.Middle);
+                long right = getChildIndex(nodeIndex, NodeType.Right);
+
+                if (isEndNode(nodeIndex)) ordinals.addAll(getOrdinals(nodeIndex));
+                if (left != 0) queue.add(left);
+                if (mid != 0) queue.add(mid);
+                if (right != 0) queue.add(right);
             }
         }
 

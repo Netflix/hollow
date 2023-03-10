@@ -55,6 +55,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     private final HollowReadStateEngine readStateEngine;
     private final String type;
     private final int estimatedMaxStringDuplicates;
+    private final boolean caseSensitive;
 
     private volatile TST prefixIndexVolatile;
     private ArraySegmentRecycler memoryRecycle;
@@ -66,7 +67,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     private boolean buildIndexOnUpdate;
 
     /**
-     * Initializes a new prefix index.
+     * Initializes a new prefix index that is case in-sensitive.
      *
      * This constructor defaults the estimatedMaxStringDuplicates to 1, however while building the index it is observed
      * that an indexed key references more than one records in the type then the prefix index dynamically resizes each node
@@ -83,7 +84,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      *
      */
     public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath) {
-        this(readStateEngine, type, fieldPath, 1);
+        this(readStateEngine, type, fieldPath, 1, false);
     }
 
     /**
@@ -99,9 +100,10 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      *                                     across instances of your type. Note that this means an
      *                                     exactly matching string, not a prefix match. A higher value will mean
      *                                     the prefix tree will reserve more memory to reference several elements per node.
+     * @param caseSensitive                Specify the case sensitivity for indexing and querying
      */
     public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath,
-            int estimatedMaxStringDuplicates) {
+            int estimatedMaxStringDuplicates, boolean caseSensitive) {
         requireNonNull(type, "Hollow Prefix Key Index creation failed because type was null");
         requireNonNull(readStateEngine, "Hollow Prefix Key Index creation for type [" + type
                 + "] failed because read state wasn't initialized");
@@ -115,6 +117,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         this.readStateEngine = readStateEngine;
         this.type = type;
         this.estimatedMaxStringDuplicates = estimatedMaxStringDuplicates;
+        this.caseSensitive = caseSensitive;
         this.fieldPath = new FieldPath(readStateEngine, type, fieldPath);
         if (!this.fieldPath.getLastFieldType().equals(HollowObjectSchema.FieldType.STRING))
             throw new IllegalArgumentException("Field path should lead to a string type");
@@ -160,12 +163,12 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
         // This is a hard limit, and currently assumes worst case unbalanced tree i.e. the total length of all words
         long estimatedMaxNodes = estimateNumNodes(totalWords, averageWordLen);
-        TST tst = new TST(estimatedMaxNodes, estimatedMaxStringDuplicates, maxOrdinalOfType,
+        TST tst = new TST(estimatedMaxNodes, estimatedMaxStringDuplicates, maxOrdinalOfType, caseSensitive,
                 memoryRecycle);
         BitSet ordinals = readStateEngine.getTypeState(type).getPopulatedOrdinals();
         int ordinal = ordinals.nextSetBit(0);
         while (ordinal != -1) {
-            for (String key : getKeys(ordinal)) {
+            for (String key : getKeys(ordinal, caseSensitive)) {
                 tst.insert(key, ordinal);
             }
             ordinal = ordinals.nextSetBit(ordinal + 1);
@@ -182,7 +185,8 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
     /**
      * Estimates the total number of nodes that will be required to create the index.
-     * Override this method if lower/higher estimate is needed compared to the default implementation.
+     * Override this method if lower/higher estimate is needed as compared to the default implementation, but note that
+     * this imposes an underlying hard limit until the backing implementation starts supporting resizing dynamically.
      *
      * @param totalWords the total number of words
      * @param averageWordLen the average word length
@@ -194,23 +198,37 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     }
 
     /**
-     * Return the key to index in prefix index. Override this method to support tokens for the key. By default keys are indexed as lower case characters.
+     * Return the key to index in prefix index. Override this method to support tokens for the key. Note that care must
+     * be taken to not return null or empty string tokens as the prefix index does not support indexing nulls or empty string.
      * <pre>{@code
-     *     String[] keys = super.getKey(ordinal);
+     *     String[] keys = super.getKey(ordinal, false);
      *     String[] tokens = keys[0].split(" ")
      *     return tokens;
      * }</pre>
      *
      * @param ordinal ordinal of the parent type.
+     * @param caseSensitive controls whether to maintain casing when indexing.
      * @return keys to index.
      */
-    protected String[] getKeys(int ordinal) {
+    protected String[] getKeys(int ordinal, boolean caseSensitive) {
         Object[] values = fieldPath.findValues(ordinal);
         String[] stringValues = new String[values.length];
         for (int i = 0; i < values.length; i++) {
-            stringValues[i] = ((String) values[i]).toLowerCase();
+            if (caseSensitive) {
+                stringValues[i] = (String) values[i];
+            } else {
+                stringValues[i] = ((String) values[i]).toLowerCase();
+            }
         }
         return stringValues;
+    }
+
+    /**
+     * @deprecated see getKeys(int ordinal, boolean caseSensitive)
+     */
+    @Deprecated
+    protected String[] getKeys(int ordinal) {
+        return getKeys(ordinal, false);
     }
 
     /**
@@ -223,7 +241,8 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      *     }
      * }</pre>
      * <p>
-     * For larger data sets, querying smaller prefixes will be longer than querying for prefixes that are longer.
+     * For larger data sets, querying shorter prefixes will return more results than longer prefixes. Passing a prefix of
+     * empty String "" will return all ordinals indexed.
      *
      * @param prefix findKeysWithPrefix prefix.
      * @return An instance of HollowOrdinalIterator to iterate over ordinals that match the given findKeysWithPrefix.
@@ -244,6 +263,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * then findLongestMatch("abce") will return a list containing only ordinal corresponding to "abc" and
      * findLongestMatch("ab") will return no matches (in the form of an empty list).
      * If the tokens indexed in the prefix index reference unique values then the result will contain upto one ordinal.
+     * In other words, the returned list contains multiple elements only if duplicate tokens were indexed.
      *
      * <pre>{@code
      *     List<Integer> matches = index.findLongestMatch("matrix");
@@ -254,22 +274,16 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * }</pre>
      * <p>
      *
-     * @param key a string of which the longest substring that was inserted into the prefix index must be returned.
-     * @return A list of ordinals that were referenced from the longest matching prefix
-     */
-    /**
-     * // SNAP: TODO: a note about default beahivor to index as lower case characters so when querying also query for lower case
+     * @param key a string for which the longest indexed substring needs to be found
+     * @return A list of ordinals corresponding to the longest matching prefix
      */
     public List<Integer> findLongestMatch(String key) {
-        if (key == null) {
-            return null;
-        }
         TST current;
         List<Integer> ordinals;
         do {
             current = prefixIndexVolatile;
-            long index = current.findLongestMatch(key);
-            ordinals = current.getOrdinals(index);
+            long nodeIndex = current.findLongestMatch(key);
+            ordinals = current.getOrdinals(nodeIndex);
         } while (current != this.prefixIndexVolatile);
         return ordinals;
     }
