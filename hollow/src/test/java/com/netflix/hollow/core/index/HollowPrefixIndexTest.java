@@ -74,12 +74,11 @@ public class HollowPrefixIndexTest {
 
     @Test
     public void testFindKeysWithPrefix() throws Exception {
-
         for (Movie movie : getSimpleList()) {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
-        HollowTokenizedPrefixIndex tokenizedPrefixIndex = new HollowTokenizedPrefixIndex(readStateEngine, "SimpleMovie", "name.value");
+        HollowTokenizedPrefixIndex tokenizedPrefixIndex = new HollowTokenizedPrefixIndex(readStateEngine, "SimpleMovie", "name.value", false);
 
         Set<Integer> ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("th"));
         Assert.assertTrue(ordinals.size() == 3);
@@ -93,23 +92,24 @@ public class HollowPrefixIndexTest {
         ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("the "));// note the whitespace in findKeysWithPrefix string.
         // expected result ordinals size is 0, since entire movie is not indexed. movie name is split by whitespace.
         Assert.assertTrue(ordinals.size() == 0);
+
+        ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix(""));
+        Assert.assertTrue(ordinals.size() == 6);
     }
 
     @Test
     public void testLongestPrefixMatch() throws Exception {
-
         // "The Matrix"
         // "Blood Diamond"
         // "Rush"
         // "Rocky"
         // "The Matrix Reloaded"
         // "The Matrix Resurrections"
-
         for (Movie movie : getSimpleList()) {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
-        HollowTokenizedPrefixIndex tokenizedPrefixIndex = new HollowTokenizedPrefixIndex(readStateEngine, "SimpleMovie", "name.value");
+        HollowTokenizedPrefixIndex tokenizedPrefixIndex = new HollowTokenizedPrefixIndex(readStateEngine, "SimpleMovie", "name.value", false);
 
         List<Integer> match;
         match = tokenizedPrefixIndex.findLongestMatch("rush");
@@ -127,11 +127,36 @@ public class HollowPrefixIndexTest {
         match = tokenizedPrefixIndex.findLongestMatch("resurrect");
         Assert.assertTrue(match.size() == 0);
 
-        match = tokenizedPrefixIndex.findLongestMatch("");
-        Assert.assertTrue(match.size() == 0);   // only if empty string is indexed in tree
+        match = tokenizedPrefixIndex.findLongestMatch("");  // empty string is not indexed in prefix index but supported in hollow type state
+        Assert.assertTrue(match.size() == 0);
 
-        match = tokenizedPrefixIndex.findLongestMatch(null);
-        Assert.assertTrue(match == null);
+        match = tokenizedPrefixIndex.findLongestMatch(null); // null value is not supported in hollow type state
+        Assert.assertTrue(match.size() == 0);
+    }
+
+    @Test
+    public void testPrefixIndexCaseSensitivity() throws Exception {
+        for (Movie movie : getSimpleList()) {
+            objectMapper.add(movie);
+        }
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+        HollowTokenizedPrefixIndex tokenizedPrefixIndex = new HollowTokenizedPrefixIndex(readStateEngine, "SimpleMovie", "name.value", true);
+
+        Set<Integer> ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("th"));
+        Assert.assertTrue(ordinals.size() == 0);
+        ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("Th"));
+        Assert.assertTrue(ordinals.size() == 3);
+
+        ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("matrix"));
+        Assert.assertTrue(ordinals.size() == 0);
+        ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("Matrix"));
+        Assert.assertTrue(ordinals.size() == 3);
+
+        List<Integer> match;
+        match = tokenizedPrefixIndex.findLongestMatch("rush");
+        Assert.assertTrue(match.size() == 0);
+        match = tokenizedPrefixIndex.findLongestMatch("Rush");
+        Assert.assertTrue(match.get(0) > -1);
     }
 
     @Test
@@ -415,19 +440,19 @@ public class HollowPrefixIndexTest {
      */
     private static class HollowTokenizedPrefixIndex extends HollowPrefixIndex {
 
-        public HollowTokenizedPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath) {
-            super(readStateEngine, type, fieldPath);
+        public HollowTokenizedPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath, boolean caseSensitive) {
+            super(readStateEngine, type, fieldPath, 1, caseSensitive);
         }
 
         @Override
-        public String[] getKeys(int ordinal) {
+        public String[] getKeys(int ordinal, boolean caseSensitive) {
             // split the key by " ";
-            String[] keys = super.getKeys(ordinal);
+            String[] keys = super.getKeys(ordinal, caseSensitive);
             List<String> tokens = new ArrayList<>();
             for (String key : keys) {
                 String[] splits = key.split(" ");
                 for (String split : splits)
-                    tokens.add(split.toLowerCase());
+                    tokens.add(split);
             }
             return tokens.toArray(new String[tokens.size()]);
         }

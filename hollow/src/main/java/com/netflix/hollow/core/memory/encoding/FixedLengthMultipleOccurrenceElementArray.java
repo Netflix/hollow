@@ -115,7 +115,7 @@ public class FixedLengthMultipleOccurrenceElementArray {
      * concurrently with this method, but calling this method concurrently with itself is safe.
      *
      * @param nodeIndex the node index
-     * @return a list of element at the node index
+     * @return a list of element at the node index, or null if nodeIndex is negative
      */
     public List<Long> getElements(long nodeIndex) {
         if (nodeIndex < 0) {
