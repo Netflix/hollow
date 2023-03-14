@@ -87,6 +87,7 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
         return cachedItems.get(ordinal);
     }
 
+    // SNAP: TODO: note about thread safety. Can it be called concurrently with addedOrdinal?
     public void detach() {
         cachedItems.clear();
         factory = null;
@@ -95,7 +96,8 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
     }
 
     @Override
-    public void addedOrdinal(int ordinal) {
+    public void addedOrdinal(int ordinal) { // SNAP: Why do we need both this per ordinal and above batch for all ordinals
+                                            // => because this is called during delta application
         // guard against being detached (or constructed without a HollowTypeReadState)
         if (factory == null)
             return;

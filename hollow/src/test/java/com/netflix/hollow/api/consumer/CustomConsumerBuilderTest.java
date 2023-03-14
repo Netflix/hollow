@@ -4,13 +4,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import com.netflix.hollow.api.client.HollowAPIFactory;
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.api.objects.provider.HollowFactory;
+import com.netflix.hollow.api.objects.provider.HollowObjectCacheProvider;
+import com.netflix.hollow.api.objects.provider.HollowObjectProvider;
 import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
+import com.netflix.hollow.test.HollowWriteStateEngineBuilder;
+import com.netflix.hollow.test.consumer.TestAnnouncementWatcher;
+import com.netflix.hollow.test.consumer.TestBlobRetriever;
+import com.netflix.hollow.test.consumer.TestHollowConsumer;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,6 +39,41 @@ public class CustomConsumerBuilderTest {
     @Before
     public void setUp() {
         blobStore = new InMemoryBlobStore();
+    }
+
+    static class MyGeneratedAPI extends HollowAPI {
+        private final HollowObjectProvider fooProvider;
+
+        public MyGeneratedAPI(HollowDataAccess dataAccess) {
+            this(dataAccess, Collections.<String>emptySet());
+        }
+
+        public MyGeneratedAPI(HollowDataAccess dataAccess, Set<String> cachedTypes) {
+            // count as  called
+            super(dataAccess);
+            if (cachedTypes.contains("foo")) {
+
+            }
+            this.fooProvider = null;
+            // this.fooProvider = new HollowObjectCacheProvider(typeDataAccess, movieTypeAPI, factory, previousCacheProvider);
+        }
+
+
+    }
+
+
+    @Test
+    public void newTest() throws Exception {
+//         HollowConsumer consumer = new AugmentedBuilder()
+//                 .withBlobRetriever(blobStore)
+//                 .withGeneratedAPIClass(HollowAPI.class, "TypeA", "TypeB")
+//                 .build();
+//         // SNAP: TODO: use factory overrides
+//         Assert.assertNotNull(consumer);
+//         assertThat(consumer.getAPI()).isNotInstanceOf(AugmentedConsumer.class);
+
+
+
     }
 
     @Test

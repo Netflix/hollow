@@ -119,6 +119,13 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     }
 
     @Override
+    public void announcementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {
+        if (!isPinned) {
+            // TODO: record version and announced timestamp
+        }
+    }
+
+    @Override
     public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
         long refreshEndTimeNano = System.nanoTime();
 
@@ -134,6 +141,11 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
         if (cycleVersionStartTimes.containsKey(afterVersion)) {
             refreshMetricsBuilder.setCycleStartTimestamp(cycleVersionStartTimes.get(afterVersion));
+        }
+
+        if (afterVersion == requestedVersion) {
+            // TODO: report the propagation delay metric
+            // what about pinning
         }
 
         noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
