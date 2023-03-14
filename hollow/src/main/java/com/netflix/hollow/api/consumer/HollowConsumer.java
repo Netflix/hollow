@@ -45,6 +45,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -222,6 +223,7 @@ public class HollowConsumer {
         refreshLock.writeLock().lock();
         try {
             updater.updateTo(announcementWatcher == null ? Long.MAX_VALUE : announcementWatcher.getLatestVersion());
+            // SNAP: report announcementWatcher.getVersionAnnounceTimes().get(getCurrentVersionId());
         } catch (Error | RuntimeException e) {
             throw e;
         } catch (Throwable t) {
@@ -229,6 +231,10 @@ public class HollowConsumer {
         } finally {
             refreshLock.writeLock().unlock();
         }
+    }
+
+    public void fireAnnouncementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {
+        updater.fireAnnouncementDetected(newVersion , metadata, isPinned);
     }
 
     /**
@@ -781,6 +787,8 @@ public class HollowConsumer {
      */
     public interface RefreshListener {
 
+        default void announcementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {}
+
         /**
          * Indicates that a refresh has begun.  Generally useful for logging.
          * <p>
@@ -1106,6 +1114,13 @@ public class HollowConsumer {
             if (HollowAPI.class.equals(generatedAPIClass))
                 throw new IllegalArgumentException("must provide a code generated API class");
             this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass);
+            return (B)this;
+        }
+
+        public B withGeneratedAPIClass(Class<? extends HollowAPI> generatedAPIClass, String... cachedTypes) {
+            if (HollowAPI.class.equals(generatedAPIClass))
+                throw new IllegalArgumentException("must provide a code generated API class");
+            this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass, cachedTypes);
             return (B)this;
         }
 

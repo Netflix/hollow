@@ -227,7 +227,7 @@ class HollowDataHolder {
 
                 wireHistoricalStateChain(priorState);
             } else {
-                if(currentAPI.getDataAccess() != stateEngine)
+                if(currentAPI.getDataAccess() != stateEngine)   // SNAP: TODO: when is this true? Delta update doesn't always do this
                     currentAPI = apiFactory.createAPI(stateEngine);
 
                 priorHistoricalDataAccess = null;

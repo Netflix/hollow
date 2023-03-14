@@ -28,6 +28,7 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
@@ -206,6 +207,11 @@ public class HollowClientUpdater {
 
             throw th;
         }
+    }
+
+    public void fireAnnouncementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {
+        for (HollowConsumer.RefreshListener listener : refreshListeners)
+            listener.announcementDetected(newVersion, metadata, isPinned);
     }
 
     public synchronized void addRefreshListener(HollowConsumer.RefreshListener refreshListener,

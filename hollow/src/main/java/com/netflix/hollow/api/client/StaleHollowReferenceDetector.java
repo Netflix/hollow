@@ -185,7 +185,7 @@ public class StaleHollowReferenceDetector {
         }
 
         private void housekeeping() {
-            if(gracePeriodBeginTimestamp != Long.MAX_VALUE) {
+            if(gracePeriodBeginTimestamp != Long.MAX_VALUE) {   // SNAP: never enter this conditional for current api
                 if(shouldBeginUsageDetectionPeriod())
                     beginUsageDetectionPeriod();
                 if(shouldDetach())
@@ -284,7 +284,7 @@ public class StaleHollowReferenceDetector {
             HollowAPI myAPI = apiHandle.get();
             if(myAPI == null)
                 return false;
-            if(myAPI == newAPI)
+            if(myAPI == newAPI)   // SNAP: never start grace period for current API handle
                 return false;
             if(myAPI.getDataAccess() == newAPI.getDataAccess())
                 return false;
