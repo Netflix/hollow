@@ -118,7 +118,7 @@ public class HollowSchemaParser {
                 throw new IOException("Invalid syntax, expected field type: " + typeName);
 
             tokens.add(tokenizer.sval);
-            tokenizer.nextToken();
+            tok = tokenizer.nextToken();
 
             if(tok != StreamTokenizer.TT_WORD)
                 throw new IOException("Invalid syntax, expected field name: " + typeName);
@@ -293,8 +293,10 @@ public class HollowSchemaParser {
 
     private static void configureTokenizer(StreamTokenizer tokenizer) {
         tokenizer.wordChars('_', '_');
+        tokenizer.ordinaryChars('0', '9');
+        tokenizer.wordChars('0', '9');
         tokenizer.slashSlashComments(true);
         tokenizer.slashStarComments(true);
     }
-
+    
 }

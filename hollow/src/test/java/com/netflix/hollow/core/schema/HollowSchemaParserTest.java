@@ -229,4 +229,11 @@ public class HollowSchemaParserTest {
             }
         }
     }
+    
+    @Test
+    public void fieldNamesCanStartWithNumbers() throws IOException {
+        HollowObjectSchema schema = (HollowObjectSchema)HollowSchemaParser.parseSchema("Test { int 3field; }");
+        
+        Assert.assertEquals("3field", schema.getFieldName(0));
+    }
 }
