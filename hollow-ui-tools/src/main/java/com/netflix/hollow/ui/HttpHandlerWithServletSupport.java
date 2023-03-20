@@ -47,6 +47,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -90,19 +91,17 @@ public class HttpHandlerWithServletSupport implements HttpHandler {
             if (headers != null) {
                 List<String> strCookies = headers.get("Cookie");
                 if (strCookies != null) {
-                    Cookie[] cookies = new Cookie[strCookies.size()];
-                    int i=0;
+                    List<Cookie> cookies = new ArrayList<>();
                     for (String cookieString : strCookies) {
-                         String[] tokens = cookieString.split("\\s*;\\s*");
-                         for (String token : tokens) {
-                              String[] keyVal = token.split("\\s*=\\s*");
-                              if(keyVal.length==2){
-                                 cookies[i] = new Cookie(keyVal[0], keyVal[1]);
-                                 i++;
-                              }
-                         }
+                        String[] tokens = cookieString.split("\\s*;\\s*");
+                        for (String token : tokens) {
+                            String[] keyVal = token.split("\\s*=\\s*");
+                            if(keyVal.length == 2){
+                                cookies.add(new Cookie(keyVal[0], keyVal[1]));
+                            }
+                        }
                    }
-                   return cookies;
+                   return cookies.toArray(new Cookie[0]);
                }
             }
             return null;
