@@ -5,13 +5,17 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.test.model.Movie;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.io.IOException;
 
 public class SearchUtilsTest {
 
@@ -61,5 +65,15 @@ public class SearchUtilsTest {
         assertEquals("a1:a2", key[0]);
         assertEquals("b", key[1]);
     }
+
+//    @Test
+//    public void generateAPI() throws IOException {
+//        new HollowAPIGenerator.Builder()
+//                .withAPIClassname("MovieAPI")
+//                .withPackageName("com.netflix.hollow.test.generated")
+//                .withDestination("/Users/xsun/workspace/hollow/hollow/src/test/java/com/netflix/hollow/test/generated")
+//                .withDataModel(Movie.class)
+//                .build().generateSourceFiles();
+//    }
 
 }
