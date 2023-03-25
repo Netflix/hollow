@@ -1102,11 +1102,18 @@ public class HollowConsumer {
          * @return this builder
          * @throws IllegalArgumentException if provided API class is {@code HollowAPI} instead of a subclass
          */
-        public B withGeneratedAPIClass(Class<? extends HollowAPI> generatedAPIClass) {
+        public B withGeneratedAPIClass(Class<? extends HollowAPI> generatedAPIClass, String cachedType, String... additionalCachedTypes) {
             if (HollowAPI.class.equals(generatedAPIClass))
                 throw new IllegalArgumentException("must provide a code generated API class");
-            this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass);
+            String[] types = new String[additionalCachedTypes.length + 1];
+            types[0] = cachedType;
+            System.arraycopy(additionalCachedTypes, 0, types, 1, additionalCachedTypes.length);
+            this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass, types);
             return (B)this;
+        }
+
+        public B withGeneratedAPIClass(Class<? extends HollowAPI> generatedAPIClass) {
+            return withGeneratedAPIClass(generatedAPIClass, null);
         }
 
         /**
