@@ -21,6 +21,16 @@ public class MovieDelegateLookupImpl extends HollowObjectAbstractDelegate implem
         return typeAPI.getIdBoxed(ordinal);
     }
 
+    public String getTitle(int ordinal) {
+        ordinal = typeAPI.getTitleOrdinal(ordinal);
+        return ordinal == -1 ? null : typeAPI.getAPI().getStringTypeAPI().getValue(ordinal);
+    }
+
+    public boolean isTitleEqual(int ordinal, String testValue) {
+        ordinal = typeAPI.getTitleOrdinal(ordinal);
+        return ordinal == -1 ? testValue == null : typeAPI.getAPI().getStringTypeAPI().isValueEqual(ordinal, testValue);
+    }
+
     public int getTitleOrdinal(int ordinal) {
         return typeAPI.getTitleOrdinal(ordinal);
     }

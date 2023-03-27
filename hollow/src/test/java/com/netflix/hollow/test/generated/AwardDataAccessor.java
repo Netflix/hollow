@@ -6,33 +6,33 @@ import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 @SuppressWarnings("all")
-public class MovieDataAccessor extends AbstractHollowDataAccessor<Movie> {
+public class AwardDataAccessor extends AbstractHollowDataAccessor<Award> {
 
-    public static final String TYPE = "Movie";
+    public static final String TYPE = "Award";
     private AwardsAPI api;
 
-    public MovieDataAccessor(HollowConsumer consumer) {
+    public AwardDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
         this.api = (AwardsAPI)consumer.getAPI();
     }
 
-    public MovieDataAccessor(HollowReadStateEngine rStateEngine, AwardsAPI api) {
+    public AwardDataAccessor(HollowReadStateEngine rStateEngine, AwardsAPI api) {
         super(rStateEngine, TYPE);
         this.api = api;
     }
 
-    public MovieDataAccessor(HollowReadStateEngine rStateEngine, AwardsAPI api, String ... fieldPaths) {
+    public AwardDataAccessor(HollowReadStateEngine rStateEngine, AwardsAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
         this.api = api;
     }
 
-    public MovieDataAccessor(HollowReadStateEngine rStateEngine, AwardsAPI api, PrimaryKey primaryKey) {
+    public AwardDataAccessor(HollowReadStateEngine rStateEngine, AwardsAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
         this.api = api;
     }
 
-    @Override public Movie getRecord(int ordinal){
-        return api.getMovie(ordinal);
+    @Override public Award getRecord(int ordinal){
+        return api.getAward(ordinal);
     }
 
 }

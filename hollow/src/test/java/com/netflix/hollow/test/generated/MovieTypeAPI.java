@@ -2,13 +2,14 @@ package com.netflix.hollow.test.generated;
 
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.type.StringTypeAPI;
 
 @SuppressWarnings("all")
 public class MovieTypeAPI extends HollowObjectTypeAPI {
 
     private final MovieDelegateLookupImpl delegateLookupImpl;
 
-    public MovieTypeAPI(MovieAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public MovieTypeAPI(AwardsAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "id",
             "title",
@@ -74,8 +75,8 @@ public class MovieTypeAPI extends HollowObjectTypeAPI {
     }
 
     @Override
-    public MovieAPI getAPI() {
-        return (MovieAPI) api;
+    public AwardsAPI getAPI() {
+        return (AwardsAPI) api;
     }
 
 }

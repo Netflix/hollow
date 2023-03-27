@@ -3,7 +3,7 @@ package com.netflix.hollow.test.generated;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.index.UniqueKeyIndex;
 import com.netflix.hollow.api.objects.HollowObject;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.type.HString;
 
 @SuppressWarnings("all")
 public class Movie extends HollowObject {
@@ -20,7 +20,15 @@ public class Movie extends HollowObject {
         return delegate().getIdBoxed(ordinal);
     }
 
-    public HString getTitle() {
+    public String getTitle() {
+        return delegate().getTitle(ordinal);
+    }
+
+    public boolean isTitleEqual(String testValue) {
+        return delegate().isTitleEqual(ordinal, testValue);
+    }
+
+    public HString getTitleHollowReference() {
         int refOrdinal = delegate().getTitleOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
@@ -35,7 +43,7 @@ public class Movie extends HollowObject {
         return delegate().getYearBoxed(ordinal);
     }
 
-    public MovieAPI api() {
+    public AwardsAPI api() {
         return typeApi().getAPI();
     }
 

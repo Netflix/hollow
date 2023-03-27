@@ -18,7 +18,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  */
 @Deprecated
 @SuppressWarnings("all")
-public class MoviePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<MovieAPI, Movie> implements HollowUniqueKeyIndex<Movie> {
+public class MoviePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<AwardsAPI, Movie> implements HollowUniqueKeyIndex<Movie> {
 
     public MoviePrimaryKeyIndex(HollowConsumer consumer) {
         this(consumer, true);

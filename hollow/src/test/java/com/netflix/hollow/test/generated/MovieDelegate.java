@@ -10,6 +10,10 @@ public interface MovieDelegate extends HollowObjectDelegate {
 
     public Long getIdBoxed(int ordinal);
 
+    public String getTitle(int ordinal);
+
+    public boolean isTitleEqual(int ordinal, String testValue);
+
     public int getTitleOrdinal(int ordinal);
 
     public int getYear(int ordinal);
