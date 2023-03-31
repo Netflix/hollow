@@ -36,11 +36,11 @@ import java.util.logging.Logger;
  */
 public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implements HollowTypeStateListener {
     private static final Logger log = Logger.getLogger(HollowObjectCacheProvider.class.getName());
-    private final List<T> cachedItems;
+    private volatile List<T> cachedItems;
 
-    private HollowFactory<T> factory;
-    private HollowTypeAPI typeAPI;
-    private HollowTypeReadState typeReadState;
+    private volatile HollowFactory<T> factory;
+    private volatile HollowTypeAPI typeAPI;
+    private volatile HollowTypeReadState typeReadState;
 
     public HollowObjectCacheProvider(HollowTypeDataAccess typeDataAccess, HollowTypeAPI typeAPI, HollowFactory<T> factory) {
         this(typeDataAccess, typeAPI, factory, null);
@@ -84,11 +84,18 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
 
     @Override
     public T getHollowObject(int ordinal) {
-        return cachedItems.get(ordinal);
+        List<T> refCachedItems = cachedItems;
+        if (refCachedItems == null) {
+            throw new IllegalStateException("Cache cannot be accessed after detached.");
+        }
+        if (refCachedItems.size() <= ordinal) {
+            throw new IllegalStateException("Ordinal is out of bound for cache array.");
+        }
+        return refCachedItems.get(ordinal);
     }
 
     public void detach() {
-        cachedItems.clear();
+        cachedItems = null;
         factory = null;
         typeAPI = null;
         typeReadState = null;

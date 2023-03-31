@@ -175,6 +175,7 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
 
         builder.append("    }\n\n");
 
+        builder.append("Cached objects are no longer accessible after this method is called and an attempt to access them will throw an IllegalStateException\n");
 
         builder.append("    public void detachCaches() {\n");
         for(HollowSchema schema : schemaList) {

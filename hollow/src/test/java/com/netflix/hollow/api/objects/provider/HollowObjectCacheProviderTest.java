@@ -117,7 +117,7 @@ public class HollowObjectCacheProviderTest {
             // filled with null
             subject.get().getHollowObject(0);
             fail("expected exception to be thrown");
-        } catch (IndexOutOfBoundsException expected) {}
+        } catch (IllegalStateException expected) {}
     }
 
     private void prepopulate(TypeA...population) {
