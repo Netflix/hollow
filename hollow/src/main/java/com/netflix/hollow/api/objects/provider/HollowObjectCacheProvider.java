@@ -84,12 +84,12 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
 
     @Override
     public T getHollowObject(int ordinal) {
-        List<T> refCachedItems = cachedItems;   // SNAP: object cache
+        List<T> refCachedItems = cachedItems;
         if (refCachedItems == null) {
-            throw new IllegalStateException("");
+            throw new IllegalStateException("Cache cannot be accessed after detached.");
         }
         if (refCachedItems.size() <= ordinal) {
-            throw new IllegalStateException("");
+            throw new IllegalStateException("Ordinal is out of bound for cache array.");
         }
         return refCachedItems.get(ordinal);
     }
