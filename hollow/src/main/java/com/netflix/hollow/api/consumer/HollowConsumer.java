@@ -1112,7 +1112,7 @@ public class HollowConsumer {
          *     the generated client API (e.g. {@code MovieDelegateCachedImpl}). For a given ordinal,
          *     the same {@code HollowRecord} instance is returned assuming the ordinal hasn't been removed.
          *     All of the type's fields are eagerly looked up from the high-density cache and stored as Java fields,
-         *     aking field access in tight loops or the hottest code paths more CPU efficient.</dd>
+         *     making field access in tight loops or the hottest code paths more CPU efficient.</dd>
          * </dl>
          *
          * Object caching should only be enabled for low cardinality, custom types in your data model.
@@ -1134,6 +1134,7 @@ public class HollowConsumer {
             if (HollowAPI.class.equals(generatedAPIClass))
                 throw new IllegalArgumentException("must provide a code generated API class");
             generatedAPIClass = Objects.requireNonNull(generatedAPIClass, "API class cannot be null");
+            Objects.requireNonNull(additionalCachedTypes, "null detected for varargs parameter additionalCachedTypes");
             String[] cachedTypes = new String[additionalCachedTypes.length + 1];
             cachedTypes[0] = cachedType;
             System.arraycopy(additionalCachedTypes, 0, cachedTypes, 1, additionalCachedTypes.length);
