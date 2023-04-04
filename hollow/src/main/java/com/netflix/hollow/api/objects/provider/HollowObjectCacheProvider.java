@@ -86,10 +86,10 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
     public T getHollowObject(int ordinal) {
         List<T> refCachedItems = cachedItems;
         if (refCachedItems == null) {
-            throw new IllegalStateException("Cache cannot be accessed after detached.");
+            throw new IllegalStateException(String.format("HollowObjectCacheProvider for type %s has been detached or was not initialized", typeReadState == null ? null : typeReadState.getSchema().getName()));
         }
         if (refCachedItems.size() <= ordinal) {
-            throw new IllegalStateException("Ordinal is out of bound for cache array.");
+            throw new IllegalStateException(String.format("Ordinal %s is out of bounds for pojo cache array of size %s.", ordinal, refCachedItems.size()));
         }
         return refCachedItems.get(ordinal);
     }
@@ -104,8 +104,9 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
     @Override
     public void addedOrdinal(int ordinal) {
         // guard against being detached (or constructed without a HollowTypeReadState)
-        if (factory == null)
+        if (factory == null) {
             return;
+        }
 
         for (int i = cachedItems.size(); i <= ordinal; ++i)
             cachedItems.add(null);

@@ -13,7 +13,9 @@ import com.netflix.hollow.test.generated.Movie;
 import com.netflix.hollow.test.generated.MoviePrimaryKeyIndex;
 import java.io.IOException;
 import java.util.HashSet;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 
 public class HollowConsumerBuilderTest {
@@ -24,6 +26,18 @@ public class HollowConsumerBuilderTest {
                 .withGeneratedAPIClass(AwardsAPI.class, "Movie")
                 .build();
         testConsumerCache(true, false, consumer);
+    }
+
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
+    @Test
+    public void testCachedTypes_inputSanitization() {
+        expectedEx.expect(NullPointerException.class);
+        expectedEx.expectMessage("null detected for varargs parameter additionalCachedTypes");
+        TestHollowConsumer consumer = new TestHollowConsumer.Builder()
+                .withBlobRetriever(new TestBlobRetriever())
+                .withGeneratedAPIClass(AwardsAPI.class, "Movie", null)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
