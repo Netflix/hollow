@@ -75,14 +75,14 @@ public class HollowUpdatePlanner {
         if (currentVersion == HollowConstants.VERSION_NONE)
             return snapshotPlan(desiredVersion);
 
-        HollowUpdatePlan deltaPlan = deltaPlan(currentVersion, desiredVersion, doubleSnapshotConfig.maxDeltasBeforeDoubleSnapshot());
+        HollowUpdatePlan updatePlan = deltaPlan(currentVersion, desiredVersion, doubleSnapshotConfig.maxDeltasBeforeDoubleSnapshot());
 
-        long deltaDestinationVersion = deltaPlan.destinationVersion(currentVersion);
+        long deltaDestinationVersion = updatePlan.destinationVersion(currentVersion);
 
         long snapshotDestinationVersion = snapshotPlan(desiredVersion).destinationVersion(currentVersion);
 
         if(deltaDestinationVersion == desiredVersion){
-            return deltaPlan;
+            return updatePlan;
         }
 
         if(allowSnapshot && snapshotDestinationVersion == desiredVersion){
@@ -93,7 +93,7 @@ public class HollowUpdatePlanner {
             return snapshotPlan(desiredVersion);
         }
 
-       return deltaPlan;
+       return updatePlan;
     }
 
     /**
