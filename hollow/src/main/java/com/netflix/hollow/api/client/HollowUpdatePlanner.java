@@ -81,12 +81,12 @@ public class HollowUpdatePlanner {
 
         long snapshotDestinationVersion = snapshotPlan(desiredVersion).destinationVersion(currentVersion);
 
-        if(deltaDestinationVersion == desiredVersion){
-            return updatePlan;
-        }
+        // comparing both snapshotDestinationVersion and desired version
+        // if snapshotDestinationVersion is max then and only then snapShotPlan(desiredVersion) is load
+        long maxDestinationVersion = Math.max(snapshotDestinationVersion, desiredVersion);
 
-        if(allowSnapshot && snapshotDestinationVersion == desiredVersion){
-            return snapshotPlan(desiredVersion);
+        if(maxDestinationVersion == desiredVersion){
+            return updatePlan;
         }
 
         if(allowSnapshot && snapshotDestinationVersion > deltaDestinationVersion){
