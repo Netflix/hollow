@@ -197,4 +197,9 @@ public class CodeGeneratorConfig {
         builder.append("]");
         return builder.toString();
     }
+
+    public String hollowImplGetClassName(String typeName){
+        return HollowCodeGenerationUtils.hollowImplClassname(typeName, getClassPostfix(),
+                isUseAggressiveSubstitutions(), isUseHollowPrimitiveTypes());
+    }
 }
