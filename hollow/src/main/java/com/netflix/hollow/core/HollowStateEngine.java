@@ -53,6 +53,11 @@ public interface HollowStateEngine extends HollowDataset {
      */
     String HEADER_TAG_METRIC_CYCLE_START = "hollow.metric.cycle.start";
 
+    /**
+     * A header tag indicating the timestamp in milliseconds to mark the start of announcement of a version.
+     * */
+    String HEADER_TAG_METRIC_ANNOUNCEMENT = "hollow.metric.announcement";
+
     @Override
     List<HollowSchema> getSchemas();
 

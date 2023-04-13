@@ -47,6 +47,8 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -58,8 +60,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-
 
 /**
  * A HollowConsumer is the top-level class used by consumers of Hollow data to initialize and keep up-to-date a local in-memory
@@ -223,7 +223,8 @@ public class HollowConsumer {
     public void triggerRefresh() {
         refreshLock.writeLock().lock();
         try {
-            updater.updateTo(announcementWatcher == null ? Long.MAX_VALUE : announcementWatcher.getLatestVersion());
+            updater.updateTo(announcementWatcher == null ? new VersionInfo(Long.MAX_VALUE)
+                    : announcementWatcher.getLatestVersionInfo());
         } catch (Error | RuntimeException e) {
             throw e;
         } catch (Throwable t) {
@@ -565,9 +566,9 @@ public class HollowConsumer {
          * <p>
          * It is expected that none of the returned InputStreams will be interrupted.  For this reason, it is a good idea to
          * retrieve the entire blob part data (e.g. to disk) from a remote datastore prior to returning these streams.
-         * 
-         * @return
-         * @throws IOException
+         *
+         * @return OptionalBlobPartInput
+         * @throws IOException exception in reading from blob or file
          */
         public OptionalBlobPartInput getOptionalBlobPartInputs() throws IOException {
             return null;
@@ -617,6 +618,39 @@ public class HollowConsumer {
     }
 
     /**
+     * This class holds an announced version, its pinned status and the announcement metadata.
+     * isPinned and announcementMetadata fields are empty unless they are populated by the AnnouncementWatcher.
+     * */
+    public static class VersionInfo {
+        long version;
+        Optional<Boolean> isPinned;
+        Optional<Map<String, String>> announcementMetadata;
+
+        public VersionInfo(long version) {
+            this(version, Optional.empty(), Optional.empty());
+        }
+
+        public VersionInfo(long version, Optional<Map<String, String>> announcementMetadata, Optional<Boolean> isPinned) {
+            this.version = version;
+            this.announcementMetadata = announcementMetadata;
+            this.isPinned = isPinned;
+
+        }
+
+        public long getVersion() {
+            return version;
+        }
+
+        public Optional<Map<String, String>> getAnnouncementMetadata() {
+            return announcementMetadata;
+        }
+
+        public Optional<Boolean> isPinned() {
+            return isPinned;
+        }
+    }
+
+    /**
      * Implementations of this class are responsible for two things:
      * <p>
      * 1) Tracking the latest announced data state version.
@@ -642,6 +676,13 @@ public class HollowConsumer {
          * @param consumer the hollow consumer
          */
         void subscribeToUpdates(HollowConsumer consumer);
+
+        /***
+         * @return versionInfo - the latest announced version, its pinned status and announcement metadata.
+         */
+        default VersionInfo getLatestVersionInfo() {
+            return new VersionInfo(getLatestVersion(), Optional.empty(), Optional.empty());
+        }
     }
 
     public interface DoubleSnapshotConfig {
@@ -782,7 +823,14 @@ public class HollowConsumer {
      * local in-memory copies of hollow data sets.
      */
     public interface RefreshListener {
-
+        /**
+         * Called when a new version has been detected in consumer refresh (and just before refreshStarted). Surfaces
+         * metadata and pinning status pertaining to requested version if available from AnnouncementWatcher. Generally
+         * useful for logging/metrics.
+         *
+         * @param requestedVersionInfo requested version's information comprising version, announcement metadata and its pinned status
+         * */
+        default void versionDetected(VersionInfo requestedVersionInfo) {};
         /**
          * Indicates that a refresh has begun.  Generally useful for logging.
          * <p>
