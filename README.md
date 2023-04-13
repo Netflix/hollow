@@ -53,6 +53,19 @@ Release candidate binaries, matching the `-rc\.*` pattern for an artifact's vers
 
 Hollow is maintained by the Platform Data Technologies team at Netflix.  Support can be obtained directly from us or from fellow users through [Gitter](https://gitter.im/Netflix/hollow) or by opening an issue in this project.
 
+## Generating the Docs
+
+To view the docs locally you can just `make site-serve`, this will start the MkDocs server at `http://127.0.0.1:8000/`.
+You can also run `make site-build` to build the site locally and `make site-deploy` to deploy it to Github.
+
+MkDocs runs with python, the Makefile via the `venv` task should take care of setting the Python's _virtualenv_ for the site tasks.
+It does assume that `virtualenv` is available as a command and it also assume that we are targeting _python3_.
+Installing Python3 is out of the scope, check your OS package manager. For example, in Mac you can use [homebrew] to install `python3` or `anaconda3`.
+
+
+[homebrew]: https://brew.sh/
+
+
 ## LICENSE
 
 Copyright (c) 2016 Netflix, Inc.
