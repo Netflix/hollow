@@ -17,4 +17,7 @@
         <property name="separateLineBetweenGroups" value="true"/>
     </module>
   </module>
+    <module name="SuppressionFilter">
+        <property name="file" value="${config_loc}/suppression.xml"/>
+    </module>
 </module>
