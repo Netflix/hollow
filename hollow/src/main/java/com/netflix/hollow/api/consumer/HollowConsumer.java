@@ -45,6 +45,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -229,6 +230,10 @@ public class HollowConsumer {
         } finally {
             refreshLock.writeLock().unlock();
         }
+    }
+
+    public void fireAnnouncementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {
+        updater.fireAnnouncementDetected(newVersion , metadata, isPinned);
     }
 
     /**
@@ -565,7 +570,7 @@ public class HollowConsumer {
          * retrieve the entire blob part data (e.g. to disk) from a remote datastore prior to returning these streams.
          * 
          * @return
-         * @throws IOException
+         * @throws IOException exception in reading from blob or file
          */
         public OptionalBlobPartInput getOptionalBlobPartInputs() throws IOException {
             return null;
@@ -859,6 +864,8 @@ public class HollowConsumer {
          * @param failureCause     - The Exception which caused the failure.
          */
         void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause);
+
+        default void announcementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {}
 
     }
 

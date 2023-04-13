@@ -31,6 +31,7 @@ public class ConsumerRefreshMetrics {
     private OptionalLong refreshSuccessAgeMillisOptional; // time elapsed since the previous successful refresh
     private long refreshEndTimeNano;                // monotonic system time when refresh ended
     private OptionalLong cycleStartTimestamp;       // timestamp in millis of when cycle started for the loaded data version
+    private OptionalLong announcementTimestamp; // timestamp in milliseconds to mark announcement for the loaded data version
 
     /**
      * A class that contains details of the consumer refresh update plan that may be useful to report as metrics or logs.
@@ -84,6 +85,8 @@ public class ConsumerRefreshMetrics {
         return cycleStartTimestamp;
     }
 
+    public OptionalLong getAnnouncementTimestamp() { return announcementTimestamp; }
+
     private ConsumerRefreshMetrics(Builder builder) {
         this.durationMillis = builder.durationMillis;
         this.isRefreshSuccess = builder.isRefreshSuccess;
@@ -94,6 +97,7 @@ public class ConsumerRefreshMetrics {
         this.refreshSuccessAgeMillisOptional = builder.refreshSuccessAgeMillisOptional;
         this.refreshEndTimeNano = builder.refreshEndTimeNano;
         this.cycleStartTimestamp = builder.cycleStartTimestamp;
+        this.announcementTimestamp = builder.announcementTimestamp;
     }
 
     public static final class Builder {
@@ -106,10 +110,12 @@ public class ConsumerRefreshMetrics {
         private OptionalLong refreshSuccessAgeMillisOptional;
         private long refreshEndTimeNano;
         private OptionalLong cycleStartTimestamp;
+        private OptionalLong announcementTimestamp;
 
         public Builder() {
             refreshSuccessAgeMillisOptional = OptionalLong.empty();
             cycleStartTimestamp = OptionalLong.empty();
+            announcementTimestamp = OptionalLong.empty();
         }
 
         public Builder setDurationMillis(long durationMillis) {
@@ -147,6 +153,11 @@ public class ConsumerRefreshMetrics {
         }
         public Builder setCycleStartTimestamp(long cycleStartTimestamp) {
             this.cycleStartTimestamp = OptionalLong.of(cycleStartTimestamp);
+            return this;
+        }
+
+        public Builder setAnnouncementTimestamp(long announcementTimestamp) {
+            this.announcementTimestamp = OptionalLong.of(announcementTimestamp);
             return this;
         }
 

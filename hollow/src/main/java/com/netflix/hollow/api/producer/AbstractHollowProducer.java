@@ -391,7 +391,6 @@ abstract class AbstractHollowProducer {
 
                 try {
                     validate(listeners, candidate.pending());
-
                     announce(listeners, candidate.pending());
 
                     readStates = candidate.commit();
@@ -863,6 +862,8 @@ abstract class AbstractHollowProducer {
                         throw new HollowProducer.NotPrimaryMidCycleException("Announcement failed primary (aka leader) check");
                     }
                     Map<String, String> announcementMetadata = new HashMap<>();
+                    // save timestamp in milliseconds to mark the announcement start stage
+                    announcementMetadata.put(HollowStateEngine.HEADER_TAG_METRIC_ANNOUNCEMENT, String.valueOf(System.currentTimeMillis()));
                     announcementMetadata.putAll(readState.getStateEngine().getHeaderTags());
                     announcementMetadata.put(ANNOUNCE_TAG_HEAP_FOOTPRINT, String.valueOf(readState.getStateEngine().calcApproxDataSize()));
                     announcer.announce(readState.getVersion(), announcementMetadata);

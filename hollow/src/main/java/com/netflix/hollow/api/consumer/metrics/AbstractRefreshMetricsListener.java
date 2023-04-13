@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.consumer.metrics;
 
 import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_ANNOUNCEMENT;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -55,11 +56,15 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     ConsumerRefreshMetrics.Builder refreshMetricsBuilder;
 
     private final Map<Long, Long> cycleVersionStartTimes;
+    private final Map<Long, Long> announcementTimestamps;
+    private volatile boolean namespacePinnedPreviously;
 
     public AbstractRefreshMetricsListener() {
         lastRefreshTimeNanoOptional = OptionalLong.empty();
         consecutiveFailures = 0l;
         cycleVersionStartTimes = new HashMap<>();
+        announcementTimestamps = new HashMap<>();
+        namespacePinnedPreviously = false;
     }
 
     @Override
@@ -70,6 +75,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         refreshMetricsBuilder.setIsInitialLoad(currentVersion == VERSION_NONE);
         refreshMetricsBuilder.setUpdatePlanDetails(updatePlanDetails);
         cycleVersionStartTimes.clear(); // clear map to avoid accumulation over time
+        announcementTimestamps.clear(); // clear map to avoid accumulation over time
     }
 
     /**
@@ -119,6 +125,21 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     }
 
     @Override
+    public void announcementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {
+        /** Track the timestamp for HEADER_TAG_METRIC_ANNOUNCEMENT only when the namespace is not pinned.
+        * Store the pinned status of previous cycle to detect the scenario where a version got unpinned in the next cycle
+        * then don't record this metric as this will record the duration of current version from the last announced version.
+        * namespacePinnedPreviously == true && isPinned == true then dont record
+        * namespacePinnedPreviously == true && isPinned == false then dont record
+        * namespacePinnedPreviously == false && isPinned == true then dont record
+        * namespacePinnedPreviously == false && isPinned == false then record */
+        if (!(namespacePinnedPreviously || isPinned)) {
+            trackTimestampsFromHeaders(newVersion, metadata, HEADER_TAG_METRIC_ANNOUNCEMENT, announcementTimestamps);
+        }
+        namespacePinnedPreviously = isPinned;
+    }
+
+    @Override
     public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
         long refreshEndTimeNano = System.nanoTime();
 
@@ -134,6 +155,10 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
         if (cycleVersionStartTimes.containsKey(afterVersion)) {
             refreshMetricsBuilder.setCycleStartTimestamp(cycleVersionStartTimes.get(afterVersion));
+        }
+
+        if (afterVersion == requestedVersion && announcementTimestamps.containsKey(afterVersion)) {
+            refreshMetricsBuilder.setAnnouncementTimestamp(announcementTimestamps.get(afterVersion));
         }
 
         noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
@@ -163,29 +188,30 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
     @Override
     public void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-        trackCycleStartTime(version, stateEngine.getHeaderTags());
+        trackTimestampsFromHeaders(version, stateEngine.getHeaderTags(), HEADER_TAG_METRIC_CYCLE_START, cycleVersionStartTimes);
     }
 
     @Override
     public void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-        trackCycleStartTime(version, stateEngine.getHeaderTags());
+        trackTimestampsFromHeaders(version, stateEngine.getHeaderTags(), HEADER_TAG_METRIC_CYCLE_START, cycleVersionStartTimes);
     }
 
     /**
-     * If the blob header contains producer cycle start time tag then save its value in version to cycle start time map
+     * If the blob header contains the timestamps like producer cycle start and announcement then save those values in
+     * the maps tracking version to cycle start time and version to announcement respectively.
      */
-    private void trackCycleStartTime(long version, Map<String, String> headers) {
+    private void trackTimestampsFromHeaders(long version, Map<String, String> headers, String headerTag, Map<Long, Long> timestampsMap) {
         if (headers != null) {
-            String cycleStartMetric = headers.get(HEADER_TAG_METRIC_CYCLE_START);
-            if (cycleStartMetric != null && !cycleStartMetric.isEmpty()) {
+            String headerTagValue = headers.get(headerTag);
+            if (headerTagValue != null && !headerTagValue.isEmpty()) {
                 try {
-                    Long cycleStartTimestamp = Long.valueOf(cycleStartMetric);
-                    if (cycleStartTimestamp != null) {
-                        cycleVersionStartTimes.put(version, cycleStartTimestamp);
+                    Long timestamp = Long.valueOf(headerTagValue);
+                    if (timestamp != null) {
+                        timestampsMap.put(version, timestamp);
                     }
                 } catch (NumberFormatException e) {
-                    log.log(Level.WARNING, "Blob header contained HEADER_TAG_METRIC_CYCLE_START but its value could"
-                            + "not be parsed as a long. Consumer metrics relying on cycle start time will be unreliable.", e);
+                    log.log(Level.WARNING, "Blob header contained " + headerTag + " but its value could"
+                            + "not be parsed as a long. Consumer metrics relying on this tag will be unreliable.", e);
                 }
             }
         }
