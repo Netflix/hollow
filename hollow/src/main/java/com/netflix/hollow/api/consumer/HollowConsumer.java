@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -232,8 +233,8 @@ public class HollowConsumer {
         }
     }
 
-    public void fireAnnouncementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {
-        updater.fireAnnouncementDetected(newVersion , metadata, isPinned);
+    public void registerAnnouncementMetadata(long newVersion, Map<String, String> metadata, boolean isPinned) {
+        updater.registerAnnouncementData(newVersion , metadata, isPinned);
     }
 
     /**
@@ -865,7 +866,7 @@ public class HollowConsumer {
          */
         void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause);
 
-        default void announcementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {}
+        default void announcementDetected(long newVersion, Optional<Map<String, String>> metadata, Optional<Boolean> isPinned) {}
 
     }
 
