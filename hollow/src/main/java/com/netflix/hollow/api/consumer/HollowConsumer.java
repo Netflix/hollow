@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.consumer;
 
 import static com.netflix.hollow.core.util.Threads.daemonThread;
+import static java.util.Collections.EMPTY_MAP;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 import com.netflix.hollow.PublicApi;
@@ -223,7 +224,7 @@ public class HollowConsumer {
     public void triggerRefresh() {
         refreshLock.writeLock().lock();
         try {
-            updater.updateTo(announcementWatcher == null ? Long.MAX_VALUE : announcementWatcher.getLatestVersion());
+            updater.updateTo(announcementWatcher == null ? Long.MAX_VALUE : announcementWatcher.getLatestVersionInfo());
         } catch (Error | RuntimeException e) {
             throw e;
         } catch (Throwable t) {
@@ -620,6 +621,35 @@ public class HollowConsumer {
         }
     }
 
+    public static class VersionInfo {
+        long version;
+        Optional<Boolean> pinned;
+        Optional<Map<String, String>> announcementMetadata;
+
+        public VersionInfo(long version) {
+            this(version, Optional.empty(), Optional.empty());
+        }
+
+        public VersionInfo(long version, Optional<Map<String, String>> announcementMetadata, Optional<Boolean> is_pinned) {
+            this.version = version;
+            this.announcementMetadata = announcementMetadata;
+            this.pinned = is_pinned;
+
+        }
+
+        public long getVersion() {
+            return version;
+        }
+
+        public Optional<Map<String, String>> getAnnouncementMetadata() {
+            return announcementMetadata;
+        }
+
+        public Optional<Boolean> getPinned() {
+            return pinned;
+        }
+    }
+
     /**
      * Implementations of this class are responsible for two things:
      * <p>
@@ -629,7 +659,6 @@ public class HollowConsumer {
      * If an AnnouncementWatcher is provided to a HollowConsumer, then calling HollowConsumer#triggerRefreshTo() is unsupported.
      */
     public interface AnnouncementWatcher {
-
         long NO_ANNOUNCEMENT_AVAILABLE = HollowConstants.VERSION_NONE;
 
         /**
@@ -646,6 +675,10 @@ public class HollowConsumer {
          * @param consumer the hollow consumer
          */
         void subscribeToUpdates(HollowConsumer consumer);
+
+        default VersionInfo getLatestVersionInfo() {
+            return new VersionInfo(getLatestVersion(), Optional.empty(), Optional.empty());
+        }
     }
 
     public interface DoubleSnapshotConfig {

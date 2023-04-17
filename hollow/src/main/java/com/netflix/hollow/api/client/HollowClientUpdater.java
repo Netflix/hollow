@@ -29,9 +29,7 @@ import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
@@ -57,7 +55,6 @@ public class HollowClientUpdater {
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
     private final HollowConsumerMetrics metrics;
     private final HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
-    private Map<Long, AnnouncementData> versionAnnouncements;
 
     private boolean skipTypeShardUpdateWithNoAdditions;
 
@@ -88,7 +85,6 @@ public class HollowClientUpdater {
         this.metrics = metrics;
         this.metricsCollector = metricsCollector;
         this.initialLoad = new CompletableFuture<>();
-        this.versionAnnouncements = new ConcurrentHashMap<>();
     }
 
     public void setSkipShardUpdateWithNoAdditions(boolean skipTypeShardUpdateWithNoAdditions) {
@@ -96,21 +92,6 @@ public class HollowClientUpdater {
         HollowDataHolder dataHolder = hollowDataHolderVolatile;
         if(dataHolder != null)
             dataHolder.getStateEngine().setSkipTypeShardUpdateWithNoAdditions(skipTypeShardUpdateWithNoAdditions);
-    }
-
-    static class AnnouncementData {
-        Map<String, String> metadata;
-        boolean isPinned;
-
-        public AnnouncementData(Map<String, String> metadata, boolean isPinned) {
-            this.metadata = metadata;
-            this.isPinned = isPinned;
-        }
-    }
-
-    // TODO: would this be synchronized?
-    public void registerAnnouncementData(long v,  Map<String, String> metadata, boolean isPinned) {
-        versionAnnouncements.put(v, new AnnouncementData(metadata, isPinned));   // TODO: also clear it to prevent accumulation, maybe copy on write
     }
 
     /**
@@ -130,6 +111,12 @@ public class HollowClientUpdater {
      * under us.
      */
     public synchronized boolean updateTo(long requestedVersion) throws Throwable {
+        return updateTo(new HollowConsumer.VersionInfo(requestedVersion);
+    }
+
+    public synchronized boolean updateTo(HollowConsumer.VersionInfo versionInfo) throws Throwable {
+        long requestedVersion = versionInfo.getVersion();
+        
         if (requestedVersion == getCurrentVersionId()) {
             if (requestedVersion == HollowConstants.VERSION_NONE && hollowDataHolderVolatile == null) {
                 LOG.warning("No versions to update to, initializing to empty state");
@@ -144,17 +131,15 @@ public class HollowClientUpdater {
         // but will not take effect until a subsequent refresh
         final HollowConsumer.RefreshListener[] localListeners =
                 refreshListeners.toArray(new HollowConsumer.RefreshListener[0]);
-
-        AnnouncementData versionAnnouncementData = versionAnnouncements.get(requestedVersion);
+        
         for (HollowConsumer.RefreshListener listener : localListeners) {
-            // TODO: null safety
-            listener.announcementDetected(requestedVersion, Optional.of(versionAnnouncementData.metadata), Optional.of(versionAnnouncementData.isPinned));
+           listener.announcementDetected(requestedVersion, versionInfo.getAnnouncementMetadata(), versionInfo.getPinned());
         }
 
         long beforeVersion = getCurrentVersionId();
 
         for (HollowConsumer.RefreshListener listener : localListeners)
-            listener.refreshStarted(beforeVersion, requestedVersion);   // TODO: Should we just add versionAnnouncementData to this method sinature?
+            listener.refreshStarted(beforeVersion, requestedVersion);   // TODO: Should we just pass versionData into here?
 
         try {
             HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan()
