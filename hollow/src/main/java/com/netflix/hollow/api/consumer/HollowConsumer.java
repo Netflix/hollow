@@ -1254,6 +1254,14 @@ public class HollowConsumer {
             return (B)this;
         }
 
+        /**
+         * Experimental: By default the Hollow dataset is eagerly loaded to heap, but shared memory mode allows mmap-ing
+         * the dataset to virtual memory and only loading specific pages to main memory.
+         *
+         * This allows faster init and support for datasets larger that available physical memory. However, shared memory
+         * implementation is not suitable for production use given its limited functionality (no delta refreshes, no
+         * un-mmap of previous version, feature gaps like indexes continue to live on heap) and limited production hardening.
+         */
         public B withMemoryMode(MemoryMode memoryMode) {
             this.memoryMode = memoryMode;
             return (B)this;
