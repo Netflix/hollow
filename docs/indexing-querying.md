@@ -13,6 +13,8 @@ public class Movie {
 
     @HollowHashKey(fields="actor.actorId")
     Set<ActorRole> cast;
+
+    CountryCode releaseCountry;
 }
 
 public class ActorRole {
@@ -25,6 +27,10 @@ public class ActorRole {
 public class Actor {
     int actorId;
     String name;
+}
+
+enum CountryCode {
+    US, CA, ME
 }
 ```
 
@@ -130,6 +136,7 @@ for(ActorRole role : idx.findActorRoleMatches(knownActorId, knownMovieTitle)) {
 }
 
 ```
+Similarly, if we want to include an enum type like releaseCountry in the fields, then its field path in the index construction can be specified as `releaseCountry._name`. Note, in field paths, an enum type is treated slightly differently from a String reference type which is expanded using `.value`.
 
 ## Prefix Index
 
@@ -179,6 +186,12 @@ Primary key and hash key field paths may only span through `OBJECT` types.  Thes
 ### Hash indexes
 
 Hash index field paths may span through any type.  Each part corresponding to a `LIST` or `SET` type should be specified as `element`. Similarly, each part corresponding to a `MAP` type should be specified as either `key` or `value`.  Hash index field paths are never auto-expanded.
+When providing an enum type in the field path, use enum field name followed by `._name`. For example,
+```
+HashIndex hashIndex = HashIndex
+.from(consumer, Movie.class)
+.usingPath("releaseCountry._name", String.class);
+```
 
 ## Hash Keys
 
