@@ -569,12 +569,8 @@ public class HollowConsumer {
          * <p>
          * It is expected that none of the returned InputStreams will be interrupted.  For this reason, it is a good idea to
          * retrieve the entire blob part data (e.g. to disk) from a remote datastore prior to returning these streams.
-         * 
-<<<<<<< Updated upstream
-         * @return
-=======
+         *
          * @return OptionalBlobPartInput
->>>>>>> Stashed changes
          * @throws IOException exception in reading from blob or file
          */
         public OptionalBlobPartInput getOptionalBlobPartInputs() throws IOException {
