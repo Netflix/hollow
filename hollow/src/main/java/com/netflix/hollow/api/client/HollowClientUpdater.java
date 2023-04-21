@@ -220,11 +220,6 @@ public class HollowClientUpdater {
         }
     }
 
-    public void fireAnnouncementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {
-        for (HollowConsumer.RefreshListener listener : refreshListeners)
-            listener.announcementDetected(newVersion, metadata, isPinned);
-    }
-
     public synchronized void addRefreshListener(HollowConsumer.RefreshListener refreshListener,
             HollowConsumer c) {
         if (refreshListener instanceof HollowConsumer.RefreshRegistrationListener) {

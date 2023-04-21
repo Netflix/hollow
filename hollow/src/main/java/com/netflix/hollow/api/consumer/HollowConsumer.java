@@ -233,10 +233,6 @@ public class HollowConsumer {
         }
     }
 
-    public void fireAnnouncementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {
-        updater.fireAnnouncementDetected(newVersion , metadata, isPinned);
-    }
-
     /**
      * Immediately triggers a refresh in a different thread to the latest version
      * specified by the {@link HollowConsumer.AnnouncementWatcher}. If already on
