@@ -49,8 +49,8 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     private long refreshStartTimeNano;
     private long consecutiveFailures;
     private BlobType overallRefreshType;    // Indicates whether the overall refresh (that could comprise of multiple transitions)
-                                            // is classified as snapshot, delta, or reverse delta. Note that if a snapshot
-                                            // transition is present then the overall refresh type is snapshot.
+    // is classified as snapshot, delta, or reverse delta. Note that if a snapshot
+    // transition is present then the overall refresh type is snapshot.
     private ConsumerRefreshMetrics.UpdatePlanDetails updatePlanDetails;  // Some details about the transitions comprising a refresh
     // visible for testing
     ConsumerRefreshMetrics.Builder refreshMetricsBuilder;
@@ -126,13 +126,9 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
     @Override
     public void announcementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {
-        /** Track the timestamp for HEADER_TAG_METRIC_ANNOUNCEMENT only when the namespace is not pinned.
-        * Store the pinned status of previous cycle to detect the scenario where a version got unpinned in the next cycle
-        * then don't record this metric as this will record the duration of current version from the last announced version.
-        * namespacePinnedPreviously == true && isPinned == true then dont record
-        * namespacePinnedPreviously == true && isPinned == false then dont record
-        * namespacePinnedPreviously == false && isPinned == true then dont record
-        * namespacePinnedPreviously == false && isPinned == false then record */
+        // Track the version to announcement timestamp only when the namespace is not pinned (either in previous cycle
+        // or for the newVersion). Don't record this metric when a namespace was pinned previously and gets unpinned
+        // in the next cycle because this metric will record the refresh duration from the latest announced version.
         if (!(namespacePinnedPreviously || isPinned)) {
             trackTimestampsFromHeaders(newVersion, metadata, HEADER_TAG_METRIC_ANNOUNCEMENT, announcementTimestamps);
         }
@@ -148,10 +144,10 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         lastRefreshTimeNanoOptional = OptionalLong.of(refreshEndTimeNano);
 
         refreshMetricsBuilder.setDurationMillis(durationMillis)
-            .setIsRefreshSuccess(true)
-            .setConsecutiveFailures(consecutiveFailures)
-            .setRefreshSuccessAgeMillisOptional(0l)
-            .setRefreshEndTimeNano(refreshEndTimeNano);
+                .setIsRefreshSuccess(true)
+                .setConsecutiveFailures(consecutiveFailures)
+                .setRefreshSuccessAgeMillisOptional(0l)
+                .setRefreshEndTimeNano(refreshEndTimeNano);
 
         if (cycleVersionStartTimes.containsKey(afterVersion)) {
             refreshMetricsBuilder.setCycleStartTimestamp(cycleVersionStartTimes.get(afterVersion));

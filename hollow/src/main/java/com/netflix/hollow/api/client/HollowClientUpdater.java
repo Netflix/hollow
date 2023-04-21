@@ -111,6 +111,10 @@ public class HollowClientUpdater {
      * under us.
      */
     public synchronized boolean updateTo(long requestedVersion) throws Throwable {
+        return updateTo(new HollowConsumer.VersionInfo(requestedVersion));
+    }
+    public synchronized boolean updateTo(HollowConsumer.VersionInfo versionInfo) throws Throwable {
+        long requestedVersion = versionInfo.getVersion();
         if (requestedVersion == getCurrentVersionId()) {
             if (requestedVersion == HollowConstants.VERSION_NONE && hollowDataHolderVolatile == null) {
                 LOG.warning("No versions to update to, initializing to empty state");
@@ -125,6 +129,13 @@ public class HollowClientUpdater {
         // but will not take effect until a subsequent refresh
         final HollowConsumer.RefreshListener[] localListeners =
                 refreshListeners.toArray(new HollowConsumer.RefreshListener[0]);
+
+        for(HollowConsumer.RefreshListener listener : localListeners) {
+            // both pinning status of the version and headers map is required further
+            if (versionInfo.isPinned().isPresent() && versionInfo.getAnnouncementMetadata().isPresent()) {
+                listener.announcementDetected(requestedVersion, versionInfo.getAnnouncementMetadata().get(), versionInfo.isPinned().get());
+            }
+        }
 
         long beforeVersion = getCurrentVersionId();
 
