@@ -23,9 +23,11 @@ import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -119,6 +121,11 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
             rec.addEntry(keyOrdinal, valueOrdinal, hashCode);
         }
         return rec;
+    }
+
+    @Override
+    protected int parseFlatRecord(FlatRecord rec, int currentRecordPointer, List<Object> parsedObjects) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override

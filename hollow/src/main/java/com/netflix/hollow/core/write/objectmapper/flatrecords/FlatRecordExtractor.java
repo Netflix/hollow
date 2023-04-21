@@ -36,9 +36,6 @@ import com.netflix.hollow.tools.combine.OrdinalRemapper;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Warning: Experimental.  the FlatRecord feature is subject to breaking changes.
- */
 public class FlatRecordExtractor {
     
     private final HollowReadStateEngine extractFrom;

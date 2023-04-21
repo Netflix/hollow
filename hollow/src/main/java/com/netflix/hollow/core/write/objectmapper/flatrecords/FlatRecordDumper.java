@@ -33,9 +33,6 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Warning: Experimental.  the FlatRecord feature is subject to breaking changes.
- */
 public class FlatRecordDumper {
     
     private final Map<Integer, Integer> ordinalMapping;

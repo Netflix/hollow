@@ -16,10 +16,14 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
+import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -73,15 +77,27 @@ public class HollowObjectMapper {
         return typeMapper.write(o);
     }
     
-    /**
-     * Warning: Experimental.  the FlatRecord feature is subject to breaking changes.
-     */
-    @Deprecated
     public void writeFlat(Object o, FlatRecordWriter flatRecordWriter) {
     	HollowTypeMapper typeMapper = getTypeMapper(o.getClass(), null, null);
     	typeMapper.writeFlat(o, flatRecordWriter);
     }
 
+    public <T> T readFlat(FlatRecord record) {
+        int currentRecordPointer = record.dataStartByte;
+        List<Object> parsedObjects = new ArrayList<>();
+
+        while(currentRecordPointer < record.dataEndByte) {
+            int currentSchemaId = VarInt.readVInt(record.data, currentRecordPointer);
+            currentRecordPointer += VarInt.sizeOfVInt(currentSchemaId);
+            HollowSchema schema = record.schemaIdMapper.getSchema(currentSchemaId);
+            
+            HollowTypeMapper mapper = typeMappers.get(schema.getName());
+            currentRecordPointer = mapper.parseFlatRecord(record, currentRecordPointer, parsedObjects);
+        }
+
+        return (T) parsedObjects.get(parsedObjects.size()-1);
+    }
+    
     /**
      * Extracts the primary key from the specified POJO.
      *

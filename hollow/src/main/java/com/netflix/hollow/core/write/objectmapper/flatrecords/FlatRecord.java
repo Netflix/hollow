@@ -32,10 +32,10 @@ import java.util.Arrays;
  */
 public class FlatRecord {
 
-    final HollowSchemaIdentifierMapper schemaIdMapper;
-    final ByteData data;
-    final int dataStartByte;
-    final int dataEndByte;
+    public final HollowSchemaIdentifierMapper schemaIdMapper;
+    public final ByteData data;
+    public final int dataStartByte;
+    public final int dataEndByte;
     final RecordPrimaryKey recordPrimaryKey;
 
     public FlatRecord(ByteData recordData, HollowSchemaIdentifierMapper schemaIdMapper) {
