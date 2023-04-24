@@ -17,17 +17,18 @@
 package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -124,8 +125,21 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
     }
 
     @Override
-    protected int parseFlatRecord(FlatRecord rec, int currentRecordPointer, List<Object> parsedObjects) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    protected Object parseFlatRecord(HollowSchema recordSchema, FlatRecordReader reader, Map<Integer, Object> parsedObjects) {
+        Map<Object, Object> collection = new HashMap<>();
+
+        int size = reader.readCollectionSize();
+        int keyOrdinal = 0;
+        for (int i = 0; i < size; i++) {
+            int keyOrdinalDelta = reader.readOrdinal();
+            int valueOrdinal = reader.readOrdinal();
+            keyOrdinal += keyOrdinalDelta;
+            Object key = parsedObjects.get(keyOrdinal);
+            Object value = parsedObjects.get(valueOrdinal);
+            collection.put(key, value);
+        }
+
+        return collection;
     }
 
     @Override

@@ -17,16 +17,19 @@
 package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowListWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class HollowListTypeMapper extends HollowTypeMapper {
@@ -61,7 +64,7 @@ public class HollowListTypeMapper extends HollowTypeMapper {
     public int write(Object obj) {
         if(obj instanceof MemoizedList) {
             long assignedOrdinal = ((MemoizedList<?>)obj).__assigned_ordinal;
-            
+
             if((assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
                 return (int)assignedOrdinal & Integer.MAX_VALUE;
         }
@@ -78,7 +81,7 @@ public class HollowListTypeMapper extends HollowTypeMapper {
 
         return assignedOrdinal;
     }
-    
+
     public int writeFlat(Object obj, FlatRecordWriter flatRecordWriter) {
     	HollowListWriteRecord rec = copyToWriteRecord((List<?>)obj, flatRecordWriter);
     	return flatRecordWriter.write(schema, rec);
@@ -110,10 +113,18 @@ public class HollowListTypeMapper extends HollowTypeMapper {
         return rec;
     }
 
-
     @Override
-    protected int parseFlatRecord(FlatRecord rec, int currentRecordPointer, List<Object> parsedObjects) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    protected Object parseFlatRecord(HollowSchema recordSchema, FlatRecordReader reader, Map<Integer, Object> parsedObjects) {
+        List<Object> collection = new ArrayList<>();
+
+        int size = reader.readCollectionSize();
+        for (int i = 0; i < size; i++) {
+            int ordinal = reader.readOrdinal();
+            Object element = parsedObjects.get(ordinal);
+            collection.add(element);
+        }
+
+        return collection;
     }
 
     @Override

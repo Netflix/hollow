@@ -16,14 +16,14 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
-import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -83,19 +83,22 @@ public class HollowObjectMapper {
     }
 
     public <T> T readFlat(FlatRecord record) {
-        int currentRecordPointer = record.dataStartByte;
-        List<Object> parsedObjects = new ArrayList<>();
+        FlatRecordReader recordReader = new FlatRecordReader(record);
 
-        while(currentRecordPointer < record.dataEndByte) {
-            int currentSchemaId = VarInt.readVInt(record.data, currentRecordPointer);
-            currentRecordPointer += VarInt.sizeOfVInt(currentSchemaId);
-            HollowSchema schema = record.schemaIdMapper.getSchema(currentSchemaId);
-            
+        int ordinal = 0;
+        Map<Integer, Object> parsedObjects = new HashMap<>();
+        while(recordReader.hasMore()) {
+            HollowSchema schema = recordReader.readSchema();
             HollowTypeMapper mapper = typeMappers.get(schema.getName());
-            currentRecordPointer = mapper.parseFlatRecord(record, currentRecordPointer, parsedObjects);
+            if (mapper == null) {
+                recordReader.skipSchema(schema);
+            } else {
+                Object obj = mapper.parseFlatRecord(schema, recordReader, parsedObjects);
+                parsedObjects.put(ordinal++, obj);
+            }
         }
 
-        return (T) parsedObjects.get(parsedObjects.size()-1);
+        return (T) parsedObjects.get(ordinal - 1);
     }
     
     /**
