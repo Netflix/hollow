@@ -38,7 +38,7 @@ site-build: venv ## Builds the doc site.
 site-serve: venv ## Serves the doc site locally
 	$(MKDOCS) serve
 
-site-deploy: venv ## Deploys the site to Github pages.
+site-deploy: site-build ## Deploys the site to Github pages.
 	$(MKDOCS) gh-deploy
 
 site-clean: venv ## Removes the site directory
