@@ -56,6 +56,9 @@ theme:
         icon: material/toggle-switch
         name: Switch to light mode
 
+extra_css:
+  - css/extra.css
+
 plugins:
   - search
 
