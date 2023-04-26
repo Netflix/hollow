@@ -1,148 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-    
     <url>
-     <loc>/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/quick-start/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/getting-started/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/indexing-querying/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/infrastructure/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/producer-consumer-apis/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/tooling/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/data-modeling/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/diving-deeper/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/interacting-with-a-dataset/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/data-ingestion/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/validation/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/advanced-topics/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/testing/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/glossary/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/community/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/acknowledgements/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
-    
     <url>
-     <loc>/license/</loc>
-     <lastmod>2018-11-21</lastmod>
-     <changefreq>daily</changefreq>
+         <loc>None</loc>
+         <lastmod>2023-04-26</lastmod>
+         <changefreq>daily</changefreq>
     </url>
-    
-
 </urlset>

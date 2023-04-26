@@ -1,18 +1,21 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="no-js">
   <head>
     
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
-      <meta http-equiv="x-ua-compatible" content="ie=edge">
       
       
       
       
-        <link rel="shortcut icon" href="../assets/images/favicon.png">
+        <link rel="prev" href="../data-modeling/">
       
-      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.10.1">
+      
+        <link rel="next" href="../interacting-with-a-dataset/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
     
     
       
@@ -20,163 +23,211 @@
       
     
     
-      <script src="../assets/javascripts/modernizr-e826f8942a.js"></script>
-    
-    
-      <link rel="stylesheet" href="../assets/stylesheets/application-a20f419c8e.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ded33207.min.css">
       
-        <link rel="stylesheet" href="../assets/stylesheets/application-23f75ab9c7.palette.css">
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.a0c5b2b5.min.css">
       
+      
+
+    
     
     
       
         
         
-        
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
-        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Robot:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Robot";--md-code-font:"Roboto Mono"}</style>
       
-      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
     
     
     
   </head>
   
   
-  
-  
-    <body data-md-color-primary="red" data-md-color-accent="brown">
-  
-    <svg class="md-svg">
-      <defs>
-        
-        
-          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
-        
-      </defs>
-    </svg>
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
-    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
     
-      <header class="md-header" data-md-component="header">
-  <nav class="md-header-nav md-grid">
-    <div class="md-flex">
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <a href=".." title="Hollow (Netflix OSS)" class="md-header-nav__button md-logo">
-          
-            <i class="md-icon md-icon--home"></i>
-          
-        </a>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
-      </div>
-      <div class="md-flex__cell md-flex__cell--stretch">
-        <span class="md-flex__ellipsis md-header-nav__title">
-          
-            
-              
-            
-            Diving Deeper
-          
-        </span>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="brown">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
         
-          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+        <a href="#diving-deeper" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Hollow (Netflix OSS)" class="md-header__button md-logo" aria-label="Hollow (Netflix OSS)" data-md-component="logo">
+      
+  <img src="../img/logo_white_bg.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Hollow (Netflix OSS)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Diving Deeper
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
           
-<div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="search"></label>
-  <div class="md-search__inner">
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="brown"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </label>
+          
+        
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="brown"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
-      <label class="md-icon md-search__icon" for="search"></label>
-      <button type="reset" class="md-icon md-search__icon" data-md-component="reset">&#xE5CD;</button>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
     </form>
     <div class="md-search__output">
       <div class="md-search__scrollwrap" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="result" data-md-lang-search="" data-md-lang-tokenizer="[\s\-]+">
-          <div class="md-search-result__meta" data-md-lang-result-none="No matching documents" data-md-lang-result-one="1 matching document" data-md-lang-result-other="# matching documents">
-            Type to start searching
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
   </div>
 </div>
-        
-      </div>
-      
-        <div class="md-flex__cell md-flex__cell--shrink">
-          <div class="md-header-nav__source">
-            
-
-
-  
-
-
-  <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-source="github">
     
-      <div class="md-source__icon">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <use xlink:href="#github" width="24" height="24"></use>
-        </svg>
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
       </div>
     
-    <div class="md-source__repository">
-      GitHub
-    </div>
-  </a>
-
-          </div>
-        </div>
-      
-    </div>
   </nav>
+  
 </header>
     
-    <div class="md-container">
+    <div class="md-container" data-md-component="container">
       
       
-      <main class="md-main">
-        <div class="md-main__inner md-grid" data-md-component="container">
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
           
             
-              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
-                    <nav class="md-nav md-nav--primary" data-md-level="0">
-  <label class="md-nav__title md-nav__title--site" for="drawer">
-    <div class="md-nav__button md-logo">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Hollow (Netflix OSS)" class="md-nav__button md-logo" aria-label="Hollow (Netflix OSS)" data-md-component="logo">
       
-        <i class="md-icon md-icon--home"></i>
-      
-    </div>
+  <img src="../img/logo_white_bg.png" alt="logo">
+
+    </a>
     Hollow (Netflix OSS)
   </label>
   
     <div class="md-nav__source">
-      
-
-
-  
-
-
-  <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-source="github">
+      <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
     
-      <div class="md-source__icon">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <use xlink:href="#github" width="24" height="24"></use>
-        </svg>
-      </div>
-    
-    <div class="md-source__repository">
-      GitHub
-    </div>
-  </a>
-
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
     </div>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -185,96 +236,15 @@
       
       
 
-
-  <li class="md-nav__item">
-    <a href=".." title="Introduction" class="md-nav__link">
-      Introduction
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../quick-start/" title="Quick Start" class="md-nav__link">
-      Quick Start
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../getting-started/" title="Getting Started" class="md-nav__link">
-      Getting Started
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../indexing-querying/" title="Indexing/Querying" class="md-nav__link">
-      Indexing/Querying
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../infrastructure/" title="Infrastructure Hooks" class="md-nav__link">
-      Infrastructure Hooks
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../producer-consumer-apis/" title="Producers and Consumers" class="md-nav__link">
-      Producers and Consumers
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../tooling/" title="Tooling" class="md-nav__link">
-      Tooling
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../data-modeling/" title="Data Modeling" class="md-nav__link">
-      Data Modeling
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
 
     
       
@@ -282,92 +252,206 @@
       
 
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-start/" class="md-nav__link">
+        Quick Start
+      </a>
+    </li>
+  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
     
       
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
     
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../indexing-querying/" class="md-nav__link">
+        Indexing/Querying
+      </a>
+    </li>
+  
+
     
-      <label class="md-nav__link md-nav__link--active" for="toc">
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../infrastructure/" class="md-nav__link">
+        Infrastructure Hooks
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../producer-consumer-apis/" class="md-nav__link">
+        Producers and Consumers
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tooling/" class="md-nav__link">
+        Tooling
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-modeling/" class="md-nav__link">
+        Data Modeling
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Diving Deeper
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Diving Deeper
-      </label>
-    
-    <a href="./" title="Diving Deeper" class="md-nav__link md-nav__link--active">
-      Diving Deeper
-    </a>
-    
+      </a>
       
-<nav class="md-nav md-nav--secondary">
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
   
   
-    <label class="md-nav__title" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#state-engines" title="State Engines" class="md-nav__link">
+  <a href="#state-engines" class="md-nav__link">
     State Engines
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#ordinals" title="Ordinals" class="md-nav__link">
+  <a href="#ordinals" class="md-nav__link">
     Ordinals
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#writing-a-data-snapshot" title="Writing a Data Snapshot" class="md-nav__link">
+  <a href="#writing-a-data-snapshot" class="md-nav__link">
     Writing a Data Snapshot
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#reading-a-data-snapshot" title="Reading a Data Snapshot" class="md-nav__link">
+  <a href="#reading-a-data-snapshot" class="md-nav__link">
     Reading a Data Snapshot
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#writing-a-delta" title="Writing a Delta" class="md-nav__link">
+  <a href="#writing-a-delta" class="md-nav__link">
     Writing a Delta
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#reading-a-delta" title="Reading a Delta" class="md-nav__link">
+  <a href="#reading-a-delta" class="md-nav__link">
     Reading a Delta
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#indexing-data-for-retrieval" title="Indexing Data for Retrieval" class="md-nav__link">
+  <a href="#indexing-data-for-retrieval" class="md-nav__link">
     Indexing Data for Retrieval
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Indexing Data for Retrieval">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#hollowprimarykeyindex" title="HollowPrimaryKeyIndex" class="md-nav__link">
+  <a href="#hollowprimarykeyindex" class="md-nav__link">
     HollowPrimaryKeyIndex
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#hollowhashindex" title="HollowHashIndex" class="md-nav__link">
+  <a href="#hollowhashindex" class="md-nav__link">
     HollowHashIndex
   </a>
   
@@ -378,121 +462,147 @@
   
 </li>
       
-      
-      
     </ul>
   
 </nav>
-    
-  </li>
+      
+    </li>
+  
 
     
       
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../interacting-with-a-dataset/" title="Interacting with a Hollow Dataset" class="md-nav__link">
-      Interacting with a Hollow Dataset
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../data-ingestion/" title="Data Ingestion" class="md-nav__link">
-      Data Ingestion
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interacting-with-a-dataset/" class="md-nav__link">
+        Interacting with a Hollow Dataset
+      </a>
+    </li>
+  
 
     
       
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../validation/" title="Validation" class="md-nav__link">
-      Validation
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../advanced-topics/" title="Advanced Topics" class="md-nav__link">
-      Advanced Topics
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-ingestion/" class="md-nav__link">
+        Data Ingestion
+      </a>
+    </li>
+  
 
     
       
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../testing/" title="Testing" class="md-nav__link">
-      Testing
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../glossary/" title="Glossary" class="md-nav__link">
-      Glossary
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation/" class="md-nav__link">
+        Validation
+      </a>
+    </li>
+  
 
     
       
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../community/" title="Community" class="md-nav__link">
-      Community
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../acknowledgements/" title="Acknowledgements" class="md-nav__link">
-      Acknowledgements
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced-topics/" class="md-nav__link">
+        Advanced Topics
+      </a>
+    </li>
+  
 
     
       
       
       
 
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        Testing
+      </a>
+    </li>
+  
 
-  <li class="md-nav__item">
-    <a href="../license/" title="License" class="md-nav__link">
-      License
-    </a>
-  </li>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        Glossary
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../community/" class="md-nav__link">
+        Community
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acknowledgements/" class="md-nav__link">
+        Acknowledgements
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
 
     
   </ul>
@@ -502,78 +612,84 @@
               </div>
             
             
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
-<nav class="md-nav md-nav--secondary">
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
   
   
-    <label class="md-nav__title" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#state-engines" title="State Engines" class="md-nav__link">
+  <a href="#state-engines" class="md-nav__link">
     State Engines
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#ordinals" title="Ordinals" class="md-nav__link">
+  <a href="#ordinals" class="md-nav__link">
     Ordinals
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#writing-a-data-snapshot" title="Writing a Data Snapshot" class="md-nav__link">
+  <a href="#writing-a-data-snapshot" class="md-nav__link">
     Writing a Data Snapshot
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#reading-a-data-snapshot" title="Reading a Data Snapshot" class="md-nav__link">
+  <a href="#reading-a-data-snapshot" class="md-nav__link">
     Reading a Data Snapshot
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#writing-a-delta" title="Writing a Delta" class="md-nav__link">
+  <a href="#writing-a-delta" class="md-nav__link">
     Writing a Delta
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#reading-a-delta" title="Reading a Delta" class="md-nav__link">
+  <a href="#reading-a-delta" class="md-nav__link">
     Reading a Delta
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#indexing-data-for-retrieval" title="Indexing Data for Retrieval" class="md-nav__link">
+  <a href="#indexing-data-for-retrieval" class="md-nav__link">
     Indexing Data for Retrieval
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Indexing Data for Retrieval">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#hollowprimarykeyindex" title="HollowPrimaryKeyIndex" class="md-nav__link">
+  <a href="#hollowprimarykeyindex" class="md-nav__link">
     HollowPrimaryKeyIndex
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#hollowhashindex" title="HollowHashIndex" class="md-nav__link">
+  <a href="#hollowhashindex" class="md-nav__link">
     HollowHashIndex
   </a>
   
@@ -584,8 +700,6 @@
   
 </li>
       
-      
-      
     </ul>
   
 </nav>
@@ -594,22 +708,25 @@
               </div>
             
           
-          <div class="md-content">
-            <article class="md-content__inner md-typeset">
-              
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
                 
-                  <a href="https://github.com/Netflix/hollow/edit/master/docs/diving-deeper.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
-                
-                
-                <h1 id="diving-deeper">Diving Deeper</h1>
+                  
+
+  
+  
+
+
+<h1 id="diving-deeper">Diving Deeper<a class="headerlink" href="#diving-deeper" title="Permanent link">&para;</a></h1>
 <p>The following section details some lower-level concepts which will provide the backdrop for some more advanced usage of Hollow.  If we didn't have a <code>HollowProducer</code> or <code>HollowConsumer</code>, this section details how we would use Hollow.</p>
-<h2 id="state-engines">State Engines</h2>
+<h2 id="state-engines">State Engines<a class="headerlink" href="#state-engines" title="Permanent link">&para;</a></h2>
 <p>Both the <code>HollowProducer</code> and <code>HollowConsumer</code> handle datasets with a <em>state engine</em>.  A state engine can be transitioned between data states.  A producer uses a <em>write state engine</em> and a consumer uses a <em>read state engine</em>.  </p>
 <ul>
 <li>A <code>HollowReadStateEngine</code> can be obtained from a <code>HollowConsumer</code> via the method <code>getStateEngine()</code>.</li>
 <li>A <code>HollowWriteStateEngine</code> can be obtained from a <code>HollowProducer</code> via the method <code>getWriteEngine()</code>.</li>
 </ul>
-<h2 id="ordinals">Ordinals</h2>
+<h2 id="ordinals">Ordinals<a class="headerlink" href="#ordinals" title="Permanent link">&para;</a></h2>
 <p>Each record in a Hollow data state is assigned to a specific <em>ordinal</em>, which is an integer value. An <em>ordinal</em>:</p>
 <ul>
 <li>is a unique identifier of the record within a type.</li>
@@ -627,69 +744,59 @@
 <li>It is guaranteed that if an exactly equivalent record exists in two adjacent states, then that record will retain the same ordinal. If, on the other hand, a record does not have an exact equivalent in an adjacent state, then its ordinal will not be populated in the state in which it does not exist.</li>
 <li>After a single delta transition has been applied which removes a record, that record will be marked as not populated, but the data for that record will still be accessible at that ordinal until the <em>next</em> delta transition.  We call these records <em>ghost records</em>.</li>
 </ul>
-<h2 id="writing-a-data-snapshot">Writing a Data Snapshot</h2>
-<p>Let's assume we have a POJO class <code>Movie</code>:</p>
-<div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Movie</span> <span class="o">{</span>
-    <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
-    <span class="n">String</span> <span class="n">title</span><span class="o">;</span>
-    <span class="kt">int</span> <span class="n">releaseYear</span><span class="o">;</span>
-
-    <span class="kd">public</span> <span class="nf">Movie</span><span class="o">(</span><span class="kt">long</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">title</span><span class="o">,</span> <span class="kt">int</span> <span class="n">releaseYear</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">title</span> <span class="o">=</span> <span class="n">title</span><span class="o">;</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">releaseYear</span> <span class="o">=</span> <span class="n">releaseYear</span><span class="o">;</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-
-
-<p>In order to create a new data state and write it to disk, we can use a <code>HollowWriteStateEngine</code> directly:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowWriteStateEngine</span> <span class="n">writeEngine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowWriteStateEngine</span><span class="o">();</span>
-<span class="n">HollowObjectMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowObjectMapper</span><span class="o">(</span><span class="n">writeEngine</span><span class="o">);</span>
-
-<span class="k">for</span><span class="o">(</span><span class="n">Movie</span> <span class="n">movie</span> <span class="o">:</span> <span class="n">movies</span><span class="o">)</span>
-    <span class="n">mapper</span><span class="o">.</span><span class="na">addObject</span><span class="o">(</span><span class="n">movie</span><span class="o">);</span>
-
-<span class="n">OutputStream</span> <span class="n">os</span> <span class="o">=</span> <span class="o">...;</span> <span class="c1">/// where to write the blob</span>
-<span class="n">HollowBlobWriter</span> <span class="n">writer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowBlobWriter</span><span class="o">(</span><span class="n">writeEngine</span><span class="o">);</span>
-<span class="n">writer</span><span class="o">.</span><span class="na">writeSnapshot</span><span class="o">(</span><span class="n">os</span><span class="o">);</span>
-</pre></div>
-
-
+<h2 id="writing-a-data-snapshot">Writing a Data Snapshot<a class="headerlink" href="#writing-a-data-snapshot" title="Permanent link">&para;</a></h2>
+<p>Let's assume we have a POJO class <code>Movie</code>:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Movie</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">title</span><span class="p">;</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">releaseYear</span><span class="p">;</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">Movie</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">releaseYear</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">title</span><span class="p">;</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">releaseYear</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">releaseYear</span><span class="p">;</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">}</span>
+</span></code></pre></div></p>
+<p>In order to create a new data state and write it to disk, we can use a <code>HollowWriteStateEngine</code> directly:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">HollowWriteStateEngine</span><span class="w"> </span><span class="n">writeEngine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowWriteStateEngine</span><span class="p">();</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">HollowObjectMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowObjectMapper</span><span class="p">(</span><span class="n">writeEngine</span><span class="p">);</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">for</span><span class="p">(</span><span class="n">Movie</span><span class="w"> </span><span class="n">movie</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">movies</span><span class="p">)</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="n">mapper</span><span class="p">.</span><span class="na">addObject</span><span class="p">(</span><span class="n">movie</span><span class="p">);</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">OutputStream</span><span class="w"> </span><span class="n">os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span><span class="w"> </span><span class="c1">/// where to write the blob</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">HollowBlobWriter</span><span class="w"> </span><span class="n">writer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowBlobWriter</span><span class="p">(</span><span class="n">writeEngine</span><span class="p">);</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">writer</span><span class="p">.</span><span class="na">writeSnapshot</span><span class="p">(</span><span class="n">os</span><span class="p">);</span>
+</span></code></pre></div></p>
 <p>A <code>HollowWriteStateEngine</code> is the main handle to a Hollow dataset for a data producer.  A <code>HollowObjectMapper</code> is one of a few different ways to populate a <code>HollowWriteStateEngine</code> with data.  When starting with POJOs, it's the easiest way.</p>
 <p>We'll use a <code>HollowBlobWriter</code> to write the current state of a <code>HollowWriteStateEngine</code> to an <code>OutputStream</code>.  We call the data which gets written to the <code>OutputStream</code> a <em>blob</em>.  </p>
-<h2 id="reading-a-data-snapshot">Reading a Data Snapshot</h2>
-<p>A data consumer can load a snapshot created by the producer into memory:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowReadStateEngine</span> <span class="n">readEngine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowReadStateEngine</span><span class="o">();</span>
-<span class="n">HollowBlobReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowBlobReader</span><span class="o">(</span><span class="n">readEngine</span><span class="o">);</span>
-
-<span class="n">InputStream</span> <span class="n">is</span> <span class="o">=</span> <span class="c1">/// where to load the snapshot from</span>
-<span class="n">reader</span><span class="o">.</span><span class="na">readSnapshot</span><span class="o">(</span><span class="n">is</span><span class="o">);</span>
-</pre></div>
-
-
+<h2 id="reading-a-data-snapshot">Reading a Data Snapshot<a class="headerlink" href="#reading-a-data-snapshot" title="Permanent link">&para;</a></h2>
+<p>A data consumer can load a snapshot created by the producer into memory:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">HollowReadStateEngine</span><span class="w"> </span><span class="n">readEngine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowReadStateEngine</span><span class="p">();</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">HollowBlobReader</span><span class="w"> </span><span class="n">reader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowBlobReader</span><span class="p">(</span><span class="n">readEngine</span><span class="p">);</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">InputStream</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// where to load the snapshot from</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">reader</span><span class="p">.</span><span class="na">readSnapshot</span><span class="p">(</span><span class="n">is</span><span class="p">);</span>
+</span></code></pre></div></p>
 <p>A <code>HollowReadStateEngine</code> is our main handle to a Hollow dataset as a consumer.  A <code>HollowBlobReader</code> is used to consume blobs into a <code>HollowReadStateEngine</code>.  Above, we're consuming a snapshot blob in order to initialize our state engine.  </p>
-<p>Once this dataset is loaded into memory, we can access the data for any records using our <a href="../getting-started/#consumer-api-generation">generated API</a>:</p>
-<div class="codehilite"><pre><span></span><span class="n">MovieAPI</span> <span class="n">movieApi</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MovieAPI</span><span class="o">(</span><span class="n">readEngine</span><span class="o">);</span>
-
-<span class="k">for</span><span class="o">(</span><span class="n">Movie</span> <span class="n">movie</span> <span class="o">:</span> <span class="n">movieApi</span><span class="o">.</span><span class="na">getAllMovieHollow</span><span class="o">())</span> <span class="o">{</span>
-    <span class="c1">/// do something for each Movie record</span>
-<span class="o">}</span>
-</pre></div>
-
-
-<h2 id="writing-a-delta">Writing a Delta</h2>
-<p>Some time has passed and the dataset has evolved.  The producer, with the same <code>HollowWriteStateEngine</code> in memory, needs to communicate this updated dataset to consumers.  The data for the new state must be added to the state engine, after which a transition from the previous state to the new state can be written as a <em>delta</em> blob:</p>
-<div class="codehilite"><pre><span></span><span class="n">writeEngine</span><span class="o">.</span><span class="na">prepareForNextCycle</span><span class="o">();</span>
-
-<span class="k">for</span><span class="o">(</span><span class="n">Movie</span> <span class="n">movie</span> <span class="o">:</span> <span class="n">movies</span><span class="o">)</span>
-    <span class="n">mapper</span><span class="o">.</span><span class="na">addObject</span><span class="o">(</span><span class="n">movie</span><span class="o">);</span>
-
-<span class="n">OutputStream</span> <span class="n">os</span> <span class="o">=</span> <span class="o">....;</span> <span class="c1">/// where to write the delta blob</span>
-<span class="n">writer</span><span class="o">.</span><span class="na">writeDelta</span><span class="o">(</span><span class="n">os</span><span class="o">);</span>
-</pre></div>
-
-
+<p>Once this dataset is loaded into memory, we can access the data for any records using our <a href="../getting-started/#consumer-api-generation">generated API</a>:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">MovieAPI</span><span class="w"> </span><span class="n">movieApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MovieAPI</span><span class="p">(</span><span class="n">readEngine</span><span class="p">);</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">for</span><span class="p">(</span><span class="n">Movie</span><span class="w"> </span><span class="n">movie</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">movieApi</span><span class="p">.</span><span class="na">getAllMovieHollow</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="c1">/// do something for each Movie record</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">}</span>
+</span></code></pre></div></p>
+<h2 id="writing-a-delta">Writing a Delta<a class="headerlink" href="#writing-a-delta" title="Permanent link">&para;</a></h2>
+<p>Some time has passed and the dataset has evolved.  The producer, with the same <code>HollowWriteStateEngine</code> in memory, needs to communicate this updated dataset to consumers.  The data for the new state must be added to the state engine, after which a transition from the previous state to the new state can be written as a <em>delta</em> blob:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">writeEngine</span><span class="p">.</span><span class="na">prepareForNextCycle</span><span class="p">();</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">for</span><span class="p">(</span><span class="n">Movie</span><span class="w"> </span><span class="n">movie</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">movies</span><span class="p">)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="n">mapper</span><span class="p">.</span><span class="na">addObject</span><span class="p">(</span><span class="n">movie</span><span class="p">);</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">OutputStream</span><span class="w"> </span><span class="n">os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">....;</span><span class="w"> </span><span class="c1">/// where to write the delta blob</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="n">writer</span><span class="p">.</span><span class="na">writeDelta</span><span class="p">(</span><span class="n">os</span><span class="p">);</span>
+</span></code></pre></div></p>
 <p>Let's take a closer look at what the above code does.  The same <code>HollowWriteStateEngine</code> which was used to produce the <em>snapshot</em> blob is used -- it already knows everything about the prior state and can be transitioned to the next state.  We call <code>prepareForNextCycle()</code> to inform the state engine that the writing of blobs from the prior state is complete, and populating data into the next state is about to begin.  When creating a new state, all of the movies currently in our dataset are re-added again.  It's not necessary to figure out which records were added, removed, or modified -- that's Hollow's job.</p>
 <p>We can (but don't have to) use the same <code>HollowObjectMapper</code> and/or <code>HollowBlobWriter</code> as we used in the prior <em>cycle</em> to create the initial snapshot.  </p>
 <p>The call to <code>writeDelta()</code> records a <em>delta</em> blob to the <code>OutputStream</code>.  Encoded into the delta is a set of instructions to update a consumer’s read state engine from the previous state to the current state.</p>
@@ -697,14 +804,12 @@
 <p class="admonition-title">Reverse Deltas</p>
 <p>Just as you can call <code>writeDelta()</code> to write a delta from one state to the next, you can also call <code>writeReverseDelta()</code> to write the reverse operation which will take you from the next state to the prior state.</p>
 </div>
-<h2 id="reading-a-delta">Reading a Delta</h2>
-<p>Once a delta is available the HollowReadStateEngine can be updated on the client:</p>
-<div class="codehilite"><pre><span></span><span class="n">InputStream</span> <span class="n">is</span> <span class="o">=</span> <span class="c1">/// where to load the delta from</span>
-<span class="n">HollowBlobReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowBlobReader</span><span class="o">(</span><span class="n">readEngine</span><span class="o">);</span>
-<span class="n">reader</span><span class="o">.</span><span class="na">applyDelta</span><span class="o">(</span><span class="n">is</span><span class="o">);</span>
-</pre></div>
-
-
+<h2 id="reading-a-delta">Reading a Delta<a class="headerlink" href="#reading-a-delta" title="Permanent link">&para;</a></h2>
+<p>Once a delta is available the HollowReadStateEngine can be updated on the client:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">InputStream</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// where to load the delta from</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">HollowBlobReader</span><span class="w"> </span><span class="n">reader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowBlobReader</span><span class="p">(</span><span class="n">readEngine</span><span class="p">);</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">reader</span><span class="p">.</span><span class="na">applyDelta</span><span class="p">(</span><span class="n">is</span><span class="p">);</span>
+</span></code></pre></div></p>
 <p>The same <code>HollowReadStateEngine</code> into which our snapshot was consumed must be reused to consume a <em>delta</em> blob.  This state engine knows everything about the current state and can use the instructions in a delta to transition to the next state.  We can (but don't have to) reuse the same <code>HollowBlobReader</code>.</p>
 <p>After this delta has been applied, the read state engine is at the new state.  </p>
 <div class="admonition hint">
@@ -715,30 +820,24 @@
 <p class="admonition-title">Delta Mismatch</p>
 <p>If a delta application is attempted onto a <code>HollowReadStateEngine</code> which is at a state from which the delta did not originate, then an exception is thrown and the state engine remains safely unchanged.</p>
 </div>
-<h2 id="indexing-data-for-retrieval">Indexing Data for Retrieval</h2>
+<h2 id="indexing-data-for-retrieval">Indexing Data for Retrieval<a class="headerlink" href="#indexing-data-for-retrieval" title="Permanent link">&para;</a></h2>
 <p>In prior examples the generated Hollow API was used by the data consumer to iterate over all <code>Movie</code> records in the dataset.  Most often, however, it isn’t desirable to iterate over the entire dataset — instead, specific records will be accessed based on some known key.  Let’s assume that the <code>Movie</code>’s id is a known key.</p>
-<p>After consumers have populated a <code>HollowReadStateEngine</code>, the data can be indexed:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowPrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span>
-                      <span class="k">new</span> <span class="n">HollowPrimaryKeyIndex</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;id&quot;</span><span class="o">);</span>
-
-<span class="n">idx</span><span class="o">.</span><span class="na">listenForDeltaUpdates</span><span class="o">();</span>
-</pre></div>
-
-
-<p>This index can be held in memory and then used in conjunction with the generated Hollow API to retrieve Movie records by id:</p>
-<div class="codehilite"><pre><span></span><span class="nt">int</span> <span class="nt">movieOrdinal</span> <span class="o">=</span> <span class="nt">idx</span><span class="p">.</span><span class="nc">getMatchingOrdinal</span><span class="o">(</span><span class="nt">2</span><span class="o">);</span>
-<span class="nt">if</span><span class="o">(</span><span class="nt">movieOrdinal</span> <span class="o">!=</span> <span class="nt">-1</span><span class="o">)</span> <span class="p">{</span>
-    <span class="err">MovieHollow</span> <span class="err">movie</span> <span class="err">=</span> <span class="err">movieApi.getMovieHollow(movieOrdinal)</span><span class="p">;</span>
-    <span class="err">System.out.println(&quot;Found</span> <span class="n">Movie</span><span class="p">:</span> <span class="err">&quot;</span> <span class="o">+</span> <span class="n">movie</span><span class="o">.</span><span class="nf">_getTitle</span><span class="p">()</span><span class="o">.</span><span class="nf">_getValue</span><span class="p">());</span>
-<span class="p">}</span>
-</pre></div>
-
-
-<p>Which outputs:</p>
-<div class="codehilite"><pre><span></span>Found Movie: Beasts of No Nation
-</pre></div>
-
-
+<p>After consumers have populated a <code>HollowReadStateEngine</code>, the data can be indexed:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">HollowPrimaryKeyIndex</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">                      </span><span class="k">new</span><span class="w"> </span><span class="n">HollowPrimaryKeyIndex</span><span class="p">(</span><span class="n">readEngine</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Movie&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">idx</span><span class="p">.</span><span class="na">listenForDeltaUpdates</span><span class="p">();</span>
+</span></code></pre></div></p>
+<p>This index can be held in memory and then used in conjunction with the generated Hollow API to retrieve Movie records by id:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>int movieOrdinal = idx.getMatchingOrdinal(2);
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>if(movieOrdinal != -1) {
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    MovieHollow movie = movieApi.getMovieHollow(movieOrdinal);
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    System.out.println(&quot;Found Movie: &quot; + movie._getTitle()._getValue());
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>}
+</span></code></pre></div></p>
+<p>Which outputs:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Found Movie: Beasts of No Nation
+</span></code></pre></div></p>
 <div class="admonition warning">
 <p class="admonition-title">Keeping an Index Up To Date</p>
 <p>The call to <code>listenForDeltaUpdates()</code> will cause a <code>HollowPrimaryKeyIndex</code> to automatically stay updated when deltas are applied to the indexed <code>HollowReadStateEngine</code>, but this should only be called if you intend to keep the index around.  See the Indexing / Querying section for usage details.</p>
@@ -751,40 +850,34 @@
 <p class="admonition-title">Ordinals</p>
 <p>See <a href="#ordinals">ordinals</a> for a discussion about ordinals.</p>
 </div>
-<h3 id="hollowprimarykeyindex">HollowPrimaryKeyIndex</h3>
-<p>In the above example, the primary key is defined for <code>Movie</code> as its <code>id</code> field.  A primary key can also be defined over multiple and/or hierarchical fields.  Imagine that <code>Movie</code> additionally had a <code>country</code> field defined in its schema, and that across countries, <code>Movie</code> <code>id</code>s may be duplicated, but that there will never exist two <code>Movie</code> records with the same id and country:</p>
-<div class="codehilite"><pre><span></span><span class="nd">@HollowPrimaryKey</span><span class="o">(</span><span class="n">fields</span><span class="o">={</span><span class="s">&quot;id&quot;</span><span class="o">,</span> <span class="s">&quot;country.id&quot;</span><span class="o">})</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Movie</span> <span class="o">{</span>
-    <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
-    <span class="n">Country</span> <span class="n">country</span><span class="o">;</span>
-    <span class="o">...</span>
-<span class="o">}</span>
-
-<span class="nd">@HollowPrimaryKey</span><span class="o">(</span><span class="n">fields</span><span class="o">={</span><span class="s">&quot;id&quot;</span><span class="o">})</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Country</span> <span class="o">{</span>
-    <span class="n">String</span> <span class="n">id</span><span class="o">;</span>
-    <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
-<span class="o">}</span>
-</pre></div>
-
-
-<p>A <code>HollowPrimaryKeyIndex</code> can be defined with a primary key consisting of both fields:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowPrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span>
-            <span class="k">new</span> <span class="n">HollowPrimaryKeyIndex</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;id&quot;</span><span class="o">,</span> <span class="s">&quot;country.id.value&quot;</span><span class="o">);</span>
-<span class="n">idx</span><span class="o">.</span><span class="na">listenForDeltaUpdates</span><span class="o">();</span>
-</pre></div>
-
-
-<p>And to query for a <code>Movie</code> based on its id and country:</p>
-<div class="codehilite"><pre><span></span><span class="kt">int</span> <span class="n">movieOrdinal</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="na">getMatchingOrdinal</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">&quot;US&quot;</span><span class="o">);</span>
-<span class="k">if</span><span class="o">(</span><span class="n">movieOrdinal</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">Movie</span> <span class="n">movie</span> <span class="o">=</span> <span class="n">movieApi</span><span class="o">.</span><span class="na">getMovie</span><span class="o">(</span><span class="n">movieOrdinal</span><span class="o">);</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Found Movie: &quot;</span> <span class="o">+</span> <span class="n">movie</span><span class="o">.</span><span class="na">getTitle</span><span class="o">().</span><span class="na">getValue</span><span class="o">());</span>
-<span class="o">}</span>
-</pre></div>
-
-
-<p>Notice that <code>Movie</code>’s country field in the above example is actually a <code>REFERENCE</code> field.  The defined key includes the id of the movie, and the value of the id String of the referenced country.  We denote this traversal using dot notation in the primary key definition.  The field definitions can be multiple references deep.</p>
+<h3 id="hollowprimarykeyindex">HollowPrimaryKeyIndex<a class="headerlink" href="#hollowprimarykeyindex" title="Permanent link">&para;</a></h3>
+<p>In the above example, the primary key is defined for <code>Movie</code> as its <code>id</code> field.  A primary key can also be defined over multiple and/or hierarchical fields.  Imagine that <code>Movie</code> additionally had a <code>country</code> field defined in its schema, and that across countries, <code>Movie</code> <code>id</code>s may be duplicated, but that there will never exist two <code>Movie</code> records with the same id and country:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nd">@HollowPrimaryKey</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;id&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;country.id&quot;</span><span class="p">})</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Movie</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="n">Country</span><span class="w"> </span><span class="n">country</span><span class="p">;</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="p">...</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">}</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="nd">@HollowPrimaryKey</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;id&quot;</span><span class="p">})</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Country</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">id</span><span class="p">;</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="p">}</span>
+</span></code></pre></div></p>
+<p>A <code>HollowPrimaryKeyIndex</code> can be defined with a primary key consisting of both fields:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">HollowPrimaryKeyIndex</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">HollowPrimaryKeyIndex</span><span class="p">(</span><span class="n">readEngine</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Movie&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;id&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;country.id.value&quot;</span><span class="p">);</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">idx</span><span class="p">.</span><span class="na">listenForDeltaUpdates</span><span class="p">();</span>
+</span></code></pre></div></p>
+<p>And to query for a <code>Movie</code> based on its id and country:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">movieOrdinal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">idx</span><span class="p">.</span><span class="na">getMatchingOrdinal</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;US&quot;</span><span class="p">);</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">if</span><span class="p">(</span><span class="n">movieOrdinal</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="n">Movie</span><span class="w"> </span><span class="n">movie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">movieApi</span><span class="p">.</span><span class="na">getMovie</span><span class="p">(</span><span class="n">movieOrdinal</span><span class="p">);</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Found Movie: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">movie</span><span class="p">.</span><span class="na">getTitle</span><span class="p">().</span><span class="na">getValue</span><span class="p">());</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">}</span>
+</span></code></pre></div>
+Notice that <code>Movie</code>’s country field in the above example is actually a <code>REFERENCE</code> field.  The defined key includes the id of the movie, and the value of the id String of the referenced country.  We denote this traversal using dot notation in the primary key definition.  The field definitions can be multiple references deep.</p>
 <p>The requirement for a primary key definition is that no duplicates should exist for the defined combination of fields.  If this rule is violated, an arbitrary match will be returned for queries when multiple matches exist.  </p>
 <div class="admonition note">
 <p class="admonition-title">Primary Key Violations</p>
@@ -796,143 +889,121 @@
 <p>If <code>listenForDeltaUpdates()</code> is called on a primary key index, then it cannot be garbage collected.  If you intend to drop an index which is listening for updates, first call <code>detachFromDeltaUpdates()</code> to prevent a memory leak.</p>
 </div>
 <p>Indexes which are listening for delta updates are updated after a dataset is updated.  In the brief interim time between when a dataset is updated and the index is updated, the index will point to the <em>ghost records</em> located at tombstoned ordinals.  This helps guarantee that all in-flight operations will observe correct data.</p>
-<h3 id="hollowhashindex">HollowHashIndex</h3>
+<h3 id="hollowhashindex">HollowHashIndex<a class="headerlink" href="#hollowhashindex" title="Permanent link">&para;</a></h3>
 <p>It is sometimes desirable to index records by fields other than primary keys.  The <code>HollowHashIndex</code> allows for indexing records by fields or combinations of fields for which values may match multiple records, and records may match multiple values.</p>
-<p>In our <code>Movie</code>/<code>Actor</code> example, we may want to index movies by their starring actors:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowHashIndex</span> <span class="n">idx</span> <span class="o">=</span>
-            <span class="k">new</span> <span class="n">HollowHashIndex</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;&quot;</span><span class="o">,</span> <span class="s">&quot;cast.element.actor.actorId&quot;</span><span class="o">);</span>
-</pre></div>
-
-
+<p>In our <code>Movie</code>/<code>Actor</code> example, we may want to index movies by their starring actors:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">HollowHashIndex</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">HollowHashIndex</span><span class="p">(</span><span class="n">readEngine</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Movie&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;cast.element.actor.actorId&quot;</span><span class="p">);</span>
+</span></code></pre></div></p>
 <p>The <code>HollowHashIndex</code> expects in its constructor arguments a query start type, a select field, and a set of match fields.  The constructor arguments above indicate that queries will start with the <code>Movie</code> type, select the root of the query (indicated by the empty string), and match the id of any <code>Actor</code> record in the actors list.</p>
-<p>To query this index:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowHashIndexResult</span> <span class="n">result</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="na">findMatches</span><span class="o">(</span><span class="mi">102</span><span class="o">);</span>
-
-<span class="k">if</span><span class="o">(</span><span class="n">result</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Found matches: &quot;</span> <span class="o">+</span> <span class="n">result</span><span class="o">.</span><span class="na">numResults</span><span class="o">());</span>
-
-    <span class="n">HollowOrdinalIterator</span> <span class="n">iter</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
-    <span class="kt">int</span> <span class="n">matchedOrdinal</span> <span class="o">=</span> <span class="n">iter</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
-    <span class="k">while</span><span class="o">(</span><span class="n">matchedOrdinal</span> <span class="o">!=</span> <span class="n">HollowOrdinalIterator</span><span class="o">.</span><span class="na">NO_MORE_ORDINALS</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Movie</span> <span class="n">movie</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="na">getMovie</span><span class="o">(</span><span class="n">matchedOrdinal</span><span class="o">);</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Starred in: &quot;</span> <span class="o">+</span> <span class="n">movie</span><span class="o">.</span><span class="na">getTitle</span><span class="o">().</span><span class="na">getValue</span><span class="o">());</span>
-        <span class="n">matchedOrdinal</span> <span class="o">=</span> <span class="n">iter</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-
-
-<p>Alternatively, if the data model included the nationality of actors, and we needed to index actors by nationality and the titles of movies in which they starred:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowHashIndex</span> <span class="n">idx</span> <span class="o">=</span>
-            <span class="k">new</span> <span class="n">HollowHashIndex</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;cast.element.actor&quot;</span><span class="o">,</span>
-                                            <span class="s">&quot;title.value&quot;</span><span class="o">,</span>
-                                            <span class="s">&quot;cast.element.actor.nationality.id.value&quot;</span><span class="o">);</span>
-</pre></div>
-
-
-<p>In this case, the query start type is still <code>Movie</code>, but we’re selecting related <code>Actor</code> records.  Matches are selected based on the <code>Movie</code>’s title, and the actor’s nationality.  Using this index, one can query for Brazilian actors who starred in movies titled “Narcos”:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowHashIndexResult</span> <span class="n">result</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="na">findMatches</span><span class="o">(</span><span class="s">&quot;Narcos&quot;</span><span class="o">,</span> <span class="s">&quot;BR&quot;</span><span class="o">);</span>
-
-<span class="k">if</span><span class="o">(</span><span class="n">result</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">HollowOrdinalIterator</span> <span class="n">iter</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
-    <span class="kt">int</span> <span class="n">matchedOrdinal</span> <span class="o">=</span> <span class="n">iter</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
-    <span class="k">while</span><span class="o">(</span><span class="n">matchedOrdinal</span> <span class="o">!=</span> <span class="n">HollowOrdinalIterator</span><span class="o">.</span><span class="na">NO_MORE_ORDINALS</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Actor</span> <span class="n">actor</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="na">getMovie</span><span class="o">(</span><span class="n">matchedOrdinal</span><span class="o">);</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Matched actor: &quot;</span> <span class="o">+</span>
-                                      <span class="n">actor</span><span class="o">.</span><span class="na">getActorName</span><span class="o">().</span><span class="na">getValue</span><span class="o">());</span>
-        <span class="n">matchedOrdinal</span> <span class="o">=</span> <span class="n">iter</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-
-
+<p>To query this index:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">HollowHashIndexResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">idx</span><span class="p">.</span><span class="na">findMatches</span><span class="p">(</span><span class="mi">102</span><span class="p">);</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="k">if</span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Found matches: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="na">numResults</span><span class="p">());</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="n">HollowOrdinalIterator</span><span class="w"> </span><span class="n">iter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="na">iterator</span><span class="p">();</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">matchedOrdinal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iter</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">matchedOrdinal</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">HollowOrdinalIterator</span><span class="p">.</span><span class="na">NO_MORE_ORDINALS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">        </span><span class="n">Movie</span><span class="w"> </span><span class="n">movie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">api</span><span class="p">.</span><span class="na">getMovie</span><span class="p">(</span><span class="n">matchedOrdinal</span><span class="p">);</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Starred in: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">movie</span><span class="p">.</span><span class="na">getTitle</span><span class="p">().</span><span class="na">getValue</span><span class="p">());</span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="w">        </span><span class="n">matchedOrdinal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iter</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="p">}</span>
+</span></code></pre></div></p>
+<p>Alternatively, if the data model included the nationality of actors, and we needed to index actors by nationality and the titles of movies in which they starred:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">HollowHashIndex</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">            </span><span class="k">new</span><span class="w"> </span><span class="n">HollowHashIndex</span><span class="p">(</span><span class="n">readEngine</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Movie&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;cast.element.actor&quot;</span><span class="p">,</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">                                            </span><span class="s">&quot;title.value&quot;</span><span class="p">,</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">                                            </span><span class="s">&quot;cast.element.actor.nationality.id.value&quot;</span><span class="p">);</span>
+</span></code></pre></div></p>
+<p>In this case, the query start type is still <code>Movie</code>, but we’re selecting related <code>Actor</code> records.  Matches are selected based on the <code>Movie</code>’s title, and the actor’s nationality.  Using this index, one can query for Brazilian actors who starred in movies titled “Narcos”:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">HollowHashIndexResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">idx</span><span class="p">.</span><span class="na">findMatches</span><span class="p">(</span><span class="s">&quot;Narcos&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;BR&quot;</span><span class="p">);</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="k">if</span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="n">HollowOrdinalIterator</span><span class="w"> </span><span class="n">iter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="na">iterator</span><span class="p">();</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">matchedOrdinal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iter</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">    </span><span class="k">while</span><span class="p">(</span><span class="n">matchedOrdinal</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">HollowOrdinalIterator</span><span class="p">.</span><span class="na">NO_MORE_ORDINALS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">        </span><span class="n">Actor</span><span class="w"> </span><span class="n">actor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">api</span><span class="p">.</span><span class="na">getMovie</span><span class="p">(</span><span class="n">matchedOrdinal</span><span class="p">);</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Matched actor: &quot;</span><span class="w"> </span><span class="o">+</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">                                      </span><span class="n">actor</span><span class="p">.</span><span class="na">getActorName</span><span class="p">().</span><span class="na">getValue</span><span class="p">());</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">        </span><span class="n">matchedOrdinal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iter</span><span class="p">.</span><span class="na">next</span><span class="p">();</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="p">}</span>
+</span></code></pre></div></p>
 <p>The <code>HollowHashIndex</code> has the same facility for listening for delta updates as <code>HollowPrimaryKeyIndex</code>, however unlike primary key index, hash index does a full re-index even on delta updates whereas primary key index refreshes more efficiently on delta updates.</p>
+
+
+
+
+
                 
-                  
-                
-              
-              
-                
-              
-            </article>
-          </div>
+              </article>
+            </div>
+          
+          
         </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </button>
+        
       </main>
       
-        
-<footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid">
-        
-          <a href="../data-modeling/" title="Data Modeling" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
-            </div>
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                Data Modeling
-              </span>
-            </div>
-          </a>
-        
-        
-          <a href="../interacting-with-a-dataset/" title="Interacting with a Hollow Dataset" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                Interacting with a Hollow Dataset
-              </span>
-            </div>
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
-            </div>
-          </a>
-        
-      </nav>
-    </div>
+        <footer class="md-footer">
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-        powered by
-        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
-        and
-        <a href="http://squidfunk.github.io/mkdocs-material/" title="Material for MkDocs">
-          Material for MkDocs</a>
-      </div>
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
       
-        
-  <div class="md-footer-social">
+        <div class="md-social">
+  
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     
-      <a href="https://github.com/Netflix/hollow" class="md-footer-social__link fa fa-github"></a>
     
-      <a href="https://gitter.im/Netflix/hollow" class="md-footer-social__link fa fa-gitter"></a>
     
-  </div>
-
+      
+      
+    
+    <a href="https://github.com/Netflix/hollow" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://gitter.im/Netflix/hollow" target="_blank" rel="noopener" title="gitter.im" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M66.4 322.5H16V0h50.4v322.5zM166.9 76.1h-50.4V512h50.4V76.1zm100.6 0h-50.4V512h50.4V76.1zM368 76h-50.4v247H368V76z"/></svg>
+    </a>
+  
+</div>
       
     </div>
   </div>
 </footer>
       
     </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
     
-      <script src="../assets/javascripts/application-f3ab9e5ff8.js"></script>
-      
-      
-      <script>app.initialize({url:{base:".."}})</script>
-      
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "content.code.copy", "navigation.indexes", "navigation.instant", "navigation.top", "navigation.tracking", "search.share", "search.highlight", "search.suggest"], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
+      <script src="../assets/javascripts/bundle.51198bba.min.js"></script>
       
     
   </body>

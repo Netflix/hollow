@@ -1,18 +1,21 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="no-js">
   <head>
     
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
-      <meta http-equiv="x-ua-compatible" content="ie=edge">
       
       
       
       
-        <link rel="shortcut icon" href="../assets/images/favicon.png">
+        <link rel="prev" href="../producer-consumer-apis/">
       
-      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.10.1">
+      
+        <link rel="next" href="../data-modeling/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.6">
     
     
       
@@ -20,163 +23,211 @@
       
     
     
-      <script src="../assets/javascripts/modernizr-e826f8942a.js"></script>
-    
-    
-      <link rel="stylesheet" href="../assets/stylesheets/application-a20f419c8e.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ded33207.min.css">
       
-        <link rel="stylesheet" href="../assets/stylesheets/application-23f75ab9c7.palette.css">
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.a0c5b2b5.min.css">
       
+      
+
+    
     
     
       
         
         
-        
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
-        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Robot:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Robot";--md-code-font:"Roboto Mono"}</style>
       
-      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
     
     
     
   </head>
   
   
-  
-  
-    <body data-md-color-primary="red" data-md-color-accent="brown">
-  
-    <svg class="md-svg">
-      <defs>
-        
-        
-          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
-        
-      </defs>
-    </svg>
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
-    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
     
-      <header class="md-header" data-md-component="header">
-  <nav class="md-header-nav md-grid">
-    <div class="md-flex">
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <a href=".." title="Hollow (Netflix OSS)" class="md-header-nav__button md-logo">
-          
-            <i class="md-icon md-icon--home"></i>
-          
-        </a>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
-      </div>
-      <div class="md-flex__cell md-flex__cell--stretch">
-        <span class="md-flex__ellipsis md-header-nav__title">
-          
-            
-              
-            
-            Tooling
-          
-        </span>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="brown">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
         
-          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+        <a href="#insight-tools" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Hollow (Netflix OSS)" class="md-header__button md-logo" aria-label="Hollow (Netflix OSS)" data-md-component="logo">
+      
+  <img src="../img/logo_white_bg.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Hollow (Netflix OSS)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Tooling
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
           
-<div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="search"></label>
-  <div class="md-search__inner">
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="brown"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </label>
+          
+        
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="brown"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
-      <label class="md-icon md-search__icon" for="search"></label>
-      <button type="reset" class="md-icon md-search__icon" data-md-component="reset">&#xE5CD;</button>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
     </form>
     <div class="md-search__output">
       <div class="md-search__scrollwrap" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="result" data-md-lang-search="" data-md-lang-tokenizer="[\s\-]+">
-          <div class="md-search-result__meta" data-md-lang-result-none="No matching documents" data-md-lang-result-one="1 matching document" data-md-lang-result-other="# matching documents">
-            Type to start searching
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
   </div>
 </div>
-        
-      </div>
-      
-        <div class="md-flex__cell md-flex__cell--shrink">
-          <div class="md-header-nav__source">
-            
-
-
-  
-
-
-  <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-source="github">
     
-      <div class="md-source__icon">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <use xlink:href="#github" width="24" height="24"></use>
-        </svg>
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
       </div>
     
-    <div class="md-source__repository">
-      GitHub
-    </div>
-  </a>
-
-          </div>
-        </div>
-      
-    </div>
   </nav>
+  
 </header>
     
-    <div class="md-container">
+    <div class="md-container" data-md-component="container">
       
       
-      <main class="md-main">
-        <div class="md-main__inner md-grid" data-md-component="container">
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
           
             
-              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
-                    <nav class="md-nav md-nav--primary" data-md-level="0">
-  <label class="md-nav__title md-nav__title--site" for="drawer">
-    <div class="md-nav__button md-logo">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Hollow (Netflix OSS)" class="md-nav__button md-logo" aria-label="Hollow (Netflix OSS)" data-md-component="logo">
       
-        <i class="md-icon md-icon--home"></i>
-      
-    </div>
+  <img src="../img/logo_white_bg.png" alt="logo">
+
+    </a>
     Hollow (Netflix OSS)
   </label>
   
     <div class="md-nav__source">
-      
-
-
-  
-
-
-  <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-source="github">
+      <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
     
-      <div class="md-source__icon">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <use xlink:href="#github" width="24" height="24"></use>
-        </svg>
-      </div>
-    
-    <div class="md-source__repository">
-      GitHub
-    </div>
-  </a>
-
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
     </div>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -185,72 +236,15 @@
       
       
 
-
-  <li class="md-nav__item">
-    <a href=".." title="Introduction" class="md-nav__link">
-      Introduction
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../quick-start/" title="Quick Start" class="md-nav__link">
-      Quick Start
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../getting-started/" title="Getting Started" class="md-nav__link">
-      Getting Started
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../indexing-querying/" title="Indexing/Querying" class="md-nav__link">
-      Indexing/Querying
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../infrastructure/" title="Infrastructure Hooks" class="md-nav__link">
-      Infrastructure Hooks
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../producer-consumer-apis/" title="Producers and Consumers" class="md-nav__link">
-      Producers and Consumers
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
 
     
       
@@ -258,58 +252,142 @@
       
 
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-start/" class="md-nav__link">
+        Quick Start
+      </a>
+    </li>
+  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
     
       
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
     
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../indexing-querying/" class="md-nav__link">
+        Indexing/Querying
+      </a>
+    </li>
+  
+
     
-      <label class="md-nav__link md-nav__link--active" for="toc">
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../infrastructure/" class="md-nav__link">
+        Infrastructure Hooks
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../producer-consumer-apis/" class="md-nav__link">
+        Producers and Consumers
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Tooling
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Tooling
-      </label>
-    
-    <a href="./" title="Tooling" class="md-nav__link md-nav__link--active">
-      Tooling
-    </a>
-    
+      </a>
       
-<nav class="md-nav md-nav--secondary">
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
   
   
-    <label class="md-nav__title" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#metrics" title="Metrics" class="md-nav__link">
+  <a href="#metrics" class="md-nav__link">
     Metrics
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Metrics">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#producer" title="Producer" class="md-nav__link">
+  <a href="#producer" class="md-nav__link">
     Producer
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Producer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#usage" title="Usage" class="md-nav__link">
+  <a href="#usage" class="md-nav__link">
     Usage
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#prometheus-example" title="Prometheus Example" class="md-nav__link">
+  <a href="#prometheus-example" class="md-nav__link">
     Prometheus Example
   </a>
   
@@ -321,22 +399,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#consumer" title="Consumer" class="md-nav__link">
+  <a href="#consumer" class="md-nav__link">
     Consumer
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Consumer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#usage_1" title="Usage" class="md-nav__link">
+  <a href="#usage_1" class="md-nav__link">
     Usage
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#prometheus-example_1" title="Prometheus Example" class="md-nav__link">
+  <a href="#prometheus-example_1" class="md-nav__link">
     Prometheus Example
   </a>
   
@@ -353,15 +431,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#blob-storage-manipulation" title="Blob Storage Manipulation" class="md-nav__link">
+  <a href="#blob-storage-manipulation" class="md-nav__link">
     Blob Storage Manipulation
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Blob Storage Manipulation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#cleaning" title="Cleaning" class="md-nav__link">
+  <a href="#cleaning" class="md-nav__link">
     Cleaning
   </a>
   
@@ -373,22 +451,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#hollow-explorer" title="Hollow Explorer" class="md-nav__link">
+  <a href="#hollow-explorer" class="md-nav__link">
     Hollow Explorer
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Hollow Explorer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#explorer-setup" title="Explorer Setup" class="md-nav__link">
+  <a href="#explorer-setup" class="md-nav__link">
     Explorer Setup
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#explorer-usage" title="Explorer Usage" class="md-nav__link">
+  <a href="#explorer-usage" class="md-nav__link">
     Explorer Usage
   </a>
   
@@ -400,22 +478,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#history-tool" title="History tool" class="md-nav__link">
+  <a href="#history-tool" class="md-nav__link">
     History tool
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="History tool">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#history-setup" title="History Setup" class="md-nav__link">
+  <a href="#history-setup" class="md-nav__link">
     History Setup
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#history-usage" title="History Usage" class="md-nav__link">
+  <a href="#history-usage" class="md-nav__link">
     History Usage
   </a>
   
@@ -427,57 +505,57 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#diff-tool" title="Diff Tool" class="md-nav__link">
+  <a href="#diff-tool" class="md-nav__link">
     Diff Tool
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#heap-usage-analysis" title="Heap Usage Analysis" class="md-nav__link">
+  <a href="#heap-usage-analysis" class="md-nav__link">
     Heap Usage Analysis
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#usage-tracking" title="Usage Tracking" class="md-nav__link">
+  <a href="#usage-tracking" class="md-nav__link">
     Usage Tracking
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#transitive-set-traverser" title="Transitive Set Traverser" class="md-nav__link">
+  <a href="#transitive-set-traverser" class="md-nav__link">
     Transitive Set Traverser
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dataset-manipulation-tools" title="Dataset Manipulation Tools" class="md-nav__link">
+  <a href="#dataset-manipulation-tools" class="md-nav__link">
     Dataset Manipulation Tools
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Dataset Manipulation Tools">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#filtering" title="Filtering" class="md-nav__link">
+  <a href="#filtering" class="md-nav__link">
     Filtering
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#combining" title="Combining" class="md-nav__link">
+  <a href="#combining" class="md-nav__link">
     Combining
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#splitting" title="Splitting" class="md-nav__link">
+  <a href="#splitting" class="md-nav__link">
     Splitting
   </a>
   
@@ -489,15 +567,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#state-manipulation-tools" title="State Manipulation Tools" class="md-nav__link">
+  <a href="#state-manipulation-tools" class="md-nav__link">
     State Manipulation Tools
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="State Manipulation Tools">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#patching" title="Patching" class="md-nav__link">
+  <a href="#patching" class="md-nav__link">
     Patching
   </a>
   
@@ -508,145 +586,177 @@
   
 </li>
       
-      
-      
     </ul>
   
 </nav>
-    
-  </li>
+      
+    </li>
+  
 
     
       
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../data-modeling/" title="Data Modeling" class="md-nav__link">
-      Data Modeling
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../diving-deeper/" title="Diving Deeper" class="md-nav__link">
-      Diving Deeper
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-modeling/" class="md-nav__link">
+        Data Modeling
+      </a>
+    </li>
+  
 
     
       
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../interacting-with-a-dataset/" title="Interacting with a Hollow Dataset" class="md-nav__link">
-      Interacting with a Hollow Dataset
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../data-ingestion/" title="Data Ingestion" class="md-nav__link">
-      Data Ingestion
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../diving-deeper/" class="md-nav__link">
+        Diving Deeper
+      </a>
+    </li>
+  
 
     
       
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../validation/" title="Validation" class="md-nav__link">
-      Validation
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../advanced-topics/" title="Advanced Topics" class="md-nav__link">
-      Advanced Topics
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interacting-with-a-dataset/" class="md-nav__link">
+        Interacting with a Hollow Dataset
+      </a>
+    </li>
+  
 
     
       
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../testing/" title="Testing" class="md-nav__link">
-      Testing
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../glossary/" title="Glossary" class="md-nav__link">
-      Glossary
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-ingestion/" class="md-nav__link">
+        Data Ingestion
+      </a>
+    </li>
+  
 
     
       
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../community/" title="Community" class="md-nav__link">
-      Community
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../acknowledgements/" title="Acknowledgements" class="md-nav__link">
-      Acknowledgements
-    </a>
-  </li>
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation/" class="md-nav__link">
+        Validation
+      </a>
+    </li>
+  
 
     
       
       
       
 
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced-topics/" class="md-nav__link">
+        Advanced Topics
+      </a>
+    </li>
+  
 
-  <li class="md-nav__item">
-    <a href="../license/" title="License" class="md-nav__link">
-      License
-    </a>
-  </li>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        Testing
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        Glossary
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../community/" class="md-nav__link">
+        Community
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acknowledgements/" class="md-nav__link">
+        Acknowledgements
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
 
     
   </ul>
@@ -656,44 +766,50 @@
               </div>
             
             
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
-<nav class="md-nav md-nav--secondary">
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
   
   
-    <label class="md-nav__title" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#metrics" title="Metrics" class="md-nav__link">
+  <a href="#metrics" class="md-nav__link">
     Metrics
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Metrics">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#producer" title="Producer" class="md-nav__link">
+  <a href="#producer" class="md-nav__link">
     Producer
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Producer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#usage" title="Usage" class="md-nav__link">
+  <a href="#usage" class="md-nav__link">
     Usage
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#prometheus-example" title="Prometheus Example" class="md-nav__link">
+  <a href="#prometheus-example" class="md-nav__link">
     Prometheus Example
   </a>
   
@@ -705,22 +821,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#consumer" title="Consumer" class="md-nav__link">
+  <a href="#consumer" class="md-nav__link">
     Consumer
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Consumer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#usage_1" title="Usage" class="md-nav__link">
+  <a href="#usage_1" class="md-nav__link">
     Usage
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#prometheus-example_1" title="Prometheus Example" class="md-nav__link">
+  <a href="#prometheus-example_1" class="md-nav__link">
     Prometheus Example
   </a>
   
@@ -737,15 +853,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#blob-storage-manipulation" title="Blob Storage Manipulation" class="md-nav__link">
+  <a href="#blob-storage-manipulation" class="md-nav__link">
     Blob Storage Manipulation
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Blob Storage Manipulation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#cleaning" title="Cleaning" class="md-nav__link">
+  <a href="#cleaning" class="md-nav__link">
     Cleaning
   </a>
   
@@ -757,22 +873,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#hollow-explorer" title="Hollow Explorer" class="md-nav__link">
+  <a href="#hollow-explorer" class="md-nav__link">
     Hollow Explorer
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Hollow Explorer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#explorer-setup" title="Explorer Setup" class="md-nav__link">
+  <a href="#explorer-setup" class="md-nav__link">
     Explorer Setup
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#explorer-usage" title="Explorer Usage" class="md-nav__link">
+  <a href="#explorer-usage" class="md-nav__link">
     Explorer Usage
   </a>
   
@@ -784,22 +900,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#history-tool" title="History tool" class="md-nav__link">
+  <a href="#history-tool" class="md-nav__link">
     History tool
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="History tool">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#history-setup" title="History Setup" class="md-nav__link">
+  <a href="#history-setup" class="md-nav__link">
     History Setup
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#history-usage" title="History Usage" class="md-nav__link">
+  <a href="#history-usage" class="md-nav__link">
     History Usage
   </a>
   
@@ -811,57 +927,57 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#diff-tool" title="Diff Tool" class="md-nav__link">
+  <a href="#diff-tool" class="md-nav__link">
     Diff Tool
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#heap-usage-analysis" title="Heap Usage Analysis" class="md-nav__link">
+  <a href="#heap-usage-analysis" class="md-nav__link">
     Heap Usage Analysis
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#usage-tracking" title="Usage Tracking" class="md-nav__link">
+  <a href="#usage-tracking" class="md-nav__link">
     Usage Tracking
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#transitive-set-traverser" title="Transitive Set Traverser" class="md-nav__link">
+  <a href="#transitive-set-traverser" class="md-nav__link">
     Transitive Set Traverser
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dataset-manipulation-tools" title="Dataset Manipulation Tools" class="md-nav__link">
+  <a href="#dataset-manipulation-tools" class="md-nav__link">
     Dataset Manipulation Tools
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="Dataset Manipulation Tools">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#filtering" title="Filtering" class="md-nav__link">
+  <a href="#filtering" class="md-nav__link">
     Filtering
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#combining" title="Combining" class="md-nav__link">
+  <a href="#combining" class="md-nav__link">
     Combining
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#splitting" title="Splitting" class="md-nav__link">
+  <a href="#splitting" class="md-nav__link">
     Splitting
   </a>
   
@@ -873,15 +989,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#state-manipulation-tools" title="State Manipulation Tools" class="md-nav__link">
+  <a href="#state-manipulation-tools" class="md-nav__link">
     State Manipulation Tools
   </a>
   
-    <nav class="md-nav">
+    <nav class="md-nav" aria-label="State Manipulation Tools">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#patching" title="Patching" class="md-nav__link">
+  <a href="#patching" class="md-nav__link">
     Patching
   </a>
   
@@ -892,8 +1008,6 @@
   
 </li>
       
-      
-      
     </ul>
   
 </nav>
@@ -902,16 +1016,19 @@
               </div>
             
           
-          <div class="md-content">
-            <article class="md-content__inner md-typeset">
-              
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
                 
-                  <a href="https://github.com/Netflix/hollow/edit/master/docs/tooling.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
-                
-                
-                <h1 id="insight-tools">Insight Tools</h1>
+                  
+
+  
+  
+
+
+<h1 id="insight-tools">Insight Tools<a class="headerlink" href="#insight-tools" title="Permanent link">&para;</a></h1>
 <p>Once your data is Hollow, you will be able to gain better insights into it.  Hollow ships with a number of useful tools for quickly gaining insights into your data, from broad patterns at high level, to zooming in to find and inspect specific individual records.</p>
-<h2 id="metrics">Metrics</h2>
+<h2 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permanent link">&para;</a></h2>
 <p>Implementing a <code>HollowMetricsCollector</code> allows to retrieve metrics from your data. Hollow collects metrics for producer and consumers by default which can be accessed by the <code>HollowMetricsCollector</code> on every cycle.</p>
 <p>Common metrics for producer and consumer:</p>
 <ul>
@@ -921,7 +1038,7 @@
 <li><code>totalHeapFootprint</code>: provides the approximate heap footprint for your data. This is based on <a href="./#heap-usage-analysis">Heap Usage Analysis</a></li>
 <li><code>totalPopulatedOrdinals</code>: provides the total number of ordinals in your data.</li>
 </ul>
-<h3 id="producer">Producer</h3>
+<h3 id="producer">Producer<a class="headerlink" href="#producer" title="Permanent link">&para;</a></h3>
 <p>In addition to the common metrics, hollow collects the following metrics from a producer:</p>
 <ul>
 <li><code>cyclesCompleted</code></li>
@@ -934,162 +1051,141 @@
 <li><code>reverseDeltasCompleted</code> </li>
 <li><code>reverseDeltasFailed</code> </li>
 </ul>
-<h4 id="usage">Usage</h4>
-<div class="codehilite"><pre><span></span><span class="n">HollowProducer</span> <span class="n">producer</span> <span class="o">=</span> <span class="n">HollowProducer</span><span class="o">.</span><span class="na">withPublisher</span><span class="o">(</span><span class="n">publisher</span><span class="o">)</span>
-                                                <span class="o">.</span><span class="na">withMetricsCollector</span><span class="o">(</span><span class="n">hollowMetricsCollector</span><span class="o">)</span> 
-                                                <span class="o">.</span><span class="na">build</span><span class="o">();</span>
-</pre></div>
-
-
-<h4 id="prometheus-example">Prometheus Example</h4>
-<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">com.netflix.hollow.api.metrics.HollowMetricsCollector</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">com.netflix.hollow.api.metrics.HollowProducerMetrics</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">io.prometheus.client.Gauge</span><span class="o">;</span>
-
-<span class="kd">class</span> <span class="nc">MyPrometheusProducerMetricsCollector</span> <span class="kd">extends</span> <span class="n">HollowMetricsCollector</span><span class="o">&lt;</span><span class="n">HollowProducerMetrics</span><span class="o">&gt;</span> <span class="o">{</span>
-    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Gauge</span> <span class="n">hollowConsumerGauge</span> <span class="o">=</span> <span class="n">Gauge</span>
-            <span class="o">.</span><span class="na">build</span><span class="o">()</span>
-            <span class="o">.</span><span class="na">name</span><span class="o">(</span><span class="s">&quot;hollowProducerMetrics&quot;</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">labelNames</span><span class="o">(</span><span class="s">&quot;metric&quot;</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">help</span><span class="o">(</span><span class="s">&quot;Hollow Producer Metrics&quot;</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">register</span><span class="o">();</span>
-
-
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">set</span><span class="o">(</span><span class="n">String</span> <span class="n">metric</span><span class="o">,</span> <span class="n">Double</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">hollowConsumerGauge</span><span class="o">.</span><span class="na">labels</span><span class="o">(</span><span class="n">metric</span><span class="o">).</span><span class="na">set</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">kb</span> <span class="o">=</span> <span class="mi">1024</span><span class="o">;</span>
-
-    <span class="nd">@Override</span>
-    <span class="kt">void</span> <span class="nf">collect</span><span class="o">(</span><span class="n">HollowConsumerMetrics</span> <span class="n">metrics</span><span class="o">)</span> <span class="o">{</span>
-        <span class="c1">//Common hollow metrics</span>
-        <span class="n">metrics</span><span class="o">.</span><span class="na">getTypeHeapFootprint</span><span class="o">().</span><span class="na">forEach</span><span class="o">((</span><span class="n">String</span> <span class="n">type</span><span class="o">,</span> <span class="n">Long</span> <span class="n">heapCost</span><span class="o">)</span> <span class="o">-&gt;</span>
-                <span class="n">set</span><span class="o">(</span><span class="n">type</span> <span class="o">+</span> <span class="s">&quot;_heap_cost_kb&quot;</span><span class="o">,</span> <span class="n">heapCost</span> <span class="o">/</span> <span class="n">kb</span><span class="o">)</span>
-        <span class="o">);</span>
-        <span class="n">metrics</span><span class="o">.</span><span class="na">getTypePopulatedOrdinals</span><span class="o">().</span><span class="na">forEach</span><span class="o">((</span><span class="n">String</span> <span class="n">type</span><span class="o">,</span> <span class="n">Long</span> <span class="n">ordinals</span><span class="o">)-&gt;</span>
-                <span class="n">set</span><span class="o">(</span><span class="n">type</span> <span class="o">+</span> <span class="s">&quot;_domain_object_count&quot;</span><span class="o">,</span> <span class="n">ordinals</span><span class="o">)</span>
-        <span class="o">);</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;total_heap_cost_kb&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getTotalHeapFootprint</span><span class="o">());</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;total_domain_object_count&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getTotalPopulatedOrdinals</span><span class="o">());</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;current_version&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getCurrentVersion</span><span class="o">());</span>
-
-        <span class="c1">//Producer specific metrics</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;cycles_completed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getCyclesCompleted</span><span class="o">());</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;cycles_succeeded&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getCyclesSucceeded</span><span class="o">());</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;cycles_failed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getCycleFailed</span><span class="o">());</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;snapshots_completed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getSnapshotsCompleted</span><span class="o">());</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;snapshotsFailed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getSnapshotsFailed</span><span class="o">());</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;deltas_completed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getDeltasCompleted</span><span class="o">());</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;deltas_failed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getDeltasFailed</span><span class="o">());</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-
-
-<h3 id="consumer">Consumer</h3>
+<h4 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h4>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">HollowProducer</span><span class="w"> </span><span class="n">producer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HollowProducer</span><span class="p">.</span><span class="na">withPublisher</span><span class="p">(</span><span class="n">publisher</span><span class="p">)</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">                                                </span><span class="p">.</span><span class="na">withMetricsCollector</span><span class="p">(</span><span class="n">hollowMetricsCollector</span><span class="p">)</span><span class="w"> </span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">                                                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span></code></pre></div>
+<h4 id="prometheus-example">Prometheus Example<a class="headerlink" href="#prometheus-example" title="Permanent link">&para;</a></h4>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.netflix.hollow.api.metrics.HollowMetricsCollector</span><span class="p">;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.netflix.hollow.api.metrics.HollowProducerMetrics</span><span class="p">;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.prometheus.client.Gauge</span><span class="p">;</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kd">class</span> <span class="nc">MyPrometheusProducerMetricsCollector</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">HollowMetricsCollector</span><span class="o">&lt;</span><span class="n">HollowProducerMetrics</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Gauge</span><span class="w"> </span><span class="n">hollowConsumerGauge</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Gauge</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">()</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">            </span><span class="p">.</span><span class="na">name</span><span class="p">(</span><span class="s">&quot;hollowProducerMetrics&quot;</span><span class="p">)</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">            </span><span class="p">.</span><span class="na">labelNames</span><span class="p">(</span><span class="s">&quot;metric&quot;</span><span class="p">)</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">            </span><span class="p">.</span><span class="na">help</span><span class="p">(</span><span class="s">&quot;Hollow Producer Metrics&quot;</span><span class="p">)</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">            </span><span class="p">.</span><span class="na">register</span><span class="p">();</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">metric</span><span class="p">,</span><span class="w"> </span><span class="n">Double</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">        </span><span class="n">hollowConsumerGauge</span><span class="p">.</span><span class="na">labels</span><span class="p">(</span><span class="n">metric</span><span class="p">).</span><span class="na">set</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">kb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1024</span><span class="p">;</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">    </span><span class="nd">@Override</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">collect</span><span class="p">(</span><span class="n">HollowConsumerMetrics</span><span class="w"> </span><span class="n">metrics</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">        </span><span class="c1">//Common hollow metrics</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">        </span><span class="n">metrics</span><span class="p">.</span><span class="na">getTypeHeapFootprint</span><span class="p">().</span><span class="na">forEach</span><span class="p">((</span><span class="n">String</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">heapCost</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">                </span><span class="n">set</span><span class="p">(</span><span class="n">type</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;_heap_cost_kb&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">heapCost</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">kb</span><span class="p">)</span>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">        </span><span class="p">);</span>
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="w">        </span><span class="n">metrics</span><span class="p">.</span><span class="na">getTypePopulatedOrdinals</span><span class="p">().</span><span class="na">forEach</span><span class="p">((</span><span class="n">String</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">ordinals</span><span class="p">)</span><span class="o">-&gt;</span>
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="w">                </span><span class="n">set</span><span class="p">(</span><span class="n">type</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;_domain_object_count&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ordinals</span><span class="p">)</span>
+</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="w">        </span><span class="p">);</span>
+</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;total_heap_cost_kb&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getTotalHeapFootprint</span><span class="p">());</span>
+</span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;total_domain_object_count&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getTotalPopulatedOrdinals</span><span class="p">());</span>
+</span><span id="__span-1-31"><a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;current_version&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getCurrentVersion</span><span class="p">());</span>
+</span><span id="__span-1-32"><a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a>
+</span><span id="__span-1-33"><a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a><span class="w">        </span><span class="c1">//Producer specific metrics</span>
+</span><span id="__span-1-34"><a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;cycles_completed&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getCyclesCompleted</span><span class="p">());</span>
+</span><span id="__span-1-35"><a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;cycles_succeeded&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getCyclesSucceeded</span><span class="p">());</span>
+</span><span id="__span-1-36"><a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;cycles_failed&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getCycleFailed</span><span class="p">());</span>
+</span><span id="__span-1-37"><a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;snapshots_completed&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getSnapshotsCompleted</span><span class="p">());</span>
+</span><span id="__span-1-38"><a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;snapshotsFailed&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getSnapshotsFailed</span><span class="p">());</span>
+</span><span id="__span-1-39"><a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;deltas_completed&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getDeltasCompleted</span><span class="p">());</span>
+</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;deltas_failed&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getDeltasFailed</span><span class="p">());</span>
+</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="consumer">Consumer<a class="headerlink" href="#consumer" title="Permanent link">&para;</a></h3>
 <p>In addition to the common metrics, hollow collects the following metrics from a consumer:</p>
 <ul>
 <li><code>refreshFailed</code></li>
 <li><code>refreshSucceeded</code></li>
 </ul>
-<h4 id="usage_1">Usage</h4>
-<div class="codehilite"><pre><span></span><span class="n">HollowConsumer</span>
-   <span class="o">.</span><span class="na">withBlobRetriever</span><span class="o">(</span><span class="n">blobRetriever</span><span class="o">)</span>           
-   <span class="o">.</span><span class="na">withMetricsCollector</span><span class="o">(</span><span class="n">hollowMetricsCollector</span><span class="o">)</span> 
-   <span class="o">.</span><span class="na">build</span><span class="o">();</span>
-</pre></div>
-
-
-<h4 id="prometheus-example_1">Prometheus Example</h4>
-<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">com.netflix.hollow.api.metrics.HollowMetricsCollector</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">com.netflix.hollow.api.metrics.HollowConsumerMetrics</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">io.prometheus.client.Gauge</span><span class="o">;</span>
-
-<span class="kd">class</span> <span class="nc">MyPrometheusConsumerMetricsCollector</span> <span class="kd">extends</span> <span class="n">HollowMetricsCollector</span><span class="o">&lt;</span><span class="n">HollowConsumerMetrics</span><span class="o">&gt;</span> <span class="o">{</span>
-    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Gauge</span> <span class="n">hollowConsumerGauge</span> <span class="o">=</span> <span class="n">Gauge</span>
-            <span class="o">.</span><span class="na">build</span><span class="o">()</span>
-            <span class="o">.</span><span class="na">name</span><span class="o">(</span><span class="s">&quot;hollowConsumerMetrics&quot;</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">labelNames</span><span class="o">(</span><span class="s">&quot;metric&quot;</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">help</span><span class="o">(</span><span class="s">&quot;Hollow Consumer Metrics&quot;</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">register</span><span class="o">();</span>
-
-
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">set</span><span class="o">(</span><span class="n">String</span> <span class="n">metric</span><span class="o">,</span> <span class="n">Double</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">hollowConsumerGauge</span><span class="o">.</span><span class="na">labels</span><span class="o">(</span><span class="n">metric</span><span class="o">).</span><span class="na">set</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">kb</span> <span class="o">=</span> <span class="mi">1024</span><span class="o">;</span>
-
-    <span class="nd">@Override</span>
-    <span class="kt">void</span> <span class="nf">collect</span><span class="o">(</span><span class="n">HollowConsumerMetrics</span> <span class="n">metrics</span><span class="o">)</span> <span class="o">{</span>
-        <span class="c1">//Common hollow metrics</span>
-        <span class="n">metrics</span><span class="o">.</span><span class="na">getTypeHeapFootprint</span><span class="o">().</span><span class="na">forEach</span><span class="o">((</span><span class="n">String</span> <span class="n">type</span><span class="o">,</span> <span class="n">Long</span> <span class="n">heapCost</span><span class="o">)</span> <span class="o">-&gt;</span>
-                <span class="n">set</span><span class="o">(</span><span class="n">type</span> <span class="o">+</span> <span class="s">&quot;_heap_cost_kb&quot;</span><span class="o">,</span> <span class="n">heapCost</span> <span class="o">/</span> <span class="n">kb</span><span class="o">)</span>
-        <span class="o">);</span>
-        <span class="n">metrics</span><span class="o">.</span><span class="na">getTypePopulatedOrdinals</span><span class="o">().</span><span class="na">forEach</span><span class="o">((</span><span class="n">String</span> <span class="n">type</span><span class="o">,</span> <span class="n">Long</span> <span class="n">ordinals</span><span class="o">)-&gt;</span>
-                <span class="n">set</span><span class="o">(</span><span class="n">type</span> <span class="o">+</span> <span class="s">&quot;_domain_object_count&quot;</span><span class="o">,</span> <span class="n">ordinals</span><span class="o">)</span>
-        <span class="o">);</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;total_heap_cost_kb&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getTotalHeapFootprint</span><span class="o">());</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;total_domain_object_count&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getTotalPopulatedOrdinals</span><span class="o">());</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;current_version&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getCurrentVersion</span><span class="o">());</span>
-
-        <span class="c1">//Consumer specific metrics</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;refresh_failed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getRefreshFailed</span><span class="o">());</span>
-        <span class="n">set</span><span class="o">(</span><span class="s">&quot;refresh_succeeded&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getRefreshSucceded</span><span class="o">());</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-
-
-<h2 id="blob-storage-manipulation">Blob Storage Manipulation</h2>
-<h3 id="cleaning">Cleaning</h3>
+<h4 id="usage_1">Usage<a class="headerlink" href="#usage_1" title="Permanent link">&para;</a></h4>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">HollowConsumer</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">   </span><span class="p">.</span><span class="na">withBlobRetriever</span><span class="p">(</span><span class="n">blobRetriever</span><span class="p">)</span><span class="w">           </span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">   </span><span class="p">.</span><span class="na">withMetricsCollector</span><span class="p">(</span><span class="n">hollowMetricsCollector</span><span class="p">)</span><span class="w"> </span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">   </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span></code></pre></div>
+<h4 id="prometheus-example_1">Prometheus Example<a class="headerlink" href="#prometheus-example_1" title="Permanent link">&para;</a></h4>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.netflix.hollow.api.metrics.HollowMetricsCollector</span><span class="p">;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.netflix.hollow.api.metrics.HollowConsumerMetrics</span><span class="p">;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">io.prometheus.client.Gauge</span><span class="p">;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kd">class</span> <span class="nc">MyPrometheusConsumerMetricsCollector</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">HollowMetricsCollector</span><span class="o">&lt;</span><span class="n">HollowConsumerMetrics</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Gauge</span><span class="w"> </span><span class="n">hollowConsumerGauge</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Gauge</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">()</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">            </span><span class="p">.</span><span class="na">name</span><span class="p">(</span><span class="s">&quot;hollowConsumerMetrics&quot;</span><span class="p">)</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">            </span><span class="p">.</span><span class="na">labelNames</span><span class="p">(</span><span class="s">&quot;metric&quot;</span><span class="p">)</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">            </span><span class="p">.</span><span class="na">help</span><span class="p">(</span><span class="s">&quot;Hollow Consumer Metrics&quot;</span><span class="p">)</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">            </span><span class="p">.</span><span class="na">register</span><span class="p">();</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">metric</span><span class="p">,</span><span class="w"> </span><span class="n">Double</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">        </span><span class="n">hollowConsumerGauge</span><span class="p">.</span><span class="na">labels</span><span class="p">(</span><span class="n">metric</span><span class="p">).</span><span class="na">set</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">kb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1024</span><span class="p">;</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="w">    </span><span class="nd">@Override</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">collect</span><span class="p">(</span><span class="n">HollowConsumerMetrics</span><span class="w"> </span><span class="n">metrics</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="w">        </span><span class="c1">//Common hollow metrics</span>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="w">        </span><span class="n">metrics</span><span class="p">.</span><span class="na">getTypeHeapFootprint</span><span class="p">().</span><span class="na">forEach</span><span class="p">((</span><span class="n">String</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">heapCost</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span>
+</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="w">                </span><span class="n">set</span><span class="p">(</span><span class="n">type</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;_heap_cost_kb&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">heapCost</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">kb</span><span class="p">)</span>
+</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="w">        </span><span class="p">);</span>
+</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a><span class="w">        </span><span class="n">metrics</span><span class="p">.</span><span class="na">getTypePopulatedOrdinals</span><span class="p">().</span><span class="na">forEach</span><span class="p">((</span><span class="n">String</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="n">Long</span><span class="w"> </span><span class="n">ordinals</span><span class="p">)</span><span class="o">-&gt;</span>
+</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a><span class="w">                </span><span class="n">set</span><span class="p">(</span><span class="n">type</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;_domain_object_count&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ordinals</span><span class="p">)</span>
+</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a><span class="w">        </span><span class="p">);</span>
+</span><span id="__span-3-29"><a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;total_heap_cost_kb&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getTotalHeapFootprint</span><span class="p">());</span>
+</span><span id="__span-3-30"><a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;total_domain_object_count&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getTotalPopulatedOrdinals</span><span class="p">());</span>
+</span><span id="__span-3-31"><a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;current_version&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getCurrentVersion</span><span class="p">());</span>
+</span><span id="__span-3-32"><a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a>
+</span><span id="__span-3-33"><a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a><span class="w">        </span><span class="c1">//Consumer specific metrics</span>
+</span><span id="__span-3-34"><a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;refresh_failed&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getRefreshFailed</span><span class="p">());</span>
+</span><span id="__span-3-35"><a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a><span class="w">        </span><span class="n">set</span><span class="p">(</span><span class="s">&quot;refresh_succeeded&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">metrics</span><span class="p">.</span><span class="na">getRefreshSucceded</span><span class="p">());</span>
+</span><span id="__span-3-36"><a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-3-37"><a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="blob-storage-manipulation">Blob Storage Manipulation<a class="headerlink" href="#blob-storage-manipulation" title="Permanent link">&para;</a></h2>
+<h3 id="cleaning">Cleaning<a class="headerlink" href="#cleaning" title="Permanent link">&para;</a></h3>
 <p>Using the <code>BlobStorageCleaner</code> capability, it's possible to free up the blob storage and prevent running out of space because of old snapshots/deltas.</p>
 <p>Hollow ships with <code>HollowFilesystemBlobStorageCleaner</code> which allows to only keep a given number of snapshots. It can be used in the following way:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowProducer</span><span class="o">.</span><span class="na">Publisher</span> <span class="n">publisher</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowFilesystemPublisher</span><span class="o">(</span><span class="n">publishDir</span><span class="o">);</span>
-<span class="n">HollowProducer</span><span class="o">.</span><span class="na">BlobStorageCleaner</span> <span class="n">blobStorageCleaner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowFilesystemBlobStorageCleaner</span><span class="o">(</span><span class="n">publishDir</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
-<span class="n">HollowProducer</span> <span class="n">producer</span> <span class="o">=</span> <span class="n">HollowProducer</span><span class="o">.</span><span class="na">withPublisher</span><span class="o">(</span><span class="n">publisher</span><span class="o">)</span>
-                                                <span class="o">.</span><span class="na">withBlobStorageCleaner</span><span class="o">(</span><span class="n">blobStorageCleaner</span><span class="o">)</span>
-                                                <span class="o">.</span><span class="na">build</span><span class="o">();</span>
-</pre></div>
-
-
+<div class="language-java highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">HollowProducer</span><span class="p">.</span><span class="na">Publisher</span><span class="w"> </span><span class="n">publisher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowFilesystemPublisher</span><span class="p">(</span><span class="n">publishDir</span><span class="p">);</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">HollowProducer</span><span class="p">.</span><span class="na">BlobStorageCleaner</span><span class="w"> </span><span class="n">blobStorageCleaner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowFilesystemBlobStorageCleaner</span><span class="p">(</span><span class="n">publishDir</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">HollowProducer</span><span class="w"> </span><span class="n">producer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HollowProducer</span><span class="p">.</span><span class="na">withPublisher</span><span class="p">(</span><span class="n">publisher</span><span class="p">)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">                                                </span><span class="p">.</span><span class="na">withBlobStorageCleaner</span><span class="p">(</span><span class="n">blobStorageCleaner</span><span class="p">)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">                                                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span></code></pre></div>
 <p>The integer <code>10</code> parameter will set the value for <code>numOfSnapshotsToKeep</code>.</p>
 <p>It is also possible to add your own blob storage cleaner by extending <code>HollowProducer.BlobStorageCleaner</code> class and provide your own mechanism to clean snapshots/deltas/reverse deltas.</p>
-<h2 id="hollow-explorer">Hollow Explorer</h2>
+<h2 id="hollow-explorer">Hollow Explorer<a class="headerlink" href="#hollow-explorer" title="Permanent link">&para;</a></h2>
 <p>Hollow ships with a UI which can be used to browse and search records within any dataset.</p>
-<h3 id="explorer-setup">Explorer Setup</h3>
-<p>The <code>HollowExplorerUI</code> class in the <em>hollow-explorer-ui</em> project is instantiated using either a <code>HollowReadStateEngine</code> or a <a href="../producer-consumer-apis/#the-hollowconsumer"><code>HollowConsumer</code></a> and a base URL path:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="c1">/// or your HollowReadStateEngine</span>
-
-<span class="n">HollowExplorerUI</span> <span class="n">ui</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowExplorerUI</span><span class="o">(</span><span class="s">&quot;&quot;</span><span class="o">,</span> <span class="n">consumer</span><span class="o">);</span>
-</pre></div>
-
-
-<p>Incoming requests should be sent to the <code>handle</code> method in your <code>HollowExplorerUI</code> instance:</p>
-<div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">handle</span><span class="o">(</span><span class="n">String</span> <span class="n">target</span><span class="o">,</span>
-                      <span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span>
-                      <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span>
-</pre></div>
-
-
-<p>The <code>HollowExplorerUI</code> can be used in the context of an existing web container as shown above, <em>or</em> can be invoked via the included <code>HollowExplorerUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="c1">/// or your HollowReadStateEngine</span>
-
-<span class="n">HollowExplorerUIServer</span> <span class="n">server</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowExplorerUIServer</span><span class="o">(</span><span class="n">consumer</span><span class="o">,</span> <span class="mi">8080</span><span class="o">);</span>
-
-<span class="n">server</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
-<span class="n">server</span><span class="o">.</span><span class="na">join</span><span class="o">();</span>
-</pre></div>
-
-
+<h3 id="explorer-setup">Explorer Setup<a class="headerlink" href="#explorer-setup" title="Permanent link">&para;</a></h3>
+<p>The <code>HollowExplorerUI</code> class in the <em>hollow-explorer-ui</em> project is instantiated using either a <code>HollowReadStateEngine</code> or a <a href="../producer-consumer-apis/#the-hollowconsumer"><code>HollowConsumer</code></a> and a base URL path:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">HollowConsumer</span><span class="w"> </span><span class="n">consumer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// or your HollowReadStateEngine</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">HollowExplorerUI</span><span class="w"> </span><span class="n">ui</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowExplorerUI</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">consumer</span><span class="p">);</span>
+</span></code></pre></div></p>
+<p>Incoming requests should be sent to the <code>handle</code> method in your <code>HollowExplorerUI</code> instance:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">target</span><span class="p">,</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">                      </span><span class="n">HttpServletRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">                      </span><span class="n">HttpServletResponse</span><span class="w"> </span><span class="n">resp</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span>
+</span></code></pre></div></p>
+<p>The <code>HollowExplorerUI</code> can be used in the context of an existing web container as shown above, <em>or</em> can be invoked via the included <code>HollowExplorerUIServer</code>, which uses the Jetty HTTP Servlet Server:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">HollowConsumer</span><span class="w"> </span><span class="n">consumer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// or your HollowReadStateEngine</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">HollowExplorerUIServer</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowExplorerUIServer</span><span class="p">(</span><span class="n">consumer</span><span class="p">,</span><span class="w"> </span><span class="mi">8080</span><span class="p">);</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">server</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="n">server</span><span class="p">.</span><span class="na">join</span><span class="p">();</span>
+</span></code></pre></div></p>
 <p>The above call to <code>server.join()</code> will block forever.  While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore your data.</p>
-<div class="admonition warning">
-<p class="admonition-title">Jetty: Optional Dependency</p>
-<p>If using the <code>HollowExplorerUIServer</code>, you'll need to include a dependency on Jetty.  For example, with a Gradle build you may add the dependency:</p>
-<p><code>compile 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'</code></p>
-</div>
-<h3 id="explorer-usage">Explorer Usage</h3>
+<h3 id="explorer-usage">Explorer Usage<a class="headerlink" href="#explorer-usage" title="Permanent link">&para;</a></h3>
 <p>Upon opening your browser, you should see something like this:</p>
 <p><img alt="Explorer Home" src="../img/explorer-home.png" /></p>
 <p>Click on a column header to sort by that column.  This view shows details about how many records exist for each type, and the approximate heap footprint of each type.</p>
@@ -1106,36 +1202,30 @@
 <p><img alt="Explorer Browse Search Results" src="../img/explorer-browsesearchresult.png" /></p>
 <p>Search queries remain active in the browser session until cleared, and can be augmented to find the intersection of matches over multiple fields by entering multiple query parameters without clearing the existing ones in the session.  For example, if we want to find movies in which <em>both</em> Carrie-Anne Moss and the Actor with ID <code>1001</code> starred, we can go back to the search page, and enter the appropriate criteria to augment our session's query.  The results will contain only records which match <em>both</em> of these criteria:</p>
 <p><img alt="Explorer Augment Query" src="../img/explorer-augmentsearchresult.png" /></p>
-<h2 id="history-tool">History tool</h2>
+<h2 id="history-tool">History tool<a class="headerlink" href="#history-tool" title="Permanent link">&para;</a></h2>
 <p>Hollow ships with a UI which can be used to browse and search changes in a dataset over time.  The history tool provides the ability to get a bird’s eye view of all of the changes a dataset goes through over time, while simultaneously allowing for specific queries to see exactly how individual records change as the dataset transitions between states.  The history tool has proven to be enormously beneficial when investigating data issues in production scenarios.  When something looks incorrect, it’s easy to pinpoint exactly what changed when, which can vastly expedite data corrections and eliminate hours of potential detective work.</p>
-<h3 id="history-setup">History Setup</h3>
-<p>The <code>HollowHistoryUI</code> class in the <em>hollow-diff-ui</em> project can be instantiated using a <code>HollowConsumer</code> and a base URL path:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="c1">/// or your HollowReadStateEngine</span>
-
-<span class="n">HollowHistoryUI</span> <span class="n">ui</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowHistoryUI</span><span class="o">(</span><span class="s">&quot;&quot;</span><span class="o">,</span> <span class="n">consumer</span><span class="o">);</span>
-</pre></div>
-
-
+<h3 id="history-setup">History Setup<a class="headerlink" href="#history-setup" title="Permanent link">&para;</a></h3>
+<p>The <code>HollowHistoryUI</code> class in the <em>hollow-diff-ui</em> project can be instantiated using a <code>HollowConsumer</code> and a base URL path:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">HollowConsumer</span><span class="w"> </span><span class="n">consumer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// or your HollowReadStateEngine</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">HollowHistoryUI</span><span class="w"> </span><span class="n">ui</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowHistoryUI</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">consumer</span><span class="p">);</span>
+</span></code></pre></div></p>
 <p>The <code>HollowHistoryUI</code> will by default be configured to track all of the types for which primary keys have been specified.  By default, it will track changes through the latest rolling 1024 states.  This default can be changed with another parameter in the constructor.</p>
-<p>Incoming requests should be sent to the <code>handle</code> method in your <code>HollowExplorerUI</code> instance:</p>
-<div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">handle</span><span class="o">(</span><span class="n">String</span> <span class="n">target</span><span class="o">,</span>
-                      <span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span>
-                      <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span>
-</pre></div>
-
-
-<p>The <code>HollowHistoryUI</code> can be used in the context of an existing web container as shown above, <em>or</em> can be invoked via the included <code>HollowHistoryUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="o">...</span>
-
-<span class="n">HollowHistoryUIServer</span> <span class="n">server</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowHistoryUIServer</span><span class="o">(</span><span class="n">consumer</span><span class="o">,</span> <span class="mi">8080</span><span class="o">);</span>
-
-<span class="n">server</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
-<span class="n">server</span><span class="o">.</span><span class="na">join</span><span class="o">();</span>
-</pre></div>
-
-
+<p>Incoming requests should be sent to the <code>handle</code> method in your <code>HollowExplorerUI</code> instance:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">target</span><span class="p">,</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">                      </span><span class="n">HttpServletRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">                      </span><span class="n">HttpServletResponse</span><span class="w"> </span><span class="n">resp</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span>
+</span></code></pre></div></p>
+<p>The <code>HollowHistoryUI</code> can be used in the context of an existing web container as shown above, <em>or</em> can be invoked via the included <code>HollowHistoryUIServer</code>, which uses the Jetty HTTP Servlet Server:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">HollowConsumer</span><span class="w"> </span><span class="n">consumer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">HollowHistoryUIServer</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowHistoryUIServer</span><span class="p">(</span><span class="n">consumer</span><span class="p">,</span><span class="w"> </span><span class="mi">8080</span><span class="p">);</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">server</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="n">server</span><span class="p">.</span><span class="na">join</span><span class="p">();</span>
+</span></code></pre></div></p>
 <p>The above call to <code>server.join()</code> will block forever.  While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore the history.</p>
-<h3 id="history-usage">History Usage</h3>
+<h3 id="history-usage">History Usage<a class="headerlink" href="#history-usage" title="Permanent link">&para;</a></h3>
 <p>Upon opening your browser, you will see something like this:</p>
 <p><img alt="History Home" src="../img/history-home.png" /></p>
 <p>The history UI will track changes in types for which you have defined primary keys.  In this view, we're looking at the number of records which changed between <em>data states</em>.  The changes in each state are broken down here into <em>modifications</em>, <em>additions</em>, and <em>removals</em>.  Clicking on a state will show us a further breakdown of these changes by each top-level type:</p>
@@ -1155,185 +1245,155 @@
 <p>We can also search for changes in specific records by their keys.  On each page in the history tool, a textbox is available in the header labeled <strong>Lookup</strong>.   Plugging in <em>a single field</em> of a key of any type into this field will find matching diffs through the history:</p>
 <p><img alt="History Lookup" src="../img/history-lookup.png" /></p>
 <p>Clicking on individual records will bring us back to the object diff view page to see what was changed.</p>
-<h2 id="diff-tool">Diff Tool</h2>
+<h2 id="diff-tool">Diff Tool<a class="headerlink" href="#diff-tool" title="Permanent link">&para;</a></h2>
 <p>Just as the Hollow history tool UI makes the differences between any two <em>adjacent</em> states in a delta chain readily accessible, the Hollow diff tool is used to investigate the differences between any two <em>arbitrary</em> data states, even those which may exist in different delta chains.</p>
 <p>This is especially useful as a step in a regular release cadence, as the differences between data states produced, for example, in a test environment and production environment can be evaluated at a glance.  Sometimes, unintended consequences of code updates may be discovered this way, which prevents production issues before they happen.</p>
-<p>Initiating a diff between two data states is accomplished by loading both states into separate <code>HollowReadStateEngines</code> in memory, and then instantiating a <code>HollowDiff</code> and configuring it with the primary keys of types to diff.  For our <code>Movie</code>/<code>Actor</code> example:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowConsumer</span> <span class="n">testConsumer</span> <span class="o">=</span> <span class="c1">/// load the test data</span>
-<span class="n">HollowConsumer</span> <span class="n">prodConsumer</span> <span class="o">=</span> <span class="c1">/// load the prod data</span>
-
-<span class="n">HollowReadStateEngine</span> <span class="n">testData</span> <span class="o">=</span> <span class="n">testConsumer</span><span class="o">.</span><span class="na">getStateEngine</span><span class="o">();</span>
-<span class="n">HollowReadStateEngine</span> <span class="n">prodData</span> <span class="o">=</span> <span class="n">prodConsumer</span><span class="o">.</span><span class="na">getStateEngine</span><span class="o">();</span>
-
-<span class="n">HollowDiff</span> <span class="n">diff</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowDiff</span><span class="o">(</span><span class="n">testData</span><span class="o">,</span> <span class="n">prodData</span><span class="o">);</span>
-<span class="n">diff</span><span class="o">.</span><span class="na">addTypeDiff</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;id&quot;</span><span class="o">);</span>
-<span class="n">diff</span><span class="o">.</span><span class="na">addTypeDiff</span><span class="o">(</span><span class="s">&quot;Actor&quot;</span><span class="o">,</span> <span class="s">&quot;actorId&quot;</span><span class="o">);</span>
-
-<span class="n">diff</span><span class="o">.</span><span class="na">calculateDiffs</span><span class="o">();</span>
-</pre></div>
-
-
+<p>Initiating a diff between two data states is accomplished by loading both states into separate <code>HollowReadStateEngines</code> in memory, and then instantiating a <code>HollowDiff</code> and configuring it with the primary keys of types to diff.  For our <code>Movie</code>/<code>Actor</code> example:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">HollowConsumer</span><span class="w"> </span><span class="n">testConsumer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// load the test data</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">HollowConsumer</span><span class="w"> </span><span class="n">prodConsumer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// load the prod data</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">HollowReadStateEngine</span><span class="w"> </span><span class="n">testData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">testConsumer</span><span class="p">.</span><span class="na">getStateEngine</span><span class="p">();</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="n">HollowReadStateEngine</span><span class="w"> </span><span class="n">prodData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prodConsumer</span><span class="p">.</span><span class="na">getStateEngine</span><span class="p">();</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">HollowDiff</span><span class="w"> </span><span class="n">diff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowDiff</span><span class="p">(</span><span class="n">testData</span><span class="p">,</span><span class="w"> </span><span class="n">prodData</span><span class="p">);</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="n">diff</span><span class="p">.</span><span class="na">addTypeDiff</span><span class="p">(</span><span class="s">&quot;Movie&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="n">diff</span><span class="p">.</span><span class="na">addTypeDiff</span><span class="p">(</span><span class="s">&quot;Actor&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;actorId&quot;</span><span class="p">);</span>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="n">diff</span><span class="p">.</span><span class="na">calculateDiffs</span><span class="p">();</span>
+</span></code></pre></div></p>
 <p>A diff is calculated by matching records of the same type based on defined primary keys.  The unmatched records in both states are tracked, and detailed differences between field values in matching pairs are also tracked.</p>
 <div class="admonition hint">
 <p class="admonition-title">Primary Keys</p>
 <p>The <code>HollowDiff</code> will, by default, automatically configure any primary keys which are defined in the <code>Object</code> schemas of your dataset.</p>
 </div>
-<p>Hollow includes a ready-made UI which can be applied to a <code>HollowDiff</code>.    The <code>HollowDiffUI</code> class can be used in the context of an existing web container, or can be invoked via the <code>HollowDiffUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowDiff</span> <span class="n">diff</span> <span class="o">=</span> <span class="c1">/// build the diff</span>
-
-<span class="n">HollowDiffUIServer</span> <span class="n">server</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowDiffUIServer</span><span class="o">(</span><span class="mi">8080</span><span class="o">);</span>
-<span class="n">server</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
-
-<span class="n">server</span><span class="o">.</span><span class="na">addDiff</span><span class="o">(</span><span class="s">&quot;diff&quot;</span><span class="o">,</span> <span class="n">diff</span><span class="o">);</span>
-
-<span class="n">server</span><span class="o">.</span><span class="na">join</span><span class="o">();</span>
-</pre></div>
-
-
+<p>Hollow includes a ready-made UI which can be applied to a <code>HollowDiff</code>.    The <code>HollowDiffUI</code> class can be used in the context of an existing web container, or can be invoked via the <code>HollowDiffUIServer</code>, which uses the Jetty HTTP Servlet Server:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">HollowDiff</span><span class="w"> </span><span class="n">diff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// build the diff</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">HollowDiffUIServer</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowDiffUIServer</span><span class="p">(</span><span class="mi">8080</span><span class="p">);</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">server</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="n">server</span><span class="p">.</span><span class="na">addDiff</span><span class="p">(</span><span class="s">&quot;diff&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">diff</span><span class="p">);</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="n">server</span><span class="p">.</span><span class="na">join</span><span class="p">();</span>
+</span></code></pre></div></p>
 <p>While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore the diff.</p>
-<h2 id="heap-usage-analysis">Heap Usage Analysis</h2>
+<h2 id="heap-usage-analysis">Heap Usage Analysis<a class="headerlink" href="#heap-usage-analysis" title="Permanent link">&para;</a></h2>
 <p>One of the most important considerations when dealing with in-memory datasets is the heap utilization of that dataset on consumer machines.  Hollow provides a number of methods to analyze this metric.</p>
-<p>Given a loaded <code>HollowReadStateEngine</code>, it is possible to iterate over each type and gather statistics about its approximate heap usage.  This is done in the following example:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowReadStateEngine</span> <span class="n">stateEngine</span> <span class="o">=</span> <span class="c1">/// a populated state engine</span>
-
-<span class="kt">long</span> <span class="n">totalApproximateHeapFootprint</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
-
-<span class="k">for</span><span class="o">(</span><span class="n">HollowTypeReadState</span> <span class="n">typeState</span> <span class="o">:</span> <span class="n">stateEngine</span><span class="o">.</span><span class="na">getTypeStates</span><span class="o">())</span> <span class="o">{</span>
-    <span class="n">String</span> <span class="n">typeName</span> <span class="o">=</span> <span class="n">typeState</span><span class="o">.</span><span class="na">getSchema</span><span class="o">().</span><span class="na">getName</span><span class="o">();</span>
-    <span class="kt">long</span> <span class="n">heapCost</span> <span class="o">=</span> <span class="n">typeState</span><span class="o">.</span><span class="na">getApproximateHeapFootprintInBytes</span><span class="o">();</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">typeName</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">heapCost</span><span class="o">);</span>
-    <span class="n">totalApproximateHeapFootprint</span> <span class="o">+=</span> <span class="n">heapCost</span><span class="o">;</span>
-<span class="o">}</span>
-
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;TOTAL: &quot;</span> <span class="o">+</span> <span class="n">totalApproximateHeapFootprint</span><span class="o">);</span>
-</pre></div>
-
-
-<p>As shown above, information can be gathered about the total heap footprint, and also about the heap footprint of individual types.  This information can be helpful in identifying optimization targets.  This technique can also be used to identify how the heap cost of individual types changes over time, which can provide early warning signs about optimizations which should be targeted proactively.</p>
-<h2 id="usage-tracking">Usage Tracking</h2>
+<p>Given a loaded <code>HollowReadStateEngine</code>, it is possible to iterate over each type and gather statistics about its approximate heap usage.  This is done in the following example:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">HollowReadStateEngine</span><span class="w"> </span><span class="n">stateEngine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// a populated state engine</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="kt">long</span><span class="w"> </span><span class="n">totalApproximateHeapFootprint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="k">for</span><span class="p">(</span><span class="n">HollowTypeReadState</span><span class="w"> </span><span class="n">typeState</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">stateEngine</span><span class="p">.</span><span class="na">getTypeStates</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">typeName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">typeState</span><span class="p">.</span><span class="na">getSchema</span><span class="p">().</span><span class="na">getName</span><span class="p">();</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">heapCost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">typeState</span><span class="p">.</span><span class="na">getApproximateHeapFootprintInBytes</span><span class="p">();</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">typeName</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">heapCost</span><span class="p">);</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">    </span><span class="n">totalApproximateHeapFootprint</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">heapCost</span><span class="p">;</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="p">}</span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;TOTAL: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">totalApproximateHeapFootprint</span><span class="p">);</span>
+</span></code></pre></div>
+As shown above, information can be gathered about the total heap footprint, and also about the heap footprint of individual types.  This information can be helpful in identifying optimization targets.  This technique can also be used to identify how the heap cost of individual types changes over time, which can provide early warning signs about optimizations which should be targeted proactively.</p>
+<h2 id="usage-tracking">Usage Tracking<a class="headerlink" href="#usage-tracking" title="Permanent link">&para;</a></h2>
 <p>Hollow tracks usage, which can be investigated at runtime.  By default, this functionality is turned off, but it can be enabled by injecting a HollowSamplingDirector into a Hollow API in a running instance.  You can use the TimeSliceSamplingDirector implementation, which will by default record every access which happens during 1ms out of every second:</p>
-<div class="codehilite"><pre><span></span><span class="n">MovieAPI</span> <span class="n">api</span> <span class="o">=</span> <span class="c1">/// a custom-generated API</span>
-
-<span class="n">TimeSliceSamplingDirector</span> <span class="n">samplingDirector</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TimeSliceSamplingDirector</span><span class="o">();</span>
-<span class="n">samplingDirector</span><span class="o">.</span><span class="na">startSampling</span><span class="o">();</span>
-
-<span class="n">api</span><span class="o">.</span><span class="na">setSamplingDirector</span><span class="o">(</span><span class="n">samplingDirector</span><span class="o">);</span>
-</pre></div>
-
-
-<p>Once this is enabled, and some time has passed for samples to be gathered, the results can be collected for analysis:</p>
-<div class="codehilite"><pre><span></span><span class="k">for</span><span class="o">(</span><span class="n">SampleResult</span> <span class="n">result</span> <span class="o">:</span> <span class="n">api</span><span class="o">.</span><span class="na">getAccessSampleResults</span><span class="o">())</span> <span class="o">{</span>
-    <span class="k">if</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getNumSamples</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getIdentifier</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span>
-                                                  <span class="n">result</span><span class="o">.</span><span class="na">getNumSamples</span><span class="o">());</span>
-<span class="o">}</span>
-</pre></div>
-
-
-<h2 id="transitive-set-traverser">Transitive Set Traverser</h2>
-<p>The <code>TransitiveSetTraverser</code> can be used to find children and parent references for a selected set of records.  We start with an initial set of selected records by ordinal, represented with a <code>Map&lt;String, BitSet&gt;</code>.  Entries in this map will indicate a type, plus the ordinals of the selected records:</p>
-<div class="codehilite"><pre><span></span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">BitSet</span><span class="o">&gt;</span> <span class="n">selection</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">BitSet</span><span class="o">&gt;();</span>
-
-<span class="c1">/// select the movies with IDs 1 and 6.</span>
-<span class="n">BitSet</span> <span class="n">selectedMovies</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BitSet</span><span class="o">();</span>
-<span class="n">selectedMovies</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">movieIdx</span><span class="o">.</span><span class="na">getMatchingOrdinal</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span>
-<span class="n">selectedMovies</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">movieIdx</span><span class="o">.</span><span class="na">getMatchingOrdinal</span><span class="o">(</span><span class="mi">6</span><span class="o">));</span>
-
-<span class="n">selection</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="n">movies</span><span class="o">);</span>
-</pre></div>
-
-
-<p>We can add the references, and the <em>transitive references</em> of our selection.  After the following call returns, our selection will be augmented with these matches:</p>
-<div class="codehilite"><pre><span></span><span class="n">TransitiveSetTraverser</span><span class="o">.</span><span class="na">addTransitiveMatches</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="n">selection</span><span class="o">);</span>
-</pre></div>
-
-
+<div class="language-java highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">MovieAPI</span><span class="w"> </span><span class="n">api</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// a custom-generated API</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">TimeSliceSamplingDirector</span><span class="w"> </span><span class="n">samplingDirector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TimeSliceSamplingDirector</span><span class="p">();</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">samplingDirector</span><span class="p">.</span><span class="na">startSampling</span><span class="p">();</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">api</span><span class="p">.</span><span class="na">setSamplingDirector</span><span class="p">(</span><span class="n">samplingDirector</span><span class="p">);</span>
+</span></code></pre></div>
+<p>Once this is enabled, and some time has passed for samples to be gathered, the results can be collected for analysis:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">for</span><span class="p">(</span><span class="n">SampleResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">api</span><span class="p">.</span><span class="na">getAccessSampleResults</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="na">getNumSamples</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="na">getIdentifier</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;: &quot;</span><span class="w"> </span><span class="o">+</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">                                                  </span><span class="n">result</span><span class="p">.</span><span class="na">getNumSamples</span><span class="p">());</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">}</span>
+</span></code></pre></div></p>
+<h2 id="transitive-set-traverser">Transitive Set Traverser<a class="headerlink" href="#transitive-set-traverser" title="Permanent link">&para;</a></h2>
+<p>The <code>TransitiveSetTraverser</code> can be used to find children and parent references for a selected set of records.  We start with an initial set of selected records by ordinal, represented with a <code>Map&lt;String, BitSet&gt;</code>.  Entries in this map will indicate a type, plus the ordinals of the selected records:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">BitSet</span><span class="o">&gt;</span><span class="w"> </span><span class="n">selection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">BitSet</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="c1">/// select the movies with IDs 1 and 6.</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">BitSet</span><span class="w"> </span><span class="n">selectedMovies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BitSet</span><span class="p">();</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">selectedMovies</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="n">movieIdx</span><span class="p">.</span><span class="na">getMatchingOrdinal</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="n">selectedMovies</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="n">movieIdx</span><span class="p">.</span><span class="na">getMatchingOrdinal</span><span class="p">(</span><span class="mi">6</span><span class="p">));</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="n">selection</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;Movie&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">movies</span><span class="p">);</span>
+</span></code></pre></div></p>
+<p>We can add the references, and the <em>transitive references</em> of our selection.  After the following call returns, our selection will be augmented with these matches:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">TransitiveSetTraverser</span><span class="p">.</span><span class="na">addTransitiveMatches</span><span class="p">(</span><span class="n">readEngine</span><span class="p">,</span><span class="w"> </span><span class="n">selection</span><span class="p">);</span>
+</span></code></pre></div></p>
 <div class="admonition note">
 <p class="admonition-title">Transitive References</p>
 <p>If A references B, and B references C, then A transitively references C</p>
 </div>
-<p>Given a selection, we can also add any records which reference anything in the selection.  This is essentially the opposite operation as above; it can be said that <code>addTransitiveMatches</code> traverses down, while <code>addReferencingOutsideClosure</code> traverses up.  After the following call returns, our selection will be augmented with this selection:</p>
-<div class="codehilite"><pre><span></span><span class="n">TransitiveSetTraverser</span><span class="o">.</span><span class="na">removedReferencedOutsideClosure</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="n">selection</span><span class="o">);</span>
-</pre></div>
-
-
-<h2 id="dataset-manipulation-tools">Dataset Manipulation Tools</h2>
-<h3 id="filtering">Filtering</h3>
+<p>Given a selection, we can also add any records which reference anything in the selection.  This is essentially the opposite operation as above; it can be said that <code>addTransitiveMatches</code> traverses down, while <code>addReferencingOutsideClosure</code> traverses up.  After the following call returns, our selection will be augmented with this selection:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">TransitiveSetTraverser</span><span class="p">.</span><span class="na">removedReferencedOutsideClosure</span><span class="p">(</span><span class="n">readEngine</span><span class="p">,</span><span class="w"> </span><span class="n">selection</span><span class="p">);</span>
+</span></code></pre></div></p>
+<h2 id="dataset-manipulation-tools">Dataset Manipulation Tools<a class="headerlink" href="#dataset-manipulation-tools" title="Permanent link">&para;</a></h2>
+<h3 id="filtering">Filtering<a class="headerlink" href="#filtering" title="Permanent link">&para;</a></h3>
 <p>Sometimes, a dataset will be of interest to multiple different types of consumers, but not all consumers may be interested in all aspects of a dataset.  In these cases, it’s possible to omit certain types and fields from a client’s view of the data.  This is typically done to tailor a consumer’s heap footprint and startup time costs based on their data needs.</p>
-<p>Using our <code>Movie</code>/<code>Actor</code> example above, if there was a consumer which was interested in <code>Movie</code> records, but not <code>Actor</code> records, that consumer might construct a consumer-side data filter configuration in the following way:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowFilterConfig</span> <span class="n">config</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowFilterConfig</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
-<span class="n">config</span><span class="o">.</span><span class="na">addField</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;actors&quot;</span><span class="o">);</span>
-<span class="n">config</span><span class="o">.</span><span class="na">addType</span><span class="o">(</span><span class="s">&quot;ListOfActor&quot;</span><span class="o">);</span>
-<span class="n">config</span><span class="o">.</span><span class="na">addType</span><span class="o">(</span><span class="s">&quot;Actor&quot;</span><span class="o">);</span>
-</pre></div>
-
-
-<p>The boolean <code>true</code> parameter in the constructor above indicates that this is an exclusion filter.  We could accomplish the same goal using an inclusion filter:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowFilterConfig</span> <span class="n">config</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowFilterConfig</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
-<span class="n">config</span><span class="o">.</span><span class="na">addField</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;id&quot;</span><span class="o">);</span>
-<span class="n">config</span><span class="o">.</span><span class="na">addField</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;title&quot;</span><span class="o">);</span>
-<span class="n">config</span><span class="o">.</span><span class="na">addField</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;releaseYear&quot;</span><span class="o">);</span>
-<span class="n">config</span><span class="o">.</span><span class="na">addType</span><span class="o">(</span><span class="s">&quot;String&quot;</span><span class="o">);</span>
-</pre></div>
-
-
+<p>Using our <code>Movie</code>/<code>Actor</code> example above, if there was a consumer which was interested in <code>Movie</code> records, but not <code>Actor</code> records, that consumer might construct a consumer-side data filter configuration in the following way:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">HollowFilterConfig</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowFilterConfig</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">config</span><span class="p">.</span><span class="na">addField</span><span class="p">(</span><span class="s">&quot;Movie&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;actors&quot;</span><span class="p">);</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">config</span><span class="p">.</span><span class="na">addType</span><span class="p">(</span><span class="s">&quot;ListOfActor&quot;</span><span class="p">);</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="n">config</span><span class="p">.</span><span class="na">addType</span><span class="p">(</span><span class="s">&quot;Actor&quot;</span><span class="p">);</span>
+</span></code></pre></div></p>
+<p>The boolean <code>true</code> parameter in the constructor above indicates that this is an exclusion filter.  We could accomplish the same goal using an inclusion filter:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">HollowFilterConfig</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowFilterConfig</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">config</span><span class="p">.</span><span class="na">addField</span><span class="p">(</span><span class="s">&quot;Movie&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="n">config</span><span class="p">.</span><span class="na">addField</span><span class="p">(</span><span class="s">&quot;Movie&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;title&quot;</span><span class="p">);</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="n">config</span><span class="p">.</span><span class="na">addField</span><span class="p">(</span><span class="s">&quot;Movie&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;releaseYear&quot;</span><span class="p">);</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="n">config</span><span class="p">.</span><span class="na">addType</span><span class="p">(</span><span class="s">&quot;String&quot;</span><span class="p">);</span>
+</span></code></pre></div></p>
 <p>The difference between these two configurations is how the filter behaves as new types and fields are added to the data model.  The exclusion filter will not exclude them by default, whereas the inclusion filter will.</p>
-<p>A filter configuration is applied to a <code>HollowConsumer</code> at read time:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="n">HollowConsumer</span><span class="o">.</span><span class="na">withBlobReader</span><span class="o">(</span><span class="n">reader</span><span class="o">)</span>
-                                        <span class="o">.</span><span class="na">withFilterConfig</span><span class="o">(</span><span class="n">config</span><span class="o">)</span>
-                                        <span class="o">.</span><span class="na">build</span><span class="o">();</span>
-</pre></div>
-
-
-<h3 id="combining">Combining</h3>
-<p>The <code>HollowCombiner</code> is used to copy data from one or more copies of hollow datasets in <code>HollowReadStateEngine</code>s into a single <code>HollowWriteStateEngine</code>.  If each of the inputs contain the same data model, the following is sufficient to combine them:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowReadStateEngine</span> <span class="n">input1</span> <span class="o">=</span> <span class="c1">/// an input</span>
-<span class="n">HollowReadStateEngine</span> <span class="n">input2</span> <span class="o">=</span> <span class="c1">/// another input</span>
-
-<span class="n">HollowCombiner</span> <span class="n">combiner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowCombiner</span><span class="o">(</span><span class="n">input1</span><span class="o">,</span> <span class="n">input2</span><span class="o">);</span>
-<span class="n">combiner</span><span class="o">.</span><span class="na">combine</span><span class="o">();</span>
-
-<span class="n">HollowWriteStateEngine</span> <span class="n">combined</span> <span class="o">=</span> <span class="n">combiner</span><span class="o">.</span><span class="na">getCombinedStateEngine</span><span class="o">();</span>
-</pre></div>
-
-
-<p>By default, the combiner will copy all records from all types from the inputs to the output.  We can direct the combiner to exclude certain records from copying using a <code>HollowCombinerCopyDirector</code>.  The interface for a <code>HollowCombinerCopyDirector</code> allows for making decisions about copying individual records during a combine operation by implementing the following method:</p>
-<div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">shouldCopy</span><span class="o">(</span><span class="n">HollowTypeReadState</span> <span class="n">typeState</span><span class="o">,</span> <span class="kt">int</span> <span class="n">ordinal</span><span class="o">);</span>
-</pre></div>
-
-
+<p>A filter configuration is applied to a <code>HollowConsumer</code> at read time:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">HollowConsumer</span><span class="w"> </span><span class="n">consumer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HollowConsumer</span><span class="p">.</span><span class="na">withBlobReader</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">                                        </span><span class="p">.</span><span class="na">withFilterConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">                                        </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span></code></pre></div></p>
+<h3 id="combining">Combining<a class="headerlink" href="#combining" title="Permanent link">&para;</a></h3>
+<p>The <code>HollowCombiner</code> is used to copy data from one or more copies of hollow datasets in <code>HollowReadStateEngine</code>s into a single <code>HollowWriteStateEngine</code>.  If each of the inputs contain the same data model, the following is sufficient to combine them:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">HollowReadStateEngine</span><span class="w"> </span><span class="n">input1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// an input</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="n">HollowReadStateEngine</span><span class="w"> </span><span class="n">input2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// another input</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="n">HollowCombiner</span><span class="w"> </span><span class="n">combiner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowCombiner</span><span class="p">(</span><span class="n">input1</span><span class="p">,</span><span class="w"> </span><span class="n">input2</span><span class="p">);</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="n">combiner</span><span class="p">.</span><span class="na">combine</span><span class="p">();</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="n">HollowWriteStateEngine</span><span class="w"> </span><span class="n">combined</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">combiner</span><span class="p">.</span><span class="na">getCombinedStateEngine</span><span class="p">();</span>
+</span></code></pre></div></p>
+<p>By default, the combiner will copy all records from all types from the inputs to the output.  We can direct the combiner to exclude certain records from copying using a <code>HollowCombinerCopyDirector</code>.  The interface for a <code>HollowCombinerCopyDirector</code> allows for making decisions about copying individual records during a combine operation by implementing the following method:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">shouldCopy</span><span class="p">(</span><span class="n">HollowTypeReadState</span><span class="w"> </span><span class="n">typeState</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ordinal</span><span class="p">);</span>
+</span></code></pre></div></p>
 <p>If this method returns false, then the copier will not attempt to directly copy the matching record.  However, if the matching record is referenced via another record for which this method returns true, then it will still be copied regardless of the return value of this method.</p>
-<p>The most broadly useful provided implementation of the <code>HollowCombinerCopyDirector</code> is the <code>HollowCombinerExcludePrimaryKeysCopyDirector</code>, which can be used to specify record exclusions by primary key.  For example, if we wanted to create a copy of a state engine with the <code>Movie</code> records with ids 100 and 125 excluded:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowReadStateEngine</span> <span class="n">input</span> <span class="o">=</span> <span class="c1">/// an input</span>
-<span class="n">HollowPrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowPrimaryKeyIndex</span><span class="o">(</span><span class="n">input</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;id&quot;</span><span class="o">);</span>
-
-<span class="n">HollowCombinerExcludePrimaryKeysCopyDirector</span> <span class="n">director</span> <span class="o">=</span>
-                          <span class="k">new</span> <span class="n">HollowCombinerExcludePrimaryKeysCopyDirector</span><span class="o">();</span>
-
-<span class="n">director</span><span class="o">.</span><span class="na">excludeKey</span><span class="o">(</span><span class="n">idx</span><span class="o">,</span> <span class="mi">100</span><span class="o">);</span>
-<span class="n">director</span><span class="o">.</span><span class="na">excludeKey</span><span class="o">(</span><span class="n">idx</span><span class="o">,</span> <span class="mi">125</span><span class="o">);</span>
-
-<span class="n">HollowCombiner</span> <span class="n">combiner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowCombiner</span><span class="o">(</span><span class="n">director</span><span class="o">,</span> <span class="n">input</span><span class="o">);</span>
-<span class="n">combiner</span><span class="o">.</span><span class="na">combine</span><span class="o">();</span>
-
-<span class="n">HollowWriteStateEngine</span> <span class="n">result</span> <span class="o">=</span> <span class="n">combiner</span><span class="o">.</span><span class="na">getCombineStateEngine</span><span class="o">();</span>
-</pre></div>
-
-
-<p>It’s possible that while combining two inputs, both may have a record of the same type with the same primary key.  This violation of the uniqueness constraint of a primary key can be avoided by informing the combiner of the primary keys in a data model prior to the combine operation:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowCombiner</span> <span class="n">combiner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowCombiner</span><span class="o">(</span><span class="n">input1</span><span class="o">,</span> <span class="n">input2</span><span class="o">);</span>
-
-<span class="n">combiner</span><span class="o">.</span><span class="na">setPrimaryKeys</span><span class="o">(</span>
-        <span class="k">new</span> <span class="n">PrimaryKey</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;id&quot;</span><span class="o">),</span>
-        <span class="k">new</span> <span class="n">PrimaryKey</span><span class="o">(</span><span class="s">&quot;Actor&quot;</span><span class="o">,</span> <span class="s">&quot;actorId&quot;</span><span class="o">)</span>
-<span class="o">);</span>
-
-<span class="n">combiner</span><span class="o">.</span><span class="na">combine</span><span class="o">();</span>
-</pre></div>
-
-
+<p>The most broadly useful provided implementation of the <code>HollowCombinerCopyDirector</code> is the <code>HollowCombinerExcludePrimaryKeysCopyDirector</code>, which can be used to specify record exclusions by primary key.  For example, if we wanted to create a copy of a state engine with the <code>Movie</code> records with ids 100 and 125 excluded:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">HollowReadStateEngine</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// an input</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="n">HollowPrimaryKeyIndex</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowPrimaryKeyIndex</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Movie&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="n">HollowCombinerExcludePrimaryKeysCopyDirector</span><span class="w"> </span><span class="n">director</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">                          </span><span class="k">new</span><span class="w"> </span><span class="n">HollowCombinerExcludePrimaryKeysCopyDirector</span><span class="p">();</span>
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="n">director</span><span class="p">.</span><span class="na">excludeKey</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="n">director</span><span class="p">.</span><span class="na">excludeKey</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="w"> </span><span class="mi">125</span><span class="p">);</span>
+</span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a>
+</span><span id="__span-24-10"><a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="n">HollowCombiner</span><span class="w"> </span><span class="n">combiner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowCombiner</span><span class="p">(</span><span class="n">director</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">);</span>
+</span><span id="__span-24-11"><a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="n">combiner</span><span class="p">.</span><span class="na">combine</span><span class="p">();</span>
+</span><span id="__span-24-12"><a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a>
+</span><span id="__span-24-13"><a id="__codelineno-24-13" name="__codelineno-24-13" href="#__codelineno-24-13"></a><span class="n">HollowWriteStateEngine</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">combiner</span><span class="p">.</span><span class="na">getCombineStateEngine</span><span class="p">();</span>
+</span></code></pre></div></p>
+<p>It’s possible that while combining two inputs, both may have a record of the same type with the same primary key.  This violation of the uniqueness constraint of a primary key can be avoided by informing the combiner of the primary keys in a data model prior to the combine operation:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">HollowCombiner</span><span class="w"> </span><span class="n">combiner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowCombiner</span><span class="p">(</span><span class="n">input1</span><span class="p">,</span><span class="w"> </span><span class="n">input2</span><span class="p">);</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="n">combiner</span><span class="p">.</span><span class="na">setPrimaryKeys</span><span class="p">(</span>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">PrimaryKey</span><span class="p">(</span><span class="s">&quot;Movie&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;id&quot;</span><span class="p">),</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">PrimaryKey</span><span class="p">(</span><span class="s">&quot;Actor&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;actorId&quot;</span><span class="p">)</span>
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="p">);</span>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="n">combiner</span><span class="p">.</span><span class="na">combine</span><span class="p">();</span>
+</span></code></pre></div></p>
 <p>If multiple records exist in the inputs matching a single value for any of the supplied primary keys, then only one such record will be copied to the output.  The specific record which is copied will be the record from the input was supplied earliest in the constructor of the <code>HollowCombiner</code>.  Further, if any record references another record which was omitted because it would have been duplicate based on this rule, then that reference is remapped in the output state to the matching record which was chosen to be included.</p>
-<h3 id="splitting">Splitting</h3>
+<h3 id="splitting">Splitting<a class="headerlink" href="#splitting" title="Permanent link">&para;</a></h3>
 <p>A single dataset can be sharded into multiple datasets using a <code>HollowSplitter</code>.  The <code>HollowSplitter</code> takes a <code>HollowSplitterCopyDirector</code>, which indicates:</p>
 <ul>
 <li><em>top level</em> types to split,</li>
@@ -1350,113 +1410,97 @@
 <li><code>HollowSplitterPrimaryKeyCopyDirector</code>.  </li>
 </ul>
 <p>These directors will split top-level types among a specified number of shards either by ordinals or primary keys, respectively.  When splitting by ordinal, a record with a specific primary key may jump between shards when it is modified, while with the primary key director a specific primary key will consistently hash to the same shard.</p>
-<p>Our <code>Movie</code>/<code>Actor</code> example may use the splitter to split a dataset into four shards with the following invocation:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowReadStateEngine</span> <span class="n">stateEngine</span> <span class="o">=</span> <span class="c1">/// a state engine</span>
-
-<span class="n">HollowSplitterCopyDirector</span> <span class="n">director</span> <span class="o">=</span>
-                            <span class="k">new</span> <span class="n">HollowSplitterOrdinalCopyDirector</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">);</span>
-
-<span class="n">HollowSplitter</span> <span class="n">splitter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowSplitter</span><span class="o">(</span><span class="n">director</span><span class="o">,</span> <span class="n">stateEngine</span><span class="o">);</span>
-<span class="n">splitter</span><span class="o">.</span><span class="na">split</span><span class="o">();</span>
-
-
-<span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
-    <span class="n">HollowWriteStateEngine</span> <span class="n">shard</span> <span class="o">=</span> <span class="n">splitter</span><span class="o">.</span><span class="na">getOutputShardStateEngine</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
-<span class="o">}</span>
-</pre></div>
-
-
-<h2 id="state-manipulation-tools">State Manipulation Tools</h2>
-<h3 id="patching">Patching</h3>
+<p>Our <code>Movie</code>/<code>Actor</code> example may use the splitter to split a dataset into four shards with the following invocation:
+<div class="language-java highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">HollowReadStateEngine</span><span class="w"> </span><span class="n">stateEngine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="c1">/// a state engine</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="n">HollowSplitterCopyDirector</span><span class="w"> </span><span class="n">director</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">                            </span><span class="k">new</span><span class="w"> </span><span class="n">HollowSplitterOrdinalCopyDirector</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Movie&quot;</span><span class="p">);</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="n">HollowSplitter</span><span class="w"> </span><span class="n">splitter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowSplitter</span><span class="p">(</span><span class="n">director</span><span class="p">,</span><span class="w"> </span><span class="n">stateEngine</span><span class="p">);</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="n">splitter</span><span class="p">.</span><span class="na">split</span><span class="p">();</span>
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a>
+</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">    </span><span class="n">HollowWriteStateEngine</span><span class="w"> </span><span class="n">shard</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">splitter</span><span class="p">.</span><span class="na">getOutputShardStateEngine</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+</span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="p">}</span>
+</span></code></pre></div></p>
+<h2 id="state-manipulation-tools">State Manipulation Tools<a class="headerlink" href="#state-manipulation-tools" title="Permanent link">&para;</a></h2>
+<h3 id="patching">Patching<a class="headerlink" href="#patching" title="Permanent link">&para;</a></h3>
 <p>Using the <code>HollowWriteStateEngine</code>’s restore capability, it’s possible to produce deltas forever, so that consumers never have to load a snapshot after initialization.  However, if environmental hiccups cause a producer to fail to publish a delta, or if a delta is lost, or if it’s desired to publish a delta between non-adjacent states, then the <code>HollowStateDeltaPatcher</code> may be used to produce deltas between two arbitrary states within the same delta chain.</p>
 <p>The <code>HollowStateDeltaPatcher</code> must produce <em>two</em> delta transitions to create a transition between arbitrary states.  This is because non-adjacent states may have different records occupying the same ordinals.  Since no ordinal may be removed and added in adjacent states, the state patcher must create an intermediate state in which modified records do not share any ordinals.</p>
 <p>See the <code>HollowStateDeltaPatcher</code> javadocs for usage details.</p>
+
+
+
+
+
                 
-                  
-                
-              
-              
-                
-              
-            </article>
-          </div>
+              </article>
+            </div>
+          
+          
         </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </button>
+        
       </main>
       
-        
-<footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid">
-        
-          <a href="../producer-consumer-apis/" title="Producers and Consumers" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
-            </div>
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                Producers and Consumers
-              </span>
-            </div>
-          </a>
-        
-        
-          <a href="../data-modeling/" title="Data Modeling" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                Data Modeling
-              </span>
-            </div>
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
-            </div>
-          </a>
-        
-      </nav>
-    </div>
+        <footer class="md-footer">
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-        powered by
-        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
-        and
-        <a href="http://squidfunk.github.io/mkdocs-material/" title="Material for MkDocs">
-          Material for MkDocs</a>
-      </div>
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
       
-        
-  <div class="md-footer-social">
+        <div class="md-social">
+  
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     
-      <a href="https://github.com/Netflix/hollow" class="md-footer-social__link fa fa-github"></a>
     
-      <a href="https://gitter.im/Netflix/hollow" class="md-footer-social__link fa fa-gitter"></a>
     
-  </div>
-
+      
+      
+    
+    <a href="https://github.com/Netflix/hollow" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://gitter.im/Netflix/hollow" target="_blank" rel="noopener" title="gitter.im" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M66.4 322.5H16V0h50.4v322.5zM166.9 76.1h-50.4V512h50.4V76.1zm100.6 0h-50.4V512h50.4V76.1zM368 76h-50.4v247H368V76z"/></svg>
+    </a>
+  
+</div>
       
     </div>
   </div>
 </footer>
       
     </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
     
-      <script src="../assets/javascripts/application-f3ab9e5ff8.js"></script>
-      
-      
-      <script>app.initialize({url:{base:".."}})</script>
-      
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "content.code.copy", "navigation.indexes", "navigation.instant", "navigation.top", "navigation.tracking", "search.share", "search.highlight", "search.suggest"], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
+      <script src="../assets/javascripts/bundle.51198bba.min.js"></script>
       
     
   </body>
