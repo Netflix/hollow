@@ -31,6 +31,66 @@ public class HollowObjectMapperFlatRecordParserTest {
         mapper.getStateEngine(), new FakeHollowSchemaIdentifierMapper(mapper.getStateEngine()));
   }
 
+  static class V0 {
+    @HollowPrimaryKey(fields={"id"})
+    private static class Movie {
+      private int id;
+      private String name;
+      int year;
+
+      public Movie(int id, String name, int year) {
+        this.id = id;
+        this.name = name;
+        this.year = year;
+      }
+    }
+  }
+
+  static class V1 {
+    @HollowPrimaryKey(fields={"id"})
+    private static class Movie {
+      private String name;
+      private int id;
+
+      public Movie() { }
+
+      public Movie(String name, int id) {
+        this.name = name;
+        this.id = id;
+      }
+    }
+  }
+
+  @Test
+  public void testSimpleSchemaEvolution() {
+    HollowObjectMapper mapper0 = new HollowObjectMapper(new HollowWriteStateEngine());
+    mapper0.initializeTypeState(V0.Movie.class);
+
+    FlatRecordWriter myFlatRecordWriter = new FlatRecordWriter(
+            mapper0.getStateEngine(), new FakeHollowSchemaIdentifierMapper(mapper0.getStateEngine()));
+
+    V0.Movie actual = new V0.Movie(1, "Serde", 2023);
+    mapper0.writeFlat(actual, myFlatRecordWriter);
+    FlatRecord fr = myFlatRecordWriter.generateFlatRecord();
+
+    HollowObjectMapper myMapper1 = new HollowObjectMapper(new HollowWriteStateEngine());
+    myMapper1.initializeTypeState(V1.Movie.class);
+
+    V1.Movie expected = myMapper1.readFlat(fr);
+    Assert.assertEquals(expected.id, actual.id);
+    Assert.assertEquals(expected.name, actual.name);
+  }
+
+  @Test (expected = RuntimeException.class)
+  public void testNoDefaultConstructor() {
+    HollowObjectMapper myMapper = new HollowObjectMapper(new HollowWriteStateEngine());
+    myMapper.initializeTypeState(V0.Movie.class);
+    FlatRecordWriter myFlatRecordWriter = new FlatRecordWriter(
+            myMapper.getStateEngine(), new FakeHollowSchemaIdentifierMapper(myMapper.getStateEngine()));
+    FlatRecord fr = myFlatRecordWriter.generateFlatRecord();
+    myMapper.readFlat(fr);
+  }
+
   @Test
   public void testSimpleTypes() {
     TypeWithAllSimpleTypes typeWithAllSimpleTypes = new TypeWithAllSimpleTypes();
