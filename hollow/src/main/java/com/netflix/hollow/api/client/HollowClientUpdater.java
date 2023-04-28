@@ -28,7 +28,6 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
@@ -130,17 +129,17 @@ public class HollowClientUpdater {
         final HollowConsumer.RefreshListener[] localListeners =
                 refreshListeners.toArray(new HollowConsumer.RefreshListener[0]);
 
+        long beforeVersion = getCurrentVersionId();
+
+        for (HollowConsumer.RefreshListener listener : localListeners)
+            listener.refreshStarted(beforeVersion, requestedVersion);
+
         for(HollowConsumer.RefreshListener listener : localListeners) {
             // both pinning status of the version and headers map is required further
             if (versionInfo.isPinned().isPresent() && versionInfo.getAnnouncementMetadata().isPresent()) {
                 listener.announcementDetected(requestedVersion, versionInfo.getAnnouncementMetadata().get(), versionInfo.isPinned().get());
             }
         }
-
-        long beforeVersion = getCurrentVersionId();
-
-        for (HollowConsumer.RefreshListener listener : localListeners)
-            listener.refreshStarted(beforeVersion, requestedVersion);
 
         try {
             HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan()
