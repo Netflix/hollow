@@ -31,6 +31,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +41,8 @@ import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
 public class HollowObjectTypeMapper extends HollowTypeMapper {
+    
+    private static Set<Class<?>> BOXED_WRAPPERS = new HashSet<>(Arrays.asList(Boolean.class, Integer.class, Short.class, Byte.class, Character.class, Long.class, Float.class, Double.class, String.class, byte[].class));
     
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
     private final HollowObjectMapper parentMapper;
@@ -192,7 +195,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             HollowObjectSchema recordObjectSchema = (HollowObjectSchema) recordSchema;
 
             Object obj;
-            if (schema.numFields() == 1 && schema.getFieldType(0) != HollowObjectSchema.FieldType.REFERENCE) {
+            if (BOXED_WRAPPERS.contains(clazz)) {
                 obj = mappedFields.get(0).parseBoxedWrapper(reader);
             } else  {
                 obj = clazz.newInstance();
@@ -497,7 +500,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     break;
             }
         }
-
+        
         private Object parseBoxedWrapper(FlatRecordReader reader) {
             switch (fieldType) {
                 case BOOLEAN: {

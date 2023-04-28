@@ -61,6 +61,7 @@ public class HollowObjectMapperFlatRecordParserTest {
     typeWithAllSimpleTypes.inlinedCharField = 'a';
     typeWithAllSimpleTypes.inlinedStringField = "inlinedstring";
     typeWithAllSimpleTypes.internalTypeAField = new InternalTypeA(1, "name");
+    typeWithAllSimpleTypes.internalTypeCField = new InternalTypeC("data");
 
     flatRecordWriter.reset();
     mapper.writeFlat(typeWithAllSimpleTypes, flatRecordWriter);
@@ -172,6 +173,7 @@ public class HollowObjectMapperFlatRecordParserTest {
     @HollowInline
     String inlinedStringField;
     InternalTypeA internalTypeAField;
+    InternalTypeC internalTypeCField;
 
     public TypeWithAllSimpleTypes() {}
 
@@ -205,7 +207,8 @@ public class HollowObjectMapperFlatRecordParserTest {
                 Objects.equals(inlinedByteField, other.inlinedByteField) &&
                 Objects.equals(inlinedCharField, other.inlinedCharField) &&
                 Objects.equals(inlinedStringField, other.inlinedStringField) &&
-                Objects.equals(internalTypeAField, other.internalTypeAField);
+                Objects.equals(internalTypeAField, other.internalTypeAField) &&
+                Objects.equals(internalTypeCField, other.internalTypeCField);
         }
         return false;
     }
@@ -433,5 +436,32 @@ public class HollowObjectMapperFlatRecordParserTest {
           ", name='" + name + '\'' +
           '}';
     }
+  }
+  
+  public static class InternalTypeC {
+      @HollowInline
+      String data;
+      
+      public InternalTypeC() { }
+      
+      public InternalTypeC(String data) { 
+          this.data = data;
+      }
+      
+      @Override
+      public boolean equals(Object o) {
+        if(o instanceof InternalTypeC) {
+          InternalTypeC other = (InternalTypeC)o;
+          return data.equals(other.data);
+        }
+        return false;
+      }
+      
+      @Override
+      public String toString() {
+        return "InternalTypeC{" +
+            "data=" + data +
+            '}';
+      }
   }
 }
