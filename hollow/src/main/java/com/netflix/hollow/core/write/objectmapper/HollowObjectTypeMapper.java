@@ -195,7 +195,11 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             if (schema.numFields() == 1 && schema.getFieldType(0) != HollowObjectSchema.FieldType.REFERENCE) {
                 obj = mappedFields.get(0).parseBoxedWrapper(reader);
             } else  {
-                obj = clazz.newInstance();
+                try {
+                    obj = clazz.newInstance();
+                } catch (InstantiationException e) {
+                    throw new IllegalStateException("Default constructor for class " + clazz.getName() + " not accessible", e);
+                }
                 for (int i = 0; i < recordObjectSchema.numFields(); i++) {
                     int posInPojoSchema = schema.getPosition(recordObjectSchema.getFieldName(i));
                     if (posInPojoSchema != -1) {
