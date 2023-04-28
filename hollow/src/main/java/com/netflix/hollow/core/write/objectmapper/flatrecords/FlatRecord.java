@@ -27,9 +27,6 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import java.util.Arrays;
 
-/**
- * Warning: Experimental.  the FlatRecord feature is subject to breaking changes.
- */
 public class FlatRecord {
 
     final HollowSchemaIdentifierMapper schemaIdMapper;
@@ -106,22 +103,22 @@ public class FlatRecord {
         case STRING:
             int length = VarInt.readVInt(data, location);
             location += VarInt.sizeOfVInt(length);
-            
+
             int endLocation = location + length;
-            
+
             char[] s = new char[length];
             int cnt = 0;
-            
+
             while(location < endLocation) {
                 int c = VarInt.readVInt(data, location);
                 s[cnt] = (char)c;
                 location += VarInt.sizeOfVInt(c);
                 cnt++;
             }
-            
+
             if(cnt < s.length)
                 s = Arrays.copyOf(s, cnt);
-            
+
             return new String(s);
         case BYTES:
             length = VarInt.readVInt(data, location);
@@ -143,5 +140,5 @@ public class FlatRecord {
     public RecordPrimaryKey getRecordPrimaryKey() {
         return recordPrimaryKey;
     }
-    
+
 }

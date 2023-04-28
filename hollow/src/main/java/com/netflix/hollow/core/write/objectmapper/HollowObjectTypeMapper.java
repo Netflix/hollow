@@ -20,10 +20,12 @@ import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -32,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import sun.misc.Unsafe;
 
@@ -183,6 +186,32 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         return rec;
     }
     
+    @Override
+    protected Object parseFlatRecord(HollowSchema recordSchema, FlatRecordReader reader, Map<Integer, Object> parsedObjects) {
+        try {
+            HollowObjectSchema recordObjectSchema = (HollowObjectSchema) recordSchema;
+
+            Object obj;
+            if (schema.numFields() == 1 && schema.getFieldType(0) != HollowObjectSchema.FieldType.REFERENCE) {
+                obj = mappedFields.get(0).parseBoxedWrapper(reader);
+            } else  {
+                obj = clazz.newInstance();
+                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
+                    int posInPojoSchema = schema.getPosition(recordObjectSchema.getFieldName(i));
+                    if (posInPojoSchema != -1) {
+                        mappedFields.get(posInPojoSchema).parse(obj, reader, parsedObjects);
+                    } else {
+                        reader.skipField(recordObjectSchema.getFieldType(i));
+                    }
+                }
+            }
+
+            return obj;
+        } catch(Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     Object[] extractPrimaryKey(Object obj) {
         int[][] primaryKeyFieldPathIdx = this.primaryKeyFieldPathIdx;
         
@@ -469,6 +498,231 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
         }
 
+        private Object parseBoxedWrapper(FlatRecordReader reader) {
+            switch (fieldType) {
+                case BOOLEAN: {
+                    return reader.readBoolean();
+                }
+                case INT: {
+                    int value = reader.readInt();
+                    if (value != Integer.MIN_VALUE) {
+                        return Integer.valueOf(value);
+                    }
+                    break;
+                }
+                case SHORT: {
+                    int value = reader.readInt();
+                    if (value != Integer.MIN_VALUE) {
+                        return Short.valueOf((short) value);
+                    }
+                    break;
+                }
+                case BYTE: {
+                    int value = reader.readInt();
+                    if (value != Integer.MIN_VALUE) {
+                        return Byte.valueOf((byte) value);
+                    }
+                    break;
+                }
+                case CHAR: {
+                    int value = reader.readInt();
+                    if (value != Integer.MIN_VALUE) {
+                        return Character.valueOf((char) value);
+                    }
+                    break;
+                }
+                case LONG: {
+                    long value = reader.readLong();
+                    if (value != Long.MIN_VALUE) {
+                        return Long.valueOf(value);
+                    }
+                    break;
+                }
+                case FLOAT: {
+                    float value = reader.readFloat();
+                    if (!Float.isNaN(value)) {
+                        return Float.valueOf(value);
+                    }
+                    break;
+                }
+                case DOUBLE: {
+                    double value = reader.readDouble();
+                    if (!Double.isNaN(value)) {
+                        return Double.valueOf(value);
+                    }
+                    break;
+                }
+                case STRING: {
+                    return reader.readString();
+                }
+                case BYTES: {
+                    return reader.readBytes();
+                }
+            }
+            return null;
+        }
+
+        private void parse(Object obj, FlatRecordReader reader, Map<Integer, Object> parsedRecords) {
+            switch(fieldType) {
+                case BOOLEAN: {
+                    Boolean value = reader.readBoolean();
+                    if (value != null) {
+                        unsafe.putBoolean(obj, fieldOffset, value == Boolean.TRUE);
+                    }
+                    break;
+                }
+                case INT: {
+                    int value = reader.readInt();
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putInt(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case SHORT: {
+                    int value = reader.readInt();
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putShort(obj, fieldOffset, (short) value);
+                    }
+                    break;
+                }
+                case BYTE: {
+                    int value = reader.readInt();
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putByte(obj, fieldOffset, (byte) value);
+                    }
+                    break;
+                }
+                case CHAR: {
+                    int value = reader.readInt();
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putChar(obj, fieldOffset, (char) value);
+                    }
+                    break;
+                }
+                case LONG: {
+                    long value = reader.readLong();
+                    if (value != Long.MIN_VALUE) {
+                        unsafe.putLong(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case FLOAT: {
+                    float value = reader.readFloat();
+                    if (!Float.isNaN(value)) {
+                        unsafe.putFloat(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case DOUBLE: {
+                    double value = reader.readDouble();
+                    if (!Double.isNaN(value)) {
+                        unsafe.putDouble(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case STRING: {
+                    String value = reader.readString();
+                    if (value != null) {
+                        unsafe.putObject(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case BYTES: {
+                    byte[] value = reader.readBytes();
+                    if (value != null) {
+                        unsafe.putObject(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case INLINED_BOOLEAN: {
+                    Boolean value = reader.readBoolean();
+                    if (value != null) {
+                        unsafe.putObject(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case INLINED_INT: {
+                    int value = reader.readInt();
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putObject(obj, fieldOffset, Integer.valueOf(value));
+                    }
+                    break;
+                }
+                case INLINED_SHORT: {
+                    int value = reader.readInt();
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putObject(obj, fieldOffset, Short.valueOf((short) value));
+                    }
+                    break;
+                }
+                case INLINED_BYTE: {
+                    int value = reader.readInt();
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putObject(obj, fieldOffset, Byte.valueOf((byte) value));
+                    }
+                    break;
+                }
+                case INLINED_CHAR: {
+                    int value = reader.readInt();
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putObject(obj, fieldOffset, Character.valueOf((char) value));
+                    }
+                    break;
+                }
+                case INLINED_LONG: {
+                    long value = reader.readLong();
+                    if (value != Long.MIN_VALUE) {
+                        unsafe.putObject(obj, fieldOffset, Long.valueOf(value));
+                    }
+                    break;
+                }
+                case INLINED_FLOAT: {
+                    float value = reader.readFloat();
+                    if (!Float.isNaN(value)) {
+                        unsafe.putObject(obj, fieldOffset, Float.valueOf(value));
+                    }
+                    break;
+                }
+                case INLINED_DOUBLE: {
+                    double value = reader.readDouble();
+                    if (!Double.isNaN(value)) {
+                        unsafe.putObject(obj, fieldOffset, Double.valueOf(value));
+                    }
+                    break;
+                }
+                case INLINED_STRING: {
+                    String value = reader.readString();
+                    if (value != null) {
+                        unsafe.putObject(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case DATE_TIME: {
+                    long value = reader.readLong();
+                    if (value != Long.MIN_VALUE) {
+                        unsafe.putObject(obj, fieldOffset, new Date(value));
+                    }
+                    break;
+                }
+                case ENUM_NAME: {
+                    String value = reader.readString();
+                    if (value != null) {
+                        unsafe.putObject(obj, fieldOffset, Enum.valueOf((Class) type, value));
+                    }
+                    break;
+                }
+                case REFERENCE: {
+                    int ordinal = reader.readOrdinal();
+                    if (ordinal != -1) {
+                        unsafe.putObject(obj, fieldOffset, parsedRecords.get(ordinal));
+                    }
+                    break;
+                }
+                default:
+                    throw new IllegalArgumentException("Unknown field type: " + fieldType);
+            }
+        }
+        
         public Object retrieveFieldValue(Object obj, int[] fieldPathIdx, int idx) {
             Object fieldObject;
 
@@ -548,7 +802,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             throw new IllegalArgumentException("Expected char[] or String value container for STRING.");
         }
     }
-    
+
     private static enum MappedFieldType {
         BOOLEAN(FieldType.BOOLEAN),
         NULLABLE_PRIMITIVE_BOOLEAN(FieldType.BOOLEAN),

@@ -38,9 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Warning: Experimental.  the FlatRecord feature is subject to breaking changes.
- */
 public class FlatRecordWriter {
 
     private final HollowDataset dataset;
