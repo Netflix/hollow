@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,9 +60,7 @@ public class HollowObjectMapperFlatRecordParserTest {
     typeWithAllSimpleTypes.inlinedByteField = (byte) 1;
     typeWithAllSimpleTypes.inlinedCharField = 'a';
     typeWithAllSimpleTypes.inlinedStringField = "inlinedstring";
-    typeWithAllSimpleTypes.internalTypeAField = new InternalTypeA();
-    typeWithAllSimpleTypes.internalTypeAField.id = 1;
-    typeWithAllSimpleTypes.internalTypeAField.name = "name";
+    typeWithAllSimpleTypes.internalTypeAField = new InternalTypeA(1, "name");
 
     flatRecordWriter.reset();
     mapper.writeFlat(typeWithAllSimpleTypes, flatRecordWriter);
@@ -78,9 +77,8 @@ public class HollowObjectMapperFlatRecordParserTest {
     type.id = 1;
     type.stringList = Arrays.asList("a", "b", "c");
     type.stringSet = new HashSet<>(type.stringList);
-    // we are in Java 8
     type.integerStringMap = type.stringList.stream().collect(
-        java.util.stream.Collectors.toMap(
+        Collectors.toMap(
             s -> type.stringList.indexOf(s),
             s -> s
         )
@@ -88,13 +86,13 @@ public class HollowObjectMapperFlatRecordParserTest {
     type.internalTypeAList = Arrays.asList(new InternalTypeA(1), new InternalTypeA(2));
     type.internalTypeASet = new HashSet<>(type.internalTypeAList);
     type.integerInternalTypeAMap = type.internalTypeAList.stream().collect(
-        java.util.stream.Collectors.toMap(
+        Collectors.toMap(
             b -> b.id,
             b -> b
         )
     );
     type.internalTypeAStringMap = type.internalTypeAList.stream().collect(
-        java.util.stream.Collectors.toMap(
+        Collectors.toMap(
             b -> b,
             b -> b.name
         )
@@ -108,7 +106,6 @@ public class HollowObjectMapperFlatRecordParserTest {
 
     Assert.assertEquals(type, result);
   }
-
 
   @Test
   public void testMapFromVersionedTypes() {
@@ -130,10 +127,10 @@ public class HollowObjectMapperFlatRecordParserTest {
 
     VersionedType1 result = readerMapper.readFlat(fr);
 
-    Assert.assertEquals(null, result.stringField);
+    Assert.assertEquals(null, result.stringField); // stringField is not present in VersionedType1
     Assert.assertEquals(versionedType2.boxedIntegerField, result.boxedIntegerField);
     Assert.assertEquals(versionedType2.primitiveDoubleField, result.primitiveDoubleField, 0);
-    Assert.assertEquals(null, result.internalTypeAField);
+    Assert.assertEquals(null, result.internalTypeAField); // internalTypeAField is not present in VersionedType1
     Assert.assertEquals(versionedType2.stringSet, result.stringSet);
   }
 

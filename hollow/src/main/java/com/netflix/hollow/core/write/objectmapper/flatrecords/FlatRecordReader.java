@@ -6,7 +6,6 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 
-
 public class FlatRecordReader {
   private final FlatRecord record;
 

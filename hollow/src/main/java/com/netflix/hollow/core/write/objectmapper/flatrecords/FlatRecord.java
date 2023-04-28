@@ -27,15 +27,12 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import java.util.Arrays;
 
-/**
- * Warning: Experimental.  the FlatRecord feature is subject to breaking changes.
- */
 public class FlatRecord {
 
-    public final HollowSchemaIdentifierMapper schemaIdMapper;
-    public final ByteData data;
-    public final int dataStartByte;
-    public final int dataEndByte;
+    final HollowSchemaIdentifierMapper schemaIdMapper;
+    final ByteData data;
+    final int dataStartByte;
+    final int dataEndByte;
     final RecordPrimaryKey recordPrimaryKey;
 
     public FlatRecord(ByteData recordData, HollowSchemaIdentifierMapper schemaIdMapper) {
