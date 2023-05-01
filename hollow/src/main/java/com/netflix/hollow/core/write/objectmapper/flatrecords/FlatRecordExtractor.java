@@ -63,6 +63,9 @@ public class FlatRecordExtractor {
     }
     
     private void extractHollowRecord(HollowTypeReadState typeState, int ordinal) {
+        if(ordinal == -1)
+            return;
+
         traverse(typeState, ordinal);
         
         String type = typeState.getSchema().getName();
