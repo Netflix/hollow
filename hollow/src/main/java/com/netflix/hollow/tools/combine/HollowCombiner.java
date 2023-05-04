@@ -393,7 +393,7 @@ public class HollowCombiner {
             HollowCombinerCopier copier = iter.next();
             HollowTypeReadState readTypeState = copier.getReadTypeState();
 
-            if(currentOrdinal <= readTypeState.maxOrdinal()) {
+            if(currentOrdinal <= readTypeState.maxOrdinal() && readTypeState.getPopulatedOrdinals().get(currentOrdinal)) {
                 if(copyDirector.shouldCopy(readTypeState, currentOrdinal))
                     copier.copy(currentOrdinal);
             } else {
