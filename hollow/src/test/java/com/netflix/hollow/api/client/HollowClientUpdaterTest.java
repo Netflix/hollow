@@ -23,11 +23,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.HollowConsumer.AbstractRefreshListener;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -37,6 +41,7 @@ import com.netflix.hollow.test.HollowWriteStateEngineBuilder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -143,11 +148,28 @@ public class HollowClientUpdaterTest {
         when(retriever.retrieveSnapshotBlob(anyLong()))
                 .thenReturn(blob);
 
+        AtomicBoolean listenerCalled = new AtomicBoolean(false);
+        subject.addRefreshListener(new AbstractRefreshListener() {
+            @Override
+            public void refreshSuccessful(long beforeVersion, long afterVersion,
+                long requestedVersion) {
+                listenerCalled.set(true);
+                // verify metrics are correct when calling the callback
+                verify(metrics)
+                    .updateTypeStateMetrics(any(HollowReadStateEngine.class), eq(requestedVersion));
+            }
+        }, null);
+
         // such act
         subject.updateTo(VERSION_LATEST);
 
         // amaze!
         assertTrue(subject.getInitialLoad().isDone());
+
+        // verify metrics were updated
+        verify(metrics)
+            .updateTypeStateMetrics(any(HollowReadStateEngine.class), eq(VERSION_LATEST));
+        assertTrue(listenerCalled.get());
 
         // test exception msg when subsequent update fails to fetch qualifying versions
         long v = Long.MAX_VALUE - 1;
