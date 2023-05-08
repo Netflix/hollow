@@ -67,7 +67,6 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         namespacePinnedPreviously = false;
     }
 
-    @Override
     public void refreshStarted(long currentVersion, long requestedVersion) {
         updatePlanDetails = new ConsumerRefreshMetrics.UpdatePlanDetails();
         refreshStartTimeNano = System.nanoTime();
@@ -75,7 +74,23 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         refreshMetricsBuilder.setIsInitialLoad(currentVersion == VERSION_NONE);
         refreshMetricsBuilder.setUpdatePlanDetails(updatePlanDetails);
         cycleVersionStartTimes.clear(); // clear map to avoid accumulation over time
+    }
+
+    @Override
+    public void versionDetected(HollowConsumer.VersionInfo requestedVersionInfo) {
         announcementTimestamps.clear(); // clear map to avoid accumulation over time
+        if (!(requestedVersionInfo.isPinned().isPresent() && requestedVersionInfo.getAnnouncementMetadata().isPresent())) {
+            return;
+        }
+        boolean isPinned = requestedVersionInfo.isPinned().get();
+        // Track the version to announcement timestamp only when the namespace is not pinned (either in previous cycle
+        // or for the newVersion). Don't record this metric when a namespace was pinned previously and gets unpinned
+        // in the next cycle because this metric will record the refresh duration from the latest announced version.
+        if (!(namespacePinnedPreviously || isPinned)) {
+            trackTimestampsFromHeaders(requestedVersionInfo.getVersion(),
+                    requestedVersionInfo.getAnnouncementMetadata().get(), HEADER_TAG_METRIC_ANNOUNCEMENT, announcementTimestamps);
+        }
+        namespacePinnedPreviously = isPinned;
     }
 
     /**
@@ -124,16 +139,22 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         }
     }
 
-    @Override
-    public void announcementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {
-        // Track the version to announcement timestamp only when the namespace is not pinned (either in previous cycle
-        // or for the newVersion). Don't record this metric when a namespace was pinned previously and gets unpinned
-        // in the next cycle because this metric will record the refresh duration from the latest announced version.
-        if (!(namespacePinnedPreviously || isPinned)) {
-            trackTimestampsFromHeaders(newVersion, metadata, HEADER_TAG_METRIC_ANNOUNCEMENT, announcementTimestamps);
-        }
-        namespacePinnedPreviously = isPinned;
-    }
+//    @Override
+//    public void tbd(HollowConsumer.VersionInfo requestedVersionInfo) {
+//        announcementTimestamps.clear(); // clear map to avoid accumulation over time
+//        if (!(requestedVersionInfo.isPinned().isPresent() && requestedVersionInfo.getAnnouncementMetadata().isPresent())) {
+//            return;
+//        }
+//        boolean isPinned = requestedVersionInfo.isPinned().get();
+//        // Track the version to announcement timestamp only when the namespace is not pinned (either in previous cycle
+//        // or for the newVersion). Don't record this metric when a namespace was pinned previously and gets unpinned
+//        // in the next cycle because this metric will record the refresh duration from the latest announced version.
+//        if (!(namespacePinnedPreviously || isPinned)) {
+//            trackTimestampsFromHeaders(requestedVersionInfo.getVersion(),
+//                    requestedVersionInfo.getAnnouncementMetadata().get(), HEADER_TAG_METRIC_ANNOUNCEMENT, announcementTimestamps);
+//        }
+//        namespacePinnedPreviously = isPinned;
+//    }
 
     @Override
     public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {

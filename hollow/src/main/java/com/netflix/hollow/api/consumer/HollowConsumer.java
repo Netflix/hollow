@@ -822,14 +822,13 @@ public class HollowConsumer {
      */
     public interface RefreshListener {
         /**
-         * Indicates that announcement information for new version has been detected. This information can be either be
-         * recorded or used in computing different metrics within Hollow.
+         * Indicates that a new version has been detected. This method requires the requested version's information
+         * {@link HollowConsumer.VersionInfo} comprising the version, its announcement metadata and pinned status
+         * to either record or compute different metrics within Hollow.
          *
-         * @param newVersion new announced version long value
-         * @param metadata map of headers and values
-         * @param isPinned pinned status of the newVersion
+         * @param requestedVersionInfo requested version's information comprising version, announcement metadata and its pinned status
          * */
-        default void announcementDetected(long newVersion, Map<String, String> metadata, boolean isPinned) {};
+        default void versionDetected(VersionInfo requestedVersionInfo) {};
         /**
          * Indicates that a refresh has begun.  Generally useful for logging.
          * <p>

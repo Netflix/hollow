@@ -36,6 +36,8 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.test.HollowWriteStateEngineBuilder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Before;
 import org.junit.Rule;
@@ -156,5 +158,17 @@ public class HollowClientUpdaterTest {
                 + "version or any qualifying previous versions could not be retrieved. Consumer will remain at current "
                 + "version %s until next update attempt.", v, subject.getCurrentVersionId()));
         subject.updateTo(v);
+    }
+
+    @Test
+    public void testUpdateTo_pinnedVersion() {
+        long pinnedVersion = 1000L;
+        HashMap<String, String> annData = new HashMap<>();
+        try {
+            subject.updateTo(new HollowConsumer.VersionInfo(pinnedVersion, Optional.of(annData), Optional.of(Boolean.TRUE)));
+        } catch(Throwable ex) {
+            // do nothing
+        }
+
     }
 }
