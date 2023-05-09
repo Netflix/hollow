@@ -110,6 +110,10 @@ public class HollowClientUpdater {
      * under us.
      */
     public synchronized boolean updateTo(long requestedVersion) throws Throwable {
+        return updateTo(new HollowConsumer.VersionInfo(requestedVersion));
+    }
+    public synchronized boolean updateTo(HollowConsumer.VersionInfo requestedVersionInfo) throws Throwable {
+        long requestedVersion = requestedVersionInfo.getVersion();
         if (requestedVersion == getCurrentVersionId()) {
             if (requestedVersion == HollowConstants.VERSION_NONE && hollowDataHolderVolatile == null) {
                 LOG.warning("No versions to update to, initializing to empty state");
@@ -125,10 +129,15 @@ public class HollowClientUpdater {
         final HollowConsumer.RefreshListener[] localListeners =
                 refreshListeners.toArray(new HollowConsumer.RefreshListener[0]);
 
+        for (HollowConsumer.RefreshListener listener : localListeners) {
+            listener.versionDetected(requestedVersionInfo);
+        }
+
         long beforeVersion = getCurrentVersionId();
 
-        for (HollowConsumer.RefreshListener listener : localListeners)
+        for (HollowConsumer.RefreshListener listener : localListeners) {
             listener.refreshStarted(beforeVersion, requestedVersion);
+        }
 
         try {
             HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan()

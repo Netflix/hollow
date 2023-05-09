@@ -123,7 +123,7 @@ public class HollowClient {
      */
     public void triggerRefresh() {
         try {
-            updater.updateTo(announcementWatcher.getLatestVersion());
+            updater.updateTo(announcementWatcher.getLatestVersionInfo());
         } catch(Throwable th) {
             throw new RuntimeException(th);
         }

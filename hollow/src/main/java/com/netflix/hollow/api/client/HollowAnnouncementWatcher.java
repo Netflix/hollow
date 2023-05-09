@@ -62,6 +62,12 @@ public abstract class HollowAnnouncementWatcher {
     }
 
     /**
+     * @return the latest announced version info comprising announced version, metadata and pinned status of this version.
+     */
+    public HollowConsumer.VersionInfo getLatestVersionInfo() {
+        return new HollowConsumer.VersionInfo(getLatestVersion());}
+
+    /**
      * @return the latest announced version.
      */
     public abstract long getLatestVersion();

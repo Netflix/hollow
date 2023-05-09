@@ -1,6 +1,7 @@
 package com.netflix.hollow.api.consumer.metrics;
 
 import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_ANNOUNCEMENT;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,6 +28,7 @@ public class AbstractRefreshMetricsListenerTest {
     private final long TEST_VERSION_LOW = 123l;
     private final long TEST_VERSION_HIGH = 456l;
     private final long TEST_CYCLE_START_TIMESTAMP = System.currentTimeMillis();
+    private final long TEST_ANNOUNCEMENT_TIMESTAMP = System.currentTimeMillis() + 5000l;
 
     private Map<String, String> testHeaderTags = new HashMap<>();
     protected TestRefreshMetricsListener concreteRefreshMetricsListener;
@@ -125,12 +127,14 @@ public class AbstractRefreshMetricsListenerTest {
                 assertEquals(0l, refreshMetrics.getRefreshSuccessAgeMillisOptional().getAsLong());
                 Assert.assertNotEquals(0l, refreshMetrics.getRefreshEndTimeNano());
                 assertEquals(TEST_CYCLE_START_TIMESTAMP, refreshMetrics.getCycleStartTimestamp().getAsLong());
+                assertEquals(TEST_ANNOUNCEMENT_TIMESTAMP, refreshMetrics.getAnnouncementTimestamp().getAsLong());
             }
         }
         SuccessTestRefreshMetricsListener successTestRefreshMetricsListener = new SuccessTestRefreshMetricsListener();
         successTestRefreshMetricsListener.refreshStarted(TEST_VERSION_LOW, TEST_VERSION_HIGH);
 
         testHeaderTags.put(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(TEST_CYCLE_START_TIMESTAMP));
+        testHeaderTags.put(HEADER_TAG_METRIC_ANNOUNCEMENT, String.valueOf(TEST_ANNOUNCEMENT_TIMESTAMP));
         successTestRefreshMetricsListener.snapshotUpdateOccurred(null, mockStateEngine, TEST_VERSION_HIGH);
 
         successTestRefreshMetricsListener.refreshSuccessful(TEST_VERSION_LOW, TEST_VERSION_HIGH, TEST_VERSION_HIGH);
@@ -146,6 +150,7 @@ public class AbstractRefreshMetricsListenerTest {
                 Assert.assertNotEquals(Optional.empty(), refreshMetrics.getRefreshSuccessAgeMillisOptional());
                 Assert.assertNotEquals(0l, refreshMetrics.getRefreshEndTimeNano());
                 Assert.assertFalse(refreshMetrics.getCycleStartTimestamp().isPresent());
+                Assert.assertFalse(refreshMetrics.getAnnouncementTimestamp().isPresent());
             }
         }
         FailureTestRefreshMetricsListener failTestRefreshMetricsListener = new FailureTestRefreshMetricsListener();
@@ -161,6 +166,7 @@ public class AbstractRefreshMetricsListenerTest {
             public void refreshEndMetricsReporting(ConsumerRefreshMetrics refreshMetrics) {
                 assertEquals(3, refreshMetrics.getUpdatePlanDetails().getNumSuccessfulTransitions());
                 assertEquals(TEST_CYCLE_START_TIMESTAMP, refreshMetrics.getCycleStartTimestamp().getAsLong());
+                assertEquals(TEST_ANNOUNCEMENT_TIMESTAMP, refreshMetrics.getAnnouncementTimestamp().getAsLong());
             }
         }
         List<HollowConsumer.Blob.BlobType> testTransitionSequence = new ArrayList<HollowConsumer.Blob.BlobType>() {{
@@ -175,14 +181,17 @@ public class AbstractRefreshMetricsListenerTest {
 
         successTestRefreshMetricsListener.blobLoaded(null);
         testHeaderTags.put(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(TEST_CYCLE_START_TIMESTAMP-2));
+        testHeaderTags.put(HEADER_TAG_METRIC_ANNOUNCEMENT, String.valueOf(TEST_ANNOUNCEMENT_TIMESTAMP-2));
         successTestRefreshMetricsListener.deltaUpdateOccurred(null, mockStateEngine, TEST_VERSION_HIGH-2);
 
         successTestRefreshMetricsListener.blobLoaded(null);
         testHeaderTags.put(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(TEST_CYCLE_START_TIMESTAMP-1));
+        testHeaderTags.put(HEADER_TAG_METRIC_ANNOUNCEMENT, String.valueOf(TEST_ANNOUNCEMENT_TIMESTAMP-1));
         successTestRefreshMetricsListener.deltaUpdateOccurred(null, mockStateEngine, TEST_VERSION_HIGH-1);
 
         successTestRefreshMetricsListener.blobLoaded(null);
         testHeaderTags.put(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(TEST_CYCLE_START_TIMESTAMP));
+        testHeaderTags.put(HEADER_TAG_METRIC_ANNOUNCEMENT, String.valueOf(TEST_ANNOUNCEMENT_TIMESTAMP));
         successTestRefreshMetricsListener.deltaUpdateOccurred(null, mockStateEngine, TEST_VERSION_HIGH);
 
         successTestRefreshMetricsListener.refreshSuccessful(TEST_VERSION_LOW, TEST_VERSION_HIGH, TEST_VERSION_HIGH);
