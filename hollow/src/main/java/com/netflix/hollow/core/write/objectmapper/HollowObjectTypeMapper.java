@@ -188,15 +188,24 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         }
         return rec;
     }
-    
+
     @Override
     protected Object parseFlatRecord(HollowSchema recordSchema, FlatRecordReader reader, Map<Integer, Object> parsedObjects) {
         try {
             HollowObjectSchema recordObjectSchema = (HollowObjectSchema) recordSchema;
 
-            Object obj;
+            Object obj = null;
             if (BOXED_WRAPPERS.contains(clazz)) {
-                obj = mappedFields.get(0).parseBoxedWrapper(reader);
+                // if `clazz` is a BoxedWrapper then by definition its OBJECT schema will have a single primitive
+                // field so find it in the FlatRecord and ignore all other fields.
+                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
+                    int posInPojoSchema = schema.getPosition(recordObjectSchema.getFieldName(i));
+                    if (posInPojoSchema != -1) {
+                        obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(reader);
+                    } else {
+                        reader.skipField(recordObjectSchema.getFieldType(i));
+                    }
+                }
             } else  {
                 obj = clazz.newInstance();
                 for (int i = 0; i < recordObjectSchema.numFields(); i++) {
