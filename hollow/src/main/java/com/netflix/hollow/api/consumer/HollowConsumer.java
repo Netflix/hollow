@@ -293,11 +293,22 @@ public class HollowConsumer {
      * @param version the version to refresh to
      */
     public void triggerRefreshTo(long version) {
+        triggerRefreshTo(new VersionInfo(version));
+    }
+
+    /**
+     * Similar to {@link #triggerRefreshTo(long)} but instead of accepting a long version no. it accepts a
+     * {@link VersionInfo} instance that contains (in addition to version no.) version specific metadata and
+     * pinning status.
+     *
+     * @param versionInfo version no., metadata, and pined status for the desired version
+     */
+    public void triggerRefreshTo(VersionInfo versionInfo) {
         if (announcementWatcher != null)
             throw new UnsupportedOperationException("Cannot trigger refresh to specified version when a HollowConsumer.AnnouncementWatcher is present");
 
         try {
-            updater.updateTo(version);
+            updater.updateTo(versionInfo);
         } catch (Error | RuntimeException e) {
             throw e;
         } catch (Throwable t) {
@@ -691,6 +702,8 @@ public class HollowConsumer {
 
         int maxDeltasBeforeDoubleSnapshot();
 
+        default boolean doubleSnapshotOnSchemaChange() { return false; }
+
         DoubleSnapshotConfig DEFAULT_CONFIG = new DoubleSnapshotConfig() {
             @Override
             public int maxDeltasBeforeDoubleSnapshot() {
@@ -831,6 +844,7 @@ public class HollowConsumer {
          * @param requestedVersionInfo requested version's information comprising version, announcement metadata and its pinned status
          * */
         default void versionDetected(VersionInfo requestedVersionInfo) {};
+
         /**
          * Indicates that a refresh has begun.  Generally useful for logging.
          * <p>

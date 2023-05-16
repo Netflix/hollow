@@ -43,9 +43,14 @@ public interface HollowStateEngine extends HollowDataset {
      * A header tag indicating that the schema has changed from that of the prior version.
      * <p>
      * If the header tag is present in the state engine and the value is "true" (ignoring case)
-     * then the schema has changed from that of the the prior version.
+     * then the schema has changed from that of the prior version.
      */
     String HEADER_TAG_SCHEMA_CHANGE = "hollow.schema.changedFromPriorVersion";
+
+    /**
+     * A header tag containing the hash of serialized hollow schema.
+     */
+    String HEADER_TAG_SCHEMA_HASH = "hollow.schema.hash";
 
     /**
      * A header tag indicating the timestamp in milliseconds of when the producer cycle started

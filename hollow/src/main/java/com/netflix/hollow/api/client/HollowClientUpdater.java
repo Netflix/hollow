@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.api.client;
 
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_SCHEMA_HASH;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
@@ -26,8 +28,10 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
+import com.netflix.hollow.core.schema.HollowSchemaHash;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
@@ -140,7 +144,7 @@ public class HollowClientUpdater {
         }
 
         try {
-            HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan()
+            HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan(requestedVersionInfo)
                 ? planner.planInitializingUpdate(requestedVersion)
                 : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersion,
                         doubleSnapshotConfig.allowDoubleSnapshot());
@@ -251,9 +255,44 @@ public class HollowClientUpdater {
     /**
      * Whether or not a snapshot plan should be created. Visible for testing.
      */
-    boolean shouldCreateSnapshotPlan() {
-        return getCurrentVersionId() == HollowConstants.VERSION_NONE
-            ||  (forceDoubleSnapshot && doubleSnapshotConfig.allowDoubleSnapshot());
+    boolean shouldCreateSnapshotPlan(HollowConsumer.VersionInfo incomingVersionInfo) {
+        if (getCurrentVersionId() == HollowConstants.VERSION_NONE
+        || (forceDoubleSnapshot && doubleSnapshotConfig.allowDoubleSnapshot())) {
+            return true;
+        }
+
+        if (doubleSnapshotConfig.doubleSnapshotOnSchemaChange() == true) {
+            // double snapshot on schema change relies on presence of a header tag in incoming version metadata
+            if (incomingVersionInfo.getAnnouncementMetadata() == null
+             || !incomingVersionInfo.getAnnouncementMetadata().isPresent()) {
+                LOG.warning("Double snapshots on schema change are enabled and its functioning depends on " +
+                        "visibility into incoming version's schema through metadata but NO metadata was available " +
+                        "for version " + incomingVersionInfo.getVersion() + ". Check that the mechanism that triggered " +
+                        "the refresh (usually announcementWatcher) supports passing version metadata. This refresh will " +
+                        "not be able to reflect any schema changes.");
+                return false;
+            }
+            Map<String, String> metadata = incomingVersionInfo.getAnnouncementMetadata().get();
+            if (metadata.get(HEADER_TAG_SCHEMA_HASH) == null) {
+                LOG.warning("Double snapshots on schema change are enabled but version metadata for incoming " +
+                        "version " + incomingVersionInfo.getVersion() + " did not contain the required attribute (" +
+                        HEADER_TAG_SCHEMA_HASH + "). Check that the producer supports setting this attribute. This " +
+                        "refresh will not be able to reflect any schema changes.");
+                return false;
+            }
+            if (!doubleSnapshotConfig.allowDoubleSnapshot()) {
+                LOG.warning("Auto double snapshots on schema changes are enabled but double snapshots on consumer " +
+                        "are prohibited by doubleSnapshotConfig. This refresh will not be able to reflect any schema changes.");
+                return false;
+            }
+
+            String incoming = metadata.get(HEADER_TAG_SCHEMA_HASH);
+            String current = (new HollowSchemaHash(getStateEngine().getSchemas())).getHash();
+            if (!current.equals(incoming)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private HollowDataHolder newHollowDataHolder() {
