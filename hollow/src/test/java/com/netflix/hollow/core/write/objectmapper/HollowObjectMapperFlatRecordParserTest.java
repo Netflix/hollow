@@ -135,6 +135,53 @@ public class HollowObjectMapperFlatRecordParserTest {
     Assert.assertEquals(versionedType2.stringSet, result.stringSet);
   }
 
+  @Test
+  public void shouldMapNonPrimitiveWrapperToPrimitiveWrapperIfCommonFieldIsTheSame() {
+    HollowObjectMapper writerMapper = new HollowObjectMapper(new HollowWriteStateEngine());
+    writerMapper.initializeTypeState(TypeStateA1.class);
+
+    FlatRecordWriter flatRecordWriter = new FlatRecordWriter(
+            writerMapper.getStateEngine(), new FakeHollowSchemaIdentifierMapper(writerMapper.getStateEngine()));
+
+    TypeStateA1 typeStateA1 = new TypeStateA1();
+    typeStateA1.id = 1;
+    typeStateA1.subValue = new SubValue();
+    typeStateA1.subValue.value = "value";
+
+    writerMapper.writeFlat(typeStateA1, flatRecordWriter);
+    FlatRecord fr = flatRecordWriter.generateFlatRecord();
+
+    HollowObjectMapper readerMapper = new HollowObjectMapper(new HollowWriteStateEngine());
+    readerMapper.initializeTypeState(TypeStateA2.class);
+
+    TypeStateA2 result = readerMapper.readFlat(fr);
+
+    Assert.assertEquals("value", result.subValue);
+  }
+
+  @Test
+  public void shouldMapPrimitiveWrapperToNonPrimitiveWrapperIfCommonFieldIsTheSame() {
+    HollowObjectMapper writerMapper = new HollowObjectMapper(new HollowWriteStateEngine());
+    writerMapper.initializeTypeState(TypeStateA2.class);
+
+    FlatRecordWriter flatRecordWriter = new FlatRecordWriter(
+            writerMapper.getStateEngine(), new FakeHollowSchemaIdentifierMapper(writerMapper.getStateEngine()));
+
+    TypeStateA2 typeStateA2 = new TypeStateA2();
+    typeStateA2.id = 1;
+    typeStateA2.subValue = "value";
+
+    writerMapper.writeFlat(typeStateA2, flatRecordWriter);
+    FlatRecord fr = flatRecordWriter.generateFlatRecord();
+
+    HollowObjectMapper readerMapper = new HollowObjectMapper(new HollowWriteStateEngine());
+    readerMapper.initializeTypeState(TypeStateA1.class);
+
+    TypeStateA1 result = readerMapper.readFlat(fr);
+
+    Assert.assertEquals("value", result.subValue.value);
+  }
+
   @HollowPrimaryKey(fields={"boxedIntegerField", "stringField"})
   private static class TypeWithAllSimpleTypes {
     Integer boxedIntegerField;
@@ -463,5 +510,27 @@ public class HollowObjectMapperFlatRecordParserTest {
             "data=" + data +
             '}';
       }
+  }
+
+  @HollowTypeName(name="TypeStateA")
+  @HollowPrimaryKey(fields="id")
+  public static class TypeStateA1 {
+    public int id;
+    public SubValue subValue;
+  }
+
+  @HollowTypeName(name="TypeStateA")
+  @HollowPrimaryKey(fields="id")
+  public static class TypeStateA2 {
+    public int id;
+    @HollowTypeName(name="SubValue")
+    public String subValue;
+  }
+
+  public static class SubValue {
+    @HollowInline
+    public String value;
+    @HollowInline
+    public String anotherValue;
   }
 }
