@@ -1,6 +1,6 @@
 package com.netflix.hollow.core.memory.encoding;
 
-import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
+import static java.nio.channels.FileChannel.MapMode.READ_WRITE;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
@@ -99,7 +99,7 @@ public final class BlobByteBuffer {
             int cap = i == (bufferCount - 1)
                     ? (int)(size - pos)
                     : bufferCapacity;
-            ByteBuffer buffer = channel.map(READ_ONLY, pos, cap);
+            ByteBuffer buffer = channel.map(READ_WRITE, pos, cap);
             /*
              * if (!((MappedByteBuffer) buffer).isLoaded()) // TODO(timt): make pre-fetching configurable
              *    ((MappedByteBuffer) buffer).load();
@@ -152,6 +152,29 @@ public final class BlobByteBuffer {
         }
     }
 
+    public void putByte(long index, byte value) {
+        if (index < 0 || index >= (this.capacity+1) << 6) {
+            throw new IllegalStateException("Attempting to write a byte out of bounds");
+        }
+
+        if (index < capacity) {
+            int spineIndex = (int)(index >>> (shift));
+            int bufferIndex = (int)(index & mask);
+            spine[spineIndex].put(bufferIndex, value);
+        }
+        else {
+            assert(index < capacity + Long.BYTES);
+            // this situation occurs when write for bits near the end of the buffer requires writing a long value that
+            // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case, ignore writes to
+            // (index >= capacity - Long.BYTES && index < capacity )
+            // these zero bytes will be discarded anyway when the returned long value is shifted to get the queried bits
+            // these bytes should not hold a value
+            if (value != 0) {
+                throw new IllegalStateException("Attempting to write a byte beyond the max buffer capacity");
+            }
+        }
+    }
+
     /**
      * Return the long value starting from given byte index. This method is thread safe.
      * @param startByteIndex byte index (from offset 0 in the backing BlobByteBuffer) at which to start reading long value
@@ -175,6 +198,25 @@ public final class BlobByteBuffer {
                 (((long) (bytes[2] & 0xff)) << 16) |
                 (((long) (bytes[1] & 0xff)) <<  8) |
                 (((long) (bytes[0] & 0xff))      ));
+    }
+
+    public void putLong(long startByteIndex, long value) {
+        int alignmentOffset = (int) (startByteIndex - this.position()) % Long.BYTES;
+        long nextAlignedPos = startByteIndex - alignmentOffset + Long.BYTES;
+
+        byte[] bytes = new byte[Long.BYTES];
+        bytes[0] = (byte) (value & 0x000000ff);
+        bytes[1] = (byte) ((value >>> 8)  & 0x000000ff);
+        bytes[2] = (byte) ((value >>> 16) & 0x000000ff);
+        bytes[3] = (byte) ((value >>> 24) & 0x000000ff);
+        bytes[4] = (byte) ((value >>> 32) & 0x000000ff);
+        bytes[5] = (byte) ((value >>> 40) & 0x000000ff);
+        bytes[6] = (byte) ((value >>> 48) & 0x000000ff);
+        bytes[7] = (byte) ((value >>> 56) & 0x000000ff);
+
+        for (int i = 0; i < Long.BYTES; i++) {
+            putByte(bigEndian(startByteIndex + i, nextAlignedPos), bytes[i]);
+        }
     }
 
     /**

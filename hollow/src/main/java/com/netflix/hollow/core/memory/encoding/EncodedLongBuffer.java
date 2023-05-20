@@ -132,7 +132,16 @@ public class EncodedLongBuffer implements FixedLengthData {
 
     @Override
     public void setElementValue(long index, int bitsPerElement, long value) {
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+        long whichByte = index >>> 3;
+        int whichBit = (int) (index & 0x3F);
+        this.bufferView.putLong(this.bufferView.position() + whichByte,
+                this.bufferView.getLong(this.bufferView.position() + whichByte) | (value << whichBit));
+
+        int bitsRemaining = 64 - whichBit;
+
+        if (bitsRemaining < bitsPerElement)
+            this.bufferView.putLong(this.bufferView.position() + whichByte + 1,
+                    this.bufferView.getLong(this.bufferView.position() + whichByte + 1) | (value >>> bitsRemaining));
     }
 
     @Override
