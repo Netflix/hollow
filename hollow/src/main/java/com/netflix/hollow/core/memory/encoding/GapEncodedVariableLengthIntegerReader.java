@@ -17,7 +17,10 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.ByteDataArray;
-import com.netflix.hollow.core.memory.SegmentedByteArray;
+import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.memory.VariableLengthData;
+import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.util.IOUtils;
@@ -36,14 +39,14 @@ public class GapEncodedVariableLengthIntegerReader {
         }
     };
 
-    private final SegmentedByteArray data;
+    private final VariableLengthData data;
     private final int numBytes;
     private int currentPosition;
 
     private int nextElement;
     private int elementIndex;
 
-    public GapEncodedVariableLengthIntegerReader(SegmentedByteArray data, int numBytes) {
+    public GapEncodedVariableLengthIntegerReader(VariableLengthData data, int numBytes) {
         this.data = data;
         this.numBytes = numBytes;
         reset();
@@ -90,7 +93,7 @@ public class GapEncodedVariableLengthIntegerReader {
 
     public void destroy() {
         if(data != null)
-            data.destroy();
+            VariableLengthDataFactory.destroy(data);
     }
     
     public void writeTo(OutputStream os) throws IOException {
@@ -99,11 +102,11 @@ public class GapEncodedVariableLengthIntegerReader {
     }
 
     public static GapEncodedVariableLengthIntegerReader readEncodedDeltaOrdinals(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
-        SegmentedByteArray arr = new SegmentedByteArray(memoryRecycler);
+        VariableLengthData data = VariableLengthDataFactory.get(in.getMemoryMode(), memoryRecycler);
         long numBytesEncodedOrdinals = VarInt.readVLong(in);
-        LOG.info("SNAP: numBytesEncodedOrdinals (currently on heap)= " + numBytesEncodedOrdinals);
-        arr.loadFrom(in, numBytesEncodedOrdinals);
-        return new GapEncodedVariableLengthIntegerReader(arr, (int)numBytesEncodedOrdinals);
+        LOG.info("SNAP: numBytesEncodedOrdinals= " + numBytesEncodedOrdinals);
+        data.loadFrom(in, numBytesEncodedOrdinals);
+        return new GapEncodedVariableLengthIntegerReader(data, (int)numBytesEncodedOrdinals);
     }
 
     public static void copyEncodedDeltaOrdinals(HollowBlobInput in, DataOutputStream... os) throws IOException {
@@ -118,29 +121,56 @@ public class GapEncodedVariableLengthIntegerReader {
         }
     }
 
-    public static GapEncodedVariableLengthIntegerReader combine(GapEncodedVariableLengthIntegerReader reader1, GapEncodedVariableLengthIntegerReader reader2, ArraySegmentRecycler memoryRecycler) {
+    public static GapEncodedVariableLengthIntegerReader combine(GapEncodedVariableLengthIntegerReader reader1,
+                                                                GapEncodedVariableLengthIntegerReader reader2,
+                                                                MemoryMode memoryMode,
+                                                                ArraySegmentRecycler memoryRecycler) {
         reader1.reset();
         reader2.reset();
-        ByteDataArray arr = new ByteDataArray(memoryRecycler);
-        int cur = 0;
+        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
+            ByteDataArray arr = new ByteDataArray(memoryRecycler);
+            int cur = 0;
 
-        while(reader1.nextElement() != Integer.MAX_VALUE || reader2.nextElement() != Integer.MAX_VALUE) {
-            if(reader1.nextElement() < reader2.nextElement()) {
-                VarInt.writeVInt(arr, reader1.nextElement() - cur);
-                cur = reader1.nextElement();
-                reader1.advance();
-            } else if(reader2.nextElement() < reader1.nextElement()) {
-                VarInt.writeVInt(arr, reader2.nextElement() - cur);
-                cur = reader2.nextElement();
-                reader2.advance();
-            } else {
-                VarInt.writeVInt(arr, reader1.nextElement() - cur);
-                cur = reader1.nextElement();
-                reader1.advance();
-                reader2.advance();
+            while (reader1.nextElement() != Integer.MAX_VALUE || reader2.nextElement() != Integer.MAX_VALUE) {
+                if (reader1.nextElement() < reader2.nextElement()) {
+                    VarInt.writeVInt(arr, reader1.nextElement() - cur);
+                    cur = reader1.nextElement();
+                    reader1.advance();
+                } else if (reader2.nextElement() < reader1.nextElement()) {
+                    VarInt.writeVInt(arr, reader2.nextElement() - cur);
+                    cur = reader2.nextElement();
+                    reader2.advance();
+                } else {
+                    VarInt.writeVInt(arr, reader1.nextElement() - cur);
+                    cur = reader1.nextElement();
+                    reader1.advance();
+                    reader2.advance();
+                }
             }
+            return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingArray(), (int)arr.length());
+        } else {
+            ByteDataBuffer buf = new ByteDataBuffer();
+            int cur = 0;
+
+            while (reader1.nextElement() != Integer.MAX_VALUE || reader2.nextElement() != Integer.MAX_VALUE) {
+                if (reader1.nextElement() < reader2.nextElement()) {
+                    VarInt.writeVInt(buf, reader1.nextElement() - cur);
+                    cur = reader1.nextElement();
+                    reader1.advance();
+                } else if (reader2.nextElement() < reader1.nextElement()) {
+                    VarInt.writeVInt(buf, reader2.nextElement() - cur);
+                    cur = reader2.nextElement();
+                    reader2.advance();
+                } else {
+                    VarInt.writeVInt(buf, reader1.nextElement() - cur);
+                    cur = reader1.nextElement();
+                    reader1.advance();
+                    reader2.advance();
+                }
+            }
+            return new GapEncodedVariableLengthIntegerReader(buf.getUnderlyingBuffer(), (int)buf.length());
         }
 
-        return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingArray(), (int)arr.length());
+
     }
 }

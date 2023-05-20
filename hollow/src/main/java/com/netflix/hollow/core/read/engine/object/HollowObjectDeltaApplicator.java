@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
+import com.netflix.hollow.core.memory.EncodedByteBuffer;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.encoding.EncodedLongBuffer;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 /**
  * This class contains the logic for applying a delta to a current OBJECT type state
@@ -89,29 +91,47 @@ class HollowObjectDeltaApplicator {
 
         // SNAP: TODO: refactor into FixedLengthDataFactory.get
         long numBits = (long) target.bitsPerRecord * (target.maxOrdinal + 1);
-        long numBytes = ((numBits - 1) >>> 3) + 1;
+        long numLongs = ((numBits - 1) >>> 6) + 1;
+        long numBytes = numLongs << 3;
         if (memoryMode.equals(MemoryMode.ON_HEAP)) {
             target.fixedLengthData = new FixedLengthElementArray(target.memoryRecycler, numBits);
         } else {
             // write to a new file using direct byte buffer
-            File targetFile = new File("/tmp/target-delta_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            File targetFile = provisionTargetFile(numBytes, "/tmp/delta-target-" + target.schema.getName() + "_"
+                    + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
             RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
             raf.setLength(numBytes);
             raf.close();
-            System.out.println("SNAP: Provisioned targetFile of size " + numBits + " bytes: " + targetFile.getPath() + "/" + targetFile.getName());
+            System.out.println("SNAP: Provisioned targetFile (one per type per shard) of size " + numBits + " bytes: " + targetFile.getPath() + "/" + targetFile.getName());
             HollowBlobInput targetBlob = HollowBlobInput.randomAccess(targetFile, 512 * 1024 * 1024);   // TODO: test with varying single buffer capacities upto MAX_SINGLE_BUFFER_CAPACITY
-            target.fixedLengthData = EncodedLongBuffer.newFrom(targetBlob, (long) target.bitsPerRecord * (target.maxOrdinal + 1));
+            target.fixedLengthData = EncodedLongBuffer.newFrom(targetBlob, numLongs);
         }
 
         for(int i=0;i<target.schema.numFields();i++) {
             if(target.schema.getFieldType(i) == FieldType.STRING || target.schema.getFieldType(i) == FieldType.BYTES) {
-                target.varLengthData[i] = new SegmentedByteArray(target.memoryRecycler);
+                if (memoryMode.equals(MemoryMode.ON_HEAP)) {
+                    target.varLengthData[i] = new SegmentedByteArray(target.memoryRecycler);
+                } else {
+                    File targetFile = provisionTargetFile(numBytes, "/tmp/delta-target-" + target.schema.getName() + "_"
+                            + target.schema.getFieldType(i) + "_"
+                            + target.schema.getFieldName(i) + "_"
+                            + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+                    EncodedByteBuffer targetByteBuffer = new EncodedByteBuffer();
+                    // TODO: resize file as needed
+                    target.varLengthData[i] = targetByteBuffer;
+                    throw new UnsupportedOperationException("Shared memory mode doesnt support delta transitions for var length types (String and byte[])");
+                    // SNAP: TODO: support writing to EncodedByteBuffers to support var length types like strings and byte arrays
+                }
             }
         }
 
         currentDeltaReadVarLengthDataPointers = new long[target.varLengthData.length];
         currentFromStateReadVarLengthDataPointers = new long[target.varLengthData.length];
         currentWriteVarLengthDataPointers = new long[target.varLengthData.length];
+
+        if (currentDeltaReadVarLengthDataPointers.length > 0 || currentFromStateReadVarLengthDataPointers.length > 0 || currentWriteVarLengthDataPointers.length > 0) {
+            throw new UnsupportedOperationException("Shared memory mode doesnt support delta transitions for var length types (String and byte[])");
+        }
 
         if(canDoFastDelta())
             fastDelta();
@@ -121,6 +141,15 @@ class HollowObjectDeltaApplicator {
         from.encodedRemovals = null;
         removalsReader.destroy();
         additionsReader.destroy();
+    }
+
+    File provisionTargetFile(long numBytes, String fileName) throws IOException {
+        File targetFile = new File(fileName);
+        RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
+        raf.setLength(numBytes);
+        raf.close();
+        System.out.println("SNAP: Provisioned targetFile (one per type per shard) of size " + numBytes + " bytes: " + targetFile.getPath() + "/" + targetFile.getName());
+        return targetFile;
     }
 
     private boolean canDoFastDelta() {
