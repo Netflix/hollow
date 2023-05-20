@@ -128,7 +128,6 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             } else {
                 HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
                 HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
-                // SNAP: TODO: delta refresh supported for shared memory mode till this watermark
                 nextData.applyDelta(oldData, deltaData);
                 shards[i].setCurrentData(nextData);
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);

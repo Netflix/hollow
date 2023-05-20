@@ -26,7 +26,7 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
  * @author dkoszewnik
  *
  */
-public class ByteDataArray {
+public class ByteDataArray implements ByteDataWrapper {
 
     private final SegmentedByteArray buf;
     private long position;
@@ -39,42 +39,60 @@ public class ByteDataArray {
         buf = new SegmentedByteArray(memoryRecycler);
     }
 
+    @Override
     public void write(byte b) {
         buf.set(position++, b);
     }
 
+    @Override
     public void reset() {
         position = 0;
     }
 
+    @Override
+    public long getPosition() {
+        return position;
+    }
+
+    @Override
     public void setPosition(long position) {
         this.position = position;
     }
 
+    @Override
     public long length() {
         return position;
     }
 
-    public void copyTo(ByteDataArray other) {
-        other.buf.copy(buf, 0, other.position, position);
-        other.position += position;
+    @Override
+    public void copyTo(ByteDataWrapper other) {
+        other.getUnderlyingVariableLengthData().copy(buf, 0, other.getPosition(), position);
+        other.setPosition(other.getPosition() + position);
     }
 
+    @Override
     public void copyFrom(ByteData data, long startPosition, int length) {
         buf.copy(data, startPosition, position, length);
         position += length;
     }
 
-    public void copyFrom(SegmentedByteArray data, long startPosition, int length) {
+    @Override
+    public void copyFrom(VariableLengthData data, long startPosition, int length) {
         buf.copy(data, startPosition, position, length);
         position += length;
     }
 
+    @Override
     public byte get(long index) {
         return buf.get(index);
     }
 
-    public SegmentedByteArray getUnderlyingArray() {
+    @Override
+    public VariableLengthData getUnderlyingVariableLengthData() {
+        return buf;
+    }
+
+    public SegmentedByteArray getUnderlyingArray() {    // needed for backwards compatibilty
         return buf;
     }
 }

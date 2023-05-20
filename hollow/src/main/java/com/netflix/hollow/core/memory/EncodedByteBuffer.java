@@ -19,6 +19,7 @@ package com.netflix.hollow.core.memory;
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * {@code BlobByteBuffer} based implementation of variable length byte data that only supports read.    // TODO: update when supports write
@@ -70,5 +71,24 @@ public class EncodedByteBuffer implements VariableLengthData {
     @Override
     public long size() {
         return size;
+    }
+
+    @Override
+    public void set(long index, byte value) {
+        throw new UnsupportedOperationException("Operation not supported in shared-memory mode");
+
+    }
+
+    /**
+     * Write a portion of this data to an OutputStream.
+     *
+     * @param os the output stream to write to
+     * @param startPosition the position to begin copying from this array
+     * @param len the length of the data to copy
+     * @throws IOException if the write to the output stream could not be performed
+     */
+    @Override
+    public void writeTo(OutputStream os, long startPosition, long len) throws IOException {
+        throw new UnsupportedOperationException("Not supported for shared memory mode, supports the type filter feature");
     }
 }

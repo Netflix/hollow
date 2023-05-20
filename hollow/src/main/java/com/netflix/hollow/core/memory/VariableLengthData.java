@@ -2,6 +2,7 @@ package com.netflix.hollow.core.memory;
 
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Conceptually this can be thought of as a single byte array or buffer of undefined length.  It will grow automatically
@@ -45,4 +46,8 @@ public interface VariableLengthData extends ByteData {
      * @return size in bytes
      */
     long size();
+
+    void set(long index, byte value);
+
+    void writeTo(OutputStream os, long startPosition, long len) throws IOException;
 }

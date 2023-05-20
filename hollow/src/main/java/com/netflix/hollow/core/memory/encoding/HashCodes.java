@@ -26,7 +26,7 @@ public class HashCodes {
     private static final int MURMURHASH_SEED = 0xeab524b9;
 
     public static int hashCode(ByteDataArray data) {
-        return hashCode(data.getUnderlyingArray(), 0, (int) data.length());
+        return hashCode(data.getUnderlyingVariableLengthData(), 0, (int) data.length());
     }
 
     public static int hashCode(final String data) {

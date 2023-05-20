@@ -16,17 +16,10 @@
  */
 package com.netflix.hollow.core.memory;
 
-import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
-import com.netflix.hollow.core.memory.pool.WastefulRecycler;
-
-
 /**
- * Writes data to a {@link SegmentedByteArray}, tracking the index to which it writes.
- *
- * @author dkoszewnik
- *
+ * Writes data to a {@link EncodedByteBuffer}, tracking the index to which it writes.
  */
-public class ByteDataBuffer {
+public class ByteDataBuffer implements ByteDataWrapper {
 
     private final EncodedByteBuffer buf;
     private long position;
@@ -35,42 +28,56 @@ public class ByteDataBuffer {
         buf = new EncodedByteBuffer();
     }
 
+    @Override
     public void write(byte b) {
         buf.set(position++, b);
     }
 
+    @Override
     public void reset() {
         position = 0;
     }
 
+    @Override
+    public long getPosition() {
+        return position;
+    }
+
+    @Override
     public void setPosition(long position) {
         this.position = position;
     }
 
+    @Override
     public long length() {
         return position;
     }
 
-    public void copyTo(ByteDataBuffer other) {
-        other.buf.copy(buf, 0, other.position, position);
-        other.position += position;
+    @Override
+    public void copyTo(ByteDataWrapper other) {
+        other.getUnderlyingVariableLengthData().copy(buf, 0, other.getPosition(), position);
+        other.setPosition(other.getPosition() + position);
     }
 
+    @Override
     public void copyFrom(ByteData data, long startPosition, int length) {
         buf.copy(data, startPosition, position, length);
         position += length;
     }
 
-    public void copyFrom(SegmentedByteArray data, long startPosition, int length) {
+    @Override
+    public void copyFrom(VariableLengthData data, long startPosition, int length) {
         buf.copy(data, startPosition, position, length);
         position += length;
     }
 
+    @Override
     public byte get(long index) {
         return buf.get(index);
     }
 
-    public EncodedByteBuffer getUnderlyingBuffer() {
+    @Override
+    public VariableLengthData getUnderlyingVariableLengthData() {
         return buf;
     }
 }

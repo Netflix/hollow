@@ -61,6 +61,7 @@ public class SegmentedByteArray implements VariableLengthData {
      * @param index the index
      * @param value the byte value
      */
+    @Override
     public void set(long index, byte value) {
         int segmentIndex = (int)(index >> log2OfSegmentSize);
         ensureCapacity(segmentIndex);
@@ -236,6 +237,7 @@ public class SegmentedByteArray implements VariableLengthData {
      * @param len the length of the data to copy
      * @throws IOException if the write to the output stream could not be performed
      */
+    @Override
     public void writeTo(OutputStream os, long startPosition, long len) throws IOException {
         int segmentSize = 1 << log2OfSegmentSize;
         int remainingBytesInSegment = segmentSize - (int)(startPosition & bitmask);

@@ -117,7 +117,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
                     oldRemovals.destroy();
                 } else {
                     if(!deltaData.encodedRemovals.isEmpty()) {
-                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryRecycler);
+                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryMode, memoryRecycler);
                         oldRemovals.destroy();
                     }
                     deltaData.encodedRemovals.destroy();

@@ -110,7 +110,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
                     oldRemovals.destroy();
                 } else {
                     if(!deltaData.encodedRemovals.isEmpty()) {
-                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryRecycler);
+                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryMode, memoryRecycler);
                         oldRemovals.destroy();
                     }
                     deltaData.encodedRemovals.destroy();

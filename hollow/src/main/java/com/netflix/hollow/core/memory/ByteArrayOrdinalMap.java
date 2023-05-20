@@ -419,7 +419,7 @@ public class ByteArrayOrdinalMap {
 
     public long getPointerForData(int ordinal) {
         long pointer = pointersByOrdinal[ordinal] & POINTER_MASK;
-        return pointer + VarInt.nextVLongSize(byteData.getUnderlyingArray(), pointer);
+        return pointer + VarInt.nextVLongSize(byteData.getUnderlyingVariableLengthData(), pointer);
     }
 
     public boolean isReadyForWriting() {
@@ -457,7 +457,7 @@ public class ByteArrayOrdinalMap {
     private boolean compare(ByteDataArray serializedRepresentation, long key) {
         long position = key & POINTER_MASK;
 
-        int sizeOfData = VarInt.readVInt(byteData.getUnderlyingArray(), position);
+        int sizeOfData = VarInt.readVInt(byteData.getUnderlyingVariableLengthData(), position);
 
         if (sizeOfData != serializedRepresentation.length()) {
             return false;
@@ -568,10 +568,10 @@ public class ByteArrayOrdinalMap {
     private int rehashPreviouslyAddedData(long key) {
         long position = key & POINTER_MASK;
 
-        int sizeOfData = VarInt.readVInt(byteData.getUnderlyingArray(), position);
+        int sizeOfData = VarInt.readVInt(byteData.getUnderlyingVariableLengthData(), position);
         position += VarInt.sizeOfVInt(sizeOfData);
 
-        return HashCodes.hashCode(byteData.getUnderlyingArray(), position, sizeOfData);
+        return HashCodes.hashCode(byteData.getUnderlyingVariableLengthData(), position, sizeOfData);
     }
 
     /**
