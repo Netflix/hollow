@@ -133,7 +133,7 @@ public class EncodedLongBuffer implements FixedLengthData {
     @Override
     public void setElementValue(long index, int bitsPerElement, long value) {
         long whichByte = index >>> 3;
-        int whichBit = (int) (index & 0x3F);
+        int whichBit = (int) (index & 0x07);
         this.bufferView.putLong(this.bufferView.position() + whichByte,
                 this.bufferView.getLong(this.bufferView.position() + whichByte) | (value << whichBit));
 

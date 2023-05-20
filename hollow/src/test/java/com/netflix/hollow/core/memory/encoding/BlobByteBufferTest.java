@@ -12,14 +12,13 @@ public class BlobByteBufferTest {
 
     @Test
     public void writeThenRead() throws IOException {
-        int leadingBytes = 8;
-        int padBytes = 0;
+        int padBytes = 8;
         int singleBufferCapacity = 1024;
 
         File targetFile = new File("test-BlobByteBuffer-" + System.currentTimeMillis());
         targetFile.deleteOnExit();
         RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
-        raf.setLength((14 * Long.BYTES) + leadingBytes + padBytes);
+        raf.setLength((14 * Long.BYTES) + padBytes);
         FileChannel channel = raf.getChannel();
         BlobByteBuffer buf = BlobByteBuffer.mmapBlob(channel, singleBufferCapacity);
 
@@ -33,13 +32,15 @@ public class BlobByteBufferTest {
                 Long.MAX_VALUE, Long.MAX_VALUE,
         };
 
-        for (int i = 0; i < values.length; i ++) {
-            buf.putLong(i * Long.BYTES, values[i]);
-        }
+        for (int offset = 0; offset < padBytes; offset ++) {
+            for (int i = 0; i < values.length; i ++) {
+                buf.putLong(offset + i * Long.BYTES, values[i]);
+            }
 
-        for (int i = 0; i < values.length; i ++) {
-            long actual = buf.getLong(i * Long.BYTES);
-            assertEquals(values[i], actual);
+            for (int i = 0; i < values.length; i ++) {
+                long actual = buf.getLong(offset + i * Long.BYTES);
+                assertEquals(values[i], actual);
+            }
         }
         raf.close();
 
