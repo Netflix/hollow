@@ -16,10 +16,18 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
+import com.netflix.hollow.core.memory.encoding.EncodedLongBuffer;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
+import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * This class contains the logic for applying a delta to a current OBJECT type state
@@ -54,7 +62,7 @@ class HollowObjectDeltaApplicator {
         this.target = target;
     }
 
-    void applyDelta() {
+    void applyDelta(MemoryMode memoryMode) throws IOException {
         removalsReader = from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
         additionsReader = delta.encodedAdditions;
         removalsReader.reset();
@@ -79,7 +87,21 @@ class HollowObjectDeltaApplicator {
                 numMergeFields = i+1;
         }
 
-        target.fixedLengthData = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerRecord * (target.maxOrdinal + 1));
+        // SNAP: TODO: refactor into FixedLengthDataFactory.get
+        long numBits = (long) target.bitsPerRecord * (target.maxOrdinal + 1);
+        long numBytes = ((numBits - 1) >>> 3) + 1;
+        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
+            target.fixedLengthData = new FixedLengthElementArray(target.memoryRecycler, numBits);
+        } else {
+            // write to a new file using direct byte buffer
+            File targetFile = new File("/tmp/target-delta_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
+            raf.setLength(numBytes);
+            raf.close();
+            System.out.println("SNAP: Provisioned targetFile of size " + numBits + " bytes: " + targetFile.getPath() + "/" + targetFile.getName());
+            HollowBlobInput targetBlob = HollowBlobInput.randomAccess(targetFile, 512 * 1024 * 1024);   // TODO: test with varying single buffer capacities upto MAX_SINGLE_BUFFER_CAPACITY
+            target.fixedLengthData = EncodedLongBuffer.newFrom(targetBlob, (long) target.bitsPerRecord * (target.maxOrdinal + 1));
+        }
 
         for(int i=0;i<target.schema.numFields();i++) {
             if(target.schema.getFieldType(i) == FieldType.STRING || target.schema.getFieldType(i) == FieldType.BYTES) {

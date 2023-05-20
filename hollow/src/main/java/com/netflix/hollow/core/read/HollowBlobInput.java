@@ -90,7 +90,8 @@ public class HollowBlobInput implements Closeable {
      */
     public static HollowBlobInput randomAccess(File f,int singleBufferCapacity) throws IOException {
         HollowBlobInput hbi = new HollowBlobInput(SHARED_MEMORY_LAZY);
-        RandomAccessFile raf = new RandomAccessFile(f, "r");
+        RandomAccessFile raf = new RandomAccessFile(f, "rws");  // TODO: evaluate rw and rwd modes too
+        // TODO: could truncate file to the desired capacity, maybe performs better for both writes and reads
         hbi.input = raf;
         FileChannel channel = ((RandomAccessFile) hbi.input).getChannel();
         hbi.buffer = BlobByteBuffer.mmapBlob(channel, singleBufferCapacity);

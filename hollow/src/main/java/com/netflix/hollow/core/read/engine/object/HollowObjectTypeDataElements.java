@@ -28,6 +28,7 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * This class holds the data for a {@link HollowObjectTypeReadState}.
@@ -36,6 +37,7 @@ import java.io.IOException;
  * with the existing one to make sure a consistent view of the data is always available. 
  */
 public class HollowObjectTypeDataElements {
+    private static final Logger LOG = Logger.getLogger(HollowObjectTypeDataElements.class.getName());
 
     final HollowObjectSchema schema;
 
@@ -84,6 +86,7 @@ public class HollowObjectTypeDataElements {
         maxOrdinal = VarInt.readVInt(in);
 
         if(isDelta) {
+            // SNAP: TODO: this part of delta is currently read into heap, but could also be a byte buffer
             encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
             encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
         }
@@ -91,12 +94,16 @@ public class HollowObjectTypeDataElements {
         readFieldStatistics(in, unfilteredSchema);
 
         fixedLengthData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
-        removeExcludedFieldsFromFixedLengthData();
+        removeExcludedFieldsFromFixedLengthData();  // SNAP: TODO: remove filtered fields from delta contents, in memory. For now, nop and log warning
 
         readVarLengthData(in, unfilteredSchema);
     }
 
     private void removeExcludedFieldsFromFixedLengthData() {
+        if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
+            LOG.warning("Type filter is not supported in Shared Memory mode");
+            return;
+        }
         if(bitsPerField.length < bitsPerUnfilteredField.length) {
             long numBitsRequired = (long)bitsPerRecord * (maxOrdinal + 1);
             FixedLengthElementArray filteredData = new FixedLengthElementArray(memoryRecycler, numBitsRequired);
@@ -199,8 +206,15 @@ public class HollowObjectTypeDataElements {
         }
     }
 
-    void applyDelta(HollowObjectTypeDataElements fromData, HollowObjectTypeDataElements deltaData) {
-        new HollowObjectDeltaApplicator(fromData, deltaData, this).applyDelta();
+    void applyDelta(HollowObjectTypeDataElements fromData, HollowObjectTypeDataElements deltaData) throws IOException {
+        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
+            new HollowObjectDeltaApplicator(fromData, deltaData, this).applyDelta(memoryMode);
+        } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
+            new HollowObjectDeltaApplicator(fromData, deltaData, this).applyDelta(memoryMode);    // SNAP: TODO: not needed
+        } else {
+            throw new UnsupportedOperationException("Delta application not supported in memory mode " + memoryMode);
+        }
+
     }
 
     public void destroy() {

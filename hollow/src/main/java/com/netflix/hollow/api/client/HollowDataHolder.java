@@ -207,8 +207,7 @@ class HollowDataHolder {
 
     private void applyDeltaTransition(HollowConsumer.Blob blob, boolean isSnapshotPlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
         if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
-            LOG.warning("Skipping delta transition in shared-memory mode");
-            return;
+            LOG.warning("SNAP: Attempting delta transition in shared-memory mode ...");
         }
 
         try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, blob);
@@ -216,6 +215,9 @@ class HollowDataHolder {
             applyStateEngineTransition(in, optionalPartIn, blob, refreshListeners);
 
             if(objLongevityConfig.enableLongLivedObjectSupport()) {
+                if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
+                    throw new UnsupportedOperationException("Shared memory mode doesn't support object longevity... yet");
+                }
                 HollowDataAccess previousDataAccess = currentAPI.getDataAccess();
                 HollowHistoricalStateDataAccess priorState = new HollowHistoricalStateCreator(null).createBasedOnNewDelta(currentVersion, stateEngine);
                 HollowProxyDataAccess newDataAccess = new HollowProxyDataAccess();

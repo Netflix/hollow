@@ -24,8 +24,10 @@ import com.netflix.hollow.core.util.IOUtils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Logger;
 
 public class GapEncodedVariableLengthIntegerReader {
+    private static final Logger LOG = Logger.getLogger(GapEncodedVariableLengthIntegerReader.class.getName());
 
     public static GapEncodedVariableLengthIntegerReader EMPTY_READER = new GapEncodedVariableLengthIntegerReader(null, 0) {
         @Override
@@ -99,6 +101,7 @@ public class GapEncodedVariableLengthIntegerReader {
     public static GapEncodedVariableLengthIntegerReader readEncodedDeltaOrdinals(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
         SegmentedByteArray arr = new SegmentedByteArray(memoryRecycler);
         long numBytesEncodedOrdinals = VarInt.readVLong(in);
+        LOG.info("SNAP: numBytesEncodedOrdinals (currently on heap)= " + numBytesEncodedOrdinals);
         arr.loadFrom(in, numBytesEncodedOrdinals);
         return new GapEncodedVariableLengthIntegerReader(arr, (int)numBytesEncodedOrdinals);
     }
