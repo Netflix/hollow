@@ -98,7 +98,9 @@ public class EncodedLongBuffer implements FixedLengthData {
         int whichBit = (int) (index & 0x07);
 
         if (whichByte + ceil((float) bitsPerElement/8) > this.maxByteIndex + 1) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(String.format("Attempted read past the end of buffer. index=%s, " +
+                    "whichByte=%s, this.maxByteIndex=%s, whichBit=%s, bitsPerElement=%s", index, whichByte,
+                    this.maxByteIndex, whichBit, bitsPerElement));
         }
 
         long longVal = this.bufferView.getLong(this.bufferView.position() + whichByte);
@@ -179,11 +181,26 @@ public class EncodedLongBuffer implements FixedLengthData {
 
     @Override
     public void incrementMany(long startBit, long increment, long bitsBetweenIncrements, int numIncrements){
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+        long endBit = startBit + (bitsBetweenIncrements * numIncrements);
+        for(; startBit<endBit; startBit += bitsBetweenIncrements) {
+            increment(startBit, increment);
+        }
+    }
+
+    public void increment(long index, long increment) {
+        long whichByte = index >>> 3;
+        int whichBit = (int) (index & 0x07);
+
+        long l = this.bufferView.getLong(this.bufferView.position() + whichByte);
+
+        this.bufferView.putLong(whichByte, l + (increment << whichBit));
+
+        /// SNAP: Didn't update the fencepost longs like we did in FixedLengthElementArray::increment
     }
 
     @Override
     public void clearElementValue(long index, int bitsPerElement) {
+        // used in primary/unique index, and write state
         throw new UnsupportedOperationException("Not supported in shared-memory mode");
     }
 

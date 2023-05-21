@@ -86,7 +86,6 @@ public class HollowObjectTypeDataElements {
         maxOrdinal = VarInt.readVInt(in);
 
         if(isDelta) {
-            // SNAP: TODO: this part of delta is currently read into heap, but could also be a byte buffer
             encodedRemovals = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
             encodedAdditions = GapEncodedVariableLengthIntegerReader.readEncodedDeltaOrdinals(in, memoryRecycler);
         }
@@ -94,7 +93,7 @@ public class HollowObjectTypeDataElements {
         readFieldStatistics(in, unfilteredSchema);
 
         fixedLengthData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
-        removeExcludedFieldsFromFixedLengthData();  // SNAP: TODO: remove filtered fields from delta contents, in memory. For now, nop and log warning
+        removeExcludedFieldsFromFixedLengthData();  // SNAP: TODO: remove filtered fields from delta contents, in memory. For now, NOP and log warning
 
         readVarLengthData(in, unfilteredSchema);
     }
