@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import sun.nio.ch.DirectBuffer;
 
 /**
  * <p>A stitching of {@link MappedByteBuffer}s to operate on large memory mapped blobs. {@code MappedByteBuffer} is
@@ -31,13 +32,17 @@ public final class BlobByteBuffer {
     private final int shift;
     private final int mask;
 
+    // SNAP: TODO: potentially needed for destruction
+    private final FileChannel channel;
+    private final boolean original;
+
     private long position;              // within index 0 to capacity-1 in the underlying ByteBuffer
 
-    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine) {
-        this(capacity, shift, mask, spine, 0);
+    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, FileChannel channel, boolean original) {
+        this(capacity, shift, mask, spine, 0, channel, original);
     }
 
-    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, long position) {
+    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, long position, FileChannel channel, boolean original) {
 
         if (!spine[0].order().equals(ByteOrder.BIG_ENDIAN)) {
             throw new UnsupportedOperationException("Little endian memory layout is not supported");
@@ -46,6 +51,8 @@ public final class BlobByteBuffer {
         this.capacity = capacity;
         this.shift = shift;
         this.mask = mask;
+        this.channel = channel;
+        this.original = original;
         this.position = position;
 
         // The following assignment is purposefully placed *after* the population of all segments (this method is called
@@ -60,7 +67,7 @@ public final class BlobByteBuffer {
      * @return a new {@code BlobByteBuffer} which is view on the current {@code BlobByteBuffer}
      */
     public BlobByteBuffer duplicate() {
-        return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position);
+        return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position, this.channel, false);
     }
 
     /**
@@ -107,7 +114,7 @@ public final class BlobByteBuffer {
             spine[i] = buffer;
         }
 
-        return new BlobByteBuffer(size, shift, mask, spine);
+        return new BlobByteBuffer(size, shift, mask, spine, channel, true);
     }
 
     /**
@@ -238,5 +245,20 @@ public final class BlobByteBuffer {
             result = boundary + (boundary + Long.BYTES - index) - 1;
         }
         return result;
+    }
+
+    public void destroy() throws IOException {
+        // NOTE: invoking this will clean up the entire buffer and truncate the backing file, so it should invoked with
+        //       care- I'm thinking maybe safe to invoke on BlobByteBuffers over delta-target files since those are
+        //       per {type,shard} so if a destroy operation is called presumably it isn't being used moving fwd.
+        //       The BlobByteBuffer over the original snapshot file may be getting referenced for a while so maybe best
+        //       to defer to GC to clean that up based on reference count.
+        if (original) {
+            for (int i = 0; i < spine.length; i++) {
+                ByteBuffer buf = spine[i];
+                ((DirectBuffer) buf).cleaner().clean();
+            }
+            channel.truncate(0);
+        }
     }
 }

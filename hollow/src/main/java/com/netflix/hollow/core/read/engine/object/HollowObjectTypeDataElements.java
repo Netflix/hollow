@@ -98,7 +98,7 @@ public class HollowObjectTypeDataElements {
         readVarLengthData(in, unfilteredSchema);
     }
 
-    private void removeExcludedFieldsFromFixedLengthData() {
+    private void removeExcludedFieldsFromFixedLengthData() throws IOException {
         if(bitsPerField.length < bitsPerUnfilteredField.length) {
             if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
                 LOG.warning("Type filter is not supported in Shared Memory mode");
@@ -217,7 +217,7 @@ public class HollowObjectTypeDataElements {
 
     }
 
-    public void destroy() {
+    public void destroy() throws IOException {
         FixedLengthDataFactory.destroy(fixedLengthData, memoryRecycler);
         for(int i=0;i<varLengthData.length;i++) {
             if(varLengthData[i] != null)

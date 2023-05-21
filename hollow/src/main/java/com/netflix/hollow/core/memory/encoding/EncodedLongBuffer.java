@@ -223,4 +223,9 @@ public class EncodedLongBuffer implements FixedLengthData {
     public long get(long index) {
         return this.bufferView.getLong(this.bufferView.position() + (index * 8));
     }
+
+    public void destroy() throws IOException {
+        System.out.println("SNAP: WARNING - shouldn't be getting invoked");
+        // since we operate on a bufferView here, we should't mutate the underlying buffer
+    }
 }

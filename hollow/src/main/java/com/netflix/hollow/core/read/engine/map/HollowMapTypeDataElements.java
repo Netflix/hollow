@@ -121,7 +121,7 @@ public class HollowMapTypeDataElements {
         new HollowMapDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 
-    public void destroy() {
+    public void destroy() throws IOException {
         FixedLengthDataFactory.destroy(mapPointerAndSizeData, memoryRecycler);
         FixedLengthDataFactory.destroy(entryData, memoryRecycler);
     }

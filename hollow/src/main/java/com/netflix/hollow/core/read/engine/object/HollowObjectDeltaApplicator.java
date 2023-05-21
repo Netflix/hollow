@@ -143,7 +143,7 @@ class HollowObjectDeltaApplicator {
         RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
         raf.setLength(numBytes);
         raf.close();
-        System.out.println("SNAP: Provisioned targetFile (one per type per shard) of size " + numBytes + " bytes: " + targetFile.getPath());
+        System.out.println("SNAP: Provisioned targetFile (one per shard per type) of size " + numBytes + " bytes: " + targetFile.getPath());
         return targetFile;
     }
 

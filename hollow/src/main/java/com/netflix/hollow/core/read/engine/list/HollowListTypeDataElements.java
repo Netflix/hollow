@@ -109,7 +109,7 @@ public class HollowListTypeDataElements {
         new HollowListDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 
-    public void destroy() {
+    public void destroy() throws IOException {
         FixedLengthDataFactory.destroy(listPointerData, memoryRecycler);
         FixedLengthDataFactory.destroy(elementData, memoryRecycler);
     }

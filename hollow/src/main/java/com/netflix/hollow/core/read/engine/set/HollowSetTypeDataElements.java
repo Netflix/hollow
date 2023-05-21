@@ -117,7 +117,7 @@ public class HollowSetTypeDataElements {
         new HollowSetDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 
-    public void destroy() {
+    public void destroy() throws IOException {
         FixedLengthDataFactory.destroy(setPointerAndSizeData, memoryRecycler);
         FixedLengthDataFactory.destroy(elementData, memoryRecycler);
     }
