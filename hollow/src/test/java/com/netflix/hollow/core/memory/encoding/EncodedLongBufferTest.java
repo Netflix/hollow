@@ -92,20 +92,22 @@ public class EncodedLongBufferTest {
         }
     }
 
-// TODO:    @Test
-// TODO:    public void testCopySmallBitRange() {
-// TODO:        FixedLengthElementArray arrFrom = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 64);
-// TODO:        FixedLengthElementArray arrTo = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 128);
-// TODO:
-// TODO:        arrFrom.setElementValue(0, 64, -1L);
-// TODO:
-// TODO:        arrTo.copyBits(arrFrom, 10, 10, 10);
-// TODO:
-// TODO:        Assert.assertEquals(0, arrTo.getElementValue(0, 10));
-// TODO:        Assert.assertEquals(1023, arrTo.getElementValue(10, 10));
-// TODO:        Assert.assertEquals(0, arrTo.getLargeElementValue(20, 10));
-// TODO:
-// TODO:    }
+    @Test
+    public void testCopySmallBitRange() throws IOException {
+        int singleBufferCapacity = 1024;
+        EncodedLongBuffer bufFrom = setupEncodedLongBuffer((64 >> 3) + 1, singleBufferCapacity);
+        EncodedLongBuffer bufTo = setupEncodedLongBuffer((128 >> 3) + 1, singleBufferCapacity);
+
+
+        bufFrom.setElementValue(0, 64, -1L);
+
+        bufTo.copyBits(bufFrom, 10, 10, 10);
+
+        Assert.assertEquals(0, bufTo.getElementValue(0, 10));
+        Assert.assertEquals(1023, bufTo.getElementValue(10, 10));
+        Assert.assertEquals(0, bufTo.getLargeElementValue(20, 10));
+
+    }
 
     @Test
     public void testIncrement() throws IOException {
