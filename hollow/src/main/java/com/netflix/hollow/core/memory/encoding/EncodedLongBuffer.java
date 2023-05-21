@@ -146,7 +146,35 @@ public class EncodedLongBuffer implements FixedLengthData {
 
     @Override
     public void copyBits(FixedLengthData copyFrom, long sourceStartBit, long destStartBit, long numBits){
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+        if(numBits == 0)
+            return;
+
+        if ((destStartBit & 63) != 0) {
+            int fillBits = (int) Math.min(64 - (destStartBit & 63), numBits);
+            long fillValue = copyFrom.getLargeElementValue(sourceStartBit, fillBits);
+            setElementValue(destStartBit, fillBits, fillValue);
+
+            destStartBit += fillBits;
+            sourceStartBit += fillBits;
+            numBits -= fillBits;
+        }
+
+        long currentWriteLong = destStartBit >>> 6;
+
+        while (numBits >= 64) {
+            long l = copyFrom.getLargeElementValue(sourceStartBit, 64, -1);
+            this.bufferView.putLong(this.bufferView.position() + (currentWriteLong * 8), l);
+            numBits -= 64;
+            sourceStartBit += 64;
+            currentWriteLong++;
+        }
+
+        if (numBits != 0) {
+            destStartBit = currentWriteLong << 6;
+
+            long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) numBits);
+            setElementValue(destStartBit, (int) numBits, fillValue);
+        }
     }
 
     @Override
@@ -157,5 +185,14 @@ public class EncodedLongBuffer implements FixedLengthData {
     @Override
     public void clearElementValue(long index, int bitsPerElement) {
         throw new UnsupportedOperationException("Not supported in shared-memory mode");
+    }
+
+    /**
+     * Set the long at the given index to the specified value. Index relative to start of this buffer, and index is
+     * specified at Long.BYTES granularity.
+     * index 0 will occupy bytes 0-7 of this buffer, etc.
+     */
+    public void set(long index, long value) {
+        this.bufferView.putLong(this.bufferView.position() + (index * 8), value);
     }
 }
