@@ -16,10 +16,9 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
-import com.netflix.hollow.core.memory.EncodedByteBuffer;
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.MemoryMode;
-import com.netflix.hollow.core.memory.SegmentedByteArray;
+import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.io.IOException;
@@ -86,26 +85,12 @@ class HollowObjectDeltaApplicator {
         }
 
         long numBits = (long) target.bitsPerRecord * (target.maxOrdinal + 1);
-        long numLongs = ((numBits - 1) >>> 6) + 1;
-        long numBytes = numLongs << 3;
         target.fixedLengthData = FixedLengthDataFactory.allocate(numBits, memoryMode, target.memoryRecycler,
                 "/tmp/delta-target-" + target.schema.getName() + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
 
         for(int i=0;i<target.schema.numFields();i++) {
             if(target.schema.getFieldType(i) == FieldType.STRING || target.schema.getFieldType(i) == FieldType.BYTES) {
-                if (memoryMode.equals(MemoryMode.ON_HEAP)) {
-                    target.varLengthData[i] = new SegmentedByteArray(target.memoryRecycler);
-                } else {
-                    // File targetFile = provisionTargetFile(numBytes, "/tmp/delta-target-" + target.schema.getName() + "_"
-                    //         + target.schema.getFieldType(i) + "_"
-                    //         + target.schema.getFieldName(i) + "_"
-                    //         + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
-                    EncodedByteBuffer targetByteBuffer = new EncodedByteBuffer();
-                    // TODO: resize file as needed
-                    target.varLengthData[i] = targetByteBuffer;
-                    throw new UnsupportedOperationException("Shared memory mode doesnt support delta transitions for var length types (String and byte[])");
-                    // SNAP: TODO: support writing to EncodedByteBuffers to support var length types like strings and byte arrays
-                }
+                target.varLengthData[i] = VariableLengthDataFactory.allocate(memoryMode, target.memoryRecycler);
             }
         }
 
