@@ -99,11 +99,12 @@ public class HollowObjectTypeDataElements {
     }
 
     private void removeExcludedFieldsFromFixedLengthData() {
-        if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
-            LOG.warning("Type filter is not supported in Shared Memory mode");
-            return;
-        }
         if(bitsPerField.length < bitsPerUnfilteredField.length) {
+            if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
+                LOG.warning("Type filter is not supported in Shared Memory mode");
+                return;
+            }
+
             long numBitsRequired = (long)bitsPerRecord * (maxOrdinal + 1);
             FixedLengthElementArray filteredData = new FixedLengthElementArray(memoryRecycler, numBitsRequired);
 

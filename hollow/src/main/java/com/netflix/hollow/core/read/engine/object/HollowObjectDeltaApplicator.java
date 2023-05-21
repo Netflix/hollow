@@ -102,7 +102,6 @@ class HollowObjectDeltaApplicator {
             RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
             raf.setLength(numBytes);
             raf.close();
-            System.out.println("SNAP: Provisioned targetFile (one per type per shard) of size " + numBits + " bytes: " + targetFile.getPath() + "/" + targetFile.getName());
             HollowBlobInput targetBlob = HollowBlobInput.randomAccess(targetFile, 512 * 1024 * 1024);   // TODO: test with varying single buffer capacities upto MAX_SINGLE_BUFFER_CAPACITY
             target.fixedLengthData = EncodedLongBuffer.newFrom(targetBlob, numLongs);
         }
@@ -129,10 +128,6 @@ class HollowObjectDeltaApplicator {
         currentFromStateReadVarLengthDataPointers = new long[target.varLengthData.length];
         currentWriteVarLengthDataPointers = new long[target.varLengthData.length];
 
-        if (currentDeltaReadVarLengthDataPointers.length > 0 || currentFromStateReadVarLengthDataPointers.length > 0 || currentWriteVarLengthDataPointers.length > 0) {
-            throw new UnsupportedOperationException("Shared memory mode doesnt support delta transitions for var length types (String and byte[])");
-        }
-
         if(canDoFastDelta())
             fastDelta();
         else
@@ -148,7 +143,7 @@ class HollowObjectDeltaApplicator {
         RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
         raf.setLength(numBytes);
         raf.close();
-        System.out.println("SNAP: Provisioned targetFile (one per type per shard) of size " + numBytes + " bytes: " + targetFile.getPath() + "/" + targetFile.getName());
+        System.out.println("SNAP: Provisioned targetFile (one per type per shard) of size " + numBytes + " bytes: " + targetFile.getPath());
         return targetFile;
     }
 

@@ -105,7 +105,6 @@ public class GapEncodedVariableLengthIntegerReader {
     public static GapEncodedVariableLengthIntegerReader readEncodedDeltaOrdinals(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
         VariableLengthData data = VariableLengthDataFactory.get(in.getMemoryMode(), memoryRecycler);
         long numBytesEncodedOrdinals = VarInt.readVLong(in);
-        LOG.info("SNAP: numBytesEncodedOrdinals= " + numBytesEncodedOrdinals);
         data.loadFrom(in, numBytesEncodedOrdinals);
         return new GapEncodedVariableLengthIntegerReader(data, (int)numBytesEncodedOrdinals);
     }
