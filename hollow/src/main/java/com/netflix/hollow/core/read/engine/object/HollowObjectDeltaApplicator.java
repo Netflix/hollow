@@ -17,16 +17,12 @@
 package com.netflix.hollow.core.read.engine.object;
 
 import com.netflix.hollow.core.memory.EncodedByteBuffer;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
-import com.netflix.hollow.core.memory.encoding.EncodedLongBuffer;
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
-import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -89,32 +85,21 @@ class HollowObjectDeltaApplicator {
                 numMergeFields = i+1;
         }
 
-        // SNAP: TODO: refactor into FixedLengthDataFactory.get
         long numBits = (long) target.bitsPerRecord * (target.maxOrdinal + 1);
         long numLongs = ((numBits - 1) >>> 6) + 1;
         long numBytes = numLongs << 3;
-        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
-            target.fixedLengthData = new FixedLengthElementArray(target.memoryRecycler, numBits);
-        } else {
-            // write to a new file using direct byte buffer
-            File targetFile = provisionTargetFile(numBytes, "/tmp/delta-target-" + target.schema.getName() + "_"
-                    + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
-            RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
-            raf.setLength(numBytes);
-            raf.close();
-            HollowBlobInput targetBlob = HollowBlobInput.randomAccess(targetFile, 512 * 1024 * 1024);   // TODO: test with varying single buffer capacities upto MAX_SINGLE_BUFFER_CAPACITY
-            target.fixedLengthData = EncodedLongBuffer.newFrom(targetBlob, numLongs);
-        }
+        target.fixedLengthData = FixedLengthDataFactory.allocate(numBits, memoryMode, target.memoryRecycler,
+                "/tmp/delta-target-" + target.schema.getName() + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
 
         for(int i=0;i<target.schema.numFields();i++) {
             if(target.schema.getFieldType(i) == FieldType.STRING || target.schema.getFieldType(i) == FieldType.BYTES) {
                 if (memoryMode.equals(MemoryMode.ON_HEAP)) {
                     target.varLengthData[i] = new SegmentedByteArray(target.memoryRecycler);
                 } else {
-                    File targetFile = provisionTargetFile(numBytes, "/tmp/delta-target-" + target.schema.getName() + "_"
-                            + target.schema.getFieldType(i) + "_"
-                            + target.schema.getFieldName(i) + "_"
-                            + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+                    // File targetFile = provisionTargetFile(numBytes, "/tmp/delta-target-" + target.schema.getName() + "_"
+                    //         + target.schema.getFieldType(i) + "_"
+                    //         + target.schema.getFieldName(i) + "_"
+                    //         + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
                     EncodedByteBuffer targetByteBuffer = new EncodedByteBuffer();
                     // TODO: resize file as needed
                     target.varLengthData[i] = targetByteBuffer;
@@ -136,15 +121,6 @@ class HollowObjectDeltaApplicator {
         from.encodedRemovals = null;
         removalsReader.destroy();
         additionsReader.destroy();
-    }
-
-    File provisionTargetFile(long numBytes, String fileName) throws IOException {
-        File targetFile = new File(fileName);
-        RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
-        raf.setLength(numBytes);
-        raf.close();
-        System.out.println("SNAP: Provisioned targetFile (one per shard per type) of size " + numBytes + " bytes: " + targetFile.getPath());
-        return targetFile;
     }
 
     private boolean canDoFastDelta() {
