@@ -117,7 +117,7 @@ public class HollowMapTypeDataElements {
         }
     }
 
-    public void applyDelta(HollowMapTypeDataElements fromData, HollowMapTypeDataElements deltaData) {
+    public void applyDelta(HollowMapTypeDataElements fromData, HollowMapTypeDataElements deltaData) throws IOException {
         new HollowMapDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 

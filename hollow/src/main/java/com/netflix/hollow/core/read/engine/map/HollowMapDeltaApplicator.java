@@ -16,8 +16,12 @@
  */
 package com.netflix.hollow.core.read.engine.map;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 /**
  * This class contains the logic for applying a delta to a current MAP type state
@@ -48,7 +52,7 @@ class HollowMapDeltaApplicator {
         this.target = target;
     }
 
-    public void applyDelta() {
+    public void applyDelta() throws IOException {
         removalsReader = from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
         additionsReader = delta.encodedAdditions;
         removalsReader.reset();
@@ -67,8 +71,10 @@ class HollowMapDeltaApplicator {
         target.emptyBucketKeyValue = delta.emptyBucketKeyValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
-        target.mapPointerAndSizeData = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion);
-        target.entryData = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfBuckets * target.bitsPerMapEntry);
+        target.mapPointerAndSizeData = FixedLengthDataFactory.allocate(((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion, target.memoryMode, target.memoryRecycler,
+                "/tmp/delta-target-mapPointerAndSizeData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+        target.entryData = FixedLengthDataFactory.allocate(target.totalNumberOfBuckets * target.bitsPerMapEntry, target.memoryMode, target.memoryRecycler,
+                "/tmp/delta-target-mapEntryData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
 
         if(target.bitsPerMapPointer == from.bitsPerMapPointer
                 && target.bitsPerMapSizeValue == from.bitsPerMapSizeValue

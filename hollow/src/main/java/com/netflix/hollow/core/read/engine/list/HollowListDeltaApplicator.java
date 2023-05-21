@@ -16,8 +16,12 @@
  */
 package com.netflix.hollow.core.read.engine.list;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 /**
  * This class contains the logic for applying a delta to a current LIST type state
@@ -48,7 +52,7 @@ class HollowListDeltaApplicator {
         this.target = target;
     }
 
-    public void applyDelta() {
+    public void applyDelta() throws IOException {
         removalsReader = from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
         additionsReader = delta.encodedAdditions;
         removalsReader.reset();
@@ -61,8 +65,11 @@ class HollowListDeltaApplicator {
         target.bitsPerListPointer = delta.bitsPerListPointer;
         target.bitsPerElement = delta.bitsPerElement;
 
-        target.listPointerData = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerListPointer);
-        target.elementData = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfElements * target.bitsPerElement);
+        target.listPointerData = FixedLengthDataFactory.allocate(((long)target.maxOrdinal + 1) * target.bitsPerListPointer, target.memoryMode, target.memoryRecycler,
+                "/tmp/delta-target-listPointerData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+
+        target.elementData = FixedLengthDataFactory.allocate(target.totalNumberOfElements * target.bitsPerElement, target.memoryMode, target.memoryRecycler,
+                "/tmp/delta-target-listElementData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
 
         if(target.bitsPerListPointer == from.bitsPerListPointer
                 && target.bitsPerElement == from.bitsPerElement)

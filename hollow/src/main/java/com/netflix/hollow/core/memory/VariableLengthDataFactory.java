@@ -40,7 +40,7 @@ public class VariableLengthDataFactory {
         if (vld instanceof SegmentedByteArray) {
             ((SegmentedByteArray) vld).destroy();
         } else if (vld instanceof EncodedByteBuffer) {
-            LOG.warning("Destroy operation is a no-op in shared memory mode");
+            LOG.warning("Destroy operation is a not implemented for shared memory mode");
         } else {
             throw new UnsupportedOperationException("Unknown type");
         }

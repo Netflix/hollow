@@ -105,7 +105,7 @@ public class HollowListTypeDataElements {
         }
     }
 
-    public void applyDelta(HollowListTypeDataElements fromData, HollowListTypeDataElements deltaData) {
+    public void applyDelta(HollowListTypeDataElements fromData, HollowListTypeDataElements deltaData) throws IOException {
         new HollowListDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 
