@@ -199,17 +199,28 @@ public class EncodedLongBuffer implements FixedLengthData {
     }
 
     @Override
-    public void clearElementValue(long index, int bitsPerElement) {
-        // used in primary/unique index, and write state
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+    public void clearElementValue(long index, int bitsPerElement) { // SNAP: can be absorbed into interface, with set and get being the specific implementations
+        long whichLong = index >>> 6;
+        int whichBit = (int) (index & 0x3F);
+
+        long mask = ((1L << bitsPerElement) - 1);
+
+        set(whichLong, get(whichLong) & ~(mask << whichBit));
+
+        int bitsRemaining = 64 - whichBit;
+
+        if (bitsRemaining < bitsPerElement)
+            set(whichLong + 1, get(whichLong + 1) & ~(mask >>> bitsRemaining));
     }
 
     /**
-     * Set the long at the given index to the specified value. Index relative to start of this buffer, and index is
-     * specified at Long.BYTES granularity.
-     * index 0 will occupy bytes 0-7 of this buffer, etc.
+     * Set and get the long at the given index to the specified value. Index is at Long.BYTES granularity and relative to
+     * the start of this buffer. So for e.g. index 0 will represent the long value occupying bytes 0-7 of this buffer, etc.
      */
     public void set(long index, long value) {
         this.bufferView.putLong(this.bufferView.position() + (index * 8), value);
+    }
+    public long get(long index) {
+        return this.bufferView.getLong(this.bufferView.position() + (index * 8));
     }
 }
