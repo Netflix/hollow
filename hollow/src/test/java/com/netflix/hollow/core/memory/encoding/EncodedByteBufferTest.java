@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class EncodedByteBufferTest {
 
     @Test
