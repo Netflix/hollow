@@ -39,7 +39,7 @@ public interface VariableLengthData extends ByteData {
      * @param destPos position in destination to begin copying to
      * @param length length of data to copy in bytes
      */
-    void orderedCopy(VariableLengthData src, long srcPos, long destPos, long length);
+    void orderedCopy(VariableLengthData src, long srcPos, long destPos, long length) throws IOException;
 
     /**
      * Data size in bytes

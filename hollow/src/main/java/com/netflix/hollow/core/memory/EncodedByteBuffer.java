@@ -33,6 +33,10 @@ public class EncodedByteBuffer implements VariableLengthData {
         this.size = 0;
     }
 
+    public BlobByteBuffer getBufferView() {
+        return bufferView;
+    }
+
     @Override
     public byte get(long index) {
         if (index >= this.size) {
@@ -64,8 +68,8 @@ public class EncodedByteBuffer implements VariableLengthData {
     }
 
     @Override
-    public void orderedCopy(VariableLengthData src, long srcPos, long destPos, long length) {
-        throw new UnsupportedOperationException("Operation not supported in shared-memory mode");
+    public void orderedCopy(VariableLengthData src, long srcPos, long destPos, long length) throws IOException {
+        throw new UnsupportedOperationException("Underlying data can only be mutated using " + VariableLengthDataFactory.StagedVariableLengthData.class.getName());
     }
 
     @Override

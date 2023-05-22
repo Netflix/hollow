@@ -83,7 +83,7 @@ public class EncodedLongBuffer implements FixedLengthData {
         buffer.position(in.getFilePointer());
         this.bufferView = buffer.duplicate();
         buffer.position(buffer.position() + (numLongs * Long.BYTES));
-        in.seek(in.getFilePointer() + (numLongs  * Long.BYTES));
+        in.seek(in.getFilePointer() + (numLongs  * Long.BYTES));    // SNAP: TODO: is this stuff unnecessary when being done in delta application? Called from FixedLengthDataFactory::allocate
     }
 
     @Override

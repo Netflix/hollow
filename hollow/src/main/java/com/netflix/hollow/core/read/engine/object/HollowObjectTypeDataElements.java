@@ -45,6 +45,7 @@ public class HollowObjectTypeDataElements {
 
     FixedLengthData fixedLengthData;
     final VariableLengthData varLengthData[];
+    final VariableLengthDataFactory.StagedVariableLengthData stagedVarLengthData[];
 
     GapEncodedVariableLengthIntegerReader encodedAdditions;
     GapEncodedVariableLengthIntegerReader encodedRemovals;
@@ -66,6 +67,7 @@ public class HollowObjectTypeDataElements {
 
     public HollowObjectTypeDataElements(HollowObjectSchema schema, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
         varLengthData = new VariableLengthData[schema.numFields()];
+        stagedVarLengthData = new VariableLengthDataFactory.StagedVariableLengthData[schema.numFields()];
         bitsPerField = new int[schema.numFields()];
         bitOffsetPerField = new int[schema.numFields()];
         nullValueForField = new long[schema.numFields()];
