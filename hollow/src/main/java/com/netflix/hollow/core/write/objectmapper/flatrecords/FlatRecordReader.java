@@ -9,11 +9,19 @@ import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 public class FlatRecordReader {
   private final FlatRecord record;
 
-  private int pointer;
+  public int pointer;
 
   public FlatRecordReader(FlatRecord record) {
     this.record = record;
     this.pointer = record.dataStartByte;
+  }
+
+  public void reset() {
+    this.pointer = record.dataStartByte;
+  }
+
+  public void resetTo(int position) {
+    this.pointer = position;
   }
 
   public boolean hasMore() {
