@@ -207,7 +207,11 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     }
                 }
             } else  {
-                obj = clazz.newInstance();
+                try {
+                    obj = clazz.newInstance();
+                } catch (InstantiationException e) {
+                    throw new IllegalStateException("Default constructor for class " + clazz.getName() + " not accessible", e);
+                }
                 for (int i = 0; i < recordObjectSchema.numFields(); i++) {
                     int posInPojoSchema = schema.getPosition(recordObjectSchema.getFieldName(i));
                     if (posInPojoSchema != -1) {
