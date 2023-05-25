@@ -694,6 +694,13 @@ public class HollowConsumer {
         default VersionInfo getLatestVersionInfo() {
             return new VersionInfo(getLatestVersion(), Optional.empty(), Optional.empty());
         }
+
+        /**
+         * @return versionInfo - the version determined for a HollowProducer to restore to while commencing a new cycle, its pinned status and announcement metadata.
+         * */
+        default VersionInfo determineVersionInfoForProducerRestore(long currentVersion) {
+            throw new UnsupportedOperationException("This feature is limited and is currently supported by only a specific implementation of HollowAnnouncementWatcher.");
+        }
     }
 
     public interface DoubleSnapshotConfig {
