@@ -53,4 +53,21 @@ public interface SingleProducerEnforcer {
      * Unlock local changes to producer primary status i.e. enable/disable are unblocked
      */
     default void unlock() {}
+
+    /**
+     * This determines the number of cycles produced by the producer when it is picked as the leader or primary.
+     * The value is can be more useful for the case where the producer is built using 
+     * {@link com.netflix.hollow.api.producer.HollowProducer#enablePrimaryProducer(boolean)}
+     * and different producers can attain and lose primary status based on the underlying leader election.
+     * It gets reset to 0 when a producer gains primary status and keeps incrementing with every successfully completed
+     * producer cycle.
+     *
+     * @return number of cycles completed by the producer with primary producer status
+     * */
+    default int getCycleCountWithPrimaryStatus() { return 0; };
+
+    /**
+     * Increment the cycle count for a producer with primary(leader) status.
+     * */
+    default void incrementCycleCountWithPrimaryStatus() {};
 }

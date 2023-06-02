@@ -58,6 +58,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -86,7 +87,6 @@ abstract class AbstractHollowProducer {
     long lastSuccessfulCycle = 0;
     final HollowObjectHashCodeFinder hashCodeFinder;
     final boolean doIntegrityCheck;
-
     boolean isInitialized;
 
     @Deprecated
@@ -332,6 +332,7 @@ abstract class AbstractHollowProducer {
             // TODO: minimum time spacing between cycles
             log.log(Level.INFO, "cycle not executed -- not primary (aka leader)");
             localListeners.fireCycleSkipped(CycleListener.CycleSkipReason.NOT_PRIMARY_PRODUCER);
+            //isFirstCycleOfPrimaryProducer.compareAndSet(false, true); // wrong -> chance that both primary and non-primary are producing simultaenously during deployment
             return lastSuccessfulCycle;
         }
 
@@ -405,6 +406,7 @@ abstract class AbstractHollowProducer {
                     throw th;
                 }
                 lastSuccessfulCycle = toVersion;
+                singleProducerEnforcer.incrementCycleCountWithPrimaryStatus();
             } else {
                 // 3b. Nothing to do; reset the effects of Step 2
                 // Return the lastSucessfulCycle to the caller thereby
@@ -952,4 +954,14 @@ abstract class AbstractHollowProducer {
         }
     }
 
+    /**
+     * This determines the number of cycles produced by the producer when it is picked as the leader or primary.
+     * The value is can be more useful for the case where the producer is built using withSingleProducerEnforcer()
+     * and different producers can attain and lose primary status based on the underlying leader election.
+     *
+     * @return number of cycles completed by the producer with primary producer status
+     * */
+    public int getCycleCountWithPrimaryStatus() {
+        return singleProducerEnforcer.getCycleCountWithPrimaryStatus();
+    }
 }
