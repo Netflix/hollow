@@ -10,8 +10,10 @@ import org.junit.Test;
 @Ignore
 public class EncodedByteBufferTest {
 
+    // TODO: remove
     @Test
     public void growUsingBuffer() throws IOException  {
+        // NOTE: requires below file to pre-exist
         File f = new File("/tmp/growme");
         RandomAccessFile raf = new RandomAccessFile(f, "rws");
         FileChannel channel = raf.getChannel();

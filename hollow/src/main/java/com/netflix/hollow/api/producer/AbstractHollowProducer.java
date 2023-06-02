@@ -89,6 +89,8 @@ abstract class AbstractHollowProducer {
 
     boolean isInitialized;
 
+    private int cycleNumSincePrimary;
+
     @Deprecated
     public AbstractHollowProducer(
             HollowProducer.Publisher publisher,
@@ -317,6 +319,10 @@ abstract class AbstractHollowProducer {
      * @return true if the intended action was successful
      */
     public boolean enablePrimaryProducer(boolean doEnable) {
+        if (!singleProducerEnforcer.isPrimary()) {
+            cycleNumSincePrimary = 0;
+        }
+
         if (doEnable) {
             singleProducerEnforcer.enable();
         } else {
@@ -329,7 +335,7 @@ abstract class AbstractHollowProducer {
         ProducerListeners localListeners = listeners.listeners();
 
         if (!singleProducerEnforcer.isPrimary()) {
-            // TODO: minimum time spacing between cycles
+            cycleNumSincePrimary = 0;
             log.log(Level.INFO, "cycle not executed -- not primary (aka leader)");
             localListeners.fireCycleSkipped(CycleListener.CycleSkipReason.NOT_PRIMARY_PRODUCER);
             return lastSuccessfulCycle;
@@ -343,6 +349,7 @@ abstract class AbstractHollowProducer {
 
         Status.StageWithStateBuilder cycleStatus = localListeners.fireCycleStart(toVersion);
         try {
+            cycleNumSincePrimary ++;
             return runCycle(localListeners, incrementalPopulator, populator, cycleStatus, toVersion);
         } finally {
             localListeners.fireCycleComplete(cycleStatus);
