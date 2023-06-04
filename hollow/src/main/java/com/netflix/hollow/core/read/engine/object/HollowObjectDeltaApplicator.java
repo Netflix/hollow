@@ -42,6 +42,7 @@ class HollowObjectDeltaApplicator {
     long currentWriteVarLengthDataPointers[];
 
     int deltaFieldIndexMapping[];
+    int fromFieldIndexMapping[];
 
     GapEncodedVariableLengthIntegerReader removalsReader;
     GapEncodedVariableLengthIntegerReader additionsReader;
@@ -55,6 +56,8 @@ class HollowObjectDeltaApplicator {
     }
 
     void applyDelta() {
+        // SNAP: TODO: also handle when a field is removed in the delta schema => maybe auto handled because result is driven off target
+        // SNAP: TODO: for delta with new field in type, what do encoded removals and additions look like?
         removalsReader = from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
         additionsReader = delta.encodedAdditions;
         removalsReader.reset();
@@ -64,14 +67,16 @@ class HollowObjectDeltaApplicator {
 
         target.maxOrdinal = delta.maxOrdinal;
 
+        // map fields in target schema to fields in delta and from schemas (target schema could be delta schema or from schema depending on if DELTA_APPLIES_SCHEMA_CHANGE)
         deltaFieldIndexMapping = new int[target.bitsPerField.length];
-
+        fromFieldIndexMapping = new int[target.bitsPerField.length];
         for(int i=0;i<target.bitsPerField.length;i++) {
             deltaFieldIndexMapping[i] = delta.schema.getPosition(target.schema.getFieldName(i));
+            fromFieldIndexMapping[i] = from.schema.getPosition(target.schema.getFieldName(i));
         }
 
         for(int i=0;i<target.bitsPerField.length;i++) {
-            target.bitsPerField[i] = deltaFieldIndexMapping[i] == -1 ? from.bitsPerField[i] : delta.bitsPerField[deltaFieldIndexMapping[i]];
+            target.bitsPerField[i] = deltaFieldIndexMapping[i] == -1 ? from.bitsPerField[fromFieldIndexMapping[i]] : delta.bitsPerField[deltaFieldIndexMapping[i]]; // fromFieldIndexMapping[i] can't be -1 when deltaFieldIndexMapping[i] == -1
             target.nullValueForField[i] = target.bitsPerField[i] == 64 ? -1L : (1L << target.bitsPerField[i]) - 1;
             target.bitOffsetPerField[i] = target.bitsPerRecord;
             target.bitsPerRecord += target.bitsPerField[i];
@@ -103,7 +108,7 @@ class HollowObjectDeltaApplicator {
 
     private boolean canDoFastDelta() {
         for(int i=0;i<target.bitsPerField.length;i++) {
-            if(target.bitsPerField[i] != from.bitsPerField[i])
+            if(fromFieldIndexMapping[i] == -1 || target.bitsPerField[i] != from.bitsPerField[fromFieldIndexMapping[i]])
                 return false;
         }
         return true;
@@ -138,16 +143,17 @@ class HollowObjectDeltaApplicator {
         currentFromStateReadFixedLengthStartBit += fixedLengthBitsToCopy;
 
         for(int i=0;i<from.schema.numFields();i++) {
+            // fromFieldIndexMapping[i] can not be -1 is a precondition for fast deltas
             if(target.varLengthData[i] != null) {
-                long fromEndByte = from.fixedLengthData.getElementValue(currentFromStateReadFixedLengthStartBit - from.bitsPerRecord + from.bitOffsetPerField[i], from.bitsPerField[i]);
-                fromEndByte &= (from.nullValueForField[i] >>> 1);
-                long varLengthToCopy = fromEndByte - currentFromStateReadVarLengthDataPointers[i];
-                long varLengthDiff = currentWriteVarLengthDataPointers[i] - currentFromStateReadVarLengthDataPointers[i];
+                long fromEndByte = from.fixedLengthData.getElementValue(currentFromStateReadFixedLengthStartBit - from.bitsPerRecord + from.bitOffsetPerField[fromFieldIndexMapping[i]], from.bitsPerField[fromFieldIndexMapping[i]]);
+                fromEndByte &= (from.nullValueForField[fromFieldIndexMapping[i]] >>> 1);
+                long varLengthToCopy = fromEndByte - currentFromStateReadVarLengthDataPointers[fromFieldIndexMapping[i]];  // SNAP: TODO: all currentFromStateReadVarLengthDataPointers to be indexed by fromFieldIndexMapping[i]
+                long varLengthDiff = currentWriteVarLengthDataPointers[i] - currentFromStateReadVarLengthDataPointers[fromFieldIndexMapping[i]];
 
-                target.varLengthData[i].orderedCopy(from.varLengthData[i], currentFromStateReadVarLengthDataPointers[i], currentWriteVarLengthDataPointers[i], varLengthToCopy);
-                target.fixedLengthData.incrementMany(currentWriteFixedLengthStartBit + from.bitOffsetPerField[i], varLengthDiff, from.bitsPerRecord, recordsToCopy);
+                target.varLengthData[i].orderedCopy(from.varLengthData[fromFieldIndexMapping[i]], currentFromStateReadVarLengthDataPointers[fromFieldIndexMapping[i]], currentWriteVarLengthDataPointers[i], varLengthToCopy);
+                target.fixedLengthData.incrementMany(currentWriteFixedLengthStartBit + from.bitOffsetPerField[fromFieldIndexMapping[i]], varLengthDiff, from.bitsPerRecord, recordsToCopy);
 
-                currentFromStateReadVarLengthDataPointers[i] += varLengthToCopy;
+                currentFromStateReadVarLengthDataPointers[fromFieldIndexMapping[i]] += varLengthToCopy;
                 currentWriteVarLengthDataPointers[i] += varLengthToCopy;
             }
         }
@@ -167,14 +173,15 @@ class HollowObjectDeltaApplicator {
 
         for(int fieldIndex=0;fieldIndex<numMergeFields;fieldIndex++) {
             int deltaFieldIndex = deltaFieldIndexMapping[fieldIndex];
+            int fromFieldIndex = fromFieldIndexMapping[fieldIndex];
 
             if(addFromDelta) {
-                addFromDelta(removeData, fieldIndex, deltaFieldIndex);
+                addFromDelta(removeData, fieldIndex, deltaFieldIndex, fromFieldIndex);
 
             } else {
                 if(i <= from.maxOrdinal) {
-                    long readStartBit = currentFromStateReadFixedLengthStartBit + from.bitOffsetPerField[fieldIndex];
-                    copyRecordField(fieldIndex, fieldIndex, from, readStartBit, currentWriteFixedLengthStartBit, currentFromStateReadVarLengthDataPointers, currentWriteVarLengthDataPointers, removeData);
+                    long readStartBit = currentFromStateReadFixedLengthStartBit + from.bitOffsetPerField[fromFieldIndexMapping[fieldIndex]];
+                    copyRecordField(fieldIndex, fromFieldIndexMapping[fieldIndex], from, readStartBit, currentWriteFixedLengthStartBit, currentFromStateReadVarLengthDataPointers, currentWriteVarLengthDataPointers, removeData);
                 } else if(target.varLengthData[fieldIndex] != null) {
                 	writeNullVarLengthField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
                 }
@@ -192,7 +199,7 @@ class HollowObjectDeltaApplicator {
             removalsReader.advance();
     }
 
-    private void addFromDelta(boolean removeData, int fieldIndex, int deltaFieldIndex) {
+    private void addFromDelta(boolean removeData, int fieldIndex, int deltaFieldIndex, int fromFieldIndex) {
         if(deltaFieldIndex == -1) {
             writeNullField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
         } else {
@@ -202,9 +209,10 @@ class HollowObjectDeltaApplicator {
 
         /// skip over var length data in from state, if removed.
         if(removeData && target.varLengthData[fieldIndex] != null) {
-            long readValue = from.fixedLengthData.getElementValue(currentFromStateReadFixedLengthStartBit + from.bitOffsetPerField[fieldIndex], from.bitsPerField[fieldIndex]);
-            if((readValue & (1L << (from.bitsPerField[fieldIndex] - 1))) == 0)
-                currentFromStateReadVarLengthDataPointers[fieldIndex] = readValue;
+            // fromFieldIndex won't be -1 here
+            long readValue = from.fixedLengthData.getElementValue(currentFromStateReadFixedLengthStartBit + from.bitOffsetPerField[fromFieldIndex], from.bitsPerField[fromFieldIndex]);
+            if((readValue & (1L << (from.bitsPerField[fromFieldIndex] - 1))) == 0)
+                currentFromStateReadVarLengthDataPointers[fromFieldIndex] = readValue;
         }
     }
 

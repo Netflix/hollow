@@ -150,7 +150,7 @@ public class HollowBlobWriter {
             executor.execute(new Runnable() {
                 public void run() {
                     if(typeState.hasChangedSinceLastCycle())
-                        typeState.calculateDelta();
+                        typeState.calculateDelta(); // here
                 }
             });
         }

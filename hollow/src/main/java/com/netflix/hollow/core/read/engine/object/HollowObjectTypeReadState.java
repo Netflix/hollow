@@ -50,6 +50,8 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     private int maxOrdinal;
 
+    private final boolean DELTA_APPLIES_SCHEMA_CHANGE = true;
+
     public HollowObjectTypeReadState(HollowReadStateEngine fileEngine, HollowObjectSchema schema) {
         this(fileEngine, MemoryMode.ON_HEAP, schema, schema, 1);
     }
@@ -126,10 +128,12 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
                 deltaData.encodedAdditions.destroy();
             } else {
-                HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
+                HollowObjectTypeDataElements nextData = DELTA_APPLIES_SCHEMA_CHANGE ?
+                        new HollowObjectTypeDataElements((HollowObjectSchema) deltaSchema, memoryMode, memoryRecycler)
+                        : new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
                 HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
                 nextData.applyDelta(oldData, deltaData);
-                shards[i].setCurrentData(nextData);
+                shards[i].setCurrentData(nextData); // if DELTA_APPLIES_SCHEMA_CHANGE then some shards may momentarily have different schema than others
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
                 oldData.destroy();
             }
