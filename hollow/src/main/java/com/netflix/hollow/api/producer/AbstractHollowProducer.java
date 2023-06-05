@@ -86,6 +86,9 @@ abstract class AbstractHollowProducer {
     long lastSuccessfulCycle = 0;
     final HollowObjectHashCodeFinder hashCodeFinder;
     final boolean doIntegrityCheck;
+    // Count to track number of cycles run by a primary producer. In the future, this can be useful in determining stickiness of a
+    // producer instance.
+    int cycleCountSincePrimaryStatus = 0;
 
     boolean isInitialized;
 
@@ -317,6 +320,9 @@ abstract class AbstractHollowProducer {
      * @return true if the intended action was successful
      */
     public boolean enablePrimaryProducer(boolean doEnable) {
+        if (!singleProducerEnforcer.isPrimary()) {
+            cycleCountSincePrimaryStatus = 0;
+        }
         if (doEnable) {
             singleProducerEnforcer.enable();
         } else {
@@ -332,6 +338,7 @@ abstract class AbstractHollowProducer {
             // TODO: minimum time spacing between cycles
             log.log(Level.INFO, "cycle not executed -- not primary (aka leader)");
             localListeners.fireCycleSkipped(CycleListener.CycleSkipReason.NOT_PRIMARY_PRODUCER);
+            cycleCountSincePrimaryStatus = 0; // reset this to 0 as producer instance does not have primary status
             return lastSuccessfulCycle;
         }
 
@@ -434,6 +441,8 @@ abstract class AbstractHollowProducer {
             throw new RuntimeException(th);
         } finally {
             artifacts.cleanup();
+            // increment the cycle count for a producer with primary status for both cases of cycle runs - success or failure.
+            cycleCountSincePrimaryStatus ++;
         }
         return lastSuccessfulCycle;
     }
@@ -950,6 +959,17 @@ abstract class AbstractHollowProducer {
         @Override
         public void cleanDeltas() {
         }
+    }
+
+    /**
+     * This determines the latest number of cycles completed by a producer with a primary status. This value is 0 by default and
+     * increments by 1 only for a successful cycle and gets reset to 0 whenever a producer loses its primary status at
+     * any time during the cycle is being run.
+     *
+     * @return cycle count of a producer with primary status.
+     * */
+    public int getCycleCountWithPrimaryStatus() {
+        return this.cycleCountSincePrimaryStatus;
     }
 
 }

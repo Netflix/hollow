@@ -103,15 +103,16 @@ public class HollowProducerTest {
         long v1 = producer.runCycle(ws -> {
             ws.add(1);
         });
-
+        Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 1);
         // Run cycle with no changes
         long v2 = producer.runCycle(ws -> {
             ws.add(1);
         });
-
+        Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 2);
         long v3 = producer.runCycle(ws -> {
             ws.add(2);
         });
+        Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 3);
 
         Assert.assertEquals(v1, v2);
         Assert.assertTrue(v3 > v2);
@@ -135,7 +136,7 @@ public class HollowProducerTest {
         long v2 = producer.runCycle(ws -> {
             ws.add(1);
         });
-
+        Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 0);
         // Run cycle as the primary producer
         enforcer.enable();
         long v3 = producer.runCycle(ws -> {
@@ -144,6 +145,7 @@ public class HollowProducerTest {
 
         Assert.assertEquals(v1, v2);
         Assert.assertTrue(v3 > v2);
+        Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 1);
     }
 
     @Test
@@ -167,6 +169,7 @@ public class HollowProducerTest {
         } catch (IllegalStateException e) {
             Assert.assertTrue(e instanceof HollowProducer.NotPrimaryMidCycleException);
             Assert.assertEquals("Publish failed primary (aka leader) check", e.getMessage());
+            Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 2); // counted as cycle ran for the producer with primary status but lost status mid cycle. Doesn't matter as the next cycle result in a no-op.
             return;
         }
         Assert.fail();
@@ -187,6 +190,7 @@ public class HollowProducerTest {
             });
         } catch (HollowProducer.NotPrimaryMidCycleException e) {
             Assert.assertEquals("Announcement failed primary (aka leader) check", e.getMessage());
+            Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 1); // counted as cycle ran for producer with primary status
             return;
         }
         Assert.fail();
@@ -204,6 +208,7 @@ public class HollowProducerTest {
 
         Assert.assertNotNull(lastRestoreStatus);
         Assert.assertEquals(Status.FAIL, lastRestoreStatus.getStatus());
+        Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 0);
     }
 
     @Test
@@ -215,6 +220,7 @@ public class HollowProducerTest {
         Assert.assertNotNull(lastRestoreStatus);
         Assert.assertEquals(Status.SUCCESS, lastRestoreStatus.getStatus());
         Assert.assertEquals("Version should be the same", version, lastRestoreStatus.getDesiredVersion());
+        Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 1);
     }
 
     @Test
@@ -242,6 +248,7 @@ public class HollowProducerTest {
             long version = testPublishV1(producer, size, valueMultiplier);
             versions.add(version);
         }
+        Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 5);
 
         System.out.println("\n\n------------ Restore and validate ------------\n");
         for (int i = 0; i < versions.size(); i++) {
@@ -286,6 +293,7 @@ public class HollowProducerTest {
         { // Publish V1
             HollowProducer producer = createProducer(tmpFolder, schema);
             v1 = testPublishV1(producer, sizeV1, valueMultiplierV1);
+            Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 1);
         }
 
         // Publish V2;
@@ -317,6 +325,7 @@ public class HollowProducerTest {
             int valueFieldCount = 2;
             restoreAndAssert(producerV2, v3, sizeV3, valueMultiplierV3, valueFieldCount);
         }
+        Assert.assertEquals(producerV2.getCycleCountWithPrimaryStatus(), 2);
     }
 
     @Test
@@ -332,6 +341,7 @@ public class HollowProducerTest {
                 lastRestoreStatus.getVersionReached());
         Assert.assertEquals("Should have correct desired version", version + 1,
                 lastRestoreStatus.getDesiredVersion());
+        Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 0); // no cycle run
     }
 
     @Test
@@ -347,6 +357,7 @@ public class HollowProducerTest {
         }
         Assert.assertEquals("Should still have no populated ordinals", 0,
                 producer.getWriteEngine().getTypeState("TestPojo").getPopulatedBitSet().cardinality());
+        Assert.assertEquals(producer.getCycleCountWithPrimaryStatus(), 1); // counted as cycle ran for producer with primary status
     }
 
     private long testPublishV1(HollowProducer producer, final int size, final int valueMultiplier) {
