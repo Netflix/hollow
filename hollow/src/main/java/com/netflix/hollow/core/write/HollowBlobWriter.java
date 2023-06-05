@@ -149,8 +149,11 @@ public class HollowBlobWriter {
         for(final HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
             executor.execute(new Runnable() {
                 public void run() {
+                    // if(typeState.hasSchemaChangedSinceLastCycle())
+                    //     typeState.calculateDeltaWithSchemaChange();
+                    // else
                     if(typeState.hasChangedSinceLastCycle())
-                        typeState.calculateDelta(); // here
+                        typeState.calculateDelta();
                 }
             });
         }

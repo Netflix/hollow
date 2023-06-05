@@ -259,7 +259,16 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         maxOrdinal = ordinalMap.maxOrdinal();
         int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
 
+        // SNAP: TODO: One option is to say || toCyclePopulated if schema changed in this deltas- but that affects how consumers process additions (they only read from delta state and dont skip over from state)
         ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
+
+        boolean SCHEMA_CHANGE_IN_THIS_DELTA = true;
+        if (SCHEMA_CHANGE_IN_THIS_DELTA) {
+            deltaAdditions = toCyclePopulated;  // SNAP: TODO: backwards compatibility for consumers
+        }
+
+        // instead, maybe we can encode reused ordinals when schema changed
+        // ThreadSafeBitSet deltaReusals = toCyclePopulated.and(fromCyclePopulated);
 
         fixedLengthLongArray = new FixedLengthElementArray[numShards];
         deltaAddedOrdinals = new ByteDataArray[numShards];

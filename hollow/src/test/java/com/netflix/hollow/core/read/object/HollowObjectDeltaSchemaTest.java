@@ -51,14 +51,13 @@ public class HollowObjectDeltaSchemaTest extends AbstractStateEngineTest {
 
         HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
 
-        Assert.assertEquals(6, typeState.maxOrdinal());
+        Assert.assertEquals(4, typeState.maxOrdinal());
 
-        assertObject(typeState, 0, 1, "one");   /// these were "removed", but data hangs around as a "ghost" until the following cycle.
-        assertObject(typeState, 1, 2, "two");   /// these were "removed", but data hangs around as a "ghost" until the following cycle.
-        assertObject(typeState, 2, 3, "three"); /// these were "removed", but data hangs around as a "ghost" until the following cycle.
-        assertObject(typeState, 3, 1, "one", 1L);
-        assertObject(typeState, 4, 3, "three", 3L);
-        assertObject(typeState, 5, 0, "zero", 0L);
+        assertObject(typeState, 0, 1, "one", 1L);   /// these were "removed", but data hangs around as a "ghost" until the following cycle.
+        // assertObject(typeState, 1, 2, "two");   /// these were "removed", but data hangs around as a "ghost" until the following cycle.
+        assertObject(typeState, 2, 3, "three", 3L); /// these were "removed", but data hangs around as a "ghost" until the following cycle.
+        assertObject(typeState, 3, 10000, "ten thousand", 10000L);
+        assertObject(typeState, 4, 0, "zero", 0L);
     }
 
     private void addRecord(int intVal, String strVal) {
@@ -92,7 +91,7 @@ public class HollowObjectDeltaSchemaTest extends AbstractStateEngineTest {
 
         Assert.assertEquals(intVal, obj.getInt("f1"));
         Assert.assertEquals(strVal, obj.getString("f2"));
-        Assert.assertEquals(longVal, obj.getString("f3"));
+        Assert.assertEquals(longVal, obj.getLong("f3"));
     }
 
     @Override

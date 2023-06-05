@@ -42,15 +42,13 @@ import java.util.BitSet;
 public class HollowObjectTypeReadState extends HollowTypeReadState implements HollowObjectTypeDataAccess {
 
     private final HollowObjectSchema unfilteredSchema;
-    private final HollowObjectSampler sampler;
+    private HollowObjectSampler sampler;
 
     private final int shardNumberMask;
     private final int shardOrdinalShift;
     private final HollowObjectTypeReadStateShard shards[];
 
     private int maxOrdinal;
-
-    private final boolean DELTA_APPLIES_SCHEMA_CHANGE = false;
 
     public HollowObjectTypeReadState(HollowReadStateEngine fileEngine, HollowObjectSchema schema) {
         this(fileEngine, MemoryMode.ON_HEAP, schema, schema, 1);
@@ -113,7 +111,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryMode, memoryRecycler);
             deltaData.readDelta(in);
             if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
-
+                // SNAP: TODO: double check for ordinals that get reused when a new field is present in delta- those don't show up under encodedAdditions
                 if(!deltaData.encodedRemovals.isEmpty())
                     notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
 
@@ -138,6 +136,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
                 nextData.applyDelta(oldData, deltaData);
                 shards[i].setCurrentData(nextData); // if DELTA_APPLIES_SCHEMA_CHANGE then some shards may momentarily have different schema than others
+                shards[i].schema = nextData.schema;
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
                 oldData.destroy();
             }
@@ -147,6 +146,12 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         if(shards.length == 1)
             maxOrdinal = shards[0].currentDataElements().maxOrdinal;
+
+        this.sampler = new HollowObjectSampler(shards[0].schema, DisabledSamplingDirector.INSTANCE);
+        this.schema = shards[0].schema;
+        // SNAP: TODO: write in a new state instead of manipulating state that is currently final
+        // HollowObjectTypeReadState newState = new HollowObjectTypeReadState(stateEngine, shards[0].schema);
+        // return newState;
     }
 
     public static void discardSnapshot(HollowBlobInput in, HollowObjectSchema schema, int numShards) throws IOException {

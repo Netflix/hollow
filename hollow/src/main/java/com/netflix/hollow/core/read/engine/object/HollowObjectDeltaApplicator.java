@@ -59,7 +59,7 @@ class HollowObjectDeltaApplicator {
         // SNAP: TODO: also handle when a field is removed in the delta schema => maybe auto handled because result is driven off target
         // SNAP: TODO: for delta with new field in type, what do encoded removals and additions look like?
         // SNAP: TODO: Hmm, maybe not encoded as removals? For ghost records
-        removalsReader = from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
+        removalsReader = from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;  // note this is removals in from, or ghosts in delta. Removals in delta are propagated to target.encodedRemovals below
         additionsReader = delta.encodedAdditions;
         removalsReader.reset();
         additionsReader.reset();
@@ -176,15 +176,24 @@ class HollowObjectDeltaApplicator {
             int deltaFieldIndex = deltaFieldIndexMapping[fieldIndex];
             int fromFieldIndex = fromFieldIndexMapping[fieldIndex];
 
+            // SNAP: TODO: ordinals where new field value is added in delta get reused, but dont appear in addFromDelta
+            // if (appearsInDelta?) {   // field added
+            //     addFromDelta(removeData, fieldIndex, deltaFieldIndex, fromFieldIndex);
+            // }
             if(addFromDelta) {
-                addFromDelta(removeData, fieldIndex, deltaFieldIndex, fromFieldIndex);
-
+                // if (from.populatedOrdinals.get(i)) {
+                    // both- from popualted & delta additions contain ordinal, because new field in schema
+                    // add from delta while advancing from (advance already happening below)
+                //     addFromDelta(removeData, fieldIndex, deltaFieldIndex, fromFieldIndex, true);
+                // } else {
+                    addFromDelta(removeData, fieldIndex, deltaFieldIndex, fromFieldIndex, false);
+                // }
             } else {
                 if(i <= from.maxOrdinal) {
-                    if (fromFieldIndexMapping[fieldIndex] != -1) {  // new field, all old records not containing field in from state will be skipped
+                    if (fromFieldIndexMapping[fieldIndex] != -1) {  // new field in delta, nothing in from to copy over
                         long readStartBit = currentFromStateReadFixedLengthStartBit + from.bitOffsetPerField[fromFieldIndexMapping[fieldIndex]];
                         copyRecordField(fieldIndex, fromFieldIndexMapping[fieldIndex], from, readStartBit, currentWriteFixedLengthStartBit, currentFromStateReadVarLengthDataPointers, currentWriteVarLengthDataPointers, removeData);
-                    }
+                    } // SNAP: TODO: should we write null fixed length field here?
                 } else if(target.varLengthData[fieldIndex] != null) {
                 	writeNullVarLengthField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
                 }
@@ -202,13 +211,18 @@ class HollowObjectDeltaApplicator {
             removalsReader.advance();
     }
 
-    private void addFromDelta(boolean removeData, int fieldIndex, int deltaFieldIndex, int fromFieldIndex) {
+    private void addFromDelta(boolean removeData, int fieldIndex, int deltaFieldIndex, int fromFieldIndex, boolean advanceFrom) {
         if(deltaFieldIndex == -1) {
             writeNullField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
         } else {
             long readStartBit = currentDeltaStateReadFixedLengthStartBit + delta.bitOffsetPerField[deltaFieldIndex];
             copyRecordField(fieldIndex, deltaFieldIndex, delta, readStartBit, currentWriteFixedLengthStartBit, currentDeltaReadVarLengthDataPointers, currentWriteVarLengthDataPointers, false);
         }
+
+        // if (advanceFrom && fromFieldIndexMapping[fieldIndex] != -1) {
+        //     long readStartBit = currentFromStateReadFixedLengthStartBit + from.bitOffsetPerField[fromFieldIndexMapping[fieldIndex]];
+        //     advance(fieldIndex, fromFieldIndexMapping[fieldIndex], from, readStartBit, currentFromStateReadVarLengthDataPointers);
+        // }
 
         /// skip over var length data in from state, if removed.
         if(removeData && target.varLengthData[fieldIndex] != null) {
@@ -243,6 +257,20 @@ class HollowObjectDeltaApplicator {
                 writeNullFixedLengthField(fieldIndex, currentWriteFixedLengthStartBit);
             else
                 target.fixedLengthData.setElementValue(currentWriteFixedLengthStartBit, target.bitsPerField[fieldIndex], readValue);
+        }
+    }
+
+    private void advance(int fieldIndex, int fromFieldIndex, HollowObjectTypeDataElements copyFromData, long currentReadFixedLengthStartBit,
+                         long[] currentReadVarLengthDataPointers) {
+        long readValue = copyFromData.bitsPerField[fromFieldIndex] > 56 ?
+                copyFromData.fixedLengthData.getLargeElementValue(currentReadFixedLengthStartBit, copyFromData.bitsPerField[fromFieldIndex])
+                : copyFromData.fixedLengthData.getElementValue(currentReadFixedLengthStartBit, copyFromData.bitsPerField[fromFieldIndex]);
+
+        if(target.varLengthData[fieldIndex] != null) {
+            if((readValue & (1L << (copyFromData.bitsPerField[fromFieldIndex] - 1))) != 0) {
+            } else {
+                currentReadVarLengthDataPointers[fieldIndex] = readValue;
+            }
         }
     }
 

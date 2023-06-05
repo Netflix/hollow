@@ -28,6 +28,7 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.io.IOException;
+import java.util.BitSet;
 
 /**
  * This class holds the data for a {@link HollowObjectTypeReadState}.
@@ -57,6 +58,12 @@ public class HollowObjectTypeDataElements {
 
     final ArraySegmentRecycler memoryRecycler;
     final MemoryMode memoryMode;
+
+    // populated for target once delta transition to target is done, before next transition when this object is the from state
+    BitSet populatedOrdinals;
+    public void setPopulatedOrdinals(BitSet populatedOrdinals) {
+        this.populatedOrdinals = populatedOrdinals;
+    }
 
     public HollowObjectTypeDataElements(HollowObjectSchema schema, ArraySegmentRecycler memoryRecycler) {
         this(schema, MemoryMode.ON_HEAP, memoryRecycler);

@@ -37,7 +37,7 @@ class HollowObjectTypeReadStateShard {
 
     private volatile HollowObjectTypeDataElements currentDataVolatile;
 
-    private final HollowObjectSchema schema;
+    HollowObjectSchema schema;
     
     HollowObjectTypeReadStateShard(HollowObjectSchema schema) {
         this.schema = schema;

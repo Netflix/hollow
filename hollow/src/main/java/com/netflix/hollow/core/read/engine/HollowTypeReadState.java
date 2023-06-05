@@ -40,7 +40,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
 
     protected final HollowReadStateEngine stateEngine;
     protected final MemoryMode memoryMode;
-    protected final HollowSchema schema;
+    protected HollowSchema schema;
     protected HollowTypeStateListener[] stateListeners;
 
     public HollowTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSchema schema) {
