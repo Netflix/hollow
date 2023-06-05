@@ -55,9 +55,14 @@ public class HollowBlobReader {
     private final HollowReadStateEngine stateEngine;
     private final MemoryMode memoryMode;
     private final HollowBlobHeaderReader headerReader;
+    private final boolean useDeltaSchema;
 
     public HollowBlobReader(HollowReadStateEngine stateEngine) {
         this(stateEngine, new HollowBlobHeaderReader());
+    }
+
+    public HollowBlobReader(HollowReadStateEngine stateEngine, boolean useDeltaSchema) {
+        this(stateEngine, new HollowBlobHeaderReader(), useDeltaSchema, MemoryMode.ON_HEAP);
     }
 
     public HollowBlobReader(HollowReadStateEngine stateEngine, HollowBlobHeaderReader headerReader) {
@@ -69,8 +74,13 @@ public class HollowBlobReader {
     }
 
     public HollowBlobReader(HollowReadStateEngine stateEngine, HollowBlobHeaderReader headerReader, MemoryMode memoryMode) {
+        this(stateEngine, headerReader, false, memoryMode);
+    }
+
+    public HollowBlobReader(HollowReadStateEngine stateEngine, HollowBlobHeaderReader headerReader, boolean useDeltaSchema, MemoryMode memoryMode) {
         this.stateEngine = stateEngine;
         this.headerReader = headerReader;
+        this.useDeltaSchema = useDeltaSchema;
         this.memoryMode = memoryMode;
     }
 
@@ -233,7 +243,7 @@ public class HollowBlobReader {
 
         Collection<String> typeNames = new TreeSet<String>();
         for(int i=0;i<numStates;i++) {
-            String typeName = readTypeStateDelta(in);
+            String typeName = readTypeStateDelta(in, useDeltaSchema);
             typeNames.add(typeName);
             stateEngine.getMemoryRecycler().swap();
         }
@@ -243,7 +253,7 @@ public class HollowBlobReader {
                 numStates = VarInt.readVInt(optionalPartEntry.getValue());
 
                 for(int i=0;i<numStates;i++) {
-                    String typeName = readTypeStateDelta(optionalPartEntry.getValue());
+                    String typeName = readTypeStateDelta(optionalPartEntry.getValue(), useDeltaSchema);
                     typeNames.add(typeName);
                     stateEngine.getMemoryRecycler().swap();
                 }
@@ -360,14 +370,18 @@ public class HollowBlobReader {
         typeState.readSnapshot(in, stateEngine.getMemoryRecycler());
     }
 
-    private String readTypeStateDelta(HollowBlobInput in) throws IOException {
+    private String readTypeStateDelta(HollowBlobInput in, boolean useDeltaSchema) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(in);
 
         int numShards = readNumShards(in);
 
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
         if(typeState != null) {
-            typeState.applyDelta(in, schema, stateEngine.getMemoryRecycler());
+            if (typeState instanceof HollowObjectTypeReadState) {
+                ((HollowObjectTypeReadState) typeState).applyDelta(in, schema, stateEngine.getMemoryRecycler(), useDeltaSchema);
+            } else {
+                typeState.applyDelta(in, schema, stateEngine.getMemoryRecycler());
+            }
         } else {
             discardDelta(in, schema, numShards);
         }

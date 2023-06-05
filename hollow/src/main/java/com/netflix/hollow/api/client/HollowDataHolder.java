@@ -25,6 +25,7 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.OptionalBlobPartInput;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
+import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
@@ -64,11 +65,12 @@ class HollowDataHolder {
                             HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
                             FailedTransitionTracker failedTransitionTracker, 
                             StaleHollowReferenceDetector staleReferenceDetector, 
-                            HollowConsumer.ObjectLongevityConfig objLongevityConfig) {
+                            HollowConsumer.ObjectLongevityConfig objLongevityConfig,
+                            boolean useDeltaSchema) {
         this.stateEngine = stateEngine;
         this.apiFactory = apiFactory;
         this.memoryMode = memoryMode;
-        this.reader = new HollowBlobReader(stateEngine, memoryMode);
+        this.reader = new HollowBlobReader(stateEngine, new HollowBlobHeaderReader(), useDeltaSchema, memoryMode);
         this.doubleSnapshotConfig = doubleSnapshotConfig;
         this.failedTransitionTracker = failedTransitionTracker;
         this.staleReferenceDetector = staleReferenceDetector;

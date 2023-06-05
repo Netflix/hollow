@@ -48,8 +48,12 @@ public abstract class AbstractStateEngineTest {
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, readFilter);
     }
 
+    protected void roundTripDelta(boolean withNewSchema) throws IOException {
+        StateEngineRoundTripper.roundTripDelta(writeStateEngine, readStateEngine, withNewSchema);
+    }
+
     protected void roundTripDelta() throws IOException {
-        StateEngineRoundTripper.roundTripDelta(writeStateEngine, readStateEngine);
+        roundTripDelta(false);
     }
 
     protected void restoreWriteStateEngineFromReadStateEngine() {

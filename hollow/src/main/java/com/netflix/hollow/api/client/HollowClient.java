@@ -110,7 +110,8 @@ public class HollowClient {
                                                memoryConfig,
                                                updateListener,
                                                hollowConsumerMetrics,
-                                               null);
+                                               null,
+                                 false);
         this.announcementWatcher = announcementWatcher;
         announcementWatcher.setClientToNotify(this);
     }

@@ -58,6 +58,7 @@ class HollowObjectDeltaApplicator {
     void applyDelta() {
         // SNAP: TODO: also handle when a field is removed in the delta schema => maybe auto handled because result is driven off target
         // SNAP: TODO: for delta with new field in type, what do encoded removals and additions look like?
+        // SNAP: TODO: Hmm, maybe not encoded as removals? For ghost records
         removalsReader = from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
         additionsReader = delta.encodedAdditions;
         removalsReader.reset();
@@ -180,8 +181,10 @@ class HollowObjectDeltaApplicator {
 
             } else {
                 if(i <= from.maxOrdinal) {
-                    long readStartBit = currentFromStateReadFixedLengthStartBit + from.bitOffsetPerField[fromFieldIndexMapping[fieldIndex]];
-                    copyRecordField(fieldIndex, fromFieldIndexMapping[fieldIndex], from, readStartBit, currentWriteFixedLengthStartBit, currentFromStateReadVarLengthDataPointers, currentWriteVarLengthDataPointers, removeData);
+                    if (fromFieldIndexMapping[fieldIndex] != -1) {  // new field, all old records not containing field in from state will be skipped
+                        long readStartBit = currentFromStateReadFixedLengthStartBit + from.bitOffsetPerField[fromFieldIndexMapping[fieldIndex]];
+                        copyRecordField(fieldIndex, fromFieldIndexMapping[fieldIndex], from, readStartBit, currentWriteFixedLengthStartBit, currentFromStateReadVarLengthDataPointers, currentWriteVarLengthDataPointers, removeData);
+                    }
                 } else if(target.varLengthData[fieldIndex] != null) {
                 	writeNullVarLengthField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
                 }

@@ -90,14 +90,19 @@ public class StateEngineRoundTripper {
      * @throws IOException if the round trip from write to read state failed
      */
     public static void roundTripDelta(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine) throws IOException {
+        roundTripDelta(writeEngine, readEngine, false);
+    }
+
+    public static void roundTripDelta(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine, boolean withNewSchema) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
         writer.writeDelta(baos);
-        HollowBlobReader reader = new HollowBlobReader(readEngine);
+        HollowBlobReader reader = new HollowBlobReader(readEngine, withNewSchema);
         try (HollowBlobInput hbi = HollowBlobInput.serial(baos.toByteArray())) {
             reader.applyDelta(hbi);
         }
         writeEngine.prepareForNextCycle();
     }
+
 
 }

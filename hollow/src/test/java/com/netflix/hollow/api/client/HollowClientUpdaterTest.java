@@ -81,7 +81,7 @@ public class HollowClientUpdaterTest {
         MemoryMode memoryMode = MemoryMode.ON_HEAP;
 
         subject = new HollowClientUpdater(retriever, emptyList(), apiFactory, snapshotConfig,
-                null, memoryMode, objectLongevityConfig, objectLongevityDetector, metrics, null);
+                null, memoryMode, objectLongevityConfig, objectLongevityDetector, metrics, null, false);
     }
 
     @Test

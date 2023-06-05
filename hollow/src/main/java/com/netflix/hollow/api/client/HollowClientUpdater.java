@@ -55,6 +55,7 @@ public class HollowClientUpdater {
     private final HollowObjectHashCodeFinder hashCodeFinder;
     private final MemoryMode memoryMode;
     private final HollowConsumer.ObjectLongevityConfig objectLongevityConfig;
+    private final boolean useDeltaSchema;
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
     private final HollowConsumerMetrics metrics;
     private final HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
@@ -72,7 +73,8 @@ public class HollowClientUpdater {
                                HollowConsumer.ObjectLongevityConfig objectLongevityConfig,
                                HollowConsumer.ObjectLongevityDetector objectLongevityDetector,
                                HollowConsumerMetrics metrics,
-                               HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
+                               HollowMetricsCollector<HollowConsumerMetrics> metricsCollector,
+                               boolean useDeltaSchema) {    // SNAP: TODO: major version release
         this.planner = new HollowUpdatePlanner(transitionCreator, doubleSnapshotConfig);
         this.failedTransitionTracker = new FailedTransitionTracker();
         this.staleReferenceDetector = new StaleHollowReferenceDetector(objectLongevityConfig, objectLongevityDetector);
@@ -87,6 +89,7 @@ public class HollowClientUpdater {
         this.staleReferenceDetector.startMonitoring();
         this.metrics = metrics;
         this.metricsCollector = metricsCollector;
+        this.useDeltaSchema = useDeltaSchema;
         this.initialLoad = new CompletableFuture<>();
     }
 
@@ -298,7 +301,7 @@ public class HollowClientUpdater {
     private HollowDataHolder newHollowDataHolder() {
         return new HollowDataHolder(newStateEngine(), apiFactory, memoryMode,
                 doubleSnapshotConfig, failedTransitionTracker,
-                staleReferenceDetector, objectLongevityConfig)
+                staleReferenceDetector, objectLongevityConfig, useDeltaSchema)
                 .setFilter(filter)
                 .setSkipTypeShardUpdateWithNoAdditions(skipTypeShardUpdateWithNoAdditions);
     }

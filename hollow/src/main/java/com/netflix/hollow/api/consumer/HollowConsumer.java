@@ -176,7 +176,8 @@ public class HollowConsumer {
                 objectLongevityConfig,
                 objectLongevityDetector,
                 metrics,
-                metricsCollector);
+                metricsCollector,
+                false);
         updater.setFilter(dataFilter);
         this.announcementWatcher = announcementWatcher;
         this.refreshExecutor = refreshExecutor;
@@ -199,7 +200,8 @@ public class HollowConsumer {
                 builder.objectLongevityConfig,
                 builder.objectLongevityDetector,
                 metrics,
-                builder.metricsCollector);
+                builder.metricsCollector,
+                builder.useDeltaSchema);
         updater.setFilter(builder.typeFilter);
         if(builder.skipTypeShardUpdateWithNoAdditions)
             updater.setSkipShardUpdateWithNoAdditions(true);
@@ -1084,6 +1086,7 @@ public class HollowConsumer {
         protected Executor refreshExecutor = null;
         protected MemoryMode memoryMode = MemoryMode.ON_HEAP;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
+        protected boolean useDeltaSchema = false;
         protected boolean skipTypeShardUpdateWithNoAdditions = false;
 
         public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
@@ -1331,6 +1334,11 @@ public class HollowConsumer {
 
         public B withMetricsCollector(HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
             this.metricsCollector = metricsCollector;
+            return (B)this;
+        }
+
+        public B withUseDeltaSchema() {
+            this.useDeltaSchema = true;
             return (B)this;
         }
         
