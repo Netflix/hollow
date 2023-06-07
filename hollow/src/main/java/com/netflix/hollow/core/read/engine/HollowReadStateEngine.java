@@ -61,6 +61,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     private Set<String> typesWithDefinedHashCodes = new HashSet<String>();
 
     private long currentRandomizedTag;
+    private long originRandomizedTag;
 
     private MissingDataHandler missingDataHandler = new DefaultMissingDataHandler();
 
@@ -308,8 +309,16 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
         return currentRandomizedTag;
     }
 
+    public long getOriginRandomizedTag() {
+        return originRandomizedTag;
+    }
+
     public void setCurrentRandomizedTag(long currentRandomizedTag) {
         this.currentRandomizedTag = currentRandomizedTag;
+    }
+
+    public void setOriginRandomizedTag(long originRandomizedTag) {
+        this.originRandomizedTag = originRandomizedTag;
     }
 
     private void populatedDefinedHashCodesTypesIfHeaderTagIsPresent() {

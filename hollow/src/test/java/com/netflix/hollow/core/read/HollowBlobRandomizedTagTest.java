@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.read;
 
+import static org.junit.Assert.assertEquals;
+
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
@@ -117,6 +119,23 @@ public class HollowBlobRandomizedTagTest {
 
         reader.applyDelta(HollowBlobInput.serial(delta1));
         reader.applyDelta(HollowBlobInput.serial(delta2));
+    }
+
+    @Test
+    public void originRandomizedTagPresence() throws IOException {
+        HollowReadStateEngine stateEngine = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(stateEngine);
+
+        reader.readSnapshot(HollowBlobInput.serial(snapshot));
+        assertEquals(-1, stateEngine.getOriginRandomizedTag());
+
+        long tag = stateEngine.getCurrentRandomizedTag();
+        reader.applyDelta(HollowBlobInput.serial(delta1));
+        assertEquals(tag, stateEngine.getOriginRandomizedTag());
+
+        tag = stateEngine.getCurrentRandomizedTag();
+        reader.applyDelta(HollowBlobInput.serial(reversedelta1));
+        assertEquals(tag, stateEngine.getOriginRandomizedTag());
     }
 
 }
