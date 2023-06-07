@@ -265,6 +265,7 @@ public class HollowBlobReader {
             throw new IOException("Attempting to apply a delta to a state from which it was not originated!");
 
         stateEngine.setCurrentRandomizedTag(header.getDestinationRandomizedTag());
+        stateEngine.setOriginRandomizedTag(header.getOriginRandomizedTag());
         stateEngine.setHeaderTags(header.getHeaderTags());
         return header;
     }
