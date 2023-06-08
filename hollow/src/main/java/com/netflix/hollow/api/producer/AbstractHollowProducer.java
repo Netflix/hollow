@@ -338,7 +338,7 @@ abstract class AbstractHollowProducer {
             // TODO: minimum time spacing between cycles
             log.log(Level.INFO, "cycle not executed -- not primary (aka leader)");
             localListeners.fireCycleSkipped(CycleListener.CycleSkipReason.NOT_PRIMARY_PRODUCER);
-            cycleCountSincePrimaryStatus = 0; // reset this to 0 as producer instance does not have primary status
+            cycleCountSincePrimaryStatus = 0;
             return lastSuccessfulCycle;
         }
 
@@ -441,7 +441,6 @@ abstract class AbstractHollowProducer {
             throw new RuntimeException(th);
         } finally {
             artifacts.cleanup();
-            // increment the cycle count for a producer with primary status for both cases of cycle runs - success or failure.
             cycleCountSincePrimaryStatus ++;
         }
         return lastSuccessfulCycle;
