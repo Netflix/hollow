@@ -2,8 +2,10 @@ package com.netflix.hollow.core.memory;
 
 import static com.netflix.hollow.core.memory.encoding.BlobByteBuffer.MAX_SINGLE_BUFFER_CAPACITY;
 
+import com.netflix.hollow.Hollow;
 import com.netflix.hollow.core.memory.encoding.EncodedLongBuffer;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.File;
@@ -24,6 +26,16 @@ public class FixedLengthDataFactory {
         } else {
             throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
         }
+    }
+
+    // allocate (for write)
+    public static FixedLengthData allocate(HollowBlobInput in,
+                                           MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler,
+                                           String fileName) throws IOException {
+
+        long numLongs = VarInt.readVLong(in);
+        long numBits = numLongs << 6;
+        return allocate(numBits, memoryMode, memoryRecycler, fileName);
     }
 
     public static FixedLengthData allocate(long numBits, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler,

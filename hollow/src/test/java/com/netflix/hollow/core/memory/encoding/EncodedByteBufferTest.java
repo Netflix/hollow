@@ -3,6 +3,7 @@ package com.netflix.hollow.core.memory.encoding;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -52,5 +53,20 @@ public class EncodedByteBufferTest {
         FileChannel channel = raf.getChannel();
         BlobByteBuffer buffer = BlobByteBuffer.mmapBlob(channel, 1024 * 1024);
         System.out.println("Mapped buffer size: " + buffer.getChannel().size());
+    }
+
+    @Test
+    public void testOrderedCopyToRaf() {
+        // MappedByteBuffer bulk read bytes
+        //  public ByteBuffer get(byte[] dst, int offset, int length) {
+        // Raf build write bytes
+        //  public void write(byte b[], int off, int len) throws IOException {
+        MappedByteBuffer mappedByteBuffer;
+        byte[] tmp;
+        // mappedByteBuffer.get(tmp, 1, 4);
+
+        RandomAccessFile raf;
+        // raf.write(tmp, 1, 4);
+
     }
 }

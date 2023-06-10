@@ -86,6 +86,12 @@ public class HollowSetTypeDataElements {
 
         setPointerAndSizeData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
         elementData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
+        // setPointerAndSizeData = FixedLengthDataFactory.allocate(in, memoryMode, memoryRecycler, isDelta ?
+        //                 "/tmp/delta-target-setPointerAndSizeData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID() :
+        //                 "/tmp/snapshot-target-setPointerAndSizeData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+        // elementData = FixedLengthDataFactory.allocate(in, memoryMode, memoryRecycler, isDelta ?
+        //                 "/tmp/delta-target-setElementData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID() :
+        //                 "/tmp/snapshot-target-setElementData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
     }
 
     static void discardFromStream(HollowBlobInput in, int numShards, boolean isDelta) throws IOException {

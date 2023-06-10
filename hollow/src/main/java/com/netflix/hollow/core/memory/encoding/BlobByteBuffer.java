@@ -81,7 +81,7 @@ public final class BlobByteBuffer {
      */
     public static BlobByteBuffer mmapBlob(FileChannel channel, int singleBufferCapacity) throws IOException {
         long size = channel.size();
-        if (size == 0) { // SNAP: TODO: this is now allowed, needed when creating delta target files
+        if (size == 0) {
             throw new IllegalStateException("File to be mmap-ed has no data");
         }
         if ((singleBufferCapacity & (singleBufferCapacity - 1)) != 0) { // should be a power of 2

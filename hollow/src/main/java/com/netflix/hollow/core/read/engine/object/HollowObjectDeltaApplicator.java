@@ -105,7 +105,7 @@ class HollowObjectDeltaApplicator {
 
         for(int i=0;i<target.schema.numFields();i++) {
             if(target.schema.getFieldType(i) == FieldType.STRING || target.schema.getFieldType(i) == FieldType.BYTES) {
-                target.varLengthData[i] = VariableLengthDataFactory.commit(target.stagedVarLengthData[i], memoryMode);
+                target.varLengthData[i] = target.stagedVarLengthData[i].commit();
             }
         }
         from.encodedRemovals = null;

@@ -14,14 +14,46 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 public class VariableLengthDataFactory {
-
     private static final Logger LOG = Logger.getLogger(VariableLengthDataFactory.class.getName());
 
+    public static VariableLengthData get(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
+        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
+            return new SegmentedByteArray(memoryRecycler);
+
+        } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
+            return new EncodedByteBuffer();
+        } else {
+            throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
+        }
+    }
+
+    // stage (for writing to)
+    public static StagedVariableLengthData stage(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) throws FileNotFoundException {
+        return new StagedVariableLengthData(memoryMode, memoryRecycler);
+    }
+
+    public static void destroy(VariableLengthData vld) {
+        if (vld instanceof SegmentedByteArray) {
+            ((SegmentedByteArray) vld).destroy();
+        } else if (vld instanceof EncodedByteBuffer) {
+            LOG.warning("Destroy operation is a not implemented for shared memory mode");
+        } else {
+            throw new UnsupportedOperationException("Unknown type");
+        }
+    }
+
+
     public static class StagedVariableLengthData {
-        SegmentedByteArray byteArray;
-        RandomAccessFile raf;
+        private final MemoryMode memoryMode;
+        private final SegmentedByteArray byteArray;
+        private final RandomAccessFile raf;
+
+        public RandomAccessFile getRaf() {
+            return raf;
+        }
 
         public StagedVariableLengthData(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) throws FileNotFoundException {
+            this.memoryMode = memoryMode;
             if (memoryMode.equals(MemoryMode.ON_HEAP)) {
                 byteArray = new SegmentedByteArray(memoryRecycler);
                 raf = null;
@@ -39,53 +71,44 @@ public class VariableLengthDataFactory {
             if (this.byteArray != null) {
                 this.byteArray.orderedCopy(src, srcPos, destPos, length);
             } else {
-                raf.setLength(destPos + length);
-                long endSrcPos = srcPos + length;
-                while(srcPos < endSrcPos) {
-                    raf.write(src.get(srcPos++));   // TODO: write faster than one byte at a time
+                if (length > 0) {
+                    resize(destPos + length);
+                    long endSrcPos = srcPos + length;
+                    while(srcPos < endSrcPos) {
+                        writeRaf(src.get(srcPos++));   // TODO: write faster than a byte at a time => this is extremely slow
+                    }
                 }
             }
         }
-    }
 
-    public static VariableLengthData get(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
-        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
-            return new SegmentedByteArray(memoryRecycler);
-
-        } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
-            return new EncodedByteBuffer();
-        } else {
-            throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
+        private void writeRaf(int b) throws IOException {
+            raf.write(b);
         }
-    }
 
-    public static StagedVariableLengthData stage(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) throws FileNotFoundException {
-        return new StagedVariableLengthData(memoryMode, memoryRecycler);
-    }
-
-    public static VariableLengthData commit(StagedVariableLengthData staged, MemoryMode memoryMode) throws IOException {
-
-        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
-            return staged.byteArray;
-
-        } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
-            EncodedByteBuffer byteBuffer = new EncodedByteBuffer();
-            HollowBlobInput hbi = HollowBlobInput.mmap(staged.raf, MAX_SINGLE_BUFFER_CAPACITY);
-            staged.raf.seek(0);
-            byteBuffer.loadFrom(hbi, staged.raf.length());
-            return byteBuffer;
-        } else {
-            throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
+        public void resize(long sizeInBytes) throws IOException {
+            if (memoryMode.equals(MemoryMode.ON_HEAP)) {
+                // TODO: NOP because array is resized dynamically
+            } else {
+                this.raf.setLength(sizeInBytes);
+            }
         }
-    }
 
-    public static void destroy(VariableLengthData vld) {
-        if (vld instanceof SegmentedByteArray) {
-            ((SegmentedByteArray) vld).destroy();
-        } else if (vld instanceof EncodedByteBuffer) {
-            LOG.warning("Destroy operation is a not implemented for shared memory mode");
-        } else {
-            throw new UnsupportedOperationException("Unknown type");
+        public VariableLengthData commit() throws IOException {
+            if (memoryMode.equals(MemoryMode.ON_HEAP)) {
+                return this.byteArray;
+
+            } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
+                EncodedByteBuffer byteBuffer = new EncodedByteBuffer();
+                if (this.raf.length() == 0) {
+                    return byteBuffer;
+                }
+                this.raf.seek(0);
+                HollowBlobInput hbi = HollowBlobInput.mmap(this.raf, MAX_SINGLE_BUFFER_CAPACITY);
+                byteBuffer.loadFrom(hbi, this.raf.length());
+                return byteBuffer;
+            } else {
+                throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
+            }
         }
     }
 }

@@ -247,7 +247,12 @@ class HollowDataHolder {
 
         } catch(Throwable t) {
             failedTransitionTracker.markFailedTransition(blob);
+            LOG.warning("SNAP: Delta transition encountered exception: " + t);
             throw t;
+        } finally {
+            if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
+                LOG.warning("SNAP: Delta transition applied");
+            }
         }
     }
 

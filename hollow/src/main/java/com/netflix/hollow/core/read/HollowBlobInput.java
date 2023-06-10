@@ -89,7 +89,7 @@ public class HollowBlobInput implements Closeable {
      * Useful for testing with custom buffer capacity
      */
     public static HollowBlobInput randomAccess(File f,int singleBufferCapacity) throws IOException {
-        RandomAccessFile raf = new RandomAccessFile(f, "rws");  // TODO: evaluate rw and rwd modes too
+        RandomAccessFile raf = new RandomAccessFile(f, "rws");  // TODO: evaluate rw and rwd modes too   // TODO: can probably open in read-only if staging+committing as different files during delta
         return mmap(raf, singleBufferCapacity);
     }
 

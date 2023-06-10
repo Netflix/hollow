@@ -96,7 +96,6 @@ public class HollowObjectTypeDataElements {
 
         fixedLengthData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
         removeExcludedFieldsFromFixedLengthData();  // SNAP: TODO: remove filtered fields from delta contents, in memory. For now, NOP and log warning
-
         readVarLengthData(in, unfilteredSchema);
     }
 
