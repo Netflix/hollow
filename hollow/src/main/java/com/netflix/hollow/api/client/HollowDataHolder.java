@@ -206,6 +206,7 @@ class HollowDataHolder {
     }
 
     private void applyDeltaTransition(HollowConsumer.Blob blob, boolean isSnapshotPlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
+        LOG.warning("SNAP: Attempting delta transition ...");
         if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
             LOG.warning("SNAP: Attempting delta transition in shared-memory mode ...");
         }
@@ -250,9 +251,9 @@ class HollowDataHolder {
             LOG.warning("SNAP: Delta transition encountered exception: " + t);
             throw t;
         } finally {
-            if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
-                LOG.warning("SNAP: Delta transition applied");
-            }
+            // if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
+                LOG.warning("SNAP: Delta transition applied to version " + blob.getToVersion());
+            // }
         }
     }
 

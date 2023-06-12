@@ -2,7 +2,6 @@ package com.netflix.hollow.core.memory;
 
 import static com.netflix.hollow.core.memory.encoding.BlobByteBuffer.MAX_SINGLE_BUFFER_CAPACITY;
 
-import com.netflix.hollow.Hollow;
 import com.netflix.hollow.core.memory.encoding.EncodedLongBuffer;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.VarInt;

@@ -63,7 +63,7 @@ public class GapEncodedVariableLengthIntegerReaderTest {
             cur = values[i];
         }
 
-        return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingVariableLengthData(), (int) arr.length());
+        return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingArray(), (int) arr.length());
     }
 
     private void assertValues(GapEncodedVariableLengthIntegerReader reader, int... expectedValues) {

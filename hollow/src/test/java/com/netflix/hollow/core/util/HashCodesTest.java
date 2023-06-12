@@ -138,7 +138,7 @@ public class HashCodesTest {
             VarInt.writeVInt(buf, str.charAt(i));
         }
 
-        return HashCodes.hashCode(buf.getUnderlyingVariableLengthData(), 0, (int)buf.length());
+        return HashCodes.hashCode(buf.getUnderlyingArray(), 0, (int)buf.length());
     }
 
 }

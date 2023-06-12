@@ -17,8 +17,6 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.ByteDataArray;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
-import com.netflix.hollow.core.memory.ByteDataWrapper;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.VariableLengthData;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
@@ -127,30 +125,25 @@ public class GapEncodedVariableLengthIntegerReader {
                                                                 ArraySegmentRecycler memoryRecycler) {
         reader1.reset();
         reader2.reset();
-        ByteDataWrapper byteData;
-        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
-            byteData = new ByteDataArray(memoryRecycler);
-        } else {
-            byteData = new ByteDataBuffer();
-        }
+        ByteDataArray arr = new ByteDataArray(memoryRecycler); // SNAP: TODO: Currently always on heap
         int cur = 0;
 
-        while (reader1.nextElement() != Integer.MAX_VALUE || reader2.nextElement() != Integer.MAX_VALUE) {
-            if (reader1.nextElement() < reader2.nextElement()) {
-                VarInt.writeVInt(byteData, reader1.nextElement() - cur);
+        while(reader1.nextElement() != Integer.MAX_VALUE || reader2.nextElement() != Integer.MAX_VALUE) {
+            if(reader1.nextElement() < reader2.nextElement()) {
+                VarInt.writeVInt(arr, reader1.nextElement() - cur);
                 cur = reader1.nextElement();
                 reader1.advance();
-            } else if (reader2.nextElement() < reader1.nextElement()) {
-                VarInt.writeVInt(byteData, reader2.nextElement() - cur);
+            } else if(reader2.nextElement() < reader1.nextElement()) {
+                VarInt.writeVInt(arr, reader2.nextElement() - cur);
                 cur = reader2.nextElement();
                 reader2.advance();
             } else {
-                VarInt.writeVInt(byteData, reader1.nextElement() - cur);
+                VarInt.writeVInt(arr, reader1.nextElement() - cur);
                 cur = reader1.nextElement();
                 reader1.advance();
                 reader2.advance();
             }
         }
-        return new GapEncodedVariableLengthIntegerReader(byteData.getUnderlyingVariableLengthData(), (int)byteData.length());
+        return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingArray(), (int)arr.length());
     }
 }

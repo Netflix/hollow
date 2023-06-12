@@ -159,6 +159,24 @@ public final class BlobByteBuffer {
         }
     }
 
+    public int getBytes(long index, long len, byte[] bytes) {
+        if (index < capacity) {
+            int spineIndex = (int)(index >>> (shift));
+            ByteBuffer buf = spine[spineIndex];
+            int indexIntoBuf = (int)(index & mask);
+            int toCopy = (int) Math.min(len, buf.capacity() - indexIntoBuf);
+            buf.get(bytes, 0, toCopy);
+            return toCopy;
+        } else {
+            assert(index < capacity + Long.BYTES);
+            // this situation occurs when read for bits near the end of the buffer requires reading a long value that
+            // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case,
+            // return 0 for (index >= capacity - Long.BYTES && index < capacity )
+            // these zero bytes will be discarded anyway when the returned long value is shifted to get the queried bits
+            throw new UnsupportedOperationException(String.format("Unexpected read past the end, index=%s, capacity=%s", index, capacity));
+        }
+    }
+
     public void putByte(long index, byte value) {
         if (index < 0 || index >= (this.capacity+1) << 6) {
             throw new IllegalStateException("Attempting to write a byte out of bounds");

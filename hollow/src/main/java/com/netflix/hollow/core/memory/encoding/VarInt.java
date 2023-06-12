@@ -18,7 +18,6 @@ package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataArray;
-import com.netflix.hollow.core.memory.ByteDataWrapper;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.EOFException;
 import java.io.IOException;
@@ -90,7 +89,7 @@ public class VarInt {
      * @param byteData the destination
      * @param value the int value
      */
-    public static void writeVInt(ByteDataWrapper byteData, int value) {
+    public static void writeVInt(ByteDataArray byteData, int value) {
         if(value > 0x0FFFFFFF || value < 0) byteData.write((byte)(0x80 | ((value >>> 28))));
         if(value > 0x1FFFFF || value < 0)   byteData.write((byte)(0x80 | ((value >>> 21) & 0x7F)));
         if(value > 0x3FFF || value < 0)     byteData.write((byte)(0x80 | ((value >>> 14) & 0x7F)));

@@ -47,6 +47,10 @@ public class EncodedByteBuffer implements VariableLengthData {
         return retVal;
     }
 
+    public int getBytes(long index, long len, byte[] bytes) {
+        return this.bufferView.getBytes(index, len, bytes);
+    }
+
     /**
      * {@inheritDoc}
      * This is achieved by initializing a {@code BlobByteBuffer} that is a view on the underlying {@code BlobByteBuffer}
@@ -64,7 +68,7 @@ public class EncodedByteBuffer implements VariableLengthData {
 
     @Override
     public void copy(ByteData src, long srcPos, long destPos, long length) {
-        throw new UnsupportedOperationException("Operation not supported in shared-memory mode");
+        throw new UnsupportedOperationException("Operation not supported in shared-memory mode - EncodedByteBuffers are read-only");
     }
 
     @Override
@@ -80,7 +84,6 @@ public class EncodedByteBuffer implements VariableLengthData {
     @Override
     public void set(long index, byte value) {
         throw new UnsupportedOperationException("Operation not supported in shared-memory mode");
-
     }
 
     /**
