@@ -161,22 +161,52 @@ public class EncodedLongBuffer implements FixedLengthData {
             numBits -= fillBits;
         }
 
-        long currentWriteLong = destStartBit >>> 6;
+//        if (copyFrom instanceof EncodedLongBuffer) {    // TODO: unit test
+//            long currentWriteByte = destStartBit >>> 3;
+//            long sourceStartByte = sourceStartBit >>> 3;
+//            long numBytes = numBits >>> 3;
+//            byte[] chunk = new byte[16384];
+//            EncodedLongBuffer from = (EncodedLongBuffer) copyFrom;
+//
+//            while (numBytes > 0) {
+//                int toReadBytes = (int) Math.min(numBytes, (long) chunk.length);
+//                int readBytes = from.bufferView.getBytes(sourceStartByte, toReadBytes, chunk);
+//                numBytes -= readBytes;
+//                numBits -= (readBytes * 8);
+//                sourceStartByte += readBytes;
+//
+//                int toWriteBytes = readBytes;
+//                while (toWriteBytes > 0) {
+//                    int writtenBytes = this.bufferView.putBytes(currentWriteByte, toWriteBytes, chunk);
+//                    currentWriteByte += writtenBytes;
+//                    toWriteBytes -= writtenBytes;
+//                }
+//            }
+//
+//            if (numBits != 0) {
+//                destStartBit = currentWriteByte << 3;
+//
+//                long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) numBits);
+//                setElementValue(destStartBit, (int) numBits, fillValue);
+//            }
+//         } else {
+            long currentWriteLong = destStartBit >>> 6;
 
-        while (numBits >= 64) {
-            long l = copyFrom.getLargeElementValue(sourceStartBit, 64, -1);
-            this.bufferView.putLong(this.bufferView.position() + (currentWriteLong * 8), l);
-            numBits -= 64;
-            sourceStartBit += 64;
-            currentWriteLong++;
-        }
+            while (numBits >= 64) {
+                long l = copyFrom.getLargeElementValue(sourceStartBit, 64, -1);
+                this.bufferView.putLong(this.bufferView.position() + (currentWriteLong * 8), l);
+                numBits -= 64;
+                sourceStartBit += 64;
+                currentWriteLong++;
+            }
 
-        if (numBits != 0) {
-            destStartBit = currentWriteLong << 6;
+            if (numBits != 0) {
+                destStartBit = currentWriteLong << 6;
 
-            long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) numBits);
-            setElementValue(destStartBit, (int) numBits, fillValue);
-        }
+                long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) numBits);
+                setElementValue(destStartBit, (int) numBits, fillValue);
+            }
+//         }
     }
 
     @Override

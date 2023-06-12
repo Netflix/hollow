@@ -72,45 +72,40 @@ public class VariableLengthDataFactory {
                 this.byteArray.orderedCopy(src, srcPos, destPos, length);
             } else {
                 EncodedByteBuffer encodedByteBuffer = (EncodedByteBuffer) src;
-                // SNAP: TODO: FileChannel readableChannel = encodedByteBuffer.getBufferView().getChannel();
-                // SNAP: TODO: if (readableChannel.isOpen()) { // SNAP: TODO: test. This is coming from delta raf
-                // SNAP: TODO:     long savePos = readableChannel.position();
-                // SNAP: TODO:     readableChannel.position(srcPos);
-                // SNAP: TODO:     this.raf.getChannel().transferFrom(readableChannel, destPos, length);
-                // SNAP: TODO:     readableChannel.position(savePos);
-                // SNAP: TODO: } else {
-                    byte[] chunk = new byte[100 * 16384];    // SNAP: vm_stat returns 16384 as page size on my mac
-                    while (length > 0) {
-                        int toReadBytes = (int) Math.min(length, (long) chunk.length);
-                        int readBytes = encodedByteBuffer.getBytes(srcPos, toReadBytes, chunk);
-                        length = length - readBytes;
-                        srcPos = srcPos + readBytes;
-                        this.raf.write(chunk, 0, readBytes);
-                    }
-                // SNAP: TODO: }
-                // this.raf.getChannel().transferFrom(encodedByteBuffer.getBufferView().getChannel().position(srcPos), destPos, length);
-                // ByteBuffer chunk = ByteBuffer.allocate(16384);    // SNAP: page size returned by vm_stat on mac
-                // while(length > 0) {
-                //     EncodedByteBuffer encodedByteBuffer = (EncodedByteBuffer) src;
-                //     int bytesToRead = (int) Math.min(length, (long) chunk.capacity());
-                //     encodedByteBuffer.getBufferView().getChannel().read(chunk, 0, bytesToRead);
-                //     int copyBytes = encodedByteBuffer.getBytes( = encodedByteBuffer.orderedCopy(srcPos, segments[currentSegment], segmentStartPos, bytesToCopyFromSegment);
-                //         // instead, get the mappedbytebuffer and pass it to raf as byte array
-                //     srcPos += copiedBytes;
-                //     length -= copiedBytes;
-                //     segmentStartPos = 0;
-                //     remainingBytesInSegment = segmentLength;
-                //     currentSegment++;
-                // }
-                // if (length > 0) {
-                //     byte[] chunk = new byte[16 * 1024];
-                //     resize(destPos + length);
-                //     long endSrcPos = srcPos + length;
-                //     while(srcPos < endSrcPos) {
-                //         int numBytesToCopy = (int) Math.min(endSrcPos - srcPos, (long) chunk.length);
-                //         writeRaf(src.get(srcPos++));   // TODO: write faster than a byte at a time => this is extremely slow
-                //     }
-                // }
+                // TODO: zero-copy from delta to target raf
+                try {
+                    // if (length > 0
+                    //         && encodedByteBuffer.getBufferView() != null
+                    //         && encodedByteBuffer.getBufferView().getChannel() != null
+                    //         && encodedByteBuffer.getBufferView().getChannel().isOpen()) {
+                    //     FileChannel readableChannel = encodedByteBuffer.getBufferView().getChannel();
+                    //     long savePos = readableChannel.position();
+                    //     readableChannel.position(srcPos);
+                    //     this.raf.getChannel().transferFrom(readableChannel, destPos, length);
+                    //     readableChannel.position(savePos);
+                    // } else {
+                        byte[] chunk = new byte[16384];    // SNAP: page size returned by vm_stat on mac
+                        while (length > 0) {
+                            int toReadBytes = (int) Math.min(length, (long) chunk.length);
+                            int readBytes = encodedByteBuffer.getBytes(srcPos, toReadBytes, chunk);
+                            length -= readBytes;
+                            srcPos += readBytes;
+                            this.raf.write(chunk, 0, readBytes);
+                        }
+                    // }
+                } catch (NullPointerException e) {
+                    LOG.warning("E");
+                    throw e;
+                }
+                //  FileChannel readableChannel = encodedByteBuffer.getBufferView().getChannel();
+                //  if (readableChannel.isOpen()) {
+                //   long savePos = readableChannel.position();
+                //   readableChannel.position(srcPos);
+                //   this.raf.getChannel().transferFrom(readableChannel, destPos, length);
+                //   readableChannel.position(savePos);
+                //  }
+                // TODO: this is much faster than a byte at a time, but still slow (10x of in-memory delta on my mac, for e.g. for 1G blob size <1s vs. 9s for delta update)
+
             }
         }
 

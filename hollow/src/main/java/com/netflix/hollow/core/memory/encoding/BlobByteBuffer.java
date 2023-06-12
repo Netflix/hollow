@@ -159,13 +159,32 @@ public final class BlobByteBuffer {
         }
     }
 
+    public int getBytesPreservingPos(long index, long len, byte[] bytes) {
+        int spineIndex = (int) (index >>> (shift));
+        ByteBuffer buf = spine[spineIndex];
+        int savePos = buf.position();
+        int bytesRead = getBytes(index, len, bytes);     // TODO: get by address to save position manipulation
+        buf.position(savePos);
+        return bytesRead;
+    }
+
     public int getBytes(long index, long len, byte[] bytes) {
+        if (len == 0) {
+            return 0;
+        }
+
         if (index < capacity) {
             int spineIndex = (int)(index >>> (shift));
             ByteBuffer buf = spine[spineIndex];
             int indexIntoBuf = (int)(index & mask);
             int toCopy = (int) Math.min(len, buf.capacity() - indexIntoBuf);
-            buf.get(bytes, 0, toCopy);
+            try {
+                int savePos = buf.position();
+                buf.get(bytes, 0, toCopy);
+                buf.position(savePos);
+            } catch (BufferUnderflowException e) {
+                System.out.println("Gotcha");
+            }
             return toCopy;
         } else {
             assert(index < capacity + Long.BYTES);
@@ -174,6 +193,25 @@ public final class BlobByteBuffer {
             // return 0 for (index >= capacity - Long.BYTES && index < capacity )
             // these zero bytes will be discarded anyway when the returned long value is shifted to get the queried bits
             throw new UnsupportedOperationException(String.format("Unexpected read past the end, index=%s, capacity=%s", index, capacity));
+        }
+    }
+
+    public int putBytes(long index, long len, byte[] bytes) {
+        if (index < capacity) {
+            int spineIndex = (int)(index >>> (shift));
+            ByteBuffer buf = spine[spineIndex];
+            int indexIntoBuf = (int)(index & mask);
+            int toCopy = (int) Math.min(len, buf.capacity() - indexIntoBuf);
+            // buf.position(indexIntoBuf);
+            buf.put(bytes, 0, toCopy);
+            return toCopy;
+        } else {
+            assert(index < capacity + Long.BYTES);
+            // this situation occurs when read for bits near the end of the buffer requires reading a long value that
+            // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case,
+            // return 0 for (index >= capacity - Long.BYTES && index < capacity )
+            // these zero bytes will be discarded anyway when the returned long value is shifted to get the queried bits
+            throw new UnsupportedOperationException(String.format("Unexpected write past the end, index=%s, capacity=%s", index, capacity));
         }
     }
 

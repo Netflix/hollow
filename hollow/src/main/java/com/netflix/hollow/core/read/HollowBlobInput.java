@@ -298,7 +298,7 @@ public class HollowBlobInput implements Closeable {
     @Override
     public void close() throws IOException {
         if (input instanceof RandomAccessFile) {
-            ((RandomAccessFile) input).close();
+            ((RandomAccessFile) input).close(); // SNAP: TODO: Might not close here if GCing / deleting file
         } else if (input instanceof DataInputStream) {
             ((DataInputStream) input).close();
         } else {
