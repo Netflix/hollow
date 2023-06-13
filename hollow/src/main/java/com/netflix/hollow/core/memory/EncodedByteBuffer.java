@@ -48,7 +48,7 @@ public class EncodedByteBuffer implements VariableLengthData {
     }
 
     public int getBytes(long index, long len, byte[] bytes) {
-        return this.bufferView.getBytes(index, len, bytes);
+        return this.bufferView.getBytes(this.bufferView.position() + index, len, bytes, true);
     }
 
     /**

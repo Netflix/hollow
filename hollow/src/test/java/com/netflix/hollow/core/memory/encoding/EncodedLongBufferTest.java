@@ -48,6 +48,51 @@ public class EncodedLongBufferTest {
         return buf;
     }
 
+    // @Test
+    public void testCopyParity() throws IOException {
+        int singleBufferCapacity = 1024 * 1024;
+        // for(int iteration = 0;iteration < 10;iteration++) { // TODO: up this count
+        //    if(iteration % 1024 == 1023)
+        //        System.out.println(iteration);
+
+            Random rand = new Random();
+
+            int totalBitsInArray = 20000; // rand.nextInt(6400000);
+            int totalBitsInCopyRange = 10000; // rand.nextInt(totalBitsInArray);
+            // SNAP: TODO: 0 and 0 passes but 3 and  fails
+            int copyFromRangeStartBit = 3; // rand.nextInt(totalBitsInArray - totalBitsInCopyRange);
+            int copyToRangeStartBit = 6; // rand.nextInt(100000);
+
+            EncodedLongBuffer source = setupEncodedLongBuffer((totalBitsInArray >> 3) + 1, singleBufferCapacity);
+            EncodedLongBuffer dest = setupEncodedLongBuffer((totalBitsInArray + copyToRangeStartBit >> 3) + 1, singleBufferCapacity);
+
+            int numLongs = (totalBitsInArray >>> 6);
+
+            for(int i=0;i<=numLongs;i++) {
+                source.set(i, i);
+            }
+
+            dest.copyBits(source, copyFromRangeStartBit, copyToRangeStartBit, totalBitsInCopyRange);
+
+            /// compare the copy range.
+            int compareBitStart = copyFromRangeStartBit;
+            int copyToRangeOffset = copyToRangeStartBit - copyFromRangeStartBit;
+            int numBitsLeftToCompare = totalBitsInCopyRange;
+
+            while(numBitsLeftToCompare > 0) {
+                int bitsToCompare = numBitsLeftToCompare > 56 ? 56 : numBitsLeftToCompare;
+                long fromLong = source.getElementValue(compareBitStart, bitsToCompare);
+                long toLong = dest.getElementValue(compareBitStart + copyToRangeOffset, bitsToCompare);
+
+                if(fromLong != toLong)
+                    Assert.fail();
+
+                numBitsLeftToCompare -= bitsToCompare;
+                compareBitStart += bitsToCompare;
+            }
+        // }
+    }
+
     @Test
     public void testCopyBitRange() throws IOException {
         int singleBufferCapacity = 1024 * 1024;

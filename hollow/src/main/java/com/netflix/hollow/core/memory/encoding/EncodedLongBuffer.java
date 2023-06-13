@@ -45,6 +45,9 @@ import java.io.IOException;
 @SuppressWarnings("restriction")
 public class EncodedLongBuffer implements FixedLengthData {
 
+    static int count1 = 0;
+    static int count2 = 0;
+
     private BlobByteBuffer bufferView;
     private long maxByteIndex = -1;
 
@@ -161,21 +164,57 @@ public class EncodedLongBuffer implements FixedLengthData {
             numBits -= fillBits;
         }
 
-        long currentWriteLong = destStartBit >>> 6;
+        // SNAP: TODO: this bulk copy optimization only works when sourceStartBit == destStartBit, otherwise byte-aligned reads look different
+        //             and we have to rely on the much less efficient unaligned long read below
+        if (copyFrom instanceof EncodedLongBuffer && sourceStartBit == destStartBit) {
+            count1 ++;
+            long currentWriteByte = destStartBit >>> 3;
+            long sourceStartByte = sourceStartBit >>> 3;
+            int endFillBits = (int) (numBits & 63);
+            long numBytes = (numBits - endFillBits) >>> 3;
+            EncodedLongBuffer from = (EncodedLongBuffer) copyFrom;
 
-        while (numBits >= 64) {
-            long l = copyFrom.getLargeElementValue(sourceStartBit, 64, -1);
-            this.bufferView.putLong(this.bufferView.position() + (currentWriteLong * 8), l);
-            numBits -= 64;
-            sourceStartBit += 64;
-            currentWriteLong++;
-        }
+            byte[] chunk = new byte[16384]; // must be multiple of 8, and 16384 is the page size returned by vm_stat on my mac
+            while (numBytes > 0) {
+                int toReadBytes = (int) Math.min(numBytes, (long) chunk.length);
+                int readBytes = from.bufferView.getBytes(from.bufferView.position() + sourceStartByte, toReadBytes, chunk, true);
+                numBytes -= readBytes;
+                sourceStartByte += readBytes;
+                sourceStartBit += readBytes * 8;
 
-        if (numBits != 0) {
-            destStartBit = currentWriteLong << 6;
+                int toWriteBytes = readBytes;
+                while (toWriteBytes > 0) {
+                    int writtenBytes = this.bufferView.putBytes(this.bufferView.position() + currentWriteByte, toWriteBytes, chunk, true);
+                    currentWriteByte += writtenBytes;
+                    destStartBit += writtenBytes * 8;
+                    toWriteBytes -= writtenBytes;
+                }
+            }
 
-            long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) numBits);
-            setElementValue(destStartBit, (int) numBits, fillValue);
+            if (endFillBits != 0) {
+                destStartBit = currentWriteByte << 3;
+
+                long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) endFillBits);
+                setElementValue(destStartBit, endFillBits, fillValue);
+            }
+        } else {
+            count2 ++;
+            long currentWriteLong = destStartBit >>> 6;
+
+            while (numBits >= 64) {
+                long l = copyFrom.getLargeElementValue(sourceStartBit, 64, -1);
+                this.bufferView.putLong(this.bufferView.position() + (currentWriteLong * 8), l);
+                numBits -= 64;
+                sourceStartBit += 64;
+                currentWriteLong++;
+            }
+
+            if (numBits != 0) {
+                destStartBit = currentWriteLong << 6;
+
+                long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) numBits);
+                setElementValue(destStartBit, (int) numBits, fillValue);
+            }
         }
     }
 
