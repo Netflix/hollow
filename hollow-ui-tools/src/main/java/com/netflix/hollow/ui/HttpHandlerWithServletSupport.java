@@ -249,6 +249,8 @@ public class HttpHandlerWithServletSupport implements HttpHandler {
 
         @Override
         public void addCookie(Cookie c) {
+            Headers header = ex.getResponseHeaders();
+            header.add("Set-Cookie", c.getName() + "=" + c.getValue());
         }
 
         public void complete() throws IOException {
