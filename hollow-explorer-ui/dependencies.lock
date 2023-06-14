@@ -1,9 +1,4 @@
 {
-    "checkstyle": {
-        "com.puppycrawl.tools:checkstyle": {
-            "locked": "8.45.1"
-        }
-    },
     "compileClasspath": {
         "com.netflix.hollow:hollow": {
             "firstLevelTransitive": [

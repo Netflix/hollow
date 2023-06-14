@@ -1,9 +1,4 @@
 {
-    "checkstyle": {
-        "com.puppycrawl.tools:checkstyle": {
-            "locked": "8.45.1"
-        }
-    },
     "compileClasspath": {
         "com.google.code.gson:gson": {
             "locked": "2.10.1"

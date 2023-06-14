@@ -1,9 +1,4 @@
 {
-    "checkstyle": {
-        "com.puppycrawl.tools:checkstyle": {
-            "locked": "8.45.1"
-        }
-    },
     "compileClasspath": {
         "com.fasterxml.jackson.core:jackson-core": {
             "locked": "2.4.3"

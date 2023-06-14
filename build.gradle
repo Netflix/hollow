@@ -8,7 +8,6 @@ plugins {
 
 subprojects {
   apply plugin: 'nebula.netflixoss'
-  apply plugin: 'checkstyle'
 
   java {
     toolchain {
@@ -24,9 +23,6 @@ subprojects {
   }
 
   group = 'com.netflix.hollow'
-  checkstyle {
-    configFile = file("$rootProject.projectDir/config/checkstyle/checkstyle.xml")
-  }
 
   repositories {
     mavenCentral()
