@@ -39,7 +39,6 @@ import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FakeHollowSchemaIdentifierMapper;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
