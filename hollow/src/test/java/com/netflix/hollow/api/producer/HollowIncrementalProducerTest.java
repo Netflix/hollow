@@ -32,15 +32,22 @@ import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.util.AllHollowRecordCollection;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FakeHollowSchemaIdentifierMapper;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Before;
@@ -161,6 +168,61 @@ public class HollowIncrementalProducerTest {
         assertTypeA(idx, 102, "one hundred and two", 9995L);
         assertTypeA(idx, 103, "one hundred and three", 9992L);
     }
+    
+    @Test
+    public void updateStateWithUnavailableCollectionElementTypes() {
+        // Producer is created but not initialized IncrementalProducer will directly initialize the first snapshot
+        HollowProducer producer = createInMemoryProducer();
+        HollowWriteStateEngine dataset = new HollowWriteStateEngine();
+        HollowObjectMapper mapper = new HollowObjectMapper(dataset);
+        mapper.doNotUseDefaultHashKeys();
+        mapper.initializeTypeState(TypeWithChildCollections.class);
+
+        producer.initializeDataModel(dataset.getSchema("TypeWithChildCollections"), dataset.getSchema("SetOfElementType"), dataset.getSchema("ListOfElementType"), dataset.getSchema("MapOfElementTypeToElementType"));
+
+        /// add/modify state of a producer with an empty previous state. delete requests for non-existent records will be ignored
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
+
+        FlatRecordWriter writer = new FlatRecordWriter(dataset, new FakeHollowSchemaIdentifierMapper(dataset));
+        mapper.writeFlat(new TypeWithChildCollections(100, null), writer);
+        
+        incrementalProducer.addOrModify(writer.generateFlatRecord());
+        
+        long version = incrementalProducer.runCycle();
+        
+        incrementalProducer.delete(new RecordPrimaryKey("TypeWithChildCollections", new Object[] {100}));
+        writer.reset();
+        mapper.writeFlat(new TypeWithChildCollections(101, null), writer);
+        incrementalProducer.addOrModify(writer.generateFlatRecord());
+
+        long nextVersion = incrementalProducer.runCycle();
+        Assert.assertTrue(nextVersion > 0);
+    }
+    
+    @HollowPrimaryKey(fields="id")
+    public static class TypeWithChildCollections {
+        int id;
+        Set<ElementType> set;
+        List<ElementType> list;
+        Map<ElementType, ElementType> map;
+        
+        public TypeWithChildCollections(int id, Integer val) {
+            ElementType el = val == null ? null : new ElementType(val);
+            this.id = id;
+            this.set = el == null ? Collections.emptySet() : Collections.singleton(el);
+            this.list = el == null ? Collections.emptyList() : Collections.singletonList(el);
+            this.map = el == null ? Collections.emptyMap() : Collections.singletonMap(el, el);
+        }
+    }
+    
+    public static class ElementType {
+        int value;
+        
+        public ElementType(int value) {
+            this.value = value;
+        }
+    }
+    
 
     @Test
     public void publishAndLoadASnapshotDirectly() {

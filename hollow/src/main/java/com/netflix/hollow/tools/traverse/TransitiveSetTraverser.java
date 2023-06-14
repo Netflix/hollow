@@ -183,26 +183,28 @@ public class TransitiveSetTraverser {
         BitSet matchingOrdinals = getOrCreateBitSet(matches, schema.getName(), typeState.maxOrdinal());
 
         HollowTypeReadState childTypeState = stateEngine.getTypeState(schema.getElementType());
-        BitSet childOrdinals = getOrCreateBitSet(matches, schema.getElementType(), childTypeState.maxOrdinal());
-
-        int ordinal = matchingOrdinals.nextSetBit(0);
-        while(ordinal != -1) {
-            try {
-                HollowOrdinalIterator iter = typeState.ordinalIterator(ordinal);
-                int elementOrdinal = iter.next();
-                while(elementOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-                    childOrdinals.set(elementOrdinal);
-                    elementOrdinal = iter.next();
+        if(childTypeState != null && childTypeState.maxOrdinal() >= 0) {
+            BitSet childOrdinals = getOrCreateBitSet(matches, schema.getElementType(), childTypeState.maxOrdinal());
+    
+            int ordinal = matchingOrdinals.nextSetBit(0);
+            while(ordinal != -1) {
+                try {
+                    HollowOrdinalIterator iter = typeState.ordinalIterator(ordinal);
+                    int elementOrdinal = iter.next();
+                    while(elementOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+                        childOrdinals.set(elementOrdinal);
+                        elementOrdinal = iter.next();
+                    }
+                } catch(Exception e) {
+                    log.log(Level.SEVERE, "Add transitive matches failed", e);
                 }
-            } catch(Exception e) {
-                log.log(Level.SEVERE, "Add transitive matches failed", e);
+    
+                ordinal = matchingOrdinals.nextSetBit(ordinal + 1);
             }
-
-            ordinal = matchingOrdinals.nextSetBit(ordinal + 1);
-        }
-
-        if(!childOrdinals.isEmpty()) {
-            matches.put(schema.getElementType(), childOrdinals);
+    
+            if(!childOrdinals.isEmpty()) {
+                matches.put(schema.getElementType(), childOrdinals);
+            }
         }
     }
 
@@ -213,15 +215,17 @@ public class TransitiveSetTraverser {
         HollowTypeReadState keyTypeState = stateEngine.getTypeState(schema.getKeyType());
         HollowTypeReadState valueTypeState = stateEngine.getTypeState(schema.getValueType());
 
-        BitSet keyOrdinals = getOrCreateBitSet(matches, schema.getKeyType(), keyTypeState.maxOrdinal());
-        BitSet valueOrdinals = getOrCreateBitSet(matches, schema.getValueType(), valueTypeState.maxOrdinal());
+        BitSet keyOrdinals = keyTypeState == null || keyTypeState.maxOrdinal() < 0 ? null : getOrCreateBitSet(matches, schema.getKeyType(), keyTypeState.maxOrdinal());
+        BitSet valueOrdinals = valueTypeState == null || valueTypeState.maxOrdinal() < 0 ? null : getOrCreateBitSet(matches, schema.getValueType(), valueTypeState.maxOrdinal());
 
         int ordinal = matchingOrdinals.nextSetBit(0);
         while(ordinal != -1) {
             HollowMapEntryOrdinalIterator iter = typeState.ordinalIterator(ordinal);
             while(iter.next()) {
-                keyOrdinals.set(iter.getKey());
-                valueOrdinals.set(iter.getValue());
+                if(keyOrdinals != null)
+                    keyOrdinals.set(iter.getKey());
+                if(valueOrdinals != null)
+                    valueOrdinals.set(iter.getValue());
             }
 
             ordinal = matchingOrdinals.nextSetBit(ordinal + 1);
