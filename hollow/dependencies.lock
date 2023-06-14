@@ -1,9 +1,4 @@
 {
-    "checkstyle": {
-        "com.puppycrawl.tools:checkstyle": {
-            "locked": "8.45.1"
-        }
-    },
     "testCompileClasspath": {
         "com.github.spotbugs:spotbugs": {
             "locked": "4.2.1"
