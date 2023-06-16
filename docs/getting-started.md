@@ -355,7 +355,7 @@ List<Movie> movies = Arrays.asList(
 
 producer.runCycle(state -> {
     for(Movie movie : movies)
-        state.addObject(movie);
+        state.add(movie);
 });
 ```
 
