@@ -94,13 +94,13 @@ HollowObjectWriteRecord movieRec = new HollowObjectWriteRecord(movieSchema);
 
 titleRec.setString("value", "The Matrix");
 
-int titleOrdinal = writeEngine.addObject("String", titleRec);
+int titleOrdinal = writeEngine.add("String", titleRec);
 
 movieRec.setLong("id", 1);
 movieRec.setReference("title", titleOrdinal);
 movieRec.setInt("releaseYear", 1999);
 
-writeEngine.addObject("Movie", movieRec);
+writeEngine.add("Movie", movieRec);
 ```
 
 Note that referenced records must be added prior to referencing records in order to obtain the referenced ordinals.
@@ -314,7 +314,7 @@ List<MovieUpdateEvent> eventBatch = /// a batch of events
 for(MovieUpdateEvent event : eventBatch) {
     int oldOrdinal = idx.getMatchingOrdinal(event.getMovie().getId());
     movieTypeState.removeOrdinalFromThisCycle(oldOrdinal);
-    mapper.addObject(event.getMovie());
+    mapper.add(event.getMovie());
 }
 ```
 

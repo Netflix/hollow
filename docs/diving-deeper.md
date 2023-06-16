@@ -53,7 +53,7 @@ HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
 HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
 
 for(Movie movie : movies)
-    mapper.addObject(movie);
+    mapper.add(movie);
 
 OutputStream os = ...; /// where to write the blob
 HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
@@ -93,7 +93,7 @@ Some time has passed and the dataset has evolved.  The producer, with the same `
 writeEngine.prepareForNextCycle();
 
 for(Movie movie : movies)
-    mapper.addObject(movie);
+    mapper.add(movie);
 
 OutputStream os = ....; /// where to write the delta blob
 writer.writeDelta(os);
