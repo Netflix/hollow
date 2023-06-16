@@ -61,6 +61,9 @@ public class HollowCombinerExcludePrimaryKeysCopyDirector implements HollowCombi
      * @param key the key
      */
     public void excludeKey(HollowPrimaryKeyIndex idx, Object... key) {
+        if (idx == null) {
+            return;
+        }
         int excludeOrdinal = idx.getMatchingOrdinal(key);
         
         if(excludeOrdinal >= 0) {
