@@ -34,6 +34,7 @@ class HollowMapDeltaApplicator {
     private final HollowMapTypeDataElements from;
     private final HollowMapTypeDataElements delta;
     private final HollowMapTypeDataElements target;
+    private final int whichShardForDiag;
 
     private long currentFromStateCopyStartBit = 0;
     private long currentDeltaCopyStartBit = 0;
@@ -46,10 +47,12 @@ class HollowMapDeltaApplicator {
     private GapEncodedVariableLengthIntegerReader removalsReader;
     private GapEncodedVariableLengthIntegerReader additionsReader;
 
-    HollowMapDeltaApplicator(HollowMapTypeDataElements from, HollowMapTypeDataElements delta, HollowMapTypeDataElements target) {
+    HollowMapDeltaApplicator(HollowMapTypeDataElements from, HollowMapTypeDataElements delta, HollowMapTypeDataElements target,
+                             int whichShardForDiag) {
         this.from = from;
         this.delta = delta;
         this.target = target;
+        this.whichShardForDiag = whichShardForDiag;
     }
 
     public void applyDelta() throws IOException {
@@ -72,9 +75,9 @@ class HollowMapDeltaApplicator {
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
         target.mapPointerAndSizeData = FixedLengthDataFactory.allocate(((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion, target.memoryMode, target.memoryRecycler,
-                "/tmp/delta-target-mapPointerAndSizeData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+                "/tmp/delta-target-mapPointerAndSizeData_" + target.schemaForDiag.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
         target.entryData = FixedLengthDataFactory.allocate(target.totalNumberOfBuckets * target.bitsPerMapEntry, target.memoryMode, target.memoryRecycler,
-                "/tmp/delta-target-mapEntryData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+                "/tmp/delta-target-mapEntryData_" + target.schemaForDiag.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
 
         if(target.bitsPerMapPointer == from.bitsPerMapPointer
                 && target.bitsPerMapSizeValue == from.bitsPerMapSizeValue

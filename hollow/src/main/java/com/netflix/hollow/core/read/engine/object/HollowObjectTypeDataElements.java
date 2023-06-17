@@ -207,11 +207,11 @@ public class HollowObjectTypeDataElements {
         }
     }
 
-    void applyDelta(HollowObjectTypeDataElements fromData, HollowObjectTypeDataElements deltaData) throws IOException {
+    void applyDelta(HollowObjectTypeDataElements fromData, HollowObjectTypeDataElements deltaData, int whichShardForDiag) throws IOException {
         if (memoryMode.equals(MemoryMode.ON_HEAP)) {
-            new HollowObjectDeltaApplicator(fromData, deltaData, this).applyDelta(memoryMode);
+            new HollowObjectDeltaApplicator(fromData, deltaData, this, whichShardForDiag).applyDelta(memoryMode);
         } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
-            new HollowObjectDeltaApplicator(fromData, deltaData, this).applyDelta(memoryMode);    // SNAP: TODO: not needed
+            new HollowObjectDeltaApplicator(fromData, deltaData, this, whichShardForDiag).applyDelta(memoryMode);    // SNAP: TODO: not needed
         } else {
             throw new UnsupportedOperationException("Delta application not supported in memory mode " + memoryMode);
         }

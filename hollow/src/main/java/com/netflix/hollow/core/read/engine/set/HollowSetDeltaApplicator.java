@@ -16,8 +16,12 @@
  */
 package com.netflix.hollow.core.read.engine.set;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 /**
  * This class contains the logic for applying a delta to a current SET type state
@@ -30,6 +34,7 @@ class HollowSetDeltaApplicator {
     private final HollowSetTypeDataElements from;
     private final HollowSetTypeDataElements delta;
     private final HollowSetTypeDataElements target;
+    private final int whichShardForDiag;
 
     private long currentFromStateCopyStartBit = 0;
     private long currentDeltaCopyStartBit = 0;
@@ -42,14 +47,15 @@ class HollowSetDeltaApplicator {
     private GapEncodedVariableLengthIntegerReader removalsReader;
     private GapEncodedVariableLengthIntegerReader additionsReader;
 
-    HollowSetDeltaApplicator(HollowSetTypeDataElements from, HollowSetTypeDataElements delta, HollowSetTypeDataElements target) {
+    HollowSetDeltaApplicator(HollowSetTypeDataElements from, HollowSetTypeDataElements delta, HollowSetTypeDataElements target, int whichShardForDiag) {
         this.from = from;
         this.delta = delta;
         this.target = target;
+        this.whichShardForDiag = whichShardForDiag;
     }
 
 
-    public void applyDelta() {
+    public void applyDelta() throws IOException {
         removalsReader = from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
         additionsReader = delta.encodedAdditions;
         removalsReader.reset();
@@ -66,8 +72,10 @@ class HollowSetDeltaApplicator {
         target.emptyBucketValue = delta.emptyBucketValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
-        target.setPointerAndSizeData = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion);
-        target.elementData = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfBuckets * target.bitsPerElement);
+        target.setPointerAndSizeData = FixedLengthDataFactory.allocate(((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion, target.memoryMode, target.memoryRecycler,
+                "/tmp/delta-target-setPointerAndSizeData_" + target.schemaForDiag.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+        target.elementData = FixedLengthDataFactory.allocate(target.totalNumberOfBuckets * target.bitsPerElement, target.memoryMode, target.memoryRecycler,
+                "/tmp/delta-target-setElementData_" + target.schemaForDiag.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
 
         if(target.bitsPerSetPointer == from.bitsPerSetPointer
                 && target.bitsPerSetSizeValue == from.bitsPerSetSizeValue

@@ -128,7 +128,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             } else {
                 HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
                 HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
-                nextData.applyDelta(oldData, deltaData);
+                nextData.applyDelta(oldData, deltaData, i);
                 shards[i].setCurrentData(nextData);
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
                 oldData.destroy();

@@ -164,9 +164,11 @@ public class EncodedLongBuffer implements FixedLengthData {
             numBits -= fillBits;
         }
 
-        // SNAP: TODO: this bulk copy optimization only works when sourceStartBit == destStartBit, otherwise byte-aligned reads look different
-        //             and we have to rely on the much less efficient unaligned long read below
-        if (copyFrom instanceof EncodedLongBuffer && sourceStartBit == destStartBit) {
+        // SNAP: TODO: this has a bug, but even then only works when sourceStartBit == destStartBit,
+        //             otherwise byte-aligned reads look different and we have to rely on the
+        //             much less efficient unaligned long read below
+        // if (copyFrom instanceof EncodedLongBuffer && sourceStartBit == destStartBit) {
+        if (false) {
             count1 ++;
             long currentWriteByte = destStartBit >>> 3;
             long sourceStartByte = sourceStartBit >>> 3;

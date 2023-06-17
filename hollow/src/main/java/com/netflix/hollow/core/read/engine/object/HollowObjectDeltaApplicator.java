@@ -37,6 +37,7 @@ class HollowObjectDeltaApplicator {
     private final HollowObjectTypeDataElements from;
     private final HollowObjectTypeDataElements delta;
     private final HollowObjectTypeDataElements target;
+    private final int whichShardForDiag;
 
     long currentDeltaStateReadFixedLengthStartBit = 0;
     long currentFromStateReadFixedLengthStartBit = 0;
@@ -53,10 +54,12 @@ class HollowObjectDeltaApplicator {
 
     int numMergeFields = 0;
 
-    public HollowObjectDeltaApplicator(HollowObjectTypeDataElements from, HollowObjectTypeDataElements delta, HollowObjectTypeDataElements target) {
+    public HollowObjectDeltaApplicator(HollowObjectTypeDataElements from, HollowObjectTypeDataElements delta, HollowObjectTypeDataElements target,
+                                       int whichShardForDiag) {
         this.from = from;
         this.delta = delta;
         this.target = target;
+        this.whichShardForDiag = whichShardForDiag;
     }
 
     void applyDelta(MemoryMode memoryMode) throws IOException {
@@ -86,7 +89,7 @@ class HollowObjectDeltaApplicator {
 
         long numBits = (long) target.bitsPerRecord * (target.maxOrdinal + 1);
         target.fixedLengthData = FixedLengthDataFactory.allocate(numBits, memoryMode, target.memoryRecycler,
-                "/tmp/delta-target-" + target.schema.getName() + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+                "/tmp/delta-target-objectData_" + target.schema.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
 
         for(int i=0;i<target.schema.numFields();i++) {
             if(target.schema.getFieldType(i) == FieldType.STRING || target.schema.getFieldType(i) == FieldType.BYTES) {

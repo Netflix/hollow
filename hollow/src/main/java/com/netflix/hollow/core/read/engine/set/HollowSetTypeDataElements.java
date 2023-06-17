@@ -23,6 +23,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.schema.HollowSchema;
 import java.io.IOException;
 
 /**
@@ -51,14 +52,16 @@ public class HollowSetTypeDataElements {
 
     final ArraySegmentRecycler memoryRecycler;
     final MemoryMode memoryMode;
+    final HollowSchema schemaForDiag;
 
-    public HollowSetTypeDataElements(ArraySegmentRecycler memoryRecycler) {
-        this(MemoryMode.ON_HEAP, memoryRecycler);
+    public HollowSetTypeDataElements(HollowSchema schemaForDiag, ArraySegmentRecycler memoryRecycler) {
+        this(schemaForDiag, MemoryMode.ON_HEAP, memoryRecycler);
     }
 
-    public HollowSetTypeDataElements(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
+    public HollowSetTypeDataElements(HollowSchema schemaForDiag, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
         this.memoryMode = memoryMode;
         this.memoryRecycler = memoryRecycler;
+        this.schemaForDiag = schemaForDiag;
     }
 
     void readSnapshot(HollowBlobInput in) throws IOException {
@@ -86,12 +89,6 @@ public class HollowSetTypeDataElements {
 
         setPointerAndSizeData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
         elementData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
-        // setPointerAndSizeData = FixedLengthDataFactory.allocate(in, memoryMode, memoryRecycler, isDelta ?
-        //                 "/tmp/delta-target-setPointerAndSizeData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID() :
-        //                 "/tmp/snapshot-target-setPointerAndSizeData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
-        // elementData = FixedLengthDataFactory.allocate(in, memoryMode, memoryRecycler, isDelta ?
-        //                 "/tmp/delta-target-setElementData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID() :
-        //                 "/tmp/snapshot-target-setElementData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
     }
 
     static void discardFromStream(HollowBlobInput in, int numShards, boolean isDelta) throws IOException {
@@ -119,8 +116,8 @@ public class HollowSetTypeDataElements {
         }
     }
 
-    public void applyDelta(HollowSetTypeDataElements fromData, HollowSetTypeDataElements deltaData) {
-        new HollowSetDeltaApplicator(fromData, deltaData, this).applyDelta();
+    public void applyDelta(HollowSetTypeDataElements fromData, HollowSetTypeDataElements deltaData, int numShardForDiag) throws IOException {
+        new HollowSetDeltaApplicator(fromData, deltaData, this, numShardForDiag).applyDelta();
     }
 
     public void destroy() throws IOException {

@@ -34,6 +34,7 @@ class HollowListDeltaApplicator {
     private final HollowListTypeDataElements from;
     private final HollowListTypeDataElements delta;
     private final HollowListTypeDataElements target;
+    private final int whichShardForDiag;
 
     private long currentFromStateCopyStartBit = 0;
     private long currentDeltaCopyStartBit = 0;
@@ -46,10 +47,11 @@ class HollowListDeltaApplicator {
     private GapEncodedVariableLengthIntegerReader removalsReader;
     private GapEncodedVariableLengthIntegerReader additionsReader;
 
-    HollowListDeltaApplicator(HollowListTypeDataElements from, HollowListTypeDataElements delta, HollowListTypeDataElements target) {
+    HollowListDeltaApplicator(HollowListTypeDataElements from, HollowListTypeDataElements delta, HollowListTypeDataElements target, int whichShardForDiag) {
         this.from = from;
         this.delta = delta;
         this.target = target;
+        this.whichShardForDiag = whichShardForDiag;
     }
 
     public void applyDelta() throws IOException {
@@ -66,10 +68,10 @@ class HollowListDeltaApplicator {
         target.bitsPerElement = delta.bitsPerElement;
 
         target.listPointerData = FixedLengthDataFactory.allocate(((long)target.maxOrdinal + 1) * target.bitsPerListPointer, target.memoryMode, target.memoryRecycler,
-                "/tmp/delta-target-listPointerData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+                "/tmp/delta-target-listPointerData_" + target.schemaForDiag.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
 
         target.elementData = FixedLengthDataFactory.allocate(target.totalNumberOfElements * target.bitsPerElement, target.memoryMode, target.memoryRecycler,
-                "/tmp/delta-target-listElementData_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+                "/tmp/delta-target-listElementData_" + target.schemaForDiag.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
 
         if(target.bitsPerListPointer == from.bitsPerListPointer
                 && target.bitsPerElement == from.bitsPerElement)
