@@ -8,6 +8,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 import sun.nio.ch.DirectBuffer;
 
 /**
@@ -24,7 +26,7 @@ import sun.nio.ch.DirectBuffer;
  *         Tim Taylor
  */
 public final class BlobByteBuffer {
-
+    private static final Logger LOG = Logger.getLogger(BlobByteBuffer.class.getName());
     public static final int MAX_SINGLE_BUFFER_CAPACITY = 1 << 30;   // largest, positive power-of-two int
 
     private final ByteBuffer[] spine;   // array of MappedByteBuffers
@@ -32,17 +34,18 @@ public final class BlobByteBuffer {
     private final int shift;
     private final int mask;
 
-    // SNAP: TODO: potentially needed for destruction
+    // SNAP: TODO: is this needed for destruction?
     private final FileChannel channel;
-    private final boolean original;
 
     private long position;              // within index 0 to capacity-1 in the underlying ByteBuffer
 
-    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, FileChannel channel, boolean original) {
-        this(capacity, shift, mask, spine, 0, channel, original);
+    private AtomicInteger referenceCount;
+
+    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, FileChannel channel, AtomicInteger referenceCount) {
+        this(capacity, shift, mask, spine, 0, channel, referenceCount);
     }
 
-    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, long position, FileChannel channel, boolean original) {
+    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, long position, FileChannel channel, AtomicInteger referenceCount) {
 
         if (!spine[0].order().equals(ByteOrder.BIG_ENDIAN)) {
             throw new UnsupportedOperationException("Little endian memory layout is not supported");
@@ -52,8 +55,9 @@ public final class BlobByteBuffer {
         this.shift = shift;
         this.mask = mask;
         this.channel = channel;
-        this.original = original;
         this.position = position;
+        this.referenceCount = referenceCount;
+        this.referenceCount.getAndIncrement();
 
         // The following assignment is purposefully placed *after* the population of all segments (this method is called
         // after mmap). The final assignment after the initialization of the array of MappedByteBuffers guarantees that
@@ -67,7 +71,7 @@ public final class BlobByteBuffer {
      * @return a new {@code BlobByteBuffer} which is view on the current {@code BlobByteBuffer}
      */
     public BlobByteBuffer duplicate() {
-        return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position, this.channel, false);
+        return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position, this.channel, this.referenceCount);
     }
 
     /**
@@ -114,7 +118,7 @@ public final class BlobByteBuffer {
             spine[i] = buffer;
         }
 
-        return new BlobByteBuffer(size, shift, mask, spine, channel, true);
+        return new BlobByteBuffer(size, shift, mask, spine, channel, new AtomicInteger(0));
     }
 
     /**
@@ -298,22 +302,30 @@ public final class BlobByteBuffer {
         return result;
     }
 
-    public void destroy() throws IOException {
-        // NOTE: invoking this will clean up the entire buffer and truncate the backing file, so it should invoked with
-        //       care- I'm thinking maybe safe to invoke on BlobByteBuffers over delta-target files since those are
-        //       per {type,shard} so if a destroy operation is called presumably it isn't being used moving fwd.
-        //       The BlobByteBuffer over the original snapshot file may be getting referenced for a while so maybe best
-        //       to defer to GC to clean that up based on reference count.
-        if (original) {
+    public void unmapBlob() {
+        // The BlobByteBuffer backed by the initial snapshot load file will likely be referenced for a while so its ref
+        // count will sustain it from getting cleaned up, but cleanup will be promptly invoked on delta blob files after
+        // consumption and on per-shard per-type delta target files when it is superseded by another file in a future delta.
+        if (this.referenceCount.decrementAndGet() == 0) {
+            LOG.info("SNAP: Unmapping BlobByteBuffer because ref count has reached 0");
             for (int i = 0; i < spine.length; i++) {
                 ByteBuffer buf = spine[i];
-                ((DirectBuffer) buf).cleaner().clean();
+                if (buf != null) {
+                    ((DirectBuffer) buf).cleaner().clean();
+                } else {
+                    LOG.warning("SNAP: unmapBlob called on BlobByteBuffer after its already been unmapped previously. " +
+                            "spine.length= " + spine.length + ", i= " + i);
+                }
+                spine[i] = null;
             }
-            channel.truncate(0);
         }
     }
 
     public FileChannel getChannel() {
         return channel;
+    }
+
+    public AtomicInteger getReferenceCount() {
+        return referenceCount;
     }
 }

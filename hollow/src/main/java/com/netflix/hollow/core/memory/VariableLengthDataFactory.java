@@ -4,6 +4,7 @@ import static com.netflix.hollow.core.memory.encoding.BlobByteBuffer.MAX_SINGLE_
 
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.schema.HollowSchema;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,15 +29,17 @@ public class VariableLengthDataFactory {
     }
 
     // stage (for writing to)
-    public static StagedVariableLengthData stage(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) throws FileNotFoundException {
-        return new StagedVariableLengthData(memoryMode, memoryRecycler);
+    public static StagedVariableLengthData stage(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler,
+                                                 HollowSchema schemaForDiag, int whichShardForDiag) throws FileNotFoundException {
+        return new StagedVariableLengthData(memoryMode, memoryRecycler, schemaForDiag, whichShardForDiag);
     }
 
     public static void destroy(VariableLengthData vld) {
         if (vld instanceof SegmentedByteArray) {
             ((SegmentedByteArray) vld).destroy();
         } else if (vld instanceof EncodedByteBuffer) {
-            LOG.warning("Destroy operation is a not implemented for shared memory mode");
+            LOG.info("SNAP: Destroy operation invoked on EncodedByteBuffer (VariableLengthData)");
+            ((EncodedByteBuffer) vld).destroy();
         } else {
             throw new UnsupportedOperationException("Unknown type");
         }
@@ -46,22 +49,27 @@ public class VariableLengthDataFactory {
     public static class StagedVariableLengthData {
         private final MemoryMode memoryMode;
         private final SegmentedByteArray byteArray;
+        private final File file;
         private final RandomAccessFile raf;
 
         public RandomAccessFile getRaf() {
             return raf;
         }
 
-        public StagedVariableLengthData(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) throws FileNotFoundException {
+        public StagedVariableLengthData(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler,
+                                        HollowSchema schemaForDiag, int whichShardForDiag) throws FileNotFoundException {
             this.memoryMode = memoryMode;
             if (memoryMode.equals(MemoryMode.ON_HEAP)) {
                 byteArray = new SegmentedByteArray(memoryRecycler);
+                file = null;
                 raf = null;
             } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
                 byteArray = null;
-                raf = new RandomAccessFile(new File("/tmp/delta-staging-varLengthData_"
+                file = new File("/tmp/delta-staging-varLengthData_"
+                        + schemaForDiag.getName() + "_" + whichShardForDiag + "_"
                         + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-                        + "_" + UUID.randomUUID()), "rws");
+                        + "_" + UUID.randomUUID());
+                raf = new RandomAccessFile(file, "rws");
             } else {
                 throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
             }
@@ -72,13 +80,13 @@ public class VariableLengthDataFactory {
                 this.byteArray.orderedCopy(src, srcPos, destPos, length);
             } else {
                 EncodedByteBuffer encodedByteBuffer = (EncodedByteBuffer) src;
-                // SNAP: TODO: FileChannel readableChannel = encodedByteBuffer.getBufferView().getChannel();
-                // SNAP: TODO: if (readableChannel.isOpen()) { // SNAP: TODO: test. This is coming from delta raf
-                // SNAP: TODO:     long savePos = readableChannel.position();
-                // SNAP: TODO:     readableChannel.position(srcPos);
-                // SNAP: TODO:     this.raf.getChannel().transferFrom(readableChannel, destPos, length);
-                // SNAP: TODO:     readableChannel.position(savePos);
-                // SNAP: TODO: } else {
+                // FileChannel readableChannel = encodedByteBuffer.getBufferView().getChannel();
+                // if (readableChannel.isOpen()) { // SNAP: TODO: test. This is coming from delta raf
+                //     long savePos = readableChannel.position();
+                //     readableChannel.position(srcPos);
+                //     this.raf.getChannel().transferFrom(readableChannel, destPos, length);
+                //     readableChannel.position(savePos);
+                // } else {
                     byte[] chunk = new byte[16384];    // SNAP: vm_stat returns 16384 as page size on my mac
 
                     while (length > 0) {
@@ -114,9 +122,12 @@ public class VariableLengthDataFactory {
                     return byteBuffer;
                 }
                 this.raf.seek(0);
-                HollowBlobInput hbi = HollowBlobInput.mmap(this.raf, MAX_SINGLE_BUFFER_CAPACITY);
-                byteBuffer.loadFrom(hbi, this.raf.length());
-                return byteBuffer;
+                try (HollowBlobInput hbi = HollowBlobInput.mmap(this.file, this.raf, MAX_SINGLE_BUFFER_CAPACITY, false)) {
+                    byteBuffer.loadFrom(hbi, this.raf.length());
+                    LOG.info("SNAP:  Closing randomaccessfile because HollowBlobInput does not manage the lifecycle (will not close) for " + file);
+                    this.raf.close();
+                    return byteBuffer;
+                }
             } else {
                 throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
             }

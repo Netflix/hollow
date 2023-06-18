@@ -45,11 +45,9 @@ public class FixedLengthDataFactory {
             return new FixedLengthElementArray(memoryRecycler, numBits);
         } else {
             File targetFile = provisionTargetFile(numBytes, fileName);
-            RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
-            raf.setLength(numBytes);
-            raf.close();
-            HollowBlobInput targetBlob = HollowBlobInput.randomAccess(targetFile, MAX_SINGLE_BUFFER_CAPACITY);   // TODO: test with different single buffer capacities
-            return EncodedLongBuffer.newFrom(targetBlob, numLongs);
+            try (HollowBlobInput targetBlob = HollowBlobInput.randomAccess(targetFile, MAX_SINGLE_BUFFER_CAPACITY)) {
+                return EncodedLongBuffer.newFrom(targetBlob, numLongs, targetFile);   // TODO: test with different single buffer capacities
+            }
         }
     }
 
@@ -58,7 +56,7 @@ public class FixedLengthDataFactory {
         RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
         raf.setLength(numBytes);
         raf.close();
-        System.out.println("SNAP: Provisioned targetFile (one per shard per type) of size " + numBytes + " bytes: " + targetFile.getPath());
+        // System.out.println("SNAP: Provisioned targetFile (one per shard per type) of size " + numBytes + " bytes: " + targetFile.getPath());
         return targetFile;
     }
 
@@ -66,7 +64,8 @@ public class FixedLengthDataFactory {
         if (fld instanceof FixedLengthElementArray) {
             ((FixedLengthElementArray) fld).destroy(memoryRecycler);
         } else if (fld instanceof EncodedLongBuffer) {
-            LOG.warning("Destroy operation is not implemented for shared memory mode");
+            LOG.info("SNAP: Destroy operation invoked on EncodedLongBuffer (FixedLengthData)");
+            ((EncodedLongBuffer) fld).destroy();
         } else {
             throw new UnsupportedOperationException("Unknown type");
         }

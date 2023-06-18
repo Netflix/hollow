@@ -20,11 +20,13 @@ import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Logger;
 
 /**
  * {@code BlobByteBuffer} based implementation of variable length byte data that only supports read.    // TODO: update when supports write
  */
 public class EncodedByteBuffer implements VariableLengthData {
+    private static final Logger LOG = Logger.getLogger(EncodedByteBuffer.class.getName());
 
     private BlobByteBuffer bufferView;
     private long size;
@@ -35,6 +37,15 @@ public class EncodedByteBuffer implements VariableLengthData {
 
     public BlobByteBuffer getBufferView() {
         return bufferView;
+    }
+
+    public void destroy() {
+        if (bufferView != null) {
+            bufferView.unmapBlob();
+        } else {
+            LOG.warning("SNAP: destroy() called on EncodedByteBuffer thats already been destroyed previously");
+        }
+        bufferView = null;
     }
 
     @Override

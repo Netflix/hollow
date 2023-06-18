@@ -90,10 +90,10 @@ class HollowObjectDeltaApplicator {
         long numBits = (long) target.bitsPerRecord * (target.maxOrdinal + 1);
         target.fixedLengthData = FixedLengthDataFactory.allocate(numBits, memoryMode, target.memoryRecycler,
                 "/tmp/delta-target-objectData_" + target.schema.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
-
+        // SNAP: TODO: having delta from/to versions on staging and target files could be be helpful for debugging
         for(int i=0;i<target.schema.numFields();i++) {
             if(target.schema.getFieldType(i) == FieldType.STRING || target.schema.getFieldType(i) == FieldType.BYTES) {
-                target.stagedVarLengthData[i] = VariableLengthDataFactory.stage(memoryMode, target.memoryRecycler);
+                target.stagedVarLengthData[i] = VariableLengthDataFactory.stage(memoryMode, target.memoryRecycler, target.schema, whichShardForDiag);
             }
         }
 

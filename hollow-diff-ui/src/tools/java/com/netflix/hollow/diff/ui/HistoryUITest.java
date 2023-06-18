@@ -229,7 +229,7 @@ public class HistoryUITest {
         System.out.println("CUSTOM_VERSION_TAG= " + readStateEngine.getHeaderTags().get(CUSTOM_VERSION_TAG));
         for (HollowTypeReadState typeReadState : readStateEngine.getTypeStates()) {
             BitSet populatedOrdinals = typeReadState.getPopulatedOrdinals();
-            System.out.println("SNAP: PopulatedOrdinals= " + populatedOrdinals);
+            // System.out.println("SNAP: PopulatedOrdinals= " + populatedOrdinals);
             int ordinal = populatedOrdinals.nextSetBit(0);
             while (ordinal != -1) {
                 HollowObjectTypeReadState o = (HollowObjectTypeReadState) typeReadState;

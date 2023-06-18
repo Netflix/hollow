@@ -20,7 +20,10 @@ import static java.lang.Math.ceil;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.logging.Logger;
 
 /**
  * This class allows for storage and retrieval of fixed-length data in ByteBuffers. As a result there two ways to obtain
@@ -44,6 +47,7 @@ import java.io.IOException;
  */
 @SuppressWarnings("restriction")
 public class EncodedLongBuffer implements FixedLengthData {
+    private static final Logger LOG = Logger.getLogger(EncodedLongBuffer.class.getName());
 
     static int count1 = 0;
     static int count2 = 0;
@@ -51,7 +55,27 @@ public class EncodedLongBuffer implements FixedLengthData {
     private BlobByteBuffer bufferView;
     private long maxByteIndex = -1;
 
-    public EncodedLongBuffer() {}
+    private final File managedFile;
+
+    public EncodedLongBuffer(File managedFile) {
+        this.managedFile = managedFile;
+    }
+
+    public void destroy() throws IOException {
+        if (bufferView != null) {
+            bufferView.unmapBlob();
+        } else {
+            LOG.warning("SNAP: destroy() called on EncodedLongBuffer thats been destroyed previously");
+        }
+        bufferView = null;
+
+        if (managedFile != null) {
+            LOG.warning("SNAP: destroy() called on EncodedLongBuffer invoking delete on backing file " + managedFile.getAbsolutePath());
+            Files.delete(managedFile.toPath());
+        }
+        // System.out.println("SNAP: WARNING - shouldn't be getting invoked");
+        // since we operate on a bufferView here, we shouldn't mutate the underlying buffer
+    }
 
     /**
      * Returns a new EncodedLongBuffer from deserializing the given input. The value of the first variable length integer
@@ -72,7 +96,11 @@ public class EncodedLongBuffer implements FixedLengthData {
      * @return new EncodedLongBuffer containing data read from input
      */
     public static EncodedLongBuffer newFrom(HollowBlobInput in, long numLongs) throws IOException {
-        EncodedLongBuffer buf = new EncodedLongBuffer();
+        return newFrom(in, numLongs, null);
+    }
+
+    public static EncodedLongBuffer newFrom(HollowBlobInput in, long numLongs, File managedFile) throws IOException {
+        EncodedLongBuffer buf = new EncodedLongBuffer(managedFile);
         buf.loadFrom(in, numLongs);
         return buf;
     }
@@ -164,9 +192,9 @@ public class EncodedLongBuffer implements FixedLengthData {
             numBits -= fillBits;
         }
 
-        // SNAP: TODO: this has a bug, but even then only works when sourceStartBit == destStartBit,
-        //             otherwise byte-aligned reads look different and we have to rely on the
-        //             much less efficient unaligned long read below
+        // SNAP: TODO: figure out bulk copy, currently has bug even when sourceStartBit == destStartBit, but in general
+        //             challenge here is that the bits need to be moved in bulk but the offsets into source and dest
+        //             are not the same so the alignment of bits will vary
         // if (copyFrom instanceof EncodedLongBuffer && sourceStartBit == destStartBit) {
         if (false) {
             count1 ++;
@@ -263,10 +291,5 @@ public class EncodedLongBuffer implements FixedLengthData {
     }
     public long get(long index) {
         return this.bufferView.getLong(this.bufferView.position() + (index * 8));
-    }
-
-    public void destroy() throws IOException {
-        System.out.println("SNAP: WARNING - shouldn't be getting invoked");
-        // since we operate on a bufferView here, we should't mutate the underlying buffer
     }
 }
