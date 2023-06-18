@@ -90,7 +90,7 @@ public class GapEncodedVariableLengthIntegerReader {
         return remainingElementCount;
     }
 
-    public void destroy() {
+    public void destroy() throws IOException {
         if(data != null)
             VariableLengthDataFactory.destroy(data);
     }

@@ -18,8 +18,10 @@ package com.netflix.hollow.core.memory;
 
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.logging.Logger;
 
 /**
@@ -31,7 +33,10 @@ public class EncodedByteBuffer implements VariableLengthData {
     private BlobByteBuffer bufferView;
     private long size;
 
-    public EncodedByteBuffer() {
+    private final File stagedFile;
+
+    public EncodedByteBuffer(File stagedFile) {
+        this.stagedFile = stagedFile;
         this.size = 0;
     }
 
@@ -39,13 +44,17 @@ public class EncodedByteBuffer implements VariableLengthData {
         return bufferView;
     }
 
-    public void destroy() {
+    public void destroy() throws IOException {
         if (bufferView != null) {
             bufferView.unmapBlob();
         } else {
             LOG.warning("SNAP: destroy() called on EncodedByteBuffer thats already been destroyed previously");
         }
         bufferView = null;
+        if (stagedFile != null) {
+            LOG.info("SNAP: EncodedByteBuffer destroy() is also deleting staged file " + stagedFile.getAbsolutePath());
+            Files.delete(stagedFile.toPath());
+        }
     }
 
     @Override

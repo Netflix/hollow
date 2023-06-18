@@ -208,12 +208,7 @@ public class HollowObjectTypeDataElements {
     }
 
     void applyDelta(HollowObjectTypeDataElements fromData, HollowObjectTypeDataElements deltaData, int whichShardForDiag) throws IOException {
-        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
-            new HollowObjectDeltaApplicator(fromData, deltaData, this, whichShardForDiag).applyDelta(memoryMode);
-        } else {
-            throw new UnsupportedOperationException("Delta application not supported in memory mode " + memoryMode);
-        }
-
+        new HollowObjectDeltaApplicator(fromData, deltaData, this, whichShardForDiag).applyDelta(memoryMode);
     }
 
     public void destroy() throws IOException {

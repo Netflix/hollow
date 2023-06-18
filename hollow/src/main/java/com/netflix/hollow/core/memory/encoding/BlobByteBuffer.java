@@ -10,7 +10,6 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
-import sun.nio.ch.DirectBuffer;
 
 /**
  * <p>A stitching of {@link MappedByteBuffer}s to operate on large memory mapped blobs. {@code MappedByteBuffer} is
@@ -311,12 +310,18 @@ public final class BlobByteBuffer {
             for (int i = 0; i < spine.length; i++) {
                 ByteBuffer buf = spine[i];
                 if (buf != null) {
-                    ((DirectBuffer) buf).cleaner().clean();
+                    // SNAP: TODO: This isn't available in java 17. For now relying on System.gc(), although it seems to add
+                    //             a cost on delta refresh
+                    //  DirectBuffer directBuffer = (DirectBuffer) buf;
+                    //  jdk.internal.ref.Cleaner cleaner = directBuffer.cleaner();
+                    //  cleaner.clean();
                 } else {
                     LOG.warning("SNAP: unmapBlob called on BlobByteBuffer after its already been unmapped previously. " +
                             "spine.length= " + spine.length + ", i= " + i);
                 }
                 spine[i] = null;
+                System.gc();    // just a hint, but does seem to keep the size of mapped file region lower- both virtual and physical sizes as reported by vmmap on mac
+                                // note that this also adds 2s to delta refresh thats 10s without it
             }
         }
     }

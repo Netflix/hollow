@@ -16,12 +16,12 @@
  */
 package com.netflix.hollow.core.read.engine.map;
 
+import static com.netflix.hollow.core.memory.MemoryFileUtil.filepath;
+
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
+import com.netflix.hollow.core.memory.MemoryFileUtil;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 /**
  * This class contains the logic for applying a delta to a current MAP type state
@@ -74,10 +74,12 @@ class HollowMapDeltaApplicator {
         target.emptyBucketKeyValue = delta.emptyBucketKeyValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
-        target.mapPointerAndSizeData = FixedLengthDataFactory.allocate(((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion, target.memoryMode, target.memoryRecycler,
-                "/tmp/delta-target-mapPointerAndSizeData_" + target.schemaForDiag.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
-        target.entryData = FixedLengthDataFactory.allocate(target.totalNumberOfBuckets * target.bitsPerMapEntry, target.memoryMode, target.memoryRecycler,
-                "/tmp/delta-target-mapEntryData_" + target.schemaForDiag.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+        target.mapPointerAndSizeData = FixedLengthDataFactory.allocate(((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion,
+                target.memoryMode, target.memoryRecycler,
+                filepath() + MemoryFileUtil.fixedLengthDataFilename(target.schemaForDiag.getName(), "mapPointerAndSizeData", whichShardForDiag));
+        target.entryData = FixedLengthDataFactory.allocate(target.totalNumberOfBuckets * target.bitsPerMapEntry,
+                target.memoryMode, target.memoryRecycler,
+                filepath() + MemoryFileUtil.fixedLengthDataFilename(target.schemaForDiag.getName(), "mapEntryData", whichShardForDiag));
 
         if(target.bitsPerMapPointer == from.bitsPerMapPointer
                 && target.bitsPerMapSizeValue == from.bitsPerMapSizeValue
@@ -90,7 +92,7 @@ class HollowMapDeltaApplicator {
 
         from.encodedRemovals = null;
         removalsReader.destroy();
-        additionsReader.destroy();
+        // additionsReader.destroy();
     }
 
     private void slowDelta() {

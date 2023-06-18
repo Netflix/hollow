@@ -1,5 +1,6 @@
 package com.netflix.hollow.core.memory;
 
+import static com.netflix.hollow.core.memory.MemoryFileUtil.filepath;
 import static com.netflix.hollow.core.memory.encoding.BlobByteBuffer.MAX_SINGLE_BUFFER_CAPACITY;
 
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
@@ -9,9 +10,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 public class VariableLengthDataFactory {
@@ -22,7 +20,7 @@ public class VariableLengthDataFactory {
             return new SegmentedByteArray(memoryRecycler);
 
         } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
-            return new EncodedByteBuffer();
+            return new EncodedByteBuffer(null);
         } else {
             throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
         }
@@ -30,11 +28,11 @@ public class VariableLengthDataFactory {
 
     // stage (for writing to)
     public static StagedVariableLengthData stage(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler,
-                                                 HollowSchema schemaForDiag, int whichShardForDiag) throws FileNotFoundException {
-        return new StagedVariableLengthData(memoryMode, memoryRecycler, schemaForDiag, whichShardForDiag);
+                                                 HollowSchema schemaForDiag, String fieldTypeForDiag, int whichShardForDiag) throws FileNotFoundException {
+        return new StagedVariableLengthData(memoryMode, memoryRecycler, schemaForDiag, fieldTypeForDiag, whichShardForDiag);
     }
 
-    public static void destroy(VariableLengthData vld) {
+    public static void destroy(VariableLengthData vld) throws IOException {
         if (vld instanceof SegmentedByteArray) {
             ((SegmentedByteArray) vld).destroy();
         } else if (vld instanceof EncodedByteBuffer) {
@@ -57,7 +55,7 @@ public class VariableLengthDataFactory {
         }
 
         public StagedVariableLengthData(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler,
-                                        HollowSchema schemaForDiag, int whichShardForDiag) throws FileNotFoundException {
+                                        HollowSchema schemaForDiag, String fieldTypeForDiag, int whichShardForDiag) throws FileNotFoundException {
             this.memoryMode = memoryMode;
             if (memoryMode.equals(MemoryMode.ON_HEAP)) {
                 byteArray = new SegmentedByteArray(memoryRecycler);
@@ -65,10 +63,7 @@ public class VariableLengthDataFactory {
                 raf = null;
             } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
                 byteArray = null;
-                file = new File("/tmp/delta-staging-varLengthData_"
-                        + schemaForDiag.getName() + "_" + whichShardForDiag + "_"
-                        + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-                        + "_" + UUID.randomUUID());
+                file = new File(filepath() + MemoryFileUtil.varLengthDataFilename(schemaForDiag.getName(), fieldTypeForDiag, whichShardForDiag));
                 raf = new RandomAccessFile(file, "rws");
             } else {
                 throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
@@ -117,7 +112,7 @@ public class VariableLengthDataFactory {
                 return this.byteArray;
 
             } else if (memoryMode.equals(MemoryMode.SHARED_MEMORY_LAZY)) {
-                EncodedByteBuffer byteBuffer = new EncodedByteBuffer();
+                EncodedByteBuffer byteBuffer = new EncodedByteBuffer(file);
                 if (this.raf.length() == 0) {
                     return byteBuffer;
                 }

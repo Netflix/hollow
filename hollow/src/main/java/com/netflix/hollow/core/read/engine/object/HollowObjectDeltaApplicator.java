@@ -16,15 +16,15 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
+import static com.netflix.hollow.core.memory.MemoryFileUtil.filepath;
+
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
+import com.netflix.hollow.core.memory.MemoryFileUtil;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 /**
  * This class contains the logic for applying a delta to a current OBJECT type state
@@ -89,11 +89,12 @@ class HollowObjectDeltaApplicator {
 
         long numBits = (long) target.bitsPerRecord * (target.maxOrdinal + 1);
         target.fixedLengthData = FixedLengthDataFactory.allocate(numBits, memoryMode, target.memoryRecycler,
-                "/tmp/delta-target-objectData_" + target.schema.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+                filepath() + MemoryFileUtil.fixedLengthDataFilename(target.schema.getName(), null, whichShardForDiag));
         // SNAP: TODO: having delta from/to versions on staging and target files could be be helpful for debugging
         for(int i=0;i<target.schema.numFields();i++) {
             if(target.schema.getFieldType(i) == FieldType.STRING || target.schema.getFieldType(i) == FieldType.BYTES) {
-                target.stagedVarLengthData[i] = VariableLengthDataFactory.stage(memoryMode, target.memoryRecycler, target.schema, whichShardForDiag);
+                target.stagedVarLengthData[i] = VariableLengthDataFactory.stage(memoryMode, target.memoryRecycler,
+                        target.schema, target.schema.getFieldType(i).toString(), whichShardForDiag);
             }
         }
 
@@ -113,7 +114,7 @@ class HollowObjectDeltaApplicator {
         }
         from.encodedRemovals = null;
         removalsReader.destroy();
-        additionsReader.destroy();
+        // additionsReader.destroy();   // SNAP: TODO: BUG: delta additionsReader can not be recycled just yet, see HollowObjectTypeReadState::applyDelta
     }
 
     private boolean canDoFastDelta() {

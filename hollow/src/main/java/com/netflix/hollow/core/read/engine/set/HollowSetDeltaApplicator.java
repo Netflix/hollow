@@ -16,12 +16,12 @@
  */
 package com.netflix.hollow.core.read.engine.set;
 
+import static com.netflix.hollow.core.memory.MemoryFileUtil.filepath;
+
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
+import com.netflix.hollow.core.memory.MemoryFileUtil;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 /**
  * This class contains the logic for applying a delta to a current SET type state
@@ -73,9 +73,9 @@ class HollowSetDeltaApplicator {
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
         target.setPointerAndSizeData = FixedLengthDataFactory.allocate(((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion, target.memoryMode, target.memoryRecycler,
-                "/tmp/delta-target-setPointerAndSizeData_" + target.schemaForDiag.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+                filepath() + MemoryFileUtil.fixedLengthDataFilename(target.schemaForDiag.getName(), "setPointerAndSizeData", whichShardForDiag));
         target.elementData = FixedLengthDataFactory.allocate(target.totalNumberOfBuckets * target.bitsPerElement, target.memoryMode, target.memoryRecycler,
-                "/tmp/delta-target-setElementData_" + target.schemaForDiag.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+                filepath() + MemoryFileUtil.fixedLengthDataFilename(target.schemaForDiag.getName(), "setElementData", whichShardForDiag));
 
         if(target.bitsPerSetPointer == from.bitsPerSetPointer
                 && target.bitsPerSetSizeValue == from.bitsPerSetSizeValue
@@ -86,8 +86,7 @@ class HollowSetDeltaApplicator {
 
         from.encodedRemovals = null;
         removalsReader.destroy();
-        additionsReader.destroy();
-
+        // additionsReader.destroy();
     }
 
     private void slowDelta() {

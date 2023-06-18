@@ -16,12 +16,12 @@
  */
 package com.netflix.hollow.core.read.engine.list;
 
+import static com.netflix.hollow.core.memory.MemoryFileUtil.filepath;
+
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
+import com.netflix.hollow.core.memory.MemoryFileUtil;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 /**
  * This class contains the logic for applying a delta to a current LIST type state
@@ -67,11 +67,12 @@ class HollowListDeltaApplicator {
         target.bitsPerListPointer = delta.bitsPerListPointer;
         target.bitsPerElement = delta.bitsPerElement;
 
-        target.listPointerData = FixedLengthDataFactory.allocate(((long)target.maxOrdinal + 1) * target.bitsPerListPointer, target.memoryMode, target.memoryRecycler,
-                "/tmp/delta-target-listPointerData_" + target.schemaForDiag.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+        target.listPointerData = FixedLengthDataFactory.allocate(((long)target.maxOrdinal + 1) * target.bitsPerListPointer,
+                target.memoryMode, target.memoryRecycler,
+                filepath() + MemoryFileUtil.fixedLengthDataFilename(target.schemaForDiag.getName(), "listPointerData", whichShardForDiag));
 
         target.elementData = FixedLengthDataFactory.allocate(target.totalNumberOfElements * target.bitsPerElement, target.memoryMode, target.memoryRecycler,
-                "/tmp/delta-target-listElementData_" + target.schemaForDiag.getName() + "_" + whichShardForDiag + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))+ "_" + UUID.randomUUID());
+                filepath() + MemoryFileUtil.fixedLengthDataFilename(target.schemaForDiag.getName(), "listElementData", whichShardForDiag));
 
         if(target.bitsPerListPointer == from.bitsPerListPointer
                 && target.bitsPerElement == from.bitsPerElement)
@@ -81,7 +82,7 @@ class HollowListDeltaApplicator {
 
         from.encodedRemovals = null;
         removalsReader.destroy();
-        additionsReader.destroy();
+        // additionsReader.destroy();
     }
 
     private void slowDelta() {

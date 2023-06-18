@@ -123,6 +123,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
                 nextData.applyDelta(oldData, deltaData, i);
                 shards[i].setCurrentData(nextData);
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+                deltaData.encodedAdditions.destroy();
                 oldData.destroy();
             }
             deltaData.destroy();

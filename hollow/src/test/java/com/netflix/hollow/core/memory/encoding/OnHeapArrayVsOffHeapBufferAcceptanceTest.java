@@ -122,7 +122,7 @@ public class OnHeapArrayVsOffHeapBufferAcceptanceTest {
         SegmentedByteArray testByteArray = new SegmentedByteArray(WastefulRecycler.DEFAULT_INSTANCE);
         testByteArray.loadFrom(HollowBlobInput.serial(new FileInputStream(testFile)), testFile.length());
 
-        EncodedByteBuffer testByteBuffer = new EncodedByteBuffer();
+        EncodedByteBuffer testByteBuffer = new EncodedByteBuffer(null);
         testByteBuffer.loadFrom(HollowBlobInput.randomAccess(testFile, TEST_SINGLE_BUFFER_CAPACITY_BYTES), testFile.length());
 
         // aligned bytes - BlobByteBuffer vs. SegmentedByteArray
