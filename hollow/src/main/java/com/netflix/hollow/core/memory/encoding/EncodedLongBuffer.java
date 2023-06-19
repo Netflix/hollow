@@ -56,6 +56,7 @@ public class EncodedLongBuffer implements FixedLengthData {
     private long maxByteIndex = -1;
 
     private final File managedFile;
+    private boolean destroyActionHasBeenTakenBeforeDiag = false;
 
     public EncodedLongBuffer(File managedFile) {
         this.managedFile = managedFile;
@@ -64,13 +65,15 @@ public class EncodedLongBuffer implements FixedLengthData {
     public void destroy() throws IOException {
         if (bufferView != null) {
             bufferView.unmapBlob();
+            destroyActionHasBeenTakenBeforeDiag = true;
         } else {
-            LOG.warning("SNAP: destroy() called on EncodedLongBuffer thats been destroyed previously");
+            if (destroyActionHasBeenTakenBeforeDiag) {
+                LOG.warning("SNAP: destroy() called on EncodedLongBuffer thats been destroyed previously");
+            }
         }
         bufferView = null;
 
         if (managedFile != null) {
-            LOG.warning("SNAP: destroy() called on EncodedLongBuffer invoking delete on backing file " + managedFile.getAbsolutePath());
             Files.delete(managedFile.toPath());
         }
         // System.out.println("SNAP: WARNING - shouldn't be getting invoked");

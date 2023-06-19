@@ -33,10 +33,11 @@ public class EncodedByteBuffer implements VariableLengthData {
     private BlobByteBuffer bufferView;
     private long size;
 
-    private final File stagedFile;
+    private final File managedFile;
+    private boolean destroyActionHasBeenTakenBeforeDiag = false;
 
-    public EncodedByteBuffer(File stagedFile) {
-        this.stagedFile = stagedFile;
+    public EncodedByteBuffer(File managedFile) {
+        this.managedFile = managedFile;
         this.size = 0;
     }
 
@@ -47,13 +48,16 @@ public class EncodedByteBuffer implements VariableLengthData {
     public void destroy() throws IOException {
         if (bufferView != null) {
             bufferView.unmapBlob();
+            destroyActionHasBeenTakenBeforeDiag = true;
         } else {
-            LOG.warning("SNAP: destroy() called on EncodedByteBuffer thats already been destroyed previously");
+            if (destroyActionHasBeenTakenBeforeDiag) {
+                LOG.warning("SNAP: destroy() called on EncodedByteBuffer thats already been destroyed previously");
+            }
         }
         bufferView = null;
-        if (stagedFile != null) {
-            LOG.info("SNAP: EncodedByteBuffer destroy() is also deleting staged file " + stagedFile.getAbsolutePath());
-            Files.delete(stagedFile.toPath());
+        if (managedFile != null) {
+            LOG.info("SNAP: EncodedByteBuffer destroy() is also deleting staged file " + managedFile.getAbsolutePath());
+            Files.delete(managedFile.toPath());
         }
     }
 

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
+import java.util.UUID;
 import org.junit.Test;
 
 public class BlobByteBufferTest {
@@ -15,7 +16,7 @@ public class BlobByteBufferTest {
         int padBytes = 8;
         int singleBufferCapacity = 1024;
 
-        File targetFile = new File("test-BlobByteBuffer-" + System.currentTimeMillis());
+        File targetFile = new File("test-BlobByteBuffer-" + System.currentTimeMillis() + "-" + UUID.randomUUID());
         targetFile.deleteOnExit();
         RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
         raf.setLength((14 * Long.BYTES) + padBytes);
@@ -32,6 +33,8 @@ public class BlobByteBufferTest {
                 Long.MAX_VALUE, Long.MAX_VALUE,
         };
 
+        assertEquals(1, buf.getReferenceCount().get());
+
         for (int offset = 0; offset < padBytes; offset ++) {
             for (int i = 0; i < values.length; i ++) {
                 buf.putLong(offset + i * Long.BYTES, values[i]);
@@ -44,5 +47,31 @@ public class BlobByteBufferTest {
         }
         raf.close();
 
+        buf.unmapBlob();
+        assertEquals(0, buf.getReferenceCount().get());
+    }
+
+    @Test
+    public void testReferenceCounting() throws IOException {
+        File targetFile = new File("test-BlobByteBuffer-" + System.currentTimeMillis() + "-" + UUID.randomUUID());
+        targetFile.deleteOnExit();
+        int singleBufferCapacity = 64;
+        RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
+        raf.setLength(14 * Long.BYTES);
+        FileChannel channel = raf.getChannel();
+        BlobByteBuffer buf = BlobByteBuffer.mmapBlob(channel, singleBufferCapacity);
+        raf.close();
+
+        assertEquals(1, buf.getReferenceCount().get());
+
+        BlobByteBuffer dupBuf = buf.duplicate();
+        assertEquals(2, buf.getReferenceCount().get());
+
+        // can unmap in same order as init
+        buf.unmapBlob();
+        assertEquals(1, buf.getReferenceCount().get());
+
+        dupBuf.unmapBlob();
+        assertEquals(0, buf.getReferenceCount().get());
     }
 }
