@@ -186,7 +186,8 @@ public final class BlobByteBuffer {
             // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case,
             // return 0 for (index >= capacity - Long.BYTES && index < capacity )
             // these zero bytes will be discarded anyway when the returned long value is shifted to get the queried bits
-            throw new UnsupportedOperationException(String.format("Unexpected read past the end, index=%s, capacity=%s", index, capacity));
+            // throw new UnsupportedOperationException(String.format("Unexpected read past the end, index=%s, capacity=%s", index, capacity));  // SNAP: TODO: in mceviewables on vmstransformer
+            LOG.warning(String.format("Unexpected read past the end, index=%s, capacity=%s", index, capacity));
         }
     }
 
