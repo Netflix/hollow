@@ -6,16 +6,19 @@ import java.util.HashMap;
 // This class memoizes types by returning references to existing objects, or storing
 // Objects if they are not currently in the pool
 public class ObjectInternPool {
-    final private GenericInternPool<Integer> integerInternPool = new GenericInternPool<Integer>();
-    final private GenericInternPool<Float> floatInternPool = new GenericInternPool<Float>();
-    final private GenericInternPool<Double> doubleInternPool = new GenericInternPool<Double>();
-    // Only two possible values (and technically null), no reason for hashmap
-    final Boolean falseBool = false;
-    final Boolean trueBool = true;
+    final private GenericInternPool<Integer> integerInternPool = new GenericInternPool<>();
+    final private GenericInternPool<Float> floatInternPool = new GenericInternPool<>();
+    final private GenericInternPool<Double> doubleInternPool = new GenericInternPool<>();
+    final private GenericInternPool<Long> longInternPool = new GenericInternPool<>();
 
     public Object intern(Object objectToIntern) {
         if(objectToIntern==null) {
             throw new IllegalArgumentException("Cannot intern null objects");
+        }
+
+        // Automatically handles booleans and integers within cached range
+        if(objectAutomaticallyCached(objectToIntern)) {
+            return objectToIntern;
         }
 
         if(objectToIntern instanceof Float) {
@@ -24,15 +27,24 @@ public class ObjectInternPool {
             return doubleInternPool.intern((Double) objectToIntern);
         } else if(objectToIntern instanceof Integer) {
             return integerInternPool.intern((Integer) objectToIntern);
+        } else if(objectToIntern instanceof Long) {
+            return longInternPool.intern((Long) objectToIntern);
         } else if(objectToIntern instanceof String) {
-            //just use Java's builtin intern function
+            // Use Java's builtin intern function
             return ((String) objectToIntern).intern();
-        } else if(objectToIntern instanceof Boolean) {
-            return (Boolean) objectToIntern ? trueBool : falseBool;
         } else {
             String className = objectToIntern.getClass().getName();
             throw new IllegalArgumentException("Cannot intern object of type " + className);
         }
+    }
+
+    private boolean objectAutomaticallyCached(Object objectToIntern) {
+        if(objectToIntern instanceof Boolean) {
+            return true;
+        } else if(objectToIntern instanceof Integer) {
+            return -128 <= (Integer) objectToIntern && (Integer) objectToIntern <= 127;
+        }
+        return false;
     }
 }
 
