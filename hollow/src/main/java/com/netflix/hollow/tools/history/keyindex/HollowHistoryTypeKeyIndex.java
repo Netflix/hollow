@@ -52,6 +52,9 @@ public class HollowHistoryTypeKeyIndex {
     private final HashMap<Integer, IntList> ordinalFieldHashMapping;
     private final HashMap<Integer, Object[]> ordinalFieldObjectMapping;
 
+    private final ObjectInternPool memoizedPool;
+
+
     public HollowHistoryTypeKeyIndex(PrimaryKey primaryKey, HollowDataset dataModel) {
         this.primaryKey = primaryKey;
         this.keyFieldIsIndexed = new boolean[primaryKey.numFields()];
@@ -65,6 +68,8 @@ public class HollowHistoryTypeKeyIndex {
         this.ordinalMapping = new HashMap<>();
         this.ordinalFieldHashMapping = new HashMap<>();
         this.ordinalFieldObjectMapping = new HashMap<>();
+
+        this.memoizedPool = new ObjectInternPool();
     }
 
     public boolean isInitialized() {
@@ -203,7 +208,8 @@ public class HollowHistoryTypeKeyIndex {
             IntList currFieldList = ordinalFieldHashMapping.get(fieldHash);
             currFieldList.add(assignedOrdinal);
 
-            ordinalFieldObjectMapping.get(assignedOrdinal)[i] = readValue(typeState, ordinal, i);
+            Object objectToStore = readValue(typeState, ordinal, i);
+            ordinalFieldObjectMapping.get(assignedOrdinal)[i] = memoizedPool.intern(objectToStore);
         }
     }
 
