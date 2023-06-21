@@ -7,7 +7,7 @@ import java.util.Random;
 public class MemoryFileUtil {
 
     public static String filepath() {
-        return "/tmp/";
+        return System.getProperty("java.io.tmpdir");
     }
 
     // whichData is null for object types, and listPointerData, listElementData, mapEntryData etc. for collection types
