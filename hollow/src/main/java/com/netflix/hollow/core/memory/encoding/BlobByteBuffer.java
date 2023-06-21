@@ -164,30 +164,28 @@ public final class BlobByteBuffer {
 
     // advances pos in backing buf
     public int getBytes(long index, long len, byte[] bytes, boolean restorePos) {
-        if (index < capacity) {
-            int spineIndex = (int)(index >>> (shift));
-            ByteBuffer buf = spine[spineIndex];
-            int indexIntoBuf = (int)(index & mask);
-            int toCopy = (int) Math.min(len, buf.capacity() - indexIntoBuf);
-            int savePos = buf.position();
-            try {
-                buf.position(indexIntoBuf);
-                buf.get(bytes, 0, toCopy);
-                if (restorePos) {
-                    buf.position(savePos);
-                }
-            } catch (BufferUnderflowException e) {
-                throw e;
-            }
-            return toCopy;
-        } else {
-            assert(index < capacity + Long.BYTES);
+        if (index >= capacity) {
             // this situation occurs when read for bits near the end of the buffer requires reading a long value that
             // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case,
             // return 0 for (index >= capacity - Long.BYTES && index < capacity )
             // these zero bytes will be discarded anyway when the returned long value is shifted to get the queried bits
-            throw new UnsupportedOperationException(String.format("Unexpected read past the end, index=%s, capacity=%s", index, capacity));
+            LOG.warning(String.format("Unexpected read past the end, index=%s, capacity=%s", index, capacity));
         }
+        int spineIndex = (int)(index >>> (shift));
+        ByteBuffer buf = spine[spineIndex];
+        int indexIntoBuf = (int)(index & mask);
+        int toCopy = (int) Math.min(len, buf.capacity() - indexIntoBuf);
+        int savePos = buf.position();
+        try {
+            buf.position(indexIntoBuf);
+            buf.get(bytes, 0, toCopy);
+            if (restorePos) {
+                buf.position(savePos);
+            }
+        } catch (BufferUnderflowException e) {
+            throw e;
+        }
+        return toCopy;
     }
 
     public int putBytes(long index, long len, byte[] bytes, boolean restorePos) {
