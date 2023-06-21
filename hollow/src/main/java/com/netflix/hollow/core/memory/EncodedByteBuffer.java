@@ -63,10 +63,11 @@ public class EncodedByteBuffer implements VariableLengthData {
 
     @Override
     public byte get(long index) {
-        if (index >= this.size) {
-            throw new IllegalStateException();
+        if (index >= this.size) {   // SNAP: TODO: realized in transformer
+            if (index >= this.size + Long.BYTES) {
+                LOG.warning(String.format("SNAP: unexpected get from EncodedByteBuffer: index=%s, size=%s", index, size));
+            }
         }
-
         byte retVal = this.bufferView.getByte(this.bufferView.position() + index);
         return retVal;
     }
