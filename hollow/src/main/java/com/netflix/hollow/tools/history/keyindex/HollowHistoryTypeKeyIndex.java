@@ -19,6 +19,7 @@ package com.netflix.hollow.tools.history.keyindex;
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 import static com.netflix.hollow.tools.util.SearchUtils.MULTI_FIELD_KEY_DELIMITER;
 
+import com.netflix.hollow.Hollow;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
@@ -158,18 +159,21 @@ public class HollowHistoryTypeKeyIndex {
         if(assignedIndex==ORDINAL_NONE)
             return;
 
-        for (int i = 0; i < primaryKey.numFields(); i++) {
-            if (!keyFieldIsIndexed[i])
-                continue;
+        for (int i = 0; i < primaryKey.numFields(); i++)
+            writeKeyField(assignedOrdinal, i);
+    }
 
-            Object fieldObject = ordinalMapping.getFieldObject(assignedOrdinal, i);
-            int fieldHash = HashCodes.hashInt(hashObject(fieldObject));
-            if(!ordinalFieldHashMapping.containsKey(fieldHash))
-                ordinalFieldHashMapping.put(fieldHash, new IntList());
+    private void writeKeyField(int assignedOrdinal, int fieldIdx) {
+        if (!keyFieldIsIndexed[fieldIdx])
+            return;
 
-            IntList matchingFieldList = ordinalFieldHashMapping.get(fieldHash);
-            matchingFieldList.add(assignedOrdinal);
-        }
+        Object fieldObject = ordinalMapping.getFieldObject(assignedOrdinal, fieldIdx);
+        int fieldHash = HashCodes.hashInt(hashObject(fieldObject));
+        if(!ordinalFieldHashMapping.containsKey(fieldHash))
+            ordinalFieldHashMapping.put(fieldHash, new IntList());
+
+        IntList matchingFieldList = ordinalFieldHashMapping.get(fieldHash);
+        matchingFieldList.add(assignedOrdinal);
     }
 
     private int hashObject(Object value) {
@@ -183,6 +187,8 @@ public class HollowHistoryTypeKeyIndex {
             return HollowReadFieldUtils.doubleHashCode((Double)value);
         } else if(value instanceof Boolean) {
             return HollowReadFieldUtils.booleanHashCode((Boolean) value);
+        } else if(value instanceof Long) {
+            return HollowReadFieldUtils.longHashCode((Long) value);
         } else if(value instanceof byte[]) {
             return HollowReadFieldUtils.byteArrayHashCode((byte[]) value);
         } else {
