@@ -16,7 +16,9 @@ public class HollowOrdinalMapper {
     private static final double LOAD_FACTOR = 0.7;
     
     private Integer[] ordinalMappings;
-    private final HashMap<Integer, Object[]> indexFieldObjectMapping;
+    private Integer[] originalHash;
+
+    private HashMap<Integer, Object[]> indexFieldObjectMapping;
     private final HashMap<Integer, Integer> assignedOrdinalToIndex;
 
     private final PrimaryKey primaryKey;
@@ -28,6 +30,7 @@ public class HollowOrdinalMapper {
     public HollowOrdinalMapper(PrimaryKey primaryKey, boolean[] keyFieldIsIndexed, int[][] keyFieldIndices) {
         // Start with prime number to assist OA
         this.ordinalMappings = new Integer[2069];
+        this.originalHash = new Integer[2069];
         Arrays.fill(this.ordinalMappings, ORDINAL_NONE);
 
         this.primaryKey = primaryKey;
@@ -42,25 +45,22 @@ public class HollowOrdinalMapper {
 
     public int findAssignedOrdinal(HollowObjectTypeReadState typeState, int keyOrdinal) {
         int hashedRecord = hashKeyRecord(typeState, keyOrdinal);
-        int index = indexFromHash(hashedRecord);
+        int index = indexFromHash(hashedRecord, ordinalMappings.length);
 
         while (ordinalMappings[index]!=ORDINAL_NONE) {
-            if(recordsAreEqual(typeState, keyOrdinal, hashedRecord))
+            if(recordsAreEqual(typeState, keyOrdinal, index))
                 return ordinalMappings[index];
             index = (index + 1) % ordinalMappings.length;
         }
+
         return ORDINAL_NONE;
     }
 
-    private boolean recordsAreEqual(HollowObjectTypeReadState typeState, int keyOrdinal, int hashedRecord) {
-        int keyHash = hashKeyRecord(typeState, keyOrdinal);
-        if(keyHash!=hashedRecord) {
-            return false;
-        }
-        int index = indexFromHash(hashedRecord);
+    private boolean recordsAreEqual(HollowObjectTypeReadState typeState, int keyOrdinal, int index) {
         for(int i=0;i<primaryKey.numFields();i++) {
             if(!keyFieldIsIndexed[i])
                 continue;
+
             Object newFieldValue = readValueInState(typeState, keyOrdinal, i);
             Object existingFieldValue = indexFieldObjectMapping.get(index)[i];
             if(!newFieldValue.equals(existingFieldValue)) {
@@ -70,27 +70,24 @@ public class HollowOrdinalMapper {
         return true;
     }
 
-    // Java modulo is more like a remainder, and we don't want it to be negative
-    // Even if the hash is
-    private int indexFromHash(int hashedValue) {
-        int modulus = hashedValue % ordinalMappings.length;
-        return modulus < 0 ? modulus + ordinalMappings.length : modulus;
+    // Java modulo is more like a remainder, indices can't be negative
+    private static int indexFromHash(int hashedValue, int length) {
+        int modulus = hashedValue % length;
+        return modulus < 0 ? modulus + length : modulus;
     }
 
-    //returns stored index
     public int storeNewRecord(HollowObjectTypeReadState typeState, int ordinal, int assignedOrdinal) {
         int hashedRecord = hashKeyRecord(typeState, ordinal);
 
         if ((double) size / ordinalMappings.length > LOAD_FACTOR) {
-            expandTable();
+            expandAndRehashTable();
         }
 
-        int index = indexFromHash(hashedRecord);
+        int index = indexFromHash(hashedRecord, ordinalMappings.length);
 
         // Linear probing
         while (ordinalMappings[index] != ORDINAL_NONE) {
             if(recordsAreEqual(typeState, ordinal, index)) {
-                //TODO: not ordinal, shouldn't return ORDINAL_NONE
                 this.assignedOrdinalToIndex.put(assignedOrdinal, index);
                 return ORDINAL_NONE;
             }
@@ -98,6 +95,7 @@ public class HollowOrdinalMapper {
         }
 
         ordinalMappings[index] = assignedOrdinal;
+        originalHash[index] = hashedRecord;
         size++;
 
         storeFields(typeState, ordinal, index);
@@ -106,23 +104,50 @@ public class HollowOrdinalMapper {
         return index;
     }
 
-    private void expandTable() {
-        Integer[] newOrdinalMapping = new Integer[ordinalMappings.length * 2];
-        System.arraycopy(ordinalMappings, 0, newOrdinalMapping, 0, ordinalMappings.length);
-        ordinalMappings = newOrdinalMapping;
-        System.exit(1);
-        //TODO: support rehashing
-    }
-
     private void storeFields(HollowObjectTypeReadState typeState, int ordinal, int index) {
         if(!indexFieldObjectMapping.containsKey(index))
             indexFieldObjectMapping.put(index, new Object[primaryKey.numFields()]);
+
         for(int i=0;i<primaryKey.numFields();i++) {
             if(!keyFieldIsIndexed[i])
                 continue;
+
             Object objectToStore = readValueInState(typeState, ordinal, i);
-            indexFieldObjectMapping.get(index)[i] = memoizedPool.intern(objectToStore);
+            //indexFieldObjectMapping.get(index)[i] = memoizedPool.intern(objectToStore);
+            indexFieldObjectMapping.get(index)[i] = objectToStore;
         }
+    }
+
+    private void expandAndRehashTable() {
+        Integer[] newTable = new Integer[ordinalMappings.length*2];
+        Arrays.fill(newTable, ORDINAL_NONE);
+
+        Integer[] newOriginalHash = new Integer[originalHash.length*2];
+        HashMap<Integer, Object[]> newIndexFieldObjectMapping = new HashMap<>();
+
+        for(int i=0;i<ordinalMappings.length;i++) {
+            if(ordinalMappings[i]==ORDINAL_NONE)
+                continue;
+            int newIndex = rehashExistingRecord(newTable, originalHash[i], ordinalMappings[i]);
+            newOriginalHash[newIndex] = originalHash[i];
+
+            Object[] fieldObjects = indexFieldObjectMapping.get(i);
+            newIndexFieldObjectMapping.put(newIndex, fieldObjects);
+        }
+
+        this.ordinalMappings = newTable;
+        this.originalHash = newOriginalHash;
+        this.indexFieldObjectMapping = newIndexFieldObjectMapping;
+    }
+
+    private int rehashExistingRecord(Integer[] newTable, int originalHash, int assignedOrdinal) {
+        int newIndex = indexFromHash(originalHash, newTable.length);
+        while (newTable[newIndex]!=ORDINAL_NONE)
+            newIndex = (newIndex + 1) % newTable.length;
+
+        assignedOrdinalToIndex.put(assignedOrdinal, newIndex);
+        newTable[newIndex] = assignedOrdinal;
+        return newIndex;
     }
 
     public Object getFieldObject(int keyOrdinal, int fieldIndex) {
