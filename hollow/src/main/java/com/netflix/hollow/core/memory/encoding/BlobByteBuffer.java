@@ -306,8 +306,9 @@ public final class BlobByteBuffer {
                             "spine.length= " + spine.length + ", i= " + i);
                 }
                 spine[i] = null;
-                System.gc();    // just a hint, but does seem to keep the size of mapped file region lower- both virtual and physical sizes as reported by vmmap on mac
-                                // note that this also adds 2s to delta refresh thats 10s without it
+                // SNAP: TODO: instead of calling it too frequently, let app decide when to call it
+                //  System.gc();    // just a hint, but does seem to keep the size of mapped file region lower- both virtual and physical sizes as reported by vmmap on mac
+                                // note that this also adds 2s to delta refresh that's 10s without it
             }
         }
     }
