@@ -1,5 +1,6 @@
 package com.netflix.hollow.core.memory.encoding;
 
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.File;
 import java.io.IOException;
@@ -37,14 +38,18 @@ public class EncodedLongBufferTest {
         }
     }
 
-    EncodedLongBuffer setupEncodedLongBuffer(int fileSizeInBytes, int singleBufferCapacity) throws IOException {
+    // SNAP: TODO: here
+    EncodedLongBuffer setupEncodedLongBuffer(long numBits, int singleBufferCapacity) throws IOException {
+        long numLongs = ((numBits - 1) >>> 6) + 1;
+        numLongs ++;
+        long numBytes = numLongs * Long.BYTES;
         File targetFile = new File("test-EncodedLongBuffer-" + System.currentTimeMillis() + "-" + RandomUtils.nextInt());
         targetFile.deleteOnExit();
         RandomAccessFile raf = new RandomAccessFile(targetFile, "rw");
-        raf.setLength(fileSizeInBytes);
+        raf.setLength(numBytes);
         raf.close();
         HollowBlobInput hbi = HollowBlobInput.randomAccess(targetFile, singleBufferCapacity);
-        EncodedLongBuffer buf = EncodedLongBuffer.newFrom(hbi, (fileSizeInBytes >> 3));
+        EncodedLongBuffer buf = EncodedLongBuffer.newFrom(hbi, numLongs);
         return buf;
     }
 
@@ -107,8 +112,8 @@ public class EncodedLongBufferTest {
             int copyFromRangeStartBit = rand.nextInt(totalBitsInArray - totalBitsInCopyRange);
             int copyToRangeStartBit = rand.nextInt(100000);
 
-            EncodedLongBuffer source = setupEncodedLongBuffer((totalBitsInArray >> 3) + 1, singleBufferCapacity);
-            EncodedLongBuffer dest = setupEncodedLongBuffer((totalBitsInArray + copyToRangeStartBit >> 3) + 1, singleBufferCapacity);
+            EncodedLongBuffer source = setupEncodedLongBuffer(totalBitsInArray, singleBufferCapacity);
+            EncodedLongBuffer dest = setupEncodedLongBuffer(totalBitsInArray + copyToRangeStartBit, singleBufferCapacity);
 
             int numLongs = (totalBitsInArray >>> 6);
 
@@ -140,8 +145,8 @@ public class EncodedLongBufferTest {
     @Test
     public void testCopySmallBitRange() throws IOException {
         int singleBufferCapacity = 1024;
-        EncodedLongBuffer bufFrom = setupEncodedLongBuffer((64 >> 3) + 1, singleBufferCapacity);
-        EncodedLongBuffer bufTo = setupEncodedLongBuffer((128 >> 3) + 1, singleBufferCapacity);
+        EncodedLongBuffer bufFrom = setupEncodedLongBuffer(64, singleBufferCapacity);
+        EncodedLongBuffer bufTo = setupEncodedLongBuffer(128, singleBufferCapacity);
 
 
         bufFrom.setElementValue(0, 64, -1L);
@@ -155,31 +160,46 @@ public class EncodedLongBufferTest {
     }
 
     @Test
+    public void testSimpleParity() throws Exception {
+        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 1000000);
+        EncodedLongBuffer buf = setupEncodedLongBuffer(1000000, 1024);
+
+        arr.setElementValue(999960, 60, 1700037421l);
+        buf.setElementValue(999960, 60, 1700037421l);
+
+        long l1 = arr.getElementValue(999960, 60);
+        long l2 = buf.getElementValue(999960, 60);
+
+        assert (l1 == l2);
+
+    }
+
+    @Test
     public void testIncrement() throws IOException {
         int singleBufferCapacity = 1024;
         int numBits = 1000000;
-        EncodedLongBuffer buf = setupEncodedLongBuffer((numBits >> 3) + 1, singleBufferCapacity);
+        EncodedLongBuffer buf = setupEncodedLongBuffer(numBits, singleBufferCapacity);
 
         Random rand = new Random();
 
         long startVal = rand.nextInt(Integer.MAX_VALUE);
         int elementCount = 0;
 
-        for(int i=0;i<1000000-64;i+=65) {
+        for(int i=0;i<1000000;i+=65) {
             buf.setElementValue(i, 60, startVal+i);
             elementCount++;
         }
 
         buf.incrementMany(0, 1000, 65, elementCount);
 
-        for(int i=0;i<1000000-64;i+=65) {
+        for(int i=0;i<1000000;i+=65) {
             long val = buf.getElementValue(i, 60);
             Assert.assertEquals(startVal + i + 1000, val);
         }
 
         buf.incrementMany(0, -2000, 65, elementCount);
 
-        for(int i=0;i<1000000-64;i+=65) {
+        for(int i=0;i<1000000;i+=65) {
             long val = buf.getElementValue(i, 60);
             Assert.assertEquals(startVal + i - 1000, val);
         }

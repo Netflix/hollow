@@ -137,7 +137,7 @@ public class OnHeapArrayVsOffHeapBufferAcceptanceTest {
         assertEquals(testByteArray.get(13 + padding), testByteBuffer.get(13 + padding));
         assertEquals(testByteArray.get(127 + padding), testByteBuffer.get(127 + padding));
 
-        // SNAP: TODO: // out of bounds read
+        // uncomment to test BlobByteBufferTest::getByte()
         // try {
         //     testByteBuffer.get(testFile.length());
         //     Assert.fail();

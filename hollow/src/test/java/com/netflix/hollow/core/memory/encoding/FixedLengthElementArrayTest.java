@@ -257,28 +257,29 @@ public class FixedLengthElementArrayTest {
 
     @Test
     public void testIncrement() {
-        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 1000000);
+        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 1000192);
 
         Random rand = new Random();
 
         long startVal = rand.nextInt(Integer.MAX_VALUE);
         int elementCount = 0;
 
-        for(int i=0;i<1000000-64;i+=65) {
+        // for(int i=0;i<1000192;i+=65) {   // SNAP: TODO: This will attempt to write past the long array capacity
+        for(int i=0;i<1000000;i+=65) {
             arr.setElementValue(i, 60, startVal+i);
             elementCount++;
         }
 
         arr.incrementMany(0, 1000, 65, elementCount);
 
-        for(int i=0;i<1000000-64;i+=65) {
+        for(int i=0;i<1000000;i+=65) {
             long val = arr.getElementValue(i, 60);
             Assert.assertEquals(startVal + i + 1000, val);
         }
 
         arr.incrementMany(0, -2000, 65, elementCount);
 
-        for(int i=0;i<1000000-64;i+=65) {
+        for(int i=0;i<1000000;i+=65) {
             long val = arr.getElementValue(i, 60);
             Assert.assertEquals(startVal + i - 1000, val);
         }

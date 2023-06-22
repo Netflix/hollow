@@ -40,6 +40,7 @@ public class FixedLengthDataFactory {
     public static FixedLengthData allocate(long numBits, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler,
                                          String fileName) throws IOException {
         long numLongs = ((numBits - 1) >>> 6) + 1;
+        numLongs ++;    // accommodate for reading a long starting at bit index within numLongs-1
         long numBytes = numLongs << 3;
         if (memoryMode.equals(MemoryMode.ON_HEAP)) {
             return new FixedLengthElementArray(memoryRecycler, numBits);

@@ -99,6 +99,7 @@ public class VariableLengthDataFactory {
             raf.write(b);
         }
 
+        // unused
         public void resize(long sizeInBytes) throws IOException {
             if (memoryMode.equals(MemoryMode.ON_HEAP)) {
                 // TODO: NOP because array is resized dynamically

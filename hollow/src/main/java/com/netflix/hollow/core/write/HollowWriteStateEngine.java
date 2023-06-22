@@ -221,6 +221,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         overridePreviousHeaderTags(headerTags);
 
         try {
+            // SNAP: TODO: creates 1 thread per processor
             SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "prepare-for-next-cycle");
 
             for(final Map.Entry<String, HollowTypeWriteState> typeStateEntry : writeStates.entrySet()) {

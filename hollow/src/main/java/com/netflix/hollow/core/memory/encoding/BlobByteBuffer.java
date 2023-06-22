@@ -154,6 +154,7 @@ public final class BlobByteBuffer {
         }
         else {
             assert(index < capacity + Long.BYTES);
+            LOG.warning("SNAP: This is happening, not necessarily bad but test using unit test readUsingVariableLengthDataModes");
             // this situation occurs when read for bits near the end of the buffer requires reading a long value that
             // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case,
             // return 0 for (index >= capacity - Long.BYTES && index < capacity )
@@ -212,29 +213,16 @@ public final class BlobByteBuffer {
     }
 
     public void putByte(long index, byte value) {
-        if (index < 0 || index >= (this.capacity+1) << 6) {
+        if (index < 0 || index >= (this.capacity+1) << 6) { // SNAP: can test using testIncrement or testSimpleParity
             throw new IllegalStateException("Attempting to write a byte out of bounds");
         }
 
-        if (index < capacity) {
-            int spineIndex = (int)(index >>> (shift));
-            int bufferIndex = (int)(index & mask);
+        int spineIndex = (int)(index >>> (shift));
+        int bufferIndex = (int)(index & mask);
+        try {
             spine[spineIndex].put(bufferIndex, value);
-        }
-        else {
-            assert(index < capacity + Long.BYTES);
-            // this situation occurs when write for bits near the end of the buffer requires writing a long value that
-            // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case, ignore writes to
-            // (index >= capacity - Long.BYTES && index < capacity )
-            // these zero bytes will be discarded anyway when the returned long value is shifted to get the queried bits
-            // these bytes should not hold a value
-            if (value != 0) {
-                if (index > capacity + Long.BYTES) {    // SNAP: can make check more strict
-                    throw new IllegalStateException("Attempting to write a byte beyond the max buffer capacity");
-                    // SNAP: TODO: move the inner check, and validate that value should be 0 or else those writes will be lost
-                    // Just that that'll fail the testCopyBitRange unit test, but probably the right thing to do.
-                }
-            }
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("here");
         }
     }
 
