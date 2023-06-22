@@ -57,23 +57,17 @@ public class HollowOrdinalMapper {
     }
 
     private boolean recordsAreEqual(HollowObjectTypeReadState typeState, int keyOrdinal, int index) {
-        for(int i=0;i<primaryKey.numFields();i++) {
-            if(!keyFieldIsIndexed[i])
+        for(int fieldIdx=0;fieldIdx<primaryKey.numFields();fieldIdx++) {
+            if(!keyFieldIsIndexed[fieldIdx])
                 continue;
 
-            Object newFieldValue = readValueInState(typeState, keyOrdinal, i);
-            Object existingFieldValue = indexFieldObjectMapping.get(index)[i];
+            Object newFieldValue = readValueInState(typeState, keyOrdinal, fieldIdx);
+            Object existingFieldValue = indexFieldObjectMapping.get(index)[fieldIdx];
             if(!newFieldValue.equals(existingFieldValue)) {
                 return false;
             }
         }
         return true;
-    }
-
-    // Java modulo is more like a remainder, indices can't be negative
-    private static int indexFromHash(int hashedValue, int length) {
-        int modulus = hashedValue % length;
-        return modulus < 0 ? modulus + length : modulus;
     }
 
     public int storeNewRecord(HollowObjectTypeReadState typeState, int ordinal, int assignedOrdinal) {
@@ -113,8 +107,7 @@ public class HollowOrdinalMapper {
                 continue;
 
             Object objectToStore = readValueInState(typeState, ordinal, i);
-            //indexFieldObjectMapping.get(index)[i] = memoizedPool.intern(objectToStore);
-            indexFieldObjectMapping.get(index)[i] = objectToStore;
+            indexFieldObjectMapping.get(index)[i] = memoizedPool.intern(objectToStore);
         }
     }
 
@@ -177,5 +170,11 @@ public class HollowOrdinalMapper {
         }
 
         return HollowReadFieldUtils.fieldValueObject(typeState, ordinal, keyFieldIndices[fieldIdx][lastFieldPath]);
+    }
+
+    // Java modulo is more like a remainder, indices can't be negative
+    private static int indexFromHash(int hashedValue, int length) {
+        int modulus = hashedValue % length;
+        return modulus < 0 ? modulus + length : modulus;
     }
 }
