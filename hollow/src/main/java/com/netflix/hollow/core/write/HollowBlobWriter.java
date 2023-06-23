@@ -78,7 +78,7 @@ public class HollowBlobWriter {
         HollowBlobHeaderWrapper hollowBlobHeaderWrapper = buildHeader(partStreams, stateEngine.getSchemas(), false);
         writeHeaders(dos, partStreams, false, hollowBlobHeaderWrapper);
 
-        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-snapshot");
+        SimultaneousExecutor executor = new SimultaneousExecutor(stateEngine.getOrderedTypeStates().size(), getClass(), "write-snapshot");
 
         for(final HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
             executor.execute(new Runnable() {
@@ -144,7 +144,7 @@ public class HollowBlobWriter {
         HollowBlobHeaderWrapper hollowBlobHeaderWrapper = buildHeader(partStreams, changedTypes, false);
         writeHeaders(dos, partStreams, false, hollowBlobHeaderWrapper);
 
-        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-delta");
+        SimultaneousExecutor executor = new SimultaneousExecutor(stateEngine.getOrderedTypeStates().size(), getClass(), "write-delta");
 
         for(final HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
             executor.execute(new Runnable() {
@@ -212,7 +212,7 @@ public class HollowBlobWriter {
         HollowBlobHeaderWrapper hollowBlobHeaderWrapper = buildHeader(partStreams, changedTypes, true);
         writeHeaders(dos, partStreams, true, hollowBlobHeaderWrapper);
 
-        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-reverse-delta");
+        SimultaneousExecutor executor = new SimultaneousExecutor(stateEngine.getOrderedTypeStates().size(), getClass(), "write-reverse-delta");
 
         for(final HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
             executor.execute(new Runnable() {

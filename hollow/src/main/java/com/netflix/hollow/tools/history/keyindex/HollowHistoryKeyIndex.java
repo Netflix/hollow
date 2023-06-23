@@ -151,7 +151,8 @@ public class HollowHistoryKeyIndex {
     }
 
     private void updateTypeIndexes(final HollowReadStateEngine latestStateEngine, final boolean isDelta) {
-        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "update-type-indexes");
+        int allocThreads = Math.min(3, Runtime.getRuntime().availableProcessors() / 5);
+        SimultaneousExecutor executor = new SimultaneousExecutor(allocThreads, getClass(), "update-type-indexes");
 
         for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
             executor.execute(() -> {
@@ -230,7 +231,8 @@ public class HollowHistoryKeyIndex {
     }
 
     private void rehashKeys() {
-        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "rehash-keys");
+        int allocThreads = Math.min(3, Runtime.getRuntime().availableProcessors() / 5);
+        SimultaneousExecutor executor = new SimultaneousExecutor(allocThreads, getClass(), "rehash-keys");
 
         for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
             executor.execute(() -> entry.getValue().hashRecordKeys());

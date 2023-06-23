@@ -176,7 +176,8 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
     }
 
     protected SimultaneousExecutor(int numThreads, ThreadFactory threadFactory) {
-        super(numThreads, numThreads, 100, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), threadFactory);
+        // SNAP: kludge for numThreads to be non-zero since moving away from no. of cores
+        super(numThreads == 0 ? 1 : numThreads, numThreads == 0 ? 1 : numThreads, 100, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), threadFactory);
     }
 
     /**

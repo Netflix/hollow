@@ -58,7 +58,8 @@ public abstract class DiffEqualityTypeMapper {
         for(int i=0;i<hashedOrdinalsLength;i++)
             hashedToOrdinals.set(i, -1);
 
-        SimultaneousExecutor executor = new SimultaneousExecutor(1.5d, getClass(), "hash-to-ordinals");
+        int allocThreads = Math.min(3, Runtime.getRuntime().availableProcessors() / 5);
+        SimultaneousExecutor executor = new SimultaneousExecutor(allocThreads, getClass(), "hash-to-ordinals");
         final int numThreads = executor.getCorePoolSize();
 
         for(int i=0;i<numThreads;i++) {
@@ -97,7 +98,8 @@ public abstract class DiffEqualityTypeMapper {
         final BitSet fromPopulatedOrdinals = listener.getPopulatedOrdinals();
         final int ordinalSpaceLength = fromPopulatedOrdinals.length();
 
-        SimultaneousExecutor executor = new SimultaneousExecutor(1.5d, getClass(), "map-matching-from-ordinals");
+        int allocThreads = Math.min(3, Runtime.getRuntime().availableProcessors() / 5);
+        SimultaneousExecutor executor = new SimultaneousExecutor(allocThreads, getClass(), "map-matching-from-ordinals");
         final int numThreads = executor.getCorePoolSize();
         final LongList[] matchPairResults = new LongList[numThreads];
 
