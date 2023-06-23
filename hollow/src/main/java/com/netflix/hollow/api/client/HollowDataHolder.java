@@ -206,10 +206,8 @@ class HollowDataHolder {
     }
 
     private void applyDeltaTransition(HollowConsumer.Blob blob, boolean isSnapshotPlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
-        LOG.info("Attempting delta transition ...");
-        if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
-            LOG.info(String.format("SNAP: Attempting delta transition to %s in shared-memory mode ...", blob.getToVersion()));
-        }
+        LOG.info(String.format("Attempting delta transition from v %s to v %s in %s mode",
+                blob.getFromVersion(), blob.getToVersion(), memoryMode));
 
         try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, blob);
              OptionalBlobPartInput optionalPartIn = blob.getOptionalBlobPartInputs()) {
@@ -251,9 +249,8 @@ class HollowDataHolder {
             LOG.warning("SNAP: Delta transition encountered exception: " + t);
             throw t;
         } finally {
-            // if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
-                LOG.info("SNAP: Delta transition applied to version " + blob.getToVersion());
-            // }
+            LOG.info(String.format("Delta transition completed from v %s to v %s in %s mode",
+                    blob.getFromVersion(), blob.getToVersion(), memoryMode));
         }
     }
 

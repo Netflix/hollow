@@ -56,7 +56,7 @@ public class EncodedByteBuffer implements VariableLengthData {
         }
         bufferView = null;
         if (managedFile != null) {
-            LOG.info("SNAP: EncodedByteBuffer destroy() is also deleting staged file " + managedFile.getAbsolutePath());
+            // LOG.info("SNAP: EncodedByteBuffer destroy() is also deleting staged file " + managedFile.getAbsolutePath());
             Files.delete(managedFile.toPath());
         }
     }
