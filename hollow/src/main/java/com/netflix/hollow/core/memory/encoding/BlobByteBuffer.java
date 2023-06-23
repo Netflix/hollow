@@ -10,6 +10,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
+import sun.nio.ch.DirectBuffer;
 
 /**
  * <p>A stitching of {@link MappedByteBuffer}s to operate on large memory mapped blobs. {@code MappedByteBuffer} is
@@ -305,12 +306,12 @@ public final class BlobByteBuffer {
                     LOG.warning("SNAP: unmapBlob called on BlobByteBuffer after its already been unmapped previously. " +
                             "spine.length= " + spine.length + ", i= " + i);
                 }
-                // try {
-                //     sun.misc.Cleaner cleaner = ((DirectBuffer) spine[i]).cleaner();
-                //     cleaner.clean();
-                // } catch (Exception e) {
-                //     LOG.warning("SNAP: sun.misc.Cleaner support not available in app");
-                // }
+                try {
+                    sun.misc.Cleaner cleaner = ((DirectBuffer) spine[i]).cleaner();
+                    cleaner.clean();
+                } catch (Exception e) {
+                    LOG.warning("SNAP: sun.misc.Cleaner support not available in app");
+                }
 
                 spine[i] = null;
 
