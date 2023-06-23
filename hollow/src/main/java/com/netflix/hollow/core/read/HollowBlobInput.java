@@ -306,12 +306,12 @@ public class HollowBlobInput implements Closeable {
     @Override
     public void close() throws IOException {
         if (input instanceof RandomAccessFile) {
-            LOG.info("SNAP: close called on BlobByteBuffer composing instance of RandomAccessFile");
+            // LOG.info("SNAP: close called on BlobByteBuffer composing instance of RandomAccessFile");
             if (manageRafLifecycle) {
-                LOG.info("SNAP:  HollowBlobInput manages the lifecycle of randomaccessfile " + file + ". Calling close.");
+                // LOG.info("SNAP:  HollowBlobInput manages the lifecycle of randomaccessfile " + file + ". Calling close.");
                 ((RandomAccessFile) input).close();
             } else {
-                LOG.info("SNAP:  HollowBlobInput does not manage the lifecycle (will not close) of randomaccessfile " + file + ". Won't close file.");
+                // LOG.info("SNAP:  HollowBlobInput does not manage the lifecycle (will not close) of randomaccessfile " + file + ". Won't close file.");
             }
             if (buffer != null) {
                 buffer.unmapBlob();

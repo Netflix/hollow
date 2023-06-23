@@ -27,7 +27,7 @@ public class FixedLengthDataFactory {
         }
     }
 
-    // allocate (for write)
+    // allocate (for write) // unused
     public static FixedLengthData allocate(HollowBlobInput in,
                                            MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler,
                                            String fileName) throws IOException {
@@ -39,13 +39,13 @@ public class FixedLengthDataFactory {
 
     public static FixedLengthData allocate(long numBits, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler,
                                          String fileName) throws IOException {
-        long numLongs = ((numBits - 1) >>> 6) + 1;
-        numLongs ++;    // accommodate for reading a long starting at bit index within numLongs-1
-        long numBytes = numLongs << 3;
         if (memoryMode.equals(MemoryMode.ON_HEAP)) {
             return new FixedLengthElementArray(memoryRecycler, numBits);
         } else {
-            File targetFile = provisionTargetFile(numBytes, fileName);
+            long numLongs = ((numBits - 1) >>> 6) + 1;
+            long numBytes = numLongs << 3;
+            // add Long.BYTES to provisioned file size to accommodate unaligned read starting offset in last long
+            File targetFile = provisionTargetFile(numBytes + Long.BYTES, fileName);
             try (HollowBlobInput targetBlob = HollowBlobInput.randomAccess(targetFile, MAX_SINGLE_BUFFER_CAPACITY)) {
                 return EncodedLongBuffer.newFrom(targetBlob, numLongs, targetFile);   // TODO: test with different single buffer capacities
             }
@@ -65,7 +65,7 @@ public class FixedLengthDataFactory {
         if (fld instanceof FixedLengthElementArray) {
             ((FixedLengthElementArray) fld).destroy(memoryRecycler);
         } else if (fld instanceof EncodedLongBuffer) {
-            LOG.info("SNAP: Destroy operation invoked on EncodedLongBuffer (FixedLengthData)");
+            // LOG.info("SNAP: Destroy operation invoked on EncodedLongBuffer (FixedLengthData)");
             ((EncodedLongBuffer) fld).destroy();
         } else {
             throw new UnsupportedOperationException("Unknown type");

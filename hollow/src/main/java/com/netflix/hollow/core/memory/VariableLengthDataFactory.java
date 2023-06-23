@@ -36,7 +36,7 @@ public class VariableLengthDataFactory {
         if (vld instanceof SegmentedByteArray) {
             ((SegmentedByteArray) vld).destroy();
         } else if (vld instanceof EncodedByteBuffer) {
-            LOG.info("SNAP: Destroy operation invoked on EncodedByteBuffer (VariableLengthData)");
+            // LOG.info("SNAP: Destroy operation invoked on EncodedByteBuffer (VariableLengthData)");
             ((EncodedByteBuffer) vld).destroy();
         } else {
             throw new UnsupportedOperationException("Unknown type");
@@ -87,6 +87,10 @@ public class VariableLengthDataFactory {
                     while (length > 0) {
                         int toReadBytes = (int) Math.min(length, (long) chunk.length);
                         int readBytes = encodedByteBuffer.getBytes(srcPos, toReadBytes, chunk);
+                        if (readBytes == 0) {
+                            throw new IllegalStateException(String.format("SNAP: 0 bytes read from encoded byte buffer, " +
+                                    "srcPos= %s, toReadBytes= %s, chunk.length=%s", srcPos, toReadBytes, chunk.length));
+                        }
                         length = length - readBytes;
                         srcPos = srcPos + readBytes;
 
@@ -120,7 +124,7 @@ public class VariableLengthDataFactory {
                 this.raf.seek(0);
                 try (HollowBlobInput hbi = HollowBlobInput.mmap(this.file, this.raf, MAX_SINGLE_BUFFER_CAPACITY, false)) {
                     byteBuffer.loadFrom(hbi, this.raf.length());
-                    LOG.info("SNAP:  Closing randomaccessfile because HollowBlobInput does not manage the lifecycle (will not close) for " + file);
+                    // LOG.info("SNAP:  Closing randomaccessfile because HollowBlobInput does not manage the lifecycle (will not close) for " + file);
                     this.raf.close();
                     return byteBuffer;
                 }

@@ -24,6 +24,8 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.util.IntMap;
 import com.netflix.hollow.core.util.RemovedOrdinalIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class contains the logic for extracting the removed records from an OBJECT type state
@@ -32,6 +34,7 @@ import com.netflix.hollow.core.util.RemovedOrdinalIterator;
  * Not intended for external consumption.
  */
 public class HollowObjectDeltaHistoricalStateCreator {
+    private static final Logger LOG = Logger.getLogger(HollowObjectDeltaHistoricalStateCreator.class.getName());
 
     private final HollowObjectTypeDataElements historicalDataElements;
 
@@ -159,8 +162,28 @@ public class HollowObjectDeltaHistoricalStateCreator {
                 long size = fromEndByte - fromStartByte;
 
                 historicalDataElements.fixedLengthData.setElementValue(((long)nextOrdinal * historicalDataElements.bitsPerRecord) + historicalDataElements.bitOffsetPerField[i], historicalDataElements.bitsPerField[i], currentWriteVarLengthDataPointers[i] + size);
-                historicalDataElements.varLengthData[i].copy(stateEngineDataElements[shard].varLengthData[i], fromStartByte, currentWriteVarLengthDataPointers[i], size);
-
+                try {
+                    historicalDataElements.varLengthData[i].copy(stateEngineDataElements[shard].varLengthData[i], fromStartByte, currentWriteVarLengthDataPointers[i], size);
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    LOG.log(Level.SEVERE,
+                            String.format("ArrayIndexOutOfBoundsException when building historical state: " +
+                                            "fieldName=%s, " +
+                                            "fieldType=%s, " +
+                                            "shard=%s, " +
+                                            "stateEngineDataElements[shard].varLengthData[i].length()=%s, " +
+                                            "fromStartByte=%s, " +
+                                            "size=%s, " +
+                                            "currentWriteVarLengthDataPointers[i]=%s, ",
+                                    historicalDataElements.schema.getFieldName(i),
+                                    historicalDataElements.schema.getFieldType(i),
+                                    shard,
+                                    stateEngineDataElements[shard].varLengthData[i].length(),
+                                    fromStartByte,
+                                    size,
+                                    currentWriteVarLengthDataPointers[i]),
+                            e);
+                    throw e;
+                }
                 currentWriteVarLengthDataPointers[i] += size;
             }
         }

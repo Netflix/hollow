@@ -155,7 +155,7 @@ public final class BlobByteBuffer {
         }
         else {
             assert(index < capacity + Long.BYTES);
-            LOG.warning("SNAP: This is happening, not necessarily bad but test using unit test readUsingVariableLengthDataModes");
+            // LOG.warning("SNAP: This is happening, not necessarily bad but test using unit test readUsingVariableLengthDataModes");
             // this situation occurs when read for bits near the end of the buffer requires reading a long value that
             // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case,
             // return 0 for (index >= capacity - Long.BYTES && index < capacity )
@@ -171,7 +171,7 @@ public final class BlobByteBuffer {
             // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case,
             // return 0 for (index >= capacity - Long.BYTES && index < capacity )
             // these zero bytes will be discarded anyway when the returned long value is shifted to get the queried bits
-            LOG.warning(String.format("Unexpected read past the end, index=%s, capacity=%s", index, capacity));
+            LOG.warning(String.format("Unexpected read past the end, index=%s, capacity=%s, len=%s", index, capacity, len));
         }
         int spineIndex = (int)(index >>> (shift));
         ByteBuffer buf = spine[spineIndex];
@@ -293,7 +293,7 @@ public final class BlobByteBuffer {
         // count will sustain it from getting cleaned up, but cleanup will be promptly invoked on delta blob files after
         // consumption and on per-shard per-type delta target files when it is superseded by another file in a future delta.
         if (this.referenceCount.decrementAndGet() == 0) {
-            LOG.info("SNAP: Unmapping BlobByteBuffer because ref count has reached 0");
+            // LOG.info("SNAP: Unmapping BlobByteBuffer because ref count has reached 0");
             for (int i = 0; i < spine.length; i++) {
                 ByteBuffer buf = spine[i];
                 if (buf != null) {
