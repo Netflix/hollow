@@ -42,7 +42,7 @@ import sun.misc.Unsafe;
 @SuppressWarnings("restriction")
 public class HollowObjectTypeMapper extends HollowTypeMapper {
     
-    private static Set<Class<?>> BOXED_WRAPPERS = new HashSet<>(Arrays.asList(Boolean.class, Integer.class, Short.class, Byte.class, Character.class, Long.class, Float.class, Double.class, String.class, byte[].class));
+    private static Set<Class<?>> BOXED_WRAPPERS = new HashSet<>(Arrays.asList(Boolean.class, Integer.class, Short.class, Byte.class, Character.class, Long.class, Float.class, Double.class, String.class, byte[].class, Date.class));
     
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
     private final HollowObjectMapper parentMapper;
@@ -195,7 +195,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             HollowObjectSchema recordObjectSchema = (HollowObjectSchema) recordSchema;
 
             Object obj = null;
-            if (BOXED_WRAPPERS.contains(clazz)) {
+            if (BOXED_WRAPPERS.contains(clazz) || clazz.isEnum()) {
                 // if `clazz` is a BoxedWrapper then by definition its OBJECT schema will have a single primitive
                 // field so find it in the FlatRecord and ignore all other fields.
                 for (int i = 0; i < recordObjectSchema.numFields(); i++) {
@@ -569,6 +569,20 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 }
                 case BYTES: {
                     return reader.readBytes();
+                }
+                case ENUM_NAME: {
+                    String enumName = reader.readString();
+                    if (enumName != null) {
+                        return Enum.valueOf((Class<Enum>) clazz, enumName);
+                    }
+                    break;
+                }
+                case DATE_TIME: {
+                    long value = reader.readLong();
+                    if (value != Long.MIN_VALUE) {
+                        return new Date(value);
+                    }
+                    break;
                 }
             }
             return null;
