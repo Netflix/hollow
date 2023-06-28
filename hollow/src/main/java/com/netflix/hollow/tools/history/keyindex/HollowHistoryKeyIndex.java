@@ -64,7 +64,16 @@ public class HollowHistoryKeyIndex {
     }
 
     public HollowHistoryTypeKeyIndex addTypeIndex(PrimaryKey primaryKey, HollowDataset dataModel) {
+        HollowHistoryTypeKeyIndex prevKeyIdx = typeKeyIndexes.get(primaryKey.getType());
         HollowHistoryTypeKeyIndex keyIdx = new HollowHistoryTypeKeyIndex(primaryKey, dataModel);
+        // retain any previous indexed fields
+        if (prevKeyIdx != null) {
+            for (int i = 0; i < prevKeyIdx.getKeyFields().length; i++) {
+                if (prevKeyIdx.getKeyFieldIsIndexed()[i]) {
+                    keyIdx.addFieldIndex(prevKeyIdx.getKeyFields()[i], dataModel);
+                }
+            }
+        }
         typeKeyIndexes.put(primaryKey.getType(), keyIdx);
         return keyIdx;
     }

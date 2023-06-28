@@ -78,6 +78,10 @@ public class HollowHistoryTypeKeyIndex {
         return primaryKey.getFieldPaths();
     }
 
+    public boolean[] getKeyFieldIsIndexed() {
+        return keyFieldIsIndexed;
+    }
+
     public void addFieldIndex(String fieldName, HollowDataset dataModel) {
         String[] fieldPathParts = PrimaryKey.getCompleteFieldPathParts(dataModel, primaryKey.getType(), fieldName);
         for (int i = 0; i < primaryKey.numFields(); i++) {
