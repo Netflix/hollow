@@ -18,6 +18,7 @@ package com.netflix.hollow.api.producer.validation;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -166,7 +167,7 @@ public final class ValidationResult {
 
         ValidationResultBuilder(String name) {
             this.name = Objects.requireNonNull(name);
-            this.details = new HashMap<>();
+            this.details = new LinkedHashMap<>();
         }
 
         /**
@@ -264,7 +265,7 @@ public final class ValidationResult {
         }
 
         private void reset() {
-            this.details = new HashMap<>();
+            this.details = new LinkedHashMap<>();
         }
     }
 }

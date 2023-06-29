@@ -26,6 +26,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class ProducerValidationTests {
     private InMemoryBlobStore blobStore;
 
@@ -133,6 +137,21 @@ public class ProducerValidationTests {
         producer.addListener(new DuplicateDataDetectionValidator("TypeWithPrimaryKey3"));
         // this adds the type state for TypeWithPrimarkyKey3
         producer.runCycle(newState -> newState.add(new TypeWithPrimaryKey3(1, "Bar")));
+    }
+
+
+    @Test
+    public void validationDetailOrdering() {
+        Map<String, String> expectedDetails = new LinkedHashMap<>();
+        expectedDetails.put("detail_key1", "detail_val1");
+        expectedDetails.put("detail_key2", "detail_val2");
+        expectedDetails.put("detail_key3", "detail_val3");
+
+        ValidationResult.ValidationResultBuilder validationResultBuilder = ValidationResult.from("my_validator");
+        expectedDetails.forEach(validationResultBuilder::detail);
+        ValidationResult result = validationResultBuilder.passed("everything is ok");
+
+        Assert.assertEquals(new ArrayList<>(expectedDetails.entrySet()), new ArrayList<>(result.getDetails().entrySet()));
     }
 
     @HollowPrimaryKey(fields = {"id", "name"})
