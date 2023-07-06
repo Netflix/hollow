@@ -16,15 +16,14 @@
  */
 package com.netflix.hollow.tools.history.keyindex;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
-import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.tools.util.ObjectInternPool;
-
-import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -167,14 +166,19 @@ public class HollowOrdinalMapper {
 
     private int hashKeyRecord(HollowObjectTypeReadState typeState, int ordinal) {
         int hashCode = 0;
+
         for (int i = 0; i < primaryKey.numFields(); i++) {
-            int fieldHashCode;
-            if (typeState.getSchema().getFieldType(i).equals(HollowObjectSchema.FieldType.REFERENCE)) {
-                HollowObjectTypeReadState otda = (HollowObjectTypeReadState) typeState.getSchema().getReferencedTypeState(i);
-                fieldHashCode = HollowReadFieldUtils.fieldHashCode(otda, typeState.readOrdinal(ordinal, i), 0);
-            } else {
-                fieldHashCode = HollowReadFieldUtils.fieldHashCode(typeState, ordinal, i);
+
+            int lastFieldPath = keyFieldIndices[i].length - 1;
+            int fieldOrdinal = ordinal;
+            HollowObjectTypeReadState fieldTypeState = typeState;
+            for (int f = 0; f < lastFieldPath; f++) {
+                int fieldPosition = keyFieldIndices[i][f];
+                fieldOrdinal = fieldTypeState.readOrdinal(fieldOrdinal, fieldPosition);
+                fieldTypeState = (HollowObjectTypeReadState) fieldTypeState.getSchema().getReferencedTypeState(fieldPosition);
             }
+
+            int fieldHashCode = HollowReadFieldUtils.fieldHashCode(fieldTypeState, fieldOrdinal, keyFieldIndices[i][lastFieldPath]);
             hashCode = (hashCode * 31) ^ fieldHashCode;
         }
         return HashCodes.hashInt(hashCode);
