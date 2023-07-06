@@ -152,7 +152,7 @@ public class HollowHistoryTypeKeyIndex {
         final int maxLength = Math.max(previousOrdinals.length(), populatedOrdinals.length());
 
         for (int i = 0; i < maxLength; i++) {
-            if (populatedOrdinals.get(i))
+            if (populatedOrdinals.get(i) || previousOrdinals.get(i))
                 writeKeyObject(typeState, i, false);
         }
     }
