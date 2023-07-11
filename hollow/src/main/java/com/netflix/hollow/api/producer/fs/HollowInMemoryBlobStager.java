@@ -22,10 +22,14 @@ import com.netflix.hollow.api.producer.HollowProducer.HeaderBlob;
 import com.netflix.hollow.api.producer.ProducerOptionalBlobPartConfig;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.write.HollowBlobWriter;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,70 +37,86 @@ import java.util.Map;
 public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
 
     private final ProducerOptionalBlobPartConfig optionalPartConfig;
+    private final HollowProducer.BlobCompressor blobCompressor;
 
-    public HollowInMemoryBlobStager() {
-        this(null);
+    public HollowInMemoryBlobStager(HollowProducer.BlobCompressor compressor) {
+        this(null, compressor); // shouldn't come here as blob compressor comes from builder
     }
 
-    public HollowInMemoryBlobStager(ProducerOptionalBlobPartConfig optionalPartConfig) {
+    public HollowInMemoryBlobStager() {
+        this(null, HollowProducer.BlobCompressor.NO_COMPRESSION); // shouldn't come here as blob compressor comes from builder
+    }
+
+    public HollowInMemoryBlobStager(ProducerOptionalBlobPartConfig optionalPartConfig, HollowProducer.BlobCompressor blobCompressor) {
         this.optionalPartConfig = optionalPartConfig;
+        this.blobCompressor = blobCompressor;
     }
 
     @Override
     public Blob openSnapshot(long version) {
-        return new InMemoryBlob(HollowConstants.VERSION_NONE, version, Blob.Type.SNAPSHOT, optionalPartConfig);
+        return new InMemoryBlob(HollowConstants.VERSION_NONE, version, Blob.Type.SNAPSHOT, optionalPartConfig, blobCompressor);
     }
 
     @Override
     public Blob openDelta(long fromVersion, long toVersion) {
-        return new InMemoryBlob(fromVersion, toVersion, Blob.Type.DELTA, optionalPartConfig);
+        return new InMemoryBlob(fromVersion, toVersion, Blob.Type.DELTA, optionalPartConfig, blobCompressor);
     }
 
     @Override
     public Blob openReverseDelta(long fromVersion, long toVersion) {
-        return new InMemoryBlob(fromVersion, toVersion, Blob.Type.REVERSE_DELTA, optionalPartConfig);
+        return new InMemoryBlob(fromVersion, toVersion, Blob.Type.REVERSE_DELTA, optionalPartConfig, blobCompressor);
     }
 
     @Override
     public HollowProducer.HeaderBlob openHeader(long version) {
-        return new InMemoryHeaderBlob(version);
+        return new InMemoryHeaderBlob(version, blobCompressor);
     }
 
     public static class InMemoryHeaderBlob extends HeaderBlob {
-        private byte[] data;
+        private byte[] data; // changed from byte[]
+        private HollowProducer.BlobCompressor blobCompressor;
 
-        protected InMemoryHeaderBlob(long version) {
+        protected InMemoryHeaderBlob(long version, HollowProducer.BlobCompressor blobCompressor) {
             super(version);
+            this.blobCompressor = blobCompressor;
         }
 
         @Override
         public void cleanup() {
+            data = null;
         }
 
         @Override
         public void write(HollowBlobWriter blobWriter) throws IOException {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            blobWriter.writeHeader(baos, null);
+            try (OutputStream os = new BufferedOutputStream(blobCompressor.compress(baos))) {
+                blobWriter.writeHeader(os, null);
+            }
+            //data = baos.toString();
             data = baos.toByteArray();
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            return new ByteArrayInputStream(data);
+            //return new BufferedInputStream(blobCompressor.decompress(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8))));
+            return new BufferedInputStream(blobCompressor.decompress(new ByteArrayInputStream(data)));
         }
     }
 
     public static class InMemoryBlob extends Blob {
 
-        private byte[] data;
+        private byte[] data; //changed from byte[]
         private Map<String, byte[]> optionalParts;
+
+        private HollowProducer.BlobCompressor blobCompressor;
         
         protected InMemoryBlob(long fromVersion, long toVersion, Type type) {
             super(fromVersion, toVersion, type);
         }
 
-        protected InMemoryBlob(long fromVersion, long toVersion, Type type, ProducerOptionalBlobPartConfig optionalPartConfig) {
+        protected InMemoryBlob(long fromVersion, long toVersion, Type type, ProducerOptionalBlobPartConfig optionalPartConfig, HollowProducer.BlobCompressor blobCompressor) {
             super(fromVersion, toVersion, type, optionalPartConfig);
+            this.blobCompressor = blobCompressor;
         }
 
         @Override
@@ -110,41 +130,58 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
                 optionalPartData = new HashMap<>();
                 for(String part : optionalPartConfig.getParts()) {
                     ByteArrayOutputStream partBaos = new ByteArrayOutputStream();
-                    optionalPartStreams.addOutputStream(part, partBaos);
+                    optionalPartStreams.addOutputStream(part, new BufferedOutputStream(blobCompressor.compress(partBaos)));
                     optionalPartData.put(part, partBaos);
                 }
             }
 
-            switch(type) {
-            case SNAPSHOT:
-                writer.writeSnapshot(baos, optionalPartStreams);
-                break;
-            case DELTA:
-                writer.writeDelta(baos, optionalPartStreams);
-                break;
-            case REVERSE_DELTA:
-                writer.writeReverseDelta(baos, optionalPartStreams);
-                break;
-            }
-
-            data = baos.toByteArray();
-
-            if(optionalPartConfig != null) {
-                optionalParts = new HashMap<>();
-                for(Map.Entry<String, ByteArrayOutputStream> partEntry : optionalPartData.entrySet()) {
-                    optionalParts.put(partEntry.getKey(), partEntry.getValue().toByteArray());
+//            switch(type) {
+//            case SNAPSHOT:
+//                writer.writeSnapshot(baos, optionalPartStreams);
+//                break;
+//            case DELTA:
+//                writer.writeDelta(baos, optionalPartStreams);
+//                break;
+//            case REVERSE_DELTA:
+//                writer.writeReverseDelta(baos, optionalPartStreams);
+//                break;
+//            }
+//
+//            data = baos.toByteArray();
+//
+//            if(optionalPartConfig != null) {
+//                optionalParts = new HashMap<>();
+//                for(Map.Entry<String, ByteArrayOutputStream> partEntry : optionalPartData.entrySet()) {
+//                    optionalParts.put(partEntry.getKey(), partEntry.getValue().toByteArray());
+//                }
+//            }
+            try (OutputStream os = new BufferedOutputStream(blobCompressor.compress(baos))) {
+                switch (type) {
+                    case SNAPSHOT:
+                        writer.writeSnapshot(os, optionalPartStreams);
+                        break;
+                    case DELTA:
+                        writer.writeDelta(os, optionalPartStreams);
+                        break;
+                    case REVERSE_DELTA:
+                        writer.writeReverseDelta(os, optionalPartStreams);
+                        break;
+                    default:
+                        throw new IllegalStateException("unknown type, type=" + type);
                 }
             }
+            data = baos.toByteArray(); // this is kind of wrong as baos has compressed lz4 block
+            //data = baos.toString();
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            return new ByteArrayInputStream(data);
+            return new BufferedInputStream(blobCompressor.decompress(new ByteArrayInputStream(data))); //creating buffer array underneath
         }
 
         @Override
         public InputStream newOptionalPartInputStream(String partName) throws IOException {
-            return new ByteArrayInputStream(optionalParts.get(partName));
+            return new BufferedInputStream(blobCompressor.decompress(new ByteArrayInputStream(optionalParts.get(partName))));
         }
 
         @Override
@@ -153,8 +190,9 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
         }
 
         @Override
-        public void cleanup() { }
-
+        public void cleanup() {
+            data = null;
+        }
     }
 
 }

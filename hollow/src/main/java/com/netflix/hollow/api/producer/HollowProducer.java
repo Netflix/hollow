@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import sun.misc.IOUtils;
 
 /**
  * A HollowProducer is the top-level class used by producers of Hollow data to populate, publish, and announce data states.
@@ -622,6 +623,11 @@ public class HollowProducer extends AbstractHollowProducer {
         default Path getPath() {
             throw new UnsupportedOperationException("Path is not available");
         }
+        default byte[] getData() throws IOException {
+            try (InputStream inputStream = newInputStream()){
+                return IOUtils.readAllBytes(inputStream);
+            }
+        }
     }
 
     public static abstract class HeaderBlob implements PublishArtifact{
@@ -887,10 +893,10 @@ public class HollowProducer extends AbstractHollowProducer {
         }
 
         protected void checkArguments() {
-            if (stager != null && compressor != null) {
-                throw new IllegalArgumentException(
-                        "Both a custom BlobStager and BlobCompressor were specified -- please specify only one of these.");
-            }
+//            if (stager != null && compressor != null) {
+//                throw new IllegalArgumentException(
+//                        "Both a custom BlobStager and BlobCompressor were specified -- please specify only one of these.");
+//            }
             if (stager != null && stagingDir != null) {
                 throw new IllegalArgumentException(
                         "Both a custom BlobStager and a staging directory were specified -- please specify only one of these.");
@@ -899,6 +905,11 @@ public class HollowProducer extends AbstractHollowProducer {
                 throw new IllegalArgumentException(
                         "Both a custom BlobStager and an optional blob part config were specified -- please specify only one of these.");
             }
+
+//            if(stager != null && stager instanceof HollowInMemoryBlobStager) {
+//                BlobCompressor compressor = this.compressor != null ? this.compressor : BlobCompressor.NO_COMPRESSION;
+//                this.stager = new Ho
+//            }
 
             if (this.stager == null) {
                 BlobCompressor compressor = this.compressor != null ? this.compressor : BlobCompressor.NO_COMPRESSION;

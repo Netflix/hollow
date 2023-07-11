@@ -50,7 +50,7 @@ public class LocalBlobStoreTest {
         InMemoryBlobStore bs = new InMemoryBlobStore(Collections.singleton("LONG"));
 
         HollowProducer producer = HollowProducer.withPublisher(bs)
-                .withBlobStager(new HollowInMemoryBlobStager(optionalPartConfig()))
+                .withBlobStager(new HollowInMemoryBlobStager(optionalPartConfig(), HollowProducer.BlobCompressor.NO_COMPRESSION))
                 .build();
 
         long v1 = producer.runCycle(ws -> {
@@ -86,7 +86,7 @@ public class LocalBlobStoreTest {
         InMemoryBlobStore bs = new InMemoryBlobStore(Collections.emptySet());
 
         HollowProducer producer = HollowProducer.withPublisher(bs)
-                .withBlobStager(new HollowInMemoryBlobStager(optionalPartConfig()))
+                .withBlobStager(new HollowInMemoryBlobStager(optionalPartConfig(), HollowProducer.BlobCompressor.NO_COMPRESSION))
                 .build();
 
         long v1 = producer.runCycle(ws -> {

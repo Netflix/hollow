@@ -96,7 +96,7 @@ public class HollowBlobOptionalPartTest {
     @Test
     public void optionalPartsAreAvailableInHighLevelAPI() throws IOException {
         InMemoryBlobStore blobStore = new InMemoryBlobStore(Collections.singleton("B"));
-        HollowInMemoryBlobStager stager = new HollowInMemoryBlobStager(newPartConfig());
+        HollowInMemoryBlobStager stager = new HollowInMemoryBlobStager(newPartConfig(), HollowProducer.BlobCompressor.NO_COMPRESSION);
 
         HollowProducer producer = HollowProducer
                 .withPublisher(blobStore)
@@ -198,7 +198,7 @@ public class HollowBlobOptionalPartTest {
     public void testFilesystemBlobRetriever() throws IOException {
         File localBlobStore = createLocalDir();
         HollowFilesystemPublisher publisher = new HollowFilesystemPublisher(localBlobStore.toPath());
-        HollowInMemoryBlobStager stager = new HollowInMemoryBlobStager(newPartConfig());
+        HollowInMemoryBlobStager stager = new HollowInMemoryBlobStager(newPartConfig(), HollowProducer.BlobCompressor.NO_COMPRESSION);
         
         HollowProducer producer = HollowProducer.withPublisher(publisher).withBlobStager(stager).build();
         producer.initializeDataModel(TypeA.class);
@@ -321,7 +321,7 @@ public class HollowBlobOptionalPartTest {
     public void optionalPartsWithSharedMemoryLazy() throws IOException {
         File localBlobStore = createLocalDir();
         HollowFilesystemPublisher publisher = new HollowFilesystemPublisher(localBlobStore.toPath());
-        HollowInMemoryBlobStager stager = new HollowInMemoryBlobStager(newPartConfig());
+        HollowInMemoryBlobStager stager = new HollowInMemoryBlobStager(newPartConfig(), HollowProducer.BlobCompressor.NO_COMPRESSION);
 
         HollowProducer producer = HollowProducer
                 .withPublisher(publisher)
