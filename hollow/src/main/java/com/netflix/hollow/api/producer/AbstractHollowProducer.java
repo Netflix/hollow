@@ -86,6 +86,7 @@ abstract class AbstractHollowProducer {
     long lastSuccessfulCycle = 0;
     final HollowObjectHashCodeFinder hashCodeFinder;
     final boolean doIntegrityCheck;
+    final boolean doHeaderPublish;
     // Count to track number of cycles run by a primary producer. In the future, this can be useful in determining stickiness of a
     // producer instance.
     int cycleCountSincePrimaryStatus = 0;
@@ -101,7 +102,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true);
+                null, true, true);
     }
 
     // The only constructor should be that which accepts a builder
@@ -113,7 +114,7 @@ abstract class AbstractHollowProducer {
                 b.versionMinter, b.snapshotPublishExecutor,
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
-                b.hashCodeFinder, b.doIntegrityCheck);
+                b.hashCodeFinder, b.doIntegrityCheck, b.doHeaderPublish);
     }
 
     private AbstractHollowProducer(
@@ -130,7 +131,8 @@ abstract class AbstractHollowProducer {
             HollowProducer.BlobStorageCleaner blobStorageCleaner,
             SingleProducerEnforcer singleProducerEnforcer,
             HollowObjectHashCodeFinder hashCodeFinder,
-            boolean doIntegrityCheck) {
+            boolean doIntegrityCheck,
+            boolean doHeaderPublish) {
         this.publisher = publisher;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
@@ -140,6 +142,7 @@ abstract class AbstractHollowProducer {
         this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
         this.hashCodeFinder = hashCodeFinder;
         this.doIntegrityCheck = doIntegrityCheck;
+        this.doHeaderPublish = doHeaderPublish;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
                 ? new HollowWriteStateEngine()
@@ -564,12 +567,16 @@ abstract class AbstractHollowProducer {
     void publish(ProducerListeners listeners, long toVersion, Artifacts artifacts) throws IOException {
         Status.StageBuilder psb = listeners.firePublishStart(toVersion);
         try {
-            // We want a header to be created for all states.
-            artifacts.header = blobStager.openHeader(toVersion);
+            // We want a header to be created for all states, unless header publish is disabled
+            if (doHeaderPublish) {
+                artifacts.header = blobStager.openHeader(toVersion);
+            }
             if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
                 artifacts.snapshot = stageBlob(listeners, blobStager.openSnapshot(toVersion));
 
-            publishHeaderBlob(artifacts.header);
+            if (doHeaderPublish) {
+                publishHeaderBlob(artifacts.header);
+            }
             if (readStates.hasCurrent()) {
                 artifacts.delta = stageBlob(listeners,
                         blobStager.openDelta(readStates.current().getVersion(), toVersion));
