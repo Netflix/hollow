@@ -30,8 +30,10 @@ public class TypeOverview {
     private final long approxHeapFootprint;
     private final PrimaryKey primaryKey;
     private final HollowSchema schema;
+    private final int numShards;
     
-    public TypeOverview(String typeName, int numRecords, int numHoles, long approxHoleFootprint,  long approxHeapFootprint, PrimaryKey primaryKey, HollowSchema schema) {
+    public TypeOverview(String typeName, int numRecords, int numHoles, long approxHoleFootprint,  long approxHeapFootprint,
+                        PrimaryKey primaryKey, HollowSchema schema, int numShards) {
         this.typeName = typeName;
         this.numRecords = numRecords;
         this.numHoles = numHoles;
@@ -39,6 +41,7 @@ public class TypeOverview {
         this.approxHeapFootprint = approxHeapFootprint;
         this.primaryKey = primaryKey;
         this.schema = schema;
+        this.numShards = numShards;
     }
 
     public String getTypeName() {
@@ -67,5 +70,12 @@ public class TypeOverview {
 
     public String getSchema() {
         return schema.toString();
+    }
+
+    public int getNumShardsInt() {
+        return numShards;
+    }
+    public String getNumShards() {
+        return NumberFormat.getIntegerInstance().format(numShards);
     }
 }
