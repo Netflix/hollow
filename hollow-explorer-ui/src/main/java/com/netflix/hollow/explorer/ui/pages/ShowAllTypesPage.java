@@ -57,8 +57,9 @@ public class ShowAllTypesPage extends HollowExplorerPage {
             PrimaryKey primaryKey = typeState.getSchema().getSchemaType() == SchemaType.OBJECT ? ((HollowObjectSchema)typeState.getSchema()).getPrimaryKey() : null;
             long approxHeapFootprint = typeState.getApproximateHeapFootprintInBytes();
             HollowSchema schema = typeState.getSchema();
+            int numShards = typeState.numShards();
             
-            typeOverviews.add(new TypeOverview(typeName, numRecords, numHoles, approxHoleFootprint, approxHeapFootprint, primaryKey, schema));
+            typeOverviews.add(new TypeOverview(typeName, numRecords, numHoles, approxHoleFootprint, approxHeapFootprint, primaryKey, schema, numShards));
         }
 
         switch(sort) {
@@ -76,10 +77,10 @@ public class ShowAllTypesPage extends HollowExplorerPage {
                 }
             });
             break;
-            case "numHoles":
+        case "numHoles":
                 typeOverviews.sort((o1, o2) -> Integer.compare(o2.getNumHolesInt(), o1.getNumHolesInt()));
                 break;
-            case "holeSize":
+        case "holeSize":
                 typeOverviews.sort((o1, o2) -> Long.compare(o2.getApproxHoleFootprintLong(), o1.getApproxHoleFootprintLong()));
                 break;
         case "heapSize":
@@ -88,6 +89,9 @@ public class ShowAllTypesPage extends HollowExplorerPage {
                     return Long.compare(o2.getApproxHeapFootprintLong(), o1.getApproxHeapFootprintLong());
                 }
             });
+            break;
+        case "numShards":
+            typeOverviews.sort((o1, o2) -> Integer.compare(o2.getNumShardsInt(), o1.getNumShardsInt()));
             break;
         default:
             Collections.sort(typeOverviews, new Comparator<TypeOverview>() {
