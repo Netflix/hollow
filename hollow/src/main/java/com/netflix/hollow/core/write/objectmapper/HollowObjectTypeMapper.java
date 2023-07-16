@@ -195,7 +195,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             HollowObjectSchema recordObjectSchema = (HollowObjectSchema) recordSchema;
 
             Object obj = null;
-            if (BOXED_WRAPPERS.contains(clazz) || clazz.isEnum()) {
+            if (BOXED_WRAPPERS.contains(clazz)) {
                 // if `clazz` is a BoxedWrapper then by definition its OBJECT schema will have a single primitive
                 // field so find it in the FlatRecord and ignore all other fields.
                 for (int i = 0; i < recordObjectSchema.numFields(); i++) {
@@ -206,7 +206,20 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                         reader.skipField(recordObjectSchema.getFieldType(i));
                     }
                 }
-            } else  {
+            } else if (clazz.isEnum()) {
+                // if `clazz` is an enum, then we should expect to find a field called `_name` in the FlatRecord.
+                // There may be other fields if the producer enum contained custom properties, we ignore them
+                // here assuming the enum constructor will set them if needed.
+                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
+                    String fieldName = recordObjectSchema.getFieldName(i);
+                    int posInPojoSchema = schema.getPosition(fieldName);
+                    if (fieldName.equals(MappedFieldType.ENUM_NAME.getSpecialFieldName()) && posInPojoSchema != -1) {
+                        obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(reader);
+                    } else {
+                        reader.skipField(recordObjectSchema.getFieldType(i));
+                    }
+                }
+            } else {
                 obj = unsafe.allocateInstance(clazz);
                 for (int i = 0; i < recordObjectSchema.numFields(); i++) {
                     int posInPojoSchema = schema.getPosition(recordObjectSchema.getFieldName(i));

@@ -38,6 +38,7 @@ public class HollowObjectMapperFlatRecordParserTest {
     SpecialWrapperTypesTest wrapperTypesTest = new SpecialWrapperTypesTest();
     wrapperTypesTest.id = 8797182L;
     wrapperTypesTest.type = AnEnum.SOME_VALUE_C;
+    wrapperTypesTest.complexEnum = ComplexEnum.SOME_VALUE_A;
     wrapperTypesTest.dateCreated = new Date();
 
     flatRecordWriter.reset();
@@ -47,6 +48,8 @@ public class HollowObjectMapperFlatRecordParserTest {
     SpecialWrapperTypesTest result = mapper.readFlat(fr);
 
     Assert.assertEquals(wrapperTypesTest, result);
+    Assert.assertEquals(wrapperTypesTest.complexEnum.value, result.complexEnum.value);
+    Assert.assertEquals(wrapperTypesTest.complexEnum.anotherValue, result.complexEnum.anotherValue);
   }
 
   @Test
@@ -558,19 +561,35 @@ public class HollowObjectMapperFlatRecordParserTest {
     SOME_VALUE_C,
   }
 
+  enum ComplexEnum {
+    SOME_VALUE_A("A", 1),
+    SOME_VALUE_B("B", 2),
+    SOME_VALUE_C("C", 3);
+
+    final String value;
+    final int anotherValue;
+
+    ComplexEnum(String value, int anotherValue) {
+      this.value = value;
+      this.anotherValue = anotherValue;
+    }
+  }
+
   @HollowTypeName(name = "SpecialWrapperTypesTest")
   @HollowPrimaryKey(fields = {"id"})
   static class SpecialWrapperTypesTest {
     long id;
     @HollowTypeName(name = "AnEnum")
     AnEnum type;
+    @HollowTypeName(name = "ComplexEnum")
+    ComplexEnum complexEnum;
     Date dateCreated;
 
     @Override
     public boolean equals(Object o) {
       if(o instanceof SpecialWrapperTypesTest) {
         SpecialWrapperTypesTest other = (SpecialWrapperTypesTest)o;
-        return id == other.id && type == other.type && dateCreated.equals(other.dateCreated);
+        return id == other.id && complexEnum == other.complexEnum && type == other.type && dateCreated.equals(other.dateCreated);
       }
       return false;
     }
@@ -580,6 +599,7 @@ public class HollowObjectMapperFlatRecordParserTest {
       return "SpecialWrapperTypesTest{" +
               "id=" + id +
               ", type='" + type + '\'' +
+              ", complexEnum='" + complexEnum + '\'' +
               ", dateCreated=" + dateCreated +
               '}';
     }
