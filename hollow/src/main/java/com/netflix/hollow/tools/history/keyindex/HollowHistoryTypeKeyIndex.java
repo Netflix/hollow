@@ -169,33 +169,12 @@ public class HollowHistoryTypeKeyIndex {
             return;
 
         Object fieldObject = ordinalMapping.getFieldObject(assignedOrdinal, fieldIdx);
-        int fieldHash = HashCodes.hashInt(hashObject(fieldObject));
+        int fieldHash = HashCodes.hashInt(HollowReadFieldUtils.hashObject(fieldObject));
         if(!ordinalFieldHashMapping.containsKey(fieldHash))
             ordinalFieldHashMapping.put(fieldHash, new IntList());
 
         IntList matchingFieldList = ordinalFieldHashMapping.get(fieldHash);
         matchingFieldList.add(assignedOrdinal);
-    }
-
-    // Retain consistency with rest of Hollow Hashing when hashing boxed primitives
-    private int hashObject(Object value) {
-        if(value instanceof Integer) {
-            return HollowReadFieldUtils.intHashCode((Integer)value);
-        } else if(value instanceof String) {
-            return HollowReadFieldUtils.stringHashCode((String)value);
-        } else if(value instanceof Float) {
-            return HollowReadFieldUtils.floatHashCode((Float)value);
-        } else if(value instanceof Double) {
-            return HollowReadFieldUtils.doubleHashCode((Double)value);
-        } else if(value instanceof Boolean) {
-            return HollowReadFieldUtils.booleanHashCode((Boolean) value);
-        } else if(value instanceof Long) {
-            return HollowReadFieldUtils.longHashCode((Long) value);
-        } else if(value instanceof byte[]) {
-            return HollowReadFieldUtils.byteArrayHashCode((byte[]) value);
-        } else {
-            throw new RuntimeException("Unable to hash field of type " + value.getClass().getName());
-        }
     }
 
     public String getKeyDisplayString(int keyOrdinal) {
