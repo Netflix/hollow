@@ -167,7 +167,8 @@ public class HollowOrdinalMapper {
     private int hashKeyRecord(HollowObjectTypeReadState typeState, int ordinal) {
         int hashCode = 0;
         for (int i = 0; i < primaryKey.numFields(); i++) {
-            int fieldHashCode = HollowReadFieldUtils.fieldHashCode(typeState, ordinal, i);
+            Object fieldObjectToHash = readValueInState(typeState, ordinal, i);
+            int fieldHashCode = HollowReadFieldUtils.hashObject(fieldObjectToHash);
             hashCode = (hashCode * 31) ^ fieldHashCode;
         }
         return HashCodes.hashInt(hashCode);
