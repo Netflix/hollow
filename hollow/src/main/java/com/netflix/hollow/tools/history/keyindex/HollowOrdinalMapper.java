@@ -26,6 +26,7 @@ import com.netflix.hollow.tools.util.ObjectInternPool;
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 public class HollowOrdinalMapper {
     private int size = 0;
@@ -142,6 +143,17 @@ public class HollowOrdinalMapper {
 
             Object[] fieldObjects = indexFieldObjectMapping.get(i);
             newIndexFieldObjectMapping.put(newIndex, fieldObjects);
+
+            // Store new index in old table so we can remap assignedOrdinalToIndex
+            ordinalMappings[i]=newIndex;
+        }
+
+        for (Map.Entry<Integer, Integer> entry : assignedOrdinalToIndex.entrySet()) {
+            int assignedOrdinal = entry.getKey();
+            int previousIndex = entry.getValue();
+            int newIndex = ordinalMappings[previousIndex];
+            
+            assignedOrdinalToIndex.put(assignedOrdinal, newIndex);
         }
 
         this.ordinalMappings = newTable;
@@ -154,7 +166,6 @@ public class HollowOrdinalMapper {
         while (newTable[newIndex]!=ORDINAL_NONE)
             newIndex = (newIndex + 1) % newTable.length;
 
-        assignedOrdinalToIndex.put(assignedOrdinal, newIndex);
         newTable[newIndex] = assignedOrdinal;
         return newIndex;
     }
