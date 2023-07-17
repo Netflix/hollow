@@ -63,6 +63,26 @@ public class HollowReadFieldUtils {
         throw new IllegalStateException("I don't know how to hash a " + schema.getFieldType(fieldPosition));
     }
 
+    public static int hashObject(Object value) {
+        if(value instanceof Integer) {
+            return HollowReadFieldUtils.intHashCode((Integer)value);
+        } else if(value instanceof String) {
+            return HollowReadFieldUtils.stringHashCode((String)value);
+        } else if(value instanceof Float) {
+            return HollowReadFieldUtils.floatHashCode((Float)value);
+        } else if(value instanceof Double) {
+            return HollowReadFieldUtils.doubleHashCode((Double)value);
+        } else if(value instanceof Boolean) {
+            return HollowReadFieldUtils.booleanHashCode((Boolean) value);
+        } else if(value instanceof Long) {
+            return HollowReadFieldUtils.longHashCode((Long) value);
+        } else if(value instanceof byte[]) {
+            return HollowReadFieldUtils.byteArrayHashCode((byte[]) value);
+        } else {
+            throw new RuntimeException("Unable to hash field of type " + value.getClass().getName());
+        }
+    }
+
     /**
      * Determine whether two OBJECT field records are exactly equal.
      *
