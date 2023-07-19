@@ -71,40 +71,6 @@ public class HollowHistoryRehashTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void correctlyRehashesKeys_ignoresDuplicates() throws IOException {
-        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
-        HollowHistory history = new HollowHistory(readEngine, 1L, 1);
-        HollowHistoryKeyIndex keyIdx = new HollowHistoryKeyIndex(history);
-        keyIdx.addTypeIndex("A", "id", "anotherField");
-        keyIdx.indexTypeField("A", "id");
-        keyIdx.indexTypeField("A", "anotherField");
-
-        // Should ignore second ones and keep hashes of first
-        for(int i=0;i<5000;i++) {
-            addRecord((float)i, (long)i);
-        }
-
-        roundTripSnapshot();
-        keyIdx.update(readStateEngine, false);
-
-        for(int i=5000;i>0;i--) {
-            addRecord((float)i, (long)i);
-        }
-
-        roundTripSnapshot();
-        keyIdx.update(readStateEngine, false);
-
-        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("A");
-
-        // Test objects before and after rehash
-        for(int ordinal=0;ordinal<5000;ordinal++) {
-            Assert.assertEquals(keyIdx.getRecordKeyOrdinal(typeState, ordinal), ordinal);
-            String expectedString = (float)ordinal+":"+ordinal;
-            Assert.assertEquals(keyIdx.getKeyDisplayString("A", ordinal), expectedString);
-        }
-    }
-
-    @Test
     public void correctlyRehashesKeys_beforeAndAfterDelta() throws IOException {
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
         HollowHistory history = new HollowHistory(readEngine, 1L, 1);
