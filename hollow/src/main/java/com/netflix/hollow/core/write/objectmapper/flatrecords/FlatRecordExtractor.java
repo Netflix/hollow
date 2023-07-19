@@ -51,7 +51,7 @@ public class FlatRecordExtractor {
         this.recordCopiersByType = new HashMap<>();
     }
 
-    public synchronized FlatRecord extract(String type, int ordinal) {
+    public FlatRecord extract(String type, int ordinal) {
         ordinalRemapper.clear();
         writer.reset();
         

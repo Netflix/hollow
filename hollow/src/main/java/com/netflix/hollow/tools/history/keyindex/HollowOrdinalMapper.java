@@ -16,16 +16,17 @@
  */
 package com.netflix.hollow.tools.history.keyindex;
 
-import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.tools.util.ObjectInternPool;
+
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 public class HollowOrdinalMapper {
     private int size = 0;
@@ -142,6 +143,17 @@ public class HollowOrdinalMapper {
 
             Object[] fieldObjects = indexFieldObjectMapping.get(i);
             newIndexFieldObjectMapping.put(newIndex, fieldObjects);
+
+            // Store new index in old table so we can remap assignedOrdinalToIndex
+            ordinalMappings[i]=newIndex;
+        }
+
+        for (Map.Entry<Integer, Integer> entry : assignedOrdinalToIndex.entrySet()) {
+            int assignedOrdinal = entry.getKey();
+            int previousIndex = entry.getValue();
+            int newIndex = ordinalMappings[previousIndex];
+
+            assignedOrdinalToIndex.put(assignedOrdinal, newIndex);
         }
 
         this.ordinalMappings = newTable;
@@ -154,31 +166,20 @@ public class HollowOrdinalMapper {
         while (newTable[newIndex]!=ORDINAL_NONE)
             newIndex = (newIndex + 1) % newTable.length;
 
-        assignedOrdinalToIndex.put(assignedOrdinal, newIndex);
         newTable[newIndex] = assignedOrdinal;
         return newIndex;
     }
 
-    public Object getFieldObject(int keyOrdinal, int fieldIndex) {
-        int index = assignedOrdinalToIndex.get(keyOrdinal);
+    public Object getFieldObject(int assignedOrdinal, int fieldIndex) {
+        int index = assignedOrdinalToIndex.get(assignedOrdinal);
         return indexFieldObjectMapping.get(index)[fieldIndex];
     }
 
     private int hashKeyRecord(HollowObjectTypeReadState typeState, int ordinal) {
         int hashCode = 0;
-
         for (int i = 0; i < primaryKey.numFields(); i++) {
-
-            int lastFieldPath = keyFieldIndices[i].length - 1;
-            int fieldOrdinal = ordinal;
-            HollowObjectTypeReadState fieldTypeState = typeState;
-            for (int f = 0; f < lastFieldPath; f++) {
-                int fieldPosition = keyFieldIndices[i][f];
-                fieldOrdinal = fieldTypeState.readOrdinal(fieldOrdinal, fieldPosition);
-                fieldTypeState = (HollowObjectTypeReadState) fieldTypeState.getSchema().getReferencedTypeState(fieldPosition);
-            }
-
-            int fieldHashCode = HollowReadFieldUtils.fieldHashCode(fieldTypeState, fieldOrdinal, keyFieldIndices[i][lastFieldPath]);
+            Object fieldObjectToHash = readValueInState(typeState, ordinal, i);
+            int fieldHashCode = HollowReadFieldUtils.hashObject(fieldObjectToHash);
             hashCode = (hashCode * 31) ^ fieldHashCode;
         }
         return HashCodes.hashInt(hashCode);
