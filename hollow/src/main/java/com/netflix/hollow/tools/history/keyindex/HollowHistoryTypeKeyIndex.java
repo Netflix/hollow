@@ -152,13 +152,13 @@ public class HollowHistoryTypeKeyIndex {
     }
 
     private void writeKeyObject(HollowObjectTypeReadState typeState, int ordinal, boolean isDelta) {
-        int assignedOrdinal = isDelta ? maxIndexedOrdinal : ordinal;
-        maxIndexedOrdinal+=1;
+        int assignedOrdinal = maxIndexedOrdinal;
         int assignedIndex = ordinalMapping.storeNewRecord(typeState, ordinal, assignedOrdinal);
 
         // Identical record already in memory, no need to store fields
         if(assignedIndex==ORDINAL_NONE)
             return;
+        maxIndexedOrdinal+=1;
 
         for (int i = 0; i < primaryKey.numFields(); i++)
             writeKeyField(assignedOrdinal, i);
@@ -197,40 +197,54 @@ public class HollowHistoryTypeKeyIndex {
 
         for (int i = 0; i < primaryKey.numFields(); i++) {
             int hashCode = 0;
+            Object objectToFind = null;
             try {
                 switch (fieldTypes[i]) {
                     case INT:
                         final int queryInt = Integer.parseInt(query);
                         hashCode = HollowReadFieldUtils.intHashCode(queryInt);
+                        objectToFind = queryInt;
                         break;
                     case LONG:
                         final long queryLong = Long.parseLong(query);
                         hashCode = HollowReadFieldUtils.longHashCode(queryLong);
+                        objectToFind = queryLong;
                         break;
                     case STRING:
                         hashCode = HashCodes.hashCode(query);
+                        objectToFind = query;
                         break;
                     case DOUBLE:
                         final double queryDouble = Double.parseDouble(query);
                         hashCode = HollowReadFieldUtils.doubleHashCode(queryDouble);
+                        objectToFind = queryDouble;
                         break;
                     case FLOAT:
                         final float queryFloat = Float.parseFloat(query);
                         hashCode = HollowReadFieldUtils.floatHashCode(queryFloat);
+                        objectToFind = queryFloat;
                         break;
                     default:
                 }
-                addMatches(HashCodes.hashInt(hashCode), matchingKeys);
+                addMatches(HashCodes.hashInt(hashCode), objectToFind, i, matchingKeys);
             } catch(NumberFormatException ignore) {}
         }
         return matchingKeys;
     }
 
-    public void addMatches(int hashCode, IntList results) {
+    public void addMatches(int hashCode, Object objectToMatch, int field, IntList results) {
         if (!ordinalFieldHashMapping.containsKey(hashCode))
             return;
-        IntList res2 = ordinalFieldHashMapping.get(hashCode);
-        results.addAll(res2);
+
+        IntList matchingOrdinals = ordinalFieldHashMapping.get(hashCode);
+        for(int i=0;i<matchingOrdinals.size();i++) {
+            int ordinal = matchingOrdinals.get(i);
+
+            Object matchingObject = ordinalMapping.getFieldObject(ordinal, field);
+            if(objectToMatch.equals(matchingObject)) {
+                results.add(ordinal);
+            }
+        }
     }
 
     public Object getKeyFieldValue(int keyFieldIdx, int keyOrdinal) {

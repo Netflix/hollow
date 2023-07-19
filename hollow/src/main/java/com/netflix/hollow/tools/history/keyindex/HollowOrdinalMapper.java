@@ -152,7 +152,7 @@ public class HollowOrdinalMapper {
             int assignedOrdinal = entry.getKey();
             int previousIndex = entry.getValue();
             int newIndex = ordinalMappings[previousIndex];
-            
+
             assignedOrdinalToIndex.put(assignedOrdinal, newIndex);
         }
 
@@ -170,8 +170,8 @@ public class HollowOrdinalMapper {
         return newIndex;
     }
 
-    public Object getFieldObject(int keyOrdinal, int fieldIndex) {
-        int index = assignedOrdinalToIndex.get(keyOrdinal);
+    public Object getFieldObject(int assignedOrdinal, int fieldIndex) {
+        int index = assignedOrdinalToIndex.get(assignedOrdinal);
         return indexFieldObjectMapping.get(index)[fieldIndex];
     }
 
