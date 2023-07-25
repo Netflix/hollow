@@ -171,7 +171,6 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
                 }
             }
             data = baos.toByteArray(); // this is kind of wrong as baos has compressed lz4 block
-            //data = baos.toString();
         }
 
         @Override
@@ -182,6 +181,11 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
         @Override
         public InputStream newOptionalPartInputStream(String partName) throws IOException {
             return new BufferedInputStream(blobCompressor.decompress(new ByteArrayInputStream(optionalParts.get(partName))));
+        }
+
+        @Override
+        public byte[] getData() {
+            return this.data;
         }
 
         @Override

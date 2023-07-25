@@ -624,9 +624,10 @@ public class HollowProducer extends AbstractHollowProducer {
             throw new UnsupportedOperationException("Path is not available");
         }
         default byte[] getData() throws IOException {
-            try (InputStream inputStream = newInputStream()){
-                return IOUtils.readAllBytes(inputStream);
-            }
+//            try (InputStream inputStream = newInputStream()){
+//                return IOUtils.readAllBytes(inputStream);
+//            }
+            return new byte[0];
         }
     }
 
