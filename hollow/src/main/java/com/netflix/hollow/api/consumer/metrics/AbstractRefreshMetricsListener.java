@@ -48,7 +48,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     private OptionalLong lastRefreshTimeNanoOptional;
     private long refreshStartTimeNano;
     private long consecutiveFailures;
-    private BlobType overallRefreshType;    // Indicates whether the overall refresh (that could comprise of multiple transitions)
+    private BlobType overallRefreshType;    // Indicates whether the overall refresh (that could comprise multiple transitions)
     // is classified as snapshot, delta, or reverse delta. Note that if a snapshot
     // transition is present then the overall refresh type is snapshot.
     private ConsumerRefreshMetrics.UpdatePlanDetails updatePlanDetails;  // Some details about the transitions comprising a refresh

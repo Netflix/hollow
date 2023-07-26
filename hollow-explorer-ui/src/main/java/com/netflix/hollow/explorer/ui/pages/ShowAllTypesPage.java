@@ -70,11 +70,7 @@ public class ShowAllTypesPage extends HollowExplorerPage {
             });
             break;
         case "numRecords":
-            Collections.sort(typeOverviews, new Comparator<TypeOverview>() {
-                public int compare(TypeOverview o1, TypeOverview o2) {
-                    return Integer.compare(o2.getNumRecordsInt(), o1.getNumRecordsInt());
-                }
-            });
+            typeOverviews.sort((o1, o2) -> Integer.compare(o2.getNumRecordsInt(), o1.getNumRecordsInt()));
             break;
             case "numHoles":
                 typeOverviews.sort((o1, o2) -> Integer.compare(o2.getNumHolesInt(), o1.getNumHolesInt()));

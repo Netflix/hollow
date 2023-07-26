@@ -21,15 +21,12 @@ import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.HeaderBlob;
 import com.netflix.hollow.api.producer.ProducerOptionalBlobPartConfig;
 import com.netflix.hollow.core.HollowConstants;
+import com.netflix.hollow.core.memory.SegmentedByteArray;
+import com.netflix.hollow.core.memory.SegmentedByteArrayInputStream;
+import com.netflix.hollow.core.memory.SegmentedByteArrayOutputStream;
 import com.netflix.hollow.core.write.HollowBlobWriter;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
+
+import java.io.*;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,20 +89,21 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
             try (OutputStream os = new BufferedOutputStream(blobCompressor.compress(baos))) {
                 blobWriter.writeHeader(os, null);
             }
-            //data = baos.toString();
+            //segmentedByteArray = baos.toString();
             data = baos.toByteArray();
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            //return new BufferedInputStream(blobCompressor.decompress(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8))));
+            //return new BufferedInputStream(blobCompressor.decompress(new ByteArrayInputStream(segmentedByteArray.getBytes(StandardCharsets.UTF_8))));
             return new BufferedInputStream(blobCompressor.decompress(new ByteArrayInputStream(data)));
         }
     }
 
     public static class InMemoryBlob extends Blob {
 
-        private byte[] data; //changed from byte[]
+        //private ByteDataArray segmentedByteArray;
+        private SegmentedByteArray segmentedByteArray;
         private Map<String, byte[]> optionalParts;
 
         private HollowProducer.BlobCompressor blobCompressor;
@@ -121,11 +119,13 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
 
         @Override
         public void write(HollowBlobWriter writer) throws IOException {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            //ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            //DataOutputStream dataOutputStream = new DataOutputStream();
+            SegmentedByteArrayOutputStream outputStream = new SegmentedByteArrayOutputStream(segmentedByteArray);
 
             ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams optionalPartStreams = null;
             Map<String, ByteArrayOutputStream> optionalPartData = null;
-            if(optionalPartConfig != null) {
+            if (optionalPartConfig != null) {
                 optionalPartStreams = optionalPartConfig.newStreams();
                 optionalPartData = new HashMap<>();
                 for(String part : optionalPartConfig.getParts()) {
@@ -135,27 +135,7 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
                 }
             }
 
-//            switch(type) {
-//            case SNAPSHOT:
-//                writer.writeSnapshot(baos, optionalPartStreams);
-//                break;
-//            case DELTA:
-//                writer.writeDelta(baos, optionalPartStreams);
-//                break;
-//            case REVERSE_DELTA:
-//                writer.writeReverseDelta(baos, optionalPartStreams);
-//                break;
-//            }
-//
-//            data = baos.toByteArray();
-//
-//            if(optionalPartConfig != null) {
-//                optionalParts = new HashMap<>();
-//                for(Map.Entry<String, ByteArrayOutputStream> partEntry : optionalPartData.entrySet()) {
-//                    optionalParts.put(partEntry.getKey(), partEntry.getValue().toByteArray());
-//                }
-//            }
-            try (OutputStream os = new BufferedOutputStream(blobCompressor.compress(baos))) {
+            try (OutputStream os = new BufferedOutputStream(blobCompressor.compress(outputStream))) {
                 switch (type) {
                     case SNAPSHOT:
                         writer.writeSnapshot(os, optionalPartStreams);
@@ -170,12 +150,13 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
                         throw new IllegalStateException("unknown type, type=" + type);
                 }
             }
-            data = baos.toByteArray(); // this is kind of wrong as baos has compressed lz4 block
+            //segmentedByteArray = baos.toByteArray();
+            segmentedByteArray = outputStream.getSegmentedByteArray();
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            return new BufferedInputStream(blobCompressor.decompress(new ByteArrayInputStream(data))); //creating buffer array underneath
+            return new BufferedInputStream(blobCompressor.decompress(new SegmentedByteArrayInputStream(segmentedByteArray))); //creating buffer array underneath
         }
 
         @Override
@@ -185,7 +166,12 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
 
         @Override
         public byte[] getData() {
-            return this.data;
+            return
+        }
+
+        @Override
+        public SegmentedByteArray getSegmentedByteArray() {
+            return this.segmentedByteArray;
         }
 
         @Override
@@ -195,7 +181,7 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
 
         @Override
         public void cleanup() {
-            data = null;
+            segmentedByteArray = null;
         }
     }
 

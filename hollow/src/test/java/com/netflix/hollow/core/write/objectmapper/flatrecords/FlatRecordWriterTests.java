@@ -64,8 +64,8 @@ public class FlatRecordWriterTests {
 
     @Test
     public void flatRecordsDedupRedundantDataWithinRecords() {
-        int recSize1 = flatRecordSize(new TypeA(1, "two", "three", "four"));
-        int recSize2 = flatRecordSize(new TypeA(1, "two", "three", "four", "three"));
+        int recSize1 = flatRecordSize(new TypeA(1, "two", new TypeB("three"), "four"));
+        int recSize2 = flatRecordSize(new TypeA(1, "two", new TypeB("three"), "four", "three"));
         
         Assert.assertTrue(recSize2 - recSize1 == 1);
     }
@@ -76,9 +76,9 @@ public class FlatRecordWriterTests {
 
         producer.runCycle(state -> {
             FlatRecordDumper dumper = new FlatRecordDumper(state.getStateEngine());
-            dumper.dump(flatten(new TypeA(1, "two", "three", "four", "five")));
-            dumper.dump(flatten(new TypeA(2, "two", "four", "six", "eight", "é with acute accent", "ten")));
-            dumper.dump(flatten(new TypeC("one", "four")));
+            dumper.dump(flatten(new TypeA(1, "two", new TypeB("three"), "four", "five")));
+            dumper.dump(flatten(new TypeA(2, "two", new TypeB("four"), "six", "eight", "é with acute accent", "ten")));
+            dumper.dump(flatten(new TypeB("one")));
         });
 
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
@@ -131,8 +131,8 @@ public class FlatRecordWriterTests {
         
         producer.runCycle(state -> {
             FlatRecordDumper dumper = new FlatRecordDumper(state.getStateEngine());
-            dumper.dump(flatten(new TypeA(1, "two", "three", "four", "five")));
-            dumper.dump(flatten(new TypeA(2, "two", "four", "six", "eight", "ten")));
+            dumper.dump(flatten(new TypeA(1, "two", new TypeB("three"), "four", "five")));
+            dumper.dump(flatten(new TypeA(2, "two", new TypeB("four"), "six", "eight", "ten")));
             dumper.dump(flatten(new TypeC("one", "three")));
         });
 
@@ -182,19 +182,19 @@ public class FlatRecordWriterTests {
 
     @HollowPrimaryKey(fields = { "a1", "a3" })
     public static class TypeA {
+        TypeB a3;
         int a1;
         @HollowInline
         String a2;
-        TypeB a3;
         @HollowHashKey(fields="b1")
         Set<TypeB> a4;
         @HollowInline
         Integer nullablePrimitiveInt;
 
-        public TypeA(int a1, String a2, String a3, String... b1s) {
+        public TypeA(int a1, String a2, TypeB a3, String... b1s) {
             this.a1 = a1;
             this.a2 = a2;
-            this.a3 = new TypeB(a3);
+            this.a3 = a3;
             this.a4 = new HashSet<>(b1s.length);
             for (int i = 0; i < b1s.length; i++) {
                 this.a4.add(new TypeB(b1s[i]));
@@ -220,6 +220,14 @@ public class FlatRecordWriterTests {
         public TypeC(String c1, String b1) {
             this.c1 = c1;
             this.c2 = new TypeB(b1);
+        }
+    }
+
+    public static class TypeD {
+        TypeB b;
+
+        public TypeD(TypeB b) {
+            this.b = b;
         }
     }
 

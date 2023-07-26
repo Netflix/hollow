@@ -26,6 +26,9 @@ import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
 import com.netflix.hollow.api.producer.listener.HollowProducerEventListener;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
+import com.netflix.hollow.core.memory.SegmentedByteArray;
+import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
@@ -623,12 +626,19 @@ public class HollowProducer extends AbstractHollowProducer {
         default Path getPath() {
             throw new UnsupportedOperationException("Path is not available");
         }
+        default SegmentedByteArray getSegmentedByteArray() throws IOException {
+            return new SegmentedByteArray(WastefulRecycler.DEFAULT_INSTANCE);
+        }
+
         default byte[] getData() throws IOException {
-//            try (InputStream inputStream = newInputStream()){
-//                return IOUtils.readAllBytes(inputStream);
-//            }
             return new byte[0];
         }
+        default byte[][] getAllData() throws IOException {
+            return new byte[0][0];
+        }
+//        default SegmentedByteArray getData() throws IOException {
+//            return new SegmentedByteArray(WastefulRecycler.DEFAULT_INSTANCE);
+//        }
     }
 
     public static abstract class HeaderBlob implements PublishArtifact{

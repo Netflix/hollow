@@ -272,6 +272,9 @@ public class FlatRecordDumper {
             int unmappedOrdinal = VarInt.readVInt(record.data, currentRecordPointer);
             
             if(rec != null) {
+//                if (ordinalMapping.get(unmappedOrdinal) == null) {
+//                    throw new IllegalStateException("");
+//                }
                 int mappedOrdinal = ordinalMapping.get(unmappedOrdinal);
                 rec.setReference(fieldName, mappedOrdinal);
             }
