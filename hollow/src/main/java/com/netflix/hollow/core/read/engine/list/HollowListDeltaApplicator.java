@@ -72,7 +72,6 @@ class HollowListDeltaApplicator {
 
         from.encodedRemovals = null;
         removalsReader.destroy();
-        additionsReader.destroy();
     }
 
     private void slowDelta() {

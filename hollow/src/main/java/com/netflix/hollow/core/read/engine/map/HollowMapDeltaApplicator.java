@@ -81,7 +81,6 @@ class HollowMapDeltaApplicator {
 
         from.encodedRemovals = null;
         removalsReader.destroy();
-        additionsReader.destroy();
     }
 
     private void slowDelta() {

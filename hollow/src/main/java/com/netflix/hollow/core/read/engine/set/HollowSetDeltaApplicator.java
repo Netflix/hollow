@@ -78,7 +78,6 @@ class HollowSetDeltaApplicator {
 
         from.encodedRemovals = null;
         removalsReader.destroy();
-        additionsReader.destroy();
 
     }
 

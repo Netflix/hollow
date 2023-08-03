@@ -98,7 +98,6 @@ class HollowObjectDeltaApplicator {
 
         from.encodedRemovals = null;
         removalsReader.destroy();
-        additionsReader.destroy();
     }
 
     private boolean canDoFastDelta() {
