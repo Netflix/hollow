@@ -124,7 +124,7 @@ public class HollowOrdinalMapper {
                 continue;
 
             Object objectToStore = readValueInState(typeState, ordinal, i);
-            indexFieldObjectMapping.get(index)[i] = memoizedPool.intern(objectToStore);
+            indexFieldObjectMapping.get(index)[i] = objectToStore;
         }
     }
 
