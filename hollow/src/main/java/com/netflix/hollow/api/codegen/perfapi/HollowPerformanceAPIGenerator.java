@@ -20,6 +20,7 @@ import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -91,6 +92,10 @@ public class HollowPerformanceAPIGenerator {
     }
     
     private void generate(HollowDataset dataset, String packageName, String apiClassName, Path destination, Set<String> checkFieldExistsMethods) throws IOException {
+        Path packagePath = Paths.get(packageName.replace(".", File.separator));
+        if (!destination.toAbsolutePath().endsWith(packagePath)) {
+            destination = destination.resolve(packagePath);
+        }
         Path apiClassDestination = destination.resolve(apiClassName + ".java");
         if (!Files.exists(apiClassDestination)) {
             Files.createDirectories(destination);

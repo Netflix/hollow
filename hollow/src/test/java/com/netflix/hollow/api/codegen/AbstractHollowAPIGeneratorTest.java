@@ -31,8 +31,8 @@ import org.junit.After;
 
 public class AbstractHollowAPIGeneratorTest {
     private String tmpFolder = System.getProperty("java.io.tmpdir");
-    private String sourceFolder = String.format("%s/src", tmpFolder);
-    private String clazzFolder = String.format("%s/classes", tmpFolder);
+    protected String sourceFolder = String.format("%s/src", tmpFolder);
+    protected String clazzFolder = String.format("%s/classes", tmpFolder);
 
     void runGenerator(String apiClassName, String packageName, Class<?> clazz,
             UnaryOperator<HollowAPIGenerator.Builder> generatorCustomizer) throws Exception {
@@ -53,7 +53,7 @@ public class AbstractHollowAPIGeneratorTest {
         HollowCodeGenerationCompileUtil.compileSrcFiles(sourceFolder, clazzFolder);
     }
 
-    void assertNonEmptyFileExists(String relativePath) throws IOException {
+    protected void assertNonEmptyFileExists(String relativePath) throws IOException {
         if (relativePath.startsWith("/")) {
             throw new IllegalArgumentException("Relative paths should not start with /");
         }

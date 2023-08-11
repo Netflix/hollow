@@ -43,6 +43,7 @@ class HollowObjectTypePerfAPIClassGenerator {
                 "import com.netflix.hollow.api.perfapi.Ref;\n" +
                 "import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;\n\n");
 
+        builder.append("@SuppressWarnings(\"all\")\n");
         builder.append("public class " + schema.getName() + "PerfAPI extends HollowObjectTypePerfAPI {\n\n");
 
         builder.append("    public static final String fieldNames[] = { ");
