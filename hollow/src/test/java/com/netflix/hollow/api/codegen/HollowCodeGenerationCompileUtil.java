@@ -68,8 +68,11 @@ public class HollowCodeGenerationCompileUtil {
      */
     private static void runFindbugs(File classDir) throws Exception {
         ClassLoader classLoader = HollowCodeGenerationCompileUtil.class.getClassLoader();
-        FindBugs2.main(new String[]{"-auxclasspath", System.getProperty(PROPERTY_CLASSPATH), "-output",
-                classLoader.getResource("").getFile() + FILENAME_FINDBUGS, classDir.getAbsolutePath()});
+        FindBugs2.main(
+            new String[]{"-auxclasspath", System.getProperty(PROPERTY_CLASSPATH), "-output",
+                classLoader.getResource("").getFile() + FILENAME_FINDBUGS,
+                "-exclude", classLoader.getResource("findbugs_exclude.xml").getFile(),
+                classDir.getAbsolutePath()});
         BufferedReader reader =
                 new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream(FILENAME_FINDBUGS)));
         String line = "";
