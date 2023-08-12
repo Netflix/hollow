@@ -5,6 +5,7 @@ import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import java.util.HashSet;
 
 
 // This class memoizes types by returning references to existing objects, or storing
@@ -12,19 +13,28 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 public class ObjectInternPool {
     final private ByteArrayOrdinalMap ordinalMap;
     private boolean isReadyToRead = false;
+    HashSet<Integer> ordinalsInCycle;
+
     public ObjectInternPool() {
         this.ordinalMap = new ByteArrayOrdinalMap(1024);
+        this.ordinalsInCycle = new HashSet<>();
     }
 
-    private void ensureReadyToRead() {
+    public boolean writtenInCycle(int ordinal) {
+        return ordinalsInCycle.contains(ordinal);
+    }
+
+    public void prepareForRead() {
         if(!isReadyToRead) {
             ordinalMap.prepareForWrite();
         }
+        ordinalsInCycle.clear();
         isReadyToRead = true;
     }
 
+    //WARNING: assumes already ready to read
     public Object getObject(int ordinal, FieldType type) {
-        ensureReadyToRead();
+        prepareForRead();
 
         long pointer = ordinalMap.getPointerForData(ordinal);
         if (pointer==-1L) {
@@ -50,8 +60,6 @@ public class ObjectInternPool {
     }
 
     public boolean getBoolean(long pointer) {
-        ensureReadyToRead();
-
         ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
         return byteData.get(pointer) == 1;
     }
@@ -129,7 +137,8 @@ public class ObjectInternPool {
             String className = objectToIntern.getClass().getName();
             throw new IllegalArgumentException("Cannot intern object of type " + className);
         }
-
-        return ordinalMap.getOrAssignOrdinal(buf);
+        int ordinal = ordinalMap.getOrAssignOrdinal(buf);
+        ordinalsInCycle.add(ordinal);
+        return ordinal;
     }
 }

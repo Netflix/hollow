@@ -32,6 +32,7 @@ import com.netflix.hollow.core.util.RemovedOrdinalIterator;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.Optional;
 
 public class HollowHistoryTypeKeyIndex {
     private final PrimaryKey primaryKey;
@@ -128,6 +129,7 @@ public class HollowHistoryTypeKeyIndex {
             maxIndexedOrdinal = 0;
             populateAllCurrentRecordKeysIntoIndex(latestTypeState);
         }
+        ordinalMapping.prepareForRead();
     }
 
     private void populateNewCurrentRecordKeysIntoIndex(HollowObjectTypeReadState typeState) {
@@ -158,22 +160,26 @@ public class HollowHistoryTypeKeyIndex {
 
     private void writeKeyObject(HollowObjectTypeReadState typeState, int ordinal, boolean isDelta) {
         int assignedOrdinal = maxIndexedOrdinal;
-        int assignedIndex = ordinalMapping.storeNewRecord(typeState, ordinal, assignedOrdinal);
+        boolean storedUniqueRecord = ordinalMapping.storeNewRecord(typeState, ordinal, assignedOrdinal);
 
         // Identical record already in memory, no need to store fields
-        if(assignedIndex==ORDINAL_NONE)
+        if(!storedUniqueRecord)
             return;
         maxIndexedOrdinal+=1;
+        Object[] fieldObjects = new Object[primaryKey.numFields()];
+        for (int i = 0; i < primaryKey.numFields(); i++) {
+            fieldObjects[i] = ordinalMapping.readValueInState(typeState, ordinal, i);
+        }
 
         for (int i = 0; i < primaryKey.numFields(); i++)
-            writeKeyField(assignedOrdinal, i);
+            writeKeyField(fieldObjects, assignedOrdinal, i);
     }
 
-    private void writeKeyField(int assignedOrdinal, int fieldIdx) {
+    private void writeKeyField(Object[] fieldObjects, int assignedOrdinal, int fieldIdx) {
         if (!keyFieldIsIndexed[fieldIdx])
             return;
 
-        Object fieldObject = ordinalMapping.getFieldObject(assignedOrdinal, fieldIdx, fieldTypes[fieldIdx]);
+        Object fieldObject = fieldObjects[fieldIdx];
         int fieldHash = HashCodes.hashInt(HollowReadFieldUtils.hashObject(fieldObject));
         if(!ordinalFieldHashMapping.containsKey(fieldHash))
             ordinalFieldHashMapping.put(fieldHash, new IntList());
