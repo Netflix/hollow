@@ -30,6 +30,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class HollowOrdinalMapper {
     private int size = 0;
@@ -65,6 +66,10 @@ public class HollowOrdinalMapper {
         this.memoizedPool = new ObjectInternPool();
     }
 
+    public void prepareForRead() {
+        memoizedPool.prepareForRead();
+    }
+
     public int findAssignedOrdinal(HollowObjectTypeReadState typeState, int keyOrdinal) {
         int hashedRecord = hashKeyRecord(typeState, keyOrdinal);
         int index = indexFromHash(hashedRecord, ordinalMappings.length);
@@ -85,6 +90,8 @@ public class HollowOrdinalMapper {
 
             Object newFieldValue = readValueInState(typeState, keyOrdinal, fieldIdx);
             int existingFieldOrdinalValue = indexFieldOrdinalMapping.get(index)[fieldIdx];
+            if(memoizedPool.writtenInCycle(existingFieldOrdinalValue))
+                return false;
             Object existingFieldObjectValue = memoizedPool.getObject(existingFieldOrdinalValue, keyFieldTypes[fieldIdx]);
             if(!newFieldValue.equals(existingFieldObjectValue)) {
                 return false;
@@ -93,7 +100,7 @@ public class HollowOrdinalMapper {
         return true;
     }
 
-    public int storeNewRecord(HollowObjectTypeReadState typeState, int ordinal, int assignedOrdinal) {
+    public boolean storeNewRecord(HollowObjectTypeReadState typeState, int ordinal, int assignedOrdinal) {
         int hashedRecord = hashKeyRecord(typeState, ordinal);
 
         if ((double) size / ordinalMappings.length > LOAD_FACTOR) {
@@ -106,7 +113,7 @@ public class HollowOrdinalMapper {
         while (ordinalMappings[index] != ORDINAL_NONE) {
             if(recordsAreEqual(typeState, ordinal, index)) {
                 this.assignedOrdinalToIndex.put(assignedOrdinal, index);
-                return ORDINAL_NONE;
+                return false;
             }
             index = (index + 1) % ordinalMappings.length;
         }
@@ -118,7 +125,7 @@ public class HollowOrdinalMapper {
         storeFields(typeState, ordinal, index);
 
         this.assignedOrdinalToIndex.put(assignedOrdinal, index);
-        return index;
+        return true;
     }
 
     private void storeFields(HollowObjectTypeReadState typeState, int ordinal, int index) {
@@ -194,7 +201,7 @@ public class HollowOrdinalMapper {
     }
 
     //taken and modified from HollowPrimaryKeyValueDeriver
-    private Object readValueInState(HollowObjectTypeReadState typeState, int ordinal, int fieldIdx) {
+    public Object readValueInState(HollowObjectTypeReadState typeState, int ordinal, int fieldIdx) {
         HollowObjectSchema schema = typeState.getSchema();
 
         int lastFieldPath = keyFieldIndices[fieldIdx].length - 1;
