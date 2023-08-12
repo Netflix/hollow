@@ -17,8 +17,7 @@
 package com.netflix.hollow.tools.util;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,8 +39,10 @@ public class ObjectInternPoolTest {
         int int1Ordinal = internPool.writeAndGetOrdinal(intObj1);
         int int2Ordinal = internPool.writeAndGetOrdinal(intObj2);
 
+        int retrievedInt1 = (int) internPool.getObject(int1Ordinal, FieldType.INT);
+
         assertEquals(int1Ordinal, int2Ordinal);
-        assertEquals(internPool.getInt(int1Ordinal), 130);
+        assertEquals(retrievedInt1, 130);
 
         Integer intObj3 = 1900;
         Integer intObj4 = 1900;
@@ -49,8 +50,10 @@ public class ObjectInternPoolTest {
         int int3Ordinal = internPool.writeAndGetOrdinal(intObj3);
         int int4Ordinal = internPool.writeAndGetOrdinal(intObj4);
 
+        int retrievedInt3 = (int) internPool.getObject(int3Ordinal, FieldType.INT);
+
         assertEquals(int3Ordinal, int4Ordinal);
-        assertEquals(internPool.getInt(int3Ordinal), 1900);
+        assertEquals(retrievedInt3, 1900);
     }
 
     @Test
@@ -63,14 +66,18 @@ public class ObjectInternPoolTest {
         int float1Ordinal = internPool.writeAndGetOrdinal(floatObj1);
         int float2Ordinal = internPool.writeAndGetOrdinal(floatObj2);
 
+        float retrievedFloat1 = (float) internPool.getObject(float1Ordinal, FieldType.FLOAT);
+
         assertEquals(float1Ordinal, float2Ordinal);
-        assertEquals(internPool.getFloat(float1Ordinal), 130.0f, 0.0f);
+        assertEquals(retrievedFloat1, 130.0f, 0.0f);
 
         int float3Ordinal = internPool.writeAndGetOrdinal(floatObj3);
         int float4Ordinal = internPool.writeAndGetOrdinal(floatObj4);
 
+        float retrievedFloat2 = (float) internPool.getObject(float3Ordinal, FieldType.FLOAT);
+
         assertEquals(float3Ordinal, float4Ordinal);
-        assertEquals(internPool.getFloat(float3Ordinal), 1900.0f, 0.0f);
+        assertEquals(retrievedFloat2, 1900.0f, 0.0f);
     }
 
     @Test
@@ -83,14 +90,18 @@ public class ObjectInternPoolTest {
         int long1Ordinal = internPool.writeAndGetOrdinal(longObj1);
         int long2Ordinal = internPool.writeAndGetOrdinal(longObj2);
 
+        long retrievedLong1 = (Long) internPool.getObject(long1Ordinal, FieldType.LONG);
+
         assertEquals(long1Ordinal, long2Ordinal);
-        assertEquals(internPool.getLong(long1Ordinal), 130L);
+        assertEquals(retrievedLong1, 130L);
 
         int long3Ordinal = internPool.writeAndGetOrdinal(longObj3);
         int long4Ordinal = internPool.writeAndGetOrdinal(longObj4);
 
+        long retrievedLong2 = (Long) internPool.getObject(long3Ordinal, FieldType.LONG);
+
         assertEquals(long3Ordinal, long4Ordinal);
-        assertEquals(internPool.getLong(long3Ordinal), 1900L);
+        assertEquals(retrievedLong2, 1900L);
     }
 
     @Test
@@ -103,14 +114,18 @@ public class ObjectInternPoolTest {
         int double1Ordinal = internPool.writeAndGetOrdinal(doubleObj1);
         int double2Ordinal = internPool.writeAndGetOrdinal(doubleObj2);
 
+        double retrievedDouble1 = (double) internPool.getObject(double1Ordinal, FieldType.DOUBLE);
+
         assertEquals(double1Ordinal, double2Ordinal);
-        assertEquals(internPool.getDouble(double1Ordinal), 130.0, 0.0);
+        assertEquals(retrievedDouble1, 130.0, 0.0);
 
         int double3Ordinal = internPool.writeAndGetOrdinal(doubleObj3);
         int double4Ordinal = internPool.writeAndGetOrdinal(doubleObj4);
 
+        double retrievedDouble2 = (double) internPool.getObject(double3Ordinal, FieldType.DOUBLE);
+
         assertEquals(double3Ordinal, double4Ordinal);
-        assertEquals(internPool.getDouble(double3Ordinal), 1900.0, 0.0);
+        assertEquals(retrievedDouble2, 1900.0, 0.0);
     }
 
     @Test
@@ -123,14 +138,18 @@ public class ObjectInternPoolTest {
         int string1Ordinal = internPool.writeAndGetOrdinal(stringObj1);
         int string2Ordinal = internPool.writeAndGetOrdinal(stringObj2);
 
+        String retrievedString1 = (String) internPool.getObject(string1Ordinal, FieldType.STRING);
+
         assertEquals(string1Ordinal, string2Ordinal);
-        assertEquals(internPool.getString(string1Ordinal), "I am Groot");
+        assertEquals(retrievedString1, "I am Groot");
 
         int string3Ordinal = internPool.writeAndGetOrdinal(stringObj3);
         int string4Ordinal = internPool.writeAndGetOrdinal(stringObj4);
 
+        String retrievedString2 = (String) internPool.getObject(string3Ordinal, FieldType.STRING);
+
         assertEquals(string3Ordinal, string4Ordinal);
-        assertEquals(internPool.getString(string3Ordinal), "I can do this all day");
+        assertEquals(retrievedString2, "I can do this all day");
     }
 
     @Test
@@ -143,13 +162,17 @@ public class ObjectInternPoolTest {
         int bool1Ordinal = internPool.writeAndGetOrdinal(boolObj1);
         int bool2Ordinal = internPool.writeAndGetOrdinal(boolObj2);
 
+        boolean retrievedBool1 = (boolean) internPool.getObject(bool1Ordinal, FieldType.BOOLEAN);
+
         assertEquals(bool1Ordinal, bool2Ordinal);
-        assertEquals(internPool.getBoolean(bool1Ordinal), true);
+        assertEquals(retrievedBool1, true);
 
         int bool3Ordinal = internPool.writeAndGetOrdinal(boolObj3);
         int bool4Ordinal = internPool.writeAndGetOrdinal(boolObj4);
 
+        boolean retrievedBool2 = (boolean) internPool.getObject(bool3Ordinal, FieldType.BOOLEAN);
+
         assertEquals(bool3Ordinal, bool4Ordinal);
-        assertEquals(internPool.getBoolean(bool3Ordinal), false);
+        assertEquals(retrievedBool2, false);
     }
 }

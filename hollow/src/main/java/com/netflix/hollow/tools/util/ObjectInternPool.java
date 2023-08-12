@@ -4,6 +4,7 @@ import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
 
 // This class memoizes types by returning references to existing objects, or storing
@@ -22,69 +23,7 @@ public class ObjectInternPool {
         isReadyToRead = true;
     }
 
-    public boolean getBoolean(int ordinal) {
-        ensureReadyToRead();
-
-        long pointer = ordinalMap.getPointerForData(ordinal);
-        if (pointer==-1L) {
-            return false;
-        }
-
-        ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
-        return byteData.get(pointer) == 1;
-    }
-
-    public float getFloat(int ordinal) {
-        ensureReadyToRead();
-
-        long pointer = ordinalMap.getPointerForData(ordinal);
-        if (pointer==-1L) {
-            return Float.NaN; //TODO: could have actual NaN's in memory, bad way of representing "not found"
-        }
-
-        ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
-        int intBytes = VarInt.readVInt(byteData, pointer);
-        return Float.intBitsToFloat(intBytes);
-    }
-
-    public double getDouble(int ordinal) {
-        ensureReadyToRead();
-
-        long pointer = ordinalMap.getPointerForData(ordinal);
-        if (pointer==-1L) {
-            return Double.NaN; //TODO: could have actual NaN's in memory, bad way of representing "not found"
-        }
-
-        ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
-        long longBytes = VarInt.readVLong(byteData, pointer);
-        return Double.longBitsToDouble(longBytes);
-    }
-
-    public int getInt(int ordinal) {
-        ensureReadyToRead();
-
-        long pointer = ordinalMap.getPointerForData(ordinal);
-        if (pointer==-1L) {
-            return -1; //TODO: could have actual -1's in memory, bad way of representing "not found"
-        }
-
-        ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
-        return VarInt.readVInt(byteData, pointer);
-    }
-
-    public long getLong(int ordinal) {
-        ensureReadyToRead();
-
-        long pointer = ordinalMap.getPointerForData(ordinal);
-        if (pointer==-1L) {
-            return -1L; //TODO: could have actual -1's in memory, bad way of representing "not found"
-        }
-
-        ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
-        return VarInt.readVLong(byteData, pointer);
-    }
-
-    public String getString(int ordinal) {
+    public Object getObject(int ordinal, FieldType type) {
         ensureReadyToRead();
 
         long pointer = ordinalMap.getPointerForData(ordinal);
@@ -92,6 +31,54 @@ public class ObjectInternPool {
             return null;
         }
 
+        switch (type) {
+            case BOOLEAN:
+                return getBoolean(pointer);
+            case FLOAT:
+                return getFloat(pointer);
+            case DOUBLE:
+                return getDouble(pointer);
+            case INT:
+                return getInt(pointer);
+            case LONG:
+                return getLong(pointer);
+            case STRING:
+                return getString(pointer);
+            default:
+                throw new IllegalArgumentException("Unknown type " + type);
+        }
+    }
+
+    public boolean getBoolean(long pointer) {
+        ensureReadyToRead();
+
+        ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
+        return byteData.get(pointer) == 1;
+    }
+
+    public float getFloat(long pointer) {
+        ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
+        int intBytes = VarInt.readVInt(byteData, pointer);
+        return Float.intBitsToFloat(intBytes);
+    }
+
+    public double getDouble(long pointer) {
+        ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
+        long longBytes = VarInt.readVLong(byteData, pointer);
+        return Double.longBitsToDouble(longBytes);
+    }
+
+    public int getInt(long pointer) {
+        ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
+        return VarInt.readVInt(byteData, pointer);
+    }
+
+    public long getLong(long pointer) {
+        ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
+        return VarInt.readVLong(byteData, pointer);
+    }
+
+    public String getString(long pointer) {
         ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
         int length = byteData.get(pointer);
         byte[] bytes = new byte[length];
