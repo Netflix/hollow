@@ -19,7 +19,6 @@ package com.netflix.hollow.tools.history.keyindex;
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 import static com.netflix.hollow.tools.util.SearchUtils.MULTI_FIELD_KEY_DELIMITER;
 
-import com.netflix.hollow.Hollow;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
@@ -58,7 +57,7 @@ public class HollowHistoryTypeKeyIndex {
         this.keyFieldIsIndexed = new boolean[primaryKey.numFields()];
         initializeKeyParts(dataModel);
 
-        this.ordinalMapping = new HollowOrdinalMapper(primaryKey, keyFieldIsIndexed, keyFieldIndices);
+        this.ordinalMapping = new HollowOrdinalMapper(primaryKey, keyFieldIsIndexed, keyFieldIndices, fieldTypes);
         this.ordinalFieldHashMapping = new HashMap<>();
     }
 
@@ -168,7 +167,7 @@ public class HollowHistoryTypeKeyIndex {
         if (!keyFieldIsIndexed[fieldIdx])
             return;
 
-        Object fieldObject = ordinalMapping.getFieldObject(assignedOrdinal, fieldIdx);
+        Object fieldObject = ordinalMapping.getFieldObject(assignedOrdinal, fieldIdx, fieldTypes[fieldIdx]);
         int fieldHash = HashCodes.hashInt(HollowReadFieldUtils.hashObject(fieldObject));
         if(!ordinalFieldHashMapping.containsKey(fieldHash))
             ordinalFieldHashMapping.put(fieldHash, new IntList());
@@ -180,7 +179,7 @@ public class HollowHistoryTypeKeyIndex {
     public String getKeyDisplayString(int keyOrdinal) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < primaryKey.numFields(); i++) {
-            Object valueAtField = ordinalMapping.getFieldObject(keyOrdinal, i);
+            Object valueAtField = ordinalMapping.getFieldObject(keyOrdinal, i, fieldTypes[i]);
             builder.append(valueAtField);
             if (i < primaryKey.numFields() - 1)
                 builder.append(MULTI_FIELD_KEY_DELIMITER);
@@ -240,7 +239,7 @@ public class HollowHistoryTypeKeyIndex {
         for(int i=0;i<matchingOrdinals.size();i++) {
             int ordinal = matchingOrdinals.get(i);
 
-            Object matchingObject = ordinalMapping.getFieldObject(ordinal, field);
+            Object matchingObject = ordinalMapping.getFieldObject(ordinal, field, fieldTypes[field]);
             if(objectToMatch.equals(matchingObject)) {
                 results.add(ordinal);
             }
@@ -248,6 +247,6 @@ public class HollowHistoryTypeKeyIndex {
     }
 
     public Object getKeyFieldValue(int keyFieldIdx, int keyOrdinal) {
-        return ordinalMapping.getFieldObject(keyOrdinal, keyFieldIdx);
+        return ordinalMapping.getFieldObject(keyOrdinal, keyFieldIdx, fieldTypes[keyFieldIdx]);
     }
 }
