@@ -90,10 +90,13 @@ public class HollowOrdinalMapper {
 
             Object newFieldValue = readValueInState(typeState, keyOrdinal, fieldIdx);
             int existingFieldOrdinalValue = indexFieldOrdinalMapping.get(index)[fieldIdx];
-            if(memoizedPool.writtenInCycle(existingFieldOrdinalValue))
+
+            //Assuming two records in the same cycle cannot be equal
+            if(memoizedPool.ordinalInCurrentCycle(existingFieldOrdinalValue)) {
                 return false;
+            }
             Object existingFieldObjectValue = memoizedPool.getObject(existingFieldOrdinalValue, keyFieldTypes[fieldIdx]);
-            if(!newFieldValue.equals(existingFieldObjectValue)) {
+            if (!newFieldValue.equals(existingFieldObjectValue)) {
                 return false;
             }
         }

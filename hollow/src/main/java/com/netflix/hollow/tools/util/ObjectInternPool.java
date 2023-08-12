@@ -6,6 +6,7 @@ import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.HashSet;
+import java.util.Optional;
 
 
 // This class memoizes types by returning references to existing objects, or storing
@@ -20,10 +21,6 @@ public class ObjectInternPool {
         this.ordinalsInCycle = new HashSet<>();
     }
 
-    public boolean writtenInCycle(int ordinal) {
-        return ordinalsInCycle.contains(ordinal);
-    }
-
     public void prepareForRead() {
         if(!isReadyToRead) {
             ordinalMap.prepareForWrite();
@@ -32,14 +29,12 @@ public class ObjectInternPool {
         isReadyToRead = true;
     }
 
-    //WARNING: assumes already ready to read
-    public Object getObject(int ordinal, FieldType type) {
-        prepareForRead();
+    public boolean ordinalInCurrentCycle(int ordinal) {
+        return ordinalsInCycle.contains(ordinal);
+    }
 
+    public Object getObject(int ordinal, FieldType type) {
         long pointer = ordinalMap.getPointerForData(ordinal);
-        if (pointer==-1L) {
-            return null;
-        }
 
         switch (type) {
             case BOOLEAN:
