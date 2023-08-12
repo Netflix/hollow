@@ -46,7 +46,7 @@ public class HollowHistoryTypeKeyIndex {
     private int maxIndexedOrdinal = 0;
 
     private final HollowOrdinalMapper ordinalMapping;
-    private final HashMap<Integer, IntList> ordinalFieldHashMapping;
+    private final HashMap<Integer, int[]> ordinalFieldHashMapping;
 
 
     public HollowHistoryTypeKeyIndex(PrimaryKey primaryKey, HollowDataset dataModel) {
@@ -182,10 +182,12 @@ public class HollowHistoryTypeKeyIndex {
         Object fieldObject = fieldObjects[fieldIdx];
         int fieldHash = HashCodes.hashInt(HollowReadFieldUtils.hashObject(fieldObject));
         if(!ordinalFieldHashMapping.containsKey(fieldHash))
-            ordinalFieldHashMapping.put(fieldHash, new IntList());
+            ordinalFieldHashMapping.put(fieldHash, new int[0]);
 
-        IntList matchingFieldList = ordinalFieldHashMapping.get(fieldHash);
-        matchingFieldList.add(assignedOrdinal);
+        int[] matchingFieldList = ordinalFieldHashMapping.get(fieldHash);
+        int[] newFieldList = Arrays.copyOf(matchingFieldList, matchingFieldList.length + 1);
+        newFieldList[matchingFieldList.length] = assignedOrdinal;
+        ordinalFieldHashMapping.put(fieldHash, newFieldList);
     }
 
     public String getKeyDisplayString(int keyOrdinal) {
@@ -247,10 +249,7 @@ public class HollowHistoryTypeKeyIndex {
         if (!ordinalFieldHashMapping.containsKey(hashCode))
             return;
 
-        IntList matchingOrdinals = ordinalFieldHashMapping.get(hashCode);
-        for(int i=0;i<matchingOrdinals.size();i++) {
-            int ordinal = matchingOrdinals.get(i);
-
+        for(int ordinal : ordinalFieldHashMapping.get(hashCode)) {
             Object matchingObject = ordinalMapping.getFieldObject(ordinal, field, fieldTypes[field]);
             if(objectToMatch.equals(matchingObject)) {
                 results.add(ordinal);
