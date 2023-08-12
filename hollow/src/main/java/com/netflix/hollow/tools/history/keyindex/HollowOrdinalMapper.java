@@ -37,10 +37,9 @@ public class HollowOrdinalMapper {
     private static final double LOAD_FACTOR = 0.7;
     
     private int[] ordinalMappings;
+    private int[][] fieldOrdinalMappings;
     private int[] originalHash;
-
-    private HashMap<Integer, int[]> indexFieldOrdinalMapping;
-    private final HashMap<Integer, Integer> assignedOrdinalToIndex;
+    private int[] assignedOrdinalToIndex;
 
     private final PrimaryKey primaryKey;
     private final int[][] keyFieldIndices;
@@ -53,6 +52,7 @@ public class HollowOrdinalMapper {
         // Start with prime number to assist OA
         this.ordinalMappings = new int[2069];
         this.originalHash = new int[2069];
+        this.fieldOrdinalMappings = new int[2069][primaryKey.numFields()];
         Arrays.fill(this.ordinalMappings, ORDINAL_NONE);
 
         this.primaryKey = primaryKey;
@@ -60,8 +60,8 @@ public class HollowOrdinalMapper {
         this.keyFieldIsIndexed = keyFieldIsIndexed;
         this.keyFieldTypes = keyFieldTypes;
 
-        this.indexFieldOrdinalMapping = new HashMap<>();
-        this.assignedOrdinalToIndex = new HashMap<>();
+        this.assignedOrdinalToIndex = new int[2069];
+        Arrays.fill(this.assignedOrdinalToIndex, ORDINAL_NONE);
 
         this.memoizedPool = new ObjectInternPool();
     }
@@ -89,7 +89,7 @@ public class HollowOrdinalMapper {
                 continue;
 
             Object newFieldValue = readValueInState(typeState, keyOrdinal, fieldIdx);
-            int existingFieldOrdinalValue = indexFieldOrdinalMapping.get(index)[fieldIdx];
+            int existingFieldOrdinalValue = fieldOrdinalMappings[index][fieldIdx];
 
             //Assuming two records in the same cycle cannot be equal
             if(memoizedPool.ordinalInCurrentCycle(existingFieldOrdinalValue)) {
@@ -115,7 +115,7 @@ public class HollowOrdinalMapper {
         // Linear probing
         while (ordinalMappings[index] != ORDINAL_NONE) {
             if(recordsAreEqual(typeState, ordinal, index)) {
-                this.assignedOrdinalToIndex.put(assignedOrdinal, index);
+                this.assignedOrdinalToIndex[assignedOrdinal]=index;
                 return false;
             }
             index = (index + 1) % ordinalMappings.length;
@@ -127,21 +127,18 @@ public class HollowOrdinalMapper {
 
         storeFields(typeState, ordinal, index);
 
-        this.assignedOrdinalToIndex.put(assignedOrdinal, index);
+        this.assignedOrdinalToIndex[assignedOrdinal]=index;
         return true;
     }
 
     private void storeFields(HollowObjectTypeReadState typeState, int ordinal, int index) {
-        if(!indexFieldOrdinalMapping.containsKey(index))
-            indexFieldOrdinalMapping.put(index, new int[primaryKey.numFields()]);
-
         for(int i=0;i<primaryKey.numFields();i++) {
             if(!keyFieldIsIndexed[i])
                 continue;
 
             Object objectToStore = readValueInState(typeState, ordinal, i);
             int objectOrdinal = memoizedPool.writeAndGetOrdinal(objectToStore);
-            indexFieldOrdinalMapping.get(index)[i] = objectOrdinal;
+            fieldOrdinalMappings[index][i] = objectOrdinal;
         }
     }
 
@@ -150,7 +147,8 @@ public class HollowOrdinalMapper {
         Arrays.fill(newTable, ORDINAL_NONE);
 
         int[] newOriginalHash = new int[originalHash.length*2];
-        HashMap<Integer, int[]> newIndexFieldObjectMapping = new HashMap<>();
+        int[][] newFieldMappings = new int[ordinalMappings.length*2][primaryKey.numFields()];
+        assignedOrdinalToIndex = Arrays.copyOf(assignedOrdinalToIndex, ordinalMappings.length*2);
 
         for(int i=0;i<ordinalMappings.length;i++) {
             if(ordinalMappings[i]==ORDINAL_NONE)
@@ -158,24 +156,26 @@ public class HollowOrdinalMapper {
             int newIndex = rehashExistingRecord(newTable, originalHash[i], ordinalMappings[i]);
             newOriginalHash[newIndex] = originalHash[i];
 
-            int[] fieldOrdinalObjects = indexFieldOrdinalMapping.get(i);
-            newIndexFieldObjectMapping.put(newIndex, fieldOrdinalObjects);
+            int[] fieldOrdinalObjects = fieldOrdinalMappings[i];
+            newFieldMappings[newIndex]=fieldOrdinalObjects;
 
             // Store new index in old table so we can remap assignedOrdinalToIndex
             ordinalMappings[i]=newIndex;
         }
 
-        for (Map.Entry<Integer, Integer> entry : assignedOrdinalToIndex.entrySet()) {
-            int assignedOrdinal = entry.getKey();
-            int previousIndex = entry.getValue();
+        for (int assignedOrdinal=0;assignedOrdinal<assignedOrdinalToIndex.length;assignedOrdinal++) {
+            int previousIndex = assignedOrdinalToIndex[assignedOrdinal];
+            if (previousIndex==ORDINAL_NONE)
+                //linear, so we can break
+                break;
             int newIndex = ordinalMappings[previousIndex];
 
-            assignedOrdinalToIndex.put(assignedOrdinal, newIndex);
+            assignedOrdinalToIndex[assignedOrdinal]=newIndex;
         }
 
         this.ordinalMappings = newTable;
         this.originalHash = newOriginalHash;
-        this.indexFieldOrdinalMapping = newIndexFieldObjectMapping;
+        this.fieldOrdinalMappings = newFieldMappings;
     }
 
     private int rehashExistingRecord(int[] newTable, int originalHash, int assignedOrdinal) {
@@ -188,8 +188,8 @@ public class HollowOrdinalMapper {
     }
 
     public Object getFieldObject(int assignedOrdinal, int fieldIndex, FieldType type) {
-        int index = assignedOrdinalToIndex.get(assignedOrdinal);
-        int fieldOrdinal = indexFieldOrdinalMapping.get(index)[fieldIndex];
+        int index = assignedOrdinalToIndex[assignedOrdinal];
+        int fieldOrdinal = fieldOrdinalMappings[index][fieldIndex];
         return memoizedPool.getObject(fieldOrdinal, type);
     }
 
