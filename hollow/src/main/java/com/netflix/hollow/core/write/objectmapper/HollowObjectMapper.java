@@ -94,8 +94,9 @@ public class HollowObjectMapper {
                 recordReader.skipSchema(schema);
             } else {
                 Object obj = mapper.parseFlatRecord(schema, recordReader, parsedObjects);
-                parsedObjects.put(ordinal++, obj);
+                parsedObjects.put(ordinal, obj);
             }
+            ordinal++;
         }
 
         return (T) parsedObjects.get(ordinal - 1);

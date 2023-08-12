@@ -42,7 +42,7 @@ import sun.misc.Unsafe;
 @SuppressWarnings("restriction")
 public class HollowObjectTypeMapper extends HollowTypeMapper {
     
-    private static Set<Class<?>> BOXED_WRAPPERS = new HashSet<>(Arrays.asList(Boolean.class, Integer.class, Short.class, Byte.class, Character.class, Long.class, Float.class, Double.class, String.class, byte[].class));
+    private static Set<Class<?>> BOXED_WRAPPERS = new HashSet<>(Arrays.asList(Boolean.class, Integer.class, Short.class, Byte.class, Character.class, Long.class, Float.class, Double.class, String.class, byte[].class, Date.class));
     
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
     private final HollowObjectMapper parentMapper;
@@ -206,7 +206,20 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                         reader.skipField(recordObjectSchema.getFieldType(i));
                     }
                 }
-            } else  {
+            } else if (clazz.isEnum()) {
+                // if `clazz` is an enum, then we should expect to find a field called `_name` in the FlatRecord.
+                // There may be other fields if the producer enum contained custom properties, we ignore them
+                // here assuming the enum constructor will set them if needed.
+                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
+                    String fieldName = recordObjectSchema.getFieldName(i);
+                    int posInPojoSchema = schema.getPosition(fieldName);
+                    if (fieldName.equals(MappedFieldType.ENUM_NAME.getSpecialFieldName()) && posInPojoSchema != -1) {
+                        obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(reader);
+                    } else {
+                        reader.skipField(recordObjectSchema.getFieldType(i));
+                    }
+                }
+            } else {
                 obj = unsafe.allocateInstance(clazz);
                 for (int i = 0; i < recordObjectSchema.numFields(); i++) {
                     int posInPojoSchema = schema.getPosition(recordObjectSchema.getFieldName(i));
@@ -569,6 +582,20 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 }
                 case BYTES: {
                     return reader.readBytes();
+                }
+                case ENUM_NAME: {
+                    String enumName = reader.readString();
+                    if (enumName != null) {
+                        return Enum.valueOf((Class<Enum>) clazz, enumName);
+                    }
+                    break;
+                }
+                case DATE_TIME: {
+                    long value = reader.readLong();
+                    if (value != Long.MIN_VALUE) {
+                        return new Date(value);
+                    }
+                    break;
                 }
             }
             return null;

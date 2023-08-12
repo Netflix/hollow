@@ -25,6 +25,7 @@
 		<th><a href="$basePath/home?sort=heapSize">Heap Footprint</a></th>
 		<th><a href="$basePath/home?sort=primaryKey">Primary Key</a></th>
 		<th><a href="$basePath/home?sort=primaryKey">Schema</a></th>
+        <th><a href="$basePath/home?sort=numShards">Shards</a></th>
     </tr>
     
     #foreach($typeOverview in $typeOverviews)
@@ -36,6 +37,7 @@
             <td>$typeOverview.getApproxHeapFootprint()</td>
             <td><pre>$esc.html($typeOverview.getPrimaryKey())</pre></td>
             <td><pre>$esc.html($typeOverview.getSchema())</pre></td>
+            <td>$typeOverview.getNumShards()</td>
         </tr>
     #end
 </table>
