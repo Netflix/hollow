@@ -92,18 +92,24 @@ public class HollowHistoryTypeKeyIndex {
         if (isInitialized) return;
         HollowObjectSchema schema = initialTypeState.getSchema();
 
-        for (String[] keyFieldPart : keyFieldNames) addSchemaField(schema, keyFieldPart, 0);
+        for (int i= 0; i < keyFieldNames.length; i ++) {
+            String[] keyFieldPart = keyFieldNames[i];
+            fieldTypes[i] = addSchemaField(schema, keyFieldPart, 0);
+        }
         isInitialized = true;
     }
 
-    private void addSchemaField(HollowObjectSchema schema, String[] keyFieldNames, int keyFieldPartPosition) {
+    private FieldType addSchemaField(HollowObjectSchema schema, String[] keyFieldNames, int keyFieldPartPosition) {
         int schemaPosition = schema.getPosition(keyFieldNames[keyFieldPartPosition]);
         if (keyFieldPartPosition < keyFieldNames.length - 1) {
             HollowObjectSchema nextPartSchema = (HollowObjectSchema) schema.getReferencedTypeState(schemaPosition).getSchema();
-            addSchemaField(nextPartSchema, keyFieldNames, keyFieldPartPosition + 1);
-        } else {
-            fieldTypes[keyFieldPartPosition] = schema.getFieldType(schemaPosition);
+            return addSchemaField(nextPartSchema, keyFieldNames, keyFieldPartPosition + 1);
         }
+        return schema.getFieldType(schemaPosition);
+    }
+
+    public boolean[] getKeyFieldIsIndexed() {
+        return keyFieldIsIndexed;
     }
 
     private void initializeKeyParts(HollowDataset dataModel) {
