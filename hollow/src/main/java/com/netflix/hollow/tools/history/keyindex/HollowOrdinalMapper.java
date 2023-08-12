@@ -36,8 +36,8 @@ public class HollowOrdinalMapper {
     private int size = 0;
     private static final double LOAD_FACTOR = 0.7;
     
-    private Integer[] ordinalMappings;
-    private Integer[] originalHash;
+    private int[] ordinalMappings;
+    private int[] originalHash;
 
     private HashMap<Integer, int[]> indexFieldOrdinalMapping;
     private final HashMap<Integer, Integer> assignedOrdinalToIndex;
@@ -51,8 +51,8 @@ public class HollowOrdinalMapper {
 
     public HollowOrdinalMapper(PrimaryKey primaryKey, boolean[] keyFieldIsIndexed, int[][] keyFieldIndices, FieldType[] keyFieldTypes) {
         // Start with prime number to assist OA
-        this.ordinalMappings = new Integer[2069];
-        this.originalHash = new Integer[2069];
+        this.ordinalMappings = new int[2069];
+        this.originalHash = new int[2069];
         Arrays.fill(this.ordinalMappings, ORDINAL_NONE);
 
         this.primaryKey = primaryKey;
@@ -146,10 +146,10 @@ public class HollowOrdinalMapper {
     }
 
     private void expandAndRehashTable() {
-        Integer[] newTable = new Integer[ordinalMappings.length*2];
+        int[] newTable = new int[ordinalMappings.length*2];
         Arrays.fill(newTable, ORDINAL_NONE);
 
-        Integer[] newOriginalHash = new Integer[originalHash.length*2];
+        int[] newOriginalHash = new int[originalHash.length*2];
         HashMap<Integer, int[]> newIndexFieldObjectMapping = new HashMap<>();
 
         for(int i=0;i<ordinalMappings.length;i++) {
@@ -178,7 +178,7 @@ public class HollowOrdinalMapper {
         this.indexFieldOrdinalMapping = newIndexFieldObjectMapping;
     }
 
-    private int rehashExistingRecord(Integer[] newTable, int originalHash, int assignedOrdinal) {
+    private int rehashExistingRecord(int[] newTable, int originalHash, int assignedOrdinal) {
         int newIndex = indexFromHash(originalHash, newTable.length);
         while (newTable[newIndex]!=ORDINAL_NONE)
             newIndex = (newIndex + 1) % newTable.length;
