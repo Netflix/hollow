@@ -46,7 +46,6 @@ public class HollowHistoryTypeKeyIndex {
     private int maxIndexedOrdinal = 0;
 
     private final HollowOrdinalMapper ordinalMapping;
-    private final HashMap<Integer, int[]> ordinalFieldHashMapping;
 
 
     public HollowHistoryTypeKeyIndex(PrimaryKey primaryKey, HollowDataset dataModel) {
@@ -59,7 +58,6 @@ public class HollowHistoryTypeKeyIndex {
         initializeKeyParts(dataModel);
 
         this.ordinalMapping = new HollowOrdinalMapper(primaryKey, keyFieldIsIndexed, keyFieldIndices, fieldTypes);
-        this.ordinalFieldHashMapping = new HashMap<>();
     }
 
     public boolean isInitialized() {
@@ -172,22 +170,7 @@ public class HollowHistoryTypeKeyIndex {
         }
 
         for (int i = 0; i < primaryKey.numFields(); i++)
-            writeKeyField(fieldObjects, assignedOrdinal, i);
-    }
-
-    private void writeKeyField(Object[] fieldObjects, int assignedOrdinal, int fieldIdx) {
-        if (!keyFieldIsIndexed[fieldIdx])
-            return;
-
-        Object fieldObject = fieldObjects[fieldIdx];
-        int fieldHash = HashCodes.hashInt(HollowReadFieldUtils.hashObject(fieldObject));
-        if(!ordinalFieldHashMapping.containsKey(fieldHash))
-            ordinalFieldHashMapping.put(fieldHash, new int[0]);
-
-        int[] matchingFieldList = ordinalFieldHashMapping.get(fieldHash);
-        int[] newFieldList = Arrays.copyOf(matchingFieldList, matchingFieldList.length + 1);
-        newFieldList[matchingFieldList.length] = assignedOrdinal;
-        ordinalFieldHashMapping.put(fieldHash, newFieldList);
+            ordinalMapping.writeKeyField(fieldObjects, assignedOrdinal, i);
     }
 
     public String getKeyDisplayString(int keyOrdinal) {
@@ -239,22 +222,10 @@ public class HollowHistoryTypeKeyIndex {
                         break;
                     default:
                 }
-                addMatches(HashCodes.hashInt(hashCode), objectToFind, i, matchingKeys);
+                ordinalMapping.addMatches(HashCodes.hashInt(hashCode), objectToFind, i, fieldTypes[i], matchingKeys);
             } catch(NumberFormatException ignore) {}
         }
         return matchingKeys;
-    }
-
-    public void addMatches(int hashCode, Object objectToMatch, int field, IntList results) {
-        if (!ordinalFieldHashMapping.containsKey(hashCode))
-            return;
-
-        for(int ordinal : ordinalFieldHashMapping.get(hashCode)) {
-            Object matchingObject = ordinalMapping.getFieldObject(ordinal, field, fieldTypes[field]);
-            if(objectToMatch.equals(matchingObject)) {
-                results.add(ordinal);
-            }
-        }
     }
 
     public Object getKeyFieldValue(int keyFieldIdx, int keyOrdinal) {
