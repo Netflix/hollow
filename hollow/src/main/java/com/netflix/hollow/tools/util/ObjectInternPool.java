@@ -91,10 +91,6 @@ public class ObjectInternPool {
         return new String(bytes);
     }
 
-    //TODO: consider splitting into individual functions?
-    //NOTE: this function is inefficient if repeatedly read/write
-    //designed to read, then write, etc
-    //TODO: see if this can be improved
     public int writeAndGetOrdinal(Object objectToIntern) {
         ByteDataArray buf = new ByteDataArray();
         if(objectToIntern==null) {
@@ -115,19 +111,13 @@ public class ObjectInternPool {
             long longBits = (long) objectToIntern;
             VarInt.writeVLong(buf, longBits);
         } else if(objectToIntern instanceof String) {
-            //add length to beginning of string
             VarInt.writeVInt(buf, ((String) objectToIntern).length());
             for (byte b : ((String) objectToIntern).getBytes()) {
                 buf.write(b);
             }
         } else if(objectToIntern instanceof Boolean) {
-            //for consistency
-            boolean bool = (boolean) objectToIntern;
-            if(bool) {
-                VarInt.writeVInt(buf, 1);
-            } else {
-                VarInt.writeVInt(buf, 0);
-            }
+            int valToWrite = (boolean) objectToIntern ? 1 : 0;
+            VarInt.writeVInt(buf, valToWrite);
         } else {
             String className = objectToIntern.getClass().getName();
             throw new IllegalArgumentException("Cannot intern object of type " + className);
