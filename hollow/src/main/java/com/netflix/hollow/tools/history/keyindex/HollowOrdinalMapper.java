@@ -21,6 +21,7 @@ import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.tools.util.ObjectInternPool;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
@@ -38,8 +39,8 @@ public class HollowOrdinalMapper {
     
     private int[] ordinalMappings;
     private int[][] fieldOrdinalMappings;
-    private int[] originalHash;
     private int[] assignedOrdinalToIndex;
+    private int[][] fieldHashToOrdinal;
 
     private final PrimaryKey primaryKey;
     private final int[][] keyFieldIndices;
@@ -51,9 +52,12 @@ public class HollowOrdinalMapper {
     public HollowOrdinalMapper(PrimaryKey primaryKey, boolean[] keyFieldIsIndexed, int[][] keyFieldIndices, FieldType[] keyFieldTypes) {
         // Start with prime number to assist OA
         this.ordinalMappings = new int[2069];
-        this.originalHash = new int[2069];
-        this.fieldOrdinalMappings = new int[2069][primaryKey.numFields()];
+        this.fieldOrdinalMappings = new int[primaryKey.numFields()][2069];
+        this.fieldHashToOrdinal = new int[primaryKey.numFields()][2069];
         Arrays.fill(this.ordinalMappings, ORDINAL_NONE);
+        for(int i=0;i<primaryKey.numFields();i++) {
+            Arrays.fill(this.fieldHashToOrdinal[i], ORDINAL_NONE);
+        }
 
         this.primaryKey = primaryKey;
         this.keyFieldIndices = keyFieldIndices;
@@ -64,6 +68,33 @@ public class HollowOrdinalMapper {
         Arrays.fill(this.assignedOrdinalToIndex, ORDINAL_NONE);
 
         this.memoizedPool = new ObjectInternPool();
+    }
+
+    public void addMatches(int hashCode, Object objectToMatch, int field, FieldType type, IntList results) {
+        int[] fieldHashes = fieldHashToOrdinal[field];
+        int index = indexFromHash(hashCode, fieldHashes.length);
+        while(fieldHashes[index] != ORDINAL_NONE) {
+            int ordinal = fieldHashes[index];
+            Object matchingObject = getFieldObject(ordinal, field, type);
+            if(objectToMatch.equals(matchingObject)) {
+                results.add(ordinal);
+            }
+            index = (index + 1) % fieldHashes.length;
+        }
+    }
+
+    public void writeKeyField(Object[] fieldObjects, int assignedOrdinal, int fieldIdx) {
+        if (!keyFieldIsIndexed[fieldIdx])
+            return;
+
+        Object fieldObject = fieldObjects[fieldIdx];
+        int fieldHash = HashCodes.hashInt(HollowReadFieldUtils.hashObject(fieldObject));
+
+        int index = indexFromHash(fieldHash, fieldHashToOrdinal[fieldIdx].length);
+        while (fieldHashToOrdinal[fieldIdx][index] != ORDINAL_NONE) {
+            index = (index + 1) % fieldHashToOrdinal[fieldIdx].length;
+        }
+        fieldHashToOrdinal[fieldIdx][index] = assignedOrdinal;
     }
 
     public void prepareForRead() {
@@ -89,7 +120,7 @@ public class HollowOrdinalMapper {
                 continue;
 
             Object newFieldValue = readValueInState(typeState, keyOrdinal, fieldIdx);
-            int existingFieldOrdinalValue = fieldOrdinalMappings[index][fieldIdx];
+            int existingFieldOrdinalValue = fieldOrdinalMappings[fieldIdx][index];
 
             //Assuming two records in the same cycle cannot be equal
             if(memoizedPool.ordinalInCurrentCycle(existingFieldOrdinalValue)) {
@@ -122,7 +153,6 @@ public class HollowOrdinalMapper {
         }
 
         ordinalMappings[index] = assignedOrdinal;
-        originalHash[index] = hashedRecord;
         size++;
 
         storeFields(typeState, ordinal, index);
@@ -138,26 +168,63 @@ public class HollowOrdinalMapper {
 
             Object objectToStore = readValueInState(typeState, ordinal, i);
             int objectOrdinal = memoizedPool.writeAndGetOrdinal(objectToStore);
-            fieldOrdinalMappings[index][i] = objectOrdinal;
+            fieldOrdinalMappings[i][index] = objectOrdinal;
         }
     }
 
+    private int[] getFieldOrdinals(int index) {
+        int[] fieldObjects = new int[primaryKey.numFields()];
+        for(int fieldIdx=0;fieldIdx< primaryKey.numFields();fieldIdx++) {
+            fieldObjects[fieldIdx] = fieldOrdinalMappings[fieldIdx][index];
+        }
+        return fieldObjects;
+    }
+
+    private int hashFromIndex(int index) {
+        int[] fieldOrdinals = getFieldOrdinals(index);
+        Object[] fieldObjects = new Object[primaryKey.numFields()];
+        for(int fieldIdx=0;fieldIdx< primaryKey.numFields();fieldIdx++) {
+            fieldObjects[fieldIdx] = memoizedPool.getObject(fieldOrdinals[fieldIdx], keyFieldTypes[fieldIdx]);
+        }
+        return hashKeyRecord(fieldObjects);
+    }
+
     private void expandAndRehashTable() {
+        prepareForRead();
+
         int[] newTable = new int[ordinalMappings.length*2];
         Arrays.fill(newTable, ORDINAL_NONE);
 
-        int[] newOriginalHash = new int[originalHash.length*2];
-        int[][] newFieldMappings = new int[ordinalMappings.length*2][primaryKey.numFields()];
+        int[][] newFieldMappings = new int[primaryKey.numFields()][ordinalMappings.length*2];
+        int[][] newFieldHashToOrdinal = new int[primaryKey.numFields()][ordinalMappings.length*2];
+        for(int i=0;i<primaryKey.numFields();i++) {
+            Arrays.fill(newFieldHashToOrdinal[i], ORDINAL_NONE);
+        }
         assignedOrdinalToIndex = Arrays.copyOf(assignedOrdinalToIndex, ordinalMappings.length*2);
+
+        for(int fieldIdx=0;fieldIdx<primaryKey.numFields();fieldIdx++) {
+            for(int i=0;i<fieldHashToOrdinal[fieldIdx].length;i++) {
+                if(fieldHashToOrdinal[fieldIdx][i]==ORDINAL_NONE)
+                    continue;
+                int objectIndex = assignedOrdinalToIndex[fieldHashToOrdinal[fieldIdx][i]];
+                int fieldObjectOrdinal = fieldOrdinalMappings[fieldIdx][objectIndex];
+                Object originalFieldObject = memoizedPool.getObject(fieldObjectOrdinal, keyFieldTypes[fieldIdx]);
+                int firstHash = HashCodes.hashInt(HollowReadFieldUtils.hashObject(originalFieldObject));
+                int newIndex = indexFromHash(firstHash, newTable.length);
+                newFieldHashToOrdinal[fieldIdx][newIndex] = fieldHashToOrdinal[fieldIdx][i];
+            }
+        }
 
         for(int i=0;i<ordinalMappings.length;i++) {
             if(ordinalMappings[i]==ORDINAL_NONE)
                 continue;
-            int newIndex = rehashExistingRecord(newTable, originalHash[i], ordinalMappings[i]);
-            newOriginalHash[newIndex] = originalHash[i];
+            // Recompute original hash
+            int firstHash = hashFromIndex(i);
+            int newIndex = rehashExistingRecord(newTable, firstHash, ordinalMappings[i]);
 
-            int[] fieldOrdinalObjects = fieldOrdinalMappings[i];
-            newFieldMappings[newIndex]=fieldOrdinalObjects;
+            for(int fieldIdx=0;fieldIdx<primaryKey.numFields();fieldIdx++) {
+                newFieldMappings[fieldIdx][newIndex] = fieldOrdinalMappings[fieldIdx][i];
+            }
 
             // Store new index in old table so we can remap assignedOrdinalToIndex
             ordinalMappings[i]=newIndex;
@@ -174,8 +241,8 @@ public class HollowOrdinalMapper {
         }
 
         this.ordinalMappings = newTable;
-        this.originalHash = newOriginalHash;
         this.fieldOrdinalMappings = newFieldMappings;
+        this.fieldHashToOrdinal = newFieldHashToOrdinal;
     }
 
     private int rehashExistingRecord(int[] newTable, int originalHash, int assignedOrdinal) {
@@ -189,7 +256,7 @@ public class HollowOrdinalMapper {
 
     public Object getFieldObject(int assignedOrdinal, int fieldIndex, FieldType type) {
         int index = assignedOrdinalToIndex[assignedOrdinal];
-        int fieldOrdinal = fieldOrdinalMappings[index][fieldIndex];
+        int fieldOrdinal = fieldOrdinalMappings[fieldIndex][index];
         return memoizedPool.getObject(fieldOrdinal, type);
     }
 
@@ -198,6 +265,15 @@ public class HollowOrdinalMapper {
         for (int i = 0; i < primaryKey.numFields(); i++) {
             Object fieldObjectToHash = readValueInState(typeState, ordinal, i);
             int fieldHashCode = HollowReadFieldUtils.hashObject(fieldObjectToHash);
+            hashCode = (hashCode * 31) ^ fieldHashCode;
+        }
+        return HashCodes.hashInt(hashCode);
+    }
+
+    private int hashKeyRecord(Object[] objects) {
+        int hashCode = 0;
+        for (Object fieldObject : objects) {
+            int fieldHashCode = HollowReadFieldUtils.hashObject(fieldObject);
             hashCode = (hashCode * 31) ^ fieldHashCode;
         }
         return HashCodes.hashInt(hashCode);
