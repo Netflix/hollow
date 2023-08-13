@@ -31,8 +31,6 @@ import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.util.RemovedOrdinalIterator;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Optional;
 
 public class HollowHistoryTypeKeyIndex {
     private final PrimaryKey primaryKey;
@@ -138,7 +136,7 @@ public class HollowHistoryTypeKeyIndex {
         RemovedOrdinalIterator iter = new RemovedOrdinalIterator(populatedOrdinals, previousOrdinals);
         int ordinal = iter.next();
         while (ordinal != ORDINAL_NONE) {
-            writeKeyObject(typeState, ordinal, true);
+            writeKeyObject(typeState, ordinal);
             ordinal = iter.next();
         }
     }
@@ -152,11 +150,11 @@ public class HollowHistoryTypeKeyIndex {
 
         for (int i = 0; i < maxLength; i++) {
             if (populatedOrdinals.get(i) || previousOrdinals.get(i))
-                writeKeyObject(typeState, i, false);
+                writeKeyObject(typeState, i);
         }
     }
 
-    private void writeKeyObject(HollowObjectTypeReadState typeState, int ordinal, boolean isDelta) {
+    private void writeKeyObject(HollowObjectTypeReadState typeState, int ordinal) {
         int assignedOrdinal = maxIndexedOrdinal;
         boolean storedUniqueRecord = ordinalMapping.storeNewRecord(typeState, ordinal, assignedOrdinal);
 
@@ -164,13 +162,6 @@ public class HollowHistoryTypeKeyIndex {
         if(!storedUniqueRecord)
             return;
         maxIndexedOrdinal+=1;
-        Object[] fieldObjects = new Object[primaryKey.numFields()];
-        for (int i = 0; i < primaryKey.numFields(); i++) {
-            fieldObjects[i] = ordinalMapping.readValueInState(typeState, ordinal, i);
-        }
-
-        for (int i = 0; i < primaryKey.numFields(); i++)
-            ordinalMapping.writeKeyField(fieldObjects, assignedOrdinal, i);
     }
 
     public String getKeyDisplayString(int keyOrdinal) {
