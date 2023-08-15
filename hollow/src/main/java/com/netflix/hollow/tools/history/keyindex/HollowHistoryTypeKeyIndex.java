@@ -31,7 +31,6 @@ import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.util.RemovedOrdinalIterator;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.HashMap;
 
 public class HollowHistoryTypeKeyIndex {
     private final PrimaryKey primaryKey;
@@ -45,7 +44,6 @@ public class HollowHistoryTypeKeyIndex {
     private int maxIndexedOrdinal = 0;
 
     private final HollowOrdinalMapper ordinalMapping;
-    private final HashMap<Integer, IntList> ordinalFieldHashMapping;
 
 
     public HollowHistoryTypeKeyIndex(PrimaryKey primaryKey, HollowDataset dataModel) {
@@ -57,8 +55,7 @@ public class HollowHistoryTypeKeyIndex {
         this.keyFieldIsIndexed = new boolean[primaryKey.numFields()];
         initializeKeyParts(dataModel);
 
-        this.ordinalMapping = new HollowOrdinalMapper(primaryKey, keyFieldIsIndexed, keyFieldIndices);
-        this.ordinalFieldHashMapping = new HashMap<>();
+        this.ordinalMapping = new HollowOrdinalMapper(primaryKey, keyFieldIsIndexed, keyFieldIndices, fieldTypes);
     }
 
     public boolean isInitialized() {
@@ -75,10 +72,6 @@ public class HollowHistoryTypeKeyIndex {
 
     public String[] getKeyFields() {
         return primaryKey.getFieldPaths();
-    }
-
-    public boolean[] getKeyFieldIsIndexed() {
-        return keyFieldIsIndexed;
     }
 
     public void addFieldIndex(String fieldName, HollowDataset dataModel) {
@@ -112,6 +105,10 @@ public class HollowHistoryTypeKeyIndex {
         return schema.getFieldType(schemaPosition);
     }
 
+    public boolean[] getKeyFieldIsIndexed() {
+        return keyFieldIsIndexed;
+    }
+
     private void initializeKeyParts(HollowDataset dataModel) {
         for (int i = 0; i < primaryKey.numFields(); i++) {
             keyFieldNames[i] = PrimaryKey.getCompleteFieldPathParts(dataModel, primaryKey.getType(), primaryKey.getFieldPath(i));
@@ -128,6 +125,7 @@ public class HollowHistoryTypeKeyIndex {
             maxIndexedOrdinal = 0;
             populateAllCurrentRecordKeysIntoIndex(latestTypeState);
         }
+        ordinalMapping.prepareForRead();
     }
 
     private void populateNewCurrentRecordKeysIntoIndex(HollowObjectTypeReadState typeState) {
@@ -138,7 +136,7 @@ public class HollowHistoryTypeKeyIndex {
         RemovedOrdinalIterator iter = new RemovedOrdinalIterator(populatedOrdinals, previousOrdinals);
         int ordinal = iter.next();
         while (ordinal != ORDINAL_NONE) {
-            writeKeyObject(typeState, ordinal, true);
+            writeKeyObject(typeState, ordinal);
             ordinal = iter.next();
         }
     }
@@ -152,40 +150,24 @@ public class HollowHistoryTypeKeyIndex {
 
         for (int i = 0; i < maxLength; i++) {
             if (populatedOrdinals.get(i) || previousOrdinals.get(i))
-                writeKeyObject(typeState, i, false);
+                writeKeyObject(typeState, i);
         }
     }
 
-    private void writeKeyObject(HollowObjectTypeReadState typeState, int ordinal, boolean isDelta) {
+    private void writeKeyObject(HollowObjectTypeReadState typeState, int ordinal) {
         int assignedOrdinal = maxIndexedOrdinal;
-        int assignedIndex = ordinalMapping.storeNewRecord(typeState, ordinal, assignedOrdinal);
+        boolean storedUniqueRecord = ordinalMapping.storeNewRecord(typeState, ordinal, assignedOrdinal);
 
         // Identical record already in memory, no need to store fields
-        if(assignedIndex==ORDINAL_NONE)
+        if(!storedUniqueRecord)
             return;
         maxIndexedOrdinal+=1;
-
-        for (int i = 0; i < primaryKey.numFields(); i++)
-            writeKeyField(assignedOrdinal, i);
-    }
-
-    private void writeKeyField(int assignedOrdinal, int fieldIdx) {
-        if (!keyFieldIsIndexed[fieldIdx])
-            return;
-
-        Object fieldObject = ordinalMapping.getFieldObject(assignedOrdinal, fieldIdx);
-        int fieldHash = HashCodes.hashInt(HollowReadFieldUtils.hashObject(fieldObject));
-        if(!ordinalFieldHashMapping.containsKey(fieldHash))
-            ordinalFieldHashMapping.put(fieldHash, new IntList());
-
-        IntList matchingFieldList = ordinalFieldHashMapping.get(fieldHash);
-        matchingFieldList.add(assignedOrdinal);
     }
 
     public String getKeyDisplayString(int keyOrdinal) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < primaryKey.numFields(); i++) {
-            Object valueAtField = ordinalMapping.getFieldObject(keyOrdinal, i);
+            Object valueAtField = ordinalMapping.getFieldObject(keyOrdinal, i, fieldTypes[i]);
             builder.append(valueAtField);
             if (i < primaryKey.numFields() - 1)
                 builder.append(MULTI_FIELD_KEY_DELIMITER);
@@ -231,28 +213,13 @@ public class HollowHistoryTypeKeyIndex {
                         break;
                     default:
                 }
-                addMatches(HashCodes.hashInt(hashCode), objectToFind, i, matchingKeys);
+                ordinalMapping.addMatches(HashCodes.hashInt(hashCode), objectToFind, i, fieldTypes[i], matchingKeys);
             } catch(NumberFormatException ignore) {}
         }
         return matchingKeys;
     }
 
-    public void addMatches(int hashCode, Object objectToMatch, int field, IntList results) {
-        if (!ordinalFieldHashMapping.containsKey(hashCode))
-            return;
-
-        IntList matchingOrdinals = ordinalFieldHashMapping.get(hashCode);
-        for(int i=0;i<matchingOrdinals.size();i++) {
-            int ordinal = matchingOrdinals.get(i);
-
-            Object matchingObject = ordinalMapping.getFieldObject(ordinal, field);
-            if(objectToMatch.equals(matchingObject)) {
-                results.add(ordinal);
-            }
-        }
-    }
-
     public Object getKeyFieldValue(int keyFieldIdx, int keyOrdinal) {
-        return ordinalMapping.getFieldObject(keyOrdinal, keyFieldIdx);
+        return ordinalMapping.getFieldObject(keyOrdinal, keyFieldIdx, fieldTypes[keyFieldIdx]);
     }
 }
