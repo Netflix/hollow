@@ -82,6 +82,7 @@ public class HollowHistoryKeyIndex {
         typeKeyIndexes.get(type).addFieldIndex(keyFieldPath, history.getLatestState());
     }
 
+
     public void indexTypeField(PrimaryKey primaryKey) {
         indexTypeField(primaryKey, history.getLatestState());
     }

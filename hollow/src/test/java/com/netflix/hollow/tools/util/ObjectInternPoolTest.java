@@ -17,166 +17,174 @@
 package com.netflix.hollow.tools.util;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class ObjectInternPoolTest {
 
-    GenericInternPool<Integer> integerPool;
-    GenericInternPool<Float> floatPool;
-    GenericInternPool<Double> doublePool;
-    GenericInternPool<Long> longPool;
-    ObjectInternPool internPool;
+    ObjectInternPool internPool = new ObjectInternPool();
 
     @Before
     public void setup() {
-        integerPool = new GenericInternPool<>();
-        floatPool = new GenericInternPool<>();
-        doublePool = new GenericInternPool<>();
-        longPool = new GenericInternPool<>();
-
         internPool = new ObjectInternPool();
     }
 
     @Test
-    public void testInteger() {
-        // Java caches boxed integers between -127 and 128
-        // Must be outside that range to test interning
-        Integer intObj = 130;
-        Integer dupIntObj = 130;
+    public void testInt() {
+        Integer intObj1 = 130;
+        Integer intObj2 = 130;
 
-        Integer internedInt = integerPool.intern(intObj);
-        Integer dupInternedInt = integerPool.intern(dupIntObj);
+        int int1Ordinal = internPool.writeAndGetOrdinal(intObj1);
+        int int2Ordinal = internPool.writeAndGetOrdinal(intObj2);
+        internPool.prepareForRead();
 
-        assertNotSame(intObj, dupIntObj);
-        assertSame(internedInt, dupInternedInt);
-        assertEquals(intObj, internedInt);
+        int retrievedInt1 = (int) internPool.getObject(int1Ordinal, FieldType.INT);
+
+        assertEquals(int1Ordinal, int2Ordinal);
+        assertEquals(retrievedInt1, 130);
+
+        Integer intObj3 = 1900;
+        Integer intObj4 = 1900;
+
+        int int3Ordinal = internPool.writeAndGetOrdinal(intObj3);
+        int int4Ordinal = internPool.writeAndGetOrdinal(intObj4);
+        internPool.prepareForRead();
+
+        int retrievedInt3 = (int) internPool.getObject(int3Ordinal, FieldType.INT);
+
+        assertEquals(int3Ordinal, int4Ordinal);
+        assertEquals(retrievedInt3, 1900);
     }
 
     @Test
     public void testFloat() {
-        Float floatObj = 130f;
-        Float dupFloatObj = 130f;
+        Float floatObj1 = 130.0f;
+        Float floatObj2 = 130.0f;
+        Float floatObj3 = 1900.0f;
+        Float floatObj4 = 1900.0f;
 
-        Float internedFloat = floatPool.intern(floatObj);
-        Float dupInternedFloat = floatPool.intern(dupFloatObj);
+        int float1Ordinal = internPool.writeAndGetOrdinal(floatObj1);
+        int float2Ordinal = internPool.writeAndGetOrdinal(floatObj2);
+        internPool.prepareForRead();
 
-        assertNotSame(floatObj, dupFloatObj);
-        assertSame(internedFloat, dupInternedFloat);
-        assertEquals(floatObj, internedFloat);
-    }
+        float retrievedFloat1 = (float) internPool.getObject(float1Ordinal, FieldType.FLOAT);
 
-    @Test
-    public void testDouble() {
-        Double doubleObj = 130d;
-        Double dupDoubleObj = 130d;
+        assertEquals(float1Ordinal, float2Ordinal);
+        assertEquals(retrievedFloat1, 130.0f, 0.0f);
 
-        Double internedDouble = doublePool.intern(doubleObj);
-        Double dupInternedDouble = doublePool.intern(dupDoubleObj);
+        int float3Ordinal = internPool.writeAndGetOrdinal(floatObj3);
+        int float4Ordinal = internPool.writeAndGetOrdinal(floatObj4);
+        internPool.prepareForRead();
 
-        assertNotSame(doubleObj, dupDoubleObj);
-        assertSame(internedDouble, dupInternedDouble);
-        assertEquals(doubleObj, internedDouble);
+        float retrievedFloat2 = (float) internPool.getObject(float3Ordinal, FieldType.FLOAT);
+
+        assertEquals(float3Ordinal, float4Ordinal);
+        assertEquals(retrievedFloat2, 1900.0f, 0.0f);
     }
 
     @Test
     public void testLong() {
-        Long longObj = 130L;
-        Long dupLongObj = 130L;
+        Long longObj1 = 130L;
+        Long longObj2 = 130L;
+        Long longObj3 = 1900L;
+        Long longObj4 = 1900L;
 
-        Long internedLong = longPool.intern(longObj);
-        Long dupInternedLong = longPool.intern(dupLongObj);
+        int long1Ordinal = internPool.writeAndGetOrdinal(longObj1);
+        int long2Ordinal = internPool.writeAndGetOrdinal(longObj2);
+        internPool.prepareForRead();
 
-        assertNotSame(longObj, dupLongObj);
-        assertSame(internedLong, dupInternedLong);
-        assertEquals(longObj, internedLong);
+        long retrievedLong1 = (Long) internPool.getObject(long1Ordinal, FieldType.LONG);
+
+        assertEquals(long1Ordinal, long2Ordinal);
+        assertEquals(retrievedLong1, 130L);
+
+        int long3Ordinal = internPool.writeAndGetOrdinal(longObj3);
+        int long4Ordinal = internPool.writeAndGetOrdinal(longObj4);
+        internPool.prepareForRead();
+
+        long retrievedLong2 = (Long) internPool.getObject(long3Ordinal, FieldType.LONG);
+
+        assertEquals(long3Ordinal, long4Ordinal);
+        assertEquals(retrievedLong2, 1900L);
     }
 
     @Test
-    public void testAutoInternInteger() {
-        //Java should automatically cache these
-        Integer lowInt = -128;
-        Integer dupLowInt = -128;
+    public void testDouble() {
+        Double doubleObj1 = 130.0;
+        Double doubleObj2 = 130.0;
+        Double doubleObj3 = 1900.0;
+        Double doubleObj4 = 1900.0;
 
-        Integer highInt = 127;
-        Integer dupHighInt = 127;
+        int double1Ordinal = internPool.writeAndGetOrdinal(doubleObj1);
+        int double2Ordinal = internPool.writeAndGetOrdinal(doubleObj2);
+        internPool.prepareForRead();
 
-        Integer internedLow1 = integerPool.intern(lowInt);
-        Integer internedLow2 = integerPool.intern(dupLowInt);
+        double retrievedDouble1 = (double) internPool.getObject(double1Ordinal, FieldType.DOUBLE);
 
-        Integer internedHigh1 = integerPool.intern(highInt);
-        Integer internedHigh2 = integerPool.intern(dupHighInt);
+        assertEquals(double1Ordinal, double2Ordinal);
+        assertEquals(retrievedDouble1, 130.0, 0.0);
 
-        assertSame(lowInt, dupLowInt);
-        assertSame(highInt, dupHighInt);
+        int double3Ordinal = internPool.writeAndGetOrdinal(doubleObj3);
+        int double4Ordinal = internPool.writeAndGetOrdinal(doubleObj4);
+        internPool.prepareForRead();
 
-        assertSame(internedLow1, internedLow2);
-        assertSame(internedHigh1, internedHigh2);
+        double retrievedDouble2 = (double) internPool.getObject(double3Ordinal, FieldType.DOUBLE);
 
-        assertEquals(lowInt, internedLow1);
-        assertEquals(highInt, internedHigh1);
+        assertEquals(double3Ordinal, double4Ordinal);
+        assertEquals(retrievedDouble2, 1900.0, 0.0);
     }
 
     @Test
-    public void testAll() {
-        Integer intObj = 130;
-        Integer dupIntObj = 130;
+    public void testString() {
+        String stringObj1 = "I am Groot";
+        String stringObj2 = "I am Groot";
+        String stringObj3 = "I can do this all day";
+        String stringObj4 = "I can do this all day";
 
-        Float floatObj = 140f;
-        Float dupFloatObj = 140f;
+        int string1Ordinal = internPool.writeAndGetOrdinal(stringObj1);
+        int string2Ordinal = internPool.writeAndGetOrdinal(stringObj2);
+        internPool.prepareForRead();
 
-        Double doubleObj = 150d;
-        Double dupDoubleObj = 150d;
+        String retrievedString1 = (String) internPool.getObject(string1Ordinal, FieldType.STRING);
 
-        Long longObj = 160L;
-        Long dupLongObj = 160L;
+        assertEquals(string1Ordinal, string2Ordinal);
+        assertEquals(retrievedString1, "I am Groot");
 
-        String stringObj = new String("I am groot");
-        String dupStringObj = new String("I am groot");
+        int string3Ordinal = internPool.writeAndGetOrdinal(stringObj3);
+        int string4Ordinal = internPool.writeAndGetOrdinal(stringObj4);
+        internPool.prepareForRead();
 
-        Boolean booleanObj = true;
-        Boolean dupBooleanObj = true;
+        String retrievedString2 = (String) internPool.getObject(string3Ordinal, FieldType.STRING);
 
-        assertNotSame(intObj, dupIntObj);
-        assertNotSame(floatObj, dupFloatObj);
-        assertNotSame(doubleObj, dupDoubleObj);
-        assertNotSame(stringObj, dupStringObj);
-        assertNotSame(longObj, dupLongObj);
-        //booleans always cached
+        assertEquals(string3Ordinal, string4Ordinal);
+        assertEquals(retrievedString2, "I can do this all day");
+    }
 
-        Integer internedInt1 = (Integer)internPool.intern(intObj);
-        Integer internedInt2 = (Integer)internPool.intern(dupIntObj);
+    @Test
+    public void testBool() {
+        Boolean boolObj1 = true;
+        Boolean boolObj2 = true;
+        Boolean boolObj3 = false;
+        Boolean boolObj4 = false;
 
-        Float internedFloat1 = (Float)internPool.intern(floatObj);
-        Float internedFloat2 = (Float)internPool.intern(dupFloatObj);
+        int bool1Ordinal = internPool.writeAndGetOrdinal(boolObj1);
+        int bool2Ordinal = internPool.writeAndGetOrdinal(boolObj2);
+        internPool.prepareForRead();
 
-        Double internedDouble1 = (Double)internPool.intern(doubleObj);
-        Double internedDouble2 = (Double)internPool.intern(dupDoubleObj);
+        boolean retrievedBool1 = (boolean) internPool.getObject(bool1Ordinal, FieldType.BOOLEAN);
 
-        Long internedLong1 = (Long)internPool.intern(longObj);
-        Long internedLong2 = (Long)internPool.intern(dupLongObj);
+        assertEquals(bool1Ordinal, bool2Ordinal);
+        assertEquals(retrievedBool1, true);
 
-        String internedString1 = (String)internPool.intern(stringObj);
-        String internedString2 = (String)internPool.intern(dupStringObj);
+        int bool3Ordinal = internPool.writeAndGetOrdinal(boolObj3);
+        int bool4Ordinal = internPool.writeAndGetOrdinal(boolObj4);
+        internPool.prepareForRead();
 
-        Boolean internedBoolean1 = (Boolean)internPool.intern(booleanObj);
-        Boolean internedBoolean2 = (Boolean)internPool.intern(dupBooleanObj);
+        boolean retrievedBool2 = (boolean) internPool.getObject(bool3Ordinal, FieldType.BOOLEAN);
 
-        assertSame(internedInt1, internedInt2);
-        assertSame(internedFloat1, internedFloat2);
-        assertSame(internedDouble1, internedDouble2);
-        assertSame(internedLong1, internedLong2);
-        assertSame(internedString1, internedString2);
-        assertSame(internedBoolean1, internedBoolean2);
-
-        assertEquals(intObj, internedInt1);
-        assertEquals(floatObj, internedFloat1);
-        assertEquals(doubleObj, internedDouble1);
-        assertEquals(longObj, internedLong1);
-        assertEquals(stringObj, internedString1);
-        assertEquals(booleanObj, internedBoolean1);
+        assertEquals(bool3Ordinal, bool4Ordinal);
+        assertEquals(retrievedBool2, false);
     }
 }

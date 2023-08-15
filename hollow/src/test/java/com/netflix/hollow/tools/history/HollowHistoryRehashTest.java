@@ -17,6 +17,7 @@
 package com.netflix.hollow.tools.history;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -32,13 +33,19 @@ import org.junit.Test;
 import java.io.IOException;
 
 public class HollowHistoryRehashTest extends AbstractStateEngineTest {
-    private HollowObjectSchema schema;
+    private HollowObjectSchema aSchema;
+    private HollowObjectSchema bSchema;
 
     @Before
     public void setUp() {
-        schema = new HollowObjectSchema("A", 2);
-        schema.addField("id", FieldType.FLOAT);
-        schema.addField("anotherField", FieldType.LONG);
+        aSchema = new HollowObjectSchema("A", 3);
+        aSchema.addField("id", FieldType.FLOAT);
+        aSchema.addField("anotherField", FieldType.LONG);
+        aSchema.addField("bRef", FieldType.REFERENCE, "B");
+
+        bSchema = new HollowObjectSchema("B", 2, new PrimaryKey("B", "id"));
+        bSchema.addField("id", FieldType.STRING);
+        bSchema.addField("anotherField", FieldType.DOUBLE);
 
         super.setUp();
     }
@@ -48,13 +55,18 @@ public class HollowHistoryRehashTest extends AbstractStateEngineTest {
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
         HollowHistory history = new HollowHistory(readEngine, 1L, 1);
         HollowHistoryKeyIndex keyIdx = new HollowHistoryKeyIndex(history);
-        keyIdx.addTypeIndex("A", "id", "anotherField");
+        keyIdx.addTypeIndex("A", "id", "bRef.id");
+        keyIdx.addTypeIndex("B", "id");
+
+        keyIdx.indexTypeField("A", "bRef");
         keyIdx.indexTypeField("A", "id");
-        keyIdx.indexTypeField("A", "anotherField");
+        keyIdx.indexTypeField("B", "id");
+        roundTripSnapshot();
+        keyIdx.update(readStateEngine, false);
 
         // Will rehash before 2069, otherwise couldn't store all values
         for(int i=0;i<5000;i++) {
-            addRecord((float)i, (long)i);
+            addRecord((float) i, Integer.toString(i), 1L, 1.1D);
         }
 
         roundTripSnapshot();
@@ -75,20 +87,25 @@ public class HollowHistoryRehashTest extends AbstractStateEngineTest {
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
         HollowHistory history = new HollowHistory(readEngine, 1L, 1);
         HollowHistoryKeyIndex keyIdx = new HollowHistoryKeyIndex(history);
-        keyIdx.addTypeIndex("A", "id", "anotherField");
+        keyIdx.addTypeIndex("A", "id", "bRef.id");
+        keyIdx.addTypeIndex("B", "id");
+
+        keyIdx.indexTypeField("A", "bRef");
         keyIdx.indexTypeField("A", "id");
-        keyIdx.indexTypeField("A", "anotherField");
+        keyIdx.indexTypeField("B", "id");
+        roundTripSnapshot();
+        keyIdx.update(readStateEngine, false);
 
         // Will rehash before 2069, otherwise couldn't store all values
         for(int i=0;i<1000;i++) {
-            addRecord((float)i, (long)i);
+            addRecord((float) i, Integer.toString(i), 1L, 1.1D);
         }
 
         roundTripSnapshot();
         keyIdx.update(readStateEngine, false);
 
         for(int i=1000;i<5000;i++) {
-            addRecord((float)i, (long)i);
+            addRecord((float) i, Integer.toString(i), 1L, 1.1D);
         }
 
         roundTripDelta();
@@ -104,17 +121,25 @@ public class HollowHistoryRehashTest extends AbstractStateEngineTest {
         }
     }
 
-    @Override
-    protected void initializeTypeStates() {
-        HollowObjectTypeWriteState writeState = new HollowObjectTypeWriteState(schema);
-        writeStateEngine.addTypeState(writeState);
+    private void addRecord(float aId, String bId, long anotherAField, double anotherBField) {
+        HollowObjectWriteRecord bRec = new HollowObjectWriteRecord(bSchema);
+        bRec.setString("id", bId);
+        bRec.setDouble("anotherField", anotherBField);
+        int bOrdinal = writeStateEngine.add("B", bRec);
+
+        HollowObjectWriteRecord aRec = new HollowObjectWriteRecord(aSchema);
+        aRec.setFloat("id", aId);
+        aRec.setReference("bRef", bOrdinal);
+        aRec.setLong("anotherField", anotherAField);
+        writeStateEngine.add("A", aRec);
     }
 
-    private void addRecord(float id, Long secondId) {
-        HollowObjectWriteRecord aRec = new HollowObjectWriteRecord(schema);
-        aRec.setFloat("id", id);
-        aRec.setLong("anotherField", secondId);
-        writeStateEngine.add("A", aRec);
+    @Override
+    protected void initializeTypeStates() {
+        HollowObjectTypeWriteState aWriteState = new HollowObjectTypeWriteState(aSchema);
+        HollowObjectTypeWriteState bWriteState = new HollowObjectTypeWriteState(bSchema);
+        writeStateEngine.addTypeState(aWriteState);
+        writeStateEngine.addTypeState(bWriteState);
     }
 
 }
