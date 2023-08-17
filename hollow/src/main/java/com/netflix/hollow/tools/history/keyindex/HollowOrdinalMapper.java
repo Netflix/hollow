@@ -45,7 +45,7 @@ public class HollowOrdinalMapper {
     * */
     private int[] hashToAssignedOrdinal;
     private int[][] fieldHashToObjectOrdinal;
-    private int[][] fieldHashToAssignedOrdinal;
+    private IntList[][] fieldHashToAssignedOrdinal;
     private int[] assignedOrdinalToIndex;
 
     private final PrimaryKey primaryKey;
@@ -58,13 +58,12 @@ public class HollowOrdinalMapper {
     public HollowOrdinalMapper(PrimaryKey primaryKey, boolean[] keyFieldIsIndexed, int[][] keyFieldIndices, FieldType[] keyFieldTypes) {
         this.hashToAssignedOrdinal = new int[STARTING_SIZE];
         this.fieldHashToObjectOrdinal = new int[primaryKey.numFields()][STARTING_SIZE];
-        this.fieldHashToAssignedOrdinal = new int[primaryKey.numFields()][STARTING_SIZE];
+        this.fieldHashToAssignedOrdinal = new IntList[primaryKey.numFields()][STARTING_SIZE];
         this.assignedOrdinalToIndex = new int[STARTING_SIZE];
 
         Arrays.fill(this.hashToAssignedOrdinal, ORDINAL_NONE);
         for(int field=0;field<primaryKey.numFields();field++) {
             Arrays.fill(this.fieldHashToObjectOrdinal[field], ORDINAL_NONE);
-            Arrays.fill(this.fieldHashToAssignedOrdinal[field], ORDINAL_NONE);
         }
         Arrays.fill(this.assignedOrdinalToIndex, ORDINAL_NONE);
 
@@ -77,16 +76,15 @@ public class HollowOrdinalMapper {
     }
 
     public void addMatches(int hashCode, Object objectToMatch, int field, FieldType type, IntList results) {
-        int[] fieldHashes = fieldHashToAssignedOrdinal[field];
+        IntList[] fieldHashes = fieldHashToAssignedOrdinal[field];
         int scanIndex = indexFromHash(hashCode, fieldHashes.length);
-
-        while(fieldHashes[scanIndex] != ORDINAL_NONE) {
-            int ordinal = fieldHashes[scanIndex];
-            Object matchingObject = getFieldObject(ordinal, field, type);
-            if(objectToMatch.equals(matchingObject)) {
-                results.add(ordinal);
-            }
-            scanIndex = (scanIndex + 1) % fieldHashes.length;
+        if (fieldHashes[scanIndex] == null)
+            return;
+        for(int i=0;i<fieldHashes[scanIndex].size();i++) {
+            int assignedOrdinal = fieldHashes[scanIndex].get(i);
+            Object object = getFieldObject(assignedOrdinal, field, type);
+            if(object.equals(objectToMatch))
+                results.add(assignedOrdinal);
         }
     }
 
@@ -94,16 +92,16 @@ public class HollowOrdinalMapper {
         if (!keyFieldIsIndexed[fieldIdx])
             return;
 
-        int[] fieldHashes = fieldHashToAssignedOrdinal[fieldIdx];
+        IntList[] fieldHashes = fieldHashToAssignedOrdinal[fieldIdx];
 
         int fieldHash = hashObject(fieldObject);
         int newIndex = indexFromHash(fieldHash, fieldHashes.length);
 
-        while (fieldHashes[newIndex] != ORDINAL_NONE) {
-            newIndex = (newIndex + 1) % fieldHashes.length;
+        if(fieldHashes[newIndex]==null) {
+            fieldHashes[newIndex] = new IntList();
         }
 
-        fieldHashes[newIndex] = assignedOrdinal;
+        fieldHashes[newIndex].add(assignedOrdinal);
     }
 
     public void prepareForRead() {
@@ -210,25 +208,24 @@ public class HollowOrdinalMapper {
         Arrays.fill(newTable, ORDINAL_NONE);
 
         int[][] newFieldMappings = new int[primaryKey.numFields()][hashToAssignedOrdinal.length*2];
-        int[][] newFieldHashToOrdinal = new int[primaryKey.numFields()][hashToAssignedOrdinal.length*2];
-        for(int i=0;i<primaryKey.numFields();i++) {
-            Arrays.fill(newFieldHashToOrdinal[i], ORDINAL_NONE);
-        }
+        IntList[][] newFieldHashToOrdinal = new IntList[primaryKey.numFields()][hashToAssignedOrdinal.length*2];
         assignedOrdinalToIndex = Arrays.copyOf(assignedOrdinalToIndex, hashToAssignedOrdinal.length*2);
 
         for(int fieldIdx=0;fieldIdx<primaryKey.numFields();fieldIdx++) {
-            int[] hashToOrdinal = fieldHashToAssignedOrdinal[fieldIdx];
+            IntList[] hashToOrdinal = fieldHashToAssignedOrdinal[fieldIdx];
 
-            for (int assignedOrdinal : hashToOrdinal) {
-                if (assignedOrdinal == ORDINAL_NONE)
+            for (IntList ordinalList : hashToOrdinal) {
+                if(ordinalList==null || ordinalList.size()==0)
                     continue;
 
-                Object originalFieldObject = getFieldObject(assignedOrdinal, fieldIdx, keyFieldTypes[fieldIdx]);
+                // Recompute original hash, based on the fact that all objects in this IntList have the same hash
+
+                Object originalFieldObject = getFieldObject(ordinalList.get(0), fieldIdx, keyFieldTypes[fieldIdx]);
 
                 int originalHash = hashObject(originalFieldObject);
                 int newIndex = indexFromHash(originalHash, newTable.length);
 
-                newFieldHashToOrdinal[fieldIdx][newIndex] = assignedOrdinal;
+                newFieldHashToOrdinal[fieldIdx][newIndex]=ordinalList;
             }
         }
 
