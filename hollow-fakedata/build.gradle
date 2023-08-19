@@ -1,0 +1,8 @@
+apply plugin: 'java'
+
+dependencies {
+  implementation project(':hollow-explorer-ui')
+  implementation project(':hollow-diff-ui')
+
+  implementation 'com.github.javafaker:javafaker:latest.release'
+}

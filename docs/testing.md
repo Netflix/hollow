@@ -75,3 +75,43 @@ HollowConsumer consumer = input
     .build();
 input.buildSnapshot(consumer);
 ```
+
+### Fake dataset
+A pre-generated fake dataset is available for download publicly in an AWS S3 bucket. 
+Alternatively, the code for generating that dataset is available under the `hollow-fakedata` module of this repo and it 
+can be run locally to produce a fake dataset for testing. There are some instructions in the README. 
+
+For reusing the pre-generated fake dataset, download from S3 to your local machine by installing the aws cli and running this command:
+```
+aws s3 cp s3://hollow-oss-public/fakedata /tmp/download --recursive  --no-sign-request
+```
+This will download around 500MB of data comprising a 100 version delta chain for a fake Book catalog. 
+These Hollow snapshot and delta blobs can be consumed in your test using the various Hollow APIs available, for e.g. 
+this code can consume those blobs and run the hollow history server over that delta chain: 
+```java
+@Test
+public void fakeHistory() throws Exception {
+    String path = "/tmp/fakedata";  // path to downloaded blobs
+    HollowConsumer c = HollowConsumer
+        .withBlobRetriever(new HollowFilesystemBlobRetriever(Paths.get(path)))
+        .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+            @Override
+            public boolean allowDoubleSnapshot() {
+                    return false;   // disable double snapshots to get history for each state in delta chain
+                }
+            @Override                
+            public int maxDeltasBeforeDoubleSnapshot() { 
+                    return Integer.MAX_VALUE;
+                }
+            })
+        .build();
+    c.triggerRefreshTo(20230808144752001l);     // first version in the delta chain
+    HollowHistoryUIServer historyUIServer = new HollowHistoryUIServer(c, 7001);
+    historyUIServer.start();
+    System.out.println("History server started at http://localhost:7001/"); // open in browser to see history of changes
+
+    c.triggerRefreshTo(20230808145930100l);     // 100th version in delta chain, apply delta transitions and computing history for each state 
+    
+    historyUIServer.join(); // block forever
+}
+```
