@@ -6,15 +6,16 @@ If you have a question that isn't covered in this documentation, please reach ou
 
 ## Stack Overflow
 
-The Platform Data Technologies team at Netflix will monitor posts tagged with `hollow`.
+We monitor posts tagged with `hollow`.
 
 ## Gitter
 
-The Platform Data Technologies team at Netflix is often available for chat via [Gitter](https://gitter.im/Netflix/hollow).  We hope that you'll stick around and pay it forward by answering other users' questions when they arise.
+We are often available for chat via [Gitter](https://gitter.im/Netflix/hollow).  We hope that you'll stick around and pay it forward by answering other users' questions when they arise.
 
 # Contributing to Hollow
 
-We'll gladly review and accept pull requests for Hollow.  If you want to have a design discussion for your changes, please reach out to us on Gitter.
+We'll gladly review and accept pull requests for Hollow.  If you want to have a design discussion for your changes, please reach out to us on Gitter. 
+There is a fake dataset of reasonable size and complexity available for testing against, please see the section on [Fake dataset](testing.md#fake-dataset). 
 
 ## Backwards Compatibility
 
