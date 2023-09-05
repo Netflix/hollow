@@ -39,6 +39,8 @@ import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.tools.history.HollowHistory;
+import org.slf4j.MDC;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -258,25 +260,36 @@ public class HollowConsumer {
      */
     public void triggerAsyncRefreshWithDelay(int delayMillis) {
         final long targetBeginTime = System.currentTimeMillis() + delayMillis;
+        // Capture MDC context on the original thread
+        final Map<String, String> mdcContext = MDC.getCopyOfContextMap();
 
         refreshExecutor.execute(() -> {
-            try {
-                long delay = targetBeginTime - System.currentTimeMillis();
-                if (delay > 0)
-                    Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                // Interrupting, such as shutting down the executor pool,
-                // cancels the trigger
-                LOG.log(Level.INFO, "Async refresh interrupted before trigger, refresh cancelled", e);
-                return;
+            // Set MDC context on the new thread
+            if (mdcContext != null) {
+                MDC.setContextMap(mdcContext);
             }
-
             try {
-                triggerRefresh();
-            } catch (Error | RuntimeException e) {
-                // Ensure exceptions are propagated to the executor
-                LOG.log(Level.SEVERE, "Async refresh failed", e);
-                throw e;
+                try {
+                    long delay = targetBeginTime - System.currentTimeMillis();
+                    if (delay > 0)
+                        Thread.sleep(delay);
+                } catch (InterruptedException e) {
+                    // Interrupting, such as shutting down the executor pool,
+                    // cancels the trigger
+                    LOG.log(Level.INFO, "Async refresh interrupted before trigger, refresh cancelled", e);
+                    return;
+                }
+
+                try {
+                    triggerRefresh();
+                } catch (Error | RuntimeException e) {
+                    // Ensure exceptions are propagated to the executor
+                    LOG.log(Level.SEVERE, "Async refresh failed", e);
+                    throw e;
+                }
+            } finally {
+                // clear MDC context when entire task is done
+                MDC.clear();
             }
         });
     }

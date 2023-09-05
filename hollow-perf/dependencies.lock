@@ -41,6 +41,12 @@
         },
         "org.openjdk.jmh:jmh-generator-bytecode": {
             "locked": "1.25"
+        },
+        "org.slf4j:jul-to-slf4j": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow"
+            ],
+            "locked": "2.0.9"
         }
     },
     "runtimeClasspath": {
@@ -49,6 +55,12 @@
         },
         "org.openjdk.jmh:jmh-core": {
             "locked": "1.21"
+        },
+        "org.slf4j:jul-to-slf4j": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow"
+            ],
+            "locked": "2.0.9"
         }
     },
     "testCompileClasspath": {
@@ -65,6 +77,12 @@
         },
         "org.openjdk.jmh:jmh-core": {
             "locked": "1.21"
+        },
+        "org.slf4j:jul-to-slf4j": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow"
+            ],
+            "locked": "2.0.9"
         }
     }
 }

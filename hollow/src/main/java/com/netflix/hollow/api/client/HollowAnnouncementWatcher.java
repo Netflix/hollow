@@ -20,6 +20,9 @@ import static com.netflix.hollow.core.util.Threads.daemonThread;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.HollowConstants;
+import org.slf4j.MDC;
+
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -129,9 +132,14 @@ public abstract class HollowAnnouncementWatcher {
     public void triggerAsyncRefreshWithDelay(int delayMillis) {
         final HollowClient client = this.client;
         final long targetBeginTime = System.currentTimeMillis() + delayMillis;
-
+        // Capture MDC context on the original thread
+        final Map<String, String> mdcContext = MDC.getCopyOfContextMap();
         refreshExecutor.execute(new Runnable() {
             public void run() {
+                // Set MDC context on the new thread
+                if (mdcContext != null) {
+                    MDC.setContextMap(mdcContext);
+                }
                 try {
                     long delay = targetBeginTime - System.currentTimeMillis();
                     if(delay > 0)
@@ -139,6 +147,8 @@ public abstract class HollowAnnouncementWatcher {
                     client.triggerRefresh();
                 } catch(Throwable th) {
                     log.log(Level.SEVERE, "Async refresh failed", th);
+                } finally {
+                    MDC.clear();
                 }
             }
         });

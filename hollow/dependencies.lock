@@ -1,4 +1,14 @@
 {
+    "compileClasspath": {
+        "org.slf4j:jul-to-slf4j": {
+            "locked": "2.0.9"
+        }
+    },
+    "runtimeClasspath": {
+        "org.slf4j:jul-to-slf4j": {
+            "locked": "2.0.9"
+        }
+    },
     "testCompileClasspath": {
         "com.github.spotbugs:spotbugs": {
             "locked": "4.2.1"
@@ -14,6 +24,9 @@
         },
         "org.mockito:mockito-core": {
             "locked": "2.15.0"
+        },
+        "org.slf4j:jul-to-slf4j": {
+            "locked": "2.0.9"
         }
     },
     "testRuntimeClasspath": {
@@ -37,6 +50,12 @@
         },
         "org.mockito:mockito-core": {
             "locked": "2.15.0"
+        },
+        "org.slf4j:jul-to-slf4j": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow"
+            ],
+            "locked": "2.0.9"
         }
     }
 }

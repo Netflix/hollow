@@ -13,6 +13,12 @@
         },
         "com.netflix.zeno:netflix-zeno": {
             "locked": "2.22.3"
+        },
+        "org.slf4j:jul-to-slf4j": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow"
+            ],
+            "locked": "2.0.9"
         }
     },
     "testCompileClasspath": {
@@ -35,6 +41,12 @@
         },
         "junit:junit": {
             "locked": "4.11"
+        },
+        "org.slf4j:jul-to-slf4j": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow"
+            ],
+            "locked": "2.0.9"
         }
     }
 }
