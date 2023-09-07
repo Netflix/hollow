@@ -43,6 +43,18 @@ public class VarInt {
     }
 
     /**
+     * Write a 'null' variable length integer into the supplied byte array.
+     *
+     * @param data the byte array to write to
+     * @param pos the position in the byte array
+     * @return the next position in the byte array after the null has been written
+     */
+    public static int writeVNull(byte data[], int pos) {
+        data[pos++] = ((byte)0x80);
+        return pos;
+    }
+
+    /**
      * Encode the specified long as a variable length integer into the supplied {@link ByteDataArray}
      *
      * @param buf the buffer to write to
@@ -81,6 +93,30 @@ public class VarInt {
         if(value > 0x7FL || value < 0)               out.write((byte)(0x80 | ((value >>>  7) & 0x7FL)));
 
         out.write((byte)(value & 0x7FL));
+    }
+
+    /**
+     * Encode the specified long as a variable length integer into the supplied byte array.
+     *
+     * @param data the byte array to write to
+     * @param pos the position in the byte array
+     * @param value the long value
+     * @return the next position after the VarLong has been written.
+     */
+    public static int writeVLong(byte data[], int pos, long value) {
+        if(value < 0)                                data[pos++] = ((byte)0x81);
+        if(value > 0xFFFFFFFFFFFFFFL || value < 0)   data[pos++] = ((byte)(0x80 | ((value >>> 56) & 0x7FL)));
+        if(value > 0x1FFFFFFFFFFFFL || value < 0)    data[pos++] = ((byte)(0x80 | ((value >>> 49) & 0x7FL)));
+        if(value > 0x3FFFFFFFFFFL || value < 0)      data[pos++] = ((byte)(0x80 | ((value >>> 42) & 0x7FL)));
+        if(value > 0x7FFFFFFFFL || value < 0)        data[pos++] = ((byte)(0x80 | ((value >>> 35) & 0x7FL)));
+        if(value > 0xFFFFFFFL || value < 0)          data[pos++] = ((byte)(0x80 | ((value >>> 28) & 0x7FL)));
+        if(value > 0x1FFFFFL || value < 0)           data[pos++] = ((byte)(0x80 | ((value >>> 21) & 0x7FL)));
+        if(value > 0x3FFFL || value < 0)             data[pos++] = ((byte)(0x80 | ((value >>> 14) & 0x7FL)));
+        if(value > 0x7FL || value < 0)               data[pos++] = ((byte)(0x80 | ((value >>>  7) & 0x7FL)));
+
+        data[pos++] = ((byte)(value & 0x7FL));
+
+        return pos;
     }
 
     /**
@@ -146,6 +182,18 @@ public class VarInt {
     }
 
     /**
+     * Determine whether the value at the specified position in the supplied byte array is a 'null' variable
+     * length integer.
+     *
+     * @param arr the byte data to read from
+     * @param position the position in the byte data to read from
+     * @return true if the value is null
+     */
+    public static boolean readVNull(byte[] arr, int position) {
+        return arr[position] == (byte)0x80;
+    }
+
+    /**
      * Read a variable length integer from the supplied {@link ByteData} starting at the specified position.
      * @param arr the byte data to read from
      * @param position the position in the byte data to read from
@@ -162,6 +210,29 @@ public class VarInt {
           b = arr.get(position++);
           value <<= 7;
           value |= (b & 0x7F);
+        }
+
+        return value;
+    }
+
+    /**
+     * Read a variable length integer from the supplied byte array starting at the specified position.
+     *
+     * @param arr the byte data to read from
+     * @param position the position in the byte data to read from
+     * @return the int value
+     */
+    public static int readVInt(byte[] arr, int position) {
+        byte b = arr[position++];
+
+        if(b == (byte) 0x80)
+            throw new RuntimeException("Attempting to read null value as int");
+
+        int value = b & 0x7F;
+        while ((b & 0x80) != 0) {
+            b = arr[position++];
+            value <<= 7;
+            value |= (b & 0x7F);
         }
 
         return value;
@@ -292,6 +363,29 @@ public class VarInt {
     }
 
     /**
+     * Read a variable length long from the supplied byte array starting at the specified position.
+     *
+     * @param arr the byte data to read from
+     * @param position the position in the byte data to read from
+     * @return the long value
+     */
+    public static long readVLong(byte[] arr, int position) {
+        byte b = arr[position++];
+
+        if(b == (byte) 0x80)
+            throw new RuntimeException("Attempting to read null value as long");
+
+        long value = b & 0x7F;
+        while ((b & 0x80) != 0) {
+            b = arr[position++];
+            value <<= 7;
+            value |= (b & 0x7F);
+        }
+
+        return value;
+    }
+
+    /**
      * Determine the size (in bytes) of the variable length long in the supplied {@link ByteData}, starting at the specified position.  
      * @param arr the byte data to read from
      * @param position the position in the byte data to read from
@@ -307,6 +401,29 @@ public class VarInt {
 
         while((b & 0x80) != 0) {
             b = arr.get(position++);
+            length++;
+        }
+
+        return length;
+    }
+
+    /**
+     * Determine the size (in bytes) of the variable length long in the supplied byte array, starting at the specified position.
+     *
+     * @param arr the byte data to read from
+     * @param position the position in the byte data to read from
+     * @return the size of long value
+     */
+    public static int nextVLongSize(byte[] arr, int position) {
+        byte b = arr[position++];
+
+        if(b == (byte) 0x80)
+            return 1;
+
+        int length = 1;
+
+        while((b & 0x80) != 0) {
+            b = arr[position++];
             length++;
         }
 
