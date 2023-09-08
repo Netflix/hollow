@@ -1,6 +1,6 @@
 package com.netflix.hollow.core.memory.encoding;
 
-import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
+import static java.nio.channels.FileChannel.MapMode.READ_WRITE;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
@@ -8,6 +8,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
+import sun.nio.ch.DirectBuffer;
 
 /**
  * <p>A stitching of {@link MappedByteBuffer}s to operate on large memory mapped blobs. {@code MappedByteBuffer} is
@@ -23,7 +26,7 @@ import java.nio.channels.FileChannel;
  *         Tim Taylor
  */
 public final class BlobByteBuffer {
-
+    private static final Logger LOG = Logger.getLogger(BlobByteBuffer.class.getName());
     public static final int MAX_SINGLE_BUFFER_CAPACITY = 1 << 30;   // largest, positive power-of-two int
 
     private final ByteBuffer[] spine;   // array of MappedByteBuffers
@@ -31,13 +34,18 @@ public final class BlobByteBuffer {
     private final int shift;
     private final int mask;
 
+    // SNAP: TODO: is this needed for destruction?
+    private final FileChannel channel;
+
     private long position;              // within index 0 to capacity-1 in the underlying ByteBuffer
 
-    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine) {
-        this(capacity, shift, mask, spine, 0);
+    private AtomicInteger referenceCount;
+
+    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, FileChannel channel, AtomicInteger referenceCount) {
+        this(capacity, shift, mask, spine, 0, channel, referenceCount);
     }
 
-    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, long position) {
+    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, long position, FileChannel channel, AtomicInteger referenceCount) {
 
         if (!spine[0].order().equals(ByteOrder.BIG_ENDIAN)) {
             throw new UnsupportedOperationException("Little endian memory layout is not supported");
@@ -46,7 +54,10 @@ public final class BlobByteBuffer {
         this.capacity = capacity;
         this.shift = shift;
         this.mask = mask;
+        this.channel = channel;
         this.position = position;
+        this.referenceCount = referenceCount;
+        this.referenceCount.getAndIncrement();
 
         // The following assignment is purposefully placed *after* the population of all segments (this method is called
         // after mmap). The final assignment after the initialization of the array of MappedByteBuffers guarantees that
@@ -60,7 +71,7 @@ public final class BlobByteBuffer {
      * @return a new {@code BlobByteBuffer} which is view on the current {@code BlobByteBuffer}
      */
     public BlobByteBuffer duplicate() {
-        return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position);
+        return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position, this.channel, this.referenceCount);
     }
 
     /**
@@ -99,7 +110,7 @@ public final class BlobByteBuffer {
             int cap = i == (bufferCount - 1)
                     ? (int)(size - pos)
                     : bufferCapacity;
-            ByteBuffer buffer = channel.map(READ_ONLY, pos, cap);
+            ByteBuffer buffer = channel.map(READ_WRITE, pos, cap);
             /*
              * if (!((MappedByteBuffer) buffer).isLoaded()) // TODO(timt): make pre-fetching configurable
              *    ((MappedByteBuffer) buffer).load();
@@ -107,7 +118,7 @@ public final class BlobByteBuffer {
             spine[i] = buffer;
         }
 
-        return new BlobByteBuffer(size, shift, mask, spine);
+        return new BlobByteBuffer(size, shift, mask, spine, channel, new AtomicInteger(0));
     }
 
     /**
@@ -144,11 +155,75 @@ public final class BlobByteBuffer {
         }
         else {
             assert(index < capacity + Long.BYTES);
+            // LOG.warning("SNAP: This is happening, not necessarily bad but test using unit test readUsingVariableLengthDataModes");
             // this situation occurs when read for bits near the end of the buffer requires reading a long value that
             // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case,
             // return 0 for (index >= capacity - Long.BYTES && index < capacity )
             // these zero bytes will be discarded anyway when the returned long value is shifted to get the queried bits
             return (byte) 0;
+        }
+    }
+
+    // advances pos in backing buf
+    public int getBytes(long index, long len, byte[] bytes, boolean restorePos) {
+        if (index >= capacity) {
+            // this situation occurs when read for bits near the end of the buffer requires reading a long value that
+            // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case,
+            // return 0 for (index >= capacity - Long.BYTES && index < capacity )
+            // these zero bytes will be discarded anyway when the returned long value is shifted to get the queried bits
+            LOG.warning(String.format("Unexpected read past the end, index=%s, capacity=%s, len=%s", index, capacity, len));
+        }
+        int spineIndex = (int)(index >>> (shift));
+        ByteBuffer buf = spine[spineIndex];
+        int indexIntoBuf = (int)(index & mask);
+        int toCopy = (int) Math.min(len, buf.capacity() - indexIntoBuf);
+        int savePos = buf.position();
+        try {
+            buf.position(indexIntoBuf);
+            buf.get(bytes, 0, toCopy);
+            if (restorePos) {
+                buf.position(savePos);
+            }
+        } catch (BufferUnderflowException e) {
+            throw e;
+        }
+        return toCopy;
+    }
+
+    public int putBytes(long index, long len, byte[] bytes, boolean restorePos) {
+        if (index < capacity) {
+            int spineIndex = (int)(index >>> (shift));
+            ByteBuffer buf = spine[spineIndex];
+            int indexIntoBuf = (int)(index & mask);
+            int toCopy = (int) Math.min(len, buf.capacity() - indexIntoBuf);
+            int savePos = buf.position();
+            buf.position(indexIntoBuf);
+            buf.put(bytes, 0, toCopy);
+            if (restorePos) {
+                buf.position(savePos);
+            }
+            return toCopy;
+        } else {
+            assert(index < capacity + Long.BYTES);
+            // this situation occurs when read for bits near the end of the buffer requires reading a long value that
+            // extends past the buffer capacity by upto Long.BYTES bytes. To handle this case,
+            // return 0 for (index >= capacity - Long.BYTES && index < capacity )
+            // these zero bytes will be discarded anyway when the returned long value is shifted to get the queried bits
+            throw new UnsupportedOperationException(String.format("Unexpected write past the end, index=%s, capacity=%s", index, capacity));
+        }
+    }
+
+    public void putByte(long index, byte value) {
+        if (index < 0 || index >= (this.capacity+1) << 6) { // SNAP: can test using testIncrement or testSimpleParity
+            throw new IllegalStateException("Attempting to write a byte out of bounds");
+        }
+
+        int spineIndex = (int)(index >>> (shift));
+        int bufferIndex = (int)(index & mask);
+        try {
+            spine[spineIndex].put(bufferIndex, value);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("here");
         }
     }
 
@@ -177,6 +252,25 @@ public final class BlobByteBuffer {
                 (((long) (bytes[0] & 0xff))      ));
     }
 
+    public void putLong(long startByteIndex, long value) {
+        int alignmentOffset = (int) (startByteIndex - this.position()) % Long.BYTES;
+        long nextAlignedPos = startByteIndex - alignmentOffset + Long.BYTES;
+
+        byte[] bytes = new byte[Long.BYTES];
+        bytes[0] = (byte) (value & 0x000000ff);
+        bytes[1] = (byte) ((value >>> 8)  & 0x000000ff);
+        bytes[2] = (byte) ((value >>> 16) & 0x000000ff);
+        bytes[3] = (byte) ((value >>> 24) & 0x000000ff);
+        bytes[4] = (byte) ((value >>> 32) & 0x000000ff);
+        bytes[5] = (byte) ((value >>> 40) & 0x000000ff);
+        bytes[6] = (byte) ((value >>> 48) & 0x000000ff);
+        bytes[7] = (byte) ((value >>> 56) & 0x000000ff);
+
+        for (int i = 0; i < Long.BYTES; i++) {
+            putByte(bigEndian(startByteIndex + i, nextAlignedPos), bytes[i]);
+        }
+    }
+
     /**
      * Given big-endian byte order, returns the position into the buffer for a given byte index. Java nio DirectByteBuffers
      * are by default big-endian. Big-endianness is validated in the constructor.
@@ -192,5 +286,47 @@ public final class BlobByteBuffer {
             result = boundary + (boundary + Long.BYTES - index) - 1;
         }
         return result;
+    }
+
+    public void unmapBlob() {
+        // The BlobByteBuffer backed by the initial snapshot load file will likely be referenced for a while so its ref
+        // count will sustain it from getting cleaned up, but cleanup will be promptly invoked on delta blob files after
+        // consumption and on per-shard per-type delta target files when it is superseded by another file in a future delta.
+        if (this.referenceCount.decrementAndGet() == 0) {
+            // LOG.info("SNAP: Unmapping BlobByteBuffer because ref count has reached 0");
+            for (int i = 0; i < spine.length; i++) {
+                ByteBuffer buf = spine[i];
+                if (buf != null) {
+                    // SNAP: TODO: This isn't available in java 17. For now relying on System.gc(), although it seems to add
+                    //             a cost on delta refresh
+                    //  DirectBuffer directBuffer = (DirectBuffer) buf;
+                    //  jdk.internal.ref.Cleaner cleaner = directBuffer.cleaner();
+                    //  cleaner.clean();
+                } else {
+                    LOG.warning("SNAP: unmapBlob called on BlobByteBuffer after its already been unmapped previously. " +
+                            "spine.length= " + spine.length + ", i= " + i);
+                }
+                try {
+                    sun.misc.Cleaner cleaner = ((DirectBuffer) spine[i]).cleaner();
+                    cleaner.clean();
+                } catch (Exception e) {
+                    LOG.warning("SNAP: sun.misc.Cleaner support not available in app");
+                }
+
+                spine[i] = null;
+
+                // SNAP: TODO: instead of calling it too frequently, let app decide when to call it
+                //  System.gc();    // just a hint, but does seem to keep the size of mapped file region lower- both virtual and physical sizes as reported by vmmap on mac
+                                // note that this also adds 2s to delta refresh that's 10s without it
+            }
+        }
+    }
+
+    public FileChannel getChannel() {
+        return channel;
+    }
+
+    public AtomicInteger getReferenceCount() {
+        return referenceCount;
     }
 }

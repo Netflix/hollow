@@ -23,6 +23,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.schema.HollowSchema;
 import java.io.IOException;
 
 /**
@@ -47,12 +48,14 @@ public class HollowListTypeDataElements {
 
     final ArraySegmentRecycler memoryRecycler;
     final MemoryMode memoryMode;
+    final HollowSchema schemaForDiag;
 
-    public HollowListTypeDataElements(ArraySegmentRecycler memoryRecycler) {
-        this(MemoryMode.ON_HEAP, memoryRecycler);
+    public HollowListTypeDataElements(HollowSchema schemaForDiag, ArraySegmentRecycler memoryRecycler) {
+        this(schemaForDiag, MemoryMode.ON_HEAP, memoryRecycler);
     }
 
-    public HollowListTypeDataElements(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
+    public HollowListTypeDataElements(HollowSchema schemaForDiag, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
+        this.schemaForDiag = schemaForDiag;
         this.memoryMode = memoryMode;
         this.memoryRecycler = memoryRecycler;
     }
@@ -105,11 +108,11 @@ public class HollowListTypeDataElements {
         }
     }
 
-    public void applyDelta(HollowListTypeDataElements fromData, HollowListTypeDataElements deltaData) {
-        new HollowListDeltaApplicator(fromData, deltaData, this).applyDelta();
+    public void applyDelta(HollowListTypeDataElements fromData, HollowListTypeDataElements deltaData, int whichShardForDiag) throws IOException {
+        new HollowListDeltaApplicator(fromData, deltaData, this, whichShardForDiag).applyDelta();
     }
 
-    public void destroy() {
+    public void destroy() throws IOException {
         FixedLengthDataFactory.destroy(listPointerData, memoryRecycler);
         FixedLengthDataFactory.destroy(elementData, memoryRecycler);
     }

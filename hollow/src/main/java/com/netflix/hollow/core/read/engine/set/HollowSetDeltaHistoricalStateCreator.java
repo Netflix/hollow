@@ -48,7 +48,7 @@ public class HollowSetDeltaHistoricalStateCreator {
     public HollowSetDeltaHistoricalStateCreator(HollowSetTypeReadState typeState, boolean reverse) {
         this.typeState = typeState;
         this.stateEngineDataElements = typeState.currentDataElements();
-        this.historicalDataElements = new HollowSetTypeDataElements(WastefulRecycler.DEFAULT_INSTANCE);
+        this.historicalDataElements = new HollowSetTypeDataElements(typeState.getSchema(), WastefulRecycler.DEFAULT_INSTANCE);
         this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class), reverse);
         this.shardNumberMask = stateEngineDataElements.length - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(stateEngineDataElements.length);

@@ -28,6 +28,7 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * This class holds the data for a {@link HollowObjectTypeReadState}.
@@ -36,6 +37,7 @@ import java.io.IOException;
  * with the existing one to make sure a consistent view of the data is always available. 
  */
 public class HollowObjectTypeDataElements {
+    private static final Logger LOG = Logger.getLogger(HollowObjectTypeDataElements.class.getName());
 
     final HollowObjectSchema schema;
 
@@ -43,6 +45,7 @@ public class HollowObjectTypeDataElements {
 
     FixedLengthData fixedLengthData;
     final VariableLengthData varLengthData[];
+    final VariableLengthDataFactory.StagedVariableLengthData stagedVarLengthData[];
 
     GapEncodedVariableLengthIntegerReader encodedAdditions;
     GapEncodedVariableLengthIntegerReader encodedRemovals;
@@ -64,6 +67,7 @@ public class HollowObjectTypeDataElements {
 
     public HollowObjectTypeDataElements(HollowObjectSchema schema, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
         varLengthData = new VariableLengthData[schema.numFields()];
+        stagedVarLengthData = new VariableLengthDataFactory.StagedVariableLengthData[schema.numFields()];
         bitsPerField = new int[schema.numFields()];
         bitOffsetPerField = new int[schema.numFields()];
         nullValueForField = new long[schema.numFields()];
@@ -91,13 +95,17 @@ public class HollowObjectTypeDataElements {
         readFieldStatistics(in, unfilteredSchema);
 
         fixedLengthData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
-        removeExcludedFieldsFromFixedLengthData();
-
+        removeExcludedFieldsFromFixedLengthData();  // SNAP: TODO: remove filtered fields from delta contents, in memory. For now, NOP and log warning
         readVarLengthData(in, unfilteredSchema);
     }
 
-    private void removeExcludedFieldsFromFixedLengthData() {
+    private void removeExcludedFieldsFromFixedLengthData() throws IOException {
         if(bitsPerField.length < bitsPerUnfilteredField.length) {
+            if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
+                LOG.warning("Type filter is not supported in Shared Memory mode");
+                return;
+            }
+
             long numBitsRequired = (long)bitsPerRecord * (maxOrdinal + 1);
             FixedLengthElementArray filteredData = new FixedLengthElementArray(memoryRecycler, numBitsRequired);
 
@@ -199,11 +207,11 @@ public class HollowObjectTypeDataElements {
         }
     }
 
-    void applyDelta(HollowObjectTypeDataElements fromData, HollowObjectTypeDataElements deltaData) {
-        new HollowObjectDeltaApplicator(fromData, deltaData, this).applyDelta();
+    void applyDelta(HollowObjectTypeDataElements fromData, HollowObjectTypeDataElements deltaData, int whichShardForDiag) throws IOException {
+        new HollowObjectDeltaApplicator(fromData, deltaData, this, whichShardForDiag).applyDelta(memoryMode);
     }
 
-    public void destroy() {
+    public void destroy() throws IOException {
         FixedLengthDataFactory.destroy(fixedLengthData, memoryRecycler);
         for(int i=0;i<varLengthData.length;i++) {
             if(varLengthData[i] != null)

@@ -86,7 +86,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
             maxOrdinal = VarInt.readVInt(in);
         
         for(int i=0; i<shards.length; i++) {
-            HollowMapTypeDataElements snapshotData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
+            HollowMapTypeDataElements snapshotData = new HollowMapTypeDataElements(getSchema(), memoryMode, memoryRecycler);
             snapshotData.readSnapshot(in);
             shards[i].setCurrentData(snapshotData);
         }
@@ -103,7 +103,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0; i<shards.length; i++) {
-            HollowMapTypeDataElements deltaData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
+            HollowMapTypeDataElements deltaData = new HollowMapTypeDataElements(schema, memoryMode, memoryRecycler);
             deltaData.readDelta(in);
             if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
 
@@ -117,7 +117,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
                     oldRemovals.destroy();
                 } else {
                     if(!deltaData.encodedRemovals.isEmpty()) {
-                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryRecycler);
+                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryMode, memoryRecycler);
                         oldRemovals.destroy();
                     }
                     deltaData.encodedRemovals.destroy();
@@ -125,11 +125,12 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
 
                 deltaData.encodedAdditions.destroy();
             } else {
-                HollowMapTypeDataElements nextData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
+                HollowMapTypeDataElements nextData = new HollowMapTypeDataElements(schema, memoryMode, memoryRecycler);
                 HollowMapTypeDataElements oldData = shards[i].currentDataElements();
-                nextData.applyDelta(oldData, deltaData);
+                nextData.applyDelta(oldData, deltaData, i);
                 shards[i].setCurrentData(nextData);
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+                deltaData.encodedAdditions.destroy();
                 oldData.destroy();
             }
             deltaData.destroy();

@@ -15,16 +15,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
+import java.util.logging.Logger;
 
 /**
  * This class provides an abstraction to help navigate between use of DataInputStream or RandomAccessFile
  * as the underlying resource for Hollow Producer/Consumer Blob to support the different memory modes.
  */
 public class HollowBlobInput implements Closeable {
+    private static final Logger LOG = Logger.getLogger(HollowBlobInput.class.getName());
+
     private final MemoryMode memoryMode;
 
     private Object input;
-    private BlobByteBuffer buffer;
+    private BlobByteBuffer buffer;  // when input is RandomAccessFile
+    private File file;              // when input is RandomAccessFile
+    private boolean manageRafLifecycle;// when raf is initialized by this class vs passed by caller
 
     private HollowBlobInput(MemoryMode memoryMode) {
         this.memoryMode = memoryMode;
@@ -89,9 +94,16 @@ public class HollowBlobInput implements Closeable {
      * Useful for testing with custom buffer capacity
      */
     public static HollowBlobInput randomAccess(File f,int singleBufferCapacity) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile(f, "rws");  // TODO: evaluate rw and rwd modes too   // TODO: can probably open in read-only if staging+committing as different files during delta
+        return mmap(f, raf, singleBufferCapacity, true);
+    }
+
+    // reference to backing file is required for deletion
+    public static HollowBlobInput mmap(File f, RandomAccessFile raf, int singleBufferCapacity, boolean manageRafLifeCycle) throws IOException {
         HollowBlobInput hbi = new HollowBlobInput(SHARED_MEMORY_LAZY);
-        RandomAccessFile raf = new RandomAccessFile(f, "r");
         hbi.input = raf;
+        hbi.manageRafLifecycle = manageRafLifeCycle;
+        hbi.file = f;
         FileChannel channel = ((RandomAccessFile) hbi.input).getChannel();
         hbi.buffer = BlobByteBuffer.mmapBlob(channel, singleBufferCapacity);
         return hbi;
@@ -294,7 +306,19 @@ public class HollowBlobInput implements Closeable {
     @Override
     public void close() throws IOException {
         if (input instanceof RandomAccessFile) {
-            ((RandomAccessFile) input).close();
+            // LOG.info("SNAP: close called on BlobByteBuffer composing instance of RandomAccessFile");
+            if (manageRafLifecycle) {
+                // LOG.info("SNAP:  HollowBlobInput manages the lifecycle of randomaccessfile " + file + ". Calling close.");
+                ((RandomAccessFile) input).close();
+            } else {
+                // LOG.info("SNAP:  HollowBlobInput does not manage the lifecycle (will not close) of randomaccessfile " + file + ". Won't close file.");
+            }
+            if (buffer != null) {
+                buffer.unmapBlob();
+                buffer = null;
+            } else {
+                LOG.warning("SNAP: HollowBlobInput close called when buffer was already null");
+            }
         } else if (input instanceof DataInputStream) {
             ((DataInputStream) input).close();
         } else {

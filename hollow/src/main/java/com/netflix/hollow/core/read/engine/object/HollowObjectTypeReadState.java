@@ -118,7 +118,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                     oldRemovals.destroy();
                 } else {
                     if(!deltaData.encodedRemovals.isEmpty()) {
-                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryRecycler);
+                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryMode, memoryRecycler);
                         oldRemovals.destroy();
                     }
                     deltaData.encodedRemovals.destroy();
@@ -128,9 +128,11 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             } else {
                 HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
                 HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
-                nextData.applyDelta(oldData, deltaData);
+                nextData.applyDelta(oldData, deltaData, i);
                 shards[i].setCurrentData(nextData);
+                // SNAP: TODO: BUG: deltaData.encodedAdditions has been destroyed when calling nextData.applyDelta(oldData, deltaData, i) above
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+                deltaData.encodedAdditions.destroy();
                 oldData.destroy();
             }
             deltaData.destroy();

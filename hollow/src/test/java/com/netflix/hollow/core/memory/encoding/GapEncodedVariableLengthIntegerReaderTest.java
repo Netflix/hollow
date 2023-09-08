@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.ByteDataArray;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,7 +49,7 @@ public class GapEncodedVariableLengthIntegerReaderTest {
         GapEncodedVariableLengthIntegerReader reader1 = reader(1, 10, 100, 105, 107, 200);
         GapEncodedVariableLengthIntegerReader reader2 = reader(5, 76, 100, 102, 109, 197, 198, 199, 200, 201);
 
-        GapEncodedVariableLengthIntegerReader combined = GapEncodedVariableLengthIntegerReader.combine(reader1, reader2, WastefulRecycler.SMALL_ARRAY_RECYCLER);
+        GapEncodedVariableLengthIntegerReader combined = GapEncodedVariableLengthIntegerReader.combine(reader1, reader2, MemoryMode.ON_HEAP, WastefulRecycler.SMALL_ARRAY_RECYCLER);
 
         assertValues(combined, 1, 5, 10, 76, 100, 102, 105, 107, 109, 197, 198, 199, 200, 201);
     }

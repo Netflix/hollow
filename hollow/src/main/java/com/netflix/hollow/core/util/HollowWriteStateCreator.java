@@ -149,7 +149,7 @@ public class HollowWriteStateCreator {
     }
 
     public static void populateUsingReadEngine(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine, boolean preserveHashPositions) {
-        SimultaneousExecutor executor = new SimultaneousExecutor(HollowWriteStateCreator.class, "populate");
+        SimultaneousExecutor executor = new SimultaneousExecutor(writeEngine.getOrderedTypeStates().size(), HollowWriteStateCreator.class, "populate");
         
         for(HollowTypeWriteState writeState : writeEngine.getOrderedTypeStates()) {
             if(writeState.getPopulatedBitSet().cardinality() != 0 || writeState.getPreviousCyclePopulatedBitSet().cardinality() != 0)

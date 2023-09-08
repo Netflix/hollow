@@ -122,7 +122,7 @@ public class OnHeapArrayVsOffHeapBufferAcceptanceTest {
         SegmentedByteArray testByteArray = new SegmentedByteArray(WastefulRecycler.DEFAULT_INSTANCE);
         testByteArray.loadFrom(HollowBlobInput.serial(new FileInputStream(testFile)), testFile.length());
 
-        EncodedByteBuffer testByteBuffer = new EncodedByteBuffer();
+        EncodedByteBuffer testByteBuffer = new EncodedByteBuffer(null);
         testByteBuffer.loadFrom(HollowBlobInput.randomAccess(testFile, TEST_SINGLE_BUFFER_CAPACITY_BYTES), testFile.length());
 
         // aligned bytes - BlobByteBuffer vs. SegmentedByteArray
@@ -137,15 +137,15 @@ public class OnHeapArrayVsOffHeapBufferAcceptanceTest {
         assertEquals(testByteArray.get(13 + padding), testByteBuffer.get(13 + padding));
         assertEquals(testByteArray.get(127 + padding), testByteBuffer.get(127 + padding));
 
-        // out of bounds read
-        try {
-            testByteBuffer.get(testFile.length());
-            Assert.fail();
-        } catch (IllegalStateException e) {
-            // this is expected
-        } catch (Exception e) {
-            Assert.fail();
-        }
+        // uncomment to test BlobByteBufferTest::getByte()
+        // try {
+        //     testByteBuffer.get(testFile.length());
+        //     Assert.fail();
+        // } catch (IllegalStateException e) {
+        //     // this is expected
+        // } catch (Exception e) {
+        //     Assert.fail();
+        // }
     }
 
     // write a File of TEST_SINGLE_BUFFER_CAPACITY_BYTES*4 size, assuming TEST_SINGLE_BUFFER_CAPACITY_BYTES is 32

@@ -150,7 +150,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         
         restoredStates = new ArrayList<String>();
 
-        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "restore");
+        SimultaneousExecutor executor = new SimultaneousExecutor(writeStates.keySet().size(), getClass(), "restore");
 
         for(final HollowTypeReadState readState : readStateEngine.getTypeStates()) {
             final String typeName = readState.getSchema().getName();
@@ -190,18 +190,20 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         addTypeNamesWithDefinedHashCodesToHeader();
 
         try {
-            SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "prepare-for-write");
+            if (!writeStates.isEmpty()) {
+                SimultaneousExecutor executor = new SimultaneousExecutor(writeStates.keySet().size(), getClass(), "prepare-for-write");
 
-            for(final Map.Entry<String, HollowTypeWriteState> typeStateEntry : writeStates.entrySet()) {
-                executor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        typeStateEntry.getValue().prepareForWrite();
-                    }
-                });
+                for(final Map.Entry<String, HollowTypeWriteState> typeStateEntry : writeStates.entrySet()) {
+                    executor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            typeStateEntry.getValue().prepareForWrite();
+                        }
+                    });
+                }
+
+                executor.awaitSuccessfulCompletion();
             }
-
-            executor.awaitSuccessfulCompletion();
         } catch(Exception ex) {
             throw new HollowWriteStateException("Failed to prepare for write", ex);
         }
@@ -221,7 +223,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         overridePreviousHeaderTags(headerTags);
 
         try {
-            SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "prepare-for-next-cycle");
+
+            SimultaneousExecutor executor = new SimultaneousExecutor(writeStates.keySet().size(), getClass(), "prepare-for-next-cycle");
 
             for(final Map.Entry<String, HollowTypeWriteState> typeStateEntry : writeStates.entrySet()) {
                 executor.execute(new Runnable() {
@@ -260,7 +263,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
      */
     public void resetToLastPrepareForNextCycle() {
         
-        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "reset-to-last-prepare-for-next-cycle");
+        SimultaneousExecutor executor = new SimultaneousExecutor(writeStates.keySet().size(), getClass(), "reset-to-last-prepare-for-next-cycle");
 
         for(final Map.Entry<String, HollowTypeWriteState> typeStateEntry : writeStates.entrySet()) {
             executor.execute(new Runnable() {

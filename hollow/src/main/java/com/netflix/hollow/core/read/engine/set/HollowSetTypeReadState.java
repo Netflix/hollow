@@ -87,7 +87,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
             maxOrdinal = VarInt.readVInt(in);
         
         for(int i=0;i<shards.length;i++) {
-            HollowSetTypeDataElements snapshotData = new HollowSetTypeDataElements(memoryMode, memoryRecycler);
+            HollowSetTypeDataElements snapshotData = new HollowSetTypeDataElements(schema, memoryMode, memoryRecycler);
             snapshotData.readSnapshot(in);
             shards[i].setCurrentData(snapshotData);
         }
@@ -104,7 +104,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0;i<shards.length;i++) {
-            HollowSetTypeDataElements deltaData = new HollowSetTypeDataElements(memoryMode, memoryRecycler);
+            HollowSetTypeDataElements deltaData = new HollowSetTypeDataElements(schema, memoryMode, memoryRecycler);
             deltaData.readDelta(in);
             if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
 
@@ -118,7 +118,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
                     oldRemovals.destroy();
                 } else {
                     if(!deltaData.encodedRemovals.isEmpty()) {
-                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryRecycler);
+                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryMode, memoryRecycler);
                         oldRemovals.destroy();
                     }
                     deltaData.encodedRemovals.destroy();
@@ -126,11 +126,12 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
                 deltaData.encodedAdditions.destroy();
             } else {
-                HollowSetTypeDataElements nextData = new HollowSetTypeDataElements(memoryMode, memoryRecycler);
+                HollowSetTypeDataElements nextData = new HollowSetTypeDataElements(schema, memoryMode, memoryRecycler);
                 HollowSetTypeDataElements oldData = shards[i].currentDataElements();
-                nextData.applyDelta(oldData, deltaData);
+                nextData.applyDelta(oldData, deltaData, i);
                 shards[i].setCurrentData(nextData);
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+                deltaData.encodedAdditions.destroy();
                 oldData.destroy();
             }
             deltaData.destroy();

@@ -18,28 +18,62 @@ package com.netflix.hollow.core.memory;
 
 import com.netflix.hollow.core.memory.encoding.BlobByteBuffer;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.util.logging.Logger;
 
 /**
- * {@code BlobByteBuffer} based implementation of variable length byte data that only supports read.
+ * {@code BlobByteBuffer} based implementation of variable length byte data that only supports read.    // TODO: update when supports write
  */
 public class EncodedByteBuffer implements VariableLengthData {
+    private static final Logger LOG = Logger.getLogger(EncodedByteBuffer.class.getName());
 
     private BlobByteBuffer bufferView;
     private long size;
 
-    public EncodedByteBuffer() {
+    private final File managedFile;
+    private boolean destroyActionHasBeenTakenBeforeDiag = false;
+
+    public EncodedByteBuffer(File managedFile) {
+        this.managedFile = managedFile;
         this.size = 0;
+    }
+
+    public BlobByteBuffer getBufferView() {
+        return bufferView;
+    }
+
+    public void destroy() throws IOException {
+        if (bufferView != null) {
+            bufferView.unmapBlob();
+            destroyActionHasBeenTakenBeforeDiag = true;
+        } else {
+            if (destroyActionHasBeenTakenBeforeDiag) {
+                LOG.warning("SNAP: destroy() called on EncodedByteBuffer thats already been destroyed previously");
+            }
+        }
+        bufferView = null;
+        if (managedFile != null) {
+            // LOG.info("SNAP: EncodedByteBuffer destroy() is also deleting staged file " + managedFile.getAbsolutePath());
+            Files.delete(managedFile.toPath());
+        }
     }
 
     @Override
     public byte get(long index) {
-        if (index >= this.size) {
-            throw new IllegalStateException();
+        if (index >= this.size) {   // SNAP: TODO: realized in transformer
+            if (index >= this.size + Long.BYTES) {
+                LOG.warning(String.format("SNAP: unexpected get from EncodedByteBuffer: index=%s, size=%s", index, size));
+            }
         }
-
         byte retVal = this.bufferView.getByte(this.bufferView.position() + index);
         return retVal;
+    }
+
+    public int getBytes(long index, long len, byte[] bytes) {
+        return this.bufferView.getBytes(this.bufferView.position() + index, len, bytes, true);
     }
 
     /**
@@ -59,16 +93,34 @@ public class EncodedByteBuffer implements VariableLengthData {
 
     @Override
     public void copy(ByteData src, long srcPos, long destPos, long length) {
-        throw new UnsupportedOperationException("Operation not supported in shared-memory mode");
+        throw new UnsupportedOperationException("Operation not supported in shared-memory mode - EncodedByteBuffers are read-only");
     }
 
     @Override
-    public void orderedCopy(VariableLengthData src, long srcPos, long destPos, long length) {
-        throw new UnsupportedOperationException("Operation not supported in shared-memory mode");
+    public void orderedCopy(VariableLengthData src, long srcPos, long destPos, long length) throws IOException {
+        throw new UnsupportedOperationException("Underlying data can only be mutated using " + VariableLengthDataFactory.StagedVariableLengthData.class.getName());
     }
 
     @Override
     public long size() {
         return size;
+    }
+
+    @Override
+    public void set(long index, byte value) {
+        throw new UnsupportedOperationException("Operation not supported in shared-memory mode");
+    }
+
+    /**
+     * Write a portion of this data to an OutputStream.
+     *
+     * @param os the output stream to write to
+     * @param startPosition the position to begin copying from this array
+     * @param len the length of the data to copy
+     * @throws IOException if the write to the output stream could not be performed
+     */
+    @Override
+    public void writeTo(OutputStream os, long startPosition, long len) throws IOException {
+        throw new UnsupportedOperationException("Not supported for shared memory mode, supports the type filter feature");
     }
 }

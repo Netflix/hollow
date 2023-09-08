@@ -20,7 +20,10 @@ import static java.lang.Math.ceil;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.logging.Logger;
 
 /**
  * This class allows for storage and retrieval of fixed-length data in ByteBuffers. As a result there two ways to obtain
@@ -44,11 +47,38 @@ import java.io.IOException;
  */
 @SuppressWarnings("restriction")
 public class EncodedLongBuffer implements FixedLengthData {
+    private static final Logger LOG = Logger.getLogger(EncodedLongBuffer.class.getName());
+
+    static int count1 = 0;
+    static int count2 = 0;
 
     private BlobByteBuffer bufferView;
     private long maxByteIndex = -1;
 
-    public EncodedLongBuffer() {}
+    private final File managedFile;
+    private boolean destroyActionHasBeenTakenBeforeDiag = false;
+
+    public EncodedLongBuffer(File managedFile) {
+        this.managedFile = managedFile;
+    }
+
+    public void destroy() throws IOException {
+        if (bufferView != null) {
+            bufferView.unmapBlob();
+            destroyActionHasBeenTakenBeforeDiag = true;
+        } else {
+            if (destroyActionHasBeenTakenBeforeDiag) {
+                LOG.warning("SNAP: destroy() called on EncodedLongBuffer thats been destroyed previously");
+            }
+        }
+        bufferView = null;
+
+        if (managedFile != null) {
+            Files.delete(managedFile.toPath());
+        }
+        // System.out.println("SNAP: WARNING - shouldn't be getting invoked");
+        // since we operate on a bufferView here, we shouldn't mutate the underlying buffer
+    }
 
     /**
      * Returns a new EncodedLongBuffer from deserializing the given input. The value of the first variable length integer
@@ -69,7 +99,11 @@ public class EncodedLongBuffer implements FixedLengthData {
      * @return new EncodedLongBuffer containing data read from input
      */
     public static EncodedLongBuffer newFrom(HollowBlobInput in, long numLongs) throws IOException {
-        EncodedLongBuffer buf = new EncodedLongBuffer();
+        return newFrom(in, numLongs, null);
+    }
+
+    public static EncodedLongBuffer newFrom(HollowBlobInput in, long numLongs, File managedFile) throws IOException {
+        EncodedLongBuffer buf = new EncodedLongBuffer(managedFile);
         buf.loadFrom(in, numLongs);
         return buf;
     }
@@ -83,7 +117,7 @@ public class EncodedLongBuffer implements FixedLengthData {
         buffer.position(in.getFilePointer());
         this.bufferView = buffer.duplicate();
         buffer.position(buffer.position() + (numLongs * Long.BYTES));
-        in.seek(in.getFilePointer() + (numLongs  * Long.BYTES));
+        in.seek(in.getFilePointer() + (numLongs  * Long.BYTES));    // SNAP: TODO: is this stuff unnecessary when being done in delta application? Called from FixedLengthDataFactory::allocate
     }
 
     @Override
@@ -98,7 +132,9 @@ public class EncodedLongBuffer implements FixedLengthData {
         int whichBit = (int) (index & 0x07);
 
         if (whichByte + ceil((float) bitsPerElement/8) > this.maxByteIndex + 1) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(String.format("Attempted read past the end of buffer. index=%s, " +
+                    "whichByte=%s, this.maxByteIndex=%s, whichBit=%s, bitsPerElement=%s", index, whichByte,
+                    this.maxByteIndex, whichBit, bitsPerElement));
         }
 
         long longVal = this.bufferView.getLong(this.bufferView.position() + whichByte);
@@ -132,21 +168,131 @@ public class EncodedLongBuffer implements FixedLengthData {
 
     @Override
     public void setElementValue(long index, int bitsPerElement, long value) {
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+        long whichByte = index >>> 3;
+        int whichBit = (int) (index & 0x07);
+        this.bufferView.putLong(this.bufferView.position() + whichByte,
+                this.bufferView.getLong(this.bufferView.position() + whichByte) | (value << whichBit));
+
+        int bitsRemaining = 64 - whichBit;
+
+        if (bitsRemaining < bitsPerElement)
+            this.bufferView.putLong(this.bufferView.position() + whichByte + 1,
+                    this.bufferView.getLong(this.bufferView.position() + whichByte + 1) | (value >>> bitsRemaining));
     }
 
     @Override
     public void copyBits(FixedLengthData copyFrom, long sourceStartBit, long destStartBit, long numBits){
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+        if(numBits == 0)
+            return;
+
+        if ((destStartBit & 63) != 0) {
+            int fillBits = (int) Math.min(64 - (destStartBit & 63), numBits);
+            long fillValue = copyFrom.getLargeElementValue(sourceStartBit, fillBits);
+            setElementValue(destStartBit, fillBits, fillValue);
+
+            destStartBit += fillBits;
+            sourceStartBit += fillBits;
+            numBits -= fillBits;
+        }
+
+        // SNAP: TODO: figure out bulk copy, currently has bug even when sourceStartBit == destStartBit, but in general
+        //             challenge here is that the bits need to be moved in bulk but the offsets into source and dest
+        //             are not the same so the alignment of bits will vary
+        // if (copyFrom instanceof EncodedLongBuffer && sourceStartBit == destStartBit) {
+        if (false) {
+            count1 ++;
+            long currentWriteByte = destStartBit >>> 3;
+            long sourceStartByte = sourceStartBit >>> 3;
+            int endFillBits = (int) (numBits & 63);
+            long numBytes = (numBits - endFillBits) >>> 3;
+            EncodedLongBuffer from = (EncodedLongBuffer) copyFrom;
+
+            byte[] chunk = new byte[16384]; // must be multiple of 8, and 16384 is the page size returned by vm_stat on my mac
+            while (numBytes > 0) {
+                int toReadBytes = (int) Math.min(numBytes, (long) chunk.length);
+                int readBytes = from.bufferView.getBytes(from.bufferView.position() + sourceStartByte, toReadBytes, chunk, true);
+                numBytes -= readBytes;
+                sourceStartByte += readBytes;
+                sourceStartBit += readBytes * 8;
+
+                int toWriteBytes = readBytes;
+                while (toWriteBytes > 0) {
+                    int writtenBytes = this.bufferView.putBytes(this.bufferView.position() + currentWriteByte, toWriteBytes, chunk, true);
+                    currentWriteByte += writtenBytes;
+                    destStartBit += writtenBytes * 8;
+                    toWriteBytes -= writtenBytes;
+                }
+            }
+
+            if (endFillBits != 0) {
+                destStartBit = currentWriteByte << 3;
+
+                long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) endFillBits);
+                setElementValue(destStartBit, endFillBits, fillValue);
+            }
+        } else {
+            count2 ++;
+            long currentWriteLong = destStartBit >>> 6;
+
+            while (numBits >= 64) {
+                long l = copyFrom.getLargeElementValue(sourceStartBit, 64, -1);
+                this.bufferView.putLong(this.bufferView.position() + (currentWriteLong * 8), l);
+                numBits -= 64;
+                sourceStartBit += 64;
+                currentWriteLong++;
+            }
+
+            if (numBits != 0) {
+                destStartBit = currentWriteLong << 6;
+
+                long fillValue = copyFrom.getLargeElementValue(sourceStartBit, (int) numBits);
+                setElementValue(destStartBit, (int) numBits, fillValue);
+            }
+        }
     }
 
     @Override
     public void incrementMany(long startBit, long increment, long bitsBetweenIncrements, int numIncrements){
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+        long endBit = startBit + (bitsBetweenIncrements * numIncrements);
+        for(; startBit<endBit; startBit += bitsBetweenIncrements) {
+            increment(startBit, increment);
+        }
+    }
+
+    public void increment(long index, long increment) {
+        long whichByte = index >>> 3;
+        int whichBit = (int) (index & 0x07);
+
+        long l = this.bufferView.getLong(this.bufferView.position() + whichByte);
+
+        this.bufferView.putLong(whichByte, l + (increment << whichBit));
+
+        /// SNAP: Didn't update the fencepost longs like we did in FixedLengthElementArray::increment
     }
 
     @Override
-    public void clearElementValue(long index, int bitsPerElement) {
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
+    public void clearElementValue(long index, int bitsPerElement) { // SNAP: can be absorbed into interface, with set and get being the specific implementations
+        long whichLong = index >>> 6;
+        int whichBit = (int) (index & 0x3F);
+
+        long mask = ((1L << bitsPerElement) - 1);
+
+        set(whichLong, get(whichLong) & ~(mask << whichBit));
+
+        int bitsRemaining = 64 - whichBit;
+
+        if (bitsRemaining < bitsPerElement)
+            set(whichLong + 1, get(whichLong + 1) & ~(mask >>> bitsRemaining));
+    }
+
+    /**
+     * Set and get the long at the given index to the specified value. Index is at Long.BYTES granularity and relative to
+     * the start of this buffer. So for e.g. index 0 will represent the long value occupying bytes 0-7 of this buffer, etc.
+     */
+    public void set(long index, long value) {
+        this.bufferView.putLong(this.bufferView.position() + (index * 8), value);
+    }
+    public long get(long index) {
+        return this.bufferView.getLong(this.bufferView.position() + (index * 8));
     }
 }

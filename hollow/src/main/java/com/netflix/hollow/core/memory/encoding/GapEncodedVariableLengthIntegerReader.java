@@ -17,15 +17,19 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.ByteDataArray;
-import com.netflix.hollow.core.memory.SegmentedByteArray;
+import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.memory.VariableLengthData;
+import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.util.IOUtils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Logger;
 
 public class GapEncodedVariableLengthIntegerReader {
+    private static final Logger LOG = Logger.getLogger(GapEncodedVariableLengthIntegerReader.class.getName());
 
     public static GapEncodedVariableLengthIntegerReader EMPTY_READER = new GapEncodedVariableLengthIntegerReader(null, 0) {
         @Override
@@ -34,14 +38,14 @@ public class GapEncodedVariableLengthIntegerReader {
         }
     };
 
-    private final SegmentedByteArray data;
+    private final VariableLengthData data;
     private final int numBytes;
     private int currentPosition;
 
     private int nextElement;
     private int elementIndex;
 
-    public GapEncodedVariableLengthIntegerReader(SegmentedByteArray data, int numBytes) {
+    public GapEncodedVariableLengthIntegerReader(VariableLengthData data, int numBytes) {
         this.data = data;
         this.numBytes = numBytes;
         reset();
@@ -86,9 +90,9 @@ public class GapEncodedVariableLengthIntegerReader {
         return remainingElementCount;
     }
 
-    public void destroy() {
+    public void destroy() throws IOException {
         if(data != null)
-            data.destroy();
+            VariableLengthDataFactory.destroy(data);
     }
     
     public void writeTo(OutputStream os) throws IOException {
@@ -97,10 +101,10 @@ public class GapEncodedVariableLengthIntegerReader {
     }
 
     public static GapEncodedVariableLengthIntegerReader readEncodedDeltaOrdinals(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
-        SegmentedByteArray arr = new SegmentedByteArray(memoryRecycler);
+        VariableLengthData data = VariableLengthDataFactory.get(in.getMemoryMode(), memoryRecycler);
         long numBytesEncodedOrdinals = VarInt.readVLong(in);
-        arr.loadFrom(in, numBytesEncodedOrdinals);
-        return new GapEncodedVariableLengthIntegerReader(arr, (int)numBytesEncodedOrdinals);
+        data.loadFrom(in, numBytesEncodedOrdinals);
+        return new GapEncodedVariableLengthIntegerReader(data, (int)numBytesEncodedOrdinals);
     }
 
     public static void copyEncodedDeltaOrdinals(HollowBlobInput in, DataOutputStream... os) throws IOException {
@@ -115,10 +119,13 @@ public class GapEncodedVariableLengthIntegerReader {
         }
     }
 
-    public static GapEncodedVariableLengthIntegerReader combine(GapEncodedVariableLengthIntegerReader reader1, GapEncodedVariableLengthIntegerReader reader2, ArraySegmentRecycler memoryRecycler) {
+    public static GapEncodedVariableLengthIntegerReader combine(GapEncodedVariableLengthIntegerReader reader1,
+                                                                GapEncodedVariableLengthIntegerReader reader2,
+                                                                MemoryMode memoryMode,
+                                                                ArraySegmentRecycler memoryRecycler) {
         reader1.reset();
         reader2.reset();
-        ByteDataArray arr = new ByteDataArray(memoryRecycler);
+        ByteDataArray arr = new ByteDataArray(memoryRecycler); // SNAP: TODO: Currently always on heap
         int cur = 0;
 
         while(reader1.nextElement() != Integer.MAX_VALUE || reader2.nextElement() != Integer.MAX_VALUE) {
@@ -137,7 +144,6 @@ public class GapEncodedVariableLengthIntegerReader {
                 reader2.advance();
             }
         }
-
         return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingArray(), (int)arr.length());
     }
 }

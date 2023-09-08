@@ -16,8 +16,12 @@
  */
 package com.netflix.hollow.core.read.engine.list;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import static com.netflix.hollow.core.memory.MemoryFileUtil.filepath;
+
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
+import com.netflix.hollow.core.memory.MemoryFileUtil;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
+import java.io.IOException;
 
 /**
  * This class contains the logic for applying a delta to a current LIST type state
@@ -30,6 +34,7 @@ class HollowListDeltaApplicator {
     private final HollowListTypeDataElements from;
     private final HollowListTypeDataElements delta;
     private final HollowListTypeDataElements target;
+    private final int whichShardForDiag;
 
     private long currentFromStateCopyStartBit = 0;
     private long currentDeltaCopyStartBit = 0;
@@ -42,13 +47,14 @@ class HollowListDeltaApplicator {
     private GapEncodedVariableLengthIntegerReader removalsReader;
     private GapEncodedVariableLengthIntegerReader additionsReader;
 
-    HollowListDeltaApplicator(HollowListTypeDataElements from, HollowListTypeDataElements delta, HollowListTypeDataElements target) {
+    HollowListDeltaApplicator(HollowListTypeDataElements from, HollowListTypeDataElements delta, HollowListTypeDataElements target, int whichShardForDiag) {
         this.from = from;
         this.delta = delta;
         this.target = target;
+        this.whichShardForDiag = whichShardForDiag;
     }
 
-    public void applyDelta() {
+    public void applyDelta() throws IOException {
         removalsReader = from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
         additionsReader = delta.encodedAdditions;
         removalsReader.reset();
@@ -61,8 +67,12 @@ class HollowListDeltaApplicator {
         target.bitsPerListPointer = delta.bitsPerListPointer;
         target.bitsPerElement = delta.bitsPerElement;
 
-        target.listPointerData = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerListPointer);
-        target.elementData = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfElements * target.bitsPerElement);
+        target.listPointerData = FixedLengthDataFactory.allocate(((long)target.maxOrdinal + 1) * target.bitsPerListPointer,
+                target.memoryMode, target.memoryRecycler,
+                filepath() + MemoryFileUtil.fixedLengthDataFilename(target.schemaForDiag.getName(), "listPointerData", whichShardForDiag));
+
+        target.elementData = FixedLengthDataFactory.allocate(target.totalNumberOfElements * target.bitsPerElement, target.memoryMode, target.memoryRecycler,
+                filepath() + MemoryFileUtil.fixedLengthDataFilename(target.schemaForDiag.getName(), "listElementData", whichShardForDiag));
 
         if(target.bitsPerListPointer == from.bitsPerListPointer
                 && target.bitsPerElement == from.bitsPerElement)
@@ -72,7 +82,7 @@ class HollowListDeltaApplicator {
 
         from.encodedRemovals = null;
         removalsReader.destroy();
-        additionsReader.destroy();
+        // additionsReader.destroy();
     }
 
     private void slowDelta() {

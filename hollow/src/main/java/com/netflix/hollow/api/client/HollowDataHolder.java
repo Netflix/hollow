@@ -206,16 +206,17 @@ class HollowDataHolder {
     }
 
     private void applyDeltaTransition(HollowConsumer.Blob blob, boolean isSnapshotPlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
-        if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
-            LOG.warning("Skipping delta transition in shared-memory mode");
-            return;
-        }
+        LOG.info(String.format("Attempting delta transition from v %s to v %s in %s mode",
+                blob.getFromVersion(), blob.getToVersion(), memoryMode));
 
         try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, blob);
              OptionalBlobPartInput optionalPartIn = blob.getOptionalBlobPartInputs()) {
             applyStateEngineTransition(in, optionalPartIn, blob, refreshListeners);
 
             if(objLongevityConfig.enableLongLivedObjectSupport()) {
+                if (!memoryMode.equals(MemoryMode.ON_HEAP)) {
+                    throw new UnsupportedOperationException("Shared memory mode doesn't support object longevity... yet");
+                }
                 HollowDataAccess previousDataAccess = currentAPI.getDataAccess();
                 HollowHistoricalStateDataAccess priorState = new HollowHistoricalStateCreator(null).createBasedOnNewDelta(currentVersion, stateEngine);
                 HollowProxyDataAccess newDataAccess = new HollowProxyDataAccess();
@@ -245,7 +246,11 @@ class HollowDataHolder {
 
         } catch(Throwable t) {
             failedTransitionTracker.markFailedTransition(blob);
+            LOG.warning("SNAP: Delta transition encountered exception: " + t);
             throw t;
+        } finally {
+            LOG.info(String.format("Delta transition completed from v %s to v %s in %s mode",
+                    blob.getFromVersion(), blob.getToVersion(), memoryMode));
         }
     }
 

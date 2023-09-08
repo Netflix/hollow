@@ -16,8 +16,12 @@
  */
 package com.netflix.hollow.core.read.engine.map;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import static com.netflix.hollow.core.memory.MemoryFileUtil.filepath;
+
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
+import com.netflix.hollow.core.memory.MemoryFileUtil;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
+import java.io.IOException;
 
 /**
  * This class contains the logic for applying a delta to a current MAP type state
@@ -30,6 +34,7 @@ class HollowMapDeltaApplicator {
     private final HollowMapTypeDataElements from;
     private final HollowMapTypeDataElements delta;
     private final HollowMapTypeDataElements target;
+    private final int whichShardForDiag;
 
     private long currentFromStateCopyStartBit = 0;
     private long currentDeltaCopyStartBit = 0;
@@ -42,13 +47,15 @@ class HollowMapDeltaApplicator {
     private GapEncodedVariableLengthIntegerReader removalsReader;
     private GapEncodedVariableLengthIntegerReader additionsReader;
 
-    HollowMapDeltaApplicator(HollowMapTypeDataElements from, HollowMapTypeDataElements delta, HollowMapTypeDataElements target) {
+    HollowMapDeltaApplicator(HollowMapTypeDataElements from, HollowMapTypeDataElements delta, HollowMapTypeDataElements target,
+                             int whichShardForDiag) {
         this.from = from;
         this.delta = delta;
         this.target = target;
+        this.whichShardForDiag = whichShardForDiag;
     }
 
-    public void applyDelta() {
+    public void applyDelta() throws IOException {
         removalsReader = from.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : from.encodedRemovals;
         additionsReader = delta.encodedAdditions;
         removalsReader.reset();
@@ -67,8 +74,12 @@ class HollowMapDeltaApplicator {
         target.emptyBucketKeyValue = delta.emptyBucketKeyValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
-        target.mapPointerAndSizeData = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion);
-        target.entryData = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfBuckets * target.bitsPerMapEntry);
+        target.mapPointerAndSizeData = FixedLengthDataFactory.allocate(((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion,
+                target.memoryMode, target.memoryRecycler,
+                filepath() + MemoryFileUtil.fixedLengthDataFilename(target.schemaForDiag.getName(), "mapPointerAndSizeData", whichShardForDiag));
+        target.entryData = FixedLengthDataFactory.allocate(target.totalNumberOfBuckets * target.bitsPerMapEntry,
+                target.memoryMode, target.memoryRecycler,
+                filepath() + MemoryFileUtil.fixedLengthDataFilename(target.schemaForDiag.getName(), "mapEntryData", whichShardForDiag));
 
         if(target.bitsPerMapPointer == from.bitsPerMapPointer
                 && target.bitsPerMapSizeValue == from.bitsPerMapSizeValue
@@ -81,7 +92,7 @@ class HollowMapDeltaApplicator {
 
         from.encodedRemovals = null;
         removalsReader.destroy();
-        additionsReader.destroy();
+        // additionsReader.destroy();
     }
 
     private void slowDelta() {
