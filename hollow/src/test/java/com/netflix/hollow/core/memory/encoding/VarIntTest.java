@@ -20,6 +20,17 @@ public class VarIntTest {
         Assert.assertEquals(129, VarInt.readVLong(is));
     }
 
+    @Test
+    public void testVLongByteArray() throws IOException {
+        long value = 129L;
+
+        byte[] serialized = new byte[VarInt.sizeOfVLong(value)];
+        VarInt.writeVLong(serialized, 0, value);
+
+        Assert.assertEquals(VarInt.sizeOfVLong(value), VarInt.nextVLongSize(serialized, 0));
+        Assert.assertEquals(value, VarInt.readVLong(serialized, 0));
+    }
+
     @Test(expected = EOFException.class)
     public void testReadVLongEmptyInputStream() throws IOException {
         InputStream is = new ByteArrayInputStream(BYTES_EMPTY);
@@ -83,6 +94,16 @@ public class VarIntTest {
         Assert.assertEquals(129l, VarInt.readVInt(hbi));
     }
 
+    @Test
+    public void testVIntByteArray() throws IOException {
+        int value = 129;
+
+        byte[] serialized = new byte[VarInt.sizeOfVInt(value)];
+        VarInt.writeVInt(serialized, 0, value);
+
+        Assert.assertEquals(value, VarInt.readVInt(serialized, 0));
+    }
+
     @Test(expected = EOFException.class)
     public void testReadVIntEmptyHollowBlobInput() throws IOException {
         HollowBlobInput hbi = HollowBlobInput.serial(BYTES_EMPTY);
@@ -95,5 +116,14 @@ public class VarIntTest {
         HollowBlobInput hbi = HollowBlobInput.serial(BYTES_TRUNCATED);
 
         VarInt.readVInt(hbi);
+    }
+
+    @Test
+    public void testVNullByteArray() throws IOException {
+        byte[] serialized = new byte[1];
+        VarInt.writeVNull(serialized, 0);
+        Assert.assertTrue(VarInt.readVNull(serialized, 0));
+
+        Assert.assertFalse(VarInt.readVNull(new byte[1], 0));
     }
 }
