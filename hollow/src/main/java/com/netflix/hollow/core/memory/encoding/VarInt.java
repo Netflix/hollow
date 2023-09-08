@@ -96,7 +96,7 @@ public class VarInt {
     }
 
     /**
-     * Encode the specified long as a variable length integer into the supplied byte array.
+     * Encode the specified long as a variable length long into the supplied byte array.
      *
      * @param data the byte array to write to
      * @param pos the position in the byte array
