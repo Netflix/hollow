@@ -413,6 +413,8 @@ public class HollowProducerTest {
         System.out.println("Asserted Correctness of version:" + version + "\n\n");
     }
 
+    // SNAP: TODO: run cycles with type sharding
+
     @SuppressWarnings("unused")
     @HollowTypeName(name = "TestPojo")
     private static class TestPojoV1 {

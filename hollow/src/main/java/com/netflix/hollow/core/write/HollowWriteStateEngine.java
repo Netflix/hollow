@@ -141,10 +141,14 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             HollowTypeWriteState writeState = writeStates.get(typeName);
 
             if(writeState != null) {
-                if(writeState.getNumShards() == -1)
+                if(writeState.getNumShards() == -1) {
                     writeState.numShards = readState.numShards();
-                else if(writeState.getNumShards() != readState.numShards())
-                    throw new IllegalStateException("Attempting to restore from a HollowReadStateEngine which does not have the same number of shards as explicitly configured for type " + typeName);
+                }
+                else if(readState.numShards() != 0 && writeState.getNumShards() != readState.numShards()) {
+                    String msg = "Attempting to restore from a HollowReadStateEngine with numShards " + readState.numShards()
+                            + " for type " + typeName + " to write state engine with numShards " + writeState.getNumShards();
+                    throw new IllegalStateException(msg);
+                }
             }
         }
         
@@ -415,6 +419,9 @@ public class HollowWriteStateEngine implements HollowStateEngine {
      * @param targetMaxTypeShardSize the target max type shard size, in bytes
      */
     public void setTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
+        if (targetMaxTypeShardSize < 0) {
+            throw new IllegalArgumentException("Invalid target max shard size specified: " + targetMaxTypeShardSize);
+        }
         this.targetMaxTypeShardSize = targetMaxTypeShardSize;
     }
     

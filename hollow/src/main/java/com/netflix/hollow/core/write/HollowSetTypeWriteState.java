@@ -62,13 +62,12 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
 
     public void prepareForWrite() {
         super.prepareForWrite();
-
         gatherStatistics();
     }
 
     private void gatherStatistics() {
         if(numShards == -1)
-            calculateNumShards();
+            calculateNumShards();   // SNAP: TODO: numShards could be fixed using annotation
         
         int maxElementOrdinal = 0;
 

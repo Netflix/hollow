@@ -34,6 +34,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
 
 /**
@@ -44,9 +45,33 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     private final HollowObjectSchema unfilteredSchema;
     private final HollowObjectSampler sampler;
 
-    private final int shardNumberMask;
-    private final int shardOrdinalShift;
-    private final HollowObjectTypeReadStateShard shards[];
+    static class ShardsHolder {
+        final HollowObjectTypeReadStateShard shards[];
+        final int shardNumberMask;
+
+        private ShardsHolder(HollowSchema schema, int numShards) {
+            HollowObjectTypeReadStateShard[] shards = new HollowObjectTypeReadStateShard[numShards];
+            int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
+            for(int i=0; i<numShards; i++) {
+                shards[i] = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, shardOrdinalShift);
+            }
+            this.shards = shards;
+            this.shardNumberMask = numShards - 1;
+        }
+
+        private ShardsHolder(HollowSchema schema, HollowObjectTypeDataElements[] dataElements, int[] shardOrdinalShifts) {
+            int numShards = dataElements.length;
+            HollowObjectTypeReadStateShard[] shards = new HollowObjectTypeReadStateShard[numShards];
+            for (int i=0; i<numShards; i++) {
+                shards[i] = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, shardOrdinalShifts[i]);
+                shards[i].setCurrentData(dataElements[i]);
+            }
+            this.shards = shards;
+            this.shardNumberMask = numShards - 1;
+        }
+    }
+
+    volatile ShardsHolder shardsVolatile;
 
     private int maxOrdinal;
 
@@ -58,17 +83,12 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         super(fileEngine, memoryMode, schema);
         this.sampler = new HollowObjectSampler(schema, DisabledSamplingDirector.INSTANCE);
         this.unfilteredSchema = unfilteredSchema;
-        this.shardNumberMask = numShards - 1;
-        this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
-        
+
+        int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
         if(numShards < 1 || 1 << shardOrdinalShift != numShards)
             throw new IllegalArgumentException("Number of shards must be a power of 2!");
-        
-        HollowObjectTypeReadStateShard shards[] = new HollowObjectTypeReadStateShard[numShards];
-        for(int i=0;i<shards.length;i++)
-            shards[i] = new HollowObjectTypeReadStateShard(schema);
-        
-        this.shards = shards;
+
+        this.shardsVolatile = new ShardsHolder(schema, numShards);
     }
 
     @Override
@@ -83,35 +103,38 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     @Override
     public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
-        if(shards.length > 1)
+        if(shardsVolatile.shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
-        for(int i=0;i<shards.length;i++) {
+        for(int i=0; i<shardsVolatile.shards.length; i++) {
             HollowObjectTypeDataElements snapshotData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
             snapshotData.readSnapshot(in, unfilteredSchema);
-            shards[i].setCurrentData(snapshotData);
+            shardsVolatile.shards[i].setCurrentData(snapshotData);
         }
 
-        if(shards.length == 1)
-            maxOrdinal = shards[0].currentDataElements().maxOrdinal;
+        if(shardsVolatile.shards.length == 1)
+            maxOrdinal = shardsVolatile.shards[0].currentDataElements().maxOrdinal;
 
         SnapshotPopulatedOrdinalsReader.readOrdinals(in, stateListeners);
     }
-    
+
     @Override
-    public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler) throws IOException {
-        if(shards.length > 1)
+    public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
+        if (shouldReshard(shardsVolatile.shards.length, deltaNumShards)) {
+            reshard(deltaNumShards);
+        }
+        if(shardsVolatile.shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
-        for(int i=0;i<shards.length;i++) {
+        for(int i=0; i<shardsVolatile.shards.length; i++) {
             HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryMode, memoryRecycler);
             deltaData.readDelta(in);
             if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
 
                 if(!deltaData.encodedRemovals.isEmpty())
-                    notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+                    notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shardsVolatile.shards.length);
 
-                HollowObjectTypeDataElements currentData = shards[i].currentDataElements();
+                HollowObjectTypeDataElements currentData = shardsVolatile.shards[i].currentDataElements();
                 GapEncodedVariableLengthIntegerReader oldRemovals = currentData.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : currentData.encodedRemovals;
                 if(oldRemovals.isEmpty()) {
                     currentData.encodedRemovals = deltaData.encodedRemovals;
@@ -127,10 +150,10 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 deltaData.encodedAdditions.destroy();
             } else {
                 HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
-                HollowObjectTypeDataElements oldData = shards[i].currentDataElements();
+                HollowObjectTypeDataElements oldData = shardsVolatile.shards[i].currentDataElements();
                 nextData.applyDelta(oldData, deltaData);
-                shards[i].setCurrentData(nextData);
-                notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+                shardsVolatile.shards[i].setCurrentData(nextData);
+                notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shardsVolatile.shards.length);
                 deltaData.encodedAdditions.destroy();
                 oldData.destroy();
             }
@@ -138,8 +161,173 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             stateEngine.getMemoryRecycler().swap();
         }
 
-        if(shards.length == 1)
-            maxOrdinal = shards[0].currentDataElements().maxOrdinal;
+        if(shardsVolatile.shards.length == 1)
+            maxOrdinal = shardsVolatile.shards[0].currentDataElements().maxOrdinal;
+    }
+
+    /**
+     * Given old and new numShards, this method returns the shard resizing multiplier.
+     */
+    static int shardingFactor(int oldNumShards, int newNumShards) {
+        if (newNumShards <= 0 || oldNumShards <= 0 || newNumShards == oldNumShards) {
+            throw new IllegalStateException("Invalid shard resizing, oldNumShards=" + oldNumShards + ", newNumShards=" + newNumShards);
+        }
+
+        boolean isNewGreater = newNumShards > oldNumShards;
+        int dividend = isNewGreater ? newNumShards : oldNumShards;
+        int divisor = isNewGreater ? oldNumShards : newNumShards;
+
+        if (dividend % divisor != 0) {
+            throw new IllegalStateException("Invalid shard resizing, oldNumShards=" + oldNumShards + ", newNumShards=" + newNumShards);
+        }
+        return dividend / divisor;
+    }
+
+    /**
+     * Reshards this type state to the desired shard count using O(shard size) space while supporting concurrent reads
+     * into the underlying data elements.
+     *
+     * @param newNumShards The desired number of shards
+     */
+    void reshard(int newNumShards) {
+        int prevNumShards = shardsVolatile.shards.length;
+        int shardingFactor = shardingFactor(prevNumShards, newNumShards);
+        HollowObjectTypeDataElements[] newDataElements;
+        int[] shardOrdinalShifts;
+
+        if (newNumShards>prevNumShards) { // split existing shards
+            // Step 1:  Grow the number of shards. Each original shard will result in N child shards where N is the sharding factor.
+            // The child shards will reference into the existing data elements as-is, and reuse existing shardOrdinalShift.
+            // However since the shards array is resized, a read will map into the new shard index, as a result a subset of
+            // ordinals in each shard will be accessed. In the next "splitting" step, the data elements in these new shards
+            // will be filtered to only retain the subset of ordinals that are actually accessed.
+            //
+            // This is an atomic update to shardsVolatile: full construction happens-before the store to shardsVolatile,
+            // in other words a fully constructed object as visible to this thread will be visible to other threads that
+            // load the new shardsVolatile.
+            shardsVolatile = expandWithOriginalDataElements(shardsVolatile, shardingFactor);
+
+            // Step 2: Split each original data element into N child data elements where N is the sharding factor.
+            // Then update each of the N child shards with the respective split of data element, this will be
+            // sufficient to serve all reads into this shard. Once all child shards for a pre-split parent
+            // shard have been assigned the split data elements, the parent data elements can be discarded.
+            for(int i=0; i<prevNumShards; i++) {
+                HollowObjectTypeDataElements originalDataElements = shardsVolatile.shards[i].currentDataElements();
+
+                shardsVolatile = splitDataElementsForOneShard(shardsVolatile, i, prevNumShards, shardingFactor);
+
+                destroyOriginalDataElements(originalDataElements);
+            }
+            // Re-sharding done.
+            // shardsVolatile now contains newNumShards shards where each shard contains
+            // a split of original data elements.
+
+        } else { // join existing shards
+            // Step 1: Join N data elements to create one, where N is the sharding factor. Then update each of the
+            //         N shards to reference the joined result, but with a new shardOrdinalShift.
+            //         Reads will continue to reference the same shard index as before, but the new shardOrdinalShift
+            //         will help these reads land at the right ordinal in the joined shard. When all N old shards
+            //         corresponding to one new shard have been updated, the N pre-join data elements can be destroyed.
+            for (int i=0; i<newNumShards; i++) {
+                HollowObjectTypeDataElements destroyCandidates[] = joinCandidates(shardsVolatile.shards, i, shardingFactor);
+
+                shardsVolatile = joinDataElementsForOneShard(shardsVolatile, i, shardingFactor);  // atomic update to shardsVolatile
+
+                for (int j = 0; j < shardingFactor; j ++) {
+                    destroyOriginalDataElements(destroyCandidates[j]);
+                };
+            }
+
+            // Step 2: Resize the shards array to only keep the first newNumShards shards.
+            newDataElements = new HollowObjectTypeDataElements[shardsVolatile.shards.length];
+            shardOrdinalShifts = new int[shardsVolatile.shards.length];
+            copyShardElements(shardsVolatile, newDataElements, shardOrdinalShifts);
+            shardsVolatile = new ShardsHolder(schema,
+                    Arrays.copyOfRange(newDataElements, 0, newNumShards),
+                    Arrays.copyOfRange(shardOrdinalShifts, 0, newNumShards));
+            // Re-sharding done.
+            // shardsVolatile now contains newNumShards shards where each shard contains
+            // a join of original data elements.
+        }
+    }
+
+    private void copyShardElements(ShardsHolder from, HollowObjectTypeDataElements[] newDataElements, int[] shardOrdinalShifts) {
+        for (int i=0; i<from.shards.length; i++) {
+            newDataElements[i] = from.shards[i].currentDataElements();
+            shardOrdinalShifts[i] = from.shards[i].shardOrdinalShift;
+        }
+    }
+
+    private HollowObjectTypeDataElements[] joinCandidates(HollowObjectTypeReadStateShard[] shards, int indexIntoShards, int shardingFactor) {
+        HollowObjectTypeDataElements[] result = new HollowObjectTypeDataElements[shardingFactor];
+        int newNumShards = shards.length / shardingFactor;
+        for (int i=0; i<shardingFactor; i++) {
+            result[i] = shards[indexIntoShards + (newNumShards*i)].currentDataElements();
+        };
+        return result;
+    }
+
+    ShardsHolder joinDataElementsForOneShard(ShardsHolder shardsHolder, int currentIndex, int shardingFactor) {
+        int newNumShards = shardsHolder.shards.length / shardingFactor;
+        int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newNumShards);
+
+        HollowObjectTypeDataElements[] joinCandidates = joinCandidates(shardsHolder.shards, currentIndex, shardingFactor);
+
+        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
+        HollowObjectTypeDataElements joined = joiner.join(joinCandidates);
+
+        HollowObjectTypeDataElements[] newDataElements = new HollowObjectTypeDataElements[shardsHolder.shards.length];
+        int[] shardOrdinalShifts = new int[shardsHolder.shards.length];
+        copyShardElements(shardsHolder, newDataElements, shardOrdinalShifts);
+
+        for (int i=0; i<shardingFactor; i++) {
+            newDataElements[currentIndex + (newNumShards*i)] = joined;
+            shardOrdinalShifts[currentIndex + (newNumShards*i)] = newShardOrdinalShift;
+        };
+        return new ShardsHolder(schema, newDataElements, shardOrdinalShifts);
+    }
+
+    ShardsHolder expandWithOriginalDataElements(ShardsHolder shardsHolder, int shardingFactor) {
+        int prevNumShards = shardsHolder.shards.length;
+        int newNumShards = prevNumShards * shardingFactor;
+        HollowObjectTypeDataElements[] newDataElements = new HollowObjectTypeDataElements[newNumShards];
+        int[] shardOrdinalShifts = new int[newNumShards];
+
+        for(int i=0; i<prevNumShards; i++) {
+            for (int j=0; j<shardingFactor; j++) {
+                newDataElements[i+(prevNumShards*j)] = shardsHolder.shards[i].currentDataElements();
+                shardOrdinalShifts[i+(prevNumShards*j)] = 31 - Integer.numberOfLeadingZeros(prevNumShards);
+            }
+        }
+        return new ShardsHolder(schema, newDataElements, shardOrdinalShifts);
+    }
+
+    ShardsHolder splitDataElementsForOneShard(ShardsHolder shardsHolder, int currentIndex, int prevNumShards, int shardingFactor) {
+        int newNumShards = shardsHolder.shards.length;
+        int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newNumShards);
+
+        HollowObjectTypeDataElements dataElementsToSplit = shardsHolder.shards[currentIndex].currentDataElements();
+
+        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
+        HollowObjectTypeDataElements[] splits = splitter.split(dataElementsToSplit, shardingFactor);
+
+        HollowObjectTypeDataElements[] newDataElements = new HollowObjectTypeDataElements[shardsHolder.shards.length];
+        int[] shardOrdinalShifts = new int[shardsHolder.shards.length];
+        copyShardElements(shardsHolder, newDataElements, shardOrdinalShifts);
+
+        for (int i = 0; i < shardingFactor; i ++) {
+            newDataElements[currentIndex + (prevNumShards*i)] = splits[i];
+            shardOrdinalShifts[currentIndex + (prevNumShards*i)] = newShardOrdinalShift;
+        }
+
+        return new ShardsHolder(schema, newDataElements, shardOrdinalShifts);
+    }
+
+    private void destroyOriginalDataElements(HollowObjectTypeDataElements dataElements) {
+        dataElements.destroy();
+        if (dataElements.encodedRemovals != null) {
+            dataElements.encodedRemovals.destroy();
+        }
     }
 
     public static void discardSnapshot(HollowBlobInput in, HollowObjectSchema schema, int numShards) throws IOException {
@@ -159,67 +347,157 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     @Override
     public boolean isNull(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
-        return shards[ordinal & shardNumberMask].isNull(ordinal >> shardOrdinalShift, fieldIndex);
+        HollowObjectTypeReadState.ShardsHolder shardsHolder;
+        boolean result;
+
+        do {
+            shardsHolder = this.shardsVolatile; // this read can return a stale shardHolder with greater or lesser than current
+                                                // num shards but maxOrdinal remains same across stale vs current. So given this
+                                                // atomic assignment below operations on a stale shards holder will be legal
+            HollowObjectTypeReadStateShard shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
+            result = shard.isNull(ordinal >> shard.shardOrdinalShift, fieldIndex);
+        } while(shardsHolder != this.shardsVolatile);   // there is a load (acquire) fence imposed within shard.isNull, no need for another here
+        return result;
     }
 
     @Override
     public int readOrdinal(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
-        return shards[ordinal & shardNumberMask].readOrdinal(ordinal >> shardOrdinalShift, fieldIndex);
+        HollowObjectTypeReadState.ShardsHolder shardsHolder;
+        int result;
+
+        do {
+            shardsHolder = this.shardsVolatile;
+            HollowObjectTypeReadStateShard shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
+            result = shard.readOrdinal(ordinal >> shard.shardOrdinalShift, fieldIndex);
+        } while(shardsHolder != this.shardsVolatile);
+        return result;
     }
 
     @Override
     public int readInt(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
-        return shards[ordinal & shardNumberMask].readInt(ordinal >> shardOrdinalShift, fieldIndex);
+        HollowObjectTypeReadState.ShardsHolder shardsHolder;
+        int result;
+
+        do {
+            shardsHolder = this.shardsVolatile;
+            HollowObjectTypeReadStateShard shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
+            result = shard.readInt(ordinal >> shard.shardOrdinalShift, fieldIndex);
+        } while(shardsHolder != this.shardsVolatile);
+        return result;
     }
 
     @Override
     public float readFloat(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
-        return shards[ordinal & shardNumberMask].readFloat(ordinal >> shardOrdinalShift, fieldIndex);
+        HollowObjectTypeReadState.ShardsHolder shardsHolder;
+        float result;
+
+        do {
+            shardsHolder = this.shardsVolatile;
+            HollowObjectTypeReadStateShard shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
+            result = shard.readFloat(ordinal >> shard.shardOrdinalShift, fieldIndex);
+        } while(shardsHolder != this.shardsVolatile);
+        return result;
     }
 
     @Override
     public double readDouble(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
-        return shards[ordinal & shardNumberMask].readDouble(ordinal >> shardOrdinalShift, fieldIndex);
+        HollowObjectTypeReadState.ShardsHolder shardsHolder;
+        double result;
+
+        do {
+            shardsHolder = this.shardsVolatile;
+            HollowObjectTypeReadStateShard shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
+            result = shard.readDouble(ordinal >> shard.shardOrdinalShift, fieldIndex);
+        } while(shardsHolder != this.shardsVolatile);
+        return result;
     }
 
     @Override
     public long readLong(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
-        return shards[ordinal & shardNumberMask].readLong(ordinal >> shardOrdinalShift, fieldIndex);
+        HollowObjectTypeReadState.ShardsHolder shardsHolder;
+        long result;
+
+        do {
+            shardsHolder = this.shardsVolatile;
+            HollowObjectTypeReadStateShard shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
+            result = shard.readLong(ordinal >> shard.shardOrdinalShift, fieldIndex);
+        } while(shardsHolder != this.shardsVolatile);
+        return result;
     }
 
     @Override
     public Boolean readBoolean(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
-        return shards[ordinal & shardNumberMask].readBoolean(ordinal >> shardOrdinalShift, fieldIndex);
+        HollowObjectTypeReadState.ShardsHolder shardsHolder;
+        Boolean result;
+
+        do {
+            shardsHolder = this.shardsVolatile;
+            HollowObjectTypeReadStateShard shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
+            result = shard.readBoolean(ordinal >> shard.shardOrdinalShift, fieldIndex);
+        } while(shardsHolder != this.shardsVolatile);
+        return result;
     }
 
     @Override
     public byte[] readBytes(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
-        return shards[ordinal & shardNumberMask].readBytes(ordinal >> shardOrdinalShift, fieldIndex);
+        HollowObjectTypeReadState.ShardsHolder shardsHolder;
+        byte[] result;
+
+        do {
+            shardsHolder = this.shardsVolatile;
+            HollowObjectTypeReadStateShard shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
+            result = shard.readBytes(ordinal >> shard.shardOrdinalShift, fieldIndex);
+        } while(shardsHolder != this.shardsVolatile);
+        return result;
     }
 
     @Override
     public String readString(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
-        return shards[ordinal & shardNumberMask].readString(ordinal >> shardOrdinalShift, fieldIndex);
+        HollowObjectTypeReadState.ShardsHolder shardsHolder;
+        String result;
+
+        do {
+            shardsHolder = this.shardsVolatile;
+            HollowObjectTypeReadStateShard shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
+            result = shard.readString(ordinal >> shard.shardOrdinalShift, fieldIndex);
+        } while(shardsHolder != this.shardsVolatile);
+        return result;
     }
 
     @Override
     public boolean isStringFieldEqual(int ordinal, int fieldIndex, String testValue) {
         sampler.recordFieldAccess(fieldIndex);
-        return shards[ordinal & shardNumberMask].isStringFieldEqual(ordinal >> shardOrdinalShift, fieldIndex, testValue);
+        HollowObjectTypeReadState.ShardsHolder shardsHolder;
+        boolean result;
+
+        do {
+            shardsHolder = this.shardsVolatile;
+            HollowObjectTypeReadStateShard shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
+            result = shard.isStringFieldEqual(ordinal >> shard.shardOrdinalShift, fieldIndex, testValue);
+        } while(shardsHolder != this.shardsVolatile);
+        return result;
     }
 
     @Override
     public int findVarLengthFieldHashCode(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
-        return shards[ordinal & shardNumberMask].findVarLengthFieldHashCode(ordinal >> shardOrdinalShift, fieldIndex);
+        HollowObjectTypeReadState.ShardsHolder shardsHolder;
+        int hashCode;
+
+        do {
+            shardsHolder = this.shardsVolatile;
+            HollowObjectTypeReadStateShard shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
+            hashCode = shard.findVarLengthFieldHashCode(ordinal >> shard.shardOrdinalShift, fieldIndex);
+        } while(shardsHolder != this.shardsVolatile);
+        return hashCode;
     }
 
     /**
@@ -228,6 +506,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
      * @return the number of bits required for the field
      */
     public int bitsRequiredForField(String fieldName) {
+        final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
         int maxBitsRequiredForField = shards[0].bitsRequiredForField(fieldName);
         
         for(int i=1;i<shards.length;i++) {
@@ -246,6 +525,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     @Override
     protected void invalidate() {
+        HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
         stateListeners = EMPTY_LISTENERS;
         for(int i=0;i<shards.length;i++)
             shards[i].invalidate();
@@ -265,8 +545,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     public void ignoreUpdateThreadForSampling(Thread t) {
         sampler.setUpdateThread(t);
     }
-    
+
     HollowObjectTypeDataElements[] currentDataElements() {
+        final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
         HollowObjectTypeDataElements currentDataElements[] = new HollowObjectTypeDataElements[shards.length];
         
         for(int i=0;i<shards.length;i++)
@@ -277,27 +558,33 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     @Override
     protected void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema) {
+        final ShardsHolder shardsHolder = this.shardsVolatile;
+        final HollowObjectTypeReadStateShard[] shards = shardsHolder.shards;
+        int shardNumberMask = shardsHolder.shardNumberMask;
         if(!(withSchema instanceof HollowObjectSchema))
             throw new IllegalArgumentException("HollowObjectTypeReadState can only calculate checksum with a HollowObjectSchema: " + getSchema().getName());
 
         BitSet populatedOrdinals = getPopulatedOrdinals();
-        
-        for(int i=0;i<shards.length;i++)
-            shards[i].applyToChecksum(checksum, withSchema, populatedOrdinals, i, shards.length);
+
+        for(int i=0;i<shards.length;i++) {
+            shards[i].applyToChecksum(checksum, withSchema, populatedOrdinals, i, shardNumberMask);
+        }
     }
 
 	@Override
 	public long getApproximateHeapFootprintInBytes() {
+        final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
 	    long totalApproximateHeapFootprintInBytes = 0;
 	    
 	    for(int i=0;i<shards.length;i++)
-	        totalApproximateHeapFootprintInBytes += shards[i].getApproximateHeapFootprintInBytes();
+            totalApproximateHeapFootprintInBytes += shards[i].getApproximateHeapFootprintInBytes();
 	    
 	    return totalApproximateHeapFootprintInBytes;
 	}
 	
 	@Override
 	public long getApproximateHoleCostInBytes() {
+        final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
 	    long totalApproximateHoleCostInBytes = 0;
 	    
 	    BitSet populatedOrdinals = getPopulatedOrdinals();
@@ -309,6 +596,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 	}
 	
 	void setCurrentData(HollowObjectTypeDataElements data) {
+        HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
 	    if(shards.length > 1)
 	        throw new UnsupportedOperationException("Cannot directly set data on sharded type state");
 	    shards[0].setCurrentData(data);
@@ -317,7 +605,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     @Override
     public int numShards() {
-        return shards.length;
+        return this.shardsVolatile.shards.length;
     }
 	
 }
