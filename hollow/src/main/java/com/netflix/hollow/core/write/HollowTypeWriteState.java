@@ -44,6 +44,7 @@ public abstract class HollowTypeWriteState {
     protected final ByteArrayOrdinalMap ordinalMap;
     
     protected int numShards;
+    protected int prevNumShards;
 
     protected HollowSchema restoredSchema;
     protected ByteArrayOrdinalMap restoredMap;
@@ -138,12 +139,12 @@ public abstract class HollowTypeWriteState {
     public void resetToLastPrepareForNextCycle() {
         if(restoredReadState == null) {
             currentCyclePopulated.clearAll();
-            ordinalMap.compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
+            ordinalMap.compact(previousCyclePopulated, prevNumShards, stateEngine.isFocusHoleFillInFewestShards());
         } else {
             /// this state engine began the cycle as a restored state engine
             currentCyclePopulated.clearAll();
             previousCyclePopulated.clearAll();
-            ordinalMap.compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
+            ordinalMap.compact(previousCyclePopulated, prevNumShards, stateEngine.isFocusHoleFillInFewestShards());
             restoreFrom(restoredReadState);
             wroteData = false;
         }
@@ -238,6 +239,10 @@ public abstract class HollowTypeWriteState {
         } else if(this.numShards != numShards) {
             throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + this.numShards + ".  Cannot reset to " + numShards + "."); 
         }
+    }
+
+    public void setPrevNumShards(int prevNumShards) {
+        this.prevNumShards = prevNumShards;
     }
 
     public void resizeOrdinalMap(int size) {

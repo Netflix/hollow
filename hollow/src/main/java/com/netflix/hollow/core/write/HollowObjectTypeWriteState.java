@@ -77,7 +77,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
         fieldStats.completeCalculations();
         
-        if(numShards == -1) {
+        if(numShards == -1) {   // or resharding
             long projectedSizeOfType = ((long)fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
             projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
             
@@ -237,7 +237,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void calculateDelta() {
-        calculateDelta(previousCyclePopulated, currentCyclePopulated);
+        calculateDelta(previousCyclePopulated, currentCyclePopulated, numShards * 2);
     }
 
     @Override
@@ -247,7 +247,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void calculateReverseDelta() {
-        calculateDelta(currentCyclePopulated, previousCyclePopulated);
+        calculateDelta(currentCyclePopulated, previousCyclePopulated, numShards);
     }
 
     @Override
@@ -255,7 +255,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         writeCalculatedDelta(dos);
     }
 
-    private void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated) {
+    private void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards) {
         maxOrdinal = ordinalMap.maxOrdinal();
         int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
 

@@ -25,6 +25,12 @@ import com.netflix.hollow.api.consumer.HollowConsumer.AbstractRefreshListener;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob.BlobType;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -148,6 +154,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         long refreshEndTimeNano = System.nanoTime();
 
         long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEndTimeNano - refreshStartTimeNano);
+
         consecutiveFailures = 0l;
         lastRefreshTimeNanoOptional = OptionalLong.of(refreshEndTimeNano);
 

@@ -97,7 +97,12 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         SnapshotPopulatedOrdinalsReader.readOrdinals(in, stateListeners);
     }
-    
+
+    // public void reshard(int targetNumShards) {
+    //     int currNumShards = shards.length;
+    //     for ()
+    // }
+
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
