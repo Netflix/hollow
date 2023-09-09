@@ -229,10 +229,6 @@ public class HollowBlobReader {
 
         long startTime = System.currentTimeMillis();
 
-        // SNAP: read from headers whether to re-shard for any types and perform re-sharding in-place here
-        // HollowObjectTypeReadState objectTypeReadState = (HollowObjectTypeReadState) stateEngine.getTypeState("type");
-        // objectTypeReadState.reshard(targetNumShards);
-
         int numStates = VarInt.readVInt(in);
 
         Collection<String> typeNames = new TreeSet<String>();
@@ -368,9 +364,7 @@ public class HollowBlobReader {
     private String readTypeStateDelta(HollowBlobInput in) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(in);
 
-        int numShards = readNumShards(in);  // SNAP:
-
-        //
+        int numShards = readNumShards(in);
 
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
         if(typeState != null) {

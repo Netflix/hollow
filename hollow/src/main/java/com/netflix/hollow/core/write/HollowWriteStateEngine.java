@@ -196,10 +196,6 @@ public class HollowWriteStateEngine implements HollowStateEngine {
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        // reshard if necessary
-                        int numShards = typeStateEntry.getValue().numShards;
-                        typeStateEntry.getValue().setPrevNumShards(numShards);
-                        typeStateEntry.getValue().setNumShards(numShards * 2);
                         typeStateEntry.getValue().prepareForWrite();
                     }
                 });
