@@ -720,6 +720,7 @@ public class HollowProducer extends AbstractHollowProducer {
         Executor snapshotPublishExecutor = null;
         int numStatesBetweenSnapshots = 0;
         boolean focusHoleFillInFewestShards = false;
+        boolean allowTypeResharding = false;
         long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
         HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
         BlobStorageCleaner blobStorageCleaner = new DummyBlobStorageCleaner();
@@ -850,8 +851,28 @@ public class HollowProducer extends AbstractHollowProducer {
             return (B) this;
         }
 
+        /**
+         * Experimental: Setting this will focus the holes returned by the FreeOrdinalTracker for each state into as few shards as possible.
+         *
+         * This can be used by the consumers to reduce the work necessary to apply a delta, by skipping recreation of shards where no records are added.
+         */
         public B withFocusHoleFillInFewestShards(boolean focusHoleFillInFewestShards) {
             this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
+            return (B) this;
+        }
+
+        /**
+         * Experimental: Setting this will allow producer to adjust number of shards per type state in the course of a delta chain.
+         *
+         * Consumer-side delta transitions work by making a copy of one shard at a time, so the ability to change the number of
+         * shards in a delta chain while keeping the max shard size constant means consumers can apply delta transitions with a
+         * constant space overhead (equal to the configured max shard size).
+         *
+         * Requires integrity check to be enabled, and honors numShards pinned using annotation in data model.
+         * Also requires consumers to be on a recent Hollow library version that supports re-sharding at the time of delta application.
+         */
+        public B withTypeResharding() {
+            this.allowTypeResharding = true;
             return (B) this;
         }
 
@@ -887,6 +908,9 @@ public class HollowProducer extends AbstractHollowProducer {
         }
 
         protected void checkArguments() {
+            if (allowTypeResharding == true && doIntegrityCheck == false) { // type resharding feature rollout
+                throw new IllegalArgumentException("Enabling type re-sharding requires integrity check to also be enabled");
+            }
             if (stager != null && compressor != null) {
                 throw new IllegalArgumentException(
                         "Both a custom BlobStager and BlobCompressor were specified -- please specify only one of these.");
