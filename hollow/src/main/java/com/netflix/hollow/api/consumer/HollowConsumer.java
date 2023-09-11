@@ -39,19 +39,11 @@ import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.tools.history.HollowHistory;
-import org.slf4j.MDC;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
@@ -123,6 +115,16 @@ import java.util.logging.Logger;
 @PublicApi
 public class HollowConsumer {
     private static final Logger LOG = Logger.getLogger(HollowConsumer.class.getName());
+
+    private final InheritableThreadLocal<Map<String, String>> inheritableThreadLocal = new InheritableThreadLocal<Map<String, String>>() {
+        @Override
+        protected Map<String, String> childValue(Map<String, String> parentValue) {
+            if (parentValue == null) {
+                return null;
+            }
+            return new HashMap<String, String>(parentValue);
+        }
+    };
 
     protected final AnnouncementWatcher announcementWatcher;
     protected final HollowClientUpdater updater;
@@ -260,13 +262,13 @@ public class HollowConsumer {
      */
     public void triggerAsyncRefreshWithDelay(int delayMillis) {
         final long targetBeginTime = System.currentTimeMillis() + delayMillis;
-        // Capture MDC context on the original thread
-        final Map<String, String> mdcContext = MDC.getCopyOfContextMap();
+        // Capture thread context on the original thread
+        final Map<String, String> contextCopy = inheritableThreadLocal.get() != null ? new HashMap<>(inheritableThreadLocal.get()) : null;
 
         refreshExecutor.execute(() -> {
-            // Set MDC context on the new thread
-            if (mdcContext != null) {
-                MDC.setContextMap(mdcContext);
+            if (contextCopy != null) {
+                // Set thread context on the new thread
+                inheritableThreadLocal.set(contextCopy);
             }
             try {
                 try {
@@ -288,8 +290,11 @@ public class HollowConsumer {
                     throw e;
                 }
             } finally {
-                // clear MDC context when entire task is done
-                MDC.clear();
+                // clear thread context
+                if (inheritableThreadLocal.get() != null) {
+                    inheritableThreadLocal.get().clear();
+                }
+                inheritableThreadLocal.remove();
             }
         });
     }

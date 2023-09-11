@@ -47,7 +47,6 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -69,6 +68,15 @@ abstract class AbstractHollowProducer {
     static final long DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE = 16L * 1024L * 1024L;
     // An announcement metadata tag indicating the approx heap footprint of the corresponding read state engine
     private static final String ANNOUNCE_TAG_HEAP_FOOTPRINT = "hollow.data.size.heap.bytes.approx";
+    private final InheritableThreadLocal<Map<String, String>> inheritableThreadLocal = new InheritableThreadLocal<Map<String, String>>() {
+        @Override
+        protected Map<String, String> childValue(Map<String, String> parentValue) {
+            if (parentValue == null) {
+                return null;
+            }
+            return new HashMap<String, String>(parentValue);
+        }
+    };
 
     final Logger log = Logger.getLogger(AbstractHollowProducer.class.getName());
     final HollowProducer.BlobStager blobStager;
@@ -666,14 +674,14 @@ abstract class AbstractHollowProducer {
     private void publishSnapshotBlobAsync(ProducerListeners listeners, Artifacts artifacts) {
         HollowProducer.Blob blob = artifacts.snapshot;
         CompletableFuture<HollowProducer.Blob> cf = new CompletableFuture<>();
-        // Capture MDC context on the original thread
-        final Map<String, String> mdcContext = MDC.getCopyOfContextMap();
+        // Capture thread context on the original thread
+        final Map<String, String> contextCopy = inheritableThreadLocal.get() != null ? new HashMap<>(inheritableThreadLocal.get()) : null;
         try {
             snapshotPublishExecutor.execute(() -> {
                 Status.StageBuilder builder = new Status.StageBuilder();
-                // Set MDC context on the new thread
-                if (mdcContext != null) {
-                    MDC.setContextMap(mdcContext);
+                // Set thread context on the new thread
+                if (contextCopy != null) {
+                    inheritableThreadLocal.set(contextCopy);
                 }
                 try {
                     publishBlob(blob);
@@ -690,7 +698,10 @@ abstract class AbstractHollowProducer {
                     if (metricsCollector != null) {
                         metricsCollector.collect(metrics);
                     }
-                    MDC.clear();
+                    if (inheritableThreadLocal.get() != null) {
+                        inheritableThreadLocal.get().clear();
+                    }
+                    inheritableThreadLocal.remove();
                 }
                 artifacts.markSnapshotPublishComplete();
             });
@@ -703,7 +714,10 @@ abstract class AbstractHollowProducer {
             throw t;
         } finally {
             listeners.fireBlobPublishAsync(cf);
-            MDC.clear();
+            if (inheritableThreadLocal.get() != null) {
+                inheritableThreadLocal.get().clear();
+            }
+            inheritableThreadLocal.remove();
         }
     }
 

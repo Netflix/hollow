@@ -20,9 +20,9 @@ import static com.netflix.hollow.core.util.Threads.daemonThread;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.HollowConstants;
-import org.slf4j.MDC;
 
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,6 +45,15 @@ import java.util.logging.Logger;
 @Deprecated
 public abstract class HollowAnnouncementWatcher {
     private static final Logger log = Logger.getLogger(HollowAnnouncementWatcher.class.getName());
+    private final InheritableThreadLocal<Map<String, String>> inheritableThreadLocal = new InheritableThreadLocal<Map<String, String>>() {
+        @Override
+        protected Map<String, String> childValue(Map<String, String> parentValue) {
+            if (parentValue == null) {
+                return null;
+            }
+            return new HashMap<String, String>(parentValue);
+        }
+    };
     private final ExecutorService refreshExecutor;
 
     /**
@@ -132,13 +141,13 @@ public abstract class HollowAnnouncementWatcher {
     public void triggerAsyncRefreshWithDelay(int delayMillis) {
         final HollowClient client = this.client;
         final long targetBeginTime = System.currentTimeMillis() + delayMillis;
-        // Capture MDC context on the original thread
-        final Map<String, String> mdcContext = MDC.getCopyOfContextMap();
+        // Capture thread context on the original thread
+        final Map<String, String> contextCopy = inheritableThreadLocal.get() != null ? new HashMap<>(inheritableThreadLocal.get()) : null;
         refreshExecutor.execute(new Runnable() {
             public void run() {
-                // Set MDC context on the new thread
-                if (mdcContext != null) {
-                    MDC.setContextMap(mdcContext);
+                // Set thread context on the new thread
+                if (contextCopy != null) {
+                    inheritableThreadLocal.set(contextCopy);
                 }
                 try {
                     long delay = targetBeginTime - System.currentTimeMillis();
@@ -148,7 +157,8 @@ public abstract class HollowAnnouncementWatcher {
                 } catch(Throwable th) {
                     log.log(Level.SEVERE, "Async refresh failed", th);
                 } finally {
-                    MDC.clear();
+                    inheritableThreadLocal.get().clear();
+                    inheritableThreadLocal.remove();
                 }
             }
         });

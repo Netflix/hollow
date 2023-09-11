@@ -28,6 +28,7 @@ import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +68,15 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private final Map<String,String> headerTags = new ConcurrentHashMap<>();
     private final Map<String,String> previousHeaderTags = new ConcurrentHashMap<>();
     private final HollowObjectHashCodeFinder hashCodeFinder;
+    private final InheritableThreadLocal<Map<String, String>> inheritableThreadLocal = new InheritableThreadLocal<Map<String, String>>() {
+        @Override
+        protected Map<String, String> childValue(Map<String, String> parentValue) {
+            if (parentValue == null) {
+                return null;
+            }
+            return new HashMap<String, String>(parentValue);
+        }
+    };
     
     //// target a maximum shard size to reduce excess memory pool requirement 
     private long targetMaxTypeShardSize = Long.MAX_VALUE;
@@ -159,11 +169,24 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             restoredStates.add(typeName);
             
             if(writeState != null) {
+                // Capture thread context on the original thread
+                final Map<String, String> contextCopy = inheritableThreadLocal.get() != null ? new HashMap<>(inheritableThreadLocal.get()) : null;
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        log.info("RESTORE: " + typeName);
-                        writeState.restoreFrom(readState);
+                        try {
+                            // Set thread context on the new thread
+                            if (contextCopy != null) {
+                                inheritableThreadLocal.set(contextCopy);
+                            }
+                            log.info("RESTORE: " + typeName);
+                            writeState.restoreFrom(readState);
+                        } finally {
+                            if (inheritableThreadLocal.get() != null) {
+                                inheritableThreadLocal.get().clear();
+                            }
+                            inheritableThreadLocal.remove();
+                        }
                     }
                 });
             }

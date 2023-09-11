@@ -22,7 +22,6 @@ import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
-import org.slf4j.MDC;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -130,40 +129,28 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
 
         @Override
         public void run() {
-            // Capture MDC context on the original thread
-            final Map<String, String> mdcContext = MDC.getCopyOfContextMap();
             try {
-                // Set MDC context on the new thread
-                if (mdcContext != null) {
-                    MDC.setContextMap(mdcContext);
-                }
-                try {
-                    HollowFilesystemAnnouncementWatcher watcher = ref.get();
-                    if (watcher != null) {
-                        if (!Files.isReadable(watcher.announcePath)) return;
+                HollowFilesystemAnnouncementWatcher watcher = ref.get();
+                if (watcher != null) {
+                    if (!Files.isReadable(watcher.announcePath)) return;
 
-                        FileTime lastModifiedTime = getLastModifiedTime(watcher.announcePath);
-                        if (lastModifiedTime.compareTo(previousFileTime) > 0) {
-                            previousFileTime = lastModifiedTime;
+                    FileTime lastModifiedTime = getLastModifiedTime(watcher.announcePath);
+                    if (lastModifiedTime.compareTo(previousFileTime) > 0) {
+                        previousFileTime = lastModifiedTime;
 
-                            long currentVersion = watcher.readLatestVersion();
-                            if (watcher.latestVersion != currentVersion) {
-                                watcher.latestVersion = currentVersion;
-                                for (HollowConsumer consumer : watcher.subscribedConsumers)
-                                    consumer.triggerAsyncRefresh();
-                            }
+                        long currentVersion = watcher.readLatestVersion();
+                        if (watcher.latestVersion != currentVersion) {
+                            watcher.latestVersion = currentVersion;
+                            for (HollowConsumer consumer : watcher.subscribedConsumers)
+                                consumer.triggerAsyncRefresh();
                         }
                     }
-                } catch (Exception ex) {
-                    log.log(Level.WARNING, "Exception reading the current announced version", ex);
-                } catch (Throwable th) {
-                    log.log(Level.SEVERE, "Exception reading the current announced version", th);
-                    throw th;
-                } finally {
-                    MDC.clear();
                 }
-            } finally {
-                MDC.clear();
+            } catch (Exception ex) {
+                log.log(Level.WARNING, "Exception reading the current announced version", ex);
+            } catch (Throwable th) {
+                log.log(Level.SEVERE, "Exception reading the current announced version", th);
+                throw th;
             }
         }
     }
