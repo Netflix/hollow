@@ -33,21 +33,40 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 
-class HollowObjectTypeReadStateShard {
+class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStateShard {
 
     private volatile HollowObjectTypeDataElements currentDataVolatile;
+    private volatile HollowObjectTypeReadState.ShardsHolder currentShardsVolatile;    // SNAP: TODO: test that back reference doesn't need to be cleaned up
+
+    final int shardOrdinalShift;
+    final int shardOrdinalOffset;
+
+    @Override
+    public int shardOrdinalShift() {
+        return shardOrdinalShift;
+    }
+
+    @Override
+    public int shardOrdinalOffset() {
+        return shardOrdinalOffset;
+    }
 
     private final HollowObjectSchema schema;
     
-    HollowObjectTypeReadStateShard(HollowObjectSchema schema) {
+    HollowObjectTypeReadStateShard(HollowObjectSchema schema, int shardOrdinalShift, int shardOrdinalOffset) {
         this.schema = schema;
+        this.shardOrdinalShift = shardOrdinalShift;
+        this.shardOrdinalOffset = shardOrdinalOffset;
     }
 
+    @Override
     public boolean isNull(int ordinal, int fieldIndex) {
+        HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         long fixedLengthValue;
 
         do {
+            currentShards = this.currentShardsVolatile;
             currentData = this.currentDataVolatile;
 
             long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
@@ -56,7 +75,7 @@ class HollowObjectTypeReadStateShard {
             fixedLengthValue = numBitsForField <= 56 ?
                     currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField)
                     : currentData.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
-        } while(readWasUnsafe(currentData));
+        } while(readWasUnsafe(currentShards, currentData));
 
         switch(schema.getFieldType(fieldIndex)) {
         case BYTES:
@@ -72,87 +91,105 @@ class HollowObjectTypeReadStateShard {
         }
     }
 
+    @Override
     public int readOrdinal(int ordinal, int fieldIndex) {
+        HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         long refOrdinal;
 
         do {
+            currentShards = this.currentShardsVolatile;
             currentData = this.currentDataVolatile;
             refOrdinal = readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
-        } while(readWasUnsafe(currentData));
+        } while(readWasUnsafe(currentShards, currentData));
 
         if(refOrdinal == currentData.nullValueForField[fieldIndex])
             return ORDINAL_NONE;
         return (int)refOrdinal;
     }
 
+    @Override
     public int readInt(int ordinal, int fieldIndex) {
+        HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         long value;
 
         do {
+            currentShards = this.currentShardsVolatile;
             currentData = this.currentDataVolatile;
             value = readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
-        } while(readWasUnsafe(currentData));
+        } while(readWasUnsafe(currentShards, currentData));
 
         if(value == currentData.nullValueForField[fieldIndex])
             return Integer.MIN_VALUE;
         return ZigZag.decodeInt((int)value);
     }
 
+    @Override
     public float readFloat(int ordinal, int fieldIndex) {
+        HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         int value;
 
         do {
+            currentShards = this.currentShardsVolatile;
             currentData = this.currentDataVolatile;
             value = (int)readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
-        } while(readWasUnsafe(currentData));
+        } while(readWasUnsafe(currentShards, currentData));
 
         if(value == HollowObjectWriteRecord.NULL_FLOAT_BITS)
             return Float.NaN;
         return Float.intBitsToFloat(value);
     }
 
+    @Override
     public double readDouble(int ordinal, int fieldIndex) {
+        HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         long value;
 
         do {
+            currentShards = this.currentShardsVolatile;
             currentData = this.currentDataVolatile;
             long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
             value = currentData.fixedLengthData.getLargeElementValue(bitOffset, 64, -1L);
-        } while(readWasUnsafe(currentData));
+        } while(readWasUnsafe(currentShards, currentData));
 
         if(value == HollowObjectWriteRecord.NULL_DOUBLE_BITS)
             return Double.NaN;
         return Double.longBitsToDouble(value);
     }
 
+    @Override
     public long readLong(int ordinal, int fieldIndex) {
+        HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         long value;
 
         do {
+            currentShards = this.currentShardsVolatile;
             currentData = this.currentDataVolatile;
             long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
             int numBitsForField = currentData.bitsPerField[fieldIndex];
             value = currentData.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
-        } while(readWasUnsafe(currentData));
+        } while(readWasUnsafe(currentShards, currentData));
 
         if(value == currentData.nullValueForField[fieldIndex])
             return Long.MIN_VALUE;
         return ZigZag.decodeLong(value);
     }
 
+    @Override
     public Boolean readBoolean(int ordinal, int fieldIndex) {
+        HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         long value;
 
         do {
+            currentShards = this.currentShardsVolatile;
             currentData = this.currentDataVolatile;
             value = readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
-        } while(readWasUnsafe(currentData));
+        } while(readWasUnsafe(currentShards, currentData));
 
         if(value == currentData.nullValueForField[fieldIndex])
             return null;
@@ -168,7 +205,9 @@ class HollowObjectTypeReadStateShard {
         return value;
     }
 
+    @Override
     public byte[] readBytes(int ordinal, int fieldIndex) {
+        HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         byte[] result;
 
@@ -178,13 +217,14 @@ class HollowObjectTypeReadStateShard {
             long startByte;
 
             do {
+                currentShards = this.currentShardsVolatile;
                 currentData = this.currentDataVolatile;
 
                 numBitsForField = currentData.bitsPerField[fieldIndex];
                 long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
                 endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
                 startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
-            } while(readWasUnsafe(currentData));
+            } while(readWasUnsafe(currentShards, currentData));
 
             if((endByte & (1L << numBitsForField - 1)) != 0)
                 return null;
@@ -196,12 +236,14 @@ class HollowObjectTypeReadStateShard {
             for(int i=0;i<length;i++)
                 result[i] = currentData.varLengthData[fieldIndex].get(startByte + i);
 
-        } while(readWasUnsafe(currentData));
+        } while(readWasUnsafe(currentShards, currentData));
 
         return result;
     }
 
+    @Override
     public String readString(int ordinal, int fieldIndex) {
+        HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         String result;
 
@@ -211,13 +253,14 @@ class HollowObjectTypeReadStateShard {
             long startByte;
 
             do {
+                currentShards = this.currentShardsVolatile;
                 currentData = this.currentDataVolatile;
 
                 numBitsForField = currentData.bitsPerField[fieldIndex];
                 long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
                 endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
                 startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
-            } while(readWasUnsafe(currentData));
+            } while(readWasUnsafe(currentShards, currentData));
 
             if((endByte & (1L << numBitsForField - 1)) != 0)
                 return null;
@@ -227,12 +270,14 @@ class HollowObjectTypeReadStateShard {
             int length = (int)(endByte - startByte);
 
             result = readString(currentData.varLengthData[fieldIndex], startByte, length);
-        } while(readWasUnsafe(currentData));
+        } while(readWasUnsafe(currentShards, currentData));
 
         return result;
     }
 
+    @Override
     public boolean isStringFieldEqual(int ordinal, int fieldIndex, String testValue) {
+        HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         boolean result;
 
@@ -242,6 +287,7 @@ class HollowObjectTypeReadStateShard {
             long startByte;
 
             do {
+                currentShards = this.currentShardsVolatile;
                 currentData = this.currentDataVolatile;
 
                 numBitsForField = currentData.bitsPerField[fieldIndex];
@@ -249,7 +295,7 @@ class HollowObjectTypeReadStateShard {
                 long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
                 endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
                 startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
-            } while(readWasUnsafe(currentData));
+            } while(readWasUnsafe(currentShards, currentData));
 
             if((endByte & (1L << numBitsForField - 1)) != 0)
                 return testValue == null;
@@ -261,12 +307,14 @@ class HollowObjectTypeReadStateShard {
             int length = (int)(endByte - startByte);
 
             result = testStringEquality(currentData.varLengthData[fieldIndex], startByte, length, testValue);
-        } while(readWasUnsafe(currentData));
+        } while(readWasUnsafe(currentShards, currentData));
 
         return result;
     }
 
+    @Override
     public int findVarLengthFieldHashCode(int ordinal, int fieldIndex) {
+        HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         int hashCode;
         do {
@@ -275,13 +323,14 @@ class HollowObjectTypeReadStateShard {
             long startByte;
 
             do {
+                currentShards = this.currentShardsVolatile;
                 currentData = this.currentDataVolatile;
 
                 numBitsForField = currentData.bitsPerField[fieldIndex];
                 long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
                 endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
                 startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
-            } while(readWasUnsafe(currentData));
+            } while(readWasUnsafe(currentShards, currentData));
 
             if((endByte & (1L << numBitsForField - 1)) != 0)
                 return -1;
@@ -291,7 +340,7 @@ class HollowObjectTypeReadStateShard {
             int length = (int)(endByte - startByte);
 
             hashCode = HashCodes.hashCode(currentData.varLengthData[fieldIndex], startByte, length);
-        } while(readWasUnsafe(currentData));
+        } while(readWasUnsafe(currentShards, currentData));
 
         return hashCode;
     }
@@ -299,6 +348,7 @@ class HollowObjectTypeReadStateShard {
     /**
      * Warning:  Not thread-safe.  Should only be called within the update thread.
      */
+    @Override
     public int bitsRequiredForField(String fieldName) {
         int fieldIndex = schema.getPosition(fieldName);
         return fieldIndex == -1 ? 0 : currentDataVolatile.bitsPerField[fieldIndex];
@@ -350,18 +400,20 @@ class HollowObjectTypeReadStateShard {
         return position == endPosition && count == testValue.length();
     }
 
-    void invalidate() {
-        setCurrentData(null);
+    @Override
+    public void invalidate() {
+        setCurrentData(null, null);
     }
 
-    HollowObjectTypeDataElements currentDataElements() {
+    @Override
+    public HollowObjectTypeDataElements currentDataElements() {
         return currentDataVolatile;
     }
 
-    private boolean readWasUnsafe(HollowObjectTypeDataElements data) {
+    private boolean readWasUnsafe(HollowObjectTypeReadState.ShardsHolder shards, HollowObjectTypeDataElements data) {
         // Use a load (acquire) fence to constrain the compiler reordering prior plain loads so
-        // that they cannot "float down" below the volatile load of currentDataVolatile.
-        // This ensures data is checked against currentData *after* optimistic calculations
+        // that they cannot "float down" below the volatile load of currentShardsVolatile and currentDataVolatile.
+        // This ensures data is checked against currentShards and currentData *after* optimistic calculations
         // have been performed on data.
         //
         // Note: the Java Memory Model allows for the reordering of plain loads and stores
@@ -384,14 +436,17 @@ class HollowObjectTypeReadStateShard {
         //
         // For more details see http://gee.cs.oswego.edu/dl/html/j9mm.html
         HollowUnsafeHandle.getUnsafe().loadFence();
-        return data != currentDataVolatile;
+        return shards != currentShardsVolatile || data != currentDataVolatile;
     }
 
-    void setCurrentData(HollowObjectTypeDataElements data) {
+    @Override
+    public void setCurrentData(HollowObjectTypeReadState.ShardsHolder shards, HollowObjectTypeDataElements data) {
         this.currentDataVolatile = data;
+        this.currentShardsVolatile = shards;
     }
 
-    protected void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema, BitSet populatedOrdinals, int shardNumber, int numShards) {
+    @Override
+    public void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema, BitSet populatedOrdinals, int shardNumber, int numShards) {
         if(!(withSchema instanceof HollowObjectSchema))
             throw new IllegalArgumentException("HollowObjectTypeReadState can only calculate checksum with a HollowObjectSchema: " + schema.getName());
 
@@ -436,6 +491,7 @@ class HollowObjectTypeReadStateShard {
         }
     }
 
+    @Override
     public long getApproximateHeapFootprintInBytes() {
         HollowObjectTypeDataElements currentData = currentDataVolatile;
         long bitsPerFixedLengthData = (long)currentData.bitsPerRecord * (currentData.maxOrdinal + 1);
@@ -450,6 +506,7 @@ class HollowObjectTypeReadStateShard {
         return requiredBytes;
     }
     
+    @Override
     public long getApproximateHoleCostInBytes(BitSet populatedOrdinals, int shardNumber, int numShards) {
         HollowObjectTypeDataElements currentData = currentDataVolatile;
         long holeBits = 0;
