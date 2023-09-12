@@ -28,6 +28,7 @@ import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
+import com.netflix.hollow.tools.util.ThreadContextHolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,13 +72,10 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private final InheritableThreadLocal<Map<String, String>> inheritableThreadLocal = new InheritableThreadLocal<Map<String, String>>() {
         @Override
         protected Map<String, String> childValue(Map<String, String> parentValue) {
-            if (parentValue == null) {
-                return null;
-            }
             return new HashMap<String, String>(parentValue);
         }
     };
-    
+
     //// target a maximum shard size to reduce excess memory pool requirement 
     private long targetMaxTypeShardSize = Long.MAX_VALUE;
     //// focus filling ordinal holes in as few shards as possible to make delta application more efficient for consumers
@@ -170,22 +168,28 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             
             if(writeState != null) {
                 // Capture thread context on the original thread
-                final Map<String, String> contextCopy = inheritableThreadLocal.get() != null ? new HashMap<>(inheritableThreadLocal.get()) : null;
+                //final Map<String, String> contextCopy = threadLocalUnmodifiableMap.get() != null ? new HashMap<>(threadLocalUnmodifiableMap.get()) : null;
+                //final Map<String, String> contextCopy = new HashMap<>(inheritableThreadLocal.get()); // null
+                final Map<String, String> contextCopy = new HashMap<>(ThreadContextHolder.getThreadContext());
                 executor.execute(new Runnable() {
+                    final ThreadLocal<Map<String, String>> threadLocalUnmodifiableMap = new ThreadLocal<Map<String, String>>();
                     @Override
                     public void run() {
                         try {
                             // Set thread context on the new thread
                             if (contextCopy != null) {
-                                inheritableThreadLocal.set(contextCopy);
+                                log.info(ThreadContextHolder.getThreadContext().get("namespace"));
+                                ThreadContextHolder.setThreadContext(contextCopy);
+                                threadLocalUnmodifiableMap.set(contextCopy);
                             }
-                            log.info("RESTORE: " + typeName);
+                            log.info("RESTORE: " + typeName + " namespace= " + ThreadContextHolder.getThreadContext().get("namespace"));
                             writeState.restoreFrom(readState);
                         } finally {
-                            if (inheritableThreadLocal.get() != null) {
-                                inheritableThreadLocal.get().clear();
+                            if (threadLocalUnmodifiableMap.get() != null) {
+                                threadLocalUnmodifiableMap.get().clear();
                             }
-                            inheritableThreadLocal.remove();
+                            threadLocalUnmodifiableMap.remove();
+                            ThreadContextHolder.clearThreadContext();
                         }
                     }
                 });
