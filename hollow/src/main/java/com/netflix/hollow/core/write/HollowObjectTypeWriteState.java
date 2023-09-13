@@ -89,7 +89,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         maxShardOrdinal = new int[numShards];
         int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards; 
         for(int i=0;i<numShards;i++)
-            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
+            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;  // SNAP: replicate 1?
     }
 
     private void discoverObjectFieldStatisticsForRecord(FieldStatistics fieldStats, int ordinal) {
@@ -171,7 +171,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         recordBitOffset = new long[numShards];
         
         for(int i=0;i<numShards;i++) {
-            fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numBitsPerRecord * (maxShardOrdinal[i] + 1));
+            fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numBitsPerRecord * (maxShardOrdinal[i] + 1));    // SNAP: replicate 2?
             varLengthByteArrays[i] = new ByteDataArray[getSchema().numFields()];
         }
         

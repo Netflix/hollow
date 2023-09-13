@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.MemoryMode;
@@ -70,6 +71,62 @@ public class HollowObjectTypeDataElements {
         this.schema = schema;
         this.memoryMode = memoryMode;
         this.memoryRecycler = memoryRecycler;
+    }
+
+//    public HollowObjectTypeDataElements skipCopy(int startOffset, int increment) {
+//        HollowObjectTypeDataElements copyDataElements = new HollowObjectTypeDataElements(this.schema, this.memoryMode, this.memoryRecycler);
+//        copyDataElements.skipCopy(this, startOffset, increment);
+//        return copyDataElements;
+//    }
+//
+//    void skipCopy(HollowObjectTypeDataElements from, int startOffset, int increment) throws IOException {
+//        this.encodedRemovals = from.encodedRemovals.skipCopy();   // SNAP: TODO: need to copy, but can copy full or only ordinals in this shard, or what?
+//
+//        copyFieldStatistics(from);
+//
+//        long numBitsInTarget = (this.maxOrdinal%2) == 0 ?
+//        fixedLengthData = new FixedLengthElementArray(memoryRecycler, from.fixedLengthData.getSizeBits());
+//        removeExcludedFieldsFromFixedLengthData();
+//
+//        readVarLengthData(in, unfilteredSchema);
+//    }
+
+    HollowObjectTypeDataElements[] split(int numSplits) {
+        HollowObjectTypeDataElements[] splitElements = new HollowObjectTypeDataElements[numSplits];
+        for(int i=0;i<numSplits;i++) {
+            splitElements[i] = new HollowObjectTypeDataElements(schema, memoryMode, memoryRecycler);
+            splitElements[i].copyFieldStatistics(this);
+            splitElements[i].maxOrdinal = -1;
+        }
+
+        int minRecordLocationsPerSplit = (this.maxOrdinal + 1) / numSplits;
+        for(int i=0;i<numSplits;i++) {
+            // SNAP: TODO: test
+            splitElements[i].maxOrdinal = (i < ((this.maxOrdinal + 1) & (numSplits - 1))) ? minRecordLocationsPerSplit : minRecordLocationsPerSplit - 1;    // SNAP: replicated from "search for "// SNAP: replicate 1?"
+            splitElements[i].fixedLengthData = new FixedLengthElementArray(memoryRecycler, (long)this.bitsPerRecord * (splitElements[i].maxOrdinal + 1));  // SNAP: replicated from "search for "// SNAP: replicate 2?"
+        }
+
+        int splitMask = numSplits - 1;
+        for(int i=0;i<=maxOrdinal;i++) {
+            int whichSplit = i & splitMask;
+            int indexInSplit = i / numSplits;
+            splitElements[whichSplit].fixedLengthData.setElementValue(indexInSplit, this.bitsPerRecord, this.fixedLengthData.getElementValue(i, this.bitsPerRecord));   // SNAP: TODO: test
+
+        }
+
+        // TODO: variable length: learn from write side
+    }
+
+    void copyFieldStatistics(HollowObjectTypeDataElements from) {
+        this.bitsPerRecord = from.bitsPerRecord;
+        for (int i=0;i<this.schema.numFields();i++) {
+            this.bitOffsetPerField[i] = from.bitOffsetPerField[i];
+            this.nullValueForField[i] = from.nullValueForField[i];
+            this.bitsPerField[i] = from.bitsPerField[i];
+
+        }
+        this.unfilteredFieldIsIncluded = from.unfilteredFieldIsIncluded;
+        this.bitsPerUnfilteredField = from.bitsPerUnfilteredField;
     }
 
     void readSnapshot(HollowBlobInput in, HollowObjectSchema unfilteredSchema) throws IOException {

@@ -125,43 +125,50 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 // ∀ i ∈ [0,currShardCount) { newShards.shard[i] and newShards.shard[i+currShardCount] will point to the
                 //                            same underlying data elements as the current i-th shard but reference alternating ordinals }
                 for(int i = 0; i< currShardCount; i++) {
-                    newShards.shards[i].setCurrentData(newShards, shardsVolatile.shards[i].currentDataElements());
                     newShards.shards[i] = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema,
                             shardsVolatile.shards[i].shardOrdinalShift() - 1, 0);
+                    newShards.shards[i].setCurrentData(newShards, shardsVolatile.shards[i].currentDataElements());
 
-                    newShards.shards[currShardCount + i].setCurrentData(newShards, shardsVolatile.shards[i].currentDataElements());
                     newShards.shards[currShardCount + i] = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema,
                             shardsVolatile.shards[i].shardOrdinalShift() - 1, 1); // TODO: implement offset
+                    newShards.shards[currShardCount + i].setCurrentData(newShards, shardsVolatile.shards[i].currentDataElements());
                 }
                 shardsVolatile = newShards; // serve up newShards
 
                 // Step 2:
-                // For each shard, store the referenced data elements (upto half of the current data elements) into a copy
-                // and discard the pre-split copy of data elements when safe
+                // For each current shard, split or join the referenced data elements into a copy and discard the pre-split data elements
                 for(int i = 0; i< currShardCount; i++) {
-                    int offset, increment;
                     HollowObjectTypeDataElements preSplitDataElements = shardsVolatile.shards[i].currentDataElements();
-                    int finalShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newShardCount);   // numShards = 4 => shardOrdinalShift = 2. Ordinal 4 = 100, shardOrdinal = 100 >> 2 == 1 (in shard 0). Ordinal 10 = 1010, shardOrdinal = 1010 >> 2 = 2 (in shard 2)
+                    int finalShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newShardCount);
+                    // For e.g.
+                    //  numShards = 4 => shardOrdinalShift = 2.
+                    //      Ordinal 4 = 100, shardOrdinal = 100 >> 2 == 1 (in shard 0).
+                    //      Ordinal 10 = 1010, shardOrdinal = 1010 >> 2 = 2 (in shard 2)
                     IHollowObjectTypeReadStateShard finalShardLeft = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, finalShardOrdinalShift, 0);
-                    offset = 0;
-                    increment = 2;
-                    finalShardLeft.setCurrentData(finalShardLeft, copySelectDataElements(preSplitDataElements, offset, increment));
-                    shardsVolatile.shards[i] = finalShardLeft;
-                    shardsVolatile = shardsVolatile;    // assignment of volatile array element
+                    int startAtZero = 0;
+                    int startAtOne = 1;
+                    int incrementByTwo = 2;
 
-                    offset = 1;
-                    increment = 2;
+                    HollowObjectTypeDataElements[] splitDataElements = preSplitDataElements.split(2);
+
+                    finalShardLeft.setCurrentData(finalShardLeft, splitDataElements[0]);
+                    shardsVolatile.shards[i] = finalShardLeft;
+                    shardsVolatile = shardsVolatile;    // assignment of volatile array element to self is required
+
                     IHollowObjectTypeReadStateShard finalShardRight = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, finalShardOrdinalShift, 0);
-                    finalShardRight.setCurrentData(finalShardRight, copySelectDataElements(preSplitDataElements, offset, increment));
+                    finalShardRight.setCurrentData(finalShardRight, splitDataElements[1]);
                     shardsVolatile.shards[i + currShardCount] = finalShardRight;
 
-                    shardsVolatile = shardsVolatile;        // propagate assignment of volatile array element
+                    shardsVolatile = shardsVolatile;        // assignment of volatile array element to self is required
+
                     preSplitDataElements.destroy();         // it is now safe to destroy pre-split data elements
                 }
             } else if (halvingTheNumOfShards) { // join existing shards
 
             }
 
+            // shardsVolatile now contains newShardCount shards with split/joined data from the original shards
+            // this is the desired end state of resharding
 
             /**
             VirtualShard[] virtualShards = new VirtualShard[newShardCount];

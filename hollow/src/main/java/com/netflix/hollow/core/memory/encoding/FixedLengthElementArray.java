@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.SegmentedLongArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
@@ -62,6 +63,7 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
 
     private final int log2OfSegmentSizeInBytes;
     private final int byteBitmask;
+
     private final long sizeBits;
 
     public FixedLengthElementArray(ArraySegmentRecycler memoryRecycler, long numBits) {
@@ -69,6 +71,11 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
         this.log2OfSegmentSizeInBytes = log2OfSegmentSize + 3;
         this.byteBitmask = (1 << log2OfSegmentSizeInBytes) - 1;
         this.sizeBits = numBits;
+    }
+
+    @Override
+    public long getSizeBits() {
+        return sizeBits;
     }
 
     public long approxHeapFootprintInBytes() {
@@ -221,5 +228,9 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
         FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, numLongs * 64);
         arr.readFrom(in, memoryRecycler, numLongs);
         return arr;
+    }
+
+    public static FixedLengthElementArray newFrom(FixedLengthData from, ArraySegmentRecycler memoryRecycler) {
+        FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, from.getSizeBits());
     }
 }
