@@ -28,6 +28,8 @@ import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
+import org.slf4j.MDC;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -157,11 +159,16 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             final HollowTypeWriteState writeState = writeStates.get(typeName);
             
             restoredStates.add(typeName);
-            
+
             if(writeState != null) {
+                final Map<String, String> mdcContext = MDC.getCopyOfContextMap();
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
+                    // Set MDC context on the new thread
+                    if (mdcContext != null) {
+                        MDC.setContextMap(mdcContext);
+                    }
                         log.info("RESTORE: " + typeName);
                         writeState.restoreFrom(readState);
                     }

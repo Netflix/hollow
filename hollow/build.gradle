@@ -6,6 +6,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.15.0'
     testImplementation 'com.github.spotbugs:spotbugs:4.2.1'
     testImplementation 'org.assertj:assertj-core:3.15.0'
+    compileOnly(group: 'org.slf4j', name: 'slf4j-api', version: '2.0.9')
 }
 
 tasks.withType(JavaCompile).configureEach {

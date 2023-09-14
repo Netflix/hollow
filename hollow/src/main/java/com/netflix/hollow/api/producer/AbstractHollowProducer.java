@@ -47,6 +47,8 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+import org.slf4j.MDC;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -664,9 +666,15 @@ abstract class AbstractHollowProducer {
     private void publishSnapshotBlobAsync(ProducerListeners listeners, Artifacts artifacts) {
         HollowProducer.Blob blob = artifacts.snapshot;
         CompletableFuture<HollowProducer.Blob> cf = new CompletableFuture<>();
+        // Capture MDC context on the original thread
+        final Map<String, String> mdcContext = MDC.getCopyOfContextMap();
         try {
             snapshotPublishExecutor.execute(() -> {
                 Status.StageBuilder builder = new Status.StageBuilder();
+                // Set MDC context on the new thread
+                if (mdcContext != null) {
+                    MDC.setContextMap(mdcContext);
+                }
                 try {
                     publishBlob(blob);
                     builder.success();
@@ -682,6 +690,7 @@ abstract class AbstractHollowProducer {
                     if (metricsCollector != null) {
                         metricsCollector.collect(metrics);
                     }
+                    MDC.clear();
                 }
                 artifacts.markSnapshotPublishComplete();
             });
@@ -694,6 +703,7 @@ abstract class AbstractHollowProducer {
             throw t;
         } finally {
             listeners.fireBlobPublishAsync(cf);
+            MDC.clear();
         }
     }
 
