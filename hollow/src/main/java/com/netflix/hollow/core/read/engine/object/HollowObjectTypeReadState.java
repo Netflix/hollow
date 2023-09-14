@@ -149,7 +149,8 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                     int startAtOne = 1;
                     int incrementByTwo = 2;
 
-                    HollowObjectTypeDataElements[] splitDataElements = preSplitDataElements.split(2);
+                    HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(preSplitDataElements, 2);
+                    HollowObjectTypeDataElements[] splitDataElements = splitter.split();
 
                     finalShardLeft.setCurrentData(finalShardLeft, splitDataElements[0]);
                     shardsVolatile.shards[i] = finalShardLeft;
