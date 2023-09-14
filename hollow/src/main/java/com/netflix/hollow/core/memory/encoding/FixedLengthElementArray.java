@@ -229,8 +229,4 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
         arr.readFrom(in, memoryRecycler, numLongs);
         return arr;
     }
-
-    public static FixedLengthElementArray newFrom(FixedLengthData from, ArraySegmentRecycler memoryRecycler) {
-        FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, from.getSizeBits());
-    }
 }

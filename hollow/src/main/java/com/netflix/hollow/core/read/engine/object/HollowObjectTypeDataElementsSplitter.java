@@ -1,11 +1,7 @@
 package com.netflix.hollow.core.read.engine.object;
 
-import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.util.IntMap;
 
 public class HollowObjectTypeDataElementsSplitter {
     private final HollowObjectTypeDataElements from;
@@ -29,6 +25,7 @@ public class HollowObjectTypeDataElementsSplitter {
         for(int i=0;i<to.length;i++) {
             to[i] = new HollowObjectTypeDataElements(from.schema, from.memoryMode, from.memoryRecycler);
         }
+
         populateStats(to, from);
 
         for(int i=0;i<to.length;i++) {

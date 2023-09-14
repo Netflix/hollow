@@ -104,14 +104,17 @@ public class HollowBlobWriter {
 
             writeNumShards(partStream, typeState.getNumShards());
 
-            typeState.writeSnapshot(partStream);
+            // if (typeState instanceof HollowObjectTypeWriteState) {
+            //     typeState.writeSnapshot(partStream, numShards);
+            // } else {
+                typeState.writeSnapshot(partStream);
+            // }
         }
 
         os.flush();
         if(partStreams != null)
             partStreams.flush();
     }
-
 
     /**
      * Serialize the changes necessary to transition a consumer from the previous state

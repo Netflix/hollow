@@ -190,13 +190,17 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     
     @Override
     public void writeSnapshot(DataOutputStream os) throws IOException {
+        writeSnapshot(os, numShards);
+    }
+
+    public void writeSnapshot(DataOutputStream os, int numShards) throws IOException {
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
             writeSnapshotShard(os, 0);
         } else {
             /// overall max ordinal
             VarInt.writeVInt(os, maxOrdinal);
-            
+
             for(int i=0;i<numShards;i++) {
                 writeSnapshotShard(os, i);
             }
@@ -204,7 +208,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
         /// Populated bits
         currentCyclePopulated.serializeBitsTo(os);
-        
+
         fixedLengthLongArray = null;
         varLengthByteArrays = null;
         recordBitOffset = null;
