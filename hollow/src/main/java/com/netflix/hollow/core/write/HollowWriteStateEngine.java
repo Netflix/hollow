@@ -76,6 +76,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         }
     };
 
+    volatile Map<String, String> contextCopy;
+
     //// target a maximum shard size to reduce excess memory pool requirement 
     private long targetMaxTypeShardSize = Long.MAX_VALUE;
     //// focus filling ordinal holes in as few shards as possible to make delta application more efficient for consumers
@@ -165,31 +167,34 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             final HollowTypeWriteState writeState = writeStates.get(typeName);
             
             restoredStates.add(typeName);
-            
+
             if(writeState != null) {
                 // Capture thread context on the original thread
                 //final Map<String, String> contextCopy = threadLocalUnmodifiableMap.get() != null ? new HashMap<>(threadLocalUnmodifiableMap.get()) : null;
                 //final Map<String, String> contextCopy = new HashMap<>(inheritableThreadLocal.get()); // null
-                final Map<String, String> contextCopy = new HashMap<>(ThreadContextHolder.getThreadContext());
+//                contextCopy = new HashMap<>();
+//                contextCopy.putAll(ThreadContextHolder.getThreadContext());
+//                contextCopy = contextCopy;
                 executor.execute(new Runnable() {
                     final ThreadLocal<Map<String, String>> threadLocalUnmodifiableMap = new ThreadLocal<Map<String, String>>();
                     @Override
                     public void run() {
                         try {
                             // Set thread context on the new thread
-                            if (contextCopy != null) {
-                                log.info(ThreadContextHolder.getThreadContext().get("namespace"));
-                                ThreadContextHolder.setThreadContext(contextCopy);
-                                threadLocalUnmodifiableMap.set(contextCopy);
-                            }
-                            log.info("RESTORE: " + typeName + " namespace= " + ThreadContextHolder.getThreadContext().get("namespace"));
+//                            if (contextCopy != null) {
+//                                log.info(ThreadContextHolder.getThreadContext().get("namespace"));
+//                                ThreadContextHolder.setThreadContext(contextCopy);
+//                                threadLocalUnmodifiableMap.set(contextCopy);
+//                            }
+                           // log.info("RESTORE: " + typeName + " namespace= " + ThreadContextHolder.getThreadContext().get("namespace"));
+                            log.info("RESTORE: " + typeName);
                             writeState.restoreFrom(readState);
                         } finally {
-                            if (threadLocalUnmodifiableMap.get() != null) {
-                                threadLocalUnmodifiableMap.get().clear();
-                            }
-                            threadLocalUnmodifiableMap.remove();
-                            ThreadContextHolder.clearThreadContext();
+//                            if (threadLocalUnmodifiableMap.get() != null) {
+//                                threadLocalUnmodifiableMap.get().clear();
+//                            }
+//                            threadLocalUnmodifiableMap.remove();
+//                            ThreadContextHolder.clearThreadContext();
                         }
                     }
                 });
