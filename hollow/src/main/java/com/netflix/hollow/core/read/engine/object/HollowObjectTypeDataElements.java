@@ -214,4 +214,14 @@ public class HollowObjectTypeDataElements {
         }
     }
 
+    public void destroySpecial() {  // SNAP: TODO: remove
+        FixedLengthDataFactory.destroy(fixedLengthData, memoryRecycler);
+        fixedLengthData = null;
+        for(int i=0;i<varLengthData.length;i++) {
+            if(varLengthData[i] != null)
+                VariableLengthDataFactory.destroy(varLengthData[i]);
+            varLengthData[i] = null;
+        }
+    }
+
 }

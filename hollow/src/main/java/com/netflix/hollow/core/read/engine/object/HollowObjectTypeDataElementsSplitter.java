@@ -9,18 +9,20 @@ public class HollowObjectTypeDataElementsSplitter {
     private final int toMask;
     private final int toOrdinalShift;
 
+    long[][] currentWriteVarLengthDataPointers;
+
     public HollowObjectTypeDataElementsSplitter(HollowObjectTypeDataElements originalDataElements, int numSplits) {
         this.from = originalDataElements;
         this.numSplits = numSplits;
         this.toMask = numSplits - 1;
         this.toOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
 
-        if (numSplits != 2) {
-            throw new UnsupportedOperationException("Only splitting into 2 is supported");  // FUTURE: remove this limitation
+        if (!(numSplits>0) || !((numSplits&(numSplits-1))==0)) {
+            throw new UnsupportedOperationException("Must split by power of 2");
         }
     }
 
-    HollowObjectTypeDataElements[] split() {
+    public HollowObjectTypeDataElements[] split() { // TODO: package private
         HollowObjectTypeDataElements[] to = new HollowObjectTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
             to[i] = new HollowObjectTypeDataElements(from.schema, from.memoryMode, from.memoryRecycler);
@@ -28,6 +30,7 @@ public class HollowObjectTypeDataElementsSplitter {
 
         populateStats(to, from);
 
+        currentWriteVarLengthDataPointers = new long[numSplits][from.schema.numFields()];
         for(int i=0;i<to.length;i++) {
             to[i].fixedLengthData = new FixedLengthElementArray(to[i].memoryRecycler, (long)to[i].bitsPerRecord * (to[i].maxOrdinal + 1));  // TODO: add to FxiedLengthDataFactory to support non-heap modes
             for(int fieldIdx=0;fieldIdx<from.schema.numFields();fieldIdx++) {
@@ -84,7 +87,6 @@ public class HollowObjectTypeDataElementsSplitter {
         int toIndex = ordinal & toMask;
         int toOrdinal = ordinal >> toOrdinalShift;
         // HollowObjectTypeDataElements dst = to[toIndex]; // TODO: optimization
-        long[] currentWriteVarLengthDataPointers = new long[from.schema.numFields()];
 
         for(int fieldIdx=0;fieldIdx<from.schema.numFields();fieldIdx++) {
             if(to[toIndex].varLengthData[fieldIdx] == null) {
@@ -95,10 +97,10 @@ public class HollowObjectTypeDataElementsSplitter {
                 long fromEndByte = varLengthEndByte(from, ordinal, fieldIdx);
                 long size = fromEndByte - fromStartByte;
 
-                to[toIndex].fixedLengthData.setElementValue(((long)toOrdinal * to[toIndex].bitsPerRecord) + to[toIndex].bitOffsetPerField[fieldIdx], to[toIndex].bitsPerField[fieldIdx], currentWriteVarLengthDataPointers[fieldIdx] + size);
-                to[toIndex].varLengthData[fieldIdx].copy(from.varLengthData[fieldIdx], fromStartByte, currentWriteVarLengthDataPointers[fieldIdx], size);
+                to[toIndex].fixedLengthData.setElementValue(((long)toOrdinal * to[toIndex].bitsPerRecord) + to[toIndex].bitOffsetPerField[fieldIdx], to[toIndex].bitsPerField[fieldIdx], currentWriteVarLengthDataPointers[toIndex][fieldIdx] + size);
+                to[toIndex].varLengthData[fieldIdx].copy(from.varLengthData[fieldIdx], fromStartByte, currentWriteVarLengthDataPointers[toIndex][fieldIdx], size);
 
-                currentWriteVarLengthDataPointers[fieldIdx] += size;
+                currentWriteVarLengthDataPointers[toIndex][fieldIdx] += size;
             }
         }
     }

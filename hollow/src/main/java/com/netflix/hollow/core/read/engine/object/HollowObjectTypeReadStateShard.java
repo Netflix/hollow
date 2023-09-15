@@ -33,7 +33,7 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 
-class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStateShard {
+public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStateShard {    // TODO: package private
 
     private volatile HollowObjectTypeDataElements currentDataVolatile;
     private volatile HollowObjectTypeReadState.ShardsHolder currentShardsVolatile;    // SNAP: TODO: test that back reference doesn't need to be cleaned up
@@ -53,7 +53,7 @@ class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStateShard 
 
     private final HollowObjectSchema schema;
     
-    HollowObjectTypeReadStateShard(HollowObjectSchema schema, int shardOrdinalShift, int shardOrdinalOffset) {
+    public HollowObjectTypeReadStateShard(HollowObjectSchema schema, int shardOrdinalShift, int shardOrdinalOffset) {   // TODO: package private
         this.schema = schema;
         this.shardOrdinalShift = shardOrdinalShift;
         this.shardOrdinalOffset = shardOrdinalOffset;

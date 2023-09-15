@@ -8,21 +8,25 @@ public class HollowObjectTypeDataElementsJoiner {
     private final int fromMask;
     private final int fromOrdinalShift;
 
+    private long[] currentWriteVarLengthDataPointers;
+
     public HollowObjectTypeDataElementsJoiner(HollowObjectTypeDataElements[] originalDataElements) {
         this.from = originalDataElements;
         this.fromMask = originalDataElements.length - 1;
         this.fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(originalDataElements.length);
 
-        if (originalDataElements.length != 2) {
-            throw new UnsupportedOperationException("Only joining 2 at a time is supported");  // FUTURE: remove this limitation
+        int numElements = originalDataElements.length;
+        if (!(numElements>0) || !((numElements&(numElements-1))==0)) {
+            throw new UnsupportedOperationException("No. of DataElements to be joined must be a power of 2");
         }
     }
 
-    HollowObjectTypeDataElements join() {
+    public HollowObjectTypeDataElements join() {    // TODO: package private
         HollowObjectTypeDataElements to = new HollowObjectTypeDataElements(from[0].schema, from[0].memoryMode, from[0].memoryRecycler);
 
         populateStats(to, from);
 
+        currentWriteVarLengthDataPointers = new long[to.schema.numFields()];
         to.fixedLengthData = new FixedLengthElementArray(to.memoryRecycler, (long)to.bitsPerRecord * (to.maxOrdinal + 1));  // TODO: add to FxiedLengthDataFactory to support non-heap modes
         for(int fieldIdx=0;fieldIdx<to.schema.numFields();fieldIdx++) {
             if(from[0].varLengthData[fieldIdx] != null) {
@@ -78,15 +82,13 @@ public class HollowObjectTypeDataElementsJoiner {
         int fromIndex = ordinal & fromMask;
         int fromOrdinal = ordinal >> fromOrdinalShift;
 
-        long[] currentWriteVarLengthDataPointers = new long[to.schema.numFields()];
-
         for(int fieldIdx=0;fieldIdx<to.schema.numFields();fieldIdx++) {
             if(to.varLengthData[fieldIdx] == null) {
-                long value = from[fromIndex].fixedLengthData.getLargeElementValue(((long)ordinal * from[fromIndex].bitsPerRecord) + from[fromIndex].bitOffsetPerField[fieldIdx], from[fromIndex].bitsPerField[fieldIdx]);
+                long value = from[fromIndex].fixedLengthData.getLargeElementValue(((long)fromOrdinal * from[fromIndex].bitsPerRecord) + from[fromIndex].bitOffsetPerField[fieldIdx], from[fromIndex].bitsPerField[fieldIdx]);
                 to.fixedLengthData.setElementValue(((long)ordinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIdx], to.bitsPerField[fieldIdx], value);
             } else {
-                long fromStartByte = varLengthStartByte(from[fromIndex], ordinal, fieldIdx);
-                long fromEndByte = varLengthEndByte(from[fromIndex], ordinal, fieldIdx);
+                long fromStartByte = varLengthStartByte(from[fromIndex], fromOrdinal, fieldIdx);
+                long fromEndByte = varLengthEndByte(from[fromIndex], fromOrdinal, fieldIdx);
                 long size = fromEndByte - fromStartByte;
 
                 to.fixedLengthData.setElementValue(((long)ordinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIdx], to.bitsPerField[fieldIdx], currentWriteVarLengthDataPointers[fieldIdx] + size);

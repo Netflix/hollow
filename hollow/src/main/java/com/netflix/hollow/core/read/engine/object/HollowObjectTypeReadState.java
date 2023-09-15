@@ -44,19 +44,23 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     private final HollowObjectSchema unfilteredSchema;
     private final HollowObjectSampler sampler;
 
-    static class ShardsHolder {
-        private final IHollowObjectTypeReadStateShard shards[];
-        private final int shardNumberMask;
+    public static class ShardsHolder {  // TODO: drop public
+        public final IHollowObjectTypeReadStateShard shards[];  // TODO: package private
+        final int shardNumberMask;
 
-        private ShardsHolder(int numShards) {
+        public ShardsHolder(int numShards) {
             this.shards = new HollowObjectTypeReadStateShard[numShards];
             this.shardNumberMask = numShards - 1;
             // for(int i=0;i<this.readStateShards.length;i++)
             //     this.readStateShards[i] = new HollowObjectTypeReadStateShard(schema, shardOrdinalShift); shardOrdinalShift different for different readStateShards
         }
 
+        public IHollowObjectTypeReadStateShard[] getShards() {  // TODO: package private
+            return shards;
+        }
     }
-    volatile ShardsHolder shardsVolatile;
+
+    public volatile ShardsHolder shardsVolatile;    // TODO: package private
 
 
     private int maxOrdinal;
@@ -173,6 +177,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                             shardsVolatile.shards[i].shardOrdinalShift() - 1, 0);
                     newShards.shards[i].setCurrentData(newShards, shardsVolatile.shards[i].currentDataElements());
 
+                    newShards = null; // SNAP: TODO: This wont work without incorporating shardOridnalOffset in underlying HollowObjectTypeReadStateShard
                     newShards.shards[currShardCount + i] = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema,
                             shardsVolatile.shards[i].shardOrdinalShift() - 1, 1); // TODO: implement offset
                     newShards.shards[currShardCount + i].setCurrentData(newShards, shardsVolatile.shards[i].currentDataElements());
@@ -188,11 +193,10 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                     //  numShards = 4 => shardOrdinalShift = 2.
                     //      Ordinal 4 = 100, shardOrdinal = 100 >> 2 == 1 (in shard 0).
                     //      Ordinal 10 = 1010, shardOrdinal = 1010 >> 2 = 2 (in shard 2)
-                    IHollowObjectTypeReadStateShard finalShardLeft = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, finalShardOrdinalShift, 0);
-
                     HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(preSplitDataElements, 2);
                     HollowObjectTypeDataElements[] splitDataElements = splitter.split();
 
+                    IHollowObjectTypeReadStateShard finalShardLeft = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, finalShardOrdinalShift, 0);
                     finalShardLeft.setCurrentData(shardsVolatile, splitDataElements[0]);
                     shardsVolatile.shards[i] = finalShardLeft;
                     shardsVolatile = shardsVolatile;    // assignment of volatile array element to self is required

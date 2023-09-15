@@ -4,7 +4,7 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.util.BitSet;
 
-interface IHollowObjectTypeReadStateShard {
+public interface IHollowObjectTypeReadStateShard {  // TODO: package private
 
     HollowObjectTypeDataElements currentDataElements();
 
