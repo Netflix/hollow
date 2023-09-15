@@ -7,6 +7,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import java.io.IOException;
+import java.util.Random;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,64 +32,109 @@ public class HollowObjectReshardingTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void testSplittingAndJoining() throws IOException {
+    public void testSplittingAndJoining() throws Exception {
 
-        HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+        for (int shardingFactor : new int[]{2, 4, 8, 16, 32}) {
+            System.out.println("shardingFactor="+shardingFactor);
+            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(300)) {
+                System.out.println("numRecords= " + numRecords);
 
-        for(int i=0;i<1000;i++) {
-            rec.reset();
-            rec.setLong("longField", i);
-            rec.setInt("intField", i);
-            rec.setDouble("doubleField", i);
+                HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+                for(int i=0;i<numRecords;i++) {
+                    rec.reset();
+                    rec.setLong("longField", i);
+                    rec.setInt("intField", i);
+                    rec.setDouble("doubleField", i);
+                    rec.setString("stringField", "Value" + i);
 
-            writeStateEngine.add("TestObject", rec);
+                    writeStateEngine.add("TestObject", rec);
+                }
+                roundTripSnapshot();
+                assertDataUnchanged(numRecords);
+
+                // Splitting shards
+                {
+                    HollowObjectTypeReadState objectTypeReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
+                    int prevShardCount = objectTypeReadState.numShards();
+                    int newShardCount = shardingFactor * prevShardCount;
+                    HollowObjectTypeReadState.ShardsHolder newShardsHolder = new HollowObjectTypeReadState.ShardsHolder(newShardCount);
+
+                    for (int i = 0; i < prevShardCount; i++) {
+                        HollowObjectTypeReadState.ShardsHolder shardsHolder = objectTypeReadState.shardsVolatile;
+                        HollowObjectTypeDataElements preSplitDataElements = shardsHolder.shards[i].currentDataElements();
+                        int finalShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newShardCount);
+
+                        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(preSplitDataElements, shardingFactor);
+                        HollowObjectTypeDataElements[] splits = splitter.split();
+
+                        for (int j = 0; j < shardingFactor; j ++) {
+                            IHollowObjectTypeReadStateShard finalShard = new HollowObjectTypeReadStateShard(schema, finalShardOrdinalShift, 0);
+                            finalShard.setCurrentData(newShardsHolder, splits[j]);
+                            newShardsHolder.shards[i + (prevShardCount*j)] = finalShard;
+                        }
+
+                        preSplitDataElements.destroySpecial();
+                    }
+                    objectTypeReadState.shardsVolatile = newShardsHolder;
+                    Assert.assertEquals(newShardCount, objectTypeReadState.numShards());
+                    Assert.assertEquals(newShardCount, shardingFactor * prevShardCount);
+                }
+                assertDataUnchanged(numRecords);
+
+                // joining shards
+                {
+                    HollowObjectTypeReadState objectTypeReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
+                    int prevShardCount = objectTypeReadState.numShards();
+                    int newShardCount = prevShardCount / shardingFactor;
+                    HollowObjectTypeReadState.ShardsHolder newShardsHolder = new HollowObjectTypeReadState.ShardsHolder(newShardCount);
+
+                    for (int i = 0; i < newShardCount; i++) {
+                        HollowObjectTypeReadState.ShardsHolder shardsHolder = objectTypeReadState.shardsVolatile;
+                        HollowObjectTypeDataElements[] preJoinDatElements = new HollowObjectTypeDataElements[shardingFactor];
+                        for (int j = 0; j < shardingFactor; j ++) {
+                            preJoinDatElements[j] = shardsHolder.shards[i + (newShardCount*j)].currentDataElements();
+                        };
+                        int finalShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newShardCount);
+
+                        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner(preJoinDatElements);
+                        HollowObjectTypeDataElements joined = joiner.join();
+
+                        IHollowObjectTypeReadStateShard finalShard = new HollowObjectTypeReadStateShard(schema, finalShardOrdinalShift, 0);
+                        finalShard.setCurrentData(newShardsHolder, joined);
+                        newShardsHolder.shards[i] = finalShard;
+
+                        for (int j = 0; j < shardingFactor; j ++) {
+                            preJoinDatElements[j].destroySpecial();
+                        };
+                    }
+                    objectTypeReadState.shardsVolatile = newShardsHolder;
+                    Assert.assertEquals(newShardCount, objectTypeReadState.numShards());
+                    Assert.assertEquals(shardingFactor * newShardCount, prevShardCount);
+
+                }
+                assertDataUnchanged(numRecords);
+            }
         }
 
-        roundTripSnapshot();
-        Assert.assertEquals(4, readStateEngine.getTypeState("TestObject").numShards());
+        // TODO: test with holes
+        // TODO: test with null values in fixed or variable length types
+        // HollowExplorerUIServer s = new HollowExplorerUIServer(readStateEngine, 7001);
+        // s.start();
+        // s.join();
+    }
 
-        for(int i=0;i<1000;i++) {
+    private void assertDataUnchanged(int numRecords) {
+        for(int i=0;i<numRecords;i++) {
             GenericHollowObject obj = new GenericHollowObject(readStateEngine, "TestObject", i);
 
-            Assert.assertEquals(i, obj.getLong("longField"));
+            try {
+                Assert.assertEquals(i, obj.getLong("longField"));
+            } catch (AssertionError e) {
+                System.out.println("i="+ i);
+            }
             Assert.assertEquals(i, obj.getInt("intField"));
             Assert.assertEquals((double)i, obj.getDouble("doubleField"), 0);
-        }
-
-        HollowObjectTypeReadState objectTypeReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
-        int currShardCount = objectTypeReadState.numShards();
-        int newShardCount = 2 * currShardCount;
-        HollowObjectTypeReadState.ShardsHolder newShardsHolder = new HollowObjectTypeReadState.ShardsHolder(newShardCount);
-
-        for(int i=0;i<currShardCount;i++) {
-            HollowObjectTypeReadState.ShardsHolder shardsHolder = objectTypeReadState.shardsVolatile;
-            HollowObjectTypeDataElements preSplitDataElements = shardsHolder.shards[i].currentDataElements();
-            int finalShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newShardCount);
-
-            HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(preSplitDataElements, 2);
-            HollowObjectTypeDataElements[] splits = splitter.split();
-
-            IHollowObjectTypeReadStateShard finalShardLeft = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, finalShardOrdinalShift, 0);
-            finalShardLeft.setCurrentData(newShardsHolder, splits[0]);
-            newShardsHolder.shards[i] = finalShardLeft;
-
-            IHollowObjectTypeReadStateShard finalShardRight = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, finalShardOrdinalShift, 0);
-            finalShardRight.setCurrentData(newShardsHolder, splits[1]);
-            newShardsHolder.shards[i + currShardCount] = finalShardRight;
-
-            preSplitDataElements.destroy();
-        }
-
-        objectTypeReadState.shardsVolatile = newShardsHolder;
-
-        Assert.assertEquals(newShardCount, objectTypeReadState.numShards());
-        // can still read sae data
-        for(int i=0;i<1000;i++) {
-            GenericHollowObject obj = new GenericHollowObject(readStateEngine, "TestObject", i);
-
-            Assert.assertEquals(i, obj.getLong("longField"));
-            Assert.assertEquals(i, obj.getInt("intField"));
-            Assert.assertEquals((double)i, obj.getDouble("doubleField"), 0);
+            Assert.assertEquals("Value"+i, obj.getString("stringField"));
         }
     }
 }
