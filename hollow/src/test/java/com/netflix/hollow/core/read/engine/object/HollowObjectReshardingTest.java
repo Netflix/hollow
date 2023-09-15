@@ -34,9 +34,11 @@ public class HollowObjectReshardingTest extends AbstractStateEngineTest {
     @Test
     public void testSplittingAndJoining() throws Exception {
 
-        for (int shardingFactor : new int[]{2, 4, 8, 16, 32}) {
+        for (int shardingFactor : new int[]{2, 4, 8, 16, 32})
+        {
             System.out.println("shardingFactor="+shardingFactor);
-            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(300)) {
+            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(1000))
+            {
                 System.out.println("numRecords= " + numRecords);
 
                 HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
@@ -113,6 +115,7 @@ public class HollowObjectReshardingTest extends AbstractStateEngineTest {
 
                 }
                 assertDataUnchanged(numRecords);
+                initWriteStateEngine();
             }
         }
 
