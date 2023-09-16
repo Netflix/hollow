@@ -10,8 +10,6 @@ public interface IHollowObjectTypeReadStateShard {  // TODO: package private
 
     int shardOrdinalShift();
 
-    int shardOrdinalOffset();
-
     void setCurrentData(HollowObjectTypeReadState.ShardsHolder shards, HollowObjectTypeDataElements data);
 
     boolean isNull(int ordinal, int fieldIndex);
