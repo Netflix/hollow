@@ -4,7 +4,7 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.util.BitSet;
 
-public interface IHollowObjectTypeReadStateShard {  // TODO: package private
+public interface IHollowObjectTypeReadStateShard {  // TODO: package private, or just make Virtual Shard (better name, virtual is confusing here given the typical java virtual/physical directionality) subclass HollowObjectTypeReadStateShard and do the necessary ordinal translation
 
     HollowObjectTypeDataElements currentDataElements();
 

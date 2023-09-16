@@ -50,15 +50,16 @@ public class HollowObjectTypeDataElementsSplitter {
         long[][] varLengthSizes = new long[to.length][from.schema.numFields()];
 
         for(int ordinal=0;ordinal<=from.maxOrdinal;ordinal++) {    // TODO: verify we're always inclusive of maxOrdinal everywhere else
+            int toIndex = ordinal & toMask;
+            int toOrdinal = ordinal >> toOrdinalShift;
+            to[toIndex].maxOrdinal = toOrdinal; // note not thread-safe but delta thread is probably the only one that needs to see maxOrdinal per split or shard
             for(int fieldIdx=0;fieldIdx<from.schema.numFields();fieldIdx++) {
                 if(from.varLengthData[fieldIdx] != null) {
-                    int toIndex = ordinal & toMask;
-                    int toOrdinal = ordinal >> toOrdinalShift;
                     varLengthSizes[toIndex][fieldIdx] += varLengthSize(ordinal, fieldIdx);
-                    to[toIndex].maxOrdinal = toOrdinal; // note not thread-safe but delta thread is probably the only one that needs to see maxOrdinal per split or shard
                 }
             }
         }
+        // SNAP: Here: populate to[toIndex].maxOrdinal for varLengthData
 
         for(int toIndex=0;toIndex<to.length;toIndex++) {
             for(int fieldIdx=0;fieldIdx<from.schema.numFields();fieldIdx++) {

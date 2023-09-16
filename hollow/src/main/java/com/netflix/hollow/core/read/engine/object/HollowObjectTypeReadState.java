@@ -51,8 +51,6 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         public ShardsHolder(int numShards) {
             this.shards = new HollowObjectTypeReadStateShard[numShards];
             this.shardNumberMask = numShards - 1;
-            // for(int i=0;i<this.readStateShards.length;i++)
-            //     this.readStateShards[i] = new HollowObjectTypeReadStateShard(schema, shardOrdinalShift); shardOrdinalShift different for different readStateShards
         }
 
         public IHollowObjectTypeReadStateShard[] getShards() {  // TODO: package private
@@ -81,7 +79,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         this.shardsVolatile = new ShardsHolder(numShards);
         for(int i=0;i<numShards;i++) {
-            this.shardsVolatile.shards[i] = new HollowObjectTypeReadStateShard(schema, shardOrdinalShift, 0);
+            this.shardsVolatile.shards[i] = new HollowObjectTypeReadStateShard(schema, shardOrdinalShift);
         }
     }
 
@@ -161,13 +159,13 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         int shardingFactor;
 
         boolean splittingShards = newShardCount > prevShardCount;
-        if (splittingShards) {
+        if (splittingShards) {  // TODO: edge cases like 0, trying to split 1
             shardingFactor = newShardCount / prevShardCount;
             if (newShardCount % prevShardCount != 0 || shardingFactor < 2) {
                 throw new IllegalStateException("Invalid shard resizing, prevShardCount= " + prevShardCount + ", newShardCount= " + newShardCount);
             }
         } else {    // joining
-            shardingFactor = prevShardCount / newShardCount;
+            shardingFactor = prevShardCount / newShardCount;    // TODO: edge cases like trying to join 1
             if (prevShardCount % newShardCount != 0 || shardingFactor < 2) {
                 throw new IllegalStateException("Invalid shard joining, prevShardCount= " + prevShardCount + ", newShardCount= " + newShardCount);
             }
@@ -180,8 +178,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             //                            same underlying data elements as the current i-th shard but reference a subset of the original ordinals}
             for(int i = 0; i< prevShardCount; i++) {
                 for (int j = 0; j < shardingFactor; j ++) {
-                    newShards.shards[i+(prevShardCount*j)] = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema,
-                            31 - Integer.numberOfLeadingZeros(prevShardCount), 0);
+                    newShards.shards[i+(prevShardCount*j)] = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, 31 - Integer.numberOfLeadingZeros(prevShardCount));
                     newShards.shards[i+(prevShardCount*j)].setCurrentData(newShards, shardsVolatile.shards[i].currentDataElements());
                 }
             }
@@ -207,7 +204,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 HollowObjectTypeDataElements[] splits = splitter.split();
 
                 for (int j = 0; j < shardingFactor; j ++) {
-                    IHollowObjectTypeReadStateShard finalShard = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, finalShardOrdinalShift, 0);
+                    IHollowObjectTypeReadStateShard finalShard = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, finalShardOrdinalShift);
                     finalShard.setCurrentData(shardsVolatile, splits[j]);
                     shardsVolatile.shards[i + (prevShardCount*j)] = finalShard;
                 }
@@ -216,14 +213,38 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 shardsVolatile.shards[0].readInt(2, 0); // TODO: remove
                 preSplitDataElements.destroySpecial();         // TODO: remove in favor of below
                 // preSplitDataElements.destroy();         // it is now safe to destroy pre-split data elements
-
-                // SNAP: HERE: HOW DID MOVING shardOrdinalShift() into here from underlying HollowObjectTypeReadStateShard fix the reads?
-
             }
             // shardsVolatile now contains newShardCount shards with split/joined data from the original shards
             // this is the desired end state of splitting shards
         } else { // joining shards
-            throw new UnsupportedOperationException("Not yet implemented");
+            int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newShardCount);
+
+            for (int i = 0; i < newShardCount; i++) {
+                HollowObjectTypeDataElements[] preJoinDatElements = new HollowObjectTypeDataElements[shardingFactor];
+                for (int j = 0; j < shardingFactor; j ++) {
+                    preJoinDatElements[j] = shardsVolatile.shards[i + (newShardCount*j)].currentDataElements();
+                };
+
+                HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner(preJoinDatElements);
+                HollowObjectTypeDataElements joined = joiner.join();
+
+                // Replace existing shards with pre-joined data elements with a new joined shard that contains data and
+                // uses newShardOrdinalShift for mapping ordinals into the joined data
+                IHollowObjectTypeReadStateShard joinedShard = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, newShardOrdinalShift);
+                joinedShard.setCurrentData(shardsVolatile, joined);
+                for (int j = 0; j < shardingFactor; j ++) {
+                    shardsVolatile.shards[i + (newShardCount*j)] = joinedShard;
+                    shardsVolatile = shardsVolatile;    // required for propagation of elements
+                    preJoinDatElements[j].destroySpecial(); // now safe to destory // TODO: replace with other destroy
+                };
+            }
+
+            // filter down to just the new (fewer) shards
+            for (int i = 0; i < newShardCount; i++) {
+                newShards.shards[i] = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, newShardOrdinalShift);
+                newShards.shards[i].setCurrentData(newShards, shardsVolatile.shards[i].currentDataElements());
+            }
+            shardsVolatile = newShards;
         }
 
         /**
@@ -447,8 +468,12 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         BitSet populatedOrdinals = getPopulatedOrdinals();
         
-        for(int i=0;i<shards.length;i++)
+        for(int i=0;i<shards.length;i++) {
+            if (shards[i].shardOrdinalShift() != 0) {
+                throw new UnsupportedOperationException("applyToChecksum called for virtual shard, unexpected");  // SNAP: TODO: remove this altogether, or support applyToChecksum for virtual shards
+            }
             shards[i].applyToChecksum(checksum, withSchema, populatedOrdinals, i, shards.length);
+        }
     }
 
 	@Override
@@ -456,8 +481,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         IHollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
 	    long totalApproximateHeapFootprintInBytes = 0;
 	    
-	    for(int i=0;i<shards.length;i++)
-	        totalApproximateHeapFootprintInBytes += shards[i].getApproximateHeapFootprintInBytes();
+	    for(int i=0;i<shards.length;i++) {
+            totalApproximateHeapFootprintInBytes += shards[i].getApproximateHeapFootprintInBytes();
+        }
 	    
 	    return totalApproximateHeapFootprintInBytes;
 	}

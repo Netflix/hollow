@@ -42,15 +42,14 @@ public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStat
         return shardOrdinalShift;
     }
 
+    // for virtual shards that skip over some data elements, ordinal >> shardOrdinalShift yields a translated in-shard ordinal
     final int shardOrdinalShift;
-    final int shardOrdinalOffset;   // TODO: unused
 
     private final HollowObjectSchema schema;
     
-    public HollowObjectTypeReadStateShard(HollowObjectSchema schema, int shardOrdinalShift, int shardOrdinalOffset) {   // TODO: package private
+    public HollowObjectTypeReadStateShard(HollowObjectSchema schema, int shardOrdinalShift) {   // TODO: package private, javadoc for shardOrdinalShift
         this.schema = schema;
         this.shardOrdinalShift = shardOrdinalShift;
-        this.shardOrdinalOffset = shardOrdinalOffset;
     }
 
     @Override
@@ -104,7 +103,6 @@ public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStat
 
     @Override
     public int readInt(int ordinal, int fieldIndex) {
-        ;
         HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         long value;
@@ -122,7 +120,6 @@ public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStat
 
     @Override
     public float readFloat(int ordinal, int fieldIndex) {
-        ;
         HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         int value;
@@ -140,7 +137,6 @@ public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStat
 
     @Override
     public double readDouble(int ordinal, int fieldIndex) {
-        ;
         HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         long value;
@@ -159,7 +155,6 @@ public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStat
 
     @Override
     public long readLong(int ordinal, int fieldIndex) {
-        ;
         HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         long value;
@@ -179,7 +174,6 @@ public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStat
 
     @Override
     public Boolean readBoolean(int ordinal, int fieldIndex) {
-        ;
         HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         long value;
@@ -196,7 +190,6 @@ public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStat
     }
 
     private long readFixedLengthFieldValue(HollowObjectTypeDataElements currentData, int ordinal, int fieldIndex) {
-        ;
         long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
         int numBitsForField = currentData.bitsPerField[fieldIndex];
 
@@ -207,7 +200,6 @@ public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStat
 
     @Override
     public byte[] readBytes(int ordinal, int fieldIndex) {
-        ;
         HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         byte[] result;
@@ -244,7 +236,6 @@ public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStat
 
     @Override
     public String readString(int ordinal, int fieldIndex) {
-        ;
         HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         String result;
@@ -279,7 +270,6 @@ public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStat
 
     @Override
     public boolean isStringFieldEqual(int ordinal, int fieldIndex, String testValue) {
-        ;
         HollowObjectTypeReadState.ShardsHolder currentShards;
         HollowObjectTypeDataElements currentData;
         boolean result;
