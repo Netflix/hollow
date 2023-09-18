@@ -236,7 +236,9 @@ public abstract class HollowTypeWriteState {
         if(this.numShards == -1) {
             this.numShards = numShards;
         } else if(this.numShards != numShards) {
-            throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + this.numShards + ".  Cannot reset to " + numShards + "."); 
+            this.numShards = numShards;
+            // SNAP: So... this exists
+            // throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + this.numShards + ".  Cannot reset to " + numShards + ".");
         }
     }
 

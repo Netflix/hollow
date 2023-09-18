@@ -39,6 +39,28 @@ public class TestHollowConsumerTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
+    public void testDelta_versionTransition_resharding() throws Exception {
+        long snapshotVersion = 1l;
+        TestHollowConsumer consumer = new TestHollowConsumer.Builder()
+                .withBlobRetriever(new TestBlobRetriever())
+                .build();
+
+        HollowWriteStateEngine state1 = new HollowWriteStateEngineBuilder().add("movie 1").build();
+        consumer.addSnapshot(snapshotVersion, state1);
+        assertEquals("Should be no version", VERSION_NONE, consumer.getCurrentVersionId());
+        consumer.triggerRefreshTo(snapshotVersion);
+        assertEquals("Should be at snapshot version", snapshotVersion, consumer.getCurrentVersionId());
+
+        long deltaToVersion = 2l;
+        HollowWriteStateEngine state2 = new HollowWriteStateEngineBuilder().add("movie 1").add("movie 2").build();
+        consumer.addDelta(snapshotVersion, deltaToVersion, state2, 4);  // NOTE: new shard count here
+
+        assertEquals("Should still be at snapshot version", snapshotVersion, consumer.getCurrentVersionId());
+        consumer.triggerRefreshTo(deltaToVersion);
+        assertEquals("Should be at delta To version", deltaToVersion, consumer.getCurrentVersionId());
+    }
+
+    @Test
     public void testAddSnapshot_version() throws Exception {
         long latestVersion = 1L;
         TestHollowConsumer consumer = new TestHollowConsumer.Builder()
