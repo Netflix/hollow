@@ -112,46 +112,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler) throws IOException {
-        if(shardsVolatile.shards.length > 1)
-            maxOrdinal = VarInt.readVInt(in);
-
-        for(int i=0;i<shardsVolatile.shards.length;i++) {
-            HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryMode, memoryRecycler);
-            deltaData.readDelta(in);
-            if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
-
-                if(!deltaData.encodedRemovals.isEmpty())
-                    notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shardsVolatile.shards.length);
-
-                HollowObjectTypeDataElements currentData = shardsVolatile.shards[i].currentDataElements();
-                GapEncodedVariableLengthIntegerReader oldRemovals = currentData.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : currentData.encodedRemovals;
-                if(oldRemovals.isEmpty()) {
-                    currentData.encodedRemovals = deltaData.encodedRemovals;
-                    oldRemovals.destroy();
-                } else {
-                    if(!deltaData.encodedRemovals.isEmpty()) {
-                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryRecycler);
-                        oldRemovals.destroy();
-                    }
-                    deltaData.encodedRemovals.destroy();
-                }
-
-                deltaData.encodedAdditions.destroy();
-            } else {
-                HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
-                HollowObjectTypeDataElements oldData = shardsVolatile.shards[i].currentDataElements();
-                nextData.applyDelta(oldData, deltaData);
-                shardsVolatile.shards[i].setCurrentData(shardsVolatile, nextData);
-                notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shardsVolatile.shards.length);
-                deltaData.encodedAdditions.destroy();
-                oldData.destroy();
-            }
-            deltaData.destroy();
-            stateEngine.getMemoryRecycler().swap();
-        }
-
-        if(shardsVolatile.shards.length == 1)
-            maxOrdinal = shardsVolatile.shards[0].currentDataElements().maxOrdinal;
+        applyDelta(in, deltaSchema, memoryRecycler, shardsVolatile.shards.length);
     }
 
     public void reshard(int newShardCount) {   // TODO: package private
@@ -182,6 +143,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                     newShards.shards[i+(prevShardCount*j)].setCurrentData(newShards, shardsVolatile.shards[i].currentDataElements());
                 }
             }
+            newShards = newShards;
             shardsVolatile = newShards; // propagate newShards
 
             // Step 2:
@@ -210,7 +172,6 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 }
 
                 shardsVolatile = shardsVolatile;        // assignment of volatile array element to self is required
-                shardsVolatile.shards[0].readInt(2, 0); // TODO: remove
                 preSplitDataElements.destroySpecial();         // TODO: remove in favor of below
                 // preSplitDataElements.destroy();         // it is now safe to destroy pre-split data elements
             }

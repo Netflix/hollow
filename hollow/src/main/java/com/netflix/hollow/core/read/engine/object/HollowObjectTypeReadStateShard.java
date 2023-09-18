@@ -429,7 +429,7 @@ public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStat
         //
         // For more details see http://gee.cs.oswego.edu/dl/html/j9mm.html
         HollowUnsafeHandle.getUnsafe().loadFence();
-        return shards != currentShardsVolatile || data != currentDataVolatile;
+        return shards != currentShardsVolatile || data != currentDataVolatile;  // SNAP: TODO: Could probably make it to only check against current shards
     }
 
     @Override
