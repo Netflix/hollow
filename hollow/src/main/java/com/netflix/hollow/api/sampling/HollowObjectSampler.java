@@ -33,10 +33,12 @@ public class HollowObjectSampler implements HollowSampler {
     private final String fieldNames[];
     private final long sampleCounts[];
     private final HollowSamplingDirector samplingDirectors[];
+    private boolean isSamplingDisabled;
 
     public HollowObjectSampler(HollowObjectSchema schema, HollowSamplingDirector director) {
         this.typeName = schema.getName();
         this.sampleCounts = new long[schema.numFields()];
+        this.isSamplingDisabled = director == DisabledSamplingDirector.INSTANCE;
         HollowSamplingDirector[] samplingDirectors = new HollowSamplingDirector[schema.numFields()];
         Arrays.fill(samplingDirectors, director);
 
@@ -50,6 +52,7 @@ public class HollowObjectSampler implements HollowSampler {
 
     public void setSamplingDirector(HollowSamplingDirector director) {
         if(!"".equals(typeName)) {
+            this.isSamplingDisabled = director == DisabledSamplingDirector.INSTANCE;
             Arrays.fill(samplingDirectors, director);
         }
     }
@@ -60,6 +63,7 @@ public class HollowObjectSampler implements HollowSampler {
 
         for(int i=0;i<fieldNames.length;i++) {
             if(typeConfig.includesField(fieldNames[i])) {
+                this.isSamplingDisabled = false;
                 samplingDirectors[i] = director;
             }
         }
@@ -71,6 +75,7 @@ public class HollowObjectSampler implements HollowSampler {
     }
 
     public void recordFieldAccess(int fieldPosition) {
+        if (this.isSamplingDisabled) return;
         if(samplingDirectors[fieldPosition].shouldRecord())
             sampleCounts[fieldPosition]++;
     }
