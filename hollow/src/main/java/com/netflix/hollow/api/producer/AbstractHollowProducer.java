@@ -64,7 +64,7 @@ import java.util.logging.Logger;
 
 abstract class AbstractHollowProducer {
 
-    static final long DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE = 16L * 1024L * 1024L;
+    static final long DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE = 1024L; // 16L * 1024L * 1024L;   // SNAP: TODO: restore
     // An announcement metadata tag indicating the approx heap footprint of the corresponding read state engine
     private static final String ANNOUNCE_TAG_HEAP_FOOTPRINT = "hollow.data.size.heap.bytes.approx";
 

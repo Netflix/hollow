@@ -241,7 +241,7 @@ public class HollowBlobWriter {
                 HollowSchema schema = typeState.getSchema();
                 schema.writeTo(partStream);
 
-                writeNumShards(partStream, typeState.getNumShards());
+                writeNumShards(partStream, typeState.getPrevNumShards());
 
                 typeState.writeReverseDelta(partStream);
             }

@@ -44,6 +44,7 @@ public abstract class HollowTypeWriteState {
     protected final ByteArrayOrdinalMap ordinalMap;
     
     protected int numShards;
+    protected int prevNumShards;
 
     protected HollowSchema restoredSchema;
     protected ByteArrayOrdinalMap restoredMap;
@@ -231,7 +232,11 @@ public abstract class HollowTypeWriteState {
     int getNumShards() {
         return numShards;
     }
-    
+
+    int getPrevNumShards() {
+        return prevNumShards;
+    }
+
     public void setNumShards(int numShards) {
         if(this.numShards == -1) {
             this.numShards = numShards;

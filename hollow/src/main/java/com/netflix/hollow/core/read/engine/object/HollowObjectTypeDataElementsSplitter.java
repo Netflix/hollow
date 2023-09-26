@@ -124,23 +124,4 @@ public class HollowObjectTypeDataElementsSplitter {
 
         return endByte;
     }
-
-// TODO: Remove
-//    public HollowObjectTypeDataElements skipCopy(int startOffset, int increment) {
-//        HollowObjectTypeDataElements copyDataElements = new HollowObjectTypeDataElements(this.schema, this.memoryMode, this.memoryRecycler);
-//        copyDataElements.skipCopy(this, startOffset, increment);
-//        return copyDataElements;
-//    }
-//
-//    void skipCopy(HollowObjectTypeDataElements from, int startOffset, int increment) throws IOException {
-//        this.encodedRemovals = from.encodedRemovals.skipCopy();   // SNAP: TODO: need to copy, but can copy full or only ordinals in this shard, or what?
-//
-//        copyFieldStatistics(from);
-//
-//        long numBitsInTarget = (this.maxOrdinal%2) == 0 ?
-//        fixedLengthData = new FixedLengthElementArray(memoryRecycler, from.fixedLengthData.getSizeBits());
-//        removeExcludedFieldsFromFixedLengthData();
-//
-//        readVarLengthData(in, unfilteredSchema);
-//    }
 }

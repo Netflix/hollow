@@ -259,7 +259,8 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             } else {
                 HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
                 HollowObjectTypeDataElements oldData = shardsVolatile.shards[i].currentDataElements();
-                nextData.applyDelta(oldData, deltaData);
+                nextData.applyDelta(oldData, deltaData);    // SNAP: Here: deltaData shards have maxOrdinal of 31 for reverse delta
+                                                            // was reverse delta written with 64 shards? It should be written with 16 !!!
                 shardsVolatile.shards[i].setCurrentData(shardsVolatile, nextData);
                 shardsVolatile = shardsVolatile;
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shardsVolatile.shards.length);
@@ -430,7 +431,8 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         BitSet populatedOrdinals = getPopulatedOrdinals();
         
         for(int i=0;i<shards.length;i++) {
-            if (shards[i].shardOrdinalShift() != 0) {
+            // if (shards[i].shardOrdinalShift() != 0) {       // SNAP: TODO: detect virtual shard
+            if (false) {
                 throw new UnsupportedOperationException("applyToChecksum called for virtual shard, unexpected");  // SNAP: TODO: remove this altogether, or support applyToChecksum for virtual shards
             }
             shards[i].applyToChecksum(checksum, withSchema, populatedOrdinals, i, shards.length);
