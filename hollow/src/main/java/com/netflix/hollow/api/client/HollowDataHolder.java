@@ -33,6 +33,8 @@ import com.netflix.hollow.tools.history.HollowHistoricalStateCreator;
 import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.logging.Logger;
 
 /**
@@ -177,7 +179,21 @@ class HollowDataHolder {
             reader.applyDelta(in, optionalPartIn);
         }
 
-        setVersion(transition.getToVersion());
+        long expectedToVersion = transition.getToVersion();
+        Long actualToVersion = null;
+        String actualToVersionStr = stateEngine.getHeaderTag("TODO: producers need to start writing this tag");
+        if (actualToVersionStr != null) {
+            actualToVersion = Long.valueOf(actualToVersionStr);
+        }
+
+        if (actualToVersion != null) {
+            if (actualToVersion.longValue() != expectedToVersion) {
+                LOG.warning("toVersion in blob didn't match toVersion seen in metadata; actualToVersion=" + actualToVersion + ", expectedToVersion=" + expectedToVersion);
+            }
+            setVersion(actualToVersion.longValue());
+        } else {
+            setVersion(transition.getToVersion());
+        }
 
         for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
             refreshListener.blobLoaded(transition);
