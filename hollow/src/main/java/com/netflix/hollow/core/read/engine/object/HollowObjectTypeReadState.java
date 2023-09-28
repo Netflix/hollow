@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowObjectSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
@@ -35,6 +37,8 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * A {@link HollowTypeReadState} for OBJECT type records. 
@@ -113,6 +117,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler) throws IOException {
         applyDelta(in, deltaSchema, memoryRecycler, shardsVolatile.shards.length);
+        throw new IllegalStateException("// SNAP: TODO: unexpected to reach here");
     }
 
     public void reshard(int newShardCount) {   // TODO: package private
@@ -234,6 +239,16 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         if(shardsVolatile.shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
+        // diag // SNAP: TODO: remove
+        if (schema.getName().equals("String") && shardsVolatile.shards.length == 2) {
+            System.out.println("SNAP: BEFORE DELTA APPLICATION");
+            int o = getPopulatedOrdinals().nextSetBit(0);
+            while(o != ORDINAL_NONE) {
+                System.out.println("    SNAP: " + o + ": " + ((HollowObjectTypeReadState) getTypeState()).readString(o, 0));
+                o = getPopulatedOrdinals().nextSetBit(o+1);
+            }
+        }
+
         for(int i = 0; i< shardsVolatile.shards.length; i++) {
             HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryMode, memoryRecycler);
             deltaData.readDelta(in);
@@ -259,10 +274,10 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             } else {
                 HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
                 HollowObjectTypeDataElements oldData = shardsVolatile.shards[i].currentDataElements();
-                nextData.applyDelta(oldData, deltaData);    // SNAP: Here: deltaData shards have maxOrdinal of 31 for reverse delta
-                                                            // was reverse delta written with 64 shards? It should be written with 16 !!!
+                nextData.applyDelta(oldData, deltaData);
                 shardsVolatile.shards[i].setCurrentData(shardsVolatile, nextData);
                 shardsVolatile = shardsVolatile;
+
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shardsVolatile.shards.length);
                 deltaData.encodedAdditions.destroy();
                 oldData.destroy();
@@ -271,8 +286,36 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             stateEngine.getMemoryRecycler().swap();
         }
 
+        // diag // SNAP: TODO: remove
+        if (schema.getName().equals("String") && shardsVolatile.shards.length == 2) {
+            System.out.println("SNAP: AFTER DELTA APPLICATION");
+            int o = getPopulatedOrdinals().nextSetBit(0);
+            while(o != ORDINAL_NONE) {
+                System.out.println("    SNAP: " + o + ": " + ((HollowObjectTypeReadState) getTypeState()).readString(o, 0));
+                o = getPopulatedOrdinals().nextSetBit(o+1);
+            }
+        }
+        // inspectDeltaData(deltaData);
+
         if(shardsVolatile.shards.length == 1)
             maxOrdinal = shardsVolatile.shards[0].currentDataElements().maxOrdinal;
+    }
+
+    private void inspectDeltaData(HollowObjectTypeDataElements deltaData) {// TODO: remove becasue it mutates readers
+        System.out.println("SNAP: DELTA DATA");
+        System.out.println("SNAP:     maxOrdinal = " + maxOrdinal);
+        GapEncodedVariableLengthIntegerReader removalsReader = deltaData.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : deltaData.encodedRemovals;
+        GapEncodedVariableLengthIntegerReader additionsReader = deltaData.encodedAdditions;
+        removalsReader.reset();
+        additionsReader.reset();
+        while(additionsReader.nextElement() != Integer.MAX_VALUE) {
+            System.out.println("SNAP:         Added ordinal " + additionsReader.nextElement());
+            additionsReader.advance();
+        }
+        while(removalsReader.nextElement() != Integer.MAX_VALUE) {
+            System.out.println("SNAP:         Removed ordinal " + removalsReader.nextElement());
+            removalsReader.advance();
+        }
     }
 
     public static void discardSnapshot(HollowBlobInput in, HollowObjectSchema schema, int numShards) throws IOException {

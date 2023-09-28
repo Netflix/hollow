@@ -124,8 +124,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     public abstract void readSnapshot(HollowBlobInput in, ArraySegmentRecycler recycler) throws IOException;
     public abstract void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException;
 
-    public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler, int newNumShards) throws IOException {
-        applyDelta(in, schema, memoryRecycler, numShards());
+    public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler, int newNumShards) throws IOException { // TODO: make abstract
     }
 
     public HollowSchema getSchema() {

@@ -82,13 +82,14 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         fieldStats.completeCalculations();
 
         // if(numShards == -1) {    // SNAP: TODO: removed
-        prevNumShards = numShards;
+        prevNumShards = numShards;  // only applicable for reverse deltas
+
         long projectedSizeOfType = ((long)fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
-            projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
-            
-            numShards = 1;
-            while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType) 
-                numShards *= 2;
+        projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
+
+        numShards = 1;
+        while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType)
+            numShards *= 2;
         // }
 
         maxShardOrdinal = new int[numShards];
@@ -260,6 +261,9 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void calculateReverseDelta() {
+        if (prevNumShards < 0) {
+            throw new IllegalStateException("// SNAP: TODO: should not be running into this");
+        }
         calculateDelta(currentCyclePopulated, previousCyclePopulated, prevNumShards);
     }
 

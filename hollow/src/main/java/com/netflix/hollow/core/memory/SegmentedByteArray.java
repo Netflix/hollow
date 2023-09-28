@@ -276,8 +276,12 @@ public class SegmentedByteArray implements VariableLengthData {
             segments = Arrays.copyOf(segments, segments.length * 3 / 2);
         }
 
-        if(segments[segmentIndex] == null) {
-            segments[segmentIndex] = memoryRecycler.getByteArray();
+        try {
+            if (segments[segmentIndex] == null) {
+                segments[segmentIndex] = memoryRecycler.getByteArray();
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw e;
         }
     }
 

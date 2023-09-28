@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.producer;
 
 import static com.netflix.hollow.api.producer.ProducerListenerSupport.ProducerListeners;
+import static com.netflix.hollow.core.util.HollowWriteStateCreator.populateUsingReadEngine;
 import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.toList;
 
@@ -38,10 +39,14 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadStateShard;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadStateDiffer;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchemaHash;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
@@ -64,7 +69,7 @@ import java.util.logging.Logger;
 
 abstract class AbstractHollowProducer {
 
-    static final long DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE = 1024L; // 16L * 1024L * 1024L;   // SNAP: TODO: restore
+    static final long DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE = 16L * 1024L * 1024L;   // SNAP: TODO: restore// 1024L;
     // An announcement metadata tag indicating the approx heap footprint of the corresponding read state engine
     private static final String ANNOUNCE_TAG_HEAP_FOOTPRINT = "hollow.data.size.heap.bytes.approx";
 
@@ -253,8 +258,7 @@ abstract class AbstractHollowProducer {
 
     HollowProducer.ReadState hardRestore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
         return restore(versionDesired, blobRetriever,
-                (restoreFrom, restoreTo) -> HollowWriteStateCreator.
-                        populateUsingReadEngine(restoreTo, restoreFrom, false));
+                (restoreFrom, restoreTo) -> populateUsingReadEngine(restoreTo, restoreFrom, false));
     }
 
     private HollowProducer.ReadState restore(
@@ -740,6 +744,9 @@ abstract class AbstractHollowProducer {
             if (readStates.hasCurrent()) {
                 HollowReadStateEngine current = readStates.current().getStateEngine();
 
+                if (current.getTypeState("String") != null)
+                    System.out.println("SNAP: Prev num shards for type String= " + current.getTypeState("String").numShards()); // SNAP: TODO: Remove
+
                 log.info("CHECKSUMS");
                 HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                 log.info("  CUR        " + currentChecksum);
@@ -752,11 +759,45 @@ abstract class AbstractHollowProducer {
                         throw new IllegalStateException("Both a delta and reverse delta are required");
                     }
 
+                    HollowReadStateEngine copyOriginalReadState = new HollowReadStateEngine();
+                    HollowWriteStateEngine wse = new HollowWriteStateEngine();
+                    HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(wse,current.getSchemas());
+                    HollowWriteStateCreator.populateUsingReadEngine(wse, current);
+                    StateEngineRoundTripper.roundTripSnapshot(wse, copyOriginalReadState);
+
+                    HollowChecksum c1 = current.getTypeState("String").getChecksum(current.getSchema("String"));
+                    HollowChecksum c2 = copyOriginalReadState.getTypeState("String").getChecksum(current.getSchema("String"));
+
                     // FIXME: timt: future cycles will fail unless both deltas validate
                     applyDelta(artifacts.delta, current);
+
+                    if (current.getTypeState("String") != null)
+                        System.out.println("SNAP: Post-delta shards for type String= " + current.getTypeState("String").numShards()); // SNAP: TODO: Remove
+
                     HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                     //out.format("  CUR => PND %s\n", forwardChecksum);
                     if (!forwardChecksum.equals(pendingChecksum)) {
+                        for (int i=0; i<current.getTypeState("String").numShards(); i++) {
+                            HollowObjectTypeReadState typeReadState = (HollowObjectTypeReadState) current.getTypeState("String");
+                            HollowObjectTypeReadStateShard shard = (HollowObjectTypeReadStateShard) typeReadState.shardsVolatile.shards[i];
+                            HollowChecksum checksum1 = new HollowChecksum();
+                            shard.applyToChecksum(checksum1, typeReadState.getSchema(), typeReadState.getPopulatedOrdinals(), i, typeReadState.numShards());
+
+                            typeReadState = (HollowObjectTypeReadState) pending.getTypeState("String");
+                            shard = (HollowObjectTypeReadStateShard) typeReadState.shardsVolatile.shards[i];
+                            HollowChecksum checksum2 = new HollowChecksum();
+                            shard.applyToChecksum(checksum2, typeReadState.getSchema(), typeReadState.getPopulatedOrdinals(), i, typeReadState.numShards());
+                            System.out.println("checksum1= " + checksum1 + ", checksum2=" + checksum2);
+
+                            HollowObjectTypeReadStateDiffer.diff(
+                                    (HollowObjectTypeReadState) current.getTypeState("String"),
+                                    (HollowObjectTypeReadState) pending.getTypeState("String"),
+                                    pending.getTypeState("String").getPopulatedOrdinals());
+
+                            // (HollowObjectTypeReadStateShard) ((HollowObjectTypeReadState) current.getTypeState("String")).shardsVolatile.shards[i]
+                            //         .diff((HollowObjectTypeReadStateShard) ((HollowObjectTypeReadState) pending.getTypeState("String")).shardsVolatile.shards[i]);
+                        }
+
                         throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.DELTA);
                     }
 

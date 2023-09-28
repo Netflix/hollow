@@ -59,7 +59,6 @@ public class HollowObjectTypeDataElementsSplitter {
                 }
             }
         }
-        // SNAP: Here: populate to[toIndex].maxOrdinal for varLengthData
 
         for(int toIndex=0;toIndex<to.length;toIndex++) {
             for(int fieldIdx=0;fieldIdx<from.schema.numFields();fieldIdx++) {
@@ -87,7 +86,6 @@ public class HollowObjectTypeDataElementsSplitter {
     private void copyRecord(int ordinal, HollowObjectTypeDataElements[] to) {
         int toIndex = ordinal & toMask;
         int toOrdinal = ordinal >> toOrdinalShift;
-        // HollowObjectTypeDataElements dst = to[toIndex]; // TODO: optimization
 
         for(int fieldIdx=0;fieldIdx<from.schema.numFields();fieldIdx++) {
             if(to[toIndex].varLengthData[fieldIdx] == null) {
