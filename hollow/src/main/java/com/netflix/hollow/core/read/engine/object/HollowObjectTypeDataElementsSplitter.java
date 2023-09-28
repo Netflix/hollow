@@ -37,6 +37,8 @@ public class HollowObjectTypeDataElementsSplitter {
         }
         currentWriteVarLengthDataPointers = new long[numSplits][from.schema.numFields()];
 
+        populateStats(to, from);
+
         // split gap encoded var length removals
         if (from.encodedRemovals != null) {
             // splits from.encodedRemovals to to[i].encodedRemovals, creating ByteDataArrays for to[i], and does not clean up from.encodedRemovals.getUnderyingArray()
@@ -46,7 +48,6 @@ public class HollowObjectTypeDataElementsSplitter {
             throw new UnsupportedOperationException("// SNAP: TODO: Splitting encoded additions is not yet implemented");
         }
 
-        populateStats(to, from);
         for(int i=0;i<to.length;i++) {
             to[i].fixedLengthData = new FixedLengthElementArray(to[i].memoryRecycler, (long)to[i].bitsPerRecord * (to[i].maxOrdinal + 1));  // TODO: add to FxiedLengthDataFactory to support non-heap modes
             for(int fieldIdx=0;fieldIdx<from.schema.numFields();fieldIdx++) {
@@ -123,10 +124,11 @@ public class HollowObjectTypeDataElementsSplitter {
     private void copyEncodedRemovals(HollowObjectTypeDataElements[] to, HollowObjectTypeDataElements from) {
         GapEncodedVariableLengthIntegerReader preSplitRemovals = from.encodedRemovals;
         System.out.println("SNAP: pre-split gap ended removals");
-        diagResetAndPrint(preSplitRemovals);
+        preSplitRemovals.diagResetAndPrint();
+        System.out.println("SNAP: from.maxOrdinal was " + from.maxOrdinal);
 
         List<Integer> ordinals = new ArrayList<>();
-        // if (originalRemovals.equals(EMPTY_READER)) // TODO: Test this case
+        // if (preSplitRemovals.equals(EMPTY_READER)) // TODO: Test this case, and what about null?
         preSplitRemovals.reset();
         while(preSplitRemovals.nextElement() != Integer.MAX_VALUE) {
             ordinals.add(preSplitRemovals.nextElement());
@@ -148,22 +150,8 @@ public class HollowObjectTypeDataElementsSplitter {
         for(int i=0;i<numSplits;i++) {
             to[i].encodedRemovals = new GapEncodedVariableLengthIntegerReader(splitOrdinals[i].getUnderlyingArray(), (int)splitOrdinals[i].length());
             System.out.println("SNAP: post-split gap ended removals for split " + i);
-            diagResetAndPrint(to[i].encodedRemovals);
+            to[i].encodedRemovals.diagResetAndPrint();
         }
-
-        // SNAP: TODO: destory original encodedRemovals here? Similar to: from.encodedRemovals = null; removalsReader.destroy();
-        // throw new UnsupportedOperationException("// SNAP: TODO: Splitting encoded removals is not yet implemented");
-    }
-
-    private void diagResetAndPrint(GapEncodedVariableLengthIntegerReader removals) {
-        List<Integer> ordinals = new ArrayList<>();
-        removals.reset();
-        while(removals.nextElement() != Integer.MAX_VALUE) {
-            ordinals.add(removals.nextElement());
-            removals.advance();
-        }
-
-        System.out.println("SNAP:         " + ordinals);
     }
 
     private long varLengthStartByte(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {

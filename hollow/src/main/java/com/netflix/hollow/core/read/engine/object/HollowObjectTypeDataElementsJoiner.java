@@ -1,7 +1,12 @@
 package com.netflix.hollow.core.read.engine.object;
 
+import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
+import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import java.util.HashSet;
 
 public class HollowObjectTypeDataElementsJoiner {
     private final HollowObjectTypeDataElements[] from;
@@ -19,21 +24,19 @@ public class HollowObjectTypeDataElementsJoiner {
         if (!(numElements>0) || !((numElements&(numElements-1))==0)) {
             throw new UnsupportedOperationException("No. of DataElements to be joined must be a power of 2");
         }
-
-        for (HollowObjectTypeDataElements elements : originalDataElements) {
-            if (elements.encodedRemovals != null) {
-                throw new UnsupportedOperationException("// SNAP: TODO: Joining encoded removals is not yet implemented");
-            }
-            if (elements.encodedAdditions != null) {
-                throw new UnsupportedOperationException("// SNAP: TODO: Joining encoded additions is not yet implemented");
-            }
-        }
     }
 
     public HollowObjectTypeDataElements join() {    // TODO: package private
         HollowObjectTypeDataElements to = new HollowObjectTypeDataElements(from[0].schema, from[0].memoryMode, from[0].memoryRecycler);
 
         populateStats(to, from);
+
+        copyEncodedRemovals(to, from);
+        for (HollowObjectTypeDataElements elements : from) {
+            if (elements.encodedAdditions != null) {
+                throw new UnsupportedOperationException("// SNAP: TODO: Joining encoded additions is not yet implemented");
+            }
+        }
 
         currentWriteVarLengthDataPointers = new long[to.schema.numFields()];
         to.fixedLengthData = new FixedLengthElementArray(to.memoryRecycler, (long)to.bitsPerRecord * (to.maxOrdinal + 1));  // TODO: add to FxiedLengthDataFactory to support non-heap modes
@@ -106,6 +109,44 @@ public class HollowObjectTypeDataElementsJoiner {
                 currentWriteVarLengthDataPointers[fieldIdx] += size;
             }
         }
+    }
+
+    private void copyEncodedRemovals(HollowObjectTypeDataElements to, HollowObjectTypeDataElements[] from) {
+
+        HashSet<Integer>[] preJoinOrdinals = new HashSet[from.length];
+        for (int i=0;i<from.length;i++) {
+            preJoinOrdinals[i] = new HashSet<>();
+            if (from[i].encodedRemovals == null) {
+                continue;   // todo: test
+            }
+            System.out.println("SNAP: pre-join gap ended removals for split " + i); // SNAP: TODO: Here!
+            from[i].encodedRemovals.diagResetAndPrint();
+
+            from[i].encodedRemovals.reset();
+            while(from[i].encodedRemovals.nextElement() != Integer.MAX_VALUE) {
+                preJoinOrdinals[i].add(from[i].encodedRemovals.nextElement());
+                from[i].encodedRemovals.advance();
+            }
+        }
+
+        ByteDataArray joinedEncodedRemovals = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+        int previousOrdinal = 0;
+        for (int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
+            int fromIndex = ordinal & fromMask;
+            int fromOrdinal = ordinal >> fromOrdinalShift;
+            if (preJoinOrdinals[fromIndex].contains(fromOrdinal)) {
+                VarInt.writeVInt(joinedEncodedRemovals, ordinal - previousOrdinal);
+                previousOrdinal = ordinal;
+            }
+        }
+
+        GapEncodedVariableLengthIntegerReader result = new GapEncodedVariableLengthIntegerReader(joinedEncodedRemovals.getUnderlyingArray(), (int) joinedEncodedRemovals.length());
+        System.out.println("SNAP: joined gap ended removals:"); // SNAP: TODO: Here!
+        System.out.println("SNAP: to.maxOrdinal was " + to.maxOrdinal);
+        result.diagResetAndPrint();
+
+        to.encodedRemovals = result;
+        // SNAP: TODO: destroy original somewhere
     }
 
     private long varLengthStartByte(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {

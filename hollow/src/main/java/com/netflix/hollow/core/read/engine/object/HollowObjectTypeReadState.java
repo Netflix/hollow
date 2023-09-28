@@ -179,7 +179,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 shardsVolatile = shardsVolatile;        // assignment of volatile array element to self is required
                 preSplitDataElements.destroySpecial();         // TODO: remove in favor of below
                 // preSplitDataElements.destroy();         // it is now safe to destroy pre-split data elements
-                preSplitDataElements.encodedRemovals.destroy();
+                if (preSplitDataElements.encodedRemovals != null) {
+                    preSplitDataElements.encodedRemovals.destroy();
+                }
             }
             // shardsVolatile now contains newShardCount shards with split/joined data from the original shards
             // this is the desired end state of splitting shards
@@ -203,6 +205,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                     shardsVolatile.shards[i + (newShardCount*j)] = joinedShard;
                     shardsVolatile = shardsVolatile;    // required for propagation of elements
                     preJoinDatElements[j].destroySpecial(); // now safe to destory // TODO: replace with other destroy
+                    if (preJoinDatElements[j].encodedRemovals != null) {
+                        preJoinDatElements[j].encodedRemovals.destroy();
+                    }
                 };
             }
 

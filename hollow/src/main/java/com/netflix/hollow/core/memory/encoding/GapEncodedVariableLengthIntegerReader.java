@@ -24,6 +24,8 @@ import com.netflix.hollow.core.util.IOUtils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GapEncodedVariableLengthIntegerReader {
 
@@ -139,5 +141,15 @@ public class GapEncodedVariableLengthIntegerReader {
         }
 
         return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingArray(), (int)arr.length());
+    }
+
+    public void diagResetAndPrint() {  // SNAP: TODO: remove
+        List<Integer> ordinals = new ArrayList<>();
+        reset();
+        while(nextElement() != Integer.MAX_VALUE) {
+            ordinals.add(nextElement());
+            advance();
+        }
+        System.out.println("SNAP:         " + ordinals);
     }
 }
