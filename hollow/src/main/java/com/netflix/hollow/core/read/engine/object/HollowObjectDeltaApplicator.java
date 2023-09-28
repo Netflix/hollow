@@ -222,7 +222,7 @@ class HollowObjectDeltaApplicator {
                             copyFromData.fixedLengthData.getLargeElementValue(currentReadFixedLengthStartBit - copyFromData.bitsPerField[fromFieldIndex], copyFromData.bitsPerField[fromFieldIndex])
                             : copyFromData.fixedLengthData.getElementValue(currentReadFixedLengthStartBit - copyFromData.bitsPerField[fromFieldIndex], copyFromData.bitsPerField[fromFieldIndex]);
                     if (readStartAlt != readStart) {    // SNAP: HERE: is this bugfix really needed? No, it still doesnt fix the producer checksum issue. Find out: Why does this only trigger when delta is serialized with different numShards?
-                        System.out.println("Help");
+                        System.out.println("// SNAP: TODO: this could probably be moved, it was happenign because splitter wasn't splitting encodedRemovals");
                         // readStart = readStartAlt;   // SNAP: HERE: why does this trigger only when num shards changed?
                     }
                 }

@@ -19,6 +19,15 @@ public class HollowObjectTypeDataElementsJoiner {
         if (!(numElements>0) || !((numElements&(numElements-1))==0)) {
             throw new UnsupportedOperationException("No. of DataElements to be joined must be a power of 2");
         }
+
+        for (HollowObjectTypeDataElements elements : originalDataElements) {
+            if (elements.encodedRemovals != null) {
+                throw new UnsupportedOperationException("// SNAP: TODO: Joining encoded removals is not yet implemented");
+            }
+            if (elements.encodedAdditions != null) {
+                throw new UnsupportedOperationException("// SNAP: TODO: Joining encoded additions is not yet implemented");
+            }
+        }
     }
 
     public HollowObjectTypeDataElements join() {    // TODO: package private

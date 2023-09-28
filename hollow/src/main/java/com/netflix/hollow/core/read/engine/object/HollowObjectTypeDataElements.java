@@ -48,7 +48,7 @@ public class HollowObjectTypeDataElements {
     final VariableLengthData varLengthData[];
 
     GapEncodedVariableLengthIntegerReader encodedAdditions;
-    GapEncodedVariableLengthIntegerReader encodedRemovals;
+    GapEncodedVariableLengthIntegerReader encodedRemovals;  // SNAP: Here: we're currently not splitting or joining encodedRemovals and encodedAdditions
 
     final int bitsPerField[];
     final int bitOffsetPerField[];

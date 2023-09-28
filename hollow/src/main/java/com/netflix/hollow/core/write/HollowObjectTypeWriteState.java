@@ -326,7 +326,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             writeCalculatedDeltaShard(os, 0, maxShardOrdinal[0]);
         } else {
             /// overall max ordinal
-            VarInt.writeVInt(os, maxOrdinal);
+            VarInt.writeVInt(os, maxOrdinal);   // SNAP: here: when going from 1 to 2 shards - is this backwards compatible with consumer?
             
             for(int i=0;i<numShards;i++) {
                 writeCalculatedDeltaShard(os, i, maxShardOrdinal[i]);

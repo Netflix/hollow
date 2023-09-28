@@ -252,7 +252,7 @@ public class HollowObjectTypeReadStateShard implements IHollowObjectTypeReadStat
                 numBitsForField = currentData.bitsPerField[fieldIndex];
                 long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
                 endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
-                startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
+                startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;  // SNAP: Here: this is how startByte is read
             } while(readWasUnsafe(currentShards, currentData));
 
             if((endByte & (1L << numBitsForField - 1)) != 0)
