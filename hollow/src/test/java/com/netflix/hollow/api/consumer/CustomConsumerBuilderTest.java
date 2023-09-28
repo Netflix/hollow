@@ -12,6 +12,8 @@ import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.util.List;
 import java.util.concurrent.Executor;
+
+import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

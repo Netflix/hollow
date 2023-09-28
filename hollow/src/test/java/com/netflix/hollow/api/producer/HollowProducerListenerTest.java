@@ -1,6 +1,5 @@
 package com.netflix.hollow.api.producer;
 
-import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.api.producer.listener.AnnouncementListener;
@@ -23,6 +22,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+
+import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

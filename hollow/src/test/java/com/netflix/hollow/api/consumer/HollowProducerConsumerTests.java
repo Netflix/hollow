@@ -29,6 +29,7 @@ import com.netflix.hollow.api.producer.validation.ValidatorListener;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.read.filter.TypeFilter;
+import com.netflix.hollow.test.InMemoryBlobStore;
 import com.netflix.hollow.tools.compact.HollowCompactor.CompactionConfig;
 import java.time.Duration;
 import java.util.BitSet;

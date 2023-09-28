@@ -1,13 +1,14 @@
 package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import java.io.IOException;
 import java.util.function.Function;
+
+import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -18,7 +18,6 @@ package com.netflix.hollow.core.read;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.DoubleSnapshotConfig;
-import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer;
@@ -44,6 +43,8 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+
+import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.Test;
 

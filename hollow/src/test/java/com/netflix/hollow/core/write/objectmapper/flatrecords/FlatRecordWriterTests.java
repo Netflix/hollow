@@ -17,7 +17,6 @@
 package com.netflix.hollow.core.write.objectmapper.flatrecords;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
@@ -33,6 +32,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

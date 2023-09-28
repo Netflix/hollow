@@ -3,7 +3,6 @@ package com.netflix.hollow.api.consumer.index;
 import static java.util.stream.Collectors.toList;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
@@ -19,6 +18,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

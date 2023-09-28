@@ -22,6 +22,7 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
+import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
