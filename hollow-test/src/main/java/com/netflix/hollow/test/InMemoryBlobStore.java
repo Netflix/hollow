@@ -14,8 +14,9 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.consumer;
+package com.netflix.hollow.test;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.api.consumer.HollowConsumer.HeaderBlob;
@@ -30,14 +31,14 @@ import java.util.Set;
 
 /// This InMemoryBlobStore is both a HollowProducer.Publisher and HollowConsumer.BlobRetriever!
 public class InMemoryBlobStore implements BlobRetriever, Publisher {
-    
+
     private final Set<String> optionalPartsToRetrieve;
 
     private Map<Long, Blob> snapshots;
     private Map<Long, Blob> deltas;
     private Map<Long, Blob> reverseDeltas;
     private Map<Long, HeaderBlob> headers;
-    
+
     public InMemoryBlobStore() {
         this(null);
     }
@@ -50,14 +51,14 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
         this.optionalPartsToRetrieve = optionalPartsToRetrieve;
     }
 
-    private HollowConsumer.VersionedBlob getDesiredVersion(long desiredVersion, Map<Long, ? extends HollowConsumer.VersionedBlob> map) {
-        HollowConsumer.VersionedBlob snapshot = map.get(desiredVersion);
+    private HollowConsumer.Blob getDesiredVersion(long desiredVersion, Map<Long, ? extends HollowConsumer.Blob> map) {
+        HollowConsumer.Blob snapshot = map.get(desiredVersion);
         if(snapshot != null)
             return snapshot;
 
         long greatestPriorSnapshotVersion = Long.MIN_VALUE;
 
-        for(Map.Entry<Long, ? extends HollowConsumer.VersionedBlob> entry : map.entrySet()) {
+        for(Map.Entry<Long, ? extends HollowConsumer.Blob> entry : map.entrySet()) {
             if(entry.getKey() > greatestPriorSnapshotVersion && entry.getKey() < desiredVersion)
                 greatestPriorSnapshotVersion = entry.getKey();
         }
@@ -67,7 +68,7 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
 
     @Override
     public Blob retrieveSnapshotBlob(long desiredVersion) {
-        return (Blob) getDesiredVersion(desiredVersion, snapshots);
+        return getDesiredVersion(desiredVersion, snapshots);
     }
 
     @Override
@@ -134,22 +135,23 @@ public class InMemoryBlobStore implements BlobRetriever, Publisher {
                 return parts;
             }
         };
-        
+
         switch(blob.getType()) {
-        case SNAPSHOT:
-            snapshots.put(blob.getToVersion(), consumerBlob);
-            break;
-        case DELTA:
-            deltas.put(blob.getFromVersion(), consumerBlob);
-            break;
-        case REVERSE_DELTA:
-            reverseDeltas.put(blob.getFromVersion(), consumerBlob);
-            break;
+            case SNAPSHOT:
+                snapshots.put(blob.getToVersion(), consumerBlob);
+                break;
+            case DELTA:
+                deltas.put(blob.getFromVersion(), consumerBlob);
+                break;
+            case REVERSE_DELTA:
+                reverseDeltas.put(blob.getFromVersion(), consumerBlob);
+                break;
         }
     }
-    
+
     public void removeSnapshot(long version) {
         snapshots.remove(version);
     }
-    
+
 }
+

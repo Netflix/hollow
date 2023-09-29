@@ -28,6 +28,8 @@ import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

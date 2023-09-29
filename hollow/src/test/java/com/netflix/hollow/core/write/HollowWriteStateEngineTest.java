@@ -3,9 +3,9 @@ package com.netflix.hollow.core.write;
 import static org.junit.Assert.assertEquals;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Test;
 
 public class HollowWriteStateEngineTest {

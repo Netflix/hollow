@@ -1,6 +1,5 @@
 package com.netflix.hollow.api.producer;
 
-import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
@@ -10,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
