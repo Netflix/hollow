@@ -45,7 +45,7 @@ public class HollowObjectTypeDataElementsSplitter {
             copyEncodedRemovals(to, from);
         }
         if (from.encodedAdditions != null) {
-            throw new UnsupportedOperationException("// SNAP: TODO: Splitting encoded additions is not yet implemented");
+            throw new UnsupportedOperationException("// SNAP: TODO: We never expect to split/join encodedAdditions- they are accepted from delta as-is");
         }
 
         for(int i=0;i<to.length;i++) {

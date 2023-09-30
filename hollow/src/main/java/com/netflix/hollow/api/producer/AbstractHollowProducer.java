@@ -744,8 +744,8 @@ abstract class AbstractHollowProducer {
             if (readStates.hasCurrent()) {
                 HollowReadStateEngine current = readStates.current().getStateEngine();
 
-                if (current.getTypeState("String") != null)
-                    System.out.println("SNAP: Prev num shards for type String= " + current.getTypeState("String").numShards()); // SNAP: TODO: Remove
+                // if (current.getTypeState("String") != null)
+                //     System.out.println("SNAP: Prev num shards for type String= " + current.getTypeState("String").numShards()); // SNAP: TODO: Remove
 
                 log.info("CHECKSUMS");
                 HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
@@ -759,20 +759,7 @@ abstract class AbstractHollowProducer {
                         throw new IllegalStateException("Both a delta and reverse delta are required");
                     }
 
-                    HollowReadStateEngine copyOriginalReadState = new HollowReadStateEngine();
-                    HollowWriteStateEngine wse = new HollowWriteStateEngine();
-                    HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(wse,current.getSchemas());
-                    HollowWriteStateCreator.populateUsingReadEngine(wse, current);
-                    StateEngineRoundTripper.roundTripSnapshot(wse, copyOriginalReadState);
-
-                    HollowChecksum c1 = current.getTypeState("String").getChecksum(current.getSchema("String"));
-                    HollowChecksum c2 = copyOriginalReadState.getTypeState("String").getChecksum(current.getSchema("String"));
-
-                    // FIXME: timt: future cycles will fail unless both deltas validate
                     applyDelta(artifacts.delta, current);
-
-                    if (current.getTypeState("String") != null)
-                        System.out.println("SNAP: Post-delta shards for type String= " + current.getTypeState("String").numShards()); // SNAP: TODO: Remove
 
                     HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                     //out.format("  CUR => PND %s\n", forwardChecksum);
@@ -793,9 +780,6 @@ abstract class AbstractHollowProducer {
                                     (HollowObjectTypeReadState) current.getTypeState("String"),
                                     (HollowObjectTypeReadState) pending.getTypeState("String"),
                                     pending.getTypeState("String").getPopulatedOrdinals());
-
-                            // (HollowObjectTypeReadStateShard) ((HollowObjectTypeReadState) current.getTypeState("String")).shardsVolatile.shards[i]
-                            //         .diff((HollowObjectTypeReadStateShard) ((HollowObjectTypeReadState) pending.getTypeState("String")).shardsVolatile.shards[i]);
                         }
 
                         throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.DELTA);

@@ -362,7 +362,12 @@ public class HollowBlobReader {
     }
 
     private String readTypeStateDelta(HollowBlobInput in) throws IOException {
-        HollowSchema schema = HollowSchema.readFrom(in);
+        HollowSchema schema = null;
+        try {
+            schema = HollowSchema.readFrom(in);
+        } catch (Exception e) {
+            System.out.println("SNAP: here");
+        }
 
         int numShards = readNumShards(in);
 

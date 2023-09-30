@@ -125,6 +125,8 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     public abstract void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException;
 
     public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler, int newNumShards) throws IOException { // TODO: make abstract
+        applyDelta(in, schema, memoryRecycler);
+        // SNAP: TODO: does not support newNumShards throw new UnsupportedOperationException("Not yet implemented");
     }
 
     public HollowSchema getSchema() {

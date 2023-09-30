@@ -60,6 +60,10 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         return (HollowObjectSchema)schema;
     }
 
+    private boolean isDynamicTypeShardingEnabled() {   // SNAP: TODO: configurable
+        return true;
+    }
+
     /**
      * Called to perform a state transition.<p>
      *
@@ -81,16 +85,20 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
         fieldStats.completeCalculations();
 
-        // if(numShards == -1) {    // SNAP: TODO: removed
         prevNumShards = numShards;  // only applicable for reverse deltas
+        if(numShards == -1 || isDynamicTypeShardingEnabled()) {    // SNAP: TODO: handle case when new type in schema
 
-        long projectedSizeOfType = ((long)fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
-        projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
+            long projectedSizeOfType = ((long)fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
+            projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
 
-        numShards = 1;
-        while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType)
-            numShards *= 2;
-        // }
+            numShards = 1;
+            while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType)
+                numShards *= 2;
+
+            if (prevNumShards == -1) {  // true for new types in schema
+                prevNumShards = numShards;
+            }
+        }
 
         maxShardOrdinal = new int[numShards];
         int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards; 
@@ -202,7 +210,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     public void writeSnapshot(DataOutputStream os) throws IOException {
-        LOG.info(String.format("Writing snapshot with num shards = %s, prev num shards = %s, max shard ordinals = %s", numShards, prevNumShards, maxShardOrdinal));
+        LOG.info(String.format("Writing snapshot with num shards = %s, prev num shards = %s, max shard ordinals = %s", numShards, prevNumShards, maxShardOrdinal.toString()));
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
             writeSnapshotShard(os, 0);
@@ -326,7 +334,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             writeCalculatedDeltaShard(os, 0, maxShardOrdinal[0]);
         } else {
             /// overall max ordinal
-            VarInt.writeVInt(os, maxOrdinal);   // SNAP: here: when going from 1 to 2 shards - is this backwards compatible with consumer?
+            VarInt.writeVInt(os, maxOrdinal);
             
             for(int i=0;i<numShards;i++) {
                 writeCalculatedDeltaShard(os, i, maxShardOrdinal[i]);

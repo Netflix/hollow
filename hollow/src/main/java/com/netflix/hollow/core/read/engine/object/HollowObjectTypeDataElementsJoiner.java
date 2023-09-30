@@ -34,7 +34,7 @@ public class HollowObjectTypeDataElementsJoiner {
         copyEncodedRemovals(to, from);
         for (HollowObjectTypeDataElements elements : from) {
             if (elements.encodedAdditions != null) {
-                throw new UnsupportedOperationException("// SNAP: TODO: Joining encoded additions is not yet implemented");
+                throw new UnsupportedOperationException("// SNAP: TODO: We never expect to split/join encodedAdditions- they are accepted from delta as-is");
             }
         }
 

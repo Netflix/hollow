@@ -246,14 +246,14 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             maxOrdinal = VarInt.readVInt(in);
 
         // diag // SNAP: TODO: remove
-        if (schema.getName().equals("String") && shardsVolatile.shards.length == 2) {
-            System.out.println("SNAP: BEFORE DELTA APPLICATION");
-            int o = getPopulatedOrdinals().nextSetBit(0);
-            while(o != ORDINAL_NONE) {
-                System.out.println("    SNAP: " + o + ": " + ((HollowObjectTypeReadState) getTypeState()).readString(o, 0));
-                o = getPopulatedOrdinals().nextSetBit(o+1);
-            }
-        }
+        // if (schema.getName().equals("String") && shardsVolatile.shards.length == 2) {
+        //     System.out.println("SNAP: BEFORE DELTA APPLICATION");
+        //     int o = getPopulatedOrdinals().nextSetBit(0);
+        //     while(o != ORDINAL_NONE) {
+        //         System.out.println("    SNAP: " + o + ": " + ((HollowObjectTypeReadState) getTypeState()).readString(o, 0));
+        //         o = getPopulatedOrdinals().nextSetBit(o+1);
+        //     }
+        // }
 
         for(int i = 0; i< shardsVolatile.shards.length; i++) {
             HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryMode, memoryRecycler);
@@ -293,14 +293,14 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         }
 
         // diag // SNAP: TODO: remove
-        if (schema.getName().equals("String") && shardsVolatile.shards.length == 2) {
-            System.out.println("SNAP: AFTER DELTA APPLICATION");
-            int o = getPopulatedOrdinals().nextSetBit(0);
-            while(o != ORDINAL_NONE) {
-                System.out.println("    SNAP: " + o + ": " + ((HollowObjectTypeReadState) getTypeState()).readString(o, 0));
-                o = getPopulatedOrdinals().nextSetBit(o+1);
-            }
-        }
+        // if (schema.getName().equals("String") && shardsVolatile.shards.length == 2) {
+        //     System.out.println("SNAP: AFTER DELTA APPLICATION");
+        //     int o = getPopulatedOrdinals().nextSetBit(0);
+        //     while(o != ORDINAL_NONE) {
+        //         System.out.println("    SNAP: " + o + ": " + ((HollowObjectTypeReadState) getTypeState()).readString(o, 0));
+        //         o = getPopulatedOrdinals().nextSetBit(o+1);
+        //     }
+        // }
         // inspectDeltaData(deltaData);
 
         if(shardsVolatile.shards.length == 1)
