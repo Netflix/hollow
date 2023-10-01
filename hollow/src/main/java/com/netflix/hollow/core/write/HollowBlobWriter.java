@@ -104,11 +104,7 @@ public class HollowBlobWriter {
 
             writeNumShards(partStream, typeState.getNumShards());
 
-            // if (typeState instanceof HollowObjectTypeWriteState) {
-            //     typeState.writeSnapshot(partStream, numShards);
-            // } else {
-                typeState.writeSnapshot(partStream);
-            // }
+            typeState.writeSnapshot(partStream);
         }
 
         os.flush();

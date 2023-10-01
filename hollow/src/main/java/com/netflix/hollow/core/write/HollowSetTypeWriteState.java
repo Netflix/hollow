@@ -62,7 +62,6 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
 
     public void prepareForWrite() {
         super.prepareForWrite();
-
         gatherStatistics();
     }
 
