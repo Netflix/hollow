@@ -87,9 +87,11 @@ public class HollowObjectTypeDataElementsSplitter {
                 to[toIndex].nullValueForField[fieldIdx] = (1L << to[toIndex].bitsPerField[fieldIdx]) - 1;
                 to[toIndex].bitOffsetPerField[fieldIdx] = to[toIndex].bitsPerRecord;
                 to[toIndex].bitsPerRecord += to[toIndex].bitsPerField[fieldIdx];
+
+                to[toIndex].bitsPerUnfilteredField = from.bitsPerUnfilteredField;
+                to[toIndex].unfilteredFieldIsIncluded = from.unfilteredFieldIsIncluded;
             }
         }
-        // TODO: what about unfilteredFieldIsIncluded and bitsPerUnfilteredField, do we need to worry about those here?
     }
 
     private long varLengthSize(int ordinal, int fieldIdx) {

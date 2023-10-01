@@ -59,19 +59,18 @@ public class HollowObjectTypeDataElementsJoiner {
         to.maxOrdinal = -1;
         for(int fromIndex=0;fromIndex<from.length;fromIndex++) {
             for(int ordinal=0;ordinal<=from[fromIndex].maxOrdinal;ordinal++) {
-                for(int fieldIdx=0;fieldIdx<to.schema.numFields();fieldIdx++) {    // TODO: validate that all schemas in from[] match
+                for(int fieldIdx=0;fieldIdx<to.schema.numFields();fieldIdx++) {
                     if(from[fromIndex].varLengthData[fieldIdx] != null) {
                         varLengthSizes[fieldIdx] += varLengthSize(from[fromIndex], ordinal, fieldIdx);
                     }
                 }
             }
-            to.maxOrdinal+= from[fromIndex].maxOrdinal + 1; // note not thread-safe but delta thread is probably the only one that needs to see maxOrdinal per split or shard
+            to.maxOrdinal+= from[fromIndex].maxOrdinal + 1;
         }
-
 
         for(int fieldIdx=0;fieldIdx<to.schema.numFields();fieldIdx++) {
             if(from[0].varLengthData[fieldIdx] == null) {
-                to.bitsPerField[fieldIdx] = from[0].bitsPerField[fieldIdx]; // TODO: validate this should be same across all elements in from[]
+                to.bitsPerField[fieldIdx] = from[0].bitsPerField[fieldIdx];
             } else {
                 to.bitsPerField[fieldIdx] = (64 - Long.numberOfLeadingZeros(varLengthSizes[fieldIdx] + 1)) + 1;
             }
@@ -79,7 +78,9 @@ public class HollowObjectTypeDataElementsJoiner {
             to.bitOffsetPerField[fieldIdx] = to.bitsPerRecord;
             to.bitsPerRecord += to.bitsPerField[fieldIdx];
         }
-        // TODO: what about unfilteredFieldIsIncluded and bitsPerUnfilteredField, do we need to worry about those here?
+
+        to.bitsPerUnfilteredField = from[0].bitsPerUnfilteredField;
+        to.unfilteredFieldIsIncluded = from[0].unfilteredFieldIsIncluded;
     }
 
     private long varLengthSize(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {

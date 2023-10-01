@@ -122,11 +122,11 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     public abstract int maxOrdinal();
 
     public abstract void readSnapshot(HollowBlobInput in, ArraySegmentRecycler recycler) throws IOException;
-    public abstract void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException;
 
-    public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler, int newNumShards) throws IOException { // TODO: make abstract
-        applyDelta(in, schema, memoryRecycler);
-        // SNAP: TODO: does not support newNumShards throw new UnsupportedOperationException("Not yet implemented");
+    public abstract void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException;
+
+    protected boolean shouldReshard(int currNumShards, int deltaNumShards) {
+        return currNumShards!=0 && deltaNumShards!=0 && currNumShards!=deltaNumShards;
     }
 
     public HollowSchema getSchema() {

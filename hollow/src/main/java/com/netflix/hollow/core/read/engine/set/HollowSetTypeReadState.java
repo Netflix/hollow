@@ -99,7 +99,11 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
     }
 
     @Override
-    public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler) throws IOException {
+    public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
+        if (shouldReshard(shards.length, deltaNumShards)) {
+            throw new IllegalStateException("Dynamic type sharding not support for " + schema.getName()
+                    + ". Current numShards=" + shards.length + ", delta numShards=" + deltaNumShards);
+        }
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 

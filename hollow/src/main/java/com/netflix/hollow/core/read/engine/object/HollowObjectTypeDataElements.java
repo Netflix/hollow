@@ -55,8 +55,8 @@ public class HollowObjectTypeDataElements {
     final long nullValueForField[];
     int bitsPerRecord;
 
-    private int bitsPerUnfilteredField[];
-    private boolean unfilteredFieldIsIncluded[];
+    int bitsPerUnfilteredField[];
+    boolean unfilteredFieldIsIncluded[];
 
     final ArraySegmentRecycler memoryRecycler;
     final MemoryMode memoryMode;

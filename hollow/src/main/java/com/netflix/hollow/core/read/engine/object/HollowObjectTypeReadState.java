@@ -114,12 +114,6 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         SnapshotPopulatedOrdinalsReader.readOrdinals(in, stateListeners);
     }
 
-    @Override
-    public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler) throws IOException {
-        applyDelta(in, deltaSchema, memoryRecycler, shardsVolatile.shards.length);
-        throw new IllegalStateException("// SNAP: TODO: unexpected to reach here");
-    }
-
     public void reshard(int newShardCount) {   // TODO: package private
         int prevShardCount = shardsVolatile.shards.length;
         int shardingFactor;
@@ -236,12 +230,10 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     }
 
     @Override
-    public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler, int newShardCount) throws IOException {
-
-        if (newShardCount != shardsVolatile.shards.length) {
-            reshard(newShardCount);
+    public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
+        if (shouldReshard(shardsVolatile.shards.length, deltaNumShards)) {
+            reshard(deltaNumShards);
         }
-
         if(shardsVolatile.shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 

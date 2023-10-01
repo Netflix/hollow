@@ -370,10 +370,9 @@ public class HollowBlobReader {
         }
 
         int numShards = readNumShards(in);
-
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
         if(typeState != null) {
-            typeState.applyDelta(in, schema, stateEngine.getMemoryRecycler(), numShards);   // SNAP: TODO: only for object type states for now
+            typeState.applyDelta(in, schema, stateEngine.getMemoryRecycler(), numShards);
         } else {
             discardDelta(in, schema, numShards);
         }
