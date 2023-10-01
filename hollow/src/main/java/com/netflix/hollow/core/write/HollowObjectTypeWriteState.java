@@ -26,6 +26,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 public class HollowObjectTypeWriteState extends HollowTypeWriteState {
@@ -37,7 +38,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     /// data required for writing snapshot or delta
     private int maxOrdinal;
     private int maxShardOrdinal[];
-    private int prevMaxShardOrdinal[];
+    private int revDeltaMaxShardOrdinal[];
 
     private FixedLengthElementArray fixedLengthLongArray[];
     private ByteDataArray varLengthByteArrays[][];
@@ -55,8 +56,8 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         this(schema, numShards, false);
     }
 
-    public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards, boolean numShardsOverridden) {
-        super(schema, numShards, true);
+    public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards, boolean numShardsFixed) {
+        super(schema, numShards, numShardsFixed);
     }
 
     @Override
@@ -89,8 +90,8 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
         fieldStats.completeCalculations();
 
-        prevNumShards = numShards;  // only applicable for reverse deltas
-        if(numShards == -1 || (!isNumShardsPreconfigured() && isDynamicTypeShardingEnabled())) {
+        revDeltaNumShards = numShards;
+        if(numShards == -1 || (!isNumShardsFixed() && isDynamicTypeShardingEnabled())) {
 
             long projectedSizeOfType = ((long)fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
             projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
@@ -99,8 +100,8 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType)
                 numShards *= 2;
 
-            if (prevNumShards == -1) {  // true for new types in schema
-                prevNumShards = numShards;
+            if (revDeltaNumShards == -1) {  // true for new types in schema
+                revDeltaNumShards = numShards;
             }
         }
 
@@ -109,11 +110,11 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         for(int i=0;i<numShards;i++)
             maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;  // SNAP: replicate 1?
 
-        if (prevNumShards > 0) {
-            prevMaxShardOrdinal = new int[prevNumShards];
-            minRecordLocationsPerShard = (maxOrdinal + 1) / prevNumShards;
-            for(int i=0;i<prevNumShards;i++)
-                prevMaxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (prevNumShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
+        if (revDeltaNumShards > 0) {
+            revDeltaMaxShardOrdinal = new int[revDeltaNumShards];
+            minRecordLocationsPerShard = (maxOrdinal + 1) / revDeltaNumShards;
+            for(int i = 0; i< revDeltaNumShards; i++)
+                revDeltaMaxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (revDeltaNumShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
         }
     }
 
@@ -214,7 +215,8 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     public void writeSnapshot(DataOutputStream os) throws IOException {
-        LOG.info(String.format("Writing snapshot with num shards = %s, prev num shards = %s, max shard ordinals = %s", numShards, prevNumShards, maxShardOrdinal.toString()));
+        LOG.info(String.format("Writing snapshot with num shards = %s, revDeltaNumShards = %s, max shard ordinals = %s", numShards, revDeltaNumShards,
+                Arrays.toString(maxShardOrdinal)));
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
             writeSnapshotShard(os, 0);
@@ -267,22 +269,24 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void writeDelta(DataOutputStream dos) throws IOException {
-        LOG.info(String.format("Writing delta with num shards = %s, max shard ordinals = %s", numShards, maxShardOrdinal));
+        LOG.info(String.format("Writing delta with num shards = %s, max shard ordinals = %s", numShards,
+                Arrays.toString(maxShardOrdinal)));
         writeCalculatedDelta(dos, numShards, maxShardOrdinal);
     }
 
     @Override
     public void calculateReverseDelta() {
-        if (prevNumShards < 0) {
+        if (revDeltaNumShards < 0) {
             throw new IllegalStateException("// SNAP: TODO: should not be running into this");
         }
-        calculateDelta(currentCyclePopulated, previousCyclePopulated, prevNumShards);
+        calculateDelta(currentCyclePopulated, previousCyclePopulated, revDeltaNumShards);  // SNAP: here    prevNumShards == 0 ? numShards : prevNumShards
     }
 
     @Override
     public void writeReverseDelta(DataOutputStream dos) throws IOException {
-        LOG.info(String.format("Writing reversedelta with num shards = %s, max shard ordinals = %s", prevNumShards, prevMaxShardOrdinal));
-        writeCalculatedDelta(dos, prevNumShards, prevMaxShardOrdinal);
+        LOG.info(String.format("Writing reversedelta with num shards = %s, max shard ordinals = %s", revDeltaNumShards,
+                Arrays.toString(revDeltaMaxShardOrdinal)));
+        writeCalculatedDelta(dos, revDeltaNumShards, revDeltaMaxShardOrdinal);
     }
 
     private void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards) {
@@ -302,7 +306,11 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         
         int addedOrdinal = deltaAdditions.nextSetBit(0);
         while(addedOrdinal != -1) {
-            numAddedRecordsInShard[addedOrdinal & shardMask]++;
+            try {
+                numAddedRecordsInShard[addedOrdinal & shardMask]++;
+            } catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println("Hi");
+            }
             addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
         }
         
@@ -325,6 +333,9 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
                 VarInt.writeVInt(deltaAddedOrdinals[shardNumber], shardOrdinal - previousAddedOrdinal[shardNumber]);
                 previousAddedOrdinal[shardNumber] = shardOrdinal;
             } else if(fromCyclePopulated.get(i) && !toCyclePopulated.get(i)) {
+                if (numShards == 0) {
+                    throw new IllegalStateException("here");
+                }
                 int shardOrdinal = i / numShards;
                 VarInt.writeVInt(deltaRemovedOrdinals[shardNumber], shardOrdinal - previousRemovedOrdinal[shardNumber]);
                 previousRemovedOrdinal[shardNumber] = shardOrdinal;

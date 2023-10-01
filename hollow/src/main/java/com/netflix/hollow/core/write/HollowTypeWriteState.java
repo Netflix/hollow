@@ -44,7 +44,9 @@ public abstract class HollowTypeWriteState {
     protected final ByteArrayOrdinalMap ordinalMap;
     
     protected int numShards;
-    protected int prevNumShards;
+    protected int revDeltaNumShards;
+
+    private int resetToLastNumShards;
 
     protected HollowSchema restoredSchema;
     protected ByteArrayOrdinalMap restoredMap;
@@ -59,20 +61,20 @@ public abstract class HollowTypeWriteState {
 
     private boolean wroteData = false;
 
-    private final boolean numShardsPreconfigured;
+    private final boolean numShardsFixed;
 
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
         this(schema, numShards, false);
     }
 
-    public HollowTypeWriteState(HollowSchema schema, int numShards, boolean numShardsPreconfigured) {
+    public HollowTypeWriteState(HollowSchema schema, int numShards, boolean numShardsFixed) {
         this.schema = schema;
         this.ordinalMap = new ByteArrayOrdinalMap();
         this.serializedScratchSpace = new ThreadLocal<ByteDataArray>();
         this.currentCyclePopulated = new ThreadSafeBitSet();
         this.previousCyclePopulated = new ThreadSafeBitSet();
         this.numShards = numShards;
-        this.numShardsPreconfigured = numShardsPreconfigured;
+        this.numShardsFixed = numShardsFixed;
         
         if(numShards != -1 && ((numShards & (numShards - 1)) != 0 || numShards <= 0))
             throw new IllegalArgumentException("Number of shards must be a power of 2!  Check configuration for type " + schema.getName());
@@ -144,6 +146,7 @@ public abstract class HollowTypeWriteState {
      * Resets this write state to empty (i.e. as if prepareForNextCycle() had just been called)
      */
     public void resetToLastPrepareForNextCycle() {
+        numShards = resetToLastNumShards;
         if(restoredReadState == null) {
             currentCyclePopulated.clearAll();
             ordinalMap.compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
@@ -240,19 +243,19 @@ public abstract class HollowTypeWriteState {
         return numShards;
     }
 
-    boolean isNumShardsPreconfigured() {
-        return numShardsPreconfigured;
+    boolean isNumShardsFixed() {
+        return numShardsFixed;
     }
 
-    int getPrevNumShards() {
-        return prevNumShards;
+    int getRevDeltaNumShards() {
+        return revDeltaNumShards;
     }
 
     public void setNumShards(int numShards) {
         if(this.numShards == -1) {
             this.numShards = numShards;
         } else if(this.numShards != numShards) {
-            if (numShardsPreconfigured) {
+            if (numShardsFixed) {
                 throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + this.numShards + ".  Cannot reset to " + numShards + ".");
             }
             this.numShards = numShards;
@@ -281,6 +284,8 @@ public abstract class HollowTypeWriteState {
         restoredMap = null;
         restoredSchema = null;
         restoredReadState = null;
+
+        resetToLastNumShards = numShards;
     }
 
     public void prepareForWrite() {
@@ -349,6 +354,8 @@ public abstract class HollowTypeWriteState {
         // Resize the ordinal map to avoid resizing when populating
         ordinalMap.resize(size);
         ordinalMap.reservePreviouslyPopulatedOrdinals(populatedOrdinals);
+
+        resetToLastNumShards = readState.numShards();
     }
 
     protected void restoreOrdinal(int ordinal, HollowRecordCopier copier, ByteArrayOrdinalMap destinationMap, HashBehavior hashBehavior) {

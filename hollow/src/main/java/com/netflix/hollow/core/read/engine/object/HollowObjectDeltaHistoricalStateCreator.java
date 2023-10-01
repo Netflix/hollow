@@ -125,7 +125,7 @@ public class HollowObjectDeltaHistoricalStateCreator {
                 historicalDataElements.bitsPerField[i] = (64 - Long.numberOfLeadingZeros(totalVarLengthSizes[i] + 1)) + 1;
             }
 
-            historicalDataElements.nullValueForField[i] = (1L << historicalDataElements.bitsPerField[i]) - 1;
+            historicalDataElements.nullValueForField[i] = historicalDataElements.bitsPerField[i] == 64 ? -1L : (1L << historicalDataElements.bitsPerField[i]) - 1;
             historicalDataElements.bitOffsetPerField[i] = historicalDataElements.bitsPerRecord;
             historicalDataElements.bitsPerRecord += historicalDataElements.bitsPerField[i];
         }

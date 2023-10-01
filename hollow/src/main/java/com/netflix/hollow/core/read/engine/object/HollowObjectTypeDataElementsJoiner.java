@@ -74,7 +74,7 @@ public class HollowObjectTypeDataElementsJoiner {
             } else {
                 to.bitsPerField[fieldIdx] = (64 - Long.numberOfLeadingZeros(varLengthSizes[fieldIdx] + 1)) + 1;
             }
-            to.nullValueForField[fieldIdx] = (1L << to.bitsPerField[fieldIdx]) - 1;
+            to.nullValueForField[fieldIdx] = to.bitsPerField[fieldIdx] == 64 ? -1L : (1L << to.bitsPerField[fieldIdx]) - 1; // SNAP: here too, can just copy over?
             to.bitOffsetPerField[fieldIdx] = to.bitsPerRecord;
             to.bitsPerRecord += to.bitsPerField[fieldIdx];
         }
@@ -120,7 +120,7 @@ public class HollowObjectTypeDataElementsJoiner {
             if (from[i].encodedRemovals == null) {
                 continue;   // todo: test
             }
-            System.out.println("SNAP: pre-join gap ended removals for split " + i); // SNAP: TODO: Here!
+            System.out.println("SNAP: pre-join gap ended removals for split " + i);
             from[i].encodedRemovals.diagResetAndPrint();
 
             from[i].encodedRemovals.reset();
@@ -142,7 +142,7 @@ public class HollowObjectTypeDataElementsJoiner {
         }
 
         GapEncodedVariableLengthIntegerReader result = new GapEncodedVariableLengthIntegerReader(joinedEncodedRemovals.getUnderlyingArray(), (int) joinedEncodedRemovals.length());
-        System.out.println("SNAP: joined gap ended removals:"); // SNAP: TODO: Here!
+        System.out.println("SNAP: joined gap ended removals:");
         System.out.println("SNAP: to.maxOrdinal was " + to.maxOrdinal);
         result.diagResetAndPrint();
 

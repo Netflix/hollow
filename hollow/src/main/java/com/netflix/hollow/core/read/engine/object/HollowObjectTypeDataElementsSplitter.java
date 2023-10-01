@@ -84,7 +84,7 @@ public class HollowObjectTypeDataElementsSplitter {
                 } else {
                     to[toIndex].bitsPerField[fieldIdx] = (64 - Long.numberOfLeadingZeros(varLengthSizes[toIndex][fieldIdx] + 1)) + 1;
                 }
-                to[toIndex].nullValueForField[fieldIdx] = (1L << to[toIndex].bitsPerField[fieldIdx]) - 1;
+                to[toIndex].nullValueForField[fieldIdx] = (to[toIndex].bitsPerField[fieldIdx] == 64) ? -1L : (1L << to[toIndex].bitsPerField[fieldIdx]) - 1;    // SNAP: here: can just copy over?
                 to[toIndex].bitOffsetPerField[fieldIdx] = to[toIndex].bitsPerRecord;
                 to[toIndex].bitsPerRecord += to[toIndex].bitsPerField[fieldIdx];
 

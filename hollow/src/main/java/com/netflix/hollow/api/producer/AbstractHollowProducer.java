@@ -745,7 +745,7 @@ abstract class AbstractHollowProducer {
                 HollowReadStateEngine current = readStates.current().getStateEngine();
 
                 // if (current.getTypeState("String") != null)
-                //     System.out.println("SNAP: Prev num shards for type String= " + current.getTypeState("String").numShards()); // SNAP: TODO: Remove
+                //     System.out.println("SNAP: revDeltaNumShards for type String= " + current.getTypeState("String").numShards()); // SNAP: TODO: Remove
 
                 log.info("CHECKSUMS");
                 HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
