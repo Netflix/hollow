@@ -17,10 +17,11 @@ public class HollowObjectReshardingTest extends AbstractStateEngineTest {
 
     @Before
     public void setUp() {
-        schema = new HollowObjectSchema("TestObject", 3);
+        schema = new HollowObjectSchema("TestObject", 4);
         schema.addField("longField", HollowObjectSchema.FieldType.LONG);
         schema.addField("intField", HollowObjectSchema.FieldType.INT);
         schema.addField("doubleField", HollowObjectSchema.FieldType.DOUBLE);
+        schema.addField("stringField", HollowObjectSchema.FieldType.STRING);
 
         super.setUp();
     }

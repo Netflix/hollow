@@ -154,7 +154,6 @@ public class TestHollowConsumer extends HollowConsumer {
                 roundTrip(state));   // input
         combiner.combine();
 
-        deltaState.getTypeState("String").setNumShards(newShardCount);
         // apply delta write state to consumer
         if (blobRetriever instanceof TestBlobRetriever) {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

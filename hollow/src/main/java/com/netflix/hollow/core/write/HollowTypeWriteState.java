@@ -56,16 +56,23 @@ public abstract class HollowTypeWriteState {
     private final ThreadLocal<ByteDataArray> serializedScratchSpace;
 
     protected HollowWriteStateEngine stateEngine;
-    
+
     private boolean wroteData = false;
 
+    private final boolean numShardsPreconfigured;
+
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
+        this(schema, numShards, false);
+    }
+
+    public HollowTypeWriteState(HollowSchema schema, int numShards, boolean numShardsPreconfigured) {
         this.schema = schema;
         this.ordinalMap = new ByteArrayOrdinalMap();
         this.serializedScratchSpace = new ThreadLocal<ByteDataArray>();
         this.currentCyclePopulated = new ThreadSafeBitSet();
         this.previousCyclePopulated = new ThreadSafeBitSet();
         this.numShards = numShards;
+        this.numShardsPreconfigured = numShardsPreconfigured;
         
         if(numShards != -1 && ((numShards & (numShards - 1)) != 0 || numShards <= 0))
             throw new IllegalArgumentException("Number of shards must be a power of 2!  Check configuration for type " + schema.getName());
@@ -233,6 +240,10 @@ public abstract class HollowTypeWriteState {
         return numShards;
     }
 
+    boolean isNumShardsPreconfigured() {
+        return numShardsPreconfigured;
+    }
+
     int getPrevNumShards() {
         return prevNumShards;
     }
@@ -241,9 +252,10 @@ public abstract class HollowTypeWriteState {
         if(this.numShards == -1) {
             this.numShards = numShards;
         } else if(this.numShards != numShards) {
+            if (numShardsPreconfigured) {
+                throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + this.numShards + ".  Cannot reset to " + numShards + ".");
+            }
             this.numShards = numShards;
-            // SNAP: So... this exists
-            // throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + this.numShards + ".  Cannot reset to " + numShards + ".");
         }
     }
 

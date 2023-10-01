@@ -144,8 +144,9 @@ public class HollowWriteStateEngine implements HollowStateEngine {
                 if(writeState.getNumShards() == -1)
                     writeState.numShards = readState.numShards();
                 else if(writeState.getNumShards() != readState.numShards()) {
-                    throw new IllegalStateException("Attempting to restore from a HollowReadStateEngine which does not have the same number of shards as explicitly configured for type " + typeName);
-                    // SNAP: TODO: remove System.out.println("Previous shard count= " + readState.numShards() + ", new shard count= " + writeState.getNumShards());
+                    String msg = "Attempting to restore from a HollowReadStateEngine with numShards " + readState.numShards()
+                            + " for type " + typeName + " to write state engine with numShards " + writeState.getNumShards();
+                    throw new IllegalStateException(msg);
                 }
             }
         }

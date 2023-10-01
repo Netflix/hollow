@@ -52,7 +52,11 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
     
     public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards) {
-        super(schema, numShards);
+        this(schema, numShards, false);
+    }
+
+    public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards, boolean numShardsOverridden) {
+        super(schema, numShards, true);
     }
 
     @Override
@@ -86,7 +90,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         fieldStats.completeCalculations();
 
         prevNumShards = numShards;  // only applicable for reverse deltas
-        if(numShards == -1 || isDynamicTypeShardingEnabled()) {    // SNAP: TODO: handle case when new type in schema
+        if(numShards == -1 || (!isNumShardsPreconfigured() && isDynamicTypeShardingEnabled())) {
 
             long projectedSizeOfType = ((long)fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
             projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
