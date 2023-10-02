@@ -157,8 +157,8 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
 
                 // create split copies of data element
-                HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(preSplitDataElements, shardingFactor);
-                HollowObjectTypeDataElements[] splits = splitter.split();
+                HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
+                HollowObjectTypeDataElements[] splits = splitter.split(preSplitDataElements, shardingFactor);
 
                 for (int j = 0; j < shardingFactor; j ++) {
                     IHollowObjectTypeReadStateShard finalShard = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, finalShardOrdinalShift);
@@ -179,13 +179,13 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newShardCount);
 
             for (int i = 0; i < newShardCount; i++) {
-                HollowObjectTypeDataElements[] preJoinDatElements = new HollowObjectTypeDataElements[shardingFactor];
+                HollowObjectTypeDataElements[] preJoinDataElements = new HollowObjectTypeDataElements[shardingFactor];
                 for (int j = 0; j < shardingFactor; j ++) {
-                    preJoinDatElements[j] = shardsVolatile.shards[i + (newShardCount*j)].currentDataElements();
+                    preJoinDataElements[j] = shardsVolatile.shards[i + (newShardCount*j)].currentDataElements();
                 };
 
-                HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner(preJoinDatElements);
-                HollowObjectTypeDataElements joined = joiner.join();
+                HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
+                HollowObjectTypeDataElements joined = joiner.join(preJoinDataElements);
 
                 // Replace existing shards with pre-joined data elements with a new joined shard that contains data and
                 // uses newShardOrdinalShift for mapping ordinals into the joined data
@@ -194,9 +194,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 for (int j = 0; j < shardingFactor; j ++) {
                     shardsVolatile.shards[i + (newShardCount*j)] = joinedShard;
                     shardsVolatile = shardsVolatile;    // required for propagation of elements
-                    preJoinDatElements[j].destroySpecial(); // now safe to destory // TODO: replace with other destroy
-                    if (preJoinDatElements[j].encodedRemovals != null) {
-                        preJoinDatElements[j].encodedRemovals.destroy();
+                    preJoinDataElements[j].destroySpecial(); // now safe to destory // TODO: replace with other destroy
+                    if (preJoinDataElements[j].encodedRemovals != null) {
+                        preJoinDataElements[j].encodedRemovals.destroy();
                     }
                 };
             }

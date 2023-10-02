@@ -9,25 +9,16 @@ import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 
 public class HollowObjectTypeDataElementsSplitter {
-    private final HollowObjectTypeDataElements from;
-    private final int numSplits;
-    private final int toMask;
-    private final int toOrdinalShift;
 
-    long[][] currentWriteVarLengthDataPointers;
-
-    public HollowObjectTypeDataElementsSplitter(HollowObjectTypeDataElements originalDataElements, int numSplits) {
-        this.from = originalDataElements;
-        this.numSplits = numSplits;
-        this.toMask = numSplits - 1;
-        this.toOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
+    HollowObjectTypeDataElements[] split(HollowObjectTypeDataElements from, int numSplits) {
+        final int toMask = numSplits - 1;
+        final int toOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
+        final long[][] currentWriteVarLengthDataPointers;
 
         if (!(numSplits>0) || !((numSplits&(numSplits-1))==0)) {
             throw new UnsupportedOperationException("Must split by power of 2");
         }
-    }
 
-    public HollowObjectTypeDataElements[] split() { // TODO: package private
         HollowObjectTypeDataElements[] to = new HollowObjectTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
             to[i] = new HollowObjectTypeDataElements(from.schema, from.memoryMode, from.memoryRecycler);
@@ -35,7 +26,7 @@ public class HollowObjectTypeDataElementsSplitter {
         }
         currentWriteVarLengthDataPointers = new long[numSplits][from.schema.numFields()];
 
-        populateStats(to, from);
+        populateStats(to, from, toMask, toOrdinalShift);
 
         // split gap encoded var length removals
         if (from.encodedRemovals != null) {
@@ -68,12 +59,12 @@ public class HollowObjectTypeDataElementsSplitter {
         }
 
         for(int i=0;i<=from.maxOrdinal;i++) {
-            copyRecord(i, to);
+            copyRecord(i, to, from, toMask, toOrdinalShift, currentWriteVarLengthDataPointers);
         }
         return to;
     }
 
-    void populateStats(HollowObjectTypeDataElements[] to, HollowObjectTypeDataElements from) {
+    private void populateStats(HollowObjectTypeDataElements[] to, HollowObjectTypeDataElements from, int toMask, int toOrdinalShift) {
         long[][] varLengthSizes = new long[to.length][from.schema.numFields()];
 
         for(int ordinal=0;ordinal<=from.maxOrdinal;ordinal++) {
@@ -104,7 +95,7 @@ public class HollowObjectTypeDataElementsSplitter {
         }
     }
 
-    private void copyRecord(int ordinal, HollowObjectTypeDataElements[] to) {
+    private void copyRecord(int ordinal, HollowObjectTypeDataElements[] to, HollowObjectTypeDataElements from, int toMask, int toOrdinalShift, long[][] currentWriteVarLengthDataPointers) {
         int toIndex = ordinal & toMask;
         int toOrdinal = ordinal >> toOrdinalShift;
 

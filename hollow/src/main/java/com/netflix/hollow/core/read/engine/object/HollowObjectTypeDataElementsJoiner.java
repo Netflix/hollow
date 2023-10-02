@@ -9,25 +9,18 @@ import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 
 public class HollowObjectTypeDataElementsJoiner {
-    private final HollowObjectTypeDataElements[] from;
-    private final int fromMask;
-    private final int fromOrdinalShift;
 
-    private long[] currentWriteVarLengthDataPointers;
+    HollowObjectTypeDataElements join(HollowObjectTypeDataElements[] from) {
+        final int fromMask = from.length - 1;
+        final int fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(from.length);
+        long[] currentWriteVarLengthDataPointers;
 
-    public HollowObjectTypeDataElementsJoiner(HollowObjectTypeDataElements[] originalDataElements) {
-        this.from = originalDataElements;
-        this.fromMask = originalDataElements.length - 1;
-        this.fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(originalDataElements.length);
-
-        int numElements = originalDataElements.length;
-        if (!(numElements>0) || !((numElements&(numElements-1))==0)) {
+        if (from.length<=0 || !((from.length&(from.length-1))==0)) { // TODO: from.length==0
             throw new UnsupportedOperationException("No. of DataElements to be joined must be a power of 2");
         }
-    }
 
-    public HollowObjectTypeDataElements join() {    // TODO: package private
         HollowObjectTypeDataElements to = new HollowObjectTypeDataElements(from[0].schema, from[0].memoryMode, from[0].memoryRecycler);
+        currentWriteVarLengthDataPointers = new long[from[0].schema.numFields()];
 
         populateStats(to, from);
 
@@ -55,7 +48,6 @@ public class HollowObjectTypeDataElementsJoiner {
             }
         }
 
-        currentWriteVarLengthDataPointers = new long[to.schema.numFields()];
         to.fixedLengthData = new FixedLengthElementArray(to.memoryRecycler, (long)to.bitsPerRecord * (to.maxOrdinal + 1));  // TODO: add to FxiedLengthDataFactory to support non-heap modes
         for(int fieldIdx=0;fieldIdx<to.schema.numFields();fieldIdx++) {
             if(from[0].varLengthData[fieldIdx] != null) {
@@ -64,7 +56,7 @@ public class HollowObjectTypeDataElementsJoiner {
         }
 
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
-            copyRecord(ordinal, to);
+            copyRecord(ordinal, to, from, fromMask, fromOrdinalShift, currentWriteVarLengthDataPointers);
         }
 
         return to;
@@ -100,7 +92,7 @@ public class HollowObjectTypeDataElementsJoiner {
         to.unfilteredFieldIsIncluded = from[0].unfilteredFieldIsIncluded;
     }
 
-    private void copyRecord(int ordinal, HollowObjectTypeDataElements to) {
+    private void copyRecord(int ordinal, HollowObjectTypeDataElements to, HollowObjectTypeDataElements[] from, int fromMask, int fromOrdinalShift, long[] currentWriteVarLengthDataPointers) {
         int fromIndex = ordinal & fromMask;
         int fromOrdinal = ordinal >> fromOrdinalShift;
 
