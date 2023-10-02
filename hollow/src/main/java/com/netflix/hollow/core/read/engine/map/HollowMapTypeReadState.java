@@ -100,7 +100,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
         if (shouldReshard(shards.length, deltaNumShards)) {
-            throw new IllegalStateException("Dynamic type sharding not support for " + schema.getName()
+            throw new IllegalStateException("Dynamic type sharding not supported for " + schema.getName()
                     + ". Current numShards=" + shards.length + ", delta numShards=" + deltaNumShards);
         }
         if(shards.length > 1)

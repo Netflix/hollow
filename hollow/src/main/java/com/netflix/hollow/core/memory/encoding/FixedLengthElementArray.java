@@ -17,7 +17,6 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
-import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.SegmentedLongArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
@@ -71,11 +70,6 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
         this.log2OfSegmentSizeInBytes = log2OfSegmentSize + 3;
         this.byteBitmask = (1 << log2OfSegmentSizeInBytes) - 1;
         this.sizeBits = numBits;
-    }
-
-    @Override
-    public long getSizeBits() {
-        return sizeBits;
     }
 
     public long approxHeapFootprintInBytes() {

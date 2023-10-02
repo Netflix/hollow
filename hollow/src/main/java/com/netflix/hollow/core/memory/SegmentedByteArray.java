@@ -74,12 +74,7 @@ public class SegmentedByteArray implements VariableLengthData {
      */
     @Override
     public byte get(long index) {
-        try {
-            return segments[(int) (index >>> log2OfSegmentSize)][(int) (index & bitmask)];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println(index);
-            throw e;
-        }
+        return segments[(int) (index >>> log2OfSegmentSize)][(int) (index & bitmask)];
     }
 
     @Override
@@ -276,12 +271,8 @@ public class SegmentedByteArray implements VariableLengthData {
             segments = Arrays.copyOf(segments, segments.length * 3 / 2);
         }
 
-        try {
-            if (segments[segmentIndex] == null) {
-                segments[segmentIndex] = memoryRecycler.getByteArray();
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw e;
+        if (segments[segmentIndex] == null) {
+            segments[segmentIndex] = memoryRecycler.getByteArray();
         }
     }
 

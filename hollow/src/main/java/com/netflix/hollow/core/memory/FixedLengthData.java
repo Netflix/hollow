@@ -87,8 +87,6 @@ public interface FixedLengthData {
 
     void clearElementValue(long index, int bitsPerElement);
 
-    long getSizeBits();
-
     /**
      * Discard fixed length data from input. The input contains the number of longs to discard.
      *

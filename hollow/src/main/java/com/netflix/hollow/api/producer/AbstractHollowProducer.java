@@ -17,7 +17,6 @@
 package com.netflix.hollow.api.producer;
 
 import static com.netflix.hollow.api.producer.ProducerListenerSupport.ProducerListeners;
-import static com.netflix.hollow.core.util.HollowWriteStateCreator.populateUsingReadEngine;
 import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.toList;
 
@@ -40,13 +39,12 @@ import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadStateShard;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadStateDiffer;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadStateShard;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchemaHash;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
-import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
@@ -258,7 +256,8 @@ abstract class AbstractHollowProducer {
 
     HollowProducer.ReadState hardRestore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
         return restore(versionDesired, blobRetriever,
-                (restoreFrom, restoreTo) -> populateUsingReadEngine(restoreTo, restoreFrom, false));
+                (restoreFrom, restoreTo) -> HollowWriteStateCreator.
+                        populateUsingReadEngine(restoreTo, restoreFrom, false));
     }
 
     private HollowProducer.ReadState restore(

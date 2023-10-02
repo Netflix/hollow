@@ -149,9 +149,4 @@ public class EncodedLongBuffer implements FixedLengthData {
     public void clearElementValue(long index, int bitsPerElement) {
         throw new UnsupportedOperationException("Not supported in shared-memory mode");
     }
-
-    @Override
-    public long getSizeBits() {
-        throw new UnsupportedOperationException("Not supported in shared-memory mode");
-    }
 }
