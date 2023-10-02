@@ -74,4 +74,6 @@ public class GapEncodedVariableLengthIntegerReaderTest {
         Assert.assertEquals(Integer.MAX_VALUE, reader.nextElement());
     }
 
+    // SNAP: TODO: test split and join here
+
 }

@@ -19,12 +19,14 @@ package com.netflix.hollow.core.memory.encoding;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.util.IOUtils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class GapEncodedVariableLengthIntegerReader {
@@ -143,7 +145,76 @@ public class GapEncodedVariableLengthIntegerReader {
         return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingArray(), (int)arr.length());
     }
 
-    public void diagResetAndPrint() {  // SNAP: TODO: remove
+    public GapEncodedVariableLengthIntegerReader[] split(int numSplits) {
+        final int toMask = numSplits - 1;
+        final int toOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
+        GapEncodedVariableLengthIntegerReader[] to = new GapEncodedVariableLengthIntegerReader[numSplits];
+
+        List<Integer> ordinals = new ArrayList<>();
+        // if (this.equals(EMPTY_READER)) // TODO: Test this case, and what about null?
+        reset();
+        while(nextElement() != Integer.MAX_VALUE) {
+            ordinals.add(nextElement());
+            advance();
+        }
+
+        ByteDataArray[] splitOrdinals = new ByteDataArray[numSplits];
+        int previousSplitOrdinal[] = new int[numSplits];
+        for(int i=0;i<numSplits;i++) {
+            to[i] = EMPTY_READER;
+            splitOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+        }
+        for (int ordinal : ordinals) {
+            int toIndex = ordinal & toMask;
+            int toOrdinal = ordinal >> toOrdinalShift;
+            VarInt.writeVInt(splitOrdinals[toIndex], toOrdinal - previousSplitOrdinal[toIndex]);
+            previousSplitOrdinal[toIndex] = toOrdinal;
+        }
+        for(int i=0;i<numSplits;i++) {
+            to[i] = new GapEncodedVariableLengthIntegerReader(splitOrdinals[i].getUnderlyingArray(), (int)splitOrdinals[i].length());
+        }
+
+        return to;
+    }
+
+    // SNAP: TODO: can be done without max ordinal
+    public static GapEncodedVariableLengthIntegerReader join(GapEncodedVariableLengthIntegerReader[] from, int joinedMaxOrdinal) {
+        int numSplits = from.length;
+        final int fromMask = numSplits - 1;
+        final int fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
+
+
+        HashSet<Integer>[] fromOrdinals = new HashSet[from.length];
+        for (int i=0;i<from.length;i++) {
+            fromOrdinals[i] = new HashSet<>();
+            if (from[i] == null) {
+                continue;   // todo: test
+            }
+            from[i].reset();
+
+            while(from[i].nextElement() != Integer.MAX_VALUE) {
+                fromOrdinals[i].add(from[i].nextElement());
+                from[i].advance();
+            }
+        }
+
+        ByteDataArray toRemovals = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+        int previousOrdinal = 0;
+        for (int ordinal=0;ordinal<=joinedMaxOrdinal;ordinal++) {
+            int fromIndex = ordinal & fromMask;
+            int fromOrdinal = ordinal >> fromOrdinalShift;
+            if (fromOrdinals[fromIndex].contains(fromOrdinal)) {
+                VarInt.writeVInt(toRemovals, ordinal - previousOrdinal);
+                previousOrdinal = ordinal;
+            }
+        }
+
+        GapEncodedVariableLengthIntegerReader result = new GapEncodedVariableLengthIntegerReader(toRemovals.getUnderlyingArray(), (int) toRemovals.length());
+        // SNAP: TODO: destroy original somewhere
+        return result;
+    }
+
+    public void prettyPrint() {  // SNAP: TODO: remove
         List<Integer> ordinals = new ArrayList<>();
         reset();
         while(nextElement() != Integer.MAX_VALUE) {

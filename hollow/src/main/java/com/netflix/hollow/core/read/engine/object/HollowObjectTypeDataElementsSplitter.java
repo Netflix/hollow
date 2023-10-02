@@ -1,15 +1,12 @@
 package com.netflix.hollow.core.read.engine.object;
 
-import static com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader.EMPTY_READER;
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthEndByte;
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthSize;
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthStartByte;
 
-import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
-import com.netflix.hollow.core.memory.encoding.VarInt;
-import com.netflix.hollow.core.memory.pool.WastefulRecycler;
-import java.util.ArrayList;
-import java.util.List;
 
 public class HollowObjectTypeDataElementsSplitter {
     private final HollowObjectTypeDataElements from;
@@ -34,6 +31,7 @@ public class HollowObjectTypeDataElementsSplitter {
         HollowObjectTypeDataElements[] to = new HollowObjectTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
             to[i] = new HollowObjectTypeDataElements(from.schema, from.memoryMode, from.memoryRecycler);
+            to[i].maxOrdinal = -1;
         }
         currentWriteVarLengthDataPointers = new long[numSplits][from.schema.numFields()];
 
@@ -42,7 +40,19 @@ public class HollowObjectTypeDataElementsSplitter {
         // split gap encoded var length removals
         if (from.encodedRemovals != null) {
             // splits from.encodedRemovals to to[i].encodedRemovals, creating ByteDataArrays for to[i], and does not clean up from.encodedRemovals.getUnderyingArray()
-            copyEncodedRemovals(to, from);
+            System.out.println("SNAP: pre-split gap ended removals");   // TODO: remove
+            from.encodedRemovals.prettyPrint();
+            System.out.println("SNAP: from.maxOrdinal was " + from.maxOrdinal);
+
+            GapEncodedVariableLengthIntegerReader[] splitRemovals = from.encodedRemovals.split(numSplits);
+            for(int i=0;i<to.length;i++) {
+                to[i].encodedRemovals = splitRemovals[i];
+            }
+
+            for(int i=0;i<numSplits;i++) {  // TODO: remove
+                System.out.println("SNAP: post-split gap ended removals for split " + i);
+                to[i].encodedRemovals.prettyPrint();
+            }
         }
         if (from.encodedAdditions != null) {
             throw new UnsupportedOperationException("// SNAP: TODO: We never expect to split/join encodedAdditions- they are accepted from delta as-is");
@@ -66,13 +76,13 @@ public class HollowObjectTypeDataElementsSplitter {
     void populateStats(HollowObjectTypeDataElements[] to, HollowObjectTypeDataElements from) {
         long[][] varLengthSizes = new long[to.length][from.schema.numFields()];
 
-        for(int ordinal=0;ordinal<=from.maxOrdinal;ordinal++) {    // TODO: verify we're always inclusive of maxOrdinal everywhere else
+        for(int ordinal=0;ordinal<=from.maxOrdinal;ordinal++) {
             int toIndex = ordinal & toMask;
             int toOrdinal = ordinal >> toOrdinalShift;
-            to[toIndex].maxOrdinal = toOrdinal; // note not thread-safe but delta thread is probably the only one that needs to see maxOrdinal per split or shard
+            to[toIndex].maxOrdinal = toOrdinal;
             for(int fieldIdx=0;fieldIdx<from.schema.numFields();fieldIdx++) {
                 if(from.varLengthData[fieldIdx] != null) {
-                    varLengthSizes[toIndex][fieldIdx] += varLengthSize(ordinal, fieldIdx);
+                    varLengthSizes[toIndex][fieldIdx] += varLengthSize(from, ordinal, fieldIdx);
                 }
             }
         }
@@ -94,14 +104,6 @@ public class HollowObjectTypeDataElementsSplitter {
         }
     }
 
-    private long varLengthSize(int ordinal, int fieldIdx) {
-        int numBitsForField = from.bitsPerField[fieldIdx];
-        long fromBitOffset = ((long)from.bitsPerRecord*ordinal) + from.bitOffsetPerField[fieldIdx];
-        long fromEndByte = from.fixedLengthData.getElementValue(fromBitOffset, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
-        long fromStartByte = ordinal != 0 ? from.fixedLengthData.getElementValue(fromBitOffset - from.bitsPerRecord, numBitsForField) & (1L << (numBitsForField - 1)) - 1 : 0;
-        return fromEndByte - fromStartByte;
-    }
-
     private void copyRecord(int ordinal, HollowObjectTypeDataElements[] to) {
         int toIndex = ordinal & toMask;
         int toOrdinal = ordinal >> toOrdinalShift;
@@ -121,57 +123,5 @@ public class HollowObjectTypeDataElementsSplitter {
                 currentWriteVarLengthDataPointers[toIndex][fieldIdx] += size;
             }
         }
-    }
-
-    private void copyEncodedRemovals(HollowObjectTypeDataElements[] to, HollowObjectTypeDataElements from) {
-        GapEncodedVariableLengthIntegerReader preSplitRemovals = from.encodedRemovals;
-        System.out.println("SNAP: pre-split gap ended removals");
-        preSplitRemovals.diagResetAndPrint();
-        System.out.println("SNAP: from.maxOrdinal was " + from.maxOrdinal);
-
-        List<Integer> ordinals = new ArrayList<>();
-        // if (preSplitRemovals.equals(EMPTY_READER)) // TODO: Test this case, and what about null?
-        preSplitRemovals.reset();
-        while(preSplitRemovals.nextElement() != Integer.MAX_VALUE) {
-            ordinals.add(preSplitRemovals.nextElement());
-            preSplitRemovals.advance();
-        }
-
-        ByteDataArray[] splitOrdinals = new ByteDataArray[numSplits];
-        int previousSplitOrdinal[] = new int[numSplits];
-        for(int i=0;i<numSplits;i++) {
-            to[i].encodedRemovals = EMPTY_READER;
-            splitOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
-        }
-        for (int ordinal : ordinals) {
-            int toIndex = ordinal & toMask;
-            int toOrdinal = ordinal >> toOrdinalShift;
-            VarInt.writeVInt(splitOrdinals[toIndex], toOrdinal - previousSplitOrdinal[toIndex]);
-            previousSplitOrdinal[toIndex] = toOrdinal;
-        }
-        for(int i=0;i<numSplits;i++) {
-            to[i].encodedRemovals = new GapEncodedVariableLengthIntegerReader(splitOrdinals[i].getUnderlyingArray(), (int)splitOrdinals[i].length());
-            System.out.println("SNAP: post-split gap ended removals for split " + i);
-            to[i].encodedRemovals.diagResetAndPrint();
-        }
-    }
-
-    private long varLengthStartByte(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {
-        if(ordinal == 0)
-            return 0;
-
-        int numBitsForField = from.bitsPerField[fieldIdx];
-        long currentBitOffset = ((long)from.bitsPerRecord * ordinal) + from.bitOffsetPerField[fieldIdx];
-        long startByte = from.fixedLengthData.getElementValue(currentBitOffset - from.bitsPerRecord, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
-
-        return startByte;
-    }
-
-    private long varLengthEndByte(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {
-        int numBitsForField = from.bitsPerField[fieldIdx];
-        long currentBitOffset = ((long)from.bitsPerRecord * ordinal) + from.bitOffsetPerField[fieldIdx];
-        long endByte = from.fixedLengthData.getElementValue(currentBitOffset, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
-
-        return endByte;
     }
 }

@@ -1,12 +1,12 @@
 package com.netflix.hollow.core.read.engine.object;
 
-import com.netflix.hollow.core.memory.ByteDataArray;
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthEndByte;
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthSize;
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthStartByte;
+
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
-import com.netflix.hollow.core.memory.encoding.VarInt;
-import com.netflix.hollow.core.memory.pool.WastefulRecycler;
-import java.util.HashSet;
 
 public class HollowObjectTypeDataElementsJoiner {
     private final HollowObjectTypeDataElements[] from;
@@ -31,7 +31,24 @@ public class HollowObjectTypeDataElementsJoiner {
 
         populateStats(to, from);
 
-        copyEncodedRemovals(to, from);
+        GapEncodedVariableLengthIntegerReader[] fromRemovals = new GapEncodedVariableLengthIntegerReader[from.length];
+        for (int i=0;i<from.length;i++) {
+            fromRemovals[i] = from[i].encodedRemovals;
+
+            // TODO: remove
+            if (fromRemovals[i] == null) {
+                continue;   // todo: test
+            }
+            System.out.println("SNAP: pre-join gap ended removals for split " + i);
+            fromRemovals[i].prettyPrint();
+        }
+        to.encodedRemovals = GapEncodedVariableLengthIntegerReader.join(fromRemovals, to.maxOrdinal);
+
+        // TODO: remove
+        System.out.println("SNAP: joined gap ended removals:");
+        System.out.println("SNAP: to.maxOrdinal was " + to.maxOrdinal);
+        to.encodedRemovals.prettyPrint();
+
         for (HollowObjectTypeDataElements elements : from) {
             if (elements.encodedAdditions != null) {
                 throw new UnsupportedOperationException("// SNAP: TODO: We never expect to split/join encodedAdditions- they are accepted from delta as-is");
@@ -83,14 +100,6 @@ public class HollowObjectTypeDataElementsJoiner {
         to.unfilteredFieldIsIncluded = from[0].unfilteredFieldIsIncluded;
     }
 
-    private long varLengthSize(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {
-        int numBitsForField = from.bitsPerField[fieldIdx];
-        long fromBitOffset = ((long)from.bitsPerRecord*ordinal) + from.bitOffsetPerField[fieldIdx];
-        long fromEndByte = from.fixedLengthData.getElementValue(fromBitOffset, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
-        long fromStartByte = ordinal != 0 ? from.fixedLengthData.getElementValue(fromBitOffset - from.bitsPerRecord, numBitsForField) & (1L << (numBitsForField - 1)) - 1 : 0;
-        return fromEndByte - fromStartByte;
-    }
-
     private void copyRecord(int ordinal, HollowObjectTypeDataElements to) {
         int fromIndex = ordinal & fromMask;
         int fromOrdinal = ordinal >> fromOrdinalShift;
@@ -110,62 +119,5 @@ public class HollowObjectTypeDataElementsJoiner {
                 currentWriteVarLengthDataPointers[fieldIdx] += size;
             }
         }
-    }
-
-    private void copyEncodedRemovals(HollowObjectTypeDataElements to, HollowObjectTypeDataElements[] from) {
-
-        HashSet<Integer>[] preJoinOrdinals = new HashSet[from.length];
-        for (int i=0;i<from.length;i++) {
-            preJoinOrdinals[i] = new HashSet<>();
-            if (from[i].encodedRemovals == null) {
-                continue;   // todo: test
-            }
-            System.out.println("SNAP: pre-join gap ended removals for split " + i);
-            from[i].encodedRemovals.diagResetAndPrint();
-
-            from[i].encodedRemovals.reset();
-            while(from[i].encodedRemovals.nextElement() != Integer.MAX_VALUE) {
-                preJoinOrdinals[i].add(from[i].encodedRemovals.nextElement());
-                from[i].encodedRemovals.advance();
-            }
-        }
-
-        ByteDataArray joinedEncodedRemovals = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
-        int previousOrdinal = 0;
-        for (int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
-            int fromIndex = ordinal & fromMask;
-            int fromOrdinal = ordinal >> fromOrdinalShift;
-            if (preJoinOrdinals[fromIndex].contains(fromOrdinal)) {
-                VarInt.writeVInt(joinedEncodedRemovals, ordinal - previousOrdinal);
-                previousOrdinal = ordinal;
-            }
-        }
-
-        GapEncodedVariableLengthIntegerReader result = new GapEncodedVariableLengthIntegerReader(joinedEncodedRemovals.getUnderlyingArray(), (int) joinedEncodedRemovals.length());
-        System.out.println("SNAP: joined gap ended removals:");
-        System.out.println("SNAP: to.maxOrdinal was " + to.maxOrdinal);
-        result.diagResetAndPrint();
-
-        to.encodedRemovals = result;
-        // SNAP: TODO: destroy original somewhere
-    }
-
-    private long varLengthStartByte(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {
-        if(ordinal == 0)
-            return 0;
-
-        int numBitsForField = from.bitsPerField[fieldIdx];
-        long currentBitOffset = ((long)from.bitsPerRecord * ordinal) + from.bitOffsetPerField[fieldIdx];
-        long startByte = from.fixedLengthData.getElementValue(currentBitOffset - from.bitsPerRecord, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
-
-        return startByte;
-    }
-
-    private long varLengthEndByte(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {
-        int numBitsForField = from.bitsPerField[fieldIdx];
-        long currentBitOffset = ((long)from.bitsPerRecord * ordinal) + from.bitOffsetPerField[fieldIdx];
-        long endByte = from.fixedLengthData.getElementValue(currentBitOffset, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
-
-        return endByte;
     }
 }

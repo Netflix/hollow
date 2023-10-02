@@ -16,8 +16,6 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
-import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.MemoryMode;
@@ -29,7 +27,6 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.util.IntMap;
 import java.io.IOException;
 
 /**
@@ -224,4 +221,30 @@ public class HollowObjectTypeDataElements {
         }
     }
 
+    static long varLengthStartByte(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {
+        if(ordinal == 0)
+            return 0;
+
+        int numBitsForField = from.bitsPerField[fieldIdx];
+        long currentBitOffset = ((long)from.bitsPerRecord * ordinal) + from.bitOffsetPerField[fieldIdx];
+        long startByte = from.fixedLengthData.getElementValue(currentBitOffset - from.bitsPerRecord, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
+
+        return startByte;
+    }
+
+    static long varLengthEndByte(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {
+        int numBitsForField = from.bitsPerField[fieldIdx];
+        long currentBitOffset = ((long)from.bitsPerRecord * ordinal) + from.bitOffsetPerField[fieldIdx];
+        long endByte = from.fixedLengthData.getElementValue(currentBitOffset, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
+
+        return endByte;
+    }
+
+    static long varLengthSize(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {
+        int numBitsForField = from.bitsPerField[fieldIdx];
+        long fromBitOffset = ((long)from.bitsPerRecord*ordinal) + from.bitOffsetPerField[fieldIdx];
+        long fromEndByte = from.fixedLengthData.getElementValue(fromBitOffset, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
+        long fromStartByte = ordinal != 0 ? from.fixedLengthData.getElementValue(fromBitOffset - from.bitsPerRecord, numBitsForField) & (1L << (numBitsForField - 1)) - 1 : 0;
+        return fromEndByte - fromStartByte;
+    }
 }

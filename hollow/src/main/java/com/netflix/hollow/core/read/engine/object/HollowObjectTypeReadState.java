@@ -16,8 +16,6 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
-import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-
 import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowObjectSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
@@ -37,8 +35,6 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
 import java.util.BitSet;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * A {@link HollowTypeReadState} for OBJECT type records. 
