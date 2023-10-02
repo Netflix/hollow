@@ -146,12 +146,14 @@ public class GapEncodedVariableLengthIntegerReader {
     }
 
     public GapEncodedVariableLengthIntegerReader[] split(int numSplits) {
+        if (numSplits<=0 || !((numSplits&(numSplits-1))==0)) {
+            throw new IllegalArgumentException("Split should only be called with powers of 2, it was called with " + numSplits);
+        }
         final int toMask = numSplits - 1;
         final int toOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
         GapEncodedVariableLengthIntegerReader[] to = new GapEncodedVariableLengthIntegerReader[numSplits];
 
         List<Integer> ordinals = new ArrayList<>();
-        // if (this.equals(EMPTY_READER)) // TODO: Test this case, and what about null?
         reset();
         while(nextElement() != Integer.MAX_VALUE) {
             ordinals.add(nextElement());
@@ -161,7 +163,6 @@ public class GapEncodedVariableLengthIntegerReader {
         ByteDataArray[] splitOrdinals = new ByteDataArray[numSplits];
         int previousSplitOrdinal[] = new int[numSplits];
         for(int i=0;i<numSplits;i++) {
-            to[i] = EMPTY_READER;
             splitOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
         }
         for (int ordinal : ordinals) {
@@ -171,7 +172,11 @@ public class GapEncodedVariableLengthIntegerReader {
             previousSplitOrdinal[toIndex] = toOrdinal;
         }
         for(int i=0;i<numSplits;i++) {
-            to[i] = new GapEncodedVariableLengthIntegerReader(splitOrdinals[i].getUnderlyingArray(), (int)splitOrdinals[i].length());
+            if (splitOrdinals[i].length() > 0) {
+                to[i] = new GapEncodedVariableLengthIntegerReader(splitOrdinals[i].getUnderlyingArray(), (int) splitOrdinals[i].length());
+            } else {
+                to[i] = EMPTY_READER;
+            }
         }
 
         return to;
@@ -179,10 +184,13 @@ public class GapEncodedVariableLengthIntegerReader {
 
     // SNAP: TODO: can be done without max ordinal
     public static GapEncodedVariableLengthIntegerReader join(GapEncodedVariableLengthIntegerReader[] from, int joinedMaxOrdinal) {
+        if (from.length<=1 || !((from.length&(from.length-1))==0)) {
+            throw new IllegalArgumentException("Join should only be called with powers of 2, it was called with " + from.length);
+        }
+
         int numSplits = from.length;
         final int fromMask = numSplits - 1;
         final int fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
-
 
         HashSet<Integer>[] fromOrdinals = new HashSet[from.length];
         for (int i=0;i<from.length;i++) {
@@ -209,9 +217,12 @@ public class GapEncodedVariableLengthIntegerReader {
             }
         }
 
-        GapEncodedVariableLengthIntegerReader result = new GapEncodedVariableLengthIntegerReader(toRemovals.getUnderlyingArray(), (int) toRemovals.length());
+        if (toRemovals.length() == 0) {
+            return EMPTY_READER;
+        } else {
+            return new GapEncodedVariableLengthIntegerReader(toRemovals.getUnderlyingArray(), (int) toRemovals.length());
+        }
         // SNAP: TODO: destroy original somewhere
-        return result;
     }
 
     public void prettyPrint() {  // SNAP: TODO: remove

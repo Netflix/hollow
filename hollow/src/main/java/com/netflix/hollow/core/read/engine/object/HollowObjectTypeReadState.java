@@ -155,7 +155,6 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 //  numShards = 1 => shardOrdinalShift = 0.
                 //      Ordinal 4 = 100, shardOrdinal = 100 >> 0 == 4 (in shard 0).
 
-
                 // create split copies of data element
                 HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
                 HollowObjectTypeDataElements[] splits = splitter.split(preSplitDataElements, shardingFactor);
