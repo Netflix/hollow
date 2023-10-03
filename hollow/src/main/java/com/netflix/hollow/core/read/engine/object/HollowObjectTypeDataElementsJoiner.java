@@ -16,7 +16,7 @@ public class HollowObjectTypeDataElementsJoiner {
         long[] currentWriteVarLengthDataPointers;
 
         if (from.length<=0 || !((from.length&(from.length-1))==0)) { // TODO: from.length==0
-            throw new UnsupportedOperationException("No. of DataElements to be joined must be a power of 2");
+            throw new IllegalStateException("No. of DataElements to be joined must be a power of 2");
         }
 
         HollowObjectTypeDataElements to = new HollowObjectTypeDataElements(from[0].schema, from[0].memoryMode, from[0].memoryRecycler);
@@ -32,15 +32,15 @@ public class HollowObjectTypeDataElementsJoiner {
             if (fromRemovals[i] == null) {
                 continue;   // todo: test
             }
-            System.out.println("SNAP: pre-join gap ended removals for split " + i);
-            fromRemovals[i].prettyPrint();
+            // System.out.println("SNAP: pre-join gap ended removals for split " + i);
+            // fromRemovals[i].prettyPrint();
         }
         to.encodedRemovals = GapEncodedVariableLengthIntegerReader.join(fromRemovals, to.maxOrdinal);
 
         // TODO: remove
-        System.out.println("SNAP: joined gap ended removals:");
-        System.out.println("SNAP: to.maxOrdinal was " + to.maxOrdinal);
-        to.encodedRemovals.prettyPrint();
+        // System.out.println("SNAP: joined gap ended removals:");
+        // System.out.println("SNAP: to.maxOrdinal was " + to.maxOrdinal);
+        // to.encodedRemovals.prettyPrint();
 
         for (HollowObjectTypeDataElements elements : from) {
             if (elements.encodedAdditions != null) {

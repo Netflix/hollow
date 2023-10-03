@@ -82,10 +82,13 @@ public class GapEncodedVariableLengthIntegerReaderTest {
         GapEncodedVariableLengthIntegerReader joinedNulls = GapEncodedVariableLengthIntegerReader.join(nulls, -1);
         assertEquals(EMPTY_READER, joinedNulls);
 
+        GapEncodedVariableLengthIntegerReader[] from1 = new GapEncodedVariableLengthIntegerReader[1];
+        from1[0] = reader(1, 10, 100, 105, 107, 200);
+        GapEncodedVariableLengthIntegerReader joined1 = GapEncodedVariableLengthIntegerReader.join(from1, 200);
+        assertValues(joined1, 1, 10, 100, 105, 107, 200);
+
         try {
-            GapEncodedVariableLengthIntegerReader[] from1 = new GapEncodedVariableLengthIntegerReader[1];
-            from[0] = reader(1, 10, 100, 105, 107, 200);
-            GapEncodedVariableLengthIntegerReader.join(from1, 200);
+            GapEncodedVariableLengthIntegerReader.join(null, 200);
             Assert.fail();
         } catch (IllegalStateException e) {
             // expected, from.length should be a power of 2
@@ -118,7 +121,7 @@ public class GapEncodedVariableLengthIntegerReaderTest {
         try {
             reader.split(0);
             Assert.fail();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalStateException e) {
             // expected
         } catch (Exception e) {
             Assert.fail();

@@ -183,7 +183,10 @@ public class GapEncodedVariableLengthIntegerReader {
     }
 
     public static GapEncodedVariableLengthIntegerReader join(GapEncodedVariableLengthIntegerReader[] from, int passedMaxOrdinal) {
-        if (from.length<=1 || !((from.length&(from.length-1))==0)) {
+        if (from==null) {
+            throw new IllegalStateException("Join invoked on a null input array");
+        }
+        if (from.length<=0 || !((from.length&(from.length-1))==0)) {
             throw new IllegalStateException("Join should only be called with powers of 2, it was called with " + from.length);
         }
 

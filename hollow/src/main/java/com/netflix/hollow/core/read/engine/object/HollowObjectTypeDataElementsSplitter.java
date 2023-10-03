@@ -31,19 +31,19 @@ public class HollowObjectTypeDataElementsSplitter {
         // split gap encoded var length removals
         if (from.encodedRemovals != null) {
             // splits from.encodedRemovals to to[i].encodedRemovals, creating ByteDataArrays for to[i], and does not clean up from.encodedRemovals.getUnderyingArray()
-            System.out.println("SNAP: pre-split gap ended removals");   // TODO: remove
-            from.encodedRemovals.prettyPrint();
-            System.out.println("SNAP: from.maxOrdinal was " + from.maxOrdinal);
+            // System.out.println("SNAP: pre-split gap ended removals");   // TODO: remove
+            // from.encodedRemovals.prettyPrint();
+            // System.out.println("SNAP: from.maxOrdinal was " + from.maxOrdinal);
 
             GapEncodedVariableLengthIntegerReader[] splitRemovals = from.encodedRemovals.split(numSplits);
             for(int i=0;i<to.length;i++) {
                 to[i].encodedRemovals = splitRemovals[i];
             }
 
-            for(int i=0;i<numSplits;i++) {  // TODO: remove
-                System.out.println("SNAP: post-split gap ended removals for split " + i);
-                to[i].encodedRemovals.prettyPrint();
-            }
+            //for(int i=0;i<numSplits;i++) {  // TODO: remove
+            //    // System.out.println("SNAP: post-split gap ended removals for split " + i);
+            //    to[i].encodedRemovals.prettyPrint();
+            //}
         }
         if (from.encodedAdditions != null) {
             throw new UnsupportedOperationException("// SNAP: TODO: We never expect to split/join encodedAdditions- they are accepted from delta as-is");
