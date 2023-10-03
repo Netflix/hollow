@@ -22,6 +22,14 @@ public class FixedLengthDataFactory {
         }
     }
 
+    public static FixedLengthData get(long numBits, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
+        if (memoryMode.equals(MemoryMode.ON_HEAP)) {
+            return new FixedLengthElementArray(memoryRecycler, numBits);
+        } else {
+            throw new UnsupportedOperationException("Memory mode " + memoryMode.name() + " not supported");
+        }
+    }
+
     public static void destroy(FixedLengthData fld, ArraySegmentRecycler memoryRecycler) {
         if (fld instanceof FixedLengthElementArray) {
             ((FixedLengthElementArray) fld).destroy(memoryRecycler);
