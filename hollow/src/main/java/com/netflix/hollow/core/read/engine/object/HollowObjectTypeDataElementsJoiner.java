@@ -4,10 +4,17 @@ import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataEle
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthSize;
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthStartByte;
 
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 
+/**
+ * Utility for joining multiple instances of {@code HollowObjectTypeDataElements} into 1 {@code HollowObjectTypeDataElements}
+ * where the no. of passed data elements is a power of 2. This is achieved by mapping ordinals in the original data to their
+ * respective ordinal in the joined result, and copying over the corresponding data. Mo cleanup is performed on the original
+ * data elements.
+ */
 public class HollowObjectTypeDataElementsJoiner {
 
     HollowObjectTypeDataElements join(HollowObjectTypeDataElements[] from) {
@@ -15,7 +22,7 @@ public class HollowObjectTypeDataElementsJoiner {
         final int fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(from.length);
         long[] currentWriteVarLengthDataPointers;
 
-        if (from.length<=0 || !((from.length&(from.length-1))==0)) { // TODO: from.length==0
+        if (from.length<=0 || !((from.length&(from.length-1))==0)) {
             throw new IllegalStateException("No. of DataElements to be joined must be a power of 2");
         }
 
@@ -27,28 +34,18 @@ public class HollowObjectTypeDataElementsJoiner {
         GapEncodedVariableLengthIntegerReader[] fromRemovals = new GapEncodedVariableLengthIntegerReader[from.length];
         for (int i=0;i<from.length;i++) {
             fromRemovals[i] = from[i].encodedRemovals;
-
-            // TODO: remove
-            if (fromRemovals[i] == null) {
-                continue;   // todo: test
-            }
-            // System.out.println("SNAP: pre-join gap ended removals for split " + i);
-            // fromRemovals[i].prettyPrint();
         }
-        to.encodedRemovals = GapEncodedVariableLengthIntegerReader.join(fromRemovals, to.maxOrdinal);
-
-        // TODO: remove
-        // System.out.println("SNAP: joined gap ended removals:");
-        // System.out.println("SNAP: to.maxOrdinal was " + to.maxOrdinal);
-        // to.encodedRemovals.prettyPrint();
+        to.encodedRemovals = GapEncodedVariableLengthIntegerReader.join(fromRemovals);
 
         for (HollowObjectTypeDataElements elements : from) {
             if (elements.encodedAdditions != null) {
-                throw new UnsupportedOperationException("// SNAP: TODO: We never expect to split/join encodedAdditions- they are accepted from delta as-is");
+                throw new IllegalStateException("Encountered encodedAdditions in data elements joiner- this is not expected " +
+                        "since encodedAdditions only exist on delta data elements and they dont carry over to target data elements, " +
+                        "delta data elements are never split/joined");
             }
         }
 
-        to.fixedLengthData = new FixedLengthElementArray(to.memoryRecycler, (long)to.bitsPerRecord * (to.maxOrdinal + 1));  // TODO: add to FxiedLengthDataFactory to support non-heap modes
+        to.fixedLengthData = FixedLengthDataFactory.get((long)to.bitsPerRecord * (to.maxOrdinal + 1), to.memoryMode, to.memoryRecycler);
         for(int fieldIdx=0;fieldIdx<to.schema.numFields();fieldIdx++) {
             if(from[0].varLengthData[fieldIdx] != null) {
                 to.varLengthData[fieldIdx] = VariableLengthDataFactory.get(to.memoryMode, to.memoryRecycler);

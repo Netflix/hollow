@@ -182,7 +182,7 @@ public class GapEncodedVariableLengthIntegerReader {
         return to;
     }
 
-    public static GapEncodedVariableLengthIntegerReader join(GapEncodedVariableLengthIntegerReader[] from, int passedMaxOrdinal) {
+    public static GapEncodedVariableLengthIntegerReader join(GapEncodedVariableLengthIntegerReader[] from) {
         if (from==null) {
             throw new IllegalStateException("Join invoked on a null input array");
         }
@@ -210,14 +210,6 @@ public class GapEncodedVariableLengthIntegerReader {
                 from[i].advance();
             }
         }
-
-        // if (joinedMaxOrdinal != passedMaxOrdinal) {
-        //     if (passedMaxOrdinal == 0 && joinedMaxOrdinal == -1) {
-        //
-        //     } else {
-        //         throw new RuntimeException("Uhoh there is a bug");  // SNAP: TODO: Remove
-        //     }
-        // }
 
         ByteDataArray toRemovals = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
         int previousOrdinal = 0;

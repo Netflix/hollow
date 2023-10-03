@@ -4,10 +4,15 @@ import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataEle
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthSize;
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthStartByte;
 
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 
+/**
+ * Utility for splitting an instance of {@code HollowObjectTypeDataElements} into N {@code HollowObjectTypeDataElements}s
+ * where N is a power of 2. This is achieved by mapping ordinals in the original data to their respective split, and copying
+ * over the corresponding data. New data elements are initialized and returned, no cleanup is performed on the original data.
+ */
 public class HollowObjectTypeDataElementsSplitter {
 
     HollowObjectTypeDataElements[] split(HollowObjectTypeDataElements from, int numSplits) {
@@ -28,29 +33,20 @@ public class HollowObjectTypeDataElementsSplitter {
 
         populateStats(to, from, toMask, toOrdinalShift);
 
-        // split gap encoded var length removals
         if (from.encodedRemovals != null) {
-            // splits from.encodedRemovals to to[i].encodedRemovals, creating ByteDataArrays for to[i], and does not clean up from.encodedRemovals.getUnderyingArray()
-            // System.out.println("SNAP: pre-split gap ended removals");   // TODO: remove
-            // from.encodedRemovals.prettyPrint();
-            // System.out.println("SNAP: from.maxOrdinal was " + from.maxOrdinal);
-
             GapEncodedVariableLengthIntegerReader[] splitRemovals = from.encodedRemovals.split(numSplits);
             for(int i=0;i<to.length;i++) {
                 to[i].encodedRemovals = splitRemovals[i];
             }
-
-            //for(int i=0;i<numSplits;i++) {  // TODO: remove
-            //    // System.out.println("SNAP: post-split gap ended removals for split " + i);
-            //    to[i].encodedRemovals.prettyPrint();
-            //}
         }
         if (from.encodedAdditions != null) {
-            throw new UnsupportedOperationException("// SNAP: TODO: We never expect to split/join encodedAdditions- they are accepted from delta as-is");
+            throw new IllegalStateException("Encountered encodedAdditions in data elements splitter- this is not expected " +
+                    "since encodedAdditions only exist on delta data elements and they dont carry over to target data elements, " +
+                    "delta data elements are never split/joined");
         }
 
         for(int i=0;i<to.length;i++) {
-            to[i].fixedLengthData = new FixedLengthElementArray(to[i].memoryRecycler, (long)to[i].bitsPerRecord * (to[i].maxOrdinal + 1));  // TODO: add to FxiedLengthDataFactory to support non-heap modes
+            to[i].fixedLengthData = FixedLengthDataFactory.get((long)to[i].bitsPerRecord * (to[i].maxOrdinal + 1), to[i].memoryMode, to[i].memoryRecycler);
             for(int fieldIdx=0;fieldIdx<from.schema.numFields();fieldIdx++) {
                 if(from.varLengthData[fieldIdx] != null) {
                     to[i].varLengthData[fieldIdx] = VariableLengthDataFactory.get(from.memoryMode, from.memoryRecycler);
