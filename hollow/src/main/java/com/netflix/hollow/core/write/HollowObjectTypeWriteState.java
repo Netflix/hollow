@@ -106,9 +106,17 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         }
 
         maxShardOrdinal = new int[numShards];
-        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards; 
+        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards; // numShards=4: maxOrdinal=3 => minRecordLocationsPerShard=1, maxOrdinal=6 => minRecordLocationsPerShard=1, maxOrdinal=1 => minRecordLocationsPerShard=0
         for(int i=0;i<numShards;i++)
             maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;  // SNAP: replicate 1?
+        // numShards=4:
+        //  maxOrdinal=3
+        //      maxShardOrdinal=0,0,0,0
+        //  maxOrdinal=6
+        //      maxShardOrdinal=1,1,1,1
+        //  maxOrdinal=1
+        //      maxShardOrdinal=0,0,-1,-1
+        //
 
         if (revDeltaNumShards > 0) {
             revDeltaMaxShardOrdinal = new int[revDeltaNumShards];

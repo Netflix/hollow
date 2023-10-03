@@ -15,8 +15,8 @@ public class HollowObjectTypeDataElementsSplitter {
         final int toOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
         final long[][] currentWriteVarLengthDataPointers;
 
-        if (!(numSplits>0) || !((numSplits&(numSplits-1))==0)) {
-            throw new UnsupportedOperationException("Must split by power of 2");
+        if (numSplits<=0 || !((numSplits&(numSplits-1))==0)) {
+            throw new IllegalStateException("Must split by power of 2");
         }
 
         HollowObjectTypeDataElements[] to = new HollowObjectTypeDataElements[numSplits];

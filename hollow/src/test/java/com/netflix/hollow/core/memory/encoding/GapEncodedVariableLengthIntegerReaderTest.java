@@ -62,30 +62,36 @@ public class GapEncodedVariableLengthIntegerReaderTest {
         from[0] = reader(1, 10, 100, 105, 107, 200);
         from[1] = reader(5, 76, 100, 102, 109, 200, 201);
         final int maxJoinedOrdinal = 403;
-
-        GapEncodedVariableLengthIntegerReader joined = GapEncodedVariableLengthIntegerReader.join(from, 403);
+        GapEncodedVariableLengthIntegerReader joined = GapEncodedVariableLengthIntegerReader.join(from, maxJoinedOrdinal);
         assertValues(joined, 2, 11, 20, 153, 200, 201, 205, 210, 214, 219, 400, 401, 403);
 
+        GapEncodedVariableLengthIntegerReader[] from4 = new GapEncodedVariableLengthIntegerReader[4];
+        from4[0] = reader(0, 1, 2, 3);
+        from4[1] = EMPTY_READER;
+        from4[2] = reader(3);
+        from4[3] = EMPTY_READER;
+        final int maxJoinedOrdinal4 = 14;   // splitOrdinal 3, in splitIndex 2 of numSplits 4 => 3*4+2
+        GapEncodedVariableLengthIntegerReader joined4 = GapEncodedVariableLengthIntegerReader.join(from4, maxJoinedOrdinal4);
+        assertValues(joined4, 0, 4, 8, 12, 14);
+
         GapEncodedVariableLengthIntegerReader[] empties = new GapEncodedVariableLengthIntegerReader[] {EMPTY_READER, EMPTY_READER};
-        GapEncodedVariableLengthIntegerReader joinedEmpties = GapEncodedVariableLengthIntegerReader.join(empties, 0);
+        GapEncodedVariableLengthIntegerReader joinedEmpties = GapEncodedVariableLengthIntegerReader.join(empties, -1);
         assertEquals(EMPTY_READER, joinedEmpties);
 
         GapEncodedVariableLengthIntegerReader[] nulls = new GapEncodedVariableLengthIntegerReader[] {null, null};
-        GapEncodedVariableLengthIntegerReader.join(nulls, 0);
-        assertEquals(EMPTY_READER, joinedEmpties);
+        GapEncodedVariableLengthIntegerReader joinedNulls = GapEncodedVariableLengthIntegerReader.join(nulls, -1);
+        assertEquals(EMPTY_READER, joinedNulls);
 
         try {
             GapEncodedVariableLengthIntegerReader[] from1 = new GapEncodedVariableLengthIntegerReader[1];
             from[0] = reader(1, 10, 100, 105, 107, 200);
             GapEncodedVariableLengthIntegerReader.join(from1, 200);
             Assert.fail();
-        } catch (IllegalArgumentException e) {
-            // expected
+        } catch (IllegalStateException e) {
+            // expected, from.length should be a power of 2
         } catch (Exception e) {
             Assert.fail();
         }
-
-        // SNAP: here
     }
 
     @Test
@@ -121,8 +127,8 @@ public class GapEncodedVariableLengthIntegerReaderTest {
         try {
             reader.split(3);
             Assert.fail();
-        } catch (IllegalArgumentException e) {
-            // expected
+        } catch (IllegalStateException e) {
+            // expected, numSplits should be a power of 2
         } catch (Exception e) {
             Assert.fail();
         }

@@ -147,7 +147,7 @@ public class GapEncodedVariableLengthIntegerReader {
 
     public GapEncodedVariableLengthIntegerReader[] split(int numSplits) {
         if (numSplits<=0 || !((numSplits&(numSplits-1))==0)) {
-            throw new IllegalArgumentException("Split should only be called with powers of 2, it was called with " + numSplits);
+            throw new IllegalStateException("Split should only be called with powers of 2, it was called with " + numSplits);
         }
         final int toMask = numSplits - 1;
         final int toOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
@@ -182,15 +182,15 @@ public class GapEncodedVariableLengthIntegerReader {
         return to;
     }
 
-    // SNAP: TODO: can be done without max ordinal
-    public static GapEncodedVariableLengthIntegerReader join(GapEncodedVariableLengthIntegerReader[] from, int joinedMaxOrdinal) {
+    public static GapEncodedVariableLengthIntegerReader join(GapEncodedVariableLengthIntegerReader[] from, int passedMaxOrdinal) {
         if (from.length<=1 || !((from.length&(from.length-1))==0)) {
-            throw new IllegalArgumentException("Join should only be called with powers of 2, it was called with " + from.length);
+            throw new IllegalStateException("Join should only be called with powers of 2, it was called with " + from.length);
         }
 
         int numSplits = from.length;
         final int fromMask = numSplits - 1;
         final int fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
+        int joinedMaxOrdinal = -1;
 
         HashSet<Integer>[] fromOrdinals = new HashSet[from.length];
         for (int i=0;i<from.length;i++) {
@@ -201,10 +201,20 @@ public class GapEncodedVariableLengthIntegerReader {
             from[i].reset();
 
             while(from[i].nextElement() != Integer.MAX_VALUE) {
-                fromOrdinals[i].add(from[i].nextElement());
+                int splitOrdinal = from[i].nextElement();
+                fromOrdinals[i].add(splitOrdinal);
+                joinedMaxOrdinal = Math.max(joinedMaxOrdinal, splitOrdinal*numSplits + i);
                 from[i].advance();
             }
         }
+
+        // if (joinedMaxOrdinal != passedMaxOrdinal) {
+        //     if (passedMaxOrdinal == 0 && joinedMaxOrdinal == -1) {
+        //
+        //     } else {
+        //         throw new RuntimeException("Uhoh there is a bug");  // SNAP: TODO: Remove
+        //     }
+        // }
 
         ByteDataArray toRemovals = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
         int previousOrdinal = 0;
