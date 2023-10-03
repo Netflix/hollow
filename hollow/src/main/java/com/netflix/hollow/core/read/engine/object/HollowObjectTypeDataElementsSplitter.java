@@ -1,8 +1,7 @@
 package com.netflix.hollow.core.read.engine.object;
 
-import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthEndByte;
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.copyRecord;
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthSize;
-import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthStartByte;
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
@@ -55,7 +54,9 @@ public class HollowObjectTypeDataElementsSplitter {
         }
 
         for(int i=0;i<=from.maxOrdinal;i++) {
-            copyRecord(i, to, from, toMask, toOrdinalShift, currentWriteVarLengthDataPointers);
+            int toIndex = i & toMask;
+            int toOrdinal = i >> toOrdinalShift;
+            copyRecord(to[toIndex], toOrdinal, from, i, currentWriteVarLengthDataPointers[toIndex]);
         }
         return to;
     }
@@ -81,33 +82,12 @@ public class HollowObjectTypeDataElementsSplitter {
                 } else {
                     to[toIndex].bitsPerField[fieldIdx] = (64 - Long.numberOfLeadingZeros(varLengthSizes[toIndex][fieldIdx] + 1)) + 1;
                 }
-                to[toIndex].nullValueForField[fieldIdx] = (to[toIndex].bitsPerField[fieldIdx] == 64) ? -1L : (1L << to[toIndex].bitsPerField[fieldIdx]) - 1;    // SNAP: here: can just copy over?
+                to[toIndex].nullValueForField[fieldIdx] = (to[toIndex].bitsPerField[fieldIdx] == 64) ? -1L : (1L << to[toIndex].bitsPerField[fieldIdx]) - 1;
                 to[toIndex].bitOffsetPerField[fieldIdx] = to[toIndex].bitsPerRecord;
                 to[toIndex].bitsPerRecord += to[toIndex].bitsPerField[fieldIdx];
 
                 to[toIndex].bitsPerUnfilteredField = from.bitsPerUnfilteredField;
                 to[toIndex].unfilteredFieldIsIncluded = from.unfilteredFieldIsIncluded;
-            }
-        }
-    }
-
-    private void copyRecord(int ordinal, HollowObjectTypeDataElements[] to, HollowObjectTypeDataElements from, int toMask, int toOrdinalShift, long[][] currentWriteVarLengthDataPointers) {
-        int toIndex = ordinal & toMask;
-        int toOrdinal = ordinal >> toOrdinalShift;
-
-        for(int fieldIdx=0;fieldIdx<from.schema.numFields();fieldIdx++) {
-            if(to[toIndex].varLengthData[fieldIdx] == null) {
-                long value = from.fixedLengthData.getLargeElementValue(((long)ordinal * from.bitsPerRecord) + from.bitOffsetPerField[fieldIdx], from.bitsPerField[fieldIdx]);
-                to[toIndex].fixedLengthData.setElementValue(((long)toOrdinal * to[toIndex].bitsPerRecord) + to[toIndex].bitOffsetPerField[fieldIdx], to[toIndex].bitsPerField[fieldIdx], value);
-            } else {
-                long fromStartByte = varLengthStartByte(from, ordinal, fieldIdx);
-                long fromEndByte = varLengthEndByte(from, ordinal, fieldIdx);
-                long size = fromEndByte - fromStartByte;
-
-                to[toIndex].fixedLengthData.setElementValue(((long)toOrdinal * to[toIndex].bitsPerRecord) + to[toIndex].bitOffsetPerField[fieldIdx], to[toIndex].bitsPerField[fieldIdx], currentWriteVarLengthDataPointers[toIndex][fieldIdx] + size);
-                to[toIndex].varLengthData[fieldIdx].copy(from.varLengthData[fieldIdx], fromStartByte, currentWriteVarLengthDataPointers[toIndex][fieldIdx], size);
-
-                currentWriteVarLengthDataPointers[toIndex][fieldIdx] += size;
             }
         }
     }

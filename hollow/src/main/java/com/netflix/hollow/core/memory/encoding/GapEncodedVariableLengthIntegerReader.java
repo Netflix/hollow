@@ -145,6 +145,14 @@ public class GapEncodedVariableLengthIntegerReader {
         return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingArray(), (int)arr.length());
     }
 
+    /**
+     * Splits the current {@code GapEncodedVariableLengthIntegerReader} instance into {@code numSplits} instances of
+     * {@code GapEncodedVariableLengthIntegerReader}. Values in the original are distributed over the split result and
+     * translated accordingly. The original data is not cleaned up.
+     *
+     * @param numSplits the number of instances to split into, should be a power of 2.
+     * @return an array of {@code GapEncodedVariableLengthIntegerReader} instances populated with the results of the split.
+     */
     public GapEncodedVariableLengthIntegerReader[] split(int numSplits) {
         if (numSplits<=0 || !((numSplits&(numSplits-1))==0)) {
             throw new IllegalStateException("Split should only be called with powers of 2, it was called with " + numSplits);
@@ -175,6 +183,8 @@ public class GapEncodedVariableLengthIntegerReader {
             if (splitOrdinals[i].length() > 0) {
                 to[i] = new GapEncodedVariableLengthIntegerReader(splitOrdinals[i].getUnderlyingArray(), (int) splitOrdinals[i].length());
             } else {
+                // SNAP: TODO:
+                splitOrdinals[i].getUnderlyingArray().destroy();
                 to[i] = EMPTY_READER;
             }
         }
@@ -182,6 +192,14 @@ public class GapEncodedVariableLengthIntegerReader {
         return to;
     }
 
+    /**
+     * Takes an array of {@code GapEncodedVariableLengthIntegerReader} instances to return one resulting
+     * {@code GapEncodedVariableLengthIntegerReader} instance. Values in the original data are translated as they are
+     * populated into the joined result. The original data is not cleaned up.
+     *
+     * @param from the array of {@code GapEncodedVariableLengthIntegerReader} to join, should have a power of 2 number of elements.
+     * @return an instance of {@code GapEncodedVariableLengthIntegerReader} with the joined result.
+     */
     public static GapEncodedVariableLengthIntegerReader join(GapEncodedVariableLengthIntegerReader[] from) {
         if (from==null) {
             throw new IllegalStateException("Join invoked on a null input array");
@@ -199,7 +217,7 @@ public class GapEncodedVariableLengthIntegerReader {
         for (int i=0;i<from.length;i++) {
             fromOrdinals[i] = new HashSet<>();
             if (from[i] == null) {
-                continue;   // todo: test
+                continue;
             }
             from[i].reset();
 
@@ -223,20 +241,10 @@ public class GapEncodedVariableLengthIntegerReader {
         }
 
         if (toRemovals.length() == 0) {
+            toRemovals.getUnderlyingArray().destroy();   // SNAP: here
             return EMPTY_READER;
         } else {
             return new GapEncodedVariableLengthIntegerReader(toRemovals.getUnderlyingArray(), (int) toRemovals.length());
         }
-        // SNAP: TODO: destroy original somewhere
-    }
-
-    public void prettyPrint() {  // SNAP: TODO: remove
-        List<Integer> ordinals = new ArrayList<>();
-        reset();
-        while(nextElement() != Integer.MAX_VALUE) {
-            ordinals.add(nextElement());
-            advance();
-        }
-        System.out.println("SNAP:         " + ordinals);
     }
 }

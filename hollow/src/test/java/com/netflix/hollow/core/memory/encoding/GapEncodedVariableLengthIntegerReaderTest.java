@@ -66,7 +66,7 @@ public class GapEncodedVariableLengthIntegerReaderTest {
 
         GapEncodedVariableLengthIntegerReader[] from4 = new GapEncodedVariableLengthIntegerReader[4];
         from4[0] = reader(0, 1, 2, 3);
-        from4[1] = EMPTY_READER;
+        from4[1] = null;
         from4[2] = reader(3);
         from4[3] = EMPTY_READER;
         GapEncodedVariableLengthIntegerReader joined4 = GapEncodedVariableLengthIntegerReader.join(from4);

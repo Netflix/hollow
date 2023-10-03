@@ -211,16 +211,6 @@ public class HollowObjectTypeDataElements {
         }
     }
 
-    public void destroySpecial() {  // SNAP: TODO: remove
-        FixedLengthDataFactory.destroy(fixedLengthData, memoryRecycler);
-        fixedLengthData = null;
-        for(int i=0;i<varLengthData.length;i++) {
-            if(varLengthData[i] != null)
-                VariableLengthDataFactory.destroy(varLengthData[i]);
-            varLengthData[i] = null;
-        }
-    }
-
     static long varLengthStartByte(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {
         if(ordinal == 0)
             return 0;
@@ -246,5 +236,23 @@ public class HollowObjectTypeDataElements {
         long fromEndByte = from.fixedLengthData.getElementValue(fromBitOffset, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
         long fromStartByte = ordinal != 0 ? from.fixedLengthData.getElementValue(fromBitOffset - from.bitsPerRecord, numBitsForField) & (1L << (numBitsForField - 1)) - 1 : 0;
         return fromEndByte - fromStartByte;
+    }
+
+    static void copyRecord(HollowObjectTypeDataElements to, int toOrdinal, HollowObjectTypeDataElements from, int fromOrdinal, long[] currentWriteVarLengthDataPointers) {
+        for(int fieldIndex=0;fieldIndex<to.schema.numFields();fieldIndex++) {
+            if(to.varLengthData[fieldIndex] == null) {
+                long value = from.fixedLengthData.getLargeElementValue(((long)fromOrdinal * from.bitsPerRecord) + from.bitOffsetPerField[fieldIndex], from.bitsPerField[fieldIndex]);
+                to.fixedLengthData.setElementValue(((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex], to.bitsPerField[fieldIndex], value);
+            } else {
+                long fromStartByte = varLengthStartByte(from, fromOrdinal, fieldIndex);
+                long fromEndByte = varLengthEndByte(from, fromOrdinal, fieldIndex);
+                long size = fromEndByte - fromStartByte;
+
+                to.fixedLengthData.setElementValue(((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex], to.bitsPerField[fieldIndex], currentWriteVarLengthDataPointers[fieldIndex] + size);
+                to.varLengthData[fieldIndex].copy(from.varLengthData[fieldIndex], fromStartByte, currentWriteVarLengthDataPointers[fieldIndex], size);
+
+                currentWriteVarLengthDataPointers[fieldIndex] += size;
+            }
+        }
     }
 }
