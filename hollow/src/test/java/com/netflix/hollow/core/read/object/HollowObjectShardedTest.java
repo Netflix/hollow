@@ -103,6 +103,4 @@ public class HollowObjectShardedTest extends AbstractStateEngineTest {
     }
 
 
-
-
 }
