@@ -29,8 +29,6 @@ public class HollowObjectTypeDataElementsSplitterTest extends AbstractHollowObje
             Assert.fail();
         } catch (IllegalStateException e) {
             // expected, numSplits should be a power of 2
-        } catch (Exception e) {
-            Assert.fail();
         }
 
         try {
@@ -38,8 +36,6 @@ public class HollowObjectTypeDataElementsSplitterTest extends AbstractHollowObje
             Assert.fail();
         } catch (IllegalStateException e) {
             // expected, numSplits should be a power of 2
-        } catch (Exception e) {
-            Assert.fail();
         }
     }
 }

@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import java.util.function.Supplier;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -85,14 +86,7 @@ public class GapEncodedVariableLengthIntegerReaderTest {
         GapEncodedVariableLengthIntegerReader joined1 = GapEncodedVariableLengthIntegerReader.join(from1);
         assertValues(joined1, 1, 10, 100, 105, 107, 200);
 
-        try {
-            GapEncodedVariableLengthIntegerReader.join(null);
-            Assert.fail();
-        } catch (IllegalStateException e) {
-            // expected, from.length should be a power of 2
-        } catch (Exception e) {
-            Assert.fail();
-        }
+        assertIllegalStateException(() -> GapEncodedVariableLengthIntegerReader.join(null));
     }
 
     @Test
@@ -116,23 +110,8 @@ public class GapEncodedVariableLengthIntegerReaderTest {
         assertEquals(EMPTY_READER, splitBy2Empty[0]);
         assertEquals(EMPTY_READER, splitBy2Empty[1]);
 
-        try {
-            reader.split(0);
-            Assert.fail();
-        } catch (IllegalStateException e) {
-            // expected
-        } catch (Exception e) {
-            Assert.fail();
-        }
-
-        try {
-            reader.split(3);
-            Assert.fail();
-        } catch (IllegalStateException e) {
-            // expected, numSplits should be a power of 2
-        } catch (Exception e) {
-            Assert.fail();
-        }
+        assertIllegalStateException(() ->reader.split(0));
+        assertIllegalStateException(() -> reader.split(3));
     }
 
     private GapEncodedVariableLengthIntegerReader reader(int... values) {
@@ -154,5 +133,14 @@ public class GapEncodedVariableLengthIntegerReaderTest {
         }
 
         assertEquals(Integer.MAX_VALUE, reader.nextElement());
+    }
+
+    private void assertIllegalStateException(Supplier<?> invocation) {
+        try {
+            invocation.get();
+            Assert.fail();
+        } catch (IllegalStateException e) {
+            // expected
+        }
     }
 }

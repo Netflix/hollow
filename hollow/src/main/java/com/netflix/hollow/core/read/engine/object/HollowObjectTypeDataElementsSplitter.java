@@ -8,9 +8,10 @@ import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 
 /**
- * Utility for splitting an instance of {@code HollowObjectTypeDataElements} into N {@code HollowObjectTypeDataElements}s
- * where N is a power of 2. This is achieved by mapping ordinals in the original data to their respective split, and copying
- * over the corresponding data. New data elements are initialized and returned, no cleanup is performed on the original data.
+ * Split a {@code HollowObjectTypeDataElements} into multiple {@code HollowObjectTypeDataElements}s.
+ * Ordinals are remapped and corresponding data is copied over.
+ * The original data elements are not destroyed.
+ * {@code numSplits} must be a power of 2.
  */
 public class HollowObjectTypeDataElementsSplitter {
 

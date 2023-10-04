@@ -24,8 +24,6 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
             Assert.fail();
         } catch (IllegalStateException e) {
             // expected, numSplits should be a power of 2
-        } catch (Exception e) {
-            Assert.fail();
         }
     }
 }

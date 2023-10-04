@@ -62,7 +62,6 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
 
     private final int log2OfSegmentSizeInBytes;
     private final int byteBitmask;
-
     private final long sizeBits;
 
     public FixedLengthElementArray(ArraySegmentRecycler memoryRecycler, long numBits) {

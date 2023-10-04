@@ -1,11 +1,15 @@
 package com.netflix.hollow.core.read.engine.object;
 
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState.shardingFactor;
+import static junit.framework.TestCase.assertEquals;
+
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import java.util.Random;
+import java.util.function.Supplier;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +33,34 @@ public class HollowObjectTypeReadStateTest extends AbstractStateEngineTest {
         writeStateEngine.setTargetMaxTypeShardSize(4096);
         writeStateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
     }
+
+    @Test
+    public void testShardingFactor() {
+        assertEquals(2, shardingFactor(1, 2));
+        assertEquals(2, shardingFactor(2, 1));
+
+        assertEquals(2, shardingFactor(4, 2));
+        assertEquals(2, shardingFactor(2, 4));
+
+        assertEquals(16, shardingFactor(1, 16));
+        assertEquals(16, shardingFactor(32, 2));
+
+        assertIllegalStateException(() -> shardingFactor(0, 1));
+        assertIllegalStateException(() -> shardingFactor(2, 0));
+        assertIllegalStateException(() -> shardingFactor(1, 1));
+        assertIllegalStateException(() -> shardingFactor(1, -1));
+        assertIllegalStateException(() -> shardingFactor(2, 3));
+    }
+
+    private void assertIllegalStateException(Supplier<Integer> invocation) {
+        try {
+            invocation.get();
+            Assert.fail();
+        } catch (IllegalStateException e) {
+            // expected
+        }
+    }
+
 
 //    @Test
 //    public void testSimpleSplitAndJoin() throws Exception {

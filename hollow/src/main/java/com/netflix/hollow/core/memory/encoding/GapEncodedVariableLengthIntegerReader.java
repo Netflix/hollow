@@ -146,9 +146,8 @@ public class GapEncodedVariableLengthIntegerReader {
     }
 
     /**
-     * Splits the current {@code GapEncodedVariableLengthIntegerReader} instance into {@code numSplits} instances of
-     * {@code GapEncodedVariableLengthIntegerReader}. Values in the original are distributed over the split result and
-     * translated accordingly. The original data is not cleaned up.
+     * Splits this {@code GapEncodedVariableLengthIntegerReader} into {@code numSplits} new instances.
+     * The original data is not cleaned up.
      *
      * @param numSplits the number of instances to split into, should be a power of 2.
      * @return an array of {@code GapEncodedVariableLengthIntegerReader} instances populated with the results of the split.
@@ -170,22 +169,20 @@ public class GapEncodedVariableLengthIntegerReader {
 
         ByteDataArray[] splitOrdinals = new ByteDataArray[numSplits];
         int previousSplitOrdinal[] = new int[numSplits];
-        for(int i=0;i<numSplits;i++) {
-            splitOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
-        }
         for (int ordinal : ordinals) {
             int toIndex = ordinal & toMask;
             int toOrdinal = ordinal >> toOrdinalShift;
+            if (splitOrdinals[toIndex] == null) {
+                splitOrdinals[toIndex] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+            }
             VarInt.writeVInt(splitOrdinals[toIndex], toOrdinal - previousSplitOrdinal[toIndex]);
             previousSplitOrdinal[toIndex] = toOrdinal;
         }
         for(int i=0;i<numSplits;i++) {
-            if (splitOrdinals[i].length() > 0) {
-                to[i] = new GapEncodedVariableLengthIntegerReader(splitOrdinals[i].getUnderlyingArray(), (int) splitOrdinals[i].length());
-            } else {
-                // SNAP: TODO:
-                splitOrdinals[i].getUnderlyingArray().destroy();
+            if (splitOrdinals[i] == null) {
                 to[i] = EMPTY_READER;
+            } else {
+                to[i] = new GapEncodedVariableLengthIntegerReader(splitOrdinals[i].getUnderlyingArray(), (int) splitOrdinals[i].length());
             }
         }
 
@@ -193,9 +190,8 @@ public class GapEncodedVariableLengthIntegerReader {
     }
 
     /**
-     * Takes an array of {@code GapEncodedVariableLengthIntegerReader} instances to return one resulting
-     * {@code GapEncodedVariableLengthIntegerReader} instance. Values in the original data are translated as they are
-     * populated into the joined result. The original data is not cleaned up.
+     * Join an array of {@code GapEncodedVariableLengthIntegerReader} instances into one.
+     * The original data is not cleaned up.
      *
      * @param from the array of {@code GapEncodedVariableLengthIntegerReader} to join, should have a power of 2 number of elements.
      * @return an instance of {@code GapEncodedVariableLengthIntegerReader} with the joined result.
@@ -229,19 +225,21 @@ public class GapEncodedVariableLengthIntegerReader {
             }
         }
 
-        ByteDataArray toRemovals = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+        ByteDataArray toRemovals = null;
         int previousOrdinal = 0;
         for (int ordinal=0;ordinal<=joinedMaxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
             if (fromOrdinals[fromIndex].contains(fromOrdinal)) {
+                if (toRemovals == null) {
+                    toRemovals = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+                }
                 VarInt.writeVInt(toRemovals, ordinal - previousOrdinal);
                 previousOrdinal = ordinal;
             }
         }
 
-        if (toRemovals.length() == 0) {
-            toRemovals.getUnderlyingArray().destroy();   // SNAP: here
+        if (toRemovals == null) {
             return EMPTY_READER;
         } else {
             return new GapEncodedVariableLengthIntegerReader(toRemovals.getUnderlyingArray(), (int) toRemovals.length());

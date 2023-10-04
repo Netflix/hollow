@@ -8,9 +8,10 @@ import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 
 /**
- * Utility for joining multiple instances of {@code HollowObjectTypeDataElements} into 1 {@code HollowObjectTypeDataElements}
- * where the no. of passed data elements is a power of 2. This is achieved by mapping ordinals in the original data to their
- * respective ordinal in the joined result, and copying over the corresponding data. The original data elements are not destroyed.
+ * Join multiple {@code HollowObjectTypeDataElements}s into 1 {@code HollowObjectTypeDataElements}.
+ * Ordinals are remapped and corresponding data is copied over.
+ * The original data elements are not destroyed.
+ * The no. of passed data elements must be a power of 2.
  */
 public class HollowObjectTypeDataElementsJoiner {
 
