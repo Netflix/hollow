@@ -3,11 +3,7 @@ package com.netflix.hollow.core.read.engine.object;
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadStateShard;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
