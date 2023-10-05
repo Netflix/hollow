@@ -53,6 +53,29 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             this.shardNumberMask = numShards - 1;
         }
 
+        private ShardsHolder(ShardsHolder from) {
+            this.shards = from.shards;
+            this.shardNumberMask = from.shardNumberMask;
+
+        }
+
+        public ShardsHolder(HollowSchema schema, HollowObjectTypeDataElements[] dataElements, int shardOrdinalShift) {
+            int numShards = dataElements.length;
+            this.shardNumberMask = numShards - 1;
+            this.shards = new HollowObjectTypeReadStateShard[numShards];
+            for (int i=0; i<numShards; i++) {
+                this.shards[i] = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, shardOrdinalShift);
+                this.shards[i].setCurrentData(this, dataElements[i]);
+            }
+
+        }
+
+        // SNAP: TODO: remove
+        public ShardsHolder fullConstruction() {  // https://stackoverflow.com/questions/13480891/java-array-synchronization-visibility
+            ShardsHolder to = new ShardsHolder(this);
+            return to;
+        }
+
         public HollowObjectTypeReadStateShard[] getShards() {  // TODO: package private
             return shards;
         }
@@ -132,25 +155,33 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         boolean shouldSplit = newNumShards > prevNumShards;
 
         ShardsHolder newShards = new ShardsHolder(newNumShards);
+        HollowObjectTypeDataElements[] newDataElements = new HollowObjectTypeDataElements[newNumShards];
         if (shouldSplit) { // split existing shards
-            // Step 1:  // SNAP: TODO: remove
-            // ∀ i ∈ [0,prevNumShards) { newShards.shard[i] and newShards.shard[i+prevNumShards] will point to the
-            //                            same underlying data elements as the current i-th shard but reference a subset of the original ordinals}
+            // Step 1:  Grow the number of shards. Each original shard will result in N child shards where N is the sharding factor.
+            //          The child shards will reference into the existing data elements as-is, and reuse existing shardOrdinalShift.
+            //          However since the shards array is resized, a read will map into the new shard index, as a result a subset of
+            //          ordinals in each shard will be accessed. In the next "splitting" step, the data elements in these new shards
+            //          will be filtered to only retain the subset of ordinals that are actually accessed.
             for(int i = 0; i< prevNumShards; i++) {
                 for (int j = 0; j < shardingFactor; j ++) {
                     newShards.shards[i+(prevNumShards*j)] = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, 31 - Integer.numberOfLeadingZeros(prevNumShards));
                     newShards.shards[i+(prevNumShards*j)].setCurrentData(newShards, shardsVolatile.shards[i].currentDataElements());
+
+                    newDataElements[i+(prevNumShards*j)] = shardsVolatile.shards[i].currentDataElements();
                 }
             }
-            newShards = newShards;  // SNAP: TODO: needed? or should it be shardsVolatile.shards = shardsVolatile.shards; and make .shards volatile?
-            shardsVolatile = newShards; // propagate newShards  // TODO: implement as update()
+            // shardsVolatile = new ShardsHolder(schema, newDataElements, 31 - Integer.numberOfLeadingZeros(prevNumShards));
+            shardsVolatile = newShards; // write to volatile will ensure that all above stores will be visible to
+                                        // threads that reads this volatile
 
-            // Step 2:
-            // For each current shard, split or join the referenced data elements into a copy and discard the pre-split data elements
+            // Step 2: Split each original data element into N child data elements where N is the sharding factor.
+            //         Then update each child shard corresponding to a pre-split parent shard with the split of data element
+            //         that is actually accessed by reads into that shard. Once all child shards for a pre-split parent
+            //         shard have been assigned the split data elements, the parent data elements can be discarded.
             for(int i = 0; i< prevNumShards; i++) {
                 HollowObjectTypeDataElements preSplitDataElements = shardsVolatile.shards[i].currentDataElements();
                 int finalShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newNumShards);
-                // For e.g.
+                // TODO: remove: For e.g.
                 //  numShards = 4 => shardOrdinalShift = 2.
                 //      Ordinal 4 = 100, shardOrdinal = 100 >> 2 == 1 (in shard 0).
                 //      Ordinal 10 = 1010, shardOrdinal = 1010 >> 2 = 2 (in shard 2)
@@ -165,7 +196,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
                 for (int j = 0; j < shardingFactor; j ++) {
                     HollowObjectTypeReadStateShard finalShard = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, finalShardOrdinalShift);
-                    finalShard.setCurrentData(shardsVolatile, splits[j]);
+                    finalShard.setCurrentData(shardsVolatile, splits[j]);   // SNAP: HERE: reuse update() to propagate all array elements ???
                     shardsVolatile.shards[i + (prevNumShards*j)] = finalShard;
                 }
 
@@ -205,6 +236,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
             // filter down to just the new (fewer) shards
             for (int i = 0; i < newNumShards; i++) {
+                // SNAP: TODO: ok to reuse newShards here?
                 newShards.shards[i] = new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, newShardOrdinalShift);
                 newShards.shards[i].setCurrentData(newShards, shardsVolatile.shards[i].currentDataElements());
             }
@@ -257,8 +289,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 HollowObjectTypeDataElements oldData = shardsVolatile.shards[i].currentDataElements();
                 nextData.applyDelta(oldData, deltaData);
                 shardsVolatile.shards[i].setCurrentData(shardsVolatile, nextData);
-                shardsVolatile = shardsVolatile;
-
+                // shardsVolatile = shardsVolatile;    // TODO: remove?
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shardsVolatile.shards.length);
                 deltaData.encodedAdditions.destroy();
                 oldData.destroy();

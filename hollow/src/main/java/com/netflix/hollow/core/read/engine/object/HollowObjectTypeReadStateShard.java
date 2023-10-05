@@ -38,7 +38,7 @@ public class HollowObjectTypeReadStateShard {    // TODO: package private
     private volatile HollowObjectTypeDataElements currentDataVolatile;
     private volatile HollowObjectTypeReadState.ShardsHolder currentShardsVolatile;    // SNAP: TODO: test that back reference doesn't need to be cleaned up
 
-    // for virtual shards that skip over some data elements, ordinal >> shardOrdinalShift yields a translated in-shard ordinal
+    // ordinal >> shardOrdinalShift yields a translated in-shard ordinal; can be useful for skipping ordinals in underlying data elements when splitting shards
     final int shardOrdinalShift;
 
     private final HollowObjectSchema schema;
@@ -411,10 +411,12 @@ public class HollowObjectTypeReadStateShard {    // TODO: package private
         //
         // For more details see http://gee.cs.oswego.edu/dl/html/j9mm.html
         HollowUnsafeHandle.getUnsafe().loadFence();
-        return shards != currentShardsVolatile || data != currentDataVolatile;  // SNAP: TODO: Could probably make it to only check against current shards
+        return shards != currentShardsVolatile || data != currentDataVolatile;
     }
 
     public void setCurrentData(HollowObjectTypeReadState.ShardsHolder shards, HollowObjectTypeDataElements data) {
+        // assignment to currentDataVolatile happens-before assignment to currentShardsVolatile, so
+        // all threads that see a new value for shards will also see the new data elements corresponding to the shards
         this.currentDataVolatile = data;
         this.currentShardsVolatile = shards;
     }
