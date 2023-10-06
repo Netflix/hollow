@@ -38,12 +38,11 @@ public class HollowObjectTypeReadStateShard {    // TODO: package private
     private volatile HollowObjectTypeDataElements currentDataVolatile;
     private volatile HollowObjectTypeReadState.ShardsHolder currentShardsVolatile;    // SNAP: TODO: test that back reference doesn't need to be cleaned up
 
-    // ordinal >> shardOrdinalShift yields a translated in-shard ordinal; can be useful for skipping ordinals in underlying data elements when splitting shards
-    final int shardOrdinalShift;
+    final int shardOrdinalShift; // (ordinal>>shardOrdinalShift) yields a translated in-shard ordinal; useful for skipping ordinals in underlying data elements when splitting shards
 
     private final HollowObjectSchema schema;
     
-    public HollowObjectTypeReadStateShard(HollowObjectSchema schema, int shardOrdinalShift) {   // TODO: package private, javadoc for shardOrdinalShift
+    public HollowObjectTypeReadStateShard(HollowObjectSchema schema, int shardOrdinalShift) {   // TODO: package private
         this.schema = schema;
         this.shardOrdinalShift = shardOrdinalShift;
     }
@@ -414,11 +413,11 @@ public class HollowObjectTypeReadStateShard {    // TODO: package private
         return shards != currentShardsVolatile || data != currentDataVolatile;
     }
 
-    public void setCurrentData(HollowObjectTypeReadState.ShardsHolder shards, HollowObjectTypeDataElements data) {
+    public void setCurrentData(HollowObjectTypeReadState.ShardsHolder shardsHolder, HollowObjectTypeDataElements data) {
         // assignment to currentDataVolatile happens-before assignment to currentShardsVolatile, so
         // all threads that see a new value for shards will also see the new data elements corresponding to the shards
         this.currentDataVolatile = data;
-        this.currentShardsVolatile = shards;
+        this.currentShardsVolatile = shardsHolder;
     }
 
     public void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema, BitSet populatedOrdinals, int shardNumber, int numShards) {
