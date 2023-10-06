@@ -119,129 +119,6 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         SnapshotPopulatedOrdinalsReader.readOrdinals(in, stateListeners);
     }
 
-    /**
-     * Given old and new numShards, this method returns the shard resizing multiplier.
-     */
-    static int shardingFactor(int oldNumShards, int newNumShards) {
-        if (newNumShards <= 0 || oldNumShards <= 0 || newNumShards == oldNumShards) {
-            throw new IllegalStateException("Invalid shard resizing, oldNumShards=" + oldNumShards + ", newNumShards=" + newNumShards);
-        }
-
-        boolean isNewGreater = newNumShards > oldNumShards;
-        int dividend = isNewGreater ? newNumShards : oldNumShards;
-        int divisor = isNewGreater ? oldNumShards : newNumShards;
-
-        if (dividend % divisor != 0) {
-            throw new IllegalStateException("Invalid shard resizing, oldNumShards=" + oldNumShards + ", newNumShards=" + newNumShards);
-        }
-        return dividend / divisor;
-    }
-
-    // SNAP: TODO: Test shards holder serving right data at the intermediate stages of resharding
-    public void reshard(int newNumShards) {   // TODO: package private
-        int prevNumShards = shardsVolatile.shards.length;
-        int shardingFactor = shardingFactor(prevNumShards, newNumShards);
-        int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newNumShards);
-        HollowObjectTypeDataElements[] newDataElements;
-        int[] shardOrdinalShifts;
-
-        if (newNumShards > prevNumShards) { // split existing shards
-            // Step 1:  Grow the number of shards. Each original shard will result in N child shards where N is the sharding factor.
-            //          The child shards will reference into the existing data elements as-is, and reuse existing shardOrdinalShift.
-            //          However since the shards array is resized, a read will map into the new shard index, as a result a subset of
-            //          ordinals in each shard will be accessed. In the next "splitting" step, the data elements in these new shards
-            //          will be filtered to only retain the subset of ordinals that are actually accessed.
-            newDataElements = new HollowObjectTypeDataElements[newNumShards];
-            shardOrdinalShifts = new int[newNumShards];
-            for(int i = 0; i< prevNumShards; i++) {
-                for (int j = 0; j < shardingFactor; j ++) {
-                    newDataElements[i+(prevNumShards*j)] = shardsVolatile.shards[i].currentDataElements();
-                    shardOrdinalShifts[i+(prevNumShards*j)] = 31 - Integer.numberOfLeadingZeros(prevNumShards);
-                }
-            }
-            // atomic update to shardsVolatile: full construction happens-before the store to shardsVolatile, in other
-            // words a fully constructed object as visible to this thread will be visible to other threads that load the
-            // new shardsVolatile.
-            shardsVolatile = new ShardsHolder(schema, newDataElements, shardOrdinalShifts);
-
-            // shardsVolatile = expandWithExistingDataElements(shardsVolatile, prevNumShards, shardingFactor);
-
-
-            // Step 2: Split each original data element into N child data elements where N is the sharding factor.
-            //         Then update each of the N child shards with the respective split of data element, this will be
-            //         sufficient to serve all reads into this shard. Once all child shards for a pre-split parent
-            //         shard have been assigned the split data elements, the parent data elements can be discarded.
-            for(int i = 0; i< prevNumShards; i++) {
-                HollowObjectTypeDataElements dataElementsToSplit = shardsVolatile.shards[i].currentDataElements();
-
-                HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
-                HollowObjectTypeDataElements[] splits = splitter.split(dataElementsToSplit, shardingFactor);
-
-                for (int j = 0; j < shardingFactor; j ++) {
-                    newDataElements[i + (prevNumShards*j)] = splits[j];
-                    shardOrdinalShifts[i + (prevNumShards*j)] = newShardOrdinalShift;
-                }
-
-                shardsVolatile = new ShardsHolder(schema, newDataElements, shardOrdinalShifts); // atomic update to shards
-
-                dataElementsToSplit.destroy(); // it is now safe to destroy pre-split data elements
-                if (dataElementsToSplit.encodedRemovals != null) {
-                    dataElementsToSplit.encodedRemovals.destroy();
-                }
-            }
-            // Re-sharding done.
-            // shardsVolatile now contains newNumShards shards where each shard contains
-            // a split of original data elements.
-
-        } else { // join existing shards
-            // Step 1: Join N data elements to create one, where N is the sharding factor. Then update each of the
-            //         N shards to reference the joined result, but with a new shardOrdinalShift.
-            //         Reads will continue to reference the same shard index as before, but the new shardOrdinalShift
-            //         will help these reads land at the right ordinal in the joined shard. When all N old shards
-            //         corresponding to one new shard have been updated, the N pre-join data elements can be destroyed.
-            newDataElements = new HollowObjectTypeDataElements[prevNumShards];
-            shardOrdinalShifts = new int[prevNumShards];
-            for (int i = 0; i < prevNumShards; i++) {
-                newDataElements[i] = shardsVolatile.shards[i].currentDataElements();
-                shardOrdinalShifts[i] = shardsVolatile.shards[i].shardOrdinalShift;
-            }
-            for (int i = 0; i < newNumShards; i++) {
-                HollowObjectTypeDataElements[] dataElementsToJoin = new HollowObjectTypeDataElements[shardingFactor];
-                for (int j = 0; j < shardingFactor; j ++) {
-                    dataElementsToJoin[j] = shardsVolatile.shards[i + (newNumShards*j)].currentDataElements();
-                };
-
-                HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
-                HollowObjectTypeDataElements joined = joiner.join(dataElementsToJoin);
-
-                for (int j = 0; j < shardingFactor; j ++) {
-                    newDataElements[i + (newNumShards*j)] = joined;
-                    shardOrdinalShifts[i + (newNumShards*j)] = newShardOrdinalShift;
-                };
-                shardsVolatile = new ShardsHolder(schema, newDataElements, shardOrdinalShifts); // atomic update to shards
-
-                for (int j = 0; j < shardingFactor; j ++) {
-                    dataElementsToJoin[j].destroy();   // now safe to destroy
-                    if (dataElementsToJoin[j].encodedRemovals != null) {
-                        dataElementsToJoin[j].encodedRemovals.destroy();
-                    }
-                };
-            }
-
-            // Step 2: Resize the shards array to only keep the first newNumShards shards.
-            shardsVolatile = new ShardsHolder(schema,
-                    Arrays.copyOfRange(newDataElements, 0, newNumShards),
-                    Arrays.copyOfRange(shardOrdinalShifts, 0, newNumShards));
-            // Re-sharding done.
-            // shardsVolatile now contains newNumShards shards where each shard contains
-            // a join of original data elements.
-        }
-    }
-
-    // ShardsHolder expandWithExistingDataElements(ShardsHolder shardsHolder, int prevNumShards, int shardingFactor) {
-// 
-    // }
-
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
         if (shouldReshard(shardsVolatile.shards.length, deltaNumShards)) {
@@ -287,6 +164,169 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         if(shardsVolatile.shards.length == 1)
             maxOrdinal = shardsVolatile.shards[0].currentDataElements().maxOrdinal;
+    }
+
+    /**
+     * Given old and new numShards, this method returns the shard resizing multiplier.
+     */
+    static int shardingFactor(int oldNumShards, int newNumShards) {
+        if (newNumShards <= 0 || oldNumShards <= 0 || newNumShards == oldNumShards) {
+            throw new IllegalStateException("Invalid shard resizing, oldNumShards=" + oldNumShards + ", newNumShards=" + newNumShards);
+        }
+
+        boolean isNewGreater = newNumShards > oldNumShards;
+        int dividend = isNewGreater ? newNumShards : oldNumShards;
+        int divisor = isNewGreater ? oldNumShards : newNumShards;
+
+        if (dividend % divisor != 0) {
+            throw new IllegalStateException("Invalid shard resizing, oldNumShards=" + oldNumShards + ", newNumShards=" + newNumShards);
+        }
+        return dividend / divisor;
+    }
+
+    // SNAP: TODO: Test shards holder serving right data at the intermediate stages of resharding
+    public void reshard(int newNumShards) {   // TODO: package private
+        int prevNumShards = shardsVolatile.shards.length;
+        int shardingFactor = shardingFactor(prevNumShards, newNumShards);
+        HollowObjectTypeDataElements[] newDataElements;
+        int[] shardOrdinalShifts;
+
+        if (newNumShards>prevNumShards) { // split existing shards
+            // Step 1:  Grow the number of shards. Each original shard will result in N child shards where N is the sharding factor.
+            // The child shards will reference into the existing data elements as-is, and reuse existing shardOrdinalShift.
+            // However since the shards array is resized, a read will map into the new shard index, as a result a subset of
+            // ordinals in each shard will be accessed. In the next "splitting" step, the data elements in these new shards
+            // will be filtered to only retain the subset of ordinals that are actually accessed.
+            //
+            // This is an atomic update to shardsVolatile: full construction happens-before the store to shardsVolatile,
+            // in other words a fully constructed object as visible to this thread will be visible to other threads that
+            // load the new shardsVolatile.
+            shardsVolatile = expandWithOriginalDataElements(shardsVolatile, shardingFactor);
+
+            // Step 2: Split each original data element into N child data elements where N is the sharding factor.
+            // Then update each of the N child shards with the respective split of data element, this will be
+            // sufficient to serve all reads into this shard. Once all child shards for a pre-split parent
+            // shard have been assigned the split data elements, the parent data elements can be discarded.
+            for(int i=0; i<prevNumShards; i++) {
+                HollowObjectTypeDataElements originalDataElements = shardsVolatile.shards[i].currentDataElements();
+
+                shardsVolatile = splitDataElementsForOneShard(shardsVolatile, i, prevNumShards, shardingFactor);
+
+                // it is now safe to destroy pre-split data elements
+                destroyOriginalDataElements(originalDataElements);
+            }
+            // Re-sharding done.
+            // shardsVolatile now contains newNumShards shards where each shard contains
+            // a split of original data elements.
+
+        } else { // join existing shards
+            // Step 1: Join N data elements to create one, where N is the sharding factor. Then update each of the
+            //         N shards to reference the joined result, but with a new shardOrdinalShift.
+            //         Reads will continue to reference the same shard index as before, but the new shardOrdinalShift
+            //         will help these reads land at the right ordinal in the joined shard. When all N old shards
+            //         corresponding to one new shard have been updated, the N pre-join data elements can be destroyed.
+            newDataElements = new HollowObjectTypeDataElements[shardsVolatile.shards.length];
+            shardOrdinalShifts = new int[shardsVolatile.shards.length];
+            copyShardElements(shardsVolatile, newDataElements, shardOrdinalShifts);
+            for (int i=0; i<newNumShards; i++) {
+                HollowObjectTypeDataElements dataElementsToJoin[] = new HollowObjectTypeDataElements[shardingFactor];
+                for (int j=0; j<shardingFactor; j++) {
+                    dataElementsToJoin[j] = shardsVolatile.shards[i + (newNumShards*j)].currentDataElements();
+                };
+
+                shardsVolatile = joinDataElementsForOneShard(shardsVolatile, i, shardingFactor);  // atomic update to shardsVolatile
+
+                // it is now safe to destroy original data elements
+                for (int j = 0; j < shardingFactor; j ++) {
+                    destroyOriginalDataElements(dataElementsToJoin[j]);
+                };
+            }
+
+            // Step 2: Resize the shards array to only keep the first newNumShards shards.
+            for (int i = 0; i < prevNumShards; i++) {
+                newDataElements[i] = shardsVolatile.shards[i].currentDataElements();
+                shardOrdinalShifts[i] = shardsVolatile.shards[i].shardOrdinalShift;
+            }
+            shardsVolatile = new ShardsHolder(schema,
+                    Arrays.copyOfRange(newDataElements, 0, newNumShards),
+                    Arrays.copyOfRange(shardOrdinalShifts, 0, newNumShards));
+            // Re-sharding done.
+            // shardsVolatile now contains newNumShards shards where each shard contains
+            // a join of original data elements.
+        }
+    }
+
+    private void copyShardElements(ShardsHolder from, HollowObjectTypeDataElements[] newDataElements, int[] shardOrdinalShifts) {
+        for (int i=0; i<from.shards.length; i++) {
+            newDataElements[i] = from.shards[i].currentDataElements();
+            shardOrdinalShifts[i] = from.shards[i].shardOrdinalShift;
+        }
+    }
+
+    ShardsHolder joinDataElementsForOneShard(ShardsHolder shardsHolder, int currentIndex, int shardingFactor) {
+        int newNumShards = shardsHolder.shards.length / shardingFactor;
+        int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newNumShards);
+
+        HollowObjectTypeDataElements[] dataElementsToJoin = new HollowObjectTypeDataElements[shardingFactor];
+        for (int i=0; i<shardingFactor; i++) {
+            dataElementsToJoin[i] = shardsHolder.shards[currentIndex + (newNumShards*i)].currentDataElements();
+        };
+
+        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
+        HollowObjectTypeDataElements joined = joiner.join(dataElementsToJoin);
+
+        HollowObjectTypeDataElements[] newDataElements = new HollowObjectTypeDataElements[shardsHolder.shards.length];
+        int[] shardOrdinalShifts = new int[shardsHolder.shards.length];
+        copyShardElements(shardsHolder, newDataElements, shardOrdinalShifts);
+
+        for (int i=0; i<shardingFactor; i++) {
+            newDataElements[currentIndex + (newNumShards*i)] = joined;
+            shardOrdinalShifts[currentIndex + (newNumShards*i)] = newShardOrdinalShift;
+        };
+        return new ShardsHolder(schema, newDataElements, shardOrdinalShifts);
+    }
+
+    ShardsHolder expandWithOriginalDataElements(ShardsHolder shardsHolder, int shardingFactor) {
+        int prevNumShards = shardsHolder.shards.length;
+        int newNumShards = prevNumShards * shardingFactor;
+        HollowObjectTypeDataElements[] newDataElements = new HollowObjectTypeDataElements[newNumShards];
+        int[] shardOrdinalShifts = new int[newNumShards];
+
+        for(int i = 0; i< prevNumShards; i++) {
+            for (int j = 0; j < shardingFactor; j ++) {
+                newDataElements[i+(prevNumShards*j)] = shardsHolder.shards[i].currentDataElements();
+                shardOrdinalShifts[i+(prevNumShards*j)] = 31 - Integer.numberOfLeadingZeros(prevNumShards);
+            }
+        }
+        return new ShardsHolder(schema, newDataElements, shardOrdinalShifts);
+    }
+
+    ShardsHolder splitDataElementsForOneShard(ShardsHolder shardsHolder, int currentIndex, int prevNumShards, int shardingFactor) {
+        int newNumShards = shardsHolder.shards.length;
+        int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newNumShards);
+
+        HollowObjectTypeDataElements dataElementsToSplit = shardsHolder.shards[currentIndex].currentDataElements();
+
+        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
+        HollowObjectTypeDataElements[] splits = splitter.split(dataElementsToSplit, shardingFactor);
+
+        HollowObjectTypeDataElements[] newDataElements = new HollowObjectTypeDataElements[shardsHolder.shards.length];
+        int[] shardOrdinalShifts = new int[shardsHolder.shards.length];
+        copyShardElements(shardsHolder, newDataElements, shardOrdinalShifts);
+
+        for (int i = 0; i < shardingFactor; i ++) {
+            newDataElements[currentIndex + (prevNumShards*i)] = splits[i];
+            shardOrdinalShifts[currentIndex + (prevNumShards*i)] = newShardOrdinalShift;
+        }
+
+        return new ShardsHolder(schema, newDataElements, shardOrdinalShifts);
+    }
+
+    private void destroyOriginalDataElements(HollowObjectTypeDataElements dataElements) {
+        dataElements.destroy();
+        if (dataElements.encodedRemovals != null) {
+            dataElements.encodedRemovals.destroy();
+        }
     }
 
     public static void discardSnapshot(HollowBlobInput in, HollowObjectSchema schema, int numShards) throws IOException {
