@@ -83,7 +83,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
     }
 
     @Test
-    public void testIntermediateStageOfResharding_expandWithOriginalDataElements() throws Exception {
+    public void testReshardingIntermediateStages_expandWithOriginalDataElements() throws Exception {
         for (int shardingFactor : new int[]{2, 4, 8}) {
             for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(1000))
             {
@@ -103,29 +103,25 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
     }
 
     @Test
-    public void testIntermediateStageOfResharding_splitDataElementsForOneShard() throws Exception {
-        for (int shardingFactor : new int[]{2, 4}) {
-            for(int numRecords=1;numRecords<=10000;numRecords+=new Random().nextInt(100))
+    public void testReshardingIntermediateStages_splitDataElementsForOneShard() throws Exception {
+        for (int shardingFactor : new int[]{2, 4, 8}) {
+            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(1000))
             {
-                HollowObjectTypeReadState expectedTypeState = populateTypeStateWith(numRecords);
+                HollowObjectTypeReadState typeState = populateTypeStateWith(numRecords);
 
-                HollowObjectTypeReadState.ShardsHolder original = expectedTypeState.shardsVolatile;
-                int originalNumShards = original.shards.length;
+                HollowObjectTypeReadState.ShardsHolder originalShardsHolder = typeState.shardsVolatile;
+                int originalNumShards = typeState.numShards();
 
-                // expansion step has to be called first to populate shards to the desired intermediate state
-                HollowObjectTypeReadState.ShardsHolder expanded = expectedTypeState.expandWithOriginalDataElements(original, shardingFactor);
+                // expand shards
+                typeState.shardsVolatile = typeState.expandWithOriginalDataElements(originalShardsHolder, shardingFactor);
 
                 for(int i=0; i<originalNumShards; i++) {
-                    HollowObjectTypeDataElements originalDataElements = expanded.shards[i].currentDataElements();
+                    HollowObjectTypeDataElements originalDataElements = typeState.shardsVolatile.shards[i].currentDataElements();
 
-                    HollowObjectTypeReadState.ShardsHolder afterSplit = expectedTypeState.splitDataElementsForOneShard(expanded,
-                            i, originalNumShards, shardingFactor);
-                    HollowObjectTypeReadState actualTypeState = new HollowObjectTypeReadState(readStateEngine, MemoryMode.ON_HEAP, schema, schema,
-                            expanded.shards.length);
-                    actualTypeState.shardsVolatile = afterSplit;
+                    typeState.shardsVolatile = typeState.splitDataElementsForOneShard(typeState.shardsVolatile, i, originalNumShards, shardingFactor);
 
-                    assertEquals(shardingFactor * expectedTypeState.numShards(), actualTypeState.numShards());
-                    assertDataUnchanged(actualTypeState, numRecords);
+                    assertEquals(shardingFactor * originalNumShards, typeState.numShards());
+                    assertDataUnchanged(typeState, numRecords);   // as each original shard is processed
 
                     originalDataElements.destroy();
                 }
@@ -133,7 +129,37 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
         }
     }
 
-    private void assertDataUnchanged(HollowObjectTypeReadState actualTypeState, int numRecords) {
+    @Test
+    public void testReshardingIntermediateStages_joinDataElementsForOneShard() throws Exception {
+        for (int shardingFactor : new int[]{2, 4, 8}) {
+            for (int numRecords = 75000; numRecords <= 100000; numRecords += new Random().nextInt(1000)) {
+                HollowObjectTypeReadState typeState = populateTypeStateWith(numRecords);
+
+                HollowObjectTypeReadState.ShardsHolder originalShardsHolder = typeState.shardsVolatile;
+                int originalNumShards = typeState.numShards();
+                assertEquals(8, originalNumShards);
+
+                int newNumShards = originalNumShards / shardingFactor;
+                for (int i=0; i<newNumShards; i++) {
+                    HollowObjectTypeDataElements dataElementsToJoin[] = new HollowObjectTypeDataElements[shardingFactor];
+                    for (int j=0; j<shardingFactor; j++) {
+                        dataElementsToJoin[j] = originalShardsHolder.shards[i + (newNumShards*j)].currentDataElements();
+                    };
+
+                    typeState.shardsVolatile = typeState.joinDataElementsForOneShard(typeState.shardsVolatile, i, shardingFactor);
+
+                    for (int j = 0; j < shardingFactor; j ++) {
+                        dataElementsToJoin[j].destroy();
+                    };
+
+                    assertEquals(originalNumShards, typeState.numShards()); // numShards remains unchanged
+                    assertDataUnchanged(typeState, numRecords);   // as each original shard is processed
+                }
+            }
+        }
+    }
+
+        private void assertDataUnchanged(HollowObjectTypeReadState actualTypeState, int numRecords) {
         for(int i=0;i<numRecords;i++) {
 
             GenericHollowObject obj = new GenericHollowObject(actualTypeState , i);

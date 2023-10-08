@@ -183,7 +183,12 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         return dividend / divisor;
     }
 
-    // SNAP: TODO: Test shards holder serving right data at the intermediate stages of resharding
+    /**
+     * Reshards this type state to the desired shard count using O(shard size) space while supporting concurrent reads
+     * into the underlying data elements.
+     *
+     * @param newNumShards The desired number of shards
+     */
     public void reshard(int newNumShards) {   // TODO: package private
         int prevNumShards = shardsVolatile.shards.length;
         int shardingFactor = shardingFactor(prevNumShards, newNumShards);
@@ -223,27 +228,20 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             //         Reads will continue to reference the same shard index as before, but the new shardOrdinalShift
             //         will help these reads land at the right ordinal in the joined shard. When all N old shards
             //         corresponding to one new shard have been updated, the N pre-join data elements can be destroyed.
-            newDataElements = new HollowObjectTypeDataElements[shardsVolatile.shards.length];
-            shardOrdinalShifts = new int[shardsVolatile.shards.length];
-            copyShardElements(shardsVolatile, newDataElements, shardOrdinalShifts);
             for (int i=0; i<newNumShards; i++) {
-                HollowObjectTypeDataElements dataElementsToJoin[] = new HollowObjectTypeDataElements[shardingFactor];
-                for (int j=0; j<shardingFactor; j++) {
-                    dataElementsToJoin[j] = shardsVolatile.shards[i + (newNumShards*j)].currentDataElements();
-                };
+                HollowObjectTypeDataElements destroyCandidates[] = joinCandidates(shardsVolatile.shards, i, shardingFactor);
 
                 shardsVolatile = joinDataElementsForOneShard(shardsVolatile, i, shardingFactor);  // atomic update to shardsVolatile
 
                 for (int j = 0; j < shardingFactor; j ++) {
-                    destroyOriginalDataElements(dataElementsToJoin[j]);
+                    destroyOriginalDataElements(destroyCandidates[j]);
                 };
             }
 
             // Step 2: Resize the shards array to only keep the first newNumShards shards.
-            for (int i = 0; i < prevNumShards; i++) {
-                newDataElements[i] = shardsVolatile.shards[i].currentDataElements();
-                shardOrdinalShifts[i] = shardsVolatile.shards[i].shardOrdinalShift;
-            }
+            newDataElements = new HollowObjectTypeDataElements[shardsVolatile.shards.length];
+            shardOrdinalShifts = new int[shardsVolatile.shards.length];
+            copyShardElements(shardsVolatile, newDataElements, shardOrdinalShifts);
             shardsVolatile = new ShardsHolder(schema,
                     Arrays.copyOfRange(newDataElements, 0, newNumShards),
                     Arrays.copyOfRange(shardOrdinalShifts, 0, newNumShards));
@@ -260,17 +258,23 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         }
     }
 
+    private HollowObjectTypeDataElements[] joinCandidates(HollowObjectTypeReadStateShard[] shards, int indexIntoShards, int shardingFactor) {
+        HollowObjectTypeDataElements[] result = new HollowObjectTypeDataElements[shardingFactor];
+        int newNumShards = shards.length / shardingFactor;
+        for (int i=0; i<shardingFactor; i++) {
+            result[i] = shards[indexIntoShards + (newNumShards*i)].currentDataElements();
+        };
+        return result;
+    }
+
     ShardsHolder joinDataElementsForOneShard(ShardsHolder shardsHolder, int currentIndex, int shardingFactor) {
         int newNumShards = shardsHolder.shards.length / shardingFactor;
         int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newNumShards);
 
-        HollowObjectTypeDataElements[] dataElementsToJoin = new HollowObjectTypeDataElements[shardingFactor];
-        for (int i=0; i<shardingFactor; i++) {
-            dataElementsToJoin[i] = shardsHolder.shards[currentIndex + (newNumShards*i)].currentDataElements();
-        };
+        HollowObjectTypeDataElements[] joinCandidates = joinCandidates(shardsHolder.shards, currentIndex, shardingFactor);
 
         HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
-        HollowObjectTypeDataElements joined = joiner.join(dataElementsToJoin);
+        HollowObjectTypeDataElements joined = joiner.join(joinCandidates);
 
         HollowObjectTypeDataElements[] newDataElements = new HollowObjectTypeDataElements[shardsHolder.shards.length];
         int[] shardOrdinalShifts = new int[shardsHolder.shards.length];
