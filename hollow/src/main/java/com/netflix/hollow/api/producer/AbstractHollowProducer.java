@@ -146,6 +146,13 @@ abstract class AbstractHollowProducer {
                 : new HollowWriteStateEngine(hashCodeFinder);
         writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
         writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
+        // SNAP: TODO:
+        // if (focusHoleFillInFewestShards && dynamicTypeShardingEnabled) {
+        //     // TODO: this code path is not tested, fail delta update until one of these features is disabled.
+        //     //       Specifically, when joining shards of a type the underlying field widths might differ.
+        //     throw new UnsupportedOperationException("Type re-sharding and focusHoleFillInFewestShards in tandem are not currently supported");
+        // }
+
 
         this.objectMapper = new HollowObjectMapper(writeEngine);
         if (hashCodeFinder != null) {
