@@ -45,7 +45,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     private final HollowObjectSchema unfilteredSchema;
     private final HollowObjectSampler sampler;
 
-    private static class ShardsHolder {
+    static class ShardsHolder {
         final HollowObjectTypeReadStateShard shards[];
         final int shardNumberMask;
 
@@ -71,7 +71,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         }
     }
 
-    private volatile ShardsHolder shardsVolatile;
+    volatile ShardsHolder shardsVolatile;
 
     private int maxOrdinal;
 

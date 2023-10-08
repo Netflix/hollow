@@ -21,9 +21,11 @@ public class AbstractHollowObjectTypeDataElementsSplitJoinTest extends AbstractS
 
     @Before
     public void setUp() {
-        schema = new HollowObjectSchema("TestObject", 2);
+        schema = new HollowObjectSchema("TestObject", 4);
         schema.addField("longField", HollowObjectSchema.FieldType.LONG);
         schema.addField("stringField", HollowObjectSchema.FieldType.STRING);
+        schema.addField("intField", HollowObjectSchema.FieldType.INT);
+        schema.addField("doubleField", HollowObjectSchema.FieldType.DOUBLE);
 
         MockitoAnnotations.initMocks(this);
         HollowObjectTypeDataElements[] fakeDataElements = new HollowObjectTypeDataElements[5];
@@ -44,6 +46,8 @@ public class AbstractHollowObjectTypeDataElementsSplitJoinTest extends AbstractS
             rec.reset();
             rec.setLong("longField", i);
             rec.setString("stringField", "Value" + i);
+            rec.setInt("intField", i);
+            rec.setDouble("doubleField", i);
 
             writeStateEngine.add("TestObject", rec);
         }
@@ -56,6 +60,8 @@ public class AbstractHollowObjectTypeDataElementsSplitJoinTest extends AbstractS
             GenericHollowObject obj = new GenericHollowObject(readStateEngine, "TestObject", i);
             assertEquals(i, obj.getLong("longField"));
             assertEquals("Value"+i, obj.getString("stringField"));
+            assertEquals(i, obj.getInt("intField"));
+            assertEquals((double)i, obj.getDouble("doubleField"), 0);
         }
     }
 }
