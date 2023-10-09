@@ -45,8 +45,6 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
         }
     }
 
-    // SNAP: TODO: test that after split/join, maxOrdinal for shard with no records should be -1 not 0
-
     @Test
     public void testResharding() throws Exception {
 

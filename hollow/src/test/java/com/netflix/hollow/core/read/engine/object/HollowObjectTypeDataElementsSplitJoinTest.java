@@ -66,6 +66,23 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
         }
     }
 
+    @Test
+    public void testSplitThenJoinWithEmptyJoin() throws IOException {
+        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
+
+        HollowObjectTypeReadState typeReadState = populateTypeStateWith(1);
+        assertEquals(1, typeReadState.numShards());
+
+        HollowObjectTypeDataElements[] splitBy4 = splitter.split(typeReadState.currentDataElements()[0], 4);
+        assertEquals(-1, splitBy4[1].maxOrdinal);
+        assertEquals(-1, splitBy4[3].maxOrdinal);
+
+        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
+        HollowObjectTypeDataElements joined = joiner.join(new HollowObjectTypeDataElements[]{splitBy4[1], splitBy4[3]});
+
+        assertEquals(-1, joined.maxOrdinal);
+    }
+
     // manually invoked
     // @Test
     public void testSplittingAndJoiningWithSnapshotBlob() throws Exception {
