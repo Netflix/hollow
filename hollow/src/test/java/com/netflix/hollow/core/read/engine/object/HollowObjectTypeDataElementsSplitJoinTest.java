@@ -44,9 +44,31 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
         }
     }
 
+    @Test
+    public void testSplitThenJoinWithFilter() throws IOException {
+        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
+        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
+
+        int numSplits = 2;
+        for (int numRecords=0;numRecords<1*1000;numRecords++) {
+            HollowObjectTypeReadState typeReadState = populateTypeStateWithFilter(numRecords);
+            assertEquals(1, typeReadState.numShards());
+            assertDataUnchanged(numRecords);
+            HollowChecksum origChecksum = typeReadState.getChecksum(typeReadState.getSchema());
+
+            HollowObjectTypeDataElements[] splitElements = splitter.split(typeReadState.currentDataElements()[0], numSplits);
+            HollowObjectTypeDataElements joinedElements = joiner.join(splitElements);
+            typeReadState.setCurrentData(joinedElements);
+
+            assertDataUnchanged(numRecords);
+            HollowChecksum resultChecksum = typeReadState.getChecksum(typeReadState.getSchema());
+            assertEquals(origChecksum, resultChecksum);
+        }
+    }
+
     // manually invoked
     // @Test
-    public void testSplittingAndJoiningWithVms() throws Exception {
+    public void testSplittingAndJoiningWithSnapshotBlob() throws Exception {
 
         String blobPath = null; // dir where snapshot blob exists for e.g. "/tmp/";
         long v = 0l; // snapshot version for e.g. 20230915162636001l;

@@ -76,7 +76,10 @@ public class HollowObjectTypeDataElementsJoiner {
 
         for(int fieldIdx=0;fieldIdx<to.schema.numFields();fieldIdx++) {
             if(from[0].varLengthData[fieldIdx] == null) {
-                to.bitsPerField[fieldIdx] = from[0].bitsPerField[fieldIdx];
+                // do not assume bitsPerField will be uniform
+                for(int fromIndex=0;fromIndex<from.length;fromIndex++) {
+                    to.bitsPerField[fieldIdx] = Math.max(to.bitsPerField[fieldIdx], from[fromIndex].bitsPerField[fieldIdx]);
+                }
             } else {
                 to.bitsPerField[fieldIdx] = (64 - Long.numberOfLeadingZeros(varLengthSizes[fieldIdx] + 1)) + 1;
             }
@@ -85,7 +88,8 @@ public class HollowObjectTypeDataElementsJoiner {
             to.bitsPerRecord += to.bitsPerField[fieldIdx];
         }
 
-        to.bitsPerUnfilteredField = from[0].bitsPerUnfilteredField;
-        to.unfilteredFieldIsIncluded = from[0].unfilteredFieldIsIncluded;
+        // unused
+        //  to.bitsPerUnfilteredField
+        //  to.unfilteredFieldIsIncluded
     }
 }
