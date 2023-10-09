@@ -88,7 +88,8 @@ public class HollowObjectTypeDataElementsJoiner {
             to.bitsPerRecord += to.bitsPerField[fieldIdx];
         }
 
-        to.bitsPerUnfilteredField = from[0].bitsPerUnfilteredField;
-        to.unfilteredFieldIsIncluded = from[0].unfilteredFieldIsIncluded;
+        // unused
+        //  to.bitsPerUnfilteredField
+        //  to.unfilteredFieldIsIncluded
     }
 }

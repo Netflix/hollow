@@ -87,8 +87,9 @@ public class HollowObjectTypeDataElementsSplitter {
                 to[toIndex].bitOffsetPerField[fieldIdx] = to[toIndex].bitsPerRecord;
                 to[toIndex].bitsPerRecord += to[toIndex].bitsPerField[fieldIdx];
 
-                to[toIndex].bitsPerUnfilteredField = from.bitsPerUnfilteredField;
-                to[toIndex].unfilteredFieldIsIncluded = from.unfilteredFieldIsIncluded;
+                // unused
+                // to[toIndex].bitsPerUnfilteredField = from.bitsPerUnfilteredField;
+                // to[toIndex].unfilteredFieldIsIncluded = from.unfilteredFieldIsIncluded;
             }
         }
     }

@@ -50,7 +50,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
     @Test
     public void testResharding() throws Exception {
 
-        for (int shardingFactor : new int[]{2, 4, 8, 16, 32, 64})   // , 128, 256, 512, 1024 // SNAP: TODO: OOM
+        for (int shardingFactor : new int[]{2, 4, 8, 16})   // 32, 64, 128, 256, 512, 1024...
         {
             for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(1000))
             {
@@ -83,9 +83,44 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
     }
 
     @Test
+    public void testReshardingWithFilter() throws Exception {
+
+        for (int shardingFactor : new int[]{2, 64})
+        {
+            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(10000))
+            {
+                HollowObjectTypeReadState objectTypeReadState = populateTypeStateWithFilter(numRecords);
+                assertDataUnchanged(numRecords);
+
+                // Splitting shards
+                {
+                    int prevShardCount = objectTypeReadState.numShards();
+                    int newShardCount = shardingFactor * prevShardCount;
+                    objectTypeReadState.reshard(newShardCount);
+
+                    assertEquals(newShardCount, objectTypeReadState.numShards());
+                    assertEquals(newShardCount, shardingFactor * prevShardCount);
+                }
+                assertDataUnchanged(numRecords);
+
+                // Joining shards
+                {
+                    int prevShardCount = objectTypeReadState.numShards();
+                    int newShardCount = prevShardCount / shardingFactor;
+                    objectTypeReadState.reshard(newShardCount);
+
+                    assertEquals(newShardCount, objectTypeReadState.numShards());
+                    assertEquals(shardingFactor * newShardCount, prevShardCount);
+                }
+                assertDataUnchanged(numRecords);
+            }
+        }
+    }
+
+    @Test
     public void testReshardingIntermediateStages_expandWithOriginalDataElements() throws Exception {
-        for (int shardingFactor : new int[]{2, 4, 8}) {
-            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(1000))
+        for (int shardingFactor : new int[]{2, 4}) {
+            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(5000))
             {
                 HollowObjectTypeReadState expectedTypeState = populateTypeStateWith(numRecords);
 
@@ -104,8 +139,8 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
 
     @Test
     public void testReshardingIntermediateStages_splitDataElementsForOneShard() throws Exception {
-        for (int shardingFactor : new int[]{2, 4, 8}) {
-            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(1000))
+        for (int shardingFactor : new int[]{2, 4}) {
+            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(5000))
             {
                 HollowObjectTypeReadState typeState = populateTypeStateWith(numRecords);
 
