@@ -2,10 +2,12 @@ package com.netflix.hollow.core.read.engine.object;
 
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.copyRecord;
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthSize;
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.writeNullField;
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
+
 
 /**
  * Join multiple {@code HollowObjectTypeDataElements}s into 1 {@code HollowObjectTypeDataElements}.
@@ -13,7 +15,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
  * The original data elements are not destroyed.
  * The no. of passed data elements must be a power of 2.
  */
-public class HollowObjectTypeDataElementsJoiner {
+class HollowObjectTypeDataElementsJoiner {
 
     HollowObjectTypeDataElements join(HollowObjectTypeDataElements[] from) {
         final int fromMask = from.length - 1;
@@ -43,20 +45,26 @@ public class HollowObjectTypeDataElementsJoiner {
             }
         }
 
-        to.fixedLengthData = FixedLengthDataFactory.get((long)to.bitsPerRecord * (to.maxOrdinal + 1), to.memoryMode, to.memoryRecycler);
-        for(int fieldIdx=0;fieldIdx<to.schema.numFields();fieldIdx++) {
-            if(from[0].varLengthData[fieldIdx] != null) {
-                to.varLengthData[fieldIdx] = VariableLengthDataFactory.get(to.memoryMode, to.memoryRecycler);
-            }
-        }
-
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
-            copyRecord(to, ordinal, from[fromIndex], fromOrdinal, currentWriteVarLengthDataPointers);
+
+            if (fromOrdinal <= from[fromIndex].maxOrdinal) {
+                copyRecord(to, ordinal, from[fromIndex], fromOrdinal, currentWriteVarLengthDataPointers);
+            } else {
+                // lopsided shards could result for consumers that skip type shards with no additions
+                writeNullRecord(to, ordinal, currentWriteVarLengthDataPointers);
+            }
         }
 
         return to;
+    }
+
+    private void writeNullRecord(HollowObjectTypeDataElements to, int toOrdinal, long[] currentWriteVarLengthDataPointers) {
+        for(int fieldIndex=0;fieldIndex<to.schema.numFields();fieldIndex++) {
+            long currentWriteFixedLengthStartBit = ((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex];
+            writeNullField(to, fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+        }
     }
 
     void populateStats(HollowObjectTypeDataElements to, HollowObjectTypeDataElements[] from) {
@@ -71,11 +79,21 @@ public class HollowObjectTypeDataElementsJoiner {
                     }
                 }
             }
-            to.maxOrdinal+= from[fromIndex].maxOrdinal + 1;
+            int mappedMaxOrdinal = from[fromIndex].maxOrdinal == -1 ? -1 : (from[fromIndex].maxOrdinal * from.length) + fromIndex;
+            to.maxOrdinal = Math.max(to.maxOrdinal, mappedMaxOrdinal);
         }
 
         for(int fieldIdx=0;fieldIdx<to.schema.numFields();fieldIdx++) {
-            if(from[0].varLengthData[fieldIdx] == null) {
+            for(int i=0;i<from.length;i++) {
+                if(from[i].varLengthData[fieldIdx] != null) { // if any of the join candidates have var len data set for this field
+                    to.varLengthData[fieldIdx] = VariableLengthDataFactory.get(to.memoryMode, to.memoryRecycler);
+                    break;
+                }
+            }
+        }
+
+        for(int fieldIdx=0;fieldIdx<to.schema.numFields();fieldIdx++) {
+            if(to.varLengthData[fieldIdx] == null) {
                 // do not assume bitsPerField will be uniform
                 for(int fromIndex=0;fromIndex<from.length;fromIndex++) {
                     to.bitsPerField[fieldIdx] = Math.max(to.bitsPerField[fieldIdx], from[fromIndex].bitsPerField[fieldIdx]);
@@ -87,6 +105,7 @@ public class HollowObjectTypeDataElementsJoiner {
             to.bitOffsetPerField[fieldIdx] = to.bitsPerRecord;
             to.bitsPerRecord += to.bitsPerField[fieldIdx];
         }
+        to.fixedLengthData = FixedLengthDataFactory.get((long)to.bitsPerRecord * (to.maxOrdinal + 1), to.memoryMode, to.memoryRecycler);
 
         // unused
         //  to.bitsPerUnfilteredField
