@@ -39,7 +39,7 @@ public class HollowObjectTypeDataElements {
 
     final HollowObjectSchema schema;
 
-    public int maxOrdinal;  // SNAP: TODO: remove
+    int maxOrdinal;
 
     FixedLengthData fixedLengthData;
     final VariableLengthData varLengthData[];
@@ -253,6 +253,14 @@ public class HollowObjectTypeDataElements {
 
                 currentWriteVarLengthDataPointers[fieldIndex] += size;
             }
+        }
+    }
+
+    static void writeNullField(HollowObjectTypeDataElements target, int fieldIndex, long currentWriteFixedLengthStartBit, long[] currentWriteVarLengthDataPointers) {
+        if(target.varLengthData[fieldIndex] != null) {
+            writeNullVarLengthField(target, fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+        } else {
+            writeNullFixedLengthField(target, fieldIndex, currentWriteFixedLengthStartBit);
         }
     }
 

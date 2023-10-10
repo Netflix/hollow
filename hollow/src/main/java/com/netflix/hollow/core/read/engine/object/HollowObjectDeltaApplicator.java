@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.writeNullField;
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.writeNullFixedLengthField;
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.writeNullVarLengthField;
 
@@ -196,7 +197,7 @@ class HollowObjectDeltaApplicator {
 
     private void addFromDelta(boolean removeData, int fieldIndex, int deltaFieldIndex) {
         if(deltaFieldIndex == -1) {
-            writeNullField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+            writeNullField(target, fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
         } else {
             long readStartBit = currentDeltaStateReadFixedLengthStartBit + delta.bitOffsetPerField[deltaFieldIndex];
             copyRecordField(fieldIndex, deltaFieldIndex, delta, readStartBit, currentWriteFixedLengthStartBit, currentDeltaReadVarLengthDataPointers, currentWriteVarLengthDataPointers, false);
@@ -234,15 +235,6 @@ class HollowObjectDeltaApplicator {
                 writeNullFixedLengthField(target, fieldIndex, currentWriteFixedLengthStartBit);
             else
                 target.fixedLengthData.setElementValue(currentWriteFixedLengthStartBit, target.bitsPerField[fieldIndex], readValue);
-        }
-    }
-
-    // SNAP: TODO: refactor
-    private void writeNullField(int fieldIndex, long currentWriteFixedLengthStartBit, long[] currentWriteVarLengthDataPointers) {
-        if(target.varLengthData[fieldIndex] != null) {
-            writeNullVarLengthField(target, fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
-        } else {
-            writeNullFixedLengthField(target, fieldIndex, currentWriteFixedLengthStartBit);
         }
     }
 }

@@ -2,11 +2,12 @@ package com.netflix.hollow.core.read.engine.object;
 
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.copyRecord;
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthSize;
-import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.writeNullVarLengthField;
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.writeNullField;
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
+
 
 /**
  * Join multiple {@code HollowObjectTypeDataElements}s into 1 {@code HollowObjectTypeDataElements}.
@@ -14,12 +15,9 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
  * The original data elements are not destroyed.
  * The no. of passed data elements must be a power of 2.
  */
-public class HollowObjectTypeDataElementsJoiner {
+class HollowObjectTypeDataElementsJoiner {
 
-    private HollowObjectTypeDataElements[] from;
-
-    public HollowObjectTypeDataElements join(HollowObjectTypeDataElements[] from) { // SNAP: TODO: remove
-        this.from = from;
+    HollowObjectTypeDataElements join(HollowObjectTypeDataElements[] from) {
         final int fromMask = from.length - 1;
         final int fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(from.length);
         long[] currentWriteVarLengthDataPointers;
@@ -54,16 +52,9 @@ public class HollowObjectTypeDataElementsJoiner {
             if (fromOrdinal <= from[fromIndex].maxOrdinal) {
                 copyRecord(to, ordinal, from[fromIndex], fromOrdinal, currentWriteVarLengthDataPointers);
             } else {
-                // continue;    // SNAP: TODO:
-                // lopsided shards could result from consumers that skip type shards with no additions
-                // throw new IllegalStateException("Arrived at lop-sided state");
-                System.out.println("// SNAP: TODO: Here");
+                // lopsided shards could result for consumers that skip type shards with no additions
                 writeNullRecord(to, ordinal, currentWriteVarLengthDataPointers);
             }
-        }
-
-        if (to.varLengthData == null) {
-            System.out.println("SNAP: Here");
         }
 
         return to;
@@ -72,14 +63,8 @@ public class HollowObjectTypeDataElementsJoiner {
     private void writeNullRecord(HollowObjectTypeDataElements to, int toOrdinal, long[] currentWriteVarLengthDataPointers) {
         for(int fieldIndex=0;fieldIndex<to.schema.numFields();fieldIndex++) {
             long currentWriteFixedLengthStartBit = ((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex];
-            if(to.varLengthData[fieldIndex] == null) {
-                // writeNullFixedLengthField(to, fieldIndex, currentWriteFixedLengthStartBit);
-            } else {
-                writeNullVarLengthField(to, fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
-                // currentWriteVarLengthDataPointers[fieldIndex] += size;
-            }
+            writeNullField(to, fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
         }
-
     }
 
     void populateStats(HollowObjectTypeDataElements to, HollowObjectTypeDataElements[] from) {
@@ -111,10 +96,6 @@ public class HollowObjectTypeDataElementsJoiner {
             if(to.varLengthData[fieldIdx] == null) {
                 // do not assume bitsPerField will be uniform
                 for(int fromIndex=0;fromIndex<from.length;fromIndex++) {
-                    if (fromIndex>0 && from[fromIndex].bitsPerField[fieldIdx] != to.bitsPerField[fieldIdx]) {
-                        // SNAP: TODO: remove
-                        System.out.println("SNAP: join is being triggered on shards of non-uniform width for field " + to.schema.getFieldName(fieldIdx));
-                    }
                     to.bitsPerField[fieldIdx] = Math.max(to.bitsPerField[fieldIdx], from[fromIndex].bitsPerField[fieldIdx]);
                 }
             } else {

@@ -6,11 +6,8 @@ import static org.junit.Assert.assertTrue;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.test.InMemoryBlobStore;
 import java.io.IOException;
 import org.junit.Assert;
@@ -117,7 +114,7 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         c.triggerRefreshTo(v2);
         assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
 
-        long v3 = oneRunCycle(p, new int[] { 0, 1, 3, 5});     // drop to 1 ordinal per shard, skipTypeShardWithNoAdds will make it so that maxOrdinal is adjusted
+        long v3 = oneRunCycle(p, new int[] { 0, 1, 3, 5}); // drop to 1 ordinal per shard, skipTypeShardWithNoAdds will make it so that maxOrdinal is adjusted
         c.triggerRefreshTo(v3);
         assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
 
@@ -126,7 +123,6 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
 
         readStateEngine = c.getStateEngine();
-        // assert joined maxOrdinals
         assertDataUnchanged(3);
 
         long v5 = oneRunCycle(p, new int[] {0, 1});
@@ -147,17 +143,15 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         c.triggerRefreshTo(v7);
         assertEquals(4, c.getStateEngine().getTypeState("TestObject").numShards()); // still 2 shards
 
+        long v8 = oneRunCycle(p, new int[] {8});
+        c.triggerRefreshTo(v8);
+        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards()); // down to 1 shard
+
         c.triggerRefreshTo(v1);
         assertEquals(v1, c.getCurrentVersionId());
 
-        c.triggerRefreshTo(v7);
-        assertEquals(v7, c.getCurrentVersionId());
-
-//
-//        long v8 = oneRunCycle(p, new int[] {8});
-//        c.triggerRefreshTo(v8);
-//        assertEquals(1, c.getStateEngine().getTypeState("TestObject").numShards()); // down to 1 shard
-
+        c.triggerRefreshTo(v8);
+        assertEquals(v8, c.getCurrentVersionId());
     }
 
     private long oneRunCycle(HollowProducer p, int recordIds[]) {
@@ -174,20 +168,4 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
             }
         });
     }
-
-    private void populate(HollowWriteStateEngine wse, HollowReadStateEngine rse, int[] recordIds) throws IOException {
-        HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
-        for(int recordId : recordIds) {
-            rec.reset();
-            rec.setLong("longField", recordId);
-            rec.setString("stringField", "Value" + recordId);
-            rec.setInt("intField", recordId);
-            rec.setDouble("doubleField", recordId);
-
-            wse.add("TestObject", rec);
-        }
-        StateEngineRoundTripper.roundTripSnapshot(wse, rse);
-    }
-
-
 }

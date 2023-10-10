@@ -167,12 +167,7 @@ public class SegmentedByteArray implements VariableLengthData {
         while(length > 0) {
             int bytesToCopyFromSegment = (int) Math.min(remainingBytesInSegment, length);
             ensureCapacity(currentSegment);
-            int copiedBytes = 0;
-            try {
-                copiedBytes = ((SegmentedByteArray) src).orderedCopy(srcPos, segments[currentSegment], segmentStartPos, bytesToCopyFromSegment);
-            } catch (NullPointerException e) {
-                System.out.println("here");
-            }
+            int copiedBytes = ((SegmentedByteArray) src).orderedCopy(srcPos, segments[currentSegment], segmentStartPos, bytesToCopyFromSegment);
 
             srcPos += copiedBytes;
             length -= copiedBytes;
