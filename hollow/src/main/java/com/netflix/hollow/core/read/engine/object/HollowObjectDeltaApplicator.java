@@ -16,6 +16,9 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.writeNullFixedLengthField;
+import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.writeNullVarLengthField;
+
 import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
@@ -175,7 +178,7 @@ class HollowObjectDeltaApplicator {
                     long readStartBit = currentFromStateReadFixedLengthStartBit + from.bitOffsetPerField[fieldIndex];
                     copyRecordField(fieldIndex, fieldIndex, from, readStartBit, currentWriteFixedLengthStartBit, currentFromStateReadVarLengthDataPointers, currentWriteVarLengthDataPointers, removeData);
                 } else if(target.varLengthData[fieldIndex] != null) {
-                	writeNullVarLengthField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+                	writeNullVarLengthField(target, fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
                 }
             }
             currentWriteFixedLengthStartBit += target.bitsPerField[fieldIndex];
@@ -214,7 +217,7 @@ class HollowObjectDeltaApplicator {
 
         if(target.varLengthData[fieldIndex] != null) {
             if((readValue & (1L << (copyFromData.bitsPerField[fromFieldIndex] - 1))) != 0) {
-                writeNullVarLengthField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+                writeNullVarLengthField(target, fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
             } else {
                 long readStart = currentReadVarLengthDataPointers[fieldIndex];
                 long length = readValue - readStart;
@@ -228,28 +231,18 @@ class HollowObjectDeltaApplicator {
             }
         } else if(!removeData) {
             if(readValue == copyFromData.nullValueForField[fromFieldIndex])
-                writeNullFixedLengthField(fieldIndex, currentWriteFixedLengthStartBit);
+                writeNullFixedLengthField(target, fieldIndex, currentWriteFixedLengthStartBit);
             else
                 target.fixedLengthData.setElementValue(currentWriteFixedLengthStartBit, target.bitsPerField[fieldIndex], readValue);
         }
     }
 
+    // SNAP: TODO: refactor
     private void writeNullField(int fieldIndex, long currentWriteFixedLengthStartBit, long[] currentWriteVarLengthDataPointers) {
         if(target.varLengthData[fieldIndex] != null) {
-            writeNullVarLengthField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+            writeNullVarLengthField(target, fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
         } else {
-            writeNullFixedLengthField(fieldIndex, currentWriteFixedLengthStartBit);
+            writeNullFixedLengthField(target, fieldIndex, currentWriteFixedLengthStartBit);
         }
     }
-
-    private void writeNullVarLengthField(int fieldIndex, long currentWriteFixedLengthStartBit, long[] currentWriteVarLengthDataPointers) {
-        long writeValue = (1L << (target.bitsPerField[fieldIndex] - 1)) | currentWriteVarLengthDataPointers[fieldIndex];
-        target.fixedLengthData.setElementValue(currentWriteFixedLengthStartBit, target.bitsPerField[fieldIndex], writeValue);
-    }
-
-    private void writeNullFixedLengthField(int fieldIndex, long currentWriteFixedLengthStartBit) {
-        target.fixedLengthData.setElementValue(currentWriteFixedLengthStartBit, target.bitsPerField[fieldIndex], target.nullValueForField[fieldIndex]);
-    }
-
-
 }
