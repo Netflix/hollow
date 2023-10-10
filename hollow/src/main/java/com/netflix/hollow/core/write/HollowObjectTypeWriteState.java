@@ -53,11 +53,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
     
     public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards) {
-        this(schema, numShards, false);
-    }
-
-    public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards, boolean numShardsFixed) {
-        super(schema, numShards, numShardsFixed);
+        super(schema, numShards, numShards == -1 ? false : true);
     }
 
     @Override

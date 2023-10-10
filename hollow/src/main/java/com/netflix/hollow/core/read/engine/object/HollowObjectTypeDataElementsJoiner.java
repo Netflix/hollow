@@ -15,7 +15,10 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
  */
 public class HollowObjectTypeDataElementsJoiner {
 
-    HollowObjectTypeDataElements join(HollowObjectTypeDataElements[] from) {
+    private HollowObjectTypeDataElements[] from;
+
+    public HollowObjectTypeDataElements join(HollowObjectTypeDataElements[] from) { // SNAP: TODO: remove
+        this.from = from;
         final int fromMask = from.length - 1;
         final int fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(from.length);
         long[] currentWriteVarLengthDataPointers;
@@ -53,11 +56,60 @@ public class HollowObjectTypeDataElementsJoiner {
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
-            copyRecord(to, ordinal, from[fromIndex], fromOrdinal, currentWriteVarLengthDataPointers);
+
+            if (fromOrdinal <= from[fromIndex].maxOrdinal) {
+                copyRecord(to, ordinal, from[fromIndex], fromOrdinal, currentWriteVarLengthDataPointers);
+            } else {
+                // lopsided shards could result from consumers that skip type shards with no additions
+                throw new IllegalStateException("Arrived at lop-sided state");
+
+                // writeNullRecord(to, ordinal, currentWriteVarLengthDataPointers);
+                // if(readValue == copyFromData.nullValueForField[fromFieldIndex])
+                //     writeNullFixedLengthField(fieldIndex, currentWriteFixedLengthStartBit);
+                // if((readValue & (1L << (copyFromData.bitsPerField[fromFieldIndex] - 1))) != 0) {
+                //     writeNullVarLengthField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+                // }
+            }
         }
 
         return to;
     }
+
+    private void writeNullRecord(HollowObjectTypeDataElements to, int toOrdinal, long[] currentWriteVarLengthDataPointers) {
+        for(int fieldIndex=0;fieldIndex<to.schema.numFields();fieldIndex++) {
+            if(to.varLengthData[fieldIndex] == null) {
+                // long value = from.fixedLengthData.getLargeElementValue(((long)fromOrdinal * from.bitsPerRecord) + from.bitOffsetPerField[fieldIndex], from.bitsPerField[fieldIndex]);
+                // to.fixedLengthData.setElementValue(((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex], to.bitsPerField[fieldIndex], value);
+            } else {
+                // long fromStartByte = varLengthStartByte(from, fromOrdinal, fieldIndex);
+                // long fromEndByte = varLengthEndByte(from, fromOrdinal, fieldIndex);
+                // long size = fromEndByte - fromStartByte;
+
+                // to.fixedLengthData.setElementValue(((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex], to.bitsPerField[fieldIndex], currentWriteVarLengthDataPointers[fieldIndex] + size);
+                // to.varLengthData[fieldIndex].copy(from.varLengthData[fieldIndex], fromStartByte, currentWriteVarLengthDataPointers[fieldIndex], size);
+
+                // currentWriteVarLengthDataPointers[fieldIndex] += size;
+            }
+        }
+
+    }
+
+//    private void writeNullField(int fieldIndex, long currentWriteFixedLengthStartBit, long[] currentWriteVarLengthDataPointers) {
+//        if(target.varLengthData[fieldIndex] != null) {
+//            writeNullVarLengthField(fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+//        } else {
+//            writeNullFixedLengthField(fieldIndex, currentWriteFixedLengthStartBit);
+//        }
+//    }
+
+//    private void writeNullVarLengthField(int fieldIndex, long currentWriteFixedLengthStartBit, long[] currentWriteVarLengthDataPointers) {
+//        long writeValue = (1L << (target.bitsPerField[fieldIndex] - 1)) | currentWriteVarLengthDataPointers[fieldIndex];
+//        target.fixedLengthData.setElementValue(currentWriteFixedLengthStartBit, target.bitsPerField[fieldIndex], writeValue);
+//    }
+//
+//    private void writeNullFixedLengthField(int fieldIndex, long currentWriteFixedLengthStartBit) {
+//        target.fixedLengthData.setElementValue(currentWriteFixedLengthStartBit, target.bitsPerField[fieldIndex], target.nullValueForField[fieldIndex]);
+//    }
 
     void populateStats(HollowObjectTypeDataElements to, HollowObjectTypeDataElements[] from) {
         long[] varLengthSizes = new long[to.schema.numFields()];
@@ -71,13 +123,18 @@ public class HollowObjectTypeDataElementsJoiner {
                     }
                 }
             }
-            to.maxOrdinal+= from[fromIndex].maxOrdinal + 1;
+            int mappedMaxOrdinal = from[fromIndex].maxOrdinal == -1 ? -1 : (from[fromIndex].maxOrdinal * from.length) + fromIndex;
+            to.maxOrdinal = Math.max(to.maxOrdinal, mappedMaxOrdinal);
+            // to.maxOrdinal+= from[fromIndex].maxOrdinal + 1;
         }
 
         for(int fieldIdx=0;fieldIdx<to.schema.numFields();fieldIdx++) {
             if(from[0].varLengthData[fieldIdx] == null) {
                 // do not assume bitsPerField will be uniform
                 for(int fromIndex=0;fromIndex<from.length;fromIndex++) {
+                    if (fromIndex>0 && from[fromIndex].bitsPerField[fieldIdx] != to.bitsPerField[fieldIdx]) {
+                        System.out.println("SNAP: join is being triggered on shards of non-uniform width for field " + to.schema.getFieldName(fieldIdx));
+                    }
                     to.bitsPerField[fieldIdx] = Math.max(to.bitsPerField[fieldIdx], from[fromIndex].bitsPerField[fieldIdx]);
                 }
             } else {

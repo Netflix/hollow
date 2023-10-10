@@ -60,7 +60,7 @@ public abstract class HollowTypeWriteState {
 
     private boolean wroteData = false;
 
-    private final boolean isNumShardsFixed;
+    private boolean isNumShardsFixed;
 
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
         this(schema, numShards, false);
@@ -254,6 +254,7 @@ public abstract class HollowTypeWriteState {
     public void setNumShards(int numShards) {
         if(this.numShards == -1) {
             this.numShards = numShards;
+            this.isNumShardsFixed = true;
         } else if(this.numShards != numShards) {
             if (isNumShardsFixed) {
                 throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + this.numShards + ".  Cannot reset to " + numShards + ".");

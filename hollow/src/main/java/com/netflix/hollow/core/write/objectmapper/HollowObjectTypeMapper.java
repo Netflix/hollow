@@ -127,7 +127,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         }
 
         HollowObjectTypeWriteState existingWriteState = (HollowObjectTypeWriteState) parentMapper.getStateEngine().getTypeState(typeName);
-        this.writeState = existingWriteState != null ? existingWriteState : new HollowObjectTypeWriteState(schema, getNumShards(clazz), true);
+        this.writeState = existingWriteState != null ? existingWriteState : new HollowObjectTypeWriteState(schema, getNumShards(clazz));
 
         this.assignedOrdinalFieldOffset = assignedOrdinalFieldOffset;
         this.hasAssignedOrdinalField = hasAssignedOrdinalField;

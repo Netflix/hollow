@@ -56,8 +56,29 @@ public class AbstractHollowObjectTypeDataElementsSplitJoinTest extends AbstractS
         }
     }
 
+    private void populateWriteStateEngine(int[] recordIds) {
+        initWriteStateEngine();
+        HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+        for(int recordId : recordIds) {
+            rec.reset();
+            rec.setLong("longField", recordId);
+            rec.setString("stringField", "Value" + recordId);
+            rec.setInt("intField", recordId);
+            rec.setDouble("doubleField", recordId);
+
+            writeStateEngine.add("TestObject", rec);
+        }
+    }
+
+
     protected HollowObjectTypeReadState populateTypeStateWith(int numRecords) throws IOException {
         populateWriteStateEngine(numRecords);
+        roundTripSnapshot();
+        return (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
+    }
+
+    protected HollowObjectTypeReadState populateTypeStateWith(int[] recordIds) throws IOException {
+        populateWriteStateEngine(recordIds);
         roundTripSnapshot();
         return (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
     }

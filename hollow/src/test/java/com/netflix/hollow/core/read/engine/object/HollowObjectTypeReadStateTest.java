@@ -19,6 +19,34 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
     }
 
     @Test
+    public void testMappingAnOrdinalToAShardAndBack() {
+        int maxOrdinal = 1000;
+        int numShards = 4;
+        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards;
+        int[][] shardOrdinals = new int[numShards][];
+        for(int i=0;i<numShards;i++) {
+            int maxShardOrdinal = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
+            shardOrdinals[i] = new int[maxShardOrdinal + 1];
+        }
+
+        int shardNumberMask = numShards - 1;
+        int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
+
+        for (int ordinal=0; ordinal<=maxOrdinal; ordinal++) {
+            int shardIndex = ordinal & shardNumberMask;
+            int shardOrdinal = ordinal >> shardOrdinalShift;
+            shardOrdinals[shardIndex][shardOrdinal] = ordinal;
+        }
+
+        for (int shardIndex=0; shardIndex<numShards; shardIndex++) {
+            for (int shardOrdinal=0; shardOrdinal<shardOrdinals[shardIndex].length; shardOrdinal++) {
+                int ordinal = (shardOrdinal * numShards) + shardIndex;
+                assertEquals(shardOrdinals[shardIndex][shardOrdinal], ordinal);
+            }
+        }
+    }
+
+    @Test
     public void testShardingFactor() {
         assertEquals(2, shardingFactor(1, 2));
         assertEquals(2, shardingFactor(2, 1));

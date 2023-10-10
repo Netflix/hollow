@@ -39,7 +39,7 @@ public class HollowObjectTypeDataElements {
 
     final HollowObjectSchema schema;
 
-    int maxOrdinal;
+    public int maxOrdinal;  // SNAP: TODO: remove
 
     FixedLengthData fixedLengthData;
     final VariableLengthData varLengthData[];
