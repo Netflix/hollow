@@ -36,11 +36,13 @@ import java.util.List;
 class HollowObjectTypeReadStateShard {
 
     private volatile HollowObjectTypeDataElements currentDataVolatile;
+    final int shardOrdinalShift;
 
     private final HollowObjectSchema schema;
     
-    HollowObjectTypeReadStateShard(HollowObjectSchema schema) {
+    HollowObjectTypeReadStateShard(HollowObjectSchema schema, int shardOrdinalShift) {
         this.schema = schema;
+        this.shardOrdinalShift = shardOrdinalShift;
     }
 
     public boolean isNull(int ordinal, int fieldIndex) {
@@ -391,7 +393,7 @@ class HollowObjectTypeReadStateShard {
         this.currentDataVolatile = data;
     }
 
-    protected void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema, BitSet populatedOrdinals, int shardNumber, int numShards) {
+    protected void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema, BitSet populatedOrdinals, int shardNumber, int shardNumberMask) {
         if(!(withSchema instanceof HollowObjectSchema))
             throw new IllegalArgumentException("HollowObjectTypeReadState can only calculate checksum with a HollowObjectSchema: " + schema.getName());
 
@@ -410,8 +412,8 @@ class HollowObjectTypeReadStateShard {
         HollowObjectTypeDataElements currentData = currentDataVolatile;
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != ORDINAL_NONE) {
-            if((ordinal & (numShards - 1)) == shardNumber) {
-                int shardOrdinal = ordinal / numShards;
+            if((ordinal & shardNumberMask) == shardNumber) {
+                int shardOrdinal = ordinal >> shardOrdinalShift;
                 checksum.applyInt(ordinal);
                 for(int i=0;i<fieldIndexes.length;i++) {
                     int fieldIdx = fieldIndexes[i];
@@ -449,7 +451,7 @@ class HollowObjectTypeReadStateShard {
         
         return requiredBytes;
     }
-    
+
     public long getApproximateHoleCostInBytes(BitSet populatedOrdinals, int shardNumber, int numShards) {
         HollowObjectTypeDataElements currentData = currentDataVolatile;
         long holeBits = 0;
