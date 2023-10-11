@@ -70,7 +70,6 @@ public class AbstractHollowObjectTypeDataElementsSplitJoinTest extends AbstractS
         }
     }
 
-
     protected HollowObjectTypeReadState populateTypeStateWith(int numRecords) throws IOException {
         populateWriteStateEngine(numRecords);
         roundTripSnapshot();

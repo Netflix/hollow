@@ -71,7 +71,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         }
     }
 
-    public volatile ShardsHolder shardsVolatile;    // SNAP: TODO: remove
+    volatile ShardsHolder shardsVolatile;    // SNAP: TODO: remove
 
     private int maxOrdinal;
 
