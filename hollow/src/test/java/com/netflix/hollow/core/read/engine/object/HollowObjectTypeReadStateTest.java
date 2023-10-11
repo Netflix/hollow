@@ -64,15 +64,6 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
         assertIllegalStateException(() -> shardingFactor(2, 3));
     }
 
-    private void assertIllegalStateException(Supplier<Integer> invocation) {
-        try {
-            invocation.get();
-            Assert.fail();
-        } catch (IllegalStateException e) {
-            // expected
-        }
-    }
-
     @Test
     public void testResharding() throws Exception {
 
@@ -220,7 +211,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
         }
     }
 
-        private void assertDataUnchanged(HollowObjectTypeReadState actualTypeState, int numRecords) {
+    private void assertDataUnchanged(HollowObjectTypeReadState actualTypeState, int numRecords) {
         for(int i=0;i<numRecords;i++) {
 
             GenericHollowObject obj = new GenericHollowObject(actualTypeState , i);
@@ -228,6 +219,15 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
             Assert.assertEquals("Value"+i, obj.getString("stringField"));
             Assert.assertEquals(i, obj.getInt("intField"));
             Assert.assertEquals((double)i, obj.getDouble("doubleField"), 0);
+        }
+    }
+
+    private void assertIllegalStateException(Supplier<Integer> invocation) {
+        try {
+            invocation.get();
+            Assert.fail();
+        } catch (IllegalStateException e) {
+            // expected
         }
     }
 }

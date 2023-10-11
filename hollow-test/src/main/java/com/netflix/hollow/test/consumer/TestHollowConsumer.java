@@ -135,7 +135,9 @@ public class TestHollowConsumer extends HollowConsumer {
         return this;
     }
 
-    public TestHollowConsumer addDelta(long fromVersion, long toVersion, HollowWriteStateEngine state) throws IOException {
+    public TestHollowConsumer addDelta(long fromVersion, long toVersion, HollowWriteStateEngine state)
+            throws IOException {
+
         if (getStateEngine() == null) {
             throw new UnsupportedOperationException("Delta can not be applied without first applying a snapshot");
         }

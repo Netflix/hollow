@@ -33,7 +33,7 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 
-public class HollowObjectTypeReadStateShard {   // SNAP: TODO: Remove
+class HollowObjectTypeReadStateShard {
 
     private volatile HollowObjectTypeDataElements currentDataVolatile;
     final int shardOrdinalShift;
@@ -356,7 +356,7 @@ public class HollowObjectTypeReadStateShard {   // SNAP: TODO: Remove
         setCurrentData(null);
     }
 
-    public HollowObjectTypeDataElements currentDataElements() { // SNAP: TODO: remove
+    HollowObjectTypeDataElements currentDataElements() {
         return currentDataVolatile;
     }
 

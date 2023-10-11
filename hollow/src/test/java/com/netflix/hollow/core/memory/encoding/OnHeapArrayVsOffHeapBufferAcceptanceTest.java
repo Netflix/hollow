@@ -85,6 +85,8 @@ public class OnHeapArrayVsOffHeapBufferAcceptanceTest {
             Assert.fail();
         } catch (IllegalStateException e) {
             // this is expected
+        } catch (Exception e) {
+            Assert.fail();
         }
 
         // out of bounds long
@@ -93,6 +95,8 @@ public class OnHeapArrayVsOffHeapBufferAcceptanceTest {
             Assert.fail();
         } catch (IllegalStateException e) {
             // this is expected
+        } catch (Exception e) {
+            Assert.fail();
         }
     }
 
@@ -139,6 +143,8 @@ public class OnHeapArrayVsOffHeapBufferAcceptanceTest {
             Assert.fail();
         } catch (IllegalStateException e) {
             // this is expected
+        } catch (Exception e) {
+            Assert.fail();
         }
     }
 

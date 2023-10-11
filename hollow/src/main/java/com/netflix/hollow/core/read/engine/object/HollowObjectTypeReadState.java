@@ -351,12 +351,10 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         boolean result;
 
         do {
-            shardsHolder = this.shardsVolatile; // this read can return a stale shardHolder with greater or lesser than current
-                                                // num shards but maxOrdinal remains same across stale vs current. So given this
-                                                // atomic assignment below operations on a stale shards holder will be legal
+            shardsHolder = this.shardsVolatile;
             HollowObjectTypeReadStateShard shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
             result = shard.isNull(ordinal >> shard.shardOrdinalShift, fieldIndex);
-        } while(shardsHolder != this.shardsVolatile);   // there is a load (acquire) fence imposed within shard.isNull, no need for another here
+        } while(shardsHolder != this.shardsVolatile);
         return result;
     }
 
