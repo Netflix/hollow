@@ -24,6 +24,7 @@ import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.util.IntMap;
 import com.netflix.hollow.core.util.RemovedOrdinalIterator;
 
@@ -63,7 +64,7 @@ public class HollowObjectDeltaHistoricalStateCreator {
         historicalDataElements.fixedLengthData = new FixedLengthElementArray(historicalDataElements.memoryRecycler, (long)historicalDataElements.bitsPerRecord * (historicalDataElements.maxOrdinal + 1));
 
         for(int i=0;i<historicalDataElements.schema.numFields();i++) {
-            if(stateEngineDataElements[0].varLengthData[i] != null) {
+            if(isVarLengthField(typeState.getSchema().getFieldType(i))) {
                 historicalDataElements.varLengthData[i] = new SegmentedByteArray(historicalDataElements.memoryRecycler);
             }
         }
@@ -106,15 +107,15 @@ public class HollowObjectDeltaHistoricalStateCreator {
     private void populateStats() {
         iter.reset();
         int removedEntryCount = 0;
-        long totalVarLengthSizes[] = new long[stateEngineDataElements[0].varLengthData.length];
+        long totalVarLengthSizes[] = new long[typeState.getSchema().numFields()];
 
         int ordinal = iter.next();
 
         while(ordinal != ORDINAL_NONE) {
             removedEntryCount++;
 
-            for(int i=0;i<totalVarLengthSizes.length;i++) {
-                if(stateEngineDataElements[0].varLengthData[i] != null) {
+            for(int i=0;i<typeState.getSchema().numFields();i++) {
+                if(isVarLengthField(typeState.getSchema().getFieldType(i))) {
                     int shard = ordinal & shardNumberMask;
                     int shardOrdinal = ordinal >> shardOrdinalShift;
                     totalVarLengthSizes[i] += varLengthSize(stateEngineDataElements[shard], shardOrdinal, i);
@@ -126,8 +127,8 @@ public class HollowObjectDeltaHistoricalStateCreator {
 
         historicalDataElements.maxOrdinal = removedEntryCount - 1;
 
-        for(int i=0;i<stateEngineDataElements[0].bitsPerField.length;i++) {
-            if(stateEngineDataElements[0].varLengthData[i] == null) {
+        for(int i=0;i<typeState.getSchema().numFields();i++) {
+            if(!isVarLengthField(typeState.getSchema().getFieldType(i))) {
                 historicalDataElements.bitsPerField[i] = stateEngineDataElements[0].bitsPerField[i];
             } else {
                 historicalDataElements.bitsPerField[i] = (64 - Long.numberOfLeadingZeros(totalVarLengthSizes[i] + 1)) + 1;
@@ -139,5 +140,9 @@ public class HollowObjectDeltaHistoricalStateCreator {
         }
 
         ordinalMapping = new IntMap(removedEntryCount);
+    }
+
+    private boolean isVarLengthField(HollowObjectSchema.FieldType fieldType) {
+        return fieldType == HollowObjectSchema.FieldType.STRING || fieldType == HollowObjectSchema.FieldType.BYTES;
     }
 }
