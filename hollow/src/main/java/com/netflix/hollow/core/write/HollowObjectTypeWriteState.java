@@ -62,6 +62,8 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     private boolean isDynamicTypeShardingEnabled() {   // SNAP: TODO: configurable
+        // SNAP: TODO: enforce integrity check
+        // SNAP: TODO: publish metric
         return true;
     }
 

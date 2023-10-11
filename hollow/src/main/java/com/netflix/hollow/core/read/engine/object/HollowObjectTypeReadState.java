@@ -45,8 +45,8 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     private final HollowObjectSchema unfilteredSchema;
     private final HollowObjectSampler sampler;
 
-    public static class ShardsHolder {   // SNAP: TODO: remove
-        public final HollowObjectTypeReadStateShard shards[];   // SNAP: TODO: remove
+    static class ShardsHolder {
+        final HollowObjectTypeReadStateShard shards[];
         final int shardNumberMask;
 
         private ShardsHolder(HollowSchema schema, int numShards) {
@@ -71,7 +71,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         }
     }
 
-    volatile ShardsHolder shardsVolatile;    // SNAP: TODO: remove
+    volatile ShardsHolder shardsVolatile;
 
     private int maxOrdinal;
 
@@ -189,7 +189,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
      *
      * @param newNumShards The desired number of shards
      */
-    public void reshard(int newNumShards) {   // TODO: package private
+    void reshard(int newNumShards) {
         int prevNumShards = shardsVolatile.shards.length;
         int shardingFactor = shardingFactor(prevNumShards, newNumShards);
         HollowObjectTypeDataElements[] newDataElements;
@@ -558,17 +558,16 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     @Override
     protected void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema) {
-        final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
+        final ShardsHolder shardsHolder = this.shardsVolatile;
+        final HollowObjectTypeReadStateShard[] shards = shardsHolder.shards;
+        int shardNumberMask = shardsHolder.shardNumberMask;
         if(!(withSchema instanceof HollowObjectSchema))
             throw new IllegalArgumentException("HollowObjectTypeReadState can only calculate checksum with a HollowObjectSchema: " + getSchema().getName());
 
         BitSet populatedOrdinals = getPopulatedOrdinals();
 
         for(int i=0;i<shards.length;i++) {
-            if (shards[i].shardOrdinalShift != (31 - Integer.numberOfLeadingZeros(shards.length))) {
-                throw new UnsupportedOperationException("applyToChecksum called for virtual shard, unexpected");  // SNAP: TODO: remove this altogether, or support applyToChecksum for virtual shards
-            }
-            shards[i].applyToChecksum(checksum, withSchema, populatedOrdinals, i, shards.length);
+            shards[i].applyToChecksum(checksum, withSchema, populatedOrdinals, i, shardNumberMask);
         }
     }
 
