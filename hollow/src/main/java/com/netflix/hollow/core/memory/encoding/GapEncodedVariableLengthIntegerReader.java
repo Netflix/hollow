@@ -19,11 +19,15 @@ package com.netflix.hollow.core.memory.encoding;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.util.IOUtils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class GapEncodedVariableLengthIntegerReader {
 
@@ -139,5 +143,106 @@ public class GapEncodedVariableLengthIntegerReader {
         }
 
         return new GapEncodedVariableLengthIntegerReader(arr.getUnderlyingArray(), (int)arr.length());
+    }
+
+    /**
+     * Splits this {@code GapEncodedVariableLengthIntegerReader} into {@code numSplits} new instances.
+     * The original data is not cleaned up.
+     *
+     * @param numSplits the number of instances to split into, should be a power of 2.
+     * @return an array of {@code GapEncodedVariableLengthIntegerReader} instances populated with the results of the split.
+     */
+    public GapEncodedVariableLengthIntegerReader[] split(int numSplits) {
+        if (numSplits<=0 || !((numSplits&(numSplits-1))==0)) {
+            throw new IllegalStateException("Split should only be called with powers of 2, it was called with " + numSplits);
+        }
+        final int toMask = numSplits - 1;
+        final int toOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
+        GapEncodedVariableLengthIntegerReader[] to = new GapEncodedVariableLengthIntegerReader[numSplits];
+
+        List<Integer> ordinals = new ArrayList<>();
+        reset();
+        while(nextElement() != Integer.MAX_VALUE) {
+            ordinals.add(nextElement());
+            advance();
+        }
+
+        ByteDataArray[] splitOrdinals = new ByteDataArray[numSplits];
+        int previousSplitOrdinal[] = new int[numSplits];
+        for (int ordinal : ordinals) {
+            int toIndex = ordinal & toMask;
+            int toOrdinal = ordinal >> toOrdinalShift;
+            if (splitOrdinals[toIndex] == null) {
+                splitOrdinals[toIndex] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+            }
+            VarInt.writeVInt(splitOrdinals[toIndex], toOrdinal - previousSplitOrdinal[toIndex]);
+            previousSplitOrdinal[toIndex] = toOrdinal;
+        }
+        for(int i=0;i<numSplits;i++) {
+            if (splitOrdinals[i] == null) {
+                to[i] = EMPTY_READER;
+            } else {
+                to[i] = new GapEncodedVariableLengthIntegerReader(splitOrdinals[i].getUnderlyingArray(), (int) splitOrdinals[i].length());
+            }
+        }
+
+        return to;
+    }
+
+    /**
+     * Join an array of {@code GapEncodedVariableLengthIntegerReader} instances into one.
+     * The original data is not cleaned up.
+     *
+     * @param from the array of {@code GapEncodedVariableLengthIntegerReader} to join, should have a power of 2 number of elements.
+     * @return an instance of {@code GapEncodedVariableLengthIntegerReader} with the joined result.
+     */
+    public static GapEncodedVariableLengthIntegerReader join(GapEncodedVariableLengthIntegerReader[] from) {
+        if (from==null) {
+            throw new IllegalStateException("Join invoked on a null input array");
+        }
+        if (from.length<=0 || !((from.length&(from.length-1))==0)) {
+            throw new IllegalStateException("Join should only be called with powers of 2, it was called with " + from.length);
+        }
+
+        int numSplits = from.length;
+        final int fromMask = numSplits - 1;
+        final int fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
+        int joinedMaxOrdinal = -1;
+
+        HashSet<Integer>[] fromOrdinals = new HashSet[from.length];
+        for (int i=0;i<from.length;i++) {
+            fromOrdinals[i] = new HashSet<>();
+            if (from[i] == null) {
+                continue;
+            }
+            from[i].reset();
+
+            while(from[i].nextElement() != Integer.MAX_VALUE) {
+                int splitOrdinal = from[i].nextElement();
+                fromOrdinals[i].add(splitOrdinal);
+                joinedMaxOrdinal = Math.max(joinedMaxOrdinal, splitOrdinal*numSplits + i);
+                from[i].advance();
+            }
+        }
+
+        ByteDataArray toRemovals = null;
+        int previousOrdinal = 0;
+        for (int ordinal=0;ordinal<=joinedMaxOrdinal;ordinal++) {
+            int fromIndex = ordinal & fromMask;
+            int fromOrdinal = ordinal >> fromOrdinalShift;
+            if (fromOrdinals[fromIndex].contains(fromOrdinal)) {
+                if (toRemovals == null) {
+                    toRemovals = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+                }
+                VarInt.writeVInt(toRemovals, ordinal - previousOrdinal);
+                previousOrdinal = ordinal;
+            }
+        }
+
+        if (toRemovals == null) {
+            return EMPTY_READER;
+        } else {
+            return new GapEncodedVariableLengthIntegerReader(toRemovals.getUnderlyingArray(), (int) toRemovals.length());
+        }
     }
 }

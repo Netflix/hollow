@@ -211,4 +211,65 @@ public class HollowObjectTypeDataElements {
         }
     }
 
+    static long varLengthStartByte(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {
+        if(ordinal == 0)
+            return 0;
+
+        int numBitsForField = from.bitsPerField[fieldIdx];
+        long currentBitOffset = ((long)from.bitsPerRecord * ordinal) + from.bitOffsetPerField[fieldIdx];
+        long startByte = from.fixedLengthData.getElementValue(currentBitOffset - from.bitsPerRecord, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
+
+        return startByte;
+    }
+
+    static long varLengthEndByte(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {
+        int numBitsForField = from.bitsPerField[fieldIdx];
+        long currentBitOffset = ((long)from.bitsPerRecord * ordinal) + from.bitOffsetPerField[fieldIdx];
+        long endByte = from.fixedLengthData.getElementValue(currentBitOffset, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
+
+        return endByte;
+    }
+
+    static long varLengthSize(HollowObjectTypeDataElements from, int ordinal, int fieldIdx) {
+        int numBitsForField = from.bitsPerField[fieldIdx];
+        long fromBitOffset = ((long)from.bitsPerRecord*ordinal) + from.bitOffsetPerField[fieldIdx];
+        long fromEndByte = from.fixedLengthData.getElementValue(fromBitOffset, numBitsForField) & (1L << (numBitsForField - 1)) - 1;
+        long fromStartByte = ordinal != 0 ? from.fixedLengthData.getElementValue(fromBitOffset - from.bitsPerRecord, numBitsForField) & (1L << (numBitsForField - 1)) - 1 : 0;
+        return fromEndByte - fromStartByte;
+    }
+
+    static void copyRecord(HollowObjectTypeDataElements to, int toOrdinal, HollowObjectTypeDataElements from, int fromOrdinal, long[] currentWriteVarLengthDataPointers) {
+        for(int fieldIndex=0;fieldIndex<to.schema.numFields();fieldIndex++) {
+            if(to.varLengthData[fieldIndex] == null) {
+                long value = from.fixedLengthData.getLargeElementValue(((long)fromOrdinal * from.bitsPerRecord) + from.bitOffsetPerField[fieldIndex], from.bitsPerField[fieldIndex]);
+                to.fixedLengthData.setElementValue(((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex], to.bitsPerField[fieldIndex], value);
+            } else {
+                long fromStartByte = varLengthStartByte(from, fromOrdinal, fieldIndex);
+                long fromEndByte = varLengthEndByte(from, fromOrdinal, fieldIndex);
+                long size = fromEndByte - fromStartByte;
+
+                to.fixedLengthData.setElementValue(((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex], to.bitsPerField[fieldIndex], currentWriteVarLengthDataPointers[fieldIndex] + size);
+                to.varLengthData[fieldIndex].copy(from.varLengthData[fieldIndex], fromStartByte, currentWriteVarLengthDataPointers[fieldIndex], size);
+
+                currentWriteVarLengthDataPointers[fieldIndex] += size;
+            }
+        }
+    }
+
+    static void writeNullField(HollowObjectTypeDataElements target, int fieldIndex, long currentWriteFixedLengthStartBit, long[] currentWriteVarLengthDataPointers) {
+        if(target.varLengthData[fieldIndex] != null) {
+            writeNullVarLengthField(target, fieldIndex, currentWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+        } else {
+            writeNullFixedLengthField(target, fieldIndex, currentWriteFixedLengthStartBit);
+        }
+    }
+
+    static void writeNullVarLengthField(HollowObjectTypeDataElements target, int fieldIndex, long currentWriteFixedLengthStartBit, long[] currentWriteVarLengthDataPointers) {
+        long writeValue = (1L << (target.bitsPerField[fieldIndex] - 1)) | currentWriteVarLengthDataPointers[fieldIndex];
+        target.fixedLengthData.setElementValue(currentWriteFixedLengthStartBit, target.bitsPerField[fieldIndex], writeValue);
+    }
+
+    static void writeNullFixedLengthField(HollowObjectTypeDataElements target, int fieldIndex, long currentWriteFixedLengthStartBit) {
+        target.fixedLengthData.setElementValue(currentWriteFixedLengthStartBit, target.bitsPerField[fieldIndex], target.nullValueForField[fieldIndex]);
+    }
 }
