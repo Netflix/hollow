@@ -92,11 +92,14 @@ public class AbstractHollowObjectTypeDataElementsSplitJoinTest extends AbstractS
     }
 
     protected void assertDataUnchanged(int numRecords) {
+        assertDataUnchanged((HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject"), numRecords);
+    }
+
+    protected void assertDataUnchanged(HollowObjectTypeReadState typeState, int numRecords) {
         for(int i=0;i<numRecords;i++) {
-            GenericHollowObject obj = new GenericHollowObject(readStateEngine, "TestObject", i);
+            GenericHollowObject obj = new GenericHollowObject(typeState, i);
             assertEquals(i, obj.getLong("longField"));
             assertEquals("Value"+i, obj.getString("stringField"));
-            HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
             assertEquals((double)i, obj.getDouble("doubleField"), 0);
             if (typeState.getSchema().numFields() == 4) {   // filtered
                 assertEquals(i, obj.getInt("intField"));

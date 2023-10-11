@@ -81,6 +81,11 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
 
     @Override
+    public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, int numShards) throws IOException {
+        throw new UnsupportedOperationException("This type does not yet support numShards specification when reading snapshot");
+    }
+
+    @Override
     public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);

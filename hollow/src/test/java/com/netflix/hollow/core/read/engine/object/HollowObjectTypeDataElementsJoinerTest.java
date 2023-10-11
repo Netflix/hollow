@@ -28,13 +28,13 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         assertEquals(1, typeReadState.numShards());
 
         HollowObjectTypeReadState typeReadStateSharded = populateTypeStateWith(5);
-        assertDataUnchanged(5);
+        assertDataUnchanged(typeReadStateSharded, 5);
         assertEquals(8, typeReadStateSharded.numShards());
 
         HollowObjectTypeDataElements joinedDataElements = joiner.join(typeReadStateSharded.currentDataElements());
 
-        typeReadState.setCurrentData(joinedDataElements);
-        assertDataUnchanged(5);
+        typeReadState = new HollowObjectTypeReadState(typeReadState.getSchema(), joinedDataElements);
+        assertDataUnchanged(typeReadState, 5);
 
         try {
             joiner.join(mockObjectTypeState.currentDataElements());
@@ -77,8 +77,8 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         assertEquals(valBig, val1);
     }
 
-//    TODO: manually invoked, depends on producer side changes for supporting changing numShards in a delta chain
-    @Test
+    //    TODO: manually invoked, depends on producer side changes for supporting changing numShards in a delta chain
+    // @Test
     public void testLopsidedShards() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
         HollowProducer p = HollowProducer.withPublisher(blobStore)
@@ -128,8 +128,8 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         long v5 = oneRunCycle(p, new int[] {0, 1});
 
         // assert lopsided shards before join
-        assertEquals(2, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[0].currentDataElements().maxOrdinal);
-        assertEquals(3, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[1].currentDataElements().maxOrdinal);
+        assertEquals(2, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[0].dataElements.maxOrdinal);
+        assertEquals(3, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[1].dataElements.maxOrdinal);
         c.triggerRefreshTo(v5);
         assertEquals(1, c.getStateEngine().getTypeState("TestObject").numShards()); // joined to 1 shard
         readStateEngine = c.getStateEngine();
