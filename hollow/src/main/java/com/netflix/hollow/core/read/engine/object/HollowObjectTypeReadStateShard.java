@@ -22,10 +22,8 @@ import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
-import com.netflix.hollow.core.memory.encoding.ZigZag;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +34,8 @@ import java.util.List;
 class HollowObjectTypeReadStateShard {
 
     private volatile HollowObjectTypeDataElements currentDataVolatile;
+    final HollowObjectTypeDataElements dataElements;
+    // private volatile HollowObjectTypeReadState.ShardsHolder shardsHolderVolatile;
     final int shardOrdinalShift;
 
     private final HollowObjectSchema schema;
@@ -43,259 +43,161 @@ class HollowObjectTypeReadStateShard {
     HollowObjectTypeReadStateShard(HollowObjectSchema schema, int shardOrdinalShift) {
         this.schema = schema;
         this.shardOrdinalShift = shardOrdinalShift;
+        this.dataElements = null;
+        // this.shardsHolderVolatile = null;
     }
 
-    public boolean isNull(int ordinal, int fieldIndex) {
-        HollowObjectTypeDataElements currentData;
-        long fixedLengthValue;
-
-        do {
-            currentData = this.currentDataVolatile;
-
-            long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
-            int numBitsForField = currentData.bitsPerField[fieldIndex];
-
-            fixedLengthValue = numBitsForField <= 56 ?
-                    currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField)
-                    : currentData.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
-        } while(readWasUnsafe(currentData));
-
-        switch(schema.getFieldType(fieldIndex)) {
-        case BYTES:
-        case STRING:
-            int numBits = currentData.bitsPerField[fieldIndex];
-            return (fixedLengthValue & (1L << (numBits - 1))) != 0;
-        case FLOAT:
-            return (int)fixedLengthValue == HollowObjectWriteRecord.NULL_FLOAT_BITS;
-        case DOUBLE:
-            return fixedLengthValue == HollowObjectWriteRecord.NULL_DOUBLE_BITS;
-        default:
-            return fixedLengthValue == currentData.nullValueForField[fieldIndex];
-        }
+    HollowObjectTypeReadStateShard(HollowObjectSchema schema, HollowObjectTypeDataElements dataElements, int shardOrdinalShift) {
+        this.schema = schema;
+        this.shardOrdinalShift = shardOrdinalShift;
+        this.dataElements = dataElements;
+        // this.shardsHolderVolatile = null;
     }
 
-    public int readOrdinal(int ordinal, int fieldIndex) {
-        HollowObjectTypeDataElements currentData;
-        long refOrdinal;
+    // HollowObjectTypeReadStateShard(HollowObjectSchema schema, HollowObjectTypeDataElements dataElements, int shardOrdinalShift, HollowObjectTypeReadState.ShardsHolder shardsHolder) {
+    //     this.schema = schema;
+    //     this.shardOrdinalShift = shardOrdinalShift;
+    //     this.dataElements = dataElements;
+    //     // this.shardsHolderVolatile = shardsHolder;
+    // SNAP: TODO: No point referencing shardsHOlderVolatile here because stale value would mean a different shard needs to be looked up,
+    //     so we have to go back up to read state.
+    // }
 
-        do {
-            currentData = this.currentDataVolatile;
-            refOrdinal = readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
-        } while(readWasUnsafe(currentData));
+    // HollowObjectTypeReadStateShard(HollowObjectTypeReadStateShard oldShard, HollowObjectTypeReadState.ShardsHolder shardsHolder) {
+    //     this.schema = oldShard.schema;
+    //     this.shardOrdinalShift = oldShard.shardOrdinalShift;
+    //     this.dataElements = oldShard.dataElements;
+    //     this.shardsHolderVolatile = shardsHolder;
+    //     so we have to go back up to read state.
+    // }
 
-        if(refOrdinal == currentData.nullValueForField[fieldIndex])
-            return ORDINAL_NONE;
-        return (int)refOrdinal;
+    public long isNull(int ordinal, int fieldIndex) {
+        long bitOffset = fieldOffset(ordinal, fieldIndex);
+        int numBitsForField = dataElements.bitsPerField[fieldIndex];
+        return numBitsForField <= 56 ?
+                dataElements.fixedLengthData.getElementValue(bitOffset, numBitsForField)
+                : dataElements.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
     }
 
-    public int readInt(int ordinal, int fieldIndex) {
-        HollowObjectTypeDataElements currentData;
-        long value;
-
-        do {
-            currentData = this.currentDataVolatile;
-            value = readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
-        } while(readWasUnsafe(currentData));
-
-        if(value == currentData.nullValueForField[fieldIndex])
-            return Integer.MIN_VALUE;
-        return ZigZag.decodeInt((int)value);
+    public long readOrdinal(int ordinal, int fieldIndex) {
+        return readFixedLengthFieldValue(ordinal, fieldIndex);
     }
 
-    public float readFloat(int ordinal, int fieldIndex) {
-        HollowObjectTypeDataElements currentData;
-        int value;
-
-        do {
-            currentData = this.currentDataVolatile;
-            value = (int)readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
-        } while(readWasUnsafe(currentData));
-
-        if(value == HollowObjectWriteRecord.NULL_FLOAT_BITS)
-            return Float.NaN;
-        return Float.intBitsToFloat(value);
+    public long readInt(int ordinal, int fieldIndex) {
+        return readFixedLengthFieldValue(ordinal, fieldIndex);
     }
 
-    public double readDouble(int ordinal, int fieldIndex) {
-        HollowObjectTypeDataElements currentData;
-        long value;
+    public int readFloat(int ordinal, int fieldIndex) {
+        return (int)readFixedLengthFieldValue(ordinal, fieldIndex);
+    }
 
-        do {
-            currentData = this.currentDataVolatile;
-            long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
-            value = currentData.fixedLengthData.getLargeElementValue(bitOffset, 64, -1L);
-        } while(readWasUnsafe(currentData));
-
-        if(value == HollowObjectWriteRecord.NULL_DOUBLE_BITS)
-            return Double.NaN;
-        return Double.longBitsToDouble(value);
+    public long readDouble(int ordinal, int fieldIndex) {
+        long bitOffset = fieldOffset(ordinal, fieldIndex);
+        return dataElements.fixedLengthData.getLargeElementValue(bitOffset, 64, -1L);
     }
 
     public long readLong(int ordinal, int fieldIndex) {
-        HollowObjectTypeDataElements currentData;
-        long value;
-
-        do {
-            currentData = this.currentDataVolatile;
-            long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
-            int numBitsForField = currentData.bitsPerField[fieldIndex];
-            value = currentData.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
-        } while(readWasUnsafe(currentData));
-
-        if(value == currentData.nullValueForField[fieldIndex])
-            return Long.MIN_VALUE;
-        return ZigZag.decodeLong(value);
+        long bitOffset = fieldOffset(ordinal, fieldIndex);
+        int numBitsForField = dataElements.bitsPerField[fieldIndex];
+        return dataElements.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
     }
 
-    public Boolean readBoolean(int ordinal, int fieldIndex) {
-        HollowObjectTypeDataElements currentData;
-        long value;
-
-        do {
-            currentData = this.currentDataVolatile;
-            value = readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
-        } while(readWasUnsafe(currentData));
-
-        if(value == currentData.nullValueForField[fieldIndex])
-            return null;
-        return value == 1 ? Boolean.TRUE : Boolean.FALSE;
+    public long readBoolean(int ordinal, int fieldIndex) {
+        return readFixedLengthFieldValue(ordinal, fieldIndex);
     }
 
-    private long readFixedLengthFieldValue(HollowObjectTypeDataElements currentData, int ordinal, int fieldIndex) {
-        long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
-        int numBitsForField = currentData.bitsPerField[fieldIndex];
+    private long readFixedLengthFieldValue(int ordinal, int fieldIndex) {
+        long bitOffset = fieldOffset(ordinal, fieldIndex);
+        int numBitsForField = dataElements.bitsPerField[fieldIndex];
 
-        long value = currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField);
+        long value = dataElements.fixedLengthData.getElementValue(bitOffset, numBitsForField);
 
         return value;
     }
 
-    public byte[] readBytes(int ordinal, int fieldIndex) {
-        HollowObjectTypeDataElements currentData;
+    static class VarLenStats {
+        int numBitsForField;
+        long startByte;
+        long endByte;
+    }
+
+    public byte[] readBytes(VarLenStats stats, int fieldIndex) {
         byte[] result;
 
-        do {
-            int numBitsForField;
-            long endByte;
-            long startByte;
+        int numBitsForField = stats.numBitsForField;
+        long startByte = stats.startByte;
+        long endByte = stats.endByte;
 
-            do {
-                currentData = this.currentDataVolatile;
+        if((endByte & (1L << numBitsForField - 1)) != 0)
+            return null;
 
-                numBitsForField = currentData.bitsPerField[fieldIndex];
-                long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
-                endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
-                startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
-            } while(readWasUnsafe(currentData));
+        startByte &= (1L << numBitsForField - 1) - 1;
 
-            if((endByte & (1L << numBitsForField - 1)) != 0)
-                return null;
-
-            startByte &= (1L << numBitsForField - 1) - 1;
-
-            int length = (int)(endByte - startByte);
-            result = new byte[length];
-            for(int i=0;i<length;i++)
-                result[i] = currentData.varLengthData[fieldIndex].get(startByte + i);
-
-        } while(readWasUnsafe(currentData));
+        int length = (int)(endByte - startByte);
+        result = new byte[length];
+        for(int i=0;i<length;i++)
+            result[i] = dataElements.varLengthData[fieldIndex].get(startByte + i);
 
         return result;
     }
 
-    public String readString(int ordinal, int fieldIndex) {
-        HollowObjectTypeDataElements currentData;
-        String result;
+    public VarLenStats readVarLenStats(int ordinal, int fieldIndex) {
+        VarLenStats result = new VarLenStats();
+        int numBitsForField = dataElements.bitsPerField[fieldIndex];
+        long currentBitOffset = fieldOffset(ordinal, fieldIndex);
 
-        do {
-            int numBitsForField;
-            long endByte;
-            long startByte;
-
-            do {
-                currentData = this.currentDataVolatile;
-
-                numBitsForField = currentData.bitsPerField[fieldIndex];
-                long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
-                endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
-                startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
-            } while(readWasUnsafe(currentData));
-
-            if((endByte & (1L << numBitsForField - 1)) != 0)
-                return null;
-
-            startByte &= (1L << numBitsForField - 1) - 1;
-
-            int length = (int)(endByte - startByte);
-
-            result = readString(currentData.varLengthData[fieldIndex], startByte, length);
-        } while(readWasUnsafe(currentData));
-
+        result.numBitsForField = numBitsForField;
+        result.endByte = dataElements.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
+        result.startByte = ordinal != 0 ? dataElements.fixedLengthData.getElementValue(currentBitOffset - dataElements.bitsPerRecord, numBitsForField) : 0;
+        // TODO: constructor
         return result;
     }
 
-    public boolean isStringFieldEqual(int ordinal, int fieldIndex, String testValue) {
-        HollowObjectTypeDataElements currentData;
-        boolean result;
+    public String readString(VarLenStats stats, int fieldIndex) {
+        int numBitsForField = stats.numBitsForField;
+        long startByte = stats.startByte;
+        long endByte = stats.endByte;
 
-        do {
-            int numBitsForField;
-            long endByte;
-            long startByte;
+        if((endByte & (1L << numBitsForField - 1)) != 0)
+            return null;
 
-            do {
-                currentData = this.currentDataVolatile;
+        startByte &= (1L << numBitsForField - 1) - 1;
 
-                numBitsForField = currentData.bitsPerField[fieldIndex];
+        int length = (int)(endByte - startByte);
 
-                long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
-                endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
-                startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
-            } while(readWasUnsafe(currentData));
-
-            if((endByte & (1L << numBitsForField - 1)) != 0)
-                return testValue == null;
-            if(testValue == null)
-                return false;
-
-            startByte &= (1L << numBitsForField - 1) - 1;
-
-            int length = (int)(endByte - startByte);
-
-            result = testStringEquality(currentData.varLengthData[fieldIndex], startByte, length, testValue);
-        } while(readWasUnsafe(currentData));
-
-        return result;
+        return readString(dataElements.varLengthData[fieldIndex], startByte, length);
     }
 
-    public int findVarLengthFieldHashCode(int ordinal, int fieldIndex) {
-        HollowObjectTypeDataElements currentData;
-        int hashCode;
-        do {
-            int numBitsForField;
-            long endByte;
-            long startByte;
+    public boolean isStringFieldEqual(VarLenStats stats, int fieldIndex, String testValue) {
+        int numBitsForField = stats.numBitsForField;
+        long startByte = stats.startByte;
+        long endByte = stats.endByte;
 
-            do {
-                currentData = this.currentDataVolatile;
+        if((endByte & (1L << numBitsForField - 1)) != 0)
+            return testValue == null;
+        if(testValue == null)
+            return false;
 
-                numBitsForField = currentData.bitsPerField[fieldIndex];
-                long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
-                endByte = currentData.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
-                startByte = ordinal != 0 ? currentData.fixedLengthData.getElementValue(currentBitOffset - currentData.bitsPerRecord, numBitsForField) : 0;
-            } while(readWasUnsafe(currentData));
+        startByte &= (1L << numBitsForField - 1) - 1;
 
-            if((endByte & (1L << numBitsForField - 1)) != 0)
-                return -1;
+        int length = (int)(endByte - startByte);
 
-            startByte &= (1L << numBitsForField - 1) - 1;
+        return testStringEquality(dataElements.varLengthData[fieldIndex], startByte, length, testValue);
+    }
 
-            int length = (int)(endByte - startByte);
+    public int findVarLengthFieldHashCode(VarLenStats stats, int fieldIndex) {
+        int numBitsForField = stats.numBitsForField;
+        long startByte = stats.startByte;
+        long endByte = stats.endByte;
 
-            hashCode = HashCodes.hashCode(currentData.varLengthData[fieldIndex], startByte, length);
-        } while(readWasUnsafe(currentData));
+        if((endByte & (1L << numBitsForField - 1)) != 0)
+            return -1;
 
-        return hashCode;
+        startByte &= (1L << numBitsForField - 1) - 1;
+
+        int length = (int)(endByte - startByte);
+
+        return HashCodes.hashCode(dataElements.varLengthData[fieldIndex], startByte, length);
     }
 
     /**
@@ -306,8 +208,8 @@ class HollowObjectTypeReadStateShard {
         return fieldIndex == -1 ? 0 : currentDataVolatile.bitsPerField[fieldIndex];
     }
 
-    private long fieldOffset(HollowObjectTypeDataElements currentData, int ordinal, int fieldIndex) {
-        return ((long)currentData.bitsPerRecord * ordinal) + currentData.bitOffsetPerField[fieldIndex];
+    private long fieldOffset(int ordinal, int fieldIndex) {
+        return ((long)dataElements.bitsPerRecord * ordinal) + dataElements.bitOffsetPerField[fieldIndex];
     }
 
     /**
@@ -360,10 +262,10 @@ class HollowObjectTypeReadStateShard {
         return currentDataVolatile;
     }
 
-    private boolean readWasUnsafe(HollowObjectTypeDataElements data) {
+    private boolean readWasUnsafe(HollowObjectTypeReadState.ShardsHolder shardsHolder) {
         // Use a load (acquire) fence to constrain the compiler reordering prior plain loads so
-        // that they cannot "float down" below the volatile load of currentDataVolatile.
-        // This ensures data is checked against currentData *after* optimistic calculations
+        // that they cannot "float down" below the volatile load of shardsHolder.
+        // This ensures data is checked against current shard holder *after* optimistic calculations
         // have been performed on data.
         //
         // Note: the Java Memory Model allows for the reordering of plain loads and stores
@@ -386,10 +288,20 @@ class HollowObjectTypeReadStateShard {
         //
         // For more details see http://gee.cs.oswego.edu/dl/html/j9mm.html
         HollowUnsafeHandle.getUnsafe().loadFence();
-        return data != currentDataVolatile;
+        return shardsHolder != shardsHolder;
     }
 
+    void setCurrentData(HollowObjectTypeReadState.ShardsHolder shardsHolder) {
+        this.shardsHolderVolatile = shardsHolder;
+    }
     void setCurrentData(HollowObjectTypeDataElements data) {
+        setCurrentData(data, true);
+    }
+
+    void setCurrentData(HollowObjectTypeDataElements data, boolean unsupported) {
+        if (unsupported) {
+            throw new UnsupportedOperationException("// SNAP: TODO: This volatile is now a final field");
+        }
         this.currentDataVolatile = data;
     }
 
@@ -409,7 +321,6 @@ class HollowObjectTypeReadStateShard {
             fieldIndexes[i] = schema.getPosition(commonFieldNames.get(i));
         }
 
-        HollowObjectTypeDataElements currentData = currentDataVolatile;
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != ORDINAL_NONE) {
             if((ordinal & shardNumberMask) == shardNumber) {
@@ -418,18 +329,18 @@ class HollowObjectTypeReadStateShard {
                 for(int i=0;i<fieldIndexes.length;i++) {
                     int fieldIdx = fieldIndexes[i];
                     if(!schema.getFieldType(fieldIdx).isVariableLength()) {
-                        long bitOffset = fieldOffset(currentData, shardOrdinal, fieldIdx);
-                        int numBitsForField = currentData.bitsPerField[fieldIdx];
+                        long bitOffset = fieldOffset(shardOrdinal, fieldIdx);
+                        int numBitsForField = dataElements.bitsPerField[fieldIdx];
                         long fixedLengthValue = numBitsForField <= 56 ?
-                                currentData.fixedLengthData.getElementValue(bitOffset, numBitsForField)
-                                : currentData.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
+                                dataElements.fixedLengthData.getElementValue(bitOffset, numBitsForField)
+                                : dataElements.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
     
-                        if(fixedLengthValue == currentData.nullValueForField[fieldIdx])
+                        if(fixedLengthValue == dataElements.nullValueForField[fieldIdx])
                             checksum.applyInt(Integer.MAX_VALUE);
                         else
                             checksum.applyLong(fixedLengthValue);
                     } else {
-                        checksum.applyInt(findVarLengthFieldHashCode(shardOrdinal, fieldIdx));
+                        checksum.applyInt(findVarLengthFieldHashCode(shardOrdinal, fieldIdx));  // SNAP: TODO:
                     }
                 }
             }

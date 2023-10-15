@@ -116,6 +116,7 @@ public class HollowClientUpdater {
     public synchronized boolean updateTo(long requestedVersion) throws Throwable {
         return updateTo(new HollowConsumer.VersionInfo(requestedVersion));
     }
+
     public synchronized boolean updateTo(HollowConsumer.VersionInfo requestedVersionInfo) throws Throwable {
         long requestedVersion = requestedVersionInfo.getVersion();
         if (requestedVersion == getCurrentVersionId()) {
