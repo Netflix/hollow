@@ -17,7 +17,8 @@ public class HollowObjectTypeDataElementsSplitterTest extends AbstractHollowObje
         assertDataUnchanged(5);
 
         HollowObjectTypeDataElements[] result1 = splitter.split(typeReadState.currentDataElements()[0], 1);
-        typeReadState.setCurrentData(result1[0]);
+        typeReadState = new HollowObjectTypeReadState(typeReadState.getSchema(), result1[0]);
+        // typeReadState.setCurrentData(result1[0]);   // SNAP: TODO: Remove
         assertDataUnchanged(5);
 
         HollowObjectTypeDataElements[] result8 = splitter.split(typeReadState.currentDataElements()[0], 8);

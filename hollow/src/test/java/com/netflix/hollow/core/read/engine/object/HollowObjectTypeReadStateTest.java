@@ -144,8 +144,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                 HollowObjectTypeReadState.ShardsHolder original = expectedTypeState.shardsVolatile;
                 HollowObjectTypeReadState.ShardsHolder expanded = expectedTypeState.expandWithOriginalDataElements(original, shardingFactor);
 
-                HollowObjectTypeReadState actualTypeState = new HollowObjectTypeReadState(readStateEngine, MemoryMode.ON_HEAP, schema, schema,
-                        expanded.shards.length);
+                HollowObjectTypeReadState actualTypeState = new HollowObjectTypeReadState(readStateEngine, MemoryMode.ON_HEAP, schema, schema);
                 actualTypeState.shardsVolatile = expanded;
 
                 assertEquals(shardingFactor * expectedTypeState.numShards(), actualTypeState.numShards());
@@ -168,7 +167,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                 typeState.shardsVolatile = typeState.expandWithOriginalDataElements(originalShardsHolder, shardingFactor);
 
                 for(int i=0; i<originalNumShards; i++) {
-                    HollowObjectTypeDataElements originalDataElements = typeState.shardsVolatile.shards[i].currentDataElements();
+                    HollowObjectTypeDataElements originalDataElements = typeState.shardsVolatile.shards[i].dataElements;
 
                     typeState.shardsVolatile = typeState.splitDataElementsForOneShard(typeState.shardsVolatile, i, originalNumShards, shardingFactor);
 
@@ -195,7 +194,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                 for (int i=0; i<newNumShards; i++) {
                     HollowObjectTypeDataElements dataElementsToJoin[] = new HollowObjectTypeDataElements[shardingFactor];
                     for (int j=0; j<shardingFactor; j++) {
-                        dataElementsToJoin[j] = originalShardsHolder.shards[i + (newNumShards*j)].currentDataElements();
+                        dataElementsToJoin[j] = originalShardsHolder.shards[i + (newNumShards*j)].dataElements;
                     };
 
                     typeState.shardsVolatile = typeState.joinDataElementsForOneShard(typeState.shardsVolatile, i, shardingFactor);

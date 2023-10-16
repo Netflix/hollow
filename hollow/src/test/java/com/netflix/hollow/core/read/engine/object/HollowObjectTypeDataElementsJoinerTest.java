@@ -33,7 +33,8 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
 
         HollowObjectTypeDataElements joinedDataElements = joiner.join(typeReadStateSharded.currentDataElements());
 
-        typeReadState.setCurrentData(joinedDataElements);
+        typeReadState = new HollowObjectTypeReadState(typeReadState.getSchema(), joinedDataElements);
+        // typeReadState.setCurrentData(joinedDataElements);    // SNAP: TODO: remove
         assertDataUnchanged(5);
 
         try {
@@ -128,8 +129,8 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         long v5 = oneRunCycle(p, new int[] {0, 1});
 
         // assert lopsided shards before join
-        assertEquals(2, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[0].currentDataElements().maxOrdinal);
-        assertEquals(3, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[1].currentDataElements().maxOrdinal);
+        assertEquals(2, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[0].dataElements.maxOrdinal);
+        assertEquals(3, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[1].dataElements.maxOrdinal);
         c.triggerRefreshTo(v5);
         assertEquals(1, c.getStateEngine().getTypeState("TestObject").numShards()); // joined to 1 shard
         readStateEngine = c.getStateEngine();
