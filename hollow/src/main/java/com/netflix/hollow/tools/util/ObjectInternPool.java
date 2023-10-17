@@ -83,7 +83,7 @@ public class ObjectInternPool {
 
     public String getString(long pointer) {
         ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
-        int length = byteData.get(pointer);
+        int length = VarInt.readVInt(byteData, pointer);
         byte[] bytes = new byte[length];
         for(int i=0;i<length;i++) {
             bytes[i] = byteData.get(pointer+1+i);
