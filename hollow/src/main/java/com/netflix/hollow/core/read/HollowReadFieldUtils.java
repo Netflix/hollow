@@ -64,6 +64,9 @@ public class HollowReadFieldUtils {
     }
 
     public static int hashObject(Object value) {
+        if (value == null) {
+            return 0;
+        }
         if(value instanceof Integer) {
             return HollowReadFieldUtils.intHashCode((Integer)value);
         } else if(value instanceof String) {
