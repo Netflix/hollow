@@ -86,34 +86,8 @@ class HollowObjectTypeReadStateShard {
         return value;
     }
 
-    static class VarLenStats {
-        final int numBitsForField;
-        final long startByte;
-        final long endByte;
-
-        public VarLenStats(int numBitsForField, long startByte, long endByte) {
-            this.numBitsForField = numBitsForField;
-            this.startByte = startByte;
-            this.endByte = endByte;
-        }
-    }
-
-    VarLenStats readVarLenStats(int ordinal, int fieldIndex) {
-        int numBitsForField = dataElements.bitsPerField[fieldIndex];
-        long currentBitOffset = fieldOffset(ordinal, fieldIndex);
-
-        long endByte = dataElements.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
-        long startByte = ordinal != 0 ? dataElements.fixedLengthData.getElementValue(currentBitOffset - dataElements.bitsPerRecord, numBitsForField) : 0;
-
-        return new VarLenStats(numBitsForField, startByte, endByte);
-    }
-
-    public byte[] readBytes(VarLenStats stats, int fieldIndex) {
+    public byte[] readBytes(long startByte, long endByte, int numBitsForField, int fieldIndex) {
         byte[] result;
-
-        int numBitsForField = stats.numBitsForField;
-        long startByte = stats.startByte;
-        long endByte = stats.endByte;
 
         if((endByte & (1L << numBitsForField - 1)) != 0)
             return null;
@@ -129,11 +103,7 @@ class HollowObjectTypeReadStateShard {
         return result;
     }
 
-    public String readString(VarLenStats stats, int fieldIndex) {
-        int numBitsForField = stats.numBitsForField;
-        long startByte = stats.startByte;
-        long endByte = stats.endByte;
-
+    public String readString(long startByte, long endByte, int numBitsForField, int fieldIndex) {
         if((endByte & (1L << numBitsForField - 1)) != 0)
             return null;
 
@@ -144,11 +114,7 @@ class HollowObjectTypeReadStateShard {
         return readString(dataElements.varLengthData[fieldIndex], startByte, length);
     }
 
-    public boolean isStringFieldEqual(VarLenStats stats, int fieldIndex, String testValue) {
-        int numBitsForField = stats.numBitsForField;
-        long startByte = stats.startByte;
-        long endByte = stats.endByte;
-
+    public boolean isStringFieldEqual(long startByte, long endByte, int numBitsForField, int fieldIndex, String testValue) {
         if((endByte & (1L << numBitsForField - 1)) != 0)
             return testValue == null;
         if(testValue == null)
@@ -161,11 +127,7 @@ class HollowObjectTypeReadStateShard {
         return testStringEquality(dataElements.varLengthData[fieldIndex], startByte, length, testValue);
     }
 
-    public int findVarLengthFieldHashCode(VarLenStats stats, int fieldIndex) {
-        int numBitsForField = stats.numBitsForField;
-        long startByte = stats.startByte;
-        long endByte = stats.endByte;
-
+    public int findVarLengthFieldHashCode(long startByte, long endByte, int numBitsForField, int fieldIndex) {
         if((endByte & (1L << numBitsForField - 1)) != 0)
             return -1;
 
@@ -184,7 +146,7 @@ class HollowObjectTypeReadStateShard {
         return fieldIndex == -1 ? 0 : dataElements.bitsPerField[fieldIndex];
     }
 
-    private long fieldOffset(int ordinal, int fieldIndex) {
+    long fieldOffset(int ordinal, int fieldIndex) {
         return ((long)dataElements.bitsPerRecord * ordinal) + dataElements.bitOffsetPerField[fieldIndex];
     }
 
@@ -227,11 +189,15 @@ class HollowObjectTypeReadStateShard {
     }
 
     protected void applyShardToChecksum(HollowChecksum checksum, HollowSchema withSchema, BitSet populatedOrdinals, int shardNumber, int shardNumberMask) {
+        int numBitsForField;
+        long bitOffset;
+        long endByte;
+        long startByte;
+
         if(!(withSchema instanceof HollowObjectSchema))
             throw new IllegalArgumentException("HollowObjectTypeReadState can only calculate checksum with a HollowObjectSchema: " + schema.getName());
 
         HollowObjectSchema commonSchema = schema.findCommonSchema((HollowObjectSchema)withSchema);
-        VarLenStats stats;
 
         List<String> commonFieldNames = new ArrayList<String>();
         for(int i=0;i<commonSchema.numFields();i++)
@@ -250,9 +216,9 @@ class HollowObjectTypeReadStateShard {
                 checksum.applyInt(ordinal);
                 for(int i=0;i<fieldIndexes.length;i++) {
                     int fieldIdx = fieldIndexes[i];
+                    bitOffset = fieldOffset(shardOrdinal, fieldIdx);
+                    numBitsForField = dataElements.bitsPerField[fieldIdx];
                     if(!schema.getFieldType(fieldIdx).isVariableLength()) {
-                        long bitOffset = fieldOffset(shardOrdinal, fieldIdx);
-                        int numBitsForField = dataElements.bitsPerField[fieldIdx];
                         long fixedLengthValue = numBitsForField <= 56 ?
                                 dataElements.fixedLengthData.getElementValue(bitOffset, numBitsForField)
                                 : dataElements.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
@@ -262,8 +228,9 @@ class HollowObjectTypeReadStateShard {
                         else
                             checksum.applyLong(fixedLengthValue);
                     } else {
-                        stats = readVarLenStats(shardOrdinal, fieldIdx);
-                        checksum.applyInt(findVarLengthFieldHashCode(stats, fieldIdx));
+                        endByte = dataElements.fixedLengthData.getElementValue(bitOffset, numBitsForField);
+                        startByte = shardOrdinal != 0 ? dataElements.fixedLengthData.getElementValue(bitOffset - dataElements.bitsPerRecord, numBitsForField) : 0;
+                        checksum.applyInt(findVarLengthFieldHashCode(startByte, endByte, numBitsForField, fieldIdx));
                     }
                 }
             }
