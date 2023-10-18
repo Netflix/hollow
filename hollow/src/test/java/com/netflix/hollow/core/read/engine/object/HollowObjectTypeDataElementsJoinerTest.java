@@ -28,14 +28,13 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         assertEquals(1, typeReadState.numShards());
 
         HollowObjectTypeReadState typeReadStateSharded = populateTypeStateWith(5);
-        assertDataUnchanged(5);
+        assertDataUnchanged(typeReadStateSharded, 5);
         assertEquals(8, typeReadStateSharded.numShards());
 
         HollowObjectTypeDataElements joinedDataElements = joiner.join(typeReadStateSharded.currentDataElements());
 
         typeReadState = new HollowObjectTypeReadState(typeReadState.getSchema(), joinedDataElements);
-        // typeReadState.setCurrentData(joinedDataElements);    // SNAP: TODO: remove
-        assertDataUnchanged(5);
+        assertDataUnchanged(typeReadState, 5);
 
         try {
             joiner.join(mockObjectTypeState.currentDataElements());
@@ -78,8 +77,8 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         assertEquals(valBig, val1);
     }
 
-//    TODO: manually invoked, depends on producer side changes for supporting changing numShards in a delta chain
-    @Test
+    //    TODO: manually invoked, depends on producer side changes for supporting changing numShards in a delta chain
+    // @Test
     public void testLopsidedShards() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
         HollowProducer p = HollowProducer.withPublisher(blobStore)

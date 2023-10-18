@@ -72,7 +72,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
             for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(1000))
             {
                 HollowObjectTypeReadState objectTypeReadState = populateTypeStateWith(numRecords);
-                assertDataUnchanged(numRecords);
+                assertDataUnchanged(objectTypeReadState, numRecords);
 
                 // Splitting shards
                 {
@@ -83,7 +83,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                     assertEquals(newShardCount, objectTypeReadState.numShards());
                     assertEquals(newShardCount, shardingFactor * prevShardCount);
                 }
-                assertDataUnchanged(numRecords);
+                assertDataUnchanged(objectTypeReadState, numRecords);
 
                 // Joining shards
                 {
@@ -94,7 +94,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                     assertEquals(newShardCount, objectTypeReadState.numShards());
                     assertEquals(shardingFactor * newShardCount, prevShardCount);
                 }
-                assertDataUnchanged(numRecords);
+                assertDataUnchanged(objectTypeReadState, numRecords);
             }
         }
     }
@@ -107,7 +107,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
             for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(10000))
             {
                 HollowObjectTypeReadState objectTypeReadState = populateTypeStateWithFilter(numRecords);
-                assertDataUnchanged(numRecords);
+                assertDataUnchanged(objectTypeReadState, numRecords);
 
                 // Splitting shards
                 {
@@ -118,7 +118,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                     assertEquals(newShardCount, objectTypeReadState.numShards());
                     assertEquals(newShardCount, shardingFactor * prevShardCount);
                 }
-                assertDataUnchanged(numRecords);
+                assertDataUnchanged(objectTypeReadState, numRecords);
 
                 // Joining shards
                 {
@@ -129,7 +129,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                     assertEquals(newShardCount, objectTypeReadState.numShards());
                     assertEquals(shardingFactor * newShardCount, prevShardCount);
                 }
-                assertDataUnchanged(numRecords);
+                assertDataUnchanged(objectTypeReadState, numRecords);
             }
         }
     }
@@ -207,17 +207,6 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                     assertDataUnchanged(typeState, numRecords);   // as each original shard is processed
                 }
             }
-        }
-    }
-
-    private void assertDataUnchanged(HollowObjectTypeReadState actualTypeState, int numRecords) {
-        for(int i=0;i<numRecords;i++) {
-
-            GenericHollowObject obj = new GenericHollowObject(actualTypeState , i);
-            Assert.assertEquals(i, obj.getLong("longField"));
-            Assert.assertEquals("Value"+i, obj.getString("stringField"));
-            Assert.assertEquals(i, obj.getInt("intField"));
-            Assert.assertEquals((double)i, obj.getDouble("doubleField"), 0);
         }
     }
 

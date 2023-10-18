@@ -331,7 +331,6 @@ public class HollowBlobReader {
             } else {
                 HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
                 HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
-                // Object types support numShards application at snapshot application time, other types allocate a fixed numShards now
                 populateTypeStateSnapshotWithNumShards(in, new HollowObjectTypeReadState(stateEngine, memoryMode, filteredSchema, unfilteredSchema), numShards);
             }
         } else if (schema instanceof HollowListSchema) {
@@ -363,9 +362,9 @@ public class HollowBlobReader {
     }
 
     private void populateTypeStateSnapshotWithNumShards(HollowBlobInput in, HollowTypeReadState typeState, int numShards) throws IOException {
-        int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);   // SNAP: TODO: can simplify to power of 2 ch
-        if(numShards < 1 || 1 << shardOrdinalShift != numShards)
+        if (numShards<=0 || ((numShards&(numShards-1))!=0)) {
             throw new IllegalArgumentException("Number of shards must be a power of 2!");
+        }
 
         stateEngine.addTypeState(typeState);
         typeState.readSnapshot(in, stateEngine.getMemoryRecycler(), numShards);

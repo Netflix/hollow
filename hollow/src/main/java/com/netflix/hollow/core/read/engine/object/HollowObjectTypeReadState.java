@@ -85,8 +85,6 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         super(fileEngine, memoryMode, schema);
         this.sampler = new HollowObjectSampler(schema, DisabledSamplingDirector.INSTANCE);
         this.unfilteredSchema = unfilteredSchema;
-
-        // this.shardsVolatile = new ShardsHolder(schema, numShards);   // SNAP: TODO: Remove
         this.shardsVolatile = null;
     }
 
@@ -651,10 +649,14 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     @Override
     protected void invalidate() {
-        HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
         stateListeners = EMPTY_LISTENERS;
-        for(int i=0;i<shards.length;i++)
-            shards[i] = null;   // SNAP: TODO: Confirm that this has the desired effect, usage in object longevity
+        HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
+        int numShards = shards.length;
+        HollowObjectTypeDataElements[] nullDataElements = new HollowObjectTypeDataElements[numShards];
+        int[] shardOridnalShifts = new int[numShards];
+        for (int i=0;i<numShards;i++)
+            shardOridnalShifts[i] = shards[i].shardOrdinalShift;
+        this.shardsVolatile = new ShardsHolder(getSchema(), nullDataElements, shardOridnalShifts);
     }
 
     @Override

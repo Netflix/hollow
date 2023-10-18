@@ -98,7 +98,7 @@ class HollowObjectTypeReadStateShard {
         }
     }
 
-    public VarLenStats readVarLenStats(int ordinal, int fieldIndex) {
+    VarLenStats readVarLenStats(int ordinal, int fieldIndex) {
         int numBitsForField = dataElements.bitsPerField[fieldIndex];
         long currentBitOffset = fieldOffset(ordinal, fieldIndex);
 
