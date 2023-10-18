@@ -511,17 +511,26 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         HollowObjectTypeReadState.ShardsHolder shardsHolder;
         HollowObjectTypeReadStateShard shard;
-        HollowObjectTypeReadStateShard.VarLenStats stats;
         byte[] result;
+        int numBitsForField;
+        long currentBitOffset;
+        long endByte;
+        long startByte;
+        int shardOrdinal;
 
         do {
             do {
                 shardsHolder = this.shardsVolatile;
                 shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
-                stats = shard.readVarLenStats(ordinal >> shard.shardOrdinalShift, fieldIndex);
+                shardOrdinal = ordinal >> shard.shardOrdinalShift;
+
+                numBitsForField = shard.dataElements.bitsPerField[fieldIndex];
+                currentBitOffset = shard.fieldOffset(shardOrdinal, fieldIndex);
+                endByte = shard.dataElements.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
+                startByte = shardOrdinal != 0 ? shard.dataElements.fixedLengthData.getElementValue(currentBitOffset - shard.dataElements.bitsPerRecord, numBitsForField) : 0;
             } while (readWasUnsafe(shardsHolder));
 
-            result = shard.readBytes(stats, fieldIndex);
+            result = shard.readBytes(startByte, endByte, numBitsForField, fieldIndex);
         } while (readWasUnsafe(shardsHolder));
 
         return result;
@@ -533,17 +542,26 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         HollowObjectTypeReadState.ShardsHolder shardsHolder;
         HollowObjectTypeReadStateShard shard;
-        HollowObjectTypeReadStateShard.VarLenStats stats;
         String result;
+        int numBitsForField;
+        long currentBitOffset;
+        long endByte;
+        long startByte;
+        int shardOrdinal;
 
         do {
             do {
                 shardsHolder = this.shardsVolatile;
                 shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
-                stats = shard.readVarLenStats(ordinal >> shard.shardOrdinalShift, fieldIndex);
+                shardOrdinal = ordinal >> shard.shardOrdinalShift;
+
+                numBitsForField = shard.dataElements.bitsPerField[fieldIndex];
+                currentBitOffset = shard.fieldOffset(shardOrdinal, fieldIndex);
+                endByte = shard.dataElements.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
+                startByte = shardOrdinal != 0 ? shard.dataElements.fixedLengthData.getElementValue(currentBitOffset - shard.dataElements.bitsPerRecord, numBitsForField) : 0;
             } while(readWasUnsafe(shardsHolder));
 
-            result = shard.readString(stats, fieldIndex);
+            result = shard.readString(startByte, endByte, numBitsForField, fieldIndex);
         } while(readWasUnsafe(shardsHolder));
 
         return result;
@@ -555,17 +573,26 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         HollowObjectTypeReadState.ShardsHolder shardsHolder;
         HollowObjectTypeReadStateShard shard;
-        HollowObjectTypeReadStateShard.VarLenStats stats;
         boolean result;
+        int numBitsForField;
+        long currentBitOffset;
+        long endByte;
+        long startByte;
+        int shardOrdinal;
 
         do {
             do {
                 shardsHolder = this.shardsVolatile;
                 shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
-                stats = shard.readVarLenStats(ordinal >> shard.shardOrdinalShift, fieldIndex);
+                shardOrdinal = ordinal >> shard.shardOrdinalShift;
+
+                numBitsForField = shard.dataElements.bitsPerField[fieldIndex];
+                currentBitOffset = shard.fieldOffset(shardOrdinal, fieldIndex);
+                endByte = shard.dataElements.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
+                startByte = shardOrdinal != 0 ? shard.dataElements.fixedLengthData.getElementValue(currentBitOffset - shard.dataElements.bitsPerRecord, numBitsForField) : 0;
             } while(readWasUnsafe(shardsHolder));
 
-            result = shard.isStringFieldEqual(stats, fieldIndex, testValue);
+            result = shard.isStringFieldEqual(startByte, endByte, numBitsForField, fieldIndex, testValue);
         } while(readWasUnsafe(shardsHolder));
 
         return result;
@@ -577,17 +604,26 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         HollowObjectTypeReadState.ShardsHolder shardsHolder;
         HollowObjectTypeReadStateShard shard;
-        HollowObjectTypeReadStateShard.VarLenStats stats;
         int hashCode;
+        int numBitsForField;
+        long currentBitOffset;
+        long endByte;
+        long startByte;
+        int shardOrdinal;
 
         do {
             do {
                 shardsHolder = this.shardsVolatile;
                 shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
-                stats = shard.readVarLenStats(ordinal >> shard.shardOrdinalShift, fieldIndex);
+                shardOrdinal = ordinal >> shard.shardOrdinalShift;
+
+                numBitsForField = shard.dataElements.bitsPerField[fieldIndex];
+                currentBitOffset = shard.fieldOffset(shardOrdinal, fieldIndex);
+                endByte = shard.dataElements.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
+                startByte = shardOrdinal != 0 ? shard.dataElements.fixedLengthData.getElementValue(currentBitOffset - shard.dataElements.bitsPerRecord, numBitsForField) : 0;
             } while(readWasUnsafe(shardsHolder));
 
-            hashCode = shard.findVarLengthFieldHashCode(stats, fieldIndex);
+            hashCode = shard.findVarLengthFieldHashCode(startByte, endByte, numBitsForField, fieldIndex);
         } while(readWasUnsafe(shardsHolder));
 
         return hashCode;
