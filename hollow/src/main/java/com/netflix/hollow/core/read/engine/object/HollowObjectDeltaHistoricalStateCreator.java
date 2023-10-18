@@ -27,6 +27,7 @@ import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.util.IntMap;
 import com.netflix.hollow.core.util.RemovedOrdinalIterator;
+import java.util.Arrays;
 
 /**
  * This class contains the logic for extracting the removed records from an OBJECT type state
@@ -38,11 +39,8 @@ public class HollowObjectDeltaHistoricalStateCreator {
 
     private final HollowObjectTypeDataElements historicalDataElements;
 
-    private final int shardNumberMask;
-    private final int shardOrdinalShift;
-
     private HollowObjectTypeReadState typeState;
-    private HollowObjectTypeDataElements stateEngineDataElements[];
+    private HollowObjectTypeReadState.ShardsHolder shardsHolder;
     private RemovedOrdinalIterator iter;
     private IntMap ordinalMapping;
     private int nextOrdinal;
@@ -50,12 +48,10 @@ public class HollowObjectDeltaHistoricalStateCreator {
 
     public HollowObjectDeltaHistoricalStateCreator(HollowObjectTypeReadState typeState, boolean reverse) {
         this.typeState = typeState;
-        this.stateEngineDataElements = typeState.currentDataElements();
         this.historicalDataElements = new HollowObjectTypeDataElements(typeState.getSchema(), WastefulRecycler.DEFAULT_INSTANCE);
         this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class), reverse);
         this.currentWriteVarLengthDataPointers = new long[typeState.getSchema().numFields()];
-        this.shardNumberMask = stateEngineDataElements.length - 1;
-        this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(stateEngineDataElements.length);
+        this.shardsHolder = typeState.shardsVolatile;
     }
 
     public void populateHistory() {
@@ -75,9 +71,9 @@ public class HollowObjectDeltaHistoricalStateCreator {
         while(ordinal != ORDINAL_NONE) {
             ordinalMapping.put(ordinal, nextOrdinal);
 
-            int shard = ordinal & shardNumberMask;
-            int shardOrdinal = ordinal >> shardOrdinalShift;
-            copyRecord(historicalDataElements, nextOrdinal, stateEngineDataElements[shard], shardOrdinal, currentWriteVarLengthDataPointers);
+            int whichShard = ordinal & shardsHolder.shardNumberMask;
+            int shardOrdinal = ordinal >> shardsHolder.shards[whichShard].shardOrdinalShift;
+            copyRecord(historicalDataElements, nextOrdinal, shardsHolder.shards[whichShard].dataElements, shardOrdinal, currentWriteVarLengthDataPointers);
             nextOrdinal++;
 
             ordinal = iter.next();
@@ -90,7 +86,7 @@ public class HollowObjectDeltaHistoricalStateCreator {
      */
     public void dereferenceTypeState() {
         this.typeState = null;
-        this.stateEngineDataElements = null;
+        this.shardsHolder = null;
         this.iter = null;
     }
 
@@ -116,9 +112,9 @@ public class HollowObjectDeltaHistoricalStateCreator {
 
             for(int i=0;i<typeState.getSchema().numFields();i++) {
                 if(isVarLengthField(typeState.getSchema().getFieldType(i))) {
-                    int shard = ordinal & shardNumberMask;
-                    int shardOrdinal = ordinal >> shardOrdinalShift;
-                    totalVarLengthSizes[i] += varLengthSize(stateEngineDataElements[shard], shardOrdinal, i);
+                    int whichShard = ordinal & shardsHolder.shardNumberMask;
+                    int shardOrdinal = ordinal >> shardsHolder.shards[whichShard].shardOrdinalShift;
+                    totalVarLengthSizes[i] += varLengthSize(shardsHolder.shards[whichShard].dataElements, shardOrdinal, i);
                 }
             }
 
@@ -129,7 +125,10 @@ public class HollowObjectDeltaHistoricalStateCreator {
 
         for(int i=0;i<typeState.getSchema().numFields();i++) {
             if(!isVarLengthField(typeState.getSchema().getFieldType(i))) {
-                historicalDataElements.bitsPerField[i] = stateEngineDataElements[0].bitsPerField[i];
+                final int fieldIdx = i;
+                historicalDataElements.bitsPerField[i] = Arrays.stream(shardsHolder.shards)
+                        .map(shard -> shard.dataElements.bitsPerField[fieldIdx])
+                        .max(Integer::compare).get();
             } else {
                 historicalDataElements.bitsPerField[i] = (64 - Long.numberOfLeadingZeros(totalVarLengthSizes[i] + 1)) + 1;
             }
