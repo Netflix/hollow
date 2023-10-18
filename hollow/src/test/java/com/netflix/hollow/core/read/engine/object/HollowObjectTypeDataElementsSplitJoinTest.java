@@ -47,11 +47,11 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
         HollowChecksum newCksum = new HollowChecksum();
 
         for(int i=0;i<origTypeState.numShards();i++) {
-            origTypeState.shardsVolatile.shards[i].applyToChecksum(origCksum, origTypeState.getSchema(), populatedOrdinals, i, origTypeState.shardsVolatile.shardNumberMask);
+            origTypeState.shardsVolatile.shards[i].applyShardToChecksum(origCksum, origTypeState.getSchema(), populatedOrdinals, i, origTypeState.shardsVolatile.shardNumberMask);
         }
 
         for(int i=0;i<newTypeState.numShards();i++) {
-            newTypeState.shardsVolatile.shards[i].applyToChecksum(newCksum, newTypeState.getSchema(), populatedOrdinals, i, newTypeState.shardsVolatile.shardNumberMask);
+            newTypeState.shardsVolatile.shards[i].applyShardToChecksum(newCksum, newTypeState.getSchema(), populatedOrdinals, i, newTypeState.shardsVolatile.shardNumberMask);
         }
 
         assertEquals(newCksum, origCksum);

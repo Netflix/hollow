@@ -77,82 +77,82 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         assertEquals(valBig, val1);
     }
 
-    //    TODO: manually invoked, depends on producer side changes for supporting changing numShards in a delta chain
-    // @Test
-    public void testLopsidedShards() {
-        InMemoryBlobStore blobStore = new InMemoryBlobStore();
-        HollowProducer p = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(new HollowInMemoryBlobStager())
-                .build();
-
-        p.initializeDataModel(schema);
-        int targetSize = 64;
-        p.getWriteEngine().setTargetMaxTypeShardSize(targetSize);
-        long v1 = oneRunCycle(p, new int[] {0, 1, 2, 3, 4, 5, 6, 7});
-
-        HollowConsumer c = HollowConsumer
-                .withBlobRetriever(blobStore)
-                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
-                    @Override
-                    public boolean allowDoubleSnapshot() {
-                        return false;
-                    }
-
-                    @Override
-                    public int maxDeltasBeforeDoubleSnapshot() {
-                        return Integer.MAX_VALUE;
-                    }
-                })
-                .withSkipTypeShardUpdateWithNoAdditions()
-                .build();
-        c.triggerRefreshTo(v1);
-
-        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
-        assertEquals(true, c.getStateEngine().isSkipTypeShardUpdateWithNoAdditions());
-
-        long v2 = oneRunCycle(p, new int[] {0, 1, 2, 3, 5, 7});
-        c.triggerRefreshTo(v2);
-        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
-
-        long v3 = oneRunCycle(p, new int[] { 0, 1, 3, 5}); // drop to 1 ordinal per shard, skipTypeShardWithNoAdds will make it so that maxOrdinal is adjusted
-        c.triggerRefreshTo(v3);
-        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
-
-        long v4 = oneRunCycle(p, new int[] { 0, 1, 2, 3}); // now add another ordinal to one shard, maxOrdinals will be lopsided
-        c.triggerRefreshTo(v4);
-        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
-
-        readStateEngine = c.getStateEngine();
-        assertDataUnchanged(3);
-
-        long v5 = oneRunCycle(p, new int[] {0, 1});
-
-        // assert lopsided shards before join
-        assertEquals(2, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[0].dataElements.maxOrdinal);
-        assertEquals(3, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[1].dataElements.maxOrdinal);
-        c.triggerRefreshTo(v5);
-        assertEquals(1, c.getStateEngine().getTypeState("TestObject").numShards()); // joined to 1 shard
-        readStateEngine = c.getStateEngine();
-        assertDataUnchanged(2);
-
-        long v6 = oneRunCycle(p, new int[] {0, 1, 2, 3, 4, 5 });
-        c.triggerRefreshTo(v6);
-        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards()); // split to 2 shards
-
-        long v7 = oneRunCycle(p, new int[] {8, 9});
-        c.triggerRefreshTo(v7);
-        assertEquals(4, c.getStateEngine().getTypeState("TestObject").numShards()); // still 2 shards
-
-        long v8 = oneRunCycle(p, new int[] {8});
-        c.triggerRefreshTo(v8);
-        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards()); // down to 1 shard
-
-        c.triggerRefreshTo(v1);
-        assertEquals(v1, c.getCurrentVersionId());
-
-        c.triggerRefreshTo(v8);
-        assertEquals(v8, c.getCurrentVersionId());
-    }
+//    TODO: manually invoked, depends on producer side changes for supporting changing numShards in a delta chain
+//    @Test
+//    public void testLopsidedShards() {
+//        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+//        HollowProducer p = HollowProducer.withPublisher(blobStore)
+//                .withBlobStager(new HollowInMemoryBlobStager())
+//                .build();
+//
+//        p.initializeDataModel(schema);
+//        int targetSize = 64;
+//        p.getWriteEngine().setTargetMaxTypeShardSize(targetSize);
+//        long v1 = oneRunCycle(p, new int[] {0, 1, 2, 3, 4, 5, 6, 7});
+//
+//        HollowConsumer c = HollowConsumer
+//                .withBlobRetriever(blobStore)
+//                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+//                    @Override
+//                    public boolean allowDoubleSnapshot() {
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public int maxDeltasBeforeDoubleSnapshot() {
+//                        return Integer.MAX_VALUE;
+//                    }
+//                })
+//                .withSkipTypeShardUpdateWithNoAdditions()
+//                .build();
+//        c.triggerRefreshTo(v1);
+//
+//        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
+//        assertEquals(true, c.getStateEngine().isSkipTypeShardUpdateWithNoAdditions());
+//
+//        long v2 = oneRunCycle(p, new int[] {0, 1, 2, 3, 5, 7});
+//        c.triggerRefreshTo(v2);
+//        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
+//
+//        long v3 = oneRunCycle(p, new int[] { 0, 1, 3, 5}); // drop to 1 ordinal per shard, skipTypeShardWithNoAdds will make it so that maxOrdinal is adjusted
+//        c.triggerRefreshTo(v3);
+//        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
+//
+//        long v4 = oneRunCycle(p, new int[] { 0, 1, 2, 3}); // now add another ordinal to one shard, maxOrdinals will be lopsided
+//        c.triggerRefreshTo(v4);
+//        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
+//
+//        readStateEngine = c.getStateEngine();
+//        assertDataUnchanged(3);
+//
+//        long v5 = oneRunCycle(p, new int[] {0, 1});
+//
+//        // assert lopsided shards before join
+//        assertEquals(2, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[0].dataElements.maxOrdinal);
+//        assertEquals(3, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[1].dataElements.maxOrdinal);
+//        c.triggerRefreshTo(v5);
+//        assertEquals(1, c.getStateEngine().getTypeState("TestObject").numShards()); // joined to 1 shard
+//        readStateEngine = c.getStateEngine();
+//        assertDataUnchanged(2);
+//
+//        long v6 = oneRunCycle(p, new int[] {0, 1, 2, 3, 4, 5 });
+//        c.triggerRefreshTo(v6);
+//        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards()); // split to 2 shards
+//
+//        long v7 = oneRunCycle(p, new int[] {8, 9});
+//        c.triggerRefreshTo(v7);
+//        assertEquals(4, c.getStateEngine().getTypeState("TestObject").numShards()); // still 2 shards
+//
+//        long v8 = oneRunCycle(p, new int[] {8});
+//        c.triggerRefreshTo(v8);
+//        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards()); // down to 1 shard
+//
+//        c.triggerRefreshTo(v1);
+//        assertEquals(v1, c.getCurrentVersionId());
+//
+//        c.triggerRefreshTo(v8);
+//        assertEquals(v8, c.getCurrentVersionId());
+//    }
 
     private long oneRunCycle(HollowProducer p, int recordIds[]) {
         return p.runCycle(state -> {

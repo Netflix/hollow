@@ -676,12 +676,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     HollowObjectTypeDataElements[] currentDataElements() {
         final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
-        HollowObjectTypeDataElements currentDataElements[] = new HollowObjectTypeDataElements[shards.length];
-        
-        for(int i=0;i<shards.length;i++)
-            currentDataElements[i] = shards[i].dataElements;
-        
-        return currentDataElements;
+        return Arrays.stream(shards)
+                .map(shard -> shard.dataElements)
+                .toArray(HollowObjectTypeDataElements[]::new);
     }
 
     @Override
@@ -695,7 +692,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         BitSet populatedOrdinals = getPopulatedOrdinals();
 
         for(int i=0;i<shards.length;i++) {
-            shards[i].applyToChecksum(checksum, withSchema, populatedOrdinals, i, shardNumberMask);
+            shards[i].applyShardToChecksum(checksum, withSchema, populatedOrdinals, i, shardNumberMask);
         }
     }
 
