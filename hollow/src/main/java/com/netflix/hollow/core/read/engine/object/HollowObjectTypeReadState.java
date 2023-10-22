@@ -644,7 +644,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         // read invalidation (numShards+2) times: once for shards expansion/truncation, once for split/join on any shard, and
         // then once when delta is applied.
         return shardsHolder != currShardsHolder
-            && (currShardsHolder.shards[ordinal & currShardsHolder.shardNumberMask] != shard);
+            && (shard != currShardsHolder.shards[ordinal & currShardsHolder.shardNumberMask]);
     }
 
     /**
