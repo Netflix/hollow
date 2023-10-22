@@ -7,6 +7,7 @@ import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import org.junit.Assert;
 import org.junit.Test;
@@ -71,8 +72,13 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
         {
             for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(1000))
             {
+                final int iterNumRecords = numRecords;
                 HollowObjectTypeReadState objectTypeReadState = populateTypeStateWith(numRecords);
-                assertDataUnchanged(objectTypeReadState, numRecords);
+                CompletableFuture<Void> reads = CompletableFuture.runAsync(() -> {
+                    for (int i=0; i<100; i++) {
+                        assertDataUnchanged(objectTypeReadState, iterNumRecords);
+                    }
+                });
 
                 // Splitting shards
                 {
@@ -95,6 +101,10 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                     assertEquals(shardingFactor * newShardCount, prevShardCount);
                 }
                 assertDataUnchanged(objectTypeReadState, numRecords);
+
+                reads.get();
+                if(reads.isCompletedExceptionally())
+                    throw new IllegalStateException();
             }
         }
     }
