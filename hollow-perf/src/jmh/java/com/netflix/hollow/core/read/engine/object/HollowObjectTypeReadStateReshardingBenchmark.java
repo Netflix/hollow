@@ -35,7 +35,7 @@ import org.openjdk.jmh.infra.Blackhole;
 @Warmup(iterations = 10, time = 1)
 @Measurement(iterations = 10, time = 1)
 @Fork(1)
-public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
+public class HollowObjectTypeReadStateReshardingBenchmark {
     HollowWriteStateEngine writeStateEngine;
     HollowReadStateEngine readStateEngine;
     HollowObjectTypeDataAccess dataAccess;
@@ -104,18 +104,9 @@ public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
         doneBenchmark = new CountDownLatch(1);
         reshardingFuture = refreshExecutor.submit(() -> {
             do {
-
-
-
-                // System.out.println("SNAP: Splitting... ");
                 HollowObjectTypeReadState stringTypeState = (HollowObjectTypeReadState) dataAccess.getTypeState();
-
-                // System.out.println("Step 1 shards = " + stringTypeState.numShards());
                 stringTypeState.reshard(stringTypeState.numShards() * 2);
-                // System.out.println("SNAP: Joining... ");
-                // System.out.println("Step 2 shards = " + stringTypeState.numShards());
                 stringTypeState.reshard(stringTypeState.numShards() / 2);
-                // System.out.println("Step 3 shards = " + stringTypeState.numShards());
                 counter.incrementAndGet();
             } while (doneBenchmark.getCount() > 0);
         });

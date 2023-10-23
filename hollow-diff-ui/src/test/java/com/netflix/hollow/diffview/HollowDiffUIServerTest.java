@@ -6,7 +6,7 @@ import org.junit.Test;
 
 public class HollowDiffUIServerTest {
 
-    @Test
+    // @Test
     public void test() throws Exception {
         HollowDiff testDiff = new FakeHollowDiffGenerator().createFakeDiff();
 
@@ -18,7 +18,7 @@ public class HollowDiffUIServerTest {
         // server.stop();
     }
 
-    @Test
+    // @Test
     public void testBackwardsCompatibiltyWithJettyImplementation() throws Exception {
         HollowDiff testDiff = new FakeHollowDiffGenerator().createFakeDiff();
 

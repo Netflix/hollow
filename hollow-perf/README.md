@@ -10,3 +10,6 @@ introduce more variance in the results.
 
 If the annotations declared on benchmark classes are modified it may be necessary to kill Gradle daemons and
 rebuild.
+
+
+`java -jar -Djmh.ignoreLock=true hollow-perf/build/libs/hollow-perf-*-jmh.jar HollowObjectTypeReadStateReshardingBenchmark -rf json`
