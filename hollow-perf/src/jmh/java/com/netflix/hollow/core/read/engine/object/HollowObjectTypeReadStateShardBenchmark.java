@@ -23,7 +23,7 @@ import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
-@BenchmarkMode(Mode.All)
+@BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 10, time = 1)
 @Measurement(iterations = 10, time = 1)
@@ -45,7 +45,7 @@ public class HollowObjectTypeReadStateShardBenchmark {
     @Param({ "5", "25", "50", "150", "1000" })
     int maxStringLength;
 
-    @Param({ "0" })
+    @Param({ "10" })
     int probabilityUnicode;
 
     @Setup

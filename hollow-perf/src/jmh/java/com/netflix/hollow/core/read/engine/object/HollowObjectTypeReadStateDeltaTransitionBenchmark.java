@@ -1,5 +1,6 @@
 package com.netflix.hollow.core.read.engine.object;
 
+
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
@@ -7,14 +8,16 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -32,9 +35,12 @@ import org.openjdk.jmh.infra.Blackhole;
 @State(Scope.Thread)
 @BenchmarkMode({Mode.All})
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 10, time = 1)
-@Measurement(iterations = 10, time = 1)
+@Warmup(iterations = 7, time = 1)
+@Measurement(iterations = 7, time = 1)
 @Fork(1)
+/**
+ * Runs delta transitions in the background while benchmarking reads. Re-sharding in delta transitions can be toggled with a param.
+ */
 public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
     HollowWriteStateEngine writeStateEngine;
     HollowReadStateEngine readStateEngine;
@@ -43,6 +49,12 @@ public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
 
     @Param({ "500" })
     int countStrings;
+
+    @Param({ "2000" })
+    int deltaChanges;
+
+    @Param({ "true" })
+    boolean isReshardingEnabled;
 
     @Param({ "100000" })
     int countStringsDb;
@@ -59,19 +71,25 @@ public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
     Future<?> reshardingFuture;
     CountDownLatch doneBenchmark;
 
-    AtomicLong counter;
-
     @Setup
     public void setUp() throws ExecutionException, InterruptedException {
+        final List<String> readStrings = new ArrayList<>();
+        final Set<Integer> readKeys = new HashSet<>();
         refreshExecutor = Executors.newSingleThreadExecutor();
 
         refreshExecutor.submit(() -> {
+            Random r = new Random();
             writeStateEngine = new HollowWriteStateEngine();
             writeStateEngine.setTargetMaxTypeShardSize((long) shardSizeMBs * 1000l * 1000l);
             objectMapper = new HollowObjectMapper(writeStateEngine);
             objectMapper.initializeTypeState(String.class);
 
-            Random r = new Random();
+            readOrder = new ArrayList<>(countStrings);
+            for (int i = 0; i < countStrings; i++) {
+                readOrder.add(r.nextInt(countStringsDb));
+            }
+            readKeys.addAll(readOrder);
+
             for (int i = 0; i < countStringsDb; i++) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("string_");
@@ -81,42 +99,60 @@ public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
                 for (int j = 0; j < thisStringLength; j++) {
                     sb.append((char) (r.nextInt(26) + 'a'));
                 }
-                objectMapper.add(sb.toString());
-            }
-
-            readOrder = new ArrayList<>(countStrings);
-            for (int i = 0; i < countStrings; i++) {
-                readOrder.add(r.nextInt(countStringsDb));
+                String s = sb.toString();
+                objectMapper.add(s);
+                if (readKeys.contains(i)) {
+                    readStrings.add(s);
+                }
             }
 
             readStateEngine = new HollowReadStateEngine();
-
             try {
                 StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             dataAccess = (HollowObjectTypeDataAccess) readStateEngine.getTypeDataAccess("String", 0);
-
         }).get();
 
-        counter = new AtomicLong(0l);
         doneBenchmark = new CountDownLatch(1);
         reshardingFuture = refreshExecutor.submit(() -> {
+            Random r = new Random();
+            long origShardSize = shardSizeMBs * 1000 * 1000;
+            long newShardSize = origShardSize;
             do {
+                for (int i=0; i<readStrings.size(); i++) {
+                    objectMapper.add(readStrings.get(i));
+                }
+                for (int i = 0; i < deltaChanges; i++) {
+                    int changeKey = r.nextInt(countStringsDb);
+                    if (readKeys.contains(changeKey)) {
+                        continue;
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("string_");
+                    sb.append(changeKey);
+                    sb.append("_");
+                    int thisStringLength = r.nextInt(maxStringLength) - sb.length() + 1;
+                    for (int j = 0; j < thisStringLength; j++) {
+                        sb.append((char) (r.nextInt(26) + 'a'));
+                    }
+                    objectMapper.add(sb.toString());
+                }
 
-
-
-                // System.out.println("SNAP: Splitting... ");
-                HollowObjectTypeReadState stringTypeState = (HollowObjectTypeReadState) dataAccess.getTypeState();
-
-                // System.out.println("Step 1 shards = " + stringTypeState.numShards());
-                stringTypeState.reshard(stringTypeState.numShards() * 2);
-                // System.out.println("SNAP: Joining... ");
-                // System.out.println("Step 2 shards = " + stringTypeState.numShards());
-                stringTypeState.reshard(stringTypeState.numShards() / 2);
-                // System.out.println("Step 3 shards = " + stringTypeState.numShards());
-                counter.incrementAndGet();
+                try {
+                    if (isReshardingEnabled) {
+                        if (newShardSize == origShardSize) {
+                            newShardSize = origShardSize / 10;
+                        } else {
+                            newShardSize = origShardSize;
+                        }
+                        writeStateEngine.setTargetMaxTypeShardSize(newShardSize);
+                    }
+                    StateEngineRoundTripper.roundTripDelta(writeStateEngine, readStateEngine);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } while (doneBenchmark.getCount() > 0);
         });
     }
@@ -124,7 +160,6 @@ public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
     @TearDown
     public void tearDown() {
         doneBenchmark.countDown();
-        System.out.println("SNAP: Resharding done " + counter.get() + " times.");
         reshardingFuture.cancel(true);
         refreshExecutor.shutdown();
         try {
@@ -138,10 +173,9 @@ public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
     }
 
     @Benchmark
-    public void testReadString(Blackhole bh) throws ExecutionException, InterruptedException {
+    public void testReadString(Blackhole bh) {
         for (int j : readOrder) {
             String result = dataAccess.readString(j, 0);
-            //System.out.println(result);
             bh.consume(result);
         }
     }
