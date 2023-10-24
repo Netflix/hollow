@@ -20,6 +20,7 @@ import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
@@ -83,7 +84,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
 
     @Deprecated
     public HollowReadStateEngine(HollowObjectHashCodeFinder hashCodeFinder) {
-        this(hashCodeFinder, true, new RecyclingRecycler());
+        this(hashCodeFinder, true, new WastefulRecycler(11, 8));
     }
 
     @Deprecated
