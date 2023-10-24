@@ -638,11 +638,11 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         //
         HollowUnsafeHandle.getUnsafe().loadFence();
         ShardsHolder currShardsHolder = shardsVolatile;
-        // Validate against the underlying shard so that, during re-sharding, the maximum times a read will be invalidated
-        // is 3: when shards are expanded or truncated, when a shard is affected by a split or join, and finally when
-        // delta is applied to a shard. If only shardsHolder was checked here, the worst-case scenario could lead to
-        // read invalidation (numShards+2) times: once for shards expansion/truncation, once for split/join on any shard, and
-        // then once when delta is applied.
+        // Validate against the underlying shard so that, during a delta application that involves re-sharding the worst
+        // case no. of times a read will be invalidatedis 3: when shards are expanded or truncated, when a shard is affected
+        // by a split or join, and finally when delta is applied to a shard. If only shardsHolder was checked here, the
+        // worst-case scenario could lead to read invalidation (numShards+2) times: once for shards expansion/truncation, o
+        // nce for split/join on any shard, and then once when delta is applied.
         return shardsHolder != currShardsHolder
             && (shard != currShardsHolder.shards[ordinal & currShardsHolder.shardNumberMask]);
     }
