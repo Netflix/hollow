@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
@@ -34,9 +35,9 @@ import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
 @BenchmarkMode({Mode.All})
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 7, time = 1)
-@Measurement(iterations = 7, time = 1)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@Warmup(iterations = 1, time = 1)
+@Measurement(iterations = 15, time = 1)
 @Fork(1)
 /**
  * Runs delta transitions in the background while benchmarking reads. Re-sharding in delta transitions can be toggled with a param.
@@ -47,45 +48,43 @@ public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
     HollowObjectTypeDataAccess dataAccess;
     HollowObjectMapper objectMapper;
 
-    @Param({ "500" })
-    int countStrings;
-
-    @Param({ "2000" })
-    int deltaChanges;
+    int countStringsToRead = 500;
 
     @Param({ "true" })
     boolean isReshardingEnabled;
 
-    @Param({ "100000" })
-    int countStringsDb;
+    @Param({ "500", "1000" })
+    int shardSizeKBs;
+
+    @Param({ "5", "100" })
+    int maxStringLength;
+
+    int countStringsDb = 100000;
+
+    int deltaChanges = 2000;
 
     ArrayList<Integer> readOrder;
-
-    @Param({ "1" })
-    int shardSizeMBs;
-
-    @Param({ "5", "25", "50", "150", "1000" })
-    int maxStringLength;
 
     ExecutorService refreshExecutor;
     Future<?> reshardingFuture;
     CountDownLatch doneBenchmark;
 
-    @Setup
+    final Random r = new Random();
+
+    @Setup(Level.Iteration)
     public void setUp() throws ExecutionException, InterruptedException {
         final List<String> readStrings = new ArrayList<>();
         final Set<Integer> readKeys = new HashSet<>();
         refreshExecutor = Executors.newSingleThreadExecutor();
 
         refreshExecutor.submit(() -> {
-            Random r = new Random();
             writeStateEngine = new HollowWriteStateEngine();
-            writeStateEngine.setTargetMaxTypeShardSize((long) shardSizeMBs * 1000l * 1000l);
+            writeStateEngine.setTargetMaxTypeShardSize((long) shardSizeKBs * 1000l);
             objectMapper = new HollowObjectMapper(writeStateEngine);
             objectMapper.initializeTypeState(String.class);
 
-            readOrder = new ArrayList<>(countStrings);
-            for (int i = 0; i < countStrings; i++) {
+            readOrder = new ArrayList<>(countStringsToRead);
+            for (int i = 0; i < countStringsToRead; i++) {
                 readOrder.add(r.nextInt(countStringsDb));
             }
             readKeys.addAll(readOrder);
@@ -118,7 +117,7 @@ public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
         doneBenchmark = new CountDownLatch(1);
         reshardingFuture = refreshExecutor.submit(() -> {
             Random r = new Random();
-            long origShardSize = shardSizeMBs * 1000 * 1000;
+            long origShardSize = shardSizeKBs * 1000l;
             long newShardSize = origShardSize;
             do {
                 for (int i=0; i<readStrings.size(); i++) {
@@ -157,7 +156,7 @@ public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
         });
     }
 
-    @TearDown
+    @TearDown(Level.Iteration)
     public void tearDown() {
         doneBenchmark.countDown();
         reshardingFuture.cancel(true);
@@ -174,9 +173,8 @@ public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
 
     @Benchmark
     public void testReadString(Blackhole bh) {
-        for (int j : readOrder) {
-            String result = dataAccess.readString(j, 0);
-            bh.consume(result);
-        }
+        int j = r.nextInt(readOrder.size());
+        String result = dataAccess.readString(j, 0);
+        bh.consume(result);
     }
 }
