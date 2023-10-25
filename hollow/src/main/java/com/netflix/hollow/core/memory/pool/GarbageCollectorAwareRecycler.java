@@ -26,10 +26,7 @@ public class GarbageCollectorAwareRecycler implements ArraySegmentRecycler {
                 .stream()
                 .map(MemoryManagerMXBean::getName)
                 .map(name -> name.split(" ")[0]) // In the form '<GC> <Phase>', for instance 'PS Scavenge' or 'ZGC Major Pauses'
-                .distinct()
-                .findFirst()
-                .map(LOW_PAUSE_COLLECTORS::contains)
-                .orElse(false);
+                .anyMatch(LOW_PAUSE_COLLECTORS::contains);
         delegate = isLowPause ? new WastefulRecycler(log2OfByteSegmentSize, log2OfLongSegmentSize)
                 : new RecyclingRecycler(log2OfByteSegmentSize, log2OfLongSegmentSize);
     }
