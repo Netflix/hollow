@@ -5,7 +5,7 @@ import java.lang.management.ManagementFactory;
 
 /**
  * A {@link ArraySegmentRecycler} that chooses the appropriate recycler based on the garbage collector in use.
- * </p>
+ * <p>
  * Specifically, when a low-pause collector is in use where promotion/evacuation pauses are no longer a concern,
  * delegate to {@link WastefulRecycler}. Otherwise the default {@link RecyclingRecycler} is used.
  */
