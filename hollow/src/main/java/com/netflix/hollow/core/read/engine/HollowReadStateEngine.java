@@ -19,7 +19,7 @@ package com.netflix.hollow.core.read.engine;
 import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
-import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
+import com.netflix.hollow.core.memory.pool.GarbageCollectorAwareRecycler;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
@@ -66,11 +66,11 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     private MissingDataHandler missingDataHandler = new DefaultMissingDataHandler();
 
     public HollowReadStateEngine() {
-        this(DefaultHashCodeFinder.INSTANCE, true, new RecyclingRecycler());
+        this(DefaultHashCodeFinder.INSTANCE, true, new GarbageCollectorAwareRecycler());
     }
 
     public HollowReadStateEngine(boolean listenToAllPopulatedOrdinals) {
-        this(DefaultHashCodeFinder.INSTANCE, listenToAllPopulatedOrdinals, new RecyclingRecycler());
+        this(DefaultHashCodeFinder.INSTANCE, listenToAllPopulatedOrdinals, new GarbageCollectorAwareRecycler());
     }
 
     public HollowReadStateEngine(ArraySegmentRecycler recycler) {
@@ -83,7 +83,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
 
     @Deprecated
     public HollowReadStateEngine(HollowObjectHashCodeFinder hashCodeFinder) {
-        this(hashCodeFinder, true, new RecyclingRecycler());
+        this(hashCodeFinder, true, new GarbageCollectorAwareRecycler());
     }
 
     @Deprecated

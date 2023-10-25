@@ -32,7 +32,7 @@ public class RecyclingRecycler implements ArraySegmentRecycler {
     private final Recycler<byte[]> byteSegmentRecycler;
 
     public RecyclingRecycler() {
-        this(11, 8);
+        this(DEFAULT_LOG2_BYTE_ARRAY_SIZE, DEFAULT_LOG2_LONG_ARRAY_SIZE);
     }
 
     public RecyclingRecycler(final int log2ByteArraySize, final int log2LongArraySize) {
