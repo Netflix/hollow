@@ -30,6 +30,10 @@ import com.netflix.hollow.core.memory.SegmentedLongArray;
 */
 public interface ArraySegmentRecycler {
 
+    int DEFAULT_LOG2_BYTE_ARRAY_SIZE = 11;
+
+    int DEFAULT_LOG2_LONG_ARRAY_SIZE = 8;
+
     public int getLog2OfByteSegmentSize();
 
     public int getLog2OfLongSegmentSize();
