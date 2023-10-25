@@ -5,8 +5,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryManagerMXBean;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * A {@link ArraySegmentRecycler} that chooses the appropriate recycler based on the garbage collector in use.
@@ -27,7 +25,7 @@ public class GarbageCollectorAwareRecycler implements ArraySegmentRecycler {
         boolean isLowPause = ManagementFactory.getGarbageCollectorMXBeans()
                 .stream()
                 .map(MemoryManagerMXBean::getName)
-                .map(name -> name.split(" ")[0])
+                .map(name -> name.split(" ")[0]) // In the form '<GC> <Phase>', for instance 'PS Scavenge' or 'ZGC Major Pauses'
                 .distinct()
                 .findFirst()
                 .map(LOW_PAUSE_COLLECTORS::contains)
