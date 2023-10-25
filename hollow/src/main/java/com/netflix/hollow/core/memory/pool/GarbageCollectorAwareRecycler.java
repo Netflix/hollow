@@ -2,6 +2,11 @@ package com.netflix.hollow.core.memory.pool;
 
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryManagerMXBean;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * A {@link ArraySegmentRecycler} that chooses the appropriate recycler based on the garbage collector in use.
@@ -10,6 +15,8 @@ import java.lang.management.ManagementFactory;
  * delegate to {@link WastefulRecycler}. Otherwise the default {@link RecyclingRecycler} is used.
  */
 public class GarbageCollectorAwareRecycler implements ArraySegmentRecycler {
+    private static final List<String> LOW_PAUSE_COLLECTORS = Arrays.asList("GPGC", "Shenandoah", "ZGC");
+
     private final ArraySegmentRecycler delegate;
 
     public GarbageCollectorAwareRecycler() {
@@ -19,7 +26,12 @@ public class GarbageCollectorAwareRecycler implements ArraySegmentRecycler {
     public GarbageCollectorAwareRecycler(int log2OfByteSegmentSize, int log2OfLongSegmentSize) {
         boolean isLowPause = ManagementFactory.getGarbageCollectorMXBeans()
                 .stream()
-                .anyMatch(bean -> bean.getName().startsWith("Shenandoah") || bean.getName().startsWith("ZGC"));
+                .map(MemoryManagerMXBean::getName)
+                .map(name -> name.split(" ")[0])
+                .distinct()
+                .findFirst()
+                .map(LOW_PAUSE_COLLECTORS::contains)
+                .orElse(false);
         delegate = isLowPause ? new WastefulRecycler(log2OfByteSegmentSize, log2OfLongSegmentSize)
                 : new RecyclingRecycler(log2OfByteSegmentSize, log2OfLongSegmentSize);
     }
