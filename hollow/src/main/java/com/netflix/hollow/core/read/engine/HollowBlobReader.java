@@ -331,7 +331,7 @@ public class HollowBlobReader {
             } else {
                 HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
                 HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
-                populateTypeStateSnapshot(in, new HollowObjectTypeReadState(stateEngine, memoryMode, filteredSchema, unfilteredSchema, numShards));
+                populateTypeStateSnapshotWithNumShards(in, new HollowObjectTypeReadState(stateEngine, memoryMode, filteredSchema, unfilteredSchema), numShards);
             }
         } else if (schema instanceof HollowListSchema) {
             if(!filter.includes(typeName)) {
@@ -361,14 +361,22 @@ public class HollowBlobReader {
         typeState.readSnapshot(in, stateEngine.getMemoryRecycler());
     }
 
+    private void populateTypeStateSnapshotWithNumShards(HollowBlobInput in, HollowTypeReadState typeState, int numShards) throws IOException {
+        if (numShards<=0 || ((numShards&(numShards-1))!=0)) {
+            throw new IllegalArgumentException("Number of shards must be a power of 2!");
+        }
+
+        stateEngine.addTypeState(typeState);
+        typeState.readSnapshot(in, stateEngine.getMemoryRecycler(), numShards);
+    }
+
     private String readTypeStateDelta(HollowBlobInput in) throws IOException {
         HollowSchema schema = HollowSchema.readFrom(in);
 
         int numShards = readNumShards(in);
-
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
         if(typeState != null) {
-            typeState.applyDelta(in, schema, stateEngine.getMemoryRecycler());
+            typeState.applyDelta(in, schema, stateEngine.getMemoryRecycler(), numShards);
         } else {
             discardDelta(in, schema, numShards);
         }
