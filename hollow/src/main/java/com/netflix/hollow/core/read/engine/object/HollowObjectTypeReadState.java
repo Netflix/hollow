@@ -354,7 +354,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         do {
             shardsHolder = this.shardsVolatile;
             shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
-            fixedLengthValue = shard.isNull(ordinal >> shard.shardOrdinalShift, fieldIndex);
+            fixedLengthValue = shard.readValue(ordinal >> shard.shardOrdinalShift, fieldIndex);
         } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
         switch(((HollowObjectSchema) schema).getFieldType(fieldIndex)) {
@@ -639,7 +639,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         HollowUnsafeHandle.getUnsafe().loadFence();
         ShardsHolder currShardsHolder = shardsVolatile;
         // Validate against the underlying shard so that, during a delta application that involves re-sharding the worst
-        // case no. of times a read will be invalidatedis 3: when shards are expanded or truncated, when a shard is affected
+        // case no. of times a read will be invalidated is 3: when shards are expanded or truncated, when a shard is affected
         // by a split or join, and finally when delta is applied to a shard. If only shardsHolder was checked here, the
         // worst-case scenario could lead to read invalidation (numShards+2) times: once for shards expansion/truncation, o
         // nce for split/join on any shard, and then once when delta is applied.
@@ -699,9 +699,11 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     HollowObjectTypeDataElements[] currentDataElements() {
         final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
-        return Arrays.stream(shards)
-                .map(shard -> shard.dataElements)
-                .toArray(HollowObjectTypeDataElements[]::new);
+        HollowObjectTypeDataElements[] elements = new HollowObjectTypeDataElements[shards.length];
+        for (int i=0;i<shards.length;i++) {
+            elements[i] = shards[i].dataElements;
+        }
+        return elements;
     }
 
     @Override
