@@ -42,7 +42,7 @@ class HollowObjectTypeReadStateShard {
         this.dataElements = dataElements;
     }
 
-    public long isNull(int ordinal, int fieldIndex) {
+    public long readValue(int ordinal, int fieldIndex) {
         long bitOffset = fieldOffset(ordinal, fieldIndex);
         int numBitsForField = dataElements.bitsPerField[fieldIndex];
         return numBitsForField <= 56 ?
