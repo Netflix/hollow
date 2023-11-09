@@ -40,8 +40,6 @@ import java.util.Map;
 
 public class HollowEffigyFactory {
 
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss.SSS z yyyy");
-
     private final Base64.Encoder base64 = Base64.getEncoder();
     private final Map<HollowEffigy.Field, HollowEffigy.Field> fieldMemoizer = new HashMap<HollowEffigy.Field, HollowEffigy.Field>();
 
@@ -113,10 +111,12 @@ public class HollowEffigyFactory {
                 break;
             case LONG:
                 long longVal = typeDataAccess.readLong(effigy.ordinal, i);
-                if(longVal != Long.MIN_VALUE && "Date".equals(typeDataAccess.getSchema().getName()))
-                    fieldValue = simpleDateFormat.format(new Date(longVal));
-                else
+                if(longVal != Long.MIN_VALUE && "Date".equals(typeDataAccess.getSchema().getName())) {
+                    SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss.SSS z yyyy");
+                    fieldValue = formatter.format(new Date(longVal));
+                } else {
                     fieldValue = Long.valueOf(typeDataAccess.readLong(effigy.ordinal, i));
+                }
                 break;
             case STRING:
                 fieldValue = typeDataAccess.readString(effigy.ordinal, i);
