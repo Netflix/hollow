@@ -30,6 +30,7 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.diffview.effigy.HollowEffigy.Field;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
@@ -38,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 
 public class HollowEffigyFactory {
+
+    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss.SSS z yyyy");
 
     private final Base64.Encoder base64 = Base64.getEncoder();
     private final Map<HollowEffigy.Field, HollowEffigy.Field> fieldMemoizer = new HashMap<HollowEffigy.Field, HollowEffigy.Field>();
@@ -111,7 +114,7 @@ public class HollowEffigyFactory {
             case LONG:
                 long longVal = typeDataAccess.readLong(effigy.ordinal, i);
                 if(longVal != Long.MIN_VALUE && "Date".equals(typeDataAccess.getSchema().getName()))
-                    fieldValue = new Date(longVal).toString();
+                    fieldValue = simpleDateFormat.format(new Date(longVal));
                 else
                     fieldValue = Long.valueOf(typeDataAccess.readLong(effigy.ordinal, i));
                 break;
