@@ -63,6 +63,11 @@ public interface HollowStateEngine extends HollowDataset {
      * */
     String HEADER_TAG_METRIC_ANNOUNCEMENT = "hollow.metric.announcement";
 
+    /**
+     * A header tag indicating which version is this blob produce to.
+     */
+    String HEADER_TAG_PRODUCER_TO_VERSION = "hollow.blob.to.version";
+
     @Override
     List<HollowSchema> getSchemas();
 
