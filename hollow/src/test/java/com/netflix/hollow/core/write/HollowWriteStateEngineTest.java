@@ -1,5 +1,6 @@
 package com.netflix.hollow.core.write;
 
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION;
 import static org.junit.Assert.assertEquals;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -57,8 +58,11 @@ public class HollowWriteStateEngineTest {
 
         consumer.triggerRefreshTo(version3);    // delta transition
         assertEquals("3", consumer.getStateEngine().getHeaderTag(TEST_TAG));
+        assertEquals(String.valueOf(version3), consumer.getStateEngine().getHeaderTag(HEADER_TAG_PRODUCER_TO_VERSION));
 
         consumer.triggerRefreshTo(version2);    // reverse delta transition
         assertEquals("2", consumer.getStateEngine().getHeaderTag(TEST_TAG));
+        assertEquals(String.valueOf(version2), consumer.getStateEngine().getHeaderTag(HEADER_TAG_PRODUCER_TO_VERSION));
+
     }
 }

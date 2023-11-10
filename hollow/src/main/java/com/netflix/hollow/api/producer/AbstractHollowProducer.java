@@ -388,6 +388,7 @@ abstract class AbstractHollowProducer {
                 } else {
                     writeEngine.getHeaderTags().remove(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE);
                 }
+                writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION, String.valueOf(toVersion));
 
                 // 3a. Publish, run checks & validation, then announce new state consumers
                 publish(listeners, toVersion, artifacts);
