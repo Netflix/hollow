@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.producer;
 
 import static com.netflix.hollow.api.producer.ProducerListenerSupport.ProducerListeners;
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED;
 import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.toList;
 
@@ -92,6 +93,11 @@ abstract class AbstractHollowProducer {
 
     boolean isInitialized;
 
+    private final long targetMaxTypeShardSize;
+    private final boolean allowTypeResharding;
+    private final boolean focusHoleFillInFewestShards;
+
+
     @Deprecated
     public AbstractHollowProducer(
             HollowProducer.Publisher publisher,
@@ -99,7 +105,7 @@ abstract class AbstractHollowProducer {
         this(new HollowFilesystemBlobStager(), publisher, announcer,
                 Collections.emptyList(),
                 new VersionMinterWithCounter(), null, 0,
-                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, null,
+                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
                 null, true);
     }
@@ -111,7 +117,7 @@ abstract class AbstractHollowProducer {
         this(b.stager, b.publisher, b.announcer,
                 b.eventListeners,
                 b.versionMinter, b.snapshotPublishExecutor,
-                b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
+                b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards, b.allowTypeResharding,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
                 b.hashCodeFinder, b.doIntegrityCheck);
     }
@@ -126,6 +132,7 @@ abstract class AbstractHollowProducer {
             int numStatesBetweenSnapshots,
             long targetMaxTypeShardSize,
             boolean focusHoleFillInFewestShards,
+            boolean allowTypeResharding,
             HollowMetricsCollector<HollowProducerMetrics> metricsCollector,
             HollowProducer.BlobStorageCleaner blobStorageCleaner,
             SingleProducerEnforcer singleProducerEnforcer,
@@ -140,11 +147,15 @@ abstract class AbstractHollowProducer {
         this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
         this.hashCodeFinder = hashCodeFinder;
         this.doIntegrityCheck = doIntegrityCheck;
+        this.targetMaxTypeShardSize = targetMaxTypeShardSize;
+        this.allowTypeResharding = allowTypeResharding;
+        this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
                 ? new HollowWriteStateEngine()
                 : new HollowWriteStateEngine(hashCodeFinder);
         writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
+        writeEngine.allowTypeResharding(allowTypeResharding);
         writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
 
         this.objectMapper = new HollowObjectMapper(writeEngine);
@@ -283,6 +294,9 @@ abstract class AbstractHollowProducer {
                 HollowWriteStateEngine writeEngine = hashCodeFinder == null
                         ? new HollowWriteStateEngine()
                         : new HollowWriteStateEngine(hashCodeFinder);
+                writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
+                writeEngine.allowTypeResharding(allowTypeResharding);
+                writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
                 HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, schemas);
                 HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);
                 if (hashCodeFinder != null) {
@@ -380,15 +394,9 @@ abstract class AbstractHollowProducer {
 
             // 3. Produce a new state if there's work to do
             if (writeEngine.hasChangedSinceLastCycle()) {
-                writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_SCHEMA_HASH, new HollowSchemaHash(writeEngine.getSchemas()).getHash());
                 boolean schemaChangedFromPriorVersion = readStates.hasCurrent() &&
                         !writeEngine.hasIdenticalSchemas(readStates.current().getStateEngine());
-                if (schemaChangedFromPriorVersion) {
-                    writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE, Boolean.TRUE.toString());
-                } else {
-                    writeEngine.getHeaderTags().remove(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE);
-                }
-                writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION, String.valueOf(toVersion));
+                updateHeaderTags(writeEngine, toVersion, schemaChangedFromPriorVersion);
 
                 // 3a. Publish, run checks & validation, then announce new state consumers
                 publish(listeners, toVersion, artifacts);
@@ -505,6 +513,17 @@ abstract class AbstractHollowProducer {
      */
     public void removeListener(HollowProducerEventListener listener) {
         listeners.removeListener(listener);
+    }
+
+    private void updateHeaderTags(HollowWriteStateEngine writeEngine, long toVersion, boolean schemaChangedFromPriorVersion) {
+        writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_SCHEMA_HASH, new HollowSchemaHash(writeEngine.getSchemas()).getHash());
+        if (schemaChangedFromPriorVersion) {
+            writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE, Boolean.TRUE.toString());
+        } else {
+            writeEngine.getHeaderTags().remove(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE);
+        }
+        writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION, String.valueOf(toVersion));
+        writeEngine.getHeaderTags().remove(HEADER_TAG_TYPE_RESHARDING_INVOKED);
     }
 
     void populate(

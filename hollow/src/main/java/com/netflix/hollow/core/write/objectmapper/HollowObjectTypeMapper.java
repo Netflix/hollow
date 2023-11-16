@@ -127,7 +127,12 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         }
 
         HollowObjectTypeWriteState existingWriteState = (HollowObjectTypeWriteState) parentMapper.getStateEngine().getTypeState(typeName);
-        this.writeState = existingWriteState != null ? existingWriteState : new HollowObjectTypeWriteState(schema, getNumShards(clazz));
+        if (existingWriteState != null) {
+            this.writeState = existingWriteState;
+        } else {
+            int numShardsByAnnotation = getNumShardsByAnnotation(clazz);
+            this.writeState = new HollowObjectTypeWriteState(schema, numShardsByAnnotation, numShardsByAnnotation == -1 ? false : true);
+        }
 
         this.assignedOrdinalFieldOffset = assignedOrdinalFieldOffset;
         this.hasAssignedOrdinalField = hasAssignedOrdinalField;
@@ -142,7 +147,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         return primaryKey == null ? null : primaryKey.fields();
     }
     
-    private static int getNumShards(Class<?> clazz) {
+    private static int getNumShardsByAnnotation(Class<?> clazz) {
         HollowShardLargeType numShardsAnnotation = clazz.getAnnotation(HollowShardLargeType.class);
         if(numShardsAnnotation != null)
             return numShardsAnnotation.numShards();

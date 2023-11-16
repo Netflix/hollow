@@ -18,12 +18,14 @@
 package com.netflix.hollow.api.producer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.api.producer.listener.IncrementalPopulateListener;
+import com.netflix.hollow.api.producer.listener.VetoableListener;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -32,13 +34,12 @@ import com.netflix.hollow.core.util.AllHollowRecordCollection;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
+import com.netflix.hollow.test.InMemoryBlobStore;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-
-import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -240,12 +241,16 @@ public class HollowProducerIncrementalTest {
 
     @Test
     public void continuesARestoredState() {
-        HollowProducer genesisProducer = createInMemoryProducer();
+        HollowProducer genesisProducer = createInMemoryProducerWithResharding();
 
         /// initialize the data -- classic producer creates the first state in the delta chain.
         long originalVersion = genesisProducer.runCycle(state -> {
             state.add(new TypeA(1, "one", 1));
+            state.add(new TypeA(2, "two", 2));
+            state.add(new TypeA(3, "three", 3));
+            state.add(new TypeA(4, "four", 4));
         });
+        assertEquals(4, genesisProducer.getWriteEngine().getTypeState("String").getNumShards());
 
         /// now at some point in the future, we will start up and create a new classic producer
         /// to back the HollowIncrementalProducer.
@@ -253,13 +258,39 @@ public class HollowProducerIncrementalTest {
         /// adding a new type this time (TypeB).
         restoringProducer.initializeDataModel(TypeA.class, TypeB.class);
         restoringProducer.restore(originalVersion, blobStore);
+        assertEquals(4, restoringProducer.getWriteEngine().getTypeState("String").getNumShards());
 
-        long version = restoringProducer.runIncrementalCycle(iws -> {
+        restoringProducer.runIncrementalCycle(iws -> {
             iws.addOrModify(new TypeA(1, "one", 2));
             iws.addOrModify(new TypeA(2, "two", 2));
             iws.addOrModify(new TypeB(3, "three"));
         });
+        assertEquals(4, restoringProducer.getWriteEngine().getTypeState("String").getNumShards());
 
+        FailingValidationListener failingListener = new FailingValidationListener();
+        restoringProducer.addListener(failingListener);
+        try {
+            restoringProducer.runIncrementalCycle(iws -> {
+                iws.addOrModify(new TypeA(1, "one", 3));
+            });
+            fail("listener fails validation");
+        } catch (Exception e) {
+        }
+        try {
+            restoringProducer.runIncrementalCycle(iws -> {
+                iws.addOrModify(new TypeA(1, "one", 4));
+            });
+            fail("listener fails validation");
+        } catch (Exception e) {
+        }
+        restoringProducer.removeListener(failingListener);
+
+        long version = restoringProducer.runIncrementalCycle(iws -> {
+            iws.addOrModify(new TypeA(1, "one", 5));
+            iws.addOrModify(new TypeA(2, "two", 5));
+            iws.addOrModify(new TypeB(3, "three"));
+        });
+        assertEquals(4, restoringProducer.getWriteEngine().getTypeState("String").getNumShards());
 
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
         consumer.triggerRefreshTo(originalVersion);
@@ -268,8 +299,8 @@ public class HollowProducerIncrementalTest {
         HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
         Assert.assertFalse(idx.containsDuplicates());
 
-        assertTypeA(idx, 1, "one", 2L);
-        assertTypeA(idx, 2, "two", 2L);
+        assertTypeA(idx, 1, "one", 5L);
+        assertTypeA(idx, 2, "two", 5L);
 
         /// consumers with established data models don't have visibility into new types.
         consumer = HollowConsumer.withBlobRetriever(blobStore).build();
@@ -279,6 +310,13 @@ public class HollowProducerIncrementalTest {
         Assert.assertFalse(idx.containsDuplicates());
 
         assertTypeB(idx, 3, "three");
+    }
+
+    private class FailingValidationListener extends AbstractHollowProducerListener implements VetoableListener {
+        @Override
+        public void onValidationStart(long version) {
+            throw new RuntimeException("This listener fails validation");
+        }
     }
     
     @Test
@@ -430,19 +468,19 @@ public class HollowProducerIncrementalTest {
 
         try {
             ar.get().addOrModify(new TypeA(1, "one", 100));
-            Assert.fail();
+            fail();
         } catch (IllegalStateException e) {
         }
 
         try {
             ar.get().delete(new TypeA(1, "one", 100));
-            Assert.fail();
+            fail();
         } catch (IllegalStateException e) {
         }
 
         try {
             ar.get().addIfAbsent(new TypeA(1, "one", 100));
-            Assert.fail();
+            fail();
         } catch (IllegalStateException e) {
         }
     }
@@ -528,7 +566,7 @@ public class HollowProducerIncrementalTest {
                 iws.delete(new TypeA(5, "five", 5));
                 throw new RuntimeException("runIncrementalCycle failed");
             });
-            Assert.fail();
+            fail();
         } catch (RuntimeException e) {
             Assert.assertEquals("runIncrementalCycle failed", e.getMessage());
         }
@@ -554,6 +592,14 @@ public class HollowProducerIncrementalTest {
         return new HollowProducer.Builder<>()
                 .withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
+                .build();
+    }
+
+    private HollowProducer createInMemoryProducerWithResharding() {
+        return HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withTypeResharding(true)
+                .withTargetMaxTypeShardSize(8)
                 .build();
     }
 
