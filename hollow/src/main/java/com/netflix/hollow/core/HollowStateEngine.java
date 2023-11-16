@@ -48,6 +48,13 @@ public interface HollowStateEngine extends HollowDataset {
     String HEADER_TAG_SCHEMA_CHANGE = "hollow.schema.changedFromPriorVersion";
 
     /**
+     * A header tag indicating that num shards for a type has changed since the prior version. Its value encodes
+     * the type(s) that were re-sharded along with the before and after num shards in the fwd delta direction.
+     * For e.g. Movie:(2,4) Actor:(8,4)
+     */
+    String HEADER_TAG_TYPE_RESHARDING_INVOKED = "hollow.type.resharding.invoked";
+
+    /**
      * A header tag containing the hash of serialized hollow schema.
      */
     String HEADER_TAG_SCHEMA_HASH = "hollow.schema.hash";

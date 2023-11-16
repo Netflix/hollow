@@ -1,7 +1,9 @@
 package com.netflix.hollow.core.write;
 
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION;
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
@@ -64,5 +66,51 @@ public class HollowWriteStateEngineTest {
         assertEquals("2", consumer.getStateEngine().getHeaderTag(TEST_TAG));
         assertEquals(String.valueOf(version2), consumer.getStateEngine().getHeaderTag(HEADER_TAG_PRODUCER_TO_VERSION));
 
+    }
+
+    @Test
+    public void testHeaderTagsWhenResharding() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        HollowProducer producer = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
+                .withTypeResharding(true).withTargetMaxTypeShardSize(32)
+                .build();
+        long v1 = producer.runCycle(ws -> {
+            // causes 2 shards for Integer at shard size 32
+            for (int i=0;i<50;i++) {
+                ws.add(i);
+            }
+        });
+        assertEquals(2, producer.getWriteEngine().getTypeState("Integer").getNumShards());
+        long v2 = producer.runCycle(ws -> {
+            // 2x the data, causes 4 shards for Integer at shard size 32
+            for (int i=0;i<100;i++) {
+                ws.add(i);
+            }
+
+        });
+        assertEquals(4, producer.getWriteEngine().getTypeState("Integer").getNumShards());
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
+                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+                    @Override
+                    public boolean allowDoubleSnapshot() {
+                        return false;
+                    }
+                    @Override
+                    public int maxDeltasBeforeDoubleSnapshot() {
+                        return Integer.MAX_VALUE;
+                    }
+                })
+                .build();
+
+        consumer.triggerRefreshTo(v1);
+        assertEquals(2, consumer.getStateEngine().getTypeState("Integer").numShards());
+        assertNull(consumer.getStateEngine().getHeaderTag(HEADER_TAG_TYPE_RESHARDING_INVOKED));
+
+        consumer.triggerRefreshTo(v2);
+        assertEquals(v2, consumer.getCurrentVersionId());
+        assertEquals(4, consumer.getStateEngine().getTypeState("Integer").numShards());
+        assertEquals("Integer:(2,4)", consumer.getStateEngine().getHeaderTag(HEADER_TAG_TYPE_RESHARDING_INVOKED));
     }
 }
