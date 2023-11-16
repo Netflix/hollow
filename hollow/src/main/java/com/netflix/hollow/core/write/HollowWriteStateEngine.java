@@ -72,6 +72,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private long targetMaxTypeShardSize = Long.MAX_VALUE;
     //// focus filling ordinal holes in as few shards as possible to make delta application more efficient for consumers
     private boolean focusHoleFillInFewestShards = false;
+    //// adjust number of shards per type during the course of the delta chain to realize consumer-side delta applications at constant space overhead
+    private boolean allowTypeResharding = false;
 
     private List<String> restoredStates;
     private boolean preparedForNextCycle = true;
@@ -141,10 +143,14 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             HollowTypeWriteState writeState = writeStates.get(typeName);
 
             if(writeState != null) {
-                if(writeState.getNumShards() == -1)
-                    writeState.numShards = readState.numShards();
-                else if(writeState.getNumShards() != readState.numShards())
-                    throw new IllegalStateException("Attempting to restore from a HollowReadStateEngine which does not have the same number of shards as explicitly configured for type " + typeName);
+                if(writeState.getNumShards() == -1) {
+                    writeState.setNumShards(readState.numShards()); // also updates resetToLastNumShards
+                }
+                else if(readState.numShards() != 0 && writeState.getNumShards() != readState.numShards()) {
+                    String msg = "Attempting to restore from a HollowReadStateEngine with numShards " + readState.numShards()
+                            + " for type " + typeName + " to write state engine with numShards " + writeState.getNumShards();
+                    throw new IllegalStateException(msg);
+                }
             }
         }
         
@@ -415,13 +421,35 @@ public class HollowWriteStateEngine implements HollowStateEngine {
      * @param targetMaxTypeShardSize the target max type shard size, in bytes
      */
     public void setTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
+        if (targetMaxTypeShardSize < 0) {
+            throw new IllegalArgumentException("Invalid target max shard size specified: " + targetMaxTypeShardSize);
+        }
         this.targetMaxTypeShardSize = targetMaxTypeShardSize;
     }
     
     long getTargetMaxTypeShardSize() {
         return targetMaxTypeShardSize;
     }
-    
+
+    /**
+     * Experimental: Setting this will allow producer to adjust number of shards per type in the course of a delta chain.
+     *
+     * Consumer-side delta transitions work by making a copy of one shard at a time, so the ability to accommodate more
+     * data in a type by growing the number of shards instead of the size of shards leads to means consumers can apply
+     * delta transitions with a memory overhead (equal to the configured max shard size).
+     *
+     * Requires integrity check to be enabled, and honors numShards pinned using annotation in data model.
+     * Also requires consumers to be on a recent Hollow library version that supports re-sharding at the time of delta application.
+     */
+    public void allowTypeResharding(boolean allowTypeResharding) {
+        this.allowTypeResharding = allowTypeResharding;
+    }
+
+    public boolean allowTypeResharding() {
+        return this.allowTypeResharding;
+    }
+
+
     /**
      * Experimental: Setting this will focus the holes returned by the FreeOrdinalTracker for each state into as few shards as possible.
      *

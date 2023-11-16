@@ -112,7 +112,6 @@ public class HollowBlobWriter {
             partStreams.flush();
     }
 
-
     /**
      * Serialize the changes necessary to transition a consumer from the previous state
      * to the current state as a delta blob.
@@ -238,7 +237,7 @@ public class HollowBlobWriter {
                 HollowSchema schema = typeState.getSchema();
                 schema.writeTo(partStream);
 
-                writeNumShards(partStream, typeState.getNumShards());
+                writeNumShards(partStream, typeState.getRevNumShards());
 
                 typeState.writeReverseDelta(partStream);
             }

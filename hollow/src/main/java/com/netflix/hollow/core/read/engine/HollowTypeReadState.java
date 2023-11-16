@@ -193,7 +193,14 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      * @return an approximate accounting of the current cost of the "ordinal holes" in this type state.
      */
     public abstract long getApproximateHoleCostInBytes();
-    
+
+    /**
+     * @return an approximate accounting of the current heap footprint occupied by each shard of this type state.
+     */
+    public long getApproximateShardSizeInBytes() {
+        return getApproximateHeapFootprintInBytes() / numShards();
+    }
+
     /**
      * @return The number of shards into which this type is split.  Sharding is transparent, so this has no effect on normal usage.
      */

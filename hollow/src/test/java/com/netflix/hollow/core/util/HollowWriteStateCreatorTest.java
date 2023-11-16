@@ -38,26 +38,31 @@ public class HollowWriteStateCreatorTest {
     @Test
     public void recreatesUsingReadEngine() throws IOException {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        writeEngine.setTargetMaxTypeShardSize(1);
 
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
-        mapper.add(new Integer(1));
+        for (int i=0; i<10; i++) {
+            mapper.add(new Integer(i));
+        }
         writeEngine.addHeaderTag("CopyTag", "copied");
         writeEngine.addHeaderTag(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(System.currentTimeMillis()));
         String toVersion = String.valueOf(System.currentTimeMillis());
         writeEngine.addHeaderTag(HEADER_TAG_PRODUCER_TO_VERSION, toVersion);
         
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
-        String cycleStartTime = readEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START);
         String readEngineToVersion = readEngine.getHeaderTag(HEADER_TAG_PRODUCER_TO_VERSION);
+        String cycleStartTime = readEngine.getHeaderTag(HEADER_TAG_METRIC_CYCLE_START);
         HollowWriteStateEngine recreatedWriteEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(readEngine);
         assertEquals(cycleStartTime, recreatedWriteEngine.getPreviousHeaderTags().get(HEADER_TAG_METRIC_CYCLE_START));
         assertEquals(readEngineToVersion, recreatedWriteEngine.getPreviousHeaderTags().get(HEADER_TAG_PRODUCER_TO_VERSION));
+        assertEquals(8, recreatedWriteEngine.getTypeState("Integer").getNumShards());
 
         HollowReadStateEngine recreatedReadEngine = StateEngineRoundTripper.roundTripSnapshot(recreatedWriteEngine);
         
         assertEquals(HollowChecksum.forStateEngine(readEngine), HollowChecksum.forStateEngine(recreatedReadEngine));
         assertEquals("copied", recreatedReadEngine.getHeaderTag("CopyTag"));
         assertEquals(readEngine.getCurrentRandomizedTag(), recreatedReadEngine.getCurrentRandomizedTag());
+        assertEquals(8, recreatedReadEngine.getTypeState("Integer").numShards());
     }
     
     @Test
