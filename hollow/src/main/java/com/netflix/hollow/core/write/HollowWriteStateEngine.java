@@ -144,7 +144,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
             if(writeState != null) {
                 if(writeState.getNumShards() == -1) {
-                    writeState.numShards = readState.numShards();
+                    writeState.setNumShards(readState.numShards()); // also updates resetToLastNumShards
                 }
                 else if(readState.numShards() != 0 && writeState.getNumShards() != readState.numShards()) {
                     String msg = "Attempting to restore from a HollowReadStateEngine with numShards " + readState.numShards()
@@ -432,16 +432,16 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     }
 
     /**
-     * Experimental: Setting this will allow producer to adjust number of shards per type state in the course of a delta chain.
+     * Experimental: Setting this will allow producer to adjust number of shards per type in the course of a delta chain.
      *
-     * Consumer-side delta transitions work by making a copy of one shard at a time, so the ability to change the number of
-     * shards in a delta chain while keeping the max shard size constant means consumers can apply delta transitions with a
-     * constant space overhead (equal to the configured max shard size).
+     * Consumer-side delta transitions work by making a copy of one shard at a time, so the ability to accommodate more
+     * data in a type by growing the number of shards instead of the size of shards leads to means consumers can apply
+     * delta transitions with a memory overhead (equal to the configured max shard size).
      *
      * Requires integrity check to be enabled, and honors numShards pinned using annotation in data model.
      * Also requires consumers to be on a recent Hollow library version that supports re-sharding at the time of delta application.
      */
-    public void setAllowTypeResharding(boolean allowTypeResharding) {
+    public void allowTypeResharding(boolean allowTypeResharding) {
         this.allowTypeResharding = allowTypeResharding;
     }
 

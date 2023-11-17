@@ -74,7 +74,7 @@ public class HollowWriteStateEngineTest {
         HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
 
         HollowProducer producer = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
-                .withTypeResharding().withTargetMaxTypeShardSize(32)
+                .withTypeResharding(true).withTargetMaxTypeShardSize(32)
                 .build();
         long v1 = producer.runCycle(ws -> {
             // causes 2 shards for Integer at shard size 32

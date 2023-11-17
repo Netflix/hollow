@@ -254,6 +254,7 @@ public abstract class HollowTypeWriteState {
     public void setNumShards(int numShards) {
         if(this.numShards == -1) {
             this.numShards = numShards;
+            this.resetToLastNumShards = numShards;
         } else if(this.numShards != numShards) {
             throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + this.numShards + ".  Cannot reset to " + numShards + ".");
         }
@@ -282,7 +283,7 @@ public abstract class HollowTypeWriteState {
         restoredSchema = null;
         restoredReadState = null;
 
-        resetToLastNumShards = numShards;
+        resetToLastNumShards = numShards; // -1 if first cycle else previous numShards. See {@code testNumShardsMaintainedWhenNoResharding}
     }
 
     public void prepareForWrite() {
@@ -303,7 +304,7 @@ public abstract class HollowTypeWriteState {
         ordinalMap.prepareForWrite();
         wroteData = true;
 
-        resetToLastNumShards = numShards;
+        resetToLastNumShards = numShards;    // SNAP: TODO: code paths involving WriteStateCreator, outside of producer runcycle. Write test.
     }
     
     public boolean hasChangedSinceLastCycle() {

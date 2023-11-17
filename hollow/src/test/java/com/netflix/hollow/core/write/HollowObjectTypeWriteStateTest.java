@@ -78,7 +78,7 @@ public class HollowObjectTypeWriteStateTest {
         HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
 
         HollowProducer p1 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
-                .withTypeResharding().withTargetMaxTypeShardSize(32).build();
+                .withTypeResharding(true).withTargetMaxTypeShardSize(32).build();
         p1.initializeDataModel(String.class, Long.class);
         long v1 = p1.runCycle(ws -> {
             // override cycle start time with a strictly incrementing count to work around clock skew
@@ -172,7 +172,7 @@ public class HollowObjectTypeWriteStateTest {
         assertEquals(2, consumer.getStateEngine().getTypeState("Long").numShards());
 
         HollowProducer p2 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
-                .withTypeResharding().withTargetMaxTypeShardSize(32).build();
+                .withTypeResharding(true).withTargetMaxTypeShardSize(32).build();
         p2.initializeDataModel(Long.class);
         p2.restore(v1, blobStore);
         assertEquals(2, p2.getWriteEngine().getTypeState("Long").numShards);

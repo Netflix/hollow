@@ -38,7 +38,6 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchemaHash;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
@@ -155,8 +154,8 @@ abstract class AbstractHollowProducer {
                 ? new HollowWriteStateEngine()
                 : new HollowWriteStateEngine(hashCodeFinder);
         writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
+        writeEngine.allowTypeResharding(allowTypeResharding);
         writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
-        writeEngine.setAllowTypeResharding(allowTypeResharding);
 
         this.objectMapper = new HollowObjectMapper(writeEngine);
         if (hashCodeFinder != null) {
@@ -295,7 +294,7 @@ abstract class AbstractHollowProducer {
                         ? new HollowWriteStateEngine()
                         : new HollowWriteStateEngine(hashCodeFinder);
                 writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
-                writeEngine.setAllowTypeResharding(allowTypeResharding);
+                writeEngine.allowTypeResharding(allowTypeResharding);
                 writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
                 HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, schemas);
                 HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);

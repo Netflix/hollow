@@ -862,17 +862,17 @@ public class HollowProducer extends AbstractHollowProducer {
         }
 
         /**
-         * Experimental: Setting this will allow producer to adjust number of shards per type state in the course of a delta chain.
+         * Experimental: Setting this will allow producer to adjust number of shards per type in the course of a delta chain.
          *
-         * Consumer-side delta transitions work by making a copy of one shard at a time, so the ability to change the number of
-         * shards in a delta chain while keeping the max shard size constant means consumers can apply delta transitions with a
-         * constant space overhead (equal to the configured max shard size).
+         * Consumer-side delta transitions work by making a copy of one shard at a time, so the ability to accommodate more
+         * data in a type by growing the number of shards instead of the size of shards leads to means consumers can apply
+         * delta transitions with a memory overhead (equal to the configured max shard size).
          *
          * Requires integrity check to be enabled, and honors numShards pinned using annotation in data model.
          * Also requires consumers to be on a recent Hollow library version that supports re-sharding at the time of delta application.
          */
-        public B withTypeResharding() {
-            this.allowTypeResharding = true;
+        public B withTypeResharding(boolean allowTypeResharding) {
+            this.allowTypeResharding = allowTypeResharding;
             return (B) this;
         }
 
@@ -910,6 +910,11 @@ public class HollowProducer extends AbstractHollowProducer {
         protected void checkArguments() {
             if (allowTypeResharding == true && doIntegrityCheck == false) { // type resharding feature rollout
                 throw new IllegalArgumentException("Enabling type re-sharding requires integrity check to also be enabled");
+            }
+            if (allowTypeResharding == true && focusHoleFillInFewestShards == true) { // type re-sharding feature rollout
+                // More thorough testing required before enabling these features to work in tandem
+                // simple test case for when features are allowed to work together passes, see {@code testReshardingWithFocusHoleFillInFewestShards}
+                throw new IllegalArgumentException("Producer does not yet support using both re-sharding and focusHoleFillInFewestShards features in tandem");
             }
             if (stager != null && compressor != null) {
                 throw new IllegalArgumentException(

@@ -18,6 +18,7 @@ package com.netflix.hollow.api.producer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
@@ -36,18 +37,15 @@ import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.api.producer.listener.VetoableListener;
 import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.core.util.HollowWriteStateCreator;
-import com.netflix.hollow.core.util.StateEngineRoundTripper;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.test.InMemoryBlobStore;
-import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -186,7 +184,7 @@ public class HollowProducerTest {
             assertEquals(producer.getCycleCountWithPrimaryStatus(), 2); // counted as cycle ran for the producer with primary status but lost status mid cycle. Doesn't matter as the next cycle result in a no-op.
             return;
         }
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -207,7 +205,7 @@ public class HollowProducerTest {
             assertEquals(producer.getCycleCountWithPrimaryStatus(), 1); // counted as cycle ran for producer with primary status
             return;
         }
-        Assert.fail();
+        fail();
     }
 
     @Test
@@ -217,7 +215,7 @@ public class HollowProducerTest {
 
         try {
             producer.restore(fakeVersion, blobRetriever);
-            Assert.fail();
+            fail();
         } catch(Exception expected) { }
 
         Assert.assertNotNull(lastRestoreStatus);
@@ -432,7 +430,7 @@ public class HollowProducerTest {
         for (boolean allowResharding : Arrays.asList(true, false)) {
             HollowProducer.Builder producerBuilder = HollowProducer.withPublisher(new FakeBlobPublisher()).withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath()));
             if (allowResharding)
-                    producerBuilder = producerBuilder.withTypeResharding();
+                    producerBuilder = producerBuilder.withTypeResharding(true);
             HollowProducer producer = producerBuilder.withTargetMaxTypeShardSize(32).build();
             producer.runCycle(ws -> {
                 // causes 2 shards for Integer at shard size 32
@@ -488,7 +486,7 @@ public class HollowProducerTest {
         long v = 0;
 
         HollowProducer p = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
-                .withTypeResharding().withTargetMaxTypeShardSize(32).build();
+                .withTypeResharding(true).withTargetMaxTypeShardSize(32).build();
 
         HollowConsumer c = HollowConsumer.withBlobRetriever(blobStore)
                 .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
@@ -528,6 +526,387 @@ public class HollowProducerTest {
         c.triggerRefreshTo(endVersion);
         assertEquals(endVersion, c.getCurrentVersionId());
     }
+
+    @Test
+    public void testNumShardsMaintainedWhenNoResharding() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+        HollowProducer nonReshardingProducer1 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
+                .withTypeResharding(false).withTargetMaxTypeShardSize(32).build();
+        long v1_1 = nonReshardingProducer1.runCycle(ws -> {
+            // causes 2 shards for Integer at shard size 32
+            for (int i=0;i<50;i++) {
+                ws.add(new TestPojoV1(i, i));
+            }
+        });
+        assertEquals(4, nonReshardingProducer1.getWriteEngine().getTypeState("TestPojo").getNumShards());
+
+        try {
+            long v1_2 = nonReshardingProducer1.runCycle(ws -> {
+                throw new RuntimeException("failed population");
+            });
+            fail("exception expected");
+        } catch (Exception e){
+        }
+
+        long v1_3 = nonReshardingProducer1.runCycle(ws -> {
+            for (int i=0;i<100;i++) {
+                ws.add(new TestPojoV1(i, i));
+            }
+        });
+        assertEquals(4, nonReshardingProducer1.getWriteEngine().getTypeState("TestPojo").getNumShards());
+
+        HollowProducer nonReshardingProducer2 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
+                .withTypeResharding(false).withTargetMaxTypeShardSize(32).build();
+        nonReshardingProducer2.initializeDataModel(TestPojoV1.class);
+        assertEquals(-1, nonReshardingProducer2.getWriteEngine().getTypeState("TestPojo").getNumShards());
+        nonReshardingProducer2.restore(v1_1, blobStore);
+        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("TestPojo").getNumShards());
+        try {
+            nonReshardingProducer2.runCycle(ws -> {
+                // causes 4 shards for Integer at shard size 32
+                throw new RuntimeException("failed population");
+            });
+            fail("exception expected");
+        } catch (Exception e){
+        }
+        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("TestPojo").getNumShards());
+
+        nonReshardingProducer2.runCycle(ws -> {
+            // causes 4 shards for Integer at shard size 32
+            for (int i=0;i<100;i++) {
+                ws.add(new TestPojoV1(i, i));
+            }
+        });
+        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("TestPojo").getNumShards());
+    }
+
+    @Test
+    public void testNumShardsMaintainedWhenNoResharding_WithNonObjectTypes() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+        HollowProducer nonReshardingProducer1 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
+                .withTypeResharding(false).withTargetMaxTypeShardSize(32).build();
+        long v1 = nonReshardingProducer1.runCycle(ws -> {
+            // causes 2 shards for Integer at shard size 32
+            for (int i=0;i<50;i++) {
+                Set<Long> set = new HashSet<>(Collections.singleton((long) i));
+                ws.add(new HasNonObjectField(i, set));
+            }
+        });
+        assertEquals(4, nonReshardingProducer1.getWriteEngine().getTypeState("SetOfLong").getNumShards());
+
+        HollowProducer nonReshardingProducer2 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
+                .withTypeResharding(false).withTargetMaxTypeShardSize(32).build();
+        nonReshardingProducer2.initializeDataModel(HasNonObjectField.class);
+        assertEquals(-1, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfLong").getNumShards());
+        nonReshardingProducer2.restore(v1, blobStore);
+        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfLong").getNumShards());
+        try {
+            nonReshardingProducer2.runCycle(ws -> {
+                // causes 4 shards for Integer at shard size 32
+                throw new RuntimeException("failed population");
+            });
+            fail("exception expected");
+        } catch (Exception e){
+        }
+        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfLong").getNumShards());
+
+        nonReshardingProducer2.runCycle(ws -> {
+            // causes 4 shards for Integer at shard size 32
+            for (int i=0;i<500;i++) {
+                Set<Long> set = new HashSet<>(Collections.singleton((long) i));
+                ws.add(new HasNonObjectField(i, set));
+            }
+        });
+        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfLong").getNumShards());
+    }
+
+    // @Test
+    public void testReshardingWithFocusHoleFillInFewestShards() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+        HollowProducer producer = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
+                .withTypeResharding(true).withTargetMaxTypeShardSize(64)
+                .withFocusHoleFillInFewestShards(true)
+                .build();
+        long v1 = producer.runCycle(state -> {
+            for(int i=1;i<=36;i++) {
+                add(state, "val" + i, i);
+            }
+        });
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
+                .withSkipTypeShardUpdateWithNoAdditions()
+                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+                    @Override
+                    public boolean allowDoubleSnapshot() {
+                        return false;
+                    }
+                    @Override
+                    public int maxDeltasBeforeDoubleSnapshot() {
+                        return Integer.MAX_VALUE;
+                    }
+                })
+                .build();
+        consumer.triggerRefreshTo(v1);
+        Assert.assertEquals(4, consumer.getStateEngine().getTypeState("TestRec").numShards());
+
+        /// remove 4 from S0: 13, 21, 25, 29
+        /// remove 5 from S1:  6, 14, 18, 26, 30
+        /// remove 2 from S2: 11, 19
+        /// remove 1 from S3: 24
+        Set<Integer> removeSet = new HashSet<>(Arrays.asList(13, 21, 25, 29, 6, 14, 18, 26, 30, 11, 19, 24));
+        long v2 = producer.runCycle(state -> {
+            for(int i=1;i<=36;i++) {
+                if(!removeSet.contains(i))
+                    add(state, "val" + i, i);
+            }
+
+            add(state, "newval37", 37);
+        });
+        consumer.triggerRefreshTo(v2);
+        removeSet.add(5);
+
+        long v3 = producer.runCycle(state -> {
+            for(int i=1;i<=36;i++) {
+                if(!removeSet.contains(i))
+                    add(state, "val" + i, i);
+            }
+            add(state, "newval37", 37);
+            for(int i=1000;i<1005;i++) {
+                add(state, "bigval"+i, i);
+            }
+        });
+        consumer.triggerRefreshTo(v3);
+
+        /// all changes focused in shard 1
+        assertRecordOrdinal(consumer,  5, "bigval1000", 1000);
+        assertRecordOrdinal(consumer, 13, "bigval1001", 1001);
+        assertRecordOrdinal(consumer, 17, "bigval1002", 1002);
+        assertRecordOrdinal(consumer, 25, "bigval1003", 1003);
+        assertRecordOrdinal(consumer, 29, "bigval1004", 1004);
+
+        assertRecordOrdinal(consumer, 32, "val33", 33); // shard1
+        assertRecordOrdinal(consumer,  9, "val10", 10); // shard2
+        assertRecordOrdinal(consumer, 14, "val15", 15);
+        assertRecordOrdinal(consumer, 11, "val12", 12);
+
+        // numShards doubled to 8
+        assertEquals(8, consumer.getStateEngine().getTypeState("TestRec").numShards());
+        assertEquals(v3, consumer.getCurrentVersionId());
+
+        FailingValidationListener cycleFailingListener = new FailingValidationListener();
+        producer.addListener(cycleFailingListener);
+
+        // exercise resetToLastNumShards
+        try {
+            producer.runCycle(state -> {
+                add(state, "newVal", 9999);
+            });
+            fail("Cycle expected to fail at validation");
+        } catch (Exception e) {
+        }
+        try {
+            producer.runCycle(state -> {
+                add(state, "anotherNewVal", 9998);
+            });
+            fail("Cycle expected to fail at validation");
+        } catch (Exception e) {
+        }
+
+        producer.removeListener(cycleFailingListener);
+        long v4 = producer.runCycle(state -> {
+            for(int i=1;i<=36;i++) {
+                if(!removeSet.contains(i))
+                    add(state, "val" + i, i);
+            }
+
+            add(state, "newval37", 37);
+
+            for(int i=1000;i<1009;i++) {
+                add(state, "bigval"+i, i);
+            }
+        });
+        consumer.triggerRefreshTo(v4);
+
+        /// all changes focused in shard 0
+        assertRecordOrdinal(consumer,  4, "bigval1005", 1005);
+        assertRecordOrdinal(consumer, 12, "bigval1006", 1006);
+        assertRecordOrdinal(consumer, 20, "bigval1007", 1007);
+        assertRecordOrdinal(consumer, 28, "bigval1008", 1008);
+
+        assertRecordOrdinal(consumer, 32, "val33", 33); // shard1
+        assertRecordOrdinal(consumer,  9, "val10", 10); // shard2
+        assertRecordOrdinal(consumer, 14, "val15", 15);
+        assertRecordOrdinal(consumer, 11, "val12", 12);
+
+        assertEquals(8, consumer.getStateEngine().getTypeState("TestRec").numShards());
+        assertEquals(v4, consumer.getCurrentVersionId());
+
+        consumer.triggerRefreshTo(v1);
+        assertEquals(v1, consumer.getCurrentVersionId());
+
+        consumer.triggerRefreshTo(v4);
+        assertEquals(v4, consumer.getCurrentVersionId());
+        assertRecordOrdinal(consumer, 28, "bigval1008", 1008);
+        assertRecordOrdinal(consumer, 32, "val33", 33); // shard1
+        assertRecordOrdinal(consumer,  9, "val10", 10); // shard2
+        assertRecordOrdinal(consumer, 11, "val12", 12);
+    }
+
+    private void add(HollowProducer.WriteState state, String sVal, int iVal) {
+        TestRec rec = new TestRec(sVal, iVal);
+        state.add(rec);
+    }
+
+    private static class TestRec {
+        @HollowInline
+        private final String strVal;
+        private final int intVal;
+
+        public TestRec(String strVal, int intVal) {
+            this.strVal = strVal;
+            this.intVal = intVal;
+        }
+    }
+
+    private void assertRecordOrdinal(HollowConsumer consumer, int ordinal, String sVal, int iVal) {
+        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState)consumer.getStateEngine().getTypeState("TestRec");
+
+        Assert.assertEquals(iVal, typeState.readInt(ordinal, typeState.getSchema().getPosition("intVal")));
+        Assert.assertEquals(sVal, typeState.readString(ordinal, typeState.getSchema().getPosition("strVal")));
+    }
+
+    /**
+    @Test
+    public void focusChanges() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowProducer producer = HollowProducer.withPublisher(blobStore).withBlobStager(new HollowInMemoryBlobStager()).withFocusHoleFillInFewestShards(true).build();
+        long v1 = producer.runCycle(state -> {
+            for(int i=1;i<=36;i++) {
+                add(state, "val" + i, i);
+            }
+        });
+
+        HollowConsumer consumer = HollowConsumer.newHollowConsumer().withBlobRetriever(blobStore).withSkipTypeShardUpdateWithNoAdditions().build();
+        consumer.triggerRefreshTo(v1);
+
+        Assert.assertEquals(4, consumer.getStateEngine().getTypeState("TestRec").numShards());
+        Assert.assertEquals(4, consumer.getStateEngine().getTypeState("ListOfTestRec").numShards());
+        Assert.assertEquals(4, consumer.getStateEngine().getTypeState("SetOfTestRec").numShards());
+        Assert.assertEquals(4, consumer.getStateEngine().getTypeState("MapOfTestRecToTestRec").numShards());
+
+        /// remove 4 from S0: 13, 21, 25, 29
+        /// remove 5 from S1:  6, 14, 18, 26, 30
+        /// remove 2 from S2: 11, 19
+        /// remove 1 from S3: 24
+        Set<Integer> removeSet = new HashSet<>(Arrays.asList(13, 21, 25, 29, 6, 14, 18, 26, 30, 11, 19, 24));
+
+        long v2 = producer.runCycle(state -> {
+            for(int i=1;i<=36;i++) {
+                if(!removeSet.contains(i))
+                    add(state, "val" + i, i);
+            }
+
+            add(state, "newval37", 37);
+        });
+
+        consumer.triggerRefreshTo(v2);
+
+        removeSet.add(5);
+
+        long v3 = producer.runCycle(state -> {
+            for(int i=1;i<=36;i++) {
+                if(!removeSet.contains(i))
+                    add(state, "val" + i, i);
+            }
+
+            add(state, "newval37", 37);
+
+            for(int i=1000;i<1005;i++) {
+                add(state, "bigval"+i, i);
+            }
+        });
+
+        consumer.triggerRefreshTo(v3);
+
+        /// all changes focused in shard 1
+        assertRecordOrdinal(consumer,  5, "bigval1000", 1000);
+        assertRecordOrdinal(consumer, 13, "bigval1001", 1001);
+        assertRecordOrdinal(consumer, 17, "bigval1002", 1002);
+        assertRecordOrdinal(consumer, 25, "bigval1003", 1003);
+        assertRecordOrdinal(consumer, 29, "bigval1004", 1004);
+
+        assertRecordOrdinal(consumer, 32, "val33", 33); // shard1
+        assertRecordOrdinal(consumer,  9, "val10", 10); // shard2
+        assertRecordOrdinal(consumer, 14, "val15", 15);
+        assertRecordOrdinal(consumer, 11, "val12", 12);
+
+        long v4 = producer.runCycle(state -> {
+            for(int i=1;i<=36;i++) {
+                if(!removeSet.contains(i))
+                    add(state, "val" + i, i);
+            }
+
+            add(state, "newval37", 37);
+
+            for(int i=1000;i<1010;i++) {
+                add(state, "bigval"+i, i);
+            }
+        });
+
+        consumer.triggerRefreshTo(v4);
+
+        /// all changes focused in shard 0
+        assertRecordOrdinal(consumer,  4, "bigval1005", 1005);
+        assertRecordOrdinal(consumer, 12, "bigval1006", 1006);
+        assertRecordOrdinal(consumer, 20, "bigval1007", 1007);
+        assertRecordOrdinal(consumer, 24, "bigval1008", 1008);
+        assertRecordOrdinal(consumer, 28, "bigval1009", 1009);
+
+        assertRecordOrdinal(consumer, 32, "val33", 33); // shard1
+        assertRecordOrdinal(consumer,  9, "val10", 10); // shard2
+        assertRecordOrdinal(consumer, 14, "val15", 15);
+        assertRecordOrdinal(consumer, 11, "val12", 12);
+
+        long v5 = producer.runCycle(state -> {
+            for(int i=1;i<=36;i++) {
+                if(!removeSet.contains(i))
+                    add(state, "val" + i, i);
+            }
+
+            add(state, "newval37", 37);
+
+            for(int i=1000;i<1013;i++) {
+                add(state, "bigval"+i, i);
+            }
+        });
+
+        consumer.triggerRefreshTo(v5);
+
+        /// all changes focused in shards 2 and 3
+        assertRecordOrdinal(consumer, 10, "bigval1010", 1010);
+        assertRecordOrdinal(consumer, 18, "bigval1011", 1011);
+        assertRecordOrdinal(consumer, 23, "bigval1012", 1012);
+
+        assertRecordOrdinal(consumer, 32, "val33", 33); // shard1
+        assertRecordOrdinal(consumer,  9, "val10", 10); // shard2
+        assertRecordOrdinal(consumer, 14, "val15", 15);
+        assertRecordOrdinal(consumer, 11, "val12", 12);
+
+        consumer.triggerRefreshTo(v1);
+
+        BitSet ordinals = consumer.getStateEngine().getTypeState("TestRec").getPopulatedOrdinals();
+
+        for(int i=0;i<36;i++) {
+            Assert.assertTrue(ordinals.get(i));
+            assertRecordOrdinal(consumer, i, "val"+(i+1), i+1);
+        }
+
+        Assert.assertEquals(36, ordinals.cardinality());
+    }
+    **/
 
     private static class HasNonObjectField {
         public Integer objectField;
@@ -575,6 +954,13 @@ public class HollowProducerTest {
         @Override
         public void onProducerRestoreComplete(RestoreStatus status, long elapsed, TimeUnit unit) {
             lastRestoreStatus = status;
+        }
+    }
+
+    private class FailingValidationListener extends AbstractHollowProducerListener implements VetoableListener {
+        @Override
+        public void onValidationStart(long version) {
+            throw new RuntimeException("This listener fails validation");
         }
     }
 

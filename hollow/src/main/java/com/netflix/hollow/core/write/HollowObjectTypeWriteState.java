@@ -133,6 +133,11 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         return targetNumShards;
     }
 
+    /**
+     * A header tag indicating that num shards for a type has changed since the prior version. Its value encodes
+     * the type(s) that were re-sharded along with the before and after num shards in the fwd delta direction.
+     * For e.g. Movie:(2,4) Actor:(8,4)
+     */
     private void addReshardingHeader(int prevNumShards, int newNumShards) {
         String existing = stateEngine.getHeaderTag(HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED);
         String appendTo = "";
@@ -144,7 +149,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     int[] calcMaxShardOrdinal(int maxOrdinal, int numShards) {
         int[] maxShardOrdinal = new int[numShards];
-        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards; // numShards=4: maxOrdinal=3 => minRecordLocationsPerShard=1, maxOrdinal=6 => minRecordLocationsPerShard=1, maxOrdinal=1 => minRecordLocationsPerShard=0
+        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards;
         for(int i=0;i<numShards;i++)
             maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
         return maxShardOrdinal;

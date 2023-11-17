@@ -82,7 +82,7 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
         HollowProducer p = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withTypeResharding()
+                .withTypeResharding(true)
                 .build();
 
         p.initializeDataModel(schema);
