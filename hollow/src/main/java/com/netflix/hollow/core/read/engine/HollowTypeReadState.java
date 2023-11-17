@@ -128,7 +128,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     public abstract void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException;
 
     protected boolean shouldReshard(int currNumShards, int deltaNumShards) {
-        return currNumShards!=0 && deltaNumShards!=0 && currNumShards!=deltaNumShards;  // SNAP: TODO: check against 0 or >=0 ?
+        return currNumShards!=0 && deltaNumShards!=0 && currNumShards!=deltaNumShards;
     }
 
     public HollowSchema getSchema() {

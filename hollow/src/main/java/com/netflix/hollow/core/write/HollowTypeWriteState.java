@@ -303,8 +303,6 @@ public abstract class HollowTypeWriteState {
 
         ordinalMap.prepareForWrite();
         wroteData = true;
-
-        resetToLastNumShards = numShards;    // SNAP: TODO: code paths involving WriteStateCreator, outside of producer runcycle. Write test.
     }
     
     public boolean hasChangedSinceLastCycle() {

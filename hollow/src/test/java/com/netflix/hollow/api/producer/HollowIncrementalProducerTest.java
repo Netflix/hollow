@@ -386,14 +386,18 @@ public class HollowIncrementalProducerTest {
 
     @Test
     public void continuesARestoredState() {
-        HollowProducer genesisProducer = createInMemoryProducer();
+        HollowProducer genesisProducer = createInMemoryProducerWithResharding();
 
         /// initialize the data -- classic producer creates the first state in the delta chain.
         long originalVersion = genesisProducer.runCycle(new Populator() {
             public void populate(WriteState state) throws Exception {
                 state.add(new TypeA(1, "one", 1));
+                state.add(new TypeA(2, "two", 2));
+                state.add(new TypeA(3, "three", 3));
+                state.add(new TypeA(4, "four", 4));
             }
         });
+        assertEquals(4, genesisProducer.getWriteEngine().getTypeState("String").getNumShards());
 
         /// now at some point in the future, we will start up and create a new classic producer
         /// to back the HollowIncrementalProducer.
@@ -407,9 +411,12 @@ public class HollowIncrementalProducerTest {
         /// now create our HollowIncrementalProducer
         HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(backingProducer);
         incrementalProducer.restore(originalVersion, blobStore);
+        assertEquals(4, backingProducer.getWriteEngine().getTypeState("String").getNumShards());
 
         incrementalProducer.addOrModify(new TypeA(1, "one", 2));
         incrementalProducer.addOrModify(new TypeA(2, "two", 2));
+        incrementalProducer.addOrModify(new TypeA(3, "three", 3));
+        incrementalProducer.addOrModify(new TypeA(4, "four", 4));
         incrementalProducer.addOrModify(new TypeB(3, "three"));
 
         long version = incrementalProducer.runCycle();
@@ -1444,6 +1451,14 @@ public class HollowIncrementalProducerTest {
     private HollowProducer createInMemoryProducer() {
         return HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
+                .build();
+    }
+
+    private HollowProducer createInMemoryProducerWithResharding() {
+        return HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withTypeResharding(true)
+                .withTargetMaxTypeShardSize(8)
                 .build();
     }
 
