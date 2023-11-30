@@ -19,6 +19,7 @@ package com.netflix.hollow.api.client;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.TransitionAwareRefreshListener;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.error.VersionMismatchException;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -33,7 +34,11 @@ import com.netflix.hollow.tools.history.HollowHistoricalStateCreator;
 import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.logging.Logger;
+
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION;
 
 /**
  * A class comprising much of the internal state of a {@link HollowConsumer}.  Not intended for external consumption.
@@ -177,8 +182,16 @@ class HollowDataHolder {
             reader.applyDelta(in, optionalPartIn);
         }
 
-        setVersion(transition.getToVersion());
+        long expectedToVersion = transition.getToVersion();
+        String actualToVersionStr = stateEngine.getHeaderTag(HEADER_TAG_PRODUCER_TO_VERSION);
+        if (actualToVersionStr != null) {
+            long actualToVersion = Long.parseLong(actualToVersionStr);
+            if (actualToVersion != expectedToVersion) {
+                throw new VersionMismatchException(expectedToVersion, actualToVersion);
+            }
+        }
 
+        setVersion(transition.getToVersion());
         for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
             refreshListener.blobLoaded(transition);
     }

@@ -18,6 +18,7 @@ package com.netflix.hollow.api.client;
 
 import static com.netflix.hollow.core.HollowConstants.VERSION_LATEST;
 import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_SCHEMA_HASH;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.error.VersionMismatchException;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.MemoryMode;
@@ -46,6 +48,7 @@ import com.netflix.hollow.test.consumer.TestBlobRetriever;
 import com.netflix.hollow.test.consumer.TestHollowConsumer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -55,6 +58,8 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -96,6 +101,27 @@ public class HollowClientUpdaterTest {
                 subject.shouldCreateSnapshotPlan(new HollowConsumer.VersionInfo(VERSION_NONE)));
         assertTrue(subject.updateTo(VERSION_NONE));
         assertTrue("Should still have no types", readStateEngine.getAllTypes().isEmpty());
+    }
+
+    @Test
+    public void testUpdateTo_updateToLatestButBlobOnDifferentVersion() throws Throwable {
+        expectedException.expect(VersionMismatchException.class);
+        expectedException.expectMessage("Could not create an update plan, because no existing versions could be retrieved.");
+        long updateToVersion = 1234;
+        long blobToVersion = 1235; //this needs to be different from updateToVersion
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        writeStateEngine.addHeaderTag(HEADER_TAG_PRODUCER_TO_VERSION, String.valueOf(blobToVersion));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        new HollowBlobWriter(writeStateEngine).writeSnapshot(os);
+        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+        HollowConsumer.Blob blob = mock(HollowConsumer.Blob.class);
+        when(blob.isSnapshot())
+                .thenReturn(true);
+        when(blob.getInputStream())
+                .thenReturn(is);
+        when(retriever.retrieveSnapshotBlob(anyLong()))
+                .thenReturn(blob);
+        subject.updateTo(updateToVersion);
     }
 
     @Rule
