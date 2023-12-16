@@ -1365,7 +1365,8 @@ public class HollowConsumer {
             }
 
             if (refreshExecutor == null) {
-                refreshExecutor = newSingleThreadExecutor(r -> daemonThread(r, getClass(), "refresh"));
+                final Class<?> clazz = getClass(); // to avoid capturing 'this' in lambda
+                refreshExecutor = newSingleThreadExecutor(r -> daemonThread(r, clazz, "refresh"));
             }
 
             if (!memoryMode.consumerSupported()) {
