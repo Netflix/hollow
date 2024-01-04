@@ -176,6 +176,30 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
                 .sum();
     }
 
+    /**
+     * @return the no. of shards for each type in the read state
+     */
+    public Map<String, Integer> numShardsPerType() {
+        Map<String, Integer> typeShards = new HashMap<>();
+        for (String type : this.getAllTypes()) {
+            HollowTypeReadState typeState = this.getTypeState(type);
+            typeShards.put(type, typeState.numShards());
+        }
+        return typeShards;
+    }
+
+    /**
+     * @return the approx heap footprint of a single shard in bytes, for each type in the read state
+     */
+    public Map<String, Long> calcApproxShardSizePerType() {
+        Map<String, Long> typeShardSizes = new HashMap<>();
+        for (String type : this.getAllTypes()) {
+            HollowTypeReadState typeState = this.getTypeState(type);
+            typeShardSizes.put(type, typeState.getApproximateShardSizeInBytes());
+        }
+        return typeShardSizes;
+    }
+
     @Override
     public HollowTypeDataAccess getTypeDataAccess(String type) {
         return typeStates.get(type);

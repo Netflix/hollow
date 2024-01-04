@@ -20,6 +20,7 @@ import com.netflix.hollow.api.producer.AbstractHollowProducerListener;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.time.Duration;
+import java.util.Map;
 import java.util.OptionalLong;
 
 /**
@@ -88,8 +89,13 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
         HollowReadStateEngine stateEngine = readState.getStateEngine();
         dataSizeBytes = stateEngine.calcApproxDataSize();
 
+        Map<String, Integer> numShardsPerType = stateEngine.numShardsPerType();
+        Map<String, Long> shardSizePerType = stateEngine.calcApproxShardSizePerType();
+
         announcementMetricsBuilder
                 .setDataSizeBytes(dataSizeBytes)
+                .setNumShardsPerType(numShardsPerType)
+                .setShardSizePerType(shardSizePerType)
                 .setIsAnnouncementSuccess(isAnnouncementSuccess)
                 .setAnnouncementDurationMillis(elapsed.toMillis());
         lastAnnouncementSuccessTimeNanoOptional.ifPresent(announcementMetricsBuilder::setLastAnnouncementSuccessTimeNano);

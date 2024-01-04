@@ -16,11 +16,14 @@
  */
 package com.netflix.hollow.api.producer.metrics;
 
+import java.util.Map;
 import java.util.OptionalLong;
 
 public class AnnouncementMetrics {
 
     private long dataSizeBytes;                             // Heap footprint of announced blob in bytes
+    private Map<String, Integer> numShardsPerType;
+    private Map<String, Long> shardSizePerType;
     private long announcementDurationMillis;                // Announcement duration in ms, only applicable to completed cycles (skipped cycles dont announce)
     private boolean isAnnouncementSuccess;                  // true if announcement was successful, false if announcement failed
     private OptionalLong lastAnnouncementSuccessTimeNano;   // monotonic time of last successful announcement (no relation to wall clock), N/A until first successful announcement
@@ -28,6 +31,12 @@ public class AnnouncementMetrics {
 
     public long getDataSizeBytes() {
         return dataSizeBytes;
+    }
+    public Map<String, Integer> getNumShardsPerType() {
+        return numShardsPerType;
+    }
+    public Map<String, Long> getShardSizePerType() {
+        return shardSizePerType;
     }
     public long getAnnouncementDurationMillis() {
         return announcementDurationMillis;
@@ -41,6 +50,8 @@ public class AnnouncementMetrics {
 
     private AnnouncementMetrics(Builder builder) {
         this.dataSizeBytes = builder.dataSizeBytes;
+        this.numShardsPerType = builder.numShardsPerType;
+        this.shardSizePerType = builder.shardSizePerType;
         this.announcementDurationMillis = builder.announcementDurationMillis;
         this.isAnnouncementSuccess = builder.isAnnouncementSuccess;
         this.lastAnnouncementSuccessTimeNano = builder.lastAnnouncementSuccessTimeNano;
@@ -51,6 +62,8 @@ public class AnnouncementMetrics {
         private long announcementDurationMillis;
         private boolean isAnnouncementSuccess;
         private OptionalLong lastAnnouncementSuccessTimeNano;
+        private Map<String, Integer> numShardsPerType;
+        private Map<String, Long> shardSizePerType;
 
         public Builder() {
             lastAnnouncementSuccessTimeNano = OptionalLong.empty();
@@ -58,6 +71,14 @@ public class AnnouncementMetrics {
 
         public Builder setDataSizeBytes(long dataSizeBytes) {
             this.dataSizeBytes = dataSizeBytes;
+            return this;
+        }
+        public Builder setNumShardsPerType(Map<String, Integer> numShardsPerType) {
+            this.numShardsPerType = numShardsPerType;
+            return this;
+        }
+        public Builder setShardSizePerType(Map<String, Long> shardSizePerType) {
+            this.shardSizePerType = shardSizePerType;
             return this;
         }
         public Builder setAnnouncementDurationMillis(long announcementDurationMillis) {
