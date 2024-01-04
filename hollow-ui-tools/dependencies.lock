@@ -43,6 +43,12 @@
         "com.google.code.gson:gson": {
             "locked": "2.10.1"
         },
+        "com.gradle:develocity-testing-annotations": {
+            "locked": "2.0"
+        },
+        "com.gradle:gradle-enterprise-testing-annotations": {
+            "locked": "1.0"
+        },
         "com.netflix.hollow:hollow": {
             "project": true
         },
@@ -66,6 +72,12 @@
         "com.google.code.gson:gson": {
             "locked": "2.10.1"
         },
+        "com.gradle:develocity-testing-annotations": {
+            "locked": "2.0"
+        },
+        "com.gradle:gradle-enterprise-testing-annotations": {
+            "locked": "1.0"
+        },
         "com.netflix.hollow:hollow": {
             "project": true
         },
@@ -83,11 +95,20 @@
         },
         "org.apache.velocity:velocity-engine-core": {
             "locked": "2.3"
+        },
+        "org.junit.platform:junit-platform-launcher": {
+            "locked": "1.10.0"
         }
     },
     "toolsCompileClasspath": {
         "com.google.code.gson:gson": {
             "locked": "2.10.1"
+        },
+        "com.gradle:develocity-testing-annotations": {
+            "locked": "2.0"
+        },
+        "com.gradle:gradle-enterprise-testing-annotations": {
+            "locked": "1.0"
         },
         "com.netflix.hollow:hollow": {
             "project": true
@@ -112,6 +133,12 @@
         "com.google.code.gson:gson": {
             "locked": "2.10.1"
         },
+        "com.gradle:develocity-testing-annotations": {
+            "locked": "2.0"
+        },
+        "com.gradle:gradle-enterprise-testing-annotations": {
+            "locked": "1.0"
+        },
         "com.netflix.hollow:hollow": {
             "project": true
         },
@@ -129,6 +156,9 @@
         },
         "org.apache.velocity:velocity-engine-core": {
             "locked": "2.3"
+        },
+        "org.junit.platform:junit-platform-launcher": {
+            "locked": "1.10.0"
         }
     }
 }

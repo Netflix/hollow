@@ -3,6 +3,12 @@
         "com.github.spotbugs:spotbugs": {
             "locked": "4.2.1"
         },
+        "com.gradle:develocity-testing-annotations": {
+            "locked": "2.0"
+        },
+        "com.gradle:gradle-enterprise-testing-annotations": {
+            "locked": "1.0"
+        },
         "com.netflix.hollow:hollow-test": {
             "project": true
         },
@@ -20,6 +26,12 @@
         "com.github.spotbugs:spotbugs": {
             "locked": "4.2.1"
         },
+        "com.gradle:develocity-testing-annotations": {
+            "locked": "2.0"
+        },
+        "com.gradle:gradle-enterprise-testing-annotations": {
+            "locked": "1.0"
+        },
         "com.netflix.hollow:hollow": {
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-test"
@@ -34,6 +46,9 @@
         },
         "org.assertj:assertj-core": {
             "locked": "3.15.0"
+        },
+        "org.junit.platform:junit-platform-launcher": {
+            "locked": "1.10.0"
         },
         "org.mockito:mockito-core": {
             "locked": "2.15.0"

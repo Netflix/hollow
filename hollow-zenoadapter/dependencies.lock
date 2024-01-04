@@ -16,6 +16,12 @@
         }
     },
     "testCompileClasspath": {
+        "com.gradle:develocity-testing-annotations": {
+            "locked": "2.0"
+        },
+        "com.gradle:gradle-enterprise-testing-annotations": {
+            "locked": "1.0"
+        },
         "com.netflix.hollow:hollow": {
             "project": true
         },
@@ -27,6 +33,12 @@
         }
     },
     "testRuntimeClasspath": {
+        "com.gradle:develocity-testing-annotations": {
+            "locked": "2.0"
+        },
+        "com.gradle:gradle-enterprise-testing-annotations": {
+            "locked": "1.0"
+        },
         "com.netflix.hollow:hollow": {
             "project": true
         },
@@ -35,6 +47,9 @@
         },
         "junit:junit": {
             "locked": "4.11"
+        },
+        "org.junit.platform:junit-platform-launcher": {
+            "locked": "1.10.0"
         }
     }
 }

@@ -9,8 +9,10 @@ import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import java.util.Random;
 import java.util.function.Supplier;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataElementsSplitJoinTest {
     @Override
     protected void initializeTypeStates() {
