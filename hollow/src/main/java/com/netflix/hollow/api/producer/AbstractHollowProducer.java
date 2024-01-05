@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.producer;
 
 import static com.netflix.hollow.api.producer.ProducerListenerSupport.ProducerListeners;
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED;
 import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.toList;
 
@@ -393,15 +394,9 @@ abstract class AbstractHollowProducer {
 
             // 3. Produce a new state if there's work to do
             if (writeEngine.hasChangedSinceLastCycle()) {
-                writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_SCHEMA_HASH, new HollowSchemaHash(writeEngine.getSchemas()).getHash());
                 boolean schemaChangedFromPriorVersion = readStates.hasCurrent() &&
                         !writeEngine.hasIdenticalSchemas(readStates.current().getStateEngine());
-                if (schemaChangedFromPriorVersion) {
-                    writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE, Boolean.TRUE.toString());
-                } else {
-                    writeEngine.getHeaderTags().remove(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE);
-                }
-                writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION, String.valueOf(toVersion));
+                updateHeaderTags(writeEngine, toVersion, schemaChangedFromPriorVersion);
 
                 // 3a. Publish, run checks & validation, then announce new state consumers
                 publish(listeners, toVersion, artifacts);
@@ -518,6 +513,17 @@ abstract class AbstractHollowProducer {
      */
     public void removeListener(HollowProducerEventListener listener) {
         listeners.removeListener(listener);
+    }
+
+    private void updateHeaderTags(HollowWriteStateEngine writeEngine, long toVersion, boolean schemaChangedFromPriorVersion) {
+        writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_SCHEMA_HASH, new HollowSchemaHash(writeEngine.getSchemas()).getHash());
+        if (schemaChangedFromPriorVersion) {
+            writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE, Boolean.TRUE.toString());
+        } else {
+            writeEngine.getHeaderTags().remove(HollowStateEngine.HEADER_TAG_SCHEMA_CHANGE);
+        }
+        writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION, String.valueOf(toVersion));
+        writeEngine.getHeaderTags().remove(HEADER_TAG_TYPE_RESHARDING_INVOKED);
     }
 
     void populate(

@@ -88,7 +88,6 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
 
         HollowReadStateEngine stateEngine = readState.getStateEngine();
         dataSizeBytes = stateEngine.calcApproxDataSize();
-
         Map<String, Integer> numShardsPerType = stateEngine.numShardsPerType();
         Map<String, Long> shardSizePerType = stateEngine.calcApproxShardSizePerType();
 

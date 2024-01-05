@@ -91,6 +91,14 @@ public class HollowWriteStateEngineTest {
 
         });
         assertEquals(4, producer.getWriteEngine().getTypeState("Integer").getNumShards());
+        long v3 = producer.runCycle(ws -> {
+            // remain at 4 shards for Integer
+            for (int i=0;i<99;i++) {
+                ws.add(i);
+            }
+
+        });
+        assertEquals(4, producer.getWriteEngine().getTypeState("Integer").getNumShards());
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
                 .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
                     @Override
@@ -112,5 +120,10 @@ public class HollowWriteStateEngineTest {
         assertEquals(v2, consumer.getCurrentVersionId());
         assertEquals(4, consumer.getStateEngine().getTypeState("Integer").numShards());
         assertEquals("Integer:(2,4)", consumer.getStateEngine().getHeaderTag(HEADER_TAG_TYPE_RESHARDING_INVOKED));
+
+        consumer.triggerRefreshTo(v3);
+        assertEquals(v3, consumer.getCurrentVersionId());
+        assertEquals(4, consumer.getStateEngine().getTypeState("Integer").numShards());
+        assertEquals(false, consumer.getStateEngine().getHeaderTags().containsKey(HEADER_TAG_TYPE_RESHARDING_INVOKED));
     }
 }
