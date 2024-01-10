@@ -80,14 +80,24 @@ public class HollowProducerTest {
     }
 
     private HollowProducer createProducer(File tmpFolder, HollowObjectSchema... schemas) {
-        HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
-            .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath())).build();
+        return createProducer(true, tmpFolder, schemas);
+    }
+
+    private HollowProducer createProducer(boolean headerPublish, File tmpFolder, HollowObjectSchema... schemas) {
+        HollowProducer.Builder producerBuilder = HollowProducer
+                .withPublisher(new FakeBlobPublisher())
+                .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath()));
+        if (!headerPublish) {
+            producerBuilder = producerBuilder.noHeaderPublish();
+        }
+        HollowProducer producer = producerBuilder.build();
         if (schemas != null && schemas.length > 0) {
             producer.initializeDataModel(schemas);
         }
         producer.addListener(new FakeProducerListener());
         return producer;
     }
+
 
     @After
     public void tearDown() {
@@ -234,6 +244,18 @@ public class HollowProducerTest {
         Assert.assertNotNull(header);
         Assert.assertEquals(1, header.getSchemas().size());
         Assert.assertEquals(schema, header.getSchemas().get(0));
+    }
+
+    @Test
+    public void testNoHeaderPublish() {
+        HollowProducer producer = createProducer(false, tmpFolder, schema);
+        long version = testPublishV1(producer, 2, 10);
+        try {
+            HollowConsumer.HeaderBlob headerBlob = blobRetriever.retrieveHeaderBlob(version);
+            Assert.assertNull(headerBlob);
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Test
@@ -574,7 +596,9 @@ public class HollowProducerTest {
         @Override
         public HollowConsumer.HeaderBlob retrieveHeaderBlob(long currentVersion) {
             final File blobFile = headerFileMap.get(currentVersion);
-            System.out.println("Restored: " + blobFile);
+            if (blobFile == null) {
+                return null;
+            }
             return new HollowConsumer.HeaderBlob(currentVersion) {
                 @Override
                 public InputStream getInputStream() throws IOException {

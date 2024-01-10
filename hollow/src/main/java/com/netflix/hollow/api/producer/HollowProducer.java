@@ -726,6 +726,7 @@ public class HollowProducer extends AbstractHollowProducer {
         SingleProducerEnforcer singleProducerEnforcer = new BasicSingleProducerEnforcer();
         HollowObjectHashCodeFinder hashCodeFinder = null;
         boolean doIntegrityCheck = true;
+        boolean doHeaderPublish = true;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
 
         public B withBlobStager(HollowProducer.BlobStager stager) {
@@ -883,6 +884,11 @@ public class HollowProducer extends AbstractHollowProducer {
         
         public B noIntegrityCheck() {
             this.doIntegrityCheck = false;
+            return (B) this;
+        }
+
+        public B noHeaderPublish() {
+            this.doHeaderPublish = false;
             return (B) this;
         }
 
