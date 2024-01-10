@@ -139,8 +139,9 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
     private void removeRecordsFromNewState(HollowProducer.WriteState newState, Map<String, BitSet> recordsToRemove) {
         for(Map.Entry<String, BitSet> removalEntry : recordsToRemove.entrySet()) {
             HollowTypeWriteState writeState = newState.getStateEngine().getTypeState(removalEntry.getKey());
-            BitSet typeRecordsToRemove = removalEntry.getValue();
+            if (writeState == null) continue;
 
+            BitSet typeRecordsToRemove = removalEntry.getValue();
             int ordinalToRemove = typeRecordsToRemove.nextSetBit(0);
             while(ordinalToRemove != -1) {
                 writeState.removeOrdinalFromThisCycle(ordinalToRemove);
