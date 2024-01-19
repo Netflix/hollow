@@ -71,7 +71,8 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
     private void gatherStatistics() {
         if(numShards == -1)
             calculateNumShards();
-        
+        revNumShards = numShards;
+
         int maxKeyOrdinal = 0;
         int maxValueOrdinal = 0;
 

@@ -69,7 +69,8 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     private void gatherStatistics() {
         if(numShards == -1)
             calculateNumShards();
-        
+        revNumShards = numShards;
+
         int maxElementOrdinal = 0;
 
         int maxOrdinal = ordinalMap.maxOrdinal();
