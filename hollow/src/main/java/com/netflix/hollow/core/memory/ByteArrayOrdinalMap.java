@@ -578,13 +578,9 @@ public class ByteArrayOrdinalMap {
      * Create an AtomicLongArray of the specified size, each value in the array will be EMPTY_BUCKET_VALUE
      */
     private AtomicLongArray emptyKeyArray(int size) {
-        AtomicLongArray arr = new AtomicLongArray(size);
-        // Volatile store not required, could use plain store
-        // See VarHandles for JDK >= 9
-        for (int i = 0; i < arr.length(); i++) {
-            arr.lazySet(i, EMPTY_BUCKET_VALUE);
-        }
-        return arr;
+        long[] mtArray = new long[size];
+        Arrays.fill(mtArray, EMPTY_BUCKET_VALUE);
+        return new AtomicLongArray(mtArray);
     }
 
     public ByteDataArray getByteData() {
