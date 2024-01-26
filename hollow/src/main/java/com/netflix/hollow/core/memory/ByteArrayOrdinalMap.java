@@ -154,7 +154,10 @@ public class ByteArrayOrdinalMap {
                 return (int) (key >>> BITS_PER_POINTER);
             }
 
-            bucket = (bucket + 1) % pao.length();
+            bucket = (bucket + 1);
+            if(bucket == pao.length()) {
+                bucket = 0;
+            }
             key = pao.get(bucket);
         }
 
@@ -237,7 +240,10 @@ public class ByteArrayOrdinalMap {
         long key = pao.get(bucket);
 
         while (key != EMPTY_BUCKET_VALUE) {
-            bucket = (bucket + 1) % pao.length();
+            bucket = (bucket + 1);
+            if(bucket==pao.length()) {
+                bucket = 0;
+            }
             key = pao.get(bucket);
         }
 
@@ -326,7 +332,10 @@ public class ByteArrayOrdinalMap {
                 return (int) (key >>> BITS_PER_POINTER);
             }
 
-            bucket = (bucket + 1) % pao.length();
+            bucket = (bucket + 1);
+            if(bucket == pao.length()) {
+                bucket = 0;
+            }
             key = pao.get(bucket);
         }
 
@@ -567,7 +576,9 @@ public class ByteArrayOrdinalMap {
                 int hash = rehashPreviouslyAddedData(value);
                 int bucket = indexFromHash(hash, newKeys.length());
                 while (newKeys.get(bucket) != EMPTY_BUCKET_VALUE) {
-                    bucket = (bucket + 1) % newKeys.length();
+                    bucket = (bucket + 1);
+                    if(bucket == newKeys.length())
+                        bucket = 0;
                 }
                 // Volatile store not required, could use plain store
                 // See VarHandles for JDK >= 9
