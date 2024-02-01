@@ -892,7 +892,6 @@ public class HollowProducer extends AbstractHollowProducer {
         }
 
         public B noSingleProducerEnforcer() {
-            this.singleProducerEnforcer = null;
             return (B) this;
         }
 
