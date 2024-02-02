@@ -153,20 +153,20 @@ class HollowObjectTypeReadStateShard {
     /**
      * Decode a String as a series of VarInts, one per character.<p>
      */
-    private static final ThreadLocal<char[]> chararr = ThreadLocal.withInitial(() -> new char[100]);
+    private static final ThreadLocal<byte[]> bytearr = ThreadLocal.withInitial(() -> new byte[100]);
 
     private String readString(ByteData data, long position, int length) {
-        char[] chararr = HollowObjectTypeReadStateShard.chararr.get();
-        if (length > chararr.length) {
-            chararr = new char[length];
+        byte[] bytearr = HollowObjectTypeReadStateShard.bytearr.get();
+        if (length > bytearr.length) {
+            bytearr = new byte[length];
         } else {
-            Arrays.fill(chararr, 0, length, '\0');
+            Arrays.fill(bytearr, 0, length, (byte) 0);
         }
 
-        int count = VarInt.readVIntsInto(data, position, length, chararr);
+        int count = VarInt.readVIntsInto(data, position, length, bytearr);
 
         // The number of chars may be fewer than the number of bytes in the serialized data
-        return new String(chararr, 0, count);
+        return new String(bytearr, 0, count);
     }
 
     private boolean testStringEquality(ByteData data, long position, int length, String testValue) {

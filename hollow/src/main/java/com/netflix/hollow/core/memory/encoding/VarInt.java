@@ -275,21 +275,21 @@ public class VarInt {
      * @param output an array where outputs will be placed, which should be at least {@code length} long and zero.
      * @return the number of values written
      */
-    public static int readVIntsInto(ByteData arr, long position, int length, char[] output) {
+    public static int readVIntsInto(ByteData arr, long position, int length, byte[] output) {
         // two loops, first for single-byte encodes, falling back to second full-featured loop
         int i = 0;
         for(; i < length; i++) {
             int b = arr.get(position + i);
             if ((b & 0x80) != 0)
                 break;
-            output[i] = (char) b;
+            output[i] = (byte) b;
         }
 
         int count = i;
         for(; i < length; i++) {
             int b = arr.get(position + i);
 
-            output[count] = (char) ((output[count] << 7) | (b & 0x7f));
+            output[count] = (byte) ((output[count] << 7) | (b & 0x7f));
             count += (~b >> 7) & 0x1;
         }
 
