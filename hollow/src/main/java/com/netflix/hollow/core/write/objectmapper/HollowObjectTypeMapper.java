@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
+import com.netflix.hollow.api.objects.HollowRecord;
+import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -192,6 +194,49 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             mappedFields.get(i).copy(obj, rec, flatRecordWriter);
         }
         return rec;
+    }
+
+    @Override
+    protected Object parseHollowRecord(HollowRecord record) {
+        try {
+            GenericHollowObject hollowObject = (GenericHollowObject) record;
+
+            HollowObjectSchema objectSchema = (HollowObjectSchema) record.getSchema();
+            Object obj = null;
+            if (BOXED_WRAPPERS.contains(clazz)) {
+                // if `clazz` is a BoxedWrapper then by definition its OBJECT schema will have a single primitive
+                // field so find it in the HollowObject and ignore all other fields.
+                for (int i = 0; i < objectSchema.numFields(); i++) {
+                    int posInPojoSchema = schema.getPosition(objectSchema.getFieldName(i));
+                    if (posInPojoSchema != -1) {
+                        obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(hollowObject);
+                    }
+                }
+            } else if (clazz.isEnum()) {
+                // if `clazz` is an enum, then we should expect to find a field called `_name` in the FlatRecord.
+                // There may be other fields if the producer enum contained custom properties, we ignore them
+                // here assuming the enum constructor will set them if needed.
+                for (int i = 0; i < objectSchema.numFields(); i++) {
+                    String fieldName = objectSchema.getFieldName(i);
+                    int posInPojoSchema = schema.getPosition(fieldName);
+                    if (fieldName.equals(MappedFieldType.ENUM_NAME.getSpecialFieldName()) && posInPojoSchema != -1) {
+                        obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(hollowObject);
+                    }
+                }
+            } else {
+                obj = unsafe.allocateInstance(clazz);
+                for (int i = 0; i < objectSchema.numFields(); i++) {
+                    int posInPojoSchema = schema.getPosition(objectSchema.getFieldName(i));
+                    if (posInPojoSchema != -1) {
+                        mappedFields.get(posInPojoSchema).copy(hollowObject, obj);
+                    }
+                }
+            }
+
+            return obj;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -527,7 +572,158 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     break;
             }
         }
-        
+
+        public void copy(GenericHollowObject rec, Object pojo) {
+            switch(fieldType) {
+                case BOOLEAN:
+                    unsafe.putBoolean(pojo, fieldOffset, rec.getBoolean(fieldName));
+                    break;
+                case INT:
+                    unsafe.putInt(pojo, fieldOffset, rec.getInt(fieldName));
+                    break;
+                case SHORT:
+                    unsafe.putShort(pojo, fieldOffset, (short)rec.getInt(fieldName));
+                    break;
+                case BYTE:
+                    unsafe.putByte(pojo, fieldOffset, (byte)rec.getInt(fieldName));
+                    break;
+                case CHAR:
+                    unsafe.putChar(pojo, fieldOffset, (char)rec.getInt(fieldName));
+                    break;
+                case LONG:
+                    unsafe.putLong(pojo, fieldOffset, rec.getLong(fieldName));
+                    break;
+                case DOUBLE:
+                    unsafe.putDouble(pojo, fieldOffset, rec.getDouble(fieldName));
+                    break;
+                case FLOAT:
+                    unsafe.putFloat(pojo, fieldOffset, rec.getFloat(fieldName));
+                    break;
+                case STRING:
+                    unsafe.putObject(pojo, fieldOffset, rec.getString(fieldName));
+                    break;
+                case BYTES:
+                    unsafe.putObject(pojo, fieldOffset, rec.getBytes(fieldName));
+                    break;
+                case INLINED_BOOLEAN:
+                    unsafe.putObject(pojo, fieldOffset, Boolean.valueOf(rec.getBoolean(fieldName)));
+                    break;
+                case INLINED_INT:
+                    unsafe.putObject(pojo, fieldOffset, Integer.valueOf(rec.getInt(fieldName)));
+                    break;
+                case INLINED_SHORT:
+                    unsafe.putObject(pojo, fieldOffset, Short.valueOf((short)rec.getInt(fieldName)));
+                    break;
+                case INLINED_BYTE:
+                    unsafe.putObject(pojo, fieldOffset, Byte.valueOf((byte)rec.getInt(fieldName)));
+                    break;
+                case INLINED_CHAR:
+                    unsafe.putObject(pojo, fieldOffset, Character.valueOf((char)rec.getInt(fieldName)));
+                    break;
+                case INLINED_LONG:
+                    unsafe.putObject(pojo, fieldOffset, Long.valueOf(rec.getLong(fieldName)));
+                    break;
+                case INLINED_DOUBLE:
+                    unsafe.putObject(pojo, fieldOffset, Double.valueOf(rec.getDouble(fieldName)));
+                    break;
+                case INLINED_FLOAT:
+                    unsafe.putObject(pojo, fieldOffset, Float.valueOf(rec.getFloat(fieldName)));
+                    break;
+                case INLINED_STRING:
+                    unsafe.putObject(pojo, fieldOffset, rec.getString(fieldName));
+                    break;
+                case NULLABLE_PRIMITIVE_BOOLEAN:
+                    // TODO (eduardo): handle the nullable primitive boolean
+                    break;
+                case DATE_TIME:
+                    long dateValue = rec.getLong(fieldName);
+                    if (dateValue != Long.MIN_VALUE) {
+                        unsafe.putObject(pojo, fieldOffset, new Date(dateValue));
+                    }
+                    break;
+                case ENUM_NAME:
+                    String enumNameValue = rec.getString(fieldName);
+                    if (enumNameValue != null) {
+                        unsafe.putObject(pojo, fieldOffset, Enum.valueOf((Class<Enum>) type, enumNameValue));
+                    }
+                    break;
+                case REFERENCE:
+                    HollowRecord fieldRecord = rec.getReferencedGenericRecord(fieldName);
+                    if(fieldRecord != null) {
+                        unsafe.putObject(pojo, fieldOffset, subTypeMapper.parseHollowRecord(fieldRecord));
+                    }
+                    break;
+            }
+        }
+
+        private Object parseBoxedWrapper(GenericHollowObject record) {
+            switch (fieldType) {
+                case BOOLEAN:
+                    return Boolean.valueOf(record.getBoolean(fieldName));
+                case INT:
+                    int intValue = record.getInt(fieldName);
+                    if (intValue == Integer.MIN_VALUE) {
+                        return null;
+                    }
+                    return Integer.valueOf(intValue);
+                case SHORT:
+                    int shortValue = record.getInt(fieldName);
+                    if (shortValue == Integer.MIN_VALUE) {
+                        return null;
+                    }
+                    return Short.valueOf((short) shortValue);
+                case BYTE:
+                    int byteValue = record.getInt(fieldName);
+                    if (byteValue == Integer.MIN_VALUE) {
+                        return null;
+                    }
+                    return Byte.valueOf((byte) byteValue);
+                case CHAR:
+                    int charValue = record.getInt(fieldName);
+                    if (charValue == Integer.MIN_VALUE) {
+                        return null;
+                    }
+                    return Character.valueOf((char) charValue);
+                case LONG:
+                    long longValue = record.getLong(fieldName);
+                    if (longValue == Long.MIN_VALUE) {
+                        return null;
+                    }
+                    return Long.valueOf(longValue);
+                case FLOAT:
+                    float floatValue = record.getFloat(fieldName);
+                    if (Float.isNaN(floatValue)) {
+                        return null;
+                    }
+                    return Float.valueOf(floatValue);
+                case DOUBLE:
+                    double doubleValue = record.getDouble(fieldName);
+                    if (Double.isNaN(doubleValue)) {
+                        return null;
+                    }
+                    return Double.valueOf(doubleValue);
+                case STRING:
+                    return record.getString(fieldName);
+                case BYTES:
+                    return record.getBytes(fieldName);
+                case ENUM_NAME:
+                    String enumName = record.getString(fieldName);
+                    if (enumName == null) {
+                        return null;
+                    }
+                    return Enum.valueOf((Class<Enum>) clazz, enumName);
+                case DATE_TIME: {
+                    long dateValue = record.getLong(fieldName);
+                    if (dateValue == Long.MIN_VALUE) {
+                        return null;
+                    }
+                    return new Date(dateValue);
+                }
+                default:
+                    throw new IllegalArgumentException("Unexpected field type " + fieldType + " for field " + fieldName);
+            }
+        }
+
         private Object parseBoxedWrapper(FlatRecordReader reader) {
             switch (fieldType) {
                 case BOOLEAN: {
