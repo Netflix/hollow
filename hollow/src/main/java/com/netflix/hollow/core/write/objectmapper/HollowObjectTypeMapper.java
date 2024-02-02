@@ -579,25 +579,46 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     unsafe.putBoolean(pojo, fieldOffset, rec.getBoolean(fieldName));
                     break;
                 case INT:
-                    unsafe.putInt(pojo, fieldOffset, rec.getInt(fieldName));
+                    int intValue = rec.getInt(fieldName);
+                    if (intValue != Integer.MIN_VALUE) {
+                        unsafe.putInt(pojo, fieldOffset, intValue);
+                    }
                     break;
                 case SHORT:
-                    unsafe.putShort(pojo, fieldOffset, (short)rec.getInt(fieldName));
+                    int shortValue = rec.getInt(fieldName);
+                    if (shortValue != Integer.MIN_VALUE) {
+                        unsafe.putShort(pojo, fieldOffset, (short) shortValue);
+                    }
                     break;
                 case BYTE:
-                    unsafe.putByte(pojo, fieldOffset, (byte)rec.getInt(fieldName));
+                    int byteValue = rec.getInt(fieldName);
+                    if (byteValue != Integer.MIN_VALUE) {
+                        unsafe.putByte(pojo, fieldOffset, (byte) byteValue);
+                    }
                     break;
                 case CHAR:
-                    unsafe.putChar(pojo, fieldOffset, (char)rec.getInt(fieldName));
+                    int charValue = rec.getInt(fieldName);
+                    if (charValue != Integer.MIN_VALUE) {
+                        unsafe.putChar(pojo, fieldOffset, (char) charValue);
+                    }
                     break;
                 case LONG:
-                    unsafe.putLong(pojo, fieldOffset, rec.getLong(fieldName));
+                    long longValue = rec.getLong(fieldName);
+                    if (longValue != Long.MIN_VALUE) {
+                        unsafe.putLong(pojo, fieldOffset, longValue);
+                    }
                     break;
                 case DOUBLE:
-                    unsafe.putDouble(pojo, fieldOffset, rec.getDouble(fieldName));
+                    double doubleValue = rec.getDouble(fieldName);
+                    if (!Double.isNaN(doubleValue)) {
+                        unsafe.putDouble(pojo, fieldOffset, doubleValue);
+                    }
                     break;
                 case FLOAT:
-                    unsafe.putFloat(pojo, fieldOffset, rec.getFloat(fieldName));
+                    float floatValue = rec.getFloat(fieldName);
+                    if (!Float.isNaN(floatValue)) {
+                        unsafe.putFloat(pojo, fieldOffset, floatValue);
+                    }
                     break;
                 case STRING:
                     unsafe.putObject(pojo, fieldOffset, rec.getString(fieldName));
@@ -609,31 +630,49 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     unsafe.putObject(pojo, fieldOffset, Boolean.valueOf(rec.getBoolean(fieldName)));
                     break;
                 case INLINED_INT:
-                    unsafe.putObject(pojo, fieldOffset, Integer.valueOf(rec.getInt(fieldName)));
+                    int inlinedIntValue = rec.getInt(fieldName);
+                    if (inlinedIntValue != Integer.MIN_VALUE) {
+                        unsafe.putObject(pojo, fieldOffset, Integer.valueOf(inlinedIntValue));
+                    }
                     break;
                 case INLINED_SHORT:
-                    unsafe.putObject(pojo, fieldOffset, Short.valueOf((short)rec.getInt(fieldName)));
+                    int inlinedShortValue = rec.getInt(fieldName);
+                    if (inlinedShortValue != Integer.MIN_VALUE) {
+                        unsafe.putObject(pojo, fieldOffset, Short.valueOf((short) inlinedShortValue));
+                    }
                     break;
                 case INLINED_BYTE:
-                    unsafe.putObject(pojo, fieldOffset, Byte.valueOf((byte)rec.getInt(fieldName)));
+                    int inlinedByteValue = rec.getInt(fieldName);
+                    if (inlinedByteValue != Integer.MIN_VALUE) {
+                        unsafe.putObject(pojo, fieldOffset, Byte.valueOf((byte) inlinedByteValue));
+                    }
                     break;
                 case INLINED_CHAR:
-                    unsafe.putObject(pojo, fieldOffset, Character.valueOf((char)rec.getInt(fieldName)));
+                    int inlinedCharValue = rec.getInt(fieldName);
+                    if (inlinedCharValue != Integer.MIN_VALUE) {
+                        unsafe.putObject(pojo, fieldOffset, Character.valueOf((char) inlinedCharValue));
+                    }
                     break;
                 case INLINED_LONG:
-                    unsafe.putObject(pojo, fieldOffset, Long.valueOf(rec.getLong(fieldName)));
+                    long inlinedLongValue = rec.getLong(fieldName);
+                    if (inlinedLongValue != Long.MIN_VALUE) {
+                        unsafe.putObject(pojo, fieldOffset, Long.valueOf(inlinedLongValue));
+                    }
                     break;
                 case INLINED_DOUBLE:
-                    unsafe.putObject(pojo, fieldOffset, Double.valueOf(rec.getDouble(fieldName)));
+                    double inlinedDoubleValue = rec.getDouble(fieldName);
+                    if (!Double.isNaN(inlinedDoubleValue)) {
+                        unsafe.putObject(pojo, fieldOffset, Double.valueOf(inlinedDoubleValue));
+                    }
                     break;
                 case INLINED_FLOAT:
-                    unsafe.putObject(pojo, fieldOffset, Float.valueOf(rec.getFloat(fieldName)));
+                    float inlinedFloatValue = rec.getFloat(fieldName);
+                    if (!Float.isNaN(inlinedFloatValue)) {
+                        unsafe.putObject(pojo, fieldOffset, Float.valueOf(inlinedFloatValue));
+                    }
                     break;
                 case INLINED_STRING:
                     unsafe.putObject(pojo, fieldOffset, rec.getString(fieldName));
-                    break;
-                case NULLABLE_PRIMITIVE_BOOLEAN:
-                    // TODO (eduardo): handle the nullable primitive boolean
                     break;
                 case DATE_TIME:
                     long dateValue = rec.getLong(fieldName);
@@ -653,6 +692,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                         unsafe.putObject(pojo, fieldOffset, subTypeMapper.parseHollowRecord(fieldRecord));
                     }
                     break;
+                default:
+                    throw new IllegalArgumentException("Unexpected field type " + fieldType + " for field " + fieldName);
             }
         }
 

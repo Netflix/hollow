@@ -80,6 +80,9 @@ public class HollowObjectMapper {
 
     public <T> T readHollowRecord(HollowRecord record) {
         HollowTypeMapper typeMapper = typeMappers.get(record.getSchema().getName());
+        if (typeMapper == null) {
+            throw new IllegalArgumentException("No type mapper found for schema " + record.getSchema().getName());
+        }
         return (T) typeMapper.parseHollowRecord(record);
     }
     

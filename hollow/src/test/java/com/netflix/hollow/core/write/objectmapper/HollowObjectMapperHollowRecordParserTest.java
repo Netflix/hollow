@@ -52,6 +52,21 @@ public class HollowObjectMapperHollowRecordParserTest {
   }
 
   @Test
+  public void testNullableSpecialWrapperTypes() {
+    SpecialWrapperTypesTest wrapperTypesTest = new SpecialWrapperTypesTest();
+    wrapperTypesTest.id = 8797182L;
+    wrapperTypesTest.type = AnEnum.SOME_VALUE_C;
+
+    HollowReadStateEngine stateEngine = createReadStateEngine(wrapperTypesTest);
+    GenericHollowObject obj = new GenericHollowObject(stateEngine, "SpecialWrapperTypesTest", 0);
+    SpecialWrapperTypesTest result = mapper.readHollowRecord(obj);
+
+    Assert.assertEquals(wrapperTypesTest, result);
+    Assert.assertNull(wrapperTypesTest.complexEnum);
+    Assert.assertNull(wrapperTypesTest.dateCreated);
+  }
+
+  @Test
   public void testSimpleTypes() {
     TypeWithAllSimpleTypes typeWithAllSimpleTypes = new TypeWithAllSimpleTypes();
     typeWithAllSimpleTypes.boxedIntegerField = 1;
@@ -102,6 +117,43 @@ public class HollowObjectMapperHollowRecordParserTest {
   }
 
   @Test
+  public void testNullablesSimpleTypes() {
+    TypeWithAllSimpleTypes typeWithAllSimpleTypes = new TypeWithAllSimpleTypes();
+    typeWithAllSimpleTypes.boxedIntegerField = 1;
+    typeWithAllSimpleTypes.boxedCharField = 'a';
+    typeWithAllSimpleTypes.primitiveIntegerField = Integer.MIN_VALUE;
+    typeWithAllSimpleTypes.primitiveDoubleField = Double.NaN;
+    typeWithAllSimpleTypes.inlinedLongField = 4L;
+
+    HollowReadStateEngine stateEngine = createReadStateEngine(typeWithAllSimpleTypes);
+    GenericHollowObject obj = new GenericHollowObject(stateEngine, "TypeWithAllSimpleTypes", 0);
+
+    TypeWithAllSimpleTypes result = mapper.readHollowRecord(obj);
+    Assert.assertEquals(Integer.valueOf(1), result.boxedIntegerField);
+    Assert.assertEquals(Character.valueOf('a'), result.boxedCharField);
+    Assert.assertNull(result.boxedFloatField);
+    Assert.assertNull(result.boxedDoubleField);
+    Assert.assertNull(result.boxedLongField);
+    Assert.assertNull(result.boxedShortField);
+    Assert.assertNull(result.boxedByteField);
+    Assert.assertEquals(0, result.primitiveIntegerField);
+    Assert.assertEquals(0.0, result.primitiveDoubleField, 0);
+    Assert.assertEquals(0.0f, result.primitiveFloatField, 0);
+    Assert.assertEquals(0L, result.primitiveLongField);
+    Assert.assertEquals(0, result.primitiveShortField);
+    Assert.assertEquals(0, result.primitiveByteField);
+    Assert.assertEquals(false, result.inlinedBooleanField);
+    Assert.assertEquals(Long.valueOf(4L), result.inlinedLongField);
+    Assert.assertNull(result.inlinedIntegerField);
+    Assert.assertNull(result.inlinedDoubleField);
+    Assert.assertNull(result.inlinedFloatField);
+    Assert.assertNull(result.inlinedShortField);
+    Assert.assertNull(result.inlinedByteField);
+    Assert.assertNull(result.inlinedCharField);
+    Assert.assertNull(result.inlinedStringField);
+  }
+
+  @Test
   public void testCollections() {
     TypeWithCollections type = new TypeWithCollections();
     type.id = 1;
@@ -137,6 +189,31 @@ public class HollowObjectMapperHollowRecordParserTest {
     TypeWithCollections result = mapper.readHollowRecord(obj);
 
     Assert.assertEquals(type, result);
+  }
+
+  @Test
+  public void testNullableCollections() {
+    TypeWithCollections type = new TypeWithCollections();
+    type.id = 1;
+    type.stringList = Arrays.asList("a", "b", "c");
+    type.integerStringMap = type.stringList.stream().collect(
+        Collectors.toMap(
+            s -> type.stringList.indexOf(s),
+            s -> s
+        )
+    );
+
+    HollowReadStateEngine stateEngine = createReadStateEngine(type);
+    GenericHollowObject obj = new GenericHollowObject(stateEngine, "TypeWithCollections", 0);
+    TypeWithCollections result = mapper.readHollowRecord(obj);
+
+    Assert.assertEquals(type, result);
+    Assert.assertNull(result.stringSet);
+    Assert.assertNull(result.internalTypeAList);
+    Assert.assertNull(result.internalTypeASet);
+    Assert.assertNull(result.integerInternalTypeAMap);
+    Assert.assertNull(result.internalTypeAStringMap);
+    Assert.assertNull(result.multiTypeMap);
   }
 
   @Test
@@ -633,9 +710,12 @@ public class HollowObjectMapperHollowRecordParserTest {
 
     @Override
     public boolean equals(Object o) {
-      if(o instanceof SpecialWrapperTypesTest) {
-        SpecialWrapperTypesTest other = (SpecialWrapperTypesTest)o;
-        return id == other.id && complexEnum == other.complexEnum && type == other.type && dateCreated.equals(other.dateCreated);
+      if (o instanceof SpecialWrapperTypesTest) {
+        SpecialWrapperTypesTest other = (SpecialWrapperTypesTest) o;
+        return Objects.equals(id, other.id) &&
+                Objects.equals(type, other.type) &&
+                Objects.equals(complexEnum, other.complexEnum) &&
+                Objects.equals(dateCreated, other.dateCreated);
       }
       return false;
     }
