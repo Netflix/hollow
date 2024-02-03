@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
+import com.netflix.hollow.api.objects.HollowRecord;
+import com.netflix.hollow.api.objects.generic.GenericHollowSet;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
@@ -102,6 +104,16 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
             rec.addElement(ordinal, hashCode);
         }
         return rec;
+    }
+
+    @Override
+    protected Object parseHollowRecord(HollowRecord record) {
+        GenericHollowSet hollowSet = (GenericHollowSet) record;
+        Set<Object> s = new HashSet<>();
+        for (HollowRecord element : hollowSet) {
+            s.add(elementMapper.parseHollowRecord(element));
+        }
+        return s;
     }
 
     @Override

@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
+import com.netflix.hollow.api.objects.HollowRecord;
+import com.netflix.hollow.api.objects.generic.GenericHollowMap;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
@@ -122,6 +124,18 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
             rec.addEntry(keyOrdinal, valueOrdinal, hashCode);
         }
         return rec;
+    }
+
+    @Override
+    protected Object parseHollowRecord(HollowRecord record) {
+        GenericHollowMap hollowMap = (GenericHollowMap) record;
+        Map<Object, Object> m = new HashMap<>();
+        for (Map.Entry<HollowRecord, HollowRecord> entry : hollowMap.entries()) {
+            Object key = keyMapper.parseHollowRecord(entry.getKey());
+            Object value = valueMapper.parseHollowRecord(entry.getValue());
+            m.put(key, value);
+        }
+        return m;
     }
 
     @Override

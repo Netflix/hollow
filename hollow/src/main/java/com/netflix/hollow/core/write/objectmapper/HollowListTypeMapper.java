@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
+import com.netflix.hollow.api.objects.HollowRecord;
+import com.netflix.hollow.api.objects.generic.GenericHollowList;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.IntList;
@@ -111,6 +113,16 @@ public class HollowListTypeMapper extends HollowTypeMapper {
             }
         }
         return rec;
+    }
+
+    @Override
+    protected Object parseHollowRecord(HollowRecord record) {
+        GenericHollowList hollowList = (GenericHollowList) record;
+        List<Object> list = new ArrayList<>();
+        for (HollowRecord element : hollowList) {
+            list.add(elementMapper.parseHollowRecord(element));
+        }
+        return list;
     }
 
     @Override

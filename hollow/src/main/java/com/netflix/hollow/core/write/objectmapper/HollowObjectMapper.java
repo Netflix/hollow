@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
+import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
@@ -75,6 +76,14 @@ public class HollowObjectMapper {
     public int add(Object o) {
         HollowTypeMapper typeMapper = getTypeMapper(o.getClass(), null, null);
         return typeMapper.write(o);
+    }
+
+    public <T> T readHollowRecord(HollowRecord record) {
+        HollowTypeMapper typeMapper = typeMappers.get(record.getSchema().getName());
+        if (typeMapper == null) {
+            throw new IllegalArgumentException("No type mapper found for schema " + record.getSchema().getName());
+        }
+        return (T) typeMapper.parseHollowRecord(record);
     }
     
     public void writeFlat(Object o, FlatRecordWriter flatRecordWriter) {

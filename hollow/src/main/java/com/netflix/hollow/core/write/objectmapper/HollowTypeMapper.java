@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
+import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
@@ -42,6 +43,8 @@ public abstract class HollowTypeMapper {
     protected abstract int write(Object obj);
 
     protected abstract int writeFlat(Object obj, FlatRecordWriter flatRecordWriter);
+
+    protected abstract Object parseHollowRecord(HollowRecord record);
     
     protected abstract Object parseFlatRecord(HollowSchema schema, FlatRecordReader reader, Map<Integer, Object> parsedObjects);
     
