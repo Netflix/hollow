@@ -42,10 +42,10 @@ public class HollowObjectTypeReadStateShardBenchmark {
 
     ArrayList<Integer> readOrder;
 
-    @Param({ "5", "25", "50", "150", "1000" })
+    @Param({ "10000", "20000", "50000" })
     int maxStringLength;
 
-    @Param({ "10" })
+    @Param({ "0" })
     int probabilityUnicode;
 
     @Setup
@@ -62,7 +62,7 @@ public class HollowObjectTypeReadStateShardBenchmark {
             sb.append("_");
             int thisStringLength = r.nextInt(maxStringLength) - sb.length() + 1;
             for (int j = 0; j < thisStringLength; j++) {
-                if (r.nextInt(100) < probabilityUnicode) {
+                if (false) { //(r.nextInt(100) < probabilityUnicode) {
                     sb.append("\u123E");
                 } else {
                     sb.append((char) (r.nextInt(26) + 'a'));
