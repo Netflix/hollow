@@ -55,10 +55,12 @@ public abstract class HollowEffigyFieldPairer {
         }
 
         private boolean calculateIsDiff() {
-            if((from == null && to != null) || (from != null && to == null))
-                return true;
-            if(from.getValue() == null)
-                return to.getValue() != null;
+            if (from == null || to == null) {
+                return from != to;
+            }
+            if (from.getValue() == null || to.getValue() == null) {
+                return from.getValue() != to.getValue();
+            }
             if(isLeafNode())
                 return !from.getValue().equals(to.getValue());
             return false;
