@@ -19,7 +19,7 @@ package com.netflix.hollow.history.ui.pages;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.model.HistoryStateTypeChanges;
 import com.netflix.hollow.ui.HollowUISession;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
 
 public class HistoryStateTypeExpandGroupPage extends HistoryPage {
