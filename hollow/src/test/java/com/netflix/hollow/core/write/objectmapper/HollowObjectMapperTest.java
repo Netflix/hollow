@@ -325,6 +325,17 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         Assert.assertEquals(1, o.__assigned_ordinal);
     }
 
+    @Test
+    public void testFailsToCreateSchemaIfThereAreDuplicateFields() {
+        try {
+            HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+            mapper.initializeTypeState(Child.class);
+            Assert.fail("Expected Exception not thrown");
+        } catch (IllegalArgumentException e) {
+            Assert.assertEquals("Duplicate field name 'myField1' found in class hierarchy for class com.netflix.hollow.core.write.objectmapper.HollowObjectMapperTest$Child", e.getMessage());
+        }
+    }
+
     /**
      * Convenience method for experimenting with {@link HollowObjectMapper#initializeTypeState(Class)}
      * on classes we know should fail due to circular references, confirming the exception message is correct.
@@ -547,4 +558,11 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         int __assigned_ordinal = HollowConstants.ORDINAL_NONE;
     }
 
+    static class Parent {
+        String myField1;
+    }
+
+    static class Child extends Parent {
+        String myField1;
+    }
 }

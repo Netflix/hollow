@@ -92,7 +92,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     throw new IllegalArgumentException("Unexpected array " + currentClass.getSimpleName() + " passed as field. Consider using collections or marking as transient.");
                 }
                 Field[] declaredFields = currentClass.getDeclaredFields();
-    
+
                 for(int i=0;i<declaredFields.length;i++) {
                     Field declaredField = declaredFields[i];
                     int modifiers = declaredField.getModifiers();
@@ -120,7 +120,11 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
         this.schema = new HollowObjectSchema(typeName, mappedFields.size(), getKeyFieldPaths(clazz));
 
+        Set<String> fieldNamesSeen = new HashSet<>();
         for(MappedField field : mappedFields) {
+            if(!fieldNamesSeen.add(field.getFieldName()))
+                throw new IllegalArgumentException("Duplicate field name '" + field.getFieldName() + "' found in class hierarchy for class " + clazz.getName());
+
             if(field.getFieldType() == MappedFieldType.REFERENCE) {
                 schema.addField(field.getFieldName(), field.getFieldType().getSchemaFieldType(), field.getReferencedTypeName());
             } else {
