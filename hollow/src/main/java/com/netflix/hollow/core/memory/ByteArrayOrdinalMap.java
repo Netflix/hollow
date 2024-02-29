@@ -47,7 +47,7 @@ public class ByteArrayOrdinalMap {
         AtomicLongArray pao = pointersAndOrdinals;
         int bitsPerPointer = Long.SIZE - bitsPerOrdinal;
 
-        for(int ptr = 0; ptr < pao.length(); ptr++) {
+        for(int ptr = 0; ptr < paoSize; ptr++) {
             long key = pao.get(ptr);
             if(key==EMPTY_BUCKET_VALUE)
                 continue;
@@ -70,6 +70,7 @@ public class ByteArrayOrdinalMap {
 
     private int BITS_PER_ORDINAL;
     private int BITS_PER_POINTER;
+    private int paoSize = 0;
     private int BITS_PER_BOTH;
     private long POINTER_MASK;
     private long ORDINAL_MASK;
@@ -107,6 +108,7 @@ public class ByteArrayOrdinalMap {
         this.freeOrdinalTracker = new FreeOrdinalTracker();
         this.byteData = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
         this.pointersAndOrdinals = emptyKeyArray(size);
+        paoSize = size;
         this.sizeBeforeGrow = (int) (((float) size) * 0.7); /// 70% load factor
         this.size = 0;
 
@@ -164,7 +166,7 @@ public class ByteArrayOrdinalMap {
         /// Note that this also requires pointersAndOrdinals be volatile so resizes are also visible
         AtomicLongArray pao = pointersAndOrdinals;
 
-        int modBitmask = pao.length() - 1;
+        int modBitmask = paoSize - 1;
         int bucket = hash & modBitmask;
         long key = pao.get(bucket);
 
@@ -243,7 +245,7 @@ public class ByteArrayOrdinalMap {
 
         AtomicLongArray pao = pointersAndOrdinals;
 
-        int modBitmask = pao.length() - 1;
+        int modBitmask = paoSize - 1;
         int bucket = hash & modBitmask;
         long key = pao.get(bucket);
 
@@ -273,7 +275,7 @@ public class ByteArrayOrdinalMap {
         BitSet populatedOrdinals = new BitSet();
         AtomicLongArray pao = pointersAndOrdinals;
 
-        for (int i = 0; i < pao.length(); i++) {
+        for (int i = 0; i < paoSize; i++) {
             long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
                 int ordinal = (int) (key >>> BITS_PER_POINTER);
@@ -323,7 +325,7 @@ public class ByteArrayOrdinalMap {
     private int get(ByteDataArray serializedRepresentation, int hash) {
         AtomicLongArray pao = pointersAndOrdinals;
 
-        int modBitmask = pao.length() - 1;
+        int modBitmask = paoSize - 1;
         int bucket = hash & modBitmask;
         long key = pao.get(bucket);
 
@@ -353,7 +355,7 @@ public class ByteArrayOrdinalMap {
         int maxOrdinal = 0;
         AtomicLongArray pao = pointersAndOrdinals;
 
-        for (int i = 0; i < pao.length(); i++) {
+        for (int i = 0; i < paoSize; i++) {
             long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
                 int ordinal = (int) (key >>> BITS_PER_POINTER);
@@ -366,7 +368,7 @@ public class ByteArrayOrdinalMap {
         long[] pbo = new long[maxOrdinal + 1];
         Arrays.fill(pbo, -1);
 
-        for (int i = 0; i < pao.length(); i++) {
+        for (int i = 0; i < paoSize; i++) {
             long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
                 int ordinal = (int) (key >>> BITS_PER_POINTER);
@@ -392,7 +394,7 @@ public class ByteArrayOrdinalMap {
         int counter = 0;
         AtomicLongArray pao = pointersAndOrdinals;
 
-        for (int i = 0; i < pao.length(); i++) {
+        for (int i = 0; i < paoSize; i++) {
             long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
                 populatedReverseKeys[counter++] = key << BITS_PER_ORDINAL | key >>> BITS_PER_POINTER;
@@ -435,7 +437,7 @@ public class ByteArrayOrdinalMap {
         // Reset the array then fill with compacted values
         // Volatile store not required, could use plain store
         // See VarHandles for JDK >= 9
-        for (int i = 0; i < pao.length(); i++) {
+        for (int i = 0; i < paoSize; i++) {
             pao.lazySet(i, EMPTY_BUCKET_VALUE);
         }
         populateNewHashArray(pao, populatedReverseKeys);
@@ -466,7 +468,7 @@ public class ByteArrayOrdinalMap {
         int maxOrdinal = -1;
         AtomicLongArray pao = pointersAndOrdinals;
 
-        for (int i = 0; i < pao.length(); i++) {
+        for (int i = 0; i < paoSize; i++) {
             long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
                 int ordinal = (int) (key >>> BITS_PER_POINTER);
@@ -545,7 +547,7 @@ public class ByteArrayOrdinalMap {
 
         /// do not iterate over these values in the same order in which they appear in the hashed array.
         /// if we do so, we cause large clusters of collisions to appear (because we resolve collisions with linear probing).
-        for (int i = 0; i < pao.length(); i++) {
+        for (int i = 0; i < paoSize; i++) {
             long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
                 valuesToAdd[counter++] = key;
@@ -559,6 +561,7 @@ public class ByteArrayOrdinalMap {
         /// 70% load factor
         sizeBeforeGrow = (int) (((float) newSize) * 0.7);
         pointersAndOrdinals = newKeys;
+        paoSize = newSize;
     }
 
     /**
