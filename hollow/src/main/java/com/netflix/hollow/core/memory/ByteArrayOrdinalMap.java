@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.memory;
 
+import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
@@ -39,11 +40,40 @@ public class ByteArrayOrdinalMap {
 
     private static final long EMPTY_BUCKET_VALUE = -1L;
 
-    private static final int BITS_PER_ORDINAL = 29;
-    private static final int BITS_PER_POINTER = Long.SIZE - BITS_PER_ORDINAL;
-    private static final long POINTER_MASK = (1L << BITS_PER_POINTER) - 1;
-    private static final long ORDINAL_MASK = (1L << BITS_PER_ORDINAL) - 1;
-    private static final long MAX_BYTE_DATA_LENGTH = 1L << BITS_PER_POINTER;
+    private void resizeBitsPerOrdinal(int bitsPerOrdinal) {
+        assert bitsPerOrdinal > BITS_PER_ORDINAL;
+        System.out.println("Resizing to "+bitsPerOrdinal+" bits per ordinal");
+
+        AtomicLongArray pao = pointersAndOrdinals;
+        int bitsPerPointer = Long.SIZE - bitsPerOrdinal;
+
+        for(int ptr = 0; ptr < pao.length(); ptr++) {
+            long key = pao.get(ptr);
+            if(key==EMPTY_BUCKET_VALUE)
+                continue;
+            int ordinal = getOrdinal(key);
+            long dataPtr = getPointer(key);
+            long newKey = ((long) ordinal << bitsPerPointer) | dataPtr;
+            pao.set(ptr, newKey);
+        }
+        setOrdinalSize(bitsPerOrdinal);
+    }
+
+    void setOrdinalSize(int bits) {
+        BITS_PER_ORDINAL = bits;
+        BITS_PER_POINTER = Long.SIZE - BITS_PER_ORDINAL;
+        POINTER_MASK = (1L << BITS_PER_POINTER) - 1;
+        ORDINAL_MASK = (1L << BITS_PER_ORDINAL) - 1;
+        MAX_BYTE_DATA_LENGTH = 1L << BITS_PER_POINTER;
+        BITS_PER_BOTH = BITS_PER_ORDINAL + BITS_PER_POINTER;
+    }
+
+    private int BITS_PER_ORDINAL;
+    private int BITS_PER_POINTER;
+    private int BITS_PER_BOTH;
+    private long POINTER_MASK;
+    private long ORDINAL_MASK;
+    private long MAX_BYTE_DATA_LENGTH;
 
     /// Thread safety:  We need volatile access semantics to the individual elements in the
     /// pointersAndOrdinals array.
@@ -79,6 +109,8 @@ public class ByteArrayOrdinalMap {
         this.pointersAndOrdinals = emptyKeyArray(size);
         this.sizeBeforeGrow = (int) (((float) size) * 0.7); /// 70% load factor
         this.size = 0;
+
+        setOrdinalSize(8);
     }
 
     private static int bucketSize(int x) {
@@ -148,10 +180,8 @@ public class ByteArrayOrdinalMap {
         /// the ordinal for this object still does not exist in the list, even after the lock has been acquired.
         /// it is up to this thread to add it at the current bucket position.
         int ordinal = findFreeOrdinal(preferredOrdinal);
-        if (ordinal > ORDINAL_MASK) {
-            throw new IllegalStateException(String.format(
-                    "Ordinal cannot be assigned. The to be assigned ordinal, %s, is greater than the maximum supported ordinal value of %s",
-                    ordinal, ORDINAL_MASK));
+        while (ordinal > ORDINAL_MASK) {
+            resizeBitsPerOrdinal(BITS_PER_ORDINAL+1);
         }
 
         long pointer = byteData.length();
@@ -161,10 +191,8 @@ public class ByteArrayOrdinalMap {
         /// A reading thread may observe a null value for a segment during the creation
         /// of a new segments array (see SegmentedByteArray.ensureCapacity).
         serializedRepresentation.copyTo(byteData);
-        if (byteData.length() > MAX_BYTE_DATA_LENGTH) {
-            throw new IllegalStateException(String.format(
-                    "The number of bytes for the serialized representations, %s, is too large and is greater than the maximum of %s bytes",
-                    byteData.length(), MAX_BYTE_DATA_LENGTH));
+        while (byteData.length() > MAX_BYTE_DATA_LENGTH) {
+            resizeBitsPerOrdinal(BITS_PER_ORDINAL+1);
         }
 
         key = ((long) ordinal << BITS_PER_POINTER) | pointer;
@@ -508,7 +536,6 @@ public class ByteArrayOrdinalMap {
     private void growKeyArray(int newSize) {
         AtomicLongArray pao = pointersAndOrdinals;
         assert (newSize & (newSize - 1)) == 0; // power of 2
-        assert pao.length() < newSize;
 
         AtomicLongArray newKeys = emptyKeyArray(newSize);
 
@@ -578,13 +605,14 @@ public class ByteArrayOrdinalMap {
      * Create an AtomicLongArray of the specified size, each value in the array will be EMPTY_BUCKET_VALUE
      */
     private AtomicLongArray emptyKeyArray(int size) {
-        AtomicLongArray arr = new AtomicLongArray(size);
-        // Volatile store not required, could use plain store
-        // See VarHandles for JDK >= 9
-        for (int i = 0; i < arr.length(); i++) {
-            arr.lazySet(i, EMPTY_BUCKET_VALUE);
-        }
-        return arr;
+        /*int numBits = size*BITS_PER_BOTH;
+        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, numBits);
+        for(int i = 0; i < size; i++) {
+            arr.setElementValue(i, BITS_PER_BOTH, EMPTY_BUCKET_VALUE);
+        }*/
+        long[] arr = new long[size];
+        Arrays.fill(arr, EMPTY_BUCKET_VALUE);
+        return new AtomicLongArray(arr);
     }
 
     public ByteDataArray getByteData() {
@@ -599,11 +627,11 @@ public class ByteArrayOrdinalMap {
         return pointerAndOrdinal == EMPTY_BUCKET_VALUE;
     }
 
-    public static long getPointer(long pointerAndOrdinal) {
+    public long getPointer(long pointerAndOrdinal) {
         return pointerAndOrdinal & POINTER_MASK;
     }
 
-    public static int getOrdinal(long pointerAndOrdinal) {
+    public int getOrdinal(long pointerAndOrdinal) {
         return (int) (pointerAndOrdinal >>> BITS_PER_POINTER);
     }
 
