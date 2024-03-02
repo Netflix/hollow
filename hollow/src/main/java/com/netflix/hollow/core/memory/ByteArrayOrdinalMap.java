@@ -41,11 +41,12 @@ public class ByteArrayOrdinalMap {
     private static final long EMPTY_BUCKET_VALUE = -1L;
 
     private void resizeBitsPerOrdinal(int bitsPerOrdinal) {
+        assert false;
         assert bitsPerOrdinal > BITS_PER_ORDINAL;
         System.out.println("Resizing to "+bitsPerOrdinal+" bits per ordinal");
 
         AtomicLongArray pao = pointersAndOrdinals;
-        int bitsPerPointer = Long.SIZE - bitsPerOrdinal;
+        int bitsPerPointer = Long.SIZE - bitsPerOrdinal-1;
 
         for(int ptr = 0; ptr < paoSize; ptr++) {
             long key = pao.get(ptr);
@@ -112,7 +113,7 @@ public class ByteArrayOrdinalMap {
         this.sizeBeforeGrow = (int) (((float) size) * 0.7); /// 70% load factor
         this.size = 0;
 
-        setOrdinalSize(8);
+        setOrdinalSize(20);
     }
 
     private static int bucketSize(int x) {
@@ -396,8 +397,11 @@ public class ByteArrayOrdinalMap {
 
         for (int i = 0; i < paoSize; i++) {
             long key = pao.get(i);
+            // xxx ordinal pointer
+            long pointer = key & POINTER_MASK;
+            long ordinal = key >>> BITS_PER_POINTER;
             if (key != EMPTY_BUCKET_VALUE) {
-                populatedReverseKeys[counter++] = key << BITS_PER_ORDINAL | key >>> BITS_PER_POINTER;
+                populatedReverseKeys[counter++] = pointer << BITS_PER_ORDINAL | ordinal;
             }
         }
 
@@ -418,7 +422,7 @@ public class ByteArrayOrdinalMap {
                     arr.copy(arr, pointer, currentCopyPointer, length);
                 }
 
-                populatedReverseKeys[i] = populatedReverseKeys[i] << BITS_PER_POINTER | currentCopyPointer;
+                populatedReverseKeys[i] = ((populatedReverseKeys[i] & ORDINAL_MASK) << BITS_PER_POINTER) | currentCopyPointer;
 
                 currentCopyPointer += length;
             } else {
