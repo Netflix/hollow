@@ -40,29 +40,24 @@ public class ByteArrayOrdinalMap {
 
     private static final long EMPTY_BUCKET_VALUE = -1L;
 
-    private void resizeBitsPerOrdinal(int bitsPerOrdinal) {
-        assert false;
-        assert bitsPerOrdinal > BITS_PER_ORDINAL;
-        System.out.println("Resizing to "+bitsPerOrdinal+" bits per ordinal");
-
+    private synchronized void resizeBitsPerOrdinal(int bitsPerOrdinal, int bitsPerPointer) {
         AtomicLongArray pao = pointersAndOrdinals;
-        int bitsPerPointer = Long.SIZE - bitsPerOrdinal-1;
+        assert bitsPerOrdinal+bitsPerPointer <= 64;
 
-        for(int ptr = 0; ptr < paoSize; ptr++) {
-            long key = pao.get(ptr);
-            if(key==EMPTY_BUCKET_VALUE)
-                continue;
-            int ordinal = getOrdinal(key);
-            long dataPtr = getPointer(key);
-            long newKey = ((long) ordinal << bitsPerPointer) | dataPtr;
-            pao.set(ptr, newKey);
+        if(bitsPerPointer!=BITS_PER_POINTER) {
+            for (int ptr = 0; ptr < paoSize; ptr++) {
+                long key = pao.get(ptr);
+                if (key == EMPTY_BUCKET_VALUE)
+                    continue;
+                int ordinal = getOrdinal(key);
+                long dataPtr = getPointer(key);
+                long newKey = ((long) ordinal << bitsPerPointer) | dataPtr;
+                pao.set(ptr, newKey);
+            }
         }
-        setOrdinalSize(bitsPerOrdinal);
-    }
 
-    void setOrdinalSize(int bits) {
-        BITS_PER_ORDINAL = bits;
-        BITS_PER_POINTER = Long.SIZE - BITS_PER_ORDINAL;
+        BITS_PER_ORDINAL = bitsPerOrdinal;
+        BITS_PER_POINTER = bitsPerPointer;
         POINTER_MASK = (1L << BITS_PER_POINTER) - 1;
         ORDINAL_MASK = (1L << BITS_PER_ORDINAL) - 1;
         MAX_BYTE_DATA_LENGTH = 1L << BITS_PER_POINTER;
@@ -113,7 +108,7 @@ public class ByteArrayOrdinalMap {
         this.sizeBeforeGrow = (int) (((float) size) * 0.7); /// 70% load factor
         this.size = 0;
 
-        setOrdinalSize(20);
+        resizeBitsPerOrdinal(4, 4);
     }
 
     private static int bucketSize(int x) {
@@ -153,10 +148,13 @@ public class ByteArrayOrdinalMap {
 
     /// acquire the lock before writing.
     private synchronized int assignOrdinal(ByteDataArray serializedRepresentation, int hash, int preferredOrdinal) {
-        if (preferredOrdinal < -1 || preferredOrdinal > ORDINAL_MASK) {
+        if (preferredOrdinal < -1) {
             throw new IllegalArgumentException(String.format(
                     "The given preferred ordinal %s is out of bounds and not within the closed interval [-1, %s]",
                     preferredOrdinal, ORDINAL_MASK));
+        }
+        while(preferredOrdinal > ORDINAL_MASK) {
+            resizeBitsPerOrdinal(BITS_PER_ORDINAL+1, BITS_PER_POINTER);
         }
         if (size > sizeBeforeGrow) {
             growKeyArray();
@@ -184,7 +182,7 @@ public class ByteArrayOrdinalMap {
         /// it is up to this thread to add it at the current bucket position.
         int ordinal = findFreeOrdinal(preferredOrdinal);
         while (ordinal > ORDINAL_MASK) {
-            resizeBitsPerOrdinal(BITS_PER_ORDINAL+1);
+            resizeBitsPerOrdinal(BITS_PER_ORDINAL+1, BITS_PER_POINTER);
         }
 
         long pointer = byteData.length();
@@ -195,7 +193,7 @@ public class ByteArrayOrdinalMap {
         /// of a new segments array (see SegmentedByteArray.ensureCapacity).
         serializedRepresentation.copyTo(byteData);
         while (byteData.length() > MAX_BYTE_DATA_LENGTH) {
-            resizeBitsPerOrdinal(BITS_PER_ORDINAL+1);
+            resizeBitsPerOrdinal(BITS_PER_ORDINAL, BITS_PER_POINTER+1);
         }
 
         key = ((long) ordinal << BITS_PER_POINTER) | pointer;
@@ -233,10 +231,13 @@ public class ByteArrayOrdinalMap {
      * @param ordinal the ordinal
      */
     public void put(ByteDataArray serializedRepresentation, int ordinal) {
-        if (ordinal < 0 || ordinal > ORDINAL_MASK) {
+        if (ordinal < 0) {
             throw new IllegalArgumentException(String.format(
                     "The given ordinal %s is out of bounds and not within the closed interval [0, %s]",
                     ordinal, ORDINAL_MASK));
+        }
+        while(ordinal > ORDINAL_MASK) {
+            resizeBitsPerOrdinal(BITS_PER_ORDINAL+1, BITS_PER_POINTER);
         }
         if (size > sizeBeforeGrow) {
             growKeyArray();
@@ -259,10 +260,11 @@ public class ByteArrayOrdinalMap {
 
         VarInt.writeVInt(byteData, (int) serializedRepresentation.length());
         serializedRepresentation.copyTo(byteData);
-        if (byteData.length() > MAX_BYTE_DATA_LENGTH) {
-            throw new IllegalStateException(String.format(
-                    "The number of bytes for the serialized representations, %s, is too large and is greater than the maximum of %s bytes",
-                    byteData.length(), MAX_BYTE_DATA_LENGTH));
+        while (byteData.length() > MAX_BYTE_DATA_LENGTH) {
+            resizeBitsPerOrdinal(BITS_PER_ORDINAL, BITS_PER_POINTER+1);
+//            throw new IllegalStateException(String.format(
+//                    "The number of bytes for the serialized representations, %s, is too large and is greater than the maximum of %s bytes",
+//                    byteData.length(), MAX_BYTE_DATA_LENGTH));
         }
 
         key = ((long) ordinal << BITS_PER_POINTER) | pointer;
