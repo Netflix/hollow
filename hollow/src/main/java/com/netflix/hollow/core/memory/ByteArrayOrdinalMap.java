@@ -38,12 +38,13 @@ import java.util.concurrent.atomic.AtomicLongArray;
  */
 public class ByteArrayOrdinalMap {
 
-    private static final long EMPTY_BUCKET_VALUE = -1L;
+    private long EMPTY_BUCKET_VALUE = ~0 & ((1 << 22)-1);
 
     private synchronized void resizeBitsPerOrdinal(int bitsPerOrdinal, int bitsPerPointer) {
         AtomicLongArray pao = pointersAndOrdinals;
         if(bitsPerPointer != bitsPerOrdinal || bitsPerPointer!=22)
             assert false;
+
         assert bitsPerOrdinal+bitsPerPointer <= 64;
 
         if(bitsPerPointer!=BITS_PER_POINTER) {
@@ -64,6 +65,7 @@ public class ByteArrayOrdinalMap {
         ORDINAL_MASK = (1L << BITS_PER_ORDINAL) - 1;
         MAX_BYTE_DATA_LENGTH = 1L << BITS_PER_POINTER;
         BITS_PER_BOTH = BITS_PER_ORDINAL + BITS_PER_POINTER;
+        EMPTY_BUCKET_VALUE = ~0 & ORDINAL_MASK;
     }
 
     private int BITS_PER_ORDINAL;
@@ -297,11 +299,11 @@ public class ByteArrayOrdinalMap {
     }
 
     private long getOrdinal(int index) {
-        return ordinals.getElementValue(index, BITS_PER_ORDINAL);
+        return ordinals.getLargeElementValue(((long)index)*BITS_PER_ORDINAL, BITS_PER_ORDINAL);
     }
 
     private long getPointer(int index) {
-        return pointers.getElementValue(index, BITS_PER_POINTER);
+        return pointers.getLargeElementValue(((long)index)*BITS_PER_POINTER, BITS_PER_POINTER);
     }
 
     public void recalculateFreeOrdinals() {
@@ -668,6 +670,7 @@ public class ByteArrayOrdinalMap {
     private FixedLengthElementArray emptyKeyArray(int size, int bitsSize) {
         FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, ((long)size)*bitsSize);
         for(long i = 0; i < size; i++) {
+            arr.clearElementValue(i*bitsSize, bitsSize);
             arr.setElementValue(i*bitsSize, bitsSize, EMPTY_BUCKET_VALUE);
         }
         return arr;
@@ -681,7 +684,7 @@ public class ByteArrayOrdinalMap {
         return pointersAndOrdinals;
     }
 
-    public static boolean isPointerAndOrdinalEmpty(long pointerAndOrdinal) {
+    public boolean isPointerAndOrdinalEmpty(long pointerAndOrdinal) {
         return pointerAndOrdinal == EMPTY_BUCKET_VALUE;
     }
 

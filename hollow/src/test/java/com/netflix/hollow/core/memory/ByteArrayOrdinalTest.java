@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.memory;
 
+import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import org.junit.Assert;
 import org.junit.Test;
 
