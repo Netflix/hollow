@@ -161,7 +161,7 @@ public class ByteArrayOrdinalMap {
                     "The given preferred ordinal %s is out of bounds and not within the closed interval [-1, %s]",
                     preferredOrdinal, ORDINAL_MASK));
         }
-        while(preferredOrdinal > ORDINAL_MASK) {
+        while(preferredOrdinal >= ORDINAL_MASK) {
             resizeBitsPerOrdinal(BITS_PER_ORDINAL+1, BITS_PER_POINTER);
         }
         if (size > sizeBeforeGrow) {
@@ -175,21 +175,19 @@ public class ByteArrayOrdinalMap {
 
         int modBitmask = paoSize - 1;
         int bucket = hash & modBitmask;
-        long key = pao.get(bucket);
 
-        while (key != EMPTY_BUCKET_VALUE) {
-            if (compare(serializedRepresentation, key)) {
-                return (int) (key >>> BITS_PER_POINTER);
+        while (getOrdinal(bucket) != EMPTY_BUCKET_VALUE) {
+            if (compare(serializedRepresentation, getPointer(bucket))) {
+                return (int) getOrdinal(bucket);
             }
 
             bucket = (bucket + 1) & modBitmask;
-            key = pao.get(bucket);
         }
 
         /// the ordinal for this object still does not exist in the list, even after the lock has been acquired.
         /// it is up to this thread to add it at the current bucket position.
         int ordinal = findFreeOrdinal(preferredOrdinal);
-        while (ordinal > ORDINAL_MASK) {
+        while (ordinal >= ORDINAL_MASK) {
             resizeBitsPerOrdinal(BITS_PER_ORDINAL+1, BITS_PER_POINTER);
         }
 
@@ -200,11 +198,11 @@ public class ByteArrayOrdinalMap {
         /// A reading thread may observe a null value for a segment during the creation
         /// of a new segments array (see SegmentedByteArray.ensureCapacity).
         serializedRepresentation.copyTo(byteData);
-        while (byteData.length() > MAX_BYTE_DATA_LENGTH) {
+        while (byteData.length() >= MAX_BYTE_DATA_LENGTH) {
             resizeBitsPerOrdinal(BITS_PER_ORDINAL, BITS_PER_POINTER+1);
         }
 
-        key = ((long) ordinal << BITS_PER_POINTER) | pointer;
+        long key = ((long) ordinal << BITS_PER_POINTER) | pointer;
 
         size++;
 
@@ -246,7 +244,7 @@ public class ByteArrayOrdinalMap {
                     "The given ordinal %s is out of bounds and not within the closed interval [0, %s]",
                     ordinal, ORDINAL_MASK));
         }
-        while(ordinal > ORDINAL_MASK) {
+        while(ordinal >= ORDINAL_MASK) {
             resizeBitsPerOrdinal(BITS_PER_ORDINAL+1, BITS_PER_POINTER);
         }
         if (size > sizeBeforeGrow) {
@@ -270,7 +268,7 @@ public class ByteArrayOrdinalMap {
 
         VarInt.writeVInt(byteData, (int) serializedRepresentation.length());
         serializedRepresentation.copyTo(byteData);
-        while (byteData.length() > MAX_BYTE_DATA_LENGTH) {
+        while (byteData.length() >= MAX_BYTE_DATA_LENGTH) {
             resizeBitsPerOrdinal(BITS_PER_ORDINAL, BITS_PER_POINTER+1);
 //            throw new IllegalStateException(String.format(
 //                    "The number of bytes for the serialized representations, %s, is too large and is greater than the maximum of %s bytes",
@@ -371,7 +369,7 @@ public class ByteArrayOrdinalMap {
         // is read into a local variable and thereafter used, otherwise a concurrent
         // size increase may break this invariant
         while (key != EMPTY_BUCKET_VALUE) {
-            if (compare(serializedRepresentation, key)) {
+            if (compare(serializedRepresentation, getPointer(key))) {
                 return (int) (key >>> BITS_PER_POINTER);
             }
 
@@ -525,9 +523,7 @@ public class ByteArrayOrdinalMap {
      * Compare the byte sequence contained in the supplied ByteDataBuffer with the
      * sequence contained in the map pointed to by the specified key, byte by byte.
      */
-    private boolean compare(ByteDataArray serializedRepresentation, long key) {
-        long position = key & POINTER_MASK;
-
+    private boolean compare(ByteDataArray serializedRepresentation, long position) {
         int sizeOfData = VarInt.readVInt(byteData.getUnderlyingArray(), position);
 
         if (sizeOfData != serializedRepresentation.length()) {
@@ -668,7 +664,7 @@ public class ByteArrayOrdinalMap {
     }
 
     private FixedLengthElementArray emptyKeyArray(int size, int bitsSize) {
-        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, ((long)size)*bitsSize);
+        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, ((long)size+10)*bitsSize);
         for(long i = 0; i < size; i++) {
             arr.clearElementValue(i*bitsSize, bitsSize);
             arr.setElementValue(i*bitsSize, bitsSize, EMPTY_BUCKET_VALUE);
