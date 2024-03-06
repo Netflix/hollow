@@ -18,6 +18,7 @@ package com.netflix.hollow.api.client;
 
 import static com.netflix.hollow.core.HollowConstants.VERSION_LATEST;
 import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_SCHEMA_HASH;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.error.VersionMismatchException;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.MemoryMode;
@@ -43,9 +45,11 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.test.HollowWriteStateEngineBuilder;
 import com.netflix.hollow.test.consumer.TestBlob;
 import com.netflix.hollow.test.consumer.TestBlobRetriever;
+import com.netflix.hollow.test.consumer.TestBlobRetrieverWithNearestSnapshotMatch;
 import com.netflix.hollow.test.consumer.TestHollowConsumer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -55,6 +59,8 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -259,6 +265,59 @@ public class HollowClientUpdaterTest {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord((HollowObjectSchema) stateEngine.getSchema("Actor"));
         rec.setInt("id", id);
         stateEngine.add("Actor", rec);
+    }
+
+    @Test
+    public void testReadBlobVersionInitialInconsistent() throws IOException {
+        testReadBlobVersion(2, 3, 1,  true);
+    }
+
+    @Test
+    public void testReadBlobVersionNotInitialInconsistent() throws IOException {
+        testReadBlobVersion(2, 3, 1,  false);
+    }
+
+    private void testReadBlobVersion(long metadataDesiredVersion1,
+                                     long blobDesiredVersion1,
+                                     long snapshotVersion,
+                                     boolean isInitialUpdate) throws IOException {
+        TestBlobRetrieverWithNearestSnapshotMatch testBlobRetriever = new TestBlobRetrieverWithNearestSnapshotMatch();
+        TestHollowConsumer testHollowConsumer = (new TestHollowConsumer.Builder())
+                .withBlobRetriever(testBlobRetriever)
+                .build();
+        HollowWriteStateEngine stateEngine = new HollowWriteStateEngine();
+        HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
+
+        HollowObjectSchema movieSchema = new HollowObjectSchema("Movie", 1, "id");
+        movieSchema.addField("id", HollowObjectSchema.FieldType.INT);
+        stateEngine.addTypeState(new HollowObjectTypeWriteState(movieSchema));
+        addMovie(stateEngine, 1);
+        stateEngine.prepareForWrite();
+        ByteArrayOutputStream baos_v1 = new ByteArrayOutputStream();
+        writer.writeSnapshot(baos_v1);
+        testBlobRetriever.addSnapshot(snapshotVersion, new TestBlob(1,new ByteArrayInputStream(baos_v1.toByteArray())));
+
+        if (isInitialUpdate) {
+            stateEngine.prepareForNextCycle();
+            ByteArrayOutputStream baos_delta = new ByteArrayOutputStream();
+            stateEngine.addHeaderTag(HEADER_TAG_PRODUCER_TO_VERSION, String.valueOf(blobDesiredVersion1));
+            addMovie(stateEngine, 2);
+            stateEngine.prepareForWrite();
+            writer.writeDelta(baos_delta);
+            testBlobRetriever.addDelta(snapshotVersion, new TestBlob(snapshotVersion, metadataDesiredVersion1, new ByteArrayInputStream(baos_delta.toByteArray())));
+            testHollowConsumer.triggerRefreshTo(metadataDesiredVersion1);
+        } else {
+            expectedException.expect(VersionMismatchException.class);
+            testHollowConsumer.triggerRefreshTo(snapshotVersion);
+            stateEngine.prepareForNextCycle();
+            ByteArrayOutputStream baos_delta = new ByteArrayOutputStream();
+            stateEngine.addHeaderTag(HEADER_TAG_PRODUCER_TO_VERSION, String.valueOf(blobDesiredVersion1));
+            addMovie(stateEngine, 2);
+            stateEngine.prepareForWrite();
+            writer.writeDelta(baos_delta);
+            testBlobRetriever.addDelta(snapshotVersion, new TestBlob(snapshotVersion, metadataDesiredVersion1, new ByteArrayInputStream(baos_delta.toByteArray())));
+            testHollowConsumer.triggerRefreshTo(metadataDesiredVersion1);
+        }
     }
 
     private TestHollowConsumer schemaChangeSubject(HollowWriteStateEngine stateEngine, boolean doubleSnapshotOnSchemaChange,

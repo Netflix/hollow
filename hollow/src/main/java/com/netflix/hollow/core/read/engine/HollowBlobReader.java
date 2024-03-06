@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.read.engine;
 
+import com.netflix.hollow.api.error.VersionMismatchException;
 import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.HollowBlobOptionalPartHeader;
 import com.netflix.hollow.core.memory.MemoryMode;
@@ -43,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.logging.Logger;
+
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION;
 
 /**
  * A HollowBlobReader is used to populate and update data in a {@link HollowReadStateEngine}, via the consumption
@@ -218,12 +221,15 @@ public class HollowBlobReader {
     }
 
     public void applyDelta(HollowBlobInput in, OptionalBlobPartInput optionalParts) throws IOException {
+        applyDelta(in, optionalParts, 0, false);
+    }
+    public void applyDelta(HollowBlobInput in, OptionalBlobPartInput optionalParts, long expectedVersion, boolean isInitialUpdate) throws IOException {
         validateMemoryMode(in.getMemoryMode());
         Map<String, HollowBlobInput> optionalPartInputs = null;
         if(optionalParts != null)
             optionalPartInputs = optionalParts.getInputsByPartName(in.getMemoryMode());
 
-        HollowBlobHeader header = readHeader(in, true);
+        HollowBlobHeader header = readHeaderAndCheckVersion(in, true, expectedVersion, isInitialUpdate);
         List<HollowBlobOptionalPartHeader> partHeaders = readPartHeaders(header, optionalPartInputs, in.getMemoryMode());
         notifyBeginUpdate();
 
@@ -258,16 +264,34 @@ public class HollowBlobReader {
         notifyEndUpdate();
     }
 
+
+    private HollowBlobHeader readHeaderAndCheckVersion(HollowBlobInput in, boolean isDelta, long expectedVersion, boolean isInitialUpdate) throws IOException {
+        HollowBlobHeader header = headerReader.readHeader(in);
+        if (expectedVersion != 0 && !isInitialUpdate) {
+            String to_version_tag = header.getHeaderTags().get(HEADER_TAG_PRODUCER_TO_VERSION);
+            if (to_version_tag != null) {
+                long to_version = Long.parseLong(to_version_tag);
+                if (expectedVersion != to_version) {
+                    throw new VersionMismatchException(expectedVersion, to_version);
+                }
+            }
+        }
+        checkAndApplyHeader(header, isDelta);
+        return header;
+    }
+
     private HollowBlobHeader readHeader(HollowBlobInput in, boolean isDelta) throws IOException {
         HollowBlobHeader header = headerReader.readHeader(in);
-
+        checkAndApplyHeader(header, isDelta);
+        return header;
+    }
+    private void checkAndApplyHeader(final HollowBlobHeader header, boolean isDelta) throws IOException {
         if(isDelta && header.getOriginRandomizedTag() != stateEngine.getCurrentRandomizedTag())
             throw new IOException("Attempting to apply a delta to a state from which it was not originated!");
 
         stateEngine.setCurrentRandomizedTag(header.getDestinationRandomizedTag());
         stateEngine.setOriginRandomizedTag(header.getOriginRandomizedTag());
         stateEngine.setHeaderTags(header.getHeaderTags());
-        return header;
     }
 
     private List<HollowBlobOptionalPartHeader> readPartHeaders(HollowBlobHeader header, Map<String, HollowBlobInput> inputsByPartName, MemoryMode mode) throws IOException {
