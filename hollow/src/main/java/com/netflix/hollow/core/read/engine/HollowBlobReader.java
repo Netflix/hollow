@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.read.engine;
 
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION;
+
 import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.HollowBlobOptionalPartHeader;
 import com.netflix.hollow.core.memory.MemoryMode;
@@ -217,13 +219,13 @@ public class HollowBlobReader {
         applyDelta(in, null);
     }
 
-    public void applyDelta(HollowBlobInput in, OptionalBlobPartInput optionalParts) throws IOException {
+    public void applyDelta(HollowBlobInput in, OptionalBlobPartInput optionalParts, long expectedToVersion) throws IOException {
         validateMemoryMode(in.getMemoryMode());
         Map<String, HollowBlobInput> optionalPartInputs = null;
         if(optionalParts != null)
             optionalPartInputs = optionalParts.getInputsByPartName(in.getMemoryMode());
 
-        HollowBlobHeader header = readHeader(in, true);
+        HollowBlobHeader header = readHeader(in, true, expectedToVersion);
         List<HollowBlobOptionalPartHeader> partHeaders = readPartHeaders(header, optionalPartInputs, in.getMemoryMode());
         notifyBeginUpdate();
 
@@ -258,11 +260,15 @@ public class HollowBlobReader {
         notifyEndUpdate();
     }
 
-    private HollowBlobHeader readHeader(HollowBlobInput in, boolean isDelta) throws IOException {
+    private HollowBlobHeader readHeader(HollowBlobInput in, boolean isDelta, long expectedToVersion) throws IOException {
         HollowBlobHeader header = headerReader.readHeader(in);
 
         if(isDelta && header.getOriginRandomizedTag() != stateEngine.getCurrentRandomizedTag())
             throw new IOException("Attempting to apply a delta to a state from which it was not originated!");
+
+        if (expectedToVersion != Long.valueOf(header.getHeaderTags().get(HEADER_TAG_PRODUCER_TO_VERSION))) {
+            throw new IllegalStateException();
+        }
 
         stateEngine.setCurrentRandomizedTag(header.getDestinationRandomizedTag());
         stateEngine.setOriginRandomizedTag(header.getOriginRandomizedTag());

@@ -179,9 +179,10 @@ class HollowDataHolder {
                 reader.readSnapshot(in, optionalPartIn, filter);
             }
         } else {
-            reader.applyDelta(in, optionalPartIn);
+            reader.applyDelta(in, optionalPartIn, expectedToVersion);
         }
 
+        // SNAP: TODO:
         long expectedToVersion = transition.getToVersion();
         String actualToVersionStr = stateEngine.getHeaderTag(HEADER_TAG_PRODUCER_TO_VERSION);
         if (actualToVersionStr != null) {
