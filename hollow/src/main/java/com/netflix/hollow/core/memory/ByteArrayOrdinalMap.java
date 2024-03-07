@@ -20,6 +20,8 @@ import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import sun.awt.Mutex;
+
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicLongArray;
@@ -37,6 +39,7 @@ import java.util.concurrent.atomic.AtomicLongArray;
  * @author dkoszewnik
  */
 public class ByteArrayOrdinalMap {
+    Mutex lock = new Mutex();
 
     private long EMPTY_BUCKET_VALUE = ~0 & ((1 << 22)-1);
 
@@ -131,7 +134,8 @@ public class ByteArrayOrdinalMap {
     }
 
     public int getOrAssignOrdinal(ByteDataArray serializedRepresentation) {
-        return getOrAssignOrdinal(serializedRepresentation, -1);
+        int rv = getOrAssignOrdinal(serializedRepresentation, -1);
+        return rv;
     }
 
     /**
@@ -175,9 +179,11 @@ public class ByteArrayOrdinalMap {
 
         int modBitmask = paoSize - 1;
         int bucket = hash & modBitmask;
+        lock.lock();
 
         while (getOrdinal(bucket) != EMPTY_BUCKET_VALUE) {
             if (compare(serializedRepresentation, getPointer(bucket))) {
+                lock.unlock();
                 return (int) getOrdinal(bucket);
             }
 
@@ -212,6 +218,7 @@ public class ByteArrayOrdinalMap {
         pao.set(bucket, key);
         setOrdinal(ordinals, bucket, ordinal);
         setPointer(pointers, bucket, pointer);
+        lock.unlock();
 
         return ordinal;
     }
@@ -257,11 +264,9 @@ public class ByteArrayOrdinalMap {
 
         int modBitmask = paoSize - 1;
         int bucket = hash & modBitmask;
-        long key = pao.get(bucket);
 
-        while (key != EMPTY_BUCKET_VALUE) {
+        while (getOrdinal(bucket) != EMPTY_BUCKET_VALUE) {
             bucket = (bucket + 1) & modBitmask;
-            key = pao.get(bucket);
         }
 
         long pointer = byteData.length();
@@ -275,7 +280,7 @@ public class ByteArrayOrdinalMap {
 //                    byteData.length(), MAX_BYTE_DATA_LENGTH));
         }
 
-        key = ((long) ordinal << BITS_PER_POINTER) | pointer;
+        long key = ((long) ordinal << BITS_PER_POINTER) | pointer;
 
         size++;
 
@@ -296,8 +301,9 @@ public class ByteArrayOrdinalMap {
         pointerArr.setElementValue(pointerIndex, BITS_PER_POINTER, pointer);
     }
 
-    private long getOrdinal(int index) {
-        return ordinals.getLargeElementValue(((long)index)*BITS_PER_ORDINAL, BITS_PER_ORDINAL);
+    private int getOrdinal(int index) {
+        assert BITS_PER_ORDINAL <= 32;
+        return (int)ordinals.getElementValue(((long)index)*BITS_PER_ORDINAL, BITS_PER_ORDINAL);
     }
 
     private long getPointer(int index) {
@@ -306,12 +312,10 @@ public class ByteArrayOrdinalMap {
 
     public void recalculateFreeOrdinals() {
         BitSet populatedOrdinals = new BitSet();
-        AtomicLongArray pao = pointersAndOrdinals;
 
         for (int i = 0; i < paoSize; i++) {
-            long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
-                int ordinal = (int) (key >>> BITS_PER_POINTER);
+            if (getOrdinal(i) != EMPTY_BUCKET_VALUE) {
+                int ordinal = getOrdinal(i);
                 populatedOrdinals.set(ordinal);
             }
         }
@@ -356,11 +360,11 @@ public class ByteArrayOrdinalMap {
     }
 
     private int get(ByteDataArray serializedRepresentation, int hash) {
+        lock.lock();
         AtomicLongArray pao = pointersAndOrdinals;
 
         int modBitmask = paoSize - 1;
         int bucket = hash & modBitmask;
-        long key = pao.get(bucket);
 
         // Linear probing to resolve collisions
         // Given the load factor it is guaranteed that the loop will terminate
@@ -368,14 +372,15 @@ public class ByteArrayOrdinalMap {
         // To ensure this is the case it is important that pointersAndOrdinals
         // is read into a local variable and thereafter used, otherwise a concurrent
         // size increase may break this invariant
-        while (key != EMPTY_BUCKET_VALUE) {
-            if (compare(serializedRepresentation, getPointer(key))) {
-                return (int) (key >>> BITS_PER_POINTER);
+        while (getOrdinal(bucket) != EMPTY_BUCKET_VALUE) {
+            if (compare(serializedRepresentation, getPointer(bucket))) {
+                lock.unlock();
+                return (int) getOrdinal(bucket);
             }
 
             bucket = (bucket + 1) & modBitmask;
-            key = pao.get(bucket);
         }
+        lock.unlock();
 
         return -1;
     }
@@ -389,11 +394,9 @@ public class ByteArrayOrdinalMap {
         AtomicLongArray pao = pointersAndOrdinals;
 
         for (int i = 0; i < paoSize; i++) {
-            long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
-                int ordinal = (int) (key >>> BITS_PER_POINTER);
-                if (ordinal > maxOrdinal) {
-                    maxOrdinal = ordinal;
+            if (getOrdinal(i) != EMPTY_BUCKET_VALUE) {
+                if (getOrdinal(i) > maxOrdinal) {
+                    maxOrdinal = (int)getOrdinal(i);
                 }
             }
         }
@@ -402,10 +405,8 @@ public class ByteArrayOrdinalMap {
         Arrays.fill(pbo, -1);
 
         for (int i = 0; i < paoSize; i++) {
-            long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
-                int ordinal = (int) (key >>> BITS_PER_POINTER);
-                pbo[ordinal] = key & POINTER_MASK;
+            if (getOrdinal(i) != EMPTY_BUCKET_VALUE) {
+                pbo[(int)getOrdinal(i)] = getPointer(i);
             }
         }
 
@@ -433,7 +434,7 @@ public class ByteArrayOrdinalMap {
             // xxx ordinal pointer
             long pointer = key & POINTER_MASK;
             long ordinal = key >>> BITS_PER_POINTER;
-            if (key != EMPTY_BUCKET_VALUE) {
+            if (getOrdinal(i) != EMPTY_BUCKET_VALUE) {
                 populatedReverseKeys[counter++] = pointer << BITS_PER_ORDINAL | ordinal;
             }
         }
@@ -508,11 +509,9 @@ public class ByteArrayOrdinalMap {
         AtomicLongArray pao = pointersAndOrdinals;
 
         for (int i = 0; i < paoSize; i++) {
-            long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
-                int ordinal = (int) (key >>> BITS_PER_POINTER);
-                if (ordinal > maxOrdinal) {
-                    maxOrdinal = ordinal;
+            if (getOrdinal(i) != EMPTY_BUCKET_VALUE) {
+                if (getOrdinal(i) > maxOrdinal) {
+                    maxOrdinal = getOrdinal(i);
                 }
             }
         }
@@ -573,6 +572,7 @@ public class ByteArrayOrdinalMap {
     }
 
     private void growKeyArray(int newSize) {
+        lock.lock();
         AtomicLongArray pao = pointersAndOrdinals;
         assert (newSize & (newSize - 1)) == 0; // power of 2
 
@@ -588,7 +588,7 @@ public class ByteArrayOrdinalMap {
         /// if we do so, we cause large clusters of collisions to appear (because we resolve collisions with linear probing).
         for (int i = 0; i < paoSize; i++) {
             long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
+            if (getOrdinal(i) != EMPTY_BUCKET_VALUE) {
                 valuesToAdd[counter++] = key;
             }
         }
@@ -603,6 +603,7 @@ public class ByteArrayOrdinalMap {
         pointers = newPointers;
         ordinals = newOrdinals;
         paoSize = newSize;
+        lock.unlock();
     }
 
     /**
