@@ -43,6 +43,47 @@ public class ByteArrayOrdinalTest {
     }
 
     @Test
+    public void testOneBil() {
+        ByteDataArray arr = new ByteDataArray();
+        int size = 560_000_000;
+        ByteArrayOrdinalMap baom = new ByteArrayOrdinalMap(size*2, false);
+        for(int i = 0; i < size; i++) {
+            if(i%1_000_000==0)
+                System.out.println((float)i/(size*2));
+            byte first = (byte) ((i>>>24) & 0xFF);
+            byte second = (byte) (i>>>16 & 0xFF);
+            byte third = (byte) (i>>>8 & 0xFF);
+            byte fourth = (byte) (i & 0xFF);
+            arr.write(first);
+            arr.write(second);
+            arr.write(third);
+            arr.write(fourth);
+            baom.getOrAssignOrdinal(arr);
+
+            arr.reset();
+        }
+
+        for(int i = 0; i < size; i++) {
+            if(i%1_000_000==0)
+                System.out.println((float)(i+size)/(size*2));
+            byte first = (byte) ((i>>>24) & 0xFF);
+            byte second = (byte) (i>>>16 & 0xFF);
+            byte third = (byte) (i>>>8 & 0xFF);
+            byte fourth = (byte) (i & 0xFF);
+            arr.write(first);
+            arr.write(second);
+            arr.write(third);
+            arr.write(fourth);
+            Assert.assertEquals(i, baom.getOrAssignOrdinal(arr));
+            arr.reset();
+        }
+
+
+    }
+
+
+
+    @Test
     public void testResizeWhenEmpty() {
         ByteArrayOrdinalMap m = new ByteArrayOrdinalMap();
         m.resize(4096);
