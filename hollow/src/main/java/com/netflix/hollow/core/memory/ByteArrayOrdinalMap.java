@@ -20,7 +20,6 @@ import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
-import sun.awt.Mutex;
 
 import java.util.Arrays;
 import java.util.BitSet;
@@ -32,8 +31,6 @@ import java.util.Comparator;
  * Technically thread safe because of the mutex (enabled by default to pass concurrent tests)
  */
 public class ByteArrayOrdinalMap {
-    Mutex lock = new Mutex();
-
     private long EMPTY_BUCKET_VALUE;
 
     private synchronized void resizeBitsPerOrdinal(int bitsPerOrdinal, int bitsPerPointer) {
@@ -86,26 +83,16 @@ public class ByteArrayOrdinalMap {
      * and a load factor of 70%.
      */
     public ByteArrayOrdinalMap() {
-        this(256, false);
+        this(256);
     }
-
-    public ByteArrayOrdinalMap(int size) {
-        this(size, true);
-    }
-
-    public ByteArrayOrdinalMap(boolean needsLock) {
-        this(256, needsLock);
-    }
-
-    private final boolean needsLock;
 
     /**
      * Creates a byte array ordinal map with an initial capacity of a given size
      * rounded up to the nearest power of two, and a load factor of 70%.
      */
-    public ByteArrayOrdinalMap(int size, boolean needsLock) {
+    public ByteArrayOrdinalMap(int size) {
         size = bucketSize(size);
-        resizeBitsPerOrdinal(31, 33);
+        resizeBitsPerOrdinal(31, 35);
 
         this.freeOrdinalTracker = new FreeOrdinalTracker();
         this.byteData = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
@@ -114,7 +101,6 @@ public class ByteArrayOrdinalMap {
         paoSize = size;
         this.sizeBeforeGrow = (int) (((float) size) * 0.7); /// 70% load factor
         this.size = 0;
-        this.needsLock = needsLock;
     }
 
     private static int bucketSize(int x) {
@@ -173,13 +159,9 @@ public class ByteArrayOrdinalMap {
         int modBitmask = paoSize - 1;
         int bucket = hash & modBitmask;
 
-        if(needsLock)
-            lock.lock();
 
         while (getOrdinal(bucket) != EMPTY_BUCKET_VALUE) {
             if (compare(serializedRepresentation, getPointer(bucket))) {
-                if(needsLock)
-                    lock.unlock();
                 return getOrdinal(bucket);
             }
 
@@ -211,8 +193,6 @@ public class ByteArrayOrdinalMap {
         /// This means the entire byte sequence is guaranteed to be visible to any thread which reads the pointer to that data.
         setOrdinal(bucket, ordinal);
         setPointer(bucket, pointer);
-        if(needsLock)
-            lock.unlock();
 
         return ordinal;
     }
@@ -360,9 +340,6 @@ public class ByteArrayOrdinalMap {
     }
 
     private int get(ByteDataArray serializedRepresentation, int hash) {
-        if(needsLock)
-            lock.lock();
-
         int modBitmask = paoSize - 1;
         int bucket = hash & modBitmask;
 
@@ -374,15 +351,11 @@ public class ByteArrayOrdinalMap {
         // size increase may break this invariant
         while (getOrdinal(bucket) != EMPTY_BUCKET_VALUE) {
             if (compare(serializedRepresentation, getPointer(bucket))) {
-                if(needsLock)
-                    lock.unlock();
                 return (int) getOrdinal(bucket);
             }
 
             bucket = (bucket + 1) & modBitmask;
         }
-        if(needsLock)
-            lock.unlock();
 
         return -1;
     }
@@ -571,8 +544,7 @@ public class ByteArrayOrdinalMap {
     }
 
     private void growKeyArray(int newSize) {
-        if(needsLock)
-            lock.lock();
+        System.out.println("Growing key array to " + newSize);
         assert (newSize & (newSize - 1)) == 0; // power of 2
 
         FixedLengthElementArray newPointers = emptyKeyArray(newSize, BITS_PER_POINTER);
@@ -601,8 +573,7 @@ public class ByteArrayOrdinalMap {
         pointers = newPointers;
         ordinals = newOrdinals;
         paoSize = newSize;
-        if(needsLock)
-            lock.unlock();
+        System.out.println("Done growing key array");
     }
 
     /**

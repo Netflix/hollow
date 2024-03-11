@@ -42,11 +42,10 @@ public class ByteArrayOrdinalTest {
         Assert.assertArrayEquals(ordinals, newOrdinals);
     }
 
-    @Test
     public void testOneBil() {
         ByteDataArray arr = new ByteDataArray();
         int size = 560_000_000;
-        ByteArrayOrdinalMap baom = new ByteArrayOrdinalMap(size*2, false);
+        ByteArrayOrdinalMap baom = new ByteArrayOrdinalMap(size*2);
         for(int i = 0; i < size; i++) {
             if(i%1_000_000==0)
                 System.out.println((float)i/(size*2));

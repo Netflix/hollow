@@ -34,25 +34,23 @@ public class OneBilTest extends AbstractStateEngineTest {
     @Test
     public void oneBilTest() throws IOException {
         roundTripSnapshot();
-        int size = 500_000_000;
-        for(int i = 0; i < size; i++) {
-            if(i%1_000_000==0)
-                System.out.println((float)i/(size*2));
-            HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
-            rec.setInt("field", i);
+        HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+        for(int j = 0; j < 2; j++) {
+            for (int i = 0; i < 300_000_000; i++) {
+                if (i % 1_000_000 == 0)
+                    System.out.println(((float) i+(j*300_000_000)) / (600_000_000));
+                rec.setInt("field", i+j*300_000_000);
 
-            writeStateEngine.add("test", rec);
+                writeStateEngine.add("test", rec);
+            }
+            roundTripDelta();
         }
-        System.out.println("Round tripping");
-        roundTripSnapshot();
         System.out.println("Done round tripping");
 
-        for(int i = 0; i < size; i++) {
-            if(i%1_000_000==0)
-                System.out.println((float)(i+size)/(size*2));
-            HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("test");
+        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("test");
+        for(int i = 0; i < 600_000_000; i++) {
             int res = typeState.readInt(i, 0);
-            Assert.assertEquals(res, i);
+            Assert.assertEquals(i, res);
         }
     }
 }
