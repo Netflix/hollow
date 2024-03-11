@@ -24,6 +24,7 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
@@ -33,7 +34,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  */
 public class ByteArrayOrdinalMap {
     private long EMPTY_BUCKET_VALUE;
-    private final ThreadSafeBitSet locks;
+    private volatile AtomicBitSet locks;
 
     private synchronized void resizeBitsPerOrdinal(int bitsPerOrdinal, int bitsPerPointer) {
         assert bitsPerOrdinal < 32;
@@ -103,10 +104,7 @@ public class ByteArrayOrdinalMap {
         paoSize = size;
         this.sizeBeforeGrow = (int) (((float) size) * 0.7); /// 70% load factor
         this.size = 0;
-        int sizeReq = 1;
-        while(1<<sizeReq < size)
-            sizeReq++;
-        this.locks = new ThreadSafeBitSet(sizeReq);
+        this.locks = new AtomicBitSet(size);
     }
 
     private static int bucketSize(int x) {
@@ -269,11 +267,10 @@ public class ByteArrayOrdinalMap {
     }
 
     private void setPointerAndOrdinal(int index, long ordinal, long pointer) {
-        while(locks.get(index)) {}
-        locks.set(index);
+        locks.lock(index);
         setOrdinal(ordinals, BITS_PER_ORDINAL, index, ordinal);
         setPointer(pointers, BITS_PER_POINTER, index, pointer);
-        locks.clear(index);
+        locks.unlock(index);
     }
 
     private static void setPointer(FixedLengthElementArray pointerArr, int bitsPerPointer, int index, long pointer) {
@@ -287,18 +284,16 @@ public class ByteArrayOrdinalMap {
     }
 
     private int getOrdinal(int index) {
-        while(locks.get(index)) {}
-        locks.set(index);
+        locks.lock(index);
         int ordinal = getOrdinal(ordinals, index, BITS_PER_ORDINAL);
-        locks.clear(index);
+        locks.unlock(index);
         return ordinal;
     }
 
     private long getPointer(int index) {
-        while(locks.get(index)) {}
-        locks.set(index);
+        locks.lock(index);
         long pointer = pointers.atomicGetLargeElementValue(((long)index)*BITS_PER_POINTER, BITS_PER_POINTER);
-        locks.clear(index);
+        locks.unlock(index);
         return pointer;
     }
 
@@ -584,6 +579,7 @@ public class ByteArrayOrdinalMap {
         pointers = newPointers;
         ordinals = newOrdinals;
         paoSize = newSize;
+        locks = new AtomicBitSet(newSize);
         System.out.println("Done growing key array");
     }
 

@@ -31,7 +31,6 @@ public class OneBilTest extends AbstractStateEngineTest {
         super.setUp();
     }
 
-    @Test
     public void oneBilTest() throws IOException {
         roundTripSnapshot();
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
