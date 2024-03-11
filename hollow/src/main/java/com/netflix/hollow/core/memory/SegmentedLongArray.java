@@ -80,6 +80,17 @@ public class SegmentedLongArray {
         }
     }
 
+    public void setAtomic(long index, long value) {
+        int segmentIndex = (int)(index >> log2OfSegmentSize);
+        int longInSegment = (int)(index & bitmask);
+        unsafe.putOrderedLong(segments[segmentIndex], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longInSegment), value);
+
+        /// duplicate the longs here so that we can read faster.
+        if(longInSegment == 0 && segmentIndex != 0) {
+            unsafe.putOrderedLong(segments[segmentIndex - 1], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * (1 << log2OfSegmentSize)), value);
+        }
+    }
+
     /**
      * Get the value of the long at the specified index.
      *
@@ -91,6 +102,13 @@ public class SegmentedLongArray {
         long ret = segments[segmentIndex][(int)(index & bitmask)];
 
         return ret;
+    }
+
+    public long getAtomic(long index) {
+        int segmentIndex = (int)(index >>> log2OfSegmentSize);
+        long offset = Unsafe.ARRAY_LONG_BASE_OFFSET;
+        offset+=(index&bitmask)*8;
+        return unsafe.getLongVolatile(segments[segmentIndex], offset);
     }
 
     public void fill(long value) {

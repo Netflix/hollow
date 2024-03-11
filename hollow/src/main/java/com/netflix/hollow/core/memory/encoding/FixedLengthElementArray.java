@@ -90,6 +90,20 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
             set(whichLong + 1, get(whichLong + 1) & ~(mask >>> bitsRemaining));
     }
 
+    public void atomicClearElementValue(long index, int bitsPerElement) {
+        long whichLong = index >>> 6;
+        int whichBit = (int) (index & 0x3F);
+
+        long mask = ((1L << bitsPerElement) - 1);
+
+        setAtomic(whichLong, get(whichLong) & ~(mask << whichBit));
+
+        int bitsRemaining = 64 - whichBit;
+
+        if (bitsRemaining < bitsPerElement)
+            setAtomic(whichLong + 1, get(whichLong + 1) & ~(mask >>> bitsRemaining));
+    }
+
     @Override
     public void setElementValue(long index, int bitsPerElement, long value) {
         long whichLong = index >>> 6;
@@ -101,6 +115,18 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
 
         if (bitsRemaining < bitsPerElement)
             set(whichLong + 1, get(whichLong + 1) | (value >>> bitsRemaining));
+    }
+
+    public void atomicSetElementValue(long index, int bitsPerElement, long value) {
+        long whichLong = index >>> 6;
+        int whichBit = (int) (index & 0x3F);
+
+        setAtomic(whichLong, get(whichLong) | (value << whichBit));
+
+        int bitsRemaining = 64 - whichBit;
+
+        if (bitsRemaining < bitsPerElement)
+            setAtomic(whichLong + 1, get(whichLong + 1) | (value >>> bitsRemaining));
     }
 
     @Override
@@ -127,6 +153,27 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
     public long getLargeElementValue(long index, int bitsPerElement) {
         long mask = bitsPerElement == 64 ? -1 : ((1L << bitsPerElement) - 1);
         return getLargeElementValue(index, bitsPerElement, mask);
+    }
+
+    public long atomicGetLargeElementValue(long index, int bitsPerElement) {
+        long mask = bitsPerElement == 64 ? -1 : ((1L << bitsPerElement) - 1);
+        return atomicGetLargeElementValue(index, bitsPerElement, mask);
+    }
+
+    public long atomicGetLargeElementValue(long index, int bitsPerElement, long mask) {
+        long whichLong = index >>> 6;
+        int whichBit = (int) (index & 0x3F);
+
+        long l = getAtomic(whichLong) >>> whichBit;
+
+        int bitsRemaining = 64 - whichBit;
+
+        if (bitsRemaining < bitsPerElement) {
+            whichLong++;
+            l |= getAtomic(whichLong) << bitsRemaining;
+        }
+
+        return l & mask;
     }
 
     @Override

@@ -24,6 +24,7 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  * This data structure maps byte sequences to ordinals.  This is a hash table.
@@ -32,6 +33,7 @@ import java.util.Comparator;
  */
 public class ByteArrayOrdinalMap {
     private long EMPTY_BUCKET_VALUE;
+    private final ThreadSafeBitSet locks;
 
     private synchronized void resizeBitsPerOrdinal(int bitsPerOrdinal, int bitsPerPointer) {
         assert bitsPerOrdinal < 32;
@@ -61,8 +63,8 @@ public class ByteArrayOrdinalMap {
     private int BITS_PER_ORDINAL;
     private int BITS_PER_POINTER;
     private int paoSize = 0;
-    private FixedLengthElementArray pointers;
-    private FixedLengthElementArray ordinals;
+    private volatile FixedLengthElementArray pointers;
+    private volatile FixedLengthElementArray ordinals;
     private long POINTER_MASK;
     private long ORDINAL_MASK;
     private long MAX_BYTE_DATA_LENGTH;
@@ -101,6 +103,10 @@ public class ByteArrayOrdinalMap {
         paoSize = size;
         this.sizeBeforeGrow = (int) (((float) size) * 0.7); /// 70% load factor
         this.size = 0;
+        int sizeReq = 1;
+        while(1<<sizeReq < size)
+            sizeReq++;
+        this.locks = new ThreadSafeBitSet(sizeReq);
     }
 
     private static int bucketSize(int x) {
@@ -259,35 +265,49 @@ public class ByteArrayOrdinalMap {
     }
 
     private void setOrdinal(int index, long ordinal) {
+        while(locks.get(index)) {}
+        locks.set(index);
         setOrdinal(ordinals, BITS_PER_ORDINAL, index, ordinal);
+        locks.clear(index);
     }
 
     private static void setOrdinal(FixedLengthElementArray ordinalArr, int bitsPerOrdinal, int index, long ordinal) {
         long ordinalIndex = ((long)index)*bitsPerOrdinal;
-        ordinalArr.clearElementValue(ordinalIndex, bitsPerOrdinal);
-        ordinalArr.setElementValue(ordinalIndex, bitsPerOrdinal, ordinal);
+        ordinalArr.atomicClearElementValue(ordinalIndex, bitsPerOrdinal);
+        ordinalArr.atomicSetElementValue(ordinalIndex, bitsPerOrdinal, ordinal);
     }
 
     private void setPointer(int index, long pointer) {
+        while(locks.get(index)) {}
+        locks.set(index);
         setPointer(pointers, BITS_PER_POINTER, index, pointer);
+        locks.clear(index);
     }
 
     private static void setPointer(FixedLengthElementArray pointerArr, int bitsPerPointer, int index, long pointer) {
         long pointerIndex = ((long)index)*bitsPerPointer;
-        pointerArr.clearElementValue(pointerIndex, bitsPerPointer);
-        pointerArr.setElementValue(pointerIndex, bitsPerPointer, pointer);
+        pointerArr.atomicClearElementValue(pointerIndex, bitsPerPointer);
+        pointerArr.atomicSetElementValue(pointerIndex, bitsPerPointer, pointer);
     }
 
     private static int getOrdinal(FixedLengthElementArray ordinals, int index, int BITS_PER_ORDINAL) {
-        return (int)ordinals.getElementValue(((long)index)*BITS_PER_ORDINAL, BITS_PER_ORDINAL);
+        return (int)ordinals.atomicGetLargeElementValue(((long)index)*BITS_PER_ORDINAL, BITS_PER_ORDINAL);
     }
 
     private int getOrdinal(int index) {
-        return getOrdinal(ordinals, index, BITS_PER_ORDINAL);
+        while(locks.get(index)) {}
+        locks.set(index);
+        int ordinal = getOrdinal(ordinals, index, BITS_PER_ORDINAL);
+        locks.clear(index);
+        return ordinal;
     }
 
     private long getPointer(int index) {
-        return pointers.getLargeElementValue(((long)index)*BITS_PER_POINTER, BITS_PER_POINTER);
+        while(locks.get(index)) {}
+        locks.set(index);
+        long pointer = pointers.atomicGetLargeElementValue(((long)index)*BITS_PER_POINTER, BITS_PER_POINTER);
+        locks.clear(index);
+        return pointer;
     }
 
     public void recalculateFreeOrdinals() {
