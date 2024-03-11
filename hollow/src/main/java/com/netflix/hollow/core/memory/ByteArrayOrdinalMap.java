@@ -250,9 +250,6 @@ public class ByteArrayOrdinalMap {
         serializedRepresentation.copyTo(byteData);
         while (byteData.length() >= MAX_BYTE_DATA_LENGTH) {
             resizeBitsPerOrdinal(BITS_PER_ORDINAL, BITS_PER_POINTER+1);
-//            throw new IllegalStateException(String.format(
-//                    "The number of bytes for the serialized representations, %s, is too large and is greater than the maximum of %s bytes",
-//                    byteData.length(), MAX_BYTE_DATA_LENGTH));
         }
 
         size++;

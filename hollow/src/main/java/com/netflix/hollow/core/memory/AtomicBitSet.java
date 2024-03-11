@@ -5,13 +5,16 @@ import java.util.concurrent.atomic.AtomicLongArray;
 public class AtomicBitSet {
     private final AtomicLongArray locks;
 
-    public AtomicBitSet(int bits) {
-        locks = new AtomicLongArray(bits>>>3);
+    public AtomicBitSet(long bits) {
+        assert bits>>>6 <= Integer.MAX_VALUE;
+        locks = new AtomicLongArray((int)(bits>>>6));
     }
 
-    public void lock(int index) {
-        int whichLong = index >> 6;
-        int whichBit = index & 0x3f;
+    public void lock(long index) {
+        assert index >>> 6 <= locks.length();
+
+        int whichLong = (int) (index >>> 6);
+        int whichBit = (int) (index & 0x3f);
 
         while(true) {
             long curr = locks.get(whichLong);
@@ -23,15 +26,19 @@ public class AtomicBitSet {
         }
     }
 
-    public boolean isLocked(int index) {
-        int whichLong = index >> 6;
-        int whichBit = index & 0x3f;
+    public boolean isLocked(long index) {
+        assert index >>> 6 <= locks.length();
+
+        int whichLong = (int) (index >>> 6);
+        int whichBit = (int) (index & 0x3f);
         return (locks.get(whichLong) & (1L<<whichBit))!=0;
     }
 
-    public void unlock(int index) {
-        int whichLong = index >> 6;
-        int whichBit = index & 0x3f;
+    public void unlock(long index) {
+        assert index >>> 6 <= locks.length();
+
+        int whichLong = (int) (index >>> 6);
+        int whichBit = (int) (index & 0x3f);
 
         while(true) {
             long curr = locks.get(whichLong);

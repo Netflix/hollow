@@ -22,4 +22,21 @@ public class AtomicBitSetTest {
             }
         }
     }
+    @Test
+    public void ABSLargeTest() {
+        long size = 5_000_000_000L;
+        AtomicBitSet abs = new AtomicBitSet(size);
+        for(long i = 0; i < size; i++) {
+            if(i%100_000_000==0)
+                System.out.println((float)i/size);
+            abs.lock(i);
+        }
+        for(long i = 0; i < size; i++) {
+            if(i%100_000_000==0)
+                System.out.println((float)i/size);
+            Assert.assertTrue(abs.isLocked(i));
+            abs.unlock(i);
+            Assert.assertFalse(abs.isLocked(i));
+        }
+    }
 }

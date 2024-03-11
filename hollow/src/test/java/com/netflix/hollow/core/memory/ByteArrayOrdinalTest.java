@@ -78,7 +78,7 @@ public class ByteArrayOrdinalTest {
         });
         Thread t2 = new Thread(() -> {
             ByteDataArray bda = new ByteDataArray();
-            for(int i = 0; i < 1_000; i++) {
+            for(int i = 0; i < 10_000; i++) {
                 writeNumToBDA(i, bda);
                 oldMap.getOrAssignOrdinal(bda);
                 newMap.getOrAssignOrdinal(bda);

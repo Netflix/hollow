@@ -31,23 +31,22 @@ public class OneBilTest extends AbstractStateEngineTest {
         super.setUp();
     }
 
+    @Test
     public void oneBilTest() throws IOException {
         roundTripSnapshot();
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
-        for(int j = 0; j < 2; j++) {
-            for (int i = 0; i < 300_000_000; i++) {
-                if (i % 1_000_000 == 0)
-                    System.out.println(((float) i+(j*300_000_000)) / (600_000_000));
-                rec.setInt("field", i+j*300_000_000);
+        for(int i = 0; i < 545_000_000; i++) {
+            if (i % 1_000_000 == 0)
+                System.out.println((float) i / (545_000_000));
+            rec.setInt("field", i);
 
-                writeStateEngine.add("test", rec);
-            }
-            roundTripDelta();
+            writeStateEngine.add("test", rec);
         }
+        roundTripDelta();
         System.out.println("Done round tripping");
 
         HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("test");
-        for(int i = 0; i < 600_000_000; i++) {
+        for(int i = 0; i < 545_000_000; i++) {
             int res = typeState.readInt(i, 0);
             Assert.assertEquals(i, res);
         }
