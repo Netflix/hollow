@@ -197,8 +197,7 @@ public class ByteArrayOrdinalMap {
         /// this set on the AtomicLongArray has volatile semantics (i.e. behaves like a monitor release).
         /// Any other thread reading this element in the AtomicLongArray will have visibility to all memory writes this thread has made up to this point.
         /// This means the entire byte sequence is guaranteed to be visible to any thread which reads the pointer to that data.
-        setOrdinal(bucket, ordinal);
-        setPointer(bucket, pointer);
+        setPointerAndOrdinal(bucket, ordinal, pointer);
 
         return ordinal;
     }
@@ -260,15 +259,7 @@ public class ByteArrayOrdinalMap {
 
         size++;
 
-        setOrdinal(bucket, ordinal);
-        setPointer(bucket, pointer);
-    }
-
-    private void setOrdinal(int index, long ordinal) {
-        while(locks.get(index)) {}
-        locks.set(index);
-        setOrdinal(ordinals, BITS_PER_ORDINAL, index, ordinal);
-        locks.clear(index);
+        setPointerAndOrdinal(bucket, ordinal, pointer);
     }
 
     private static void setOrdinal(FixedLengthElementArray ordinalArr, int bitsPerOrdinal, int index, long ordinal) {
@@ -277,9 +268,10 @@ public class ByteArrayOrdinalMap {
         ordinalArr.atomicSetElementValue(ordinalIndex, bitsPerOrdinal, ordinal);
     }
 
-    private void setPointer(int index, long pointer) {
+    private void setPointerAndOrdinal(int index, long ordinal, long pointer) {
         while(locks.get(index)) {}
         locks.set(index);
+        setOrdinal(ordinals, BITS_PER_ORDINAL, index, ordinal);
         setPointer(pointers, BITS_PER_POINTER, index, pointer);
         locks.clear(index);
     }
@@ -470,8 +462,7 @@ public class ByteArrayOrdinalMap {
         // Volatile store not required, could use plain store
         // See VarHandles for JDK >= 9
         for (int i = 0; i < paoSize; i++) {
-            setPointer(i, EMPTY_BUCKET_VALUE);
-            setOrdinal(i, EMPTY_BUCKET_VALUE);
+            setPointerAndOrdinal(i, EMPTY_BUCKET_VALUE, EMPTY_BUCKET_VALUE);
         }
         populateNewHashArray(pointers, ordinals, populatedReverseKeys, paoSize);
         size = usedOrdinals.cardinality();

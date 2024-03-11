@@ -42,6 +42,59 @@ public class ByteArrayOrdinalTest {
         Assert.assertArrayEquals(ordinals, newOrdinals);
     }
 
+    void writeNumToBDA(int num, ByteDataArray bda) {
+        bda.reset();
+        byte b1 = (byte) ((num >> 24) & 0xFF);
+        byte b2 = (byte) ((num >> 16) & 0xFF);
+        byte b3 = (byte) ((num >> 8) & 0xFF);
+        byte b4 = (byte) (num & 0xFF);
+        bda.write(b1);
+        bda.write(b2);
+        bda.write(b3);
+        bda.write(b4);
+    }
+
+    int numFromBDA(ByteDataArray bda) {
+        int ans = 0;
+        ans |= bda.get(0) << 24;
+        ans |= bda.get(1) << 16;
+        ans |= bda.get(2) << 8;
+        ans |= bda.get(3);
+        return ans;
+    }
+
+    @Test
+    public void testAtomic() throws InterruptedException {
+        ByteArrayOrdinalMap newMap = new ByteArrayOrdinalMap();
+        SmallByteArrayOrdinalMap oldMap = new SmallByteArrayOrdinalMap();
+
+        Thread t1 = new Thread(() -> {
+            ByteDataArray bda = new ByteDataArray();
+            for(int i = 0; i < 10_000; i++) {
+                writeNumToBDA(i, bda);
+                oldMap.getOrAssignOrdinal(bda);
+                newMap.getOrAssignOrdinal(bda);
+            }
+        });
+        Thread t2 = new Thread(() -> {
+            ByteDataArray bda = new ByteDataArray();
+            for(int i = 0; i < 1_000; i++) {
+                writeNumToBDA(i, bda);
+                oldMap.getOrAssignOrdinal(bda);
+                newMap.getOrAssignOrdinal(bda);
+            }
+        });
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+        ByteDataArray bda = new ByteDataArray();
+        for(int i = 0; i < 10_000; i++) {
+            writeNumToBDA(i, bda);
+            Assert.assertEquals(oldMap.getOrAssignOrdinal(bda), newMap.getOrAssignOrdinal(bda));
+        }
+    }
+
     public void testOneBil() {
         ByteDataArray arr = new ByteDataArray();
         int size = 560_000_000;
