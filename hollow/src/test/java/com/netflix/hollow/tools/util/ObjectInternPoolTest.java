@@ -16,7 +16,6 @@
  */
 package com.netflix.hollow.tools.util;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
@@ -161,32 +160,6 @@ public class ObjectInternPoolTest {
 
         assertEquals(string3Ordinal, string4Ordinal);
         assertEquals(retrievedString2, "I can do this all day");
-    }
-
-    @Test
-    public void testBytes() {
-        byte[] bytesObj1 = "I am Groot".getBytes();
-        byte[] bytesObj2 = "I am Groot".getBytes();
-        byte[] bytesObj3 = "I can do this all day".getBytes();
-        byte[] bytesObj4 = "I can do this all day".getBytes();
-
-        int bytes1Ordinal = internPool.writeAndGetOrdinal(bytesObj1);
-        int bytes2Ordinal = internPool.writeAndGetOrdinal(bytesObj2);
-        internPool.prepareForRead();
-
-        byte[] retrievedString1 = (byte[]) internPool.getObject(bytes1Ordinal, FieldType.BYTES);
-
-        assertEquals(bytes1Ordinal, bytes2Ordinal);
-        assertArrayEquals(retrievedString1, "I am Groot".getBytes());
-
-        int bytes3Ordinal = internPool.writeAndGetOrdinal(bytesObj3);
-        int bytes4Ordinal = internPool.writeAndGetOrdinal(bytesObj4);
-        internPool.prepareForRead();
-
-        byte[] retrievedBytes2 = (byte[]) internPool.getObject(bytes3Ordinal, FieldType.BYTES);
-
-        assertEquals(bytes3Ordinal, bytes4Ordinal);
-        assertArrayEquals(retrievedBytes2, "I can do this all day".getBytes());
     }
 
     @Test

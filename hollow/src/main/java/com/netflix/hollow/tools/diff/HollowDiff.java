@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  *
  */
 public class HollowDiff {
-    private final EnumSet<FieldType> SINGLE_FIELD_SUPPORTED_TYPES = EnumSet.of(FieldType.INT, FieldType.LONG, FieldType.DOUBLE, FieldType.STRING, FieldType.FLOAT, FieldType.BOOLEAN, FieldType.BYTES);
+    private final EnumSet<FieldType> SINGLE_FIELD_SUPPORTED_TYPES = EnumSet.of(FieldType.INT, FieldType.LONG, FieldType.DOUBLE, FieldType.STRING, FieldType.FLOAT, FieldType.BOOLEAN);
 
     private final Logger log = Logger.getLogger(HollowDiff.class.getName());
     private final HollowReadStateEngine fromStateEngine;
