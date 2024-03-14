@@ -26,6 +26,7 @@ import com.netflix.hollow.api.producer.IncrementalCycleListener.IncrementalCycle
 import com.netflix.hollow.api.producer.listener.AnnouncementListener;
 import com.netflix.hollow.api.producer.listener.CycleListener;
 import com.netflix.hollow.api.producer.listener.DataModelInitializationListener;
+import com.netflix.hollow.api.producer.listener.DeltaChainForkListener;
 import com.netflix.hollow.api.producer.listener.HollowProducerEventListener;
 import com.netflix.hollow.api.producer.listener.IncrementalPopulateListener;
 import com.netflix.hollow.api.producer.listener.IntegrityCheckListener;
@@ -104,6 +105,11 @@ final class ProducerListenerSupport extends ListenerSupport {
 
         ProducerListeners(HollowProducerEventListener[] listeners) {
             super(listeners);
+        }
+
+        void fireVersionValidationCheck(long restoredVersion) {
+            fire(DeltaChainForkListener.class,
+                    l -> l.onVersionValidationCheck(restoredVersion));
         }
 
         void fireProducerInit(long elapsedMillis) {

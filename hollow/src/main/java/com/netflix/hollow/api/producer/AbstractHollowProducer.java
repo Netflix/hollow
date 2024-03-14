@@ -392,6 +392,8 @@ abstract class AbstractHollowProducer {
             // 2. Populate the state
             populate(listeners, incrementalPopulator, populator, toVersion);
 
+            listeners.fireVersionValidationCheck(readStates.current().getVersion());
+
             // 3. Produce a new state if there's work to do
             if (writeEngine.hasChangedSinceLastCycle()) {
                 boolean schemaChangedFromPriorVersion = readStates.hasCurrent() &&

@@ -149,7 +149,6 @@ public class HollowClientUpdater {
                 ? planner.planInitializingUpdate(requestedVersion)
                 : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersion,
                         doubleSnapshotConfig.allowDoubleSnapshot());
-            boolean isInitialUpdate = getCurrentVersionId() == VERSION_NONE;
 
             for (HollowConsumer.RefreshListener listener : localListeners)
                 if (listener instanceof HollowConsumer.TransitionAwareRefreshListener)
@@ -187,6 +186,7 @@ public class HollowClientUpdater {
                          * Also note that hollowDataHolderVolatile only changes for snapshot plans,
                          * and it is only for snapshot plans that HollowDataHolder#initializeAPI is
                          * called. */
+                        boolean isInitialUpdate = getCurrentVersionId() == VERSION_NONE;
                         newDh.update(updatePlan, localListeners, () -> hollowDataHolderVolatile = newDh, isInitialUpdate);
                     } catch (Throwable t) {
                         // If the update plan failed then revert back to the old holder
@@ -196,7 +196,7 @@ public class HollowClientUpdater {
                     forceDoubleSnapshot = false;
                 }
             } else {    // 0 snapshot and 1+ delta transitions
-                hollowDataHolderVolatile.update(updatePlan, localListeners, () -> {}, isInitialUpdate);
+                hollowDataHolderVolatile.update(updatePlan, localListeners, () -> {}, false);
             }
 
             for(HollowConsumer.RefreshListener refreshListener : localListeners)

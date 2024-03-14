@@ -152,7 +152,8 @@ public class HollowBlobReader {
         if(optionalParts != null)
             optionalPartInputs = optionalParts.getInputsByPartName(in.getMemoryMode());
 
-        HollowBlobHeader header = readHeader(in, false);
+        HollowBlobHeader header = headerReader.readHeader(in);
+        readHeader(header, false);
         List<HollowBlobOptionalPartHeader> partHeaders = readPartHeaders(header, optionalPartInputs, in.getMemoryMode());
         List<HollowSchema> allSchemas = combineSchemas(header, partHeaders);
 
@@ -216,20 +217,21 @@ public class HollowBlobReader {
      * @param in the Hollow blob input to read the delta from
      * @throws IOException if the delta could not be applied
      */
+    long VERSION_UNKNOWN = -1;
+    @Deprecated
     public void applyDelta(HollowBlobInput in) throws IOException {
-        applyDelta(in, null);
+        applyDelta(in, null, VERSION_UNKNOWN);
     }
 
-    public void applyDelta(HollowBlobInput in, OptionalBlobPartInput optionalParts) throws IOException {
-        applyDelta(in, optionalParts, 0, false);
-    }
-    public void applyDelta(HollowBlobInput in, OptionalBlobPartInput optionalParts, long expectedVersion, boolean isInitialUpdate) throws IOException {
+    public void applyDelta(HollowBlobInput in, OptionalBlobPartInput optionalParts, long expectedVersion) throws IOException {
         validateMemoryMode(in.getMemoryMode());
         Map<String, HollowBlobInput> optionalPartInputs = null;
         if(optionalParts != null)
             optionalPartInputs = optionalParts.getInputsByPartName(in.getMemoryMode());
 
-        HollowBlobHeader header = readHeaderAndCheckVersion(in, true, expectedVersion, isInitialUpdate);
+        HollowBlobHeader header = headerReader.readHeader(in);
+        // here 3 ?
+        readHeaderAndCheckVersion(header, true, expectedVersion);
         List<HollowBlobOptionalPartHeader> partHeaders = readPartHeaders(header, optionalPartInputs, in.getMemoryMode());
         notifyBeginUpdate();
 
@@ -265,9 +267,8 @@ public class HollowBlobReader {
     }
 
 
-    private HollowBlobHeader readHeaderAndCheckVersion(HollowBlobInput in, boolean isDelta, long expectedVersion, boolean isInitialUpdate) throws IOException {
-        HollowBlobHeader header = headerReader.readHeader(in);
-        if (expectedVersion != 0 && !isInitialUpdate) {
+    private void readHeaderAndCheckVersion(HollowBlobHeader header, boolean isDelta, long expectedVersion) throws IOException {
+        if (expectedVersion != 0) {
             String to_version_tag = header.getHeaderTags().get(HEADER_TAG_PRODUCER_TO_VERSION);
             if (to_version_tag != null) {
                 long to_version = Long.parseLong(to_version_tag);
@@ -276,16 +277,10 @@ public class HollowBlobReader {
                 }
             }
         }
-        checkAndApplyHeader(header, isDelta);
-        return header;
+        readHeader(header, isDelta);
     }
 
-    private HollowBlobHeader readHeader(HollowBlobInput in, boolean isDelta) throws IOException {
-        HollowBlobHeader header = headerReader.readHeader(in);
-        checkAndApplyHeader(header, isDelta);
-        return header;
-    }
-    private void checkAndApplyHeader(final HollowBlobHeader header, boolean isDelta) throws IOException {
+    private void readHeader(HollowBlobHeader header, boolean isDelta) throws IOException {
         if(isDelta && header.getOriginRandomizedTag() != stateEngine.getCurrentRandomizedTag())
             throw new IOException("Attempting to apply a delta to a state from which it was not originated!");
 

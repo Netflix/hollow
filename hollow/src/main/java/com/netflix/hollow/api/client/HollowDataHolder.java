@@ -131,14 +131,14 @@ class HollowDataHolder {
         if (updatePlan.isSnapshotPlan()) {
             applySnapshotPlan(updatePlan, refreshListeners, apiInitCallback, isInitialUpdate);
         } else {
-            applyDeltaOnlyPlan(updatePlan, refreshListeners, isInitialUpdate);
+            applyDeltaOnlyPlan(updatePlan, refreshListeners);
         }
     }
 
     private void applySnapshotPlan(HollowUpdatePlan updatePlan,
             HollowConsumer.RefreshListener[] refreshListeners,
             Runnable apiInitCallback, boolean isInitialUpdate) throws Throwable {
-        applySnapshotTransition(updatePlan.getSnapshotTransition(), refreshListeners, apiInitCallback, isInitialUpdate);
+        applySnapshotTransition(updatePlan.getSnapshotTransition(), refreshListeners, apiInitCallback);
             
         for(HollowConsumer.Blob blob : updatePlan.getDeltaTransitions()) {
             applyDeltaTransition(blob, true, refreshListeners, isInitialUpdate);
@@ -155,10 +155,10 @@ class HollowDataHolder {
 
     private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob,
             HollowConsumer.RefreshListener[] refreshListeners,
-            Runnable apiInitCallback, boolean isInitialUpdate) throws Throwable {
+            Runnable apiInitCallback) throws Throwable {
         try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, snapshotBlob);
              OptionalBlobPartInput optionalPartIn = snapshotBlob.getOptionalBlobPartInputs()) {
-            applyStateEngineTransition(in, optionalPartIn, snapshotBlob, refreshListeners, isInitialUpdate);
+            applyStateEngineTransition(in, optionalPartIn, snapshotBlob, refreshListeners, false);
             initializeAPI(apiInitCallback);
 
             for (HollowConsumer.RefreshListener refreshListener : refreshListeners) {
@@ -176,6 +176,7 @@ class HollowDataHolder {
                                             HollowConsumer.Blob transition,
                                             HollowConsumer.RefreshListener[] refreshListeners,
                                             boolean isInitialUpdate) throws IOException {
+        // here 1?
         if(transition.isSnapshot()) {
             if(filter == null) {
                 reader.readSnapshot(in, optionalPartIn);
@@ -184,8 +185,10 @@ class HollowDataHolder {
                 reader.readSnapshot(in, optionalPartIn, filter);
             }
         } else {
+            // here 2 ?
             long expectedToVersion = transition.getToVersion();
-            reader.applyDelta(in, optionalPartIn, expectedToVersion, isInitialUpdate);
+            // read headers here and do the check
+            reader.applyDelta(in, optionalPartIn, expectedToVersion);
         }
 
         setVersion(transition.getToVersion());
@@ -209,10 +212,9 @@ class HollowDataHolder {
         }
     }
 
-    private void applyDeltaOnlyPlan(HollowUpdatePlan updatePlan, HollowConsumer.RefreshListener[] refreshListeners,
-                                    boolean isInitialUpdate) throws Throwable {
+    private void applyDeltaOnlyPlan(HollowUpdatePlan updatePlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
         for(HollowConsumer.Blob blob : updatePlan) {
-            applyDeltaTransition(blob, false, refreshListeners, isInitialUpdate);
+            applyDeltaTransition(blob, false, refreshListeners, false);
         }
     }
 
