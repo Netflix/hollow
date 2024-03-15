@@ -121,6 +121,11 @@ public class ObjectInternPool {
             for (byte b : ((String) objectToIntern).getBytes()) {
                 buf.write(b);
             }
+        } else if(objectToIntern instanceof byte[]) {
+            VarInt.writeVInt(buf, ((byte[]) objectToIntern).length);
+            for (byte b : ((byte[]) objectToIntern)) {
+                buf.write(b);
+            }
         } else if(objectToIntern instanceof Boolean) {
             int valToWrite = (boolean) objectToIntern ? 1 : 0;
             VarInt.writeVInt(buf, valToWrite);
