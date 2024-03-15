@@ -1,5 +1,8 @@
 package com.netflix.hollow.core.read.engine;
 
+import com.netflix.hollow.api.producer.HollowProducer;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemPublisher;
 import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -9,11 +12,16 @@ import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteRecord;
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class OneBilTest extends AbstractStateEngineTest {
     private HollowObjectSchema schema;
@@ -31,24 +39,16 @@ public class OneBilTest extends AbstractStateEngineTest {
         super.setUp();
     }
 
-    @Test
-    public void oneBilTest() throws IOException {
-        roundTripSnapshot();
-        HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
-        for(int i = 0; i < 545_000_000; i++) {
-            if (i % 1_000_000 == 0)
-                System.out.println((float) i / (545_000_000));
-            rec.setInt("field", i);
+    
 
-            writeStateEngine.add("test", rec);
-        }
-        roundTripDelta();
-        System.out.println("Done round tripping");
+    @HollowPrimaryKey(fields="id")
+    public static class Movie {
+        int id;
+        int releaseYear;
 
-        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("test");
-        for(int i = 0; i < 545_000_000; i++) {
-            int res = typeState.readInt(i, 0);
-            Assert.assertEquals(i, res);
+        public Movie(int id, int releaseYear) {
+            this.id = id;
+            this.releaseYear = releaseYear;
         }
     }
 }

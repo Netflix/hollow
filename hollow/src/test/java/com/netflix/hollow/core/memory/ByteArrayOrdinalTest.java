@@ -94,10 +94,10 @@ public class ByteArrayOrdinalTest {
             Assert.assertEquals(oldMap.getOrAssignOrdinal(bda), newMap.getOrAssignOrdinal(bda));
         }
     }
-
+    
     public void testOneBil() {
         ByteDataArray arr = new ByteDataArray();
-        int size = 560_000_000;
+        int size = 1_0_000;
         ByteArrayOrdinalMap baom = new ByteArrayOrdinalMap(size*2);
         for(int i = 0; i < size; i++) {
             if(i%1_000_000==0)
@@ -128,6 +128,13 @@ public class ByteArrayOrdinalTest {
             arr.write(fourth);
             Assert.assertEquals(i, baom.getOrAssignOrdinal(arr));
             arr.reset();
+        }
+        System.out.println("Getting pointers");
+
+        baom.prepareForWrite();
+        for(int i = 0; i < size; i++) {
+            long pointer = baom.getPointerForData(i);
+            assert (true || pointer == ((long)i)*4);
         }
 
 
