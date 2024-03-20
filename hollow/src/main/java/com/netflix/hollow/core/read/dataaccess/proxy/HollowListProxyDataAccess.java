@@ -26,15 +26,15 @@ import com.netflix.hollow.core.schema.HollowListSchema;
  * 
  * @see HollowProxyDataAccess
  */
-public class HollowListProxyDataAccess extends HollowTypeProxyDataAccess implements HollowListTypeDataAccess {
+public class HollowListProxyDataAccess extends HollowTypeProxyDataAccess<HollowListTypeDataAccess> implements HollowListTypeDataAccess {
 
-    public HollowListProxyDataAccess(HollowProxyDataAccess dataAccess) {
+    HollowListProxyDataAccess(HollowProxyDataAccess dataAccess) {
         super(dataAccess);
     }
 
     @Override
     public int size(int ordinal) {
-        return currentDataAccess().size(ordinal);
+        return currentDataAccess.size(ordinal);
     }
 
     @Override
@@ -44,15 +44,11 @@ public class HollowListProxyDataAccess extends HollowTypeProxyDataAccess impleme
 
     @Override
     public HollowListSchema getSchema() {
-        return currentDataAccess().getSchema();
+        return currentDataAccess.getSchema();
     }
 
     @Override
     public int getElementOrdinal(int ordinal, int listIndex) {
-        return currentDataAccess().getElementOrdinal(ordinal, listIndex);
-    }
-
-    private HollowListTypeDataAccess currentDataAccess() {
-        return (HollowListTypeDataAccess)currentDataAccess;
+        return currentDataAccess.getElementOrdinal(ordinal, listIndex);
     }
 }
