@@ -16,12 +16,6 @@
  */
 package com.netflix.hollow.api.codegen.delegate;
 
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateCachedImplName;
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateInterfaceName;
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
-
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
@@ -35,6 +29,8 @@ import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.*;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
@@ -175,76 +171,33 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
     }
 
     private void addAccessor(StringBuilder builder, FieldType fieldType, String fieldName) {
+        FieldAccessor fieldAccessor = null;
         switch(fieldType) {
         case BOOLEAN:
-            builder.append("    public boolean get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-            builder.append("        if(").append(fieldName).append(" == null)\n");
-            builder.append("            return false;\n");
-            builder.append("        return ").append(fieldName).append(".booleanValue();\n");
-            builder.append("    }\n\n");
-            builder.append("    public Boolean get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
-            builder.append("        return ").append(fieldName).append(";\n");
-            builder.append("    }\n\n");
+            fieldAccessor = new BooleanFieldAccessor(fieldName);
             break;
         case BYTES:
-            builder.append("    public byte[] get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-            // we need the cast to get around http://findbugs.sourceforge.net/bugDescriptions.html#EI_EXPOSE_REP
-            builder.append("        return (byte[]) ").append(fieldName).append(";\n");
-            builder.append("    }\n\n");
+            fieldAccessor = new BytesFieldAccessor(fieldName);
             break;
         case DOUBLE:
-            builder.append("    public double get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-            builder.append("        if(").append(fieldName).append(" == null)\n");
-            builder.append("            return Double.NaN;\n");
-            builder.append("        return ").append(fieldName).append(".doubleValue();\n");
-            builder.append("    }\n\n");
-            builder.append("    public Double get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
-            builder.append("        return ").append(fieldName).append(";\n");
-            builder.append("    }\n\n");
+            fieldAccessor = new DoubleFieldAccessor(fieldName);
             break;
         case FLOAT:
-            builder.append("    public float get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-            builder.append("        if(").append(fieldName).append(" == null)\n");
-            builder.append("            return Float.NaN;\n");
-            builder.append("        return ").append(fieldName).append(".floatValue();\n");
-            builder.append("    }\n\n");
-            builder.append("    public Float get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
-            builder.append("        return ").append(fieldName).append(";\n");
-            builder.append("    }\n\n");
+            fieldAccessor = new FloatFieldAccessor(fieldName);
             break;
         case INT:
-            builder.append("    public int get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-            builder.append("        if(").append(fieldName).append(" == null)\n");
-            builder.append("            return Integer.MIN_VALUE;\n");
-            builder.append("        return ").append(fieldName).append(".intValue();\n");
-            builder.append("    }\n\n");
-            builder.append("    public Integer get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
-            builder.append("        return ").append(fieldName).append(";\n");
-            builder.append("    }\n\n");
+            fieldAccessor = new IntFieldAccessor(fieldName);
             break;
         case LONG:
-            builder.append("    public long get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-            builder.append("        if(").append(fieldName).append(" == null)\n");
-            builder.append("            return Long.MIN_VALUE;\n");
-            builder.append("        return ").append(fieldName).append(".longValue();\n");
-            builder.append("    }\n\n");
-            builder.append("    public Long get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
-            builder.append("        return ").append(fieldName).append(";\n");
-            builder.append("    }\n\n");
+            fieldAccessor = new LongFieldAccessor(fieldName);
             break;
         case STRING:
-            builder.append("    public String get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-            builder.append("        return ").append(fieldName).append(";\n");
-            builder.append("    }\n\n");
-            builder.append("    public boolean is").append(uppercase(fieldName)).append("Equal(int ordinal, String testValue) {\n");
-            builder.append("        if(testValue == null)\n");
-            builder.append("            return ").append(fieldName).append(" == null;\n");
-            builder.append("        return testValue.equals(").append(fieldName).append(");\n");
-            builder.append("    }\n\n");
+            fieldAccessor = new StringFieldAccessor(fieldName);
             break;
         case REFERENCE:
             throw new IllegalArgumentException();
         }
+        builder.append(fieldAccessor.generateGetCode());
     }
 
 }
