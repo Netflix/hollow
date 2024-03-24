@@ -18,13 +18,10 @@ package com.netflix.hollow.api.codegen;
 
 import com.netflix.hollow.api.objects.delegate.HollowListCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowListDelegate;
-import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowMapCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowMapDelegate;
-import com.netflix.hollow.api.objects.delegate.HollowMapLookupDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
-import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
@@ -219,18 +216,6 @@ public class HollowCodeGenerationUtils {
 
     public static String delegateLookupImplName(String typeName) {
         return substituteInvalidChars(uppercase(typeName)) + "DelegateLookupImpl";
-    }
-
-    public static String delegateLookupClassname(HollowSchema schema) {
-        if(schema instanceof HollowObjectSchema)
-            return delegateLookupImplName(schema.getName());
-        if(schema instanceof HollowListSchema)
-            return HollowListLookupDelegate.class.getSimpleName();
-        if(schema instanceof HollowSetSchema)
-            return HollowSetLookupDelegate.class.getSimpleName();
-        if(schema instanceof HollowMapSchema)
-            return HollowMapLookupDelegate.class.getSimpleName();
-        throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getSimpleName() + "?");
     }
 
     public static String lowercase(String str) {

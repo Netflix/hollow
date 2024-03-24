@@ -19,13 +19,14 @@ package com.netflix.hollow.core.type;
 import com.netflix.hollow.api.custom.HollowTypeAPI;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.type.delegate.StringDelegate;
 import com.netflix.hollow.core.type.delegate.StringDelegateCachedImpl;
 
 public class StringHollowFactory extends HollowFactory<HString> {
 
     @Override
     public HString newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HString(((StringTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return new HString(((StringDelegate)typeAPI), ordinal);
     }
 
     @Override

@@ -19,17 +19,14 @@ package com.netflix.hollow.core.type;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.core.type.delegate.LongDelegateLookupImpl;
+import com.netflix.hollow.core.type.delegate.LongDelegate;
 
-public class LongTypeAPI extends HollowObjectTypeAPI {
-
-    private final LongDelegateLookupImpl delegateLookupImpl;
+public class LongTypeAPI extends HollowObjectTypeAPI implements LongDelegate {
 
     public LongTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });
-        this.delegateLookupImpl = new LongDelegateLookupImpl(this);
     }
 
     public long getValue(int ordinal) {
@@ -51,8 +48,9 @@ public class LongTypeAPI extends HollowObjectTypeAPI {
         return Long.valueOf(l);
     }
 
-    public LongDelegateLookupImpl getDelegateLookupImpl() {
-        return delegateLookupImpl;
+    @Override
+    public LongTypeAPI getTypeAPI() {
+        return this;
     }
 
 }

@@ -19,17 +19,14 @@ package com.netflix.hollow.core.type;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.core.type.delegate.StringDelegateLookupImpl;
+import com.netflix.hollow.core.type.delegate.StringDelegate;
 
-public class StringTypeAPI extends HollowObjectTypeAPI {
-
-    private final StringDelegateLookupImpl delegateLookupImpl;
+public class StringTypeAPI extends HollowObjectTypeAPI implements StringDelegate {
 
     public StringTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });
-        this.delegateLookupImpl = new StringDelegateLookupImpl(this);
     }
 
     public String getValue(int ordinal) {
@@ -45,8 +42,8 @@ public class StringTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().isStringFieldEqual(ordinal, fieldIndex[0], testValue);
     }
 
-    public StringDelegateLookupImpl getDelegateLookupImpl() {
-        return delegateLookupImpl;
+    @Override
+    public StringTypeAPI getTypeAPI() {
+        return this;
     }
-
 }

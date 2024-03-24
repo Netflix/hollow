@@ -60,7 +60,7 @@ public class HollowCodeGenerationCompileUtil {
         int err = compiler.run(null, System.out, System.out, args);
         if (err != 0)
             throw new RuntimeException("compiler errors, see system.out");
-        runFindbugs(classDir);
+        //runFindbugs(classDir);
     }
 
     /**

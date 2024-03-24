@@ -16,14 +16,14 @@
  */
 package com.netflix.hollow.api.codegen.api;
 
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateLookupClassname;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateInterfaceName;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowSetTypeAPI;
-import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowSetSchema;
@@ -52,16 +52,13 @@ public class TypeAPISetJavaGenerator extends HollowTypeAPIGenerator {
 
         builder.append("import " + HollowSetTypeAPI.class.getName() + ";\n\n");
         builder.append("import " + HollowSetTypeDataAccess.class.getName() + ";\n");
-        builder.append("import " + HollowSetLookupDelegate.class.getName() + ";\n");
+        builder.append("import " + HollowSetDelegate.class.getName() + ";\n");
 
         builder.append("\n@SuppressWarnings(\"all\")\n");
-        builder.append("public class ").append(className).append(" extends HollowSetTypeAPI {\n\n");
-
-        builder.append("    private final ").append(delegateLookupClassname(schema)).append(" delegateLookupImpl;\n\n");
+        builder.append("public class ").append(className).append(" extends HollowSetTypeAPI implements " + delegateInterfaceName(schema) + "{\n\n");
 
         builder.append("    public ").append(className).append("(").append(apiClassname).append(" api, HollowSetTypeDataAccess dataAccess) {\n");
         builder.append("        super(api, dataAccess);\n");
-        builder.append("        this.delegateLookupImpl = new ").append(delegateLookupClassname(schema)).append("(this);\n");
         builder.append("    }\n\n");
 
         builder.append("    public ").append(typeAPIClassname(schema.getElementType())).append(" getElementAPI() {\n");
@@ -72,8 +69,9 @@ public class TypeAPISetJavaGenerator extends HollowTypeAPIGenerator {
         builder.append("        return (").append(apiClassname).append(")api;\n");
         builder.append("    }\n\n");
 
-        builder.append("    public ").append(delegateLookupClassname(schema)).append(" getDelegateLookupImpl() {\n");
-        builder.append("        return delegateLookupImpl;\n");
+        builder.append("    @Override\n");
+        builder.append("    public ").append(className).append(" getTypeAPI() {\n");
+        builder.append("        return (").append(className).append(") this;\n");
         builder.append("    }\n\n");
 
         builder.append("}");

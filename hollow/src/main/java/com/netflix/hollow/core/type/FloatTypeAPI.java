@@ -19,17 +19,14 @@ package com.netflix.hollow.core.type;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.core.type.delegate.FloatDelegateLookupImpl;
+import com.netflix.hollow.core.type.delegate.FloatDelegate;
 
-public class FloatTypeAPI extends HollowObjectTypeAPI {
-
-    private final FloatDelegateLookupImpl delegateLookupImpl;
+public class FloatTypeAPI extends HollowObjectTypeAPI implements FloatDelegate {
 
     public FloatTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });
-        this.delegateLookupImpl = new FloatDelegateLookupImpl(this);
     }
 
     public float getValue(int ordinal) {
@@ -48,7 +45,8 @@ public class FloatTypeAPI extends HollowObjectTypeAPI {
         }        return Float.isNaN(f) ? null : Float.valueOf(f);
     }
 
-    public FloatDelegateLookupImpl getDelegateLookupImpl() {
-        return delegateLookupImpl;
+    @Override
+    public FloatTypeAPI getTypeAPI() {
+        return this;
     }
 }

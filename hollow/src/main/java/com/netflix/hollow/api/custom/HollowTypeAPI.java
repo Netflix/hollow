@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.api.custom;
 
+import com.netflix.hollow.api.objects.delegate.HollowRecordDelegate;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.api.sampling.SampleResult;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
@@ -29,7 +30,7 @@ import java.util.Collection;
  *  This can be useful in tight loops, where the excess object creation incurred by using a Generated or Generic
  *  Hollow Object API would be prohibitively expensive.
  */
-public abstract class HollowTypeAPI {
+public abstract class HollowTypeAPI implements HollowRecordDelegate {
 
     protected final HollowAPI api;
     protected final HollowTypeDataAccess typeDataAccess;

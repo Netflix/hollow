@@ -19,17 +19,14 @@ package com.netflix.hollow.core.type;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.core.type.delegate.BooleanDelegateLookupImpl;
+import com.netflix.hollow.core.type.delegate.BooleanDelegate;
 
-public class BooleanTypeAPI extends HollowObjectTypeAPI {
-
-    private final BooleanDelegateLookupImpl delegateLookupImpl;
+public class BooleanTypeAPI extends HollowObjectTypeAPI implements BooleanDelegate {
 
     public BooleanTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });
-        this.delegateLookupImpl = new BooleanDelegateLookupImpl(this);
     }
 
     public boolean getValue(int ordinal) {
@@ -44,7 +41,8 @@ public class BooleanTypeAPI extends HollowObjectTypeAPI {
         return getTypeDataAccess().readBoolean(ordinal, fieldIndex[0]);
     }
 
-    public BooleanDelegateLookupImpl getDelegateLookupImpl() {
-        return delegateLookupImpl;
+    @Override
+    public BooleanTypeAPI getTypeAPI() {
+        return this;
     }
 }
