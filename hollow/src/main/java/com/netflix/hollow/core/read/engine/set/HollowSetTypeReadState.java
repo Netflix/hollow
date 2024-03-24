@@ -22,6 +22,7 @@ import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowSetSampler;
+import com.netflix.hollow.core.index.FieldPaths.FieldPathException;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
@@ -310,8 +311,13 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 	}
 	
 	public void buildKeyDeriver() {
-	    if(getSchema().getHashKey() != null)
-	        this.keyDeriver = new HollowPrimaryKeyValueDeriver(getSchema().getHashKey(), getStateEngine());
+	    if(getSchema().getHashKey() != null) {
+	        try {
+	            this.keyDeriver = new HollowPrimaryKeyValueDeriver(getSchema().getHashKey(), getStateEngine());
+	        } catch(FieldPathException ex) {
+	            ex.printStackTrace();
+	        }
+	    }
 	    
 	    for(int i=0;i<shards.length;i++)
 	        shards[i].setKeyDeriver(keyDeriver);
