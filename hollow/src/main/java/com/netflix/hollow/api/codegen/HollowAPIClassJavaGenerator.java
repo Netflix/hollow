@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import static com.netflix.hollow.api.codegen.HollowAPIGenerator.SCHEMA_DOC_SUFFIX;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowFactoryClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowObjectProviderName;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.lowercase;
@@ -112,6 +113,10 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
             }
         }
         builder.append(" {\n\n");
+
+        if (config.isUseMetaInfo()) {
+            builder.append("    public static final String SCHEMA_DOC = \"" + packageName + "." + className + SCHEMA_DOC_SUFFIX + "\";\n\n");
+        }
 
         builder.append("    private final HollowObjectCreationSampler objectCreationSampler;\n\n");
 

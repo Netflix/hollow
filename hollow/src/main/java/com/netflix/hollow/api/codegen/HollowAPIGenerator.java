@@ -40,6 +40,7 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+import com.netflix.hollow.core.schema.HollowSchemaSorter;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -50,6 +51,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -117,6 +119,8 @@ public class HollowAPIGenerator {
     protected final HollowErgonomicAPIShortcuts ergonomicShortcuts;
 
     protected CodeGeneratorConfig config = new CodeGeneratorConfig("Hollow", "_"); // NOTE: to be backwards compatible
+
+    protected static final String SCHEMA_DOC_SUFFIX = ".schema";
 
     /**
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
@@ -434,6 +438,10 @@ public class HollowAPIGenerator {
         generateFile(directory, hashIndexGenerator);
 
         generateFilesForHollowSchemas(directory);
+
+        if (config.isUseMetaInfo()) {
+            generateMetaInfo(apiClassname);
+        }
     }
 
     /**
@@ -506,6 +514,30 @@ public class HollowAPIGenerator {
 
         FileWriter writer = new FileWriter(new File(directory, generator.getClassName() + ".java"));
         writer.write(generator.generate());
+        writer.close();
+    }
+
+    private void generateMetaInfo(String apiClassname) throws IOException {
+        if (config.getMetaInfoPath() == null)  {
+            throw new IllegalStateException("Meta info generation is enabled but path for generating meta info not set");
+        }
+
+        File metaInfoDir = config.getMetaInfoPath().toFile();
+        if (!metaInfoDir.exists()) metaInfoDir.mkdirs();
+
+        // top-level types first
+        List<HollowSchema> schemas = HollowSchemaSorter.dependencyOrderedSchemaList(dataset);
+        Collections.reverse(schemas);
+
+        // line-separated {@code HollowSchema}s for readability
+        StringBuilder builder = new StringBuilder();
+        for(HollowSchema schema : schemas) {
+            builder.append(schema.toString()).append("\n");
+        }
+        String schemaDoc = builder.toString();
+
+        FileWriter writer = new FileWriter(new File(metaInfoDir, packageName + "." + apiClassname + SCHEMA_DOC_SUFFIX));
+        writer.write(schemaDoc);
         writer.close();
     }
 
