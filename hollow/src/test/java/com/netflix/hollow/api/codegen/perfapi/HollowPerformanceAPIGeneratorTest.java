@@ -4,6 +4,7 @@ import com.netflix.hollow.api.codegen.AbstractHollowAPIGeneratorTest;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationCompileUtil;
 import com.netflix.hollow.core.schema.SimpleHollowDataset;
 import java.io.File;
+import java.nio.file.Paths;
 import org.junit.Test;
 
 public class HollowPerformanceAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
@@ -16,9 +17,9 @@ public class HollowPerformanceAPIGeneratorTest extends AbstractHollowAPIGenerato
   @Test
   public void testGeneratedFilesArePlacedInPackageDirectory() throws Exception {
     runGenerator("API", "codegen.api", MyClass.class);
-    assertNonEmptyFileExists("codegen/api/MyClassPerfAPI.java");
-    assertNonEmptyFileExists("codegen/api/StringPerfAPI.java");
-    assertNonEmptyFileExists("codegen/api/API.java");
+    assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/api/MyClassPerfAPI.java"));
+    assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/api/StringPerfAPI.java"));
+    assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/api/API.java"));
   }
 
   private void runGenerator(String apiClassName, String packageName, Class<?> clazz) throws Exception {

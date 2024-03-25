@@ -36,7 +36,6 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
     protected boolean parameterizeAllClassNames = false;
     protected boolean useErgonomicShortcuts = false;
     protected Path destinationPath;
-
     protected CodeGeneratorConfig config = new CodeGeneratorConfig();
 
     protected abstract G instantiateGenerator();
@@ -138,6 +137,20 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
 
     public B withDestination(Path destinationPath) {
         this.destinationPath = destinationPath;
+        return getBuilder();
+    }
+
+    /**
+     * Enable meta info (e.g. schema doc) and specify the path where it is to be generated.
+     * @param metaInfoPath location for meta info
+     * @return this builder
+     */
+    public B withMetaInfo(String metaInfoPath) {
+        return withMetaInfo(Paths.get(metaInfoPath));
+    }
+
+    public B withMetaInfo(Path metaInfoPath) {
+        config.setMetaInfoPath(metaInfoPath);
         return getBuilder();
     }
 

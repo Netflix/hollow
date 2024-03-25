@@ -26,13 +26,16 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.UnaryOperator;
 import org.junit.After;
 
 public class AbstractHollowAPIGeneratorTest {
-    private String tmpFolder = System.getProperty("java.io.tmpdir");
+    protected String tmpFolder = System.getProperty("java.io.tmpdir");
     protected String sourceFolder = String.format("%s/src", tmpFolder);
     protected String clazzFolder = String.format("%s/classes", tmpFolder);
+    private Path metaInfoPath = null;
 
     void runGenerator(String apiClassName, String packageName, Class<?> clazz,
             UnaryOperator<HollowAPIGenerator.Builder> generatorCustomizer) throws Exception {
@@ -49,16 +52,15 @@ public class AbstractHollowAPIGeneratorTest {
                 .withDestination(sourceFolder).build();
         generator.generateSourceFiles();
 
+        if(generator.config.isUseMetaInfo()) {
+            metaInfoPath = generator.config.getMetaInfoPath();
+        }
         // Compile to validate generated files
         HollowCodeGenerationCompileUtil.compileSrcFiles(sourceFolder, clazzFolder);
     }
 
-    protected void assertNonEmptyFileExists(String relativePath) throws IOException {
-        if (relativePath.startsWith("/")) {
-            throw new IllegalArgumentException("Relative paths should not start with /");
-        }
-        File f = new File(sourceFolder + "/" + relativePath);
-        assertTrue("File at " + relativePath + " should exist", f.exists() && f.length() > 0L);
+    protected void assertNonEmptyFileExists(Path absolutePath) {
+        assertTrue("File at " + absolutePath + " should exist", absolutePath.toFile().exists() && absolutePath.toFile().length() > 0L);
     }
 
     void assertClassHasHollowTypeName(String clazz, String typeName) throws IOException, ClassNotFoundException {
@@ -81,5 +83,8 @@ public class AbstractHollowAPIGeneratorTest {
     public void cleanup() {
         HollowCodeGenerationCompileUtil.cleanupFolder(new File(sourceFolder), null);
         HollowCodeGenerationCompileUtil.cleanupFolder(new File(clazzFolder), null);
+        if (metaInfoPath != null) {
+            HollowCodeGenerationCompileUtil.cleanupFolder(metaInfoPath.toFile(), null);
+        }
     }
 }

@@ -15,6 +15,8 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import java.nio.file.Path;
+
 public class CodeGeneratorConfig {
     private String classPostfix = "";
     private String getterPrefix = "";
@@ -27,6 +29,22 @@ public class CodeGeneratorConfig {
     private boolean useHollowPrimitiveTypes = false;
     private boolean restrictApiToFieldType = false;
     private boolean useVerboseToString = false;
+
+    private boolean useMetaInfo = false;
+    private Path metaInfoPath;
+
+    public void setMetaInfoPath(Path metaInfoPath) {
+        this.useMetaInfo = true;
+        this.metaInfoPath = metaInfoPath;
+    }
+
+    public boolean isUseMetaInfo() {
+        return useMetaInfo;
+    }
+
+    public Path getMetaInfoPath() {
+        return metaInfoPath;
+    }
 
     public CodeGeneratorConfig() {}
 
@@ -134,6 +152,8 @@ public class CodeGeneratorConfig {
         result = prime * result + (useHollowPrimitiveTypes ? 1231 : 1237);
         result = prime * result + (usePackageGrouping ? 1231 : 1237);
         result = prime * result + (useVerboseToString ? 1231 : 1237);
+        result = prime * result + (useMetaInfo ? 1231 : 1237);
+        result = prime * result + ((metaInfoPath == null) ? 0 : metaInfoPath.hashCode());
         return result;
     }
 
@@ -170,6 +190,13 @@ public class CodeGeneratorConfig {
             return false;
         if (useVerboseToString != other.useVerboseToString)
             return false;
+        if (useMetaInfo != other.useMetaInfo)
+            return false;
+        if (metaInfoPath == null) {
+            if (other.metaInfoPath != null)
+                return false;
+        } else if (!metaInfoPath.equals(other.metaInfoPath))
+            return false;
         return true;
     }
 
@@ -194,6 +221,10 @@ public class CodeGeneratorConfig {
         builder.append(restrictApiToFieldType);
         builder.append(", useVerboseToString=");
         builder.append(useVerboseToString);
+        builder.append(", useMetaInfo=");
+        builder.append(useMetaInfo);
+        builder.append(", metaInfoPath=");
+        builder.append(metaInfoPath);
         builder.append("]");
         return builder.toString();
     }
