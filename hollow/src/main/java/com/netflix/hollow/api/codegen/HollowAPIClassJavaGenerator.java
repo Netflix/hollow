@@ -113,6 +113,10 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
         }
         builder.append(" {\n\n");
 
+        if (config.isUseMetaInfo()) {
+            builder.append("    public static final String SCHEMA_DOC = \"" + packageName + "." + className + ".schema" + "\";\n\n");
+        }
+
         builder.append("    private final HollowObjectCreationSampler objectCreationSampler;\n\n");
 
         for (HollowSchema schema : schemaList) {

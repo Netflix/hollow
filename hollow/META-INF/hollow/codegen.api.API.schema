@@ -1,0 +1,7 @@
+String {
+	string value;
+}
+MyClass @PrimaryKey(id) {
+	int id;
+	String foo;
+}
