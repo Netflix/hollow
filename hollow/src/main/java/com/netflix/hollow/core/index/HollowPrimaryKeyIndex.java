@@ -100,7 +100,6 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
                 + "] failed because read state wasn't initialized");
 
         this.primaryKey = primaryKey;
-        this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
         this.fieldPathIndexes = new int[primaryKey.numFields()][];
         this.fieldTypes = new FieldType[primaryKey.numFields()];
 
@@ -111,8 +110,15 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
             fieldTypes[i] = primaryKey.getFieldType(stateEngine, i);
         }
 
-        this.keyDeriver = new HollowPrimaryKeyValueDeriver(typeState, fieldPathIndexes, fieldTypes);
         this.specificOrdinalsToIndex = specificOrdinalsToIndex;
+        this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
+        if (typeState == null) {
+            this.keyDeriver = null;
+            LOG.log(Level.WARNING, "Hollow Primary Key Index creation for type [" + primaryKey.getType()
+                    + "] failed because type state wasn't initialized");
+            return;
+        }
+        this.keyDeriver = new HollowPrimaryKeyValueDeriver(typeState, fieldPathIndexes, fieldTypes);
 
         reindex();
     }
@@ -123,9 +129,16 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * This method should be called <b>before</b> any subsequent deltas occur after the index is created.
      * <p>
      * In order to prevent memory leaks, if this method is called and the index is no longer needed, call detachFromDeltaUpdates() before
-     * discarding the index.
+     * discarding the index. Note that if the consumer is allowed to double snapshot then that will be one such case where caller
+     * should explicitly call detachFromDeltaUpdates() and initialize a new index on snapshot update.
      */
     public void listenForDeltaUpdates() {
+        if (typeState == null) {
+            LOG.log(Level.WARNING, "Hollow Primary Key Index for type [" + primaryKey.getType()
+                    + "] wasn't updated because type state wasn't found upon initialization");
+            return;
+        }
+
         if(specificOrdinalsToIndex != null)
             throw new IllegalStateException("Cannot listen for delta updates when indexing only specified ordinals!");
 
@@ -138,6 +151,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * Call this method before discarding indexes which are currently listening for delta updates.
      */
     public void detachFromDeltaUpdates() {
+        if (typeState == null) {
+            return;
+        }
+
         typeState.removeListener(this);
     }
 
@@ -378,6 +395,12 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
     @Override
     public synchronized void endUpdate() {
+        if (typeState == null) {
+            LOG.log(Level.WARNING, "Hollow Primary Key Index for type [" + primaryKey.getType()
+                    + "] wasn't updated because type state wasn't found upon initialization");
+            return;
+        }
+
         BitSet ordinals = typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
         int hashTableSize = HashCodes.hashTableSize(ordinals.cardinality());

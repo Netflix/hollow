@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.consumer.index;
 
 import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.fail;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.HollowObject;
@@ -457,11 +458,23 @@ public class UniqueKeyIndexTest {
             }
         }
 
-        @Test(expected = IllegalArgumentException.class)
-        public void testUnknownRootSelectType() {
+        @Test
+        public void testUnknownRootSelectTypeDoesNotThrow() {
             UniqueKeyIndex
                     .from(consumer, ErrorsTest.Unknown.class)
                     .usingPath("values", DataModel.Consumer.Values.class);
+        }
+
+        @Test
+        public void testUnknownRootSelectType() {
+            try {
+                UniqueKeyIndex index = UniqueKeyIndex
+                        .from(consumer, ErrorsTest.Unknown.class)
+                        .usingPath("values", DataModel.Consumer.Values.class);
+                HollowObject o = index.findMatch(new Object());
+            } catch (Exception e) {
+                fail("Exception not expected for unexpected type in key definition");
+            }
         }
 
         @Test(expected = IllegalArgumentException.class)

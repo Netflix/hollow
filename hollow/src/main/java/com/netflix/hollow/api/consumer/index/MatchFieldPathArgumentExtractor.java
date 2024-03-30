@@ -173,6 +173,9 @@ final class MatchFieldPathArgumentExtractor<Q> {
         String rootTypeName = HollowObjectTypeMapper.getDefaultTypeName(rootType);
         FieldPaths.FieldPath<? extends FieldPaths.FieldSegment> fp = fpResolver.resolve(dataset, rootTypeName,
                 fieldPath);
+        if (fp.getSegments().size() == 0) {
+            return new MatchFieldPathArgumentExtractor<>(FieldPaths.FieldPath.NOT_BOUND, q -> null);
+        }
 
         // @@@ Method on FieldPath
         FieldPaths.FieldSegment lastSegment = fp.getSegments().get(fp.getSegments().size() - 1);

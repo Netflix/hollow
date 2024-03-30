@@ -29,11 +29,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Functionality for processing field paths.
  */
 public final class FieldPaths {
+
+    private static final Logger LOG = Logger.getLogger(FieldPaths.class.getName());
 
     /**
      * Creates an object-based field path given a data set and the field path in symbolic form conforming to paths
@@ -55,8 +59,10 @@ public final class FieldPaths {
         // Erasure trick to avoid copying when it is known the list only contains
         // instances of ObjectFieldSegment
         assert fp.segments.stream().allMatch(o -> o instanceof ObjectFieldSegment);
+
         @SuppressWarnings( {"unchecked", "raw"})
         FieldPath<ObjectFieldSegment> result = (FieldPath<ObjectFieldSegment>) (FieldPath) fp;
+
         return result;
     }
 
@@ -106,7 +112,7 @@ public final class FieldPaths {
      * Ignored if {@code autoExpand} is {@code true}.
      * @param traverseSequences {@code true} if lists, sets and maps are traversed, otherwise an
      * {@code IllegalArgumentException} will be thrown
-     * @return the field path
+     * @return the field path, or {@code FieldPath.NOT_BOUND} if field path could not be bound
      * @throws IllegalArgumentException if the symbolic field path is ill-formed and cannot be bound
      */
     static FieldPath<FieldSegment> createFieldPath(
@@ -124,8 +130,12 @@ public final class FieldPaths {
             HollowSchema schema = dataset.getSchema(segmentType);
             // @@@ Can this only occur for anything other than the root `type`?
             if (schema == null) {
-                throw new FieldPathException(FieldPathException.ErrorKind.NOT_BINDABLE, dataset, type, segments,
-                        fieldSegments, null, i);
+                LOG.log(Level.WARNING, FieldPathException.message(FieldPathException.ErrorKind.NOT_BINDABLE, dataset,
+                        type, segments, fieldSegments, null, i));
+                // throw new FieldPathException(FieldPathException.ErrorKind.NOT_BINDABLE, dataset, type, segments,
+                //         fieldSegments, null, i);
+                return FieldPath.NOT_BOUND;
+                // return null;
             }
 
             String segment = segments[i];
@@ -359,6 +369,7 @@ public final class FieldPaths {
      * @param <T> the field segment type
      */
     public final static class FieldPath<T extends FieldSegment> {
+        public static final FieldPath NOT_BOUND = new FieldPath("", new ArrayList(), true);
         final String rootType;
         final List<T> segments;
         final boolean noAutoExpand;

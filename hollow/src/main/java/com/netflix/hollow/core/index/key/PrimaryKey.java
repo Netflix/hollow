@@ -125,6 +125,8 @@ public class PrimaryKey {
         int pathIndexes[] = getFieldPathIndex(dataAccess, type, fieldPath);
         for(int i=0;i<pathIndexes.length - 1;i++)
             schema = (HollowObjectSchema)dataAccess.getSchema(schema.getReferencedType(pathIndexes[i]));
+        if (pathIndexes.length == 0)
+            return null;
         return schema.getFieldType(pathIndexes[pathIndexes.length - 1]);
     }
 

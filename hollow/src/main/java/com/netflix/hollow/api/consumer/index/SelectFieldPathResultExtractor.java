@@ -131,10 +131,13 @@ final class SelectFieldPathResultExtractor<T> {
                         "get" + selectType.getSimpleName(),
                         MethodType.methodType(selectType, int.class));
             } catch (NoSuchMethodException | IllegalAccessException e) {
-                throw new IllegalArgumentException(
-                        String.format("Select type %s is not associated with API %s",
-                                selectType.getName(), apiType.getName()),
-                        e);
+                // SNAP: TODO: log warning
+
+                return new SelectFieldPathResultExtractor<>(FieldPaths.FieldPath.NOT_BOUND, (a, i) -> null);
+                // throw new IllegalArgumentException(
+                //         String.format("Select type %s is not associated with API %s",
+                //                 selectType.getName(), apiType.getName()),
+                //         e);
             }
 
             BiObjectIntFunction<HollowAPI, T> extractor = (a, i) -> {
