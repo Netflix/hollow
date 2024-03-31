@@ -112,7 +112,7 @@ public final class FieldPaths {
      * Ignored if {@code autoExpand} is {@code true}.
      * @param traverseSequences {@code true} if lists, sets and maps are traversed, otherwise an
      * {@code IllegalArgumentException} will be thrown
-     * @return the field path, or {@code FieldPath.NOT_BOUND} if field path could not be bound
+     * @return the field path, or {@code FieldPath.NOT_BOUND} if field path could not be bound  // SNAP: TODO: update
      * @throws IllegalArgumentException if the symbolic field path is ill-formed and cannot be bound
      */
     static FieldPath<FieldSegment> createFieldPath(

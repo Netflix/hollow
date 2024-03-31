@@ -1,6 +1,7 @@
 package com.netflix.hollow.api.consumer.index;
 
 import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.fail;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.HollowObject;
@@ -624,19 +625,27 @@ public class HashIndexTest {
             }
         }
 
-        @Test(expected = IllegalArgumentException.class)
+        @Test
         public void testUnknownRootSelectType() {
-            HashIndex
-                    .from(consumer, Unknown.class)
-                    .usingPath("values", DataModel.Consumer.Values.class);
+            try {
+                HashIndex
+                        .from(consumer, Unknown.class)
+                        .usingPath("values", DataModel.Consumer.Values.class);
+            } catch (Exception e) {
+                fail("Exception not expected for unexpected type in key definition");
+            }
         }
 
-        @Test(expected = IllegalArgumentException.class)
+        @Test
         public void testUnknownSelectType() {
-            HashIndex
-                    .from(consumer, DataModel.Consumer.References.class)
-                    .selectField("values", Unknown.class)
-                    .usingPath("values", DataModel.Consumer.Values.class);
+            try {
+                HashIndex
+                        .from(consumer, DataModel.Consumer.References.class)
+                        .selectField("values", Unknown.class)
+                        .usingPath("values", DataModel.Consumer.Values.class);
+            } catch (Exception e) {
+                fail("Exception not expected for unexpected field in key definition");
+            }
         }
 
         @Test(expected = IllegalArgumentException.class)

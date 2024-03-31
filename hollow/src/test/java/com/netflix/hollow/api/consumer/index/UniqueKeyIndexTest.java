@@ -25,6 +25,17 @@ import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.index.FieldPaths;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
+import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.test.consumer.TestBlobRetriever;
+import com.netflix.hollow.test.consumer.TestHollowConsumer;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -471,10 +482,61 @@ public class UniqueKeyIndexTest {
                 UniqueKeyIndex index = UniqueKeyIndex
                         .from(consumer, ErrorsTest.Unknown.class)
                         .usingPath("values", DataModel.Consumer.Values.class);
-                HollowObject o = index.findMatch(new Object());
+                HollowObject o = index.findMatch(1);
             } catch (Exception e) {
                 fail("Exception not expected for unexpected type in key definition");
             }
+        }
+
+        // @Test(expected = FieldPaths.FieldPathException.class)
+        // public void testNotBindableFieldPathType() {
+        //     UniqueKeyIndex index = UniqueKeyIndex
+        //             .from(consumer, DataModel.Consumer.TypeWithPrimaryKey.class)
+        //             .usingPath("invalidPath", DataModel.Consumer.Values.class);
+        // }
+
+        // SNAP: TODO: None of these tests exercise the NOT BOUND case, actually testUnknownRootSelectTypeDoesNotThrow does
+        //             for that, a field would have to exist in type A, but no type in dataset would have to exist
+
+        @Test
+        public void testFieldPathCanNotBeBound() throws IOException {
+            HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+            HollowObjectSchema movieSchema = new HollowObjectSchema("Movie", 3);
+            movieSchema.addField("id", HollowObjectSchema.FieldType.LONG);
+            movieSchema.addField("title", HollowObjectSchema.FieldType.REFERENCE, "String");
+            movieSchema.addField("releaseYear", HollowObjectSchema.FieldType.INT);
+            HollowObjectTypeWriteState movieState = new HollowObjectTypeWriteState(movieSchema);
+            writeEngine.addTypeState(movieState);
+
+            HollowObjectWriteRecord movieRec = new HollowObjectWriteRecord(movieSchema);
+            movieRec.setLong("id", 1);
+            movieRec.setReference("title", 0);  // NOTE that String type wasn't added
+            movieRec.setInt("releaseYear", 1999);
+            writeEngine.add("Movie", movieRec);
+
+            TestHollowConsumer consumer = new TestHollowConsumer.Builder()
+                    .withBlobRetriever(new TestBlobRetriever())
+                    .build();
+            consumer.addSnapshot(1L, writeEngine);
+            consumer.triggerRefreshTo(1L);
+
+            // valid
+            // HollowPrimaryKeyIndex validPki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "Movie", "id");
+            // validPki.getMatchingOrdinal(1L);
+
+            // invalid
+            HollowPrimaryKeyIndex invalidPki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "Movie", "title.value");
+            invalidPki.getMatchingOrdinal(1L);
+
+
+            // HollowReadStateEngine readEngine = new HollowReadStateEngine();
+            // StateEngineRoundTripper.roundTripSnapshot(writeEngine, readEngine);
+
+            // SNAP: TODO: complete this test
+            // UniqueKeyIndex
+            //         .from(consumer, DataModel.Consumer.References.class)
+            //         .usingPath("", DataModel.Consumer.References.class);
+
         }
 
         @Test(expected = IllegalArgumentException.class)

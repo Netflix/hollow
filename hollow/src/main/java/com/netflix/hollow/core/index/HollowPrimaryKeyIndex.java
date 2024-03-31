@@ -104,18 +104,24 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         this.fieldTypes = new FieldType[primaryKey.numFields()];
 
         this.memoryRecycler = memoryRecycler;
+        this.specificOrdinalsToIndex = specificOrdinalsToIndex;
+        this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
 
         for(int i=0;i<primaryKey.numFields();i++) {
             fieldPathIndexes[i] = primaryKey.getFieldPathIndex(stateEngine, i);
+            if (fieldPathIndexes[i].length == 0) {
+                LOG.log(Level.WARNING, "Hollow Primary Key Index creation for type [" + primaryKey.getType()
+                        + "] failed because type corresponding to " + primaryKey.getFieldPath(i) + "was not found in read state");
+                this.keyDeriver = null;
+                return;
+            }
             fieldTypes[i] = primaryKey.getFieldType(stateEngine, i);
         }
 
-        this.specificOrdinalsToIndex = specificOrdinalsToIndex;
-        this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
         if (typeState == null) {
             this.keyDeriver = null;
             LOG.log(Level.WARNING, "Hollow Primary Key Index creation for type [" + primaryKey.getType()
-                    + "] failed because type state wasn't initialized");
+                    + "] failed because type was not found in read state");
             return;
         }
         this.keyDeriver = new HollowPrimaryKeyValueDeriver(typeState, fieldPathIndexes, fieldTypes);
@@ -134,11 +140,8 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      */
     public void listenForDeltaUpdates() {
         if (typeState == null) {
-            LOG.log(Level.WARNING, "Hollow Primary Key Index for type [" + primaryKey.getType()
-                    + "] wasn't updated because type state wasn't found upon initialization");
             return;
         }
-
         if(specificOrdinalsToIndex != null)
             throw new IllegalStateException("Cannot listen for delta updates when indexing only specified ordinals!");
 
@@ -154,7 +157,6 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         if (typeState == null) {
             return;
         }
-
         typeState.removeListener(this);
     }
 
@@ -179,6 +181,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * @return the matching ordinal for the key, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object key) {
+        if (hashTableVolatile == null) {
+            throw new IllegalStateException("Index " + primaryKey.toString()  + " wasn't initialized");
+        }
+
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(fieldPathIndexes.length != 1 || hashTable.bitsPerElement == 0)
             return -1;
@@ -214,6 +220,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * @return the matching ordinal for the two keys, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object key1, Object key2) {
+        if (hashTableVolatile == null) {
+            throw new IllegalStateException("Index " + primaryKey.toString()  + " wasn't initialized");
+        }
+
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(fieldPathIndexes.length != 2 || hashTable.bitsPerElement == 0)
             return -1;
@@ -251,6 +261,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * @return the matching ordinal for the three keys, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object key1, Object key2, Object key3) {
+        if (hashTableVolatile == null) {
+            throw new IllegalStateException("Index " + primaryKey.toString()  + " wasn't initialized");
+        }
+
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(fieldPathIndexes.length != 3 || hashTable.bitsPerElement == 0)
             return -1;
@@ -287,6 +301,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * @return the matching ordinal for the keys, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object... keys) {
+        if (hashTableVolatile == null) {
+            throw new IllegalStateException("Index " + primaryKey.toString()  + " wasn't initialized");
+        }
+
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(fieldPathIndexes.length != keys.length || hashTable.bitsPerElement == 0)
             return -1;
@@ -395,9 +413,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
     @Override
     public synchronized void endUpdate() {
-        if (typeState == null) {
-            LOG.log(Level.WARNING, "Hollow Primary Key Index for type [" + primaryKey.getType()
-                    + "] wasn't updated because type state wasn't found upon initialization");
+        if (hashTableVolatile == null) {
             return;
         }
 

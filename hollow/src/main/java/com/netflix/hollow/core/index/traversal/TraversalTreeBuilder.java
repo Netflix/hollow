@@ -71,6 +71,9 @@ class TraversalTreeBuilder {
         HollowIndexerTraversalNode rootNode = createTypeNode(rootTypeDataAccess);
 
         List<HollowIndexerTraversalNode> allNodes = new ArrayList<HollowIndexerTraversalNode>();
+        // if (rootNode == null)
+        //     return rootNode;
+
         allNodes.add(rootNode);
 
         for(int i=0;i<fieldPaths.length;i++) {
@@ -185,6 +188,7 @@ class TraversalTreeBuilder {
         else if(typeDataAccess instanceof HollowMapTypeDataAccess)
             return new HollowIndexerMapTraversalNode(typeDataAccess, fieldMatchLists);
 
+        // return new HollowIndexerObjectTraversalNode(null, fieldMatchLists);    // SNAP: TODO: or some other sentinel?
         throw new IllegalArgumentException("I can't create a type node for a " + typeDataAccess.getClass());
     }
 

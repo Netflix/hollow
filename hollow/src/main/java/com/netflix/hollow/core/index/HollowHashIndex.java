@@ -28,6 +28,7 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import java.util.Arrays;
 
 /**
  * A HollowHashIndex is used for indexing non-primary-key data.  This type of index can map multiple keys to a single matching record, and/or
@@ -81,6 +82,10 @@ public class HollowHashIndex implements HollowTypeStateListener {
         this.selectField = selectField;
         this.matchFields = matchFields;
 
+        if (typeState == null) {
+            // SNAP: TODO: warn, that type didn't exist in read state
+            return;
+        }
         reindexHashIndex();
     }
 
@@ -104,8 +109,12 @@ public class HollowHashIndex implements HollowTypeStateListener {
      * found.
      */
     public HollowHashIndexResult findMatches(Object... query) {
+        if (hashStateVolatile == null) {
+            throw new IllegalStateException(this + " wasn't initialized");
+        }
         int hashCode = 0;
 
+        // SNAP: TODO: may have to assume a default type BYTES or something, to compute at a valid hash
         for(int i=0;i<query.length;i++) {
             if(query[i] == null)
                 throw new IllegalArgumentException("querying by null unsupported; i=" + i);
@@ -158,9 +167,13 @@ public class HollowHashIndex implements HollowTypeStateListener {
             return HashCodes.hashCode((byte[])key);
         case STRING:
             return HashCodes.hashCode((String)key);
+        // SNAP: TODO: temp, remove for performance reasons
+        default:
+            return HashCodes.hashCode((byte[])key);
         }
 
-        throw new IllegalArgumentException("I don't know how to hash a " + hashState.getMatchFields()[fieldIdx].getFieldType());
+        // SNAP: TODO: restore this
+        //  throw new IllegalArgumentException("I don't know how to hash a " + hashState.getMatchFields()[fieldIdx].getFieldType());
     }
 
     private boolean matchIsEqual(FixedLengthElementArray matchHashTable, long hashBucketBit, Object[] query) {
@@ -202,6 +215,10 @@ public class HollowHashIndex implements HollowTypeStateListener {
      * discarding the index.
      */
     public void listenForDeltaUpdates() {
+        if (typeState == null) {
+            // SNAP: TODO: warn
+            return;
+        }
         if (!(typeState instanceof HollowObjectTypeReadState))
             throw new IllegalStateException("Cannot listen for delta updates when objectTypeDataAccess is a " + typeState.getClass().getSimpleName() + ". Is this index participating in object longevity?");
 
@@ -214,6 +231,10 @@ public class HollowHashIndex implements HollowTypeStateListener {
      * Call this method before discarding indexes which are currently listening for delta updates.
      */
     public void detachFromDeltaUpdates() {
+        if (typeState == null) {
+            // SNAP: TODO: warn
+            return;
+        }
         if ((typeState instanceof HollowObjectTypeReadState))
             ((HollowObjectTypeReadState) typeState).removeListener(this);
     }
@@ -229,7 +250,11 @@ public class HollowHashIndex implements HollowTypeStateListener {
 
     @Override
     public void endUpdate() {
-       reindexHashIndex();
+        if (hashStateVolatile == null) {
+            // SNAP: TODO: warn
+            return;
+        }
+        reindexHashIndex();
     }
 
     /**
@@ -328,5 +353,10 @@ public class HollowHashIndex implements HollowTypeStateListener {
         public int getBitsPerSelectTablePointer() {
             return bitsPerSelectTablePointer;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "HollowHashIndex [type=" + type + ", selectField=" + selectField + ", matchFields=" + Arrays.toString(matchFields) + "]";
     }
 }

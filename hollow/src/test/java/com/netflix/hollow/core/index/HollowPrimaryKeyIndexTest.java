@@ -16,15 +16,20 @@
  */
 package com.netflix.hollow.core.index;
 
+import static org.junit.Assert.fail;
+
 import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
+import com.netflix.hollow.test.consumer.TestBlobRetriever;
+import com.netflix.hollow.test.consumer.TestHollowConsumer;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -290,6 +295,47 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
                 Assert.assertTrue(a2Val == a2dupValues);
             }
         }
+    }
+
+    @Test
+    public void testFieldPathCanNotBeBound() throws IOException {
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowObjectSchema movieSchema = new HollowObjectSchema("Movie", 3);
+        movieSchema.addField("id", HollowObjectSchema.FieldType.LONG);
+        movieSchema.addField("title", HollowObjectSchema.FieldType.REFERENCE, "String");
+        movieSchema.addField("releaseYear", HollowObjectSchema.FieldType.INT);
+        HollowObjectTypeWriteState movieState = new HollowObjectTypeWriteState(movieSchema);
+        writeEngine.addTypeState(movieState);
+
+        HollowObjectWriteRecord movieRec = new HollowObjectWriteRecord(movieSchema);
+        movieRec.setLong("id", 1);
+        movieRec.setReference("title", 0);  // NOTE that String type wasn't added
+        movieRec.setInt("releaseYear", 1999);
+        writeEngine.add("Movie", movieRec);
+
+        TestHollowConsumer consumer = new TestHollowConsumer.Builder()
+                .withBlobRetriever(new TestBlobRetriever())
+                .build();
+        consumer.addSnapshot(1L, writeEngine);
+        consumer.triggerRefreshTo(1L);
+
+        // invalid because root type doesn't exist
+        HollowPrimaryKeyIndex invalidPki1 = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "String", "value");
+        try {
+            invalidPki1.getMatchingOrdinal("test");
+            fail("Index on root type not bound is expected to fail hard at query time");
+        } catch (IllegalStateException e) {}
+
+        // invalid because a type in the field paths doesn't exist
+        HollowPrimaryKeyIndex invalidPki2 = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "Movie", "title.value");
+        try {
+            invalidPki2.getMatchingOrdinal(1L);
+            fail("Index on field path not bound is expected to fail hard at query time");
+        } catch (IllegalStateException e) {}
+
+        // valid index despite a non-indexed field (title) not bindable to a type (String)
+        HollowPrimaryKeyIndex validPki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "Movie", "id");
+        Assert.assertEquals(0, validPki.getMatchingOrdinal(1L));
     }
 
     private static void addDataForDupTesting(HollowWriteStateEngine writeStateEngine, int a1Start, double a2, int size) {

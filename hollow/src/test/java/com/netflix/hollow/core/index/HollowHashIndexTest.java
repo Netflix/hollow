@@ -19,6 +19,7 @@ package com.netflix.hollow.core.index;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.junit.Assert.fail;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
@@ -261,7 +262,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         roundTripSnapshot();
         HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeB", "", "b1.value");
         index.findMatches(new Object[]{null});
-        Assert.fail("exception expected");
+        fail("exception expected");
     }
 
     @Test
@@ -321,6 +322,38 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         Assert.assertEquals(index.getSelectField(), "");
     }
 
+    @Test
+    public void testUnknownTypeDoesNotThrow() throws Exception {
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        roundTripSnapshot();
+
+        try {
+            HollowHashIndex index = new HollowHashIndex(readStateEngine, "UnknownType", "unknownField", "a1");
+        } catch (Exception e) {
+            fail("Index init should not fail hard on unknown type");
+        }
+
+        // SNAP: TODO: throws exception, maybe ok Assert.assertNull("An entry that doesn't have any matches has a null iterator", index.findMatches(0, "notfound"));
+        // assertIteratorContainsAll(index.findMatches(1, "one").iterator(), 0);
+    }
+
+    @Test
+    public void testUnknownMatchFieldInKnownTypeDoesNotThrow() throws Exception {
+        mapper.add(new TypeA(1, 1.1d, null));
+        mapper.initializeTypeState(TypeB.class);
+        roundTripSnapshot();
+
+        // try {
+            HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeA", "a1", "ab.element.b1");
+        // } catch (Exception e) {
+        //     fail("Index init should not fail hard on unknown match field");
+        // }
+
+        index.findMatches(1);
+        // SNAP: TODO: throws exception, maybe ok Assert.assertNull("An entry that doesn't have any matches has a null iterator", index.findMatches(0, "notfound"));
+        // assertIteratorContainsAll(index.findMatches(1, "one").iterator(), 0);
+    }
+
     private void assertIteratorContainsAll(HollowOrdinalIterator iter, int... expectedOrdinals) {
         Set<Integer> ordinalSet = new HashSet<>();
         int ordinal = iter.next();
@@ -342,7 +375,11 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         public TypeA(int a1, double a2, TypeB... ab) {
             this.a1 = a1;
             this.a2 = a2;
-            this.ab = Arrays.asList(ab);
+            if (ab == null) {
+                this.ab = null;
+            } else {
+                this.ab = Arrays.asList(ab);
+            }
         }
     }
 
