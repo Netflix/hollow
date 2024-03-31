@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.index;
 
+import static com.netflix.hollow.core.index.FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE;
 import static java.util.Objects.requireNonNull;
 
 import com.netflix.hollow.core.HollowConstants;
@@ -29,6 +30,8 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A HollowHashIndex is used for indexing non-primary-key data.  This type of index can map multiple keys to a single matching record, and/or
@@ -39,6 +42,7 @@ import java.util.Arrays;
  * <i>actors</i>, each elements contained therein, and finally each actors <i>actorId</i> field.
  */
 public class HollowHashIndex implements HollowTypeStateListener {
+    private static final Logger LOG = Logger.getLogger(HollowHashIndex.class.getName());
 
     private volatile HollowHashIndexState hashStateVolatile;
 
@@ -83,7 +87,8 @@ public class HollowHashIndex implements HollowTypeStateListener {
         this.matchFields = matchFields;
 
         if (typeState == null) {
-            // SNAP: TODO: warn, that type didn't exist in read state
+            LOG.log(Level.WARNING, "Index initialization for " + this + " failed because type "
+                    + type + " was not found in read state");
             return;
         }
         reindexHashIndex();
@@ -93,10 +98,22 @@ public class HollowHashIndex implements HollowTypeStateListener {
      * Recreate the hash index entirely
      */
     private void reindexHashIndex() {
-        HollowHashIndexBuilder builder = new HollowHashIndexBuilder(hollowDataAccess, type, selectField, matchFields);
+        HollowHashIndexBuilder builder;
+        try {
+            builder = new HollowHashIndexBuilder(hollowDataAccess, type, selectField, matchFields);
+        } catch (FieldPaths.FieldPathException e) {
+            if (e.error == NOT_BINDABLE) {
+                LOG.log(Level.WARNING, "Index initialization for " + this
+                        + " failed because one of the match fields could not be bound to a type in"
+                        + " the read state");
+                this.hashStateVolatile = null;
+                return;
+            } else {
+                throw e;
+            }
+        }
 
         builder.buildIndex();
-
         this.hashStateVolatile = new HollowHashIndexState(builder);
     }
 
@@ -114,7 +131,6 @@ public class HollowHashIndex implements HollowTypeStateListener {
         }
         int hashCode = 0;
 
-        // SNAP: TODO: may have to assume a default type BYTES or something, to compute at a valid hash
         for(int i=0;i<query.length;i++) {
             if(query[i] == null)
                 throw new IllegalArgumentException("querying by null unsupported; i=" + i);
@@ -167,13 +183,9 @@ public class HollowHashIndex implements HollowTypeStateListener {
             return HashCodes.hashCode((byte[])key);
         case STRING:
             return HashCodes.hashCode((String)key);
-        // SNAP: TODO: temp, remove for performance reasons
-        default:
-            return HashCodes.hashCode((byte[])key);
         }
 
-        // SNAP: TODO: restore this
-        //  throw new IllegalArgumentException("I don't know how to hash a " + hashState.getMatchFields()[fieldIdx].getFieldType());
+        throw new IllegalArgumentException("I don't know how to hash a " + hashState.getMatchFields()[fieldIdx].getFieldType());
     }
 
     private boolean matchIsEqual(FixedLengthElementArray matchHashTable, long hashBucketBit, Object[] query) {
@@ -216,7 +228,6 @@ public class HollowHashIndex implements HollowTypeStateListener {
      */
     public void listenForDeltaUpdates() {
         if (typeState == null) {
-            // SNAP: TODO: warn
             return;
         }
         if (!(typeState instanceof HollowObjectTypeReadState))
@@ -232,7 +243,6 @@ public class HollowHashIndex implements HollowTypeStateListener {
      */
     public void detachFromDeltaUpdates() {
         if (typeState == null) {
-            // SNAP: TODO: warn
             return;
         }
         if ((typeState instanceof HollowObjectTypeReadState))
@@ -251,7 +261,6 @@ public class HollowHashIndex implements HollowTypeStateListener {
     @Override
     public void endUpdate() {
         if (hashStateVolatile == null) {
-            // SNAP: TODO: warn
             return;
         }
         reindexHashIndex();

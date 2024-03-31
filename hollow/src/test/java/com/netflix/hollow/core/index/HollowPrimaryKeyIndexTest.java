@@ -20,16 +20,16 @@ import static org.junit.Assert.fail;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-import com.netflix.hollow.test.consumer.TestBlobRetriever;
-import com.netflix.hollow.test.consumer.TestHollowConsumer;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -313,28 +313,25 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         movieRec.setInt("releaseYear", 1999);
         writeEngine.add("Movie", movieRec);
 
-        TestHollowConsumer consumer = new TestHollowConsumer.Builder()
-                .withBlobRetriever(new TestBlobRetriever())
-                .build();
-        consumer.addSnapshot(1L, writeEngine);
-        consumer.triggerRefreshTo(1L);
+        HollowReadStateEngine readEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeEngine, readEngine);
 
         // invalid because root type doesn't exist
-        HollowPrimaryKeyIndex invalidPki1 = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "String", "value");
+        HollowPrimaryKeyIndex invalidPki1 = new HollowPrimaryKeyIndex(readEngine, "String", "value");
         try {
             invalidPki1.getMatchingOrdinal("test");
             fail("Index on root type not bound is expected to fail hard at query time");
         } catch (IllegalStateException e) {}
 
         // invalid because a type in the field paths doesn't exist
-        HollowPrimaryKeyIndex invalidPki2 = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "Movie", "title.value");
+        HollowPrimaryKeyIndex invalidPki2 = new HollowPrimaryKeyIndex(readEngine, "Movie", "title.value");
         try {
             invalidPki2.getMatchingOrdinal(1L);
             fail("Index on field path not bound is expected to fail hard at query time");
         } catch (IllegalStateException e) {}
 
         // valid index despite a non-indexed field (title) not bindable to a type (String)
-        HollowPrimaryKeyIndex validPki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "Movie", "id");
+        HollowPrimaryKeyIndex validPki = new HollowPrimaryKeyIndex(readEngine, "Movie", "id");
         Assert.assertEquals(0, validPki.getMatchingOrdinal(1L));
     }
 

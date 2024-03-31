@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.index;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.core.index.FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE;
 import static java.util.Objects.requireNonNull;
 
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
@@ -107,22 +108,28 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         this.specificOrdinalsToIndex = specificOrdinalsToIndex;
         this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
 
-        for(int i=0;i<primaryKey.numFields();i++) {
-            fieldPathIndexes[i] = primaryKey.getFieldPathIndex(stateEngine, i);
-            if (fieldPathIndexes[i].length == 0) {
-                LOG.log(Level.WARNING, "Hollow Primary Key Index creation for type [" + primaryKey.getType()
-                        + "] failed because type corresponding to " + primaryKey.getFieldPath(i) + "was not found in read state");
-                this.keyDeriver = null;
-                return;
-            }
-            fieldTypes[i] = primaryKey.getFieldType(stateEngine, i);
-        }
-
         if (typeState == null) {
             this.keyDeriver = null;
             LOG.log(Level.WARNING, "Hollow Primary Key Index creation for type [" + primaryKey.getType()
                     + "] failed because type was not found in read state");
             return;
+        }
+
+        for(int i=0;i<primaryKey.numFields();i++) {
+            try {
+                fieldPathIndexes[i] = primaryKey.getFieldPathIndex(stateEngine, i);
+            } catch (FieldPaths.FieldPathException e) {
+                if (e.error == NOT_BINDABLE) {
+                    LOG.log(Level.WARNING, "Index initialization for " + primaryKey.toString()
+                            + " failed because field " + primaryKey.getFieldPath(i) + " could not be bound to a type in " +
+                            "the read state");
+                    this.keyDeriver = null;
+                    return;
+                } else {
+                    throw e;
+                }
+            }
+            fieldTypes[i] = primaryKey.getFieldType(stateEngine, i);
         }
         this.keyDeriver = new HollowPrimaryKeyValueDeriver(typeState, fieldPathIndexes, fieldTypes);
 

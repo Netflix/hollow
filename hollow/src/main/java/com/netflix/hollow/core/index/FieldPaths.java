@@ -132,9 +132,8 @@ public final class FieldPaths {
             if (schema == null) {
                 LOG.log(Level.WARNING, FieldPathException.message(FieldPathException.ErrorKind.NOT_BINDABLE, dataset,
                         type, segments, fieldSegments, null, i));
-                // throw new FieldPathException(FieldPathException.ErrorKind.NOT_BINDABLE, dataset, type, segments,
-                //         fieldSegments, null, i);
-                return FieldPath.NOT_BOUND;
+                throw new FieldPathException(FieldPathException.ErrorKind.NOT_BINDABLE, dataset, type, segments, fieldSegments, null, i);
+                // SNAP: TODO: lets try preserving the exception here first return FieldPath.NOT_BOUND;
                 // return null;
             }
 
