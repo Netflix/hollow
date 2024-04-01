@@ -28,6 +28,9 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectTypeMapper;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * An extractor that extracts a result value for an associated select field path transforming the value if
@@ -36,6 +39,10 @@ import java.lang.invoke.MethodType;
  * @param <T> the result type
  */
 final class SelectFieldPathResultExtractor<T> {
+    private static final Logger LOG = Logger.getLogger(SelectFieldPathResultExtractor.class.getName());
+    static final BiObjectIntFunction<?, ?> NOT_BINDABLE_EXTRACTOR = (a, o) -> {
+        throw new IllegalStateException("Extractor for " + a + " and " + o + " is not bindable.");
+    };
     final FieldPaths.FieldPath<FieldPaths.FieldSegment> fieldPath;
 
     final BiObjectIntFunction<HollowAPI, T> extractor;
@@ -131,13 +138,8 @@ final class SelectFieldPathResultExtractor<T> {
                         "get" + selectType.getSimpleName(),
                         MethodType.methodType(selectType, int.class));
             } catch (NoSuchMethodException | IllegalAccessException e) {
-                // SNAP: TODO: log warning
-
-                return new SelectFieldPathResultExtractor<>(FieldPaths.FieldPath.NOT_BOUND, (a, i) -> null);
-                // throw new IllegalArgumentException(
-                //         String.format("Select type %s is not associated with API %s",
-                //                 selectType.getName(), apiType.getName()),
-                //         e);
+                LOG.log(Level.WARNING, String.format("Select type %s is not associated with API %s", selectType.getName(), apiType.getName()), e);
+                return new SelectFieldPathResultExtractor(FieldPaths.FieldPath.NOT_BOUND, NOT_BINDABLE_EXTRACTOR);
             }
 
             BiObjectIntFunction<HollowAPI, T> extractor = (a, i) -> {

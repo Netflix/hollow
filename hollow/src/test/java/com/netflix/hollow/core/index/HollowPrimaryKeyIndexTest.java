@@ -298,7 +298,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void testFieldPathCanNotBeBound() throws IOException {
+    public void testNotBindable() throws IOException {
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectSchema movieSchema = new HollowObjectSchema("Movie", 3);
         movieSchema.addField("id", HollowObjectSchema.FieldType.LONG);

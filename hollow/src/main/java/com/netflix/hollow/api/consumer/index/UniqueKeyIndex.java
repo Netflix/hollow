@@ -30,6 +30,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectTypeMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -50,13 +51,14 @@ import java.util.stream.Stream;
  */
 public class UniqueKeyIndex<T extends HollowObject, Q>
         implements HollowConsumer.RefreshListener, HollowConsumer.RefreshRegistrationListener, Function<Q, T> {
+
     final HollowConsumer consumer;
     HollowAPI api;
     final SelectFieldPathResultExtractor<T> uniqueTypeExtractor;
     final List<MatchFieldPathArgumentExtractor<Q>> matchFields;
     final String uniqueSchemaName;
     final String[] matchFieldPaths;
-    HollowPrimaryKeyIndex hpki;
+    volatile HollowPrimaryKeyIndex hpki;
 
     UniqueKeyIndex(
             HollowConsumer consumer,
@@ -67,19 +69,31 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
         this.api = consumer.getAPI();
         this.uniqueSchemaName = HollowObjectTypeMapper.getDefaultTypeName(uniqueType);
 
-        this.uniqueTypeExtractor = SelectFieldPathResultExtractor
-                .from(consumer.getAPI().getClass(), consumer.getStateEngine(), uniqueType, "", uniqueType);
-
-        if (primaryTypeKey != null) {
-            matchFields = validatePrimaryKeyFieldPaths(consumer, uniqueSchemaName, primaryTypeKey, matchFields);
+        HollowPrimaryKeyIndex hpki = null;
+        String[] matchFieldPaths = null;
+        SelectFieldPathResultExtractor<T> uniqueTypeExtractor = null;
+        try {
+            if (primaryTypeKey != null) {
+                matchFields = validatePrimaryKeyFieldPaths(consumer, uniqueSchemaName, primaryTypeKey, matchFields);
+            }
+            uniqueTypeExtractor = SelectFieldPathResultExtractor
+                    .from(consumer.getAPI().getClass(), consumer.getStateEngine(), uniqueType, "", uniqueType);
+            matchFieldPaths = matchFields.stream()
+                    .map(mf -> mf.fieldPath.toString())
+                    .toArray(String[]::new);
+            hpki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), uniqueSchemaName, matchFieldPaths);
+        } catch (FieldPaths.FieldPathException e) {
+            if (e.error != FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE) {
+                throw e;
+            }
         }
-
         this.matchFields = matchFields;
-        this.matchFieldPaths = matchFields.stream()
-                .map(mf -> mf.fieldPath.toString())
-                .toArray(String[]::new);
-        
-        this.hpki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), uniqueSchemaName, matchFieldPaths);
+        this.matchFieldPaths = matchFieldPaths == null ? matchFields.stream()
+                    .map(mf -> mf.fieldPath.toString())
+                    .toArray(String[]::new)
+                : matchFieldPaths;
+        this.uniqueTypeExtractor = uniqueTypeExtractor;
+        this.hpki = hpki;
     }
 
     static <Q> List<MatchFieldPathArgumentExtractor<Q>> validatePrimaryKeyFieldPaths(
@@ -158,6 +172,10 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
      * @return the unique object
      */
     public T findMatch(Q key) {
+        if (hpki == null) {
+            throw new IllegalStateException("Unique key index for type " + uniqueSchemaName + " with match fields paths "
+                    + Arrays.asList(matchFieldPaths) + " wasn't initialized");
+        }
         Object[] keyArray = new Object[matchFields.size()];
         int keyArrayLogicalSize = 0;
         for (int i = 0; i < matchFields.size(); i++)
@@ -193,6 +211,9 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
 
     @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
         HollowPrimaryKeyIndex hpki = this.hpki;
+        if (hpki == null) {
+            return;
+        }
         hpki.detachFromDeltaUpdates();
         hpki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), hpki.getPrimaryKey());
         hpki.listenForDeltaUpdates();
@@ -220,10 +241,16 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
         if (c != consumer) {
             throw new IllegalStateException("The index's consumer and the listener's consumer are not the same");
         }
+        if (hpki == null)  {
+            return;
+        }
         hpki.listenForDeltaUpdates();
     }
 
     @Override public void onAfterRemoval(HollowConsumer c) {
+        if (hpki == null) {
+            return;
+        }
         hpki.detachFromDeltaUpdates();
     }
 
@@ -316,6 +343,7 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
             Objects.requireNonNull(keyFieldType);
             return new UniqueKeyIndex<>(consumer, uniqueType, primaryTypeKey,
                     keyFieldPath, keyFieldType);
+
         }
     }
 }

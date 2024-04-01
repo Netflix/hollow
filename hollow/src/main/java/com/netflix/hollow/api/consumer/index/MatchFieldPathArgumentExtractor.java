@@ -44,6 +44,9 @@ import java.util.stream.Stream;
  * @param <Q> query type
  */
 final class MatchFieldPathArgumentExtractor<Q> {
+    static final Function<?, ?> NOT_BINDABLE_EXTRACTOR = arg -> {
+        throw new IllegalStateException("Extractor for key " + arg + " is not bindable.");
+    };
 
     /**
      * A resolver of a field path.
@@ -171,10 +174,15 @@ final class MatchFieldPathArgumentExtractor<Q> {
             Class<T> extractorType, Function<Q, T> extractorFunction,
             FieldPathResolver fpResolver) {
         String rootTypeName = HollowObjectTypeMapper.getDefaultTypeName(rootType);
-        FieldPaths.FieldPath<? extends FieldPaths.FieldSegment> fp = fpResolver.resolve(dataset, rootTypeName,
-                fieldPath);
-        if (fp.getSegments().size() == 0) {
-            return new MatchFieldPathArgumentExtractor<>(FieldPaths.FieldPath.NOT_BOUND, q -> null);
+        FieldPaths.FieldPath<? extends FieldPaths.FieldSegment> fp;
+        try {
+            fp = fpResolver.resolve(dataset, rootTypeName, fieldPath);
+        } catch (FieldPaths.FieldPathException e) {
+            if (e.error == FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE) {
+                return new MatchFieldPathArgumentExtractor<>(FieldPaths.FieldPath.NOT_BOUND, NOT_BINDABLE_EXTRACTOR);
+            } else {
+                throw e;
+            }
         }
 
         // @@@ Method on FieldPath

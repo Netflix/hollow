@@ -129,6 +129,7 @@ public class DataModel {
             }
         }
 
+        @HollowPrimaryKey(fields = {"i", "s"})
         public static class TypeA {
             final int i;
             final String s;

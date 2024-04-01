@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.consumer.index;
 
 import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -26,13 +27,11 @@ import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.index.FieldPaths;
-import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.test.InMemoryBlobStore;
 import com.netflix.hollow.test.consumer.TestBlobRetriever;
 import com.netflix.hollow.test.consumer.TestHollowConsumer;
 import java.io.IOException;
@@ -43,8 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-
-import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -117,7 +114,7 @@ public class UniqueKeyIndexTest {
             T r = pki.findMatch(value);
 
             Assert.assertNotNull(r);
-            Assert.assertEquals(0, r.getOrdinal());
+            assertEquals(0, r.getOrdinal());
         }
     }
 
@@ -236,7 +233,7 @@ public class UniqueKeyIndexTest {
             DataModel.Consumer.Values r = hi.findMatch(MatchOnValuesBeanTest.ValueFieldsQuery.create());
 
             Assert.assertNotNull(r);
-            Assert.assertEquals(0, r.getOrdinal());
+            assertEquals(0, r.getOrdinal());
         }
 
         static class ValueMethodsQuery {
@@ -328,7 +325,7 @@ public class UniqueKeyIndexTest {
             DataModel.Consumer.Values r = hi.findMatch(MatchOnValuesBeanTest.ValueMethodsQuery.create());
 
             Assert.assertNotNull(r);
-            Assert.assertEquals(0, r.getOrdinal());
+            assertEquals(0, r.getOrdinal());
         }
     }
 
@@ -457,7 +454,7 @@ public class UniqueKeyIndexTest {
             DataModel.Consumer.References r = uki.findMatch(value);
 
             Assert.assertNotNull(r);
-            Assert.assertEquals(0, r.getOrdinal());
+            assertEquals(0, r.getOrdinal());
         }
     }
 
@@ -470,73 +467,103 @@ public class UniqueKeyIndexTest {
         }
 
         @Test
-        public void testUnknownRootSelectTypeDoesNotThrow() {
-            UniqueKeyIndex
+        public void testRootNotBindable() {
+            UniqueKeyIndex index = UniqueKeyIndex
                     .from(consumer, ErrorsTest.Unknown.class)
                     .usingPath("values", DataModel.Consumer.Values.class);
-        }
-
-        @Test
-        public void testUnknownRootSelectType() {
             try {
-                UniqueKeyIndex index = UniqueKeyIndex
-                        .from(consumer, ErrorsTest.Unknown.class)
-                        .usingPath("values", DataModel.Consumer.Values.class);
-                HollowObject o = index.findMatch(1);
-            } catch (Exception e) {
-                fail("Exception not expected for unexpected type in key definition");
-            }
+                index.findMatch(1);
+                fail("Index on root type not bound is expected to fail hard at query time");
+            } catch (IllegalStateException e) {}
         }
 
-        // @Test(expected = FieldPaths.FieldPathException.class)
-        // public void testNotBindableFieldPathType() {
-        //     UniqueKeyIndex index = UniqueKeyIndex
-        //             .from(consumer, DataModel.Consumer.TypeWithPrimaryKey.class)
-        //             .usingPath("invalidPath", DataModel.Consumer.Values.class);
-        // }
+        @Test
+        public void testKeyFieldNotBindable() throws IOException {
+            HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+            HollowObjectSchema typeASchema = new HollowObjectSchema("TypeA", 2, "i", "s");
+            typeASchema.addField("i", HollowObjectSchema.FieldType.INT);
+            typeASchema.addField("s", HollowObjectSchema.FieldType.REFERENCE, "String");
+            HollowObjectTypeWriteState typeAState = new HollowObjectTypeWriteState(typeASchema);
+            writeEngine.addTypeState(typeAState);
 
-        // SNAP: TODO: None of these tests exercise the NOT BOUND case, actually testUnknownRootSelectTypeDoesNotThrow does
-        //             for that, a field would have to exist in type A, but no type in dataset would have to exist
+            HollowObjectWriteRecord typeARec = new HollowObjectWriteRecord(typeASchema);
+            typeARec.setInt("i", 1);
+            typeARec.setReference("s", 0);  // NOTE that String type wasn't added
+            writeEngine.add("TypeA", typeARec);
+
+            TestHollowConsumer testConsumer = new TestHollowConsumer.Builder()
+                    .withBlobRetriever(new TestBlobRetriever())
+                    .withGeneratedAPIClass(DataModel.Consumer.Api.class)
+                    .build();
+            testConsumer.addSnapshot(1L, writeEngine);
+            testConsumer.triggerRefreshTo(1L);
+
+            UniqueKeyIndex<DataModel.Consumer.TypeA, TypeAKey> invalidIndex = UniqueKeyIndex
+                    .from(testConsumer, DataModel.Consumer.TypeA.class)
+                    .bindToPrimaryKey()
+                    .usingBean(TypeAKey.class); // indexes a value of String type but String type isn't bindable
+            try {
+                invalidIndex.findMatch(new TypeAKey(1, "TypeA1"));
+                fail("Index on field path not bound is expected to fail hard at query time");
+            } catch (IllegalStateException e) {}
+        }
 
         @Test
-        public void testFieldPathCanNotBeBound() throws IOException {
+        public void testIsBindable() {
+            UniqueKeyIndex<DataModel.Consumer.TypeA, Integer> index1 = UniqueKeyIndex
+                    .from(consumer, DataModel.Consumer.TypeA.class)
+                    .usingPath("i", Integer.class);
+            DataModel.Consumer.TypeA typeA = index1.findMatch(1);
+            assertEquals(0, typeA.getOrdinal());
+
+            UniqueKeyIndex<DataModel.Consumer.TypeA, TypeAKey> index2 = UniqueKeyIndex
+                    .from(consumer, DataModel.Consumer.TypeA.class)
+                    .bindToPrimaryKey()
+                    .usingBean(TypeAKey.class);
+            typeA = index2.findMatch(new TypeAKey(1, "TypeA1"));
+            assertEquals(1, typeA.getOrdinal());
+        }
+
+        @Test
+        public void testKeyFieldPathIsBindableWhenNonKeyedTypeIsExcluded() throws IOException {
             HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
-            HollowObjectSchema movieSchema = new HollowObjectSchema("Movie", 3);
-            movieSchema.addField("id", HollowObjectSchema.FieldType.LONG);
-            movieSchema.addField("title", HollowObjectSchema.FieldType.REFERENCE, "String");
-            movieSchema.addField("releaseYear", HollowObjectSchema.FieldType.INT);
-            HollowObjectTypeWriteState movieState = new HollowObjectTypeWriteState(movieSchema);
-            writeEngine.addTypeState(movieState);
 
-            HollowObjectWriteRecord movieRec = new HollowObjectWriteRecord(movieSchema);
-            movieRec.setLong("id", 1);
-            movieRec.setReference("title", 0);  // NOTE that String type wasn't added
-            movieRec.setInt("releaseYear", 1999);
-            writeEngine.add("Movie", movieRec);
+            HollowObjectSchema typeASchema = new HollowObjectSchema("TypeA", 2, "i", "s");
+            typeASchema.addField("i", HollowObjectSchema.FieldType.INT);
+            typeASchema.addField("s", HollowObjectSchema.FieldType.REFERENCE, "String");
+            HollowObjectTypeWriteState typeAState = new HollowObjectTypeWriteState(typeASchema);
+            writeEngine.addTypeState(typeAState);
 
-            TestHollowConsumer consumer = new TestHollowConsumer.Builder()
+            HollowObjectWriteRecord typeARec = new HollowObjectWriteRecord(typeASchema);
+            typeARec.setInt("i", 1);
+            typeARec.setReference("s", 0);
+            writeEngine.add("TypeA", typeARec);
+
+            TestHollowConsumer testConsumer = new TestHollowConsumer.Builder()
                     .withBlobRetriever(new TestBlobRetriever())
+                    .withGeneratedAPIClass(DataModel.Consumer.Api.class)
                     .build();
-            consumer.addSnapshot(1L, writeEngine);
-            consumer.triggerRefreshTo(1L);
+            testConsumer.addSnapshot(1L, writeEngine);
+            testConsumer.triggerRefreshTo(1L);
 
-            // valid
-            // HollowPrimaryKeyIndex validPki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "Movie", "id");
-            // validPki.getMatchingOrdinal(1L);
+            UniqueKeyIndex<DataModel.Consumer.TypeA, Integer> invalidIndex = UniqueKeyIndex
+                    .from(testConsumer, DataModel.Consumer.TypeA.class)
+                    .usingPath("i", Integer.class); // indexes a value of String type but String type isn't bindable
 
-            // invalid
-            HollowPrimaryKeyIndex invalidPki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "Movie", "title.value");
-            invalidPki.getMatchingOrdinal(1L);
+            assertEquals(0, invalidIndex.findMatch(1).getOrdinal());
+        }
 
-
-            // HollowReadStateEngine readEngine = new HollowReadStateEngine();
-            // StateEngineRoundTripper.roundTripSnapshot(writeEngine, readEngine);
-
-            // SNAP: TODO: complete this test
-            // UniqueKeyIndex
-            //         .from(consumer, DataModel.Consumer.References.class)
-            //         .usingPath("", DataModel.Consumer.References.class);
-
+        @Test
+        public void testFieldPathNotFound() {
+            try {
+                UniqueKeyIndex
+                        .from(consumer, DataModel.Consumer.TypeWithPrimaryKey.class)
+                        .usingPath("invalidPath", DataModel.Consumer.Values.class);
+            } catch (FieldPaths.FieldPathException e) {
+                if (e.error != FieldPaths.FieldPathException.ErrorKind.NOT_FOUND) {
+                    throw e;
+                }
+            }
         }
 
         @Test(expected = IllegalArgumentException.class)
@@ -552,6 +579,19 @@ public class UniqueKeyIndexTest {
                     .from(consumer, DataModel.Consumer.References.class)
                     .bindToPrimaryKey()
                     .usingPath("values._int", int.class);
+        }
+
+        class TypeAKey {
+            @FieldPath
+            int i;
+
+            @FieldPath("s")
+            String s;
+
+            TypeAKey(int i, String s) {
+                this.i = i;
+                this.s = s;
+            }
         }
     }
 
@@ -637,7 +677,7 @@ public class UniqueKeyIndexTest {
 
             DataModel.Consumer.TypeWithPrimaryKey match = pki.findMatch(key);
             Assert.assertNotNull(match);
-            Assert.assertEquals(0, match.getOrdinal());
+            assertEquals(0, match.getOrdinal());
         }
 
         @Test
@@ -654,7 +694,7 @@ public class UniqueKeyIndexTest {
 
             DataModel.Consumer.TypeWithPrimaryKeySuffixed match = pki.findMatch(1);
             Assert.assertNotNull(match);
-            Assert.assertEquals(0, match.getOrdinal());
+            assertEquals(0, match.getOrdinal());
 
             UniqueKeyIndex<DataModel.Consumer.TypeWithPrimaryKeySuffixed, KeyWithSinglePath> pki2 =
                     UniqueKeyIndex.from(consumer, DataModel.Consumer.TypeWithPrimaryKeySuffixed.class)
@@ -662,7 +702,7 @@ public class UniqueKeyIndexTest {
                             .usingBean(KeyWithSinglePath.class);
             match = pki2.findMatch(new KeyWithSinglePath(1));
             Assert.assertNotNull(match);
-            Assert.assertEquals(0, match.getOrdinal());
+            assertEquals(0, match.getOrdinal());
         }
 
         @Test

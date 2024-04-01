@@ -188,6 +188,11 @@ public final class FieldPaths {
         if (autoExpand) {
             while (segmentType != null) {
                 HollowSchema schema = dataset.getSchema(segmentType);
+                if (schema == null) {
+                    // SNAP: TODO: warn
+                    throw new FieldPathException(FieldPathException.ErrorKind.NOT_BINDABLE, dataset, type, segments,
+                            fieldSegments, schema);
+                }
 
                 if (schema.getSchemaType() == HollowSchema.SchemaType.OBJECT) {
                     HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
@@ -236,8 +241,8 @@ public final class FieldPaths {
     /**
      * An exception contain structured information when a field path cannot be bound.
      */
-    static final class FieldPathException extends IllegalArgumentException {
-        enum ErrorKind {
+    public static final class FieldPathException extends IllegalArgumentException {
+        public enum ErrorKind {
             NOT_BINDABLE,
             NOT_FOUND,
             NOT_FULL,
@@ -246,7 +251,7 @@ public final class FieldPaths {
             ;
         }
 
-        final ErrorKind error;
+        public final ErrorKind error;
         final String rootType;
         final String[] segments;
 

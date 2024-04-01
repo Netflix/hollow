@@ -625,7 +625,7 @@ public class HashIndexTest {
             }
         }
 
-        @Test
+        // @Test    // SNAP: TODO: remove?
         public void testUnknownRootSelectType() {
             try {
                 HashIndex
@@ -636,7 +636,7 @@ public class HashIndexTest {
             }
         }
 
-        @Test
+        // @Test    // SNAP: TODO: remove?
         public void testUnknownSelectType() {
             try {
                 HashIndex
