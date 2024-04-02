@@ -29,11 +29,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Functionality for processing field paths.
  */
 public final class FieldPaths {
+
+    private static final Logger LOG = Logger.getLogger(FieldPaths.class.getName());
 
     /**
      * Creates an object-based field path given a data set and the field path in symbolic form conforming to paths
@@ -124,8 +128,9 @@ public final class FieldPaths {
             HollowSchema schema = dataset.getSchema(segmentType);
             // @@@ Can this only occur for anything other than the root `type`?
             if (schema == null) {
-                throw new FieldPathException(FieldPathException.ErrorKind.NOT_BINDABLE, dataset, type, segments,
-                        fieldSegments, null, i);
+                LOG.log(Level.WARNING, FieldPathException.message(FieldPathException.ErrorKind.NOT_BINDABLE, dataset,
+                        type, segments, fieldSegments, null, i));
+                throw new FieldPathException(FieldPathException.ErrorKind.NOT_BINDABLE, dataset, type, segments, fieldSegments, null, i);
             }
 
             String segment = segments[i];
