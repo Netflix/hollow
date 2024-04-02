@@ -185,8 +185,7 @@ public final class FieldPaths {
             while (segmentType != null) {
                 HollowSchema schema = dataset.getSchema(segmentType);
                 if (schema == null) {
-                    LOG.log(Level.WARNING, FieldPathException.message(FieldPathException.ErrorKind.NOT_BINDABLE, dataset,
-                            type, segments, fieldSegments, null, i));
+                    // SNAP: TODO: warn
                     throw new FieldPathException(FieldPathException.ErrorKind.NOT_BINDABLE, dataset, type, segments,
                             fieldSegments, schema);
                 }

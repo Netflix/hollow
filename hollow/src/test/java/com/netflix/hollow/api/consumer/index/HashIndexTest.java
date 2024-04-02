@@ -689,7 +689,7 @@ public class HashIndexTest {
                     .usingPath("", DataModel.Consumer.References.class);
         }
 
-        HollowConsumer initConsumerWithMissingTypeState() throws IOException {
+        private HollowConsumer initConsumerWithMissingTypeState() throws IOException {
             HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
             HollowObjectSchema typeASchema = new HollowObjectSchema("TypeA", 2, "i", "s");
             typeASchema.addField("i", HollowObjectSchema.FieldType.INT);

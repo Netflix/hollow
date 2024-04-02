@@ -467,55 +467,34 @@ public class UniqueKeyIndexTest {
         }
 
         @Test
-        public void testRootNotBindable() {
-            UniqueKeyIndex index = UniqueKeyIndex
+        public void testNotBindable() throws IOException {
+            // root type does not exist in read state
+            UniqueKeyIndex invalidIndex1 = UniqueKeyIndex
                     .from(consumer, ErrorsTest.Unknown.class)
                     .usingPath("values", DataModel.Consumer.Values.class);
             try {
-                index.findMatch(1);
+                invalidIndex1.findMatch(1);
                 fail("Index on root type not bound is expected to fail hard at query time");
             } catch (IllegalStateException e) {}
-        }
 
-        @Test
-        public void testIsBindable() {
-            UniqueKeyIndex<DataModel.Consumer.TypeA, Integer> index1 = UniqueKeyIndex
-                    .from(consumer, DataModel.Consumer.TypeA.class)
-                    .usingPath("i", Integer.class);
-            DataModel.Consumer.TypeA typeA = index1.findMatch(1);
-            assertEquals(0, typeA.getOrdinal());
-
-            UniqueKeyIndex<DataModel.Consumer.TypeA, TypeAKey> index2 = UniqueKeyIndex
-                    .from(consumer, DataModel.Consumer.TypeA.class)
-                    .bindToPrimaryKey()
-                    .usingBean(TypeAKey.class);
-            typeA = index2.findMatch(new TypeAKey(1, "TypeA1"));
-            assertEquals(1, typeA.getOrdinal());
-        }
-
-        @Test
-        public void testKeyFieldNotBindable() throws IOException {
+            // key contains a type (string) that doesn't exist in read state
             HollowConsumer testConsumer = initConsumerWithMissingTypeState();
-
-            UniqueKeyIndex<DataModel.Consumer.TypeA, TypeAKey> invalidIndex = UniqueKeyIndex
+            UniqueKeyIndex<DataModel.Consumer.TypeA, TypeAKey> invalidIndex2 = UniqueKeyIndex
                     .from(testConsumer, DataModel.Consumer.TypeA.class)
                     .bindToPrimaryKey()
                     .usingBean(TypeAKey.class); // indexes a value of String type but String type isn't bindable
             try {
-                invalidIndex.findMatch(new TypeAKey(1, "TypeA1"));
+                invalidIndex2.findMatch(new TypeAKey(1, "TypeA1"));
                 fail("Index on field path not bound is expected to fail hard at query time");
             } catch (IllegalStateException e) {}
-        }
 
-        @Test
-        public void testKeyFieldPathIsBindableWhenNonKeyedTypeIsExcluded() throws IOException {
-            HollowConsumer testConsumer = initConsumerWithMissingTypeState();
 
-            UniqueKeyIndex<DataModel.Consumer.TypeA, Integer> invalidIndex = UniqueKeyIndex
+            // index is valid despit non-keyed fields not bindable
+            UniqueKeyIndex<DataModel.Consumer.TypeA, Integer> validIndex = UniqueKeyIndex
                     .from(testConsumer, DataModel.Consumer.TypeA.class)
                     .usingPath("i", Integer.class); // indexes a value of String type but String type isn't bindable
 
-            assertEquals(0, invalidIndex.findMatch(1).getOrdinal());
+            assertEquals(0, validIndex.findMatch(1).getOrdinal());
         }
 
         @Test
@@ -546,7 +525,7 @@ public class UniqueKeyIndexTest {
                     .usingPath("values._int", int.class);
         }
 
-        HollowConsumer initConsumerWithMissingTypeState() throws IOException {
+        private HollowConsumer initConsumerWithMissingTypeState() throws IOException {
             HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
             HollowObjectSchema typeASchema = new HollowObjectSchema("TypeA", 2, "i", "s");
             typeASchema.addField("i", HollowObjectSchema.FieldType.INT);
