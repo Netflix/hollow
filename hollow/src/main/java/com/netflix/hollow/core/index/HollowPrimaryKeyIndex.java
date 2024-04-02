@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.index;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.core.index.FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE;
 import static java.util.Objects.requireNonNull;
 
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
@@ -100,20 +101,37 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
                 + "] failed because read state wasn't initialized");
 
         this.primaryKey = primaryKey;
-        this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
         this.fieldPathIndexes = new int[primaryKey.numFields()][];
         this.fieldTypes = new FieldType[primaryKey.numFields()];
 
         this.memoryRecycler = memoryRecycler;
+        this.specificOrdinalsToIndex = specificOrdinalsToIndex;
+        this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
 
-        for(int i=0;i<primaryKey.numFields();i++) {
-            fieldPathIndexes[i] = primaryKey.getFieldPathIndex(stateEngine, i);
-            fieldTypes[i] = primaryKey.getFieldType(stateEngine, i);
+        if (typeState == null) {
+            LOG.log(Level.WARNING, "Hollow Primary Key Index creation for type [" + primaryKey.getType()
+                    + "] failed because type was not found in read state");
+            this.keyDeriver = null;
+            return;
         }
 
+        int i=0;
+        try {
+            for(i=0;i<primaryKey.numFields();i++) {
+                fieldPathIndexes[i] = primaryKey.getFieldPathIndex(stateEngine, i);
+                fieldTypes[i] = primaryKey.getFieldType(stateEngine, i);
+            }
+        } catch (FieldPaths.FieldPathException e) {
+            if (e.error == NOT_BINDABLE) {
+                LOG.log(Level.WARNING, "Index initialization for " + primaryKey + " failed because field " +
+                        primaryKey.getFieldPath(i) + " could not be bound to a type in the read state");
+                this.keyDeriver = null;
+                return;
+            } else {
+                throw e;
+            }
+        }
         this.keyDeriver = new HollowPrimaryKeyValueDeriver(typeState, fieldPathIndexes, fieldTypes);
-        this.specificOrdinalsToIndex = specificOrdinalsToIndex;
-
         reindex();
     }
 
@@ -124,8 +142,15 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * <p>
      * In order to prevent memory leaks, if this method is called and the index is no longer needed, call detachFromDeltaUpdates() before
      * discarding the index.
+     * <p>
+     * Note that this index does not listen on snapshot update. If a snapshot update occurs this index will
+     * NOT return the latest data in the consumer. Callers must detach this index instance and initialize a new
+     * one on snapshot update, or disable double snapshot update for the consumer altogether.
      */
     public void listenForDeltaUpdates() {
+        if (typeState == null) {
+            return;
+        }
         if(specificOrdinalsToIndex != null)
             throw new IllegalStateException("Cannot listen for delta updates when indexing only specified ordinals!");
 
@@ -138,6 +163,9 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * Call this method before discarding indexes which are currently listening for delta updates.
      */
     public void detachFromDeltaUpdates() {
+        if (typeState == null) {
+            return;
+        }
         typeState.removeListener(this);
     }
 
@@ -162,6 +190,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * @return the matching ordinal for the key, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object key) {
+        if (hashTableVolatile == null) {
+            throw new IllegalStateException("Index " + primaryKey.toString()  + " wasn't initialized");
+        }
+
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(fieldPathIndexes.length != 1 || hashTable.bitsPerElement == 0)
             return -1;
@@ -197,6 +229,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * @return the matching ordinal for the two keys, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object key1, Object key2) {
+        if (hashTableVolatile == null) {
+            throw new IllegalStateException("Index " + primaryKey.toString()  + " wasn't initialized");
+        }
+
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(fieldPathIndexes.length != 2 || hashTable.bitsPerElement == 0)
             return -1;
@@ -234,6 +270,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * @return the matching ordinal for the three keys, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object key1, Object key2, Object key3) {
+        if (hashTableVolatile == null) {
+            throw new IllegalStateException("Index " + primaryKey.toString()  + " wasn't initialized");
+        }
+
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(fieldPathIndexes.length != 3 || hashTable.bitsPerElement == 0)
             return -1;
@@ -270,6 +310,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * @return the matching ordinal for the keys, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object... keys) {
+        if (hashTableVolatile == null) {
+            throw new IllegalStateException("Index " + primaryKey.toString()  + " wasn't initialized");
+        }
+
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(fieldPathIndexes.length != keys.length || hashTable.bitsPerElement == 0)
             return -1;
@@ -378,6 +422,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
     @Override
     public synchronized void endUpdate() {
+        if (hashTableVolatile == null) {
+            return;
+        }
+
         BitSet ordinals = typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
         int hashTableSize = HashCodes.hashTableSize(ordinals.cardinality());

@@ -19,11 +19,19 @@ package com.netflix.hollow.core.index;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.junit.Assert.fail;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
+import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -261,7 +269,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         roundTripSnapshot();
         HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeB", "", "b1.value");
         index.findMatches(new Object[]{null});
-        Assert.fail("exception expected");
+        fail("exception expected");
     }
 
     @Test
@@ -319,6 +327,44 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         Assert.assertEquals(index.getMatchFields()[0], "data");
         Assert.assertEquals(index.getType(), "TypeInlinedString");
         Assert.assertEquals(index.getSelectField(), "");
+    }
+
+    @Test
+    public void testNotBindable() throws IOException {
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowObjectSchema movieSchema = new HollowObjectSchema("Movie", 3);
+        movieSchema.addField("id", HollowObjectSchema.FieldType.LONG);
+        movieSchema.addField("title", HollowObjectSchema.FieldType.REFERENCE, "String");
+        movieSchema.addField("releaseYear", HollowObjectSchema.FieldType.INT);
+        HollowObjectTypeWriteState movieState = new HollowObjectTypeWriteState(movieSchema);
+        writeEngine.addTypeState(movieState);
+
+        HollowObjectWriteRecord movieRec = new HollowObjectWriteRecord(movieSchema);
+        movieRec.setLong("id", 1);
+        movieRec.setReference("title", 0);  // NOTE that String type wasn't added
+        movieRec.setInt("releaseYear", 1999);
+        writeEngine.add("Movie", movieRec);
+
+        HollowReadStateEngine readEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeEngine, readEngine);
+
+        // invalid because root type doesn't exist
+        HollowHashIndex invalidHashIndex1 = new HollowHashIndex(readEngine, "String", "value", "value");
+        try {
+            invalidHashIndex1.findMatches("test");
+            fail("Index on root type not bound is expected to fail hard at query time");
+        } catch (IllegalStateException e) {}
+
+        // invalid because a type in the field paths doesn't exist
+        HollowHashIndex invalidHashIndex2 = new HollowHashIndex(readEngine, "Movie", "id", "title.value");
+        try {
+            invalidHashIndex2.findMatches("test");
+            fail("Index on field path not bound is expected to fail hard at query time");
+        } catch (IllegalStateException e) {}
+
+        // valid index despite a non-indexed field (title) not bindable to a type (String)
+        HollowPrimaryKeyIndex validPki = new HollowPrimaryKeyIndex(readEngine, "Movie", "id");
+        Assert.assertEquals(0, validPki.getMatchingOrdinal(1L));
     }
 
     private void assertIteratorContainsAll(HollowOrdinalIterator iter, int... expectedOrdinals) {
