@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.api.consumer.index;
 
+import static com.netflix.hollow.api.consumer.index.SelectFieldPathResultExtractor.NOT_BINDABLE_EXTRACTOR;
+import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.joining;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -26,10 +28,12 @@ import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectTypeMapper;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 /**
@@ -50,6 +54,7 @@ import java.util.stream.Stream;
  */
 public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
         implements HollowConsumer.RefreshListener, HollowConsumer.RefreshRegistrationListener, Function<Q, Stream<S>> {
+    private static final Logger LOG = Logger.getLogger(HashIndexSelect.class.getName());
     final HollowConsumer consumer;
     HollowAPI api;
     final SelectFieldPathResultExtractor<S> selectField;
@@ -57,7 +62,7 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
     final String rootTypeName;
     final String selectFieldPath;
     final String[] matchFieldPaths;
-    HollowHashIndex hhi;
+    volatile HollowHashIndex hhi;
 
     HashIndexSelect(
             HollowConsumer consumer,
@@ -69,11 +74,6 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
         this.selectField = selectField;
         this.matchFields = matchFields;
 
-        // Validate select field path
-        // @@@ Add method to FieldPath
-        this.selectFieldPath = selectField.fieldPath.getSegments().stream().map(FieldPaths.FieldSegment::getName)
-                .collect(joining("."));
-
         // Validate match field paths
         this.matchFieldPaths = matchFields.stream()
                 // @@@ Add method to FieldPath
@@ -82,7 +82,21 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
                 .toArray(String[]::new);
         this.rootTypeName = HollowObjectTypeMapper.getDefaultTypeName(rootType);
 
-        this.hhi = new HollowHashIndex(consumer.getStateEngine(), rootTypeName, selectFieldPath, matchFieldPaths);
+        // Validate select field path
+        // @@@ Add method to FieldPath
+        String selectFieldPath = "";
+        HollowHashIndex hhi = null;
+        if (!selectField.extractor.equals(NOT_BINDABLE_EXTRACTOR)) {
+            try {
+                selectFieldPath = selectField.fieldPath.getSegments().stream().map(FieldPaths.FieldSegment::getName)
+                    .collect(joining("."));
+                hhi = new HollowHashIndex(consumer.getStateEngine(), rootTypeName, selectFieldPath, matchFieldPaths);
+            } catch (IllegalArgumentException e) {
+                LOG.log(WARNING, "Hash Index Select init failed to bind select field path", e);
+            }
+        }
+        this.selectFieldPath = selectFieldPath;
+        this.hhi = hhi;
     }
 
     HashIndexSelect(
@@ -134,6 +148,10 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
      * @return a stream of matching records (may be empty if there are no matches)
      */
     public Stream<S> findMatches(Q query) {
+        if (hhi == null) {
+            throw new IllegalStateException("Hash Index Select was not initialized for root type " + rootTypeName + ", " +
+                    "select type " + selectFieldPath + ", and match types " + Arrays.asList(matchFieldPaths));
+        }
         Object[] queryArray = matchFields.stream().map(mf -> mf.extract(query)).toArray();
 
         HollowHashIndexResult matches = hhi.findMatches(queryArray);
@@ -151,6 +169,8 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
 
     @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
         HollowHashIndex hhi = this.hhi;
+        if (hhi == null)
+            return;
         hhi.detachFromDeltaUpdates();
         hhi = new HollowHashIndex(consumer.getStateEngine(), rootTypeName, selectFieldPath, matchFieldPaths);
         hhi.listenForDeltaUpdates();
@@ -178,10 +198,16 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
         if (c != consumer) {
             throw new IllegalStateException("The index's consumer and the listener's consumer are not the same");
         }
+        if (hhi == null) {
+            return;
+        }
         hhi.listenForDeltaUpdates();
     }
 
     @Override public void onAfterRemoval(HollowConsumer c) {
+        if (hhi == null) {
+            return;
+        }
         hhi.detachFromDeltaUpdates();
     }
 

@@ -59,10 +59,8 @@ public final class FieldPaths {
         // Erasure trick to avoid copying when it is known the list only contains
         // instances of ObjectFieldSegment
         assert fp.segments.stream().allMatch(o -> o instanceof ObjectFieldSegment);
-
         @SuppressWarnings( {"unchecked", "raw"})
         FieldPath<ObjectFieldSegment> result = (FieldPath<ObjectFieldSegment>) (FieldPath) fp;
-
         return result;
     }
 
@@ -112,7 +110,7 @@ public final class FieldPaths {
      * Ignored if {@code autoExpand} is {@code true}.
      * @param traverseSequences {@code true} if lists, sets and maps are traversed, otherwise an
      * {@code IllegalArgumentException} will be thrown
-     * @return the field path, or {@code FieldPath.NOT_BOUND} if field path could not be bound  // SNAP: TODO: update
+     * @return the field path
      * @throws IllegalArgumentException if the symbolic field path is ill-formed and cannot be bound
      */
     static FieldPath<FieldSegment> createFieldPath(
@@ -133,8 +131,6 @@ public final class FieldPaths {
                 LOG.log(Level.WARNING, FieldPathException.message(FieldPathException.ErrorKind.NOT_BINDABLE, dataset,
                         type, segments, fieldSegments, null, i));
                 throw new FieldPathException(FieldPathException.ErrorKind.NOT_BINDABLE, dataset, type, segments, fieldSegments, null, i);
-                // SNAP: TODO: lets try preserving the exception here first return FieldPath.NOT_BOUND;
-                // return null;
             }
 
             String segment = segments[i];
@@ -189,7 +185,8 @@ public final class FieldPaths {
             while (segmentType != null) {
                 HollowSchema schema = dataset.getSchema(segmentType);
                 if (schema == null) {
-                    // SNAP: TODO: warn
+                    LOG.log(Level.WARNING, FieldPathException.message(FieldPathException.ErrorKind.NOT_BINDABLE, dataset,
+                            type, segments, fieldSegments, null, i));
                     throw new FieldPathException(FieldPathException.ErrorKind.NOT_BINDABLE, dataset, type, segments,
                             fieldSegments, schema);
                 }

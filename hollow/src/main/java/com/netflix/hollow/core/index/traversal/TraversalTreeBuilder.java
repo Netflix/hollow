@@ -68,12 +68,9 @@ class TraversalTreeBuilder {
 
     public HollowIndexerTraversalNode buildTree() {
         HollowTypeDataAccess rootTypeDataAccess = dataAccess.getTypeDataAccess(type);
-        HollowIndexerTraversalNode rootNode = createTypeNode(rootTypeDataAccess);
+        HollowIndexerTraversalNode rootNode = createTypeNode(type, rootTypeDataAccess);
 
         List<HollowIndexerTraversalNode> allNodes = new ArrayList<HollowIndexerTraversalNode>();
-        // if (rootNode == null)
-        //     return rootNode;
-
         allNodes.add(rootNode);
 
         for(int i=0;i<fieldPaths.length;i++) {
@@ -142,19 +139,19 @@ class TraversalTreeBuilder {
             if(schema.getFieldType(fieldIdx) == FieldType.REFERENCE) {
                 String childType = schema.getReferencedType(fieldIdx);
                 HollowTypeDataAccess childTypeAccess = dataAccess.getTypeDataAccess(childType);
-                return createTypeNode(childTypeAccess);
+                return createTypeNode(childType, childTypeAccess);
             } else {
                 return new HollowIndexerObjectFieldTraversalNode(objectAccess, fieldMatchLists);
             }
         } else if(typeDataAccess instanceof HollowCollectionTypeDataAccess) {
             HollowCollectionSchema schema = (HollowCollectionSchema) typeDataAccess.getSchema();
             HollowTypeDataAccess childTypeAccess = dataAccess.getTypeDataAccess(schema.getElementType());
-            return createTypeNode(childTypeAccess);
+            return createTypeNode(schema.getElementType(), childTypeAccess);
         } else if(typeDataAccess instanceof HollowMapTypeDataAccess) {
             HollowMapSchema schema = (HollowMapSchema) typeDataAccess.getSchema();
             String childType = "key".equals(childName) ? schema.getKeyType() : schema.getValueType();
             HollowTypeDataAccess childTypeAccess = dataAccess.getTypeDataAccess(childType);
-            return createTypeNode(childTypeAccess);
+            return createTypeNode(childType, childTypeAccess);
         }
 
         throw new IllegalArgumentException("I can't create a child node for a " + typeDataAccess.getClass());
@@ -178,7 +175,7 @@ class TraversalTreeBuilder {
         throw new IllegalArgumentException("I can't create a child node for a " + typeDataAccess.getClass());
     }
 
-    private HollowIndexerTraversalNode createTypeNode(HollowTypeDataAccess typeDataAccess) {
+    private HollowIndexerTraversalNode createTypeNode(String type, HollowTypeDataAccess typeDataAccess) {
         if(typeDataAccess instanceof HollowObjectTypeDataAccess)
             return new HollowIndexerObjectTraversalNode((HollowObjectTypeDataAccess) typeDataAccess, fieldMatchLists);
         else if(typeDataAccess instanceof HollowListTypeDataAccess)
@@ -188,8 +185,10 @@ class TraversalTreeBuilder {
         else if(typeDataAccess instanceof HollowMapTypeDataAccess)
             return new HollowIndexerMapTraversalNode(typeDataAccess, fieldMatchLists);
 
-        // return new HollowIndexerObjectTraversalNode(null, fieldMatchLists);    // SNAP: TODO: or some other sentinel?
-        throw new IllegalArgumentException("I can't create a type node for a " + typeDataAccess.getClass());
+        if (typeDataAccess == null) {
+            throw new IllegalArgumentException("Failed to create a type node for " + type);
+        }
+        throw new IllegalArgumentException("Failed to create a type node for a " + typeDataAccess.getClass());
     }
 
 }

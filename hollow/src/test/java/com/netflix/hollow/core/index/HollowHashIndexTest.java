@@ -367,40 +367,6 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         Assert.assertEquals(0, validPki.getMatchingOrdinal(1L));
     }
 
-    // SNAP: TODO: remove
-    @Test
-    public void testUnknownTypeDoesNotThrow() throws Exception {
-        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
-        roundTripSnapshot();
-
-        try {
-            HollowHashIndex index = new HollowHashIndex(readStateEngine, "UnknownType", "unknownField", "a1");
-        } catch (Exception e) {
-            fail("Index init should not fail hard on unknown type");
-        }
-
-        // SNAP: TODO: throws exception, maybe ok Assert.assertNull("An entry that doesn't have any matches has a null iterator", index.findMatches(0, "notfound"));
-        // assertIteratorContainsAll(index.findMatches(1, "one").iterator(), 0);
-    }
-
-    // SNAP: TODO: remove
-    @Test
-    public void testUnknownMatchFieldInKnownTypeDoesNotThrow() throws Exception {
-        mapper.add(new TypeA(1, 1.1d, null));
-        mapper.initializeTypeState(TypeB.class);
-        roundTripSnapshot();
-
-        // try {
-            HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeA", "a1", "ab.element.b1");
-        // } catch (Exception e) {
-        //     fail("Index init should not fail hard on unknown match field");
-        // }
-
-        index.findMatches(1);
-        // SNAP: TODO: throws exception, maybe ok Assert.assertNull("An entry that doesn't have any matches has a null iterator", index.findMatches(0, "notfound"));
-        // assertIteratorContainsAll(index.findMatches(1, "one").iterator(), 0);
-    }
-
     private void assertIteratorContainsAll(HollowOrdinalIterator iter, int... expectedOrdinals) {
         Set<Integer> ordinalSet = new HashSet<>();
         int ordinal = iter.next();

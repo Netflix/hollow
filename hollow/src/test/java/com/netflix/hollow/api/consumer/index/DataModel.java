@@ -343,6 +343,16 @@ public class DataModel {
             }
         }
 
+        public static class HInteger extends HollowObject {
+            public HInteger(HollowObjectDelegate delegate, int ordinal) {
+                super(delegate, ordinal);
+            }
+
+            public Integer getValue() {
+                return ((HollowObjectGenericDelegate) getDelegate()).getInt(getOrdinal(), "value");
+            }
+        }
+
         public static class Values extends HollowObject {
             public Values(HollowObjectDelegate delegate, int ordinal) {
                 super(delegate, ordinal);

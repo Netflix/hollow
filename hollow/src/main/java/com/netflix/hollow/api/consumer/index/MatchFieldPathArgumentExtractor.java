@@ -45,7 +45,7 @@ import java.util.stream.Stream;
  */
 final class MatchFieldPathArgumentExtractor<Q> {
     static final Function<?, ?> NOT_BINDABLE_EXTRACTOR = arg -> {
-        throw new IllegalStateException("Extractor for key " + arg + " is not bindable.");
+        throw new IllegalStateException("Index match field could not be bound, query= " + arg);
     };
 
     /**

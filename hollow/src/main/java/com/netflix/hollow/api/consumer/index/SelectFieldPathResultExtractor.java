@@ -28,7 +28,6 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectTypeMapper;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

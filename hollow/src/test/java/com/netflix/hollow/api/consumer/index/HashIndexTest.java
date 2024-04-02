@@ -10,6 +10,14 @@ import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.test.InMemoryBlobStore;
+import com.netflix.hollow.test.consumer.TestBlobRetriever;
+import com.netflix.hollow.test.consumer.TestHollowConsumer;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -19,8 +27,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -625,27 +631,55 @@ public class HashIndexTest {
             }
         }
 
-        // @Test    // SNAP: TODO: remove?
+        @Test
         public void testUnknownRootSelectType() {
+            HashIndex<Unknown, DataModel.Consumer.Values> hashIndex = HashIndex
+                    .from(consumer, Unknown.class)
+                    .usingPath("values", DataModel.Consumer.Values.class);
             try {
-                HashIndex
-                        .from(consumer, Unknown.class)
-                        .usingPath("values", DataModel.Consumer.Values.class);
-            } catch (Exception e) {
-                fail("Exception not expected for unexpected type in key definition");
-            }
+                hashIndex.findMatches(new DataModel.Consumer.Values(null, 0));
+                fail("Exception expected for looking up uninitialized index");
+            } catch (IllegalStateException e) {}
         }
 
-        // @Test    // SNAP: TODO: remove?
+        @Test
         public void testUnknownSelectType() {
-            try {
-                HashIndex
+            HashIndexSelect<DataModel.Consumer.References, Unknown, DataModel.Consumer.Values> hashIndexSelect = HashIndex
                         .from(consumer, DataModel.Consumer.References.class)
                         .selectField("values", Unknown.class)
                         .usingPath("values", DataModel.Consumer.Values.class);
-            } catch (Exception e) {
-                fail("Exception not expected for unexpected field in key definition");
-            }
+            try {
+                hashIndexSelect.findMatches(new DataModel.Consumer.Values(null, 0));
+                fail("Exception expected for looking up uninitialized index");
+            } catch (IllegalStateException e) {}
+        }
+
+        @Test
+        public void testUnknownSelectTypeBecauseMissingTypeState() throws IOException {
+            HollowConsumer testConsumer = initConsumerWithMissingTypeState();
+
+            HashIndexSelect<DataModel.Consumer.TypeA, DataModel.Consumer.HString, Integer> invalidIndex = HashIndex
+                    .from(testConsumer, DataModel.Consumer.TypeA.class)
+                    .selectField("s", DataModel.Consumer.HString.class) // String type isn't bindable
+                    .usingPath("i", Integer.class);
+            try {
+                invalidIndex.findMatches(1);
+                fail("Exception expected for looking up uninitialized index");
+            } catch (IllegalStateException e) {}
+        }
+
+        @Test
+        public void testUnknownMatchTypeBecauseMissingTypeState() throws IOException {
+            HollowConsumer testConsumer = initConsumerWithMissingTypeState();
+
+            HashIndexSelect<DataModel.Consumer.TypeA, GenericHollowObject, String> invalidIndex = HashIndex
+                    .from(testConsumer, DataModel.Consumer.TypeA.class)
+                    .selectField("", GenericHollowObject.class)
+                    .usingPath("s.value", String.class);
+            try {
+                invalidIndex.findMatches("TypeA1");
+                fail("Exception expected for looking up uninitialized index");
+            } catch (IllegalStateException e) {}
         }
 
         @Test(expected = IllegalArgumentException.class)
@@ -653,6 +687,29 @@ public class HashIndexTest {
             HashIndex
                     .from(consumer, DataModel.Consumer.References.class)
                     .usingPath("", DataModel.Consumer.References.class);
+        }
+
+        HollowConsumer initConsumerWithMissingTypeState() throws IOException {
+            HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+            HollowObjectSchema typeASchema = new HollowObjectSchema("TypeA", 2, "i", "s");
+            typeASchema.addField("i", HollowObjectSchema.FieldType.INT);
+            typeASchema.addField("s", HollowObjectSchema.FieldType.REFERENCE, "String");
+            HollowObjectTypeWriteState typeAState = new HollowObjectTypeWriteState(typeASchema);
+            writeEngine.addTypeState(typeAState);
+
+            HollowObjectWriteRecord typeARec = new HollowObjectWriteRecord(typeASchema);
+            typeARec.setInt("i", 1);
+            typeARec.setReference("s", 0);  // NOTE that String type wasn't added
+            writeEngine.add("TypeA", typeARec);
+
+            TestHollowConsumer testConsumer = new TestHollowConsumer.Builder()
+                    .withBlobRetriever(new TestBlobRetriever())
+                    .withGeneratedAPIClass(DataModel.Consumer.Api.class)
+                    .build();
+            testConsumer.addSnapshot(1L, writeEngine);
+            testConsumer.triggerRefreshTo(1L);
+
+            return testConsumer;
         }
     }
 

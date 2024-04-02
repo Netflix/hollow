@@ -478,37 +478,6 @@ public class UniqueKeyIndexTest {
         }
 
         @Test
-        public void testKeyFieldNotBindable() throws IOException {
-            HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
-            HollowObjectSchema typeASchema = new HollowObjectSchema("TypeA", 2, "i", "s");
-            typeASchema.addField("i", HollowObjectSchema.FieldType.INT);
-            typeASchema.addField("s", HollowObjectSchema.FieldType.REFERENCE, "String");
-            HollowObjectTypeWriteState typeAState = new HollowObjectTypeWriteState(typeASchema);
-            writeEngine.addTypeState(typeAState);
-
-            HollowObjectWriteRecord typeARec = new HollowObjectWriteRecord(typeASchema);
-            typeARec.setInt("i", 1);
-            typeARec.setReference("s", 0);  // NOTE that String type wasn't added
-            writeEngine.add("TypeA", typeARec);
-
-            TestHollowConsumer testConsumer = new TestHollowConsumer.Builder()
-                    .withBlobRetriever(new TestBlobRetriever())
-                    .withGeneratedAPIClass(DataModel.Consumer.Api.class)
-                    .build();
-            testConsumer.addSnapshot(1L, writeEngine);
-            testConsumer.triggerRefreshTo(1L);
-
-            UniqueKeyIndex<DataModel.Consumer.TypeA, TypeAKey> invalidIndex = UniqueKeyIndex
-                    .from(testConsumer, DataModel.Consumer.TypeA.class)
-                    .bindToPrimaryKey()
-                    .usingBean(TypeAKey.class); // indexes a value of String type but String type isn't bindable
-            try {
-                invalidIndex.findMatch(new TypeAKey(1, "TypeA1"));
-                fail("Index on field path not bound is expected to fail hard at query time");
-            } catch (IllegalStateException e) {}
-        }
-
-        @Test
         public void testIsBindable() {
             UniqueKeyIndex<DataModel.Consumer.TypeA, Integer> index1 = UniqueKeyIndex
                     .from(consumer, DataModel.Consumer.TypeA.class)
@@ -525,26 +494,22 @@ public class UniqueKeyIndexTest {
         }
 
         @Test
+        public void testKeyFieldNotBindable() throws IOException {
+            HollowConsumer testConsumer = initConsumerWithMissingTypeState();
+
+            UniqueKeyIndex<DataModel.Consumer.TypeA, TypeAKey> invalidIndex = UniqueKeyIndex
+                    .from(testConsumer, DataModel.Consumer.TypeA.class)
+                    .bindToPrimaryKey()
+                    .usingBean(TypeAKey.class); // indexes a value of String type but String type isn't bindable
+            try {
+                invalidIndex.findMatch(new TypeAKey(1, "TypeA1"));
+                fail("Index on field path not bound is expected to fail hard at query time");
+            } catch (IllegalStateException e) {}
+        }
+
+        @Test
         public void testKeyFieldPathIsBindableWhenNonKeyedTypeIsExcluded() throws IOException {
-            HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
-
-            HollowObjectSchema typeASchema = new HollowObjectSchema("TypeA", 2, "i", "s");
-            typeASchema.addField("i", HollowObjectSchema.FieldType.INT);
-            typeASchema.addField("s", HollowObjectSchema.FieldType.REFERENCE, "String");
-            HollowObjectTypeWriteState typeAState = new HollowObjectTypeWriteState(typeASchema);
-            writeEngine.addTypeState(typeAState);
-
-            HollowObjectWriteRecord typeARec = new HollowObjectWriteRecord(typeASchema);
-            typeARec.setInt("i", 1);
-            typeARec.setReference("s", 0);
-            writeEngine.add("TypeA", typeARec);
-
-            TestHollowConsumer testConsumer = new TestHollowConsumer.Builder()
-                    .withBlobRetriever(new TestBlobRetriever())
-                    .withGeneratedAPIClass(DataModel.Consumer.Api.class)
-                    .build();
-            testConsumer.addSnapshot(1L, writeEngine);
-            testConsumer.triggerRefreshTo(1L);
+            HollowConsumer testConsumer = initConsumerWithMissingTypeState();
 
             UniqueKeyIndex<DataModel.Consumer.TypeA, Integer> invalidIndex = UniqueKeyIndex
                     .from(testConsumer, DataModel.Consumer.TypeA.class)
@@ -579,6 +544,29 @@ public class UniqueKeyIndexTest {
                     .from(consumer, DataModel.Consumer.References.class)
                     .bindToPrimaryKey()
                     .usingPath("values._int", int.class);
+        }
+
+        HollowConsumer initConsumerWithMissingTypeState() throws IOException {
+            HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+            HollowObjectSchema typeASchema = new HollowObjectSchema("TypeA", 2, "i", "s");
+            typeASchema.addField("i", HollowObjectSchema.FieldType.INT);
+            typeASchema.addField("s", HollowObjectSchema.FieldType.REFERENCE, "String");
+            HollowObjectTypeWriteState typeAState = new HollowObjectTypeWriteState(typeASchema);
+            writeEngine.addTypeState(typeAState);
+
+            HollowObjectWriteRecord typeARec = new HollowObjectWriteRecord(typeASchema);
+            typeARec.setInt("i", 1);
+            typeARec.setReference("s", 0);  // NOTE that String type wasn't added
+            writeEngine.add("TypeA", typeARec);
+
+            TestHollowConsumer testConsumer = new TestHollowConsumer.Builder()
+                    .withBlobRetriever(new TestBlobRetriever())
+                    .withGeneratedAPIClass(DataModel.Consumer.Api.class)
+                    .build();
+            testConsumer.addSnapshot(1L, writeEngine);
+            testConsumer.triggerRefreshTo(1L);
+
+            return testConsumer;
         }
 
         class TypeAKey {
