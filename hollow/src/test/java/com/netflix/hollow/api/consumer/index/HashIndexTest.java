@@ -632,7 +632,8 @@ public class HashIndexTest {
         }
 
         @Test
-        public void testUnknownRootSelectType() {
+        public void testNotBindable() throws IOException {
+            // root select type does not exist in read state
             HashIndex<Unknown, DataModel.Consumer.Values> hashIndex = HashIndex
                     .from(consumer, Unknown.class)
                     .usingPath("values", DataModel.Consumer.Values.class);
@@ -640,46 +641,40 @@ public class HashIndexTest {
                 hashIndex.findMatches(new DataModel.Consumer.Values(null, 0));
                 fail("Exception expected for looking up uninitialized index");
             } catch (IllegalStateException e) {}
-        }
 
-        @Test
-        public void testUnknownSelectType() {
-            HashIndexSelect<DataModel.Consumer.References, Unknown, DataModel.Consumer.Values> hashIndexSelect = HashIndex
-                        .from(consumer, DataModel.Consumer.References.class)
-                        .selectField("values", Unknown.class)
-                        .usingPath("values", DataModel.Consumer.Values.class);
-            try {
-                hashIndexSelect.findMatches(new DataModel.Consumer.Values(null, 0));
-                fail("Exception expected for looking up uninitialized index");
-            } catch (IllegalStateException e) {}
-        }
-
-        @Test
-        public void testUnknownSelectTypeBecauseMissingTypeState() throws IOException {
+            // type corresponding to select field does not exist in type state
             HollowConsumer testConsumer = initConsumerWithMissingTypeState();
-
-            HashIndexSelect<DataModel.Consumer.TypeA, DataModel.Consumer.HString, Integer> invalidIndex = HashIndex
+            HashIndexSelect<DataModel.Consumer.TypeA, DataModel.Consumer.HString, Integer> invalidIndex1 = HashIndex
                     .from(testConsumer, DataModel.Consumer.TypeA.class)
                     .selectField("s", DataModel.Consumer.HString.class) // String type isn't bindable
                     .usingPath("i", Integer.class);
             try {
-                invalidIndex.findMatches(1);
+                invalidIndex1.findMatches(1);
                 fail("Exception expected for looking up uninitialized index");
             } catch (IllegalStateException e) {}
-        }
 
-        @Test
-        public void testUnknownMatchTypeBecauseMissingTypeState() throws IOException {
-            HollowConsumer testConsumer = initConsumerWithMissingTypeState();
-
-            HashIndexSelect<DataModel.Consumer.TypeA, GenericHollowObject, String> invalidIndex = HashIndex
+            // type corresponding to match field is missing in type state
+            HashIndexSelect<DataModel.Consumer.TypeA, GenericHollowObject, String> invalidIndex2 = HashIndex
                     .from(testConsumer, DataModel.Consumer.TypeA.class)
                     .selectField("", GenericHollowObject.class)
                     .usingPath("s.value", String.class);
             try {
-                invalidIndex.findMatches("TypeA1");
+                invalidIndex2.findMatches("TypeA1");
                 fail("Exception expected for looking up uninitialized index");
             } catch (IllegalStateException e) {}
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void testUnknownSelectType() {
+            // SNAP: TODO: this is really a type mismatch
+            HashIndexSelect<DataModel.Consumer.References, Unknown, DataModel.Consumer.Values> hashIndexSelect = HashIndex
+                        .from(consumer, DataModel.Consumer.References.class)
+                        .selectField("values", Unknown.class)
+                        .usingPath("values", DataModel.Consumer.Values.class);
+            //try {
+                // hashIndexSelect.findMatches(new DataModel.Consumer.Values(null, 0));
+                // fail("Exception expected for looking up uninitialized index");
+            //} catch (IllegalStateException e) {}
         }
 
         @Test(expected = IllegalArgumentException.class)

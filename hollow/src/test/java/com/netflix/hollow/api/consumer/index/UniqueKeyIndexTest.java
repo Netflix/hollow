@@ -489,7 +489,7 @@ public class UniqueKeyIndexTest {
             } catch (IllegalStateException e) {}
 
 
-            // index is valid despit non-keyed fields not bindable
+            // index is valid despite non-keyed fields not bindable
             UniqueKeyIndex<DataModel.Consumer.TypeA, Integer> validIndex = UniqueKeyIndex
                     .from(testConsumer, DataModel.Consumer.TypeA.class)
                     .usingPath("i", Integer.class); // indexes a value of String type but String type isn't bindable
