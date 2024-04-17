@@ -35,7 +35,7 @@ import java.util.Objects;
  * @param <T> the root, select, and result type
  * @param <Q> the query type
  */
-public final class HashIndex<T extends HollowRecord, Q> extends HashIndexSelect<T, T, Q> {
+public class HashIndex<T extends HollowRecord, Q> extends HashIndexSelect<T, T, Q> {
 
     HashIndex(
             HollowConsumer consumer,
