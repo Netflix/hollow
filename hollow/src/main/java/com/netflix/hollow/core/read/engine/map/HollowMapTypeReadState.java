@@ -16,12 +16,11 @@
  */
 package com.netflix.hollow.core.read.engine.map;
 
-import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-
 import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowMapSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
+import com.netflix.hollow.core.index.FieldPaths;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
@@ -43,11 +42,17 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.core.index.FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE;
 
 /**
  * A {@link HollowTypeReadState} for MAP type records. 
  */
 public class HollowMapTypeReadState extends HollowTypeReadState implements HollowMapTypeDataAccess {
+    private static final Logger LOG = Logger.getLogger(HollowMapTypeReadState.class.getName());
 
     private final HollowMapSampler sampler;
     
@@ -332,9 +337,19 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
     
     public void buildKeyDeriver() {
-        if(getSchema().getHashKey() != null)
-            this.keyDeriver = new HollowPrimaryKeyValueDeriver(getSchema().getHashKey(), getStateEngine());
-        
+        if(getSchema().getHashKey() != null) {
+            try {
+                this.keyDeriver = new HollowPrimaryKeyValueDeriver(getSchema().getHashKey(), getStateEngine());
+            } catch (FieldPaths.FieldPathException e) {
+                if (e.error == NOT_BINDABLE) {
+                    LOG.log(Level.WARNING, "Failed to create a key value deriver for " + getSchema().getHashKey() +
+                        " because a field could not be bound to a type in the state");
+                } else {
+                    throw e;
+                }
+            }
+        }
+
         for(int i=0; i<shards.length; i++)
             shards[i].setKeyDeriver(keyDeriver);
     }

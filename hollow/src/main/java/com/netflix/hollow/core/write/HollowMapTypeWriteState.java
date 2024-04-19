@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.core.index.FieldPaths;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -26,8 +27,13 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static com.netflix.hollow.core.index.FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE;
 
 public class HollowMapTypeWriteState extends HollowTypeWriteState {
+    private static final Logger LOG = Logger.getLogger(HollowMapTypeWriteState.class.getName());
 
     /// statistics required for writing fixed length set data
     private int bitsPerMapPointer;
@@ -212,9 +218,19 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
 
         HollowWriteStateEnginePrimaryKeyHasher primaryKeyHasher = null;
 
-        if(getSchema().getHashKey() != null)
-            primaryKeyHasher = new HollowWriteStateEnginePrimaryKeyHasher(getSchema().getHashKey(), getStateEngine());
-        
+        if(getSchema().getHashKey() != null) {
+            try {
+                primaryKeyHasher = new HollowWriteStateEnginePrimaryKeyHasher(getSchema().getHashKey(), getStateEngine());
+            } catch (FieldPaths.FieldPathException e) {
+                if (e.error == NOT_BINDABLE) {
+                    LOG.log(Level.WARNING, "Failed to create a key hasher for " + getSchema().getHashKey() +
+                        " because a field could not be bound to a type in the state");
+                } else {
+                    throw e;
+                }
+            }
+        }
+
         for(int ordinal=0;ordinal<=maxOrdinal;ordinal++) {
             int shardNumber = ordinal & shardMask;
             int shardOrdinal = ordinal / numShards;
@@ -378,8 +394,18 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
         
         HollowWriteStateEnginePrimaryKeyHasher primaryKeyHasher = null;
 
-        if(getSchema().getHashKey() != null)
-            primaryKeyHasher = new HollowWriteStateEnginePrimaryKeyHasher(getSchema().getHashKey(), getStateEngine());
+        if(getSchema().getHashKey() != null) {
+            try {
+                primaryKeyHasher = new HollowWriteStateEnginePrimaryKeyHasher(getSchema().getHashKey(), getStateEngine());
+            } catch (FieldPaths.FieldPathException e) {
+                if (e.error == NOT_BINDABLE) {
+                    LOG.log(Level.WARNING, "Failed to create a key hasher for " + getSchema().getHashKey() +
+                        " because a field could not be bound to a type in the state");
+                } else {
+                    throw e;
+                }
+            }
+        }
 
         for(int ordinal=0;ordinal<=maxOrdinal;ordinal++) {
             int shardNumber = ordinal & shardMask;
