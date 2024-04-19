@@ -16,6 +16,9 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.core.index.FieldPaths;
+import static com.netflix.hollow.core.index.FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE;
+
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
@@ -23,8 +26,12 @@ import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.encoding.ZigZag;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class HollowWriteStateEnginePrimaryKeyHasher {
+
+    private static final Logger LOG = Logger.getLogger(HollowWriteStateEnginePrimaryKeyHasher.class.getName());
 
     private final HollowObjectTypeWriteState typeStates[][];
     private final int[][] fieldPathIndexes;
@@ -37,14 +44,32 @@ class HollowWriteStateEnginePrimaryKeyHasher {
         this.typeStates = new HollowObjectTypeWriteState[primaryKey.numFields()][];
         
         for(int i=0;i<primaryKey.numFields();i++) {
-            fieldPathIndexes[i] = primaryKey.getFieldPathIndex(stateEngine, i);
             typeStates[i] = new HollowObjectTypeWriteState[fieldPathIndexes[i].length];
             
             typeStates[i][0] = rootTypeWriteState;
-            
+
+            try {
+                fieldPathIndexes[i] = primaryKey.getFieldPathIndex(stateEngine, i);
+            } catch (FieldPaths.FieldPathException e) {
+                if (e.error == NOT_BINDABLE) {
+                    LOG.log(Level.WARNING, "Hasher initialization for " + primaryKey + " failed because field " +
+                            primaryKey.getFieldPath(i) + " could not be bound to a type in the read state");
+                    fieldPathIndexes[i]  = null;
+                } else {
+                    throw e;
+                }
+            }
+
             for(int j=1;j<typeStates[i].length;j++) {
                  String referencedType = typeStates[i][j-1].getSchema().getReferencedType(fieldPathIndexes[i][j-1]);
-                 typeStates[i][j] = (HollowObjectTypeWriteState) stateEngine.getTypeState(referencedType);
+                 HollowObjectTypeWriteState ws = (HollowObjectTypeWriteState) stateEngine.getTypeState(referencedType);
+                 if (ws == null) {
+                     LOG.log(Level.WARNING, "Hasher initialization for " + primaryKey + " failed because field " +
+                             primaryKey.getFieldPath(i) + " could not be bound to a type in the read state");
+                     typeStates[i][j] = null;
+                 } else {
+                     typeStates[i][j] = ws;
+                 }
             }
         }
     }
@@ -61,8 +86,14 @@ class HollowWriteStateEnginePrimaryKeyHasher {
     }
 
     private int hashValue(int ordinal, int fieldIdx) {
+        if (fieldPathIndexes[fieldIdx] == null) {
+            return 0;
+        }
         int lastFieldPath = fieldPathIndexes[fieldIdx].length - 1;
         for (int i = 0; i < lastFieldPath; i++) {
+            if(typeStates[fieldIdx][i] == null) {
+                return 0;
+            }
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
             ByteArrayOrdinalMap ordinalMap = typeStates[fieldIdx][i].ordinalMap;
             long offset = ordinalMap.getPointerForData(ordinal);
