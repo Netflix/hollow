@@ -232,7 +232,7 @@ public final class FieldPaths {
     /**
      * An exception contain structured information when a field path cannot be bound.
      */
-    static final class FieldPathException extends IllegalArgumentException {
+    public static final class FieldPathException extends IllegalArgumentException {
         enum ErrorKind {
             NOT_BINDABLE,
             NOT_FOUND,
