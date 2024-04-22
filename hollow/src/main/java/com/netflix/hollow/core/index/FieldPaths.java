@@ -232,8 +232,8 @@ public final class FieldPaths {
     /**
      * An exception contain structured information when a field path cannot be bound.
      */
-    static final class FieldPathException extends IllegalArgumentException {
-        enum ErrorKind {
+    public static final class FieldPathException extends IllegalArgumentException {
+        public enum ErrorKind {
             NOT_BINDABLE,
             NOT_FOUND,
             NOT_FULL,
@@ -242,7 +242,7 @@ public final class FieldPaths {
             ;
         }
 
-        final ErrorKind error;
+        public final ErrorKind error;
         final String rootType;
         final String[] segments;
 
