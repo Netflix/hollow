@@ -78,7 +78,7 @@ public class HollowBlobHeaderReader {
         int headerVersion = in.readInt();
         if(headerVersion != HollowBlobOptionalPartHeader.HOLLOW_BLOB_PART_VERSION_HEADER) {
             throw new IOException("The HollowBlob optional part you are trying to read is incompatible. "
-                    + "The expected Hollow blob version was " + HollowBlobHeader.HOLLOW_BLOB_VERSION_HEADER
+                    + "The expected Hollow blob version was " + HollowBlobOptionalPartHeader.HOLLOW_BLOB_PART_VERSION_HEADER
                     + " but the actual version was " + headerVersion);
         }
 
