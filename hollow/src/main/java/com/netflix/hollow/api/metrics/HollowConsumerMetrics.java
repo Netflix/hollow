@@ -22,6 +22,16 @@ public class HollowConsumerMetrics extends HollowMetrics {
     private int refreshFailed;      // TODO: Move these metrics over to com.netflix.hollow.api.consumer.metrics.AbstractRefreshMetricsListener
     private int refreshSucceeded;
 
+    private long durationNs;
+
+    public void setDurationNs(long durationNs) {
+        this.durationNs = durationNs;
+    }
+
+    public long getDurationNs() {
+        return durationNs;
+    }
+
     /**
      * Updates the consumer metrics:
      * refresh succeeded, version and type's footprint and ordinals.

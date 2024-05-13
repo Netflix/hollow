@@ -21,6 +21,7 @@ import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_SCHEMA_HASH;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
+import com.netflix.hollow.api.metrics.HollowMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.MemoryMode;
@@ -117,6 +118,9 @@ public class HollowClientUpdater {
         return updateTo(new HollowConsumer.VersionInfo(requestedVersion));
     }
     public synchronized boolean updateTo(HollowConsumer.VersionInfo requestedVersionInfo) throws Throwable {
+        metrics.setDurationNs(0);
+        long startUpdate = System.nanoTime();
+
         long requestedVersion = requestedVersionInfo.getVersion();
         if (requestedVersion == getCurrentVersionId()) {
             if (requestedVersion == HollowConstants.VERSION_NONE && hollowDataHolderVolatile == null) {
@@ -201,16 +205,22 @@ public class HollowClientUpdater {
                 refreshListener.refreshSuccessful(beforeVersion, getCurrentVersionId(), requestedVersion);
 
             metrics.updateTypeStateMetrics(getStateEngine(), requestedVersion);
-            if(metricsCollector != null)
+            if(metricsCollector != null) {
+                long duration = System.nanoTime() - startUpdate;
+                metrics.setDurationNs(duration);
                 metricsCollector.collect(metrics);
+            }
 
             initialLoad.complete(getCurrentVersionId()); // only set the first time
             return getCurrentVersionId() == requestedVersion;
         } catch(Throwable th) {
             forceDoubleSnapshotNextUpdate();
             metrics.updateRefreshFailed();
-            if(metricsCollector != null)
+            if(metricsCollector != null) {
+                long duration = System.nanoTime() - startUpdate;
+                metrics.setDurationNs(duration);
                 metricsCollector.collect(metrics);
+            }
             for(HollowConsumer.RefreshListener refreshListener : localListeners)
                 refreshListener.refreshFailed(beforeVersion, getCurrentVersionId(), requestedVersion, th);
 
