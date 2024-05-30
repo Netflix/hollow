@@ -154,6 +154,15 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
         return getBuilder();
     }
 
+    /**
+     * Enable @Generated annotation in the generated API
+     * @return
+     */
+    public B withGeneratedAnnotation() {
+        config.setUseGeneratedAnnotation(true);
+        return getBuilder();
+    }
+
     public G build() {
         if (apiClassname == null)
             throw new IllegalStateException("Please specify an API classname (.withAPIClassname()) before calling .build()");

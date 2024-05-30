@@ -60,6 +60,7 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
         builder.append("import ").append(HollowTypeAPI.class.getName()).append(";\n");
         builder.append("import ").append(HollowCachedDelegate.class.getName()).append(";\n");
 
+        appendGeneratedAnnotation(builder);
         builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class ").append(className).append(" extends HollowObjectAbstractDelegate implements HollowCachedDelegate, ").append(delegateInterfaceName(schema.getName())).append(" {\n\n");
 

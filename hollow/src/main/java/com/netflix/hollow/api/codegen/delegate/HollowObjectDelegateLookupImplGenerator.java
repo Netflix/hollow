@@ -54,6 +54,7 @@ public class HollowObjectDelegateLookupImplGenerator extends HollowObjectDelegat
         builder.append("import ").append(HollowObjectTypeDataAccess.class.getName()).append(";\n");
         builder.append("import ").append(HollowObjectSchema.class.getName()).append(";\n");
 
+        appendGeneratedAnnotation(builder);
         builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class ").append(className).append(" extends HollowObjectAbstractDelegate implements ").append(delegateInterfaceName(schema.getName())).append(" {\n\n");
 

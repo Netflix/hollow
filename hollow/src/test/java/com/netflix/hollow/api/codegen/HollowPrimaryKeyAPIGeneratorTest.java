@@ -36,6 +36,15 @@ public class HollowPrimaryKeyAPIGeneratorTest extends AbstractHollowAPIGenerator
                 builder -> builder.withClassPostfix("Generated").withPackageGrouping());
     }
 
+    @Test
+    public void testWithGeneratedAnnotation() throws Exception {
+        String apiClassName = "PrimaryKeyIndexTestAPI";
+        String packageName = "codegen.primarykey";
+        runGenerator(apiClassName, packageName, Movie.class,
+                builder -> builder.withClassPostfix("Generated").withPackageGrouping().withGeneratedAnnotation());
+        assertClassHasGeneratedAnnotation(packageName + "." + apiClassName);
+    }
+
     @HollowPrimaryKey(fields = {"id", "hasSubtitles", "actor", "role.id!", "role.rank"})
     static class Movie {
         int id;

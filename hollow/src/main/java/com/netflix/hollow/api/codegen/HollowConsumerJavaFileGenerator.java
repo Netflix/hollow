@@ -15,6 +15,7 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import com.netflix.hollow.Generated;
 import com.netflix.hollow.api.codegen.objects.HollowCollectionsGenerator;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowListSchema;
@@ -126,6 +127,16 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
                 }
                 builder.append("\n");
             }
+        }
+    }
+
+    /**
+     * Add @com.netflix.hollow.Generated annotation to the generated class
+     */
+    protected void appendGeneratedAnnotation(StringBuilder builder) {
+        if(config.isUseGeneratedAnnotation()) {
+            builder.append("import ").append(Generated.class.getName()).append(";\n");
+            builder.append("\n@Generated");
         }
     }
 

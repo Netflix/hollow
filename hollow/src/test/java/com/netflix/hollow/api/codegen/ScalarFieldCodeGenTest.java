@@ -29,7 +29,9 @@ public class ScalarFieldCodeGenTest extends AbstractHollowAPIGeneratorTest {
         String packageName = "codegen.scalar.types";
         runGenerator(apiClassName, packageName, Movie.class, builder ->
                 builder.withErgonomicShortcuts().withPackageGrouping()
-                        .withHollowPrimitiveTypes(true).withRestrictApiToFieldType());
+                        .withHollowPrimitiveTypes(true)
+                        .withRestrictApiToFieldType().withGeneratedAnnotation());
+        assertClassHasGeneratedAnnotation(packageName + "." + apiClassName);
     }
 
     @SuppressWarnings("unused")

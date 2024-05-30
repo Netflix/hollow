@@ -29,6 +29,7 @@ public class CodeGeneratorConfig {
     private boolean useHollowPrimitiveTypes = false;
     private boolean restrictApiToFieldType = false;
     private boolean useVerboseToString = false;
+    private boolean useGeneratedAnnotation = false;
 
     private boolean useMetaInfo = false;
     private Path metaInfoPath;
@@ -139,6 +140,15 @@ public class CodeGeneratorConfig {
         this.useVerboseToString = useVerboseToString;
     }
 
+    public boolean isUseGeneratedAnnotation() {
+        return useGeneratedAnnotation;
+    }
+
+    public void setUseGeneratedAnnotation(boolean useGeneratedAnnotation) {
+        this.useGeneratedAnnotation = useGeneratedAnnotation;
+    }
+
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -149,6 +159,7 @@ public class CodeGeneratorConfig {
         result = prime * result + (restrictApiToFieldType ? 1231 : 1237);
         result = prime * result + (useAggressiveSubstitutions ? 1231 : 1237);
         result = prime * result + (useBooleanFieldErgonomics ? 1231 : 1237);
+        result = prime * result + (useGeneratedAnnotation ? 1231 : 1237);
         result = prime * result + (useHollowPrimitiveTypes ? 1231 : 1237);
         result = prime * result + (usePackageGrouping ? 1231 : 1237);
         result = prime * result + (useVerboseToString ? 1231 : 1237);
@@ -184,6 +195,8 @@ public class CodeGeneratorConfig {
             return false;
         if (useBooleanFieldErgonomics != other.useBooleanFieldErgonomics)
             return false;
+        if (useGeneratedAnnotation != other.useGeneratedAnnotation)
+            return false;
         if (useHollowPrimitiveTypes != other.useHollowPrimitiveTypes)
             return false;
         if (usePackageGrouping != other.usePackageGrouping)
@@ -207,6 +220,8 @@ public class CodeGeneratorConfig {
         builder.append(classPostfix);
         builder.append(", getterPrefix=");
         builder.append(getterPrefix);
+        builder.append(", useGeneratedAnnotation=");
+        builder.append(useGeneratedAnnotation);
         builder.append(", usePackageGrouping=");
         builder.append(usePackageGrouping);
         builder.append(", useAggressiveSubstitutions=");

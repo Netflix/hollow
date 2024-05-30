@@ -28,7 +28,8 @@ public class HollowPrimitiveTypesAPIGeneratorTest extends AbstractHollowAPIGener
         String apiClassName = "PrimitiveTypeTestAPI";
         String packageName = "codegen.primitive.types";
         runGenerator(apiClassName, packageName, Movie.class, builder -> builder
-                .withErgonomicShortcuts().withPackageGrouping().withHollowPrimitiveTypes(true));
+                .withErgonomicShortcuts().withPackageGrouping().withHollowPrimitiveTypes(true).withGeneratedAnnotation());
+        assertClassHasGeneratedAnnotation(packageName + "." + apiClassName);
     }
 
     @SuppressWarnings("unused")

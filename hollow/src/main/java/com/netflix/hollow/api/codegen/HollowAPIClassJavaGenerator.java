@@ -100,6 +100,8 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
         builder.append("import ").append(SampleResult.class.getName()).append(";\n");
         builder.append("import ").append(AllHollowRecordCollection.class.getName()).append(";\n");
 
+        appendGeneratedAnnotation(builder);
+
         builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class ").append(className).append(" extends HollowAPI ");
         Set<String> primitiveTypes = HollowCodeGenerationUtils.getPrimitiveTypes(schemaList); // Implement Primitive Type Retriever(s)

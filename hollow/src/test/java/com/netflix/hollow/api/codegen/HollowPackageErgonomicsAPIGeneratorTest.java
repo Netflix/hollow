@@ -38,6 +38,12 @@ public class HollowPackageErgonomicsAPIGeneratorTest extends AbstractHollowAPIGe
         runGenerator(API_CLASS_NAME, "", Movie.class, b -> b);
     }
 
+    @Test
+    public void testWithGeneratedAnnotation() throws Exception {
+        runGenerator(API_CLASS_NAME, "codegen.subpackage.grouping", Movie.class,  builder -> builder.withErgonomicShortcuts().withPackageGrouping().withGeneratedAnnotation());
+        assertClassHasGeneratedAnnotation("codegen.subpackage.grouping." + API_CLASS_NAME);
+    }
+
     @SuppressWarnings("unused")
     @HollowPrimaryKey(fields = { "id" })
     static class Movie {
