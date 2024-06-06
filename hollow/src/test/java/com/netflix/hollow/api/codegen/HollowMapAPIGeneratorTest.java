@@ -57,4 +57,11 @@ public class HollowMapAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
     public void test_withoutPackageGrouping() throws Exception {
         runGenerator(API_CLASS_NAME, PACKAGE_NAME, Gru.class, b -> b);
     }
+
+    @Test
+    public void test_withGeneratedAnnotation() throws Exception {
+        runGenerator(API_CLASS_NAME, PACKAGE_NAME, Gru.class,
+                HollowAPIGenerator.Builder::withGeneratedAnnotation);
+        assertClassHasGeneratedAnnotation(PACKAGE_NAME + "." + API_CLASS_NAME);
+    }
 }

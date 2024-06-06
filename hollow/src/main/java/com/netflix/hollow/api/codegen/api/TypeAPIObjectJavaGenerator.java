@@ -65,7 +65,8 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
     public String generate() {
         StringBuilder classBodyBuilder = new StringBuilder();
 
-        classBodyBuilder.append("@SuppressWarnings(\"all\")\n");
+        appendGeneratedAnnotation(classBodyBuilder);
+        classBodyBuilder.append("\n@SuppressWarnings(\"all\")\n");
         classBodyBuilder.append("public class " + className + " extends HollowObjectTypeAPI {\n\n");
 
         classBodyBuilder.append("    private final ").append(delegateLookupClassname(objectSchema)).append(" delegateLookupImpl;\n\n");

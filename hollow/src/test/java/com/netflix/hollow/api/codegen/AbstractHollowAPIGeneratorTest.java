@@ -20,6 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import com.netflix.hollow.HollowGenerated;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +28,6 @@ import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.function.UnaryOperator;
 import org.junit.After;
 
@@ -37,7 +37,7 @@ public class AbstractHollowAPIGeneratorTest {
     protected String clazzFolder = String.format("%s/classes", tmpFolder);
     private Path metaInfoPath = null;
 
-    void runGenerator(String apiClassName, String packageName, Class<?> clazz,
+    protected void runGenerator(String apiClassName, String packageName, Class<?> clazz,
             UnaryOperator<HollowAPIGenerator.Builder> generatorCustomizer) throws Exception {
         System.out.println(String.format("Folders (%s) : \n\tsource=%s \n\tclasses=%s",
                     getClass().getSimpleName(), sourceFolder, clazzFolder));
@@ -69,6 +69,13 @@ public class AbstractHollowAPIGeneratorTest {
         Annotation annotation = cls.getAnnotation(HollowTypeName.class);
         assertNotNull(annotation);
         assertEquals(typeName, ((HollowTypeName) annotation).name());
+    }
+
+    protected void assertClassHasGeneratedAnnotation(String clazz) throws IOException, ClassNotFoundException {
+        ClassLoader cl = new URLClassLoader(new URL[]{new File(clazzFolder).toURI().toURL()});
+        Class cls = cl.loadClass(clazz);
+        Annotation annotation = cls.getAnnotation(HollowGenerated.class);
+        assertNotNull(annotation);
     }
 
     void assertFileDoesNotExist(String relativePath) {

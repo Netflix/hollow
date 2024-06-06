@@ -72,6 +72,8 @@ public class HollowFactoryJavaGenerator extends HollowConsumerJavaFileGenerator 
         if(schema instanceof HollowMapSchema)
             builder.append("import " + HollowMapCachedDelegate.class.getName() + ";\n");
 
+        appendGeneratedAnnotation(builder);
+
         builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class " + className + "<T extends " + objectClassName + "> extends HollowFactory<T> {\n\n");
 

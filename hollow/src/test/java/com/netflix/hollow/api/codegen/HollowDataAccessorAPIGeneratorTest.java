@@ -34,6 +34,14 @@ public class HollowDataAccessorAPIGeneratorTest extends AbstractHollowAPIGenerat
                 builder -> builder.withClassPostfix("Generated").withPackageGrouping());
     }
 
+    @Test
+    public void testGenerateWithGeneratedAnnotation() throws Exception {
+        runGenerator(API_CLASS_NAME, PACKAGE_NAME, Movie.class,
+                builder -> builder.withClassPostfix("Generated").withGeneratedAnnotation());
+        assertClassHasGeneratedAnnotation(PACKAGE_NAME + "." + API_CLASS_NAME);
+        assertClassHasGeneratedAnnotation(PACKAGE_NAME + ".StringGenerated");
+    }
+
     @HollowPrimaryKey(fields="id")
     static class Movie {
         int id;

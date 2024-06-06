@@ -65,11 +65,12 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
         if (isGenSimpleConstructor)
             builder.append("import " + HollowObjectSchema.class.getName() + ";\n");
 
+        appendGeneratedAnnotation(builder);
         builder.append("\n/**\n");
         genDeprecatedJavaDoc(builder);
         builder.append(" */\n");
         builder.append("@Deprecated\n");
-        builder.append("@SuppressWarnings(\"all\")\n");
+        builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class " + className + " extends " + AbstractHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + hollowImplClassname(type) + "> ");
         if (isImplementsUniqueKeyIndex) {
             builder.append("implements " + HollowUniqueKeyIndex.class.getSimpleName() + "<" + hollowImplClassname(type) + "> ");

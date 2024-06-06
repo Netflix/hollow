@@ -81,6 +81,14 @@ public class HollowAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
         assertFileDoesNotExist("codegen/api/StringGenerated.java");
     }
 
+    @Test
+    public void testGenerateWithGeneratedAnnotation() throws Exception {
+        runGenerator("MyClassTestAPI", "codegen.api", MyClass.class,
+                builder -> builder.withClassPostfix("Generated").withGeneratedAnnotation());
+        assertClassHasGeneratedAnnotation("codegen.api.MyClassTestAPI");
+    }
+
+
     @SuppressWarnings("unused")
     @HollowPrimaryKey(fields = "id")
     private static class MyClass {

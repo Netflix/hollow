@@ -52,7 +52,7 @@ class HollowPerformanceAPIClassGenerator {
                 "import java.util.Set;\n" +
                 "\n");
 
-        builder.append("@SuppressWarnings(\"all\")\n");
+        builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class " + apiClassName + " extends HollowPerformanceAPI {\n\n");
 
         List<HollowSchema> schemas = new ArrayList<>(dataset.getSchemas());

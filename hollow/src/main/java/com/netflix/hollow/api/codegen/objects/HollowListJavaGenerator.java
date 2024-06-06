@@ -61,7 +61,9 @@ public class HollowListJavaGenerator extends HollowCollectionsGenerator {
         builder.append("import " + HollowListDelegate.class.getName() + ";\n");
         builder.append("import " + GenericHollowRecordHelper.class.getName() + ";\n\n");
 
-        builder.append("@SuppressWarnings(\"all\")\n");
+         appendGeneratedAnnotation(builder);
+
+        builder.append("\n@SuppressWarnings(\"all\")\n");
         if(parameterize)
             builder.append("public class " + className + "<T> extends HollowList<T> {\n\n");
         else

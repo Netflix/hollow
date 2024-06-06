@@ -68,7 +68,8 @@ public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
         builder.append("import " + HollowMapDelegate.class.getName() + ";\n");
         builder.append("import " + GenericHollowRecordHelper.class.getName() + ";\n\n");
 
-        builder.append("@SuppressWarnings(\"all\")\n");
+        appendGeneratedAnnotation(builder);
+        builder.append("\n@SuppressWarnings(\"all\")\n");
 
         String keyGeneric = parameterizeKey ? "K" : keyClassName;
         String valueGeneric = parameterizeValue ? "V" : valueClassName;

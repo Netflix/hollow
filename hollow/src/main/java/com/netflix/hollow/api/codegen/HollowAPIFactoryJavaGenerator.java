@@ -54,6 +54,7 @@ public class HollowAPIFactoryJavaGenerator extends HollowConsumerJavaFileGenerat
         builder.append("import ").append(Collections.class.getName()).append(";\n");
         builder.append("import ").append(Set.class.getName()).append(";\n");
 
+        appendGeneratedAnnotation(builder);
 
         builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class ").append(className).append(" implements HollowAPIFactory {\n\n");

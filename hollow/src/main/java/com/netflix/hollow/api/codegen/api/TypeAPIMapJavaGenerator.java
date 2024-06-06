@@ -54,6 +54,8 @@ public class TypeAPIMapJavaGenerator extends HollowTypeAPIGenerator {
         builder.append("import " + HollowMapTypeDataAccess.class.getName() + ";\n");
         builder.append("import " + HollowMapLookupDelegate.class.getName() + ";\n");
 
+        appendGeneratedAnnotation(builder);
+
         builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class ").append(className).append(" extends HollowMapTypeAPI {\n\n");
 

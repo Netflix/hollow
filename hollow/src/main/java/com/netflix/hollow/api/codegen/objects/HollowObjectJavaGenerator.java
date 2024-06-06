@@ -109,7 +109,8 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         }
         classBuilder.append("\n");
 
-        classBuilder.append("@SuppressWarnings(\"all\")\n");
+        appendGeneratedAnnotation(classBuilder);
+        classBuilder.append("\n@SuppressWarnings(\"all\")\n");
         if (requiresHollowTypeName) {
             classBuilder.append("@" + HollowTypeName.class.getSimpleName() + "(name=\"" + schema.getName() + "\")\n");
         }

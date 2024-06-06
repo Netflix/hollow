@@ -54,6 +54,7 @@ public class TypeAPISetJavaGenerator extends HollowTypeAPIGenerator {
         builder.append("import " + HollowSetTypeDataAccess.class.getName() + ";\n");
         builder.append("import " + HollowSetLookupDelegate.class.getName() + ";\n");
 
+        appendGeneratedAnnotation(builder);
         builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class ").append(className).append(" extends HollowSetTypeAPI {\n\n");
 

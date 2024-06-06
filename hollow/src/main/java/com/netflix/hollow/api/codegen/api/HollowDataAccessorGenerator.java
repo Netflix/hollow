@@ -66,7 +66,8 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
         builder.append("import " + HollowReadStateEngine.class.getName() + ";\n");
 
         builder.append("\n");
-        builder.append("@SuppressWarnings(\"all\")\n");
+        appendGeneratedAnnotation(builder);
+        builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class " + className + " extends " + AbstractHollowDataAccessor.class.getSimpleName() + "<" + type  +"> {\n\n");
 
         builder.append("    public static final String TYPE = \"" + schema.getName() + "\";\n");
