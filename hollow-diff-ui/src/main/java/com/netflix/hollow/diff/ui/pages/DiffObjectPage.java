@@ -24,7 +24,7 @@ import com.netflix.hollow.tools.diff.HollowTypeDiff;
 import com.netflix.hollow.ui.HollowUISession;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
 
 public class DiffObjectPage extends DiffPage {

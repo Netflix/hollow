@@ -27,8 +27,8 @@ import com.netflix.hollow.ui.HollowUIRouter;
 import com.netflix.hollow.ui.HollowUISession;
 import java.io.IOException;
 import java.util.HashMap;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("deprecation")
 public class HollowExplorerUI extends HollowUIRouter {
