@@ -28,10 +28,10 @@ import java.util.Map;
  * memory.
  */
 public class TestBlobRetriever implements BlobRetriever {
-    private final Map<Long, Blob> snapshots = new HashMap<>();
-    private final Map<Long, Blob> deltas = new HashMap<>();
-    private final Map<Long, Blob> reverseDeltas = new HashMap<>();
-    private final Map<Long, HeaderBlob> headers = new HashMap<>();
+    protected final Map<Long, Blob> snapshots = new HashMap<>();
+    protected final Map<Long, Blob> deltas = new HashMap<>();
+    protected final Map<Long, Blob> reverseDeltas = new HashMap<>();
+    protected final Map<Long, HeaderBlob> headers = new HashMap<>();
 
     @Override
     public HeaderBlob retrieveHeaderBlob(long desiredVersion) {
@@ -60,7 +60,7 @@ public class TestBlobRetriever implements BlobRetriever {
     }
 
     // so blob can be reused
-    private void resetStream(Blob b) {
+    protected void resetStream(Blob b) {
         try {
             if (b!= null && b.getInputStream() != null) {
                 b.getInputStream().reset();
