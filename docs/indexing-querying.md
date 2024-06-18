@@ -46,7 +46,7 @@ Once we have loaded a dataset into a `HollowConsumer`, we can use the `Movie` in
 
 HollowConsumer consumer = ...;
 
-MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIndex(consumer);
+MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIndex(consumer, true); // param isListenToDataRefresh set to true
 
 int knownMovieId = ...;
 
@@ -54,7 +54,7 @@ Movie movie = idx.findMatch(knownMovieId);
 
 ```
 
-Just as the `HollowConsumer` will automatically stay up-to-date as your dataset updates, a primary key index will also stay up-to-date with the `HollowConsumer` with which it is backed.
+Note that keeping the primary key index up-to-date with the `HollowConsumer` data state changes is optional.
 
 !!! hint "Share Indexes"
     Queries to indexes are thread-safe.  We should create each of the indexes we need only once, and share them everywhere they are needed.
@@ -138,7 +138,7 @@ for(ActorRole role : idx.findActorRoleMatches(knownActorId, knownMovieTitle)) {
 ```
 Similarly, if we want to include an enum type like releaseCountry in the fields, then its field path in the index construction can be specified as `releaseCountry._name`. Note, in field paths, an enum type is treated slightly differently from a String reference type which is expanded using `.value`.
 
-## Prefix Index
+## Prefix Index (experimental)
 
 A prefix index is used for indexing string values to records containing them. Prefix index in hollow also supports partial matching of string values enabling quick development of features like auto-complete, spell-checkers and others. In order to create a new prefix index, use this class by providing the following arguments in the constructor:
 - An instance of `HollowReadStateEngine`
@@ -163,7 +163,11 @@ while(ordinal != HollowOrdinalIterator.NO_MORE_ORDINAL)
 ```
 The above code will print out all the movie titles that begin with the letter "A". Field path could be a reference to an `OBJECT`, `LIST`, or a `SET`, it has to ultimately lead to a String type.
 
-You can also keep this index updated when a new delta blob is received on the consumer. When a new delta is available, a new prefix is built completely from scratch. While a new prefix index is being built, the current index can continue to answer queries. The implementation of the index takes care of swapping the new updated index with old one. In order to keep your index updated with delta changes, use the following:
+You can also keep this index updated when a new delta blob is received on the consumer. 
+When a new delta is available, a new prefix is built completely from scratch. 
+While a new prefix index is being built, the current index can continue to answer queries. 
+The implementation of the index takes care of swapping the new updated index with old one. 
+In order to keep your index updated with delta changes, use the following:
 
 ```java
 // add the index object as listener for delta updates for type "Movie".
@@ -173,7 +177,7 @@ prefixIndex.listenForDeltaUpdates();
 prefixIndex.detachFromDeltaUpdates();
 
 ```
-
+Also see section on [Keeping an index up-to-date](diving-deeper.md#keeping-an-index-up-to-date)
 
 ## Field Paths
 

@@ -136,7 +136,7 @@ After consumers have populated a `HollowReadStateEngine`, the data can be indexe
 HollowPrimaryKeyIndex idx =
                       new HollowPrimaryKeyIndex(readEngine, "Movie", "id");
 
-idx.listenForDeltaUpdates();
+idx.listenForDeltaUpdates(); // but does not listen for double-snapshot, see section on "Keeping an index up-to-date"
 ```
 
 This index can be held in memory and then used in conjunction with the generated Hollow API to retrieve Movie records by id:
@@ -153,14 +153,36 @@ Which outputs:
 Found Movie: Beasts of No Nation
 ```
 
-!!! warning "Keeping an Index Up To Date"
-    The call to `listenForDeltaUpdates()` will cause a `HollowPrimaryKeyIndex` to automatically stay updated when deltas are applied to the indexed `HollowReadStateEngine`, but this should only be called if you intend to keep the index around.  See the Indexing / Querying section for usage details.
-
 !!! hint "Thread Safety"
-    Retrievals from a `HollowPrimaryKeyIndex` are thread-safe.  It is safe to use a `HollowPrimaryKeyIndex` from multiple threads, and it is safe to query while a transition is in progress.
+    Retrievals from a `HollowPrimaryKeyIndex` are thread-safe.  It is safe to use a `HollowPrimaryKeyIndex` from multiple threads, 
+    and it is safe to query while a transition is in progress.
 
 !!! note "Ordinals"
     See [ordinals](#ordinals) for a discussion about ordinals.
+
+## Keeping an index up-to-date
+Indexes by default do not recalculate their state when the consumer refreshes to a new data state. 
+As such results for queries may become stale or corrupt if the consumer is refreshed.
+
+The index classes in the generated API (for e.g. `MoviePrimaryKeyIndex` or `<API classname>HashIndex`) have public constructors 
+that accept a boolean `isListenToDataRefresh` argument for whether or not to keep the indexes up to date.
+
+For indexes created using higher-level type-safe index API: `UniqueKeyIndex`, `HashIndex`, and `HashIndexSelect`: to subscribe these
+to consumer refreshes the caller must add the index as a refresh listener on the consumer. If/when the index is no longer
+required the index should be removed as a listener.
+
+For the lower-level index API: `HollowPrimaryKeyIndex`, `HollowHashIndex`, and `HollowUniqueKeyIndex` (latter is
+similar to `HollowPrimaryKeyIndex` but also supports object longevity) additional consideration is required for keeping an
+index up to date. The caller is required to call `listenForDeltaUpdates()` to subscribe an index to updates and if/when
+an index is to be cleaned up the caller must call `detachFromDeltaUpdates()` on the index. Just doing that is sufficient
+for consumers that are configured to only allow delta transitions i.e. allows delta updates but does not allow
+[double snapshot](advanced-topics.md#double-snapshots) updates. The default configuration
+for a Hollow Consumer is to allow double snapshot updates so in most cases with the lower-level index API calling
+`listenForDeltaUpdates()` is not sufficient- it can leave the index is a stale or corrupt state if a double snapshot is incurred. For
+handling double-snapshots on the consumer, the caller must also attach another listener on the
+consumer that listens on `snapshotOccurred` and initializes a  new instance of the index and subscribes that to consumer
+refreshes using `listenForDeltaUpdates()` (and detach the old index if necessary). `UniqueKeyIndex` implements this and
+can be used as a reference implementation.
 
 
 ### HollowPrimaryKeyIndex
@@ -185,7 +207,7 @@ A `HollowPrimaryKeyIndex` can be defined with a primary key consisting of both f
 ```java
 HollowPrimaryKeyIndex idx =
             new HollowPrimaryKeyIndex(readEngine, "Movie", "id", "country.id.value");
-idx.listenForDeltaUpdates();
+idx.listenForDeltaUpdates(); // but does not listen for double-snapshot, see section on "Keeping an index up-to-date"
 ```
 
 And to query for a `Movie` based on its id and country:
@@ -263,4 +285,7 @@ if(result != null) {
 }
 ```
 
-The `HollowHashIndex` has the same facility for listening for delta updates as `HollowPrimaryKeyIndex`, however unlike primary key index, hash index does a full re-index even on delta updates whereas primary key index refreshes more efficiently on delta updates.
+The `HollowHashIndex` has the same facility and caveats for listening for delta updates as `HollowPrimaryKeyIndex`
+(see above section on "Keeping an Index Up To Date"), however unlike primary key index, hash index does a full re-index 
+even on delta updates whereas primary key index has the ability to refresh more efficiently on delta updates. This ability 
+for primary key index is under evaluation and it will be enabled by default at some point in the future.

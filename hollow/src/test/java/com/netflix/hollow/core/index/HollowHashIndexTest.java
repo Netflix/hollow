@@ -313,6 +313,18 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
 
         // an iterator doesn't update itself if it was retrieved prior to an update being applied
         assertIteratorContainsAll(preUpdateIterator, 4, 5);
+
+        // snapshot updates don't update HollowHashIndex subscribed using listenForDeltaUpdates
+        mapper.add(new TypeA(5, 5.1d, new TypeB("five")));
+        roundTripSnapshot();
+        Assert.assertNull("Double snapshots not expected to update index subscribed using listenForDeltaUpdates",
+                index.findMatches(5));
+
+        // after a snapshot, subsequent delta updates don't update the original index
+        mapper.add(new TypeA(6, 6.1d, new TypeB("six")));
+        roundTripDelta();
+        Assert.assertNull("Original index subscribed using listenForDeltaUpdates not expected to refresh on " +
+                "deltas after incurring a double snapshot", index.findMatches(6));
     }
     
     @Test
