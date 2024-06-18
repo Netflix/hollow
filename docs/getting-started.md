@@ -273,6 +273,7 @@ HollowConsumer consumer = ...;
 consumer.triggerRefresh();
 
 UniqueKeyIndex<Movie, Integer> idx = Movie.uniqueIndex(consumer);
+consumer.addRefreshListener(idx);  // tell index to listen for consumer updates
 ```
 
 This index can be held in memory and then used in conjunction with the generated Hollow API to retrieve Movie records by 
@@ -288,7 +289,7 @@ Which outputs:
 Found Movie: Beasts of No Nation
 ```
 
-In our generated API, each type annotated with `@HollowPrimaryLey` has a static method to obtain a `UniqueIndex`.  For
+In our generated API, each type annotated with `@HollowPrimaryKey` has a static method to obtain a `UniqueIndex`.  For
 primary keys with multiple fields a _bean_ class is also generated to hold key values.
 
 A `UniqueIndex` may be also created explicitly to index by any field, or multiple fields.

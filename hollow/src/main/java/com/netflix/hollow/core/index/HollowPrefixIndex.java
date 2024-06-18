@@ -48,6 +48,10 @@ import java.util.logging.Logger;
  * </ul><p>
  * Includes methods for getting stats on memory usage and query performance.
  */
+/**
+ * @deprecated experimental, discontinued due to memory efficiency concerns. Could try multiple lookups into UniqueKeyIndex instead.
+ */
+@Deprecated
 public class HollowPrefixIndex implements HollowTypeStateListener {
     private static final Logger LOG = Logger.getLogger(HollowPrefixIndex.class.getName());
 

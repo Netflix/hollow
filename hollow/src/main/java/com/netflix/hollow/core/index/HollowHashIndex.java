@@ -225,6 +225,11 @@ public class HollowHashIndex implements HollowTypeStateListener {
      * <p>
      * In order to prevent memory leaks, if this method is called and the index is no longer needed, call detachFromDeltaUpdates() before
      * discarding the index.
+     * <p>
+     * Note that this index does not listen on snapshot update. If a snapshot update occurs this index will
+     * NOT return the latest data in the consumer and after 2 updates it could start returning corrupt results.
+     * If double-snapshot updates are expected the caller must detach this index instance and initialize a new one. See
+     * implementation of {@link com.netflix.hollow.api.consumer.index.UniqueKeyIndex} for a reference implementation.
      */
     public void listenForDeltaUpdates() {
         if (typeState == null) {
