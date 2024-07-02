@@ -50,6 +50,9 @@ public class FlatRecord {
 
         int topRecordSchemaId = VarInt.readVInt(recordData, dataStartByte + locationOfTopRecord);
         HollowSchema topRecordSchema = schemaIdMapper.getSchema(topRecordSchemaId);
+        if (topRecordSchema == null) {
+            throw new IllegalStateException("Could not find schema for schemaId " + topRecordSchemaId);
+        }
 
         if (topRecordSchema.getSchemaType() == SchemaType.OBJECT) {
             PrimaryKey primaryKey = ((HollowObjectSchema) topRecordSchema).getPrimaryKey();
