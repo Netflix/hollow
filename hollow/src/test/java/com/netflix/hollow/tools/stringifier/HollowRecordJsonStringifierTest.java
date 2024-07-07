@@ -38,6 +38,8 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
         String msg = "String types should be printed correctly";
         Assert.assertEquals(msg, "\"foo\"",
                 stringifyType(TypeWithString.class, true, false, new TypeWithString("foo")));
+        Assert.assertEquals(msg, "\"\\\\/foo\\u000a\"",
+                stringifyType(TypeWithString.class, true, false, new TypeWithString("\\/foo\n")));
         Assert.assertEquals(msg, "{" + NEWLINE
                 + INDENT + "\"value\": {" + NEWLINE
                 + INDENT + INDENT + "\"value\": \"foo\"" + NEWLINE
