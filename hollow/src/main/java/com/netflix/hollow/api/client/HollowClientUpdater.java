@@ -117,6 +117,7 @@ public class HollowClientUpdater {
         return updateTo(new HollowConsumer.VersionInfo(requestedVersion));
     }
     public synchronized boolean updateTo(HollowConsumer.VersionInfo requestedVersionInfo) throws Throwable {
+        metrics.setRefreshStartTimeNs(System.nanoTime());
         long requestedVersion = requestedVersionInfo.getVersion();
         if (requestedVersion == getCurrentVersionId()) {
             if (requestedVersion == HollowConstants.VERSION_NONE && hollowDataHolderVolatile == null) {
