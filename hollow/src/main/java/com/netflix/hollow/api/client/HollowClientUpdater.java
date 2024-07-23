@@ -117,6 +117,7 @@ public class HollowClientUpdater {
         return updateTo(new HollowConsumer.VersionInfo(requestedVersion));
     }
     public synchronized boolean updateTo(HollowConsumer.VersionInfo requestedVersionInfo) throws Throwable {
+        metrics.setLastRefreshStartNs(System.nanoTime());
         long requestedVersion = requestedVersionInfo.getVersion();
         if (requestedVersion == getCurrentVersionId()) {
             if (requestedVersion == HollowConstants.VERSION_NONE && hollowDataHolderVolatile == null) {
@@ -205,6 +206,7 @@ public class HollowClientUpdater {
                 metricsCollector.collect(metrics);
 
             initialLoad.complete(getCurrentVersionId()); // only set the first time
+            metrics.setLastRefreshEndNs(System.nanoTime());
             return getCurrentVersionId() == requestedVersion;
         } catch(Throwable th) {
             forceDoubleSnapshotNextUpdate();
@@ -216,6 +218,7 @@ public class HollowClientUpdater {
 
             // intentionally omitting a call to initialLoad.completeExceptionally(th), for producers
             // that write often a consumer has a chance to try another snapshot that might succeed
+            metrics.setLastRefreshEndNs(System.nanoTime());
 
             throw th;
         }

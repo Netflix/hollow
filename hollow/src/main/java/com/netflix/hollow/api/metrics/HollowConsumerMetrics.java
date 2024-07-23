@@ -18,9 +18,31 @@ package com.netflix.hollow.api.metrics;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 public class HollowConsumerMetrics extends HollowMetrics {
     private int refreshFailed;      // TODO: Move these metrics over to com.netflix.hollow.api.consumer.metrics.AbstractRefreshMetricsListener
     private int refreshSucceeded;
+    private final AtomicLong lastRefreshStartNs = new AtomicLong(); //last time a refresh started
+    private final AtomicLong lastRefreshEndNs = new AtomicLong();
+
+    public void setLastRefreshStartNs(long startNs) {
+        lastRefreshStartNs.set(startNs);
+    }
+
+    public AtomicLong getLastRefreshStartNs() {
+        return lastRefreshStartNs;
+    }
+
+    public void setLastRefreshEndNs(long endNs) {
+        lastRefreshEndNs.set(endNs);
+    }
+
+    public AtomicLong getLastRefreshEndNs() {
+       return lastRefreshEndNs;
+    }
+
+
 
     /**
      * Updates the consumer metrics:
