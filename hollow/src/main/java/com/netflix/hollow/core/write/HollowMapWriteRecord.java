@@ -26,10 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class HollowMapWriteRecord implements HollowHashableWriteRecord {
-    private static final Logger LOG = Logger.getLogger(HollowMapWriteRecord.class.getName());
 
     private static final Comparator<HollowMapEntry> MAP_ENTRY_COMPARATOR = new Comparator<HollowMapEntry>() {
         public int compare(HollowMapEntry o1, HollowMapEntry o2) {
