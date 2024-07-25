@@ -31,7 +31,11 @@ public class HollowMapWriteRecord implements HollowHashableWriteRecord {
 
     private static final Comparator<HollowMapEntry> MAP_ENTRY_COMPARATOR = new Comparator<HollowMapEntry>() {
         public int compare(HollowMapEntry o1, HollowMapEntry o2) {
-            return o1.getKeyOrdinal() - o2.getKeyOrdinal();
+            int res = o1.getKeyOrdinal() - o2.getKeyOrdinal();
+            if (res == 0) {
+                res =  o1.getValueOrdinal() - o2.getValueOrdinal();
+            }
+            return res;
         }
     };
 
