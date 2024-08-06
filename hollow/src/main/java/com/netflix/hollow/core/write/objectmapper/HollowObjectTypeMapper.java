@@ -631,7 +631,9 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     unsafe.putObject(pojo, fieldOffset, rec.getBytes(fieldName));
                     break;
                 case INLINED_BOOLEAN:
-                    unsafe.putObject(pojo, fieldOffset, Boolean.valueOf(rec.getBoolean(fieldName)));
+                    if (!rec.isNull(fieldName)) {
+                        unsafe.putObject(pojo, fieldOffset, Boolean.valueOf(rec.getBoolean(fieldName)));
+                    }
                     break;
                 case INLINED_INT:
                     int inlinedIntValue = rec.getInt(fieldName);
