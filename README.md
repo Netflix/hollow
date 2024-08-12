@@ -24,7 +24,7 @@ Release binaries are available from Maven Central and jCenter.
 |com.netflix.hollow|hollow|5.1.3|
 
 In a Maven `.pom` file:
-
+```xml
         ...
         <dependency>
                 <groupId>com.netflix.hollow</groupId>
@@ -32,15 +32,18 @@ In a Maven `.pom` file:
                 <version>5.1.3</version>
         </dependency>
         ...
+```
 
 In a Gradle `build.gradle` file:
-
+```gradle
         ...
         compile 'com.netflix.hollow:hollow:5.1.3'
         ...
+```
         
 Release candidate binaries, matching the `-rc\.*` pattern for an artifact's version, are available from the jCenter [oss-candidate](https://dl.bintray.com/netflixoss/oss-candidate/) repository, which may be declared in a `build.gradle` file:
 
+```gradle
         ...
         repositories {
             maven {
@@ -48,6 +51,7 @@ Release candidate binaries, matching the `-rc\.*` pattern for an artifact's vers
             }
         }
         ...
+```
 
 ## Get Support
 
