@@ -24,6 +24,8 @@ import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -47,6 +49,8 @@ public abstract class HollowTypeMapper {
     protected abstract Object parseHollowRecord(HollowRecord record);
     
     protected abstract Object parseFlatRecord(HollowSchema schema, FlatRecordReader reader, Map<Integer, Object> parsedObjects);
+
+    protected abstract Object parseFlatRecordTraversalNode(FlatRecordTraversalNode node);
     
     protected abstract HollowWriteRecord newWriteRecord();
 

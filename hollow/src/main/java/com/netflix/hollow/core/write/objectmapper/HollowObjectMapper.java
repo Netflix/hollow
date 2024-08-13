@@ -22,6 +22,8 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalObjectNode;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -89,6 +91,16 @@ public class HollowObjectMapper {
     public void writeFlat(Object o, FlatRecordWriter flatRecordWriter) {
     	HollowTypeMapper typeMapper = getTypeMapper(o.getClass(), null, null);
     	typeMapper.writeFlat(o, flatRecordWriter);
+    }
+
+    public <T> T readFlat(FlatRecordTraversalObjectNode node) {
+        String schemaName = node.getSchema().getName();
+        HollowTypeMapper typeMapper = typeMappers.get(schemaName);
+        if (typeMapper == null) {
+            throw new IllegalArgumentException("No type mapper found for schema " + schemaName);
+        }
+        Object obj = typeMapper.parseFlatRecordTraversalNode(node);
+        return (T) obj;
     }
 
     public <T> T readFlat(FlatRecord record) {

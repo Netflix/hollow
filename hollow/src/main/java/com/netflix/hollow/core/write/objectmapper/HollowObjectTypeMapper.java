@@ -39,6 +39,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalObjectNode;
 import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
@@ -287,6 +290,49 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
             return obj;
         } catch(Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    @Override
+    protected Object parseFlatRecordTraversalNode(FlatRecordTraversalNode node) {
+        try {
+            FlatRecordTraversalObjectNode objectNode = (FlatRecordTraversalObjectNode) node;
+            HollowObjectSchema recordObjectSchema = objectNode.getSchema();
+
+            Object obj = null;
+            if (BOXED_WRAPPERS.contains(clazz)) {
+                // if `clazz` is a BoxedWrapper then by definition its OBJECT schema will have a single primitive
+                // field so find it in the FlatRecord and ignore all other fields.
+                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
+                    int posInPojoSchema = schema.getPosition(recordObjectSchema.getFieldName(i));
+                    if (posInPojoSchema != -1) {
+                        obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(objectNode);
+                    }
+                }
+            } else if (clazz.isEnum()) {
+                // if `clazz` is an enum, then we should expect to find a field called `_name` in the FlatRecord.
+                // There may be other fields if the producer enum contained custom properties, we ignore them
+                // here assuming the enum constructor will set them if needed.
+                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
+                    String fieldName = recordObjectSchema.getFieldName(i);
+                    int posInPojoSchema = schema.getPosition(fieldName);
+                    if (fieldName.equals(MappedFieldType.ENUM_NAME.getSpecialFieldName()) && posInPojoSchema != -1) {
+                        obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(objectNode);
+                    }
+                }
+            } else {
+                obj = unsafe.allocateInstance(clazz);
+                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
+                    int posInPojoSchema = schema.getPosition(recordObjectSchema.getFieldName(i));
+                    if (posInPojoSchema != -1) {
+                        mappedFields.get(posInPojoSchema).parse(obj, objectNode);
+                    }
+                }
+            }
+
+            return obj;
+        }
+        catch(Exception ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -848,6 +894,224 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
             return null;
         }
+
+        private Object parseBoxedWrapper(FlatRecordTraversalObjectNode record) {
+            switch (fieldType) {
+                case BOOLEAN:
+                    return record.getFieldValueBooleanBoxed(fieldName);
+                case INT:
+                    int intValue = record.getFieldValueInt(fieldName);
+                    if (intValue == Integer.MIN_VALUE) {
+                        return null;
+                    }
+                    return Integer.valueOf(intValue);
+                case SHORT:
+                    int shortValue = record.getFieldValueIntBoxed(fieldName);
+                    if (shortValue == Integer.MIN_VALUE) {
+                        return null;
+                    }
+                    return Short.valueOf((short) shortValue);
+                case BYTE:
+                    int byteValue = record.getFieldValueInt(fieldName);
+                    if (byteValue == Integer.MIN_VALUE) {
+                        return null;
+                    }
+                    return Byte.valueOf((byte) byteValue);
+                case CHAR:
+                    int charValue = record.getFieldValueInt(fieldName);
+                    if (charValue == Integer.MIN_VALUE) {
+                        return null;
+                    }
+                    return Character.valueOf((char) charValue);
+                case LONG:
+                    return record.getFieldValueLongBoxed(fieldName);
+                case FLOAT:
+                    return record.getFieldValueFloatBoxed(fieldName);
+                case DOUBLE:
+                    return record.getFieldValueDoubleBoxed(fieldName);
+                case STRING:
+                    return record.getFieldValueString(fieldName);
+                case BYTES:
+                    return record.getFieldValueBytes(fieldName);
+                case ENUM_NAME:
+                    String enumName = record.getFieldValueString(fieldName);
+                    if (enumName == null) {
+                        return null;
+                    }
+                    return Enum.valueOf((Class<Enum>) clazz, enumName);
+                case DATE_TIME: {
+                    long dateValue = record.getFieldValueLong(fieldName);
+                    if (dateValue == Long.MIN_VALUE) {
+                        return null;
+                    }
+                    return new Date(dateValue);
+                }
+                default:
+                    throw new IllegalArgumentException("Unexpected field type " + fieldType + " for field " + fieldName);
+            }
+        }
+
+        private void parse(Object obj, FlatRecordTraversalObjectNode node) {
+            switch(fieldType) {
+                case BOOLEAN: {
+                    Boolean value = node.getFieldValueBooleanBoxed(fieldName);
+                    if (value != null) {
+                        unsafe.putBoolean(obj, fieldOffset, value == Boolean.TRUE);
+                    }
+                    break;
+                }
+                case INT: {
+                    int value = node.getFieldValueInt(fieldName);
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putInt(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case SHORT: {
+                    int value = node.getFieldValueInt(fieldName);
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putShort(obj, fieldOffset, (short) value);
+                    }
+                    break;
+                }
+                case BYTE: {
+                    int value = node.getFieldValueInt(fieldName);
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putByte(obj, fieldOffset, (byte) value);
+                    }
+                    break;
+                }
+                case CHAR: {
+                    int value = node.getFieldValueInt(fieldName);
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putChar(obj, fieldOffset, (char) value);
+                    }
+                    break;
+                }
+                case LONG: {
+                    long value = node.getFieldValueLongBoxed(fieldName);
+                    if (value != Long.MIN_VALUE) {
+                        unsafe.putLong(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case FLOAT: {
+                    float value = node.getFieldValueFloatBoxed(fieldName);
+                    if (!Float.isNaN(value)) {
+                        unsafe.putFloat(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case DOUBLE: {
+                    double value = node.getFieldValueDoubleBoxed(fieldName);
+                    if (!Double.isNaN(value)) {
+                        unsafe.putDouble(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case STRING: {
+                    String value = node.getFieldValueString(fieldName);
+                    if (value != null) {
+                        unsafe.putObject(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case BYTES: {
+                    byte[] value = node.getFieldValueBytes(fieldName);
+                    if (value != null) {
+                        unsafe.putObject(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case INLINED_BOOLEAN: {
+                    Boolean value = node.getFieldValueBooleanBoxed(fieldName);
+                    if (value != null) {
+                        unsafe.putObject(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case INLINED_INT: {
+                    int value = node.getFieldValueInt(fieldName);
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putObject(obj, fieldOffset, Integer.valueOf(value));
+                    }
+                    break;
+                }
+                case INLINED_SHORT: {
+                    int value = node.getFieldValueInt(fieldName);
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putObject(obj, fieldOffset, Short.valueOf((short) value));
+                    }
+                    break;
+                }
+                case INLINED_BYTE: {
+                    int value = node.getFieldValueInt(fieldName);
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putObject(obj, fieldOffset, Byte.valueOf((byte) value));
+                    }
+                    break;
+                }
+                case INLINED_CHAR: {
+                    int value = node.getFieldValueInt(fieldName);
+                    if (value != Integer.MIN_VALUE) {
+                        unsafe.putObject(obj, fieldOffset, Character.valueOf((char) value));
+                    }
+                    break;
+                }
+                case INLINED_LONG: {
+                    long value = node.getFieldValueLong(fieldName);
+                    if (value != Long.MIN_VALUE) {
+                        unsafe.putObject(obj, fieldOffset, Long.valueOf(value));
+                    }
+                    break;
+                }
+                case INLINED_FLOAT: {
+                    float value = node.getFieldValueFloat(fieldName);
+                    if (!Float.isNaN(value)) {
+                        unsafe.putObject(obj, fieldOffset, Float.valueOf(value));
+                    }
+                    break;
+                }
+                case INLINED_DOUBLE: {
+                    double value = node.getFieldValueDouble(fieldName);
+                    if (!Double.isNaN(value)) {
+                        unsafe.putObject(obj, fieldOffset, Double.valueOf(value));
+                    }
+                    break;
+                }
+                case INLINED_STRING: {
+                    String value = node.getFieldValueString(fieldName);
+                    if (value != null) {
+                        unsafe.putObject(obj, fieldOffset, value);
+                    }
+                    break;
+                }
+                case DATE_TIME: {
+                    long value = node.getFieldValueLong(fieldName);
+                    if (value != Long.MIN_VALUE) {
+                        unsafe.putObject(obj, fieldOffset, new Date(value));
+                    }
+                    break;
+                }
+                case ENUM_NAME: {
+                    String value = node.getFieldValueString(fieldName);
+                    if (value != null) {
+                        unsafe.putObject(obj, fieldOffset, Enum.valueOf((Class) type, value));
+                    }
+                    break;
+                }
+                case REFERENCE: {
+                    FlatRecordTraversalNode childNode = node.getFieldNode(fieldName);
+                    if (childNode != null) {
+                        unsafe.putObject(obj, fieldOffset, subTypeMapper.parseFlatRecordTraversalNode(childNode));
+                    }
+                    break;
+                }
+                default:
+                    throw new IllegalArgumentException("Unknown field type: " + fieldType);
+            }
+        }
+
 
         private void parse(Object obj, FlatRecordReader reader, Map<Integer, Object> parsedRecords) {
             switch(fieldType) {

@@ -27,6 +27,9 @@ import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalListNode;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -133,6 +136,21 @@ public class HollowListTypeMapper extends HollowTypeMapper {
         for (int i = 0; i < size; i++) {
             int ordinal = reader.readOrdinal();
             Object element = parsedObjects.get(ordinal);
+            collection.add(element);
+        }
+
+        return collection;
+    }
+
+    @Override
+    protected Object parseFlatRecordTraversalNode(FlatRecordTraversalNode node) {
+        List<Object> collection = new ArrayList<>();
+
+        FlatRecordTraversalListNode listNode = (FlatRecordTraversalListNode) node;
+        int size = listNode.size();
+        for (int i = 0; i < size; i++) {
+            FlatRecordTraversalNode elementNode = listNode.get(i);
+            Object element = elementMapper.parseFlatRecordTraversalNode(elementNode);
             collection.add(element);
         }
 
