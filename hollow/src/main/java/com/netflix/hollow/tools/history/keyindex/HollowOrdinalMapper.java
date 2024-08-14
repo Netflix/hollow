@@ -16,17 +16,16 @@
  */
 package com.netflix.hollow.tools.history.keyindex;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.tools.util.ObjectInternPool;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
-import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-
 import java.util.Arrays;
 
 public class HollowOrdinalMapper {
@@ -218,14 +217,17 @@ public class HollowOrdinalMapper {
                 if(ordinalList==null || ordinalList.size()==0)
                     continue;
 
-                // Recompute original hash, based on the fact that all objects in this IntList have the same hash
-
-                Object originalFieldObject = getFieldObject(ordinalList.get(0), fieldIdx, keyFieldTypes[fieldIdx]);
-
-                int originalHash = hashObject(originalFieldObject);
-                int newIndex = indexFromHash(originalHash, newTable.length);
-
-                newFieldHashToOrdinal[fieldIdx][newIndex]=ordinalList;
+                // Recompute original hash, objects in the IntList don't necessarily share the same hash (see indexFromHash)
+                for (int i=0;i<ordinalList.size();i++) {
+                    int ordinal = ordinalList.get(i);
+                    Object originalFieldObject = getFieldObject(ordinal, fieldIdx, keyFieldTypes[fieldIdx]);
+                    int originalHash = hashObject(originalFieldObject);
+                    int newIndex = indexFromHash(originalHash, newTable.length);
+                    if (newFieldHashToOrdinal[fieldIdx][newIndex] == null) {
+                        newFieldHashToOrdinal[fieldIdx][newIndex] = new IntList();
+                    }
+                    newFieldHashToOrdinal[fieldIdx][newIndex].add(ordinal);
+                }
             }
         }
 
