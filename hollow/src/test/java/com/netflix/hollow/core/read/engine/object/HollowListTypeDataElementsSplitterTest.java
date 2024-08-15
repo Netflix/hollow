@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class HollowObjectTypeDataElementsSplitterTest extends AbstractHollowObjectTypeDataElementsSplitJoinTest {
+public class HollowListTypeDataElementsSplitterTest extends AbstractHollowObjectTypeDataElementsSplitJoinTest {
 
     @Test
     public void testSplit() throws IOException {

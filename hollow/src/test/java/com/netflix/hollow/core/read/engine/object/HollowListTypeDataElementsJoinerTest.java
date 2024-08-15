@@ -13,7 +13,7 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObjectTypeDataElementsSplitJoinTest {
+public class HollowListTypeDataElementsJoinerTest extends AbstractHollowObjectTypeDataElementsSplitJoinTest {
     @Override
     protected void initializeTypeStates() {
         writeStateEngine.setTargetMaxTypeShardSize(16);
