@@ -1,13 +1,11 @@
 package com.netflix.hollow.core.read.engine.list;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.netflix.hollow.api.objects.generic.GenericHollowList;
-import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
@@ -17,6 +15,7 @@ import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import java.io.IOException;
 import java.util.Arrays;
+import org.junit.Assert;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -108,23 +107,19 @@ public class AbstractHollowListTypeDataElementsSplitJoinTest extends AbstractSta
         return (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
     }
 
-    protected HollowListTypeReadState populateTypeStateWithFilter(int numRecords, int[][] listContents) throws IOException {
-        populateWriteStateEngine(numRecords, listContents);
-        readStateEngine = new HollowReadStateEngine();
-        HollowFilterConfig readFilter = new HollowFilterConfig(true);
-        readFilter.addField("TestObject", "intField");
-        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, readFilter);
-        return (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
+    protected void assertDataUnchanged(int[][] listContents) {
+        assertDataUnchanged((HollowListTypeReadState) readStateEngine.getTypeState("TestList"), listContents);
     }
 
-    protected void assertDataUnchanged(int numRecords) {
-        assertDataUnchanged((HollowListTypeReadState) readStateEngine.getTypeState("TestObject"), numRecords);
-    }
-
-    protected void assertDataUnchanged(HollowListTypeReadState typeState, int numRecords) {
-        for(int i=0;i<numRecords;i++) {
-            GenericHollowList obj = new GenericHollowList(typeState, i);
-            System.out.println(obj.toString());
+    protected void assertDataUnchanged(HollowListTypeReadState typeState, int[][] listContents) {
+        int numListRecords = listContents.length;
+        for(int i=0;i<numListRecords;i++) {
+            HollowOrdinalIterator iter = typeState.ordinalIterator(i);
+            for(int j=0;j<listContents[i].length;j++) {
+                Assert.assertEquals(listContents[i][j], iter.next());
+            }
+            Assert.assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iter.next());
+            // System.out.println(obj.toString());
             // assertEquals(i, obj.get("longField"));
             // assertEquals("Value"+i, obj.getString("stringField"));
             // assertEquals((double)i, obj.getDouble("doubleField"), 0);

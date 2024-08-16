@@ -47,9 +47,9 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
 
     private final HollowListSampler sampler;
     
-    private final int shardNumberMask;
+    final int shardNumberMask;    // SNAP: TODO: elevated from private access for testing
     private final int shardOrdinalShift;
-    private final HollowListTypeReadStateShard shards[];
+    final HollowListTypeReadStateShard shards[];    // SNAP: TODO: elevated from private access for testing
     
     private int maxOrdinal;
 
@@ -70,6 +70,19 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
         for(int i=0;i<shards.length;i++)
             shards[i] = new HollowListTypeReadStateShard();
         
+        this.shards = shards;
+    }
+
+    // SNAP: TODO: for testing
+    public HollowListTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowListSchema schema, int numShards, HollowListTypeReadStateShard[] shards) {
+        super(stateEngine, memoryMode, schema);
+        this.sampler = new HollowListSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
+        this.shardNumberMask = numShards - 1;
+        this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
+
+        if(numShards < 1 || 1 << shardOrdinalShift != numShards)
+            throw new IllegalArgumentException("Number of shards must be a power of 2!");
+
         this.shards = shards;
     }
 

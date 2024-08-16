@@ -39,7 +39,7 @@ public class HollowListTypeDataElementsSplitter {
 
         populateStats(to, from, toMask, toOrdinalShift);
 
-        copyRecords(to, from, toMask);
+        copyRecords(to, from, toMask, toOrdinalShift);
 
         return to;
     }
@@ -82,19 +82,19 @@ public class HollowListTypeDataElementsSplitter {
 
             to[toIndex].listPointerData = FixedLengthDataFactory.get((long)to[toIndex].bitsPerListPointer * (to[toIndex].maxOrdinal + 1), to[toIndex].memoryMode, to[toIndex].memoryRecycler);
             to[toIndex].elementData = FixedLengthDataFactory.get((long)to[toIndex].bitsPerElement * totalOfListSizes[toIndex], to[toIndex].memoryMode, to[toIndex].memoryRecycler);
-            // SNAP: TODO: who does clean up?
 
             to[toIndex].totalNumberOfElements = totalOfListSizes[toIndex];  // useful for heap usage stats
         }
     }
 
-    private void copyRecords(HollowListTypeDataElements[] to, HollowListTypeDataElements from, int toMask) {
+    private void copyRecords(HollowListTypeDataElements[] to, HollowListTypeDataElements from, int toMask, int toOrdinalShift) {
         int numSplits = to.length;
         long elementCounter[] = new long[numSplits];
 
         // count elements per split
         for(int ordinal=0;ordinal<=from.maxOrdinal;ordinal++) {
             int toIndex = ordinal & toMask;
+            int toOrdinal = ordinal >> toOrdinalShift;
 
             long startElement;
             long endElement;
@@ -113,7 +113,7 @@ public class HollowListTypeDataElementsSplitter {
                 to[toIndex].elementData.setElementValue(elementCounter[toIndex] * to[toIndex].bitsPerElement, to[toIndex].bitsPerElement, elementOrdinal);
                 elementCounter[toIndex]++;
             }
-            to[toIndex].listPointerData.setElementValue(to[toIndex].bitsPerListPointer * toIndex, to[toIndex].bitsPerListPointer, elementCounter[toIndex]);
+            to[toIndex].listPointerData.setElementValue(to[toIndex].bitsPerListPointer * toOrdinal, to[toIndex].bitsPerListPointer, elementCounter[toIndex]);
         }
     }
 }
