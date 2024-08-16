@@ -1,4 +1,4 @@
-package com.netflix.hollow.core.read.engine.list;
+package com.netflix.hollow.core.read.engine.object;
 
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.copyRecord;
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthSize;
@@ -7,7 +7,6 @@ import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataEle
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements;
 
 
 /**
@@ -16,7 +15,7 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements;
  * The original data elements are not destroyed.
  * The no. of passed data elements must be a power of 2.
  */
-class HollowListTypeDataElementsJoiner {
+class HollowObjectTypeDataElementsJoiner {
 
     HollowObjectTypeDataElements join(HollowObjectTypeDataElements[] from) {
         final int fromMask = from.length - 1;
