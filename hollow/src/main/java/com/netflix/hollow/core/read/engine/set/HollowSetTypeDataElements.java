@@ -23,6 +23,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElements;
 import java.io.IOException;
 
 /**
@@ -32,15 +33,10 @@ import java.io.IOException;
  * with the existing one to make sure a consistent view of the data is always available. 
  */
 
-public class HollowSetTypeDataElements {
-
-    int maxOrdinal;
+public class HollowSetTypeDataElements extends AbstractHollowTypeDataElements {
 
     FixedLengthData setPointerAndSizeData;
     FixedLengthData elementData;
-
-    GapEncodedVariableLengthIntegerReader encodedRemovals;
-    GapEncodedVariableLengthIntegerReader encodedAdditions;
 
     int bitsPerSetPointer;
     int bitsPerSetSizeValue;
@@ -49,16 +45,12 @@ public class HollowSetTypeDataElements {
     int emptyBucketValue;
     long totalNumberOfBuckets;
 
-    final ArraySegmentRecycler memoryRecycler;
-    final MemoryMode memoryMode;
-
     public HollowSetTypeDataElements(ArraySegmentRecycler memoryRecycler) {
         this(MemoryMode.ON_HEAP, memoryRecycler);
     }
 
     public HollowSetTypeDataElements(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
-        this.memoryMode = memoryMode;
-        this.memoryRecycler = memoryRecycler;
+        super(memoryMode, memoryRecycler);
     }
 
     void readSnapshot(HollowBlobInput in) throws IOException {

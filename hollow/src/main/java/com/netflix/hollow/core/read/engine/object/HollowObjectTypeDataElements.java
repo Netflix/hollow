@@ -26,6 +26,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElements;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.io.IOException;
 
@@ -35,17 +36,12 @@ import java.io.IOException;
  * During a delta, the HollowObjectTypeReadState will create a new HollowObjectTypeDataElements and atomically swap
  * with the existing one to make sure a consistent view of the data is always available. 
  */
-public class HollowObjectTypeDataElements {
+public class HollowObjectTypeDataElements extends AbstractHollowTypeDataElements {
 
-    final HollowObjectSchema schema;
-
-    int maxOrdinal;
+    public final HollowObjectSchema schema;
 
     FixedLengthData fixedLengthData;
     final VariableLengthData varLengthData[];
-
-    GapEncodedVariableLengthIntegerReader encodedAdditions;
-    GapEncodedVariableLengthIntegerReader encodedRemovals;
 
     final int bitsPerField[];
     final int bitOffsetPerField[];
@@ -55,21 +51,17 @@ public class HollowObjectTypeDataElements {
     private int bitsPerUnfilteredField[];
     private boolean unfilteredFieldIsIncluded[];
 
-    final ArraySegmentRecycler memoryRecycler;
-    final MemoryMode memoryMode;
-
     public HollowObjectTypeDataElements(HollowObjectSchema schema, ArraySegmentRecycler memoryRecycler) {
         this(schema, MemoryMode.ON_HEAP, memoryRecycler);
     }
 
     public HollowObjectTypeDataElements(HollowObjectSchema schema, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
+        super(memoryMode, memoryRecycler);
         varLengthData = new VariableLengthData[schema.numFields()];
         bitsPerField = new int[schema.numFields()];
         bitOffsetPerField = new int[schema.numFields()];
         nullValueForField = new long[schema.numFields()];
         this.schema = schema;
-        this.memoryMode = memoryMode;
-        this.memoryRecycler = memoryRecycler;
     }
 
     void readSnapshot(HollowBlobInput in, HollowObjectSchema unfilteredSchema) throws IOException {

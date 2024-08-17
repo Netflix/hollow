@@ -1,7 +1,7 @@
 package com.netflix.hollow.core.read.engine.list;
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
-import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
+import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitter;
 
 /**
  * Split a {@code HollowListTypeDataElements} into multiple {@code HollowListTypeDataElements}s.
@@ -9,42 +9,21 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
  * The original data elements are not destroyed.
  * {@code numSplits} must be a power of 2.
  */
-public class HollowListTypeDataElementsSplitter {
+public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataElementsSplitter {
 
-    HollowListTypeDataElements[] split(HollowListTypeDataElements from, int numSplits) {
-        final int toMask = numSplits - 1;
-        final int toOrdinalShift = 31 - Integer.numberOfLeadingZeros(numSplits);
-
-        if (numSplits<=0 || !((numSplits&(numSplits-1))==0)) {
-            throw new IllegalStateException("Must split by power of 2");
-        }
-
-        HollowListTypeDataElements[] to = new HollowListTypeDataElements[numSplits];
+    public HollowListTypeDataElementsSplitter(HollowListTypeDataElements from, int numSplits) {
+        super(from, numSplits);
+        this.to = new HollowListTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
             to[i] = new HollowListTypeDataElements(from.memoryMode, from.memoryRecycler);
-            to[i].maxOrdinal = -1;
         }
-
-        if (from.encodedRemovals != null) {
-            GapEncodedVariableLengthIntegerReader[] splitRemovals = from.encodedRemovals.split(numSplits);
-            for(int i=0;i<to.length;i++) {
-                to[i].encodedRemovals = splitRemovals[i];
-            }
-        }
-        if (from.encodedAdditions != null) {
-            throw new IllegalStateException("Encountered encodedAdditions in data elements splitter- this is not expected " +
-                    "since encodedAdditions only exist on delta data elements and they dont carry over to target data elements, " +
-                    "delta data elements are never split/joined");
-        }
-
-        populateStats(to, from, toMask, toOrdinalShift);
-
-        copyRecords(to, from, toMask, toOrdinalShift);
-
-        return to;
     }
 
-    private void populateStats(HollowListTypeDataElements[] to, HollowListTypeDataElements from, int toMask, int toOrdinalShift) {
+    @Override
+    public void populateStats() {
+        HollowListTypeDataElements[] to = (HollowListTypeDataElements[]) this.to;
+        HollowListTypeDataElements from = (HollowListTypeDataElements) this.from;
+
         int numSplits = to.length;
         long[] totalOfListSizes  = new long[numSplits];
 
@@ -87,7 +66,11 @@ public class HollowListTypeDataElementsSplitter {
         }
     }
 
-    private void copyRecords(HollowListTypeDataElements[] to, HollowListTypeDataElements from, int toMask, int toOrdinalShift) {
+    @Override
+    public void copyRecords() {
+        HollowListTypeDataElements[] to = (HollowListTypeDataElements[]) this.to;
+        HollowListTypeDataElements from = (HollowListTypeDataElements) this.from;
+
         int numSplits = to.length;
         long elementCounter[] = new long[numSplits];
 

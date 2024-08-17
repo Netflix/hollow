@@ -23,6 +23,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElements;
 import java.io.IOException;
 
 /**
@@ -31,15 +32,10 @@ import java.io.IOException;
  * During a delta, the HollowMapTypeReadState will create a new HollowMapTypeDataElements and atomically swap
  * with the existing one to make sure a consistent view of the data is always available. 
  */
-public class HollowMapTypeDataElements {
-
-    int maxOrdinal;
+public class HollowMapTypeDataElements extends AbstractHollowTypeDataElements {
 
     FixedLengthData mapPointerAndSizeData;
     FixedLengthData entryData;
-
-    GapEncodedVariableLengthIntegerReader encodedRemovals;
-    GapEncodedVariableLengthIntegerReader encodedAdditions;
 
     int bitsPerMapPointer;
     int bitsPerMapSizeValue;
@@ -50,16 +46,12 @@ public class HollowMapTypeDataElements {
     int emptyBucketKeyValue;
     long totalNumberOfBuckets;
 
-    final ArraySegmentRecycler memoryRecycler;
-    final MemoryMode memoryMode;
-
     public HollowMapTypeDataElements(ArraySegmentRecycler memoryRecycler) {
         this(MemoryMode.ON_HEAP, memoryRecycler);
     }
 
     public HollowMapTypeDataElements(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
-        this.memoryMode = memoryMode;
-        this.memoryRecycler = memoryRecycler;
+        super(memoryMode, memoryRecycler);
     }
 
     void readSnapshot(HollowBlobInput in) throws IOException {

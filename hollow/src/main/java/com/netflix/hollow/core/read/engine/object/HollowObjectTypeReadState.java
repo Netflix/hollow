@@ -311,9 +311,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         int newNumShards = shardsHolder.shards.length;
         int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newNumShards);
 
-        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
         HollowObjectTypeDataElements dataElementsToSplit = shardsHolder.shards[currentIndex].dataElements;
-        HollowObjectTypeDataElements[] splits = splitter.split(dataElementsToSplit, shardingFactor);
+        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(dataElementsToSplit, shardingFactor);
+        HollowObjectTypeDataElements[] splits = (HollowObjectTypeDataElements[]) splitter.split();
 
         HollowObjectTypeReadStateShard[] newShards = Arrays.copyOf(shardsHolder.shards, shardsHolder.shards.length);
         for (int i = 0; i < shardingFactor; i ++) {

@@ -23,7 +23,6 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
 
     @Test
     public void testSplitThenJoin() throws IOException {
-        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
         HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
 
         for (int numRecords=0;numRecords<1*1000;numRecords++) {
@@ -32,7 +31,8 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
             assertDataUnchanged(typeReadState, numRecords);
 
             for (int numSplits : new int[]{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024}) {
-                HollowObjectTypeDataElements[] splitElements = splitter.split(typeReadState.currentDataElements()[0], numSplits);
+                HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
+                HollowObjectTypeDataElements[] splitElements = (HollowObjectTypeDataElements[]) splitter.split();
                 HollowObjectTypeDataElements joinedElements = joiner.join(splitElements);
                 HollowObjectTypeReadState resultTypeReadState = new HollowObjectTypeReadState(typeReadState.getSchema(), joinedElements);
 
@@ -59,7 +59,6 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
 
     @Test
     public void testSplitThenJoinWithFilter() throws IOException {
-        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
         HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
 
         int numSplits = 2;
@@ -68,7 +67,8 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
             assertEquals(1, typeReadState.numShards());
             assertDataUnchanged(typeReadState, numRecords);
 
-            HollowObjectTypeDataElements[] splitElements = splitter.split(typeReadState.currentDataElements()[0], numSplits);
+            HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
+            HollowObjectTypeDataElements[] splitElements = (HollowObjectTypeDataElements[]) splitter.split();
             HollowObjectTypeDataElements joinedElements = joiner.join(splitElements);
             HollowObjectTypeReadState resultTypeReadState = new HollowObjectTypeReadState(typeReadState.getSchema(), joinedElements);
 
@@ -79,12 +79,12 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
 
     @Test
     public void testSplitThenJoinWithEmptyJoin() throws IOException {
-        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
 
         HollowObjectTypeReadState typeReadState = populateTypeStateWith(1);
         assertEquals(1, typeReadState.numShards());
 
-        HollowObjectTypeDataElements[] splitBy4 = splitter.split(typeReadState.currentDataElements()[0], 4);
+        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 4);
+        HollowObjectTypeDataElements[] splitBy4 = (HollowObjectTypeDataElements[]) splitter.split();
         assertEquals(-1, splitBy4[1].maxOrdinal);
         assertEquals(-1, splitBy4[3].maxOrdinal);
 
@@ -116,8 +116,8 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
 
         assertEquals(1, typeState.numShards());
 
-        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
-        HollowObjectTypeDataElements[] splitElements = splitter.split(typeState.currentDataElements()[0], numSplits);
+        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(typeState.currentDataElements()[0], numSplits);
+        HollowObjectTypeDataElements[] splitElements = (HollowObjectTypeDataElements[]) splitter.split();
 
         HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
         HollowObjectTypeDataElements joinedElements = joiner.join(splitElements);
