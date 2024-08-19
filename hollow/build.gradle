@@ -2,7 +2,7 @@ apply plugin: 'java-library'
 
 dependencies {
     testImplementation project(":hollow-test")
-    testImplementation 'junit:junit:5.8.1'
+    testImplementation 'junit:junit:4.11'
     testImplementation 'org.mockito:mockito-core:2.15.0'
     testImplementation 'com.github.spotbugs:spotbugs:4.2.1'
     testImplementation 'org.assertj:assertj-core:3.15.0'
