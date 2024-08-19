@@ -15,12 +15,12 @@ public class HollowObjectTypeDataElementsSplitterTest extends AbstractHollowObje
         assertDataUnchanged(typeReadState, 5);
 
         HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 1);
-        HollowObjectTypeDataElements[] result1 = (HollowObjectTypeDataElements[]) splitter.split();
+        HollowObjectTypeDataElements[] result1 = splitter.split();
         typeReadState = new HollowObjectTypeReadState(typeReadState.getSchema(), result1[0]);
         assertDataUnchanged(typeReadState, 5);
 
         splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 8);
-        HollowObjectTypeDataElements[] result8 = (HollowObjectTypeDataElements[]) splitter.split();
+        HollowObjectTypeDataElements[] result8 = splitter.split();
         assertEquals(0, result8[0].maxOrdinal);  // for index that landed one record after split
         assertEquals(-1, result8[7].maxOrdinal); // for index that landed no records after split
 

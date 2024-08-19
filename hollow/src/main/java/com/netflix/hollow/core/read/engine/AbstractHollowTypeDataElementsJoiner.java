@@ -2,14 +2,14 @@ package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 
-public abstract class AbstractHollowTypeDataElementsJoiner {
+public abstract class AbstractHollowTypeDataElementsJoiner <T extends AbstractHollowTypeDataElements> {
     public final int fromMask;
     public final int fromOrdinalShift;
-    public final AbstractHollowTypeDataElements[] from;
+    public final T[] from;
 
-    public AbstractHollowTypeDataElements to;
+    public T to;
 
-    public AbstractHollowTypeDataElementsJoiner(AbstractHollowTypeDataElements[] from) {
+    public AbstractHollowTypeDataElementsJoiner(T[] from) {
         this.from = from;
         this.fromMask = from.length - 1;
         this.fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(from.length);
@@ -27,7 +27,7 @@ public abstract class AbstractHollowTypeDataElementsJoiner {
         }
     }
 
-    public AbstractHollowTypeDataElements join() {
+    public T join() {
 
         init();
 
@@ -43,7 +43,7 @@ public abstract class AbstractHollowTypeDataElementsJoiner {
         }
         to.encodedRemovals = GapEncodedVariableLengthIntegerReader.join(fromRemovals);
 
-        return to;
+        return (T) to;
     }
 
     public abstract void init();

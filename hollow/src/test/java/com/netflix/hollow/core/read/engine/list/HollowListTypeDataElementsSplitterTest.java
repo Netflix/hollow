@@ -21,13 +21,13 @@ public class HollowListTypeDataElementsSplitterTest extends AbstractHollowListTy
         assertDataUnchanged(typeReadState, listContents);
 
         HollowListTypeDataElementsSplitter splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 1);
-        HollowListTypeDataElements[] result1 = (HollowListTypeDataElements[]) splitter.split();
+        HollowListTypeDataElements[] result1 = splitter.split();
         typeReadState = new HollowListTypeReadState(typeReadState.getStateEngine(), typeReadState.getSchema(), 1);
         typeReadState.setCurrentData(result1[0]);
         assertDataUnchanged(typeReadState, listContents);
 
         splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 8);
-        HollowListTypeDataElements[] result8 = (HollowListTypeDataElements[]) splitter.split();
+        HollowListTypeDataElements[] result8 = splitter.split();
         assertEquals(0, result8[0].maxOrdinal);  // for index that landed one record after split
         assertEquals(-1, result8[7].maxOrdinal); // for index that landed no records after split
 

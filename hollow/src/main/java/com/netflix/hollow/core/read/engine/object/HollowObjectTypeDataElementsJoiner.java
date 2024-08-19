@@ -16,10 +16,9 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  * The original data elements are not destroyed.
  * The no. of passed data elements must be a power of 2.
  */
-class HollowObjectTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoiner {
+class HollowObjectTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoiner<HollowObjectTypeDataElements> {
 
     private HollowObjectSchema schema;
-    private HollowObjectTypeDataElements to;
 
     public HollowObjectTypeDataElementsJoiner(HollowObjectTypeDataElements[] from) {
         super(from);
@@ -33,8 +32,6 @@ class HollowObjectTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJ
 
     @Override
     public void populateStats() {
-        HollowObjectTypeDataElements[] from = (HollowObjectTypeDataElements[]) this.from;
-
         long[] varLengthSizes = new long[to.schema.numFields()];
 
         for(int fromIndex=0;fromIndex<from.length;fromIndex++) {
@@ -80,8 +77,6 @@ class HollowObjectTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJ
 
     @Override
     public void copyRecords() {
-        HollowObjectTypeDataElements[] from = (HollowObjectTypeDataElements[]) this.from;
-
         long[] currentWriteVarLengthDataPointers = new long[from[0].schema.numFields()];
 
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {

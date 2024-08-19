@@ -8,7 +8,7 @@ import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitte
  * The original data elements are not destroyed.
  * {@code numSplits} must be a power of 2.
  */
-public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataElementsSplitter {
+public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataElementsSplitter<HollowSetTypeDataElements> {
 
     public HollowSetTypeDataElementsSplitter(HollowSetTypeDataElements from, int numSplits) {
         super(from, numSplits);

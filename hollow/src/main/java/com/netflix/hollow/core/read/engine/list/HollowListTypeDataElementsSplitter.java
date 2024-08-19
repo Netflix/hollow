@@ -9,7 +9,7 @@ import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitte
  * The original data elements are not destroyed.
  * {@code numSplits} must be a power of 2.
  */
-public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataElementsSplitter {
+public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataElementsSplitter<HollowListTypeDataElements> {
 
     public HollowListTypeDataElementsSplitter(HollowListTypeDataElements from, int numSplits) {
         super(from, numSplits);
@@ -25,9 +25,6 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
 
     @Override
     public void populateStats() {
-        HollowListTypeDataElements[] to = (HollowListTypeDataElements[]) this.to;
-        HollowListTypeDataElements from = (HollowListTypeDataElements) this.from;
-
         int numSplits = to.length;
         long[] totalOfListSizes  = new long[numSplits];
 
@@ -72,9 +69,6 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
 
     @Override
     public void copyRecords() {
-        HollowListTypeDataElements[] to = (HollowListTypeDataElements[]) this.to;
-        HollowListTypeDataElements from = (HollowListTypeDataElements) this.from;
-
         int numSplits = to.length;
         long elementCounter[] = new long[numSplits];
 

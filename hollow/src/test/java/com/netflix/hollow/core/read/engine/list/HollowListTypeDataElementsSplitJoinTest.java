@@ -26,7 +26,6 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
 
     @Test
     public void testSplitThenJoin() throws IOException {
-        HollowListTypeDataElementsJoiner joiner = new HollowListTypeDataElementsJoiner();
 
         int numListRecords = 100;
         int[][] listContents = new int[numListRecords][];
@@ -48,9 +47,10 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
 
             for (int numSplits : new int[]{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024}) {
                 HollowListTypeDataElementsSplitter splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
-                HollowListTypeDataElements[] splitElements = (HollowListTypeDataElements[]) splitter.split();
+                HollowListTypeDataElements[] splitElements = splitter.split();
 
-                HollowListTypeDataElements joinedElements = joiner.join(splitElements);
+                HollowListTypeDataElementsJoiner joiner = new HollowListTypeDataElementsJoiner(splitElements);
+                HollowListTypeDataElements joinedElements = joiner.join();
                 HollowListTypeReadStateShard joinedShard = new HollowListTypeReadStateShard();
                 joinedShard.setCurrentData(joinedElements);
 
@@ -99,12 +99,12 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
         assertEquals(1, typeReadState.numShards());
 
         HollowListTypeDataElementsSplitter splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 4);
-        HollowListTypeDataElements[] splitBy4 = (HollowListTypeDataElements[]) splitter.split();
+        HollowListTypeDataElements[] splitBy4 = splitter.split();
         assertEquals(-1, splitBy4[1].maxOrdinal);
         assertEquals(-1, splitBy4[3].maxOrdinal);
 
-        HollowListTypeDataElementsJoiner joiner = new HollowListTypeDataElementsJoiner();
-        HollowListTypeDataElements joined = joiner.join(new HollowListTypeDataElements[]{splitBy4[1], splitBy4[3]});
+        HollowListTypeDataElementsJoiner joiner = new HollowListTypeDataElementsJoiner(new HollowListTypeDataElements[]{splitBy4[1], splitBy4[3]});
+        HollowListTypeDataElements joined = joiner.join();
 
         assertEquals(-1, joined.maxOrdinal);
     }
@@ -136,10 +136,10 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
                 assertEquals(1, typeState.numShards());
 
                 HollowListTypeDataElementsSplitter splitter = new HollowListTypeDataElementsSplitter(typeState.currentDataElements()[0], numSplits);
-                HollowListTypeDataElements[] splitElements = (HollowListTypeDataElements[]) splitter.split();
+                HollowListTypeDataElements[] splitElements = splitter.split();
 
-                HollowListTypeDataElementsJoiner joiner = new HollowListTypeDataElementsJoiner();
-                HollowListTypeDataElements joinedElements = joiner.join(splitElements);
+                HollowListTypeDataElementsJoiner joiner = new HollowListTypeDataElementsJoiner(splitElements);
+                HollowListTypeDataElements joinedElements = joiner.join();
 
                 HollowListTypeReadStateShard joinedShard = new HollowListTypeReadStateShard();
                 joinedShard.setCurrentData(joinedElements);

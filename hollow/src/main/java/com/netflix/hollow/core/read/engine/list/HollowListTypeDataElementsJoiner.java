@@ -10,7 +10,7 @@ import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsJoiner;
  * The original data elements are not destroyed.
  * The no. of passed data elements must be a power of 2.
  */
-class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoiner {
+class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoiner<HollowListTypeDataElements> {
 
     public HollowListTypeDataElementsJoiner(HollowListTypeDataElements[] from) {
         super(from);
@@ -23,9 +23,6 @@ class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoi
 
     @Override
     public void populateStats() {
-        HollowListTypeDataElements[] from = (HollowListTypeDataElements[]) this.from;
-        HollowListTypeDataElements to = (HollowListTypeDataElements) this.to;
-
         for(int fromIndex=0;fromIndex<from.length;fromIndex++) {
             int mappedMaxOrdinal = from[fromIndex].maxOrdinal == -1 ? -1 : (from[fromIndex].maxOrdinal * from.length) + fromIndex;
             to.maxOrdinal = Math.max(to.maxOrdinal, mappedMaxOrdinal);
@@ -63,9 +60,6 @@ class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoi
 
     @Override
     public void copyRecords() {
-        HollowListTypeDataElements[] from = (HollowListTypeDataElements[]) this.from;
-        HollowListTypeDataElements to = (HollowListTypeDataElements) this.to;
-
         long elementCounter = 0;
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;

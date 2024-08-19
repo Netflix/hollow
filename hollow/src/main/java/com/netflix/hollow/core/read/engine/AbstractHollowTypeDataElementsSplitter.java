@@ -2,15 +2,15 @@ package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 
-public abstract class AbstractHollowTypeDataElementsSplitter {
+public abstract class AbstractHollowTypeDataElementsSplitter<T extends AbstractHollowTypeDataElements> {
     public final int numSplits;
     public final int toMask;
     public final int toOrdinalShift;
-    public final AbstractHollowTypeDataElements from;
+    public final T from;
 
-    public AbstractHollowTypeDataElements[] to;
+    public T[] to;
 
-    public AbstractHollowTypeDataElementsSplitter(AbstractHollowTypeDataElements from, int numSplits) {
+    public AbstractHollowTypeDataElementsSplitter(T from, int numSplits) {
         this.from = from;
         this.numSplits = numSplits;
         this.toMask = numSplits - 1;
@@ -27,7 +27,7 @@ public abstract class AbstractHollowTypeDataElementsSplitter {
         }
     }
 
-    public AbstractHollowTypeDataElements[] split() {
+    public T[] split() {
 
         init();
 
@@ -46,7 +46,7 @@ public abstract class AbstractHollowTypeDataElementsSplitter {
             }
         }
 
-        return to;
+        return (T[]) to;
     }
 
     public abstract void init();

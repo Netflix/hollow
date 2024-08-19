@@ -15,7 +15,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  * The original data elements are not destroyed.
  * {@code numSplits} must be a power of 2.
  */
-public class HollowObjectTypeDataElementsSplitter extends AbstractHollowTypeDataElementsSplitter {
+public class HollowObjectTypeDataElementsSplitter extends AbstractHollowTypeDataElementsSplitter<HollowObjectTypeDataElements> {
     private HollowObjectSchema schema;
 
     HollowObjectTypeDataElementsSplitter(HollowObjectTypeDataElements from, int numSplits) {
@@ -33,9 +33,6 @@ public class HollowObjectTypeDataElementsSplitter extends AbstractHollowTypeData
 
     @Override
     public void populateStats() {
-        HollowObjectTypeDataElements[] to = (HollowObjectTypeDataElements[])this.to;
-        HollowObjectTypeDataElements from = (HollowObjectTypeDataElements) this.from;
-
         long[][] varLengthSizes = new long[to.length][from.schema.numFields()];
 
         for(int ordinal=0;ordinal<=from.maxOrdinal;ordinal++) {
@@ -69,9 +66,6 @@ public class HollowObjectTypeDataElementsSplitter extends AbstractHollowTypeData
 
     @Override
     public void copyRecords() {
-        HollowObjectTypeDataElements[] to = (HollowObjectTypeDataElements[])this.to;
-        HollowObjectTypeDataElements from = (HollowObjectTypeDataElements) this.from;
-
         final long[][] currentWriteVarLengthDataPointers = new long[to.length][from.schema.numFields()];
 
         for(int i=0;i<to.length;i++) {

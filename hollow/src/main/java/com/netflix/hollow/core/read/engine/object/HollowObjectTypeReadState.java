@@ -283,9 +283,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         int newNumShards = shardsHolder.shards.length / shardingFactor;
         int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newNumShards);
 
-        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
         HollowObjectTypeDataElements[] joinCandidates = joinCandidates(shardsHolder.shards, currentIndex, shardingFactor);
-        HollowObjectTypeDataElements joined = joiner.join(joinCandidates);
+        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner(joinCandidates);
+        HollowObjectTypeDataElements joined = joiner.join();
 
         HollowObjectTypeReadStateShard[] newShards = Arrays.copyOf(shardsHolder.shards, shardsHolder.shards.length);
         for (int i=0; i<shardingFactor; i++) {
@@ -313,7 +313,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         HollowObjectTypeDataElements dataElementsToSplit = shardsHolder.shards[currentIndex].dataElements;
         HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(dataElementsToSplit, shardingFactor);
-        HollowObjectTypeDataElements[] splits = (HollowObjectTypeDataElements[]) splitter.split();
+        HollowObjectTypeDataElements[] splits = splitter.split();
 
         HollowObjectTypeReadStateShard[] newShards = Arrays.copyOf(shardsHolder.shards, shardsHolder.shards.length);
         for (int i = 0; i < shardingFactor; i ++) {
