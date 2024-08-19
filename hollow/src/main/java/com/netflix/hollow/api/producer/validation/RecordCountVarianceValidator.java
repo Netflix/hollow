@@ -18,6 +18,7 @@ package com.netflix.hollow.api.producer.validation;
 
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import java.util.function.Supplier;
 
 /**
  * Used to validate if the cardinality change in current cycle is with in the allowed percent for a given typeName.
@@ -36,6 +37,9 @@ public class RecordCountVarianceValidator implements ValidatorListener {
             "Record count validation for type %s has failed as actual change percent %s "
                     + "is greater than allowed change percent %s.";
 
+    private static final String NULL_THRESHOLD =
+            "Record count validation for type %s has failed because the variance threshold was null.";
+
     private static final String DATA_TYPE_NAME = "Typename";
     private static final String ALLOWABLE_VARIANCE_PERCENT_NAME = "AllowableVariancePercent";
     private static final String LATEST_CARDINALITY_NAME = "LatestRecordCount";
@@ -46,7 +50,7 @@ public class RecordCountVarianceValidator implements ValidatorListener {
 
     private final String typeName;
 
-    private final float allowableVariancePercent;
+    private final Supplier<Float> allowableVariancePercentSupplier;
 
     /**
      * @param typeName type name
@@ -58,13 +62,27 @@ public class RecordCountVarianceValidator implements ValidatorListener {
      * Anything more results in failure of validation.
      */
     public RecordCountVarianceValidator(String typeName, float allowableVariancePercent) {
+        this(typeName, () -> allowableVariancePercent);
+    }
+
+    /**
+     * @param typeName type name
+     * @param allowableVariancePercentSupplier: Used to validate if the cardinality change in current cycle is with in the
+     * allowed percent, and changes to this threshold are applied in the next invocation of validation.
+     * Ex: 0% allowableVariancePercent ensures type cardinality does not vary at all for cycle to cycle.
+     * Ex: Number of state in United States.
+     * 10% allowableVariancePercent: from previous cycle any addition or removal within 10% cardinality is valid.
+     * Anything more results in failure of validation.
+     */
+    public RecordCountVarianceValidator(String typeName, Supplier<Float> allowableVariancePercentSupplier)  {
         this.typeName = typeName;
-        if (allowableVariancePercent < 0) {
+        this.allowableVariancePercentSupplier = allowableVariancePercentSupplier;
+        Float allowableVariancePercent = allowableVariancePercentSupplier.get();
+        if (allowableVariancePercent == null || allowableVariancePercent < 0) {
             throw new IllegalArgumentException("RecordCountVarianceValidator for type " + typeName
-                    + ": cannot have allowableVariancePercent less than 0. Value provided: "
+                    + ": cannot have allowableVariancePercent be null or less than 0. Value provided: "
                     + allowableVariancePercent);
         }
-        this.allowableVariancePercent = allowableVariancePercent;
     }
 
     @Override
@@ -75,6 +93,13 @@ public class RecordCountVarianceValidator implements ValidatorListener {
     @Override
     public ValidationResult onValidate(ReadState readState) {
         ValidationResult.ValidationResultBuilder vrb = ValidationResult.from(this);
+
+        Float allowableVariancePercent = allowableVariancePercentSupplier.get();
+        if (allowableVariancePercent == null) {
+            String message = String.format(NULL_THRESHOLD, typeName);
+            return vrb.failed(message);
+        }
+
         vrb.detail(ALLOWABLE_VARIANCE_PERCENT_NAME, allowableVariancePercent)
                 .detail(DATA_TYPE_NAME, typeName);
 

@@ -90,7 +90,7 @@ public class HollowProducerValidationListenerTest {
 
     private void createHollowProducerAndRunCycle(final String typeName, boolean addPrimaryKeyValidator) {
         ValidatorListener dupeValidator = new DuplicateDataDetectionValidator(typeName);
-        ValidatorListener countValidator = new RecordCountVarianceValidator(typeName, 3.0f);
+        ValidatorListener countValidator = new RecordCountVarianceValidator(typeName, () -> 3.0f);
         validationListener = new TestValidationStatusListener();
         cycleAndValidationListener = new TestCycleAndValidationStatusListener();
         Builder builder = HollowProducer.withPublisher(publisher).withAnnouncer(announcer)
