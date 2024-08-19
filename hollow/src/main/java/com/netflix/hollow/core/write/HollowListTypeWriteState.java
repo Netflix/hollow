@@ -158,7 +158,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
 
         for(int i=0;i<numShards;i++) {
             listPointerArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerListPointer * (maxShardOrdinal[i] + 1));
-            elementArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerElement * totalOfListSizes[i]);   // SNAP: TODO: elementData
+            elementArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerElement * totalOfListSizes[i]);
         }
 
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
@@ -216,7 +216,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         /// 2) statistics
         VarInt.writeVInt(os, bitsPerListPointer);
         VarInt.writeVInt(os, bitsPerElement);
-        VarInt.writeVLong(os, totalOfListSizes[shardNumber]);   // SNAP: TODO: totalNumberOfElements
+        VarInt.writeVLong(os, totalOfListSizes[shardNumber]);
 
         /// 3) list pointer array
         int numListPointerLongs = maxShardOrdinal[shardNumber] == -1 ? 0 : (int)((((long)(maxShardOrdinal[shardNumber] + 1) * bitsPerListPointer) - 1) / 64) + 1;

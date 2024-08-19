@@ -12,6 +12,10 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
 
     public HollowSetTypeDataElementsSplitter(HollowSetTypeDataElements from, int numSplits) {
         super(from, numSplits);
+    }
+
+    @Override
+    public void init() {
         this.to = new HollowSetTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
             to[i] = new HollowSetTypeDataElements(from.memoryMode, from.memoryRecycler);

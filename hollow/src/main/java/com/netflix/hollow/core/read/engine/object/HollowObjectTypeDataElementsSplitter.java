@@ -7,21 +7,27 @@ import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElements;
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitter;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 /**
  * Split a {@code HollowObjectTypeDataElements} into multiple {@code HollowObjectTypeDataElements}s.
  * Ordinals are remapped and corresponding data is copied over.
  * The original data elements are not destroyed.
- * // SNAP: TODO: single-shot, split() not expected to be called repeatedly
  * {@code numSplits} must be a power of 2.
  */
 public class HollowObjectTypeDataElementsSplitter extends AbstractHollowTypeDataElementsSplitter {
+    private HollowObjectSchema schema;
 
     HollowObjectTypeDataElementsSplitter(HollowObjectTypeDataElements from, int numSplits) {
         super(from, numSplits);
+        this.schema = from.schema;
+    }
+
+    @Override
+    public void init() {
         this.to = new HollowObjectTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
-            to[i] = new HollowObjectTypeDataElements(from.schema, from.memoryMode, from.memoryRecycler);
+            to[i] = new HollowObjectTypeDataElements(schema, from.memoryMode, from.memoryRecycler);
         }
     }
 

@@ -28,9 +28,13 @@ public abstract class AbstractHollowTypeDataElementsSplitter {
     }
 
     public AbstractHollowTypeDataElements[] split() {
+
+        init();
+
         for(int i=0;i<to.length;i++) {
             to[i].maxOrdinal = -1;
         }
+
         populateStats();
 
         copyRecords();
@@ -44,6 +48,8 @@ public abstract class AbstractHollowTypeDataElementsSplitter {
 
         return to;
     }
+
+    public abstract void init();
 
     public abstract void populateStats();
 

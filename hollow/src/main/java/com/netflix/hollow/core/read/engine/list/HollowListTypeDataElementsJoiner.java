@@ -1,7 +1,7 @@
 package com.netflix.hollow.core.read.engine.list;
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
-import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
+import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsJoiner;
 
 
 /**
@@ -10,41 +10,22 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
  * The original data elements are not destroyed.
  * The no. of passed data elements must be a power of 2.
  */
-class HollowListTypeDataElementsJoiner {
+class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoiner {
 
-    HollowListTypeDataElements join(HollowListTypeDataElements[] from) {
-        final int fromMask = from.length - 1;
-        final int fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(from.length);
-
-        if (from.length<=0 || !((from.length&(from.length-1))==0)) {
-            throw new IllegalStateException("No. of DataElements to be joined must be a power of 2");
-        }
-
-        HollowListTypeDataElements to = new HollowListTypeDataElements(from[0].memoryMode, from[0].memoryRecycler);
-
-        GapEncodedVariableLengthIntegerReader[] fromRemovals = new GapEncodedVariableLengthIntegerReader[from.length];
-        for (int i=0;i<from.length;i++) {
-            fromRemovals[i] = from[i].encodedRemovals;
-        }
-        to.encodedRemovals = GapEncodedVariableLengthIntegerReader.join(fromRemovals);
-
-        for (HollowListTypeDataElements elements : from) {
-            if (elements.encodedAdditions != null) {
-                throw new IllegalStateException("Encountered encodedAdditions in data elements joiner- this is not expected " +
-                        "since encodedAdditions only exist on delta data elements and they dont carry over to target data elements, " +
-                        "delta data elements are never split/joined");
-            }
-        }
-
-        populateStats(to, from);
-
-        copyRecords(to, from);
-
-        return to;
+    public HollowListTypeDataElementsJoiner(HollowListTypeDataElements[] from) {
+        super(from);
     }
 
-    void populateStats(HollowListTypeDataElements to, HollowListTypeDataElements[] from) {
-        to.maxOrdinal = -1;
+    @Override
+    public void init() {
+        this.to = new HollowListTypeDataElements(from[0].memoryMode, from[0].memoryRecycler);
+    }
+
+    @Override
+    public void populateStats() {
+        HollowListTypeDataElements[] from = (HollowListTypeDataElements[]) this.from;
+        HollowListTypeDataElements to = (HollowListTypeDataElements) this.to;
+
         for(int fromIndex=0;fromIndex<from.length;fromIndex++) {
             int mappedMaxOrdinal = from[fromIndex].maxOrdinal == -1 ? -1 : (from[fromIndex].maxOrdinal * from.length) + fromIndex;
             to.maxOrdinal = Math.max(to.maxOrdinal, mappedMaxOrdinal);
@@ -54,8 +35,6 @@ class HollowListTypeDataElementsJoiner {
             }
         }
 
-        final int fromMask = from.length - 1;
-        final int fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(from.length);
         long totalOfListSizes = 0;
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;
@@ -82,9 +61,11 @@ class HollowListTypeDataElementsJoiner {
         to.totalNumberOfElements = totalOfListSizes;
     }
 
-    private void copyRecords(HollowListTypeDataElements to, HollowListTypeDataElements[] from) {
-        final int fromMask = from.length - 1;
-        final int fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(from.length);
+    @Override
+    public void copyRecords() {
+        HollowListTypeDataElements[] from = (HollowListTypeDataElements[]) this.from;
+        HollowListTypeDataElements to = (HollowListTypeDataElements) this.to;
+
         long elementCounter = 0;
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;

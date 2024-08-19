@@ -74,13 +74,6 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
         }
     }
 
-// SNAP: TODO: remove
-//     static int fibonacci(int n) {
-//         if (n <= 1) {
-//             return n;
-//         }
-//         return fibonacci(n - 1) + fibonacci(n - 2);
-//     }
     private void assertChecksumUnchanged(HollowListTypeReadState newTypeState, HollowListTypeReadState origTypeState, BitSet populatedOrdinals) {
         HollowChecksum origCksum = new HollowChecksum();
         HollowChecksum newCksum = new HollowChecksum();
