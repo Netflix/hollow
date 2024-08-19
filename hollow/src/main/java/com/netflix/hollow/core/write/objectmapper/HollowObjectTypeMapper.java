@@ -900,13 +900,9 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 case BOOLEAN:
                     return record.getFieldValueBooleanBoxed(fieldName);
                 case INT:
-                    int intValue = record.getFieldValueInt(fieldName);
-                    if (intValue == Integer.MIN_VALUE) {
-                        return null;
-                    }
-                    return Integer.valueOf(intValue);
+                    return record.getFieldValueIntBoxed(fieldName);
                 case SHORT:
-                    int shortValue = record.getFieldValueIntBoxed(fieldName);
+                    int shortValue = record.getFieldValueInt(fieldName);
                     if (shortValue == Integer.MIN_VALUE) {
                         return null;
                     }
@@ -989,21 +985,21 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     break;
                 }
                 case LONG: {
-                    long value = node.getFieldValueLongBoxed(fieldName);
+                    long value = node.getFieldValueLong(fieldName);
                     if (value != Long.MIN_VALUE) {
                         unsafe.putLong(obj, fieldOffset, value);
                     }
                     break;
                 }
                 case FLOAT: {
-                    float value = node.getFieldValueFloatBoxed(fieldName);
+                    float value = node.getFieldValueFloat(fieldName);
                     if (!Float.isNaN(value)) {
                         unsafe.putFloat(obj, fieldOffset, value);
                     }
                     break;
                 }
                 case DOUBLE: {
-                    double value = node.getFieldValueDoubleBoxed(fieldName);
+                    double value = node.getFieldValueDouble(fieldName);
                     if (!Double.isNaN(value)) {
                         unsafe.putDouble(obj, fieldOffset, value);
                     }

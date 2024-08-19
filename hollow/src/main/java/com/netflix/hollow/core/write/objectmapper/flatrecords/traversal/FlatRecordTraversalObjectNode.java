@@ -6,10 +6,15 @@ import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
+
 public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
   private FlatRecordReader reader;
   private IntList ordinalPositions;
   private HollowObjectSchema schema;
+  private Map<String, HollowObjectSchema> commonSchemaMap;
   private int position;
 
   public FlatRecordTraversalObjectNode() {}
@@ -40,6 +45,11 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
   @Override
   public HollowObjectSchema getSchema() {
     return schema;
+  }
+
+  @Override
+  public void setCommonSchema(Map<String, HollowObjectSchema> commonSchema) {
+    this.commonSchemaMap = commonSchema;
   }
 
   public FlatRecordTraversalObjectNode getObjectFieldNode(String field) {
@@ -190,6 +200,49 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
     }
     assertFieldType(field, HollowObjectSchema.FieldType.BYTES);
     return reader.readBytes();
+  }
+
+  @Override
+  public int hashCode() {
+    HollowObjectSchema commonSchema = commonSchemaMap.get(schema.getName());
+    Object[] fields = new Object[commonSchema.numFields()];
+    for(int i=0;i<commonSchema.numFields();i++) {
+      String fieldName = commonSchema.getFieldName(i);
+      if(!commonSchema.getFieldType(fieldName).equals(HollowObjectSchema.FieldType.REFERENCE)) {
+        fields[i] = getFieldValue(fieldName);
+      }
+    }
+    return Objects.hash(schema.getName(), Arrays.deepHashCode(fields));
+  }
+
+  @Override
+  public boolean equals(Object object) {
+    if(object instanceof FlatRecordTraversalObjectNode) {
+      FlatRecordTraversalObjectNode other = (FlatRecordTraversalObjectNode) object;
+      HollowObjectSchema commonSchema = this.getSchema().findCommonSchema(other.getSchema());
+      for(int i=0;i<commonSchema.numFields();i++) {
+        String fieldName = commonSchema.getFieldName(i);
+        // same fieldName but different fieldType
+        if (this.getSchema().getFieldType(fieldName) != other.getSchema().getFieldType(fieldName)) {
+          return false;
+        }
+        // same fieldType and equal to reference
+        if(this.getSchema().getFieldType(fieldName).equals(HollowObjectSchema.FieldType.REFERENCE)) {
+          FlatRecordTraversalNode leftChildNode = this.getFieldNode(fieldName);
+          FlatRecordTraversalNode rightChildNode = other.getFieldNode(fieldName);
+          if(!leftChildNode.equals(rightChildNode)) {
+            return false;
+          }
+        }
+        else {
+          if (!this.getFieldValue(fieldName).equals(other.getFieldValue(fieldName))) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   private void assertFieldType(String fieldName, HollowObjectSchema.FieldType expectedFieldType) {

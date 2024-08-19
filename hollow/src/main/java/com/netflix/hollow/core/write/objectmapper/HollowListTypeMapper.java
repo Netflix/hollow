@@ -146,10 +146,7 @@ public class HollowListTypeMapper extends HollowTypeMapper {
     protected Object parseFlatRecordTraversalNode(FlatRecordTraversalNode node) {
         List<Object> collection = new ArrayList<>();
 
-        FlatRecordTraversalListNode listNode = (FlatRecordTraversalListNode) node;
-        int size = listNode.size();
-        for (int i = 0; i < size; i++) {
-            FlatRecordTraversalNode elementNode = listNode.get(i);
+        for (FlatRecordTraversalNode elementNode : (FlatRecordTraversalListNode) node) {
             Object element = elementMapper.parseFlatRecordTraversalNode(elementNode);
             collection.add(element);
         }

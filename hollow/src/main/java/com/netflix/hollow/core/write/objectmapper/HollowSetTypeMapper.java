@@ -138,11 +138,8 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
 
     @Override
     protected Object parseFlatRecordTraversalNode(FlatRecordTraversalNode node) {
-        FlatRecordTraversalSetNode setNode = (FlatRecordTraversalSetNode) node;
         Set<Object> collection = new HashSet<>();
-        Iterator<FlatRecordTraversalNode> elements = setNode.iterator();
-        while (elements.hasNext()) {
-            FlatRecordTraversalNode elementNode = elements.next();
+        for (FlatRecordTraversalNode elementNode : (FlatRecordTraversalSetNode) node) {
             collection.add(elementMapper.parseFlatRecordTraversalNode(elementNode));
         }
         return collection;

@@ -1,12 +1,17 @@
 package com.netflix.hollow.core.write.objectmapper.flatrecords.traversal;
 
 import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class FlatRecordTraversalMapNode extends AbstractMap<FlatRecordTraversalNode, FlatRecordTraversalNode> implements FlatRecordTraversalNode {
@@ -15,6 +20,7 @@ public class FlatRecordTraversalMapNode extends AbstractMap<FlatRecordTraversalN
     private HollowMapSchema schema;
     private int[] keyOrdinals;
     private int[] valueOrdinals;
+    private Map<String, HollowObjectSchema> commonSchemaMap;
 
     @Override
     public void reposition(FlatRecordReader reader, IntList ordinalPositions, int ordinal) {
@@ -33,6 +39,31 @@ public class FlatRecordTraversalMapNode extends AbstractMap<FlatRecordTraversalN
             keyOrdinals[i] = keyOrdinal;
             valueOrdinals[i] = reader.readOrdinal();
         }
+    }
+
+    @Override
+    public void setCommonSchema(Map<String, HollowObjectSchema> commonSchema) {
+        this.commonSchemaMap = commonSchema;
+    }
+
+    @Override
+    public int hashCode() {
+        int h = 0;
+        Iterator<Entry<FlatRecordTraversalNode,FlatRecordTraversalNode>> i = entrySet().iterator();
+        while (i.hasNext()) {
+            Entry<FlatRecordTraversalNode, FlatRecordTraversalNode> e = i.next();
+            FlatRecordTraversalNode key = e.getKey();
+            FlatRecordTraversalNode value = e.getValue();
+            if(commonSchemaMap.containsKey(key.getSchema().getName())) {
+                key.setCommonSchema(commonSchemaMap);
+                h += (key == null ? 0 : key.hashCode());
+            }
+            if(commonSchemaMap.containsKey(value.getSchema().getName())) {
+                value.setCommonSchema(commonSchemaMap);
+                h += (value == null ? 0 : value.hashCode());
+            }
+        }
+        return h;
     }
 
     @Override
@@ -99,6 +130,33 @@ public class FlatRecordTraversalMapNode extends AbstractMap<FlatRecordTraversalN
                     throw new UnsupportedOperationException();
                 }
             };
+        }
+    }
+    private static class MapEntry {
+        private final int key;
+        private final int value;
+
+        public MapEntry(int key, int value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (!(o instanceof MapEntry)) return false;
+            MapEntry other = (MapEntry) o;
+            return key == other.key && value == other.value;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(key, value);
+        }
+
+        @Override
+        public String toString() {
+            return "MapEntry(" + key + ", " + value + ")";
         }
     }
 }
