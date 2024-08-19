@@ -25,7 +25,6 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
 
     @Override
     public void populateStats() {
-        int numSplits = to.length;
         long[] totalOfListSizes  = new long[numSplits];
 
         // count elements per split
@@ -57,13 +56,14 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
         }
 
         for(int toIndex=0;toIndex<numSplits;toIndex++) {
-            to[toIndex].bitsPerElement = from.bitsPerElement;   // retained: it's the max across all shards in type, so splitting has no effect
-            to[toIndex].bitsPerListPointer = maxShardTotalOfListSizes == 0 ? 1 : 64 - Long.numberOfLeadingZeros(maxShardTotalOfListSizes);
+            HollowListTypeDataElements target = to[toIndex];
+            target.bitsPerElement = from.bitsPerElement;   // retained: it's the max across all shards in type, so splitting has no effect
+            target.bitsPerListPointer = maxShardTotalOfListSizes == 0 ? 1 : 64 - Long.numberOfLeadingZeros(maxShardTotalOfListSizes);
 
-            to[toIndex].listPointerData = FixedLengthDataFactory.get((long)to[toIndex].bitsPerListPointer * (to[toIndex].maxOrdinal + 1), to[toIndex].memoryMode, to[toIndex].memoryRecycler);
-            to[toIndex].elementData = FixedLengthDataFactory.get((long)to[toIndex].bitsPerElement * totalOfListSizes[toIndex], to[toIndex].memoryMode, to[toIndex].memoryRecycler);
+            target.listPointerData = FixedLengthDataFactory.get((long)target.bitsPerListPointer * (target.maxOrdinal + 1), target.memoryMode, target.memoryRecycler);
+            target.elementData = FixedLengthDataFactory.get((long)target.bitsPerElement * totalOfListSizes[toIndex], target.memoryMode, target.memoryRecycler);
 
-            to[toIndex].totalNumberOfElements = totalOfListSizes[toIndex];  // useful for heap usage stats
+            target.totalNumberOfElements = totalOfListSizes[toIndex];  // useful for heap usage stats
         }
     }
 
@@ -79,6 +79,7 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
 
             long startElement;
             long endElement;
+
             if (ordinal == 0) {
                 startElement = 0;
                 endElement = from.listPointerData.getElementValue(0, from.bitsPerListPointer);
@@ -89,12 +90,13 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
                 endElement = from.listPointerData.getElementValue(endFixedLengthOffset, from.bitsPerListPointer);
             }
 
+            HollowListTypeDataElements target = to[toIndex];
             for (long element=startElement;element<endElement;element++) {
                 int elementOrdinal = (int)from.elementData.getElementValue(element * from.bitsPerElement, from.bitsPerElement);
-                to[toIndex].elementData.setElementValue(elementCounter[toIndex] * to[toIndex].bitsPerElement, to[toIndex].bitsPerElement, elementOrdinal);
+                target.elementData.setElementValue(elementCounter[toIndex] * target.bitsPerElement, target.bitsPerElement, elementOrdinal);
                 elementCounter[toIndex]++;
             }
-            to[toIndex].listPointerData.setElementValue(to[toIndex].bitsPerListPointer * toOrdinal, to[toIndex].bitsPerListPointer, elementCounter[toIndex]);
+            target.listPointerData.setElementValue(target.bitsPerListPointer * toOrdinal, target.bitsPerListPointer, elementCounter[toIndex]);
         }
     }
 }

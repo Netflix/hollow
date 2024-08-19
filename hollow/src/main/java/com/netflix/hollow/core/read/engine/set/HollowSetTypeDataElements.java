@@ -35,8 +35,8 @@ import java.io.IOException;
 
 public class HollowSetTypeDataElements extends AbstractHollowTypeDataElements {
 
-    FixedLengthData setPointerAndSizeData;
-    FixedLengthData elementData;
+    public FixedLengthData setPointerAndSizeData;
+    public FixedLengthData elementData;
 
     int bitsPerSetPointer;
     int bitsPerSetSizeValue;

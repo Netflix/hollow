@@ -139,11 +139,11 @@ class HollowSetTypeReadStateShard {
         return value;
     }
 
-    private long getAbsoluteBucketStart(HollowSetTypeDataElements currentData, int ordinal) {
+    public static long getAbsoluteBucketStart(HollowSetTypeDataElements currentData, int ordinal) {
         return ordinal == 0 ? 0 : currentData.setPointerAndSizeData.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
     }
 
-    private int absoluteBucketValue(HollowSetTypeDataElements currentData, long absoluteBucketIndex) {
+    public static int absoluteBucketValue(HollowSetTypeDataElements currentData, long absoluteBucketIndex) {
         return (int)currentData.elementData.getElementValue(absoluteBucketIndex * currentData.bitsPerElement, currentData.bitsPerElement);
     }
     
