@@ -16,6 +16,9 @@
  */
 package com.netflix.hollow.core.read.engine.set;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.core.index.FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE;
+
 import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
@@ -46,9 +49,6 @@ import java.util.BitSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-import static com.netflix.hollow.core.index.FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE;
-
 /**
  * A {@link HollowTypeReadState} for OBJECT type records. 
  */
@@ -59,7 +59,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
     
     private final int shardNumberMask;
     private final int shardOrdinalShift;
-    private final HollowSetTypeReadStateShard shards[];
+    final HollowSetTypeReadStateShard shards[];    // SNAP: TODO: elevated from private access for testing
     
     private HollowPrimaryKeyValueDeriver keyDeriver;
     
@@ -86,7 +86,20 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     }
 
-    @Override
+    // SNAP: TODO: for testing
+    public HollowSetTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSetSchema schema, int numShards, HollowSetTypeReadStateShard[] shards) {
+        super(stateEngine, memoryMode, schema);
+        this.sampler = new HollowSetSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
+        this.shardNumberMask = numShards - 1;
+        this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
+
+        if(numShards < 1 || 1 << shardOrdinalShift != numShards)
+            throw new IllegalArgumentException("Number of shards must be a power of 2!");
+
+        this.shards = shards;
+    }
+
+        @Override
     public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, int numShards) throws IOException {
         throw new UnsupportedOperationException("This type does not yet support numShards specification when reading snapshot");
     }

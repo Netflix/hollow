@@ -84,7 +84,7 @@ class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoi
                 }
             } // else: lopsided shards could result for consumers that skip type shards with no additions, that gets handled
               // by not writing anything to elementData, and writing the cached value of elementCounter to listPointerData
-                // SNAP: TODO: write a test for lopsided list shards
+                // SNAP: TODO: write a test for lopsided list shards. Theres one in object joiner tests.
 
             to.listPointerData.setElementValue(to.bitsPerListPointer * ordinal, to.bitsPerListPointer, elementCounter);
         }

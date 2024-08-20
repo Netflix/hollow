@@ -3,7 +3,6 @@ package com.netflix.hollow.core.read.engine.object;
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState.shardingFactor;
 import static junit.framework.TestCase.assertEquals;
 
-import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import java.util.Random;

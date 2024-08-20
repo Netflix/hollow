@@ -6,9 +6,6 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.write.HollowListTypeWriteState;
-import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -16,13 +13,6 @@ import java.util.BitSet;
 import org.junit.Test;
 
 public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListTypeDataElementsSplitJoinTest {
-
-    @Override
-    protected void initializeTypeStates() {
-        writeStateEngine.setTargetMaxTypeShardSize(4 * 100 * 1000 * 1024);
-        writeStateEngine.addTypeState(new HollowObjectTypeWriteState(objectSchema));
-        writeStateEngine.addTypeState(new HollowListTypeWriteState(listSchema));
-    }
 
     @Test
     public void testSplitThenJoin() throws IOException {
@@ -80,7 +70,7 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
 
         for(int i=0;i<origTypeState.numShards();i++) {
             origTypeState.shards[i].applyToChecksum(origCksum, populatedOrdinals, i, origTypeState.numShards());
-            // SNAP: TODO: this will be shardsVolatile
+            // SNAP: TODO: this will be shardsVolatile, and consider moving this method into base class
         }
 
         for(int i=0;i<newTypeState.numShards();i++) {
@@ -131,7 +121,6 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
                     throw new IllegalArgumentException("These arguments need to be specified");
                 }
                 HollowListTypeReadState typeState = (HollowListTypeReadState) readStateEngine.getTypeState(listTypeWithOneShard);
-                HollowSchema origSchema = typeState.getSchema();
 
                 assertEquals(1, typeState.numShards());
 
@@ -143,7 +132,7 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
 
                 HollowListTypeReadStateShard joinedShard = new HollowListTypeReadStateShard();
                 joinedShard.setCurrentData(joinedElements);
-                // SNAP: TODO: refactor when constructor changes (this one takes readStateEnginer which doesnt correspond to joinedShard)
+                // SNAP: TODO: refactor when constructor changes (this one takes readStateEngine which doesnt correspond to joinedShard)
                 HollowListTypeReadState resultTypeState = new HollowListTypeReadState(readStateEngine, MemoryMode.ON_HEAP, typeState.getSchema(), 1,
                         new HollowListTypeReadStateShard[]{joinedShard});
 

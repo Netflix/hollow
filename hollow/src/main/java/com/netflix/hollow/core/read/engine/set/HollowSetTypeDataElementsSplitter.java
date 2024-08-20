@@ -84,6 +84,8 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
                 target.elementData.setElementValue(bucketCounter[toIndex] * target.bitsPerElement, target.bitsPerElement, bucketVal);
                 bucketCounter[toIndex]++;
             }
+
+            target.setPointerAndSizeData.setElementValue((toOrdinal * target.bitsPerFixedLengthSetPortion), target.bitsPerSetPointer, bucketCounter[toIndex]);
             long setSize = from.setPointerAndSizeData.getElementValue((ordinal * from.bitsPerFixedLengthSetPortion) + from.bitsPerSetPointer, from.bitsPerSetSizeValue);
             target.setPointerAndSizeData.setElementValue((toOrdinal * target.bitsPerFixedLengthSetPortion) + target.bitsPerSetPointer, target.bitsPerSetSizeValue, setSize);
         }

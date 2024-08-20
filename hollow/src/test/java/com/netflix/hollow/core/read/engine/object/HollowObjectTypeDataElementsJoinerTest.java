@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
-import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.test.InMemoryBlobStore;
 import java.io.IOException;
@@ -16,8 +15,8 @@ import org.junit.Test;
 public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObjectTypeDataElementsSplitJoinTest {
     @Override
     protected void initializeTypeStates() {
+        super.initializeTypeStates();
         writeStateEngine.setTargetMaxTypeShardSize(16);
-        writeStateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
     }
 
     @Test

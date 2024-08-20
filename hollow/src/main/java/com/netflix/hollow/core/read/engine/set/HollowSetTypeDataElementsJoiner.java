@@ -21,6 +21,7 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
     @Override
     public void init() {
         this.to = new HollowSetTypeDataElements(from[0].memoryMode, from[0].memoryRecycler);
+        to.bitsPerElement = 0;
     }
 
     @Override
@@ -47,7 +48,7 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
 
             HollowSetTypeDataElements source = from[fromIndex];
 
-            long startBucket = getAbsoluteBucketStart(source, ordinal);
+            long startBucket = getAbsoluteBucketStart(source, fromOrdinal);
             long endBucket = source.setPointerAndSizeData.getElementValue((long)fromOrdinal * source.bitsPerFixedLengthSetPortion, source.bitsPerSetPointer);
             long numBuckets = endBucket - startBucket;
 
@@ -83,8 +84,9 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
                 }
             } // else: lopsided shards could result for consumers that skip type shards with no additions, that gets handled
             // by not writing anything to elementData, and writing the cached value of bucketCounter to listPointerData
-            // SNAP: TODO: write a test for lopsided list shards (similar to for list types)
+            // SNAP: TODO: write a test for lopsided list shards (similar to for list types). Theres one in object joiner tests.
 
+            to.setPointerAndSizeData.setElementValue((ordinal * to.bitsPerFixedLengthSetPortion), to.bitsPerSetPointer, bucketCounter);
             long setSize = source.setPointerAndSizeData.getElementValue((fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);
             to.setPointerAndSizeData.setElementValue((ordinal * to.bitsPerFixedLengthSetPortion) + to.bitsPerSetPointer, to.bitsPerSetSizeValue, setSize);
         }

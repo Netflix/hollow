@@ -6,7 +6,6 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -14,12 +13,6 @@ import java.util.BitSet;
 import org.junit.Test;
 
 public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObjectTypeDataElementsSplitJoinTest {
-
-    @Override
-    protected void initializeTypeStates() {
-        writeStateEngine.setTargetMaxTypeShardSize(4 * 1000 * 1024);
-        writeStateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
-    }
 
     @Test
     public void testSplitThenJoin() throws IOException {
