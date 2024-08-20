@@ -48,12 +48,12 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
 
         for(int toIndex=0;toIndex<numSplits;toIndex++) {
             HollowSetTypeDataElements target = to[toIndex];
-            // retained because these are computed based on max across all shards, so splitting has no effect
+            // retained because these are computed based on max across all shards, splitting has no effect
             target.bitsPerElement = from.bitsPerElement;
             target.bitsPerSetSizeValue = from.bitsPerSetSizeValue;
             target.emptyBucketValue = from.emptyBucketValue;
 
-            // recomputed based on max per split shards
+            // recomputed based on split shards
             target.bitsPerSetPointer = 64 - Long.numberOfLeadingZeros(maxShardTotalOfSetBuckets);
             target.totalNumberOfBuckets = shardTotalOfSetBuckets[toIndex];
             target.bitsPerFixedLengthSetPortion = target.bitsPerSetPointer + target.bitsPerSetSizeValue;
