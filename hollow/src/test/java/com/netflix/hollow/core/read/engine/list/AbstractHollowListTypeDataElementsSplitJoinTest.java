@@ -55,8 +55,11 @@ public class AbstractHollowListTypeDataElementsSplitJoinTest extends AbstractHol
     }
 
 
-    protected HollowListTypeReadState populateTypeStateWith(int numRecords, int[][] listContents) throws IOException {
-        populateWriteStateEngine(numRecords);
+    protected HollowListTypeReadState populateTypeStateWith(int[][] listContents) throws IOException {
+        for (int[] list : listContents) {
+            populateWriteStateEngine(list);
+        }
+        // populateWriteStateEngine(numRecords);
         populateWriteStateEngine(listContents);
         roundTripSnapshot();
         return (HollowListTypeReadState) readStateEngine.getTypeState("TestList");

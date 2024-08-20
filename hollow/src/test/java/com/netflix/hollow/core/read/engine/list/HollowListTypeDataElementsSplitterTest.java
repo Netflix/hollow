@@ -16,7 +16,7 @@ public class HollowListTypeDataElementsSplitterTest extends AbstractHollowListTy
                 {2, 3},
                 {0, 4}
         };
-        HollowListTypeReadState typeReadState = populateTypeStateWith(5, listContents);
+        HollowListTypeReadState typeReadState = populateTypeStateWith(listContents);
         assertEquals(1, typeReadState.numShards());
         assertDataUnchanged(typeReadState, listContents);
 

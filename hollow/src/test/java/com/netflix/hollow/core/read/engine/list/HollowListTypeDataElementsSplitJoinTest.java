@@ -30,7 +30,7 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
 
         // 1->2->1, 1->4->1, ...
         for (int listRecord=0;listRecord<numListRecords;listRecord++) {
-            HollowListTypeReadState typeReadState = populateTypeStateWith(listRecord, listContents);
+            HollowListTypeReadState typeReadState = populateTypeStateWith(listContents);
             assertEquals(1, typeReadState.numShards());
             assertEquals(numListRecords, typeReadState.getPopulatedOrdinals().cardinality());
             assertDataUnchanged(typeReadState, listContents);
@@ -85,7 +85,7 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
     public void testSplitThenJoinWithEmptyJoin() throws IOException {
         int numListRecords = 1;
         int[][] listContents = {{1}};
-        HollowListTypeReadState typeReadState = populateTypeStateWith(numListRecords, listContents);
+        HollowListTypeReadState typeReadState = populateTypeStateWith(listContents);
         assertEquals(1, typeReadState.numShards());
 
         HollowListTypeDataElementsSplitter splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 4);
