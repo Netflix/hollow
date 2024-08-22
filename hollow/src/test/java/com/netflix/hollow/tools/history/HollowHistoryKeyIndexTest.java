@@ -105,8 +105,15 @@ public class HollowHistoryKeyIndexTest extends AbstractStateEngineTest {
 
         Assert.assertEquals("2.2:two", keyIdx.getKeyDisplayString("A", 1));
 
-
         /// query returns all matching keys
+        assertResults(keyIdx, "A", "1.1:one", 0);
+        assertResults(keyIdx, "A", "3.3:one", 2);
+        assertResults(keyIdx, "A", "4.4:four", 3);
+        assertResults(keyIdx, "A", "5.5:five!", 4);
+        assertResults(keyIdx, "A", "5.5!:five!" );
+        assertResults(keyIdx, "A", "5.5:five!:" );
+        assertResults(keyIdx, "A", "5.5:");
+
         assertResults(keyIdx, "A", "one", 0, 2);
         assertResults(keyIdx, "A", "two", 1);
         assertResults(keyIdx, "A", "four", 3);
@@ -132,7 +139,6 @@ public class HollowHistoryKeyIndexTest extends AbstractStateEngineTest {
         Assert.assertEquals(expectedResults.length, actualResults.size());
 
         actualResults.sort();
-
         for(int i=0;i<expectedResults.length;i++) {
             Assert.assertEquals(expectedResults[i], actualResults.get(i));
         }

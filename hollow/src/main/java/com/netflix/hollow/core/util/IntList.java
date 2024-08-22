@@ -17,6 +17,9 @@
 package com.netflix.hollow.core.util;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * A list of primitive ints
@@ -104,6 +107,33 @@ public class IntList {
     public int hashCode() {
         int result = size;
         result = 31 * result + Arrays.hashCode(values);
+        return result;
+    }
+
+    public static Set<Integer> createSetFromIntList(IntList list) {
+        if (Objects.isNull(list)) {
+            return new HashSet<>();
+        }
+
+        HashSet<Integer> result = new HashSet<>(list.size());
+        int listSize = list.size();
+        for (int i = 0; i < listSize; ++i) {
+            result.add(list.get(i));
+        }
+
+        return result;
+    }
+
+    public static IntList createIntListFromSet(Set<Integer> set) {
+        if (Objects.isNull(set)) {
+            return new IntList(0);
+        }
+
+        IntList result = new IntList(set.size());
+        for (int value : set) {
+            result.add(value);
+        }
+
         return result;
     }
 }
