@@ -16,7 +16,7 @@ public class HollowSetTypeDataElementsSplitterTest extends AbstractHollowSetType
                 {2, 3},
                 {0, 4}
         };
-        HollowSetTypeReadState typeReadState = populateTypeStateWith(5, setContents);
+        HollowSetTypeReadState typeReadState = populateTypeStateWith(setContents);
         assertEquals(1, typeReadState.numShards());
         assertDataUnchanged(typeReadState, setContents);
 

@@ -57,9 +57,10 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
         writeStateEngine.add("TestSet", rec);
     }
 
-
-    protected HollowSetTypeReadState populateTypeStateWith(int numRecords, int[][] setContents) throws IOException {
-        populateWriteStateEngine(numRecords);
+    protected HollowSetTypeReadState populateTypeStateWith(int[][] setContents) throws IOException {
+        for(int[] set : setContents) {
+            addRecord(Arrays.stream(set).toArray());
+        }
         populateWriteStateEngine(setContents);
         roundTripSnapshot();
         return (HollowSetTypeReadState) readStateEngine.getTypeState("TestSet");
