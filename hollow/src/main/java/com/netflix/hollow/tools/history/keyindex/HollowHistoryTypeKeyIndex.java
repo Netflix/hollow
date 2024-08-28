@@ -17,6 +17,7 @@
 package com.netflix.hollow.tools.history.keyindex;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.tools.util.SearchUtils.ESCAPED_MULTI_FIELD_KEY_DELIMITER;
 import static com.netflix.hollow.tools.util.SearchUtils.MULTI_FIELD_KEY_DELIMITER;
 
 import com.netflix.hollow.core.HollowDataset;
@@ -31,6 +32,8 @@ import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.util.RemovedOrdinalIterator;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Objects;
+import java.util.Set;
 
 public class HollowHistoryTypeKeyIndex {
     private final PrimaryKey primaryKey;
@@ -175,48 +178,90 @@ public class HollowHistoryTypeKeyIndex {
         return builder.toString();
     }
 
-    public IntList queryIndexedFields(final String query) {
-        IntList matchingKeys = new IntList();
+    private void getMatchesForField(int fieldIdx, String strVal, IntList matchingKeys) throws NumberFormatException {
+        int hashCode = 0;
+        Object objectToFind = null;
+        FieldType fieldType = fieldTypes[fieldIdx];
+        switch (fieldType) {
+            case INT:
+                final int queryInt = Integer.parseInt(strVal);
+                hashCode = HollowReadFieldUtils.intHashCode(queryInt);
+                objectToFind = queryInt;
+                break;
+            case LONG:
+                final long queryLong = Long.parseLong(strVal);
+                hashCode = HollowReadFieldUtils.longHashCode(queryLong);
+                objectToFind = queryLong;
+                break;
+            case STRING:
+                hashCode = HashCodes.hashCode(strVal);
+                objectToFind = strVal.replaceAll(ESCAPED_MULTI_FIELD_KEY_DELIMITER, MULTI_FIELD_KEY_DELIMITER);
+                break;
+            case DOUBLE:
+                final double queryDouble = Double.parseDouble(strVal);
+                hashCode = HollowReadFieldUtils.doubleHashCode(queryDouble);
+                objectToFind = queryDouble;
+                break;
+            case FLOAT:
+                final float queryFloat = Float.parseFloat(strVal);
+                hashCode = HollowReadFieldUtils.floatHashCode(queryFloat);
+                objectToFind = queryFloat;
+                break;
+            default:
+        }
+        ordinalMapping.addMatches(HashCodes.hashInt(hashCode), objectToFind, fieldIdx, fieldType, matchingKeys);
+    }
 
-        if (!isInitialized) {
-            return matchingKeys;
+    // find the exact matches for the given composite key.
+    private IntList queryIndexedFieldsForCompositeKey(final String[] compositeKeyComponents) {
+        IntList matchingKeys = new IntList();
+        Set<Integer> resultSet = null;
+        for (int i = 0; i < compositeKeyComponents.length; ++i) {
+            String currComponent = compositeKeyComponents[i];
+            try {
+                getMatchesForField(i, currComponent, matchingKeys);
+                Set<Integer> keySet = IntList.createSetFromIntList(matchingKeys);
+                matchingKeys.clear();
+                if (keySet.isEmpty()) {
+                    // directly return as we'll not be able to find any exact matches for the given
+                    // composite key.
+                    return new IntList();
+                }
+                if (Objects.isNull(resultSet)) {
+                    resultSet = keySet;
+                }
+                else {
+                    resultSet.retainAll(keySet);
+                }
+            } catch (NumberFormatException ignore) {
+                return new IntList();
+            }
         }
 
+        return IntList.createIntListFromSet(resultSet);
+    }
+
+    private IntList queryIndexedFieldsForNonCompositeKey(final String query) {
+        IntList matchingKeys = new IntList();
         for (int i = 0; i < primaryKey.numFields(); i++) {
-            int hashCode = 0;
-            Object objectToFind = null;
             try {
-                switch (fieldTypes[i]) {
-                    case INT:
-                        final int queryInt = Integer.parseInt(query);
-                        hashCode = HollowReadFieldUtils.intHashCode(queryInt);
-                        objectToFind = queryInt;
-                        break;
-                    case LONG:
-                        final long queryLong = Long.parseLong(query);
-                        hashCode = HollowReadFieldUtils.longHashCode(queryLong);
-                        objectToFind = queryLong;
-                        break;
-                    case STRING:
-                        hashCode = HashCodes.hashCode(query);
-                        objectToFind = query;
-                        break;
-                    case DOUBLE:
-                        final double queryDouble = Double.parseDouble(query);
-                        hashCode = HollowReadFieldUtils.doubleHashCode(queryDouble);
-                        objectToFind = queryDouble;
-                        break;
-                    case FLOAT:
-                        final float queryFloat = Float.parseFloat(query);
-                        hashCode = HollowReadFieldUtils.floatHashCode(queryFloat);
-                        objectToFind = queryFloat;
-                        break;
-                    default:
-                }
-                ordinalMapping.addMatches(HashCodes.hashInt(hashCode), objectToFind, i, fieldTypes[i], matchingKeys);
+                getMatchesForField(i, query, matchingKeys);
             } catch(NumberFormatException ignore) {}
         }
         return matchingKeys;
+    }
+
+    public IntList queryIndexedFields(final String query) {
+        if (!isInitialized) {
+            return new IntList();
+        }
+
+        String[] keyComponents = query.split("(?<!\\\\)" + MULTI_FIELD_KEY_DELIMITER, primaryKey.numFields());
+        if (keyComponents.length > 1 && keyComponents.length == primaryKey.numFields()) {
+            return queryIndexedFieldsForCompositeKey(keyComponents);
+        } else {
+            return queryIndexedFieldsForNonCompositeKey(query);
+        }
     }
 
     public Object getKeyFieldValue(int keyFieldIdx, int keyOrdinal) {
