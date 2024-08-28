@@ -39,7 +39,7 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
                 startElement = 0;
                 endElement = from.listPointerData.getElementValue(0, from.bitsPerListPointer);
             } else {
-                long endFixedLengthOffset = (long)ordinal * from.bitsPerListPointer;
+                long endFixedLengthOffset = (long) ordinal * from.bitsPerListPointer;
                 long startFixedLengthOffset = endFixedLengthOffset - from.bitsPerListPointer;
                 startElement = from.listPointerData.getElementValue(startFixedLengthOffset, from.bitsPerListPointer);
                 endElement = from.listPointerData.getElementValue(endFixedLengthOffset, from.bitsPerListPointer);
@@ -61,7 +61,7 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
             target.bitsPerListPointer = maxShardTotalOfListSizes == 0 ? 1 : 64 - Long.numberOfLeadingZeros(maxShardTotalOfListSizes);
 
             target.listPointerData = FixedLengthDataFactory.get((long)target.bitsPerListPointer * (target.maxOrdinal + 1), target.memoryMode, target.memoryRecycler);
-            target.elementData = FixedLengthDataFactory.get((long)target.bitsPerElement * totalOfListSizes[toIndex], target.memoryMode, target.memoryRecycler);
+            target.elementData = FixedLengthDataFactory.get(target.bitsPerElement * totalOfListSizes[toIndex], target.memoryMode, target.memoryRecycler);
 
             target.totalNumberOfElements = totalOfListSizes[toIndex];  // useful for heap usage stats
         }
@@ -96,7 +96,7 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
                 target.elementData.setElementValue(elementCounter[toIndex] * target.bitsPerElement, target.bitsPerElement, elementOrdinal);
                 elementCounter[toIndex]++;
             }
-            target.listPointerData.setElementValue(target.bitsPerListPointer * toOrdinal, target.bitsPerListPointer, elementCounter[toIndex]);
+            target.listPointerData.setElementValue((long) target.bitsPerListPointer * toOrdinal, target.bitsPerListPointer, elementCounter[toIndex]);
         }
     }
 }

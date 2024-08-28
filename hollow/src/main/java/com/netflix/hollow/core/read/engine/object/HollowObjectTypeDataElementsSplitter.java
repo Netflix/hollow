@@ -5,7 +5,6 @@ import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataEle
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
-import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElements;
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitter;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 

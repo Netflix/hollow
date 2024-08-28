@@ -16,6 +16,9 @@
  */
 package com.netflix.hollow.core.read.engine.map;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.core.index.FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE;
+
 import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowMapSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
@@ -45,9 +48,6 @@ import java.util.BitSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
-import static com.netflix.hollow.core.index.FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE;
-
 /**
  * A {@link HollowTypeReadState} for MAP type records. 
  */
@@ -58,7 +58,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     
     private final int shardNumberMask;
     private final int shardOrdinalShift;
-    private final HollowMapTypeReadStateShard shards[];
+    final HollowMapTypeReadStateShard shards[];    // SNAP: TODO: elevated from private access for testing
     
     private HollowPrimaryKeyValueDeriver keyDeriver;
     
@@ -83,6 +83,19 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         
         this.shards = shards;
         
+    }
+
+    // SNAP: TODO: for testing
+    public HollowMapTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowMapSchema schema, int numShards, HollowMapTypeReadStateShard[] shards) {
+        super(stateEngine, memoryMode, schema);
+        this.sampler = new HollowMapSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
+        this.shardNumberMask = numShards - 1;
+        this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
+
+        if(numShards < 1 || 1 << shardOrdinalShift != numShards)
+            throw new IllegalArgumentException("Number of shards must be a power of 2!");
+
+        this.shards = shards;
     }
 
     @Override

@@ -43,7 +43,7 @@ class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoi
                 startElement = 0;
                 endElement = from[fromIndex].listPointerData.getElementValue(0, from[fromIndex].bitsPerListPointer);
             } else {
-                long endFixedLengthOffset = (long)fromOrdinal * from[fromIndex].bitsPerListPointer;
+                long endFixedLengthOffset = (long) fromOrdinal * from[fromIndex].bitsPerListPointer;
                 long startFixedLengthOffset = endFixedLengthOffset - from[fromIndex].bitsPerListPointer;
                 startElement = from[fromIndex].listPointerData.getElementValue(startFixedLengthOffset, from[fromIndex].bitsPerListPointer);
                 endElement = from[fromIndex].listPointerData.getElementValue(endFixedLengthOffset, from[fromIndex].bitsPerListPointer);
@@ -86,7 +86,7 @@ class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoi
               // by not writing anything to elementData, and writing the cached value of elementCounter to listPointerData
                 // SNAP: TODO: write a test for lopsided list shards. Theres one in object joiner tests.
 
-            to.listPointerData.setElementValue(to.bitsPerListPointer * ordinal, to.bitsPerListPointer, elementCounter);
+            to.listPointerData.setElementValue((long) to.bitsPerListPointer * ordinal, to.bitsPerListPointer, elementCounter);
         }
     }
 }

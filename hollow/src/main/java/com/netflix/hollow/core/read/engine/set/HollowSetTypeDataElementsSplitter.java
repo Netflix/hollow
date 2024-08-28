@@ -74,7 +74,7 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
             int toOrdinal = ordinal >> toOrdinalShift;
 
             long startBucket = getAbsoluteBucketStart(from, ordinal);
-            long endBucket = from.setPointerAndSizeData.getElementValue((long)ordinal * from.bitsPerFixedLengthSetPortion, from.bitsPerSetPointer);
+            long endBucket = from.setPointerAndSizeData.getElementValue((long) ordinal * from.bitsPerFixedLengthSetPortion, from.bitsPerSetPointer);
 
             HollowSetTypeDataElements target = to[toIndex];
             for (long bucket=startBucket;bucket<endBucket;bucket++) {
@@ -85,9 +85,9 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
                 bucketCounter[toIndex]++;
             }
 
-            target.setPointerAndSizeData.setElementValue((toOrdinal * target.bitsPerFixedLengthSetPortion), target.bitsPerSetPointer, bucketCounter[toIndex]);
-            long setSize = from.setPointerAndSizeData.getElementValue((ordinal * from.bitsPerFixedLengthSetPortion) + from.bitsPerSetPointer, from.bitsPerSetSizeValue);
-            target.setPointerAndSizeData.setElementValue((toOrdinal * target.bitsPerFixedLengthSetPortion) + target.bitsPerSetPointer, target.bitsPerSetSizeValue, setSize);
+            target.setPointerAndSizeData.setElementValue((long) toOrdinal * target.bitsPerFixedLengthSetPortion, target.bitsPerSetPointer, bucketCounter[toIndex]);
+            long setSize = from.setPointerAndSizeData.getElementValue((long) (ordinal * from.bitsPerFixedLengthSetPortion) + from.bitsPerSetPointer, from.bitsPerSetSizeValue);
+            target.setPointerAndSizeData.setElementValue((long) (toOrdinal * target.bitsPerFixedLengthSetPortion) + target.bitsPerSetPointer, target.bitsPerSetSizeValue, setSize);
         }
     }
 }

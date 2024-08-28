@@ -178,7 +178,7 @@ class HollowMapTypeReadStateShard {
         return bucketValue;
     }
 
-    private long getAbsoluteBucketStart(HollowMapTypeDataElements currentData, int ordinal) {
+    public static long getAbsoluteBucketStart(HollowMapTypeDataElements currentData, int ordinal) {
         long startBucket = ordinal == 0 ? 0 : currentData.mapPointerAndSizeData.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthMapPortion, currentData.bitsPerMapPointer);
         return startBucket;
     }

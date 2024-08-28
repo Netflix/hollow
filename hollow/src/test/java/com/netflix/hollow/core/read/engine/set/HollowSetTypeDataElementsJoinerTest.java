@@ -46,7 +46,7 @@ public class HollowSetTypeDataElementsJoinerTest extends AbstractHollowSetTypeDa
         assertDataUnchanged(typeReadState, setContents);
 
         try {
-            joiner = new HollowSetTypeDataElementsJoiner(mockListTypeState.currentDataElements());
+            joiner = new HollowSetTypeDataElementsJoiner(mockSetTypeState.currentDataElements());
             joiner.join();
             Assert.fail();
         } catch (IllegalStateException e) {

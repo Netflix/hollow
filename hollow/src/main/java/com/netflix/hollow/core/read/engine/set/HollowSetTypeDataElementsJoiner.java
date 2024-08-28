@@ -49,13 +49,12 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
             HollowSetTypeDataElements source = from[fromIndex];
 
             long startBucket = getAbsoluteBucketStart(source, fromOrdinal);
-            long endBucket = source.setPointerAndSizeData.getElementValue((long)fromOrdinal * source.bitsPerFixedLengthSetPortion, source.bitsPerSetPointer);
+            long endBucket = source.setPointerAndSizeData.getElementValue((long) fromOrdinal * source.bitsPerFixedLengthSetPortion, source.bitsPerSetPointer);
             long numBuckets = endBucket - startBucket;
 
             totalOfSetBuckets += numBuckets;
         }
 
-        // retained because these are computed based on max across all shards, splitting has no effect
         to.totalNumberOfBuckets = totalOfSetBuckets;
         to.bitsPerSetPointer = 64 - Long.numberOfLeadingZeros(to.totalNumberOfBuckets);
         to.bitsPerFixedLengthSetPortion = to.bitsPerSetPointer + to.bitsPerSetSizeValue;
@@ -75,7 +74,7 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
 
             if (fromOrdinal <= from[fromIndex].maxOrdinal) {
                 long startBucket = getAbsoluteBucketStart(source, fromOrdinal);
-                long endBucket = source.setPointerAndSizeData.getElementValue((long)fromOrdinal * source.bitsPerFixedLengthSetPortion, source.bitsPerSetPointer);
+                long endBucket = source.setPointerAndSizeData.getElementValue((long) fromOrdinal * source.bitsPerFixedLengthSetPortion, source.bitsPerSetPointer);
 
                 for (long bucket=startBucket;bucket<endBucket;bucket++) {
                     int bucketOrdinal = (int)source.elementData.getElementValue(bucket * source.bitsPerElement, source.bitsPerElement);
@@ -86,9 +85,9 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
             // by not writing anything to elementData, and writing the cached value of bucketCounter to listPointerData
             // SNAP: TODO: write a test for lopsided list shards (similar to for list types). Theres one in object joiner tests.
 
-            to.setPointerAndSizeData.setElementValue((ordinal * to.bitsPerFixedLengthSetPortion), to.bitsPerSetPointer, bucketCounter);
-            long setSize = source.setPointerAndSizeData.getElementValue((fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);
-            to.setPointerAndSizeData.setElementValue((ordinal * to.bitsPerFixedLengthSetPortion) + to.bitsPerSetPointer, to.bitsPerSetSizeValue, setSize);
+            to.setPointerAndSizeData.setElementValue((long) ordinal * to.bitsPerFixedLengthSetPortion, to.bitsPerSetPointer, bucketCounter);
+            long setSize = source.setPointerAndSizeData.getElementValue((long) (fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);
+            to.setPointerAndSizeData.setElementValue((long) (ordinal * to.bitsPerFixedLengthSetPortion) + to.bitsPerSetPointer, to.bitsPerSetSizeValue, setSize);
         }
     }
 }

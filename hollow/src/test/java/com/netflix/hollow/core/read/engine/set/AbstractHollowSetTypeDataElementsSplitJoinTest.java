@@ -21,7 +21,7 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
     protected HollowSetSchema setSchema;
 
     @Mock
-    protected HollowSetTypeReadState mockListTypeState;
+    protected HollowSetTypeReadState mockSetTypeState;
 
     @Before
     public void setUp() {
@@ -31,7 +31,7 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
 
         MockitoAnnotations.initMocks(this);
         HollowSetTypeDataElements[] fakeDataElements = new HollowSetTypeDataElements[5];
-        when(mockListTypeState.currentDataElements()).thenReturn(fakeDataElements);
+        when(mockSetTypeState.currentDataElements()).thenReturn(fakeDataElements);
     }
 
     @Override
@@ -41,6 +41,7 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
         writeStateEngine.setTargetMaxTypeShardSize(4 * 100 * 1000 * 1024);
     }
 
+    // SNAP: TOFO: seems repetitive, can be dropped
     private void populateWriteStateEngine(int[][] setContents) {
         for(int[] set : setContents) {
             addRecord(Arrays.stream(set).toArray());
