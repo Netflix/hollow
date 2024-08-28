@@ -72,7 +72,8 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
 
             HollowSetTypeDataElements source = from[fromIndex];
 
-            if (fromOrdinal <= from[fromIndex].maxOrdinal) {
+            long setSize = 0;
+            if (fromOrdinal <= from[fromIndex].maxOrdinal) { // else lopsided shards resulting from skipping type shards with no additions, setSize remains 0
                 long startBucket = getAbsoluteBucketStart(source, fromOrdinal);
                 long endBucket = source.setPointerAndSizeData.getElementValue((long) fromOrdinal * source.bitsPerFixedLengthSetPortion, source.bitsPerSetPointer);
 
@@ -81,12 +82,11 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
                     to.elementData.setElementValue(bucketCounter * to.bitsPerElement, to.bitsPerElement, bucketOrdinal);
                     bucketCounter++;
                 }
-            } // else: lopsided shards could result for consumers that skip type shards with no additions, that gets handled
-            // by not writing anything to elementData, and writing the cached value of bucketCounter to listPointerData
-            // SNAP: TODO: write a test for lopsided list shards (similar to for list types). Theres one in object joiner tests.
 
+                setSize = source.setPointerAndSizeData.getElementValue((long) (fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);
+            }
+            // SNAP: TODO: write a test for lopsided list shards (similar to for list types). Theres one in object joiner tests.
             to.setPointerAndSizeData.setElementValue((long) ordinal * to.bitsPerFixedLengthSetPortion, to.bitsPerSetPointer, bucketCounter);
-            long setSize = source.setPointerAndSizeData.getElementValue((long) (fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);
             to.setPointerAndSizeData.setElementValue((long) (ordinal * to.bitsPerFixedLengthSetPortion) + to.bitsPerSetPointer, to.bitsPerSetSizeValue, setSize);
         }
     }

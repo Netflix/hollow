@@ -72,7 +72,11 @@ public class SegmentedLongArray {
     public void set(long index, long value) {
         int segmentIndex = (int)(index >> log2OfSegmentSize);
         int longInSegment = (int)(index & bitmask);
-        unsafe.putLong(segments[segmentIndex], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longInSegment), value);
+        try {
+            unsafe.putLong(segments[segmentIndex], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longInSegment), value);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw e;
+        }
 
         /// duplicate the longs here so that we can read faster.
         if(longInSegment == 0 && segmentIndex != 0) {
