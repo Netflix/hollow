@@ -23,7 +23,7 @@ import com.netflix.hollow.core.HollowConstants;
  * The HollowUpdatePlanner defines the logic responsible for interacting with a {@link HollowBlobRetriever} 
  * to create a {@link HollowUpdatePlan}.
  */
-public class HollowUpdatePlanner {
+public class HollowUpdatePlanner implements IHollowUpdatePlanner {
 
     private final HollowConsumer.BlobRetriever transitionCreator;
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
