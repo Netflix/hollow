@@ -106,4 +106,11 @@ public class HollowListTypeDataElements extends AbstractHollowTypeDataElements {
         FixedLengthDataFactory.destroy(elementData, memoryRecycler);
     }
 
+    public long getStartElement(int ordinal) {
+        return ordinal == 0 ? 0 : listPointerData.getElementValue(((long) (ordinal-1) * bitsPerListPointer), bitsPerListPointer);
+    }
+
+    public long getEndElement(int ordinal) {
+        return listPointerData.getElementValue((long)ordinal * bitsPerListPointer, bitsPerListPointer);
+    }
 }

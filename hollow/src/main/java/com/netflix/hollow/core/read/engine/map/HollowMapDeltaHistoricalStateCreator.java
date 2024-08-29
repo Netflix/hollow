@@ -123,8 +123,8 @@ public class HollowMapDeltaHistoricalStateCreator {
         long bitsPerBucket = historicalDataElements.bitsPerMapEntry;
         long size = typeState.size(ordinal);
 
-        long fromStartBucket = shardOrdinal == 0 ? 0 : stateEngineDataElements[shard].mapPointerAndSizeData.getElementValue((long)(shardOrdinal - 1) * stateEngineDataElements[shard].bitsPerFixedLengthMapPortion, stateEngineDataElements[shard].bitsPerMapPointer);
-        long fromEndBucket = stateEngineDataElements[shard].mapPointerAndSizeData.getElementValue((long)shardOrdinal * stateEngineDataElements[shard].bitsPerFixedLengthMapPortion, stateEngineDataElements[shard].bitsPerMapPointer);
+        long fromStartBucket = stateEngineDataElements[shard].getStartBucket(shardOrdinal);
+        long fromEndBucket = stateEngineDataElements[shard].getEndBucket(shardOrdinal);
         long numBuckets = fromEndBucket - fromStartBucket;
 
         historicalDataElements.mapPointerAndSizeData.setElementValue((long)nextOrdinal * historicalDataElements.bitsPerFixedLengthMapPortion, historicalDataElements.bitsPerMapPointer, nextStartBucket + numBuckets);

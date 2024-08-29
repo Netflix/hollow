@@ -118,4 +118,20 @@ public class HollowMapTypeDataElements extends AbstractHollowTypeDataElements {
         FixedLengthDataFactory.destroy(entryData, memoryRecycler);
     }
 
+    public long getStartBucket(int ordinal) {
+        return ordinal == 0 ? 0 : mapPointerAndSizeData.getElementValue((long)(ordinal - 1) * bitsPerFixedLengthMapPortion, bitsPerMapPointer);
+    }
+
+    public long getEndBucket(int ordinal) {
+        return mapPointerAndSizeData.getElementValue((long)ordinal * bitsPerFixedLengthMapPortion, bitsPerMapPointer);
+    }
+
+    int getBucketKeyByAbsoluteIndex(long absoluteBucketIndex) {
+        return (int)entryData.getElementValue(absoluteBucketIndex * bitsPerMapEntry, bitsPerKeyElement);
+    }
+
+    int getBucketValueByAbsoluteIndex(long absoluteBucketIndex) {
+        return (int)entryData.getElementValue((absoluteBucketIndex * bitsPerMapEntry) + bitsPerKeyElement, bitsPerValueElement);
+    }
+
 }

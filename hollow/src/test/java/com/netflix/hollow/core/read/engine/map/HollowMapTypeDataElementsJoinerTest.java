@@ -1,6 +1,5 @@
 package com.netflix.hollow.core.read.engine.map;
 
-import static com.netflix.hollow.core.read.engine.map.HollowMapTypeReadStateShard.getAbsoluteBucketStart;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -95,8 +94,8 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
         assertEquals(valSmall, valJoined);
 
         int ordinalFirstBig = 1;
-        long startBucketFirstBig = getAbsoluteBucketStart(dataElementsJoined, ordinalFirstBig);
-        long endBucketFirstBig = dataElementsJoined.mapPointerAndSizeData.getElementValue((long) ordinalFirstBig * dataElementsJoined.bitsPerFixedLengthMapPortion, dataElementsJoined.bitsPerMapPointer);
+        long startBucketFirstBig = dataElementsJoined.getStartBucket(ordinalFirstBig);
+        long endBucketFirstBig = dataElementsJoined.getEndBucket(ordinalFirstBig);
         Map<Integer, Integer> bigValueMapJoined = new HashMap<>();
         for (long bucket=startBucketFirstBig;bucket<endBucketFirstBig;bucket++) {
             long key = dataElementsJoined.entryData.getElementValue(bucket * dataElementsJoined.bitsPerMapEntry, dataElementsJoined.bitsPerKeyElement);

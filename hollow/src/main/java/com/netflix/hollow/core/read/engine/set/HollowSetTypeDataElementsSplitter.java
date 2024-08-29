@@ -1,7 +1,5 @@
 package com.netflix.hollow.core.read.engine.set;
 
-import static com.netflix.hollow.core.read.engine.set.HollowSetTypeReadStateShard.getAbsoluteBucketStart;
-
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitter;
 
@@ -36,8 +34,8 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
             int toOrdinal = ordinal >> toOrdinalShift;
             to[toIndex].maxOrdinal = toOrdinal;
 
-            long startBucket = getAbsoluteBucketStart(from, ordinal);
-            long endBucket = from.setPointerAndSizeData.getElementValue((long)ordinal * from.bitsPerFixedLengthSetPortion, from.bitsPerSetPointer);
+            long startBucket = from.getStartBucket(ordinal);
+            long endBucket = from.getEndBucket(ordinal);
             long numBuckets = endBucket - startBucket;
 
             shardTotalOfSetBuckets[toIndex] += numBuckets;
@@ -50,8 +48,8 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
             HollowSetTypeDataElements target = to[toIndex];
             // retained because these are computed based on max across all shards, splitting has no effect
             target.bitsPerElement = from.bitsPerElement;
-            target.bitsPerSetSizeValue = from.bitsPerSetSizeValue;
             target.emptyBucketValue = from.emptyBucketValue;
+            target.bitsPerSetSizeValue = from.bitsPerSetSizeValue;
 
             // recomputed based on split shards
             target.bitsPerSetPointer = 64 - Long.numberOfLeadingZeros(maxShardTotalOfSetBuckets);
@@ -73,18 +71,27 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
             int toIndex = ordinal & toMask;
             int toOrdinal = ordinal >> toOrdinalShift;
 
-            long startBucket = getAbsoluteBucketStart(from, ordinal);
-            long endBucket = from.setPointerAndSizeData.getElementValue((long) ordinal * from.bitsPerFixedLengthSetPortion, from.bitsPerSetPointer);
-
+            long startBucket = from.getStartBucket(ordinal);
+            long endBucket = from.getEndBucket(ordinal);
             HollowSetTypeDataElements target = to[toIndex];
-            for (long bucket=startBucket;bucket<endBucket;bucket++) {
-                long bucketVal = from.elementData.getElementValue(bucket * from.bitsPerElement, from.bitsPerElement);
-                if(bucketVal == from.emptyBucketValue)
-                    bucketVal = target.emptyBucketValue;
-                target.elementData.setElementValue(bucketCounter[toIndex] * target.bitsPerElement, target.bitsPerElement, bucketVal);
-                bucketCounter[toIndex]++;
-            }
 
+            if (target.bitsPerElement == from.bitsPerElement && target.emptyBucketValue == from.emptyBucketValue) {
+                // fastpath
+                int bitsPerElement = from.bitsPerElement;
+                long numBuckets = endBucket - startBucket;
+                target.elementData.copyBits(from.elementData, startBucket * bitsPerElement, bucketCounter[toIndex] * bitsPerElement, numBuckets * bitsPerElement);
+                bucketCounter[toIndex] += numBuckets;
+            } else {
+                // for (long bucket=startBucket;bucket<endBucket;bucket++) {
+                //     long bucketVal = from.elementData.getElementValue(bucket * from.bitsPerElement, from.bitsPerElement);
+                //     if(bucketVal == from.emptyBucketValue)
+                //         bucketVal = target.emptyBucketValue;
+                //     target.elementData.setElementValue(bucketCounter[toIndex] * target.bitsPerElement, target.bitsPerElement, bucketVal);
+                //     bucketCounter[toIndex]++;
+                // }
+                throw new RuntimeException("Unexpected for Set type during split, expected during join");  // SNAP: TODO: remove, or keep for now so that we can test the slow path and in future when we make size optimizations then consumers will be backwards compatible
+
+            }
             target.setPointerAndSizeData.setElementValue((long) toOrdinal * target.bitsPerFixedLengthSetPortion, target.bitsPerSetPointer, bucketCounter[toIndex]);
             long setSize = from.setPointerAndSizeData.getElementValue((long) (ordinal * from.bitsPerFixedLengthSetPortion) + from.bitsPerSetPointer, from.bitsPerSetSizeValue);
             target.setPointerAndSizeData.setElementValue((long) (toOrdinal * target.bitsPerFixedLengthSetPortion) + target.bitsPerSetPointer, target.bitsPerSetSizeValue, setSize);

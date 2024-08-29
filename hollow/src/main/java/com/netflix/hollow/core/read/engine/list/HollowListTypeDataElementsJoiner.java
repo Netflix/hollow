@@ -37,17 +37,8 @@ class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoi
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
 
-            long startElement;
-            long endElement;
-            if (fromOrdinal == 0) {
-                startElement = 0;
-                endElement = from[fromIndex].listPointerData.getElementValue(0, from[fromIndex].bitsPerListPointer);
-            } else {
-                long endFixedLengthOffset = (long) fromOrdinal * from[fromIndex].bitsPerListPointer;
-                long startFixedLengthOffset = endFixedLengthOffset - from[fromIndex].bitsPerListPointer;
-                startElement = from[fromIndex].listPointerData.getElementValue(startFixedLengthOffset, from[fromIndex].bitsPerListPointer);
-                endElement = from[fromIndex].listPointerData.getElementValue(endFixedLengthOffset, from[fromIndex].bitsPerListPointer);
-            }
+            long startElement = from[fromIndex].getStartElement(fromOrdinal);
+            long endElement = from[fromIndex].getEndElement(fromOrdinal);
             long numElements = endElement - startElement;
             totalOfListSizes += numElements;
 
@@ -65,23 +56,23 @@ class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoi
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
 
-            long startElement;
-            long endElement;
             if (fromOrdinal <= from[fromIndex].maxOrdinal) {
-                if (fromOrdinal == 0) {
-                    startElement = 0;
-                    endElement = from[fromIndex].listPointerData.getElementValue(0, from[fromIndex].bitsPerListPointer);
+                HollowListTypeDataElements source = from[fromIndex];
+                long startElement = source.getStartElement(fromOrdinal);
+                long endElement = source.getEndElement(fromOrdinal);
+
+                if (source.bitsPerElement == to.bitsPerElement) {
+                    // fastpath can bulk copy elements. emptyBucketValue is same since bitsPerElement is same
+                    long numElements = endElement - startElement;
+                    int bitsPerElement = source.bitsPerElement;
+                    to.elementData.copyBits(source.elementData, startElement * bitsPerElement, elementCounter * bitsPerElement, numElements * bitsPerElement);
+                    elementCounter += numElements;
                 } else {
-                    long endFixedLengthOffset = (long)fromOrdinal * from[fromIndex].bitsPerListPointer;
-                    long startFixedLengthOffset = endFixedLengthOffset - from[fromIndex].bitsPerListPointer;
-                    startElement = from[fromIndex].listPointerData.getElementValue(startFixedLengthOffset, from[fromIndex].bitsPerListPointer);
-                    endElement = from[fromIndex].listPointerData.getElementValue(endFixedLengthOffset, from[fromIndex].bitsPerListPointer);
-                }
-                // SNAP: TODO: fastpath
-                for (long element=startElement;element<endElement;element++) {
-                    int elementOrdinal = (int)from[fromIndex].elementData.getElementValue(element * from[fromIndex].bitsPerElement, from[fromIndex].bitsPerElement);
-                    to.elementData.setElementValue(elementCounter * to.bitsPerElement, to.bitsPerElement, elementOrdinal);
-                    elementCounter++;
+                    for (long element = startElement; element < endElement; element++) {
+                        int elementOrdinal = (int) source.elementData.getElementValue(element * source.bitsPerElement, source.bitsPerElement);
+                        to.elementData.setElementValue(elementCounter * to.bitsPerElement, to.bitsPerElement, elementOrdinal);
+                        elementCounter++;
+                    }
                 }
             } // else: lopsided shards could result for consumers that skip type shards with no additions, that gets handled
               // by not writing anything to elementData, and writing the cached value of elementCounter to listPointerData

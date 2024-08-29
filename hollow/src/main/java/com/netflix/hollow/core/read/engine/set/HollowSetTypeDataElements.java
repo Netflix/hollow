@@ -113,4 +113,16 @@ public class HollowSetTypeDataElements extends AbstractHollowTypeDataElements {
         FixedLengthDataFactory.destroy(setPointerAndSizeData, memoryRecycler);
         FixedLengthDataFactory.destroy(elementData, memoryRecycler);
     }
+
+    public long getStartBucket(int ordinal) {
+        return ordinal == 0 ? 0 : setPointerAndSizeData.getElementValue((long)(ordinal - 1) * bitsPerFixedLengthSetPortion, bitsPerSetPointer);
+    }
+
+    public long getEndBucket(int ordinal) {
+        return setPointerAndSizeData.getElementValue((long) ordinal * bitsPerFixedLengthSetPortion, bitsPerSetPointer);
+    }
+
+    public int getBucketValue(long absoluteBucketIndex) {
+        return (int)elementData.getElementValue(absoluteBucketIndex * bitsPerElement, bitsPerElement);
+    }
 }

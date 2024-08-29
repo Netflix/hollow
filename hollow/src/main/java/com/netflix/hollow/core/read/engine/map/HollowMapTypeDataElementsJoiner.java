@@ -1,7 +1,5 @@
 package com.netflix.hollow.core.read.engine.map;
 
-import static com.netflix.hollow.core.read.engine.map.HollowMapTypeReadStateShard.getAbsoluteBucketStart;
-
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsJoiner;
 
@@ -50,8 +48,8 @@ class HollowMapTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
 
             HollowMapTypeDataElements source = from[fromIndex];
 
-            long startBucket = getAbsoluteBucketStart(source, fromOrdinal);
-            long endBucket = source.mapPointerAndSizeData.getElementValue((long)fromOrdinal * source.bitsPerFixedLengthMapPortion, source.bitsPerMapPointer);
+            long startBucket = source.getStartBucket(fromOrdinal);
+            long endBucket = source.getEndBucket(fromOrdinal);
             long numBuckets = endBucket - startBucket;
 
             totalOfMapBuckets += numBuckets;
@@ -77,8 +75,8 @@ class HollowMapTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
 
             long mapSize = 0;
             if (fromOrdinal <= from[fromIndex].maxOrdinal) { // else lopsided shards resulting from skipping type shards with no additions, mapSize remains 0
-                long startBucket = getAbsoluteBucketStart(source, fromOrdinal);
-                long endBucket = source.mapPointerAndSizeData.getElementValue((long)fromOrdinal * source.bitsPerFixedLengthMapPortion, source.bitsPerMapPointer);
+                long startBucket = source.getStartBucket(fromOrdinal);
+                long endBucket = source.getEndBucket(fromOrdinal);
                 long numBuckets = endBucket - startBucket;
 
                 // if (false) { // SNAP: TODO: test the slow path

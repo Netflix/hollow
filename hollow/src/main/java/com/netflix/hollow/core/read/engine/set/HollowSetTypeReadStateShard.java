@@ -55,13 +55,13 @@ class HollowSetTypeReadStateShard {
             do {
                 currentData = this.currentDataVolatile;
 
-                startBucket = getAbsoluteBucketStart(currentData, ordinal);
-                endBucket = currentData.setPointerAndSizeData.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
+                startBucket = currentData.getStartBucket(ordinal);
+                endBucket = currentData.getEndBucket(ordinal);
             } while(readWasUnsafe(currentData));
 
             hashCode = HashCodes.hashInt(hashCode);
             long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
-            int bucketOrdinal = absoluteBucketValue(currentData, bucket);
+            int bucketOrdinal = currentData.getBucketValue(bucket);
 
             while(bucketOrdinal != currentData.emptyBucketValue) {
                 if(bucketOrdinal == value) {
@@ -71,7 +71,7 @@ class HollowSetTypeReadStateShard {
                 bucket++;
                 if(bucket == endBucket)
                     bucket = startBucket;
-                bucketOrdinal = absoluteBucketValue(currentData, bucket);
+                bucketOrdinal = currentData.getBucketValue(bucket);
             }
 
             foundData = false;
@@ -93,12 +93,12 @@ class HollowSetTypeReadStateShard {
             do {
                 currentData = this.currentDataVolatile;
 
-                startBucket = getAbsoluteBucketStart(currentData, ordinal);
-                endBucket = currentData.setPointerAndSizeData.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
+                startBucket = currentData.getStartBucket(ordinal);
+                endBucket = currentData.getEndBucket(ordinal);
             } while(readWasUnsafe(currentData));
 
             long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
-            int bucketOrdinal = absoluteBucketValue(currentData, bucket);
+            int bucketOrdinal = currentData.getBucketValue(bucket);
 
             while(bucketOrdinal != currentData.emptyBucketValue) {
                 if(readWasUnsafe(currentData))
@@ -110,7 +110,7 @@ class HollowSetTypeReadStateShard {
                 bucket++;
                 if(bucket == endBucket)
                     bucket = startBucket;
-                bucketOrdinal = absoluteBucketValue(currentData, bucket);
+                bucketOrdinal = currentData.getBucketValue(bucket);
             }
 
         } while(readWasUnsafe(currentData));
@@ -127,10 +127,10 @@ class HollowSetTypeReadStateShard {
             do {
                 currentData = this.currentDataVolatile;
 
-                startBucket = getAbsoluteBucketStart(currentData, setOrdinal);
+                startBucket = currentData.getStartBucket(setOrdinal);
             } while(readWasUnsafe(currentData));
 
-            value = absoluteBucketValue(currentData, startBucket + bucketIndex);
+            value = currentData.getBucketValue(startBucket + bucketIndex);
 
             if(value == currentData.emptyBucketValue)
                 value = ORDINAL_NONE;
@@ -139,14 +139,6 @@ class HollowSetTypeReadStateShard {
         return value;
     }
 
-    public static long getAbsoluteBucketStart(HollowSetTypeDataElements currentData, int ordinal) {
-        return ordinal == 0 ? 0 : currentData.setPointerAndSizeData.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
-    }
-
-    public static int absoluteBucketValue(HollowSetTypeDataElements currentData, long absoluteBucketIndex) {
-        return (int)currentData.elementData.getElementValue(absoluteBucketIndex * currentData.bitsPerElement, currentData.bitsPerElement);
-    }
-    
     void invalidate() {
         setCurrentData(null);
     }
@@ -171,11 +163,11 @@ class HollowSetTypeReadStateShard {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
                 int numBuckets = HashCodes.hashTableSize(size(shardOrdinal));
-                long offset = getAbsoluteBucketStart(currentData, shardOrdinal);
+                long offset = currentData.getStartBucket(shardOrdinal);
     
                 checksum.applyInt(ordinal);
                 for(int i=0;i<numBuckets;i++) {
-                    int bucketValue = absoluteBucketValue(currentData, offset + i);
+                    int bucketValue = currentData.getBucketValue(offset + i);
                     if(bucketValue != currentData.emptyBucketValue) {
                         checksum.applyInt(i);
                         checksum.applyInt(bucketValue);

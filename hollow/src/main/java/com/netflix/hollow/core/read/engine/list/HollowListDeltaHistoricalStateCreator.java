@@ -110,8 +110,8 @@ public class HollowListDeltaHistoricalStateCreator {
         int shardOrdinal = ordinal >> shardOrdinalShift; 
         
         long bitsPerElement = stateEngineDataElements[shard].bitsPerElement;
-        long fromStartElement = shardOrdinal == 0 ? 0 : stateEngineDataElements[shard].listPointerData.getElementValue((long)(shardOrdinal - 1) * stateEngineDataElements[shard].bitsPerListPointer, stateEngineDataElements[shard].bitsPerListPointer);
-        long fromEndElement = stateEngineDataElements[shard].listPointerData.getElementValue((long)shardOrdinal * stateEngineDataElements[shard].bitsPerListPointer, stateEngineDataElements[shard].bitsPerListPointer);
+        long fromStartElement = stateEngineDataElements[shard].getStartElement(shardOrdinal);
+        long fromEndElement = stateEngineDataElements[shard].getEndElement(shardOrdinal);
         long size = fromEndElement - fromStartElement;
 
         historicalDataElements.elementData.copyBits(stateEngineDataElements[shard].elementData, fromStartElement * bitsPerElement, nextStartElement * bitsPerElement, size * bitsPerElement);

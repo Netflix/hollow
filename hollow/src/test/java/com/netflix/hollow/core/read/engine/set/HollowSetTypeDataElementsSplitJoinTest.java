@@ -15,7 +15,7 @@ import org.junit.Test;
 public class HollowSetTypeDataElementsSplitJoinTest extends AbstractHollowSetTypeDataElementsSplitJoinTest {
 
     // manually invoked
-    // @Test
+    @Test
     public void testSplittingAndJoiningWithSnapshotBlob() throws Exception {
 
         // SNAP: TODO: cleanup this whole method

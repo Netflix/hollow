@@ -100,7 +100,7 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
     }
 
     // manually invoked
-    // @Test
+    @Test
     public void testSplittingAndJoiningWithSnapshotBlob() throws Exception {
 
         // SNAP: TODO: cleanup this whole method

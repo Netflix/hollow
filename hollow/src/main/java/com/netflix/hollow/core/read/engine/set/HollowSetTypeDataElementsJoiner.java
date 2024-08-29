@@ -1,7 +1,5 @@
 package com.netflix.hollow.core.read.engine.set;
 
-import static com.netflix.hollow.core.read.engine.set.HollowSetTypeReadStateShard.getAbsoluteBucketStart;
-
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsJoiner;
 
@@ -48,8 +46,8 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
 
             HollowSetTypeDataElements source = from[fromIndex];
 
-            long startBucket = getAbsoluteBucketStart(source, fromOrdinal);
-            long endBucket = source.setPointerAndSizeData.getElementValue((long) fromOrdinal * source.bitsPerFixedLengthSetPortion, source.bitsPerSetPointer);
+            long startBucket = source.getStartBucket(fromOrdinal);
+            long endBucket = source.getEndBucket(fromOrdinal);
             long numBuckets = endBucket - startBucket;
 
             totalOfSetBuckets += numBuckets;
@@ -74,15 +72,22 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
 
             long setSize = 0;
             if (fromOrdinal <= from[fromIndex].maxOrdinal) { // else lopsided shards resulting from skipping type shards with no additions, setSize remains 0
-                long startBucket = getAbsoluteBucketStart(source, fromOrdinal);
-                long endBucket = source.setPointerAndSizeData.getElementValue((long) fromOrdinal * source.bitsPerFixedLengthSetPortion, source.bitsPerSetPointer);
+                long startBucket = source.getStartBucket(fromOrdinal);
+                long endBucket = source.getEndBucket(fromOrdinal);
 
-                // SNAP: TODO: fastpath
-
-                for (long bucket=startBucket;bucket<endBucket;bucket++) {
-                    int bucketOrdinal = (int)source.elementData.getElementValue(bucket * source.bitsPerElement, source.bitsPerElement);
-                    to.elementData.setElementValue(bucketCounter * to.bitsPerElement, to.bitsPerElement, bucketOrdinal);
-                    bucketCounter++;
+                if (to.bitsPerElement == source.bitsPerElement) {
+                    // fastpath can bulk copy buckets. emptyBucketValue is same since bitsPerElement is same
+                    long numBuckets = endBucket - startBucket;
+                    int bitsPerElement = source.bitsPerElement;
+                    to.elementData.copyBits(source.elementData, startBucket * bitsPerElement, bucketCounter * bitsPerElement, numBuckets * bitsPerElement);
+                    bucketCounter += numBuckets;
+                } else {
+                    // one bucket at a time
+                    for (long bucket=startBucket;bucket<endBucket;bucket++) {
+                        int bucketOrdinal = (int)source.elementData.getElementValue(bucket * source.bitsPerElement, source.bitsPerElement);
+                        to.elementData.setElementValue(bucketCounter * to.bitsPerElement, to.bitsPerElement, bucketOrdinal);
+                        bucketCounter++;
+                    }
                 }
 
                 setSize = source.setPointerAndSizeData.getElementValue((long) (fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);

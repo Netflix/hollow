@@ -1,8 +1,6 @@
 package com.netflix.hollow.core.read.engine.map;
 
 
-import static com.netflix.hollow.core.read.engine.map.HollowMapTypeReadStateShard.getAbsoluteBucketStart;
-
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitter;
 
@@ -37,8 +35,8 @@ public class HollowMapTypeDataElementsSplitter extends AbstractHollowTypeDataEle
             int toOrdinal = ordinal >> toOrdinalShift;
             to[toIndex].maxOrdinal = toOrdinal;
 
-            long startBucket = getAbsoluteBucketStart(from, ordinal);
-            long endBucket = from.mapPointerAndSizeData.getElementValue((long)ordinal * from.bitsPerFixedLengthMapPortion, from.bitsPerMapPointer);
+            long startBucket = from.getStartBucket(ordinal);
+            long endBucket = from.getEndBucket(ordinal);
             long numBuckets = endBucket - startBucket;
 
             shardTotalOfMapBuckets[toIndex] += numBuckets;
@@ -75,10 +73,10 @@ public class HollowMapTypeDataElementsSplitter extends AbstractHollowTypeDataEle
         for(int ordinal=0;ordinal<=from.maxOrdinal;ordinal++) {
             int toIndex = ordinal & toMask;
             int toOrdinal = ordinal >> toOrdinalShift;
-            HollowMapTypeDataElements target = to[toIndex];
 
-            long startBucket = getAbsoluteBucketStart(from, ordinal);
-            long endBucket =from.mapPointerAndSizeData.getElementValue((long) ordinal * from.bitsPerFixedLengthMapPortion, from.bitsPerMapPointer);
+            HollowMapTypeDataElements target = to[toIndex];
+            long startBucket = from.getStartBucket(ordinal);
+            long endBucket = from.getEndBucket(ordinal);
 
             // if (false) { // SNAP: TODO: test the slow path
             if (target.bitsPerKeyElement == from.bitsPerKeyElement && target.bitsPerValueElement == from.bitsPerValueElement) {
@@ -88,7 +86,7 @@ public class HollowMapTypeDataElementsSplitter extends AbstractHollowTypeDataEle
                 target.entryData.copyBits(from.entryData, startBucket * bitsPerMapEntry, bucketCounter[toIndex] * bitsPerMapEntry, numBuckets * bitsPerMapEntry);
                 bucketCounter[toIndex] += numBuckets;
             } else {
-                throw new RuntimeException("Unexpected for Map type");
+                throw new RuntimeException("Unexpected for Map type during split, expected during join");  // SNAP: TODO: remove
                 // for (long bucket=startBucket;bucket<endBucket;bucket++) {
                 //     long bucketKey = from.entryData.getElementValue(bucket * from.bitsPerMapEntry, from.bitsPerKeyElement);
                 //     long bucketValue = from.entryData.getElementValue(bucket * from.bitsPerMapEntry + from.bitsPerKeyElement, from.bitsPerValueElement);

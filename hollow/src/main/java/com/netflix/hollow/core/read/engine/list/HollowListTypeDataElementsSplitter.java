@@ -33,18 +33,8 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
             int toOrdinal = ordinal >> toOrdinalShift;
             to[toIndex].maxOrdinal = toOrdinal;
 
-            long startElement;
-            long endElement;
-            if (ordinal == 0) {
-                startElement = 0;
-                endElement = from.listPointerData.getElementValue(0, from.bitsPerListPointer);
-            } else {
-                long endFixedLengthOffset = (long) ordinal * from.bitsPerListPointer;
-                long startFixedLengthOffset = endFixedLengthOffset - from.bitsPerListPointer;
-                startElement = from.listPointerData.getElementValue(startFixedLengthOffset, from.bitsPerListPointer);
-                endElement = from.listPointerData.getElementValue(endFixedLengthOffset, from.bitsPerListPointer);
-            }
-
+            long startElement = from.getStartElement(ordinal);
+            long endElement = from.getEndElement(ordinal);
             long numElements = endElement - startElement;
             totalOfListSizes[toIndex] += numElements;
         }
@@ -77,25 +67,25 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
             int toIndex = ordinal & toMask;
             int toOrdinal = ordinal >> toOrdinalShift;
 
-            long startElement;
-            long endElement;
-
-            if (ordinal == 0) {
-                startElement = 0;
-                endElement = from.listPointerData.getElementValue(0, from.bitsPerListPointer);
-            } else {
-                long endFixedLengthOffset = (long)ordinal * from.bitsPerListPointer;
-                long startFixedLengthOffset = endFixedLengthOffset - from.bitsPerListPointer;
-                startElement = from.listPointerData.getElementValue(startFixedLengthOffset, from.bitsPerListPointer);
-                endElement = from.listPointerData.getElementValue(endFixedLengthOffset, from.bitsPerListPointer);
-            }
-
+            long startElement = from.getStartElement(ordinal);
+            long endElement = from.getEndElement(ordinal);
             HollowListTypeDataElements target = to[toIndex];
-            for (long element=startElement;element<endElement;element++) {
-                int elementOrdinal = (int)from.elementData.getElementValue(element * from.bitsPerElement, from.bitsPerElement);
-                target.elementData.setElementValue(elementCounter[toIndex] * target.bitsPerElement, target.bitsPerElement, elementOrdinal);
-                elementCounter[toIndex]++;
+
+            if (from.bitsPerElement == target.bitsPerElement) {
+                // fastpath can bulk copy elements. emptyBucketValue is same since bitsPerElement is same
+                long numElements = endElement - startElement;
+                int bitsPerElement = from.bitsPerElement;
+                target.elementData.copyBits(from.elementData, startElement * bitsPerElement, elementCounter[toIndex] * bitsPerElement, numElements * bitsPerElement);
+                elementCounter[toIndex] += numElements;
+            } else {
+                for (long element=startElement;element<endElement;element++) {
+                    int elementOrdinal = (int)from.elementData.getElementValue(element * from.bitsPerElement, from.bitsPerElement);
+                    target.elementData.setElementValue(elementCounter[toIndex] * target.bitsPerElement, target.bitsPerElement, elementOrdinal);
+                    elementCounter[toIndex]++;
+                }
+                throw new RuntimeException("Unexpected for List type during split, expected during join");  // SNAP: TODO: remove, or keep for now so that we can test the slow path and in future when we make size optimizations then consumers will be backwards compatible
             }
+
             target.listPointerData.setElementValue((long) target.bitsPerListPointer * toOrdinal, target.bitsPerListPointer, elementCounter[toIndex]);
         }
     }

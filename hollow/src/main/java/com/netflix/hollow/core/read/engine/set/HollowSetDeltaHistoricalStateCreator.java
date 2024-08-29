@@ -121,8 +121,8 @@ public class HollowSetDeltaHistoricalStateCreator {
         long bitsPerBucket = historicalDataElements.bitsPerElement;
         long size = typeState.size(ordinal);
 
-        long fromStartBucket = shardOrdinal == 0 ? 0 : stateEngineDataElements[shard].setPointerAndSizeData.getElementValue((long)(shardOrdinal - 1) * stateEngineDataElements[shard].bitsPerFixedLengthSetPortion, stateEngineDataElements[shard].bitsPerSetPointer);
-        long fromEndBucket = stateEngineDataElements[shard].setPointerAndSizeData.getElementValue((long)shardOrdinal * stateEngineDataElements[shard].bitsPerFixedLengthSetPortion, stateEngineDataElements[shard].bitsPerSetPointer);
+        long fromStartBucket = stateEngineDataElements[shard].getStartBucket(shardOrdinal);
+        long fromEndBucket = stateEngineDataElements[shard].getEndBucket(shardOrdinal);
         long numBuckets = fromEndBucket - fromStartBucket;
 
         historicalDataElements.setPointerAndSizeData.setElementValue((long)nextOrdinal * historicalDataElements.bitsPerFixedLengthSetPortion, historicalDataElements.bitsPerSetPointer, nextStartBucket + numBuckets);

@@ -36,16 +36,8 @@ class HollowListTypeReadStateShard {
 
             do {
                 currentData = this.currentDataVolatile;
-
-                if (ordinal == 0) {
-                    startElement = 0;
-                    endElement = currentData.listPointerData.getElementValue(0, currentData.bitsPerListPointer);
-                } else {
-                    long endFixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
-                    long startFixedLengthOffset = endFixedLengthOffset - currentData.bitsPerListPointer;
-                    startElement = currentData.listPointerData.getElementValue(startFixedLengthOffset, currentData.bitsPerListPointer);
-                    endElement = currentData.listPointerData.getElementValue(endFixedLengthOffset, currentData.bitsPerListPointer);
-                }
+                startElement = currentData.getStartElement(ordinal);
+                endElement = currentData.getEndElement(ordinal);
             } while(readWasUnsafe(currentData));
 
             long elementIndex = startElement + listIndex;
@@ -65,19 +57,8 @@ class HollowListTypeReadStateShard {
 
         do {
             currentData = this.currentDataVolatile;
-
-            long startElement;
-            long endElement;
-            if (ordinal == 0) {
-                startElement = 0;
-                endElement = currentData.listPointerData.getElementValue(0, currentData.bitsPerListPointer);
-            } else {
-                long endFixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
-                long startFixedLengthOffset = endFixedLengthOffset - currentData.bitsPerListPointer;
-                startElement = currentData.listPointerData.getElementValue(startFixedLengthOffset, currentData.bitsPerListPointer);
-                endElement = currentData.listPointerData.getElementValue(endFixedLengthOffset, currentData.bitsPerListPointer);
-            }
-
+            long startElement = currentData.getStartElement(ordinal);
+            long endElement = currentData.getEndElement(ordinal);
             size = (int)(endElement - startElement);
         } while(readWasUnsafe(currentData));
 

@@ -54,23 +54,23 @@ class HollowMapTypeReadStateShard {
             do {
                 currentData = this.currentDataVolatile;
 
-                startBucket = ordinal == 0 ? 0 : currentData.mapPointerAndSizeData.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthMapPortion, currentData.bitsPerMapPointer);
-                endBucket = currentData.mapPointerAndSizeData.getElementValue((long)ordinal * currentData.bitsPerFixedLengthMapPortion, currentData.bitsPerMapPointer);
+                startBucket = currentData.getStartBucket(ordinal);
+                endBucket = currentData.getEndBucket(ordinal);
             } while(readWasUnsafe(currentData));
 
             hashCode = HashCodes.hashInt(hashCode);
             long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
-            int bucketKeyOrdinal = getBucketKeyByAbsoluteIndex(currentData, bucket);
+            int bucketKeyOrdinal = currentData.getBucketKeyByAbsoluteIndex(bucket);
 
             while(bucketKeyOrdinal != currentData.emptyBucketKeyValue) {
                 if(bucketKeyOrdinal == keyOrdinal) {
-                    valueOrdinal = getBucketValueByAbsoluteIndex(currentData, bucket);
+                    valueOrdinal = currentData.getBucketValueByAbsoluteIndex(bucket);
                     continue threadsafe;
                 }
                 bucket++;
                 if(bucket == endBucket)
                     bucket = startBucket;
-                bucketKeyOrdinal = getBucketKeyByAbsoluteIndex(currentData, bucket);
+                bucketKeyOrdinal = currentData.getBucketKeyByAbsoluteIndex(bucket);
             }
 
             valueOrdinal = ORDINAL_NONE;
@@ -91,12 +91,12 @@ class HollowMapTypeReadStateShard {
             do {
                 currentData = this.currentDataVolatile;
 
-                startBucket = ordinal == 0 ? 0 : currentData.mapPointerAndSizeData.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthMapPortion, currentData.bitsPerMapPointer);
-                endBucket = currentData.mapPointerAndSizeData.getElementValue((long)ordinal * currentData.bitsPerFixedLengthMapPortion, currentData.bitsPerMapPointer);
+                startBucket = currentData.getStartBucket(ordinal);
+                endBucket = currentData.getEndBucket(ordinal);
             } while(readWasUnsafe(currentData));
 
             long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
-            int bucketKeyOrdinal = getBucketKeyByAbsoluteIndex(currentData, bucket);
+            int bucketKeyOrdinal = currentData.getBucketKeyByAbsoluteIndex(bucket);
 
             while(bucketKeyOrdinal != currentData.emptyBucketKeyValue) {
                 if(readWasUnsafe(currentData))
@@ -109,7 +109,7 @@ class HollowMapTypeReadStateShard {
                 bucket++;
                 if(bucket == endBucket)
                     bucket = startBucket;
-                bucketKeyOrdinal = getBucketKeyByAbsoluteIndex(currentData, bucket);
+                bucketKeyOrdinal = currentData.getBucketKeyByAbsoluteIndex(bucket);
             }
 
         } while(readWasUnsafe(currentData));
@@ -129,19 +129,19 @@ class HollowMapTypeReadStateShard {
             do {
                 currentData = this.currentDataVolatile;
 
-                startBucket = ordinal == 0 ? 0 : currentData.mapPointerAndSizeData.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthMapPortion, currentData.bitsPerMapPointer);
-                endBucket = currentData.mapPointerAndSizeData.getElementValue((long)ordinal * currentData.bitsPerFixedLengthMapPortion, currentData.bitsPerMapPointer);
+                startBucket = currentData.getStartBucket(ordinal);
+                endBucket = currentData.getEndBucket(ordinal);
             } while(readWasUnsafe(currentData));
 
             long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
-            int bucketKeyOrdinal = getBucketKeyByAbsoluteIndex(currentData, bucket);
+            int bucketKeyOrdinal = currentData.getBucketKeyByAbsoluteIndex(bucket);
 
             while(bucketKeyOrdinal != currentData.emptyBucketKeyValue) {
                 if(readWasUnsafe(currentData))
                     continue threadsafe;
 
                 if(keyDeriver.keyMatches(bucketKeyOrdinal, hashKey)) {
-                    long valueOrdinal = getBucketValueByAbsoluteIndex(currentData, bucket);
+                    long valueOrdinal = currentData.getBucketValueByAbsoluteIndex(bucket);
                     if(readWasUnsafe(currentData))
                         continue threadsafe;
 
@@ -151,7 +151,7 @@ class HollowMapTypeReadStateShard {
                 bucket++;
                 if(bucket == endBucket)
                     bucket = startBucket;
-                bucketKeyOrdinal = getBucketKeyByAbsoluteIndex(currentData, bucket);
+                bucketKeyOrdinal = currentData.getBucketKeyByAbsoluteIndex(bucket);
             }
 
         } while(readWasUnsafe(currentData));
@@ -166,29 +166,16 @@ class HollowMapTypeReadStateShard {
             long absoluteBucketIndex;
             do {
                 currentData = this.currentDataVolatile;
-                absoluteBucketIndex = getAbsoluteBucketStart(currentData, ordinal) + bucketIndex;
+                absoluteBucketIndex = currentData.getStartBucket(ordinal) + bucketIndex;
             } while(readWasUnsafe(currentData));
-            long key = getBucketKeyByAbsoluteIndex(currentData, absoluteBucketIndex);
+            long key = currentData.getBucketKeyByAbsoluteIndex(absoluteBucketIndex);
             if(key == currentData.emptyBucketKeyValue)
                 return -1L;
 
-            bucketValue = key << 32 | getBucketValueByAbsoluteIndex(currentData, absoluteBucketIndex);
+            bucketValue = key << 32 | currentData.getBucketValueByAbsoluteIndex(absoluteBucketIndex);
         } while(readWasUnsafe(currentData));
 
         return bucketValue;
-    }
-
-    public static long getAbsoluteBucketStart(HollowMapTypeDataElements currentData, int ordinal) {
-        long startBucket = ordinal == 0 ? 0 : currentData.mapPointerAndSizeData.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthMapPortion, currentData.bitsPerMapPointer);
-        return startBucket;
-    }
-
-    private int getBucketKeyByAbsoluteIndex(HollowMapTypeDataElements currentData, long absoluteBucketIndex) {
-        return (int)currentData.entryData.getElementValue(absoluteBucketIndex * currentData.bitsPerMapEntry, currentData.bitsPerKeyElement);
-    }
-
-    private int getBucketValueByAbsoluteIndex(HollowMapTypeDataElements currentData, long absoluteBucketIndex) {
-        return (int)currentData.entryData.getElementValue((absoluteBucketIndex * currentData.bitsPerMapEntry) + currentData.bitsPerKeyElement, currentData.bitsPerValueElement);
     }
 
     void invalidate() {
@@ -215,15 +202,15 @@ class HollowMapTypeReadStateShard {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
                 int numBuckets = HashCodes.hashTableSize(size(shardOrdinal));
-                long offset = getAbsoluteBucketStart(currentData, shardOrdinal);
+                long offset = currentData.getStartBucket(shardOrdinal);
 
                 checksum.applyInt(ordinal);
                 for(int i=0; i<numBuckets; i++) {
-                    int bucketKey = getBucketKeyByAbsoluteIndex(currentData, offset + i);
+                    int bucketKey = currentData.getBucketKeyByAbsoluteIndex(offset + i);
                     if(bucketKey != currentData.emptyBucketKeyValue) {
                         checksum.applyInt(i);
                         checksum.applyInt(bucketKey);
-                        checksum.applyInt(getBucketValueByAbsoluteIndex(currentData, offset + i));
+                        checksum.applyInt(currentData.getBucketValueByAbsoluteIndex(offset + i));
                     }
                 }
                 ordinal = ordinal + numShards;
