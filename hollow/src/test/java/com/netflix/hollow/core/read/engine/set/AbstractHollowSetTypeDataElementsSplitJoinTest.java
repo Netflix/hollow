@@ -41,28 +41,20 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
         writeStateEngine.setTargetMaxTypeShardSize(4 * 100 * 1000 * 1024);
     }
 
-    // SNAP: TOFO: seems repetitive, can be dropped
-    private void populateWriteStateEngine(int[][] setContents) {
-        for(int[] set : setContents) {
-            addRecord(Arrays.stream(set).toArray());
-        }
-    }
-
-    private void addRecord(int... ordinals) {
-        HollowSetWriteRecord rec = new HollowSetWriteRecord();
-
-        for(int i=0;i<ordinals.length;i++) {
-            rec.addElement(ordinals[i]);
-        }
-
-        writeStateEngine.add("TestSet", rec);
-    }
-
     protected HollowSetTypeReadState populateTypeStateWith(int[][] setContents) throws IOException {
+        int numOrdinals = 1 + Arrays.stream(setContents)
+                .flatMapToInt(Arrays::stream)
+                .max()
+                .orElseThrow(() -> new IllegalArgumentException("Array is empty"));
+        // populate write state with that many ordinals
+        super.populateWriteStateEngine(numOrdinals);
         for(int[] set : setContents) {
-            addRecord(Arrays.stream(set).toArray());
+            HollowSetWriteRecord rec = new HollowSetWriteRecord();
+            for(int ordinal : set) {
+                rec.addElement(ordinal);
+            }
+            writeStateEngine.add("TestSet", rec);
         }
-        populateWriteStateEngine(setContents);
         roundTripSnapshot();
         return (HollowSetTypeReadState) readStateEngine.getTypeState("TestSet");
     }

@@ -5,6 +5,10 @@ import static org.junit.Assert.assertTrue;
 
 import com.netflix.hollow.core.memory.MemoryMode;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -18,19 +22,20 @@ public class HollowSetTypeDataElementsJoinerTest extends AbstractHollowSetTypeDa
     @Test
     public void testJoin() throws IOException {
         int[][] setContents = new int[][] {
-                {1000, 2000, 3000}};
+                {0, 1, 2}
+        };
         HollowSetTypeReadState typeReadState = populateTypeStateWith(setContents);
         assertEquals(1, typeReadState.numShards());
 
         setContents = new int[][] {
-                {1000, 2000, 3000},
-                {0},
+                {0, 1, 2},
+                {3},
                 {}
         };
         int setSize = 50;
         setContents[2] = new int[setSize];
-        for (int i=0; i<setSize; i++) {
-            setContents[2][i] = (int) Math.pow(2,7) - i;
+        for (int i=4; i<setSize; i++) {
+            setContents[2][i] = i;
         }
         HollowSetTypeReadState typeReadStateSharded = populateTypeStateWith(setContents);
         assertDataUnchanged(typeReadStateSharded, setContents);
@@ -62,31 +67,39 @@ public class HollowSetTypeDataElementsJoinerTest extends AbstractHollowSetTypeDa
         int widthSmall = dataElementsSmall.bitsPerElement;
         long valSmall = dataElementsSmall.elementData.getElementValue(0, widthSmall);
 
-        int bigListLen = 5;
-        int[][] bigListContents = new int[3][bigListLen];
-        for (int i=0; i<bigListLen; i++) {
-            bigListContents[2][i] = (int) Math.pow(2,7) - i;
-        }
-
-        HollowSetTypeReadState typeReadStateBig = populateTypeStateWith(bigListContents);
+        int[] bigVals = new int[] {1000, 2000};
+        HollowSetTypeReadState typeReadStateBig = populateTypeStateWith(new int[][] {bigVals});
+        Set<Integer> setOfBigVals =  IntStream.of(bigVals).boxed().collect(Collectors.toSet());
         assertEquals(1, typeReadStateBig.numShards());
         HollowSetTypeDataElements dataElementsBig = typeReadStateBig.currentDataElements()[0];
         int widthBig = dataElementsBig.bitsPerElement;
-        long valBig = dataElementsBig.elementData.getElementValue(0, widthBig);
-
-        assertTrue(widthBig > widthSmall);
+        long bucketStart = 0;
+        long valBig = dataElementsBig.elementData.getElementValue(bucketStart, widthBig);
+        while (valBig == dataElementsBig.emptyBucketValue) {
+            bucketStart += widthBig;
+            valBig = dataElementsBig.elementData.getElementValue(bucketStart, widthBig);
+        }
 
         HollowSetTypeDataElementsJoiner joiner = new HollowSetTypeDataElementsJoiner(new HollowSetTypeDataElements[]
                 {dataElementsSmall, dataElementsBig});
         HollowSetTypeDataElements dataElementsJoined = joiner.join();
         int widthJoined = dataElementsJoined.bitsPerElement;
 
-        long val0 = dataElementsJoined.elementData.getElementValue(0, widthJoined);
-        long val1 = dataElementsJoined.elementData.getElementValue(dataElementsJoined.bitsPerSetPointer, widthJoined);
+        long valSmallJoined = dataElementsJoined.elementData.getElementValue(0, widthJoined);
+        bucketStart = dataElementsJoined.getStartBucket(1);
+        long bucketEnd = dataElementsJoined.getEndBucket(1);
+        Set<Integer> bigValsJoined = new HashSet<>();
+        for (long bucket=bucketStart;bucket<bucketEnd;bucket++)  {
+            int val = dataElementsJoined.getBucketValue(bucket);
+            if (val != dataElementsJoined.emptyBucketValue) {
+                bigValsJoined.add(val);
+            }
+        }
 
+        assertTrue(widthBig > widthSmall);
         assertEquals(widthBig, widthJoined);
-        assertEquals(valSmall, val0);
-        assertEquals(valBig, val1);
+        assertEquals(valSmall, valSmallJoined);
+        assertEquals(setOfBigVals, bigValsJoined);
     }
 
 //    @Test
