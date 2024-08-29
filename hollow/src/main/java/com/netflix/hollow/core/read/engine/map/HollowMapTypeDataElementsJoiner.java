@@ -81,39 +81,10 @@ class HollowMapTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
                 long endBucket = source.mapPointerAndSizeData.getElementValue((long)fromOrdinal * source.bitsPerFixedLengthMapPortion, source.bitsPerMapPointer);
                 long numBuckets = endBucket - startBucket;
 
-//                if (to.bitsPerKeyElement == source.bitsPerKeyElement && to.bitsPerValueElement == source.bitsPerValueElement) {
-//                    long bitsPerMapEntry = to.bitsPerMapEntry;
-//                    FixedLengthElementArray a1 = new FixedLengthElementArray(to.memoryRecycler, bitsPerMapEntry * numBuckets);
-//                    FixedLengthElementArray a2 = new FixedLengthElementArray(to.memoryRecycler, bitsPerMapEntry * numBuckets);
-//
-//                    a1.copyBits(source.entryData, startBucket * bitsPerMapEntry, 0, numBuckets * bitsPerMapEntry);
-//                    long targetBucketOffset = 0;
-//                    for (long bucket=startBucket;bucket<endBucket;bucket++) {
-//                        long bucketKey = source.entryData.getElementValue(bucket * source.bitsPerMapEntry, source.bitsPerKeyElement);
-//                        long bucketValue = source.entryData.getElementValue(bucket * source.bitsPerMapEntry + source.bitsPerKeyElement, source.bitsPerValueElement);
-//                        if(bucketKey == source.emptyBucketKeyValue)
-//                            bucketKey = to.emptyBucketKeyValue; // since empty bucket key value can be non-uniform across shards
-//                        a2.setElementValue(targetBucketOffset, to.bitsPerKeyElement, bucketKey);
-//                        a2.setElementValue(targetBucketOffset + to.bitsPerKeyElement, to.bitsPerValueElement, bucketValue);
-//                        targetBucketOffset += to.bitsPerMapEntry;
-//                    }
-//
-//                    for(int i=0; i<bitsPerMapEntry*numBuckets; i++) {
-//                        if (a1.getElementValue(i, 0) != a2.getElementValue(i, 0)) {
-//                            throw new IllegalStateException("Mismatch in map data");
-//                        }
-//                    }
-//
-//                    a1.destroy(to.memoryRecycler);
-//                    a2.destroy(to.memoryRecycler);
-//                }
-
                 // if (false) { // SNAP: TODO: test the slow path
                 if (to.bitsPerKeyElement == source.bitsPerKeyElement && to.bitsPerValueElement == source.bitsPerValueElement) {
                     // emptyBucketKeyValue will also be uniform
                     long bitsPerMapEntry = to.bitsPerMapEntry;
-                    // can only do one map record at a time at most, unlike delta
-                    // SNAP: TODO: bulk copy can also be applied to splitter
                     to.entryData.copyBits(source.entryData, startBucket * bitsPerMapEntry, bucketCounter * bitsPerMapEntry, numBuckets * bitsPerMapEntry);
                     bucketCounter += numBuckets;
                 } else {
@@ -132,7 +103,6 @@ class HollowMapTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
                 mapSize = source.mapPointerAndSizeData.getElementValue((long) (fromOrdinal * source.bitsPerFixedLengthMapPortion) + source.bitsPerMapPointer, source.bitsPerMapSizeValue);
             }
 
-            // SNAP: TODO: write a test for lopsided list shards (similar to for list and set types). Theres one in object joiner tests.
             to.mapPointerAndSizeData.setElementValue( (long) ordinal * to.bitsPerFixedLengthMapPortion, to.bitsPerMapPointer, bucketCounter);
             to.mapPointerAndSizeData.setElementValue((long) (ordinal * to.bitsPerFixedLengthMapPortion) + to.bitsPerMapPointer, to.bitsPerMapSizeValue, mapSize);
         }

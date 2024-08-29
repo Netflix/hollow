@@ -107,7 +107,7 @@ public class HollowMapDeltaHistoricalStateCreator {
         historicalDataElements.bitsPerMapPointer = 64 - Long.numberOfLeadingZeros(totalBucketCount);
         historicalDataElements.bitsPerMapSizeValue = 64 - Long.numberOfLeadingZeros(maxSize);
         historicalDataElements.bitsPerFixedLengthMapPortion = historicalDataElements.bitsPerMapPointer + historicalDataElements.bitsPerMapSizeValue;
-        historicalDataElements.bitsPerKeyElement = stateEngineDataElements[0].bitsPerKeyElement;
+        historicalDataElements.bitsPerKeyElement = stateEngineDataElements[0].bitsPerKeyElement; // SNAP: TODO: pick max across all shards
         historicalDataElements.bitsPerValueElement = stateEngineDataElements[0].bitsPerValueElement;
         historicalDataElements.bitsPerMapEntry = stateEngineDataElements[0].bitsPerMapEntry;
         historicalDataElements.emptyBucketKeyValue = stateEngineDataElements[0].emptyBucketKeyValue;

@@ -77,6 +77,8 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
                 long startBucket = getAbsoluteBucketStart(source, fromOrdinal);
                 long endBucket = source.setPointerAndSizeData.getElementValue((long) fromOrdinal * source.bitsPerFixedLengthSetPortion, source.bitsPerSetPointer);
 
+                // SNAP: TODO: fastpath
+
                 for (long bucket=startBucket;bucket<endBucket;bucket++) {
                     int bucketOrdinal = (int)source.elementData.getElementValue(bucket * source.bitsPerElement, source.bitsPerElement);
                     to.elementData.setElementValue(bucketCounter * to.bitsPerElement, to.bitsPerElement, bucketOrdinal);

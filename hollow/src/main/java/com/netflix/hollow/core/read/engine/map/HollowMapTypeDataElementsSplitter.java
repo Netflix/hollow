@@ -75,23 +75,30 @@ public class HollowMapTypeDataElementsSplitter extends AbstractHollowTypeDataEle
         for(int ordinal=0;ordinal<=from.maxOrdinal;ordinal++) {
             int toIndex = ordinal & toMask;
             int toOrdinal = ordinal >> toOrdinalShift;
+            HollowMapTypeDataElements target = to[toIndex];
 
             long startBucket = getAbsoluteBucketStart(from, ordinal);
             long endBucket =from.mapPointerAndSizeData.getElementValue((long) ordinal * from.bitsPerFixedLengthMapPortion, from.bitsPerMapPointer);
 
-            HollowMapTypeDataElements target = to[toIndex];
-            for (long bucket=startBucket;bucket<endBucket;bucket++) {
-                long bucketKey = from.entryData.getElementValue(bucket * from.bitsPerMapEntry, from.bitsPerKeyElement);
-                long bucketValue = from.entryData.getElementValue(bucket * from.bitsPerMapEntry + from.bitsPerKeyElement, from.bitsPerValueElement);
-                // SNAP: TODO: noop for map type?
-                if(bucketKey == from.emptyBucketKeyValue)
-                    bucketKey = target.emptyBucketKeyValue;
-                // SNAP: TODO: bulk copy cos empty bucket value is the same and key/value bits are the same as from
-                long targetBucketOffset = (bucketCounter[toIndex] * target.bitsPerMapEntry);
-                target.entryData.setElementValue(targetBucketOffset, target.bitsPerKeyElement, bucketKey);
-                target.entryData.setElementValue(targetBucketOffset + target.bitsPerKeyElement, target.bitsPerValueElement, bucketValue);
-
-                bucketCounter[toIndex]++;
+            // if (false) { // SNAP: TODO: test the slow path
+            if (target.bitsPerKeyElement == from.bitsPerKeyElement && target.bitsPerValueElement == from.bitsPerValueElement) {
+                long numBuckets = endBucket - startBucket;
+                // emptyBucketKeyValue will also be uniform
+                long bitsPerMapEntry = from.bitsPerMapEntry;
+                target.entryData.copyBits(from.entryData, startBucket * bitsPerMapEntry, bucketCounter[toIndex] * bitsPerMapEntry, numBuckets * bitsPerMapEntry);
+                bucketCounter[toIndex] += numBuckets;
+            } else {
+                throw new RuntimeException("Unexpected for Map type");
+                // for (long bucket=startBucket;bucket<endBucket;bucket++) {
+                //     long bucketKey = from.entryData.getElementValue(bucket * from.bitsPerMapEntry, from.bitsPerKeyElement);
+                //     long bucketValue = from.entryData.getElementValue(bucket * from.bitsPerMapEntry + from.bitsPerKeyElement, from.bitsPerValueElement);
+                //     if(bucketKey == from.emptyBucketKeyValue)
+                //         bucketKey = target.emptyBucketKeyValue;
+                //     long targetBucketOffset = (bucketCounter[toIndex] * target.bitsPerMapEntry);
+                //     target.entryData.setElementValue(targetBucketOffset, target.bitsPerKeyElement, bucketKey);
+                //     target.entryData.setElementValue(targetBucketOffset + target.bitsPerKeyElement, target.bitsPerValueElement, bucketValue);
+                //     bucketCounter[toIndex]++;
+                // }
             }
 
             target.mapPointerAndSizeData.setElementValue((long) toOrdinal * target.bitsPerFixedLengthMapPortion, target.bitsPerMapPointer, bucketCounter[toIndex]);

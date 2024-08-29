@@ -1,32 +1,26 @@
 package com.netflix.hollow.core.read.engine.map;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitJoinTest;
-import com.netflix.hollow.core.read.engine.set.HollowSetTypeDataElements;
-import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
-import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
-import com.netflix.hollow.core.write.HollowObjectWriteRecord;
-import com.netflix.hollow.core.write.HollowSetTypeWriteState;
-import com.netflix.hollow.core.write.HollowSetWriteRecord;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.junit.Assert;
 import org.junit.Before;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class AbstractHollowMapTypeDataElementsSplitJoinTest extends AbstractHollowTypeDataElementsSplitJoinTest {
     protected HollowMapSchema mapSchema;
+
+    @Mock
+    protected HollowMapTypeReadState mockMapTypeState;
 
     @Before
     public void setUp() {
@@ -34,6 +28,8 @@ public class AbstractHollowMapTypeDataElementsSplitJoinTest extends AbstractHoll
         super.setUp();
 
         MockitoAnnotations.initMocks(this);
+        HollowMapTypeDataElements[] fakeDataElements = new HollowMapTypeDataElements[5];
+        when(mockMapTypeState.currentDataElements()).thenReturn(fakeDataElements);
     }
 
     @Override

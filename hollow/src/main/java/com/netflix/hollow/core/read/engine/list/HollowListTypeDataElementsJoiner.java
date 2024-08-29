@@ -77,6 +77,7 @@ class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoi
                     startElement = from[fromIndex].listPointerData.getElementValue(startFixedLengthOffset, from[fromIndex].bitsPerListPointer);
                     endElement = from[fromIndex].listPointerData.getElementValue(endFixedLengthOffset, from[fromIndex].bitsPerListPointer);
                 }
+                // SNAP: TODO: fastpath
                 for (long element=startElement;element<endElement;element++) {
                     int elementOrdinal = (int)from[fromIndex].elementData.getElementValue(element * from[fromIndex].bitsPerElement, from[fromIndex].bitsPerElement);
                     to.elementData.setElementValue(elementCounter * to.bitsPerElement, to.bitsPerElement, elementOrdinal);

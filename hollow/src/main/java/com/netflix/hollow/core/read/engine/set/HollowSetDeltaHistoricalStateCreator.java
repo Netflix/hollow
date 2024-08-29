@@ -107,7 +107,7 @@ public class HollowSetDeltaHistoricalStateCreator {
         historicalDataElements.bitsPerSetPointer = 64 - Long.numberOfLeadingZeros(totalBucketCount);
         historicalDataElements.bitsPerSetSizeValue = 64 - Long.numberOfLeadingZeros(maxSize);
         historicalDataElements.bitsPerFixedLengthSetPortion = historicalDataElements.bitsPerSetPointer + historicalDataElements.bitsPerSetSizeValue;
-        historicalDataElements.bitsPerElement = stateEngineDataElements[0].bitsPerElement;  // SNAP: TODO: safe to assume size here?
+        historicalDataElements.bitsPerElement = stateEngineDataElements[0].bitsPerElement; // SNAP: TODO: pick max across all shards
         historicalDataElements.emptyBucketValue = stateEngineDataElements[0].emptyBucketValue;
         historicalDataElements.totalNumberOfBuckets = totalBucketCount;
 
