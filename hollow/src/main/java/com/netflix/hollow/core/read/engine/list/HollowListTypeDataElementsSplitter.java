@@ -71,21 +71,9 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
             long endElement = from.getEndElement(ordinal);
             HollowListTypeDataElements target = to[toIndex];
 
-            if (from.bitsPerElement == target.bitsPerElement) {
-                // fast path can bulk copy elements. emptyBucketValue is same since bitsPerElement is same
-                long numElements = endElement - startElement;
-                int bitsPerElement = from.bitsPerElement;
-                target.elementData.copyBits(from.elementData, startElement * bitsPerElement, elementCounter[toIndex] * bitsPerElement, numElements * bitsPerElement);
-                elementCounter[toIndex] += numElements;
-            } else {
-                // slow path(but more compact) not exercised until populateSats above supports split shard specific bitsPerElement
-                // (which would make sense to add once HollowListTypeWriteState's gatherStatistics supports assigning bitsPerElement at a shard level)
-                for (long element=startElement;element<endElement;element++) {
-                    int elementOrdinal = (int)from.elementData.getElementValue(element * from.bitsPerElement, from.bitsPerElement);
-                    target.elementData.setElementValue(elementCounter[toIndex] * target.bitsPerElement, target.bitsPerElement, elementOrdinal);
-                    elementCounter[toIndex]++;
-                }
-            }
+            long numElements = endElement - startElement;
+            target.copyElementsFrom(elementCounter[toIndex], from, startElement, endElement);
+            elementCounter[toIndex] += numElements;
 
             target.listPointerData.setElementValue((long) target.bitsPerListPointer * toOrdinal, target.bitsPerListPointer, elementCounter[toIndex]);
         }

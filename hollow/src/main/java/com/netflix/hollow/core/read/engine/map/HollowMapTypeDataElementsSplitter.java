@@ -78,26 +78,9 @@ public class HollowMapTypeDataElementsSplitter extends AbstractHollowTypeDataEle
             long startBucket = from.getStartBucket(ordinal);
             long endBucket = from.getEndBucket(ordinal);
 
-            if (target.bitsPerKeyElement == from.bitsPerKeyElement && target.bitsPerValueElement == from.bitsPerValueElement) {
-                // fast path can bulk copy buckets. emptyBucketKeyValue is same since bitsPerKeyElement is the same
-                long numBuckets = endBucket - startBucket;
-                long bitsPerMapEntry = from.bitsPerMapEntry;
-                target.entryData.copyBits(from.entryData, startBucket * bitsPerMapEntry, bucketCounter[toIndex] * bitsPerMapEntry, numBuckets * bitsPerMapEntry);
-                bucketCounter[toIndex] += numBuckets;
-            } else {
-                // slow path(but more compact) not exercised until populateSats above supports split shard specific bitsPerKeyElement and bitsPerValueElement
-                // (which would make sense to add once HollowMapTypeWriteState's gatherStatistics supports assigning bitsPerKeyElement and bitsPerValueElement at a shard level)
-                for (long bucket=startBucket;bucket<endBucket;bucket++) {
-                    long bucketKey = from.entryData.getElementValue(bucket * from.bitsPerMapEntry, from.bitsPerKeyElement);
-                    long bucketValue = from.entryData.getElementValue(bucket * from.bitsPerMapEntry + from.bitsPerKeyElement, from.bitsPerValueElement);
-                    if(bucketKey == from.emptyBucketKeyValue)
-                        bucketKey = target.emptyBucketKeyValue;
-                    long targetBucketOffset = (bucketCounter[toIndex] * target.bitsPerMapEntry);
-                    target.entryData.setElementValue(targetBucketOffset, target.bitsPerKeyElement, bucketKey);
-                    target.entryData.setElementValue(targetBucketOffset + target.bitsPerKeyElement, target.bitsPerValueElement, bucketValue);
-                    bucketCounter[toIndex]++;
-                }
-            }
+            long numBuckets = endBucket - startBucket;
+            target.copyBucketsFrom(bucketCounter[toIndex], from, startBucket, endBucket);
+            bucketCounter[toIndex] += numBuckets;
 
             target.mapPointerAndSizeData.setElementValue((long) toOrdinal * target.bitsPerFixedLengthMapPortion, target.bitsPerMapPointer, bucketCounter[toIndex]);
             long mapSize = from.mapPointerAndSizeData.getElementValue((long) (ordinal * from.bitsPerFixedLengthMapPortion) + from.bitsPerMapPointer, from.bitsPerMapSizeValue);

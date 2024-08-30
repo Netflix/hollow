@@ -17,7 +17,9 @@ public class HollowSetTypeDataElementsSplitJoinTest extends AbstractHollowSetTyp
     @Test
     public void testSplittingAndJoiningWithSnapshotBlob() throws Exception {
 
-        // SNAP: TODO: cleanup this whole method
+        // SNAP: TODO: duplicate this test
+
+        // SNAP: TODO: cleanup this whole method.
         String blobPath = "/Users/ssingh/workspace/blob-cache/vms-daintree/prod/"; // null; // dir where snapshot blob exists for e.g. "/tmp/";
         long v = 20230611133921525l; // 0l; // snapshot version for e.g. 20230915162636001l;
         String[] setTypesWithOneShard = {"SetOfContractRestriction", "SetOfContractAsset", "SetOfDashStreamBoxInfo",

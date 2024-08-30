@@ -134,4 +134,22 @@ public class HollowMapTypeDataElements extends AbstractHollowTypeDataElements {
         return (int)entryData.getElementValue((absoluteBucketIndex * bitsPerMapEntry) + bitsPerKeyElement, bitsPerValueElement);
     }
 
+    public void copyBucketsFrom(long startBucket, HollowMapTypeDataElements src, long srcStartBucket, long srcEndBucket) {
+        if (bitsPerKeyElement == src.bitsPerKeyElement && bitsPerValueElement == src.bitsPerValueElement) {
+            // fast path can bulk copy buckets. emptyBucketKeyValue is same since bitsPerKeyElement is the same
+            long numBuckets = srcEndBucket - srcStartBucket;
+            entryData.copyBits(src.entryData, srcStartBucket * bitsPerMapEntry, startBucket * bitsPerMapEntry, numBuckets * bitsPerMapEntry);
+        } else {
+            for (long bucket=srcStartBucket;bucket<srcEndBucket;bucket++) {
+                long bucketKey = src.entryData.getElementValue(bucket * src.bitsPerMapEntry, src.bitsPerKeyElement);
+                long bucketValue = src.entryData.getElementValue(bucket * src.bitsPerMapEntry + src.bitsPerKeyElement, src.bitsPerValueElement);
+                if(bucketKey == src.emptyBucketKeyValue)
+                    bucketKey = emptyBucketKeyValue;
+                long targetBucketOffset = startBucket * bitsPerMapEntry;
+                entryData.setElementValue(targetBucketOffset, bitsPerKeyElement, bucketKey);
+                entryData.setElementValue(targetBucketOffset + bitsPerKeyElement, bitsPerValueElement, bucketValue);
+                startBucket++;
+            }
+        }
+    }
 }

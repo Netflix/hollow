@@ -56,27 +56,15 @@ class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoi
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
 
-            if (fromOrdinal <= from[fromIndex].maxOrdinal) {
+            if (fromOrdinal <= from[fromIndex].maxOrdinal) { // else lopsided shard for e.g. when consumers skip type shards with no additions
                 HollowListTypeDataElements source = from[fromIndex];
                 long startElement = source.getStartElement(fromOrdinal);
                 long endElement = source.getEndElement(fromOrdinal);
 
-                if (source.bitsPerElement == to.bitsPerElement) {
-                    // fastpath can bulk copy elements. emptyBucketValue is same since bitsPerElement is same
-                    long numElements = endElement - startElement;
-                    int bitsPerElement = source.bitsPerElement;
-                    to.elementData.copyBits(source.elementData, startElement * bitsPerElement, elementCounter * bitsPerElement, numElements * bitsPerElement);
-                    elementCounter += numElements;
-                } else {
-                    for (long element = startElement; element < endElement; element++) {
-                        int elementOrdinal = (int) source.elementData.getElementValue(element * source.bitsPerElement, source.bitsPerElement);
-                        to.elementData.setElementValue(elementCounter * to.bitsPerElement, to.bitsPerElement, elementOrdinal);
-                        elementCounter++;
-                    }
-                }
-            } // else: lopsided shard for e.g. when consumers skip type shards with no additions.
-              //       nothing is written to elementData and the cached value of elementCounter is written to listPointerData.
-
+                long numElements = endElement - startElement;
+                to.copyElementsFrom(elementCounter, source, startElement, endElement);
+                elementCounter += numElements;
+            }
             to.listPointerData.setElementValue((long) to.bitsPerListPointer * ordinal, to.bitsPerListPointer, elementCounter);
         }
     }

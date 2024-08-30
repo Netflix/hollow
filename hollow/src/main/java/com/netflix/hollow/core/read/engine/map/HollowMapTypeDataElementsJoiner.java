@@ -77,29 +77,13 @@ class HollowMapTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
             if (fromOrdinal <= from[fromIndex].maxOrdinal) { // else lopsided shards resulting from skipping type shards with no additions, mapSize remains 0
                 long startBucket = source.getStartBucket(fromOrdinal);
                 long endBucket = source.getEndBucket(fromOrdinal);
-                long numBuckets = endBucket - startBucket;
 
-                if (to.bitsPerKeyElement == source.bitsPerKeyElement && to.bitsPerValueElement == source.bitsPerValueElement) {
-                    // emptyBucketKeyValue will also be uniform
-                    long bitsPerMapEntry = to.bitsPerMapEntry;
-                    to.entryData.copyBits(source.entryData, startBucket * bitsPerMapEntry, bucketCounter * bitsPerMapEntry, numBuckets * bitsPerMapEntry);
-                    bucketCounter += numBuckets;
-                } else {
-                    for (long bucket=startBucket;bucket<endBucket;bucket++) {
-                        long bucketKey = source.entryData.getElementValue(bucket * source.bitsPerMapEntry, source.bitsPerKeyElement);
-                        long bucketValue = source.entryData.getElementValue(bucket * source.bitsPerMapEntry + source.bitsPerKeyElement, source.bitsPerValueElement);
-                        if (bucketKey == source.emptyBucketKeyValue)
-                            bucketKey = to.emptyBucketKeyValue; // since empty bucket key value can be non-uniform across shards
-                        long targetBucketOffset = bucketCounter * to.bitsPerMapEntry;
-                        to.entryData.setElementValue(targetBucketOffset, to.bitsPerKeyElement, bucketKey);
-                        to.entryData.setElementValue(targetBucketOffset + to.bitsPerKeyElement, to.bitsPerValueElement, bucketValue);
-                        bucketCounter ++;
-                    }
-                }
+                long numBuckets = endBucket - startBucket;
+                to.copyBucketsFrom(bucketCounter, source, startBucket, endBucket);
+                bucketCounter += numBuckets;
 
                 mapSize = source.mapPointerAndSizeData.getElementValue((long) (fromOrdinal * source.bitsPerFixedLengthMapPortion) + source.bitsPerMapPointer, source.bitsPerMapSizeValue);
             }
-
             to.mapPointerAndSizeData.setElementValue( (long) ordinal * to.bitsPerFixedLengthMapPortion, to.bitsPerMapPointer, bucketCounter);
             to.mapPointerAndSizeData.setElementValue((long) (ordinal * to.bitsPerFixedLengthMapPortion) + to.bitsPerMapPointer, to.bitsPerMapSizeValue, mapSize);
         }

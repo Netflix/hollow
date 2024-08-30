@@ -113,4 +113,18 @@ public class HollowListTypeDataElements extends AbstractHollowTypeDataElements {
     public long getEndElement(int ordinal) {
         return listPointerData.getElementValue((long)ordinal * bitsPerListPointer, bitsPerListPointer);
     }
+
+    public void copyElementsFrom(long startElement, HollowListTypeDataElements src, long srcStartElement, long srcEndElement) {
+        if (bitsPerElement == src.bitsPerElement) {
+            // fast path can bulk copy elements
+            long numElements = srcEndElement - srcStartElement;
+            elementData.copyBits(src.elementData, srcStartElement * bitsPerElement, startElement * bitsPerElement, numElements * bitsPerElement);
+        } else {
+            for (long element=srcStartElement;element<srcEndElement;element++) {
+                long elementVal = src.elementData.getElementValue(element * src.bitsPerElement, src.bitsPerElement);
+                elementData.setElementValue(startElement * bitsPerElement, bitsPerElement, elementVal);
+                startElement++;
+            }
+        }
+    }
 }
