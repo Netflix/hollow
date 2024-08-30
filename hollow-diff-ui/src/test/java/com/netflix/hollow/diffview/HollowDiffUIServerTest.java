@@ -10,7 +10,7 @@ public class HollowDiffUIServerTest {
     public void test() throws Exception {
         HollowDiff testDiff = new FakeHollowDiffGenerator().createFakeDiff();
 
-        HollowDiffUIServer server = new HollowDiffUIServer();
+        HollowDiffUIServer server = new HollowDiffUIServer(0);
 
         server.addDiff("diff", testDiff);
 
@@ -22,7 +22,7 @@ public class HollowDiffUIServerTest {
     public void testBackwardsCompatibiltyWithJettyImplementation() throws Exception {
         HollowDiff testDiff = new FakeHollowDiffGenerator().createFakeDiff();
 
-        com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer server = new com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer();
+        com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer server = new com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer(0);
 
         server.addDiff("diff", testDiff);
 

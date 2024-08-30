@@ -67,17 +67,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         return (HollowObjectSchema)schema;
     }
 
-    boolean allowTypeResharding() {
-        if (stateEngine.allowTypeResharding()) {
-            if (isNumShardsPinned()) {
-                LOG.warning("Type re-sharding feature was enabled but num shards is pinned (likely using the " +
-                        "HollowShardLargeType annotation in the data model). Proceeding with fixed num shards.");
-                return false;
-            }
-        }
-        return stateEngine.allowTypeResharding();
-    }
-
     /**
      * Called to perform a state transition.<p>
      *

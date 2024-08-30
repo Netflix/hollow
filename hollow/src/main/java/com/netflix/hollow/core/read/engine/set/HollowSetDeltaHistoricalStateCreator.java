@@ -82,8 +82,7 @@ public class HollowSetDeltaHistoricalStateCreator {
     }
 
     public HollowSetTypeReadState createHistoricalTypeReadState() {
-        HollowSetTypeReadState historicalTypeState = new HollowSetTypeReadState(null, typeState.getSchema(), 1);
-        historicalTypeState.setCurrentData(historicalDataElements);
+        HollowSetTypeReadState historicalTypeState = new HollowSetTypeReadState(typeState.getSchema(), historicalDataElements);
         return historicalTypeState;
     }
 
@@ -107,8 +106,12 @@ public class HollowSetDeltaHistoricalStateCreator {
         historicalDataElements.bitsPerSetPointer = 64 - Long.numberOfLeadingZeros(totalBucketCount);
         historicalDataElements.bitsPerSetSizeValue = 64 - Long.numberOfLeadingZeros(maxSize);
         historicalDataElements.bitsPerFixedLengthSetPortion = historicalDataElements.bitsPerSetPointer + historicalDataElements.bitsPerSetSizeValue;
-        historicalDataElements.bitsPerElement = stateEngineDataElements[0].bitsPerElement;
-        historicalDataElements.emptyBucketValue = stateEngineDataElements[0].emptyBucketValue;
+        for (int i=0;i<stateEngineDataElements.length;i++) {
+            if (stateEngineDataElements[i].bitsPerElement > historicalDataElements.bitsPerElement) {
+                historicalDataElements.bitsPerElement = stateEngineDataElements[i].bitsPerElement;
+                historicalDataElements.emptyBucketValue = stateEngineDataElements[i].emptyBucketValue;
+            }
+        }
         historicalDataElements.totalNumberOfBuckets = totalBucketCount;
 
         ordinalMapping = new IntMap(removedEntryCount);
@@ -121,8 +124,8 @@ public class HollowSetDeltaHistoricalStateCreator {
         long bitsPerBucket = historicalDataElements.bitsPerElement;
         long size = typeState.size(ordinal);
 
-        long fromStartBucket = shardOrdinal == 0 ? 0 : stateEngineDataElements[shard].setPointerAndSizeData.getElementValue((long)(shardOrdinal - 1) * stateEngineDataElements[shard].bitsPerFixedLengthSetPortion, stateEngineDataElements[shard].bitsPerSetPointer);
-        long fromEndBucket = stateEngineDataElements[shard].setPointerAndSizeData.getElementValue((long)shardOrdinal * stateEngineDataElements[shard].bitsPerFixedLengthSetPortion, stateEngineDataElements[shard].bitsPerSetPointer);
+        long fromStartBucket = stateEngineDataElements[shard].getStartBucket(shardOrdinal);
+        long fromEndBucket = stateEngineDataElements[shard].getEndBucket(shardOrdinal);
         long numBuckets = fromEndBucket - fromStartBucket;
 
         historicalDataElements.setPointerAndSizeData.setElementValue((long)nextOrdinal * historicalDataElements.bitsPerFixedLengthSetPortion, historicalDataElements.bitsPerSetPointer, nextStartBucket + numBuckets);
