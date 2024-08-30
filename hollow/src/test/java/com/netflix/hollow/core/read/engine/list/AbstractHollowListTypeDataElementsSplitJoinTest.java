@@ -54,12 +54,10 @@ public class AbstractHollowListTypeDataElementsSplitJoinTest extends AbstractHol
         writeStateEngine.add("TestList", rec);
     }
 
-
     protected HollowListTypeReadState populateTypeStateWith(int[][] listContents) throws IOException {
         for (int[] list : listContents) {
             populateWriteStateEngine(list);
         }
-        // populateWriteStateEngine(numRecords);
         populateWriteStateEngine(listContents);
         roundTripSnapshot();
         return (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
@@ -73,13 +71,6 @@ public class AbstractHollowListTypeDataElementsSplitJoinTest extends AbstractHol
                 Assert.assertEquals(listContents[i][j], iter.next());
             }
             Assert.assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iter.next());
-            // System.out.println(obj.toString());
-            // assertEquals(i, obj.get("longField"));
-            // assertEquals("Value"+i, obj.getString("stringField"));
-            // assertEquals((double)i, obj.getDouble("doubleField"), 0);
-            // if (typeState.getSchema().numFields() == 4) {   // filtered
-            //     assertEquals(i, obj.getInt("intField"));
-            // }
         }
     }
 }
