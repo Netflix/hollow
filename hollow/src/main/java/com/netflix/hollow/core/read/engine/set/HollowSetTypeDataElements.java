@@ -23,6 +23,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import java.io.IOException;
 
 /**
@@ -32,15 +33,10 @@ import java.io.IOException;
  * with the existing one to make sure a consistent view of the data is always available. 
  */
 
-public class HollowSetTypeDataElements {
+public class HollowSetTypeDataElements extends HollowTypeDataElements {
 
-    int maxOrdinal;
-
-    FixedLengthData setPointerAndSizeData;
-    FixedLengthData elementData;
-
-    GapEncodedVariableLengthIntegerReader encodedRemovals;
-    GapEncodedVariableLengthIntegerReader encodedAdditions;
+    public FixedLengthData setPointerAndSizeData;
+    public FixedLengthData elementData;
 
     int bitsPerSetPointer;
     int bitsPerSetSizeValue;
@@ -49,16 +45,12 @@ public class HollowSetTypeDataElements {
     int emptyBucketValue;
     long totalNumberOfBuckets;
 
-    final ArraySegmentRecycler memoryRecycler;
-    final MemoryMode memoryMode;
-
     public HollowSetTypeDataElements(ArraySegmentRecycler memoryRecycler) {
         this(MemoryMode.ON_HEAP, memoryRecycler);
     }
 
     public HollowSetTypeDataElements(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
-        this.memoryMode = memoryMode;
-        this.memoryRecycler = memoryRecycler;
+        super(memoryMode, memoryRecycler);
     }
 
     void readSnapshot(HollowBlobInput in) throws IOException {
@@ -117,8 +109,37 @@ public class HollowSetTypeDataElements {
         new HollowSetDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 
+    @Override
     public void destroy() {
         FixedLengthDataFactory.destroy(setPointerAndSizeData, memoryRecycler);
         FixedLengthDataFactory.destroy(elementData, memoryRecycler);
+    }
+
+    long getStartBucket(int ordinal) {
+        return ordinal == 0 ? 0 : setPointerAndSizeData.getElementValue((long)(ordinal - 1) * bitsPerFixedLengthSetPortion, bitsPerSetPointer);
+    }
+
+    long getEndBucket(int ordinal) {
+        return setPointerAndSizeData.getElementValue((long) ordinal * bitsPerFixedLengthSetPortion, bitsPerSetPointer);
+    }
+
+    int getBucketValue(long absoluteBucketIndex) {
+        return (int)elementData.getElementValue(absoluteBucketIndex * bitsPerElement, bitsPerElement);
+    }
+
+    void copyBucketsFrom(long startBucket, HollowSetTypeDataElements src, long srcStartBucket, long srcEndBucket) {
+        if (bitsPerElement == src.bitsPerElement) {
+            // fast path can bulk copy buckets. emptyBucketValue is same since bitsPerElement is same
+            long numBuckets = srcEndBucket - srcStartBucket;
+            elementData.copyBits(src.elementData, srcStartBucket * bitsPerElement, startBucket * bitsPerElement, numBuckets * bitsPerElement);
+        } else {
+            for (long bucket=srcStartBucket;bucket<srcEndBucket;bucket++) {
+                long bucketVal = src.elementData.getElementValue(bucket * src.bitsPerElement, src.bitsPerElement);
+                if(bucketVal == src.emptyBucketValue)
+                    bucketVal = emptyBucketValue;
+                elementData.setElementValue(startBucket * bitsPerElement, bitsPerElement, bucketVal);
+                startBucket++;
+            }
+        }
     }
 }

@@ -32,12 +32,14 @@ import com.netflix.hollow.core.write.copy.HollowRecordCopier;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.logging.Logger;
 
 /**
  * The {@link HollowTypeWriteState} contains and is the root handle to all of the records of a specific type in
  * a {@link HollowWriteStateEngine}.
  */
 public abstract class HollowTypeWriteState {
+    private static final Logger LOG = Logger.getLogger(HollowTypeWriteState.class.getName());
 
     protected final HollowSchema schema;
 
@@ -389,4 +391,18 @@ public abstract class HollowTypeWriteState {
         return stateEngine;
     }
 
+    public boolean allowTypeResharding() {
+        if (this instanceof HollowObjectTypeWriteState) {
+            if (stateEngine.allowTypeResharding()) {
+                if (isNumShardsPinned()) {
+                    LOG.warning("Type re-sharding feature was enabled but num shards is pinned (likely using the " +
+                            "HollowShardLargeType annotation in the data model). Proceeding with fixed num shards.");
+                    return false;
+                }
+            }
+            return stateEngine.allowTypeResharding();
+        } else {
+            return false;   // only supported for object types
+        }
+    }
 }

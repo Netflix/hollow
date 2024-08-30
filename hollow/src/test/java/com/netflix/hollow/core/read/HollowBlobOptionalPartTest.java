@@ -34,6 +34,7 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.TypeA;
 import com.netflix.hollow.core.write.objectmapper.TypeB;
 import com.netflix.hollow.core.write.objectmapper.TypeC;
+import com.netflix.hollow.test.InMemoryBlobStore;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -43,8 +44,6 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-
-import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.Test;
 
