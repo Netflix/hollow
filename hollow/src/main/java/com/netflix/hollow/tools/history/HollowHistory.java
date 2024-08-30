@@ -278,8 +278,8 @@ public class HollowHistory {
         // {@code latestVersion} is still the version from before the delta transition. {@code latestVersion} is
         // updated in this method.
 
-        // Update the state stored in keyIndex (in its member readStateEngine) with the passed read state engine.
-        // The readStateEngine within keyIndex stores an ever-growing state of all keys ever seen by this HollowHistory
+        // Update the state stored in keyIndex.
+        // The keyIndex stores an ever-growing state of all keys ever seen by this HollowHistory
         // instance i.e. all keys seen in initial load or a successive double-snapshot and all keys added/removed in
         // deltas and reverse deltas. It doesn't store a copy of the keyed records, instead just the primary key values
         // for each type that has a primary key defined (in schema or custom via history helpers).
@@ -290,7 +290,7 @@ public class HollowHistory {
         // data corresponding to ghost records in the "to" state in any state transition (i.e. records corresponding to
         // ordinals were populated in the "from" state but are not populated in the "to" state) into a new state engine
         // where it assigns new ordinals serially(0, 1, 2, etc.) to each such record. A mapping of original ordinal
-        // in the read state to its new ordinal position in the historical state data access for all such records in
+        // in the read state to its reference in the historical state data access for all such records in
         // each type is stored in the member typeRemovedOrdinalMapping.
         HollowHistoricalStateDataAccess historicalDataAccess = creator.createBasedOnNewDelta(latestVersion, latestHollowReadStateEngine);
         historicalDataAccess.setNextState(latestHollowReadStateEngine);
