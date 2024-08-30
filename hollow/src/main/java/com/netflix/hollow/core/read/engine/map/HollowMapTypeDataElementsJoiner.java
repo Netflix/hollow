@@ -79,14 +79,13 @@ class HollowMapTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
                 long endBucket = source.getEndBucket(fromOrdinal);
                 long numBuckets = endBucket - startBucket;
 
-                // if (false) { // SNAP: TODO: test the slow path
                 if (to.bitsPerKeyElement == source.bitsPerKeyElement && to.bitsPerValueElement == source.bitsPerValueElement) {
                     // emptyBucketKeyValue will also be uniform
                     long bitsPerMapEntry = to.bitsPerMapEntry;
                     to.entryData.copyBits(source.entryData, startBucket * bitsPerMapEntry, bucketCounter * bitsPerMapEntry, numBuckets * bitsPerMapEntry);
                     bucketCounter += numBuckets;
                 } else {
-                    for (long bucket = startBucket; bucket < endBucket; bucket++) {
+                    for (long bucket=startBucket;bucket<endBucket;bucket++) {
                         long bucketKey = source.entryData.getElementValue(bucket * source.bitsPerMapEntry, source.bitsPerKeyElement);
                         long bucketValue = source.entryData.getElementValue(bucket * source.bitsPerMapEntry + source.bitsPerKeyElement, source.bitsPerValueElement);
                         if (bucketKey == source.emptyBucketKeyValue)

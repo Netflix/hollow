@@ -47,9 +47,9 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
 
     private final HollowListSampler sampler;
     
-    final int shardNumberMask;    // SNAP: TODO: elevated from private access for testing
+    final int shardNumberMask;
     private final int shardOrdinalShift;
-    final HollowListTypeReadStateShard shards[];    // SNAP: TODO: elevated from private access for testing
+    final HollowListTypeReadStateShard shards[];
     
     private int maxOrdinal;
 
@@ -73,9 +73,8 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
         this.shards = shards;
     }
 
-    // SNAP: TODO: for testing
-    public HollowListTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowListSchema schema, int numShards, HollowListTypeReadStateShard[] shards) {
-        super(stateEngine, memoryMode, schema);
+    public HollowListTypeReadState(MemoryMode memoryMode, HollowListSchema schema, int numShards, HollowListTypeReadStateShard[] shards) {
+        super(null, memoryMode, schema);
         this.sampler = new HollowListSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         this.shardNumberMask = numShards - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);

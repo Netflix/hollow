@@ -75,24 +75,12 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
                 long startBucket = source.getStartBucket(fromOrdinal);
                 long endBucket = source.getEndBucket(fromOrdinal);
 
-                if (to.bitsPerElement == source.bitsPerElement) {
-                    // fastpath can bulk copy buckets. emptyBucketValue is same since bitsPerElement is same
-                    long numBuckets = endBucket - startBucket;
-                    int bitsPerElement = source.bitsPerElement;
-                    to.elementData.copyBits(source.elementData, startBucket * bitsPerElement, bucketCounter * bitsPerElement, numBuckets * bitsPerElement);
-                    bucketCounter += numBuckets;
-                } else {
-                    // one bucket at a time
-                    for (long bucket=startBucket;bucket<endBucket;bucket++) {
-                        int bucketOrdinal = (int)source.elementData.getElementValue(bucket * source.bitsPerElement, source.bitsPerElement);
-                        to.elementData.setElementValue(bucketCounter * to.bitsPerElement, to.bitsPerElement, bucketOrdinal);
-                        bucketCounter++;
-                    }
-                }
+                long numBuckets = endBucket - startBucket;
+                to.copyBucketsFrom(bucketCounter, source, startBucket, endBucket);
+                bucketCounter += numBuckets;
 
                 setSize = source.setPointerAndSizeData.getElementValue((long) (fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);
             }
-            // SNAP: TODO: write a test for lopsided list shards (similar to for list types). Theres one in object joiner tests.
             to.setPointerAndSizeData.setElementValue((long) ordinal * to.bitsPerFixedLengthSetPortion, to.bitsPerSetPointer, bucketCounter);
             to.setPointerAndSizeData.setElementValue((long) (ordinal * to.bitsPerFixedLengthSetPortion) + to.bitsPerSetPointer, to.bitsPerSetSizeValue, setSize);
         }

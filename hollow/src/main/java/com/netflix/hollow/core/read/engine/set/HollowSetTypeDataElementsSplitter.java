@@ -75,23 +75,10 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
             long endBucket = from.getEndBucket(ordinal);
             HollowSetTypeDataElements target = to[toIndex];
 
-            if (target.bitsPerElement == from.bitsPerElement && target.emptyBucketValue == from.emptyBucketValue) {
-                // fastpath
-                int bitsPerElement = from.bitsPerElement;
-                long numBuckets = endBucket - startBucket;
-                target.elementData.copyBits(from.elementData, startBucket * bitsPerElement, bucketCounter[toIndex] * bitsPerElement, numBuckets * bitsPerElement);
-                bucketCounter[toIndex] += numBuckets;
-            } else {
-                // for (long bucket=startBucket;bucket<endBucket;bucket++) {
-                //     long bucketVal = from.elementData.getElementValue(bucket * from.bitsPerElement, from.bitsPerElement);
-                //     if(bucketVal == from.emptyBucketValue)
-                //         bucketVal = target.emptyBucketValue;
-                //     target.elementData.setElementValue(bucketCounter[toIndex] * target.bitsPerElement, target.bitsPerElement, bucketVal);
-                //     bucketCounter[toIndex]++;
-                // }
-                throw new RuntimeException("Unexpected for Set type during split, expected during join");  // SNAP: TODO: remove, or keep for now so that we can test the slow path and in future when we make size optimizations then consumers will be backwards compatible
+            long numBuckets = endBucket - startBucket;
+            target.copyBucketsFrom(bucketCounter[toIndex], from, startBucket, endBucket);
+            bucketCounter[toIndex] += numBuckets;
 
-            }
             target.setPointerAndSizeData.setElementValue((long) toOrdinal * target.bitsPerFixedLengthSetPortion, target.bitsPerSetPointer, bucketCounter[toIndex]);
             long setSize = from.setPointerAndSizeData.getElementValue((long) (ordinal * from.bitsPerFixedLengthSetPortion) + from.bitsPerSetPointer, from.bitsPerSetSizeValue);
             target.setPointerAndSizeData.setElementValue((long) (toOrdinal * target.bitsPerFixedLengthSetPortion) + target.bitsPerSetPointer, target.bitsPerSetSizeValue, setSize);

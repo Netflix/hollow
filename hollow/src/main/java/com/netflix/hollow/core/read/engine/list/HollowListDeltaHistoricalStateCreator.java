@@ -100,8 +100,11 @@ public class HollowListDeltaHistoricalStateCreator {
         historicalDataElements.maxOrdinal = removedEntryCount - 1;
         historicalDataElements.totalNumberOfElements = totalElementCount;
         historicalDataElements.bitsPerListPointer = totalElementCount == 0 ? 1 : 64 - Long.numberOfLeadingZeros(totalElementCount);
-        historicalDataElements.bitsPerElement = stateEngineDataElements[0].bitsPerElement; // SNAP: TODO: pick max across all shards
-
+        for (int i=0;i<stateEngineDataElements.length;i++) {
+            if (stateEngineDataElements[i].bitsPerElement > historicalDataElements.bitsPerElement) {
+                historicalDataElements.bitsPerElement = stateEngineDataElements[i].bitsPerElement;
+            }
+        }
         ordinalMapping = new IntMap(removedEntryCount);
     }
 

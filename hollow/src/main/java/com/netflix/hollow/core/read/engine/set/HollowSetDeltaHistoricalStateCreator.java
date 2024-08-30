@@ -107,8 +107,12 @@ public class HollowSetDeltaHistoricalStateCreator {
         historicalDataElements.bitsPerSetPointer = 64 - Long.numberOfLeadingZeros(totalBucketCount);
         historicalDataElements.bitsPerSetSizeValue = 64 - Long.numberOfLeadingZeros(maxSize);
         historicalDataElements.bitsPerFixedLengthSetPortion = historicalDataElements.bitsPerSetPointer + historicalDataElements.bitsPerSetSizeValue;
-        historicalDataElements.bitsPerElement = stateEngineDataElements[0].bitsPerElement; // SNAP: TODO: pick max across all shards
-        historicalDataElements.emptyBucketValue = stateEngineDataElements[0].emptyBucketValue;
+        for (int i=0;i<stateEngineDataElements.length;i++) {
+            if (stateEngineDataElements[i].bitsPerElement > historicalDataElements.bitsPerElement) {
+                historicalDataElements.bitsPerElement = stateEngineDataElements[i].bitsPerElement;
+                historicalDataElements.emptyBucketValue = stateEngineDataElements[i].emptyBucketValue;
+            }
+        }
         historicalDataElements.totalNumberOfBuckets = totalBucketCount;
 
         ordinalMapping = new IntMap(removedEntryCount);

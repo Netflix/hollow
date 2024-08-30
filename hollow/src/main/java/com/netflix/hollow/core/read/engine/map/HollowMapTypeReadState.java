@@ -58,7 +58,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     
     private final int shardNumberMask;
     private final int shardOrdinalShift;
-    final HollowMapTypeReadStateShard shards[];    // SNAP: TODO: elevated from private access for testing
+    final HollowMapTypeReadStateShard shards[];
     
     private HollowPrimaryKeyValueDeriver keyDeriver;
     
@@ -85,9 +85,8 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         
     }
 
-    // SNAP: TODO: for testing
-    public HollowMapTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowMapSchema schema, int numShards, HollowMapTypeReadStateShard[] shards) {
-        super(stateEngine, memoryMode, schema);
+    public HollowMapTypeReadState(MemoryMode memoryMode, HollowMapSchema schema, int numShards, HollowMapTypeReadStateShard[] shards) {
+        super(null, memoryMode, schema);
         this.sampler = new HollowMapSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         this.shardNumberMask = numShards - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);

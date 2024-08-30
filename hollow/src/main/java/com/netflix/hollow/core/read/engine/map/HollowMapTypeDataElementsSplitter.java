@@ -51,7 +51,7 @@ public class HollowMapTypeDataElementsSplitter extends AbstractHollowTypeDataEle
             target.bitsPerKeyElement = from.bitsPerKeyElement;
             target.bitsPerValueElement = from.bitsPerValueElement;
             target.bitsPerMapSizeValue = from.bitsPerMapSizeValue;
-            target.emptyBucketKeyValue = from.emptyBucketKeyValue;      // SNAP: TODO: test with some empty buckets too
+            target.emptyBucketKeyValue = from.emptyBucketKeyValue;
 
             // recomputed based on split shards
             target.bitsPerMapPointer = 64 - Long.numberOfLeadingZeros(maxShardTotalOfMapBuckets);
@@ -78,25 +78,25 @@ public class HollowMapTypeDataElementsSplitter extends AbstractHollowTypeDataEle
             long startBucket = from.getStartBucket(ordinal);
             long endBucket = from.getEndBucket(ordinal);
 
-            // if (false) { // SNAP: TODO: test the slow path
             if (target.bitsPerKeyElement == from.bitsPerKeyElement && target.bitsPerValueElement == from.bitsPerValueElement) {
+                // fast path can bulk copy buckets. emptyBucketKeyValue is same since bitsPerKeyElement is the same
                 long numBuckets = endBucket - startBucket;
-                // emptyBucketKeyValue will also be uniform
                 long bitsPerMapEntry = from.bitsPerMapEntry;
                 target.entryData.copyBits(from.entryData, startBucket * bitsPerMapEntry, bucketCounter[toIndex] * bitsPerMapEntry, numBuckets * bitsPerMapEntry);
                 bucketCounter[toIndex] += numBuckets;
             } else {
-                throw new RuntimeException("Unexpected for Map type during split, expected during join");  // SNAP: TODO: remove
-                // for (long bucket=startBucket;bucket<endBucket;bucket++) {
-                //     long bucketKey = from.entryData.getElementValue(bucket * from.bitsPerMapEntry, from.bitsPerKeyElement);
-                //     long bucketValue = from.entryData.getElementValue(bucket * from.bitsPerMapEntry + from.bitsPerKeyElement, from.bitsPerValueElement);
-                //     if(bucketKey == from.emptyBucketKeyValue)
-                //         bucketKey = target.emptyBucketKeyValue;
-                //     long targetBucketOffset = (bucketCounter[toIndex] * target.bitsPerMapEntry);
-                //     target.entryData.setElementValue(targetBucketOffset, target.bitsPerKeyElement, bucketKey);
-                //     target.entryData.setElementValue(targetBucketOffset + target.bitsPerKeyElement, target.bitsPerValueElement, bucketValue);
-                //     bucketCounter[toIndex]++;
-                // }
+                // slow path(but more compact) not exercised until populateSats above supports split shard specific bitsPerKeyElement and bitsPerValueElement
+                // (which would make sense to add once HollowMapTypeWriteState's gatherStatistics supports assigning bitsPerKeyElement and bitsPerValueElement at a shard level)
+                for (long bucket=startBucket;bucket<endBucket;bucket++) {
+                    long bucketKey = from.entryData.getElementValue(bucket * from.bitsPerMapEntry, from.bitsPerKeyElement);
+                    long bucketValue = from.entryData.getElementValue(bucket * from.bitsPerMapEntry + from.bitsPerKeyElement, from.bitsPerValueElement);
+                    if(bucketKey == from.emptyBucketKeyValue)
+                        bucketKey = target.emptyBucketKeyValue;
+                    long targetBucketOffset = (bucketCounter[toIndex] * target.bitsPerMapEntry);
+                    target.entryData.setElementValue(targetBucketOffset, target.bitsPerKeyElement, bucketKey);
+                    target.entryData.setElementValue(targetBucketOffset + target.bitsPerKeyElement, target.bitsPerValueElement, bucketValue);
+                    bucketCounter[toIndex]++;
+                }
             }
 
             target.mapPointerAndSizeData.setElementValue((long) toOrdinal * target.bitsPerFixedLengthMapPortion, target.bitsPerMapPointer, bucketCounter[toIndex]);

@@ -6,7 +6,6 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.nio.file.Paths;
 import java.util.BitSet;
@@ -48,8 +47,7 @@ public class HollowSetTypeDataElementsSplitJoinTest extends AbstractHollowSetTyp
                 HollowSetTypeReadStateShard joinedShard = new HollowSetTypeReadStateShard();
                 joinedShard.setCurrentData(joinedElements);
                 // SNAP: TODO: refactor when constructor changes (this one takes readStateEnginer which doesnt correspond to joinedShard)
-                HollowSetTypeReadState resultTypeState = new HollowSetTypeReadState(readStateEngine, MemoryMode.ON_HEAP, typeState.getSchema(), 1,
-                        new HollowSetTypeReadStateShard[]{joinedShard});
+                HollowSetTypeReadState resultTypeState = new HollowSetTypeReadState(MemoryMode.ON_HEAP, typeState.getSchema(), 1, new HollowSetTypeReadStateShard[]{joinedShard});
 
                 assertChecksumUnchanged(resultTypeState, typeState, typeState.getPopulatedOrdinals());
 

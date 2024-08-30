@@ -59,7 +59,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
     
     private final int shardNumberMask;
     private final int shardOrdinalShift;
-    final HollowSetTypeReadStateShard shards[];    // SNAP: TODO: elevated from private access for testing
+    final HollowSetTypeReadStateShard shards[];
     
     private HollowPrimaryKeyValueDeriver keyDeriver;
     
@@ -86,9 +86,8 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     }
 
-    // SNAP: TODO: for testing
-    public HollowSetTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSetSchema schema, int numShards, HollowSetTypeReadStateShard[] shards) {
-        super(stateEngine, memoryMode, schema);
+    public HollowSetTypeReadState(MemoryMode memoryMode, HollowSetSchema schema, int numShards, HollowSetTypeReadStateShard[] shards) {
+        super(null, memoryMode, schema);
         this.sampler = new HollowSetSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         this.shardNumberMask = numShards - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);

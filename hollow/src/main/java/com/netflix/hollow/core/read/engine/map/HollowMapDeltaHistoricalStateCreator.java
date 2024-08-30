@@ -107,10 +107,18 @@ public class HollowMapDeltaHistoricalStateCreator {
         historicalDataElements.bitsPerMapPointer = 64 - Long.numberOfLeadingZeros(totalBucketCount);
         historicalDataElements.bitsPerMapSizeValue = 64 - Long.numberOfLeadingZeros(maxSize);
         historicalDataElements.bitsPerFixedLengthMapPortion = historicalDataElements.bitsPerMapPointer + historicalDataElements.bitsPerMapSizeValue;
-        historicalDataElements.bitsPerKeyElement = stateEngineDataElements[0].bitsPerKeyElement; // SNAP: TODO: pick max across all shards
-        historicalDataElements.bitsPerValueElement = stateEngineDataElements[0].bitsPerValueElement;
-        historicalDataElements.bitsPerMapEntry = stateEngineDataElements[0].bitsPerMapEntry;
-        historicalDataElements.emptyBucketKeyValue = stateEngineDataElements[0].emptyBucketKeyValue;
+        for (int i=0;i<stateEngineDataElements.length;i++) {
+            if (stateEngineDataElements[i].bitsPerKeyElement > historicalDataElements.bitsPerKeyElement) {
+                historicalDataElements.bitsPerKeyElement = stateEngineDataElements[i].bitsPerKeyElement;
+                historicalDataElements.emptyBucketKeyValue = stateEngineDataElements[i].emptyBucketKeyValue;
+            }
+            if (stateEngineDataElements[i].bitsPerValueElement > historicalDataElements.bitsPerValueElement) {
+                historicalDataElements.bitsPerValueElement = stateEngineDataElements[i].bitsPerValueElement;
+            }
+            if (stateEngineDataElements[i].bitsPerMapEntry > historicalDataElements.bitsPerMapEntry) {
+                historicalDataElements.bitsPerMapEntry = stateEngineDataElements[i].bitsPerMapEntry;
+            }
+        }
         historicalDataElements.totalNumberOfBuckets = totalBucketCount;
 
         ordinalMapping = new IntMap(removedEntryCount);

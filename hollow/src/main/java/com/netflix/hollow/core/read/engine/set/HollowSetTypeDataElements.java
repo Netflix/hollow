@@ -125,4 +125,22 @@ public class HollowSetTypeDataElements extends AbstractHollowTypeDataElements {
     public int getBucketValue(long absoluteBucketIndex) {
         return (int)elementData.getElementValue(absoluteBucketIndex * bitsPerElement, bitsPerElement);
     }
+
+    public void copyBucketsFrom(long startBucket, HollowSetTypeDataElements src, long srcStartBucket, long srcEndBucket) {
+        if (bitsPerElement == src.bitsPerElement) {
+            // fast path can bulk copy buckets. emptyBucketValue is same since bitsPerElement is same
+            long numBuckets = srcEndBucket - srcStartBucket;
+            elementData.copyBits(src.elementData, srcStartBucket * bitsPerElement, startBucket * bitsPerElement, numBuckets * bitsPerElement);
+        } else {
+            // one bucket at a time
+            for (long bucket=srcStartBucket;bucket<srcEndBucket;bucket++) {
+                long bucketVal = src.elementData.getElementValue(bucket * src.bitsPerElement, src.bitsPerElement);
+                if(bucketVal == src.emptyBucketValue)
+                    bucketVal = emptyBucketValue;
+                // SNAP: TODO: empty bucket should be encoded with all 1s, not copied as-is - in all collection spliitters/joiners
+                elementData.setElementValue(startBucket * bitsPerElement, bitsPerElement, bucketVal);
+                startBucket++;
+            }
+        }
+    }
 }

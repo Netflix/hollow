@@ -41,8 +41,7 @@ public class HollowListTypeDataElementsJoinerTest extends AbstractHollowListType
 
         HollowListTypeReadStateShard joinedShard = new HollowListTypeReadStateShard();
         joinedShard.setCurrentData(joinedDataElements);
-        typeReadState = new HollowListTypeReadState(typeReadState.getStateEngine(), MemoryMode.ON_HEAP, typeReadState.getSchema(), 1,
-                new HollowListTypeReadStateShard[] {joinedShard});
+        typeReadState = new HollowListTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), 1, new HollowListTypeReadStateShard[] {joinedShard});
         assertDataUnchanged(typeReadState, listContents);
 
         try {

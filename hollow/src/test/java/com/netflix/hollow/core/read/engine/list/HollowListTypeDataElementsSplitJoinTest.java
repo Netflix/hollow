@@ -46,8 +46,7 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
 
                 // SNAP: TODO: hack: constructor created for test, passed read state engine has reference to pre-join type state.
                 //                   can replace with checking equality on on data elements
-                HollowListTypeReadState resultTypeReadState = new HollowListTypeReadState(typeReadState.getStateEngine(), MemoryMode.ON_HEAP, typeReadState.getSchema(), 1,
-                        new HollowListTypeReadStateShard[] {joinedShard});
+                HollowListTypeReadState resultTypeReadState = new HollowListTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), 1, new HollowListTypeReadStateShard[] {joinedShard});
 
                 assertDataUnchanged(resultTypeReadState, listContents);
                 assertChecksumUnchanged(resultTypeReadState, typeReadState, typeReadState.getPopulatedOrdinals());
@@ -133,8 +132,7 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
                 HollowListTypeReadStateShard joinedShard = new HollowListTypeReadStateShard();
                 joinedShard.setCurrentData(joinedElements);
                 // SNAP: TODO: refactor when constructor changes (this one takes readStateEngine which doesnt correspond to joinedShard)
-                HollowListTypeReadState resultTypeState = new HollowListTypeReadState(readStateEngine, MemoryMode.ON_HEAP, typeState.getSchema(), 1,
-                        new HollowListTypeReadStateShard[]{joinedShard});
+                HollowListTypeReadState resultTypeState = new HollowListTypeReadState(MemoryMode.ON_HEAP, typeState.getSchema(), 1, new HollowListTypeReadStateShard[]{joinedShard});
 
                 assertChecksumUnchanged(resultTypeState, typeState, typeState.getPopulatedOrdinals());
 
