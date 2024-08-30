@@ -23,6 +23,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import java.io.IOException;
 
 /**
@@ -31,30 +32,21 @@ import java.io.IOException;
  * During a delta, the HollowListTypeReadState will create a new HollowListTypeDataElements and atomically swap
  * with the existing one to make sure a consistent view of the data is always available. 
  */
-public class HollowListTypeDataElements {
-
-    int maxOrdinal;
+public class HollowListTypeDataElements extends HollowTypeDataElements {
 
     FixedLengthData listPointerData;
     FixedLengthData elementData;
 
-    GapEncodedVariableLengthIntegerReader encodedAdditions;
-    GapEncodedVariableLengthIntegerReader encodedRemovals;
-
     int bitsPerListPointer;
     int bitsPerElement;
-    long totalNumberOfElements = 0;
-
-    final ArraySegmentRecycler memoryRecycler;
-    final MemoryMode memoryMode;
+    long totalNumberOfElements;
 
     public HollowListTypeDataElements(ArraySegmentRecycler memoryRecycler) {
         this(MemoryMode.ON_HEAP, memoryRecycler);
     }
 
     public HollowListTypeDataElements(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
-        this.memoryMode = memoryMode;
-        this.memoryRecycler = memoryRecycler;
+        super(memoryMode, memoryRecycler);
     }
 
     void readSnapshot(HollowBlobInput in) throws IOException {
@@ -109,9 +101,31 @@ public class HollowListTypeDataElements {
         new HollowListDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 
+    @Override
     public void destroy() {
         FixedLengthDataFactory.destroy(listPointerData, memoryRecycler);
         FixedLengthDataFactory.destroy(elementData, memoryRecycler);
     }
 
+    long getStartElement(int ordinal) {
+        return ordinal == 0 ? 0 : listPointerData.getElementValue(((long)(ordinal-1) * bitsPerListPointer), bitsPerListPointer);
+    }
+
+    long getEndElement(int ordinal) {
+        return listPointerData.getElementValue((long)ordinal * bitsPerListPointer, bitsPerListPointer);
+    }
+
+    void copyElementsFrom(long startElement, HollowListTypeDataElements src, long srcStartElement, long srcEndElement) {
+        if (bitsPerElement == src.bitsPerElement) {
+            // fast path can bulk copy elements
+            long numElements = srcEndElement - srcStartElement;
+            elementData.copyBits(src.elementData, srcStartElement * bitsPerElement, startElement * bitsPerElement, numElements * bitsPerElement);
+        } else {
+            for (long element=srcStartElement;element<srcEndElement;element++) {
+                long elementVal = src.elementData.getElementValue(element * src.bitsPerElement, src.bitsPerElement);
+                elementData.setElementValue(startElement * bitsPerElement, bitsPerElement, elementVal);
+                startElement++;
+            }
+        }
+    }
 }

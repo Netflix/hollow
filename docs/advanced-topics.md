@@ -372,7 +372,7 @@ The number of bits used to represent a field which is one of the types (`INT`, `
 
 32 bits are used to represent a `FLOAT`, and 64 bits are used to represent a `DOUBLE`.
 
-`STRING` and `BYTES` fields each get a separate byte array, into which the values for all records are packed.  The fixed-length value in these fields are offsets into the field’s byte array where the record’s value ends.  In order to determine the begin byte for the record with ordinal n, the offset encoded into the record with ordinal (n-1) is read.  The number of fixed length bits used to represent the offsets is exactly equal to the number of number of bits required to represent the maximum offset, plus one.
+`STRING` and `BYTES` fields each get a separate byte array, into which the values for all records are packed.  The fixed-length value in these fields are offsets into the field’s byte array where the record’s value ends.  In order to determine the begin byte for the record with ordinal n, the offset encoded into the record with ordinal (n-1) is read.  The number of fixed length bits used to represent the offsets is exactly equal to the number of bits required to represent the maximum offset, plus one.
 
 Each field type may be assigned a null value.  For `INT`, `LONG`, and `REFERENCE` fields, null is encoded as a value with all ones.  For `FLOAT` and `DOUBLE` fields, null is encoded as special bit sequences.  For `STRING` and `BYTES` fields, null is encoded by setting a designated null bit at the beginning of each field, followed by the end offset of the last populated value for that field.
 
