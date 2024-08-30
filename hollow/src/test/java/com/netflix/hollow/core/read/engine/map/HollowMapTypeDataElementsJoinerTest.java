@@ -57,7 +57,6 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
     }
 
     @Test
-    // SNAP: TODO: also do this at the read state level
     public void testJoinDifferentFieldWidths() throws IOException {
         HollowMapTypeReadState typeReadStateSmall = populateTypeStateWith(new int[][][] {{{1,2}}});
         assertEquals(1, typeReadStateSmall.numShards());

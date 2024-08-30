@@ -73,13 +73,6 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
 
             Assert.assertEquals(expected, actual);
             Assert.assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iter.next());
-            // System.out.println(obj.toString());  // SNAP: TODO: cleanup
-            // assertEquals(i, obj.get("longField"));
-            // assertEquals("Value"+i, obj.getString("stringField"));
-            // assertEquals((double)i, obj.getDouble("doubleField"), 0);
-            // if (typeState.getSchema().numFields() == 4) {   // filtered
-            //     assertEquals(i, obj.getInt("intField"));
-            // }
         }
     }
 }

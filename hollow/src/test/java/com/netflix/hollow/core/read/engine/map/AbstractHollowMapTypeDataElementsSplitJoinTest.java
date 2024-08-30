@@ -71,14 +71,6 @@ public class AbstractHollowMapTypeDataElementsSplitJoinTest extends AbstractHoll
             Map<Integer, Integer> expected = convertToMap(maps[i]);
             Map<Integer, Integer> actual = readMap(typeState, i);
             assertEquals(expected, actual);
-
-            // System.out.println(obj.toString());  // SNAP: TODO: cleanup
-            // assertEquals(i, obj.get("longField"));
-            // assertEquals("Value"+i, obj.getString("stringField"));
-            // assertEquals((double)i, obj.getDouble("doubleField"), 0);
-            // if (typeState.getSchema().numFields() == 4) {   // filtered
-            //     assertEquals(i, obj.getInt("intField"));
-            // }
         }
     }
 

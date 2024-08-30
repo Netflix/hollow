@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.BitSet;
 import org.junit.Test;
 
-public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListTypeDataElementsSplitJoinTest {
+public class VMSHollowListTypeDataElementsSplitJoinTest extends AbstractHollowListTypeDataElementsSplitJoinTest {
 
     @Test
     public void testSplitThenJoin() throws IOException {
@@ -25,6 +25,8 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
                 listContents[i][j] = j;
             }
         }
+
+        prettyPrintArray(listContents);
 
         // 1->2->1, 1->4->1, ...
         for (int listRecord=0;listRecord<numListRecords;listRecord++) {
@@ -50,6 +52,30 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
         }
     }
 
+    static void prettyPrintArray(int[][] array) {
+        for (int[] row : array) {
+            for (int element : row) {
+                System.out.print(element + "\t");
+            }
+            System.out.println();
+        }
+    }
+
+    private void assertChecksumUnchanged(HollowListTypeReadState newTypeState, HollowListTypeReadState origTypeState, BitSet populatedOrdinals) {
+        HollowChecksum origCksum = new HollowChecksum();
+        HollowChecksum newCksum = new HollowChecksum();
+
+        for(int i=0;i<origTypeState.numShards();i++) {
+            origTypeState.shards[i].applyToChecksum(origCksum, populatedOrdinals, i, origTypeState.numShards());
+        }
+
+        for(int i=0;i<newTypeState.numShards();i++) {
+            newTypeState.shards[i].applyToChecksum(newCksum, populatedOrdinals, i, newTypeState.numShards());
+        }
+
+        assertEquals(newCksum, origCksum);
+    }
+
 
     @Test
     public void testSplitThenJoinWithEmptyJoin() throws IOException {
@@ -70,13 +96,14 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
     }
 
     // manually invoked
-    // @Test
+    @Test
     public void testSplittingAndJoiningWithSnapshotBlob() throws Exception {
 
-        String blobPath = null; // dir where snapshot blob exists for e.g. "/tmp/";
-        long v = 0l; // snapshot version for e.g. 20230915162636001l;
-        String[] listTypesWithOneShard = null; // type name corresponding to an Object type with single shard for e.g. "Movie";
-        int[] numSplitsArray = {2, 4, 8, 16, 32, 64, 128, 256, 512, 1024};
+        String blobPath = "/Users/ssingh/workspace/blob-cache/vms-daintree/prod/"; // null; // dir where snapshot blob exists for e.g. "/tmp/";
+        long v = 20230611133921525l; // 0l; // snapshot version for e.g. 20230915162636001l;
+        String[] listTypesWithOneShard = {"ListOfInteger", "ListOfMoviePersonCharacter", "ListOfLiveOutputGroup", "ListOfVideo", "ListOfVideoEpisode",
+                "ListOfPhase", "ListOfRolloutPhaseWindow", "ListOfStrings", "ListOfTimecodeAnnotation"}; // null; // type name corresponding to an Object type with single shard for e.g. "Movie";
+        int[] numSplitsArray = {2, 4, 8, 16, 32, 64, 128, 256, 512, 1024}; //
 
         HollowFilesystemBlobRetriever hollowBlobRetriever = new HollowFilesystemBlobRetriever(Paths.get(blobPath));
         HollowConsumer c = HollowConsumer.withBlobRetriever(hollowBlobRetriever).build();
@@ -108,20 +135,5 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
                 System.out.println("Processed type " + listTypeWithOneShard + " with " + numSplits + " splits");
             }
         }
-    }
-
-    private void assertChecksumUnchanged(HollowListTypeReadState newTypeState, HollowListTypeReadState origTypeState, BitSet populatedOrdinals) {
-        HollowChecksum origCksum = new HollowChecksum();
-        HollowChecksum newCksum = new HollowChecksum();
-
-        for(int i=0;i<origTypeState.numShards();i++) {
-            origTypeState.shards[i].applyToChecksum(origCksum, populatedOrdinals, i, origTypeState.numShards());
-        }
-
-        for(int i=0;i<newTypeState.numShards();i++) {
-            newTypeState.shards[i].applyToChecksum(newCksum, populatedOrdinals, i, newTypeState.numShards());
-        }
-
-        assertEquals(newCksum, origCksum);
     }
 }

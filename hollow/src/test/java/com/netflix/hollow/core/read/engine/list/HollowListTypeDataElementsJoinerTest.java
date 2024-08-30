@@ -54,8 +54,6 @@ public class HollowListTypeDataElementsJoinerTest extends AbstractHollowListType
     }
 
     @Test
-    // SNAP: TODO: achieve this at the read state level, need to read the set back out for comparison
-    // SNAP: TODO: consider cleaning this test up
     public void testJoinDifferentFieldWidths() throws IOException {
         HollowListTypeReadState typeReadStateSmall = populateTypeStateWith(new int[][] {{1}});
         assertEquals(1, typeReadStateSmall.numShards());
@@ -90,6 +88,6 @@ public class HollowListTypeDataElementsJoinerTest extends AbstractHollowListType
 
 //    @Test
 //    public void testLopsidedShards() {
-//      // TODO: implement when producer supports enabling type sharding for List types
+//      // TODO: implement when producer allows enabling type sharding for List types
 //    }
 }
