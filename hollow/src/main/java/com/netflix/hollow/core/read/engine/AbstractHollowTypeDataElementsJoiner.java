@@ -20,17 +20,18 @@ public abstract class AbstractHollowTypeDataElementsJoiner <T extends AbstractHo
 
         for (AbstractHollowTypeDataElements elements : from) {
             if (elements.encodedAdditions != null) {
-                throw new IllegalStateException("Encountered encodedAdditions in data elements splitter- this is not expected " +
+                throw new IllegalStateException("Encountered encodedAdditions in data elements joiner- this is not expected " +
                         "since encodedAdditions only exist on delta data elements and they dont carry over to target data elements, " +
                         "delta data elements are never split/joined");
             }
         }
+
+        // SNAP: TODO: should support a "too large to join" when joined ordinals will overflow
     }
 
     public T join() {
 
-        init();
-
+        initToElements();
         to.maxOrdinal = -1;
 
         populateStats();
@@ -43,13 +44,22 @@ public abstract class AbstractHollowTypeDataElementsJoiner <T extends AbstractHo
         }
         to.encodedRemovals = GapEncodedVariableLengthIntegerReader.join(fromRemovals);
 
-        return (T) to;
+        return to;
     }
 
-    public abstract void init();
+    /**
+     * Initialize the target data elements.
+     */
+    public abstract void initToElements();
 
+    /**
+     * Populate the stats of the target data elements.
+     */
     public abstract void populateStats();
 
+    /**
+     * Copy records from the source data elements to the target data elements.
+     */
     public abstract void copyRecords();
 
 

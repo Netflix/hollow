@@ -17,7 +17,7 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
     }
 
     @Override
-    public void init() {
+    public void initToElements() {
         this.to = new HollowSetTypeDataElements(from[0].memoryMode, from[0].memoryRecycler);
         to.bitsPerElement = 0;
     }
@@ -56,14 +56,15 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
         to.totalNumberOfBuckets = totalOfSetBuckets;
         to.bitsPerSetPointer = 64 - Long.numberOfLeadingZeros(to.totalNumberOfBuckets);
         to.bitsPerFixedLengthSetPortion = to.bitsPerSetPointer + to.bitsPerSetSizeValue;
-
-        to.setPointerAndSizeData = FixedLengthDataFactory.get(((long)to.maxOrdinal + 1) * to.bitsPerFixedLengthSetPortion, to.memoryMode, to.memoryRecycler);
-        to.elementData = FixedLengthDataFactory.get(to.totalNumberOfBuckets * to.bitsPerElement, to.memoryMode, to.memoryRecycler);
     }
 
     @Override
     public void copyRecords() {
         long bucketCounter = 0;
+
+        to.setPointerAndSizeData = FixedLengthDataFactory.get(((long)to.maxOrdinal + 1) * to.bitsPerFixedLengthSetPortion, to.memoryMode, to.memoryRecycler);
+        to.elementData = FixedLengthDataFactory.get(to.totalNumberOfBuckets * to.bitsPerElement, to.memoryMode, to.memoryRecycler);
+
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
@@ -79,10 +80,10 @@ class HollowSetTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
                 to.copyBucketsFrom(bucketCounter, source, startBucket, endBucket);
                 bucketCounter += numBuckets;
 
-                setSize = source.setPointerAndSizeData.getElementValue((long) (fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);
+                setSize = source.setPointerAndSizeData.getElementValue((long)(fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);
             }
-            to.setPointerAndSizeData.setElementValue((long) ordinal * to.bitsPerFixedLengthSetPortion, to.bitsPerSetPointer, bucketCounter);
-            to.setPointerAndSizeData.setElementValue((long) (ordinal * to.bitsPerFixedLengthSetPortion) + to.bitsPerSetPointer, to.bitsPerSetSizeValue, setSize);
+            to.setPointerAndSizeData.setElementValue((long)ordinal * to.bitsPerFixedLengthSetPortion, to.bitsPerSetPointer, bucketCounter);
+            to.setPointerAndSizeData.setElementValue((long)(ordinal * to.bitsPerFixedLengthSetPortion) + to.bitsPerSetPointer, to.bitsPerSetSizeValue, setSize);
         }
     }
 }

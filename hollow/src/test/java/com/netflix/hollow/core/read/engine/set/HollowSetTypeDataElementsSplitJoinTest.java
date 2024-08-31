@@ -44,7 +44,7 @@ public class HollowSetTypeDataElementsSplitJoinTest extends AbstractHollowSetTyp
                 HollowSetTypeReadStateShard joinedShard = new HollowSetTypeReadStateShard();
                 joinedShard.setCurrentData(joinedElements);
 
-                HollowSetTypeReadState resultTypeState = new HollowSetTypeReadState(MemoryMode.ON_HEAP, typeState.getSchema(), 1, new HollowSetTypeReadStateShard[]{joinedShard});
+                HollowSetTypeReadState resultTypeState = new HollowSetTypeReadState(MemoryMode.ON_HEAP, typeState.getSchema(), new HollowSetTypeReadStateShard[]{joinedShard});
 
                 assertChecksumUnchanged(resultTypeState, typeState, typeState.getPopulatedOrdinals());
 

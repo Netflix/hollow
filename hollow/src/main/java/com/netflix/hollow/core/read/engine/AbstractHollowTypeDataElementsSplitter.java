@@ -2,6 +2,12 @@ package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 
+/**
+ * Join multiple {@code HollowListTypeDataElements}s into 1 {@code HollowListTypeDataElements}.
+ * Ordinals are remapped and corresponding data is copied over.
+ * The original data elements are not destroyed.
+ * The no. of passed data elements must be a power of 2.
+ */
 public abstract class AbstractHollowTypeDataElementsSplitter<T extends AbstractHollowTypeDataElements> {
     public final int numSplits;
     public final int toMask;
@@ -10,7 +16,7 @@ public abstract class AbstractHollowTypeDataElementsSplitter<T extends AbstractH
 
     public T[] to;
 
-    public AbstractHollowTypeDataElementsSplitter(T from, int numSplits) {
+    public AbstractHollowTypeDataElementsSplitter(T from, int numSplits) {  // SNAP: TODO: does this allow releasing old splits?
         this.from = from;
         this.numSplits = numSplits;
         this.toMask = numSplits - 1;
@@ -29,8 +35,7 @@ public abstract class AbstractHollowTypeDataElementsSplitter<T extends AbstractH
 
     public T[] split() {
 
-        init();
-
+        initToElements();
         for(int i=0;i<to.length;i++) {
             to[i].maxOrdinal = -1;
         }
@@ -46,13 +51,22 @@ public abstract class AbstractHollowTypeDataElementsSplitter<T extends AbstractH
             }
         }
 
-        return (T[]) to;
+        return to;
     }
 
-    public abstract void init();
+    /**
+     * Initialize the target data elements.
+     */
+    public abstract void initToElements();
 
+    /**
+     * Populate the stats of the target data elements.
+     */
     public abstract void populateStats();
 
+    /**
+     * Copy records from the source data elements to the target data elements.
+     */
     public abstract void copyRecords();
 
 

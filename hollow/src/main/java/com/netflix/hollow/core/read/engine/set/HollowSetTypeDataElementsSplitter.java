@@ -16,7 +16,7 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
     }
 
     @Override
-    public void init() {
+    public void initToElements() {
         this.to = new HollowSetTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
             to[i] = new HollowSetTypeDataElements(from.memoryMode, from.memoryRecycler);
@@ -28,7 +28,6 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
         long[] shardTotalOfSetBuckets  = new long[numSplits];
         long maxShardTotalOfSetBuckets = 0;
 
-        // count buckets per split
         for(int ordinal=0;ordinal<=from.maxOrdinal;ordinal++) {
             int toIndex = ordinal & toMask;
             int toOrdinal = ordinal >> toOrdinalShift;
@@ -46,18 +45,15 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
 
         for(int toIndex=0;toIndex<numSplits;toIndex++) {
             HollowSetTypeDataElements target = to[toIndex];
-            // retained because these are computed based on max across all shards, splitting has no effect
+            // retained
             target.bitsPerElement = from.bitsPerElement;
             target.emptyBucketValue = from.emptyBucketValue;
             target.bitsPerSetSizeValue = from.bitsPerSetSizeValue;
 
-            // recomputed based on split shards
+            // recomputed
             target.bitsPerSetPointer = 64 - Long.numberOfLeadingZeros(maxShardTotalOfSetBuckets);
             target.totalNumberOfBuckets = shardTotalOfSetBuckets[toIndex];
             target.bitsPerFixedLengthSetPortion = target.bitsPerSetPointer + target.bitsPerSetSizeValue;
-
-            target.setPointerAndSizeData = FixedLengthDataFactory.get(((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion, target.memoryMode, target.memoryRecycler);
-            target.elementData = FixedLengthDataFactory.get(target.totalNumberOfBuckets * target.bitsPerElement, target.memoryMode, target.memoryRecycler);
         }
     }
 
@@ -65,6 +61,12 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
     public void copyRecords() {
         int numSplits = to.length;
         long bucketCounter[] = new long[numSplits];
+
+        for(int toIndex=0;toIndex<numSplits;toIndex++) {
+            HollowSetTypeDataElements target = to[toIndex];
+            target.setPointerAndSizeData = FixedLengthDataFactory.get(((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion, target.memoryMode, target.memoryRecycler);
+            target.elementData = FixedLengthDataFactory.get(target.totalNumberOfBuckets * target.bitsPerElement, target.memoryMode, target.memoryRecycler);
+        }
 
         // count elements per split
         for(int ordinal=0;ordinal<=from.maxOrdinal;ordinal++) {
@@ -79,9 +81,9 @@ public class HollowSetTypeDataElementsSplitter extends AbstractHollowTypeDataEle
             target.copyBucketsFrom(bucketCounter[toIndex], from, startBucket, endBucket);
             bucketCounter[toIndex] += numBuckets;
 
-            target.setPointerAndSizeData.setElementValue((long) toOrdinal * target.bitsPerFixedLengthSetPortion, target.bitsPerSetPointer, bucketCounter[toIndex]);
-            long setSize = from.setPointerAndSizeData.getElementValue((long) (ordinal * from.bitsPerFixedLengthSetPortion) + from.bitsPerSetPointer, from.bitsPerSetSizeValue);
-            target.setPointerAndSizeData.setElementValue((long) (toOrdinal * target.bitsPerFixedLengthSetPortion) + target.bitsPerSetPointer, target.bitsPerSetSizeValue, setSize);
+            target.setPointerAndSizeData.setElementValue((long)toOrdinal * target.bitsPerFixedLengthSetPortion, target.bitsPerSetPointer, bucketCounter[toIndex]);
+            long setSize = from.setPointerAndSizeData.getElementValue((long)(ordinal * from.bitsPerFixedLengthSetPortion) + from.bitsPerSetPointer, from.bitsPerSetSizeValue);
+            target.setPointerAndSizeData.setElementValue((long)(toOrdinal * target.bitsPerFixedLengthSetPortion) + target.bitsPerSetPointer, target.bitsPerSetSizeValue, setSize);
         }
     }
 }

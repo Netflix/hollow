@@ -46,7 +46,7 @@ public class HollowSetTypeDataElementsJoinerTest extends AbstractHollowSetTypeDa
 
         HollowSetTypeReadStateShard joinedShard = new HollowSetTypeReadStateShard();
         joinedShard.setCurrentData(joinedDataElements);
-        typeReadState = new HollowSetTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), 1, new HollowSetTypeReadStateShard[] {joinedShard});
+        typeReadState = new HollowSetTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), new HollowSetTypeReadStateShard[] {joinedShard});
         assertDataUnchanged(typeReadState, setContents);
 
         try {

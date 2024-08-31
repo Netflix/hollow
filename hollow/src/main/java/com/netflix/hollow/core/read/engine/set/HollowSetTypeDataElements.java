@@ -41,7 +41,7 @@ public class HollowSetTypeDataElements extends AbstractHollowTypeDataElements {
     int bitsPerSetPointer;
     int bitsPerSetSizeValue;
     int bitsPerFixedLengthSetPortion;
-    int bitsPerElement;
+    int bitsPerElement = 0;
     int emptyBucketValue;
     long totalNumberOfBuckets;
 
@@ -109,24 +109,25 @@ public class HollowSetTypeDataElements extends AbstractHollowTypeDataElements {
         new HollowSetDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 
+    @Override
     public void destroy() {
         FixedLengthDataFactory.destroy(setPointerAndSizeData, memoryRecycler);
         FixedLengthDataFactory.destroy(elementData, memoryRecycler);
     }
 
-    public long getStartBucket(int ordinal) {
+    long getStartBucket(int ordinal) {
         return ordinal == 0 ? 0 : setPointerAndSizeData.getElementValue((long)(ordinal - 1) * bitsPerFixedLengthSetPortion, bitsPerSetPointer);
     }
 
-    public long getEndBucket(int ordinal) {
+    long getEndBucket(int ordinal) {
         return setPointerAndSizeData.getElementValue((long) ordinal * bitsPerFixedLengthSetPortion, bitsPerSetPointer);
     }
 
-    public int getBucketValue(long absoluteBucketIndex) {
+    int getBucketValue(long absoluteBucketIndex) {
         return (int)elementData.getElementValue(absoluteBucketIndex * bitsPerElement, bitsPerElement);
     }
 
-    public void copyBucketsFrom(long startBucket, HollowSetTypeDataElements src, long srcStartBucket, long srcEndBucket) {
+    void copyBucketsFrom(long startBucket, HollowSetTypeDataElements src, long srcStartBucket, long srcEndBucket) {
         if (bitsPerElement == src.bitsPerElement) {
             // fast path can bulk copy buckets. emptyBucketValue is same since bitsPerElement is same
             long numBuckets = srcEndBucket - srcStartBucket;

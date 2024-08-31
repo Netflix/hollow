@@ -73,9 +73,10 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
         this.shards = shards;
     }
 
-    public HollowListTypeReadState(MemoryMode memoryMode, HollowListSchema schema, int numShards, HollowListTypeReadStateShard[] shards) {
+    HollowListTypeReadState(MemoryMode memoryMode, HollowListSchema schema, HollowListTypeReadStateShard[] shards) {
         super(null, memoryMode, schema);
         this.sampler = new HollowListSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
+        int numShards = shards.length;
         this.shardNumberMask = numShards - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
 

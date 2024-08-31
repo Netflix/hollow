@@ -17,7 +17,7 @@ class HollowMapTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
     }
 
     @Override
-    public void init() {
+    public void initToElements() {
         this.to = new HollowMapTypeDataElements(from[0].memoryMode, from[0].memoryRecycler);
     }
 
@@ -59,14 +59,15 @@ class HollowMapTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
         to.bitsPerMapPointer = 64 - Long.numberOfLeadingZeros(to.totalNumberOfBuckets);
         to.bitsPerFixedLengthMapPortion = to.bitsPerMapSizeValue + to.bitsPerMapPointer;
         to.bitsPerMapEntry = to.bitsPerKeyElement + to.bitsPerValueElement;
-
-        to.mapPointerAndSizeData = FixedLengthDataFactory.get((long)to.bitsPerFixedLengthMapPortion * (to.maxOrdinal + 1), to.memoryMode, to.memoryRecycler);
-        to.entryData = FixedLengthDataFactory.get((long)to.bitsPerMapEntry * to.totalNumberOfBuckets, to.memoryMode, to.memoryRecycler);
     }
 
     @Override
     public void copyRecords() {
         long bucketCounter = 0;
+
+        to.mapPointerAndSizeData = FixedLengthDataFactory.get((long)(to.maxOrdinal + 1) *  to.bitsPerFixedLengthMapPortion, to.memoryMode, to.memoryRecycler);
+        to.entryData = FixedLengthDataFactory.get(to.totalNumberOfBuckets * to.bitsPerMapEntry, to.memoryMode, to.memoryRecycler);
+
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
@@ -82,10 +83,10 @@ class HollowMapTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoin
                 to.copyBucketsFrom(bucketCounter, source, startBucket, endBucket);
                 bucketCounter += numBuckets;
 
-                mapSize = source.mapPointerAndSizeData.getElementValue((long) (fromOrdinal * source.bitsPerFixedLengthMapPortion) + source.bitsPerMapPointer, source.bitsPerMapSizeValue);
+                mapSize = source.mapPointerAndSizeData.getElementValue((long)(fromOrdinal * source.bitsPerFixedLengthMapPortion) + source.bitsPerMapPointer, source.bitsPerMapSizeValue);
             }
-            to.mapPointerAndSizeData.setElementValue( (long) ordinal * to.bitsPerFixedLengthMapPortion, to.bitsPerMapPointer, bucketCounter);
-            to.mapPointerAndSizeData.setElementValue((long) (ordinal * to.bitsPerFixedLengthMapPortion) + to.bitsPerMapPointer, to.bitsPerMapSizeValue, mapSize);
+            to.mapPointerAndSizeData.setElementValue( (long)ordinal * to.bitsPerFixedLengthMapPortion, to.bitsPerMapPointer, bucketCounter);
+            to.mapPointerAndSizeData.setElementValue((long)(ordinal * to.bitsPerFixedLengthMapPortion) + to.bitsPerMapPointer, to.bitsPerMapSizeValue, mapSize);
         }
     }
 }

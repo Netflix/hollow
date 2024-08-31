@@ -3,12 +3,17 @@ package com.netflix.hollow.core.read.engine;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.engine.map.HollowMapTypeDataElements;
+import java.io.IOException;
 
 public abstract class AbstractHollowTypeDataElements {
 
     public int maxOrdinal;
+
     public GapEncodedVariableLengthIntegerReader encodedAdditions;
     public GapEncodedVariableLengthIntegerReader encodedRemovals;
+
     public final ArraySegmentRecycler memoryRecycler;
     public final MemoryMode memoryMode;
 
@@ -16,4 +21,6 @@ public abstract class AbstractHollowTypeDataElements {
         this.memoryMode = memoryMode;
         this.memoryRecycler = memoryRecycler;
     }
+
+    public abstract void destroy();
 }

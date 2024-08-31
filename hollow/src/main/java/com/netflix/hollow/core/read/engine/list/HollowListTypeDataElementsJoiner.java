@@ -17,7 +17,7 @@ class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoi
     }
 
     @Override
-    public void init() {
+    public void initToElements() {
         this.to = new HollowListTypeDataElements(from[0].memoryMode, from[0].memoryRecycler);
     }
 
@@ -44,14 +44,16 @@ class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoi
 
         }
         to.bitsPerListPointer = totalOfListSizes == 0 ? 1 : 64 - Long.numberOfLeadingZeros(totalOfListSizes);
-        to.listPointerData = FixedLengthDataFactory.get((long)to.bitsPerListPointer * (to.maxOrdinal + 1), to.memoryMode, to.memoryRecycler);
-        to.elementData = FixedLengthDataFactory.get((long)to.bitsPerElement * totalOfListSizes, to.memoryMode, to.memoryRecycler);
         to.totalNumberOfElements = totalOfListSizes;
     }
 
     @Override
     public void copyRecords() {
         long elementCounter = 0;
+
+        to.listPointerData = FixedLengthDataFactory.get((long)to.bitsPerListPointer * (to.maxOrdinal + 1), to.memoryMode, to.memoryRecycler);
+        to.elementData = FixedLengthDataFactory.get(to.bitsPerElement * to.totalNumberOfElements, to.memoryMode, to.memoryRecycler);
+
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
@@ -65,7 +67,7 @@ class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoi
                 to.copyElementsFrom(elementCounter, source, startElement, endElement);
                 elementCounter += numElements;
             }
-            to.listPointerData.setElementValue((long) to.bitsPerListPointer * ordinal, to.bitsPerListPointer, elementCounter);
+            to.listPointerData.setElementValue((long)to.bitsPerListPointer * ordinal, to.bitsPerListPointer, elementCounter);
         }
     }
 }

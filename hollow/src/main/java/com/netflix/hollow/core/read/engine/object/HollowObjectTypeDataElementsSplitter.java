@@ -23,7 +23,7 @@ public class HollowObjectTypeDataElementsSplitter extends AbstractHollowTypeData
     }
 
     @Override
-    public void init() {
+    public void initToElements() {
         this.to = new HollowObjectTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
             to[i] = new HollowObjectTypeDataElements(schema, from.memoryMode, from.memoryRecycler);

@@ -38,7 +38,7 @@ import java.io.IOException;
  */
 public class HollowObjectTypeDataElements extends AbstractHollowTypeDataElements {
 
-    public final HollowObjectSchema schema;
+    final HollowObjectSchema schema;
 
     FixedLengthData fixedLengthData;
     final VariableLengthData varLengthData[];
@@ -191,10 +191,11 @@ public class HollowObjectTypeDataElements extends AbstractHollowTypeDataElements
         }
     }
 
-    void applyDelta(HollowObjectTypeDataElements fromData, HollowObjectTypeDataElements deltaData) {
+    public void applyDelta(HollowObjectTypeDataElements fromData, HollowObjectTypeDataElements deltaData) {
         new HollowObjectDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 
+    @Override
     public void destroy() {
         FixedLengthDataFactory.destroy(fixedLengthData, memoryRecycler);
         for(int i=0;i<varLengthData.length;i++) {

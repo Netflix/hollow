@@ -38,7 +38,7 @@ public class HollowListTypeDataElements extends AbstractHollowTypeDataElements {
     FixedLengthData elementData;
 
     int bitsPerListPointer;
-    int bitsPerElement;
+    int bitsPerElement = 0;
     long totalNumberOfElements = 0;
 
     public HollowListTypeDataElements(ArraySegmentRecycler memoryRecycler) {
@@ -101,20 +101,21 @@ public class HollowListTypeDataElements extends AbstractHollowTypeDataElements {
         new HollowListDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 
+    @Override
     public void destroy() {
         FixedLengthDataFactory.destroy(listPointerData, memoryRecycler);
         FixedLengthDataFactory.destroy(elementData, memoryRecycler);
     }
 
-    public long getStartElement(int ordinal) {
-        return ordinal == 0 ? 0 : listPointerData.getElementValue(((long) (ordinal-1) * bitsPerListPointer), bitsPerListPointer);
+    long getStartElement(int ordinal) {
+        return ordinal == 0 ? 0 : listPointerData.getElementValue(((long)(ordinal-1) * bitsPerListPointer), bitsPerListPointer);
     }
 
-    public long getEndElement(int ordinal) {
+    long getEndElement(int ordinal) {
         return listPointerData.getElementValue((long)ordinal * bitsPerListPointer, bitsPerListPointer);
     }
 
-    public void copyElementsFrom(long startElement, HollowListTypeDataElements src, long srcStartElement, long srcEndElement) {
+    void copyElementsFrom(long startElement, HollowListTypeDataElements src, long srcStartElement, long srcEndElement) {
         if (bitsPerElement == src.bitsPerElement) {
             // fast path can bulk copy elements
             long numElements = srcEndElement - srcStartElement;

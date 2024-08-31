@@ -16,7 +16,7 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
     }
 
     @Override
-    public void init() {
+    public void initToElements() {
         this.to = new HollowListTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
             to[i] = new HollowListTypeDataElements(from.memoryMode, from.memoryRecycler);
@@ -47,12 +47,8 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
 
         for(int toIndex=0;toIndex<numSplits;toIndex++) {
             HollowListTypeDataElements target = to[toIndex];
-            target.bitsPerElement = from.bitsPerElement;   // retained: it's the max across all shards in type, so splitting has no effect
+            target.bitsPerElement = from.bitsPerElement;   // retained
             target.bitsPerListPointer = maxShardTotalOfListSizes == 0 ? 1 : 64 - Long.numberOfLeadingZeros(maxShardTotalOfListSizes);
-
-            target.listPointerData = FixedLengthDataFactory.get((long)target.bitsPerListPointer * (target.maxOrdinal + 1), target.memoryMode, target.memoryRecycler);
-            target.elementData = FixedLengthDataFactory.get(target.bitsPerElement * totalOfListSizes[toIndex], target.memoryMode, target.memoryRecycler);
-
             target.totalNumberOfElements = totalOfListSizes[toIndex];  // useful for heap usage stats
         }
     }
@@ -61,6 +57,12 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
     public void copyRecords() {
         int numSplits = to.length;
         long elementCounter[] = new long[numSplits];
+
+        for(int toIndex=0;toIndex<numSplits;toIndex++) {
+            HollowListTypeDataElements target = to[toIndex];
+            target.listPointerData = FixedLengthDataFactory.get((long)target.bitsPerListPointer * (target.maxOrdinal + 1), target.memoryMode, target.memoryRecycler);
+            target.elementData = FixedLengthDataFactory.get(target.bitsPerElement * target.totalNumberOfElements, target.memoryMode, target.memoryRecycler);
+        }
 
         // count elements per split
         for(int ordinal=0;ordinal<=from.maxOrdinal;ordinal++) {
@@ -75,7 +77,7 @@ public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataEl
             target.copyElementsFrom(elementCounter[toIndex], from, startElement, endElement);
             elementCounter[toIndex] += numElements;
 
-            target.listPointerData.setElementValue((long) target.bitsPerListPointer * toOrdinal, target.bitsPerListPointer, elementCounter[toIndex]);
+            target.listPointerData.setElementValue((long)target.bitsPerListPointer * toOrdinal, target.bitsPerListPointer, elementCounter[toIndex]);
         }
     }
 }

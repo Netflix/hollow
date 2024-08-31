@@ -39,7 +39,7 @@ public class VMSHollowMapTypeDataElementsSplitJoinTest extends AbstractHollowMap
                 HollowMapTypeReadStateShard joinedShard = new HollowMapTypeReadStateShard();
                 joinedShard.setCurrentData(joinedElements);
 
-                HollowMapTypeReadState resultTypeReadState = new HollowMapTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), 1, new HollowMapTypeReadStateShard[] {joinedShard});
+                HollowMapTypeReadState resultTypeReadState = new HollowMapTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), new HollowMapTypeReadStateShard[] {joinedShard});
 
                 assertDataUnchanged(resultTypeReadState, maps);
                 assertChecksumUnchanged(resultTypeReadState, typeReadState, typeReadState.getPopulatedOrdinals());
@@ -106,7 +106,7 @@ public class VMSHollowMapTypeDataElementsSplitJoinTest extends AbstractHollowMap
 
                 HollowMapTypeReadStateShard joinedShard = new HollowMapTypeReadStateShard();
                 joinedShard.setCurrentData(joinedElements);
-                HollowMapTypeReadState resultTypeState = new HollowMapTypeReadState(MemoryMode.ON_HEAP, typeState.getSchema(), 1, new HollowMapTypeReadStateShard[]{joinedShard});
+                HollowMapTypeReadState resultTypeState = new HollowMapTypeReadState(MemoryMode.ON_HEAP, typeState.getSchema(), new HollowMapTypeReadStateShard[]{joinedShard});
 
                 assertChecksumUnchanged(resultTypeState, typeState, typeState.getPopulatedOrdinals());
 

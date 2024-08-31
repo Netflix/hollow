@@ -44,7 +44,7 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
 
         HollowMapTypeReadStateShard joinedShard = new HollowMapTypeReadStateShard();
         joinedShard.setCurrentData(joinedDataElements);
-        typeReadState = new HollowMapTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), 1, new HollowMapTypeReadStateShard[] {joinedShard});
+        typeReadState = new HollowMapTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), new HollowMapTypeReadStateShard[] {joinedShard});
         assertDataUnchanged(typeReadState, maps);
 
         try {

@@ -26,7 +26,7 @@ class HollowObjectTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJ
     }
 
     @Override
-    public void init() {
+    public void initToElements() {
         this.to = new HollowObjectTypeDataElements(schema, from[0].memoryMode, from[0].memoryRecycler);
     }
 
@@ -68,7 +68,6 @@ class HollowObjectTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJ
             to.bitOffsetPerField[fieldIdx] = to.bitsPerRecord;
             to.bitsPerRecord += to.bitsPerField[fieldIdx];
         }
-        to.fixedLengthData = FixedLengthDataFactory.get((long)to.bitsPerRecord * (to.maxOrdinal + 1), to.memoryMode, to.memoryRecycler);
 
         // unused
         //  to.bitsPerUnfilteredField
@@ -79,6 +78,8 @@ class HollowObjectTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJ
     public void copyRecords() {
         long[] currentWriteVarLengthDataPointers = new long[from[0].schema.numFields()];
 
+        to.fixedLengthData = FixedLengthDataFactory.get((long)to.bitsPerRecord * (to.maxOrdinal + 1), to.memoryMode, to.memoryRecycler);
+
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
@@ -86,7 +87,7 @@ class HollowObjectTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJ
             if (fromOrdinal <= from[fromIndex].maxOrdinal) {
                 copyRecord(to, ordinal, from[fromIndex], fromOrdinal, currentWriteVarLengthDataPointers);
             } else {
-                // lopsided shards could result for consumers that skip type shards with no additions
+                // handle lopsided shards that could result from e.g. consumers skipping type shards with no additions
                 writeNullRecord(to, ordinal, currentWriteVarLengthDataPointers);
             }
         }

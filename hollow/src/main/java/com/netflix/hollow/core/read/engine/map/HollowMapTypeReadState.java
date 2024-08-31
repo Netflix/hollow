@@ -85,9 +85,10 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         
     }
 
-    public HollowMapTypeReadState(MemoryMode memoryMode, HollowMapSchema schema, int numShards, HollowMapTypeReadStateShard[] shards) {
+    HollowMapTypeReadState(MemoryMode memoryMode, HollowMapSchema schema, HollowMapTypeReadStateShard[] shards) {
         super(null, memoryMode, schema);
         this.sampler = new HollowMapSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
+        int numShards = shards.length;
         this.shardNumberMask = numShards - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
 

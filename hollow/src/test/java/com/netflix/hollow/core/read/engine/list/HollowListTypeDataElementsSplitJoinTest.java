@@ -42,7 +42,7 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
                 HollowListTypeReadStateShard joinedShard = new HollowListTypeReadStateShard();
                 joinedShard.setCurrentData(joinedElements);
 
-                HollowListTypeReadState resultTypeReadState = new HollowListTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), 1, new HollowListTypeReadStateShard[] {joinedShard});
+                HollowListTypeReadState resultTypeReadState = new HollowListTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), new HollowListTypeReadStateShard[] {joinedShard});
 
                 assertDataUnchanged(resultTypeReadState, listContents);
                 assertChecksumUnchanged(resultTypeReadState, typeReadState, typeReadState.getPopulatedOrdinals());
@@ -101,7 +101,7 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
                 HollowListTypeReadStateShard joinedShard = new HollowListTypeReadStateShard();
                 joinedShard.setCurrentData(joinedElements);
 
-                HollowListTypeReadState resultTypeState = new HollowListTypeReadState(MemoryMode.ON_HEAP, typeState.getSchema(), 1, new HollowListTypeReadStateShard[]{joinedShard});
+                HollowListTypeReadState resultTypeState = new HollowListTypeReadState(MemoryMode.ON_HEAP, typeState.getSchema(), new HollowListTypeReadStateShard[]{joinedShard});
 
                 assertChecksumUnchanged(resultTypeState, typeState, typeState.getPopulatedOrdinals());
 

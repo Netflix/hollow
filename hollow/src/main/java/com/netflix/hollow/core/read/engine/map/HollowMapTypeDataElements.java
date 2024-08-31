@@ -40,9 +40,9 @@ public class HollowMapTypeDataElements extends AbstractHollowTypeDataElements {
     int bitsPerMapPointer;
     int bitsPerMapSizeValue;
     int bitsPerFixedLengthMapPortion;
-    int bitsPerKeyElement;
-    int bitsPerValueElement;
-    int bitsPerMapEntry;
+    int bitsPerKeyElement = 0;
+    int bitsPerValueElement = 0;
+    int bitsPerMapEntry = 0;
     int emptyBucketKeyValue;
     long totalNumberOfBuckets;
 
@@ -113,16 +113,17 @@ public class HollowMapTypeDataElements extends AbstractHollowTypeDataElements {
         new HollowMapDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 
+    @Override
     public void destroy() {
         FixedLengthDataFactory.destroy(mapPointerAndSizeData, memoryRecycler);
         FixedLengthDataFactory.destroy(entryData, memoryRecycler);
     }
 
-    public long getStartBucket(int ordinal) {
+    long getStartBucket(int ordinal) {
         return ordinal == 0 ? 0 : mapPointerAndSizeData.getElementValue((long)(ordinal - 1) * bitsPerFixedLengthMapPortion, bitsPerMapPointer);
     }
 
-    public long getEndBucket(int ordinal) {
+    long getEndBucket(int ordinal) {
         return mapPointerAndSizeData.getElementValue((long)ordinal * bitsPerFixedLengthMapPortion, bitsPerMapPointer);
     }
 
@@ -134,7 +135,7 @@ public class HollowMapTypeDataElements extends AbstractHollowTypeDataElements {
         return (int)entryData.getElementValue((absoluteBucketIndex * bitsPerMapEntry) + bitsPerKeyElement, bitsPerValueElement);
     }
 
-    public void copyBucketsFrom(long startBucket, HollowMapTypeDataElements src, long srcStartBucket, long srcEndBucket) {
+    void copyBucketsFrom(long startBucket, HollowMapTypeDataElements src, long srcStartBucket, long srcEndBucket) {
         if (bitsPerKeyElement == src.bitsPerKeyElement && bitsPerValueElement == src.bitsPerValueElement) {
             // fast path can bulk copy buckets. emptyBucketKeyValue is same since bitsPerKeyElement is the same
             long numBuckets = srcEndBucket - srcStartBucket;
