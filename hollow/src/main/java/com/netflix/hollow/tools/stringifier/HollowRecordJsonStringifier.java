@@ -409,10 +409,94 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
         }
     }
 
+    private final static long CHARS2DETECT =
+            (0x22L << (2*17)) |     // " DQ
+            (0x5cL << 17) |         // \ RS
+            0x1fL;                  // < 0x20 (non-print)
+    private final static long CAT_DQ = 1L << (3*17 - 1);
+    private final static long CAT_RS = 1L << (2*17 - 1);
+    private final static long CAT_NP = 1L << (17 - 1);
+    private final static long CATEGORY_BITS_MASK = CAT_DQ | CAT_RS | CAT_NP;
+    private final static long DETECT_MASK = ~CHARS2DETECT & ~CATEGORY_BITS_MASK;
+    private final static long DUP3TIMES_WITH_CAT_BIT= 1 | (1 << 17) | (1L << (17*2));
+    private final static long CAUSE_CARRY = 0x20 | (1 << 17) | (1L << (17*2));
+
+    /**
+     * Returns the category (CAT_*) of ch8 - non-carry bits are garbage
+     *
+     * Works by making 3 copies of the character every 17 bits leaving a "carry" bit
+     * to hold the category in front of each copy.  When detecting a specific char,
+     * the xor mask is the 1's complement of the char to detect, which will set the
+     * test char to 0xffff when it matches.  Adding 1 to the 0xffff will clear 0xffff to 0,
+     * and "carry" over into the category bit recording the test character was detected.
+     * (e.g, 0x5c ^ 0xffa3 + 1 = 0x10000).  Detecting < 0x20 is detecting just the upper
+     * 11 bits are 0 so, 0x20 is added instead of 1 (e.g., 0x0a ^ ffe0 + 0x20 = 0x1000a).
+     */
+    private static long categorize(char ch) {
+        long cat = ch * DUP3TIMES_WITH_CAT_BIT;
+
+        cat ^= DETECT_MASK;
+        cat += CAUSE_CARRY;
+
+        return cat;
+}
+
+    /**
+     * Returns the categories found in str (or of CAT_*)
+     */
+    private static long categorize(String string) {
+        int len = string.length();
+        long cat = 0;
+
+        for(int i = 0; i < len ; i++) {
+                cat = cat | categorize(string.charAt(i));
+        }
+        return cat & CATEGORY_BITS_MASK;
+}
+
+    /**
+     * Escapes the NP characters in str (eg. \n becomes \u000a)
+     */
+    private String escapeNP(String str) {
+        int len = str.length();
+        StringBuilder sb = new StringBuilder(2*len);
+
+        for (int i = 0; i < len; i += 1) {
+            char c = str.charAt(i);
+
+            if (c < 0x10)
+                sb.append("\\u000" + Integer.toHexString(c));
+            else if (c < 0x20)
+                sb.append("\\u00" + Integer.toHexString(c));
+            else
+                sb.append(c);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Escapes JSON's invalid string characters in str
+     * Works by categorizing the characters in str and then only
+     * escaping the characters based on the categories recorded.
+     */
     private String escapeString(String str) {
-        if (str.indexOf('\\') == -1 && str.indexOf('\"') == -1)
+        long cat = categorize(str);
+
+        if (cat == 0) {
             return str;
-        return str.replace("\\", "\\\\").replace("\"", "\\\"");
+        }
+
+        /* Replace reverse solidus first since subsequent substitutions add more */
+        if ((cat & CAT_RS) != 0) {
+            str = str.replace("\\","\\\\");
+        }
+        if ((cat & CAT_DQ) != 0) {
+            str = str.replace("\"","\\\"");
+        }
+        if ((cat & CAT_NP) != 0) {
+            return escapeNP(str);
+        }
+        return str;
     }
 
     private void appendIndentation(Writer writer, int indentation) throws IOException {
