@@ -29,7 +29,9 @@ import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.read.engine.ShardsHolder;
 import com.netflix.hollow.core.read.engine.SnapshotPopulatedOrdinalsReader;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
@@ -52,6 +54,29 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     final HollowListTypeReadStateShard shards[];
     
     private int maxOrdinal;
+
+    // SNAP: TODO: move shards holder and shards volatile here
+    class ListTypeShardsHolder extends ShardsHolder {
+        @Override
+        public HollowTypeReadStateShard[] getShards() {
+            throw new UnsupportedOperationException("Not implemented yet");
+        }
+
+        @Override
+        public int getShardNumberMask() {
+            throw new UnsupportedOperationException("Not implemented yet");
+        }
+    }
+
+    @Override
+    public void setShardsVolatile(ShardsHolder newShardsVolatile) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public ShardsHolder getShardsVolatile() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 
     public HollowListTypeReadState(HollowReadStateEngine stateEngine, HollowListSchema schema, int numShards) {
         this(stateEngine, MemoryMode.ON_HEAP, schema, numShards);
@@ -278,6 +303,5 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     @Override
     public int numShards() {
         return shards.length;
-    }
-
+    }   // SNAP: TODO: move to abstract?
 }

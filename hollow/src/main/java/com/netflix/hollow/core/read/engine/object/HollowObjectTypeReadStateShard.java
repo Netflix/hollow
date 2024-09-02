@@ -21,6 +21,8 @@ import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElements;
+import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
@@ -30,13 +32,23 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 
-class HollowObjectTypeReadStateShard {
+public class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
+
+    private final HollowObjectSchema schema;
     final HollowObjectTypeDataElements dataElements;
     final int shardOrdinalShift;
 
-    private final HollowObjectSchema schema;
+    @Override
+    public HollowObjectTypeDataElements getDataElements() {
+        return dataElements;
+    }
 
-    HollowObjectTypeReadStateShard(HollowObjectSchema schema, HollowObjectTypeDataElements dataElements, int shardOrdinalShift) {
+    @Override
+    public int getShardOrdinalShift() {
+        return shardOrdinalShift;
+    }
+
+    public HollowObjectTypeReadStateShard(HollowObjectSchema schema, HollowObjectTypeDataElements dataElements, int shardOrdinalShift) {
         this.schema = schema;
         this.shardOrdinalShift = shardOrdinalShift;
         this.dataElements = dataElements;

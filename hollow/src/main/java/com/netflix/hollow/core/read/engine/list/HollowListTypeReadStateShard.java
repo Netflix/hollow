@@ -19,12 +19,13 @@ package com.netflix.hollow.core.read.engine.list;
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
+import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.util.BitSet;
 
-class HollowListTypeReadStateShard {
+public class HollowListTypeReadStateShard { // SNAP: TODO: extends HollowTypeReadStateShard {
 
-    private volatile HollowListTypeDataElements currentDataVolatile;
+    HollowListTypeDataElements currentDataVolatile; // SNAP: TODO: make final
 
     public int getElementOrdinal(int ordinal, int listIndex) {
         HollowListTypeDataElements currentData;

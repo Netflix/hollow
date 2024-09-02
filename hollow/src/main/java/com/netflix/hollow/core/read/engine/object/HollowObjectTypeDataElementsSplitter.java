@@ -17,7 +17,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class HollowObjectTypeDataElementsSplitter extends AbstractHollowTypeDataElementsSplitter<HollowObjectTypeDataElements> {
     private HollowObjectSchema schema;
 
-    HollowObjectTypeDataElementsSplitter(HollowObjectTypeDataElements from, int numSplits) {
+    public HollowObjectTypeDataElementsSplitter(HollowObjectTypeDataElements from, int numSplits) {
         super(from, numSplits);
         this.schema = from.schema;
     }

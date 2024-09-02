@@ -34,7 +34,9 @@ import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.read.engine.ShardsHolder;
 import com.netflix.hollow.core.read.engine.SnapshotPopulatedOrdinalsReader;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.iterator.EmptyOrdinalIterator;
@@ -64,6 +66,28 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
     private HollowPrimaryKeyValueDeriver keyDeriver;
     
     private int maxOrdinal;
+
+    class SetTypeShardsHolder extends ShardsHolder {
+        @Override
+        public HollowTypeReadStateShard[] getShards() {
+            throw new UnsupportedOperationException("Not implemented yet");
+        }
+
+        @Override
+        public int getShardNumberMask() {
+            throw new UnsupportedOperationException("Not implemented yet");
+        }
+    }
+
+    @Override
+    public void setShardsVolatile(ShardsHolder newShardsVolatile) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public ShardsHolder getShardsVolatile() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 
     public HollowSetTypeReadState(HollowReadStateEngine stateEngine, HollowSetSchema schema, int numShards) {
         this(stateEngine, MemoryMode.ON_HEAP, schema, numShards);

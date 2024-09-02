@@ -16,7 +16,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  * The original data elements are not destroyed.
  * The no. of passed data elements must be a power of 2.
  */
-class HollowObjectTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoiner<HollowObjectTypeDataElements> {
+public class HollowObjectTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoiner<HollowObjectTypeDataElements> {
 
     private HollowObjectSchema schema;
 
