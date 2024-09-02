@@ -16,7 +16,7 @@ public abstract class AbstractHollowTypeDataElementsSplitter<T extends AbstractH
 
     public T[] to;
 
-    public AbstractHollowTypeDataElementsSplitter(T from, int numSplits) {  // SNAP: TODO: does this allow releasing old splits?
+    public AbstractHollowTypeDataElementsSplitter(T from, int numSplits) {
         this.from = from;
         this.numSplits = numSplits;
         this.toMask = numSplits - 1;

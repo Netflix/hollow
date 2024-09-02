@@ -18,6 +18,17 @@ public abstract class AbstractHollowTypeDataElementsJoiner <T extends AbstractHo
             throw new IllegalStateException("No. of DataElements to be joined must be a power of 2");
         }
 
+        for (int i=0;i<from.length;i++) {
+            if (from[i].maxOrdinal == -1) {
+                continue;
+            }
+            if (from[i].maxOrdinal > (1<<29)
+             || from[i].maxOrdinal != 0 && (from.length > (1<<29)/from[i].maxOrdinal)
+             || from[i].maxOrdinal * from.length + i > (1<<29)) {
+                throw new IllegalArgumentException("Too large to join, maxOrdinal would exceed 2<<29");
+            }
+        }
+
         for (AbstractHollowTypeDataElements elements : from) {
             if (elements.encodedAdditions != null) {
                 throw new IllegalStateException("Encountered encodedAdditions in data elements joiner- this is not expected " +
@@ -25,8 +36,6 @@ public abstract class AbstractHollowTypeDataElementsJoiner <T extends AbstractHo
                         "delta data elements are never split/joined");
             }
         }
-
-        // SNAP: TODO: should support a "too large to join" when joined ordinals will overflow
     }
 
     public T join() {
