@@ -6,7 +6,7 @@ import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataEle
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
-import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsJoiner;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElementsJoiner;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 
@@ -16,7 +16,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  * The original data elements are not destroyed.
  * The no. of passed data elements must be a power of 2.
  */
-public class HollowObjectTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoiner<HollowObjectTypeDataElements> {
+public class HollowObjectTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<HollowObjectTypeDataElements> {
 
     private HollowObjectSchema schema;
 

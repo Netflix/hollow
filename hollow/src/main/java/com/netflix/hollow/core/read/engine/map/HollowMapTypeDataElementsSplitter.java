@@ -2,7 +2,7 @@ package com.netflix.hollow.core.read.engine.map;
 
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
-import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitter;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElementsSplitter;
 
 /**
  * Split a {@code HollowMapTypeDataElements} into multiple {@code HollowMapTypeDataElements}s.
@@ -10,7 +10,7 @@ import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitte
  * The original data elements are not destroyed.
  * {@code numSplits} must be a power of 2.
  */
-public class HollowMapTypeDataElementsSplitter extends AbstractHollowTypeDataElementsSplitter<HollowMapTypeDataElements> {
+public class HollowMapTypeDataElementsSplitter extends HollowTypeDataElementsSplitter<HollowMapTypeDataElements> {
 
     public HollowMapTypeDataElementsSplitter(HollowMapTypeDataElements from, int numSplits) {
         super(from, numSplits);

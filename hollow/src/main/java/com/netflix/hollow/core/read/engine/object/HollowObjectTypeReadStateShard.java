@@ -21,7 +21,6 @@ import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
-import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElements;
 import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;

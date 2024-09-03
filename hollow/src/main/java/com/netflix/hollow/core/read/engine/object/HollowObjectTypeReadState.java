@@ -31,9 +31,9 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
-import com.netflix.hollow.core.read.engine.ShardsHolder;
 import com.netflix.hollow.core.read.engine.SnapshotPopulatedOrdinalsReader;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -55,13 +55,13 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     volatile ObjectTypeShardsHolder shardsVolatile;
 
     @Override
-    public ShardsHolder getShardsVolatile() {
+    public ObjectTypeShardsHolder getShardsVolatile() {
         return shardsVolatile;
     }
 
     @Override
-    public void setShardsVolatile(ShardsHolder newShardsVolatile) {
-        this.shardsVolatile = (ObjectTypeShardsHolder) newShardsVolatile;
+    public void updateShardsVolatile(HollowTypeReadStateShard[] shards) {
+        this.shardsVolatile = new ObjectTypeShardsHolder(shards);
     }
 
     public HollowObjectTypeReadState(HollowReadStateEngine fileEngine, MemoryMode memoryMode, HollowObjectSchema schema, HollowObjectSchema unfilteredSchema) {

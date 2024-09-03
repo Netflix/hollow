@@ -26,6 +26,7 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -69,12 +70,23 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     }
 
     @Override
-    public void setShardsVolatile(ShardsHolder newShardsVolatile) {
+    public ShardsHolder getShardsVolatile() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
-    public ShardsHolder getShardsVolatile() {
+    public HollowTypeDataElements[] createTypeDataElements(int len) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public HollowTypeReadStateShard createTypeReadStateShard(HollowSchema schema, HollowTypeDataElements dataElements, int shardOrdinalShift) {
+        // schema unused
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public void updateShardsVolatile(HollowTypeReadStateShard[] shards) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

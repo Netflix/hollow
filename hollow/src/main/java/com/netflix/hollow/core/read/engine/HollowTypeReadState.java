@@ -28,9 +28,6 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElementsJoiner;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElementsSplitter;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadStateShard;
-import com.netflix.hollow.core.read.engine.object.ObjectTypeShardsHolder;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
@@ -42,7 +39,7 @@ import java.util.stream.Stream;
  * A HollowTypeReadState contains and is the root handle to all the records of a specific type in
  * a {@link HollowReadStateEngine}.
  */
-public abstract class HollowTypeReadState implements HollowTypeDataAccess {  // SNAP: Cant add generic here
+public abstract class HollowTypeReadState implements HollowTypeDataAccess, HollowTypeReshardingStrategy {
 
     protected static final HollowTypeStateListener[] EMPTY_LISTENERS = new HollowTypeStateListener[0];
 
@@ -92,13 +89,13 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {  // 
      * @param listenerClazz the listener class
      * @return a {@link HollowTypeStateListener} of the specified class currently associated with this type, or
      * null if none is currently attached.
-     * @param <L> the type of the listener
+     * @param <T> the type of the listener
      */
     @SuppressWarnings("unchecked")
-    public <L extends HollowTypeStateListener> L getListener(Class<L> listenerClazz) {
+    public <T extends HollowTypeStateListener> T getListener(Class<T> listenerClazz) {
         for (HollowTypeStateListener listener : stateListeners) {
             if (listenerClazz.isAssignableFrom(listener.getClass())) {
-                return (L) listener;
+                return (T) listener;
             }
         }
         return null;
@@ -134,10 +131,6 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {  // 
     public abstract void readSnapshot(HollowBlobInput in, ArraySegmentRecycler recycler, int numShards) throws IOException;
 
     public abstract void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException;
-
-    protected boolean shouldReshard(int currNumShards, int deltaNumShards) {
-        return currNumShards!=0 && deltaNumShards!=0 && currNumShards!=deltaNumShards;
-    }
 
     public HollowSchema getSchema() {
         return schema;
@@ -214,9 +207,9 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {  // 
      */
     public abstract int numShards();
 
-    public abstract <T extends ShardsHolder> T getShardsVolatile();
-
-    public abstract void setShardsVolatile(ShardsHolder newShardsVolatile);
+    protected boolean shouldReshard(int currNumShards, int deltaNumShards) {
+        return currNumShards!=0 && deltaNumShards!=0 && currNumShards!=deltaNumShards;
+    }
 
     /**
      * Reshards this type state to the desired shard count using O(shard size) space while supporting concurrent reads
@@ -227,7 +220,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {  // 
     public void reshard(int newNumShards) {
         int prevNumShards = getShardsVolatile().getShards().length;    // SNAP: TODO: or .shards.length
         int shardingFactor = shardingFactor(prevNumShards, newNumShards);
-        HollowObjectTypeDataElements[] newDataElements;
+        HollowTypeDataElements[] newDataElements;
         int[] shardOrdinalShifts;
 
         try {
@@ -241,16 +234,16 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {  // 
                 // This is an atomic update to shardsVolatile: full construction happens-before the store to shardsVolatile,
                 // in other words a fully constructed object as visible to this thread will be visible to other threads that
                 // load the new shardsVolatile.
-                setShardsVolatile(expandWithOriginalDataElements(getShardsVolatile(), shardingFactor));
+                updateShardsVolatile(expandWithOriginalDataElements(getShardsVolatile(), shardingFactor));
 
                 // Step 2: Split each original data element into N child data elements where N is the sharding factor.
                 // Then update each of the N child shards with the respective split of data element, this will be
                 // sufficient to serve all reads into this shard. Once all child shards for a pre-split parent
                 // shard have been assigned the split data elements, the parent data elements can be discarded.
                 for (int i = 0; i < prevNumShards; i++) {
-                    AbstractHollowTypeDataElements originalDataElements = getShardsVolatile().getShards()[i].getDataElements();
+                    HollowTypeDataElements originalDataElements = getShardsVolatile().getShards()[i].getDataElements();
 
-                    setShardsVolatile(splitDataElementsForOneShard(getShardsVolatile(), i, prevNumShards, shardingFactor));
+                    updateShardsVolatile(splitDataElementsForOneShard(getShardsVolatile(), i, prevNumShards, shardingFactor));
 
                     destroyOriginalDataElements(originalDataElements);
                 }
@@ -265,9 +258,9 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {  // 
                 //         will help these reads land at the right ordinal in the joined shard. When all N old shards
                 //         corresponding to one new shard have been updated, the N pre-join data elements can be destroyed.
                 for (int i = 0; i < newNumShards; i++) {
-                    AbstractHollowTypeDataElements destroyCandidates[] = joinCandidates(getShardsVolatile().getShards(), i, shardingFactor);
+                    HollowTypeDataElements destroyCandidates[] = joinCandidates(getShardsVolatile().getShards(), i, shardingFactor);
 
-                    setShardsVolatile(joinDataElementsForOneShard(getShardsVolatile(), i, shardingFactor));  // atomic update to shardsVolatile
+                    updateShardsVolatile(joinDataElementsForOneShard(getShardsVolatile(), i, shardingFactor));  // atomic update to shardsVolatile
 
                     for (int j = 0; j < shardingFactor; j++) {
                         destroyOriginalDataElements(destroyCandidates[j]);
@@ -275,22 +268,17 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {  // 
                 }
 
                 // Step 2: Resize the shards array to only keep the first newNumShards shards.
-                newDataElements = new HollowObjectTypeDataElements[getShardsVolatile().getShards().length];
+                newDataElements = createTypeDataElements(getShardsVolatile().getShards().length);
                 shardOrdinalShifts = new int[getShardsVolatile().getShards().length];
-                copyShardElements(getShardsVolatile(), newDataElements, shardOrdinalShifts);
+                copyShardDataElements(getShardsVolatile(), newDataElements, shardOrdinalShifts);
 
                 HollowTypeReadStateShard[] newShards = Arrays.copyOfRange(getShardsVolatile().getShards(), 0, newNumShards);
-                if (this instanceof HollowObjectTypeReadState) {
-                    setShardsVolatile(new ObjectTypeShardsHolder((HollowObjectTypeReadStateShard[]) newShards));
-                } else if (this instanceof HollowListTypeReadState) {
-                    // newShards[currentIndex + (newNumShards*i)] = new HollowListTypeReadStateShard(joined, newShardOrdinalShift);
-                    throw new UnsupportedOperationException("Not yet implemented");
-                }
+                updateShardsVolatile(newShards);
                 // setShardsVolatile(   // SNAP: TODO: constructor has HollowObjectTypeReadStateShard[] parameter
                 //         getShardsVolatile().getClass().getConstructor(HollowTypeReadStateShard[].class).newInstance(
                 //                 newShards
                 //         )
-                //); // SNAP: TODO: is this better addressed with a factor method in the interface, or by switching over to an abstract class?
+                //); // SNAP: TODO: is this better addressed with a factory method in the interface, or by switching over to an abstract class?
                 // SNAP: TODO: can do generics with reflective constructor invocation here, or create an abstract method reassignShardsHolder(), or check instanceOf or assignableFrom
 
                 // Re-sharding done.
@@ -320,55 +308,47 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {  // 
         return dividend / divisor;
     }
 
-    private void copyShardElements(ShardsHolder from, AbstractHollowTypeDataElements[] newDataElements, int[] shardOrdinalShifts) {
+    private void copyShardDataElements(ShardsHolder from, HollowTypeDataElements[] newDataElements, int[] shardOrdinalShifts) {
         for (int i=0; i<from.getShards().length; i++) {
             newDataElements[i] = from.getShards()[i].getDataElements();
             shardOrdinalShifts[i] = from.getShards()[i].getShardOrdinalShift();
         }
     }
 
-    private AbstractHollowTypeDataElements[] joinCandidates(HollowTypeReadStateShard[] shards, int indexIntoShards, int shardingFactor) {
-        AbstractHollowTypeDataElements[] result = new HollowObjectTypeDataElements[shardingFactor];
+    private HollowTypeDataElements[] joinCandidates(HollowTypeReadStateShard[] shards, int indexIntoShards, int shardingFactor) {
+        HollowTypeDataElements[] result = createTypeDataElements(shardingFactor);
         int newNumShards = shards.length / shardingFactor;
         for (int i=0; i<shardingFactor; i++) {
             result[i] = shards[indexIntoShards + (newNumShards*i)].getDataElements();
-        };
+        }
         return result;
     }
 
-    public ShardsHolder joinDataElementsForOneShard(ShardsHolder shardsHolder, int currentIndex, int shardingFactor) throws Exception {
+    public HollowTypeReadStateShard[] joinDataElementsForOneShard(ShardsHolder shardsHolder, int currentIndex, int shardingFactor) {
         int newNumShards = shardsHolder.getShards().length / shardingFactor;
         int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newNumShards);
 
-        AbstractHollowTypeDataElements[] joinCandidates = joinCandidates(shardsHolder.getShards(), currentIndex, shardingFactor);
+        HollowTypeDataElements[] joinCandidates = joinCandidates(shardsHolder.getShards(), currentIndex, shardingFactor);
 
         // SNAP: TODO: a better way
-        AbstractHollowTypeDataElementsJoiner joiner = null;
+        HollowTypeDataElementsJoiner joiner = null;
         if (this instanceof HollowObjectTypeReadState) {
             joiner = new HollowObjectTypeDataElementsJoiner((HollowObjectTypeDataElements[]) joinCandidates);
         } else if (this instanceof HollowListTypeReadState) {
             // newShards[currentIndex + (newNumShards*i)] = new HollowListTypeReadStateShard(joined, newShardOrdinalShift);
             throw new UnsupportedOperationException("Not yet implemented");
         }
-        AbstractHollowTypeDataElements joined = joiner.join();
+        HollowTypeDataElements joined = joiner.join();
 
         HollowTypeReadStateShard[] newShards = Arrays.copyOf(shardsHolder.getShards(), shardsHolder.getShards().length);
         for (int i=0; i<shardingFactor; i++) {
-            if (this instanceof HollowObjectTypeReadState) {
-                newShards[currentIndex + (newNumShards*i)] = new HollowObjectTypeReadStateShard((HollowObjectSchema) getSchema(), (HollowObjectTypeDataElements) joined, newShardOrdinalShift);
-            } else if (this instanceof HollowListTypeReadState) {
-                // newShards[currentIndex + (newNumShards*i)] = new HollowListTypeReadStateShard(joined, newShardOrdinalShift);
-                throw new UnsupportedOperationException("Not yet implemented");
-            }
-
+            newShards[currentIndex + (newNumShards*i)] = createTypeReadStateShard(schema, joined, newShardOrdinalShift);
         }
 
-        return new ObjectTypeShardsHolder((HollowObjectTypeReadStateShard[]) newShards);
-        // SNAP: TODO: update enclosing class? may have to move shardsHolder out
-        // return shardsHolder.getClass().getConstructor(HollowTypeReadStateShard[].class).newInstance(newShards);
+        return newShards;
     }
 
-    public ShardsHolder expandWithOriginalDataElements(ShardsHolder shardsHolder, int shardingFactor) throws Exception {
+    public HollowTypeReadStateShard[] expandWithOriginalDataElements(ShardsHolder shardsHolder, int shardingFactor) {
         int prevNumShards = shardsHolder.getShards().length;
         int newNumShards = prevNumShards * shardingFactor;
         HollowTypeReadStateShard[] newShards = new HollowTypeReadStateShard[newNumShards];
@@ -378,37 +358,32 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {  // 
                 newShards[i+(prevNumShards*j)] = shardsHolder.getShards()[i];
             }
         }
-        return shardsHolder.getClass().getConstructor(HollowTypeReadStateShard[].class).newInstance((Object) newShards);
+        return newShards;
+        // return shardsHolder.getClass().getConstructor(HollowTypeReadStateShard[].class).newInstance((Object) newShards);
     }
 
-    public ShardsHolder splitDataElementsForOneShard(ShardsHolder shardsHolder, int currentIndex, int prevNumShards, int shardingFactor) throws Exception {
+    public HollowTypeReadStateShard[] splitDataElementsForOneShard(ShardsHolder shardsHolder, int currentIndex, int prevNumShards, int shardingFactor) {
         int newNumShards = shardsHolder.getShards().length;
         int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newNumShards);
 
-        AbstractHollowTypeDataElements dataElementsToSplit = shardsHolder.getShards()[currentIndex].getDataElements();
-        AbstractHollowTypeDataElementsSplitter splitter = null;
+        HollowTypeDataElements dataElementsToSplit = shardsHolder.getShards()[currentIndex].getDataElements();
+        HollowTypeDataElementsSplitter splitter = null;
         if (this instanceof HollowObjectTypeReadState) {
             splitter = new HollowObjectTypeDataElementsSplitter((HollowObjectTypeDataElements) dataElementsToSplit, shardingFactor);
         } else if (this instanceof HollowListTypeReadState) {
             // newShards[currentIndex + (newNumShards*i)] = new HollowListTypeReadStateShard(joined, newShardOrdinalShift);
             throw new UnsupportedOperationException("Not yet implemented");
         }
-        AbstractHollowTypeDataElements[] splits = splitter.split();
+        HollowTypeDataElements[] splits = splitter.split();
 
         HollowTypeReadStateShard[] newShards = Arrays.copyOf(shardsHolder.getShards(), shardsHolder.getShards().length);
         for (int i = 0; i < shardingFactor; i ++) {
-            if (this instanceof HollowObjectTypeReadState) {
-                newShards[currentIndex + (prevNumShards*i)] = new HollowObjectTypeReadStateShard((HollowObjectSchema) getSchema(), (HollowObjectTypeDataElements) splits[i], newShardOrdinalShift);
-            } else if (this instanceof HollowListTypeReadState) {
-                // newShards[currentIndex + (newNumShards*i)] = new HollowListTypeReadStateShard(joined, newShardOrdinalShift);
-                throw new UnsupportedOperationException("Not yet implemented");
-            }
+            newShards[currentIndex + (prevNumShards*i)] = createTypeReadStateShard(schema, splits[i], newShardOrdinalShift);
         }
-        // return shardsHolder.getClass().getConstructor(HollowTypeReadStateShard[].class).newInstance(newShards);
-        return new ObjectTypeShardsHolder(newShards);
+        return newShards;
     }
 
-    private void destroyOriginalDataElements(AbstractHollowTypeDataElements dataElements) {
+    private void destroyOriginalDataElements(HollowTypeDataElements dataElements) {
         dataElements.destroy();
         if (dataElements.encodedRemovals != null) {
             dataElements.encodedRemovals.destroy();

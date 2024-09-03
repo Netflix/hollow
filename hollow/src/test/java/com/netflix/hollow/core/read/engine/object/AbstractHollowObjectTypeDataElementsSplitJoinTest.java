@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
-import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitJoinTest;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElementsSplitJoinTest;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class AbstractHollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowTypeDataElementsSplitJoinTest {
+public class AbstractHollowObjectTypeDataElementsSplitJoinTest extends HollowTypeDataElementsSplitJoinTest {
 
     @Mock
     protected HollowObjectTypeReadState mockObjectTypeState;

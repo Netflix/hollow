@@ -8,7 +8,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
  * The original data elements are not destroyed.
  * The no. of passed data elements must be a power of 2.
  */
-public abstract class AbstractHollowTypeDataElementsSplitter<T extends AbstractHollowTypeDataElements> {
+public abstract class HollowTypeDataElementsSplitter<T extends HollowTypeDataElements> {
     public final int numSplits;
     public final int toMask;
     public final int toOrdinalShift;
@@ -16,7 +16,7 @@ public abstract class AbstractHollowTypeDataElementsSplitter<T extends AbstractH
 
     public T[] to;
 
-    public AbstractHollowTypeDataElementsSplitter(T from, int numSplits) {
+    public HollowTypeDataElementsSplitter(T from, int numSplits) {
         this.from = from;
         this.numSplits = numSplits;
         this.toMask = numSplits - 1;

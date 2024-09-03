@@ -15,6 +15,7 @@ public class ObjectTypeShardsHolder extends ShardsHolder {
         this.shardNumberMask = fromShards.length - 1;
     }
 
+    // SNAP: TODO: javadoc: supports thread-safe construction
     ObjectTypeShardsHolder(HollowObjectTypeReadStateShard[] oldShards, HollowObjectTypeReadStateShard newShard, int newShardIndex) {
         int numShards = oldShards.length;
         HollowObjectTypeReadStateShard[] shards = new HollowObjectTypeReadStateShard[numShards];

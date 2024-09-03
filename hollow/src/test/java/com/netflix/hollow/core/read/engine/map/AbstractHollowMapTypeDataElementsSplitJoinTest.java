@@ -3,7 +3,7 @@ package com.netflix.hollow.core.read.engine.map;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitJoinTest;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElementsSplitJoinTest;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class AbstractHollowMapTypeDataElementsSplitJoinTest extends AbstractHollowTypeDataElementsSplitJoinTest {
+public class AbstractHollowMapTypeDataElementsSplitJoinTest extends HollowTypeDataElementsSplitJoinTest {
     protected HollowMapSchema mapSchema;
 
     @Mock

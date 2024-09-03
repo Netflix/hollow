@@ -1,7 +1,7 @@
 package com.netflix.hollow.core.read.engine.list;
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
-import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitter;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElementsSplitter;
 
 /**
  * Split a {@code HollowListTypeDataElements} into multiple {@code HollowListTypeDataElements}s.
@@ -9,7 +9,7 @@ import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitte
  * The original data elements are not destroyed.
  * {@code numSplits} must be a power of 2.
  */
-public class HollowListTypeDataElementsSplitter extends AbstractHollowTypeDataElementsSplitter<HollowListTypeDataElements> {
+public class HollowListTypeDataElementsSplitter extends HollowTypeDataElementsSplitter<HollowListTypeDataElements> {
 
     public HollowListTypeDataElementsSplitter(HollowListTypeDataElements from, int numSplits) {
         super(from, numSplits);

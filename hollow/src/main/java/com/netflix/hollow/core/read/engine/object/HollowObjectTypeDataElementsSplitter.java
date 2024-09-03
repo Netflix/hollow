@@ -5,7 +5,7 @@ import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataEle
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
-import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitter;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElementsSplitter;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 /**
@@ -14,7 +14,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  * The original data elements are not destroyed.
  * {@code numSplits} must be a power of 2.
  */
-public class HollowObjectTypeDataElementsSplitter extends AbstractHollowTypeDataElementsSplitter<HollowObjectTypeDataElements> {
+public class HollowObjectTypeDataElementsSplitter extends HollowTypeDataElementsSplitter<HollowObjectTypeDataElements> {
     private HollowObjectSchema schema;
 
     public HollowObjectTypeDataElementsSplitter(HollowObjectTypeDataElements from, int numSplits) {

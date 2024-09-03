@@ -1,7 +1,7 @@
 package com.netflix.hollow.core.read.engine.list;
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
-import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsJoiner;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElementsJoiner;
 
 
 /**
@@ -10,7 +10,7 @@ import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsJoiner;
  * The original data elements are not destroyed.
  * The no. of passed data elements must be a power of 2.
  */
-class HollowListTypeDataElementsJoiner extends AbstractHollowTypeDataElementsJoiner<HollowListTypeDataElements> {
+class HollowListTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<HollowListTypeDataElements> {
 
     public HollowListTypeDataElementsJoiner(HollowListTypeDataElements[] from) {
         super(from);

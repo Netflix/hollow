@@ -2,14 +2,14 @@ package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 
-public abstract class AbstractHollowTypeDataElementsJoiner <T extends AbstractHollowTypeDataElements> {
+public abstract class HollowTypeDataElementsJoiner<T extends HollowTypeDataElements> {
     public final int fromMask;
     public final int fromOrdinalShift;
     public final T[] from;
 
     public T to;
 
-    public AbstractHollowTypeDataElementsJoiner(T[] from) {
+    public HollowTypeDataElementsJoiner(T[] from) {
         this.from = from;
         this.fromMask = from.length - 1;
         this.fromOrdinalShift = 31 - Integer.numberOfLeadingZeros(from.length);
@@ -29,7 +29,7 @@ public abstract class AbstractHollowTypeDataElementsJoiner <T extends AbstractHo
             }
         }
 
-        for (AbstractHollowTypeDataElements elements : from) {
+        for (HollowTypeDataElements elements : from) {
             if (elements.encodedAdditions != null) {
                 throw new IllegalStateException("Encountered encodedAdditions in data elements joiner- this is not expected " +
                         "since encodedAdditions only exist on delta data elements and they dont carry over to target data elements, " +

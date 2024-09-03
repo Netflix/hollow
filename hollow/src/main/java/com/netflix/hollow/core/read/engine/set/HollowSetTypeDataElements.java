@@ -23,7 +23,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
-import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElements;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import java.io.IOException;
 
 /**
@@ -33,7 +33,7 @@ import java.io.IOException;
  * with the existing one to make sure a consistent view of the data is always available. 
  */
 
-public class HollowSetTypeDataElements extends AbstractHollowTypeDataElements {
+public class HollowSetTypeDataElements extends HollowTypeDataElements {
 
     public FixedLengthData setPointerAndSizeData;
     public FixedLengthData elementData;
