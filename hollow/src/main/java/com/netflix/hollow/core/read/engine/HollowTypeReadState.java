@@ -23,11 +23,6 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
-import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElementsJoiner;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElementsSplitter;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
@@ -39,7 +34,7 @@ import java.util.stream.Stream;
  * A HollowTypeReadState contains and is the root handle to all the records of a specific type in
  * a {@link HollowReadStateEngine}.
  */
-public abstract class HollowTypeReadState implements HollowTypeDataAccess, HollowTypeReshardingStrategy {
+public abstract class HollowTypeReadState implements HollowTypeDataAccess {
 
     protected static final HollowTypeStateListener[] EMPTY_LISTENERS = new HollowTypeStateListener[0];
 
@@ -48,11 +43,14 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess, Hollo
     protected final HollowSchema schema;
     protected HollowTypeStateListener[] stateListeners;
 
-    public HollowTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSchema schema) {
+    private final HollowTypeReshardingStrategy reshardingStrategy;
+
+    public HollowTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSchema schema, HollowTypeReshardingStrategy reshardingStrategy) {
         this.stateEngine = stateEngine;
         this.memoryMode = memoryMode;
         this.schema = schema;
         this.stateListeners = EMPTY_LISTENERS;
+        this.reshardingStrategy = reshardingStrategy;
     }
 
     /**
@@ -207,6 +205,14 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess, Hollo
      */
     public abstract int numShards();
 
+    public abstract ShardsHolder getShardsVolatile();
+
+    public abstract void updateShardsVolatile(HollowTypeReadStateShard[] shards);
+
+    public abstract HollowTypeDataElements[] createTypeDataElements(int len);
+
+    public abstract HollowTypeReadStateShard createTypeReadStateShard(HollowSchema schema, HollowTypeDataElements dataElements, int shardOrdinalShift);
+
     protected boolean shouldReshard(int currNumShards, int deltaNumShards) {
         return currNumShards!=0 && deltaNumShards!=0 && currNumShards!=deltaNumShards;
     }
@@ -331,13 +337,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess, Hollo
         HollowTypeDataElements[] joinCandidates = joinCandidates(shardsHolder.getShards(), currentIndex, shardingFactor);
 
         // SNAP: TODO: a better way
-        HollowTypeDataElementsJoiner joiner = null;
-        if (this instanceof HollowObjectTypeReadState) {
-            joiner = new HollowObjectTypeDataElementsJoiner((HollowObjectTypeDataElements[]) joinCandidates);
-        } else if (this instanceof HollowListTypeReadState) {
-            // newShards[currentIndex + (newNumShards*i)] = new HollowListTypeReadStateShard(joined, newShardOrdinalShift);
-            throw new UnsupportedOperationException("Not yet implemented");
-        }
+        HollowTypeDataElementsJoiner joiner = reshardingStrategy.createDataElementsJoiner(joinCandidates);
         HollowTypeDataElements joined = joiner.join();
 
         HollowTypeReadStateShard[] newShards = Arrays.copyOf(shardsHolder.getShards(), shardsHolder.getShards().length);
@@ -367,13 +367,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess, Hollo
         int newShardOrdinalShift = 31 - Integer.numberOfLeadingZeros(newNumShards);
 
         HollowTypeDataElements dataElementsToSplit = shardsHolder.getShards()[currentIndex].getDataElements();
-        HollowTypeDataElementsSplitter splitter = null;
-        if (this instanceof HollowObjectTypeReadState) {
-            splitter = new HollowObjectTypeDataElementsSplitter((HollowObjectTypeDataElements) dataElementsToSplit, shardingFactor);
-        } else if (this instanceof HollowListTypeReadState) {
-            // newShards[currentIndex + (newNumShards*i)] = new HollowListTypeReadStateShard(joined, newShardOrdinalShift);
-            throw new UnsupportedOperationException("Not yet implemented");
-        }
+        HollowTypeDataElementsSplitter splitter = reshardingStrategy.createDataElementsSplitter(dataElementsToSplit, shardingFactor);
         HollowTypeDataElements[] splits = splitter.split();
 
         HollowTypeReadStateShard[] newShards = Arrays.copyOf(shardsHolder.getShards(), shardsHolder.getShards().length);

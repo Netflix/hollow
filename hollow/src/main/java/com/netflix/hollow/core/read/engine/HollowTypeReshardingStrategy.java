@@ -1,11 +1,8 @@
 package com.netflix.hollow.core.read.engine;
 
-import com.netflix.hollow.core.schema.HollowSchema;
-
 public interface HollowTypeReshardingStrategy {
 
-    HollowTypeDataElements[] createTypeDataElements(int len);
+    HollowTypeDataElementsSplitter createDataElementsSplitter(HollowTypeDataElements from, int shardingFactor);
 
-    HollowTypeReadStateShard createTypeReadStateShard(HollowSchema schema, HollowTypeDataElements dataElements, int shardOrdinalShift);
-
+    HollowTypeDataElementsJoiner createDataElementsJoiner(HollowTypeDataElements[] from);
 }

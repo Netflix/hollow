@@ -34,6 +34,7 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
+import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.read.engine.SnapshotPopulatedOrdinalsReader;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -47,9 +48,11 @@ import java.util.BitSet;
  * A {@link HollowTypeReadState} for OBJECT type records. 
  */
 public class HollowObjectTypeReadState extends HollowTypeReadState implements HollowObjectTypeDataAccess {
+    private static final HollowTypeReshardingStrategy RESHARDING_STRATEGY = new HollowObjectTypeReshardingStrategy();
 
     private final HollowObjectSchema unfilteredSchema;
     private final HollowObjectSampler sampler;
+
     private int maxOrdinal;
 
     volatile ObjectTypeShardsHolder shardsVolatile;
@@ -64,15 +67,25 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         this.shardsVolatile = new ObjectTypeShardsHolder(shards);
     }
 
+    @Override
+    public HollowTypeDataElements[] createTypeDataElements(int len) {
+        return new HollowObjectTypeDataElements[len];
+    }
+
+    @Override
+    public HollowTypeReadStateShard createTypeReadStateShard(HollowSchema schema, HollowTypeDataElements dataElements, int shardOrdinalShift) {
+        return new HollowObjectTypeReadStateShard((HollowObjectSchema) schema, (HollowObjectTypeDataElements) dataElements, shardOrdinalShift);
+    }
+
     public HollowObjectTypeReadState(HollowReadStateEngine fileEngine, MemoryMode memoryMode, HollowObjectSchema schema, HollowObjectSchema unfilteredSchema) {
-        super(fileEngine, memoryMode, schema);
+        super(fileEngine, memoryMode, schema, RESHARDING_STRATEGY);
         this.sampler = new HollowObjectSampler(schema, DisabledSamplingDirector.INSTANCE);
         this.unfilteredSchema = unfilteredSchema;
         this.shardsVolatile = null;
     }
 
     public HollowObjectTypeReadState(HollowObjectSchema schema, HollowObjectTypeDataElements dataElements) {
-        super(null, MemoryMode.ON_HEAP, schema);
+        super(null, MemoryMode.ON_HEAP, schema, RESHARDING_STRATEGY);
         this.sampler = new HollowObjectSampler(schema, DisabledSamplingDirector.INSTANCE);
         this.unfilteredSchema = schema;
 

@@ -31,10 +31,11 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
-import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
+import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.ShardsHolder;
 import com.netflix.hollow.core.read.engine.SnapshotPopulatedOrdinalsReader;
@@ -56,6 +57,7 @@ import java.util.logging.Logger;
  */
 public class HollowMapTypeReadState extends HollowTypeReadState implements HollowMapTypeDataAccess {
     private static final Logger LOG = Logger.getLogger(HollowMapTypeReadState.class.getName());
+    private static final HollowTypeReshardingStrategy RESHARDING_STRATEGY = new HollowMapTypeReshardingStrategy();
 
     private final HollowMapSampler sampler;
     
@@ -105,7 +107,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
 
     public HollowMapTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowMapSchema schema, int numShards) {
-        super(stateEngine, memoryMode, schema);
+        super(stateEngine, memoryMode, schema, RESHARDING_STRATEGY);
         this.sampler = new HollowMapSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         this.shardNumberMask = numShards - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
@@ -122,7 +124,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
 
     HollowMapTypeReadState(MemoryMode memoryMode, HollowMapSchema schema, HollowMapTypeReadStateShard[] shards) {
-        super(null, memoryMode, schema);
+        super(null, memoryMode, schema, RESHARDING_STRATEGY);
         this.sampler = new HollowMapSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         int numShards = shards.length;
         this.shardNumberMask = numShards - 1;
