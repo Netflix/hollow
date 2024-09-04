@@ -384,6 +384,7 @@ public class HollowIncrementalProducerTest {
 
     }
 
+    // SNAP: TODO: add test for collections
     @Test
     public void continuesARestoredState() {
         HollowProducer genesisProducer = createInMemoryProducerWithResharding();

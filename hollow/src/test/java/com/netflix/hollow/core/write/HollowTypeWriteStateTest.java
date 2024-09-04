@@ -17,6 +17,7 @@ import org.junit.Test;
 
 public class HollowTypeWriteStateTest {
 
+    // SNAP: TODO: already has collections
     @Test
     public void testReverseDeltaNumShardsWhenNewTypes() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();

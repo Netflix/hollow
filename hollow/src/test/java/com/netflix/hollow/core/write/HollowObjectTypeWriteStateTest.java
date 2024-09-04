@@ -72,6 +72,7 @@ public class HollowObjectTypeWriteStateTest {
         assertEquals(2, consumer.getStateEngine().getTypeState("Long").numShards());
     }
 
+    // SNAP: TODO: add test for collections
     @Test
     public void testReverseDeltaNumShardsWhenTypeDropsToZeroRecords() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
@@ -132,6 +133,7 @@ public class HollowObjectTypeWriteStateTest {
         assertEquals(2, consumer.getStateEngine().getTypeState("Long").numShards()); // Long type has 1 record again
     }
 
+    // SNAP: TODO: add test for collections
     @Test
     public void testNoReshardingIfNumShardsPinnedByAnnotation() {
         HollowWriteStateEngine wse = new HollowWriteStateEngine();
@@ -140,6 +142,7 @@ public class HollowObjectTypeWriteStateTest {
         assertFalse(typeWriteState.allowTypeResharding());
     }
 
+    // SNAP: TODO: add test for collections
     @Test
     public void testRestoreNumShardsButDoNotPin() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
