@@ -1,9 +1,11 @@
 package com.netflix.hollow.core.write.objectmapper.flatrecords.traversal;
 
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.util.IntList;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
+import com.netflix.hollow.core.schema.HollowSetSchema;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordOrdinalReader;
 
 import java.util.Map;
 
@@ -15,31 +17,19 @@ public interface FlatRecordTraversalNode {
 
   void setCommonSchema(Map<String, HollowObjectSchema> commonSchema);
 
-  void reposition(FlatRecordReader reader, IntList ordinalPositions, int ordinal);
-
-  default FlatRecordTraversalNode createAndRepositionNode(FlatRecordReader reader, IntList ordinalPositions, int ordinal) {
-    reader.pointer = ordinalPositions.get(ordinal);
-    HollowSchema schema = reader.readSchema();
-
-    FlatRecordTraversalNode node;
+  default FlatRecordTraversalNode createNode(FlatRecordOrdinalReader reader, int ordinal) {
+    HollowSchema schema = reader.readSchema(ordinal);
     switch (schema.getSchemaType()) {
       case OBJECT:
-        node = new FlatRecordTraversalObjectNode();
-        break;
+        return new FlatRecordTraversalObjectNode(reader, (HollowObjectSchema) schema, ordinal);
       case LIST:
-        node = new FlatRecordTraversalListNode();
-        break;
+        return new FlatRecordTraversalListNode(reader, (HollowListSchema) schema, ordinal);
       case SET:
-        node = new FlatRecordTraversalSetNode();
-        break;
+        return new FlatRecordTraversalSetNode(reader, (HollowSetSchema) schema, ordinal);
       case MAP:
-        node = new FlatRecordTraversalMapNode();
-        break;
+        return new FlatRecordTraversalMapNode(reader, (HollowMapSchema) schema, ordinal);
       default:
         throw new IllegalArgumentException("Unsupported schema type: " + schema.getSchemaType());
     }
-
-    node.reposition(reader, ordinalPositions, ordinal);
-    return node;
   }
 }

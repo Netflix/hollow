@@ -6,8 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class FlatRecordTraversalObjectNodeEquality {
-
-    private static Map<String, HollowObjectSchema> commonSchemaCache = new HashMap<>();
+    private static final Map<String, HollowObjectSchema> commonSchemaCache = new HashMap<>();
 
     public static boolean equals(FlatRecordTraversalObjectNode left, FlatRecordTraversalObjectNode right) {
         if (left == null && right == null) {
@@ -138,5 +137,4 @@ public class FlatRecordTraversalObjectNodeEquality {
                 }
         }
     }
-
 }

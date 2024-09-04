@@ -1,45 +1,30 @@
 package com.netflix.hollow.core.write.objectmapper.flatrecords.traversal;
 
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordOrdinalReader;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
 public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
-  private FlatRecordReader reader;
-  private IntList ordinalPositions;
-  private HollowObjectSchema schema;
+  private final FlatRecordOrdinalReader reader;
+  private final HollowObjectSchema schema;
+  private final int ordinal;
+
   private Map<String, HollowObjectSchema> commonSchemaMap;
-  private int position;
 
-  public FlatRecordTraversalObjectNode() {}
-
-  public FlatRecordTraversalObjectNode(FlatRecord rec) {
-    FlatRecordReader reader = new FlatRecordReader(rec);
-
-    IntList ordinalPositions = new IntList();
-    while (reader.hasMore()) {
-      ordinalPositions.add(reader.pointer);
-      HollowSchema schema = reader.readSchema();
-      reader.skipSchema(schema);
-    }
-
-    reposition(reader, ordinalPositions, ordinalPositions.size() - 1);
+  public FlatRecordTraversalObjectNode(FlatRecordOrdinalReader reader, HollowObjectSchema schema, int ordinal) {
+    this.reader = reader;
+    this.ordinal = ordinal;
+    this.schema = schema;
   }
 
-  @Override
-  public void reposition(FlatRecordReader reader, IntList ordinalPositions, int ordinal) {
-    this.reader = reader;
-    this.ordinalPositions = ordinalPositions;
-
-    reader.resetTo(ordinalPositions.get(ordinal));
-    schema = (HollowObjectSchema) reader.readSchema();
-    position = reader.pointer;
+  public FlatRecordTraversalObjectNode(FlatRecord rec) {
+    this.reader = new FlatRecordOrdinalReader(rec);
+    this.ordinal = reader.getOrdinalCount() - 1;
+    this.schema = (HollowObjectSchema) reader.readSchema(ordinal);
   }
 
   @Override
@@ -69,53 +54,53 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
   }
 
   public FlatRecordTraversalNode getFieldNode(String field) {
-    if (!skipToField(field)) {
+    HollowObjectSchema.FieldType fieldType = schema.getFieldType(field);
+    if (fieldType == null) {
       return null;
     }
 
-    if (schema.getFieldType(field) != HollowObjectSchema.FieldType.REFERENCE) {
-      throw new IllegalStateException("Cannot get child for non-reference field");
+    if (fieldType != HollowObjectSchema.FieldType.REFERENCE) {
+      throw new IllegalArgumentException("Cannot get child for non-reference field");
     }
 
-    int refOrdinal = reader.readOrdinal();
+    int refOrdinal = reader.readFieldReference(ordinal, field);
     if (refOrdinal == -1) {
       return null;
     }
 
-    return createAndRepositionNode(reader, ordinalPositions, refOrdinal);
+    return createNode(reader, refOrdinal);
   }
 
   public Object getFieldValue(String field) {
-    if (!skipToField(field)) {
+    HollowObjectSchema.FieldType fieldType = schema.getFieldType(field);
+    if (fieldType == null) {
       return null;
     }
-    switch(schema.getFieldType(field)) {
+
+    switch (fieldType) {
       case BOOLEAN:
-        return reader.readBoolean();
+        return reader.readFieldBoolean(ordinal, field);
       case INT:
-        return reader.readInt();
+        return reader.readFieldInt(ordinal, field);
       case LONG:
-        return reader.readLong();
+        return reader.readFieldLong(ordinal, field);
       case FLOAT:
-        return reader.readFloat();
+        return reader.readFieldFloat(ordinal, field);
       case DOUBLE:
-        return reader.readDouble();
+        return reader.readFieldDouble(ordinal, field);
       case STRING:
-        return reader.readString();
+        return reader.readFieldString(ordinal, field);
       case BYTES:
-        return reader.readBytes();
+        return reader.readFieldBytes(ordinal, field);
       case REFERENCE:
-        throw new IllegalStateException("Cannot get leaf value for reference field");
+        throw new IllegalArgumentException("Cannot get leaf value for reference field");
     }
     return null;
   }
 
   public boolean getFieldValueBoolean(String field) {
-    if (!skipToField(field)) {
-      return false;
-    }
-    assertFieldType(field, HollowObjectSchema.FieldType.BOOLEAN);
-    return reader.readBoolean();
+    Boolean b = reader.readFieldBoolean(ordinal, field);
+    return Boolean.TRUE.equals(b);
   }
 
   public Boolean getFieldValueBooleanBoxed(String field) {
@@ -123,11 +108,7 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
   }
 
   public int getFieldValueInt(String field) {
-    if (!skipToField(field)) {
-      return Integer.MIN_VALUE;
-    }
-    assertFieldType(field, HollowObjectSchema.FieldType.INT);
-    return reader.readInt();
+    return reader.readFieldInt(ordinal, field);
   }
 
   public Integer getFieldValueIntBoxed(String field) {
@@ -139,11 +120,7 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
   }
 
   public long getFieldValueLong(String field) {
-    if (!skipToField(field)) {
-      return Long.MIN_VALUE;
-    }
-    assertFieldType(field, HollowObjectSchema.FieldType.LONG);
-    return reader.readLong();
+    return reader.readFieldLong(ordinal, field);
   }
 
   public Long getFieldValueLongBoxed(String field) {
@@ -155,11 +132,7 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
   }
 
   public float getFieldValueFloat(String field) {
-    if (!skipToField(field)) {
-      return Float.NaN;
-    }
-    assertFieldType(field, HollowObjectSchema.FieldType.FLOAT);
-    return reader.readFloat();
+    return reader.readFieldFloat(ordinal, field);
   }
 
   public Float getFieldValueFloatBoxed(String field) {
@@ -171,11 +144,7 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
   }
 
   public double getFieldValueDouble(String field) {
-    if (!skipToField(field)) {
-      return Double.NaN;
-    }
-    assertFieldType(field, HollowObjectSchema.FieldType.DOUBLE);
-    return reader.readDouble();
+    return reader.readFieldDouble(ordinal, field);
   }
 
   public Double getFieldValueDoubleBoxed(String field) {
@@ -187,93 +156,23 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
   }
 
   public String getFieldValueString(String field) {
-    if (!skipToField(field)) {
-      return null;
-    }
-    assertFieldType(field, HollowObjectSchema.FieldType.STRING);
-    return reader.readString();
+    return reader.readFieldString(ordinal, field);
   }
 
   public byte[] getFieldValueBytes(String field) {
-    if (!skipToField(field)) {
-      return null;
-    }
-    assertFieldType(field, HollowObjectSchema.FieldType.BYTES);
-    return reader.readBytes();
+    return reader.readFieldBytes(ordinal, field);
   }
 
   @Override
   public int hashCode() {
     HollowObjectSchema commonSchema = commonSchemaMap.get(schema.getName());
     Object[] fields = new Object[commonSchema.numFields()];
-    for(int i=0;i<commonSchema.numFields();i++) {
+    for (int i = 0; i < commonSchema.numFields(); i++) {
       String fieldName = commonSchema.getFieldName(i);
-      if(!commonSchema.getFieldType(fieldName).equals(HollowObjectSchema.FieldType.REFERENCE)) {
+      if (commonSchema.getFieldType(fieldName) != HollowObjectSchema.FieldType.REFERENCE) {
         fields[i] = getFieldValue(fieldName);
       }
     }
     return Objects.hash(schema.getName(), Arrays.deepHashCode(fields));
-  }
-
-  @Override
-  public boolean equals(Object object) {
-    if(object instanceof FlatRecordTraversalObjectNode) {
-      FlatRecordTraversalObjectNode other = (FlatRecordTraversalObjectNode) object;
-      HollowObjectSchema commonSchema = this.getSchema().findCommonSchema(other.getSchema());
-      for(int i=0;i<commonSchema.numFields();i++) {
-        String fieldName = commonSchema.getFieldName(i);
-        // same fieldName but different fieldType
-        if (this.getSchema().getFieldType(fieldName) != other.getSchema().getFieldType(fieldName)) {
-          return false;
-        }
-        // same fieldType and equal to reference
-        if(this.getSchema().getFieldType(fieldName).equals(HollowObjectSchema.FieldType.REFERENCE)) {
-          FlatRecordTraversalNode leftChildNode = this.getFieldNode(fieldName);
-          FlatRecordTraversalNode rightChildNode = other.getFieldNode(fieldName);
-          if(!leftChildNode.equals(rightChildNode)) {
-            return false;
-          }
-        }
-        else {
-          if (!this.getFieldValue(fieldName).equals(other.getFieldValue(fieldName))) {
-            return false;
-          }
-        }
-      }
-      return true;
-    }
-    return false;
-  }
-
-  private void assertFieldType(String fieldName, HollowObjectSchema.FieldType expectedFieldType) {
-    int fieldPosition = schema.getPosition(fieldName);
-    assertFieldType(fieldPosition, expectedFieldType);
-  }
-
-  private void assertFieldType(int fieldPosition, HollowObjectSchema.FieldType expectedFieldType) {
-    HollowObjectSchema.FieldType fieldType = schema.getFieldType(fieldPosition);
-    if (fieldType != expectedFieldType) {
-      throw new IllegalStateException("Field " + schema.getFieldName(fieldPosition) + " is not of type " + expectedFieldType);
-    }
-  }
-
-  private boolean skipToField(String fieldName) {
-    return skipToField(schema.getPosition(fieldName));
-  }
-
-  /** Skip to the field at the given position.
-   *
-   * @param fieldPosition the position of the field to skip to
-   * @return true if the field was found and skipped to, false otherwise
-   */
-  private boolean skipToField(int fieldPosition) {
-    if (fieldPosition == -1) {
-      return false;
-    }
-    reader.resetTo(position);
-    for (int i = 0; i < fieldPosition; i++) {
-      reader.skipField(schema.getFieldType(i));
-    }
-    return true;
   }
 }
