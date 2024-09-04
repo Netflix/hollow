@@ -1,9 +1,10 @@
 package com.netflix.hollow.core.read.engine.object;
 
-import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState.shardingFactor;
+import static com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy.shardingFactor;
 import static junit.framework.TestCase.assertEquals;
 
 import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import java.util.Random;
 import java.util.function.Supplier;
@@ -11,6 +12,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataElementsSplitJoinTest {
+    private static final HollowTypeReshardingStrategy RESHARDING_STRATEGY = new HollowObjectTypeReshardingStrategy();
+
     @Override
     protected void initializeTypeStates() {
         writeStateEngine.setTargetMaxTypeShardSize(4 * 100 * 1024);
@@ -77,7 +80,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                 {
                     int prevShardCount = objectTypeReadState.numShards();
                     int newShardCount = shardingFactor * prevShardCount;
-                    objectTypeReadState.reshard(newShardCount);
+                    RESHARDING_STRATEGY.reshard(objectTypeReadState, newShardCount);
 
                     assertEquals(newShardCount, objectTypeReadState.numShards());
                     assertEquals(newShardCount, shardingFactor * prevShardCount);
@@ -88,7 +91,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                 {
                     int prevShardCount = objectTypeReadState.numShards();
                     int newShardCount = prevShardCount / shardingFactor;
-                    objectTypeReadState.reshard(newShardCount);
+                    RESHARDING_STRATEGY.reshard(objectTypeReadState, newShardCount);
 
                     assertEquals(newShardCount, objectTypeReadState.numShards());
                     assertEquals(shardingFactor * newShardCount, prevShardCount);
@@ -100,7 +103,6 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
 
     @Test
     public void testReshardingWithFilter() throws Exception {
-
         for (int shardingFactor : new int[]{2, 64})
         {
             for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(10000))
@@ -112,7 +114,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                 {
                     int prevShardCount = objectTypeReadState.numShards();
                     int newShardCount = shardingFactor * prevShardCount;
-                    objectTypeReadState.reshard(newShardCount);
+                    RESHARDING_STRATEGY.reshard(objectTypeReadState, newShardCount);
 
                     assertEquals(newShardCount, objectTypeReadState.numShards());
                     assertEquals(newShardCount, shardingFactor * prevShardCount);
@@ -123,7 +125,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                 {
                     int prevShardCount = objectTypeReadState.numShards();
                     int newShardCount = prevShardCount / shardingFactor;
-                    objectTypeReadState.reshard(newShardCount);
+                    RESHARDING_STRATEGY.reshard(objectTypeReadState, newShardCount);
 
                     assertEquals(newShardCount, objectTypeReadState.numShards());
                     assertEquals(shardingFactor * newShardCount, prevShardCount);
@@ -142,7 +144,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
 
                 HollowObjectTypeShardsHolder original = expectedTypeState.shardsVolatile;
                 HollowObjectTypeReadState actualTypeState = new HollowObjectTypeReadState(readStateEngine, MemoryMode.ON_HEAP, schema, schema);
-                actualTypeState.updateShardsVolatile(expectedTypeState.expandWithOriginalDataElements(original, shardingFactor));
+                actualTypeState.updateShardsVolatile(RESHARDING_STRATEGY.expandWithOriginalDataElements(original, shardingFactor));
 
                 assertEquals(shardingFactor * expectedTypeState.numShards(), actualTypeState.numShards());
                 assertDataUnchanged(actualTypeState, numRecords);
@@ -161,12 +163,12 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                 int originalNumShards = typeState.numShards();
 
                 // expand shards
-                typeState.updateShardsVolatile(typeState.expandWithOriginalDataElements(originalShardsHolder, shardingFactor));
+                typeState.updateShardsVolatile(RESHARDING_STRATEGY.expandWithOriginalDataElements(originalShardsHolder, shardingFactor));
 
                 for(int i=0; i<originalNumShards; i++) {
                     HollowObjectTypeDataElements originalDataElements = typeState.shardsVolatile.shards[i].dataElements;
 
-                    typeState.updateShardsVolatile(typeState.splitDataElementsForOneShard(typeState.shardsVolatile, i, originalNumShards, shardingFactor));
+                    typeState.updateShardsVolatile(RESHARDING_STRATEGY.splitDataElementsForOneShard(typeState, i, originalNumShards, shardingFactor));
 
                     assertEquals(shardingFactor * originalNumShards, typeState.numShards());
                     assertDataUnchanged(typeState, numRecords);   // as each original shard is processed
@@ -194,7 +196,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                         dataElementsToJoin[j] = originalShardsHolder.shards[i + (newNumShards*j)].dataElements;
                     };
 
-                    typeState.updateShardsVolatile(typeState.joinDataElementsForOneShard(typeState.shardsVolatile, i, shardingFactor));
+                    typeState.updateShardsVolatile(RESHARDING_STRATEGY.joinDataElementsForOneShard(typeState, i, shardingFactor));
 
                     for (int j = 0; j < shardingFactor; j ++) {
                         dataElementsToJoin[j].destroy();

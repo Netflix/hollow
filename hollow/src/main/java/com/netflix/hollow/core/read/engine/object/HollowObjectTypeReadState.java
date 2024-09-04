@@ -34,7 +34,6 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
-import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.read.engine.SnapshotPopulatedOrdinalsReader;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -48,8 +47,6 @@ import java.util.BitSet;
  * A {@link HollowTypeReadState} for OBJECT type records. 
  */
 public class HollowObjectTypeReadState extends HollowTypeReadState implements HollowObjectTypeDataAccess {
-    private static final HollowTypeReshardingStrategy RESHARDING_STRATEGY = new HollowObjectTypeReshardingStrategy();
-
     private final HollowObjectSchema unfilteredSchema;
     private final HollowObjectSampler sampler;
 
@@ -78,14 +75,14 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     }
 
     public HollowObjectTypeReadState(HollowReadStateEngine fileEngine, MemoryMode memoryMode, HollowObjectSchema schema, HollowObjectSchema unfilteredSchema) {
-        super(fileEngine, memoryMode, schema, RESHARDING_STRATEGY);
+        super(fileEngine, memoryMode, schema);
         this.sampler = new HollowObjectSampler(schema, DisabledSamplingDirector.INSTANCE);
         this.unfilteredSchema = unfilteredSchema;
         this.shardsVolatile = null;
     }
 
     public HollowObjectTypeReadState(HollowObjectSchema schema, HollowObjectTypeDataElements dataElements) {
-        super(null, MemoryMode.ON_HEAP, schema, RESHARDING_STRATEGY);
+        super(null, MemoryMode.ON_HEAP, schema);
         this.sampler = new HollowObjectSampler(schema, DisabledSamplingDirector.INSTANCE);
         this.unfilteredSchema = schema;
 
@@ -131,9 +128,6 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
-        if (shouldReshard(shardsVolatile.shards.length, deltaNumShards)) {
-            reshard(deltaNumShards);
-        }
         if(shardsVolatile.shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 

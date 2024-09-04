@@ -27,8 +27,8 @@ import com.netflix.hollow.core.schema.HollowSchema;
  */
 public abstract class HollowCollectionTypeReadState extends HollowTypeReadState implements HollowCollectionTypeDataAccess {
 
-    public HollowCollectionTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSchema schema, HollowTypeReshardingStrategy reshardingStrategy) {
-        super(stateEngine, memoryMode, schema, reshardingStrategy);
+    public HollowCollectionTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSchema schema) {
+        super(stateEngine, memoryMode, schema);
     }
 
     public abstract int size(int ordinal);

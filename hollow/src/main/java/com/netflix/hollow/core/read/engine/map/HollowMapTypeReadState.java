@@ -107,7 +107,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
 
     public HollowMapTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowMapSchema schema, int numShards) {
-        super(stateEngine, memoryMode, schema, RESHARDING_STRATEGY);
+        super(stateEngine, memoryMode, schema);
         this.sampler = new HollowMapSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         this.shardNumberMask = numShards - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
@@ -124,7 +124,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
 
     HollowMapTypeReadState(MemoryMode memoryMode, HollowMapSchema schema, HollowMapTypeReadStateShard[] shards) {
-        super(null, memoryMode, schema, RESHARDING_STRATEGY);
+        super(null, memoryMode, schema);
         this.sampler = new HollowMapSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         int numShards = shards.length;
         this.shardNumberMask = numShards - 1;
@@ -160,10 +160,6 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
 
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
-        if (shouldReshard(shards.length, deltaNumShards)) {
-            throw new UnsupportedOperationException("Dynamic type sharding not supported for " + schema.getName()
-                    + ". Current numShards=" + shards.length + ", delta numShards=" + deltaNumShards);
-        }
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 

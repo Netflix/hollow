@@ -5,7 +5,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeDataElementsJoiner;
 import com.netflix.hollow.core.read.engine.HollowTypeDataElementsSplitter;
 import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 
-public class HollowSetTypeReshardingStrategy implements HollowTypeReshardingStrategy {
+public class HollowSetTypeReshardingStrategy extends HollowTypeReshardingStrategy {
     @Override
     public HollowTypeDataElementsSplitter createDataElementsSplitter(HollowTypeDataElements from, int shardingFactor) {
         return new HollowSetTypeDataElementsSplitter((HollowSetTypeDataElements) from, shardingFactor);

@@ -31,7 +31,6 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
-import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.ShardsHolder;
 import com.netflix.hollow.core.read.engine.SnapshotPopulatedOrdinalsReader;
@@ -48,8 +47,6 @@ import java.util.BitSet;
  * A {@link HollowTypeReadState} for LIST type records.
  */
 public class HollowListTypeReadState extends HollowCollectionTypeReadState implements HollowListTypeDataAccess {
-    private static final HollowTypeReshardingStrategy RESHARDING_STRATEGY = new HollowListTypeReshardingStrategy();
-
     private final HollowListSampler sampler;
     
     final int shardNumberMask;
@@ -97,7 +94,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     }
 
     public HollowListTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowListSchema schema, int numShards) {
-        super(stateEngine, memoryMode, schema, RESHARDING_STRATEGY);
+        super(stateEngine, memoryMode, schema);
         this.sampler = new HollowListSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         this.shardNumberMask = numShards - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
@@ -113,7 +110,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     }
 
     HollowListTypeReadState(MemoryMode memoryMode, HollowListSchema schema, HollowListTypeReadStateShard[] shards) {
-        super(null, memoryMode, schema, RESHARDING_STRATEGY);
+        super(null, memoryMode, schema);
         this.sampler = new HollowListSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         int numShards = shards.length;
         this.shardNumberMask = numShards - 1;
@@ -149,10 +146,6 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
 
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
-        if (shouldReshard(shards.length, deltaNumShards)) {
-            throw new UnsupportedOperationException("Dynamic type sharding not supported for " + schema.getName()
-                    + ". Current numShards=" + shards.length + ", delta numShards=" + deltaNumShards);
-        }
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
