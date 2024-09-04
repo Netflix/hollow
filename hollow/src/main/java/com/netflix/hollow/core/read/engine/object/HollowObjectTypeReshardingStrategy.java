@@ -13,7 +13,6 @@ public class HollowObjectTypeReshardingStrategy implements HollowTypeReshardingS
 
     @Override
     public HollowTypeDataElementsJoiner createDataElementsJoiner(HollowTypeDataElements[] from) {
-        // SNAP: TODO: array casting?
         return new HollowObjectTypeDataElementsJoiner((HollowObjectTypeDataElements[]) from);
     }
 }

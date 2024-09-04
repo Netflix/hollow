@@ -280,12 +280,6 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
 
                 HollowTypeReadStateShard[] newShards = Arrays.copyOfRange(getShardsVolatile().getShards(), 0, newNumShards);
                 updateShardsVolatile(newShards);
-                // setShardsVolatile(   // SNAP: TODO: constructor has HollowObjectTypeReadStateShard[] parameter
-                //         getShardsVolatile().getClass().getConstructor(HollowTypeReadStateShard[].class).newInstance(
-                //                 newShards
-                //         )
-                //); // SNAP: TODO: is this better addressed with a factory method in the interface, or by switching over to an abstract class?
-                // SNAP: TODO: can do generics with reflective constructor invocation here, or create an abstract method reassignShardsHolder(), or check instanceOf or assignableFrom
 
                 // Re-sharding done.
                 // shardsVolatile now contains newNumShards shards where each shard contains

@@ -40,7 +40,7 @@ public class HollowObjectDeltaHistoricalStateCreator {
     private final HollowObjectTypeDataElements historicalDataElements;
 
     private HollowObjectTypeReadState typeState;
-    private ObjectTypeShardsHolder shardsHolder;
+    private HollowObjectTypeShardsHolder shardsHolder;
     private RemovedOrdinalIterator iter;
     private IntMap ordinalMapping;
     private int nextOrdinal;

@@ -140,7 +140,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
             {
                 HollowObjectTypeReadState expectedTypeState = populateTypeStateWith(numRecords);
 
-                ObjectTypeShardsHolder original = expectedTypeState.shardsVolatile;
+                HollowObjectTypeShardsHolder original = expectedTypeState.shardsVolatile;
                 HollowObjectTypeReadState actualTypeState = new HollowObjectTypeReadState(readStateEngine, MemoryMode.ON_HEAP, schema, schema);
                 actualTypeState.updateShardsVolatile(expectedTypeState.expandWithOriginalDataElements(original, shardingFactor));
 
@@ -157,7 +157,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
             {
                 HollowObjectTypeReadState typeState = populateTypeStateWith(numRecords);
 
-                ObjectTypeShardsHolder originalShardsHolder = typeState.shardsVolatile;
+                HollowObjectTypeShardsHolder originalShardsHolder = typeState.shardsVolatile;
                 int originalNumShards = typeState.numShards();
 
                 // expand shards
@@ -183,7 +183,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
             for (int numRecords = 75000; numRecords <= 100000; numRecords += new Random().nextInt(1000)) {
                 HollowObjectTypeReadState typeState = populateTypeStateWith(numRecords);
 
-                ObjectTypeShardsHolder originalShardsHolder = typeState.shardsVolatile;
+                HollowObjectTypeShardsHolder originalShardsHolder = typeState.shardsVolatile;
                 int originalNumShards = typeState.numShards();
                 assertEquals(8, originalNumShards);
 
