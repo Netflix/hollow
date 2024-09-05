@@ -297,7 +297,7 @@ We can also search for changes in specific records by their keys.  On each page 
 
 ![History Lookup](img/history-lookup.png)
 
-Search for _exact matches_ using composite key is also supported. When search for a composite key, different fields need to be separated by colons.
+Search for _exact matches_ using composite key is also supported. When searching for a composite key, different fields need to be separated by colons.
 
 Clicking on individual records will bring us back to the object diff view page to see what was changed.
 
