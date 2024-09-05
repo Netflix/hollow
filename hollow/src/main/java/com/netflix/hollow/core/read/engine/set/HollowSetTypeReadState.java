@@ -46,7 +46,6 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.iterator.EmptyOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowSetOrdinalIterator;
-import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
@@ -90,7 +89,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
         return new HollowSetTypeReadStateShard((HollowSetTypeDataElements)dataElements, shardOrdinalShift);
     }
 
-    public HollowSetTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowMapSchema schema) {
+    public HollowSetTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSetSchema schema) {
         super(stateEngine, memoryMode, schema);
         this.sampler = new HollowSetSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
         this.shardsVolatile = null;
