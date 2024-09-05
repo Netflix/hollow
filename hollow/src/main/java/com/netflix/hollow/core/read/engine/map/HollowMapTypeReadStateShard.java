@@ -21,15 +21,33 @@ import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
+import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
 import com.netflix.hollow.core.read.engine.SetMapKeyHasher;
+import com.netflix.hollow.core.read.engine.list.HollowListTypeDataElements;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.util.BitSet;
 
-class HollowMapTypeReadStateShard {
-    
-    private volatile HollowMapTypeDataElements currentDataVolatile;
+class HollowMapTypeReadStateShard implements HollowTypeReadStateShard {
+
+    final HollowMapTypeDataElements dataElements;
+    final int shardOrdinalShift;
 
     private HollowPrimaryKeyValueDeriver keyDeriver;
+
+    @Override
+    public HollowMapTypeDataElements getDataElements() {
+        return dataElements;
+    }
+
+    @Override
+    public int getShardOrdinalShift() {
+        return shardOrdinalShift;
+    }
+
+    public HollowMapTypeReadStateShard(HollowMapTypeDataElements dataElements, int shardOrdinalShift) {
+        this.shardOrdinalShift = shardOrdinalShift;
+        this.dataElements = dataElements;
+    }
 
     public int size(int ordinal) {
         HollowMapTypeDataElements currentData;

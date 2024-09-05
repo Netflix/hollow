@@ -102,11 +102,6 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     }
 
     @Override
-    public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
-        throw new IllegalStateException("Object type read state requires numShards when reading snapshot");
-    }
-
-    @Override
     public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, int numShards) throws IOException {
         if(numShards > 1)
             maxOrdinal = VarInt.readVInt(in);

@@ -82,8 +82,7 @@ public class HollowSetDeltaHistoricalStateCreator {
     }
 
     public HollowSetTypeReadState createHistoricalTypeReadState() {
-        HollowSetTypeReadState historicalTypeState = new HollowSetTypeReadState(null, typeState.getSchema(), 1);
-        historicalTypeState.setCurrentData(historicalDataElements);
+        HollowSetTypeReadState historicalTypeState = new HollowSetTypeReadState(typeState.getSchema(), historicalDataElements);
         return historicalTypeState;
     }
 

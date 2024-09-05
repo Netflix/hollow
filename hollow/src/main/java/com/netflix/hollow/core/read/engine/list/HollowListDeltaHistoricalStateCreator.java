@@ -81,8 +81,7 @@ public class HollowListDeltaHistoricalStateCreator {
     }
 
     public HollowListTypeReadState createHistoricalTypeReadState() {
-        HollowListTypeReadState historicalTypeState = new HollowListTypeReadState(null, typeState.getSchema(), 1);
-        historicalTypeState.setCurrentData(historicalDataElements);
+        HollowListTypeReadState historicalTypeState = new HollowListTypeReadState(typeState.getSchema(), historicalDataElements);
         return historicalTypeState;
     }
 

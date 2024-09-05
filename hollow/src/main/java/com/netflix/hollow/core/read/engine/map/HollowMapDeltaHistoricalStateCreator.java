@@ -82,8 +82,7 @@ public class HollowMapDeltaHistoricalStateCreator {
     }
 
     public HollowMapTypeReadState createHistoricalTypeReadState() {
-        HollowMapTypeReadState historicalTypeState = new HollowMapTypeReadState(null, typeState.getSchema(), 1);
-        historicalTypeState.setCurrentData(historicalDataElements);
+        HollowMapTypeReadState historicalTypeState = new HollowMapTypeReadState(typeState.getSchema(), historicalDataElements);
         return historicalTypeState;
     }
 

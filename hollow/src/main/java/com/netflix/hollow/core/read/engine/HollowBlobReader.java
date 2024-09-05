@@ -337,28 +337,23 @@ public class HollowBlobReader {
             if(!filter.includes(typeName)) {
                 HollowListTypeReadState.discardSnapshot(in, numShards);
             } else {
-                populateTypeStateSnapshot(in, new HollowListTypeReadState(stateEngine, memoryMode, (HollowListSchema)schema, numShards));
+                populateTypeStateSnapshotWithNumShards(in, new HollowListTypeReadState(stateEngine, memoryMode, (HollowListSchema)schema), numShards);
             }
         } else if(schema instanceof HollowSetSchema) {
             if(!filter.includes(typeName)) {
                 HollowSetTypeReadState.discardSnapshot(in, numShards);
             } else {
-                populateTypeStateSnapshot(in, new HollowSetTypeReadState(stateEngine, memoryMode, (HollowSetSchema)schema, numShards));
+                populateTypeStateSnapshotWithNumShards(in, new HollowSetTypeReadState(stateEngine, memoryMode, (HollowSetSchema)schema), numShards);
             }
         } else if(schema instanceof HollowMapSchema) {
             if(!filter.includes(typeName)) {
                 HollowMapTypeReadState.discardSnapshot(in, numShards);
             } else {
-                populateTypeStateSnapshot(in, new HollowMapTypeReadState(stateEngine, memoryMode, (HollowMapSchema)schema, numShards));
+                populateTypeStateSnapshotWithNumShards(in, new HollowMapTypeReadState(stateEngine, memoryMode, (HollowMapSchema)schema), numShards);
             }
         }
 
         return typeName;
-    }
-
-    private void populateTypeStateSnapshot(HollowBlobInput in, HollowTypeReadState typeState) throws IOException {
-        stateEngine.addTypeState(typeState);
-        typeState.readSnapshot(in, stateEngine.getMemoryRecycler());
     }
 
     private void populateTypeStateSnapshotWithNumShards(HollowBlobInput in, HollowTypeReadState typeState, int numShards) throws IOException {

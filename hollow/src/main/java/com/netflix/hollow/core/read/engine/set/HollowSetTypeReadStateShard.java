@@ -18,157 +18,48 @@ package com.netflix.hollow.core.read.engine.set;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
-import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
-import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-import com.netflix.hollow.core.read.engine.SetMapKeyHasher;
+import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.util.BitSet;
 
-class HollowSetTypeReadStateShard {
+class HollowSetTypeReadStateShard implements HollowTypeReadStateShard {
 
-    private volatile HollowSetTypeDataElements currentDataVolatile;
+    final HollowSetTypeDataElements dataElements;
+    final int shardOrdinalShift;
 
-    private HollowPrimaryKeyValueDeriver keyDeriver;
+    @Override
+    public HollowSetTypeDataElements getDataElements() {
+        return dataElements;
+    }
+
+    @Override
+    public int getShardOrdinalShift() {
+        return shardOrdinalShift;
+    }
+
+    public HollowSetTypeReadStateShard(HollowSetTypeDataElements dataElements, int shardOrdinalShift) {
+        this.shardOrdinalShift = shardOrdinalShift;
+        this.dataElements = dataElements;
+    }
 
     public int size(int ordinal) {
-        HollowSetTypeDataElements currentData;
-        int size;
-
-        do {
-            currentData = this.currentDataVolatile;
-            size = (int)currentData.setPointerAndSizeData.getElementValue(((long)ordinal * currentData.bitsPerFixedLengthSetPortion) + currentData.bitsPerSetPointer, currentData.bitsPerSetSizeValue);
-        } while(readWasUnsafe(currentData));
-
+        int size = (int)dataElements.setPointerAndSizeData.getElementValue(((long)ordinal * dataElements.bitsPerFixedLengthSetPortion) + dataElements.bitsPerSetPointer, dataElements.bitsPerSetSizeValue);
         return size;
     }
 
-    public boolean contains(int ordinal, int value, int hashCode) {
-        HollowSetTypeDataElements currentData;
-        boolean foundData;
-
-        threadsafe:
-        do {
-            long startBucket;
-            long endBucket;
-
-            do {
-                currentData = this.currentDataVolatile;
-
-                startBucket = currentData.getStartBucket(ordinal);
-                endBucket = currentData.getEndBucket(ordinal);
-            } while(readWasUnsafe(currentData));
-
-            hashCode = HashCodes.hashInt(hashCode);
-            long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
-            int bucketOrdinal = currentData.getBucketValue(bucket);
-
-            while(bucketOrdinal != currentData.emptyBucketValue) {
-                if(bucketOrdinal == value) {
-                    foundData = true;
-                    continue threadsafe;
-                }
-                bucket++;
-                if(bucket == endBucket)
-                    bucket = startBucket;
-                bucketOrdinal = currentData.getBucketValue(bucket);
-            }
-
-            foundData = false;
-        } while(readWasUnsafe(currentData));
-
-        return foundData;
-    }
-    
-    public int findElement(int ordinal, Object... hashKey) {
-        int hashCode = SetMapKeyHasher.hash(hashKey, keyDeriver.getFieldTypes());
-
-        HollowSetTypeDataElements currentData;
-
-        threadsafe:
-        do {
-            long startBucket;
-            long endBucket;
-
-            do {
-                currentData = this.currentDataVolatile;
-
-                startBucket = currentData.getStartBucket(ordinal);
-                endBucket = currentData.getEndBucket(ordinal);
-            } while(readWasUnsafe(currentData));
-
-            long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
-            int bucketOrdinal = currentData.getBucketValue(bucket);
-
-            while(bucketOrdinal != currentData.emptyBucketValue) {
-                if(readWasUnsafe(currentData))
-                    continue threadsafe;
-                
-                if(keyDeriver.keyMatches(bucketOrdinal, hashKey))
-                    return bucketOrdinal;
-                
-                bucket++;
-                if(bucket == endBucket)
-                    bucket = startBucket;
-                bucketOrdinal = currentData.getBucketValue(bucket);
-            }
-
-        } while(readWasUnsafe(currentData));
-
-        return ORDINAL_NONE;
-    }
-
-    public int relativeBucketValue(int setOrdinal, int bucketIndex) {
-        HollowSetTypeDataElements currentData;
-        int value;
-
-        do {
-            long startBucket;
-            do {
-                currentData = this.currentDataVolatile;
-
-                startBucket = currentData.getStartBucket(setOrdinal);
-            } while(readWasUnsafe(currentData));
-
-            value = currentData.getBucketValue(startBucket + bucketIndex);
-
-            if(value == currentData.emptyBucketValue)
-                value = ORDINAL_NONE;
-        } while(readWasUnsafe(currentData));
-
-        return value;
-    }
-
-    void invalidate() {
-        setCurrentData(null);
-    }
-
-    HollowSetTypeDataElements currentDataElements() {
-        return currentDataVolatile;
-    }
-
-    private boolean readWasUnsafe(HollowSetTypeDataElements data) {
-        HollowUnsafeHandle.getUnsafe().loadFence();
-        return data != currentDataVolatile;
-    }
-
-    void setCurrentData(HollowSetTypeDataElements data) {
-        this.currentDataVolatile = data;
-    }
-
-    protected void applyToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
-        HollowSetTypeDataElements currentData = currentDataVolatile;
+    protected void applyShardToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
         int ordinal = populatedOrdinals.nextSetBit(shardNumber);
         while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
                 int numBuckets = HashCodes.hashTableSize(size(shardOrdinal));
-                long offset = currentData.getStartBucket(shardOrdinal);
+                long offset = dataElements.getStartBucket(shardOrdinal);
     
                 checksum.applyInt(ordinal);
                 for(int i=0;i<numBuckets;i++) {
-                    int bucketValue = currentData.getBucketValue(offset + i);
-                    if(bucketValue != currentData.emptyBucketValue) {
+                    int bucketValue = dataElements.getBucketValue(offset + i);
+                    if(bucketValue != dataElements.emptyBucketValue) {
                         checksum.applyInt(i);
                         checksum.applyInt(bucketValue);
                     }
@@ -184,29 +75,23 @@ class HollowSetTypeReadStateShard {
     }
 
     public long getApproximateHeapFootprintInBytes() {
-        HollowSetTypeDataElements currentData = currentDataVolatile;
-        long requiredBitsForSetPointers = ((long)currentData.maxOrdinal + 1) * currentData.bitsPerFixedLengthSetPortion;
-        long requiredBitsForBuckets = currentData.totalNumberOfBuckets * currentData.bitsPerElement;
+        long requiredBitsForSetPointers = ((long)dataElements.maxOrdinal + 1) * dataElements.bitsPerFixedLengthSetPortion;
+        long requiredBitsForBuckets = dataElements.totalNumberOfBuckets * dataElements.bitsPerElement;
         long requiredBits = requiredBitsForSetPointers + requiredBitsForBuckets;
         return requiredBits / 8;
     }
     
     public long getApproximateHoleCostInBytes(BitSet populatedOrdinals, int shardNumber, int numShards) {
-        HollowSetTypeDataElements currentData = currentDataVolatile;
         long holeBits = 0;
         
         int holeOrdinal = populatedOrdinals.nextClearBit(0);
-        while(holeOrdinal <= currentData.maxOrdinal) {
+        while(holeOrdinal <= dataElements.maxOrdinal) {
             if((holeOrdinal & (numShards - 1)) == shardNumber)
-                holeBits += currentData.bitsPerFixedLengthSetPortion;
+                holeBits += dataElements.bitsPerFixedLengthSetPortion;
             
             holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
         }
         
         return holeBits / 8;
-    }
-    
-    public void setKeyDeriver(HollowPrimaryKeyValueDeriver keyDeriver) {
-        this.keyDeriver = keyDeriver;
     }
 }

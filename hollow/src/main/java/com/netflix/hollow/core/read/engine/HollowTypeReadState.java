@@ -121,8 +121,6 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      */
     public abstract int maxOrdinal();
 
-    public abstract void readSnapshot(HollowBlobInput in, ArraySegmentRecycler recycler) throws IOException;
-
     public abstract void readSnapshot(HollowBlobInput in, ArraySegmentRecycler recycler, int numShards) throws IOException;
 
     public abstract void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException;

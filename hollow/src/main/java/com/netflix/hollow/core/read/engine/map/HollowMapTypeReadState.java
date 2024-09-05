@@ -61,117 +61,81 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
 
     private final HollowMapSampler sampler;
     
-    private final int shardNumberMask;
-    private final int shardOrdinalShift;
-    final HollowMapTypeReadStateShard shards[];
-    
     private HollowPrimaryKeyValueDeriver keyDeriver;
     
     private int maxOrdinal;
 
-    class MapTypeShardsHolder extends ShardsHolder {
-        @Override
-        public HollowTypeReadStateShard[] getShards() {
-            throw new UnsupportedOperationException("Not implemented yet");
-        }
-
-        @Override
-        public int getShardNumberMask() {
-            throw new UnsupportedOperationException("Not implemented yet");
-        }
-    }
+    volatile HollowMapTypeShardsHolder shardsVolatile;
 
     @Override
     public ShardsHolder getShardsVolatile() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    public HollowTypeDataElements[] createTypeDataElements(int len) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    public HollowTypeReadStateShard createTypeReadStateShard(HollowSchema schema, HollowTypeDataElements dataElements, int shardOrdinalShift) {
-        // schema unused
-        throw new UnsupportedOperationException("Not implemented yet");
+        return shardsVolatile;
     }
 
     @Override
     public void updateShardsVolatile(HollowTypeReadStateShard[] shards) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.shardsVolatile = new HollowMapTypeShardsHolder(shards);
     }
 
-    public HollowMapTypeReadState(HollowReadStateEngine stateEngine, HollowMapSchema schema, int numShards) {
-        this(stateEngine, MemoryMode.ON_HEAP, schema, numShards);
+    @Override
+    public HollowTypeDataElements[] createTypeDataElements(int len) {
+        return new HollowMapTypeDataElements[len];
     }
 
-    public HollowMapTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowMapSchema schema, int numShards) {
+    @Override
+    public HollowTypeReadStateShard createTypeReadStateShard(HollowSchema schema, HollowTypeDataElements dataElements, int shardOrdinalShift) {
+        return new HollowMapTypeReadStateShard((HollowMapTypeDataElements) dataElements, shardOrdinalShift);
+    }
+
+    public HollowMapTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowMapSchema schema) {
         super(stateEngine, memoryMode, schema);
         this.sampler = new HollowMapSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
-        this.shardNumberMask = numShards - 1;
-        this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
-        
-        if(numShards < 1 || 1 << shardOrdinalShift != numShards)
-            throw new IllegalArgumentException("Number of shards must be a power of 2!");
-        
-        HollowMapTypeReadStateShard shards[] = new HollowMapTypeReadStateShard[numShards];
-        for(int i=0; i<shards.length; i++)
-            shards[i] = new HollowMapTypeReadStateShard();
-        
-        this.shards = shards;
-        
+        this.shardsVolatile = null;
     }
 
-    HollowMapTypeReadState(MemoryMode memoryMode, HollowMapSchema schema, HollowMapTypeReadStateShard[] shards) {
-        super(null, memoryMode, schema);
+    public HollowMapTypeReadState(HollowMapSchema schema, HollowMapTypeDataElements dataElements) {
+        super(null, MemoryMode.ON_HEAP, schema);
         this.sampler = new HollowMapSampler(schema.getName(), DisabledSamplingDirector.INSTANCE);
-        int numShards = shards.length;
-        this.shardNumberMask = numShards - 1;
-        this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
 
-        if(numShards < 1 || 1 << shardOrdinalShift != numShards)
-            throw new IllegalArgumentException("Number of shards must be a power of 2!");
-
-        this.shards = shards;
+        HollowMapTypeReadStateShard newShard = new HollowMapTypeReadStateShard(dataElements, 0);
+        this.shardsVolatile = new HollowMapTypeShardsHolder(new HollowMapTypeReadStateShard[] {newShard});
+        this.maxOrdinal = dataElements.maxOrdinal;
     }
 
     @Override
     public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, int numShards) throws IOException {
-        throw new UnsupportedOperationException("This type does not yet support numShards specification when reading snapshot");
-    }
-
-    @Override
-    public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler) throws IOException {
-        if(shards.length > 1)
+        if(numShards > 1)
             maxOrdinal = VarInt.readVInt(in);
-        
-        for(int i=0; i<shards.length; i++) {
-            HollowMapTypeDataElements snapshotData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
-            snapshotData.readSnapshot(in);
-            shards[i].setCurrentData(snapshotData);
+
+        HollowMapTypeReadStateShard[] newShards = new HollowMapTypeReadStateShard[numShards];
+        int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
+        for(int i=0; i<numShards; i++) {
+            HollowMapTypeDataElements shardDataElements = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
+            shardDataElements.readSnapshot(in);
+            newShards[i] = new HollowMapTypeReadStateShard(shardDataElements, shardOrdinalShift);
         }
-        
-        if(shards.length == 1)
-            maxOrdinal = shards[0].currentDataElements().maxOrdinal;
-        
+        shardsVolatile = new HollowMapTypeShardsHolder(newShards);
+
+        if(shardsVolatile.shards.length == 1)
+            maxOrdinal = shardsVolatile.shards[0].dataElements.maxOrdinal;
+
         SnapshotPopulatedOrdinalsReader.readOrdinals(in, stateListeners);
     }
 
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
-        if(shards.length > 1)
+        if(shardsVolatile.shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
-        for(int i=0; i<shards.length; i++) {
+        for(int i=0; i<shardsVolatile.shards.length; i++) {
             HollowMapTypeDataElements deltaData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
             deltaData.readDelta(in);
             if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
 
                 if(!deltaData.encodedRemovals.isEmpty())
-                    notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+                    notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shardsVolatile.shards.length);
 
-                HollowMapTypeDataElements currentData = shards[i].currentDataElements();
+                HollowMapTypeDataElements currentData = shardsVolatile.shards[i].currentDataElements();
                 GapEncodedVariableLengthIntegerReader oldRemovals = currentData.encodedRemovals == null ? GapEncodedVariableLengthIntegerReader.EMPTY_READER : currentData.encodedRemovals;
                 if(oldRemovals.isEmpty()) {
                     currentData.encodedRemovals = deltaData.encodedRemovals;
@@ -187,10 +151,13 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
                 deltaData.encodedAdditions.destroy();
             } else {
                 HollowMapTypeDataElements nextData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
-                HollowMapTypeDataElements oldData = shards[i].currentDataElements();
+                HollowMapTypeDataElements oldData = shardsVolatile.shards[i].currentDataElements();
                 nextData.applyDelta(oldData, deltaData);
-                shards[i].setCurrentData(nextData);
-                notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shards.length);
+
+                HollowMapTypeReadStateShard newShard = new HollowMapTypeReadStateShard(nextData, shardsVolatile.shards[i].shardOrdinalShift);
+                shardsVolatile = new HollowMapTypeShardsHolder(shardsVolatile.shards, newShard, i);
+
+                notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shardsVolatile.shards.length);
                 deltaData.encodedAdditions.destroy();
                 oldData.destroy();
             }
@@ -198,8 +165,8 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
             stateEngine.getMemoryRecycler().swap();
         }
 
-        if(shards.length == 1)
-            maxOrdinal = shards[0].currentDataElements().maxOrdinal;
+        if(shardsVolatile.shards.length == 1)
+            maxOrdinal = shardsVolatile.shards[0].currentDataElements().maxOrdinal;
     }
 
     public static void discardSnapshot(HollowBlobInput in, int numShards) throws IOException {

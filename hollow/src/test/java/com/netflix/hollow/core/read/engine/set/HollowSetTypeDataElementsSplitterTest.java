@@ -22,8 +22,7 @@ public class HollowSetTypeDataElementsSplitterTest extends AbstractHollowSetType
 
         HollowSetTypeDataElementsSplitter splitter = new HollowSetTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 1);
         HollowSetTypeDataElements[] result1 = splitter.split();
-        typeReadState = new HollowSetTypeReadState(typeReadState.getStateEngine(), typeReadState.getSchema(), 1);
-        typeReadState.setCurrentData(result1[0]);
+        typeReadState = new HollowSetTypeReadState(typeReadState.getSchema(), result1[0]);
         assertDataUnchanged(typeReadState, setContents);
 
         splitter = new HollowSetTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 8);

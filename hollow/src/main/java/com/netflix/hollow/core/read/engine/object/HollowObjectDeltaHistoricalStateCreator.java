@@ -96,7 +96,6 @@ public class HollowObjectDeltaHistoricalStateCreator {
 
     public HollowObjectTypeReadState createHistoricalTypeReadState() {
         HollowObjectTypeReadState historicalTypeState = new HollowObjectTypeReadState(typeState.getSchema(), historicalDataElements);
-
         return historicalTypeState;
     }
 
