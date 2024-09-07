@@ -23,7 +23,7 @@ public class HollowMapTypeDataElementsSplitJoinTest extends AbstractHollowMapTyp
         };
 
         // 1->2->1, 1->4->1, ...
-        for (int listRecord=0;listRecord<maps.length;listRecord++) {
+        for (int listRecord=0;listRecord<maps.length;listRecord++) {    // SNAP: TODO: what is this iteration for?
             HollowMapTypeReadState typeReadState = populateTypeStateWith(maps);
             assertEquals(1, typeReadState.numShards());
             assertEquals(maps.length, typeReadState.getPopulatedOrdinals().cardinality());

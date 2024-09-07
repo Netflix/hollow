@@ -38,10 +38,11 @@ public abstract class HollowTypeReshardingStrategy {
      * Reshards this type state to the desired shard count using O(shard size) space while supporting concurrent reads
      * into the underlying data elements.
      *
-     * @param newNumShards The desired number of shards
+     * @param typeState The type state to reshard
+     * @param prevNumShards The current number of shards in typeState
+     * @param newNumShards The desired number of shards for typeState
      */
-    public void reshard(HollowTypeReadState typeState, int newNumShards) {
-        int prevNumShards = typeState.getShardsVolatile().getShards().length;    // SNAP: TODO: or .shards.length
+    public void reshard(HollowTypeReadState typeState, int prevNumShards, int newNumShards) {
         int shardingFactor = shardingFactor(prevNumShards, newNumShards);
         HollowTypeDataElements[] newDataElements;
         int[] shardOrdinalShifts;

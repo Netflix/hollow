@@ -63,6 +63,17 @@ public class AbstractHollowListTypeDataElementsSplitJoinTest extends HollowTypeD
         return (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
     }
 
+    protected int[][] generateListContents(int numRecords) {
+        int[][] listContents = new int[numRecords][];
+        for (int i=0;i<numRecords;i++) {
+            listContents[i] = new int[i+1];
+            for (int j=0;j<i+1;j++) {
+                listContents[i][j] = j;
+            }
+        }
+        return listContents;
+    }
+
     protected void assertDataUnchanged(HollowListTypeReadState typeState, int[][] listContents) {
         int numListRecords = listContents.length;
         for(int i=0;i<numListRecords;i++) {

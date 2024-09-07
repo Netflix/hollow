@@ -16,20 +16,15 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
     @Test
     public void testSplitThenJoin() throws IOException {
 
-        int numListRecords = 100;
-        int[][] listContents = new int[numListRecords][];
-        for (int i=0;i<numListRecords;i++) {
-            listContents[i] = new int[i+1];
-            for (int j=0;j<i+1;j++) {
-                listContents[i][j] = j;
-            }
-        }
+        int maxNumListRecords = 100;
 
         // 1->2->1, 1->4->1, ...
-        for (int listRecord=0;listRecord<numListRecords;listRecord++) {
+        for (int numRecords=0;numRecords<maxNumListRecords;numRecords++) { // SNAP: TODO: what is this iteration for?
+
+            int[][] listContents = generateListContents(numRecords);
             HollowListTypeReadState typeReadState = populateTypeStateWith(listContents);
             assertEquals(1, typeReadState.numShards());
-            assertEquals(numListRecords, typeReadState.getPopulatedOrdinals().cardinality());
+            assertEquals(numRecords, typeReadState.getPopulatedOrdinals().cardinality());
             assertDataUnchanged(typeReadState, listContents);
 
             for (int numSplits : new int[]{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024}) {

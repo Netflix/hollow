@@ -42,8 +42,7 @@ public class HollowSetTypeShardsHolder extends ShardsHolder {
 
     @Override
     public HollowTypeReadStateShard[] getShards() {
-        throw new UnsupportedOperationException("Not implemented yet");
-        // return shards;
+        return shards;
     }
 
     @Override

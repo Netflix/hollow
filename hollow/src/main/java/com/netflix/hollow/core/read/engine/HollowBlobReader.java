@@ -373,7 +373,7 @@ public class HollowBlobReader {
         if(typeState != null) {
             if (shouldReshard(typeState, typeState.numShards(), numShards)) {
                 HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(typeState);
-                reshardingStrategy.reshard(typeState, numShards);
+                reshardingStrategy.reshard(typeState, typeState.numShards(), numShards);
             }
             typeState.applyDelta(in, schema, stateEngine.getMemoryRecycler(), numShards);
         } else {
