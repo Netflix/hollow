@@ -3,7 +3,6 @@ package com.netflix.hollow.core.read.engine.map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.netflix.hollow.core.memory.MemoryMode;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,9 +41,7 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
         HollowMapTypeDataElementsJoiner joiner = new HollowMapTypeDataElementsJoiner(typeReadStateSharded.currentDataElements());
         HollowMapTypeDataElements joinedDataElements = joiner.join();
 
-        HollowMapTypeReadStateShard joinedShard = new HollowMapTypeReadStateShard();
-        joinedShard.setCurrentData(joinedDataElements);
-        typeReadState = new HollowMapTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), new HollowMapTypeReadStateShard[] {joinedShard});
+        typeReadState = new HollowMapTypeReadState(typeReadState.getSchema(), joinedDataElements);
         assertDataUnchanged(typeReadState, maps);
 
         try {

@@ -15,10 +15,4 @@ public class HollowObjectTypeReshardingStrategy extends HollowTypeReshardingStra
     public HollowTypeDataElementsJoiner createDataElementsJoiner(HollowTypeDataElements[] from) {
         return new HollowObjectTypeDataElementsJoiner((HollowObjectTypeDataElements[]) from);
     }
-
-    // SNAP: TODO: can drop once base class supports resharding all types
-    @Override
-    public boolean shouldReshard(int currNumShards, int deltaNumShards) {
-        return currNumShards!=0 && deltaNumShards!=0 && currNumShards!=deltaNumShards;
-    }
 }

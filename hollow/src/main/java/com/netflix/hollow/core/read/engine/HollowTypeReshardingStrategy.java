@@ -12,6 +12,9 @@ import java.util.Arrays;
 
 public abstract class HollowTypeReshardingStrategy {
     private final static HollowTypeReshardingStrategy OBJECT_RESHARDING_STRATEGY = new HollowObjectTypeReshardingStrategy();
+    private final static HollowTypeReshardingStrategy LIST_RESHARDING_STRATEGY = new HollowListTypeReshardingStrategy();
+    private final static HollowTypeReshardingStrategy SET_RESHARDING_STRATEGY = new HollowSetTypeReshardingStrategy();
+    private final static HollowTypeReshardingStrategy MAP_RESHARDING_STRATEGY = new HollowMapTypeReshardingStrategy();
 
     public abstract HollowTypeDataElementsSplitter createDataElementsSplitter(HollowTypeDataElements from, int shardingFactor);
 
@@ -21,11 +24,11 @@ public abstract class HollowTypeReshardingStrategy {
         if (typeState instanceof HollowObjectTypeReadState) {
             return OBJECT_RESHARDING_STRATEGY;
         } else if (typeState instanceof HollowListTypeReadState) {
-            return new HollowListTypeReshardingStrategy();
+            return LIST_RESHARDING_STRATEGY;
         } else if (typeState instanceof HollowSetTypeReadState) {
-            return new HollowSetTypeReshardingStrategy();
+            return SET_RESHARDING_STRATEGY;
         } else if (typeState instanceof HollowMapTypeReadState) {
-            return new HollowMapTypeReshardingStrategy();
+            return MAP_RESHARDING_STRATEGY;
         } else {
             throw new IllegalArgumentException("Unsupported type state: " + typeState.getClass().getName());
         }
@@ -102,10 +105,6 @@ public abstract class HollowTypeReshardingStrategy {
         } catch (Exception e) {
             throw new RuntimeException("Error in re-sharding", e);
         }
-    }
-
-    public boolean shouldReshard(int currNumShards, int deltaNumShards) {
-        return false;
     }
 
     /**

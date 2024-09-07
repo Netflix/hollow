@@ -371,8 +371,8 @@ public class HollowBlobReader {
         int numShards = readNumShards(in);
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
         if(typeState != null) {
-            HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(typeState);
-            if (reshardingStrategy.shouldReshard(typeState.numShards(), numShards)) {
+            if (shouldReshard(typeState, typeState.numShards(), numShards)) {
+                HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(typeState);
                 reshardingStrategy.reshard(typeState, numShards);
             }
             typeState.applyDelta(in, schema, stateEngine.getMemoryRecycler(), numShards);
@@ -381,6 +381,14 @@ public class HollowBlobReader {
         }
 
         return schema.getName();
+    }
+
+    private boolean shouldReshard(HollowTypeReadState typeState, int currNumShards, int deltaNumShards) {
+        if (typeState instanceof HollowObjectTypeReadState) {
+            return currNumShards != 0 && deltaNumShards != 0 && currNumShards != deltaNumShards;
+        } else {
+            return false;
+        }
     }
 
     private int readNumShards(HollowBlobInput in) throws IOException {

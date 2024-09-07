@@ -22,8 +22,7 @@ public class HollowListTypeDataElementsSplitterTest extends AbstractHollowListTy
 
         HollowListTypeDataElementsSplitter splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 1);
         HollowListTypeDataElements[] result1 = splitter.split();
-        typeReadState = new HollowListTypeReadState(typeReadState.getStateEngine(), typeReadState.getSchema(), 1);
-        typeReadState.setCurrentData(result1[0]);
+        typeReadState = new HollowListTypeReadState(typeReadState.getSchema(), result1[0]);
         assertDataUnchanged(typeReadState, listContents);
 
         splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 8);

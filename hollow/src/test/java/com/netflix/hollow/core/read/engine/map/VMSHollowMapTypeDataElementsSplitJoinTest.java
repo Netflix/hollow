@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
-import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
@@ -36,11 +35,8 @@ public class VMSHollowMapTypeDataElementsSplitJoinTest extends AbstractHollowMap
 
                 HollowMapTypeDataElementsJoiner joiner = new HollowMapTypeDataElementsJoiner(splitElements);
                 HollowMapTypeDataElements joinedElements = joiner.join();
-                HollowMapTypeReadStateShard joinedShard = new HollowMapTypeReadStateShard();
-                joinedShard.setCurrentData(joinedElements);
 
-                HollowMapTypeReadState resultTypeReadState = new HollowMapTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), new HollowMapTypeReadStateShard[] {joinedShard});
-
+                HollowMapTypeReadState resultTypeReadState = new HollowMapTypeReadState(typeReadState.getSchema(), joinedElements);
                 assertDataUnchanged(resultTypeReadState, maps);
                 assertChecksumUnchanged(resultTypeReadState, typeReadState, typeReadState.getPopulatedOrdinals());
             }
@@ -104,10 +100,7 @@ public class VMSHollowMapTypeDataElementsSplitJoinTest extends AbstractHollowMap
                 HollowMapTypeDataElementsJoiner joiner = new HollowMapTypeDataElementsJoiner(splitElements);
                 HollowMapTypeDataElements joinedElements = joiner.join();
 
-                HollowMapTypeReadStateShard joinedShard = new HollowMapTypeReadStateShard();
-                joinedShard.setCurrentData(joinedElements);
-                HollowMapTypeReadState resultTypeState = new HollowMapTypeReadState(MemoryMode.ON_HEAP, typeState.getSchema(), new HollowMapTypeReadStateShard[]{joinedShard});
-
+                HollowMapTypeReadState resultTypeState = new HollowMapTypeReadState(typeState.getSchema(), joinedElements);
                 assertChecksumUnchanged(resultTypeState, typeState, typeState.getPopulatedOrdinals());
 
                 System.out.println("Processed type " + mapTypeWithOneShard + " with " + numSplits + " splits");
@@ -120,11 +113,11 @@ public class VMSHollowMapTypeDataElementsSplitJoinTest extends AbstractHollowMap
         HollowChecksum newCksum = new HollowChecksum();
 
         for(int i=0;i<origTypeState.numShards();i++) {
-            origTypeState.shards[i].applyToChecksum(origCksum, populatedOrdinals, i, origTypeState.numShards());
+            origTypeState.shardsVolatile.shards[i].applyShardToChecksum(origCksum, populatedOrdinals, i, origTypeState.numShards());
         }
 
         for(int i=0;i<newTypeState.numShards();i++) {
-            newTypeState.shards[i].applyToChecksum(newCksum, populatedOrdinals, i, newTypeState.numShards());
+            newTypeState.shardsVolatile.shards[i].applyShardToChecksum(newCksum, populatedOrdinals, i, newTypeState.numShards());
         }
 
         assertEquals(newCksum, origCksum);

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
-import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.nio.file.Paths;
@@ -43,10 +42,7 @@ public class VMSHollowSetTypeDataElementsSplitJoinTest extends AbstractHollowSet
                 HollowSetTypeDataElementsJoiner joiner = new HollowSetTypeDataElementsJoiner(splitElements);
                 HollowSetTypeDataElements joinedElements = joiner.join();
 
-                HollowSetTypeReadStateShard joinedShard = new HollowSetTypeReadStateShard();
-                joinedShard.setCurrentData(joinedElements);
-
-                HollowSetTypeReadState resultTypeState = new HollowSetTypeReadState(MemoryMode.ON_HEAP, typeState.getSchema(), new HollowSetTypeReadStateShard[]{joinedShard});
+                HollowSetTypeReadState resultTypeState = new HollowSetTypeReadState(typeState.getSchema(), joinedElements);
 
                 assertChecksumUnchanged(resultTypeState, typeState, typeState.getPopulatedOrdinals());
 
@@ -60,11 +56,11 @@ public class VMSHollowSetTypeDataElementsSplitJoinTest extends AbstractHollowSet
         HollowChecksum newCksum = new HollowChecksum();
 
         for(int i=0;i<origTypeState.numShards();i++) {
-            origTypeState.shards[i].applyToChecksum(origCksum, populatedOrdinals, i, origTypeState.numShards());
+            origTypeState.shardsVolatile.shards[i].applyShardToChecksum(origCksum, populatedOrdinals, i, origTypeState.numShards());
         }
 
         for(int i=0;i<newTypeState.numShards();i++) {
-            newTypeState.shards[i].applyToChecksum(newCksum, populatedOrdinals, i, newTypeState.numShards());
+            newTypeState.shardsVolatile.shards[i].applyShardToChecksum(newCksum, populatedOrdinals, i, newTypeState.numShards());
         }
 
         assertEquals(newCksum, origCksum);

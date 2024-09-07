@@ -3,7 +3,6 @@ package com.netflix.hollow.core.read.engine.set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.netflix.hollow.core.memory.MemoryMode;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,9 +43,7 @@ public class HollowSetTypeDataElementsJoinerTest extends AbstractHollowSetTypeDa
         HollowSetTypeDataElementsJoiner joiner = new HollowSetTypeDataElementsJoiner(typeReadStateSharded.currentDataElements());
         HollowSetTypeDataElements joinedDataElements = joiner.join();
 
-        HollowSetTypeReadStateShard joinedShard = new HollowSetTypeReadStateShard();
-        joinedShard.setCurrentData(joinedDataElements);
-        typeReadState = new HollowSetTypeReadState(MemoryMode.ON_HEAP, typeReadState.getSchema(), new HollowSetTypeReadStateShard[] {joinedShard});
+        typeReadState = new HollowSetTypeReadState(typeReadState.getSchema(), joinedDataElements);
         assertDataUnchanged(typeReadState, setContents);
 
         try {

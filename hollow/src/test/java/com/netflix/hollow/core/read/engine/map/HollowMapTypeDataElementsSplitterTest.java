@@ -25,8 +25,7 @@ public class HollowMapTypeDataElementsSplitterTest extends AbstractHollowMapType
 
         HollowMapTypeDataElementsSplitter splitter = new HollowMapTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 1);
         HollowMapTypeDataElements[] result1 = splitter.split();
-        typeReadState = new HollowMapTypeReadState(typeReadState.getStateEngine(), typeReadState.getSchema(), 1);
-        typeReadState.setCurrentData(result1[0]);
+        typeReadState = new HollowMapTypeReadState(typeReadState.getSchema(), result1[0]);
         assertDataUnchanged(typeReadState, maps);
 
         splitter = new HollowMapTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 8);
