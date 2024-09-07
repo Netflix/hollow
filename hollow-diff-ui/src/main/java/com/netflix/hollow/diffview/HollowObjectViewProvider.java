@@ -17,7 +17,7 @@
 package com.netflix.hollow.diffview;
 
 import com.netflix.hollow.ui.HollowUISession;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public interface HollowObjectViewProvider {
 
