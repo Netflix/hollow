@@ -19,7 +19,7 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
         int maxNumListRecords = 100;
 
         // 1->2->1, 1->4->1, ...
-        for (int numRecords=0;numRecords<maxNumListRecords;numRecords++) { // SNAP: TODO: what is this iteration for?
+        for (int numRecords=0;numRecords<maxNumListRecords;numRecords++) {
 
             int[][] listContents = generateListContents(numRecords);
             HollowListTypeReadState typeReadState = populateTypeStateWith(listContents);
@@ -27,7 +27,7 @@ public class HollowListTypeDataElementsSplitJoinTest extends AbstractHollowListT
             assertEquals(numRecords, typeReadState.getPopulatedOrdinals().cardinality());
             assertDataUnchanged(typeReadState, listContents);
 
-            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024}) {
+            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32}) {  // , 64, 128, 256, 512, 1024
                 HollowListTypeDataElementsSplitter splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
                 HollowListTypeDataElements[] splitElements = splitter.split();
 

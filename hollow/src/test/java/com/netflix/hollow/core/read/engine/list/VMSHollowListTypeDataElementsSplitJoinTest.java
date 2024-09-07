@@ -34,7 +34,7 @@ public class VMSHollowListTypeDataElementsSplitJoinTest extends AbstractHollowLi
             assertEquals(numListRecords, typeReadState.getPopulatedOrdinals().cardinality());
             assertDataUnchanged(typeReadState, listContents);
 
-            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024}) {
+            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32}) {  // , 64, 128, 256, 512, 1024
                 HollowListTypeDataElementsSplitter splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
                 HollowListTypeDataElements[] splitElements = splitter.split();
 

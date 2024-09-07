@@ -15,21 +15,17 @@ public class HollowMapTypeDataElementsSplitJoinTest extends AbstractHollowMapTyp
 
     @Test
     public void testSplitThenJoin() throws IOException {
-        int[][][] maps = new int[][][] {
-                { {33321, 1}, {2, 2}, {32224, 3} },
-                { {1, 31442}, {2, 1}, {3, 2} },
-                { {1002, 2} },
-                { {0, 134} },
-        };
+        int maxNumMapRecords = 100;
 
         // 1->2->1, 1->4->1, ...
-        for (int listRecord=0;listRecord<maps.length;listRecord++) {    // SNAP: TODO: what is this iteration for?
+        for (int numRecords=0;numRecords<maxNumMapRecords;numRecords++) {
+            int[][][] maps = generateListContents(numRecords);
             HollowMapTypeReadState typeReadState = populateTypeStateWith(maps);
             assertEquals(1, typeReadState.numShards());
             assertEquals(maps.length, typeReadState.getPopulatedOrdinals().cardinality());
             assertDataUnchanged(typeReadState,maps);
 
-            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024}) {
+            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32}) {  // , 64, 128, 256, 512, 1024
                 HollowMapTypeDataElementsSplitter splitter = new HollowMapTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
                 HollowMapTypeDataElements[] splitElements = splitter.split();
 

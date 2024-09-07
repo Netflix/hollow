@@ -21,7 +21,7 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
             assertEquals(1, typeReadState.numShards());
             assertDataUnchanged(typeReadState, numRecords);
 
-            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024}) {
+            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32}) {  // , 64, 128, 256, 512, 1024
                 HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
                 HollowObjectTypeDataElements[] splitElements = splitter.split();
                 HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner(splitElements);

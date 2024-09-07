@@ -41,6 +41,17 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends HollowTypeDa
         writeStateEngine.setTargetMaxTypeShardSize(4 * 100 * 1000 * 1024);
     }
 
+    int[][] generateListContents(int numRecords) {
+        int[][] listContents = new int[numRecords][];
+        for (int i=0;i<numRecords;i++) {
+            listContents[i] = new int[i+1];
+            for (int j=0;j<i+1;j++) {
+                listContents[i][j] = j;
+            }
+        }
+        return listContents;
+    }
+
     protected HollowSetTypeReadState populateTypeStateWith(int[][] setContents) throws IOException {
         int numOrdinals = 1 + Arrays.stream(setContents)
                 .flatMapToInt(Arrays::stream)

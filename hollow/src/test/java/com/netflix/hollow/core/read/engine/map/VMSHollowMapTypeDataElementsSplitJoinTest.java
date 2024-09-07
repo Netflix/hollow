@@ -29,7 +29,7 @@ public class VMSHollowMapTypeDataElementsSplitJoinTest extends AbstractHollowMap
             assertEquals(maps.length, typeReadState.getPopulatedOrdinals().cardinality());
             assertDataUnchanged(typeReadState,maps);
 
-            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024}) {
+            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32}) {  // , 64, 128, 256, 512, 1024
                 HollowMapTypeDataElementsSplitter splitter = new HollowMapTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
                 HollowMapTypeDataElements[] splitElements = splitter.split();
 

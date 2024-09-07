@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -42,13 +43,15 @@ public class AbstractHollowMapTypeDataElementsSplitJoinTest extends HollowTypeDa
     private void populateWriteStateEngine(int[][][] maps) {
         // populate state so that there is 1:1 correspondence in key/value ordinal to value in int type
         // find max value across all maps
-        int numKeyValueOrdinals = 1 + Arrays.stream(maps)
-                .flatMap(Arrays::stream)
-                .flatMapToInt(Arrays::stream)
-                .max()
-                .orElseThrow(() -> new IllegalArgumentException("Array is empty"));
-        // populate write state with that many ordinals
-        super.populateWriteStateEngine(numKeyValueOrdinals);
+        if (maps.length > 0) {
+            int numKeyValueOrdinals = 1 + Arrays.stream(maps)
+                    .flatMap(Arrays::stream)
+                    .flatMapToInt(Arrays::stream)
+                    .max()
+                    .orElseThrow(() -> new IllegalArgumentException("Array is empty"));
+            // populate write state with that many ordinals
+            super.populateWriteStateEngine(numKeyValueOrdinals);
+        }
         for(int[][] map : maps) {
             HollowMapWriteRecord rec = new HollowMapWriteRecord();
             for (int[] entry : map) {
@@ -63,6 +66,21 @@ public class AbstractHollowMapTypeDataElementsSplitJoinTest extends HollowTypeDa
         populateWriteStateEngine(maps);
         roundTripSnapshot();
         return (HollowMapTypeReadState) readStateEngine.getTypeState("TestMap");
+    }
+
+    protected int[][][] generateListContents(int numRecords) {
+        int[][][] maps = new int[numRecords][][];
+        Random random = new Random();
+        int maxEntries = 10;
+        for (int i=0;i<numRecords;i++) {
+            int numEntries = 1 + random.nextInt(maxEntries);
+            maps[i] = new int[numEntries][2];
+            for (int j=0;j<numEntries;j++) {
+                maps[i][j][0] = (i * maxEntries) + j;
+                maps[i][j][1] = (i * maxEntries) + j + 1;
+            }
+        }
+        return maps;
     }
 
     protected void assertDataUnchanged(HollowMapTypeReadState typeState, int[][][] maps) {
