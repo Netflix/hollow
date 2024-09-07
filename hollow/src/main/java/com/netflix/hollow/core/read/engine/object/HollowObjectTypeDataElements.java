@@ -233,18 +233,33 @@ public class HollowObjectTypeDataElements extends HollowTypeDataElements {
 
     static void copyRecord(HollowObjectTypeDataElements to, int toOrdinal, HollowObjectTypeDataElements from, int fromOrdinal, long[] currentWriteVarLengthDataPointers) {
         for(int fieldIndex=0;fieldIndex<to.schema.numFields();fieldIndex++) {
+            long currentReadFixedLengthStartBit = ((long)fromOrdinal * from.bitsPerRecord) + from.bitOffsetPerField[fieldIndex];
+            long readValue = from.bitsPerField[fieldIndex] > 56 ?
+                    from.fixedLengthData.getLargeElementValue(currentReadFixedLengthStartBit, from.bitsPerField[fieldIndex])
+                    : from.fixedLengthData.getElementValue(currentReadFixedLengthStartBit, from.bitsPerField[fieldIndex]);
+
+            long toWriteFixedLengthStartBit = ((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex];
             if(to.varLengthData[fieldIndex] == null) {
-                long value = from.fixedLengthData.getLargeElementValue(((long)fromOrdinal * from.bitsPerRecord) + from.bitOffsetPerField[fieldIndex], from.bitsPerField[fieldIndex]);
-                to.fixedLengthData.setElementValue(((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex], to.bitsPerField[fieldIndex], value);
+                if(readValue == from.nullValueForField[fieldIndex]) {
+                    writeNullFixedLengthField(to, fieldIndex, toWriteFixedLengthStartBit);
+                }
+                else {
+                    to.fixedLengthData.setElementValue(toWriteFixedLengthStartBit, to.bitsPerField[fieldIndex], readValue);
+                }
             } else {
-                long fromStartByte = varLengthStartByte(from, fromOrdinal, fieldIndex);
-                long fromEndByte = varLengthEndByte(from, fromOrdinal, fieldIndex);
-                long size = fromEndByte - fromStartByte;
+                if ((readValue & (1L << (from.bitsPerField[fieldIndex] - 1))) != 0) {
+                    // SNAP: TODO: also nulls for test for float, double (special bit sequences), bytes,
+                    writeNullVarLengthField(to, fieldIndex, toWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+                    // SNAP: TODO: Maybe refactor: writeNullField(to, fieldIndex, toWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+                } else {
+                    long fromStartByte = varLengthStartByte(from, fromOrdinal, fieldIndex);
+                    long fromEndByte = varLengthEndByte(from, fromOrdinal, fieldIndex);
+                    long size = fromEndByte - fromStartByte;
 
-                to.fixedLengthData.setElementValue(((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex], to.bitsPerField[fieldIndex], currentWriteVarLengthDataPointers[fieldIndex] + size);
-                to.varLengthData[fieldIndex].copy(from.varLengthData[fieldIndex], fromStartByte, currentWriteVarLengthDataPointers[fieldIndex], size);
-
-                currentWriteVarLengthDataPointers[fieldIndex] += size;
+                    to.fixedLengthData.setElementValue(toWriteFixedLengthStartBit, to.bitsPerField[fieldIndex], currentWriteVarLengthDataPointers[fieldIndex] + size);
+                    to.varLengthData[fieldIndex].copy(from.varLengthData[fieldIndex], fromStartByte, currentWriteVarLengthDataPointers[fieldIndex], size);
+                    currentWriteVarLengthDataPointers[fieldIndex] += size;
+                }
             }
         }
     }
