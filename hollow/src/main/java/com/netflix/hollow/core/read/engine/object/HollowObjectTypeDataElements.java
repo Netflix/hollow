@@ -239,7 +239,7 @@ public class HollowObjectTypeDataElements extends HollowTypeDataElements {
                     : from.fixedLengthData.getElementValue(currentReadFixedLengthStartBit, from.bitsPerField[fieldIndex]);
 
             long toWriteFixedLengthStartBit = ((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex];
-            if(to.varLengthData[fieldIndex] == null) {
+            if(to.varLengthData[fieldIndex] == null) {   // fixed len data
                 if(readValue == from.nullValueForField[fieldIndex]) {
                     writeNullFixedLengthField(to, fieldIndex, toWriteFixedLengthStartBit);
                 }
@@ -247,10 +247,8 @@ public class HollowObjectTypeDataElements extends HollowTypeDataElements {
                     to.fixedLengthData.setElementValue(toWriteFixedLengthStartBit, to.bitsPerField[fieldIndex], readValue);
                 }
             } else {
-                if ((readValue & (1L << (from.bitsPerField[fieldIndex] - 1))) != 0) {
-                    // SNAP: TODO: also nulls for test for float, double (special bit sequences), bytes,
+                if ((readValue & (1L << (from.bitsPerField[fieldIndex] - 1))) != 0) {   // null check is the first bit set (other bits have an offset of the last non-null value)
                     writeNullVarLengthField(to, fieldIndex, toWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
-                    // SNAP: TODO: Maybe refactor: writeNullField(to, fieldIndex, toWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
                 } else {
                     long fromStartByte = varLengthStartByte(from, fromOrdinal, fieldIndex);
                     long fromEndByte = varLengthEndByte(from, fromOrdinal, fieldIndex);

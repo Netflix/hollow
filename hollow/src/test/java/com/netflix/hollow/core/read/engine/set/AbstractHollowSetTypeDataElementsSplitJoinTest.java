@@ -2,7 +2,7 @@ package com.netflix.hollow.core.read.engine.set;
 
 import static org.mockito.Mockito.when;
 
-import com.netflix.hollow.core.read.engine.HollowTypeDataElementsSplitJoinTest;
+import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitJoinTest;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.write.HollowSetTypeWriteState;
@@ -17,7 +17,7 @@ import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class AbstractHollowSetTypeDataElementsSplitJoinTest extends HollowTypeDataElementsSplitJoinTest {
+public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHollowTypeDataElementsSplitJoinTest {
     protected HollowSetSchema setSchema;
 
     @Mock

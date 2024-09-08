@@ -6,7 +6,7 @@ import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import org.junit.Before;
 
-public class HollowTypeDataElementsSplitJoinTest extends AbstractStateEngineTest {
+public class AbstractHollowTypeDataElementsSplitJoinTest extends AbstractStateEngineTest {
     protected HollowObjectSchema schema;
 
     @Before

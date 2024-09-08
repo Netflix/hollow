@@ -15,23 +15,16 @@ public class VMSHollowTypeReshardingStrategyTest {
 
         String blobPath = "/Users/ssingh/workspace/blob-cache/vms-daintree/prod/"; // null; // dir where snapshot blob exists for e.g. "/tmp/";
         long v = 20230611133921525l; // 0l; // snapshot version for e.g. 20230915162636001l;
-        int[] shardingFactorArray = {2 , 4, 8, 16, 32, 64, 128, 256, 512, 1024}; //
+        int[] shardingFactorArray = {2, 4, 8, 16, 32, 64, 128, 256, 512, 1024}; //
 
         HollowFilesystemBlobRetriever hollowBlobRetriever = new HollowFilesystemBlobRetriever(Paths.get(blobPath));
         HollowConsumer c = HollowConsumer
                 .withBlobRetriever(hollowBlobRetriever).build();
         c.triggerRefreshTo(v);
 
-        // SNAP: TODO: object type splitter is making null value an empty string (for inline string, not sure if it matters),
         // could be that the null value needs to be recomputed for the split shard?
         for (HollowTypeReadState typeReadState : c.getStateEngine().getTypeStates()) {
             for (int shardingFactor : shardingFactorArray) {
-                if (!(typeReadState.getSchema().getName().equals("StreamVariant")
-                 || typeReadState.getSchema().getName().equals("Certification")
-                || typeReadState.getSchema().getName().equals("Phase")
-                 || typeReadState.getSchema().getName().equals("EncodingProfile"))) {
-                    continue;
-                }
                 System.out.println("Processing type " + typeReadState.getSchema().getName() + " with " + typeReadState.numShards() + " shard and sharding factor " + shardingFactor);
                 if (blobPath==null || v==0l) {
                     throw new IllegalArgumentException("These arguments need to be specified");

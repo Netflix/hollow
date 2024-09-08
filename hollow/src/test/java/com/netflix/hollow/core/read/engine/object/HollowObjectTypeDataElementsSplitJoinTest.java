@@ -6,6 +6,7 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -83,6 +84,39 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
         HollowObjectTypeDataElements joined = joiner.join();
 
         assertEquals(-1, joined.maxOrdinal);
+    }
+
+    @Test
+    public void testSplitThenJoinWithNullAndSpecialValues() throws IOException {
+        initWriteStateEngine();
+        HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+        for(int i=0;i<10;i++) {
+            rec.reset();
+            rec.setLong("longField", i);
+            // other fields will be null
+            writeStateEngine.add("TestObject", rec);
+        }
+        for(int i=10;i<20;i++) {
+            rec.reset();
+            rec.setLong("longField", Long.MIN_VALUE);
+            rec.setString("stringField", "");
+            rec.setInt("intField", i);
+            rec.setDouble("doubleField", Double.NaN);
+            writeStateEngine.add("TestObject", rec);
+        }
+
+        roundTripSnapshot();
+        HollowObjectTypeReadState typeReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
+        assertEquals(1, typeReadState.numShards());
+
+        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 4);
+        HollowObjectTypeDataElements[] splitBy4 = splitter.split();
+
+        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner(splitBy4);
+        HollowObjectTypeDataElements joined = joiner.join();
+
+        HollowObjectTypeReadState joinedTypeReadState = new HollowObjectTypeReadState(typeReadState.getSchema(), joined);
+        assertChecksumUnchanged(typeReadState, joinedTypeReadState, typeReadState.getPopulatedOrdinals());
     }
 
     // manually invoked
