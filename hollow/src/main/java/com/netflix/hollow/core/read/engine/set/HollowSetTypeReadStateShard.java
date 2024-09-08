@@ -48,6 +48,23 @@ class HollowSetTypeReadStateShard implements HollowTypeReadStateShard {
         return size;
     }
 
+    boolean foundData(int hashCode, long startBucket, long endBucket, int value) {
+        hashCode = HashCodes.hashInt(hashCode);
+        long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
+        int bucketOrdinal = dataElements.getBucketValue(bucket);
+
+        while(bucketOrdinal != dataElements.emptyBucketValue) {
+            if(bucketOrdinal == value) {
+                return true;
+            }
+            bucket++;
+            if(bucket == endBucket)
+                bucket = startBucket;
+            bucketOrdinal = dataElements.getBucketValue(bucket);
+        }
+        return false;
+    }
+
     protected void applyShardToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
         int ordinal = populatedOrdinals.nextSetBit(shardNumber);
         while(ordinal != ORDINAL_NONE) {

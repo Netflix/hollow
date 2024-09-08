@@ -221,7 +221,6 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
         int shardOrdinal;
         boolean foundData;
 
-        threadsafe:
         do {
             long startBucket;
             long endBucket;
@@ -235,22 +234,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
                 endBucket = shard.dataElements.getEndBucket(shardOrdinal);
             } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
-            hashCode = HashCodes.hashInt(hashCode);
-            long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
-            int bucketOrdinal = shard.dataElements.getBucketValue(bucket);
-
-            while(bucketOrdinal != shard.dataElements.emptyBucketValue) {
-                if(bucketOrdinal == value) {
-                    foundData = true;
-                    continue threadsafe;
-                }
-                bucket++;
-                if(bucket == endBucket)
-                    bucket = startBucket;
-                bucketOrdinal = shard.dataElements.getBucketValue(bucket);
-            }
-
-            foundData = false;
+            foundData = shard.foundData(hashCode, startBucket, endBucket, value);
         } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
         return foundData;

@@ -28,7 +28,6 @@ import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
-import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -223,7 +222,6 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         int shardOrdinal;
         int valueOrdinal;
 
-        threadsafe: // SNAP: TODO: is there a better way to handle this pattern?
         do {
             long startBucket;
             long endBucket;
@@ -236,22 +234,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
                 endBucket = shard.dataElements.getEndBucket(shardOrdinal);
             } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
-            hashCode = HashCodes.hashInt(hashCode);
-            long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
-            int bucketKeyOrdinal = shard.dataElements.getBucketKeyByAbsoluteIndex(bucket);
-
-            while(bucketKeyOrdinal != shard.dataElements.emptyBucketKeyValue) {
-                if(bucketKeyOrdinal == keyOrdinal) {
-                    valueOrdinal = shard.dataElements.getBucketValueByAbsoluteIndex(bucket);
-                    continue threadsafe;
-                }
-                bucket++;
-                if(bucket == endBucket)
-                    bucket = startBucket;
-                bucketKeyOrdinal = shard.dataElements.getBucketKeyByAbsoluteIndex(bucket);
-            }
-
-            valueOrdinal = ORDINAL_NONE;
+            valueOrdinal = shard.get(hashCode, startBucket, endBucket, keyOrdinal);
         } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
         return valueOrdinal;

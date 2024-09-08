@@ -18,7 +18,6 @@ package com.netflix.hollow.core.read.engine.map;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
-import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
@@ -49,6 +48,22 @@ class HollowMapTypeReadStateShard implements HollowTypeReadStateShard {
         return size;
     }
 
+    int get(int hashCode, long startBucket, long endBucket, int keyOrdinal)  {
+        hashCode = HashCodes.hashInt(hashCode);
+        long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
+        int bucketKeyOrdinal = dataElements.getBucketKeyByAbsoluteIndex(bucket);
+
+        while(bucketKeyOrdinal != dataElements.emptyBucketKeyValue) {
+            if(bucketKeyOrdinal == keyOrdinal) {
+                return dataElements.getBucketValueByAbsoluteIndex(bucket);
+            }
+            bucket++;
+            if(bucket == endBucket)
+                bucket = startBucket;
+            bucketKeyOrdinal = dataElements.getBucketKeyByAbsoluteIndex(bucket);
+        }
+        return ORDINAL_NONE;
+    }
 
     public long relativeBucket(long absoluteBucketIndex) {
         long bucketValue;

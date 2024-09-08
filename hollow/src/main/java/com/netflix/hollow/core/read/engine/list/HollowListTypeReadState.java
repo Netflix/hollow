@@ -192,7 +192,6 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
         long endElement;
 
         do {
-
             do {
                 shardsHolder = this.shardsVolatile;
                 shard = shardsHolder.shards[ordinal & shardsHolder.shardNumberMask];
@@ -203,7 +202,6 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
             } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
             long elementIndex = startElement + listIndex;
-
             if(elementIndex >= endElement)
                 throw new ArrayIndexOutOfBoundsException("Array index out of bounds: " + listIndex + ", list size: " + (endElement - startElement));
 
@@ -233,7 +231,6 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     @Override
     public HollowOrdinalIterator ordinalIterator(int ordinal) {
         sampler.recordIterator();
-
         return new HollowListOrdinalIterator(ordinal, this);
     }
 
