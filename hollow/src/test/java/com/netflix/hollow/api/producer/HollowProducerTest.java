@@ -427,7 +427,6 @@ public class HollowProducerTest {
         System.out.println("Asserted Correctness of version:" + version + "\n\n");
     }
 
-    // SNAP: TODO: add test for collections
     @Test
     public void testReshardingAllTypes() {
         for (boolean allowResharding : Arrays.asList(true, false)) {
