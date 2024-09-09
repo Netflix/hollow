@@ -117,7 +117,6 @@ public class HollowClientUpdater {
         return updateTo(new HollowConsumer.VersionInfo(requestedVersion));
     }
     public synchronized boolean updateTo(HollowConsumer.VersionInfo requestedVersionInfo) throws Throwable {
-        metrics.setLastRefreshStartNs(System.nanoTime());
         long requestedVersion = requestedVersionInfo.getVersion();
         if (requestedVersion == getCurrentVersionId()) {
             if (requestedVersion == HollowConstants.VERSION_NONE && hollowDataHolderVolatile == null) {
@@ -128,6 +127,7 @@ public class HollowClientUpdater {
             }
             return true;
         }
+        metrics.setLastRefreshStartNs(System.nanoTime());
 
         // Take a snapshot of the listeners to ensure additions or removals may occur concurrently
         // but will not take effect until a subsequent refresh
@@ -168,8 +168,10 @@ public class HollowClientUpdater {
                     && requestedVersion == HollowConstants.VERSION_LATEST)
                 throw new IllegalArgumentException("Could not create an update plan, because no existing versions could be retrieved.");
 
-            if (updatePlan.destinationVersion(requestedVersion) == getCurrentVersionId())
+            if (updatePlan.destinationVersion(requestedVersion) == getCurrentVersionId()) {
+                metrics.setLastRefreshEndNs(System.nanoTime());
                 return true;
+            }
 
             if (updatePlan.isSnapshotPlan()) {  // 1 snapshot and 0+ delta transitions
                 HollowDataHolder oldDh = hollowDataHolderVolatile;
