@@ -38,6 +38,8 @@ import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.api.producer.listener.VetoableListener;
+import com.netflix.hollow.api.producer.model.CustomReferenceType;
+import com.netflix.hollow.api.producer.model.HasAllTypeStates;
 import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -427,53 +429,91 @@ public class HollowProducerTest {
 
     // SNAP: TODO: add test for collections
     @Test
-    public void testReshardingObjectTypes() {
+    public void testReshardingAllTypes() {
         for (boolean allowResharding : Arrays.asList(true, false)) {
             HollowProducer.Builder producerBuilder = HollowProducer.withPublisher(new FakeBlobPublisher()).withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath()));
             if (allowResharding)
                     producerBuilder = producerBuilder.withTypeResharding(true);
             HollowProducer producer = producerBuilder.withTargetMaxTypeShardSize(32).build();
+            producer.initializeDataModel(HasAllTypeStates.class);
             producer.runCycle(ws -> {
                 // causes 2 shards for Integer at shard size 32
                 for (int i=0;i<50;i++) {
-                    Set<Long> set = new HashSet<>(Collections.singleton((long) i));
-                    ws.add(new HasNonObjectField(i, set));
+                    final long val = new Long(i);
+                    Set<String> set = new HashSet<>(Arrays.asList("e" + val));
+                    List<Integer> list = Arrays.asList(i);
+                    Map<String, Long> map = new HashMap<String, Long>(){{put("k"+val, new Long(val));}};
+                    ws.add(new HasAllTypeStates(
+                            new CustomReferenceType(val),
+                            set,
+                            list,
+                            map
+                    ));
                 }
             });
-            assertEquals(2, producer.getWriteEngine().getTypeState("Integer").getNumShards());
-            int numShardsNonObjectType = producer.getWriteEngine().getTypeState("SetOfLong").getNumShards();
-            assertTrue(numShardsNonObjectType >= 1);
+            assertEquals(2, producer.getWriteEngine().getTypeState("Long").getNumShards());
+            assertEquals(2, producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+            assertEquals(8, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+            assertEquals(4, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+            assertEquals(8, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
+
             producer.runCycle(ws -> {
 
-                // 2x the data, causes 4 shards for Integer at shard size 32
-                // 2x the collection type, numShards should remain the same (until non object types support resharding)
+                // 1x the data, causes more num shards at same shard size
                 for (int i=0;i<100;i++) {
-                    Set<Long> set = new HashSet<>(Collections.singleton((long) i));
-                    ws.add(new HasNonObjectField(i, set));
+                    final long val = new Long(i);
+                    ws.add(new HasAllTypeStates(
+                            new CustomReferenceType(val),
+                            new HashSet<>(Arrays.asList("e" + val)),
+                            Arrays.asList(i),
+                            new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                    ));
                 }
             });
             if (allowResharding) {
-                assertEquals(4, producer.getWriteEngine().getTypeState("Integer").getNumShards());
+                assertTrue(2 < producer.getWriteEngine().getTypeState("Long").getNumShards());
+                assertTrue(2 < producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+
             } else {
-                assertEquals(2, producer.getWriteEngine().getTypeState("Integer").getNumShards());
+                assertEquals(2, producer.getWriteEngine().getTypeState("Long").getNumShards());
+                assertEquals(2, producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+
             }
-            assertEquals(numShardsNonObjectType, producer.getWriteEngine().getTypeState("SetOfLong").getNumShards());
+
+            // producer doesn't support resharding for these types yet
+            assertEquals(8, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+            assertEquals(4, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+            assertEquals(8, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
 
             producer.runCycle(ws -> {
-                // still 4 shards, because ghost records
+                // still same num shards, because ghost records
                 for (int i=0;i<50;i++) {
-                    Set<Long> set = new HashSet<>(Collections.singleton((long) i));
-                    ws.add(new HasNonObjectField(i, set));
+                    final long val = new Long(i);
+                    ws.add(new HasAllTypeStates(
+                            new CustomReferenceType(val),
+                            new HashSet<>(Arrays.asList("e" + val)),
+                            Arrays.asList(i),
+                            new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                    ));
                 }
             });
             producer.runCycle(ws -> {
-                // back to 2 shards for Integer
+                // back to original shard count
                 for (int i=0;i<49;i++) {    // one change in runCycle
-                    Set<Long> set = new HashSet<>(Collections.singleton((long) i));
-                    ws.add(new HasNonObjectField(i, set));
+                    final long val = new Long(i);
+                    ws.add(new HasAllTypeStates(
+                            new CustomReferenceType(val),
+                            new HashSet<>(Arrays.asList("e" + val)),
+                            Arrays.asList(i),
+                            new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                    ));
                 }
             });
-            assertEquals(2, producer.getWriteEngine().getTypeState("Integer").getNumShards());
+            assertEquals(2, producer.getWriteEngine().getTypeState("Long").getNumShards());
+            assertEquals(2, producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+            assertEquals(8, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+            assertEquals(4, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+            assertEquals(8, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
         }
     }
 

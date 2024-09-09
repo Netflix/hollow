@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.api.producer.model.CustomReferenceType;
+import com.netflix.hollow.api.producer.model.HasAllTypeStates;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
 import com.netflix.hollow.test.InMemoryBlobStore;
@@ -31,10 +33,10 @@ public class HollowTypeWriteStateTest {
 
         // add a new object type and all collection types to data model
         HollowProducer p2 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager).build();
-        p2.initializeDataModel(HasAllTypes.class);
+        p2.initializeDataModel(HasAllTypeStates.class);
         p2.restore(v1, blobStore);
         long v2 = p2.runCycle(state -> {
-            HasAllTypes o1 = new HasAllTypes(
+            HasAllTypeStates o1 = new HasAllTypeStates(
                     new CustomReferenceType(5l),
                     new HashSet<>(Arrays.asList("e1")),
                     Arrays.asList(1, 2, 3),
@@ -81,12 +83,12 @@ public class HollowTypeWriteStateTest {
 
         HollowProducer p1 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
                 .withTypeResharding(true).withTargetMaxTypeShardSize(32).build();
-        p1.initializeDataModel(HasAllTypes.class);
+        p1.initializeDataModel(HasAllTypeStates.class);
         long v1 = p1.runCycle(ws -> {
             ws.add("A");
             for (int i=0; i<50; i++) { // results in 2 shards at shard size 32
                 final long val = new Long(i);
-                ws.add(new HasAllTypes(
+                ws.add(new HasAllTypeStates(
                         new CustomReferenceType(val),
                         new HashSet<>(Arrays.asList("e" + val)),
                         Arrays.asList(i),
@@ -144,7 +146,7 @@ public class HollowTypeWriteStateTest {
             ws.add("A");
             for (int i=0; i<50; i++) { // back up to the original shard counts
                 final long val = new Long(i);
-                ws.add(new HasAllTypes(
+                ws.add(new HasAllTypeStates(
                         new CustomReferenceType(val),
                         new HashSet<>(Arrays.asList("e" + val)),
                         Arrays.asList(i),
@@ -187,11 +189,11 @@ public class HollowTypeWriteStateTest {
 
         HollowProducer p1 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
                 .withTargetMaxTypeShardSize(32).build();
-        p1.initializeDataModel(HasAllTypes.class);
+        p1.initializeDataModel(HasAllTypeStates.class);
         long v1 = p1.runCycle(ws -> {
             for (int i=0; i<50; i++) {
                 final long val = new Long(i);
-                ws.add(new HasAllTypes(
+                ws.add(new HasAllTypeStates(
                         new CustomReferenceType(val),
                         new HashSet<>(Arrays.asList("e" + val)),
                         Arrays.asList(i),
@@ -223,7 +225,7 @@ public class HollowTypeWriteStateTest {
 
         HollowProducer p2 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
                 .withTypeResharding(true).withTargetMaxTypeShardSize(32).build();
-        p2.initializeDataModel(HasAllTypes.class);
+        p2.initializeDataModel(HasAllTypeStates.class);
         p2.restore(v1, blobStore);
         assertEquals(2, p2.getWriteEngine().getTypeState("Long").numShards);
         assertEquals(2, consumer.getStateEngine().getTypeState("CustomReferenceType").numShards());
@@ -238,7 +240,7 @@ public class HollowTypeWriteStateTest {
         long v2 = p2.runCycle(ws -> {
             for (int i=0; i<1000; i++) { // results more shards at same shard size
                 final long val = new Long(i);
-                ws.add(new HasAllTypes(
+                ws.add(new HasAllTypeStates(
                         new CustomReferenceType(val),
                         new HashSet<>(Arrays.asList("e" + val)),
                         Arrays.asList(i),
@@ -271,27 +273,6 @@ public class HollowTypeWriteStateTest {
         assertEquals(8, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
 
 
-    }
-
-    private class HasAllTypes {
-        CustomReferenceType customReferenceType;
-        Set<String> setOfStrings;
-        List<Integer> listOfInt;
-        Map<String, Long> mapOfStringToLong;
-
-        private HasAllTypes(CustomReferenceType customReferenceType, Set<String> setOfStrings, List<Integer> listOfInt, Map<String, Long> mapOfStringToLong) {
-            this.customReferenceType = customReferenceType;
-            this.setOfStrings = setOfStrings;
-            this.listOfInt = listOfInt;
-            this.mapOfStringToLong = mapOfStringToLong;
-        }
-    }
-
-    private class CustomReferenceType {
-        long id;
-        private CustomReferenceType(long id) {
-            this.id = id;
-        }
     }
 
     @HollowShardLargeType(numShards=4)
