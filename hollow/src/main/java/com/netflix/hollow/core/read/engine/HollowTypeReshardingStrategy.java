@@ -171,7 +171,6 @@ public abstract class HollowTypeReshardingStrategy {
             }
         }
         return newShards;
-        // return shardsHolder.getClass().getConstructor(HollowTypeReadStateShard[].class).newInstance((Object) newShards);
     }
 
     public HollowTypeReadStateShard[] splitDataElementsForOneShard(HollowTypeReadState typeState, int currentIndex, int prevNumShards, int shardingFactor) {

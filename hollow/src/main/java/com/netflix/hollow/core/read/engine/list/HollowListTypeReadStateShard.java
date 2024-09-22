@@ -22,7 +22,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.util.BitSet;
 
-public class HollowListTypeReadStateShard implements HollowTypeReadStateShard {
+class HollowListTypeReadStateShard implements HollowTypeReadStateShard {
 
     final HollowListTypeDataElements dataElements;
     final int shardOrdinalShift;
@@ -58,8 +58,10 @@ public class HollowListTypeReadStateShard implements HollowTypeReadStateShard {
                 int size = size(shardOrdinal);
     
                 checksum.applyInt(ordinal);
+                long startElement = dataElements.getStartElement(shardOrdinal);
+                long endElement = dataElements.getEndElement(shardOrdinal);
                 for(int i=0;i<size;i++)
-                    checksum.applyInt(getElementOrdinal(shardOrdinal, i));
+                    checksum.applyInt(getElementOrdinal(startElement, endElement, i));
 
                 ordinal = ordinal + numShards;
             } else {
@@ -71,9 +73,7 @@ public class HollowListTypeReadStateShard implements HollowTypeReadStateShard {
         }
     }
 
-    private int getElementOrdinal(int ordinal, int listIndex) {
-        long startElement = dataElements.getStartElement(ordinal);
-        long endElement = dataElements.getEndElement(ordinal);
+    int getElementOrdinal(long startElement, long endElement, int listIndex) {
         long elementIndex = startElement + listIndex;
         if(elementIndex >= endElement)
             throw new ArrayIndexOutOfBoundsException("Array index out of bounds: " + listIndex + ", list size: " + (endElement - startElement));

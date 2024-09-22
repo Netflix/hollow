@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class VMSHollowTypeReshardingStrategyTest {
 
-    @Test
+    // @Test
     public void testSplittingAndJoiningWithSnapshotBlob() throws Exception {
 
         String blobPath = "/Users/ssingh/workspace/blob-cache/vms-daintree/prod/"; // null; // dir where snapshot blob exists for e.g. "/tmp/";

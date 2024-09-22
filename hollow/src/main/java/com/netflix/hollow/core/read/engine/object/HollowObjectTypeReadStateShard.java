@@ -31,7 +31,7 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 
-public class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
+class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
 
     private final HollowObjectSchema schema;
     final HollowObjectTypeDataElements dataElements;

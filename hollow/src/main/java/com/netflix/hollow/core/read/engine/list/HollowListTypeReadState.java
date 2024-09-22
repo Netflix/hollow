@@ -201,11 +201,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
                 endElement = shard.dataElements.getEndElement(shardOrdinal);
             } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
-            long elementIndex = startElement + listIndex;
-            if(elementIndex >= endElement)
-                throw new ArrayIndexOutOfBoundsException("Array index out of bounds: " + listIndex + ", list size: " + (endElement - startElement));
-
-            elementOrdinal = (int)shard.dataElements.elementData.getElementValue(elementIndex * shard.dataElements.bitsPerElement, shard.dataElements.bitsPerElement);
+            elementOrdinal = shard.getElementOrdinal(startElement, endElement, listIndex);
         } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
         return elementOrdinal;
@@ -284,8 +280,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
 
     @Override
     protected void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema) {
-        final HollowListTypeShardsHolder shardsHolder = this.shardsVolatile;
-        final HollowListTypeReadStateShard[] shards = shardsHolder.shards;
+        final HollowListTypeReadStateShard[] shards = this.shardsVolatile.shards;
         if(!getSchema().equals(withSchema))
             throw new IllegalArgumentException("HollowListTypeReadState cannot calculate checksum with unequal schemas: " + getSchema().getName());
         

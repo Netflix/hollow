@@ -28,7 +28,6 @@ import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
-import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -62,7 +61,6 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
     private static final Logger LOG = Logger.getLogger(HollowSetTypeReadState.class.getName());
 
     private final HollowSetSampler sampler;
-    
 
     private int maxOrdinal;
 
@@ -429,7 +427,6 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 	}
 	
 	public void buildKeyDeriver() {
-        final HollowSetTypeReadStateShard[] shards = this.shardsVolatile.shards;
         if(getSchema().getHashKey() != null) {
             try {
                 this.keyDeriver = new HollowPrimaryKeyValueDeriver(getSchema().getHashKey(), getStateEngine());

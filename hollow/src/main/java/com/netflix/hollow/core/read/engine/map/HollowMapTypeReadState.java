@@ -36,7 +36,6 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
-import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.SetMapKeyHasher;
 import com.netflix.hollow.core.read.engine.ShardsHolder;
@@ -59,14 +58,12 @@ import java.util.logging.Logger;
  */
 public class HollowMapTypeReadState extends HollowTypeReadState implements HollowMapTypeDataAccess {
     private static final Logger LOG = Logger.getLogger(HollowMapTypeReadState.class.getName());
-    private static final HollowTypeReshardingStrategy RESHARDING_STRATEGY = new HollowMapTypeReshardingStrategy();
 
     private final HollowMapSampler sampler;
     
-    private volatile HollowPrimaryKeyValueDeriver keyDeriver;
-    
     private int maxOrdinal;
 
+    private volatile HollowPrimaryKeyValueDeriver keyDeriver;
     volatile HollowMapTypeShardsHolder shardsVolatile;
 
     @Override
@@ -487,7 +484,6 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
     
     public void buildKeyDeriver() {
-        HollowMapTypeReadStateShard[] shards = this.shardsVolatile.shards;
         if(getSchema().getHashKey() != null) {
             try {
                 this.keyDeriver = new HollowPrimaryKeyValueDeriver(getSchema().getHashKey(), getStateEngine());
