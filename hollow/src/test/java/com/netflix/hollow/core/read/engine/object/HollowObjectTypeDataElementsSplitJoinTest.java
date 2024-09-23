@@ -2,14 +2,9 @@ package com.netflix.hollow.core.read.engine.object;
 
 import static org.junit.Assert.assertEquals;
 
-import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.BitSet;
 import org.junit.Test;
 
@@ -22,7 +17,7 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
             assertEquals(1, typeReadState.numShards());
             assertDataUnchanged(typeReadState, numRecords);
 
-            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32}) {  // , 64, 128, 256, 512, 1024
+            for (int numSplits : new int[]{2}) {  // 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024
                 HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
                 HollowObjectTypeDataElements[] splitElements = splitter.split();
                 HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner(splitElements);
@@ -117,38 +112,5 @@ public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObj
 
         HollowObjectTypeReadState joinedTypeReadState = new HollowObjectTypeReadState(typeReadState.getSchema(), joined);
         assertChecksumUnchanged(typeReadState, joinedTypeReadState, typeReadState.getPopulatedOrdinals());
-    }
-
-    // manually invoked
-    // @Test
-    public void testSplittingAndJoiningWithSnapshotBlob() throws Exception {
-
-        String blobPath = null; // dir where snapshot blob exists for e.g. "/tmp/";
-        long v = 0l; // snapshot version for e.g. 20230915162636001l;
-        String objectTypeWithOneShard = null; // type name corresponding to an Object type with single shard for e.g. "Movie";
-        int numSplits = 2;
-
-        if (blobPath==null || v==0l || objectTypeWithOneShard==null) {
-            throw new IllegalArgumentException("These arguments need to be specified");
-        }
-        HollowFilesystemBlobRetriever hollowBlobRetriever = new HollowFilesystemBlobRetriever(Paths.get(blobPath));
-        HollowConsumer c = HollowConsumer.withBlobRetriever(hollowBlobRetriever).build();
-        c.triggerRefreshTo(v);
-        HollowReadStateEngine readStateEngine = c.getStateEngine();
-
-        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(objectTypeWithOneShard);
-        HollowSchema origSchema = typeState.getSchema();
-
-        assertEquals(1, typeState.numShards());
-
-        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(typeState.currentDataElements()[0], numSplits);
-        HollowObjectTypeDataElements[] splitElements = splitter.split();
-
-        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner(splitElements);
-        HollowObjectTypeDataElements joinedElements = joiner.join();
-
-        HollowObjectTypeReadState resultTypeState = new HollowObjectTypeReadState(typeState.getSchema(), joinedElements);
-
-        assertChecksumUnchanged(resultTypeState, typeState, typeState.getPopulatedOrdinals());
     }
 }

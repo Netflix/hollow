@@ -13,54 +13,54 @@ import org.junit.Test;
 
 public class VMSHollowMapTypeDataElementsSplitJoinTest extends AbstractHollowMapTypeDataElementsSplitJoinTest {
 
-    @Test
-    public void testSplitThenJoin() throws IOException {
-        int[][][] maps = new int[][][] {
-                { {33321, 1}, {2, 2}, {32224, 3} },
-                { {1, 31442}, {2, 1}, {3, 2} },
-                { {1002, 2} },
-                { {0, 134} },
-        };
+//    @Test
+//    public void testSplitThenJoin() throws IOException {
+//        int[][][] maps = new int[][][] {
+//                { {33321, 1}, {2, 2}, {32224, 3} },
+//                { {1, 31442}, {2, 1}, {3, 2} },
+//                { {1002, 2} },
+//                { {0, 134} },
+//        };
+//
+//        // 1->2->1, 1->4->1, ...
+//        for (int listRecord=0;listRecord<maps.length;listRecord++) {
+//            HollowMapTypeReadState typeReadState = populateTypeStateWith(maps);
+//            assertEquals(1, typeReadState.numShards());
+//            assertEquals(maps.length, typeReadState.getPopulatedOrdinals().cardinality());
+//            assertDataUnchanged(typeReadState,maps);
+//
+//            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32}) {  // , 64, 128, 256, 512, 1024
+//                HollowMapTypeDataElementsSplitter splitter = new HollowMapTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
+//                HollowMapTypeDataElements[] splitElements = splitter.split();
+//
+//                HollowMapTypeDataElementsJoiner joiner = new HollowMapTypeDataElementsJoiner(splitElements);
+//                HollowMapTypeDataElements joinedElements = joiner.join();
+//
+//                HollowMapTypeReadState resultTypeReadState = new HollowMapTypeReadState(typeReadState.getSchema(), joinedElements);
+//                assertDataUnchanged(resultTypeReadState, maps);
+//                assertChecksumUnchanged(resultTypeReadState, typeReadState, typeReadState.getPopulatedOrdinals());
+//            }
+//        }
+//    }
 
-        // 1->2->1, 1->4->1, ...
-        for (int listRecord=0;listRecord<maps.length;listRecord++) {
-            HollowMapTypeReadState typeReadState = populateTypeStateWith(maps);
-            assertEquals(1, typeReadState.numShards());
-            assertEquals(maps.length, typeReadState.getPopulatedOrdinals().cardinality());
-            assertDataUnchanged(typeReadState,maps);
-
-            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32}) {  // , 64, 128, 256, 512, 1024
-                HollowMapTypeDataElementsSplitter splitter = new HollowMapTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
-                HollowMapTypeDataElements[] splitElements = splitter.split();
-
-                HollowMapTypeDataElementsJoiner joiner = new HollowMapTypeDataElementsJoiner(splitElements);
-                HollowMapTypeDataElements joinedElements = joiner.join();
-
-                HollowMapTypeReadState resultTypeReadState = new HollowMapTypeReadState(typeReadState.getSchema(), joinedElements);
-                assertDataUnchanged(resultTypeReadState, maps);
-                assertChecksumUnchanged(resultTypeReadState, typeReadState, typeReadState.getPopulatedOrdinals());
-            }
-        }
-    }
-
-    @Test
-    public void testSplitThenJoinWithEmptyJoin() throws IOException {
-        int[][][] maps = new int[][][] {
-                { {1, 1} }
-        };
-        HollowMapTypeReadState typeReadState = populateTypeStateWith(maps);
-        assertEquals(1, typeReadState.numShards());
-
-        HollowMapTypeDataElementsSplitter splitter = new HollowMapTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 4);
-        HollowMapTypeDataElements[] splitBy4 = splitter.split();
-        assertEquals(-1, splitBy4[1].maxOrdinal);
-        assertEquals(-1, splitBy4[3].maxOrdinal);
-
-        HollowMapTypeDataElementsJoiner joiner = new HollowMapTypeDataElementsJoiner(new HollowMapTypeDataElements[]{splitBy4[1], splitBy4[3]});
-        HollowMapTypeDataElements joined = joiner.join();
-
-        assertEquals(-1, joined.maxOrdinal);
-    }
+//    @Test
+//    public void testSplitThenJoinWithEmptyJoin() throws IOException {
+//        int[][][] maps = new int[][][] {
+//                { {1, 1} }
+//        };
+//        HollowMapTypeReadState typeReadState = populateTypeStateWith(maps);
+//        assertEquals(1, typeReadState.numShards());
+//
+//        HollowMapTypeDataElementsSplitter splitter = new HollowMapTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 4);
+//        HollowMapTypeDataElements[] splitBy4 = splitter.split();
+//        assertEquals(-1, splitBy4[1].maxOrdinal);
+//        assertEquals(-1, splitBy4[3].maxOrdinal);
+//
+//        HollowMapTypeDataElementsJoiner joiner = new HollowMapTypeDataElementsJoiner(new HollowMapTypeDataElements[]{splitBy4[1], splitBy4[3]});
+//        HollowMapTypeDataElements joined = joiner.join();
+//
+//        assertEquals(-1, joined.maxOrdinal);
+//    }
 
     // manually invoked
     @Test

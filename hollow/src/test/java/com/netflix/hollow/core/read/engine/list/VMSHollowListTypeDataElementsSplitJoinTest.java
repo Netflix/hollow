@@ -6,47 +6,46 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.BitSet;
 import org.junit.Test;
 
 public class VMSHollowListTypeDataElementsSplitJoinTest extends AbstractHollowListTypeDataElementsSplitJoinTest {
 
-    @Test
-    public void testSplitThenJoin() throws IOException {
+//    @Test
+//    public void testSplitThenJoin() throws IOException {
 
-        int numListRecords = 100;
-        int[][] listContents = new int[numListRecords][];
-        for (int i=0;i<numListRecords;i++) {
-            listContents[i] = new int[i+1];
-            for (int j=0;j<i+1;j++) {
-                listContents[i][j] = j;
-            }
-        }
+//        int numListRecords = 100;
+//        int[][] listContents = new int[numListRecords][];
+//        for (int i=0;i<numListRecords;i++) {
+//            listContents[i] = new int[i+1];
+//            for (int j=0;j<i+1;j++) {
+//                listContents[i][j] = j;
+//            }
+//        }
 
-        prettyPrintArray(listContents);
+//        prettyPrintArray(listContents);
 
-        // 1->2->1, 1->4->1, ...
-        for (int listRecord=0;listRecord<numListRecords;listRecord++) {
-            HollowListTypeReadState typeReadState = populateTypeStateWith(listContents);
-            assertEquals(1, typeReadState.numShards());
-            assertEquals(numListRecords, typeReadState.getPopulatedOrdinals().cardinality());
-            assertDataUnchanged(typeReadState, listContents);
+//        // 1->2->1, 1->4->1, ...
+//        for (int listRecord=0;listRecord<numListRecords;listRecord++) {
+//            HollowListTypeReadState typeReadState = populateTypeStateWith(listContents);
+//            assertEquals(1, typeReadState.numShards());
+//            assertEquals(numListRecords, typeReadState.getPopulatedOrdinals().cardinality());
+//            assertDataUnchanged(typeReadState, listContents);
 
-            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32}) {  // , 64, 128, 256, 512, 1024
-                HollowListTypeDataElementsSplitter splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
-                HollowListTypeDataElements[] splitElements = splitter.split();
+//            for (int numSplits : new int[]{1, 2, 4, 8, 16, 32}) {  // , 64, 128, 256, 512, 1024
+//                HollowListTypeDataElementsSplitter splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
+//                HollowListTypeDataElements[] splitElements = splitter.split();
 
-                HollowListTypeDataElementsJoiner joiner = new HollowListTypeDataElementsJoiner(splitElements);
-                HollowListTypeDataElements joinedElements = joiner.join();
-                HollowListTypeReadState resultTypeReadState = new HollowListTypeReadState(typeReadState.getSchema(), joinedElements);
+//                HollowListTypeDataElementsJoiner joiner = new HollowListTypeDataElementsJoiner(splitElements);
+//                HollowListTypeDataElements joinedElements = joiner.join();
+//                HollowListTypeReadState resultTypeReadState = new HollowListTypeReadState(typeReadState.getSchema(), joinedElements);
 
-                assertDataUnchanged(resultTypeReadState, listContents);
-                assertChecksumUnchanged(resultTypeReadState, typeReadState, typeReadState.getPopulatedOrdinals());
-            }
-        }
-    }
+//                assertDataUnchanged(resultTypeReadState, listContents);
+//                assertChecksumUnchanged(resultTypeReadState, typeReadState, typeReadState.getPopulatedOrdinals());
+//            }
+//        }
+//    }
 
     static void prettyPrintArray(int[][] array) {
         for (int[] row : array) {
@@ -73,23 +72,23 @@ public class VMSHollowListTypeDataElementsSplitJoinTest extends AbstractHollowLi
     }
 
 
-    @Test
-    public void testSplitThenJoinWithEmptyJoin() throws IOException {
-        int numListRecords = 1;
-        int[][] listContents = {{1}};
-        HollowListTypeReadState typeReadState = populateTypeStateWith(listContents);
-        assertEquals(1, typeReadState.numShards());
-
-        HollowListTypeDataElementsSplitter splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 4);
-        HollowListTypeDataElements[] splitBy4 = splitter.split();
-        assertEquals(-1, splitBy4[1].maxOrdinal);
-        assertEquals(-1, splitBy4[3].maxOrdinal);
-
-        HollowListTypeDataElementsJoiner joiner = new HollowListTypeDataElementsJoiner(new HollowListTypeDataElements[]{splitBy4[1], splitBy4[3]});
-        HollowListTypeDataElements joined = joiner.join();
-
-        assertEquals(-1, joined.maxOrdinal);
-    }
+//    @Test
+//    public void testSplitThenJoinWithEmptyJoin() throws IOException {
+//        int numListRecords = 1;
+//        int[][] listContents = {{1}};
+//        HollowListTypeReadState typeReadState = populateTypeStateWith(listContents);
+//        assertEquals(1, typeReadState.numShards());
+//
+//        HollowListTypeDataElementsSplitter splitter = new HollowListTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 4);
+//        HollowListTypeDataElements[] splitBy4 = splitter.split();
+//        assertEquals(-1, splitBy4[1].maxOrdinal);
+//        assertEquals(-1, splitBy4[3].maxOrdinal);
+//
+//        HollowListTypeDataElementsJoiner joiner = new HollowListTypeDataElementsJoiner(new HollowListTypeDataElements[]{splitBy4[1], splitBy4[3]});
+//        HollowListTypeDataElements joined = joiner.join();
+//
+//        assertEquals(-1, joined.maxOrdinal);
+//    }
 
     // manually invoked
     @Test

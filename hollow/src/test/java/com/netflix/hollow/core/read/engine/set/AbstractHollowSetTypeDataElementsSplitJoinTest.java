@@ -41,22 +41,22 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
         writeStateEngine.setTargetMaxTypeShardSize(4 * 100 * 1000 * 1024);
     }
 
-    int[][] generateListContents(int numRecords) {
-        int[][] listContents = new int[numRecords][];
+    int[][] generateSetContents(int numRecords) {
+        int[][] setContents = new int[numRecords][];
         for (int i=0;i<numRecords;i++) {
-            listContents[i] = new int[i+1];
+            setContents[i] = new int[i+1];
             for (int j=0;j<i+1;j++) {
-                listContents[i][j] = j;
+                setContents[i][j] = j;
             }
         }
-        return listContents;
+        return setContents;
     }
 
     protected HollowSetTypeReadState populateTypeStateWith(int[][] setContents) throws IOException {
         int numOrdinals = 1 + Arrays.stream(setContents)
                 .flatMapToInt(Arrays::stream)
                 .max()
-                .orElseThrow(() -> new IllegalArgumentException("Array is empty"));
+                .orElse(0);
         // populate write state with that many ordinals
         super.populateWriteStateEngine(numOrdinals);
         for(int[] set : setContents) {

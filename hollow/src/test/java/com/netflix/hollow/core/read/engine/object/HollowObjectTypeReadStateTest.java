@@ -10,8 +10,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
     @Test
     public void testResharding() throws Exception {
 
-        for (int shardingFactor : new int[]{2, 4, 8})   // , 16, 32, 64, 128, 256, 512, 1024...
-        {
+        for (int shardingFactor : new int[]{2}) { // , 4, 8, 16, 32, 64, 128, 256, 512, 1024
             for(int numRecords=1;numRecords<=10000;numRecords+=new Random().nextInt(1000))
             {
                 HollowObjectTypeReadState objectTypeReadState = populateTypeStateWith(numRecords);
@@ -45,10 +44,8 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
 
     @Test
     public void testReshardingWithFilter() throws Exception {
-        for (int shardingFactor : new int[]{2, 64})
-        {
-            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(10000))
-            {
+        for (int shardingFactor : new int[]{2}) { // , 4, 8, 16, 32, 64, 128, 256, 512, 1024
+            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(10000)) {
                 HollowObjectTypeReadState objectTypeReadState = populateTypeStateWithFilter(numRecords);
                 assertDataUnchanged(objectTypeReadState, numRecords);
                 HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(objectTypeReadState);

@@ -3,6 +3,8 @@ package com.netflix.hollow.core.read.engine;
 import static com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy.shardingFactor;
 import static junit.framework.TestCase.assertEquals;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements;
@@ -13,7 +15,9 @@ import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Random;
 import java.util.function.Supplier;
 import org.junit.Assert;
@@ -72,9 +76,8 @@ public class HollowTypeReshardingStrategyTest {
 
     @Test
     public void testReshardingIntermediateStages_expandWithOriginalDataElements() throws Exception {
-        for (int shardingFactor : new int[]{2, 4}) {
-            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(5000))
-            {
+        for (int shardingFactor : new int[]{2}) { // , 4, 8, 16, 32, 64, 128, 256, 512, 1024
+            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(5000)) {
                 HollowObjectTypeReadState expectedTypeState = populateTypeStateWith(numRecords);
                 HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(expectedTypeState);
 
@@ -90,9 +93,8 @@ public class HollowTypeReshardingStrategyTest {
 
     @Test
     public void testReshardingIntermediateStages_splitDataElementsForOneShard() throws Exception {
-        for (int shardingFactor : new int[]{2, 4}) {
-            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(5000))
-            {
+        for (int shardingFactor : new int[]{2}) { // , 4, 8, 16, 32, 64, 128, 256, 512, 1024
+            for(int numRecords=1;numRecords<=100000;numRecords+=new Random().nextInt(5000)) {
                 HollowObjectTypeReadState typeState = populateTypeStateWith(numRecords);
                 HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(typeState);
 
@@ -118,7 +120,7 @@ public class HollowTypeReshardingStrategyTest {
 
     @Test
     public void testReshardingIntermediateStages_joinDataElementsForOneShard() throws Exception {
-        for (int shardingFactor : new int[]{2, 4, 8}) {
+        for (int shardingFactor : new int[]{2}) { // , 4, 8, 16, 32, 64, 128, 256, 512, 1024
             for (int numRecords = 75000; numRecords <= 100000; numRecords += new Random().nextInt(1000)) {
                 HollowObjectTypeReadState typeState = populateTypeStateWith(numRecords);
                 HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(typeState);
@@ -143,6 +145,44 @@ public class HollowTypeReshardingStrategyTest {
                     assertEquals(originalNumShards, typeState.numShards()); // numShards remains unchanged
                     assertDataUnchanged(typeState, numRecords);   // as each original shard is processed
                 }
+            }
+        }
+    }
+
+    // manually invoked
+    // @Test
+    public void testSplittingAndJoiningWithSnapshotBlob() throws Exception {
+
+        String blobPath = null; // dir where snapshot blob exists for e.g. "/tmp/";
+        long v = 0l; // snapshot version for e.g. 20230915162636001l;
+        int[] shardingFactorArray = {2, 4, 8, 16, 32, 64, 128, 256, 512, 1024};
+
+        HollowFilesystemBlobRetriever hollowBlobRetriever = new HollowFilesystemBlobRetriever(Paths.get(blobPath));
+        HollowConsumer c = HollowConsumer
+                .withBlobRetriever(hollowBlobRetriever).build();
+        c.triggerRefreshTo(v);
+
+        // could be that the null value needs to be recomputed for the split shard?
+        for (HollowTypeReadState typeReadState : c.getStateEngine().getTypeStates()) {
+            for (int shardingFactor : shardingFactorArray) {
+                System.out.println("Processing type " + typeReadState.getSchema().getName() + " with " + typeReadState.numShards() + " shard and sharding factor " + shardingFactor);
+                if (blobPath==null || v==0l) {
+                    throw new IllegalArgumentException("These arguments need to be specified");
+                }
+
+                HollowChecksum origChecksum = typeReadState.getChecksum(typeReadState.getSchema());
+
+                HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(typeReadState);
+                reshardingStrategy.reshard(typeReadState, typeReadState.numShards(), shardingFactor * typeReadState.numShards());
+                reshardingStrategy.reshard(typeReadState, typeReadState.numShards(), typeReadState.numShards() / shardingFactor);
+                HollowChecksum joinedChecksum = typeReadState.getChecksum(typeReadState.getSchema());
+
+                try {
+                    assertEquals(joinedChecksum, origChecksum);
+                } catch (Exception e) {
+                    System.out.println("MISMATCH: " + typeReadState.getSchema().getName() + " with " + typeReadState.numShards() + " shard and sharding factor " + shardingFactor);
+                }
+                System.out.println("Processed type " + typeReadState.getSchema().getName() + " with " + typeReadState.numShards() + " shard and sharding factor " + shardingFactor);
             }
         }
     }

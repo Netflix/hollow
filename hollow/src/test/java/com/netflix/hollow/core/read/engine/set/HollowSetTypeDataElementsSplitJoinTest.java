@@ -2,51 +2,56 @@ package com.netflix.hollow.core.read.engine.set;
 
 import static org.junit.Assert.assertEquals;
 
-import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
-import java.nio.file.Paths;
+import java.io.IOException;
 import java.util.BitSet;
+import org.junit.Test;
 
 public class HollowSetTypeDataElementsSplitJoinTest extends AbstractHollowSetTypeDataElementsSplitJoinTest {
 
-    // manually invoked
-    // @Test
-    public void testSplittingAndJoiningWithSnapshotBlob() throws Exception {
+    @Test
+    public void testSplitThenJoin() throws IOException {
+        int maxNumMapRecords = 100;
 
-        String blobPath = null; // dir where snapshot blob exists for e.g. "/tmp/";
-        long v = 0l; // snapshot version for e.g. 20230915162636001l;
-        String[] setTypesWithOneShard = null; // type name corresponding to an Object type with single shard for e.g. "Movie";
-        int[] numSplitsArray = {2, 4, 8, 16, 32, 64, 128, 256, 512, 1024};
+        // 1->2->1, 1->4->1, ...
+        for (int numRecords=0;numRecords<maxNumMapRecords;numRecords++) {
+            int[][] sets = generateSetContents(numRecords);
+            HollowSetTypeReadState typeReadState = populateTypeStateWith(sets);
+            assertEquals(1, typeReadState.numShards());
+            assertEquals(sets.length, typeReadState.getPopulatedOrdinals().cardinality());
+            assertDataUnchanged(typeReadState,sets);
 
-        HollowFilesystemBlobRetriever hollowBlobRetriever = new HollowFilesystemBlobRetriever(Paths.get(blobPath));
-        HollowConsumer c = HollowConsumer.withBlobRetriever(hollowBlobRetriever).build();
-        c.triggerRefreshTo(v);
-        HollowReadStateEngine readStateEngine = c.getStateEngine();
-
-        for (String setTypeWithOneShard : setTypesWithOneShard) {
-            for (int numSplits : numSplitsArray) {
-                if (blobPath==null || v==0l || setTypeWithOneShard==null) {
-                    throw new IllegalArgumentException("These arguments need to be specified");
-                }
-                HollowSetTypeReadState typeState = (HollowSetTypeReadState) readStateEngine.getTypeState(setTypeWithOneShard);
-
-                assertEquals(1, typeState.numShards());
-
-                HollowSetTypeDataElementsSplitter splitter = new HollowSetTypeDataElementsSplitter(typeState.currentDataElements()[0], numSplits);
+            for (int numSplits : new int[]{2}) {  // 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024
+                HollowSetTypeDataElementsSplitter splitter = new HollowSetTypeDataElementsSplitter(typeReadState.currentDataElements()[0], numSplits);
                 HollowSetTypeDataElements[] splitElements = splitter.split();
 
                 HollowSetTypeDataElementsJoiner joiner = new HollowSetTypeDataElementsJoiner(splitElements);
                 HollowSetTypeDataElements joinedElements = joiner.join();
 
-                HollowSetTypeReadState resultTypeState = new HollowSetTypeReadState(typeState.getSchema(), joinedElements);
-
-                assertChecksumUnchanged(resultTypeState, typeState, typeState.getPopulatedOrdinals());
-
-                System.out.println("Processed type " + setTypeWithOneShard + " with " + numSplits + " splits");
+                HollowSetTypeReadState resultTypeReadState = new HollowSetTypeReadState(typeReadState.getSchema(), joinedElements);
+                assertDataUnchanged(resultTypeReadState, sets);
+                assertChecksumUnchanged(resultTypeReadState, typeReadState, typeReadState.getPopulatedOrdinals());
             }
         }
+    }
+
+    @Test
+    public void testSplitThenJoinWithEmptyJoin() throws IOException {
+        int[][] sets = new int[][] {
+                {1, 1}
+        };
+        HollowSetTypeReadState typeReadState = populateTypeStateWith(sets);
+        assertEquals(1, typeReadState.numShards());
+
+        HollowSetTypeDataElementsSplitter splitter = new HollowSetTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 4);
+        HollowSetTypeDataElements[] splitBy4 = splitter.split();
+        assertEquals(-1, splitBy4[1].maxOrdinal);
+        assertEquals(-1, splitBy4[3].maxOrdinal);
+
+        HollowSetTypeDataElementsJoiner joiner = new HollowSetTypeDataElementsJoiner(new HollowSetTypeDataElements[]{splitBy4[1], splitBy4[3]});
+        HollowSetTypeDataElements joined = joiner.join();
+
+        assertEquals(-1, joined.maxOrdinal);
     }
 
     private void assertChecksumUnchanged(HollowSetTypeReadState newTypeState, HollowSetTypeReadState origTypeState, BitSet populatedOrdinals) {
