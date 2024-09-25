@@ -87,6 +87,7 @@ public class HollowClientUpdater {
         this.staleReferenceDetector.startMonitoring();
         this.metrics = metrics;
         this.metricsCollector = metricsCollector;
+        this.metricsCollector.setMetrics(metrics);
         this.initialLoad = new CompletableFuture<>();
     }
 
@@ -127,102 +128,103 @@ public class HollowClientUpdater {
             }
             return true;
         }
-        metrics.setLastRefreshStartNs(System.nanoTime());
-
-        // Take a snapshot of the listeners to ensure additions or removals may occur concurrently
-        // but will not take effect until a subsequent refresh
-        final HollowConsumer.RefreshListener[] localListeners =
-                refreshListeners.toArray(new HollowConsumer.RefreshListener[0]);
-
-        for (HollowConsumer.RefreshListener listener : localListeners) {
-            listener.versionDetected(requestedVersionInfo);
-        }
-
-        long beforeVersion = getCurrentVersionId();
-
-        for (HollowConsumer.RefreshListener listener : localListeners) {
-            listener.refreshStarted(beforeVersion, requestedVersion);
-        }
-
         try {
-            HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan(requestedVersionInfo)
-                ? planner.planInitializingUpdate(requestedVersion)
-                : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersion,
+            metrics.setLastRefreshStartNs(System.nanoTime());
+
+            // Take a snapshot of the listeners to ensure additions or removals may occur concurrently
+            // but will not take effect until a subsequent refresh
+            final HollowConsumer.RefreshListener[] localListeners =
+                    refreshListeners.toArray(new HollowConsumer.RefreshListener[0]);
+
+            for (HollowConsumer.RefreshListener listener : localListeners) {
+                listener.versionDetected(requestedVersionInfo);
+            }
+
+            long beforeVersion = getCurrentVersionId();
+
+            for (HollowConsumer.RefreshListener listener : localListeners) {
+                listener.refreshStarted(beforeVersion, requestedVersion);
+            }
+
+            try {
+                HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan(requestedVersionInfo)
+                        ? planner.planInitializingUpdate(requestedVersion)
+                        : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersion,
                         doubleSnapshotConfig.allowDoubleSnapshot());
 
-            for (HollowConsumer.RefreshListener listener : localListeners)
-                if (listener instanceof HollowConsumer.TransitionAwareRefreshListener)
-                    ((HollowConsumer.TransitionAwareRefreshListener)listener).transitionsPlanned(beforeVersion, requestedVersion, updatePlan.isSnapshotPlan(), updatePlan.getTransitionSequence());
+                for (HollowConsumer.RefreshListener listener : localListeners)
+                    if (listener instanceof HollowConsumer.TransitionAwareRefreshListener)
+                        ((HollowConsumer.TransitionAwareRefreshListener) listener).transitionsPlanned(beforeVersion, requestedVersion, updatePlan.isSnapshotPlan(), updatePlan.getTransitionSequence());
 
-            if (updatePlan.destinationVersion() == HollowConstants.VERSION_NONE
-                    && requestedVersion != HollowConstants.VERSION_LATEST) {
-                String msg = String.format("Could not create an update plan for version %s, because "
-                        + "that version or any qualifying previous versions could not be retrieved.", requestedVersion);
-                if (beforeVersion != HollowConstants.VERSION_NONE) {
-                    msg += String.format(" Consumer will remain at current version %s until next update attempt.", beforeVersion);
-                }
-                throw new IllegalArgumentException(msg);
-            }
-
-            if (updatePlan.equals(HollowUpdatePlan.DO_NOTHING)
-                    && requestedVersion == HollowConstants.VERSION_LATEST)
-                throw new IllegalArgumentException("Could not create an update plan, because no existing versions could be retrieved.");
-
-            if (updatePlan.destinationVersion(requestedVersion) == getCurrentVersionId()) {
-                metrics.setLastRefreshEndNs(System.nanoTime());
-                return true;
-            }
-
-            if (updatePlan.isSnapshotPlan()) {  // 1 snapshot and 0+ delta transitions
-                HollowDataHolder oldDh = hollowDataHolderVolatile;
-                if (oldDh == null || doubleSnapshotConfig.allowDoubleSnapshot()) {
-                    HollowDataHolder newDh = newHollowDataHolder();
-                    try {
-                        /* We need to assign the volatile field after API init since it may be
-                         * accessed during the update plan application, for example via a refresh
-                         * listener (such as a unique key indexer) that calls getAPI. If we do it after
-                         * newDh.update(), refresh listeners will see the old API. If we do it
-                         * before then we open ourselves up to a race where a caller will get back
-                         * null if they call getAPI after assigning the volatile but before the API
-                         * is initialized in HollowDataHolder#initializeAPI.
-                         * Also note that hollowDataHolderVolatile only changes for snapshot plans,
-                         * and it is only for snapshot plans that HollowDataHolder#initializeAPI is
-                         * called. */
-                        newDh.update(updatePlan, localListeners, () -> hollowDataHolderVolatile = newDh);
-                    } catch (Throwable t) {
-                        // If the update plan failed then revert back to the old holder
-                        hollowDataHolderVolatile = oldDh;
-                        throw t;
+                if (updatePlan.destinationVersion() == HollowConstants.VERSION_NONE
+                        && requestedVersion != HollowConstants.VERSION_LATEST) {
+                    String msg = String.format("Could not create an update plan for version %s, because "
+                            + "that version or any qualifying previous versions could not be retrieved.", requestedVersion);
+                    if (beforeVersion != HollowConstants.VERSION_NONE) {
+                        msg += String.format(" Consumer will remain at current version %s until next update attempt.", beforeVersion);
                     }
-                    forceDoubleSnapshot = false;
+                    throw new IllegalArgumentException(msg);
                 }
-            } else {    // 0 snapshot and 1+ delta transitions
-                hollowDataHolderVolatile.update(updatePlan, localListeners, () -> {});
+
+                if (updatePlan.equals(HollowUpdatePlan.DO_NOTHING)
+                        && requestedVersion == HollowConstants.VERSION_LATEST)
+                    throw new IllegalArgumentException("Could not create an update plan, because no existing versions could be retrieved.");
+
+                if (updatePlan.destinationVersion(requestedVersion) == getCurrentVersionId()) {
+                    return true;
+                }
+
+                if (updatePlan.isSnapshotPlan()) {  // 1 snapshot and 0+ delta transitions
+                    HollowDataHolder oldDh = hollowDataHolderVolatile;
+                    if (oldDh == null || doubleSnapshotConfig.allowDoubleSnapshot()) {
+                        HollowDataHolder newDh = newHollowDataHolder();
+                        try {
+                            /* We need to assign the volatile field after API init since it may be
+                             * accessed during the update plan application, for example via a refresh
+                             * listener (such as a unique key indexer) that calls getAPI. If we do it after
+                             * newDh.update(), refresh listeners will see the old API. If we do it
+                             * before then we open ourselves up to a race where a caller will get back
+                             * null if they call getAPI after assigning the volatile but before the API
+                             * is initialized in HollowDataHolder#initializeAPI.
+                             * Also note that hollowDataHolderVolatile only changes for snapshot plans,
+                             * and it is only for snapshot plans that HollowDataHolder#initializeAPI is
+                             * called. */
+                            newDh.update(updatePlan, localListeners, () -> hollowDataHolderVolatile = newDh);
+                        } catch (Throwable t) {
+                            // If the update plan failed then revert back to the old holder
+                            hollowDataHolderVolatile = oldDh;
+                            throw t;
+                        }
+                        forceDoubleSnapshot = false;
+                    }
+                } else {    // 0 snapshot and 1+ delta transitions
+                    hollowDataHolderVolatile.update(updatePlan, localListeners, () -> {
+                    });
+                }
+
+                for (HollowConsumer.RefreshListener refreshListener : localListeners)
+                    refreshListener.refreshSuccessful(beforeVersion, getCurrentVersionId(), requestedVersion);
+
+                metrics.updateTypeStateMetrics(getStateEngine(), requestedVersion);
+                if (metricsCollector != null)
+                    metricsCollector.collect(metrics);
+
+                initialLoad.complete(getCurrentVersionId()); // only set the first time
+                return getCurrentVersionId() == requestedVersion;
+            } catch (Throwable th) {
+                forceDoubleSnapshotNextUpdate();
+                metrics.updateRefreshFailed();
+                if (metricsCollector != null)
+                    metricsCollector.collect(metrics);
+                for (HollowConsumer.RefreshListener refreshListener : localListeners)
+                    refreshListener.refreshFailed(beforeVersion, getCurrentVersionId(), requestedVersion, th);
+
+                // intentionally omitting a call to initialLoad.completeExceptionally(th), for producers
+                // that write often a consumer has a chance to try another snapshot that might succeed
+                throw th;
             }
-
-            for(HollowConsumer.RefreshListener refreshListener : localListeners)
-                refreshListener.refreshSuccessful(beforeVersion, getCurrentVersionId(), requestedVersion);
-
-            metrics.updateTypeStateMetrics(getStateEngine(), requestedVersion);
-            if(metricsCollector != null)
-                metricsCollector.collect(metrics);
-
-            initialLoad.complete(getCurrentVersionId()); // only set the first time
+        } finally {
             metrics.setLastRefreshEndNs(System.nanoTime());
-            return getCurrentVersionId() == requestedVersion;
-        } catch(Throwable th) {
-            forceDoubleSnapshotNextUpdate();
-            metrics.updateRefreshFailed();
-            if(metricsCollector != null)
-                metricsCollector.collect(metrics);
-            for(HollowConsumer.RefreshListener refreshListener : localListeners)
-                refreshListener.refreshFailed(beforeVersion, getCurrentVersionId(), requestedVersion, th);
-
-            // intentionally omitting a call to initialLoad.completeExceptionally(th), for producers
-            // that write often a consumer has a chance to try another snapshot that might succeed
-            metrics.setLastRefreshEndNs(System.nanoTime());
-
-            throw th;
         }
     }
 
