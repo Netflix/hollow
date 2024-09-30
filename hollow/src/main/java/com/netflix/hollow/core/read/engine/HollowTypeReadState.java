@@ -31,7 +31,7 @@ import java.util.BitSet;
 import java.util.stream.Stream;
 
 /**
- * A HollowTypeReadState contains and is the root handle to all of the records of a specific type in
+ * A HollowTypeReadState contains and is the root handle to all the records of a specific type in
  * a {@link HollowReadStateEngine}.
  */
 public abstract class HollowTypeReadState implements HollowTypeDataAccess {
@@ -121,15 +121,9 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      */
     public abstract int maxOrdinal();
 
-    public abstract void readSnapshot(HollowBlobInput in, ArraySegmentRecycler recycler) throws IOException;
-
     public abstract void readSnapshot(HollowBlobInput in, ArraySegmentRecycler recycler, int numShards) throws IOException;
 
     public abstract void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException;
-
-    protected boolean shouldReshard(int currNumShards, int deltaNumShards) {
-        return currNumShards!=0 && deltaNumShards!=0 && currNumShards!=deltaNumShards;
-    }
 
     public HollowSchema getSchema() {
         return schema;
@@ -206,4 +200,18 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      */
     public abstract int numShards();
 
+    public abstract ShardsHolder getShardsVolatile();
+
+    public abstract void updateShardsVolatile(HollowTypeReadStateShard[] shards);
+
+    public abstract HollowTypeDataElements[] createTypeDataElements(int len);
+
+    public abstract HollowTypeReadStateShard createTypeReadStateShard(HollowSchema schema, HollowTypeDataElements dataElements, int shardOrdinalShift);
+
+    public void destroyOriginalDataElements(HollowTypeDataElements dataElements) {
+        dataElements.destroy();
+        if (dataElements.encodedRemovals != null) {
+            dataElements.encodedRemovals.destroy();
+        }
+    }
 }

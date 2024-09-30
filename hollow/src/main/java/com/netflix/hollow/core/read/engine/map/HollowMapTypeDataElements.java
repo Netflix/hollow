@@ -23,6 +23,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import java.io.IOException;
 
 /**
@@ -31,15 +32,10 @@ import java.io.IOException;
  * During a delta, the HollowMapTypeReadState will create a new HollowMapTypeDataElements and atomically swap
  * with the existing one to make sure a consistent view of the data is always available. 
  */
-public class HollowMapTypeDataElements {
-
-    int maxOrdinal;
+public class HollowMapTypeDataElements extends HollowTypeDataElements {
 
     FixedLengthData mapPointerAndSizeData;
     FixedLengthData entryData;
-
-    GapEncodedVariableLengthIntegerReader encodedRemovals;
-    GapEncodedVariableLengthIntegerReader encodedAdditions;
 
     int bitsPerMapPointer;
     int bitsPerMapSizeValue;
@@ -50,16 +46,12 @@ public class HollowMapTypeDataElements {
     int emptyBucketKeyValue;
     long totalNumberOfBuckets;
 
-    final ArraySegmentRecycler memoryRecycler;
-    final MemoryMode memoryMode;
-
     public HollowMapTypeDataElements(ArraySegmentRecycler memoryRecycler) {
         this(MemoryMode.ON_HEAP, memoryRecycler);
     }
 
     public HollowMapTypeDataElements(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
-        this.memoryMode = memoryMode;
-        this.memoryRecycler = memoryRecycler;
+        super(memoryMode, memoryRecycler);
     }
 
     void readSnapshot(HollowBlobInput in) throws IOException {
@@ -121,9 +113,44 @@ public class HollowMapTypeDataElements {
         new HollowMapDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 
+    @Override
     public void destroy() {
         FixedLengthDataFactory.destroy(mapPointerAndSizeData, memoryRecycler);
         FixedLengthDataFactory.destroy(entryData, memoryRecycler);
     }
 
+    long getStartBucket(int ordinal) {
+        return ordinal == 0 ? 0 : mapPointerAndSizeData.getElementValue((long)(ordinal - 1) * bitsPerFixedLengthMapPortion, bitsPerMapPointer);
+    }
+
+    long getEndBucket(int ordinal) {
+        return mapPointerAndSizeData.getElementValue((long)ordinal * bitsPerFixedLengthMapPortion, bitsPerMapPointer);
+    }
+
+    int getBucketKeyByAbsoluteIndex(long absoluteBucketIndex) {
+        return (int)entryData.getElementValue(absoluteBucketIndex * bitsPerMapEntry, bitsPerKeyElement);
+    }
+
+    int getBucketValueByAbsoluteIndex(long absoluteBucketIndex) {
+        return (int)entryData.getElementValue((absoluteBucketIndex * bitsPerMapEntry) + bitsPerKeyElement, bitsPerValueElement);
+    }
+
+    void copyBucketsFrom(long startBucket, HollowMapTypeDataElements src, long srcStartBucket, long srcEndBucket) {
+        if (bitsPerKeyElement == src.bitsPerKeyElement && bitsPerValueElement == src.bitsPerValueElement) {
+            // fast path can bulk copy buckets. emptyBucketKeyValue is same since bitsPerKeyElement is the same
+            long numBuckets = srcEndBucket - srcStartBucket;
+            entryData.copyBits(src.entryData, srcStartBucket * bitsPerMapEntry, startBucket * bitsPerMapEntry, numBuckets * bitsPerMapEntry);
+        } else {
+            for (long bucket=srcStartBucket;bucket<srcEndBucket;bucket++) {
+                long bucketKey = src.entryData.getElementValue(bucket * src.bitsPerMapEntry, src.bitsPerKeyElement);
+                long bucketValue = src.entryData.getElementValue(bucket * src.bitsPerMapEntry + src.bitsPerKeyElement, src.bitsPerValueElement);
+                if(bucketKey == src.emptyBucketKeyValue)
+                    bucketKey = emptyBucketKeyValue;
+                long targetBucketOffset = startBucket * bitsPerMapEntry;
+                entryData.setElementValue(targetBucketOffset, bitsPerKeyElement, bucketKey);
+                entryData.setElementValue(targetBucketOffset + bitsPerKeyElement, bitsPerValueElement, bucketValue);
+                startBucket++;
+            }
+        }
+    }
 }

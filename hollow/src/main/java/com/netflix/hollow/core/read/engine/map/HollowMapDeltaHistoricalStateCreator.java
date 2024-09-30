@@ -82,8 +82,7 @@ public class HollowMapDeltaHistoricalStateCreator {
     }
 
     public HollowMapTypeReadState createHistoricalTypeReadState() {
-        HollowMapTypeReadState historicalTypeState = new HollowMapTypeReadState(null, typeState.getSchema(), 1);
-        historicalTypeState.setCurrentData(historicalDataElements);
+        HollowMapTypeReadState historicalTypeState = new HollowMapTypeReadState(typeState.getSchema(), historicalDataElements);
         return historicalTypeState;
     }
 
@@ -107,10 +106,18 @@ public class HollowMapDeltaHistoricalStateCreator {
         historicalDataElements.bitsPerMapPointer = 64 - Long.numberOfLeadingZeros(totalBucketCount);
         historicalDataElements.bitsPerMapSizeValue = 64 - Long.numberOfLeadingZeros(maxSize);
         historicalDataElements.bitsPerFixedLengthMapPortion = historicalDataElements.bitsPerMapPointer + historicalDataElements.bitsPerMapSizeValue;
-        historicalDataElements.bitsPerKeyElement = stateEngineDataElements[0].bitsPerKeyElement;
-        historicalDataElements.bitsPerValueElement = stateEngineDataElements[0].bitsPerValueElement;
-        historicalDataElements.bitsPerMapEntry = stateEngineDataElements[0].bitsPerMapEntry;
-        historicalDataElements.emptyBucketKeyValue = stateEngineDataElements[0].emptyBucketKeyValue;
+        for (int i=0;i<stateEngineDataElements.length;i++) {
+            if (stateEngineDataElements[i].bitsPerKeyElement > historicalDataElements.bitsPerKeyElement) {
+                historicalDataElements.bitsPerKeyElement = stateEngineDataElements[i].bitsPerKeyElement;
+                historicalDataElements.emptyBucketKeyValue = stateEngineDataElements[i].emptyBucketKeyValue;
+            }
+            if (stateEngineDataElements[i].bitsPerValueElement > historicalDataElements.bitsPerValueElement) {
+                historicalDataElements.bitsPerValueElement = stateEngineDataElements[i].bitsPerValueElement;
+            }
+            if (stateEngineDataElements[i].bitsPerMapEntry > historicalDataElements.bitsPerMapEntry) {
+                historicalDataElements.bitsPerMapEntry = stateEngineDataElements[i].bitsPerMapEntry;
+            }
+        }
         historicalDataElements.totalNumberOfBuckets = totalBucketCount;
 
         ordinalMapping = new IntMap(removedEntryCount);
@@ -123,8 +130,8 @@ public class HollowMapDeltaHistoricalStateCreator {
         long bitsPerBucket = historicalDataElements.bitsPerMapEntry;
         long size = typeState.size(ordinal);
 
-        long fromStartBucket = shardOrdinal == 0 ? 0 : stateEngineDataElements[shard].mapPointerAndSizeData.getElementValue((long)(shardOrdinal - 1) * stateEngineDataElements[shard].bitsPerFixedLengthMapPortion, stateEngineDataElements[shard].bitsPerMapPointer);
-        long fromEndBucket = stateEngineDataElements[shard].mapPointerAndSizeData.getElementValue((long)shardOrdinal * stateEngineDataElements[shard].bitsPerFixedLengthMapPortion, stateEngineDataElements[shard].bitsPerMapPointer);
+        long fromStartBucket = stateEngineDataElements[shard].getStartBucket(shardOrdinal);
+        long fromEndBucket = stateEngineDataElements[shard].getEndBucket(shardOrdinal);
         long numBuckets = fromEndBucket - fromStartBucket;
 
         historicalDataElements.mapPointerAndSizeData.setElementValue((long)nextOrdinal * historicalDataElements.bitsPerFixedLengthMapPortion, historicalDataElements.bitsPerMapPointer, nextStartBucket + numBuckets);

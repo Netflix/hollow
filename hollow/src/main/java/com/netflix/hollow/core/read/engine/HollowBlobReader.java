@@ -337,28 +337,23 @@ public class HollowBlobReader {
             if(!filter.includes(typeName)) {
                 HollowListTypeReadState.discardSnapshot(in, numShards);
             } else {
-                populateTypeStateSnapshot(in, new HollowListTypeReadState(stateEngine, memoryMode, (HollowListSchema)schema, numShards));
+                populateTypeStateSnapshotWithNumShards(in, new HollowListTypeReadState(stateEngine, memoryMode, (HollowListSchema)schema), numShards);
             }
         } else if(schema instanceof HollowSetSchema) {
             if(!filter.includes(typeName)) {
                 HollowSetTypeReadState.discardSnapshot(in, numShards);
             } else {
-                populateTypeStateSnapshot(in, new HollowSetTypeReadState(stateEngine, memoryMode, (HollowSetSchema)schema, numShards));
+                populateTypeStateSnapshotWithNumShards(in, new HollowSetTypeReadState(stateEngine, memoryMode, (HollowSetSchema)schema), numShards);
             }
         } else if(schema instanceof HollowMapSchema) {
             if(!filter.includes(typeName)) {
                 HollowMapTypeReadState.discardSnapshot(in, numShards);
             } else {
-                populateTypeStateSnapshot(in, new HollowMapTypeReadState(stateEngine, memoryMode, (HollowMapSchema)schema, numShards));
+                populateTypeStateSnapshotWithNumShards(in, new HollowMapTypeReadState(stateEngine, memoryMode, (HollowMapSchema)schema), numShards);
             }
         }
 
         return typeName;
-    }
-
-    private void populateTypeStateSnapshot(HollowBlobInput in, HollowTypeReadState typeState) throws IOException {
-        stateEngine.addTypeState(typeState);
-        typeState.readSnapshot(in, stateEngine.getMemoryRecycler());
     }
 
     private void populateTypeStateSnapshotWithNumShards(HollowBlobInput in, HollowTypeReadState typeState, int numShards) throws IOException {
@@ -376,12 +371,20 @@ public class HollowBlobReader {
         int numShards = readNumShards(in);
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
         if(typeState != null) {
+            if (shouldReshard(typeState.numShards(), numShards)) {
+                HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(typeState);
+                reshardingStrategy.reshard(typeState, typeState.numShards(), numShards);
+            }
             typeState.applyDelta(in, schema, stateEngine.getMemoryRecycler(), numShards);
         } else {
             discardDelta(in, schema, numShards);
         }
 
         return schema.getName();
+    }
+
+    private boolean shouldReshard(int currNumShards, int deltaNumShards) {
+        return currNumShards != 0 && deltaNumShards != 0 && currNumShards != deltaNumShards;
     }
 
     private int readNumShards(HollowBlobInput in) throws IOException {

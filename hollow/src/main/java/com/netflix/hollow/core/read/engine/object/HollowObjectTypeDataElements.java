@@ -26,6 +26,7 @@ import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerRe
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.io.IOException;
 
@@ -35,17 +36,12 @@ import java.io.IOException;
  * During a delta, the HollowObjectTypeReadState will create a new HollowObjectTypeDataElements and atomically swap
  * with the existing one to make sure a consistent view of the data is always available. 
  */
-public class HollowObjectTypeDataElements {
+public class HollowObjectTypeDataElements extends HollowTypeDataElements {
 
     final HollowObjectSchema schema;
 
-    int maxOrdinal;
-
     FixedLengthData fixedLengthData;
     final VariableLengthData varLengthData[];
-
-    GapEncodedVariableLengthIntegerReader encodedAdditions;
-    GapEncodedVariableLengthIntegerReader encodedRemovals;
 
     final int bitsPerField[];
     final int bitOffsetPerField[];
@@ -55,21 +51,17 @@ public class HollowObjectTypeDataElements {
     private int bitsPerUnfilteredField[];
     private boolean unfilteredFieldIsIncluded[];
 
-    final ArraySegmentRecycler memoryRecycler;
-    final MemoryMode memoryMode;
-
     public HollowObjectTypeDataElements(HollowObjectSchema schema, ArraySegmentRecycler memoryRecycler) {
         this(schema, MemoryMode.ON_HEAP, memoryRecycler);
     }
 
     public HollowObjectTypeDataElements(HollowObjectSchema schema, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
+        super(memoryMode, memoryRecycler);
         varLengthData = new VariableLengthData[schema.numFields()];
         bitsPerField = new int[schema.numFields()];
         bitOffsetPerField = new int[schema.numFields()];
         nullValueForField = new long[schema.numFields()];
         this.schema = schema;
-        this.memoryMode = memoryMode;
-        this.memoryRecycler = memoryRecycler;
     }
 
     void readSnapshot(HollowBlobInput in, HollowObjectSchema unfilteredSchema) throws IOException {
@@ -203,6 +195,7 @@ public class HollowObjectTypeDataElements {
         new HollowObjectDeltaApplicator(fromData, deltaData, this).applyDelta();
     }
 
+    @Override
     public void destroy() {
         FixedLengthDataFactory.destroy(fixedLengthData, memoryRecycler);
         for(int i=0;i<varLengthData.length;i++) {
@@ -240,18 +233,31 @@ public class HollowObjectTypeDataElements {
 
     static void copyRecord(HollowObjectTypeDataElements to, int toOrdinal, HollowObjectTypeDataElements from, int fromOrdinal, long[] currentWriteVarLengthDataPointers) {
         for(int fieldIndex=0;fieldIndex<to.schema.numFields();fieldIndex++) {
-            if(to.varLengthData[fieldIndex] == null) {
-                long value = from.fixedLengthData.getLargeElementValue(((long)fromOrdinal * from.bitsPerRecord) + from.bitOffsetPerField[fieldIndex], from.bitsPerField[fieldIndex]);
-                to.fixedLengthData.setElementValue(((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex], to.bitsPerField[fieldIndex], value);
+            long currentReadFixedLengthStartBit = ((long)fromOrdinal * from.bitsPerRecord) + from.bitOffsetPerField[fieldIndex];
+            long readValue = from.bitsPerField[fieldIndex] > 56 ?
+                    from.fixedLengthData.getLargeElementValue(currentReadFixedLengthStartBit, from.bitsPerField[fieldIndex])
+                    : from.fixedLengthData.getElementValue(currentReadFixedLengthStartBit, from.bitsPerField[fieldIndex]);
+
+            long toWriteFixedLengthStartBit = ((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex];
+            if(to.varLengthData[fieldIndex] == null) {   // fixed len data
+                if(readValue == from.nullValueForField[fieldIndex]) {
+                    writeNullFixedLengthField(to, fieldIndex, toWriteFixedLengthStartBit);
+                }
+                else {
+                    to.fixedLengthData.setElementValue(toWriteFixedLengthStartBit, to.bitsPerField[fieldIndex], readValue);
+                }
             } else {
-                long fromStartByte = varLengthStartByte(from, fromOrdinal, fieldIndex);
-                long fromEndByte = varLengthEndByte(from, fromOrdinal, fieldIndex);
-                long size = fromEndByte - fromStartByte;
+                if ((readValue & (1L << (from.bitsPerField[fieldIndex] - 1))) != 0) {   // null check is the first bit set (other bits have an offset of the last non-null value)
+                    writeNullVarLengthField(to, fieldIndex, toWriteFixedLengthStartBit, currentWriteVarLengthDataPointers);
+                } else {
+                    long fromStartByte = varLengthStartByte(from, fromOrdinal, fieldIndex);
+                    long fromEndByte = varLengthEndByte(from, fromOrdinal, fieldIndex);
+                    long size = fromEndByte - fromStartByte;
 
-                to.fixedLengthData.setElementValue(((long)toOrdinal * to.bitsPerRecord) + to.bitOffsetPerField[fieldIndex], to.bitsPerField[fieldIndex], currentWriteVarLengthDataPointers[fieldIndex] + size);
-                to.varLengthData[fieldIndex].copy(from.varLengthData[fieldIndex], fromStartByte, currentWriteVarLengthDataPointers[fieldIndex], size);
-
-                currentWriteVarLengthDataPointers[fieldIndex] += size;
+                    to.fixedLengthData.setElementValue(toWriteFixedLengthStartBit, to.bitsPerField[fieldIndex], currentWriteVarLengthDataPointers[fieldIndex] + size);
+                    to.varLengthData[fieldIndex].copy(from.varLengthData[fieldIndex], fromStartByte, currentWriteVarLengthDataPointers[fieldIndex], size);
+                    currentWriteVarLengthDataPointers[fieldIndex] += size;
+                }
             }
         }
     }

@@ -81,8 +81,7 @@ public class HollowListDeltaHistoricalStateCreator {
     }
 
     public HollowListTypeReadState createHistoricalTypeReadState() {
-        HollowListTypeReadState historicalTypeState = new HollowListTypeReadState(null, typeState.getSchema(), 1);
-        historicalTypeState.setCurrentData(historicalDataElements);
+        HollowListTypeReadState historicalTypeState = new HollowListTypeReadState(typeState.getSchema(), historicalDataElements);
         return historicalTypeState;
     }
 
@@ -100,8 +99,11 @@ public class HollowListDeltaHistoricalStateCreator {
         historicalDataElements.maxOrdinal = removedEntryCount - 1;
         historicalDataElements.totalNumberOfElements = totalElementCount;
         historicalDataElements.bitsPerListPointer = totalElementCount == 0 ? 1 : 64 - Long.numberOfLeadingZeros(totalElementCount);
-        historicalDataElements.bitsPerElement = stateEngineDataElements[0].bitsPerElement;
-
+        for (int i=0;i<stateEngineDataElements.length;i++) {
+            if (stateEngineDataElements[i].bitsPerElement > historicalDataElements.bitsPerElement) {
+                historicalDataElements.bitsPerElement = stateEngineDataElements[i].bitsPerElement;
+            }
+        }
         ordinalMapping = new IntMap(removedEntryCount);
     }
 
@@ -110,8 +112,8 @@ public class HollowListDeltaHistoricalStateCreator {
         int shardOrdinal = ordinal >> shardOrdinalShift; 
         
         long bitsPerElement = stateEngineDataElements[shard].bitsPerElement;
-        long fromStartElement = shardOrdinal == 0 ? 0 : stateEngineDataElements[shard].listPointerData.getElementValue((long)(shardOrdinal - 1) * stateEngineDataElements[shard].bitsPerListPointer, stateEngineDataElements[shard].bitsPerListPointer);
-        long fromEndElement = stateEngineDataElements[shard].listPointerData.getElementValue((long)shardOrdinal * stateEngineDataElements[shard].bitsPerListPointer, stateEngineDataElements[shard].bitsPerListPointer);
+        long fromStartElement = stateEngineDataElements[shard].getStartElement(shardOrdinal);
+        long fromEndElement = stateEngineDataElements[shard].getEndElement(shardOrdinal);
         long size = fromEndElement - fromStartElement;
 
         historicalDataElements.elementData.copyBits(stateEngineDataElements[shard].elementData, fromStartElement * bitsPerElement, nextStartElement * bitsPerElement, size * bitsPerElement);

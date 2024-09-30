@@ -10,29 +10,31 @@ public class HollowObjectTypeDataElementsSplitterTest extends AbstractHollowObje
 
     @Test
     public void testSplit() throws IOException {
-        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter();
-
         HollowObjectTypeReadState typeReadState = populateTypeStateWith(5);
         assertEquals(1, typeReadState.numShards());
         assertDataUnchanged(typeReadState, 5);
 
-        HollowObjectTypeDataElements[] result1 = splitter.split(typeReadState.currentDataElements()[0], 1);
+        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 1);
+        HollowObjectTypeDataElements[] result1 = splitter.split();
         typeReadState = new HollowObjectTypeReadState(typeReadState.getSchema(), result1[0]);
         assertDataUnchanged(typeReadState, 5);
 
-        HollowObjectTypeDataElements[] result8 = splitter.split(typeReadState.currentDataElements()[0], 8);
+        splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 8);
+        HollowObjectTypeDataElements[] result8 = splitter.split();
         assertEquals(0, result8[0].maxOrdinal);  // for index that landed one record after split
         assertEquals(-1, result8[7].maxOrdinal); // for index that landed no records after split
 
         try {
-            splitter.split(typeReadState.currentDataElements()[0], 3);  // numSplits=3
+            splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 3);
+            splitter.split();  // numSplits=3
             Assert.fail();
         } catch (IllegalStateException e) {
             // expected, numSplits should be a power of 2
         }
 
         try {
-            splitter.split(typeReadState.currentDataElements()[0], 0);  // numSplits=0
+            splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 0);
+            splitter.split();  // numSplits=0
             Assert.fail();
         } catch (IllegalStateException e) {
             // expected, numSplits should be a power of 2

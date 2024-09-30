@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
-import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.test.InMemoryBlobStore;
 import java.io.IOException;
@@ -16,14 +15,12 @@ import org.junit.Test;
 public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObjectTypeDataElementsSplitJoinTest {
     @Override
     protected void initializeTypeStates() {
+        super.initializeTypeStates();
         writeStateEngine.setTargetMaxTypeShardSize(16);
-        writeStateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
     }
 
     @Test
     public void testJoin() throws IOException {
-        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
-
         HollowObjectTypeReadState typeReadState = populateTypeStateWith(1);
         assertEquals(1, typeReadState.numShards());
 
@@ -31,13 +28,15 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         assertDataUnchanged(typeReadStateSharded, 5);
         assertEquals(8, typeReadStateSharded.numShards());
 
-        HollowObjectTypeDataElements joinedDataElements = joiner.join(typeReadStateSharded.currentDataElements());
+        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner(typeReadStateSharded.currentDataElements());
+        HollowObjectTypeDataElements joinedDataElements = joiner.join();
 
         typeReadState = new HollowObjectTypeReadState(typeReadState.getSchema(), joinedDataElements);
         assertDataUnchanged(typeReadState, 5);
 
         try {
-            joiner.join(mockObjectTypeState.currentDataElements());
+            joiner = new HollowObjectTypeDataElementsJoiner(mockObjectTypeState.currentDataElements());
+            joiner.join();
             Assert.fail();
         } catch (IllegalStateException e) {
             // expected, numSplits should be a power of 2
@@ -46,8 +45,6 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
 
     @Test
     public void testJoinDifferentFieldWidths() throws IOException {
-        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner();
-
         HollowObjectTypeReadState typeReadStateSmall = populateTypeStateWith(new int[] {1});
         assertEquals(1, typeReadStateSmall.numShards());
         HollowObjectTypeDataElements dataElementsSmall = typeReadStateSmall.currentDataElements()[0];
@@ -64,8 +61,9 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
 
         assertTrue(widthBig > widthSmall);
 
-        HollowObjectTypeDataElements dataElementsJoined = joiner.join(new HollowObjectTypeDataElements[]
+        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner(new HollowObjectTypeDataElements[]
                 {dataElementsSmall, dataElementsBig});
+        HollowObjectTypeDataElements dataElementsJoined = joiner.join();
         int intFieldPosJoined = dataElementsJoined.schema.getPosition("intField");
         int widthJoined = dataElementsJoined.bitsPerField[intFieldPosJoined];
 

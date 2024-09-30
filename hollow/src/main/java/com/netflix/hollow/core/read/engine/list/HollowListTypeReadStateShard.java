@@ -18,90 +18,39 @@ package com.netflix.hollow.core.read.engine.list;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
-import com.netflix.hollow.core.memory.HollowUnsafeHandle;
+import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.util.BitSet;
 
-class HollowListTypeReadStateShard {
+class HollowListTypeReadStateShard implements HollowTypeReadStateShard {
 
-    private volatile HollowListTypeDataElements currentDataVolatile;
+    final HollowListTypeDataElements dataElements;
+    final int shardOrdinalShift;
 
-    public int getElementOrdinal(int ordinal, int listIndex) {
-        HollowListTypeDataElements currentData;
-        int elementOrdinal;
+    @Override
+    public HollowListTypeDataElements getDataElements() {
+        return dataElements;
+    }
 
-        do {
-            long startElement;
-            long endElement;
+    @Override
+    public int getShardOrdinalShift() {
+        return shardOrdinalShift;
+    }
 
-            do {
-                currentData = this.currentDataVolatile;
-
-                if (ordinal == 0) {
-                    startElement = 0;
-                    endElement = currentData.listPointerData.getElementValue(0, currentData.bitsPerListPointer);
-                } else {
-                    long endFixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
-                    long startFixedLengthOffset = endFixedLengthOffset - currentData.bitsPerListPointer;
-                    startElement = currentData.listPointerData.getElementValue(startFixedLengthOffset, currentData.bitsPerListPointer);
-                    endElement = currentData.listPointerData.getElementValue(endFixedLengthOffset, currentData.bitsPerListPointer);
-                }
-            } while(readWasUnsafe(currentData));
-
-            long elementIndex = startElement + listIndex;
-
-            if(elementIndex >= endElement)
-                throw new ArrayIndexOutOfBoundsException("Array index out of bounds: " + listIndex + ", list size: " + (endElement - startElement));
-
-            elementOrdinal = (int)currentData.elementData.getElementValue(elementIndex * currentData.bitsPerElement, currentData.bitsPerElement);
-        } while(readWasUnsafe(currentData));
-
-        return elementOrdinal;
+    public HollowListTypeReadStateShard(HollowListTypeDataElements dataElements, int shardOrdinalShift) {
+        this.shardOrdinalShift = shardOrdinalShift;
+        this.dataElements = dataElements;
     }
 
     public int size(int ordinal) {
-        HollowListTypeDataElements currentData;
-        int size;
-
-        do {
-            currentData = this.currentDataVolatile;
-
-            long startElement;
-            long endElement;
-            if (ordinal == 0) {
-                startElement = 0;
-                endElement = currentData.listPointerData.getElementValue(0, currentData.bitsPerListPointer);
-            } else {
-                long endFixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
-                long startFixedLengthOffset = endFixedLengthOffset - currentData.bitsPerListPointer;
-                startElement = currentData.listPointerData.getElementValue(startFixedLengthOffset, currentData.bitsPerListPointer);
-                endElement = currentData.listPointerData.getElementValue(endFixedLengthOffset, currentData.bitsPerListPointer);
-            }
-
-            size = (int)(endElement - startElement);
-        } while(readWasUnsafe(currentData));
+        long startElement = dataElements.getStartElement(ordinal);
+        long endElement = dataElements.getEndElement(ordinal);
+        int size = (int)(endElement - startElement);
 
         return size;
     }
 
-    void invalidate() {
-        setCurrentData(null);
-    }
-
-    HollowListTypeDataElements currentDataElements() {
-        return currentDataVolatile;
-    }
-
-    private boolean readWasUnsafe(HollowListTypeDataElements data) {
-        HollowUnsafeHandle.getUnsafe().loadFence();
-        return data != currentDataVolatile;
-    }
-
-    void setCurrentData(HollowListTypeDataElements data) {
-        this.currentDataVolatile = data;
-    }
-
-    protected void applyToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
+    protected void applyShardToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
         int ordinal = populatedOrdinals.nextSetBit(shardNumber);
         while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
@@ -109,8 +58,10 @@ class HollowListTypeReadStateShard {
                 int size = size(shardOrdinal);
     
                 checksum.applyInt(ordinal);
+                long startElement = dataElements.getStartElement(shardOrdinal);
+                long endElement = dataElements.getEndElement(shardOrdinal);
                 for(int i=0;i<size;i++)
-                    checksum.applyInt(getElementOrdinal(shardOrdinal, i));
+                    checksum.applyInt(getElementOrdinal(startElement, endElement, i));
 
                 ordinal = ordinal + numShards;
             } else {
@@ -122,22 +73,29 @@ class HollowListTypeReadStateShard {
         }
     }
 
+    int getElementOrdinal(long startElement, long endElement, int listIndex) {
+        long elementIndex = startElement + listIndex;
+        if(elementIndex >= endElement)
+            throw new ArrayIndexOutOfBoundsException("Array index out of bounds: " + listIndex + ", list size: " + (endElement - startElement));
+
+        int elementOrdinal = (int)dataElements.elementData.getElementValue(elementIndex * dataElements.bitsPerElement, dataElements.bitsPerElement);
+        return elementOrdinal;
+    }
+
     public long getApproximateHeapFootprintInBytes() {
-        HollowListTypeDataElements currentData = currentDataVolatile;
-        long requiredListPointerBits = ((long)currentData.maxOrdinal + 1) * currentData.bitsPerListPointer;
-        long requiredElementBits = currentData.totalNumberOfElements * currentData.bitsPerElement;
+        long requiredListPointerBits = ((long)dataElements.maxOrdinal + 1) * dataElements.bitsPerListPointer;
+        long requiredElementBits = dataElements.totalNumberOfElements * dataElements.bitsPerElement;
         long requiredBits = requiredListPointerBits + requiredElementBits;
         return requiredBits / 8;
     }
     
     public long getApproximateHoleCostInBytes(BitSet populatedOrdinals, int shardNumber, int numShards) {
-        HollowListTypeDataElements currentData = currentDataVolatile;
         long holeBits = 0;
         
         int holeOrdinal = populatedOrdinals.nextClearBit(0);
-        while(holeOrdinal <= currentData.maxOrdinal) {
+        while(holeOrdinal <= dataElements.maxOrdinal) {
             if((holeOrdinal & (numShards - 1)) == shardNumber)
-                holeBits += currentData.bitsPerListPointer;
+                holeBits += dataElements.bitsPerListPointer;
             
             holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
         }
