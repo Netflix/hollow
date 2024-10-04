@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.api.client;
 
+import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_SCHEMA_HASH;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -119,7 +120,7 @@ public class HollowClientUpdater {
     public synchronized boolean updateTo(HollowConsumer.VersionInfo requestedVersionInfo) throws Throwable {
         long requestedVersion = requestedVersionInfo.getVersion();
         if (requestedVersion == getCurrentVersionId()) {
-            if (requestedVersion == HollowConstants.VERSION_NONE && hollowDataHolderVolatile == null) {
+            if (requestedVersion == VERSION_NONE && hollowDataHolderVolatile == null) {
                 LOG.warning("No versions to update to, initializing to empty state");
                 // attempting to refresh, but no available versions - initialize to empty state
                 hollowDataHolderVolatile = newHollowDataHolder();
@@ -149,16 +150,17 @@ public class HollowClientUpdater {
                 ? planner.planInitializingUpdate(requestedVersion)
                 : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersion,
                         doubleSnapshotConfig.allowDoubleSnapshot());
+            boolean isInitialUpdate = getCurrentVersionId() == VERSION_NONE;
 
             for (HollowConsumer.RefreshListener listener : localListeners)
                 if (listener instanceof HollowConsumer.TransitionAwareRefreshListener)
                     ((HollowConsumer.TransitionAwareRefreshListener)listener).transitionsPlanned(beforeVersion, requestedVersion, updatePlan.isSnapshotPlan(), updatePlan.getTransitionSequence());
 
-            if (updatePlan.destinationVersion() == HollowConstants.VERSION_NONE
+            if (updatePlan.destinationVersion() == VERSION_NONE
                     && requestedVersion != HollowConstants.VERSION_LATEST) {
                 String msg = String.format("Could not create an update plan for version %s, because "
                         + "that version or any qualifying previous versions could not be retrieved.", requestedVersion);
-                if (beforeVersion != HollowConstants.VERSION_NONE) {
+                if (beforeVersion != VERSION_NONE) {
                     msg += String.format(" Consumer will remain at current version %s until next update attempt.", beforeVersion);
                 }
                 throw new IllegalArgumentException(msg);
@@ -188,7 +190,7 @@ public class HollowClientUpdater {
                          * Also note that hollowDataHolderVolatile only changes for snapshot plans,
                          * and it is only for snapshot plans that HollowDataHolder#initializeAPI is
                          * called. */
-                        newDh.update(updatePlan, localListeners, () -> hollowDataHolderVolatile = newDh);
+                        newDh.update(updatePlan, localListeners, () -> hollowDataHolderVolatile = newDh, isInitialUpdate);
                     } catch (Throwable t) {
                         // If the update plan failed then revert back to the old holder
                         hollowDataHolderVolatile = oldDh;
@@ -197,7 +199,7 @@ public class HollowClientUpdater {
                     forceDoubleSnapshot = false;
                 }
             } else {    // 0 snapshot and 1+ delta transitions
-                hollowDataHolderVolatile.update(updatePlan, localListeners, () -> {});
+                hollowDataHolderVolatile.update(updatePlan, localListeners, () -> {}, isInitialUpdate);
             }
 
             for(HollowConsumer.RefreshListener refreshListener : localListeners)
@@ -250,7 +252,7 @@ public class HollowClientUpdater {
     public long getCurrentVersionId() {
         HollowDataHolder hollowDataHolderLocal = hollowDataHolderVolatile;
         return hollowDataHolderLocal != null ? hollowDataHolderLocal.getCurrentVersion()
-            : HollowConstants.VERSION_NONE;
+            : VERSION_NONE;
     }
 
     public void forceDoubleSnapshotNextUpdate() {
@@ -261,7 +263,7 @@ public class HollowClientUpdater {
      * Whether or not a snapshot plan should be created. Visible for testing.
      */
     boolean shouldCreateSnapshotPlan(HollowConsumer.VersionInfo incomingVersionInfo) {
-        if (getCurrentVersionId() == HollowConstants.VERSION_NONE
+        if (getCurrentVersionId() == VERSION_NONE
         || (forceDoubleSnapshot && doubleSnapshotConfig.allowDoubleSnapshot())) {
             return true;
         }
