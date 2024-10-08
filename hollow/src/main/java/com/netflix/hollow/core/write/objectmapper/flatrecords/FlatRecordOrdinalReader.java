@@ -32,8 +32,24 @@ public class FlatRecordOrdinalReader {
     return ordinalOffsets.size();
   }
 
+  public Offset getOffsetOf(int ordinal) {
+    return new Offset(getOrdinalOffset(ordinal));
+  }
+
+  public Offset getOffsetAtDataStartOf(int ordinal) {
+    int ordinalOffset = getOrdinalOffset(ordinal);
+    int schemaId = VarInt.readVInt(record.data, ordinalOffset);
+    return new Offset(ordinalOffset + VarInt.sizeOfVInt(schemaId));
+  }
+
   public HollowSchema readSchema(int ordinal) {
     int schemaId = VarInt.readVInt(record.data, getOrdinalOffset(ordinal));
+    return record.schemaIdMapper.getSchema(schemaId);
+  }
+
+  public HollowSchema readSchema(Offset offset) {
+    int schemaId = VarInt.readVInt(record.data, offset.get());
+    offset.increment(VarInt.sizeOfVInt(schemaId));
     return record.schemaIdMapper.getSchema(schemaId);
   }
 
@@ -51,6 +67,42 @@ public class FlatRecordOrdinalReader {
     }
 
     return VarInt.readVInt(record.data, offset);
+  }
+
+  public int readSize(Offset offset) {
+    int schemaId = VarInt.readVInt(record.data, offset.get());
+    offset.increment(VarInt.sizeOfVInt(schemaId));
+
+    HollowSchema schema = record.schemaIdMapper.getSchema(schemaId);
+    if (schema.getSchemaType() != HollowSchema.SchemaType.LIST &&
+        schema.getSchemaType() != HollowSchema.SchemaType.SET &&
+        schema.getSchemaType() != HollowSchema.SchemaType.MAP) {
+      throw new IllegalArgumentException(String.format("Schema %s is not a LIST, SET, or MAP type (found %s)", schema.getName(), schema.getSchemaType()));
+    }
+
+    int size = VarInt.readVInt(record.data, offset.get());
+    offset.increment(VarInt.sizeOfVInt(size));
+    return size;
+  }
+
+  public int readListElementOrdinal(Offset offset) {
+    int elementOrdinal = VarInt.readVInt(record.data, offset.get());
+    offset.increment(VarInt.sizeOfVInt(elementOrdinal));
+    return elementOrdinal;
+  }
+
+  public int readSetElementOrdinalDelta(Offset offset) {
+    int elementOrdinalDelta = VarInt.readVInt(record.data, offset.get());
+    offset.increment(VarInt.sizeOfVInt(elementOrdinalDelta));
+    return elementOrdinalDelta;
+  }
+
+  public long readMapKeyOrdinalDeltaAndValueOrdinal(Offset offset) {
+    int keyOrdinalDelta = VarInt.readVInt(record.data, offset.get());
+    offset.increment(VarInt.sizeOfVInt(keyOrdinalDelta));
+    int valueOrdinal = VarInt.readVInt(record.data, offset.get());
+    offset.increment(VarInt.sizeOfVInt(valueOrdinal));
+    return (long) keyOrdinalDelta << 32 | valueOrdinal;
   }
 
   public void readListElementsInto(int ordinal, int[] elements) {
@@ -126,12 +178,20 @@ public class FlatRecordOrdinalReader {
     if (offset == -1) {
       return -1;
     }
-
     if (VarInt.readVNull(record.data, offset)) {
       return -1;
     }
-
     return VarInt.readVInt(record.data, offset);
+  }
+
+  public int readFieldReference(Offset offset) {
+    if (VarInt.readVNull(record.data, offset.get())) {
+      offset.increment(1);
+      return -1;
+    }
+    int value = VarInt.readVInt(record.data, offset.get());
+    offset.increment(VarInt.sizeOfVInt(value));
+    return value;
   }
 
   public Boolean readFieldBoolean(int ordinal, String field) {
@@ -139,12 +199,19 @@ public class FlatRecordOrdinalReader {
     if (offset == -1) {
       return null;
     }
-
     if (VarInt.readVNull(record.data, offset)) {
       return null;
     }
-
     int value = record.data.get(offset);
+    return value == 1 ? Boolean.TRUE : Boolean.FALSE;
+  }
+
+  public Boolean readFieldBoolean(Offset offset) {
+    offset.increment(1);
+    if (VarInt.readVNull(record.data, offset.get())) {
+      return null;
+    }
+    int value = record.data.get(offset.get());
     return value == 1 ? Boolean.TRUE : Boolean.FALSE;
   }
 
@@ -153,12 +220,20 @@ public class FlatRecordOrdinalReader {
     if (offset == -1) {
       return Integer.MIN_VALUE;
     }
-
     if (VarInt.readVNull(record.data, offset)) {
       return Integer.MIN_VALUE;
     }
-
     int value = VarInt.readVInt(record.data, offset);
+    return ZigZag.decodeInt(value);
+  }
+
+  public int readFieldInt(Offset offset) {
+    if (VarInt.readVNull(record.data, offset.get())) {
+      offset.increment(1);
+      return Integer.MIN_VALUE;
+    }
+    int value = VarInt.readVInt(record.data, offset.get());
+    offset.increment(VarInt.sizeOfVInt(value));
     return ZigZag.decodeInt(value);
   }
 
@@ -167,12 +242,20 @@ public class FlatRecordOrdinalReader {
     if (offset == -1) {
       return Long.MIN_VALUE;
     }
-
     if (VarInt.readVNull(record.data, offset)) {
       return Long.MIN_VALUE;
     }
-
     long value = VarInt.readVLong(record.data, offset);
+    return ZigZag.decodeLong(value);
+  }
+
+  public long readFieldLong(Offset offset) {
+    if (VarInt.readVNull(record.data, offset.get())) {
+      offset.increment(1);
+      return Long.MIN_VALUE;
+    }
+    long value = VarInt.readVLong(record.data, offset.get());
+    offset.increment(VarInt.sizeOfVLong(value));
     return ZigZag.decodeLong(value);
   }
 
@@ -181,12 +264,19 @@ public class FlatRecordOrdinalReader {
     if (offset == -1) {
       return Float.NaN;
     }
-
     int value = record.data.readIntBits(offset);
     if (value == HollowObjectWriteRecord.NULL_FLOAT_BITS) {
       return Float.NaN;
     }
+    return Float.intBitsToFloat(value);
+  }
 
+  public float readFieldFloat(Offset offset) {
+    offset.increment(4);
+    int value = record.data.readIntBits(offset.get());
+    if (value == HollowObjectWriteRecord.NULL_FLOAT_BITS) {
+      return Float.NaN;
+    }
     return Float.intBitsToFloat(value);
   }
 
@@ -201,6 +291,15 @@ public class FlatRecordOrdinalReader {
       return Double.NaN;
     }
 
+    return Double.longBitsToDouble(value);
+  }
+
+  public double readFieldDouble(Offset offset) {
+    offset.increment(8);
+    long value = record.data.readLongBits(offset.get());
+    if (value == HollowObjectWriteRecord.NULL_DOUBLE_BITS) {
+      return Double.NaN;
+    }
     return Double.longBitsToDouble(value);
   }
 
@@ -228,6 +327,26 @@ public class FlatRecordOrdinalReader {
     return new String(s);
   }
 
+  public String readFieldString(Offset offset) {
+    if (VarInt.readVNull(record.data, offset.get())) {
+      offset.increment(1);
+      return null;
+    }
+
+    int length = VarInt.readVInt(record.data, offset.get());
+    offset.increment(VarInt.sizeOfVInt(length));
+
+    int cLength = VarInt.countVarIntsInRange(record.data, offset.get(), length);
+    char[] s = new char[cLength];
+    for (int i = 0; i < cLength; i++) {
+      int charValue = VarInt.readVInt(record.data, offset.get());
+      s[i] = (char) charValue;
+      offset.increment(VarInt.sizeOfVInt(charValue));
+    }
+
+    return new String(s);
+  }
+
   public byte[] readFieldBytes(int ordinal, String field) {
     int offset = skipToField(ordinal, HollowObjectSchema.FieldType.BYTES, field);
     if (offset == -1) {
@@ -247,6 +366,29 @@ public class FlatRecordOrdinalReader {
     }
 
     return b;
+  }
+
+  public byte[] readFieldBytes(Offset offset) {
+    if (VarInt.readVNull(record.data, offset.get())) {
+      offset.increment(1);
+      return null;
+    }
+
+    int length = VarInt.readVInt(record.data, offset.get());
+    offset.increment(VarInt.sizeOfVInt(length));
+
+    byte[] b = new byte[length];
+    for (int i = 0; i < length; i++) {
+      b[i] = record.data.get(offset.get());
+      offset.increment(1);
+    }
+
+    return b;
+  }
+
+  public void skipField(Offset offset, HollowObjectSchema.FieldType fieldType) {
+    int size = sizeOfFieldValue(fieldType, offset.get());
+    offset.increment(size);
   }
 
   private int skipToField(int ordinal, HollowObjectSchema.FieldType fieldType, String field) {
@@ -337,6 +479,22 @@ public class FlatRecordOrdinalReader {
         return 4;
       default:
         throw new IllegalArgumentException("Unsupported field type: " + fieldType);
+    }
+  }
+
+  public static class Offset {
+    public int offset;
+
+    Offset(int offset) {
+      this.offset = offset;
+    }
+
+    public void increment(int delta) {
+      offset += delta;
+    }
+
+    public int get() {
+      return offset;
     }
   }
 }
