@@ -17,8 +17,8 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
 
   public FlatRecordTraversalObjectNode(FlatRecordOrdinalReader reader, HollowObjectSchema schema, int ordinal) {
     this.reader = reader;
-    this.ordinal = ordinal;
     this.schema = schema;
+    this.ordinal = ordinal;
   }
 
   public FlatRecordTraversalObjectNode(FlatRecord rec) {
@@ -30,6 +30,11 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
   @Override
   public HollowObjectSchema getSchema() {
     return schema;
+  }
+
+  @Override
+  public int getOrdinal() {
+    return ordinal;
   }
 
   @Override
@@ -60,7 +65,7 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
     }
 
     if (fieldType != HollowObjectSchema.FieldType.REFERENCE) {
-      throw new IllegalArgumentException("Cannot get child for non-reference field");
+      throw new IllegalArgumentException("Cannot get child for non-reference field: " + field);
     }
 
     int refOrdinal = reader.readFieldReference(ordinal, field);
@@ -93,7 +98,7 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
       case BYTES:
         return reader.readFieldBytes(ordinal, field);
       case REFERENCE:
-        throw new IllegalArgumentException("Cannot get leaf value for reference field");
+        throw new IllegalArgumentException("Cannot get leaf value for reference field: " + field);
     }
     return null;
   }

@@ -11,12 +11,14 @@ import java.util.Map;
 public class FlatRecordTraversalSetNode extends AbstractSet<FlatRecordTraversalNode> implements FlatRecordTraversalNode {
   private final FlatRecordOrdinalReader reader;
   private final HollowSetSchema schema;
+  private final int ordinal;
   private final int[] elementOrdinals;
 
   private Map<String, HollowObjectSchema> commonSchemaMap;
 
   public FlatRecordTraversalSetNode(FlatRecordOrdinalReader reader, HollowSetSchema schema, int ordinal) {
     this.reader = reader;
+    this.ordinal = ordinal;
     this.schema = schema;
 
     int size = reader.readSize(ordinal);
@@ -27,6 +29,11 @@ public class FlatRecordTraversalSetNode extends AbstractSet<FlatRecordTraversalN
   @Override
   public HollowSetSchema getSchema() {
     return schema;
+  }
+
+  @Override
+  public int getOrdinal() {
+    return ordinal;
   }
 
   @Override

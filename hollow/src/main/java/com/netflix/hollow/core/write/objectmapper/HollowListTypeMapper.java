@@ -19,13 +19,11 @@ package com.netflix.hollow.core.write.objectmapper;
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.generic.GenericHollowList;
 import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowListWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalListNode;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
@@ -34,7 +32,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class HollowListTypeMapper extends HollowTypeMapper {
@@ -129,25 +126,11 @@ public class HollowListTypeMapper extends HollowTypeMapper {
     }
 
     @Override
-    protected Object parseFlatRecord(HollowSchema recordSchema, FlatRecordReader reader, Map<Integer, Object> parsedObjects) {
-        List<Object> collection = new ArrayList<>();
-
-        int size = reader.readCollectionSize();
-        for (int i = 0; i < size; i++) {
-            int ordinal = reader.readOrdinal();
-            Object element = parsedObjects.get(ordinal);
-            collection.add(element);
-        }
-
-        return collection;
-    }
-
-    @Override
-    protected Object parseFlatRecordTraversalNode(FlatRecordTraversalNode node) {
+    protected Object parseFlatRecord(FlatRecordTraversalNode node) {
         List<Object> collection = new ArrayList<>();
 
         for (FlatRecordTraversalNode elementNode : (FlatRecordTraversalListNode) node) {
-            Object element = elementMapper.parseFlatRecordTraversalNode(elementNode);
+            Object element = elementMapper.parseFlatRecord(elementNode);
             collection.add(element);
         }
 

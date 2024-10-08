@@ -13,6 +13,8 @@ import java.util.Map;
  * An abstraction that allows for the traversal of a flat record from the root type to a specific sub-path.
  */
 public interface FlatRecordTraversalNode {
+  int getOrdinal();
+
   HollowSchema getSchema();
 
   void setCommonSchema(Map<String, HollowObjectSchema> commonSchema);
