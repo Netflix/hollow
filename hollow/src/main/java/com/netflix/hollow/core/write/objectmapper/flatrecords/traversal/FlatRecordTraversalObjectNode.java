@@ -38,6 +38,11 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
   }
 
   @Override
+  public FlatRecordOrdinalReader getReader() {
+    return reader;
+  }
+
+  @Override
   public void setCommonSchema(Map<String, HollowObjectSchema> commonSchema) {
     this.commonSchemaMap = commonSchema;
   }

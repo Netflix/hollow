@@ -15,6 +15,8 @@ import java.util.Map;
 public interface FlatRecordTraversalNode {
   int getOrdinal();
 
+  FlatRecordOrdinalReader getReader();
+
   HollowSchema getSchema();
 
   void setCommonSchema(Map<String, HollowObjectSchema> commonSchema);
