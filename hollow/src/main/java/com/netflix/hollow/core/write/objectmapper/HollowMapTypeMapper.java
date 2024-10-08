@@ -19,14 +19,12 @@ package com.netflix.hollow.core.write.objectmapper;
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.generic.GenericHollowMap;
 import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalMapNode;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
@@ -142,31 +140,13 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
     }
 
     @Override
-    protected Object parseFlatRecord(HollowSchema recordSchema, FlatRecordReader reader, Map<Integer, Object> parsedObjects) {
-        Map<Object, Object> collection = new HashMap<>();
-
-        int size = reader.readCollectionSize();
-        int keyOrdinal = 0;
-        for (int i = 0; i < size; i++) {
-            int keyOrdinalDelta = reader.readOrdinal();
-            int valueOrdinal = reader.readOrdinal();
-            keyOrdinal += keyOrdinalDelta;
-            Object key = parsedObjects.get(keyOrdinal);
-            Object value = parsedObjects.get(valueOrdinal);
-            collection.put(key, value);
-        }
-
-        return collection;
-    }
-
-    @Override
-    protected Object parseFlatRecordTraversalNode(FlatRecordTraversalNode node) {
+    protected Object parseFlatRecord(FlatRecordTraversalNode node) {
         FlatRecordTraversalMapNode mapNode = (FlatRecordTraversalMapNode) node;
         Map<Object, Object> collection = new HashMap<>();
 
         for (Map.Entry<FlatRecordTraversalNode, FlatRecordTraversalNode> entry : mapNode.entrySet()) {
-            Object key = keyMapper.parseFlatRecordTraversalNode(entry.getKey());
-            Object value = valueMapper.parseFlatRecordTraversalNode(entry.getValue());
+            Object key = keyMapper.parseFlatRecord(entry.getKey());
+            Object value = valueMapper.parseFlatRecord(entry.getValue());
             collection.put(key, value);
         }
         return collection;

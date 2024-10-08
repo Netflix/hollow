@@ -22,12 +22,10 @@ import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -37,7 +35,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
@@ -47,9 +44,9 @@ import sun.misc.Unsafe;
 @SuppressWarnings("restriction")
 public class HollowObjectTypeMapper extends HollowTypeMapper {
     
-    private static Set<Class<?>> BOXED_WRAPPERS = new HashSet<>(Arrays.asList(Boolean.class, Integer.class, Short.class, Byte.class, Character.class, Long.class, Float.class, Double.class, String.class, byte[].class, Date.class));
-    
+    private static final Set<Class<?>> BOXED_WRAPPERS = new HashSet<>(Arrays.asList(Boolean.class, Integer.class, Short.class, Byte.class, Character.class, Long.class, Float.class, Double.class, String.class, byte[].class, Date.class));
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
+
     private final HollowObjectMapper parentMapper;
 
     private final String typeName;
@@ -220,7 +217,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     }
                 }
             } else if (clazz.isEnum()) {
-                // if `clazz` is an enum, then we should expect to find a field called `_name` in the FlatRecord.
+                // if `clazz` is an enum, then we should expect to find a field called `_name` in the record.
                 // There may be other fields if the producer enum contained custom properties, we ignore them
                 // here assuming the enum constructor will set them if needed.
                 for (int i = 0; i < objectSchema.numFields(); i++) {
@@ -235,7 +232,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 for (int i = 0; i < objectSchema.numFields(); i++) {
                     int posInPojoSchema = schema.getPosition(objectSchema.getFieldName(i));
                     if (posInPojoSchema != -1) {
-                        mappedFields.get(posInPojoSchema).copy(hollowObject, obj);
+                        mappedFields.get(posInPojoSchema).copy(obj, hollowObject);
                     }
                 }
             }
@@ -247,74 +244,27 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     }
 
     @Override
-    protected Object parseFlatRecord(HollowSchema recordSchema, FlatRecordReader reader, Map<Integer, Object> parsedObjects) {
-        try {
-            HollowObjectSchema recordObjectSchema = (HollowObjectSchema) recordSchema;
-
-            Object obj = null;
-            if (BOXED_WRAPPERS.contains(clazz)) {
-                // if `clazz` is a BoxedWrapper then by definition its OBJECT schema will have a single primitive
-                // field so find it in the FlatRecord and ignore all other fields.
-                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
-                    int posInPojoSchema = schema.getPosition(recordObjectSchema.getFieldName(i));
-                    if (posInPojoSchema != -1) {
-                        obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(reader);
-                    } else {
-                        reader.skipField(recordObjectSchema.getFieldType(i));
-                    }
-                }
-            } else if (clazz.isEnum()) {
-                // if `clazz` is an enum, then we should expect to find a field called `_name` in the FlatRecord.
-                // There may be other fields if the producer enum contained custom properties, we ignore them
-                // here assuming the enum constructor will set them if needed.
-                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
-                    String fieldName = recordObjectSchema.getFieldName(i);
-                    int posInPojoSchema = schema.getPosition(fieldName);
-                    if (fieldName.equals(MappedFieldType.ENUM_NAME.getSpecialFieldName()) && posInPojoSchema != -1) {
-                        obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(reader);
-                    } else {
-                        reader.skipField(recordObjectSchema.getFieldType(i));
-                    }
-                }
-            } else {
-                obj = unsafe.allocateInstance(clazz);
-                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
-                    int posInPojoSchema = schema.getPosition(recordObjectSchema.getFieldName(i));
-                    if (posInPojoSchema != -1) {
-                        mappedFields.get(posInPojoSchema).parse(obj, reader, parsedObjects);
-                    } else {
-                        reader.skipField(recordObjectSchema.getFieldType(i));
-                    }
-                }
-            }
-
-            return obj;
-        } catch(Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-    @Override
-    protected Object parseFlatRecordTraversalNode(FlatRecordTraversalNode node) {
+    protected Object parseFlatRecord(FlatRecordTraversalNode node) {
         try {
             FlatRecordTraversalObjectNode objectNode = (FlatRecordTraversalObjectNode) node;
-            HollowObjectSchema recordObjectSchema = objectNode.getSchema();
+            HollowObjectSchema flatRecordSchema = objectNode.getSchema();
 
             Object obj = null;
             if (BOXED_WRAPPERS.contains(clazz)) {
                 // if `clazz` is a BoxedWrapper then by definition its OBJECT schema will have a single primitive
                 // field so find it in the FlatRecord and ignore all other fields.
-                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
-                    int posInPojoSchema = schema.getPosition(recordObjectSchema.getFieldName(i));
+                for (int i = 0; i < flatRecordSchema.numFields(); i++) {
+                    int posInPojoSchema = schema.getPosition(flatRecordSchema.getFieldName(i));
                     if (posInPojoSchema != -1) {
                         obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(objectNode);
                     }
                 }
             } else if (clazz.isEnum()) {
-                // if `clazz` is an enum, then we should expect to find a field called `_name` in the FlatRecord.
+                // if `clazz` is an enum, then we should expect to find a field called `_name` in the record.
                 // There may be other fields if the producer enum contained custom properties, we ignore them
                 // here assuming the enum constructor will set them if needed.
-                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
-                    String fieldName = recordObjectSchema.getFieldName(i);
+                for (int i = 0; i < flatRecordSchema.numFields(); i++) {
+                    String fieldName = flatRecordSchema.getFieldName(i);
                     int posInPojoSchema = schema.getPosition(fieldName);
                     if (fieldName.equals(MappedFieldType.ENUM_NAME.getSpecialFieldName()) && posInPojoSchema != -1) {
                         obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(objectNode);
@@ -322,17 +272,16 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 }
             } else {
                 obj = unsafe.allocateInstance(clazz);
-                for (int i = 0; i < recordObjectSchema.numFields(); i++) {
-                    int posInPojoSchema = schema.getPosition(recordObjectSchema.getFieldName(i));
+                for (int i = 0; i < flatRecordSchema.numFields(); i++) {
+                    int posInPojoSchema = schema.getPosition(flatRecordSchema.getFieldName(i));
                     if (posInPojoSchema != -1) {
-                        mappedFields.get(posInPojoSchema).parse(obj, objectNode);
+                        mappedFields.get(posInPojoSchema).copy(obj, objectNode);
                     }
                 }
             }
 
             return obj;
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -623,8 +572,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
         }
 
-        public void copy(GenericHollowObject rec, Object pojo) {
-            switch(fieldType) {
+        public void copy(Object pojo, GenericHollowObject rec) {
+            switch (fieldType) {
                 case BOOLEAN:
                     unsafe.putBoolean(pojo, fieldOffset, rec.getBoolean(fieldName));
                     break;
@@ -817,84 +766,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
         }
 
-        private Object parseBoxedWrapper(FlatRecordReader reader) {
-            switch (fieldType) {
-                case BOOLEAN: {
-                    return reader.readBoolean();
-                }
-                case INT: {
-                    int value = reader.readInt();
-                    if (value != Integer.MIN_VALUE) {
-                        return Integer.valueOf(value);
-                    }
-                    break;
-                }
-                case SHORT: {
-                    int value = reader.readInt();
-                    if (value != Integer.MIN_VALUE) {
-                        return Short.valueOf((short) value);
-                    }
-                    break;
-                }
-                case BYTE: {
-                    int value = reader.readInt();
-                    if (value != Integer.MIN_VALUE) {
-                        return Byte.valueOf((byte) value);
-                    }
-                    break;
-                }
-                case CHAR: {
-                    int value = reader.readInt();
-                    if (value != Integer.MIN_VALUE) {
-                        return Character.valueOf((char) value);
-                    }
-                    break;
-                }
-                case LONG: {
-                    long value = reader.readLong();
-                    if (value != Long.MIN_VALUE) {
-                        return Long.valueOf(value);
-                    }
-                    break;
-                }
-                case FLOAT: {
-                    float value = reader.readFloat();
-                    if (!Float.isNaN(value)) {
-                        return Float.valueOf(value);
-                    }
-                    break;
-                }
-                case DOUBLE: {
-                    double value = reader.readDouble();
-                    if (!Double.isNaN(value)) {
-                        return Double.valueOf(value);
-                    }
-                    break;
-                }
-                case STRING: {
-                    return reader.readString();
-                }
-                case BYTES: {
-                    return reader.readBytes();
-                }
-                case ENUM_NAME: {
-                    String enumName = reader.readString();
-                    if (enumName != null) {
-                        return Enum.valueOf((Class<Enum>) clazz, enumName);
-                    }
-                    break;
-                }
-                case DATE_TIME: {
-                    long value = reader.readLong();
-                    if (value != Long.MIN_VALUE) {
-                        return new Date(value);
-                    }
-                    break;
-                }
-            }
-            return null;
-        }
-
         private Object parseBoxedWrapper(FlatRecordTraversalObjectNode record) {
             switch (fieldType) {
                 case BOOLEAN:
@@ -947,8 +818,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
         }
 
-        private void parse(Object obj, FlatRecordTraversalObjectNode node) {
-            switch(fieldType) {
+        private void copy(Object obj, FlatRecordTraversalObjectNode node) {
+            switch (fieldType) {
                 case BOOLEAN: {
                     Boolean value = node.getFieldValueBooleanBoxed(fieldName);
                     if (value != null) {
@@ -1099,7 +970,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 case REFERENCE: {
                     FlatRecordTraversalNode childNode = node.getFieldNode(fieldName);
                     if (childNode != null) {
-                        unsafe.putObject(obj, fieldOffset, subTypeMapper.parseFlatRecordTraversalNode(childNode));
+                        unsafe.putObject(obj, fieldOffset, subTypeMapper.parseFlatRecord(childNode));
                     }
                     break;
                 }
@@ -1108,168 +979,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
         }
 
-
-        private void parse(Object obj, FlatRecordReader reader, Map<Integer, Object> parsedRecords) {
-            switch(fieldType) {
-                case BOOLEAN: {
-                    Boolean value = reader.readBoolean();
-                    if (value != null) {
-                        unsafe.putBoolean(obj, fieldOffset, value == Boolean.TRUE);
-                    }
-                    break;
-                }
-                case INT: {
-                    int value = reader.readInt();
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putInt(obj, fieldOffset, value);
-                    }
-                    break;
-                }
-                case SHORT: {
-                    int value = reader.readInt();
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putShort(obj, fieldOffset, (short) value);
-                    }
-                    break;
-                }
-                case BYTE: {
-                    int value = reader.readInt();
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putByte(obj, fieldOffset, (byte) value);
-                    }
-                    break;
-                }
-                case CHAR: {
-                    int value = reader.readInt();
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putChar(obj, fieldOffset, (char) value);
-                    }
-                    break;
-                }
-                case LONG: {
-                    long value = reader.readLong();
-                    if (value != Long.MIN_VALUE) {
-                        unsafe.putLong(obj, fieldOffset, value);
-                    }
-                    break;
-                }
-                case FLOAT: {
-                    float value = reader.readFloat();
-                    if (!Float.isNaN(value)) {
-                        unsafe.putFloat(obj, fieldOffset, value);
-                    }
-                    break;
-                }
-                case DOUBLE: {
-                    double value = reader.readDouble();
-                    if (!Double.isNaN(value)) {
-                        unsafe.putDouble(obj, fieldOffset, value);
-                    }
-                    break;
-                }
-                case STRING: {
-                    String value = reader.readString();
-                    if (value != null) {
-                        unsafe.putObject(obj, fieldOffset, value);
-                    }
-                    break;
-                }
-                case BYTES: {
-                    byte[] value = reader.readBytes();
-                    if (value != null) {
-                        unsafe.putObject(obj, fieldOffset, value);
-                    }
-                    break;
-                }
-                case INLINED_BOOLEAN: {
-                    Boolean value = reader.readBoolean();
-                    if (value != null) {
-                        unsafe.putObject(obj, fieldOffset, value);
-                    }
-                    break;
-                }
-                case INLINED_INT: {
-                    int value = reader.readInt();
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putObject(obj, fieldOffset, Integer.valueOf(value));
-                    }
-                    break;
-                }
-                case INLINED_SHORT: {
-                    int value = reader.readInt();
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putObject(obj, fieldOffset, Short.valueOf((short) value));
-                    }
-                    break;
-                }
-                case INLINED_BYTE: {
-                    int value = reader.readInt();
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putObject(obj, fieldOffset, Byte.valueOf((byte) value));
-                    }
-                    break;
-                }
-                case INLINED_CHAR: {
-                    int value = reader.readInt();
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putObject(obj, fieldOffset, Character.valueOf((char) value));
-                    }
-                    break;
-                }
-                case INLINED_LONG: {
-                    long value = reader.readLong();
-                    if (value != Long.MIN_VALUE) {
-                        unsafe.putObject(obj, fieldOffset, Long.valueOf(value));
-                    }
-                    break;
-                }
-                case INLINED_FLOAT: {
-                    float value = reader.readFloat();
-                    if (!Float.isNaN(value)) {
-                        unsafe.putObject(obj, fieldOffset, Float.valueOf(value));
-                    }
-                    break;
-                }
-                case INLINED_DOUBLE: {
-                    double value = reader.readDouble();
-                    if (!Double.isNaN(value)) {
-                        unsafe.putObject(obj, fieldOffset, Double.valueOf(value));
-                    }
-                    break;
-                }
-                case INLINED_STRING: {
-                    String value = reader.readString();
-                    if (value != null) {
-                        unsafe.putObject(obj, fieldOffset, value);
-                    }
-                    break;
-                }
-                case DATE_TIME: {
-                    long value = reader.readLong();
-                    if (value != Long.MIN_VALUE) {
-                        unsafe.putObject(obj, fieldOffset, new Date(value));
-                    }
-                    break;
-                }
-                case ENUM_NAME: {
-                    String value = reader.readString();
-                    if (value != null) {
-                        unsafe.putObject(obj, fieldOffset, Enum.valueOf((Class) type, value));
-                    }
-                    break;
-                }
-                case REFERENCE: {
-                    int ordinal = reader.readOrdinal();
-                    if (ordinal != -1) {
-                        unsafe.putObject(obj, fieldOffset, parsedRecords.get(ordinal));
-                    }
-                    break;
-                }
-                default:
-                    throw new IllegalArgumentException("Unknown field type: " + fieldType);
-            }
-        }
-        
         public Object retrieveFieldValue(Object obj, int[] fieldPathIdx, int idx) {
             Object fieldObject;
 
@@ -1282,7 +991,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 return ((HollowObjectTypeMapper)subTypeMapper).retrieveFieldValue(fieldObject, fieldPathIdx, idx+1);
             }
             
-
             switch(fieldType) {
             case BOOLEAN:
                 return unsafe.getBoolean(obj, fieldOffset);
