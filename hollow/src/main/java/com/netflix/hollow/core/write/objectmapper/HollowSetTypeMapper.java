@@ -18,7 +18,6 @@ package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.generic.GenericHollowSet;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.write.HollowSetTypeWriteState;
@@ -26,16 +25,12 @@ import com.netflix.hollow.core.write.HollowSetWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordOrdinalReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalSetNode;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 public class HollowSetTypeMapper extends HollowTypeMapper {
@@ -121,26 +116,14 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
     }
 
     @Override
-    protected Object parseFlatRecord(HollowSchema recordSchema, FlatRecordReader reader, Map<Integer, Object> parsedObjects) {
+    protected Object parseFlatRecord(FlatRecordOrdinalReader reader, int ordinal) {
+        FlatRecordOrdinalReader.Offset offset = reader.getOffsetAtDataStartOf(ordinal);
+        int size = reader.readSize(offset);
         Set<Object> collection = new HashSet<>();
-
-        int size = reader.readCollectionSize();
-        int ordinal = 0;
+        int elementOrdinal = 0;
         for (int i = 0; i < size; i++) {
-            int ordinalDelta = reader.readOrdinal();
-            ordinal += ordinalDelta;
-            Object element = parsedObjects.get(ordinal);
-            collection.add(element);
-        }
-
-        return collection;
-    }
-
-    @Override
-    protected Object parseFlatRecordTraversalNode(FlatRecordTraversalNode node) {
-        Set<Object> collection = new HashSet<>();
-        for (FlatRecordTraversalNode elementNode : (FlatRecordTraversalSetNode) node) {
-            collection.add(elementMapper.parseFlatRecordTraversalNode(elementNode));
+            elementOrdinal +=  reader.readSetElementOrdinalDelta(offset);
+            collection.add(elementMapper.parseFlatRecord(reader, elementOrdinal));
         }
         return collection;
     }

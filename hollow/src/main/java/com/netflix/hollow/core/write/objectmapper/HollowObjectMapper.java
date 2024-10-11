@@ -20,6 +20,7 @@ import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordOrdinalReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
@@ -100,28 +101,20 @@ public class HollowObjectMapper {
         if (typeMapper == null) {
             throw new IllegalArgumentException("No type mapper found for schema " + schemaName);
         }
-        Object obj = typeMapper.parseFlatRecordTraversalNode(node);
+        Object obj = typeMapper.parseFlatRecord(node.getReader(), node.getOrdinal());
         return (T) obj;
     }
 
     public <T> T readFlat(FlatRecord record) {
-        FlatRecordReader recordReader = new FlatRecordReader(record);
-
-        int ordinal = 0;
-        Map<Integer, Object> parsedObjects = new HashMap<>();
-        while(recordReader.hasMore()) {
-            HollowSchema schema = recordReader.readSchema();
-            HollowTypeMapper mapper = typeMappers.get(schema.getName());
-            if (mapper == null) {
-                recordReader.skipSchema(schema);
-            } else {
-                Object obj = mapper.parseFlatRecord(schema, recordReader, parsedObjects);
-                parsedObjects.put(ordinal, obj);
-            }
-            ordinal++;
+        FlatRecordOrdinalReader reader = new FlatRecordOrdinalReader(record);
+        int ordinal = reader.getOrdinalCount() - 1;
+        HollowSchema schema = reader.readSchema(ordinal);
+        HollowTypeMapper typeMapper = typeMappers.get(schema.getName());
+        if (typeMapper == null) {
+            throw new IllegalArgumentException("No type mapper found for schema " + schema.getName());
         }
-
-        return (T) parsedObjects.get(ordinal - 1);
+        Object obj = typeMapper.parseFlatRecord(reader, ordinal);
+        return (T) obj;
     }
     
     /**
