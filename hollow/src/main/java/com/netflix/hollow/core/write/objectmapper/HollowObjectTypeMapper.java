@@ -257,7 +257,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     if (posInPojoSchema != -1) {
                         obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(reader, offset);
                     } else {
-                        reader.skipField(offset, schema.getFieldType(i));
+                        reader.skipField(offset, flatRecordSchema.getFieldType(i));
                     }
                 }
             } else if (clazz.isEnum()) {
@@ -270,7 +270,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     if (fieldName.equals(MappedFieldType.ENUM_NAME.getSpecialFieldName()) && posInPojoSchema != -1) {
                         obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(reader, offset);
                     } else {
-                        reader.skipField(offset, schema.getFieldType(i));
+                        reader.skipField(offset, flatRecordSchema.getFieldType(i));
                     }
                 }
             } else {
@@ -280,7 +280,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     if (posInPojoSchema != -1) {
                         mappedFields.get(posInPojoSchema).copy(obj, reader, offset);
                     } else {
-                        reader.skipField(offset, schema.getFieldType(i));
+                        reader.skipField(offset, flatRecordSchema.getFieldType(i));
                     }
                 }
             }

@@ -120,10 +120,10 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
         FlatRecordOrdinalReader.Offset offset = reader.getOffsetAtDataStartOf(ordinal);
         int size = reader.readSize(offset);
         Set<Object> collection = new HashSet<>();
-        int elementOrdinal = 0;
+        int previousElementOrdinal = 0;
         for (int i = 0; i < size; i++) {
-            elementOrdinal +=  reader.readSetElementOrdinalDelta(offset);
-            collection.add(elementMapper.parseFlatRecord(reader, elementOrdinal));
+            previousElementOrdinal = reader.readSetElementOrdinal(offset, previousElementOrdinal);
+            collection.add(elementMapper.parseFlatRecord(reader, previousElementOrdinal));
         }
         return collection;
     }

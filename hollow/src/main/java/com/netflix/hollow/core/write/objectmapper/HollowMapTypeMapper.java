@@ -143,13 +143,13 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
         FlatRecordOrdinalReader.Offset offset = reader.getOffsetAtDataStartOf(ordinal);
         int size = reader.readSize(offset);
         Map<Object, Object> collection = new HashMap<>(size);
-        int keyOrdinal = 0;
+        int previousKeyOrdinal = 0;
         for (int i = 0; i < size; i++) {
-            long keyOrdinalDeltaAndValueOrdinal = reader.readMapKeyOrdinalDeltaAndValueOrdinal(offset);
-            keyOrdinal += (int) (keyOrdinalDeltaAndValueOrdinal >>> 32);
-            int valueOrdinal = (int) keyOrdinalDeltaAndValueOrdinal;
+            long keyAndValueOrdinals = reader.readMapKeyAndValueOrdinals(offset, previousKeyOrdinal);
+            previousKeyOrdinal = (int) (keyAndValueOrdinals >>> 32);
+            int valueOrdinal = (int) keyAndValueOrdinals;
 
-            Object key = keyMapper.parseFlatRecord(reader, keyOrdinal);
+            Object key = keyMapper.parseFlatRecord(reader, previousKeyOrdinal);
             Object value = valueMapper.parseFlatRecord(reader, valueOrdinal);
             collection.put(key, value);
         }

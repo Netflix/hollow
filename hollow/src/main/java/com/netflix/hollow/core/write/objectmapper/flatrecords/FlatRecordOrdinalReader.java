@@ -70,16 +70,6 @@ public class FlatRecordOrdinalReader {
   }
 
   public int readSize(Offset offset) {
-    int schemaId = VarInt.readVInt(record.data, offset.get());
-    offset.increment(VarInt.sizeOfVInt(schemaId));
-
-    HollowSchema schema = record.schemaIdMapper.getSchema(schemaId);
-    if (schema.getSchemaType() != HollowSchema.SchemaType.LIST &&
-        schema.getSchemaType() != HollowSchema.SchemaType.SET &&
-        schema.getSchemaType() != HollowSchema.SchemaType.MAP) {
-      throw new IllegalArgumentException(String.format("Schema %s is not a LIST, SET, or MAP type (found %s)", schema.getName(), schema.getSchemaType()));
-    }
-
     int size = VarInt.readVInt(record.data, offset.get());
     offset.increment(VarInt.sizeOfVInt(size));
     return size;
@@ -91,18 +81,18 @@ public class FlatRecordOrdinalReader {
     return elementOrdinal;
   }
 
-  public int readSetElementOrdinalDelta(Offset offset) {
+  public int readSetElementOrdinal(Offset offset, int previousElementOrdinal) {
     int elementOrdinalDelta = VarInt.readVInt(record.data, offset.get());
     offset.increment(VarInt.sizeOfVInt(elementOrdinalDelta));
-    return elementOrdinalDelta;
+    return previousElementOrdinal + elementOrdinalDelta;
   }
 
-  public long readMapKeyOrdinalDeltaAndValueOrdinal(Offset offset) {
+  public long readMapKeyAndValueOrdinals(Offset offset, int previousKeyOrdinal) {
     int keyOrdinalDelta = VarInt.readVInt(record.data, offset.get());
     offset.increment(VarInt.sizeOfVInt(keyOrdinalDelta));
     int valueOrdinal = VarInt.readVInt(record.data, offset.get());
     offset.increment(VarInt.sizeOfVInt(valueOrdinal));
-    return (long) keyOrdinalDelta << 32 | valueOrdinal;
+    return (long) (previousKeyOrdinal + keyOrdinalDelta) << 32 | valueOrdinal;
   }
 
   public void readListElementsInto(int ordinal, int[] elements) {
