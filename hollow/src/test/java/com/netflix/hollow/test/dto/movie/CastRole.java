@@ -1,4 +1,4 @@
-package com.netflix.hollow.test.dto;
+package com.netflix.hollow.test.dto.movie;
 
 public enum CastRole {
   DIRECTOR,

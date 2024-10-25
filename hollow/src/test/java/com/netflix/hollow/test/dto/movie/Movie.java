@@ -1,4 +1,4 @@
-package com.netflix.hollow.test.dto;
+package com.netflix.hollow.test.dto.movie;
 
 
 import com.netflix.hollow.core.write.objectmapper.HollowHashKey;
