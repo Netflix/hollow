@@ -207,11 +207,12 @@ public class FlatRecordOrdinalReader {
   }
 
   public Boolean readFieldBoolean(Offset offset) {
-    offset.increment(1);
     if (VarInt.readVNull(record.data, offset.get())) {
+      offset.increment(1);
       return null;
     }
     int value = record.data.get(offset.get());
+    offset.increment(1);
     return value == 1 ? Boolean.TRUE : Boolean.FALSE;
   }
 
@@ -272,8 +273,8 @@ public class FlatRecordOrdinalReader {
   }
 
   public float readFieldFloat(Offset offset) {
-    offset.increment(4);
     int value = record.data.readIntBits(offset.get());
+    offset.increment(4);
     if (value == HollowObjectWriteRecord.NULL_FLOAT_BITS) {
       return Float.NaN;
     }
@@ -295,8 +296,8 @@ public class FlatRecordOrdinalReader {
   }
 
   public double readFieldDouble(Offset offset) {
-    offset.increment(8);
     long value = record.data.readLongBits(offset.get());
+    offset.increment(8);
     if (value == HollowObjectWriteRecord.NULL_DOUBLE_BITS) {
       return Double.NaN;
     }
