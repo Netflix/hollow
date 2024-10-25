@@ -1,12 +1,11 @@
-package com.netflix.hollow.test.dto;
-
+package com.netflix.hollow.test.dto.movie;
 
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 
-public class Country {
+public class Tag {
   @HollowInline String value;
 
-  public Country(String value) {
+  public Tag(String value) {
     this.value = value;
   }
 }
