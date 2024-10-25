@@ -100,28 +100,13 @@ public class HollowObjectMapper {
         if (typeMapper == null) {
             throw new IllegalArgumentException("No type mapper found for schema " + schemaName);
         }
-        Object obj = typeMapper.parseFlatRecordTraversalNode(node);
+        Object obj = typeMapper.parseFlatRecord(node);
         return (T) obj;
     }
 
     public <T> T readFlat(FlatRecord record) {
-        FlatRecordReader recordReader = new FlatRecordReader(record);
-
-        int ordinal = 0;
-        Map<Integer, Object> parsedObjects = new HashMap<>();
-        while(recordReader.hasMore()) {
-            HollowSchema schema = recordReader.readSchema();
-            HollowTypeMapper mapper = typeMappers.get(schema.getName());
-            if (mapper == null) {
-                recordReader.skipSchema(schema);
-            } else {
-                Object obj = mapper.parseFlatRecord(schema, recordReader, parsedObjects);
-                parsedObjects.put(ordinal, obj);
-            }
-            ordinal++;
-        }
-
-        return (T) parsedObjects.get(ordinal - 1);
+        FlatRecordTraversalNode node = new FlatRecordTraversalObjectNode(record);
+        return readFlat(node);
     }
     
     /**
