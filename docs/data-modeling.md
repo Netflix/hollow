@@ -28,8 +28,8 @@ Each schema field has a _field name_, which will default to the same name as the
 
 The possible field types are:
 
-* `INT`: An integer value up to 32-bits
-* `LONG`: An integer value up to 64-bits
+* `INT`: An integer value up to 32-bits. Integer.MIN_VALUE is reserved for a sentinel value indicating null.
+* `LONG`: An integer value up to 64-bits. Long.MIN_VALUE is reserved for a sentinel value indicating null.
 * `FLOAT`: A 32-bit floating-point value
 * `DOUBLE`: A 64-bit floating-point value
 * `BOOLEAN`: `true` or `false`
