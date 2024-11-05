@@ -533,7 +533,7 @@ abstract class AbstractHollowProducer {
                 try {
                     prevDeltaChainVersionCounter = Long.valueOf(str);
                 } catch (NumberFormatException e) {
-                    prevDeltaChainVersionCounter = 0;
+                    // ignore, prevDeltaChainVersionCounter remains 0
                 }
             }
         }
