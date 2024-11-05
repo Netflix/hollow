@@ -32,6 +32,7 @@ public class ConsumerRefreshMetrics {
     private long refreshEndTimeNano;                // monotonic system time when refresh ended
     private OptionalLong cycleStartTimestamp;       // timestamp in millis of when cycle started for the loaded data version
     private OptionalLong announcementTimestamp; // timestamp in milliseconds to mark announcement for the loaded data version
+    private OptionalLong deltaChainVersionCounter;  // the sequence number of a version in a delta chain
 
     /**
      * A class that contains details of the consumer refresh update plan that may be useful to report as metrics or logs.
@@ -84,8 +85,12 @@ public class ConsumerRefreshMetrics {
     public OptionalLong getCycleStartTimestamp() {
         return cycleStartTimestamp;
     }
-
-    public OptionalLong getAnnouncementTimestamp() { return announcementTimestamp; }
+    public OptionalLong getAnnouncementTimestamp() {
+        return announcementTimestamp;
+    }
+    public OptionalLong getDeltaChainVersionCounter() {
+        return deltaChainVersionCounter;
+    }
 
     private ConsumerRefreshMetrics(Builder builder) {
         this.durationMillis = builder.durationMillis;
@@ -98,6 +103,7 @@ public class ConsumerRefreshMetrics {
         this.refreshEndTimeNano = builder.refreshEndTimeNano;
         this.cycleStartTimestamp = builder.cycleStartTimestamp;
         this.announcementTimestamp = builder.announcementTimestamp;
+        this.deltaChainVersionCounter = builder.deltaChainVersionCounter;
     }
 
     public static final class Builder {
@@ -111,11 +117,13 @@ public class ConsumerRefreshMetrics {
         private long refreshEndTimeNano;
         private OptionalLong cycleStartTimestamp;
         private OptionalLong announcementTimestamp;
+        private OptionalLong deltaChainVersionCounter;
 
         public Builder() {
             refreshSuccessAgeMillisOptional = OptionalLong.empty();
             cycleStartTimestamp = OptionalLong.empty();
             announcementTimestamp = OptionalLong.empty();
+            deltaChainVersionCounter = OptionalLong.empty();
         }
 
         public Builder setDurationMillis(long durationMillis) {
@@ -158,6 +166,10 @@ public class ConsumerRefreshMetrics {
 
         public Builder setAnnouncementTimestamp(long announcementTimestamp) {
             this.announcementTimestamp = OptionalLong.of(announcementTimestamp);
+            return this;
+        }
+        public Builder setDeltaChainVersionCounter(long deltaChainVersionCounter) {
+            this.deltaChainVersionCounter = OptionalLong.of(deltaChainVersionCounter);
             return this;
         }
 

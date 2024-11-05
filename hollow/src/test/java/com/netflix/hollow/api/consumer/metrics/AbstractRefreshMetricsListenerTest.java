@@ -1,6 +1,7 @@
 package com.netflix.hollow.api.consumer.metrics;
 
 import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_ANNOUNCEMENT;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
 import static org.junit.Assert.assertEquals;
@@ -11,13 +12,12 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.test.InMemoryBlobStore;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -129,6 +129,7 @@ public class AbstractRefreshMetricsListenerTest {
                 Assert.assertNotEquals(0l, refreshMetrics.getRefreshEndTimeNano());
                 assertEquals(TEST_CYCLE_START_TIMESTAMP, refreshMetrics.getCycleStartTimestamp().getAsLong());
                 assertEquals(TEST_ANNOUNCEMENT_TIMESTAMP, refreshMetrics.getAnnouncementTimestamp().getAsLong());
+                assertEquals(1l, refreshMetrics.getDeltaChainVersionCounter().getAsLong());
             }
         }
         SuccessTestRefreshMetricsListener successTestRefreshMetricsListener = new SuccessTestRefreshMetricsListener();
@@ -136,6 +137,7 @@ public class AbstractRefreshMetricsListenerTest {
 
         testHeaderTags.put(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(TEST_CYCLE_START_TIMESTAMP));
         testHeaderTags.put(HEADER_TAG_METRIC_ANNOUNCEMENT, String.valueOf(TEST_ANNOUNCEMENT_TIMESTAMP));
+        testHeaderTags.put(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER, String.valueOf(1l));
         successTestRefreshMetricsListener.snapshotUpdateOccurred(null, mockStateEngine, TEST_VERSION_HIGH);
 
         successTestRefreshMetricsListener.refreshSuccessful(TEST_VERSION_LOW, TEST_VERSION_HIGH, TEST_VERSION_HIGH);
@@ -152,6 +154,7 @@ public class AbstractRefreshMetricsListenerTest {
                 Assert.assertNotEquals(0l, refreshMetrics.getRefreshEndTimeNano());
                 Assert.assertFalse(refreshMetrics.getCycleStartTimestamp().isPresent());
                 Assert.assertFalse(refreshMetrics.getAnnouncementTimestamp().isPresent());
+                Assert.assertFalse(refreshMetrics.getDeltaChainVersionCounter().isPresent());
             }
         }
         FailureTestRefreshMetricsListener failTestRefreshMetricsListener = new FailureTestRefreshMetricsListener();
@@ -168,6 +171,7 @@ public class AbstractRefreshMetricsListenerTest {
                 assertEquals(3, refreshMetrics.getUpdatePlanDetails().getNumSuccessfulTransitions());
                 assertEquals(TEST_CYCLE_START_TIMESTAMP, refreshMetrics.getCycleStartTimestamp().getAsLong());
                 assertEquals(TEST_ANNOUNCEMENT_TIMESTAMP, refreshMetrics.getAnnouncementTimestamp().getAsLong());
+                assertEquals(3l, refreshMetrics.getDeltaChainVersionCounter().getAsLong());
             }
         }
         List<HollowConsumer.Blob.BlobType> testTransitionSequence = new ArrayList<HollowConsumer.Blob.BlobType>() {{
@@ -183,16 +187,19 @@ public class AbstractRefreshMetricsListenerTest {
         successTestRefreshMetricsListener.blobLoaded(null);
         testHeaderTags.put(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(TEST_CYCLE_START_TIMESTAMP-2));
         testHeaderTags.put(HEADER_TAG_METRIC_ANNOUNCEMENT, String.valueOf(TEST_ANNOUNCEMENT_TIMESTAMP-2));
+        testHeaderTags.put(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER, String.valueOf(1l));
         successTestRefreshMetricsListener.deltaUpdateOccurred(null, mockStateEngine, TEST_VERSION_HIGH-2);
 
         successTestRefreshMetricsListener.blobLoaded(null);
         testHeaderTags.put(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(TEST_CYCLE_START_TIMESTAMP-1));
         testHeaderTags.put(HEADER_TAG_METRIC_ANNOUNCEMENT, String.valueOf(TEST_ANNOUNCEMENT_TIMESTAMP-1));
+        testHeaderTags.put(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER, String.valueOf(2l));
         successTestRefreshMetricsListener.deltaUpdateOccurred(null, mockStateEngine, TEST_VERSION_HIGH-1);
 
         successTestRefreshMetricsListener.blobLoaded(null);
         testHeaderTags.put(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(TEST_CYCLE_START_TIMESTAMP));
         testHeaderTags.put(HEADER_TAG_METRIC_ANNOUNCEMENT, String.valueOf(TEST_ANNOUNCEMENT_TIMESTAMP));
+        testHeaderTags.put(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER, String.valueOf(3l));
         successTestRefreshMetricsListener.deltaUpdateOccurred(null, mockStateEngine, TEST_VERSION_HIGH);
 
         successTestRefreshMetricsListener.refreshSuccessful(TEST_VERSION_LOW, TEST_VERSION_HIGH, TEST_VERSION_HIGH);
@@ -205,6 +212,7 @@ public class AbstractRefreshMetricsListenerTest {
             public void refreshEndMetricsReporting(ConsumerRefreshMetrics refreshMetrics) {
                 assertEquals(1, refreshMetrics.getUpdatePlanDetails().getNumSuccessfulTransitions());
                 assertEquals(TEST_CYCLE_START_TIMESTAMP, refreshMetrics.getCycleStartTimestamp().getAsLong());
+                assertEquals(1l, refreshMetrics.getDeltaChainVersionCounter().getAsLong());
             }
         }
         List<HollowConsumer.Blob.BlobType> testTransitionSequence = new ArrayList<HollowConsumer.Blob.BlobType>() {{
@@ -219,6 +227,7 @@ public class AbstractRefreshMetricsListenerTest {
 
         failureTestRefreshMetricsListener.blobLoaded(null);
         testHeaderTags.put(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(TEST_CYCLE_START_TIMESTAMP));
+        testHeaderTags.put(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER, String.valueOf(1l));
         failureTestRefreshMetricsListener.snapshotUpdateOccurred(null, mockStateEngine, TEST_VERSION_LOW);
 
         failureTestRefreshMetricsListener.refreshFailed(TEST_VERSION_LOW-1, TEST_VERSION_LOW, TEST_VERSION_HIGH, null);
@@ -226,7 +235,7 @@ public class AbstractRefreshMetricsListenerTest {
     }
 
     @Test
-    public void testCycleStart() {  // also exercises reverse delta transition
+    public void testCycles() {  // also exercises reverse delta transition
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
         HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
         HollowProducer p = HollowProducer
@@ -252,16 +261,20 @@ public class AbstractRefreshMetricsListenerTest {
                 switch (run) {
                     case 1:
                         assertEquals(1L, refreshMetrics.getCycleStartTimestamp().getAsLong());
+                        assertEquals(1L, refreshMetrics.getDeltaChainVersionCounter().getAsLong());
                         break;
                     case 2:
                     case 5:
                         assertEquals(2L, refreshMetrics.getCycleStartTimestamp().getAsLong());
+                        assertEquals(2L, refreshMetrics.getDeltaChainVersionCounter().getAsLong());
                         break;
                     case 3:
                         assertEquals(1L, refreshMetrics.getCycleStartTimestamp().getAsLong());
+                        assertEquals(1L, refreshMetrics.getDeltaChainVersionCounter().getAsLong());
                         break;
                     case 4:
                         assertEquals(3L, refreshMetrics.getCycleStartTimestamp().getAsLong());
+                        assertEquals(3L, refreshMetrics.getDeltaChainVersionCounter().getAsLong());
                         break;
                 }
             }
