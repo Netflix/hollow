@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.producer;
 
 import static com.netflix.hollow.api.producer.ProducerListenerSupport.ProducerListeners;
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED;
 import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.toList;
@@ -524,6 +525,20 @@ abstract class AbstractHollowProducer {
         }
         writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION, String.valueOf(toVersion));
         writeEngine.getHeaderTags().remove(HEADER_TAG_TYPE_RESHARDING_INVOKED);
+
+        long prevDeltaChainVersionCounter = 0l;
+        if (readStates.hasCurrent()) {
+            String str = readStates.current().getStateEngine().getHeaderTag(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER);
+            if (str != null) {
+                try {
+                    prevDeltaChainVersionCounter = Long.valueOf(str);
+                } catch (NumberFormatException e) {
+                    // ignore, prevDeltaChainVersionCounter remains 0
+                }
+            }
+        }
+        long deltaChainVersionCounter = prevDeltaChainVersionCounter + 1;
+        writeEngine.addHeaderTag(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER, String.valueOf(deltaChainVersionCounter));
     }
 
     void populate(

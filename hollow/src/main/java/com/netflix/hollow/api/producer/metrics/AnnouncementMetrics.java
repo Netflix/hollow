@@ -27,7 +27,7 @@ public class AnnouncementMetrics {
     private long announcementDurationMillis;                // Announcement duration in ms, only applicable to completed cycles (skipped cycles dont announce)
     private boolean isAnnouncementSuccess;                  // true if announcement was successful, false if announcement failed
     private OptionalLong lastAnnouncementSuccessTimeNano;   // monotonic time of last successful announcement (no relation to wall clock), N/A until first successful announcement
-
+    private OptionalLong deltaChainVersionCounter;
 
     public long getDataSizeBytes() {
         return dataSizeBytes;
@@ -47,6 +47,10 @@ public class AnnouncementMetrics {
     public OptionalLong getLastAnnouncementSuccessTimeNano() {
         return lastAnnouncementSuccessTimeNano;
     }
+    public OptionalLong getDeltaChainVersionCounter() {
+        return deltaChainVersionCounter;
+    }
+
 
     private AnnouncementMetrics(Builder builder) {
         this.dataSizeBytes = builder.dataSizeBytes;
@@ -55,6 +59,7 @@ public class AnnouncementMetrics {
         this.announcementDurationMillis = builder.announcementDurationMillis;
         this.isAnnouncementSuccess = builder.isAnnouncementSuccess;
         this.lastAnnouncementSuccessTimeNano = builder.lastAnnouncementSuccessTimeNano;
+        this.deltaChainVersionCounter = builder.deltaChainVersionCounter;
     }
 
     public static final class Builder {
@@ -62,11 +67,13 @@ public class AnnouncementMetrics {
         private long announcementDurationMillis;
         private boolean isAnnouncementSuccess;
         private OptionalLong lastAnnouncementSuccessTimeNano;
+        private OptionalLong deltaChainVersionCounter;
         private Map<String, Integer> numShardsPerType;
         private Map<String, Long> shardSizePerType;
 
         public Builder() {
             lastAnnouncementSuccessTimeNano = OptionalLong.empty();
+            deltaChainVersionCounter = OptionalLong.empty();
         }
 
         public Builder setDataSizeBytes(long dataSizeBytes) {
@@ -91,6 +98,10 @@ public class AnnouncementMetrics {
         }
         public Builder setLastAnnouncementSuccessTimeNano(long lastAnnouncementSuccessTimeNano) {
             this.lastAnnouncementSuccessTimeNano = OptionalLong.of(lastAnnouncementSuccessTimeNano);
+            return this;
+        }
+        public Builder setDeltaChainVersionCounter(long deltaChainVersionCounter) {
+            this.deltaChainVersionCounter = OptionalLong.of(deltaChainVersionCounter);
             return this;
         }
 

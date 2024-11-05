@@ -18,6 +18,7 @@ package com.netflix.hollow.api.producer.metrics;
 
 import com.netflix.hollow.api.producer.AbstractHollowProducerListener;
 import com.netflix.hollow.api.producer.HollowProducer;
+import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.time.Duration;
 import java.util.Map;
@@ -98,6 +99,15 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
                 .setIsAnnouncementSuccess(isAnnouncementSuccess)
                 .setAnnouncementDurationMillis(elapsed.toMillis());
         lastAnnouncementSuccessTimeNanoOptional.ifPresent(announcementMetricsBuilder::setLastAnnouncementSuccessTimeNano);
+
+        if (stateEngine.getHeaderTag(HollowStateEngine.HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER) != null) {
+            try {
+                long deltaChainVersionCounter = Long.parseLong(stateEngine.getHeaderTag(HollowStateEngine.HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER));
+                announcementMetricsBuilder.setDeltaChainVersionCounter(deltaChainVersionCounter);
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+        }
 
         announcementMetricsReporting(announcementMetricsBuilder.build());
     }

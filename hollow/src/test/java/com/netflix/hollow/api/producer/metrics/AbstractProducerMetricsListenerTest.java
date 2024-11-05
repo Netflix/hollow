@@ -1,5 +1,7 @@
 package com.netflix.hollow.api.producer.metrics;
 
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.producer.HollowProducer;
@@ -114,6 +116,7 @@ public class AbstractProducerMetricsListenerTest {
 
     @Test
     public void testAnnouncementCompleteWithSuccess() {
+        when(mockStateEngine.getHeaderTag(eq(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER))).thenReturn("1");
         final class TestProducerMetricsListener extends AbstractProducerMetricsListener {
             @Override
             public void announcementMetricsReporting(AnnouncementMetrics announcementMetrics) {
@@ -124,6 +127,8 @@ public class AbstractProducerMetricsListenerTest {
                         announcementMetrics.getAnnouncementDurationMillis());
                 Assert.assertNotEquals(OptionalLong.of(TEST_LAST_ANNOUNCEMENT_NANOS),
                         announcementMetrics.getLastAnnouncementSuccessTimeNano());
+                Assert.assertEquals(OptionalLong.of(1l),
+                        announcementMetrics.getDeltaChainVersionCounter());
             }
         }
 
@@ -146,6 +151,8 @@ public class AbstractProducerMetricsListenerTest {
                         announcementMetrics.getAnnouncementDurationMillis());
                 Assert.assertEquals(OptionalLong.of(TEST_LAST_ANNOUNCEMENT_NANOS),
                         announcementMetrics.getLastAnnouncementSuccessTimeNano());
+                Assert.assertEquals(OptionalLong.empty(),
+                        announcementMetrics.getDeltaChainVersionCounter());
             }
         }
 
