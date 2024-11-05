@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.consumer.metrics;
 
 import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_ANNOUNCEMENT;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
 
@@ -59,12 +60,15 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     private final Map<Long, Long> announcementTimestamps;
     private volatile boolean namespacePinnedPreviously;
 
+    private final Map<Long, Long> cycleVersionDeltaCounters; // delta chain version counter for each cycle version
+
     public AbstractRefreshMetricsListener() {
         lastRefreshTimeNanoOptional = OptionalLong.empty();
         consecutiveFailures = 0l;
         cycleVersionStartTimes = new HashMap<>();
         announcementTimestamps = new HashMap<>();
         namespacePinnedPreviously = false;
+        cycleVersionDeltaCounters = new HashMap<>();
     }
 
     public void refreshStarted(long currentVersion, long requestedVersion) {
@@ -73,7 +77,9 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         refreshMetricsBuilder = new ConsumerRefreshMetrics.Builder();
         refreshMetricsBuilder.setIsInitialLoad(currentVersion == VERSION_NONE);
         refreshMetricsBuilder.setUpdatePlanDetails(updatePlanDetails);
-        cycleVersionStartTimes.clear(); // clear map to avoid accumulation over time
+        // clear maps to avoid accumulation over time
+        cycleVersionStartTimes.clear();
+        cycleVersionDeltaCounters.clear();
     }
 
     @Override
@@ -91,7 +97,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         // or for the newVersion). Don't record this metric when a namespace was pinned previously and gets unpinned
         // in the next cycle because this metric will record the refresh duration from the latest announced version.
         if (!(namespacePinnedPreviously || isPinned)) {
-            trackTimestampsFromHeaders(requestedVersionInfo.getVersion(),
+            trackHeaderTagInVersion(requestedVersionInfo.getVersion(),
                     requestedVersionInfo.getAnnouncementMetadata().get(), HEADER_TAG_METRIC_ANNOUNCEMENT, announcementTimestamps);
         }
         namespacePinnedPreviously = isPinned;
@@ -160,6 +166,9 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         if (cycleVersionStartTimes.containsKey(afterVersion)) {
             refreshMetricsBuilder.setCycleStartTimestamp(cycleVersionStartTimes.get(afterVersion));
         }
+        if (cycleVersionDeltaCounters.containsKey(afterVersion)) {
+            refreshMetricsBuilder.setDeltaChainVersionCounter(cycleVersionDeltaCounters.get(afterVersion));
+        }
 
         if (afterVersion == requestedVersion && announcementTimestamps.containsKey(afterVersion)) {
             refreshMetricsBuilder.setAnnouncementTimestamp(announcementTimestamps.get(afterVersion));
@@ -186,32 +195,37 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         if (cycleVersionStartTimes.containsKey(afterVersion)) {
             refreshMetricsBuilder.setCycleStartTimestamp(cycleVersionStartTimes.get(afterVersion));
         }
+        if (cycleVersionDeltaCounters.containsKey(afterVersion)) {
+            refreshMetricsBuilder.setDeltaChainVersionCounter(cycleVersionDeltaCounters.get(afterVersion));
+        }
 
         noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
     }
 
     @Override
     public void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-        trackTimestampsFromHeaders(version, stateEngine.getHeaderTags(), HEADER_TAG_METRIC_CYCLE_START, cycleVersionStartTimes);
+        trackHeaderTagInVersion(version, stateEngine.getHeaderTags(), HEADER_TAG_METRIC_CYCLE_START, cycleVersionStartTimes);
+        trackHeaderTagInVersion(version, stateEngine.getHeaderTags(), HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER, cycleVersionDeltaCounters);
     }
 
     @Override
     public void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-        trackTimestampsFromHeaders(version, stateEngine.getHeaderTags(), HEADER_TAG_METRIC_CYCLE_START, cycleVersionStartTimes);
+        trackHeaderTagInVersion(version, stateEngine.getHeaderTags(), HEADER_TAG_METRIC_CYCLE_START, cycleVersionStartTimes);
+        trackHeaderTagInVersion(version, stateEngine.getHeaderTags(), HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER, cycleVersionDeltaCounters);
     }
 
     /**
-     * If the blob header contains the timestamps like producer cycle start and announcement then save those values in
-     * the maps tracking version to cycle start time and version to announcement respectively.
+     * If the blob header contains a value for the given header tag (like producer cycle start time) then save that value in
+     * a maps tracking the value per version in this refresh.
      */
-    private void trackTimestampsFromHeaders(long version, Map<String, String> headers, String headerTag, Map<Long, Long> timestampsMap) {
+    private void trackHeaderTagInVersion(long version, Map<String, String> headers, String headerTag, Map<Long, Long> tracker) {
         if (headers != null) {
             String headerTagValue = headers.get(headerTag);
             if (headerTagValue != null && !headerTagValue.isEmpty()) {
                 try {
-                    Long timestamp = Long.valueOf(headerTagValue);
-                    if (timestamp != null) {
-                        timestampsMap.put(version, timestamp);
+                    Long val = Long.valueOf(headerTagValue);
+                    if (val != null) {
+                        tracker.put(version, val);
                     }
                 } catch (NumberFormatException e) {
                     log.log(Level.WARNING, "Blob header contained " + headerTag + " but its value could"
