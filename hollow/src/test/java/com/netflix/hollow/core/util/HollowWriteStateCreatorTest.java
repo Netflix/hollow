@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.util;
 
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION;
 import static org.junit.Assert.assertEquals;
@@ -46,6 +47,7 @@ public class HollowWriteStateCreatorTest {
         }
         writeEngine.addHeaderTag("CopyTag", "copied");
         writeEngine.addHeaderTag(HEADER_TAG_METRIC_CYCLE_START, String.valueOf(System.currentTimeMillis()));
+        writeEngine.addHeaderTag(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER, "1");
         String toVersion = String.valueOf(System.currentTimeMillis());
         writeEngine.addHeaderTag(HEADER_TAG_PRODUCER_TO_VERSION, toVersion);
         
@@ -55,6 +57,7 @@ public class HollowWriteStateCreatorTest {
         HollowWriteStateEngine recreatedWriteEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(readEngine);
         assertEquals(cycleStartTime, recreatedWriteEngine.getPreviousHeaderTags().get(HEADER_TAG_METRIC_CYCLE_START));
         assertEquals(readEngineToVersion, recreatedWriteEngine.getPreviousHeaderTags().get(HEADER_TAG_PRODUCER_TO_VERSION));
+        assertEquals("1", recreatedWriteEngine.getPreviousHeaderTags().get(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER));
         assertEquals(8, recreatedWriteEngine.getTypeState("Integer").getNumShards());
 
         HollowReadStateEngine recreatedReadEngine = StateEngineRoundTripper.roundTripSnapshot(recreatedWriteEngine);

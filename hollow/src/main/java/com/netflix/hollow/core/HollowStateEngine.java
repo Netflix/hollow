@@ -75,6 +75,11 @@ public interface HollowStateEngine extends HollowDataset {
      */
     String HEADER_TAG_PRODUCER_TO_VERSION = "hollow.blob.to.version";
 
+    /**
+     * A header tag indicating monotonically increasing version in the same delta chain
+     */
+    String HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER = "hollow.delta.chain.version.counter";
+
     @Override
     List<HollowSchema> getSchemas();
 
