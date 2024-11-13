@@ -88,6 +88,10 @@ public class FlatRecord {
         return arr;
     }
 
+    public long size() {
+        return data.length();
+    }
+
     private Object readPrimaryKeyField(int location, FieldType fieldType) {
         /// assumption: primary key fields are never null
         switch (fieldType) {
