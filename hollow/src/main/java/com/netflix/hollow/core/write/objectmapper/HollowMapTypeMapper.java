@@ -25,9 +25,8 @@ import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordOrdinalReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalMapNode;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -140,13 +139,18 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
     }
 
     @Override
-    protected Object parseFlatRecord(FlatRecordTraversalNode node) {
-        FlatRecordTraversalMapNode mapNode = (FlatRecordTraversalMapNode) node;
-        Map<Object, Object> collection = new HashMap<>();
+    protected Object parseFlatRecord(FlatRecordOrdinalReader reader, int ordinal) {
+        FlatRecordOrdinalReader.Offset offset = reader.getOffsetAtDataStartOf(ordinal);
+        int size = reader.readSize(offset);
+        Map<Object, Object> collection = new HashMap<>(size);
+        int previousKeyOrdinal = 0;
+        for (int i = 0; i < size; i++) {
+            long keyAndValueOrdinals = reader.readMapKeyAndValueOrdinals(offset, previousKeyOrdinal);
+            previousKeyOrdinal = (int) (keyAndValueOrdinals >>> 32);
+            int valueOrdinal = (int) keyAndValueOrdinals;
 
-        for (Map.Entry<FlatRecordTraversalNode, FlatRecordTraversalNode> entry : mapNode.entrySet()) {
-            Object key = keyMapper.parseFlatRecord(entry.getKey());
-            Object value = valueMapper.parseFlatRecord(entry.getValue());
+            Object key = keyMapper.parseFlatRecord(reader, previousKeyOrdinal);
+            Object value = valueMapper.parseFlatRecord(reader, valueOrdinal);
             collection.put(key, value);
         }
         return collection;

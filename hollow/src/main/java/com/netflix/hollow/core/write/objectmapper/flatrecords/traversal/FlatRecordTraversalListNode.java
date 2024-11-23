@@ -36,6 +36,11 @@ public class FlatRecordTraversalListNode extends AbstractList<FlatRecordTraversa
   }
 
   @Override
+  public FlatRecordOrdinalReader getReader() {
+    return reader;
+  }
+
+  @Override
   public void setCommonSchema(Map<String, HollowObjectSchema> commonSchema) {
     this.commonSchemaMap = commonSchema;
   }

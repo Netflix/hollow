@@ -25,9 +25,8 @@ import com.netflix.hollow.core.write.HollowSetWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordOrdinalReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalSetNode;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -117,10 +116,14 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
     }
 
     @Override
-    protected Object parseFlatRecord(FlatRecordTraversalNode node) {
+    protected Object parseFlatRecord(FlatRecordOrdinalReader reader, int ordinal) {
+        FlatRecordOrdinalReader.Offset offset = reader.getOffsetAtDataStartOf(ordinal);
+        int size = reader.readSize(offset);
         Set<Object> collection = new HashSet<>();
-        for (FlatRecordTraversalNode elementNode : (FlatRecordTraversalSetNode) node) {
-            collection.add(elementMapper.parseFlatRecord(elementNode));
+        int previousElementOrdinal = 0;
+        for (int i = 0; i < size; i++) {
+            previousElementOrdinal = reader.readSetElementOrdinal(offset, previousElementOrdinal);
+            collection.add(elementMapper.parseFlatRecord(reader, previousElementOrdinal));
         }
         return collection;
     }
