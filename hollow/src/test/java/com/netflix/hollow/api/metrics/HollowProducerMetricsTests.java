@@ -38,18 +38,38 @@ public class HollowProducerMetricsTests {
     }
 
     @Test
+    public void metricsWhenNothingToPublish() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+            .withBlobStager(new HollowInMemoryBlobStager())
+            .build();
+
+        producer.runCycle(new HollowProducer.Populator() {
+            public void populate(HollowProducer.WriteState state) throws Exception {
+            }
+        });
+
+        HollowProducerMetrics hollowProducerMetrics = producer.getMetrics();
+        Assert.assertEquals(hollowProducerMetrics.getLastAnnouncedVersion(), 0);
+        Assert.assertEquals(hollowProducerMetrics.getCyclesSucceeded(), 1);
+        Assert.assertEquals(hollowProducerMetrics.getCyclesCompleted(), 1);
+        Assert.assertEquals(hollowProducerMetrics.getTotalPopulatedOrdinals(), 0);
+        Assert.assertEquals(hollowProducerMetrics.getSnapshotsCompleted(), 0);
+    }
+
+    @Test
     public void metricsWhenPublishingSnapshot() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
                 .build();
 
-        producer.runCycle(new HollowProducer.Populator() {
+        long version = producer.runCycle(new HollowProducer.Populator() {
             public void populate(HollowProducer.WriteState state) throws Exception {
                 state.add(Integer.valueOf(1));
             }
         });
 
         HollowProducerMetrics hollowProducerMetrics = producer.getMetrics();
+        Assert.assertEquals(hollowProducerMetrics.getLastAnnouncedVersion(), version);
         Assert.assertEquals(hollowProducerMetrics.getCyclesSucceeded(), 1);
         Assert.assertEquals(hollowProducerMetrics.getCyclesCompleted(), 1);
         Assert.assertEquals(hollowProducerMetrics.getTotalPopulatedOrdinals(), 1);
