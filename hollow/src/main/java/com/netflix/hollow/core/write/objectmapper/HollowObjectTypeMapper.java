@@ -579,45 +579,31 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     break;
                 case INT:
                     int intValue = rec.getInt(fieldName);
-                    if (intValue != Integer.MIN_VALUE) {
-                        unsafe.putInt(pojo, fieldOffset, intValue);
-                    }
+                    unsafe.putInt(pojo, fieldOffset, intValue);
                     break;
                 case SHORT:
                     int shortValue = rec.getInt(fieldName);
-                    if (shortValue != Integer.MIN_VALUE) {
-                        unsafe.putShort(pojo, fieldOffset, (short) shortValue);
-                    }
+                    unsafe.putShort(pojo, fieldOffset, (short) shortValue);
                     break;
                 case BYTE:
                     int byteValue = rec.getInt(fieldName);
-                    if (byteValue != Integer.MIN_VALUE) {
-                        unsafe.putByte(pojo, fieldOffset, (byte) byteValue);
-                    }
+                    unsafe.putByte(pojo, fieldOffset, (byte) byteValue);
                     break;
                 case CHAR:
                     int charValue = rec.getInt(fieldName);
-                    if (charValue != Integer.MIN_VALUE) {
-                        unsafe.putChar(pojo, fieldOffset, (char) charValue);
-                    }
+                    unsafe.putChar(pojo, fieldOffset, (char) charValue);
                     break;
                 case LONG:
                     long longValue = rec.getLong(fieldName);
-                    if (longValue != Long.MIN_VALUE) {
-                        unsafe.putLong(pojo, fieldOffset, longValue);
-                    }
+                    unsafe.putLong(pojo, fieldOffset, longValue);
                     break;
                 case DOUBLE:
                     double doubleValue = rec.getDouble(fieldName);
-                    if (!Double.isNaN(doubleValue)) {
-                        unsafe.putDouble(pojo, fieldOffset, doubleValue);
-                    }
+                    unsafe.putDouble(pojo, fieldOffset, doubleValue);
                     break;
                 case FLOAT:
                     float floatValue = rec.getFloat(fieldName);
-                    if (!Float.isNaN(floatValue)) {
-                        unsafe.putFloat(pojo, fieldOffset, floatValue);
-                    }
+                    unsafe.putFloat(pojo, fieldOffset, floatValue);
                     break;
                 case STRING:
                     unsafe.putObject(pojo, fieldOffset, rec.getString(fieldName));
@@ -829,51 +815,37 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 }
                 case INT: {
                     int value = node.getFieldValueInt(fieldName);
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putInt(obj, fieldOffset, value);
-                    }
+                    unsafe.putInt(obj, fieldOffset, value);
                     break;
                 }
                 case SHORT: {
                     int value = node.getFieldValueInt(fieldName);
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putShort(obj, fieldOffset, (short) value);
-                    }
+                    unsafe.putShort(obj, fieldOffset, (short) value);
                     break;
                 }
                 case BYTE: {
                     int value = node.getFieldValueInt(fieldName);
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putByte(obj, fieldOffset, (byte) value);
-                    }
+                    unsafe.putByte(obj, fieldOffset, (byte) value);
                     break;
                 }
                 case CHAR: {
                     int value = node.getFieldValueInt(fieldName);
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putChar(obj, fieldOffset, (char) value);
-                    }
+                    unsafe.putChar(obj, fieldOffset, (char) value);
                     break;
                 }
                 case LONG: {
                     long value = node.getFieldValueLong(fieldName);
-                    if (value != Long.MIN_VALUE) {
-                        unsafe.putLong(obj, fieldOffset, value);
-                    }
+                    unsafe.putLong(obj, fieldOffset, value);
                     break;
                 }
                 case FLOAT: {
                     float value = node.getFieldValueFloat(fieldName);
-                    if (!Float.isNaN(value)) {
-                        unsafe.putFloat(obj, fieldOffset, value);
-                    }
+                    unsafe.putFloat(obj, fieldOffset, value);
                     break;
                 }
                 case DOUBLE: {
                     double value = node.getFieldValueDouble(fieldName);
-                    if (!Double.isNaN(value)) {
-                        unsafe.putDouble(obj, fieldOffset, value);
-                    }
+                    unsafe.putDouble(obj, fieldOffset, value);
                     break;
                 }
                 case STRING: {
