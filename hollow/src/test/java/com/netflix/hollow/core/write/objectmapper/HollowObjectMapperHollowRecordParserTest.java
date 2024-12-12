@@ -117,6 +117,34 @@ public class HollowObjectMapperHollowRecordParserTest {
   }
 
   @Test
+  public void testReadPrimitivesPersistedWithSentinalValues() {
+    TypeWithAllSimpleTypes typeWithAllSimpleTypes = new TypeWithAllSimpleTypes();
+    typeWithAllSimpleTypes.primitiveIntegerField = Integer.MIN_VALUE; //write sentinal
+    typeWithAllSimpleTypes.primitiveFloatField = Float.NaN;
+    typeWithAllSimpleTypes.primitiveDoubleField = Double.NaN;
+    typeWithAllSimpleTypes.primitiveLongField = Long.MIN_VALUE;
+    typeWithAllSimpleTypes.primitiveShortField = Short.MIN_VALUE;
+    typeWithAllSimpleTypes.primitiveByteField = Byte.MIN_VALUE;
+    typeWithAllSimpleTypes.primitiveCharField = Character.MIN_VALUE;
+    HollowReadStateEngine stateEngine = createReadStateEngine(typeWithAllSimpleTypes);
+    GenericHollowObject obj = new GenericHollowObject(stateEngine, "TypeWithAllSimpleTypes", 0);
+    TypeWithAllSimpleTypes result = mapper.readHollowRecord(obj);
+    Assert.assertEquals(result.primitiveByteField, Byte.MIN_VALUE);
+    Assert.assertEquals(result.primitiveCharField, Character.MIN_VALUE);
+    Assert.assertEquals(result.primitiveIntegerField, Integer.MIN_VALUE);
+    Assert.assertEquals(result.primitiveShortField, Short.MIN_VALUE);
+    Assert.assertEquals(0, Double.compare(result.primitiveDoubleField, Double.NaN));
+    Assert.assertEquals(result.primitiveLongField, Long.MIN_VALUE);
+    Assert.assertEquals(0, Float.compare(result.primitiveFloatField, Float.NaN));
+    Assert.assertEquals(result.primitiveIntegerField, Integer.MIN_VALUE);
+  }
+
+  @Test
+  public void testWritePrimitivesPersistedWithSentinalValues() {
+    TypeWithAllSimpleTypes typeWithAllSimpleTypes = new TypeWithAllSimpleTypes();
+  }
+
+  @Test
   public void testNullablesSimpleTypes() {
     TypeWithAllSimpleTypes typeWithAllSimpleTypes = new TypeWithAllSimpleTypes();
     typeWithAllSimpleTypes.boxedIntegerField = 1;
@@ -137,9 +165,9 @@ public class HollowObjectMapperHollowRecordParserTest {
     Assert.assertNull(result.boxedLongField);
     Assert.assertNull(result.boxedShortField);
     Assert.assertNull(result.boxedByteField);
-    Assert.assertEquals(0, result.primitiveIntegerField);
+    Assert.assertEquals(Integer.MIN_VALUE, result.primitiveIntegerField);
     Assert.assertFalse(result.primitiveBooleanField);
-    Assert.assertEquals(0.0, result.primitiveDoubleField, 0);
+    Assert.assertEquals(Double.NaN, result.primitiveDoubleField, 0);
     Assert.assertEquals(0.0f, result.primitiveFloatField, 0);
     Assert.assertEquals(0L, result.primitiveLongField);
     Assert.assertEquals(0, result.primitiveShortField);

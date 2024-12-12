@@ -203,6 +203,32 @@ public class HollowObjectMapperFlatRecordParserTest {
     Assert.assertEquals("value", result.subValue.value);
   }
 
+  @Test
+  public void testReadPrimitivesPersistedWithSentinalValues() {
+    TypeWithAllSimpleTypes
+        typeWithAllSimpleTypes = new TypeWithAllSimpleTypes();
+    typeWithAllSimpleTypes.boxedIntegerField = 10;
+    typeWithAllSimpleTypes.stringField = "stringField";
+    typeWithAllSimpleTypes.primitiveIntegerField = Integer.MIN_VALUE; //write sentinal
+    typeWithAllSimpleTypes.primitiveFloatField = Float.NaN;
+    typeWithAllSimpleTypes.primitiveDoubleField = Double.NaN;
+    typeWithAllSimpleTypes.primitiveLongField = Long.MIN_VALUE;
+    typeWithAllSimpleTypes.primitiveShortField = Short.MIN_VALUE;
+    typeWithAllSimpleTypes.primitiveByteField = Byte.MIN_VALUE;
+    typeWithAllSimpleTypes.primitiveCharField = Character.MIN_VALUE;
+    flatRecordWriter.reset();
+    mapper.writeFlat(typeWithAllSimpleTypes, flatRecordWriter);
+    FlatRecord fr = flatRecordWriter.generateFlatRecord();
+    TypeWithAllSimpleTypes result = mapper.readFlat(fr);
+    Assert.assertEquals(Integer.MIN_VALUE, typeWithAllSimpleTypes.primitiveIntegerField);
+    Assert.assertEquals(Long.MIN_VALUE, typeWithAllSimpleTypes.primitiveLongField);
+    Assert.assertEquals(Short.MIN_VALUE, typeWithAllSimpleTypes.primitiveShortField);
+    Assert.assertEquals(Byte.MIN_VALUE, typeWithAllSimpleTypes.primitiveByteField);
+    Assert.assertEquals(Character.MIN_VALUE, typeWithAllSimpleTypes.primitiveCharField);
+    Assert.assertTrue(Float.isNaN(typeWithAllSimpleTypes.primitiveFloatField));
+    Assert.assertTrue(Double.isNaN(typeWithAllSimpleTypes.primitiveDoubleField));
+  }
+
   @HollowPrimaryKey(fields={"boxedIntegerField", "stringField"})
   private static class TypeWithAllSimpleTypes {
     Integer boxedIntegerField;
