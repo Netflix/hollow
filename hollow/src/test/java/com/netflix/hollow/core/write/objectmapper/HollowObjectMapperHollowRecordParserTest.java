@@ -140,11 +140,6 @@ public class HollowObjectMapperHollowRecordParserTest {
   }
 
   @Test
-  public void testWritePrimitivesPersistedWithSentinalValues() {
-    TypeWithAllSimpleTypes typeWithAllSimpleTypes = new TypeWithAllSimpleTypes();
-  }
-
-  @Test
   public void testNullablesSimpleTypes() {
     TypeWithAllSimpleTypes typeWithAllSimpleTypes = new TypeWithAllSimpleTypes();
     typeWithAllSimpleTypes.boxedIntegerField = 1;
