@@ -473,13 +473,28 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     rec.setInt(fieldName, unsafe.getInt(obj, fieldOffset));
                     break;
                 case SHORT:
-                    rec.setInt(fieldName, unsafe.getShort(obj, fieldOffset));
+                    short shortValue = unsafe.getShort(obj, fieldOffset);
+                    if (shortValue == Short.MIN_VALUE) {
+                        rec.setInt(fieldName, Integer.MIN_VALUE);
+                    } else {
+                        rec.setInt(fieldName, shortValue);
+                    }
                     break;
                 case BYTE:
-                    rec.setInt(fieldName, unsafe.getByte(obj, fieldOffset));
+                    byte byteValue = unsafe.getByte(obj, fieldOffset);
+                    if (byteValue == Byte.MIN_VALUE) {
+                        rec.setInt(fieldName, Integer.MIN_VALUE);
+                    } else {
+                        rec.setInt(fieldName, byteValue);
+                    }
                     break;
                 case CHAR:
-                    rec.setInt(fieldName, unsafe.getChar(obj, fieldOffset));
+                    char charValue = unsafe.getChar(obj, fieldOffset);
+                    if (charValue == Character.MIN_VALUE) {
+                        rec.setInt(fieldName, Integer.MIN_VALUE);
+                    } else {
+                        rec.setInt(fieldName, charValue);
+                    }
                     break;
                 case LONG:
                     rec.setLong(fieldName, unsafe.getLong(obj, fieldOffset));
@@ -579,45 +594,43 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     break;
                 case INT:
                     int intValue = rec.getInt(fieldName);
-                    if (intValue != Integer.MIN_VALUE) {
-                        unsafe.putInt(pojo, fieldOffset, intValue);
-                    }
+                    unsafe.putInt(pojo, fieldOffset, intValue);
                     break;
                 case SHORT:
                     int shortValue = rec.getInt(fieldName);
-                    if (shortValue != Integer.MIN_VALUE) {
+                    if (shortValue == Integer.MIN_VALUE) {
+                        unsafe.putShort(pojo, fieldOffset, Short.MIN_VALUE);
+                    } else {
                         unsafe.putShort(pojo, fieldOffset, (short) shortValue);
                     }
                     break;
                 case BYTE:
                     int byteValue = rec.getInt(fieldName);
-                    if (byteValue != Integer.MIN_VALUE) {
+                    if (byteValue == Integer.MIN_VALUE) {
+                        unsafe.putByte(pojo, fieldOffset, Byte.MIN_VALUE);
+                    } else {
                         unsafe.putByte(pojo, fieldOffset, (byte) byteValue);
                     }
                     break;
                 case CHAR:
                     int charValue = rec.getInt(fieldName);
-                    if (charValue != Integer.MIN_VALUE) {
+                    if (charValue == Integer.MIN_VALUE) {
+                        unsafe.putChar(pojo, fieldOffset, Character.MIN_VALUE);
+                    } else {
                         unsafe.putChar(pojo, fieldOffset, (char) charValue);
                     }
                     break;
                 case LONG:
                     long longValue = rec.getLong(fieldName);
-                    if (longValue != Long.MIN_VALUE) {
-                        unsafe.putLong(pojo, fieldOffset, longValue);
-                    }
+                    unsafe.putLong(pojo, fieldOffset, longValue);
                     break;
                 case DOUBLE:
                     double doubleValue = rec.getDouble(fieldName);
-                    if (!Double.isNaN(doubleValue)) {
-                        unsafe.putDouble(pojo, fieldOffset, doubleValue);
-                    }
+                    unsafe.putDouble(pojo, fieldOffset, doubleValue);
                     break;
                 case FLOAT:
                     float floatValue = rec.getFloat(fieldName);
-                    if (!Float.isNaN(floatValue)) {
-                        unsafe.putFloat(pojo, fieldOffset, floatValue);
-                    }
+                    unsafe.putFloat(pojo, fieldOffset, floatValue);
                     break;
                 case STRING:
                     unsafe.putObject(pojo, fieldOffset, rec.getString(fieldName));
@@ -829,51 +842,49 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 }
                 case INT: {
                     int value = node.getFieldValueInt(fieldName);
-                    if (value != Integer.MIN_VALUE) {
-                        unsafe.putInt(obj, fieldOffset, value);
-                    }
+                    unsafe.putInt(obj, fieldOffset, value);
                     break;
                 }
                 case SHORT: {
                     int value = node.getFieldValueInt(fieldName);
-                    if (value != Integer.MIN_VALUE) {
+                    if(value == Integer.MIN_VALUE) {
+                        unsafe.putShort(obj, fieldOffset, Short.MIN_VALUE);
+                    } else {
                         unsafe.putShort(obj, fieldOffset, (short) value);
                     }
                     break;
                 }
                 case BYTE: {
                     int value = node.getFieldValueInt(fieldName);
-                    if (value != Integer.MIN_VALUE) {
+                    if (value == Integer.MIN_VALUE) {
+                        unsafe.putByte(obj, fieldOffset, Byte.MIN_VALUE);
+                    } else {
                         unsafe.putByte(obj, fieldOffset, (byte) value);
                     }
                     break;
                 }
                 case CHAR: {
                     int value = node.getFieldValueInt(fieldName);
-                    if (value != Integer.MIN_VALUE) {
+                    if (value == Integer.MIN_VALUE) {
+                        unsafe.putChar(obj, fieldOffset, Character.MIN_VALUE);
+                    } else {
                         unsafe.putChar(obj, fieldOffset, (char) value);
                     }
                     break;
                 }
                 case LONG: {
                     long value = node.getFieldValueLong(fieldName);
-                    if (value != Long.MIN_VALUE) {
-                        unsafe.putLong(obj, fieldOffset, value);
-                    }
+                    unsafe.putLong(obj, fieldOffset, value);
                     break;
                 }
                 case FLOAT: {
                     float value = node.getFieldValueFloat(fieldName);
-                    if (!Float.isNaN(value)) {
-                        unsafe.putFloat(obj, fieldOffset, value);
-                    }
+                    unsafe.putFloat(obj, fieldOffset, value);
                     break;
                 }
                 case DOUBLE: {
                     double value = node.getFieldValueDouble(fieldName);
-                    if (!Double.isNaN(value)) {
-                        unsafe.putDouble(obj, fieldOffset, value);
-                    }
+                    unsafe.putDouble(obj, fieldOffset, value);
                     break;
                 }
                 case STRING: {
