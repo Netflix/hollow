@@ -1,15 +1,23 @@
 package com.netflix.hollow.core.write.objectmapper;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
+import com.netflix.hollow.api.producer.HollowProducer;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemPublisher;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FakeHollowSchemaIdentifierMapper;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordExtractor;
 import com.netflix.hollow.test.HollowWriteStateEngineBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
@@ -20,6 +28,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class HollowObjectMapperHollowRecordParserTest {
   private HollowObjectMapper mapper;
@@ -299,6 +309,106 @@ public class HollowObjectMapperHollowRecordParserTest {
     TypeStateA1 result = readerMapper.readHollowRecord(obj);
 
     Assert.assertEquals("value", result.subValue.value);
+  }
+
+  @Test
+  public void testPrimitiveNullFieldsReceiveTheirSentinelValues() {
+    HollowProducer producer =
+        new HollowProducer.Builder<>()
+            .withPublisher(new HollowFilesystemPublisher(Paths.get("/tmp/blob-cache/")))
+            .build();
+
+    producer.runCycle(
+        state -> {
+          state.add(new PojoV1(1, "The Matrix"));
+        });
+
+    // A new producer with a different schema
+    HollowProducer producerWithSchemaChange =
+        new HollowProducer.Builder<>()
+            .withPublisher(new HollowFilesystemPublisher(Paths.get("/tmp/blob-cache/")))
+            .build();
+    producerWithSchemaChange.initializeDataModel(PojoV2.class);
+    producerWithSchemaChange.restore(
+        Long.MAX_VALUE, new HollowFilesystemBlobRetriever(Paths.get("/tmp/blob-cache/")));
+
+    producerWithSchemaChange.runCycle(
+        state -> {
+          state.getStateEngine().addAllObjectsFromPreviousCycle();
+          state.add(new PojoV2(2, "Speed Racer", 2008, 0.0d, 0.0f, (short) 10, (byte) 0x8, 'a'));
+        });
+
+    HollowConsumer consumer =
+        HollowConsumer.withBlobRetriever(
+                new HollowFilesystemBlobRetriever(Paths.get("/tmp/blob-cache/")))
+            .build();
+    consumer.triggerRefresh();
+
+    HollowObjectMapper typeMapper = new HollowObjectMapper(new HollowWriteStateEngine());
+    typeMapper.initializeTypeState(PojoV2.class);
+
+    //////////////////////////
+    // Test ReadState parsing
+    GenericHollowObject theMatrixObj = new GenericHollowObject(consumer.getStateEngine(), "Pojo", 0);
+    PojoV2 theMatrixObjPojo = typeMapper.readHollowRecord(theMatrixObj);
+    assertThat(theMatrixObjPojo.intField).isEqualTo(Integer.MIN_VALUE);
+    // check other primitive fields...
+
+    GenericHollowObject speedRacerObj = new GenericHollowObject(consumer.getStateEngine(), "Pojo", 1);
+    PojoV2 speedRacerObjPojo = typeMapper.readHollowRecord(speedRacerObj);
+    assertThat(speedRacerObjPojo.intField).isEqualTo(2008);
+    // check other primitive fields...
+
+    //////////////////////////
+    // Test FlatRecord parsing
+    FlatRecordExtractor extractor = new FlatRecordExtractor(consumer.getStateEngine(), new FakeHollowSchemaIdentifierMapper(consumer.getStateEngine()));
+
+    FlatRecord theMatrixFr = extractor.extract("Pojo", 0);
+    PojoV2 theMatrixFrPojo = typeMapper.readFlat(theMatrixFr);
+    assertThat(theMatrixFrPojo.intField).isEqualTo(Integer.MIN_VALUE);
+    // check other primitive fields...
+
+    FlatRecord speedRacerFr = extractor.extract("Pojo", 1);
+    PojoV2 speedRacerFrPojo = typeMapper.readFlat(speedRacerFr);
+    assertThat(speedRacerFrPojo.intField).isEqualTo(2008);
+    // check other primitive fields...
+  }
+
+  @HollowTypeName(name = "Pojo")
+  @HollowPrimaryKey(fields = {"id"})
+  static class PojoV1 {
+    final int id;
+    final String strField;
+
+    public PojoV1(int id, String strField) {
+      this.id = id;
+      this.strField = strField;
+    }
+  }
+
+  @HollowTypeName(name = "Pojo")
+  @HollowPrimaryKey(fields = {"id"})
+  static class PojoV2 {
+    final int id;
+    final String strField;
+    final int intField;
+    final double doubleField;
+    final float floatField;
+    final short shortField;
+    final byte byteField;
+    final char charField;
+    // all other primitives
+
+    public PojoV2(int id, String strField, int intField, double doubleField, float floatField, short shortField, byte byteField, char charField) {
+      this.id = id;
+      this.strField = strField;
+      this.intField = intField;
+      this.doubleField = doubleField;
+      this.floatField = floatField;
+      this.shortField = shortField;
+      this.byteField = byteField;
+      this.charField = charField;
+    }
   }
 
   private HollowReadStateEngine createReadStateEngine(Object... recs) {
