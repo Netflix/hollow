@@ -185,7 +185,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
         }
 
         long bitsPerKeyElement = 64 - Long.numberOfLeadingZeros(maxKeyOrdinal + 1);
-        long bitsPerValueElement = 64 - Long.numberOfLeadingZeros(maxValueOrdinal);
+        long bitsPerValueElement = maxValueOrdinal == 0 ? 1 : 64 - Long.numberOfLeadingZeros(maxValueOrdinal);
         long bitsPerMapSizeValue = 64 - Long.numberOfLeadingZeros(maxMapSize);
         long bitsPerMapPointer = 64 - Long.numberOfLeadingZeros(totalOfMapBuckets);
         
