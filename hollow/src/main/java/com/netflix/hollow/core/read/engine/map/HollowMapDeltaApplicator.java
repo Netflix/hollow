@@ -143,7 +143,12 @@ class HollowMapDeltaApplicator {
             if(!removeData) {
                 for(long bucketIdx=currentFromStateStartBucket; bucketIdx<fromDataEndBucket; bucketIdx++) {
                     long bucketKey = from.entryData.getElementValue(bucketIdx * from.bitsPerMapEntry, from.bitsPerKeyElement);
-                    long bucketValue = from.entryData.getElementValue(bucketIdx * from.bitsPerMapEntry + from.bitsPerKeyElement, from.bitsPerValueElement);
+                    long bucketValue;
+                    if (from.bitsPerValueElement == 0) {
+                        bucketValue = 0;
+                    } else {
+                        bucketValue = from.entryData.getElementValue(bucketIdx * from.bitsPerMapEntry + from.bitsPerKeyElement, from.bitsPerValueElement);
+                    }
                     if(bucketKey == from.emptyBucketKeyValue)
                         bucketKey = target.emptyBucketKeyValue;
                     long currentWriteStartBucketBit = currentWriteStartBucket * target.bitsPerMapEntry;
