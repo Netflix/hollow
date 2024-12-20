@@ -61,9 +61,14 @@ class HollowMapDeltaApplicator {
         target.bitsPerMapPointer = delta.bitsPerMapPointer;
         target.bitsPerMapSizeValue = delta.bitsPerMapSizeValue;
         target.bitsPerKeyElement = delta.bitsPerKeyElement;
-        target.bitsPerValueElement = delta.bitsPerValueElement;
+        // Prior to Jan 2025, the producer was able to generate blobs where it reserved 0 bits for the Map value
+        // element when all keys stored the same record and that record's ordinal was 0. In this case, when reading the
+        // Map value of the last bucket, the code would trigger ArrayIndexOutOfBoundsException since there was no space
+        // allocated for the value element. This is a workaround to avoid the exception when transitioning out of one
+        // of these bad blobs.
+        target.bitsPerValueElement = delta.bitsPerValueElement == 0 ? 1 : delta.bitsPerValueElement;
         target.bitsPerFixedLengthMapPortion = delta.bitsPerFixedLengthMapPortion;
-        target.bitsPerMapEntry = delta.bitsPerMapEntry;
+        target.bitsPerMapEntry = target.bitsPerKeyElement + target.bitsPerValueElement;
         target.emptyBucketKeyValue = delta.emptyBucketKeyValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
@@ -143,7 +148,15 @@ class HollowMapDeltaApplicator {
             if(!removeData) {
                 for(long bucketIdx=currentFromStateStartBucket; bucketIdx<fromDataEndBucket; bucketIdx++) {
                     long bucketKey = from.entryData.getElementValue(bucketIdx * from.bitsPerMapEntry, from.bitsPerKeyElement);
-                    long bucketValue = from.entryData.getElementValue(bucketIdx * from.bitsPerMapEntry + from.bitsPerKeyElement, from.bitsPerValueElement);
+                    // Prior to Jan 2025, the producer was able to generate blobs where it reserved 0 bits for the Map value
+                    // element when all keys stored the same record and that record's ordinal was 0. In this case, when reading the
+                    // Map value of the last bucket, the code would trigger ArrayIndexOutOfBoundsException since there was no space
+                    // allocated for the value element. This is a workaround to avoid the exception when transitioning out of one
+                    // of these bad blobs.
+                    long bucketValue =
+                      from.bitsPerValueElement == 0
+                        ? 0
+                        : from.entryData.getElementValue(bucketIdx * from.bitsPerMapEntry + from.bitsPerKeyElement, from.bitsPerValueElement);
                     if(bucketKey == from.emptyBucketKeyValue)
                         bucketKey = target.emptyBucketKeyValue;
                     long currentWriteStartBucketBit = currentWriteStartBucket * target.bitsPerMapEntry;
