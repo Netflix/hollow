@@ -159,7 +159,7 @@ public final class BlobByteBuffer {
      */
     public long getLong(long startByteIndex) throws BufferUnderflowException {
 
-        int alignmentOffset = (int)(startByteIndex - this.position()) % Long.BYTES;
+        int alignmentOffset = (int)((startByteIndex - this.position()) % Long.BYTES);
         long nextAlignedPos = startByteIndex - alignmentOffset + Long.BYTES;
 
         byte[] bytes = new byte[Long.BYTES];
