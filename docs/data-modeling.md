@@ -56,6 +56,13 @@ When defined in the schema, primary keys are a part of your data model and drive
 
 Primary keys defined in the schema follow the same convention as primary keys defined for indexes.  They consist of one or more [field paths](indexing-querying.md#field-paths), which will auto-expand if they terminate in a `REFERENCE` field.
 
+!!! warning "Duplidate record validation"
+    Hollow producer does not dedupe records based on primary key definition, by default. For e.g. if two records with
+    the same value for primary key field(s) but different values for other field(s) are added to the write state in a
+    runCycle, both records will be accepted. A consumer querying using primary key will see inconsistent behavior.
+    Either one of those records can be returned. To address this, Hollow offers the [DuplicateDataDetectionValidator](validation.md#pre-defined-validators), which enforces primary key constraints. This validator
+    is not enabled by default and must be opted into.
+
 !!! warning "Null values are not supported"
 	Primary key field(s) cannot have null values. This is not supported as it was not needed. Please be mindful when adding values to primary key fields. This will result in exception similar to below. 
 
