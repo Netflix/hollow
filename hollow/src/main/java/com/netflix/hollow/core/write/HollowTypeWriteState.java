@@ -19,6 +19,7 @@ package com.netflix.hollow.core.write;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.IGNORED_HASHES;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.UNMIXED_HASHES;
 
+import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -392,17 +393,27 @@ public abstract class HollowTypeWriteState {
     }
 
     public boolean allowTypeResharding() {
-        if (this instanceof HollowObjectTypeWriteState) {
-            if (stateEngine.allowTypeResharding()) {
-                if (isNumShardsPinned()) {
-                    LOG.warning("Type re-sharding feature was enabled but num shards is pinned (likely using the " +
-                            "HollowShardLargeType annotation in the data model). Proceeding with fixed num shards.");
-                    return false;
-                }
+        if (stateEngine.allowTypeResharding()) {
+            if (isNumShardsPinned()) {
+                LOG.info("Types will not re-shard automatically because num shards is pinned (likely using the " +
+                        "HollowShardLargeType annotation in the data model). Proceeding with fixed num shards.");
+                return false;
             }
-            return stateEngine.allowTypeResharding();
-        } else {
-            return false;   // only supported for object types
         }
+        return stateEngine.allowTypeResharding();
+    }
+
+    /**
+     * A header tag indicating that num shards for a type has changed since the prior version. Its value encodes
+     * the type(s) that were re-sharded along with the before and after num shards in the fwd delta direction.
+     * For e.g. Movie:(2,4) Actor:(8,4)
+     */
+    protected void addReshardingHeader(int prevNumShards, int newNumShards) {
+        String existing = stateEngine.getHeaderTag(HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED);
+        String appendTo = "";
+        if (existing != null) {
+            appendTo = existing + " ";
+        }
+        stateEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED, appendTo + schema.getName() + ":(" + prevNumShards + "," + newNumShards + ")");
     }
 }

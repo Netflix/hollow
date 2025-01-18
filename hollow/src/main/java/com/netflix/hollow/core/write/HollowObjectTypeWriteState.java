@@ -16,7 +16,6 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -93,7 +92,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             revNumShards = numShards;
         } else {
             revNumShards = numShards;
-            if (allowTypeResharding()) {
+            if (allowTypeResharding()) {    // SNAP: TODO: extend to other types
                 numShards = targetNumShards(maxOrdinal);
                 if (numShards != revNumShards) {    // re-sharding
                     // limit numShards to 2x or .5x of prevShards per producer cycle
@@ -120,20 +119,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             targetNumShards *= 2;
 
         return targetNumShards;
-    }
-
-    /**
-     * A header tag indicating that num shards for a type has changed since the prior version. Its value encodes
-     * the type(s) that were re-sharded along with the before and after num shards in the fwd delta direction.
-     * For e.g. Movie:(2,4) Actor:(8,4)
-     */
-    private void addReshardingHeader(int prevNumShards, int newNumShards) {
-        String existing = stateEngine.getHeaderTag(HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED);
-        String appendTo = "";
-        if (existing != null) {
-            appendTo = existing + " ";
-        }
-        stateEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED, appendTo + schema.getName() + ":(" + prevNumShards + "," + newNumShards + ")");
     }
 
     int[] calcMaxShardOrdinal(int maxOrdinal, int numShards) {
@@ -298,13 +283,13 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void calculateReverseDelta() {
-        calculateDelta(currentCyclePopulated, previousCyclePopulated, revNumShards);
+        calculateDelta(currentCyclePopulated, previousCyclePopulated, revNumShards);    // SNAP: TODO: extend passing of revNumShards for other types
     }
 
     @Override
     public void writeReverseDelta(DataOutputStream dos) throws IOException {
         LOG.log(Level.FINE, String.format("Writing reversedelta with num shards = %s, max shard ordinals = %s", revNumShards, Arrays.toString(revMaxShardOrdinal)));
-        writeCalculatedDelta(dos, revNumShards, revMaxShardOrdinal);
+        writeCalculatedDelta(dos, revNumShards, revMaxShardOrdinal);    // SNAP: TODO: extend passing of revNumShards and revMaxShardOrdinal for other types
     }
 
     private void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards) {

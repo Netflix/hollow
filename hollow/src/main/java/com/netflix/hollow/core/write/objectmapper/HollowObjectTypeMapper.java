@@ -137,7 +137,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.writeState = existingWriteState;
         } else {
             int numShardsByAnnotation = getNumShardsByAnnotation(clazz);
-            this.writeState = new HollowObjectTypeWriteState(schema, numShardsByAnnotation, numShardsByAnnotation == -1 ? false : true);
+            this.writeState = new HollowObjectTypeWriteState(schema, numShardsByAnnotation, numShardsByAnnotation == -1 ? false : true);    // SNAP: TODO: extend to list set etc.
         }
 
         this.assignedOrdinalFieldOffset = assignedOrdinalFieldOffset;
@@ -153,7 +153,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         return primaryKey == null ? null : primaryKey.fields();
     }
     
-    private static int getNumShardsByAnnotation(Class<?> clazz) {
+    private static int getNumShardsByAnnotation(Class<?> clazz) {   // SNAP: TODO: can be on non-object types like https://stash.corp.netflix.com/users/sunjeets/repos/hollow/browse/hollow/src/test/java/com/netflix/hollow/api/consumer/FocusedShardHoleFillTest.java#190-191
         HollowShardLargeType numShardsAnnotation = clazz.getAnnotation(HollowShardLargeType.class);
         if(numShardsAnnotation != null)
             return numShardsAnnotation.numShards();

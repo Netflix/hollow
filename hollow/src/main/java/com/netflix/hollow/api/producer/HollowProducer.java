@@ -869,7 +869,7 @@ public class HollowProducer extends AbstractHollowProducer {
          * delta transitions with a memory overhead (equal to the configured max shard size).
          *
          * Requires integrity check to be enabled, and honors numShards pinned using annotation in data model.
-         * Also requires consumers to be on a recent Hollow library version that supports re-sharding at the time of delta application.
+         * Also requires consumers of the delta chain to be on a recent Hollow library version that supports re-sharding at the time of delta application.
          */
         public B withTypeResharding(boolean allowTypeResharding) {
             this.allowTypeResharding = allowTypeResharding;
