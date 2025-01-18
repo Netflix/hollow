@@ -17,17 +17,13 @@
 package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.api.objects.HollowRecord;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalObjectNode;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -149,11 +145,11 @@ public class HollowObjectMapper {
     }
 
     HollowTypeMapper getTypeMapper(Type type, String declaredName, String[] hashKeyFieldPaths) {
-        return getTypeMapper(type, declaredName, hashKeyFieldPaths, -1, null);
+        return getTypeMapper(type, declaredName, hashKeyFieldPaths, -1, false, null);
     }
 
     HollowTypeMapper getTypeMapper(
-            Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited) {
+            Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, boolean isNumShardsPinned, Set<Type> visited) {
 
         // Compute the type name
         String typeName = declaredName != null
@@ -173,14 +169,14 @@ public class HollowObjectMapper {
                 Class<?> clazz = (Class<?>) parameterizedType.getRawType();
 
                 if (List.class.isAssignableFrom(clazz)) {
-                    typeMapper = new HollowListTypeMapper(this, parameterizedType, typeName, numShards,
-                            ignoreListOrdering, visited);
+                    typeMapper = new HollowListTypeMapper(this, parameterizedType, typeName,
+                            numShards, isNumShardsPinned, ignoreListOrdering, visited);
                 } else if (Set.class.isAssignableFrom(clazz)) {
                     typeMapper = new HollowSetTypeMapper(this, parameterizedType, typeName, hashKeyFieldPaths,
-                            numShards, stateEngine, useDefaultHashKeys, visited);
+                            numShards, isNumShardsPinned, stateEngine, useDefaultHashKeys, visited);
                 } else if (Map.class.isAssignableFrom(clazz)) {
                     typeMapper = new HollowMapTypeMapper(this, parameterizedType, typeName, hashKeyFieldPaths,
-                            numShards, stateEngine, useDefaultHashKeys, visited);
+                            numShards, isNumShardsPinned, stateEngine, useDefaultHashKeys, visited);
                 } else {
                     typeMapper = new HollowObjectTypeMapper(this, clazz, typeName, visited);
                 }

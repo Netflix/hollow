@@ -16,7 +16,6 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -38,10 +37,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     private FieldStatistics fieldStats;
 
     /// data required for writing snapshot or delta
-    private int maxOrdinal;
-    private int maxShardOrdinal[];
-    private int revMaxShardOrdinal[];
-
     private FixedLengthElementArray fixedLengthLongArray[];
     private ByteDataArray varLengthByteArrays[][];
     private long recordBitOffset[];
@@ -78,40 +73,21 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     public void prepareForWrite() {
         super.prepareForWrite();
 
-        fieldStats = new FieldStatistics(getSchema());
+        maxOrdinal = ordinalMap.maxOrdinal();
+        gatherFieldStats();
+        gatherShardingStats(maxOrdinal);
+    }
 
-        int maxOrdinal = ordinalMap.maxOrdinal();
-        
+    private void gatherFieldStats() {
+        fieldStats = new FieldStatistics(getSchema());
         for(int i=0;i<=maxOrdinal;i++) {
             discoverObjectFieldStatisticsForRecord(fieldStats, i);
         }
-
         fieldStats.completeCalculations();
-
-        if (numShards == -1) {
-            numShards = targetNumShards(maxOrdinal);
-            revNumShards = numShards;
-        } else {
-            revNumShards = numShards;
-            if (allowTypeResharding()) {
-                numShards = targetNumShards(maxOrdinal);
-                if (numShards != revNumShards) {    // re-sharding
-                    // limit numShards to 2x or .5x of prevShards per producer cycle
-                    numShards = numShards > revNumShards ? revNumShards * 2 : revNumShards / 2;
-
-                    LOG.info(String.format("Num shards for type %s changing from %s to %s", schema.getName(), revNumShards, numShards));
-                    addReshardingHeader(revNumShards, numShards);
-                }
-            }
-        }
-
-        maxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, numShards);
-        if (revNumShards > 0) {
-            revMaxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, revNumShards);
-        }
     }
 
-    private int targetNumShards(int maxOrdinal) {
+    @Override
+    protected int typeStateNumShards(int maxOrdinal) {
         long projectedSizeOfType = ((long)fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
         projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
 
@@ -120,28 +96,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             targetNumShards *= 2;
 
         return targetNumShards;
-    }
-
-    /**
-     * A header tag indicating that num shards for a type has changed since the prior version. Its value encodes
-     * the type(s) that were re-sharded along with the before and after num shards in the fwd delta direction.
-     * For e.g. Movie:(2,4) Actor:(8,4)
-     */
-    private void addReshardingHeader(int prevNumShards, int newNumShards) {
-        String existing = stateEngine.getHeaderTag(HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED);
-        String appendTo = "";
-        if (existing != null) {
-            appendTo = existing + " ";
-        }
-        stateEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED, appendTo + schema.getName() + ":(" + prevNumShards + "," + newNumShards + ")");
-    }
-
-    int[] calcMaxShardOrdinal(int maxOrdinal, int numShards) {
-        int[] maxShardOrdinal = new int[numShards];
-        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards;
-        for(int i=0;i<numShards;i++)
-            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
-        return maxShardOrdinal;
     }
 
     private void discoverObjectFieldStatisticsForRecord(FieldStatistics fieldStats, int ordinal) {
@@ -215,9 +169,8 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void calculateSnapshot() {
-        maxOrdinal = ordinalMap.maxOrdinal();
         int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
-        
+
         fixedLengthLongArray = new FixedLengthElementArray[numShards];
         varLengthByteArrays = new ByteDataArray[numShards][];
         recordBitOffset = new long[numShards];
@@ -286,29 +239,12 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     @Override
-    public void calculateDelta() {
-        calculateDelta(previousCyclePopulated, currentCyclePopulated, numShards);
-    }
+    public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, boolean isReverse) {
+        int numShards = this.numShards;
+        if (isReverse && this.numShards != this.revNumShards) {
+            numShards = this.revNumShards;
+        }
 
-    @Override
-    public void writeDelta(DataOutputStream dos) throws IOException {
-        LOG.log(Level.FINE, String.format("Writing delta with num shards = %s, max shard ordinals = %s", numShards, Arrays.toString(maxShardOrdinal)));
-        writeCalculatedDelta(dos, numShards, maxShardOrdinal);
-    }
-
-    @Override
-    public void calculateReverseDelta() {
-        calculateDelta(currentCyclePopulated, previousCyclePopulated, revNumShards);
-    }
-
-    @Override
-    public void writeReverseDelta(DataOutputStream dos) throws IOException {
-        LOG.log(Level.FINE, String.format("Writing reversedelta with num shards = %s, max shard ordinals = %s", revNumShards, Arrays.toString(revMaxShardOrdinal)));
-        writeCalculatedDelta(dos, revNumShards, revMaxShardOrdinal);
-    }
-
-    private void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards) {
-        maxOrdinal = ordinalMap.maxOrdinal();
         int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
 
         ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
@@ -319,15 +255,15 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         varLengthByteArrays = new ByteDataArray[numShards][];
         recordBitOffset = new long[numShards];
         int numAddedRecordsInShard[] = new int[numShards];
-        
+
         int shardMask = numShards - 1;
-        
+
         int addedOrdinal = deltaAdditions.nextSetBit(0);
         while(addedOrdinal != -1) {
             numAddedRecordsInShard[addedOrdinal & shardMask]++;
             addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
         }
-        
+
         for(int i=0;i<numShards;i++) {
             fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numAddedRecordsInShard[i] * numBitsPerRecord);
             deltaAddedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
@@ -354,19 +290,25 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         }
     }
 
-    private void writeCalculatedDelta(DataOutputStream os, int numShards, int[] maxShardOrdinal) throws IOException {
+    @Override
+    public void writeCalculatedDelta(DataOutputStream os, boolean isReverse, int[] maxShardOrdinal) throws IOException {
+        int numShards = this.numShards;
+        if (isReverse && this.numShards != this.revNumShards) {
+            numShards = this.revNumShards;
+        }
+
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
             writeCalculatedDeltaShard(os, 0, maxShardOrdinal);
         } else {
             /// overall max ordinal
             VarInt.writeVInt(os, maxOrdinal);
-            
+
             for(int i=0;i<numShards;i++) {
                 writeCalculatedDeltaShard(os, i, maxShardOrdinal);
             }
         }
-        
+
         fixedLengthLongArray = null;
         varLengthByteArrays = null;
         deltaAddedOrdinals = null;

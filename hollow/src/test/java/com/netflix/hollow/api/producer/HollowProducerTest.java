@@ -42,9 +42,13 @@ import com.netflix.hollow.api.producer.model.CustomReferenceType;
 import com.netflix.hollow.api.producer.model.HasAllTypeStates;
 import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
+import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.write.HollowMapWriteRecord;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.test.InMemoryBlobStore;
@@ -56,7 +60,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -429,14 +432,17 @@ public class HollowProducerTest {
 
     @Test
     public void testReshardingAllTypes() {
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
         for (boolean allowResharding : Arrays.asList(true, false)) {
-            HollowProducer.Builder producerBuilder = HollowProducer.withPublisher(new FakeBlobPublisher()).withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath()));
+            HollowProducer.Builder producerBuilder = HollowProducer.withPublisher(blobStore)
+                    .withBlobStager(blobStager);
             if (allowResharding)
                     producerBuilder = producerBuilder.withTypeResharding(true);
             HollowProducer producer = producerBuilder.withTargetMaxTypeShardSize(32).build();
             producer.initializeDataModel(HasAllTypeStates.class);
-            producer.runCycle(ws -> {
-                // causes 2 shards for Integer at shard size 32
+            long v0 = producer.runCycle(ws -> {
+                // At shard size 32 results in 2 shards for Integer, 4 for ListOfInteger, etc.
                 for (int i=0;i<50;i++) {
                     final long val = new Long(i);
                     Set<String> set = new HashSet<>(Arrays.asList("e" + val));
@@ -455,10 +461,28 @@ public class HollowProducerTest {
             assertEquals(8, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
             assertEquals(4, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
             assertEquals(8, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
+            HollowConsumer c = HollowConsumer.withBlobRetriever(blobStore)
+                    .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+                        @Override
+                        public boolean allowDoubleSnapshot() {
+                            return false;
+                        }
+                        @Override
+                        public int maxDeltasBeforeDoubleSnapshot() {
+                            return Integer.MAX_VALUE;
+                        }
+                    })
+                    .build();
+            c.triggerRefreshTo(v0);
+            assertEquals(2, c.getStateEngine().getTypeState("Long").numShards());
+            assertEquals(2, c.getStateEngine().getTypeState("CustomReferenceType").numShards());
+            assertEquals(8, c.getStateEngine().getTypeState("SetOfString").numShards());
+            assertEquals(4, c.getStateEngine().getTypeState("ListOfInteger").numShards());
+            assertEquals(8, c.getStateEngine().getTypeState("MapOfStringToLong").numShards());
 
-            producer.runCycle(ws -> {
+            long v1 = producer.runCycle(ws -> {
 
-                // 1x the data, causes more num shards at same shard size
+                // 2x the data, causes more num shards at same shard size if resharding is enabled
                 for (int i=0;i<100;i++) {
                     final long val = new Long(i);
                     ws.add(new HasAllTypeStates(
@@ -469,23 +493,35 @@ public class HollowProducerTest {
                     ));
                 }
             });
+            c.triggerRefreshTo(v1);
             if (allowResharding) {
                 assertTrue(2 < producer.getWriteEngine().getTypeState("Long").getNumShards());
                 assertTrue(2 < producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+                assertTrue(8 < producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+                assertTrue(4 < producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+                assertTrue(8 < producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
 
+                assertTrue(2 < c.getStateEngine().getTypeState("Long").numShards());
+                assertTrue(2 < c.getStateEngine().getTypeState("CustomReferenceType").numShards());
+                assertTrue(8 < c.getStateEngine().getTypeState("SetOfString").numShards());
+                assertTrue(4 < c.getStateEngine().getTypeState("ListOfInteger").numShards());
+                assertTrue(8 < c.getStateEngine().getTypeState("MapOfStringToLong").numShards());
             } else {
                 assertEquals(2, producer.getWriteEngine().getTypeState("Long").getNumShards());
                 assertEquals(2, producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+                assertEquals(8, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+                assertEquals(4, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+                assertEquals(8, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
 
+                assertEquals(2, c.getStateEngine().getTypeState("Long").numShards());
+                assertEquals(2, c.getStateEngine().getTypeState("CustomReferenceType").numShards());
+                assertEquals(8, c.getStateEngine().getTypeState("SetOfString").numShards());
+                assertEquals(4, c.getStateEngine().getTypeState("ListOfInteger").numShards());
+                assertEquals(8, c.getStateEngine().getTypeState("MapOfStringToLong").numShards());
             }
 
-            // producer doesn't support resharding for these types yet
-            assertEquals(8, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
-            assertEquals(4, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
-            assertEquals(8, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
-
-            producer.runCycle(ws -> {
-                // still same num shards, because ghost records
+            long v2 = producer.runCycle(ws -> {
+                // still same num shards, because ghost records are accounted for in determining num shards
                 for (int i=0;i<50;i++) {
                     final long val = new Long(i);
                     ws.add(new HasAllTypeStates(
@@ -496,7 +532,34 @@ public class HollowProducerTest {
                     ));
                 }
             });
-            producer.runCycle(ws -> {
+            c.triggerRefreshTo(v2);
+            if (allowResharding) {
+                assertTrue(2 < producer.getWriteEngine().getTypeState("Long").getNumShards());
+                assertTrue(2 < producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+                assertTrue(8 < producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+                assertTrue(4 < producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+                assertTrue(8 < producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
+
+                assertTrue(2 < c.getStateEngine().getTypeState("Long").numShards());
+                assertTrue(2 < c.getStateEngine().getTypeState("CustomReferenceType").numShards());
+                assertTrue(8 < c.getStateEngine().getTypeState("SetOfString").numShards());
+                assertTrue(4 < c.getStateEngine().getTypeState("ListOfInteger").numShards());
+                assertTrue(8 < c.getStateEngine().getTypeState("MapOfStringToLong").numShards());
+            } else {
+                assertEquals(2, producer.getWriteEngine().getTypeState("Long").getNumShards());
+                assertEquals(2, producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+                assertEquals(8, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+                assertEquals(4, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+                assertEquals(8, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
+
+                assertEquals(2, c.getStateEngine().getTypeState("Long").numShards());
+                assertEquals(2, c.getStateEngine().getTypeState("CustomReferenceType").numShards());
+                assertEquals(8, c.getStateEngine().getTypeState("SetOfString").numShards());
+                assertEquals(4, c.getStateEngine().getTypeState("ListOfInteger").numShards());
+                assertEquals(8, c.getStateEngine().getTypeState("MapOfStringToLong").numShards());
+            }
+
+            long v3 = producer.runCycle(ws -> {
                 // back to original shard count
                 for (int i=0;i<49;i++) {    // one change in runCycle
                     final long val = new Long(i);
@@ -508,11 +571,17 @@ public class HollowProducerTest {
                     ));
                 }
             });
+            c.triggerRefreshTo(v3);
             assertEquals(2, producer.getWriteEngine().getTypeState("Long").getNumShards());
             assertEquals(2, producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
             assertEquals(8, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
             assertEquals(4, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
             assertEquals(8, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
+            assertEquals(2, c.getStateEngine().getTypeState("Long").numShards());
+            assertEquals(2, c.getStateEngine().getTypeState("CustomReferenceType").numShards());
+            assertEquals(8, c.getStateEngine().getTypeState("SetOfString").numShards());
+            assertEquals(4, c.getStateEngine().getTypeState("ListOfInteger").numShards());
+            assertEquals(8, c.getStateEngine().getTypeState("MapOfStringToLong").numShards());
         }
     }
 
@@ -542,12 +611,19 @@ public class HollowProducerTest {
                 .build();
 
         long startVersion = 0;
-        Set<Integer> numShardsExercised = new HashSet<>();
+        Map<String, Set<Integer>> numShardsExercised = new HashMap<>();
         for (int n = 0; n < numCycles; n ++) {
             int numRecords = numRecordsMin + new Random().nextInt(100);
             v = p.runCycle(state -> {
                 for (int i = 0; i < numRecords; i ++) {
-                    state.add(new TestPojoV1(i, i));
+                    final long val = new Long(i);
+                    state.add(new HasAllTypeStates(
+                            new CustomReferenceType(val),
+                            new HashSet<>(Arrays.asList("e" + val)),
+                            Arrays.asList(i),
+                            new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                    ));
+
                 }
             });
             if (n == 0)
@@ -555,16 +631,29 @@ public class HollowProducerTest {
 
             c.triggerRefreshTo(v);
 
-            numShardsExercised.add(c.getStateEngine().getTypeState("TestPojo").numShards());
+            for (HollowTypeReadState type : c.getStateEngine().getTypeStates()) {
+                String t = type.getSchema().getName();
+                if (!numShardsExercised.containsKey(t)) {
+                    numShardsExercised.put(t, new HashSet<>());
+                }
+                numShardsExercised.get(t).add(new Integer(type.numShards()));
+
+            }
         }
         long endVersion = v;
 
-        Assert.assertTrue(numShardsExercised.size() > 1);
+
+        assertEquals(8, numShardsExercised.size());
+        for (HollowTypeReadState type : c.getStateEngine().getTypeStates()) {
+            assertTrue(numShardsExercised.get(type.getSchema().getName()).size() > 1);
+        }
 
         c.triggerRefreshTo(startVersion);
         assertEquals(startVersion, c.getCurrentVersionId());
         c.triggerRefreshTo(endVersion);
         assertEquals(endVersion, c.getCurrentVersionId());
+        c.triggerRefreshTo(startVersion);
+        assertEquals(startVersion, c.getCurrentVersionId());
     }
 
     @Test
@@ -574,12 +663,22 @@ public class HollowProducerTest {
         HollowProducer nonReshardingProducer1 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
                 .withTypeResharding(false).withTargetMaxTypeShardSize(32).build();
         long v1_1 = nonReshardingProducer1.runCycle(ws -> {
-            // causes 2 shards for Integer at shard size 32
+            // At target shard size 32, causes 2 shards for Integer, 4 for ListOfInteger, etc.
             for (int i=0;i<50;i++) {
-                ws.add(new TestPojoV1(i, i));
+                final long val = new Long(i);
+                ws.add(new HasAllTypeStates(
+                        new CustomReferenceType(val),
+                        new HashSet<>(Arrays.asList("e" + val)),
+                        Arrays.asList(i),
+                        new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                ));
             }
         });
-        assertEquals(4, nonReshardingProducer1.getWriteEngine().getTypeState("TestPojo").getNumShards());
+        assertEquals(2, nonReshardingProducer1.getWriteEngine().getTypeState("Long").getNumShards());
+        assertEquals(2, nonReshardingProducer1.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+        assertEquals(8, nonReshardingProducer1.getWriteEngine().getTypeState("SetOfString").getNumShards());
+        assertEquals(4, nonReshardingProducer1.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+        assertEquals(8, nonReshardingProducer1.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
 
         try {
             long v1_2 = nonReshardingProducer1.runCycle(ws -> {
@@ -591,17 +690,39 @@ public class HollowProducerTest {
 
         long v1_3 = nonReshardingProducer1.runCycle(ws -> {
             for (int i=0;i<100;i++) {
-                ws.add(new TestPojoV1(i, i));
+                final long val = new Long(i);
+                ws.add(new HasAllTypeStates(
+                        new CustomReferenceType(val),
+                        new HashSet<>(Arrays.asList("e" + val)),
+                        Arrays.asList(i),
+                        new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                ));
             }
         });
-        assertEquals(4, nonReshardingProducer1.getWriteEngine().getTypeState("TestPojo").getNumShards());
+        // no change in num shards
+        assertEquals(2, nonReshardingProducer1.getWriteEngine().getTypeState("Long").getNumShards());
+        assertEquals(2, nonReshardingProducer1.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+        assertEquals(8, nonReshardingProducer1.getWriteEngine().getTypeState("SetOfString").getNumShards());
+        assertEquals(4, nonReshardingProducer1.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+        assertEquals(8, nonReshardingProducer1.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
 
         HollowProducer nonReshardingProducer2 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
                 .withTypeResharding(false).withTargetMaxTypeShardSize(32).build();
-        nonReshardingProducer2.initializeDataModel(TestPojoV1.class);
-        assertEquals(-1, nonReshardingProducer2.getWriteEngine().getTypeState("TestPojo").getNumShards());
+        nonReshardingProducer2.initializeDataModel(HasAllTypeStates.class);
+
+        assertEquals(-1, nonReshardingProducer2.getWriteEngine().getTypeState("Long").getNumShards());
+        assertEquals(-1, nonReshardingProducer2.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+        assertEquals(-1, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfString").getNumShards());
+        assertEquals(-1, nonReshardingProducer2.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+        assertEquals(-1, nonReshardingProducer2.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
+
         nonReshardingProducer2.restore(v1_1, blobStore);
-        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("TestPojo").getNumShards());
+        assertEquals(2, nonReshardingProducer2.getWriteEngine().getTypeState("Long").getNumShards());
+        assertEquals(2, nonReshardingProducer2.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+        assertEquals(8, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfString").getNumShards());
+        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+        assertEquals(8, nonReshardingProducer2.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
+
         try {
             nonReshardingProducer2.runCycle(ws -> {
                 // causes 4 shards for Integer at shard size 32
@@ -610,56 +731,116 @@ public class HollowProducerTest {
             fail("exception expected");
         } catch (Exception e){
         }
-        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("TestPojo").getNumShards());
+        // still no change in num shards
+        assertEquals(2, nonReshardingProducer2.getWriteEngine().getTypeState("Long").getNumShards());
+        assertEquals(2, nonReshardingProducer2.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+        assertEquals(8, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfString").getNumShards());
+        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+        assertEquals(8, nonReshardingProducer2.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
 
         nonReshardingProducer2.runCycle(ws -> {
-            // causes 4 shards for Integer at shard size 32
             for (int i=0;i<100;i++) {
-                ws.add(new TestPojoV1(i, i));
+                final long val = new Long(i);
+                ws.add(new HasAllTypeStates(
+                        new CustomReferenceType(val),
+                        new HashSet<>(Arrays.asList("e" + val)),
+                        Arrays.asList(i),
+                        new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                ));
             }
         });
-        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("TestPojo").getNumShards());
+        // still no change in num shards
+        assertEquals(2, nonReshardingProducer2.getWriteEngine().getTypeState("Long").getNumShards());
+        assertEquals(2, nonReshardingProducer2.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+        assertEquals(8, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfString").getNumShards());
+        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+        assertEquals(8, nonReshardingProducer2.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
     }
 
+    // Delta should serialize type with num shard change even if there is no populated ordinal change, this is needed for
+    // consistent num shards across snapshot and delta to a version, and without this producer will fail integrity check.
+    // This can happen for e.g. when ghost records got dropped, or when a large change in type size results in num shards
+    // adjusting over a few cycles
     @Test
-    public void testNumShardsMaintainedWhenNoResharding_WithNonObjectTypes() {
+    public void testChangingNumShardsWithoutChangesInPopulatedOrdinals() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
-        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
-        HollowProducer nonReshardingProducer1 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
-                .withTypeResharding(false).withTargetMaxTypeShardSize(32).build();
-        long v1 = nonReshardingProducer1.runCycle(ws -> {
-            // causes 2 shards for Integer at shard size 32
-            for (int i=0;i<50;i++) {
-                Set<Long> set = new HashSet<>(Collections.singleton((long) i));
-                ws.add(new HasNonObjectField(i, set));
-            }
-        });
-        assertEquals(4, nonReshardingProducer1.getWriteEngine().getTypeState("SetOfLong").getNumShards());
+        HollowInMemoryBlobStager inMemoryBlobStager = new HollowInMemoryBlobStager();
+        HollowProducer p = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(inMemoryBlobStager)
+                .withTypeResharding(true)
+                .build();
 
-        HollowProducer nonReshardingProducer2 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
-                .withTypeResharding(false).withTargetMaxTypeShardSize(32).build();
-        nonReshardingProducer2.initializeDataModel(HasNonObjectField.class);
-        assertEquals(-1, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfLong").getNumShards());
-        nonReshardingProducer2.restore(v1, blobStore);
-        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfLong").getNumShards());
-        try {
-            nonReshardingProducer2.runCycle(ws -> {
-                // causes 4 shards for Integer at shard size 32
-                throw new RuntimeException("failed population");
+        HollowObjectSchema testObjectSchema = new HollowObjectSchema("TestObject", 1);
+        testObjectSchema.addField("intField", HollowObjectSchema.FieldType.INT);
+        HollowMapSchema testMapSchema = new HollowMapSchema("TestMap", "TestObject", "String", "intField");
+
+        p.initializeDataModel(testObjectSchema, testMapSchema);
+        int targetSize = 16;
+        p.getWriteEngine().setTargetMaxTypeShardSize(targetSize);
+        long v1 = p.runCycle(state -> {
+                for (int i = 0; i <= 1; i++) {
+                    HollowObjectWriteRecord rec = new HollowObjectWriteRecord(testObjectSchema);
+                    rec.setInt("intField", i);
+                    state.getStateEngine().add("TestObject", rec);
+                }
+                HollowMapWriteRecord rec = new HollowMapWriteRecord();
+                rec.addEntry(1, 1);
+                state.getStateEngine().add("TestMap", rec);
             });
-            fail("exception expected");
-        } catch (Exception e){
-        }
-        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfLong").getNumShards());
 
-        nonReshardingProducer2.runCycle(ws -> {
-            // causes 4 shards for Integer at shard size 32
-            for (int i=0;i<500;i++) {
-                Set<Long> set = new HashSet<>(Collections.singleton((long) i));
-                ws.add(new HasNonObjectField(i, set));
+        HollowConsumer c = HollowConsumer
+                .withBlobRetriever(blobStore)
+                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+                    @Override
+                    public boolean allowDoubleSnapshot() {
+                        return false;
+                    }
+                    @Override
+                    public int maxDeltasBeforeDoubleSnapshot() {
+                        return Integer.MAX_VALUE;
+                    }
+                })
+                .build();
+        c.triggerRefreshTo(v1);
+
+        assertEquals(1, c.getStateEngine().getTypeState("TestMap").numShards());
+        assertEquals(1, c.getStateEngine().getTypeState("TestObject").numShards());
+
+        long v2 = p.runCycle(state -> {
+            for (int i=0; i<=1001; i++) {
+                HollowObjectWriteRecord rec = new HollowObjectWriteRecord(testObjectSchema);
+                rec.setInt("intField", i);
+                state.getStateEngine().add("TestObject", rec);
             }
+            HollowMapWriteRecord rec = new HollowMapWriteRecord();
+            rec.addEntry(1, 1);
+            state.getStateEngine().add("TestMap", rec);
+            rec = new HollowMapWriteRecord();
+            rec.addEntry(1000, 1001);
+            state.getStateEngine().add("TestMap", rec);
         });
-        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfLong").getNumShards());
+        c.triggerRefreshTo(v2);
+        assertEquals(1, c.getStateEngine().getTypeState("TestMap").numShards());
+        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
+
+        long v3 = p.runCycle(state -> {
+            for (int i = 0; i <= 1001; i++) {
+                HollowObjectWriteRecord rec = new HollowObjectWriteRecord(testObjectSchema);
+                rec.setInt("intField", i);
+                state.getStateEngine().add("TestObject", rec);
+            }
+            HollowMapWriteRecord rec = new HollowMapWriteRecord();
+            rec.addEntry(1, 1);
+            state.getStateEngine().add("TestMap", rec);
+            rec = new HollowMapWriteRecord();
+            rec.addEntry(1000, 1001);
+            state.getStateEngine().add("TestMap", rec);
+            rec = new HollowMapWriteRecord();
+            rec.addEntry(1, 2);
+            state.getStateEngine().add("TestMap", rec);
+        });
+        c.triggerRefreshTo(v3);
+        assertEquals(v3, c.getCurrentVersionId());
     }
 
     // @Test Disabled until producer allows both resharding and focusHolesInFewestShards features
@@ -816,16 +997,6 @@ public class HollowProducerTest {
 
         Assert.assertEquals(iVal, typeState.readInt(ordinal, typeState.getSchema().getPosition("intVal")));
         Assert.assertEquals(sVal, typeState.readString(ordinal, typeState.getSchema().getPosition("strVal")));
-    }
-
-    private static class HasNonObjectField {
-        public Integer objectField;
-        public Set<Long> nonObjectField;
-
-        public HasNonObjectField(int objectField, Set<Long> nonObjectField) {
-            this.objectField = objectField;
-            this.nonObjectField = nonObjectField;
-        }
     }
 
     @SuppressWarnings("unused")

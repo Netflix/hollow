@@ -36,6 +36,9 @@ class HollowListTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Holl
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
+            if (fromOrdinal > from[fromIndex].maxOrdinal) {
+                continue; // could be lopsided shards resulting from skipping type shards with no additions
+            }
 
             long startElement = from[fromIndex].getStartElement(fromOrdinal);
             long endElement = from[fromIndex].getEndElement(fromOrdinal);

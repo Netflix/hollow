@@ -43,9 +43,11 @@ class HollowSetTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Hollo
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
+            if (fromOrdinal > from[fromIndex].maxOrdinal) {
+                continue; // could be lopsided shards resulting from skipping type shards with no additions
+            }
 
             HollowSetTypeDataElements source = from[fromIndex];
-
             long startBucket = source.getStartBucket(fromOrdinal);
             long endBucket = source.getEndBucket(fromOrdinal);
             long numBuckets = endBucket - startBucket;
@@ -80,10 +82,10 @@ class HollowSetTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Hollo
                 to.copyBucketsFrom(bucketCounter, source, startBucket, endBucket);
                 bucketCounter += numBuckets;
 
-                setSize = source.setPointerAndSizeData.getElementValue((long)(fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);
+                setSize = source.setPointerAndSizeData.getElementValue(((long)fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);
             }
             to.setPointerAndSizeData.setElementValue((long)ordinal * to.bitsPerFixedLengthSetPortion, to.bitsPerSetPointer, bucketCounter);
-            to.setPointerAndSizeData.setElementValue((long)(ordinal * to.bitsPerFixedLengthSetPortion) + to.bitsPerSetPointer, to.bitsPerSetSizeValue, setSize);
+            to.setPointerAndSizeData.setElementValue(((long)ordinal * to.bitsPerFixedLengthSetPortion) + to.bitsPerSetPointer, to.bitsPerSetSizeValue, setSize);
         }
     }
 }

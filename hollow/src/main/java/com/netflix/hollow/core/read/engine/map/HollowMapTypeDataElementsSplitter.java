@@ -84,8 +84,8 @@ public class HollowMapTypeDataElementsSplitter extends HollowTypeDataElementsSpl
             bucketCounter[toIndex] += numBuckets;
 
             target.mapPointerAndSizeData.setElementValue((long)toOrdinal * target.bitsPerFixedLengthMapPortion, target.bitsPerMapPointer, bucketCounter[toIndex]);
-            long mapSize = from.mapPointerAndSizeData.getElementValue((long)(ordinal * from.bitsPerFixedLengthMapPortion) + from.bitsPerMapPointer, from.bitsPerMapSizeValue);
-            target.mapPointerAndSizeData.setElementValue((long)(toOrdinal * target.bitsPerFixedLengthMapPortion) + target.bitsPerMapPointer, target.bitsPerMapSizeValue, mapSize);
+            long mapSize = from.mapPointerAndSizeData.getElementValue(((long)ordinal * from.bitsPerFixedLengthMapPortion) + from.bitsPerMapPointer, from.bitsPerMapSizeValue);
+            target.mapPointerAndSizeData.setElementValue(((long)toOrdinal * target.bitsPerFixedLengthMapPortion) + target.bitsPerMapPointer, target.bitsPerMapSizeValue, mapSize);
         }
     }
 }

@@ -9,8 +9,7 @@ public class HollowHistoryUIServerTest {
     @Test
     public void test() throws Exception {
         HollowHistory hh = new HollowHistory(new HollowReadStateEngine(), Long.MAX_VALUE, 10);
-        HollowHistoryUIServer server = new HollowHistoryUIServer(hh, 7890);
-
+        HollowHistoryUIServer server = new HollowHistoryUIServer(hh, 0);
         server.start();
         server.stop();
     }
@@ -18,7 +17,7 @@ public class HollowHistoryUIServerTest {
     @Test
     public void testBackwardsCompatibiltyWithJettyImplementation() throws Exception {
         HollowHistory hh = new HollowHistory(new HollowReadStateEngine(), Long.MAX_VALUE, 10);
-        com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer server = new com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer(hh, 7890);
+        com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer server = new com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer(hh, 0);
 
         server.start();
         server.stop();

@@ -554,8 +554,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             throw new IllegalArgumentException("HollowObjectTypeReadState can only calculate checksum with a HollowObjectSchema: " + getSchema().getName());
 
         BitSet populatedOrdinals = getPopulatedOrdinals();
-
-        for(int i=0;i<shards.length;i++) {
+        for (int i = 0; i < shards.length; i++) {
             shards[i].applyShardToChecksum(checksum, withSchema, populatedOrdinals, i, shardNumberMask);
         }
     }

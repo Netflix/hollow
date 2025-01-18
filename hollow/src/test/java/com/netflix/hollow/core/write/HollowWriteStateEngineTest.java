@@ -5,11 +5,17 @@ import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_PRODUCER_TO_V
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.api.producer.model.CustomReferenceType;
+import com.netflix.hollow.api.producer.model.HasAllTypeStates;
 import com.netflix.hollow.test.InMemoryBlobStore;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import org.junit.Test;
 
 public class HollowWriteStateEngineTest {
@@ -80,28 +86,70 @@ public class HollowWriteStateEngineTest {
                 .withTypeResharding(true).withTargetMaxTypeShardSize(32)
                 .build();
         long v1 = producer.runCycle(ws -> {
-            // causes 2 shards for Integer at shard size 32
-            for (int i=0;i<50;i++) {
-                ws.add(i);
+            for (int i=0; i<50; i++) { // results in 2 shards at shard size 32
+                final long val = new Long(i);
+                ws.add(new HasAllTypeStates(
+                        new CustomReferenceType(val),
+                        new HashSet<>(Arrays.asList("e" + val)),
+                        Arrays.asList(i),
+                        new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                ));
             }
         });
-        assertEquals(2, producer.getWriteEngine().getTypeState("Integer").getNumShards());
+
+        int oldNumShardsObj = producer.getWriteEngine().getTypeState("Long").getNumShards();
+        assertTrue(0 < oldNumShardsObj);
+        int oldNumShardsRef = producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards();
+        assertTrue(0 < oldNumShardsRef);
+        int oldNumShardsSet = producer.getWriteEngine().getTypeState("SetOfString").getNumShards();
+        assertTrue(0 < oldNumShardsSet);
+        int oldNumShardsList = producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards();
+        assertTrue(0 < oldNumShardsList);
+        int oldNumShardsMap = producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards();
+        assertTrue(0 < oldNumShardsMap);
+
         long v2 = producer.runCycle(ws -> {
-            // 2x the data, causes 4 shards for Integer at shard size 32
+            // 2x the data
             for (int i=0;i<100;i++) {
-                ws.add(i);
+                final long val = new Long(i);
+                ws.add(new HasAllTypeStates(
+                        new CustomReferenceType(val),
+                        new HashSet<>(Arrays.asList("e" + val)),
+                        Arrays.asList(i),
+                        new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                ));
             }
-
         });
-        assertEquals(4, producer.getWriteEngine().getTypeState("Integer").getNumShards());
+        int newNumShardsObj = producer.getWriteEngine().getTypeState("Long").getNumShards();
+        assertTrue(oldNumShardsObj < newNumShardsObj);
+        int newNumShardsRef = producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards();
+        assertTrue(oldNumShardsRef < newNumShardsRef);
+        int newNumShardsSet = producer.getWriteEngine().getTypeState("SetOfString").getNumShards();
+        assertTrue(oldNumShardsSet < newNumShardsSet);
+        int newNumShardsList = producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards();
+        assertTrue(oldNumShardsList < newNumShardsList);
+        int newNumShardsMap = producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards();
+        assertTrue(oldNumShardsMap < newNumShardsMap);
+
         long v3 = producer.runCycle(ws -> {
-            // remain at 4 shards for Integer
+            // remain at same num shards as 100 records
             for (int i=0;i<99;i++) {
-                ws.add(i);
+                final long val = new Long(i);
+                ws.add(new HasAllTypeStates(
+                        new CustomReferenceType(val),
+                        new HashSet<>(Arrays.asList("e" + val)),
+                        Arrays.asList(i),
+                        new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                ));
             }
 
         });
-        assertEquals(4, producer.getWriteEngine().getTypeState("Integer").getNumShards());
+        assertEquals(newNumShardsObj, producer.getWriteEngine().getTypeState("Long").getNumShards());
+        assertEquals(newNumShardsRef, producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+        assertEquals(newNumShardsSet, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+        assertEquals(newNumShardsList, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+        assertEquals(newNumShardsMap, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
+
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
                 .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
                     @Override
@@ -116,17 +164,34 @@ public class HollowWriteStateEngineTest {
                 .build();
 
         consumer.triggerRefreshTo(v1);
-        assertEquals(2, consumer.getStateEngine().getTypeState("Integer").numShards());
+        assertEquals(oldNumShardsObj, consumer.getStateEngine().getTypeState("Long").numShards());
+        assertEquals(oldNumShardsRef, consumer.getStateEngine().getTypeState("CustomReferenceType").numShards());
+        assertEquals(oldNumShardsSet, consumer.getStateEngine().getTypeState("SetOfString").numShards());
+        assertEquals(oldNumShardsList, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
+        assertEquals(oldNumShardsMap, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
         assertNull(consumer.getStateEngine().getHeaderTag(HEADER_TAG_TYPE_RESHARDING_INVOKED));
 
         consumer.triggerRefreshTo(v2);
         assertEquals(v2, consumer.getCurrentVersionId());
-        assertEquals(4, consumer.getStateEngine().getTypeState("Integer").numShards());
-        assertEquals("Integer:(2,4)", consumer.getStateEngine().getHeaderTag(HEADER_TAG_TYPE_RESHARDING_INVOKED));
+        assertEquals(newNumShardsObj, consumer.getStateEngine().getTypeState("Long").numShards());
+        assertEquals(newNumShardsRef, consumer.getStateEngine().getTypeState("CustomReferenceType").numShards());
+        assertEquals(newNumShardsSet, consumer.getStateEngine().getTypeState("SetOfString").numShards());
+        assertEquals(newNumShardsList, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
+        assertEquals(newNumShardsMap, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
+        String reshardingInvokedHeader = consumer.getStateEngine().getHeaderTag(HEADER_TAG_TYPE_RESHARDING_INVOKED);
+        assertTrue(reshardingInvokedHeader.contains(String.format("Long:(%s,%s)", oldNumShardsObj, newNumShardsObj)));
+        assertTrue(reshardingInvokedHeader.contains(String.format("CustomReferenceType:(%s,%s)", oldNumShardsRef, newNumShardsRef)));
+        assertTrue(reshardingInvokedHeader.contains(String.format("SetOfString:(%s,%s)", oldNumShardsSet, newNumShardsSet)));
+        assertTrue(reshardingInvokedHeader.contains(String.format("ListOfInteger:(%s,%s)", oldNumShardsList, newNumShardsList)));
+        assertTrue(reshardingInvokedHeader.contains(String.format("MapOfStringToLong:(%s,%s)", oldNumShardsMap, newNumShardsMap)));
 
         consumer.triggerRefreshTo(v3);
         assertEquals(v3, consumer.getCurrentVersionId());
-        assertEquals(4, consumer.getStateEngine().getTypeState("Integer").numShards());
+        assertEquals(newNumShardsObj, consumer.getStateEngine().getTypeState("Long").numShards());
+        assertEquals(newNumShardsRef, consumer.getStateEngine().getTypeState("CustomReferenceType").numShards());
+        assertEquals(newNumShardsSet, consumer.getStateEngine().getTypeState("SetOfString").numShards());
+        assertEquals(newNumShardsList, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
+        assertEquals(newNumShardsMap, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
         assertEquals(false, consumer.getStateEngine().getHeaderTags().containsKey(HEADER_TAG_TYPE_RESHARDING_INVOKED));
     }
 }

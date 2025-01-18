@@ -1,8 +1,11 @@
 package com.netflix.hollow.core.read.engine.set;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitJoinTest;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.write.HollowSetTypeWriteState;
@@ -12,7 +15,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.Assert;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -70,20 +72,28 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
         return (HollowSetTypeReadState) readStateEngine.getTypeState("TestSet");
     }
 
-    protected void assertDataUnchanged(HollowSetTypeReadState typeState, int[][] listContents) {
-        int numListRecords = listContents.length;
-        for(int i=0;i<numListRecords;i++) {
-            HollowOrdinalIterator iter = typeState.ordinalIterator(i);
-            Set<Integer> expected = Arrays.stream(listContents[i]).boxed().collect(Collectors.toSet());
-            Set<Integer> actual = new HashSet<>();
-            int o = iter.next();
-            while (o != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-                actual.add(o);
-                o = iter.next();
+    protected void assertDataUnchanged(HollowSetTypeReadState typeState, int[][] setContents) {
+        int numSetRecords = setContents.length;
+        if (typeState.getListener(PopulatedOrdinalListener.class) != null) {
+            assertEquals(setContents.length, typeState.getPopulatedOrdinals().cardinality());
+        }
+        for(int i=0;i<numSetRecords;i++) {
+            Set<Integer> expected = Arrays.stream(setContents[i]).boxed().collect(Collectors.toSet());
+            boolean matched = false;
+            for (int setRecordOridnal=0; setRecordOridnal<=typeState.maxOrdinal(); setRecordOridnal++) {
+                HollowOrdinalIterator iter = typeState.ordinalIterator(setRecordOridnal);
+                Set<Integer> actual = new HashSet<>();
+                int o = iter.next();
+                while (o != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+                    actual.add(o);
+                    o = iter.next();
+                }
+                if (actual.equals(expected)) {
+                    matched = true;
+                    break;
+                }
             }
-
-            Assert.assertEquals(expected, actual);
-            Assert.assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iter.next());
+            assertTrue(matched);
         }
     }
 }

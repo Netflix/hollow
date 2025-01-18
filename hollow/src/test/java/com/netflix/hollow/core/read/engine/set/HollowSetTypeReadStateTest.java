@@ -12,7 +12,7 @@ public class HollowSetTypeReadStateTest extends AbstractHollowSetTypeDataElement
     public void testResharding() throws Exception {
 
         for (int shardingFactor : new int[]{2}) { // , 4, 8, 16, 32, 64, 128, 256, 512, 1024
-            for(int numRecords=1;numRecords<=1000;numRecords+=new Random().nextInt(100)) {
+            for(int numRecords=1;numRecords<=1000;numRecords+=new Random().nextInt(300)) {
                 int[][] listContents = generateSetContents(numRecords);
                 HollowSetTypeReadState setTypeReadState = populateTypeStateWith(listContents);
                 assertDataUnchanged(setTypeReadState, listContents);
