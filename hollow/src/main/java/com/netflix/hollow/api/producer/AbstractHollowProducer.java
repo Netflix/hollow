@@ -792,14 +792,14 @@ abstract class AbstractHollowProducer {
                     HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                     //out.format("  CUR => PND %s\n", forwardChecksum);
                     if (!forwardChecksum.equals(pendingChecksum)) {
-                        throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.DELTA);
+                        throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.DELTA, forwardChecksum, pendingChecksum);
                     }
 
                     applyDelta(artifacts.reverseDelta, pending);
                     HollowChecksum reverseChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
                     //out.format("  CUR <= PND %s\n", reverseChecksum);
                     if (!reverseChecksum.equals(currentChecksum)) {
-                        throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.REVERSE_DELTA);
+                        throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.REVERSE_DELTA, reverseChecksum, currentChecksum);
                     }
                     if (!schemaChangedFromPriorVersion) {
                         // optimization - they have identical schemas, so just swap them

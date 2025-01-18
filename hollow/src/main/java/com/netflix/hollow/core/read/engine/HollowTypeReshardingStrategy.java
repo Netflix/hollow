@@ -104,7 +104,15 @@ public abstract class HollowTypeReshardingStrategy {
                 // a join of original data elements.
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error in re-sharding", e);
+            throw new IllegalStateException(String.format("Failed to reshard %s type %s from %s to %s shards. " +
+                            "This may leave the Hollow read state in a corrupt state. " +
+                            "Recovery will require a snapshot update. \nSome diagnostics: " +
+                            "isSkipTypeShardUpdateWithNoAdditions= %s, " +
+                            "maxOrdinal= %s," +
+                            "schema= %s",
+                    typeState.getSchema().getSchemaType(), typeState.getSchema().getName(), prevNumShards, newNumShards,
+                    typeState.getStateEngine().isSkipTypeShardUpdateWithNoAdditions(), typeState.maxOrdinal(),
+                    typeState.getSchema().toString()), e);
         }
     }
 

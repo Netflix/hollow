@@ -15,7 +15,7 @@ public class HollowMapTypeDataElementsSplitJoinTest extends AbstractHollowMapTyp
 
         // 1->2->1, 1->4->1, ...
         for (int numRecords=0;numRecords<maxNumMapRecords;numRecords++) {
-            int[][][] maps = generateListContents(numRecords);
+            int[][][] maps = generateMapContents(numRecords);
             HollowMapTypeReadState typeReadState = populateTypeStateWith(maps);
             assertEquals(1, typeReadState.numShards());
             assertEquals(maps.length, typeReadState.getPopulatedOrdinals().cardinality());

@@ -22,6 +22,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Vector;
 
 /**
@@ -32,8 +33,25 @@ import java.util.Vector;
 public class HollowChecksum {
 
     private int currentChecksum = 0;
+    private Vector<TypeChecksum> sortedTypeChecksums;
+
+    public void setSortedTypeChecksums(Vector<TypeChecksum> sortedTypeChecksums) {
+        this.sortedTypeChecksums = sortedTypeChecksums;
+    }
+
+    public Vector<TypeChecksum> getSortedTypeChecksums() {
+        return sortedTypeChecksums;
+    }
 
     public HollowChecksum() { }
+
+    public void applyType(TypeChecksum typeChecksum) {
+        if (this.sortedTypeChecksums == null) {
+            this.sortedTypeChecksums = new Vector<>();
+        }
+        this.sortedTypeChecksums.addElement(typeChecksum);
+        applyInt(typeChecksum.checksum);
+    }
 
     public void applyInt(int value) {
         currentChecksum ^= HashCodes.hashInt(value);
@@ -95,16 +113,15 @@ public class HollowChecksum {
         Collections.sort(typeChecksums);
 
         HollowChecksum totalChecksum = new HollowChecksum();
-
         for(TypeChecksum cksum : typeChecksums) {
-            totalChecksum.applyInt(cksum.getChecksum());
+            totalChecksum.applyType(cksum);
         }
 
         return totalChecksum;
     }
 
 
-    private static class TypeChecksum implements Comparable<TypeChecksum>{
+    public static class TypeChecksum implements Comparable<TypeChecksum>{
         private final String type;
         private final int checksum;
 
@@ -120,6 +137,27 @@ public class HollowChecksum {
         @Override
         public int compareTo(TypeChecksum other) {
             return type.compareTo(other.type);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            TypeChecksum that = (TypeChecksum) o;
+            return checksum == that.checksum && Objects.equals(type, that.type);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(type, checksum);
+        }
+
+        @Override
+        public String toString() {
+            return "TypeChecksum{" +
+                    "type='" + type + '\'' +
+                    ", checksum=" + Integer.toHexString(checksum) +
+                    '}';
         }
     }
 }

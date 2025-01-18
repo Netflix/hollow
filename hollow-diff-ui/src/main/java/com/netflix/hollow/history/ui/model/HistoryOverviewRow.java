@@ -26,13 +26,22 @@ public class HistoryOverviewRow {
     private final Map<String, ChangeBreakdown> topLevelChangesByType;
     private final ChangeBreakdown topLevelChanges;
     private final String[] overviewDisplayHeaderValues;
+    private final String reshardingInvocationHeader;
 
-    public HistoryOverviewRow(String dateDisplayString, long version, ChangeBreakdown topLevelChanges, Map<String, ChangeBreakdown> topLevelChangesByType, String[] overviewDisplayHeaderValues) {
+    public HistoryOverviewRow(String dateDisplayString, long version, ChangeBreakdown topLevelChanges,
+                              Map<String, ChangeBreakdown> topLevelChangesByType, String[] overviewDisplayHeaderValues) {
+        this(dateDisplayString, version, topLevelChanges, topLevelChangesByType, overviewDisplayHeaderValues, null);
+    }
+
+    public HistoryOverviewRow(String dateDisplayString, long version, ChangeBreakdown topLevelChanges,
+                              Map<String, ChangeBreakdown> topLevelChangesByType, String[] overviewDisplayHeaderValues,
+                              String reshardingInvocationHeader) {
         this.dateDisplayString = dateDisplayString;
         this.version = version;
         this.topLevelChanges = topLevelChanges;
         this.topLevelChangesByType = topLevelChangesByType;
         this.overviewDisplayHeaderValues = overviewDisplayHeaderValues;
+        this.reshardingInvocationHeader = reshardingInvocationHeader;
     }
 
     public String getDateDisplayString() {
@@ -53,5 +62,9 @@ public class HistoryOverviewRow {
 
     public String[] getOverviewDisplayHeaderValues() {
         return overviewDisplayHeaderValues;
+    }
+
+    public String getReshardingInvocationHeader() {
+        return reshardingInvocationHeader;
     }
 }

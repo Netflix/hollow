@@ -19,6 +19,7 @@ package com.netflix.hollow.core.write;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.IGNORED_HASHES;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.UNMIXED_HASHES;
 
+import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -31,7 +32,9 @@ import com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior;
 import com.netflix.hollow.core.write.copy.HollowRecordCopier;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -44,7 +47,8 @@ public abstract class HollowTypeWriteState {
     protected final HollowSchema schema;
 
     protected final ByteArrayOrdinalMap ordinalMap;
-    
+    protected int maxOrdinal;
+
     protected int numShards;
     protected int revNumShards;
     private int resetToLastNumShards;
@@ -63,6 +67,9 @@ public abstract class HollowTypeWriteState {
     private boolean wroteData = false;
 
     private boolean isNumShardsPinned;  // if numShards is pinned using numShards annotation in data model
+    protected int maxShardOrdinal[];
+    protected int revMaxShardOrdinal[];
+
 
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
         this(schema, numShards, false);
@@ -306,9 +313,16 @@ public abstract class HollowTypeWriteState {
         ordinalMap.prepareForWrite();
         wroteData = true;
     }
-    
+
     public boolean hasChangedSinceLastCycle() {
-        return !currentCyclePopulated.equals(previousCyclePopulated);
+        if (!currentCyclePopulated.equals(previousCyclePopulated)) {
+            return true;
+        }
+        if (numShards != revNumShards) { // see {@code testChangingNumShardsWithoutChangesInPopulatedOrdinals}
+            return true;
+        }
+        return false;
+
     }
     
     public boolean isRestored() {
@@ -319,14 +333,28 @@ public abstract class HollowTypeWriteState {
 
     public abstract void writeSnapshot(DataOutputStream dos) throws IOException;
 
-    public abstract void calculateDelta();
+    public void calculateDelta() {
+        calculateDelta(previousCyclePopulated, currentCyclePopulated, false);
+    }
 
-    public abstract void writeDelta(DataOutputStream dos) throws IOException;
+    public void calculateReverseDelta() {
+        calculateDelta(currentCyclePopulated, previousCyclePopulated, true);
+    }
 
-    public abstract void calculateReverseDelta();
+    public void writeDelta(DataOutputStream dos) throws IOException {
+        LOG.log(Level.FINE, String.format("Writing delta with num shards = %s, max shard ordinals = %s", numShards, Arrays.toString(maxShardOrdinal)));
+        writeCalculatedDelta(dos, false, maxShardOrdinal);
+    }
 
-    public abstract void writeReverseDelta(DataOutputStream dos) throws IOException;
-    
+    public void writeReverseDelta(DataOutputStream dos) throws IOException {
+        LOG.log(Level.FINE, String.format("Writing reversedelta with num shards = %s, max shard ordinals = %s", revNumShards, Arrays.toString(revMaxShardOrdinal)));
+        writeCalculatedDelta(dos, true, revMaxShardOrdinal);
+    }
+
+    public abstract void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, boolean isReverse);
+
+    public abstract void writeCalculatedDelta(DataOutputStream os, boolean isReverse, int[] maxShardOrdinal) throws IOException;
+
     protected void restoreFrom(HollowTypeReadState readState) {
         if(previousCyclePopulated.cardinality() != 0 || currentCyclePopulated.cardinality() != 0)
             throw new IllegalStateException("Attempting to restore into a non-empty state (type " + schema.getName() + ")");
@@ -391,18 +419,62 @@ public abstract class HollowTypeWriteState {
         return stateEngine;
     }
 
+    protected static int[] calcMaxShardOrdinal(int maxOrdinal, int numShards) {
+        int[] maxShardOrdinal = new int[numShards];
+        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards;
+        for(int i=0;i<numShards;i++)
+            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
+        return maxShardOrdinal;
+    }
+
     public boolean allowTypeResharding() {
-        if (this instanceof HollowObjectTypeWriteState) {
-            if (stateEngine.allowTypeResharding()) {
-                if (isNumShardsPinned()) {
-                    LOG.warning("Type re-sharding feature was enabled but num shards is pinned (likely using the " +
-                            "HollowShardLargeType annotation in the data model). Proceeding with fixed num shards.");
-                    return false;
+        if (stateEngine.allowTypeResharding()) {
+            if (isNumShardsPinned()) {
+                LOG.info("Types will not re-shard automatically because num shards is pinned (likely using the " +
+                        "HollowShardLargeType annotation in the data model). Proceeding with fixed num shards.");
+                return false;
+            }
+        }
+        return stateEngine.allowTypeResharding();
+    }
+
+    protected void gatherShardingStats(int maxOrdinal) {
+        if(numShards == -1) {
+            numShards = typeStateNumShards(maxOrdinal);
+            revNumShards = numShards;
+        } else {
+            revNumShards = numShards;
+            if (allowTypeResharding()) {
+                numShards = typeStateNumShards(maxOrdinal);
+                if (numShards != revNumShards) {    // re-sharding
+                    // limit numShards to 2x or .5x of prevShards per producer cycle
+                    numShards = numShards > revNumShards ? revNumShards * 2 : revNumShards / 2;
+
+                    LOG.info(String.format("Num shards for type %s changing from %s to %s", schema.getName(), revNumShards, numShards));
+                    addReshardingHeader(revNumShards, numShards);
                 }
             }
-            return stateEngine.allowTypeResharding();
-        } else {
-            return false;   // only supported for object types
         }
+
+        maxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, numShards);
+        if (revNumShards > 0) {
+            revMaxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, revNumShards);
+        }
+    }
+
+    protected abstract int typeStateNumShards(int maxOrdinal);
+
+    /**
+     * A header tag indicating that num shards for a type has changed since the prior version. Its value encodes
+     * the type(s) that were re-sharded along with the before and after num shards in the fwd delta direction.
+     * For e.g. Movie:(2,4) Actor:(8,4)
+     */
+    protected void addReshardingHeader(int prevNumShards, int newNumShards) {
+        String existing = stateEngine.getHeaderTag(HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED);
+        String appendTo = "";
+        if (existing != null) {
+            appendTo = existing + " ";
+        }
+        stateEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED, appendTo + schema.getName() + ":(" + prevNumShards + "," + newNumShards + ")");
     }
 }

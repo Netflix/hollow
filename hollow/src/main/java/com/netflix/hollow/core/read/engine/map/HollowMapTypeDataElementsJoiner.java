@@ -45,6 +45,9 @@ class HollowMapTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Hollo
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
+            if (fromOrdinal > from[fromIndex].maxOrdinal) {
+                continue; // could be lopsided shards resulting from skipping type shards with no additions
+            }
 
             HollowMapTypeDataElements source = from[fromIndex];
 
@@ -83,10 +86,10 @@ class HollowMapTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Hollo
                 to.copyBucketsFrom(bucketCounter, source, startBucket, endBucket);
                 bucketCounter += numBuckets;
 
-                mapSize = source.mapPointerAndSizeData.getElementValue((long)(fromOrdinal * source.bitsPerFixedLengthMapPortion) + source.bitsPerMapPointer, source.bitsPerMapSizeValue);
+                mapSize = source.mapPointerAndSizeData.getElementValue(((long)fromOrdinal * source.bitsPerFixedLengthMapPortion) + source.bitsPerMapPointer, source.bitsPerMapSizeValue);
             }
             to.mapPointerAndSizeData.setElementValue( (long)ordinal * to.bitsPerFixedLengthMapPortion, to.bitsPerMapPointer, bucketCounter);
-            to.mapPointerAndSizeData.setElementValue((long)(ordinal * to.bitsPerFixedLengthMapPortion) + to.bitsPerMapPointer, to.bitsPerMapSizeValue, mapSize);
+            to.mapPointerAndSizeData.setElementValue(((long)ordinal * to.bitsPerFixedLengthMapPortion) + to.bitsPerMapPointer, to.bitsPerMapSizeValue, mapSize);
         }
     }
 }

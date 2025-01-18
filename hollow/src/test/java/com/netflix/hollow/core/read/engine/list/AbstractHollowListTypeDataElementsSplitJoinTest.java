@@ -1,15 +1,20 @@
 package com.netflix.hollow.core.read.engine.list;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitJoinTest;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowListWriteRecord;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import org.junit.Assert;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -76,12 +81,27 @@ public class AbstractHollowListTypeDataElementsSplitJoinTest extends AbstractHol
 
     protected void assertDataUnchanged(HollowListTypeReadState typeState, int[][] listContents) {
         int numListRecords = listContents.length;
+        if (typeState.getListener(PopulatedOrdinalListener.class) != null) {
+            assertEquals(listContents.length, typeState.getPopulatedOrdinals().cardinality());
+        }
         for(int i=0;i<numListRecords;i++) {
-            HollowOrdinalIterator iter = typeState.ordinalIterator(i);
-            for(int j=0;j<listContents[i].length;j++) {
-                Assert.assertEquals(listContents[i][j], iter.next());
+            List<Integer> expected = Arrays.stream(listContents[i]).boxed().collect(Collectors.toList());
+            boolean matched = false;
+            List<Integer> actual = null;
+            for (int listRecordOridnal=0; listRecordOridnal<=typeState.maxOrdinal(); listRecordOridnal++) {
+                HollowOrdinalIterator iter = typeState.ordinalIterator(listRecordOridnal);
+                actual = new ArrayList<>();
+                int o = iter.next();
+                while (o != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+                    actual.add(o);
+                    o = iter.next();
+                }
+                if (actual.equals(expected)) {
+                    matched = true;
+                    break;
+                }
             }
-            Assert.assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iter.next());
+            assertTrue(matched);
         }
     }
 }

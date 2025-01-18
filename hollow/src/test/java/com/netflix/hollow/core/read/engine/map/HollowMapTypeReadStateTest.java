@@ -13,7 +13,7 @@ public class HollowMapTypeReadStateTest extends AbstractHollowMapTypeDataElement
 
         for (int shardingFactor : new int[]{2}) { // , 4, 8, 16, 32, 64, 128, 256, 512, 1024
             for(int numRecords=1;numRecords<=1000;numRecords+=new Random().nextInt(100)) {
-                int[][][] listContents = generateListContents(numRecords);
+                int[][][] listContents = generateMapContents(numRecords);
                 HollowMapTypeReadState mapTypeReadState = populateTypeStateWith(listContents);
                 assertDataUnchanged(mapTypeReadState, listContents);
                 HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(mapTypeReadState);
