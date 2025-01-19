@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.write;
 
+import static com.netflix.hollow.core.index.FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE;
+
 import com.netflix.hollow.core.index.FieldPaths;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataArray;
@@ -29,8 +31,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.netflix.hollow.core.index.FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE;
 
 public class HollowSetTypeWriteState extends HollowTypeWriteState {
     private static final Logger LOG = Logger.getLogger(HollowSetTypeWriteState.class.getName());
@@ -56,9 +56,13 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     public HollowSetTypeWriteState(HollowSetSchema schema) {
         this(schema, -1);
     }
-    
+
     public HollowSetTypeWriteState(HollowSetSchema schema, int numShards) {
-        super(schema, numShards);
+        this(schema, numShards, false);
+    }
+
+    public HollowSetTypeWriteState(HollowSetSchema schema, int numShards, boolean isNumShardsPinned) {
+        super(schema, numShards, isNumShardsPinned);
     }
 
     @Override

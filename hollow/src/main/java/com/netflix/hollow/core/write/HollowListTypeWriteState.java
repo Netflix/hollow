@@ -50,7 +50,11 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     }
     
     public HollowListTypeWriteState(HollowListSchema schema, int numShards) {
-        super(schema, numShards);
+        this(schema, numShards, false);
+    }
+
+    public HollowListTypeWriteState(HollowListSchema schema, int numShards, boolean isNumShardsPinned) {
+        super(schema, numShards, isNumShardsPinned);
     }
 
     @Override

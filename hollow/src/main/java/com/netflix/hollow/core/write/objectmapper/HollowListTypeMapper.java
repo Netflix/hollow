@@ -47,14 +47,15 @@ public class HollowListTypeMapper extends HollowTypeMapper {
 
     private final HollowTypeMapper elementMapper;
 
-    public HollowListTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, int numShards, boolean ignoreListOrdering, Set<Type> visited) {
+    public HollowListTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, int numShards, boolean isNumShardsPinned,
+                                boolean ignoreListOrdering, Set<Type> visited) {
         this.elementMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], null, null, -1, visited);
         String typeName = declaredName != null ? declaredName : getDefaultTypeName(type);
         this.schema = new HollowListSchema(typeName, elementMapper.getTypeName());
         this.ignoreListOrdering = ignoreListOrdering;
 
         HollowListTypeWriteState existingTypeState = (HollowListTypeWriteState)parentMapper.getStateEngine().getTypeState(typeName);
-        this.writeState = existingTypeState != null ? existingTypeState : new HollowListTypeWriteState(schema, numShards);
+        this.writeState = existingTypeState != null ? existingTypeState : new HollowListTypeWriteState(schema, numShards, isNumShardsPinned);
     }
 
     @Override

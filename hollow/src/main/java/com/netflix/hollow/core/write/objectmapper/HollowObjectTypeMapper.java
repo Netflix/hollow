@@ -27,6 +27,8 @@ import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalObjectNode;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -36,9 +38,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalObjectNode;
 import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
@@ -425,7 +424,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 subTypeMapper = parentMapper.getTypeMapper(type, 
                         typeNameAnnotation != null ? typeNameAnnotation.name() : null, 
                                 hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null, 
-                                        numShardsAnnotation != null ? numShardsAnnotation.numShards() : -1, 
+                                        numShardsAnnotation != null ? numShardsAnnotation.numShards() : -1,
+                                        isNumShardsPinnedByAnnotation(numShardsAnnotation),
                                                 visitedTypes);
                 
                 // once we've safely returned from a leaf node in recursion, we can remove this MappedField's type
@@ -433,6 +433,10 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
 
             this.subTypeMapper = subTypeMapper;
+        }
+
+        private boolean isNumShardsPinnedByAnnotation(HollowShardLargeType numShardsAnnotation) {
+            return numShardsAnnotation != null && numShardsAnnotation.numShards() != -1;
         }
 
         private MappedField(MappedFieldType specialField) {
