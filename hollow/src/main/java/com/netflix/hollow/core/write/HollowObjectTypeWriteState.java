@@ -37,10 +37,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     private FieldStatistics fieldStats;
 
     /// data required for writing snapshot or delta
-    private int maxOrdinal;
-    private int maxShardOrdinal[];
-    private int revMaxShardOrdinal[];
-
     private FixedLengthElementArray fixedLengthLongArray[];
     private ByteDataArray varLengthByteArrays[][];
     private long recordBitOffset[];
@@ -119,14 +115,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             targetNumShards *= 2;
 
         return targetNumShards;
-    }
-
-    int[] calcMaxShardOrdinal(int maxOrdinal, int numShards) {
-        int[] maxShardOrdinal = new int[numShards];
-        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards;
-        for(int i=0;i<numShards;i++)
-            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
-        return maxShardOrdinal;
     }
 
     private void discoverObjectFieldStatisticsForRecord(FieldStatistics fieldStats, int ordinal) {

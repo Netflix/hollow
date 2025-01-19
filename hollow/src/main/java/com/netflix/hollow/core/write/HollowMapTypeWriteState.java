@@ -43,8 +43,6 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
     private long totalOfMapBuckets[];
 
     /// data required for writing snapshot or delta
-    private int maxOrdinal;
-    private int maxShardOrdinal[];
     private FixedLengthElementArray mapPointersAndSizesArray[];
     private FixedLengthElementArray entryData[];
 

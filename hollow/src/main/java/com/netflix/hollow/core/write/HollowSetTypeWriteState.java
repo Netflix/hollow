@@ -42,8 +42,6 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     private long totalOfSetBuckets[];
 
     /// data required for writing snapshot or delta
-    private int maxOrdinal;
-    private int maxShardOrdinal[];
     private FixedLengthElementArray setPointersAndSizesArray[];
     private FixedLengthElementArray elementArray[];
 
@@ -77,19 +75,30 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     }
 
     private void gatherStatistics() {
-        if(numShards == -1)
-            calculateNumShards();
-        revNumShards = numShards;
+        int maxOrdinal = ordinalMap.maxOrdinal();
+        if(numShards == -1) {
+            numShards = calculateNumShards(maxOrdinal);
+            revNumShards = numShards;
+        } else {
+            revNumShards = numShards;
+            if (allowTypeResharding()) {
+                numShards = calculateNumShards(maxOrdinal);
+                if (numShards != revNumShards) {    // re-sharding
+                    // limit numShards to 2x or .5x of prevShards per producer cycle
+                    numShards = numShards > revNumShards ? revNumShards * 2 : revNumShards / 2;
+
+                    LOG.info(String.format("Num shards for type %s changing from %s to %s", schema.getName(), revNumShards, numShards));
+                    addReshardingHeader(revNumShards, numShards);   // SNAP: TODO: Here,
+                }
+            }
+        }
+
+        maxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, numShards);
+        if (revNumShards > 0) {
+            revMaxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, revNumShards);
+        }
 
         int maxElementOrdinal = 0;
-
-        int maxOrdinal = ordinalMap.maxOrdinal();
-        
-        maxShardOrdinal = new int[numShards];
-        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards; 
-        for(int i=0;i<numShards;i++)
-            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
-        
         int maxSetSize = 0;
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
@@ -133,8 +142,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         bitsPerSetPointer = 64 - Long.numberOfLeadingZeros(maxShardTotalOfSetBuckets);
     }
     
-    private void calculateNumShards() {
-        int maxOrdinal = ordinalMap.maxOrdinal();
+    private int calculateNumShards(int maxOrdinal) {
         int maxSetSize = 0;
         int maxElementOrdinal = 0;
         
@@ -176,9 +184,10 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         long projectedSizeOfType = (bitsPerSetSizeValue + bitsPerSetPointer) * (maxOrdinal + 1) / 8;
         projectedSizeOfType += (bitsPerElement * totalOfSetBuckets) / 8;
         
-        numShards = 1;
-        while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType) 
-            numShards *= 2;
+        int targetNumShards = 1;
+        while(stateEngine.getTargetMaxTypeShardSize() * targetNumShards < projectedSizeOfType)
+            targetNumShards *= 2;
+        return targetNumShards;
     }
 
     @Override

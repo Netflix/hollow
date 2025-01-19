@@ -34,8 +34,6 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     private long totalOfListSizes[];
 
     /// data required for writing snapshot or delta
-    private int maxOrdinal;
-    private int maxShardOrdinal[];
     private FixedLengthElementArray listPointerArray[];
     private FixedLengthElementArray elementArray[];
 

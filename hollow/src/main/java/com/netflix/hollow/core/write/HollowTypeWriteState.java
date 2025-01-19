@@ -65,6 +65,10 @@ public abstract class HollowTypeWriteState {
 
     private boolean isNumShardsPinned;  // if numShards is pinned using numShards annotation in data model
 
+    protected int maxOrdinal;
+    protected int maxShardOrdinal[];
+    protected int revMaxShardOrdinal[];
+
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
         this(schema, numShards, false);
     }
@@ -390,6 +394,14 @@ public abstract class HollowTypeWriteState {
     
     public HollowWriteStateEngine getStateEngine() {
         return stateEngine;
+    }
+
+    protected int[] calcMaxShardOrdinal(int maxOrdinal, int numShards) {
+        int[] maxShardOrdinal = new int[numShards];
+        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards;
+        for(int i=0;i<numShards;i++)
+            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
+        return maxShardOrdinal;
     }
 
     public boolean allowTypeResharding() {

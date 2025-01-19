@@ -267,7 +267,7 @@ public class HollowTypeWriteStateTest {
         assertTrue(2 < consumer2.getStateEngine().getTypeState("Long").numShards());
         assertTrue(2 < consumer2.getStateEngine().getTypeState("CustomReferenceType").numShards());
 
-        // producer doesn't support resharding for these types yet
+        // producer doesn't support resharding for these types yet  // SNAP: TODO: update
         assertEquals(8, consumer.getStateEngine().getTypeState("SetOfString").numShards());
         assertEquals(4, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
         assertEquals(8, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
