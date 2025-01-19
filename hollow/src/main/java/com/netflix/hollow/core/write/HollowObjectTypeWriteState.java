@@ -83,30 +83,11 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
         fieldStats.completeCalculations();
 
-        if (numShards == -1) {
-            numShards = targetNumShards(maxOrdinal);
-            revNumShards = numShards;
-        } else {
-            revNumShards = numShards;
-            if (allowTypeResharding()) {    // SNAP: TODO: extend to other types
-                numShards = targetNumShards(maxOrdinal);
-                if (numShards != revNumShards) {    // re-sharding
-                    // limit numShards to 2x or .5x of prevShards per producer cycle
-                    numShards = numShards > revNumShards ? revNumShards * 2 : revNumShards / 2;
-
-                    LOG.info(String.format("Num shards for type %s changing from %s to %s", schema.getName(), revNumShards, numShards));
-                    addReshardingHeader(revNumShards, numShards);
-                }
-            }
-        }
-
-        maxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, numShards);
-        if (revNumShards > 0) {
-            revMaxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, revNumShards);
-        }
+        gatherShardingStats();
     }
 
-    private int targetNumShards(int maxOrdinal) {
+    @Override
+    protected int typeStateNumShards(int maxOrdinal) {
         long projectedSizeOfType = ((long)fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
         projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
 

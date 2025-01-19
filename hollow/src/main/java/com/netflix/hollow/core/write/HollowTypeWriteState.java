@@ -415,6 +415,33 @@ public abstract class HollowTypeWriteState {
         return stateEngine.allowTypeResharding();
     }
 
+    protected void gatherShardingStats() {
+        int maxOrdinal = ordinalMap.maxOrdinal();
+        if(numShards == -1) {
+            numShards = typeStateNumShards(maxOrdinal);
+            revNumShards = numShards;
+        } else {
+            revNumShards = numShards;
+            if (allowTypeResharding()) {
+                numShards = typeStateNumShards(maxOrdinal);
+                if (numShards != revNumShards) {    // re-sharding
+                    // limit numShards to 2x or .5x of prevShards per producer cycle
+                    numShards = numShards > revNumShards ? revNumShards * 2 : revNumShards / 2;
+
+                    LOG.info(String.format("Num shards for type %s changing from %s to %s", schema.getName(), revNumShards, numShards));
+                    addReshardingHeader(revNumShards, numShards);   // SNAP: TODO: Here,
+                }
+            }
+        }
+
+        maxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, numShards);
+        if (revNumShards > 0) {
+            revMaxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, revNumShards);
+        }
+    }
+
+    protected abstract int typeStateNumShards(int maxOrdinal);
+
     /**
      * A header tag indicating that num shards for a type has changed since the prior version. Its value encodes
      * the type(s) that were re-sharded along with the before and after num shards in the fwd delta direction.

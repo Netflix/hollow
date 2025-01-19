@@ -25,8 +25,10 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 public class HollowListTypeWriteState extends HollowTypeWriteState {
+    private static final Logger LOG = Logger.getLogger(HollowListTypeWriteState.class.getName());
 
     /// statistics required for writing fixed length list data
     private int bitsPerListPointer;
@@ -68,18 +70,10 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     }
 
     private void gatherStatistics() {
-        if(numShards == -1)
-            calculateNumShards();
-        revNumShards = numShards;
+        gatherShardingStats();
 
-        int maxOrdinal = ordinalMap.maxOrdinal();
         int maxElementOrdinal = 0;
 
-        maxShardOrdinal = new int[numShards];
-        int minRecordLocationsPerShard = (maxOrdinal + 1) / numShards; 
-        for(int i=0;i<numShards;i++)
-            maxShardOrdinal[i] = (i < ((maxOrdinal + 1) & (numShards - 1))) ? minRecordLocationsPerShard : minRecordLocationsPerShard - 1;
-        
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
         
         totalOfListSizes = new long[numShards];
@@ -113,8 +107,8 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         bitsPerListPointer = maxShardTotalOfListSizes == 0 ? 1 : 64 - Long.numberOfLeadingZeros(maxShardTotalOfListSizes);
     }
     
-    private void calculateNumShards() {
-        int maxOrdinal = ordinalMap.maxOrdinal();
+    @Override
+    protected int typeStateNumShards(int maxOrdinal) {
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
         
         long maxElementOrdinal = 0;
@@ -144,9 +138,10 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         long projectedSizeOfType = (bitsPerElement * totalOfListSizes) / 8;
         projectedSizeOfType += (bitsPerListPointer * maxOrdinal + 1) / 8;
         
-        numShards = 1;
-        while(stateEngine.getTargetMaxTypeShardSize() * numShards < projectedSizeOfType) 
-            numShards *= 2;
+        int targetNumShards = 1;
+        while(stateEngine.getTargetMaxTypeShardSize() * targetNumShards < projectedSizeOfType)
+            targetNumShards *= 2;
+        return targetNumShards;
     }
     
     @Override

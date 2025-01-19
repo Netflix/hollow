@@ -77,28 +77,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
     }
 
     private void gatherStatistics() {
-        int maxOrdinal = ordinalMap.maxOrdinal();
-        if(numShards == -1) {
-            numShards = calculateNumShards(maxOrdinal);
-            revNumShards = numShards;
-        } else {
-            revNumShards = numShards;
-            if (allowTypeResharding()) {
-                numShards = calculateNumShards(maxOrdinal);
-                if (numShards != revNumShards) {    // re-sharding
-                    // limit numShards to 2x or .5x of prevShards per producer cycle
-                    numShards = numShards > revNumShards ? revNumShards * 2 : revNumShards / 2;
-
-                    LOG.info(String.format("Num shards for type %s changing from %s to %s", schema.getName(), revNumShards, numShards));
-                    addReshardingHeader(revNumShards, numShards);   // SNAP: TODO: Here,
-                }
-            }
-        }
-
-        maxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, numShards);
-        if (revNumShards > 0) {
-            revMaxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, revNumShards);
-        }
+        gatherShardingStats();
 
         int maxKeyOrdinal = 0;
         int maxValueOrdinal = 0;
@@ -154,8 +133,9 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
 
         bitsPerMapPointer = 64 - Long.numberOfLeadingZeros(maxShardTotalOfMapBuckets);
     }
-    
-    int calculateNumShards(int maxOrdinal) {
+
+    @Override
+    protected int typeStateNumShards(int maxOrdinal) {
         int maxKeyOrdinal = 0;
         int maxValueOrdinal = 0;
 
