@@ -70,13 +70,13 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         return (HollowSetSchema)schema;
     }
 
-    public void prepareForWrite() {
+    public void prepareForWrite(int numShards) {
         super.prepareForWrite();
 
-        gatherStatistics();
+        gatherStatistics(numShards);
     }
 
-    private void gatherStatistics() {
+    private void gatherStatistics(int numShards) {
         maxOrdinal = ordinalMap.maxOrdinal();
 
         gatherShardingStats(maxOrdinal);
@@ -85,7 +85,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         int maxSetSize = 0;
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
-        totalOfSetBuckets = new long[numShards];
+        totalOfSetBuckets = new long[numShards];// SNAP: TODO: called for delta and rev delta
 
         for(int i=0;i<=maxOrdinal;i++) {
             if(currentCyclePopulated.get(i) || previousCyclePopulated.get(i)) {
@@ -303,26 +303,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     }
 
     @Override
-    public void calculateDelta() {
-        calculateDelta(previousCyclePopulated, currentCyclePopulated);
-    }
-
-    @Override
-    public void writeDelta(DataOutputStream dos) throws IOException {
-        writeCalculatedDelta(dos);
-    }
-
-    @Override
-    public void calculateReverseDelta() {
-        calculateDelta(currentCyclePopulated, previousCyclePopulated);
-    }
-
-    @Override
-    public void writeReverseDelta(DataOutputStream dos) throws IOException {
-        writeCalculatedDelta(dos);
-    }
-
-    public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated) {
+    public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards) {
         maxOrdinal = ordinalMap.maxOrdinal();
         int bitsPerSetFixedLengthPortion = bitsPerSetSizeValue + bitsPerSetPointer;
         
@@ -430,16 +411,17 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         }
     }
 
-    private void writeCalculatedDelta(DataOutputStream os) throws IOException {
+    @Override
+    public void writeCalculatedDelta(DataOutputStream os, int numShards, int[] maxShardOrdinal) throws IOException {
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
-            writeCalculatedDeltaShard(os, 0);
+            writeCalculatedDeltaShard(os, 0, maxShardOrdinal);
         } else {
             /// overall max ordinal
             VarInt.writeVInt(os, maxOrdinal);
             
             for(int i=0;i<numShards;i++) {
-                writeCalculatedDeltaShard(os, i);
+                writeCalculatedDeltaShard(os, i, maxShardOrdinal);
             }
         }
         
@@ -449,7 +431,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         deltaRemovedOrdinals = null;
     }
     
-    private void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber) throws IOException {
+    private void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber, int[] maxShardOrdinal) throws IOException {
         
         int bitsPerSetFixedLengthPortion = bitsPerSetSizeValue + bitsPerSetPointer;
 

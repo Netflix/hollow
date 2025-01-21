@@ -243,28 +243,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     @Override
-    public void calculateDelta() {
-        calculateDelta(previousCyclePopulated, currentCyclePopulated, numShards);
-    }
-
-    @Override
-    public void writeDelta(DataOutputStream dos) throws IOException {
-        LOG.log(Level.FINE, String.format("Writing delta with num shards = %s, max shard ordinals = %s", numShards, Arrays.toString(maxShardOrdinal)));
-        writeCalculatedDelta(dos, numShards, maxShardOrdinal);
-    }
-
-    @Override
-    public void calculateReverseDelta() {
-        calculateDelta(currentCyclePopulated, previousCyclePopulated, revNumShards);    // SNAP: TODO: extend passing of revNumShards for other types
-    }
-
-    @Override
-    public void writeReverseDelta(DataOutputStream dos) throws IOException {
-        LOG.log(Level.FINE, String.format("Writing reversedelta with num shards = %s, max shard ordinals = %s", revNumShards, Arrays.toString(revMaxShardOrdinal)));
-        writeCalculatedDelta(dos, revNumShards, revMaxShardOrdinal);    // SNAP: TODO: extend passing of revNumShards and revMaxShardOrdinal for other types
-    }
-
-    private void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards) {
+    public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards) {
         maxOrdinal = ordinalMap.maxOrdinal();
         int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
 
@@ -311,7 +290,8 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         }
     }
 
-    private void writeCalculatedDelta(DataOutputStream os, int numShards, int[] maxShardOrdinal) throws IOException {
+    @Override
+    public void writeCalculatedDelta(DataOutputStream os, int numShards, int[] maxShardOrdinal) throws IOException {
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
             writeCalculatedDeltaShard(os, 0, maxShardOrdinal);

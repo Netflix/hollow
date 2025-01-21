@@ -32,7 +32,9 @@ import com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior;
 import com.netflix.hollow.core.write.copy.HollowRecordCopier;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -64,6 +66,9 @@ public abstract class HollowTypeWriteState {
     private boolean wroteData = false;
 
     private boolean isNumShardsPinned;  // if numShards is pinned using numShards annotation in data model
+    protected int maxShardOrdinal[];
+    protected int revMaxShardOrdinal[];
+
 
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
         this(schema, numShards, false);
@@ -320,14 +325,28 @@ public abstract class HollowTypeWriteState {
 
     public abstract void writeSnapshot(DataOutputStream dos) throws IOException;
 
-    public abstract void calculateDelta();
+    public void calculateDelta() {
+        calculateDelta(previousCyclePopulated, currentCyclePopulated, numShards);
+    }
 
-    public abstract void writeDelta(DataOutputStream dos) throws IOException;
+    public void calculateReverseDelta() {
+        calculateDelta(currentCyclePopulated, previousCyclePopulated, revNumShards);
+    }
 
-    public abstract void calculateReverseDelta();
+    public void writeDelta(DataOutputStream dos) throws IOException {
+        LOG.log(Level.FINE, String.format("Writing delta with num shards = %s, max shard ordinals = %s", numShards, Arrays.toString(maxShardOrdinal)));
+        writeCalculatedDelta(dos, numShards, maxShardOrdinal);
+    }
 
-    public abstract void writeReverseDelta(DataOutputStream dos) throws IOException;
-    
+    public void writeReverseDelta(DataOutputStream dos) throws IOException {
+        LOG.log(Level.FINE, String.format("Writing reversedelta with num shards = %s, max shard ordinals = %s", revNumShards, Arrays.toString(revMaxShardOrdinal)));
+        writeCalculatedDelta(dos, revNumShards, revMaxShardOrdinal);
+    }
+
+    public abstract void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards);
+
+    public abstract void writeCalculatedDelta(DataOutputStream os, int numShards, int[] maxShardOrdinal) throws IOException;
+
     protected void restoreFrom(HollowTypeReadState readState) {
         if(previousCyclePopulated.cardinality() != 0 || currentCyclePopulated.cardinality() != 0)
             throw new IllegalStateException("Attempting to restore into a non-empty state (type " + schema.getName() + ")");
@@ -410,10 +429,6 @@ public abstract class HollowTypeWriteState {
         }
         return stateEngine.allowTypeResharding();
     }
-
-    protected int maxShardOrdinal[];
-    protected int revMaxShardOrdinal[];
-
 
     protected void gatherShardingStats(int maxOrdinal) {
         if(numShards == -1) {

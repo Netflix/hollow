@@ -479,10 +479,9 @@ public class HollowProducerTest {
 
             }
 
-            // producer doesn't support resharding for these types yet
-            assertEquals(8, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
-            assertEquals(4, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
-            assertEquals(8, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
+            assertEquals(16, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+            assertEquals(8, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+            assertEquals(16, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
 
             producer.runCycle(ws -> {
                 // still same num shards, because ghost records

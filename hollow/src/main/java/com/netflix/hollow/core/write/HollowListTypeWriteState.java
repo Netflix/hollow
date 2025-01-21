@@ -232,26 +232,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     }
 
     @Override
-    public void calculateDelta() {
-        calculateDelta(previousCyclePopulated, currentCyclePopulated);
-    }
-
-    @Override
-    public void writeDelta(DataOutputStream dos) throws IOException {
-        writeCalculatedDelta(dos);
-    }
-
-    @Override
-    public void calculateReverseDelta() {
-        calculateDelta(currentCyclePopulated, previousCyclePopulated);
-    }
-
-    @Override
-    public void writeReverseDelta(DataOutputStream dos) throws IOException {
-        writeCalculatedDelta(dos);
-    }
-
-    private void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated) {
+    public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards) {
         maxOrdinal = ordinalMap.maxOrdinal();
         numListsInDelta = new int[numShards];
         numElementsInDelta = new long[numShards];
@@ -318,16 +299,17 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         }
     }
 
-    private void writeCalculatedDelta(DataOutputStream os) throws IOException {
+    @Override
+    public void writeCalculatedDelta(DataOutputStream os, int numShards, int[] maxShardOrdinal) throws IOException {
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
-            writeCalculatedDeltaShard(os, 0);
+            writeCalculatedDeltaShard(os, 0, maxShardOrdinal);
         } else {
             /// overall max ordinal
             VarInt.writeVInt(os, maxOrdinal);
             
             for(int i=0;i<numShards;i++) {
-                writeCalculatedDeltaShard(os, i);
+                writeCalculatedDeltaShard(os, i, maxShardOrdinal);
             }
         }
 
@@ -338,7 +320,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     }
 
 
-    private void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber) throws IOException {
+    private void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber, int[] maxShardOrdinal) throws IOException {
         /// 1) max shard ordinal
         VarInt.writeVInt(os, maxShardOrdinal[shardNumber]);
 
