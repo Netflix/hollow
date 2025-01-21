@@ -51,6 +51,8 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     private ByteDataArray deltaAddedOrdinals[];
     private ByteDataArray deltaRemovedOrdinals[];
 
+    protected int maxOrdinal;
+
     public HollowSetTypeWriteState(HollowSetSchema schema) {
         this(schema, -1);
     }
@@ -75,7 +77,9 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     }
 
     private void gatherStatistics() {
-        gatherShardingStats();
+        maxOrdinal = ordinalMap.maxOrdinal();
+
+        gatherShardingStats(maxOrdinal);
 
         int maxElementOrdinal = 0;
         int maxSetSize = 0;
