@@ -186,10 +186,15 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         }
     }
 
+    public void prepareForWrite() {
+        // SNAP: TODO: suspicious, for backwards compatibility
+        prepareForWrite(false);
+    }
     /**
      * Transition from the "adding records" phase of a cycle to the "writing" phase of a cycle.
      */
     public void prepareForWrite() {
+        // SNAP: TODO: here, this short circuits, rev delta may need some stat recomputation- see test testReshardingAllTypes
         if(!preparedForNextCycle)  // this call should be a no-op if we are already prepared for write
             return;
 

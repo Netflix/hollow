@@ -84,13 +84,15 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
 
         gatherShardingStats(maxOrdinal);
 
+        int statNumShards = isReverseDelta ? revNumShards : numShards;
+
         int maxKeyOrdinal = 0;
         int maxValueOrdinal = 0;
 
         int maxMapSize = 0;
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
-        totalOfMapBuckets = new long[numShards];
+        totalOfMapBuckets = new long[statNumShards];
         
         for(int i=0;i<=maxOrdinal;i++) {
             if(currentCyclePopulated.get(i) || previousCyclePopulated.get(i)) {
@@ -121,12 +123,12 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
                     pointer += VarInt.nextVLongSize(data, pointer);  /// discard hashed bucket
                 }
 
-                totalOfMapBuckets[i & (numShards-1)] += numBuckets;
+                totalOfMapBuckets[i & (statNumShards-1)] += numBuckets;
             }
         }
         
         long maxShardTotalOfMapBuckets = 0;
-        for(int i=0;i<numShards;i++) {
+        for(int i=0;i<statNumShards;i++) {
             if(totalOfMapBuckets[i] > maxShardTotalOfMapBuckets)
                 maxShardTotalOfMapBuckets = totalOfMapBuckets[i];
         }
@@ -332,7 +334,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
     }
 
     @Override
-    public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards) {
+    public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, boolean isReverse) {
         maxOrdinal = ordinalMap.maxOrdinal();
         int bitsPerMapFixedLengthPortion = bitsPerMapSizeValue + bitsPerMapPointer;
         int bitsPerMapEntry = bitsPerKeyElement + bitsPerValueElement;

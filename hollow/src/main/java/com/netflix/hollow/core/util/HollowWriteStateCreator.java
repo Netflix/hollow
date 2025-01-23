@@ -192,6 +192,6 @@ public class HollowWriteStateCreator {
         writeEngine.overridePreviousHeaderTags(readEngine.getHeaderTags());
         writeEngine.addHeaderTags(readEngine.getHeaderTags());
         writeEngine.overrideNextStateRandomizedTag(readEngine.getCurrentRandomizedTag());
-        writeEngine.prepareForWrite();
+        writeEngine.prepareForWrite(false);
     }
 }

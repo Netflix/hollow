@@ -75,12 +75,13 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         maxOrdinal = ordinalMap.maxOrdinal();
 
         gatherShardingStats(maxOrdinal);
+        int statNumShards = isReverseDelta ? revNumShards : numShards;
 
         int maxElementOrdinal = 0;
 
         ByteData data = ordinalMap.getByteData().getUnderlyingArray();
         
-        totalOfListSizes = new long[numShards];
+        totalOfListSizes = new long[statNumShards];
 
         for(int i=0;i<=maxOrdinal;i++) {
             if(currentCyclePopulated.get(i) || previousCyclePopulated.get(i)) {
@@ -96,12 +97,12 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
                     pointer += VarInt.sizeOfVInt(elementOrdinal);
                 }
 
-                totalOfListSizes[i & (numShards-1)] += size;
+                totalOfListSizes[i & (statNumShards-1)] += size;
             }
         }
         
         long maxShardTotalOfListSizes = 0;
-        for(int i=0;i<numShards;i++) {
+        for(int i=0;i<statNumShards;i++) {
             if(totalOfListSizes[i] > maxShardTotalOfListSizes)
                 maxShardTotalOfListSizes = totalOfListSizes[i];
         }

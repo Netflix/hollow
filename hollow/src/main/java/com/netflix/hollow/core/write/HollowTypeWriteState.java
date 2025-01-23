@@ -294,6 +294,9 @@ public abstract class HollowTypeWriteState {
         resetToLastNumShards = numShards; // -1 if first cycle else previous numShards. See {@code testNumShardsMaintainedWhenNoResharding}
     }
 
+    // SNAP: TODO: this method does not need isReverseDelta, infact it should
+    // gather stats for both fwd and rev numShards, but only populate the extra revNumShards
+    // data structures if fwd and rev numShards are different
     public void prepareForWrite() {
         /// write all of the unused objects to the current ordinalMap, without updating the current cycle bitset,
         /// this way we can do a reverse delta.
@@ -326,26 +329,26 @@ public abstract class HollowTypeWriteState {
     public abstract void writeSnapshot(DataOutputStream dos) throws IOException;
 
     public void calculateDelta() {
-        calculateDelta(previousCyclePopulated, currentCyclePopulated, numShards);
+        calculateDelta(previousCyclePopulated, currentCyclePopulated, false);
     }
 
     public void calculateReverseDelta() {
-        calculateDelta(currentCyclePopulated, previousCyclePopulated, revNumShards);
+        calculateDelta(currentCyclePopulated, previousCyclePopulated, true);
     }
 
     public void writeDelta(DataOutputStream dos) throws IOException {
         LOG.log(Level.FINE, String.format("Writing delta with num shards = %s, max shard ordinals = %s", numShards, Arrays.toString(maxShardOrdinal)));
-        writeCalculatedDelta(dos, numShards, maxShardOrdinal);
+        writeCalculatedDelta(dos, false, maxShardOrdinal);
     }
 
     public void writeReverseDelta(DataOutputStream dos) throws IOException {
         LOG.log(Level.FINE, String.format("Writing reversedelta with num shards = %s, max shard ordinals = %s", revNumShards, Arrays.toString(revMaxShardOrdinal)));
-        writeCalculatedDelta(dos, revNumShards, revMaxShardOrdinal);
+        writeCalculatedDelta(dos, true, revMaxShardOrdinal);
     }
 
-    public abstract void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards);
+    public abstract void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, boolean isReverse);
 
-    public abstract void writeCalculatedDelta(DataOutputStream os, int numShards, int[] maxShardOrdinal) throws IOException;
+    public abstract void writeCalculatedDelta(DataOutputStream os, boolean isReverse, int[] maxShardOrdinal) throws IOException;
 
     protected void restoreFrom(HollowTypeReadState readState) {
         if(previousCyclePopulated.cardinality() != 0 || currentCyclePopulated.cardinality() != 0)
