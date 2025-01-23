@@ -302,7 +302,7 @@ public class HollowClientUpdaterTest {
         }
         // v1
         addMovie(stateEngine, 1);
-        stateEngine.prepareForWrite(false);
+        stateEngine.prepareForWrite();
         ByteArrayOutputStream baos_v1 = new ByteArrayOutputStream();
         HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
         writer.writeSnapshot(baos_v1);
@@ -322,7 +322,7 @@ public class HollowClientUpdaterTest {
         stateEngine.addTypeState(new HollowObjectTypeWriteState(actorSchema));
 
         addActor(stateEngine, 1);
-        stateEngine.prepareForWrite(false);
+        stateEngine.prepareForWrite();
         ByteArrayOutputStream baos_v1_to_v2 = new ByteArrayOutputStream();
         ByteArrayOutputStream baos_v2_to_v1 = new ByteArrayOutputStream();
         ByteArrayOutputStream baos_v2 = new ByteArrayOutputStream();

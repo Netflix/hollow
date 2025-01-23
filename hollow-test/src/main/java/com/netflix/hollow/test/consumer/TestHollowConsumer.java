@@ -165,7 +165,7 @@ public class TestHollowConsumer extends HollowConsumer {
     }
 
     private HollowReadStateEngine roundTrip(HollowWriteStateEngine writeEngine) throws IOException {
-        writeEngine.prepareForWrite(false);
+        writeEngine.prepareForWrite();
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writer.writeSnapshot(baos);

@@ -294,9 +294,6 @@ public abstract class HollowTypeWriteState {
         resetToLastNumShards = numShards; // -1 if first cycle else previous numShards. See {@code testNumShardsMaintainedWhenNoResharding}
     }
 
-    // SNAP: TODO: this method does not need isReverseDelta, infact it should
-    // gather stats for both fwd and rev numShards, but only populate the extra revNumShards
-    // data structures if fwd and rev numShards are different
     public void prepareForWrite() {
         /// write all of the unused objects to the current ordinalMap, without updating the current cycle bitset,
         /// this way we can do a reverse delta.
@@ -315,6 +312,8 @@ public abstract class HollowTypeWriteState {
         ordinalMap.prepareForWrite();
         wroteData = true;
     }
+
+    public abstract void gatherStatistics(int numShards);
     
     public boolean hasChangedSinceLastCycle() {
         return !currentCyclePopulated.equals(previousCyclePopulated);
@@ -329,24 +328,28 @@ public abstract class HollowTypeWriteState {
     public abstract void writeSnapshot(DataOutputStream dos) throws IOException;
 
     public void calculateDelta() {
-        calculateDelta(previousCyclePopulated, currentCyclePopulated, false);
+        calculateDelta(previousCyclePopulated, currentCyclePopulated, numShards);
     }
 
     public void calculateReverseDelta() {
-        calculateDelta(currentCyclePopulated, previousCyclePopulated, true);
+        calculateDelta(currentCyclePopulated, previousCyclePopulated, revNumShards);
     }
 
     public void writeDelta(DataOutputStream dos) throws IOException {
         LOG.log(Level.FINE, String.format("Writing delta with num shards = %s, max shard ordinals = %s", numShards, Arrays.toString(maxShardOrdinal)));
-        writeCalculatedDelta(dos, false, maxShardOrdinal);
+        writeCalculatedDelta(dos, maxShardOrdinal);
     }
 
     public void writeReverseDelta(DataOutputStream dos) throws IOException {
         LOG.log(Level.FINE, String.format("Writing reversedelta with num shards = %s, max shard ordinals = %s", revNumShards, Arrays.toString(revMaxShardOrdinal)));
-        writeCalculatedDelta(dos, true, revMaxShardOrdinal);
+        writeCalculatedDelta(dos, revMaxShardOrdinal);
     }
 
+    public abstract void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards);
+
     public abstract void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, boolean isReverse);
+
+    public abstract void writeCalculatedDelta(DataOutputStream os, int[] maxShardOrdinal) throws IOException;
 
     public abstract void writeCalculatedDelta(DataOutputStream os, boolean isReverse, int[] maxShardOrdinal) throws IOException;
 
@@ -446,7 +449,7 @@ public abstract class HollowTypeWriteState {
                     numShards = numShards > revNumShards ? revNumShards * 2 : revNumShards / 2;
 
                     LOG.info(String.format("Num shards for type %s changing from %s to %s", schema.getName(), revNumShards, numShards));
-                    addReshardingHeader(revNumShards, numShards);   // SNAP: TODO: Here,
+                    addReshardingHeader(revNumShards, numShards);
                 }
             }
         }

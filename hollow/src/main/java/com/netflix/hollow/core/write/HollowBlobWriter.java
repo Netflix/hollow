@@ -56,7 +56,7 @@ public class HollowBlobWriter {
     }
 
     public void writeHeader(OutputStream os, ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams partStreams) throws IOException {
-        stateEngine.prepareForWrite(false);
+        stateEngine.prepareForWrite();
 
         DataOutputStream dos = new DataOutputStream(os);
         HollowBlobHeaderWrapper hollowBlobHeaderWrapper = buildHeader(partStreams, stateEngine.getSchemas(), false);
@@ -72,7 +72,7 @@ public class HollowBlobWriter {
         if(partStreams != null)
             partStreamsByType = partStreams.getStreamsByType();
 
-        stateEngine.prepareForWrite(false);
+        stateEngine.prepareForWrite();
 
         DataOutputStream dos = new DataOutputStream(os);
         HollowBlobHeaderWrapper hollowBlobHeaderWrapper = buildHeader(partStreams, stateEngine.getSchemas(), false);
@@ -132,7 +132,7 @@ public class HollowBlobWriter {
         if(partStreams != null)
             partStreamsByType = partStreams.getStreamsByType();
 
-        stateEngine.prepareForWrite(false);
+        stateEngine.prepareForWrite();
         
         if(stateEngine.isRestored())
             stateEngine.ensureAllNecessaryStatesRestored();
