@@ -47,7 +47,8 @@ public abstract class HollowTypeWriteState {
     protected final HollowSchema schema;
 
     protected final ByteArrayOrdinalMap ordinalMap;
-    
+    protected int maxOrdinal;
+
     protected int numShards;
     protected int revNumShards;
     private int resetToLastNumShards;
@@ -327,24 +328,20 @@ public abstract class HollowTypeWriteState {
 
     public void calculateDelta() {
         calculateDelta(previousCyclePopulated, currentCyclePopulated, false);
-        // calculateDelta(previousCyclePopulated, currentCyclePopulated, numShards);
     }
 
     public void calculateReverseDelta() {
         calculateDelta(currentCyclePopulated, previousCyclePopulated, true);
-        // calculateDelta(currentCyclePopulated, previousCyclePopulated, revNumShards);
     }
 
     public void writeDelta(DataOutputStream dos) throws IOException {
         LOG.log(Level.FINE, String.format("Writing delta with num shards = %s, max shard ordinals = %s", numShards, Arrays.toString(maxShardOrdinal)));
         writeCalculatedDelta(dos, false, maxShardOrdinal);
-        // writeCalculatedDelta(dos, maxShardOrdinal);
     }
 
     public void writeReverseDelta(DataOutputStream dos) throws IOException {
         LOG.log(Level.FINE, String.format("Writing reversedelta with num shards = %s, max shard ordinals = %s", revNumShards, Arrays.toString(revMaxShardOrdinal)));
         writeCalculatedDelta(dos, true, revMaxShardOrdinal);
-        // writeCalculatedDelta(dos, revMaxShardOrdinal);
     }
 
     public abstract void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, boolean isReverse);

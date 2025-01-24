@@ -191,9 +191,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
      */
     public void prepareForWrite() {
 
-        if(!preparedForNextCycle) {
+        if(!preparedForNextCycle)  // this call should be a no-op if we are already prepared for write
             return;
-        }
 
         addTypeNamesWithDefinedHashCodesToHeader();
 

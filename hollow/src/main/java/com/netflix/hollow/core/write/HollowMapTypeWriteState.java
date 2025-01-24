@@ -54,9 +54,6 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
     private ByteDataArray deltaAddedOrdinals[];
     private ByteDataArray deltaRemovedOrdinals[];
 
-    protected int maxOrdinal;
-
-
     public HollowMapTypeWriteState(HollowMapSchema schema) {
         this(schema, -1);
     }
@@ -80,7 +77,6 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
 
         maxOrdinal = ordinalMap.maxOrdinal();
         gatherShardingStats(maxOrdinal);
-
         gatherStatistics(numShards != revNumShards);
     }
 
@@ -215,7 +211,6 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void calculateSnapshot() {
-        maxOrdinal = ordinalMap.maxOrdinal();
         int bitsPerMapFixedLengthPortion = bitsPerMapSizeValue + bitsPerMapPointer;
         int bitsPerMapEntry = bitsPerKeyElement + bitsPerValueElement;
         
@@ -347,7 +342,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
             os.writeLong(entryData[shardNumber].get(i));
         }
     }
-    
+
     @Override
     public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, boolean isReverse) {
         int numShards = this.numShards;
@@ -357,7 +352,6 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
             bitsPerMapPointer = this.revBitsPerMapPointer;
         }
 
-        maxOrdinal = ordinalMap.maxOrdinal();
         int bitsPerMapFixedLengthPortion = bitsPerMapSizeValue + bitsPerMapPointer;
         int bitsPerMapEntry = bitsPerKeyElement + bitsPerValueElement;
 

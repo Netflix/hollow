@@ -53,8 +53,6 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     private ByteDataArray deltaAddedOrdinals[];
     private ByteDataArray deltaRemovedOrdinals[];
 
-    protected int maxOrdinal;
-
     public HollowSetTypeWriteState(HollowSetSchema schema) {
         this(schema, -1);
     }
@@ -75,8 +73,8 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     @Override
     public void prepareForWrite() {
         super.prepareForWrite();
-        maxOrdinal = ordinalMap.maxOrdinal();
 
+        maxOrdinal = ordinalMap.maxOrdinal();
         gatherShardingStats(maxOrdinal);
         gatherStatistics(numShards != revNumShards);
     }
@@ -191,7 +189,6 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void calculateSnapshot() {
-        maxOrdinal = ordinalMap.maxOrdinal();
         int bitsPerSetFixedLengthPortion = bitsPerSetSizeValue + bitsPerSetPointer;
         
         setPointersAndSizesArray = new FixedLengthElementArray[numShards];
@@ -325,8 +322,6 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
             numShards = this.revNumShards;
             bitsPerSetPointer = this.revBitsPerSetPointer;
         }
-
-        maxOrdinal = ordinalMap.maxOrdinal();
 
         int bitsPerSetFixedLengthPortion = bitsPerSetSizeValue + bitsPerSetPointer;
 
