@@ -74,23 +74,24 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     @Override
     public void prepareForWrite() {
         super.prepareForWrite();
-
-        fieldStats = new FieldStatistics(getSchema());  // SNAP: TODO: also test resharding in tandem with schema change
-
         maxOrdinal = ordinalMap.maxOrdinal();
 
-        gatherStatistics(numShards);
+        gatherFieldStats();
 
         gatherShardingStats(maxOrdinal);
     }
 
-    @Override
-    public void gatherStatistics(int numShards) {
+    private void gatherFieldStats() {
+        fieldStats = new FieldStatistics(getSchema()); // SNAP: TODO: also test resharding in tandem with schema change
         for(int i=0;i<=maxOrdinal;i++) {
             discoverObjectFieldStatisticsForRecord(fieldStats, i);
         }
-
         fieldStats.completeCalculations();
+    }
+
+    @Override
+    public void gatherStatistics(int numShards) {
+        // no ops   // SNAP: TODO: can drop this from abstract class
     }
 
     @Override
@@ -298,51 +299,52 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, boolean isReverse) {
+        throw new UnsupportedOperationException();
 
-        maxOrdinal = ordinalMap.maxOrdinal();
-        int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
-
-        ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
-
-        fixedLengthLongArray = new FixedLengthElementArray[numShards];
-        deltaAddedOrdinals = new ByteDataArray[numShards];
-        deltaRemovedOrdinals = new ByteDataArray[numShards];
-        varLengthByteArrays = new ByteDataArray[numShards][];
-        recordBitOffset = new long[numShards];
-        int numAddedRecordsInShard[] = new int[numShards];
-        
-        int shardMask = numShards - 1;
-        
-        int addedOrdinal = deltaAdditions.nextSetBit(0);
-        while(addedOrdinal != -1) {
-            numAddedRecordsInShard[addedOrdinal & shardMask]++;
-            addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
-        }
-        
-        for(int i=0;i<numShards;i++) {
-            fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numAddedRecordsInShard[i] * numBitsPerRecord);
-            deltaAddedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
-            deltaRemovedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
-            varLengthByteArrays[i] = new ByteDataArray[getSchema().numFields()];
-        }
-
-        int previousRemovedOrdinal[] = new int[numShards];
-        int previousAddedOrdinal[] = new int[numShards];
-
-        for(int i=0;i<=maxOrdinal;i++) {
-            int shardNumber = i & shardMask;
-            if(deltaAdditions.get(i)) {
-                addRecord(i, recordBitOffset[shardNumber], fixedLengthLongArray[shardNumber], varLengthByteArrays[shardNumber]);
-                recordBitOffset[shardNumber] += numBitsPerRecord;
-                int shardOrdinal = i / numShards;
-                VarInt.writeVInt(deltaAddedOrdinals[shardNumber], shardOrdinal - previousAddedOrdinal[shardNumber]);
-                previousAddedOrdinal[shardNumber] = shardOrdinal;
-            } else if(fromCyclePopulated.get(i) && !toCyclePopulated.get(i)) {
-                int shardOrdinal = i / numShards;
-                VarInt.writeVInt(deltaRemovedOrdinals[shardNumber], shardOrdinal - previousRemovedOrdinal[shardNumber]);
-                previousRemovedOrdinal[shardNumber] = shardOrdinal;
-            }
-        }
+//        maxOrdinal = ordinalMap.maxOrdinal();
+//        int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
+//
+//        ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
+//
+//        fixedLengthLongArray = new FixedLengthElementArray[numShards];
+//        deltaAddedOrdinals = new ByteDataArray[numShards];
+//        deltaRemovedOrdinals = new ByteDataArray[numShards];
+//        varLengthByteArrays = new ByteDataArray[numShards][];
+//        recordBitOffset = new long[numShards];
+//        int numAddedRecordsInShard[] = new int[numShards];
+//
+//        int shardMask = numShards - 1;
+//
+//        int addedOrdinal = deltaAdditions.nextSetBit(0);
+//        while(addedOrdinal != -1) {
+//            numAddedRecordsInShard[addedOrdinal & shardMask]++;
+//            addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
+//        }
+//
+//        for(int i=0;i<numShards;i++) {
+//            fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numAddedRecordsInShard[i] * numBitsPerRecord);
+//            deltaAddedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+//            deltaRemovedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
+//            varLengthByteArrays[i] = new ByteDataArray[getSchema().numFields()];
+//        }
+//
+//        int previousRemovedOrdinal[] = new int[numShards];
+//        int previousAddedOrdinal[] = new int[numShards];
+//
+//        for(int i=0;i<=maxOrdinal;i++) {
+//            int shardNumber = i & shardMask;
+//            if(deltaAdditions.get(i)) {
+//                addRecord(i, recordBitOffset[shardNumber], fixedLengthLongArray[shardNumber], varLengthByteArrays[shardNumber]);
+//                recordBitOffset[shardNumber] += numBitsPerRecord;
+//                int shardOrdinal = i / numShards;
+//                VarInt.writeVInt(deltaAddedOrdinals[shardNumber], shardOrdinal - previousAddedOrdinal[shardNumber]);
+//                previousAddedOrdinal[shardNumber] = shardOrdinal;
+//            } else if(fromCyclePopulated.get(i) && !toCyclePopulated.get(i)) {
+//                int shardOrdinal = i / numShards;
+//                VarInt.writeVInt(deltaRemovedOrdinals[shardNumber], shardOrdinal - previousRemovedOrdinal[shardNumber]);
+//                previousRemovedOrdinal[shardNumber] = shardOrdinal;
+//            }
+//        }
     }
 
     @Override
@@ -370,29 +372,30 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void writeCalculatedDelta(DataOutputStream os, boolean isReverse, int[] maxShardOrdinal) throws IOException {
-        boolean numShardsChanged = this.revNumShards != this.numShards;
-        int numShards = this.numShards;
-        if (numShardsChanged && isReverse) {
-            numShards = this.revNumShards;
-        }
-
-        /// for unsharded blobs, support pre v2.1.0 clients
-        if(numShards == 1) {
-            writeCalculatedDeltaShard(os, 0, maxShardOrdinal);
-        } else {
-            /// overall max ordinal
-            VarInt.writeVInt(os, maxOrdinal);
-            
-            for(int i=0;i<numShards;i++) {
-                writeCalculatedDeltaShard(os, i, maxShardOrdinal);
-            }
-        }
-        
-        fixedLengthLongArray = null;
-        varLengthByteArrays = null;
-        deltaAddedOrdinals = null;
-        deltaRemovedOrdinals = null;
-        recordBitOffset = null;
+        throw new IllegalStateException();
+//        boolean numShardsChanged = this.revNumShards != this.numShards;
+//        int numShards = this.numShards;
+//        if (numShardsChanged && isReverse) {
+//            numShards = this.revNumShards;
+//        }
+//
+//        /// for unsharded blobs, support pre v2.1.0 clients
+//        if(numShards == 1) {
+//            writeCalculatedDeltaShard(os, 0, maxShardOrdinal);
+//        } else {
+//            /// overall max ordinal
+//            VarInt.writeVInt(os, maxOrdinal);
+//
+//            for(int i=0;i<numShards;i++) {
+//                writeCalculatedDeltaShard(os, i, maxShardOrdinal);
+//            }
+//        }
+//
+//        fixedLengthLongArray = null;
+//        varLengthByteArrays = null;
+//        deltaAddedOrdinals = null;
+//        deltaRemovedOrdinals = null;
+//        recordBitOffset = null;
     }
 
     private void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber, int[] maxShardOrdinal) throws IOException {

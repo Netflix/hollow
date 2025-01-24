@@ -214,7 +214,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
                     executor.awaitSuccessfulCompletion();
                 } catch (Exception ex) {
-                    throw new HollowWriteStateException("Failed to prepare for write", ex);
+                    throw new HollowWriteStateException("Failed to recompute stats in prep for write", ex);
                 }
             }
             return;

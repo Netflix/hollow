@@ -75,10 +75,9 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     @Override
     public void prepareForWrite() {
         super.prepareForWrite();
-
         maxOrdinal = ordinalMap.maxOrdinal();
-        gatherShardingStats(maxOrdinal);
 
+        gatherShardingStats(maxOrdinal);
         gatherStatistics(numShards);
     }
 

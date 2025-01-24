@@ -80,6 +80,7 @@ public class HollowChecksum {
                 executor.execute(new Runnable() {
                     public void run() {
                         HollowChecksum cksum = typeState.getChecksum(commonSchemasWith);
+                        System.out.println("// SNAP: TODO: " + typeState.getSchema().getName() + " = " + cksum);
                         typeChecksums.addElement(new TypeChecksum(typeState.getSchema().getName(), cksum));
                     }
                 });

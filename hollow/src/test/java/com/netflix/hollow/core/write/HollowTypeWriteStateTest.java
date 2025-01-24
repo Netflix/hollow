@@ -125,9 +125,9 @@ public class HollowTypeWriteStateTest {
         assertEquals(v2, consumer.getCurrentVersionId());
         assertEquals(2, consumer.getStateEngine().getTypeState("Long").numShards()); // all types contain ghost records
         assertEquals(2, consumer.getStateEngine().getTypeState("CustomReferenceType").numShards());
-        assertEquals(8, consumer.getStateEngine().getTypeState("SetOfString").numShards());
-        assertEquals(4, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
-        assertEquals(8, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
+        assertEquals(4, consumer.getStateEngine().getTypeState("SetOfString").numShards());
+        assertEquals(2, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
+        assertEquals(4, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
 
         long v3 = p1.runCycle(ws -> {
             ws.add("A");
@@ -138,9 +138,9 @@ public class HollowTypeWriteStateTest {
         // All types dropped all records, no serialization in delta for these types (irrespective of dynamic type sharding)
         assertEquals(2, consumer.getStateEngine().getTypeState("Long").numShards());
         assertEquals(2, consumer.getStateEngine().getTypeState("CustomReferenceType").numShards());
-        assertEquals(8, consumer.getStateEngine().getTypeState("SetOfString").numShards());
-        assertEquals(4, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
-        assertEquals(8, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
+        assertEquals(4, consumer.getStateEngine().getTypeState("SetOfString").numShards());
+        assertEquals(2, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
+        assertEquals(4, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
 
         long v4 = p1.runCycle(ws -> {
             ws.add("A");
@@ -158,9 +158,9 @@ public class HollowTypeWriteStateTest {
         assertEquals(v4, consumer.getCurrentVersionId());
         assertEquals(2, consumer.getStateEngine().getTypeState("Long").numShards());
         assertEquals(2, consumer.getStateEngine().getTypeState("CustomReferenceType").numShards());
-        assertEquals(8, consumer.getStateEngine().getTypeState("SetOfString").numShards());
-        assertEquals(4, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
-        assertEquals(8, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
+        assertEquals(4, consumer.getStateEngine().getTypeState("SetOfString").numShards());
+        assertEquals(2, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
+        assertEquals(4, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
 
         consumer.triggerRefreshTo(v1);
         HollowChecksum finalChecksum = new HollowChecksum().forStateEngineWithCommonSchemas(consumer.getStateEngine(), consumer.getStateEngine());
