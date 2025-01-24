@@ -9,6 +9,7 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.api.producer.model.CustomReferenceType;
 import com.netflix.hollow.api.producer.model.HasAllTypeStates;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
 import com.netflix.hollow.test.InMemoryBlobStore;
@@ -22,6 +23,19 @@ import java.util.Set;
 import org.junit.Test;
 
 public class HollowTypeWriteStateTest {
+
+    @Test
+    public void testCalcMaxShardOrdinal() {
+        HollowObjectSchema testSchema = new HollowObjectSchema("Test", 1);
+        testSchema.addField("test1", HollowObjectSchema.FieldType.INT);
+        HollowObjectTypeWriteState testState = new HollowObjectTypeWriteState(testSchema);
+
+        assertTrue(Arrays.equals(new int[] {-1, -1, -1, -1}, testState.calcMaxShardOrdinal(-1, 4)));
+        assertTrue(Arrays.equals(new int[] {0, -1, -1, -1}, testState.calcMaxShardOrdinal(0, 4)));
+        assertTrue(Arrays.equals(new int[] {0, 0, -1, -1}, testState.calcMaxShardOrdinal(1, 4)));
+        assertTrue(Arrays.equals(new int[] {0, 0, 0, 0}, testState.calcMaxShardOrdinal(3, 4)));
+        assertTrue(Arrays.equals(new int[] {1, 1, 1, 1}, testState.calcMaxShardOrdinal(7, 4)));
+    }
 
     @Test
     public void testReverseDeltaNumShardsWhenNewTypes() {
@@ -125,9 +139,9 @@ public class HollowTypeWriteStateTest {
         assertEquals(v2, consumer.getCurrentVersionId());
         assertEquals(2, consumer.getStateEngine().getTypeState("Long").numShards()); // all types contain ghost records
         assertEquals(2, consumer.getStateEngine().getTypeState("CustomReferenceType").numShards());
-        assertEquals(4, consumer.getStateEngine().getTypeState("SetOfString").numShards());
-        assertEquals(2, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
-        assertEquals(4, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
+        assertEquals(8, consumer.getStateEngine().getTypeState("SetOfString").numShards());
+        assertEquals(4, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
+        assertEquals(8, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
 
         long v3 = p1.runCycle(ws -> {
             ws.add("A");

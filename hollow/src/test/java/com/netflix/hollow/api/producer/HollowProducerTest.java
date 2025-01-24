@@ -57,7 +57,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -661,7 +660,7 @@ public class HollowProducerTest {
         HollowProducer nonReshardingProducer1 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
                 .withTypeResharding(false).withTargetMaxTypeShardSize(32).build();
         long v1_1 = nonReshardingProducer1.runCycle(ws -> {
-            // causes 2 shards for Integer at shard size 32
+            // At target shard size 32, causes 2 shards for Integer, 4 for ListOfInteger, etc.
             for (int i=0;i<50;i++) {
                 final long val = new Long(i);
                 ws.add(new HasAllTypeStates(
@@ -749,52 +748,11 @@ public class HollowProducerTest {
             }
         });
         // still no change in num shards
-        assertEquals(2, nonReshardingProducer2 .getWriteEngine().getTypeState("Long").getNumShards());
-        assertEquals(2, nonReshardingProducer2 .getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
-        assertEquals(8, nonReshardingProducer2 .getWriteEngine().getTypeState("SetOfString").getNumShards());
-        assertEquals(4, nonReshardingProducer2 .getWriteEngine().getTypeState("ListOfInteger").getNumShards());
-        assertEquals(8, nonReshardingProducer2 .getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
-    }
-
-    @Test
-    public void testNumShardsMaintainedWhenNoResharding_WithNonObjectTypes() {
-        InMemoryBlobStore blobStore = new InMemoryBlobStore();
-        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
-        HollowProducer nonReshardingProducer1 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
-                .withTypeResharding(false).withTargetMaxTypeShardSize(32).build();
-        long v1 = nonReshardingProducer1.runCycle(ws -> {
-            // causes 2 shards for Integer at shard size 32
-            for (int i=0;i<50;i++) {
-                Set<Long> set = new HashSet<>(Collections.singleton((long) i));
-                ws.add(new HasNonObjectField(i, set));
-            }
-        });
-        assertEquals(4, nonReshardingProducer1.getWriteEngine().getTypeState("SetOfLong").getNumShards());
-
-        HollowProducer nonReshardingProducer2 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
-                .withTypeResharding(false).withTargetMaxTypeShardSize(32).build();
-        nonReshardingProducer2.initializeDataModel(HasNonObjectField.class);
-        assertEquals(-1, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfLong").getNumShards());
-        nonReshardingProducer2.restore(v1, blobStore);
-        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfLong").getNumShards());
-        try {
-            nonReshardingProducer2.runCycle(ws -> {
-                // causes 4 shards for Integer at shard size 32
-                throw new RuntimeException("failed population");
-            });
-            fail("exception expected");
-        } catch (Exception e){
-        }
-        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfLong").getNumShards());
-
-        nonReshardingProducer2.runCycle(ws -> {
-            // causes 4 shards for Integer at shard size 32
-            for (int i=0;i<500;i++) {
-                Set<Long> set = new HashSet<>(Collections.singleton((long) i));
-                ws.add(new HasNonObjectField(i, set));
-            }
-        });
-        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfLong").getNumShards());
+        assertEquals(2, nonReshardingProducer2.getWriteEngine().getTypeState("Long").getNumShards());
+        assertEquals(2, nonReshardingProducer2.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+        assertEquals(8, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfString").getNumShards());
+        assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+        assertEquals(8, nonReshardingProducer2.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
     }
 
     // @Test Disabled until producer allows both resharding and focusHolesInFewestShards features

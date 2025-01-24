@@ -152,7 +152,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         return primaryKey == null ? null : primaryKey.fields();
     }
     
-    private static int getNumShardsByAnnotation(Class<?> clazz) {   // SNAP: TODO: can be on non-object types like https://stash.corp.netflix.com/users/sunjeets/repos/hollow/browse/hollow/src/test/java/com/netflix/hollow/api/consumer/FocusedShardHoleFillTest.java#190-191
+    private static int getNumShardsByAnnotation(Class<?> clazz) {
         HollowShardLargeType numShardsAnnotation = clazz.getAnnotation(HollowShardLargeType.class);
         if(numShardsAnnotation != null)
             return numShardsAnnotation.numShards();
