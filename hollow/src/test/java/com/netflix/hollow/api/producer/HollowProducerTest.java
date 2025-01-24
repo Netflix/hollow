@@ -472,16 +472,17 @@ public class HollowProducerTest {
             if (allowResharding) {
                 assertTrue(2 < producer.getWriteEngine().getTypeState("Long").getNumShards());
                 assertTrue(2 < producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+                assertTrue(8 < producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+                assertTrue(4 < producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+                assertTrue(8 < producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
 
             } else {
                 assertEquals(2, producer.getWriteEngine().getTypeState("Long").getNumShards());
                 assertEquals(2, producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
-
+                assertEquals(8, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+                assertEquals(4, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+                assertEquals(8, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
             }
-
-            assertEquals(16, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
-            assertEquals(8, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
-            assertEquals(16, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
 
             producer.runCycle(ws -> {
                 // still same num shards, because ghost records
