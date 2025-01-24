@@ -736,7 +736,6 @@ public class HollowProducerTest {
         assertEquals(8, nonReshardingProducer2.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
 
         nonReshardingProducer2.runCycle(ws -> {
-            // causes 4 shards for Integer at shard size 32
             for (int i=0;i<100;i++) {
                 final long val = new Long(i);
                 ws.add(new HasAllTypeStates(
