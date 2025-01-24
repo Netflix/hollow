@@ -148,7 +148,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         long totalOfSetBuckets = 0;
 
         for(int i=0;i<=maxOrdinal;i++) {
-            if(currentCyclePopulated.get(i) || previousCyclePopulated.get(i)) {  // SNAP: TODO: Fix:  || previousCyclePopulated.get(i) to get consistent behavior for ghost records across object/reference and collection types
+            if(currentCyclePopulated.get(i) || previousCyclePopulated.get(i)) {
                 long pointer = ordinalMap.getPointerForData(i);
                 int size = VarInt.readVInt(data, pointer);
 
