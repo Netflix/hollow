@@ -201,7 +201,6 @@ public class HollowBlobWriter {
             partStreamsByType = partStreams.getStreamsByType();
 
         stateEngine.prepareForWrite();
-        // stateEngine.prepareForWrite(true);   // SNAP: TODO: remove
 
         if(stateEngine.isRestored())
             stateEngine.ensureAllNecessaryStatesRestored();

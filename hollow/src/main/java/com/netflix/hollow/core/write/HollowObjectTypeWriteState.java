@@ -90,11 +90,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     @Override
-    public void gatherStatistics(int numShards) {
-        // no ops   // SNAP: TODO: can drop this from abstract class
-    }
-
-    @Override
     protected int typeStateNumShards(int maxOrdinal) {
         long projectedSizeOfType = ((long)fieldStats.getNumBitsPerRecord() * (maxOrdinal + 1)) / 8;
         projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
@@ -249,55 +244,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     @Override
-    public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards) {
-
-        maxOrdinal = ordinalMap.maxOrdinal();
-        int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
-
-        ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
-
-        fixedLengthLongArray = new FixedLengthElementArray[numShards];
-        deltaAddedOrdinals = new ByteDataArray[numShards];
-        deltaRemovedOrdinals = new ByteDataArray[numShards];
-        varLengthByteArrays = new ByteDataArray[numShards][];
-        recordBitOffset = new long[numShards];
-        int numAddedRecordsInShard[] = new int[numShards];
-
-        int shardMask = numShards - 1;
-
-        int addedOrdinal = deltaAdditions.nextSetBit(0);
-        while(addedOrdinal != -1) {
-            numAddedRecordsInShard[addedOrdinal & shardMask]++;
-            addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
-        }
-
-        for(int i=0;i<numShards;i++) {
-            fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numAddedRecordsInShard[i] * numBitsPerRecord);
-            deltaAddedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
-            deltaRemovedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
-            varLengthByteArrays[i] = new ByteDataArray[getSchema().numFields()];
-        }
-
-        int previousRemovedOrdinal[] = new int[numShards];
-        int previousAddedOrdinal[] = new int[numShards];
-
-        for(int i=0;i<=maxOrdinal;i++) {
-            int shardNumber = i & shardMask;
-            if(deltaAdditions.get(i)) {
-                addRecord(i, recordBitOffset[shardNumber], fixedLengthLongArray[shardNumber], varLengthByteArrays[shardNumber]);
-                recordBitOffset[shardNumber] += numBitsPerRecord;
-                int shardOrdinal = i / numShards;
-                VarInt.writeVInt(deltaAddedOrdinals[shardNumber], shardOrdinal - previousAddedOrdinal[shardNumber]);
-                previousAddedOrdinal[shardNumber] = shardOrdinal;
-            } else if(fromCyclePopulated.get(i) && !toCyclePopulated.get(i)) {
-                int shardOrdinal = i / numShards;
-                VarInt.writeVInt(deltaRemovedOrdinals[shardNumber], shardOrdinal - previousRemovedOrdinal[shardNumber]);
-                previousRemovedOrdinal[shardNumber] = shardOrdinal;
-            }
-        }
-    }
-
-    @Override
     public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, boolean isReverse) {
         int numShards = this.numShards;
         if (isReverse && this.numShards != this.revNumShards) {
@@ -348,29 +294,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
                 previousRemovedOrdinal[shardNumber] = shardOrdinal;
             }
         }
-    }
-
-    @Override
-    public void writeCalculatedDelta(DataOutputStream os, int[] maxShardOrdinal) throws IOException {
-        int numShards = maxShardOrdinal.length;
-
-        /// for unsharded blobs, support pre v2.1.0 clients
-        if(numShards == 1) {
-            writeCalculatedDeltaShard(os, 0, maxShardOrdinal);
-        } else {
-            /// overall max ordinal
-            VarInt.writeVInt(os, maxOrdinal);
-
-            for(int i=0;i<numShards;i++) {
-                writeCalculatedDeltaShard(os, i, maxShardOrdinal);
-            }
-        }
-
-        fixedLengthLongArray = null;
-        varLengthByteArrays = null;
-        deltaAddedOrdinals = null;
-        deltaRemovedOrdinals = null;
-        recordBitOffset = null;
     }
 
     @Override

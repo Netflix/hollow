@@ -157,65 +157,6 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
     }
 
     @Override
-    public void gatherStatistics(int numShards) {
-
-        int maxKeyOrdinal = 0;
-        int maxValueOrdinal = 0;
-
-        int maxMapSize = 0;
-        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
-
-        totalOfMapBuckets = new long[numShards];
-        // SNAP: TOOD: missing revNumShards for approach 1
-
-        for(int i=0;i<=maxOrdinal;i++) {
-            if(currentCyclePopulated.get(i) || previousCyclePopulated.get(i)) {
-                long pointer = ordinalMap.getPointerForData(i);
-                int size = VarInt.readVInt(data, pointer);
-
-                int numBuckets = HashCodes.hashTableSize(size);
-
-                if(size > maxMapSize)
-                    maxMapSize = size;
-
-                pointer += VarInt.sizeOfVInt(size);
-
-                int keyOrdinal = 0;
-
-                for(int j=0;j<size;j++) {
-                    int keyOrdinalDelta = VarInt.readVInt(data, pointer);
-                    pointer += VarInt.sizeOfVInt(keyOrdinalDelta);
-                    int valueOrdinal = VarInt.readVInt(data, pointer);
-                    pointer += VarInt.sizeOfVInt(valueOrdinal);
-
-                    keyOrdinal += keyOrdinalDelta;
-                    if(keyOrdinal > maxKeyOrdinal)
-                        maxKeyOrdinal = keyOrdinal;
-                    if(valueOrdinal > maxValueOrdinal)
-                        maxValueOrdinal = valueOrdinal;
-
-                    pointer += VarInt.nextVLongSize(data, pointer);  /// discard hashed bucket
-                }
-
-                totalOfMapBuckets[i & (numShards-1)] += numBuckets;
-            }
-        }
-
-        long maxShardTotalOfMapBuckets = 0;
-        for(int i=0;i<numShards;i++) {
-            if(totalOfMapBuckets[i] > maxShardTotalOfMapBuckets)
-                maxShardTotalOfMapBuckets = totalOfMapBuckets[i];
-        }
-
-        bitsPerKeyElement = 64 - Long.numberOfLeadingZeros(maxKeyOrdinal + 1);
-        bitsPerValueElement = maxValueOrdinal == 0 ? 1 : 64 - Long.numberOfLeadingZeros(maxValueOrdinal);
-
-        bitsPerMapSizeValue = 64 - Long.numberOfLeadingZeros(maxMapSize);
-
-        bitsPerMapPointer = 64 - Long.numberOfLeadingZeros(maxShardTotalOfMapBuckets);
-    }
-
-    @Override
     protected int typeStateNumShards(int maxOrdinal) {
         int maxKeyOrdinal = 0;
         int maxValueOrdinal = 0;
@@ -406,123 +347,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
             os.writeLong(entryData[shardNumber].get(i));
         }
     }
-
-    @Override
-    public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards) {
-
-        maxOrdinal = ordinalMap.maxOrdinal();
-        int bitsPerMapFixedLengthPortion = bitsPerMapSizeValue + bitsPerMapPointer;
-        int bitsPerMapEntry = bitsPerKeyElement + bitsPerValueElement;
-
-        numMapsInDelta = new int[numShards];
-        numBucketsInDelta = new long[numShards];
-        mapPointersAndSizesArray = new FixedLengthElementArray[numShards];
-        entryData = new FixedLengthElementArray[numShards];
-        deltaAddedOrdinals = new ByteDataArray[numShards];
-        deltaRemovedOrdinals = new ByteDataArray[numShards];
-
-        ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
-
-        int shardMask = numShards - 1;
-
-        int addedOrdinal = deltaAdditions.nextSetBit(0);
-        while(addedOrdinal != -1) {
-            numMapsInDelta[addedOrdinal & shardMask]++;
-            long readPointer = ordinalMap.getPointerForData(addedOrdinal);
-            int size = VarInt.readVInt(ordinalMap.getByteData().getUnderlyingArray(), readPointer);
-            numBucketsInDelta[addedOrdinal & shardMask] += HashCodes.hashTableSize(size);
-
-            addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
-        }
-
-        for(int i=0;i<numShards;i++) {
-            mapPointersAndSizesArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numMapsInDelta[i] * bitsPerMapFixedLengthPortion);
-            entryData[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, numBucketsInDelta[i] * bitsPerMapEntry);
-            deltaAddedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
-            deltaRemovedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
-        }
-
-        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
-
-        int mapCounter[] = new int[numShards];
-        long bucketCounter[] = new long[numShards];
-        int previousRemovedOrdinal[] = new int[numShards];
-        int previousAddedOrdinal[] = new int[numShards];
-
-        HollowWriteStateEnginePrimaryKeyHasher primaryKeyHasher = null;
-
-        if(getSchema().getHashKey() != null) {
-            try {
-                primaryKeyHasher = new HollowWriteStateEnginePrimaryKeyHasher(getSchema().getHashKey(), getStateEngine());
-            } catch (FieldPaths.FieldPathException e) {
-                if (e.error == NOT_BINDABLE) {
-                    LOG.log(Level.WARNING, "Failed to create a key hasher for " + getSchema().getHashKey() +
-                            " because a field could not be bound to a type in the state");
-                } else {
-                    throw e;
-                }
-            }
-        }
-
-        for(int ordinal=0;ordinal<=maxOrdinal;ordinal++) {
-            int shardNumber = ordinal & shardMask;
-            if(deltaAdditions.get(ordinal)) {
-                long readPointer = ordinalMap.getPointerForData(ordinal);
-
-                int size = VarInt.readVInt(data, readPointer);
-                readPointer += VarInt.sizeOfVInt(size);
-
-                int numBuckets = HashCodes.hashTableSize(size);
-
-                long endBucketPosition = bucketCounter[shardNumber] + numBuckets;
-
-                mapPointersAndSizesArray[shardNumber].setElementValue((long)bitsPerMapFixedLengthPortion * mapCounter[shardNumber], bitsPerMapPointer, endBucketPosition);
-                mapPointersAndSizesArray[shardNumber].setElementValue(((long)bitsPerMapFixedLengthPortion * mapCounter[shardNumber]) + bitsPerMapPointer, bitsPerMapSizeValue, size);
-
-                int keyElementOrdinal = 0;
-
-                for(int j=0;j<numBuckets;j++) {
-                    entryData[shardNumber].setElementValue((long)bitsPerMapEntry * (bucketCounter[shardNumber] + j), bitsPerKeyElement, (1L << bitsPerKeyElement) - 1);
-                }
-
-                for(int j=0;j<size;j++) {
-                    int keyElementOrdinalDelta = VarInt.readVInt(data, readPointer);
-                    readPointer += VarInt.sizeOfVInt(keyElementOrdinalDelta);
-                    int valueElementOrdinal = VarInt.readVInt(data, readPointer);
-                    readPointer += VarInt.sizeOfVInt(valueElementOrdinal);
-                    int hashedBucket = VarInt.readVInt(data, readPointer);
-                    readPointer += VarInt.sizeOfVInt(hashedBucket);
-
-                    keyElementOrdinal += keyElementOrdinalDelta;
-
-                    if(primaryKeyHasher != null)
-                        hashedBucket = primaryKeyHasher.getRecordHash(keyElementOrdinal) & (numBuckets - 1);
-
-                    while(entryData[shardNumber].getElementValue((long)bitsPerMapEntry * (bucketCounter[shardNumber] + hashedBucket), bitsPerKeyElement) != ((1L << bitsPerKeyElement) - 1)) {
-                        hashedBucket++;
-                        hashedBucket &= (numBuckets - 1);
-                    }
-
-                    long mapEntryBitOffset = (long)bitsPerMapEntry * (bucketCounter[shardNumber] + hashedBucket);
-                    entryData[shardNumber].clearElementValue(mapEntryBitOffset, bitsPerMapEntry);
-                    entryData[shardNumber].setElementValue(mapEntryBitOffset, bitsPerKeyElement, keyElementOrdinal);
-                    entryData[shardNumber].setElementValue(mapEntryBitOffset + bitsPerKeyElement, bitsPerValueElement, valueElementOrdinal);
-                }
-
-                bucketCounter[shardNumber] += numBuckets;
-                mapCounter[shardNumber]++;
-
-                int shardOrdinal = ordinal / numShards;
-                VarInt.writeVInt(deltaAddedOrdinals[shardNumber], shardOrdinal - previousAddedOrdinal[shardNumber]);
-                previousAddedOrdinal[shardNumber] = shardOrdinal;
-            } else if(fromCyclePopulated.get(ordinal) && !toCyclePopulated.get(ordinal)) {
-                int shardOrdinal = ordinal / numShards;
-                VarInt.writeVInt(deltaRemovedOrdinals[shardNumber], shardOrdinal - previousRemovedOrdinal[shardNumber]);
-                previousRemovedOrdinal[shardNumber] = shardOrdinal;
-            }
-        }
-    }
-
+    
     @Override
     public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, boolean isReverse) {
         int numShards = this.numShards;
@@ -643,28 +468,6 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
                 previousRemovedOrdinal[shardNumber] = shardOrdinal;
             }
         }
-    }
-
-    @Override
-    public void writeCalculatedDelta(DataOutputStream os, int[] maxShardOrdinal) throws IOException {
-        int numShards = maxShardOrdinal.length;
-
-        /// for unsharded blobs, support pre v2.1.0 clients
-        if(numShards == 1) {
-            writeCalculatedDeltaShard(os, 0, maxShardOrdinal, bitsPerMapPointer, totalOfMapBuckets);
-        } else {
-            /// overall max ordinal
-            VarInt.writeVInt(os, maxOrdinal);
-
-            for(int i=0;i<numShards;i++) {
-                writeCalculatedDeltaShard(os, i, maxShardOrdinal, bitsPerMapPointer, totalOfMapBuckets);
-            }
-        }
-
-        mapPointersAndSizesArray = null;
-        entryData = null;
-        deltaAddedOrdinals = null;
-        deltaRemovedOrdinals = null;
     }
 
     @Override

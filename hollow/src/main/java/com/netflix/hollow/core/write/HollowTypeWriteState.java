@@ -313,8 +313,6 @@ public abstract class HollowTypeWriteState {
         wroteData = true;
     }
 
-    public abstract void gatherStatistics(int numShards);
-    
     public boolean hasChangedSinceLastCycle() {
         return !currentCyclePopulated.equals(previousCyclePopulated);
     }
@@ -349,11 +347,7 @@ public abstract class HollowTypeWriteState {
         // writeCalculatedDelta(dos, revMaxShardOrdinal);
     }
 
-    public abstract void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, int numShards);
-
     public abstract void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, boolean isReverse);
-
-    public abstract void writeCalculatedDelta(DataOutputStream os, int[] maxShardOrdinal) throws IOException;
 
     public abstract void writeCalculatedDelta(DataOutputStream os, boolean isReverse, int[] maxShardOrdinal) throws IOException;
 

@@ -217,55 +217,6 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         preparedForNextCycle = false;
     }
 
-    public void prepareForWrite(boolean recomputeStats) {   // SNAP: TODO: remove
-
-        if(!preparedForNextCycle) {
-            if (recomputeStats) {   // already prepared for write but stats needs to be recomputed (when reverse delta has different num shards)
-                try {
-                    SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "prepare-for-write-stats");
-
-                    for (final Map.Entry<String, HollowTypeWriteState> typeStateEntry : writeStates.entrySet()) {
-                        // if numShardsChanged
-                        if (typeStateEntry.getValue().getNumShards() != typeStateEntry.getValue().getRevNumShards()) {
-                            executor.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    typeStateEntry.getValue().gatherStatistics(typeStateEntry.getValue().getRevNumShards()); // SNAP: TODO: approach 2
-                                }
-                            });
-                        }
-                    }
-
-                    executor.awaitSuccessfulCompletion();
-                } catch (Exception ex) {
-                    throw new HollowWriteStateException("Failed to recompute stats in prep for write", ex);
-                }
-            }
-            return;
-        }
-
-        addTypeNamesWithDefinedHashCodesToHeader();
-
-        try {
-            SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "prepare-for-write");
-
-            for(final Map.Entry<String, HollowTypeWriteState> typeStateEntry : writeStates.entrySet()) {
-                executor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        typeStateEntry.getValue().prepareForWrite();
-                    }
-                });
-            }
-
-            executor.awaitSuccessfulCompletion();
-        } catch(Exception ex) {
-            throw new HollowWriteStateException("Failed to prepare for write", ex);
-        }
-
-        preparedForNextCycle = false;
-    }
-
     /**
      * Transition from the "writing" phase of a cycle to the "adding records" phase of the next cycle.
      */
