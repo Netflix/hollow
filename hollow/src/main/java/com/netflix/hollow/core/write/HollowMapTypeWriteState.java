@@ -163,7 +163,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
         long totalOfMapBuckets = 0;
         
         for(int i=0;i<=maxOrdinal;i++) {
-            if(currentCyclePopulated.get(i)) {
+            if(currentCyclePopulated.get(i) || previousCyclePopulated.get(i)) {
                 long pointer = ordinalMap.getPointerForData(i);
                 int size = VarInt.readVInt(data, pointer);
 

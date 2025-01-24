@@ -436,7 +436,7 @@ public class HollowProducerTest {
             HollowProducer producer = producerBuilder.withTargetMaxTypeShardSize(32).build();
             producer.initializeDataModel(HasAllTypeStates.class);
             producer.runCycle(ws -> {
-                // causes 2 shards for Integer at shard size 32
+                // At shard size 32 results in 2 shards for Integer, 4 for ListOfInteger, etc.
                 for (int i=0;i<50;i++) {
                     final long val = new Long(i);
                     Set<String> set = new HashSet<>(Arrays.asList("e" + val));
@@ -458,7 +458,7 @@ public class HollowProducerTest {
 
             producer.runCycle(ws -> {
 
-                // 1x the data, causes more num shards at same shard size
+                // 2x the data, causes more num shards at same shard size if resharding is enabled
                 for (int i=0;i<100;i++) {
                     final long val = new Long(i);
                     ws.add(new HasAllTypeStates(
@@ -496,6 +496,21 @@ public class HollowProducerTest {
                     ));
                 }
             });
+            if (allowResharding) {
+                assertTrue(2 < producer.getWriteEngine().getTypeState("Long").getNumShards());
+                assertTrue(2 < producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+                assertTrue(8 < producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+                assertTrue(4 < producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+                assertTrue(8 < producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
+
+            } else {
+                assertEquals(2, producer.getWriteEngine().getTypeState("Long").getNumShards());
+                assertEquals(2, producer.getWriteEngine().getTypeState("CustomReferenceType").getNumShards());
+                assertEquals(8, producer.getWriteEngine().getTypeState("SetOfString").getNumShards());
+                assertEquals(4, producer.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
+                assertEquals(8, producer.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
+            }
+
             producer.runCycle(ws -> {
                 // back to original shard count
                 for (int i=0;i<49;i++) {    // one change in runCycle
