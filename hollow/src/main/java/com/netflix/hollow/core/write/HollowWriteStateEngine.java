@@ -186,13 +186,13 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         }
     }
 
-    public void prepareForWrite() {
-        prepareForWrite(false);
-    }
-
     /**
      * Transition from the "adding records" phase of a cycle to the "writing" phase of a cycle.
      */
+    public void prepareForWrite() { // SNAP: TODO: implement the selection of true/false
+        prepareForWrite(false);
+    }
+
     public void prepareForWrite(boolean recomputeStats) {
 
         if(!preparedForNextCycle) {
