@@ -73,7 +73,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
         maxOrdinal = ordinalMap.maxOrdinal();
         gatherShardingStats(maxOrdinal);
 
-        gatherStatistics(numShards);
+        gatherStatistics(numShards != revNumShards);
     }
 
     private void gatherStatistics(boolean numShardsChanged) {
@@ -351,12 +351,11 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void calculateDelta(ThreadSafeBitSet fromCyclePopulated, ThreadSafeBitSet toCyclePopulated, boolean isReverse) {
-        boolean numShardsChanged = this.revNumShards != this.numShards;
         int numShards = this.numShards;
-        long[] totalOfListSizes = this.totalOfListSizes;
-        if (numShardsChanged && isReverse) {
+        int bitsPerListPointer = this.bitsPerListPointer;
+        if (isReverse && this.numShards != this.revNumShards) {
             numShards = this.revNumShards;
-            totalOfListSizes = this.revTotalOfListSizes;
+            bitsPerListPointer = this.revBitsPerListPointer;
         }
 
         maxOrdinal = ordinalMap.maxOrdinal();
@@ -431,13 +430,13 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
 
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
-            writeCalculatedDeltaShard(os, 0, maxShardOrdinal);
+            writeCalculatedDeltaShard(os, 0, maxShardOrdinal, bitsPerListPointer, totalOfListSizes);
         } else {
             /// overall max ordinal
             VarInt.writeVInt(os, maxOrdinal);
 
             for(int i=0;i<numShards;i++) {
-                writeCalculatedDeltaShard(os, i, maxShardOrdinal);
+                writeCalculatedDeltaShard(os, i, maxShardOrdinal, bitsPerListPointer, totalOfListSizes);
             }
         }
 
@@ -449,23 +448,25 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
 
     @Override
     public void writeCalculatedDelta(DataOutputStream os, boolean isReverse, int[] maxShardOrdinal) throws IOException {
-        boolean numShardsChanged = this.revNumShards != this.numShards;
         int numShards = this.numShards;
+        int bitsPerListPointer = this.bitsPerListPointer;
         long[] totalOfListSizes = this.totalOfListSizes;
-        if (numShardsChanged && isReverse) {
+        if (isReverse && this.numShards != this.revNumShards) {
             numShards = this.revNumShards;
+            bitsPerListPointer = this.revBitsPerListPointer;
             totalOfListSizes = this.revTotalOfListSizes;
         }
 
+
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
-            writeCalculatedDeltaShard(os, 0, maxShardOrdinal);
+            writeCalculatedDeltaShard(os, 0, maxShardOrdinal, bitsPerListPointer, totalOfListSizes);
         } else {
             /// overall max ordinal
             VarInt.writeVInt(os, maxOrdinal);
             
             for(int i=0;i<numShards;i++) {
-                writeCalculatedDeltaShard(os, i, maxShardOrdinal);
+                writeCalculatedDeltaShard(os, i, maxShardOrdinal, bitsPerListPointer, totalOfListSizes);
             }
         }
 
@@ -476,7 +477,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     }
 
 
-    private void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber, int[] maxShardOrdinal) throws IOException {
+    private void writeCalculatedDeltaShard(DataOutputStream os, int shardNumber, int[] maxShardOrdinal, int bitsPerListPointer, long[] totalOfListSizes) throws IOException {
         /// 1) max shard ordinal
         VarInt.writeVInt(os, maxShardOrdinal[shardNumber]);
 

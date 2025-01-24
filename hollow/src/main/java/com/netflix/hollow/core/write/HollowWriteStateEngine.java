@@ -189,11 +189,35 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     /**
      * Transition from the "adding records" phase of a cycle to the "writing" phase of a cycle.
      */
-    public void prepareForWrite() { // SNAP: TODO: implement the selection of true/false
-        prepareForWrite(false);
+    public void prepareForWrite() {
+
+        if(!preparedForNextCycle) {
+            return;
+        }
+
+        addTypeNamesWithDefinedHashCodesToHeader();
+
+        try {
+            SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "prepare-for-write");
+
+            for(final Map.Entry<String, HollowTypeWriteState> typeStateEntry : writeStates.entrySet()) {
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        typeStateEntry.getValue().prepareForWrite();
+                    }
+                });
+            }
+
+            executor.awaitSuccessfulCompletion();
+        } catch(Exception ex) {
+            throw new HollowWriteStateException("Failed to prepare for write", ex);
+        }
+
+        preparedForNextCycle = false;
     }
 
-    public void prepareForWrite(boolean recomputeStats) {
+    public void prepareForWrite(boolean recomputeStats) {   // SNAP: TODO: remove
 
         if(!preparedForNextCycle) {
             if (recomputeStats) {   // already prepared for write but stats needs to be recomputed (when reverse delta has different num shards)
