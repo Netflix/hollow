@@ -107,6 +107,6 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
 
 //    @Test
 //    public void testLopsidedShards() {
-//      // TODO: implement when producer supports enabling type sharding for Map types
+//      // SNAP: TODO: implement when producer supports enabling type sharding for Map types
 //    }
 }

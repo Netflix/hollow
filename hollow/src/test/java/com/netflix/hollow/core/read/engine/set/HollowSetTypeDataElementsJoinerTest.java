@@ -3,6 +3,14 @@ package com.netflix.hollow.core.read.engine.set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.producer.HollowProducer;
+import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowSetWriteRecord;
+import com.netflix.hollow.test.InMemoryBlobStore;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -98,8 +106,101 @@ public class HollowSetTypeDataElementsJoinerTest extends AbstractHollowSetTypeDa
         assertEquals(setOfBigVals, bigValsJoined);
     }
 
-//    @Test
-//    public void testLopsidedShards() {
-//      // TODO: implement when producer supports enabling type sharding for Set types
-//    }
+    // tests data integrity and delta chain traversal when re-sharding in the presence of lopsided shards (different maxOrdinals)
+    @Test
+    public void testLopsidedShards() throws IOException {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowProducer p = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withTypeResharding(true)
+                .build();
+
+        p.initializeDataModel(setSchema, schema);
+        int targetSize = 16;
+        p.getWriteEngine().setTargetMaxTypeShardSize(targetSize);
+        long v1 = oneRunCycle(p, new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}});
+
+        HollowConsumer c = HollowConsumer
+                .withBlobRetriever(blobStore)
+                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+                    @Override
+                    public boolean allowDoubleSnapshot() {
+                        return false;
+                    }
+
+                    @Override
+                    public int maxDeltasBeforeDoubleSnapshot() {
+                        return Integer.MAX_VALUE;
+                    }
+                })
+                .withSkipTypeShardUpdateWithNoAdditions()
+                .build();
+        c.triggerRefreshTo(v1);
+
+        assertEquals(2, c.getStateEngine().getTypeState("TestSet").numShards()); // shard[0] maxOrdinal 5, shard[1] maxOrdinal 4
+        assertEquals(5, c.getStateEngine().getTypeState("TestSet").getShardsVolatile().getShards()[0].getDataElements().maxOrdinal);
+        assertEquals(4, c.getStateEngine().getTypeState("TestSet").getShardsVolatile().getShards()[1].getDataElements().maxOrdinal);
+        assertEquals(true, c.getStateEngine().isSkipTypeShardUpdateWithNoAdditions());
+
+        long v2 = oneRunCycle(p, new int[][] {{0}, {1}, {3}, {5}, {7}, {9}});
+        c.triggerRefreshTo(v2);
+        assertEquals(5, c.getStateEngine().getTypeState("TestSet").getShardsVolatile().getShards()[0].getDataElements().maxOrdinal);
+        assertEquals(4, c.getStateEngine().getTypeState("TestSet").getShardsVolatile().getShards()[1].getDataElements().maxOrdinal);
+        assertEquals(6, c.getStateEngine().getTypeState("TestSet").getPopulatedOrdinals().cardinality());
+        assertEquals(2, c.getStateEngine().getTypeState("TestSet").numShards()); // ghost records accounted for in shard size, shards not joined yet
+
+        // v2 snapshot was also serialized with same numShards as delta
+        HollowReadStateEngine testSnapshot = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(testSnapshot);
+        reader.readSnapshot(blobStore.retrieveSnapshotBlob(v2).getInputStream());
+        assertEquals(c.getStateEngine().getTypeState("TestSet").numShards(), testSnapshot.getTypeState("TestSet").numShards());
+
+        long v3 = oneRunCycle(p, new int[][] {{0}, {1}, {3}, {5}, {7}, {9}, {11}}); // {2} is a ghost
+        c.triggerRefreshTo(v3);
+        assertEquals(1, c.getStateEngine().getTypeState("TestSet").numShards());
+        assertDataUnchanged((HollowSetTypeReadState) c.getStateEngine().getTypeState("TestSet"), new int[][] {{0}, {1}, {3}, {5}, {7}, {9}, {11}});
+
+        long v4 = oneRunCycle(p, new int[][] {{0}, {1}, {3}});
+        c.triggerRefreshTo(v4);
+        assertDataUnchanged((HollowSetTypeReadState) c.getStateEngine().getTypeState("TestSet"), new int[][] {{0}, {1}, {3}});
+
+        c.triggerRefreshTo(v3);
+        assertDataUnchanged((HollowSetTypeReadState) c.getStateEngine().getTypeState("TestSet"), new int[][] {{0}, {1}, {3}, {5}, {7}, {9}, {11}});
+
+        c.triggerRefreshTo(v2);
+        assertDataUnchanged((HollowSetTypeReadState) c.getStateEngine().getTypeState("TestSet"), new int[][] {{0}, {1}, {3}, {5}, {7}, {9}});
+        assertEquals(2, c.getStateEngine().getTypeState("TestSet").numShards());
+
+        c.triggerRefreshTo(v4);
+        assertDataUnchanged((HollowSetTypeReadState) c.getStateEngine().getTypeState("TestSet"), new int[][] {{0}, {1}, {3}});
+    }
+
+    private long oneRunCycle(HollowProducer p, int setContents[][]) {
+        return p.runCycle(state -> {
+            int maxElement = -1;
+            for(int[] set : setContents) {
+                for(int element : set) {
+                    if (element > maxElement) {
+                        maxElement = element;
+                    }
+                }
+            }
+            for(int i=0; i<=maxElement; i++) {
+                HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+                rec.setLong("longField", i);
+                rec.setString("stringField", "Value" + i);
+                rec.setInt("intField", i);
+                rec.setDouble("doubleField", i);
+
+                state.getStateEngine().add("TestObject", rec);
+            }
+            for(int[] set : setContents) {
+                HollowSetWriteRecord rec = new HollowSetWriteRecord();
+                for (int ordinal : set) {
+                    rec.addElement(ordinal);
+                }
+                state.getStateEngine().add("TestSet", rec);
+            }
+        });
+    }
 }

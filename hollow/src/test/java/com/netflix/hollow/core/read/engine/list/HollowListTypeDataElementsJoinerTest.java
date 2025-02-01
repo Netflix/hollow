@@ -86,6 +86,6 @@ public class HollowListTypeDataElementsJoinerTest extends AbstractHollowListType
 
 //    @Test
 //    public void testLopsidedShards() {
-//      // TODO: implement when producer allows enabling type sharding for List types
+//      // SNAP: TODO: implement when producer allows enabling type sharding for List types
 //    }
 }
