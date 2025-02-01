@@ -92,6 +92,22 @@ public class HollowAPI {
 
         return sampleResults;
     }
+    public List<SampleResult> getSampleResults(List<HollowTypeAPI> typeAPIs, String typeOfResult){
+        List<SampleResult> results = new ArrayList<>();
+        SampleResultsRetrival retrival = new SampleResultsRetrival();
+        switch(typeOfResult){
+            case "Access":
+                results = retrival.getAccessSampleResults(typeAPIs);
+                break;
+            case "Boxed":
+                results = retrival.getBoxedSampleResults(typeAPIs);
+                break;
+            default:
+                break;
+
+        }
+        return results;
+    }
 
     public void detachCaches() { }
 
