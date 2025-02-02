@@ -176,6 +176,91 @@ public class HollowSetTypeDataElementsJoinerTest extends AbstractHollowSetTypeDa
         assertDataUnchanged((HollowSetTypeReadState) c.getStateEngine().getTypeState("TestSet"), new int[][] {{0}, {1}, {3}});
     }
 
+    @Test
+    public void testLopsidedStatsShards() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowProducer p = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withTypeResharding(true)
+                .build();
+
+        p.initializeDataModel(setSchema, schema);
+        int targetSize = 16;
+        p.getWriteEngine().setTargetMaxTypeShardSize(targetSize);
+        long v1 = oneRunCycle(p, new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}});
+
+        HollowConsumer c = HollowConsumer
+                .withBlobRetriever(blobStore)
+                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+                    @Override
+                    public boolean allowDoubleSnapshot() {
+                        return false;
+                    }
+
+                    @Override
+                    public int maxDeltasBeforeDoubleSnapshot() {
+                        return Integer.MAX_VALUE;
+                    }
+                })
+                .withSkipTypeShardUpdateWithNoAdditions()
+                .build();
+        c.triggerRefreshTo(v1);
+
+        assertEquals(2, c.getStateEngine().getTypeState("TestSet").numShards());
+        assertEquals(true, c.getStateEngine().isSkipTypeShardUpdateWithNoAdditions());
+        HollowSetTypeDataElements dataElements0 = (HollowSetTypeDataElements) c.getStateEngine().getTypeState("TestSet").getShardsVolatile().getShards()[0].getDataElements();
+        HollowSetTypeDataElements dataElements1 = (HollowSetTypeDataElements) c.getStateEngine().getTypeState("TestSet").getShardsVolatile().getShards()[1].getDataElements();
+        assertEquals(4, dataElements0.bitsPerElement);
+        assertEquals(4, dataElements0.bitsPerSetPointer);
+        assertEquals(1, dataElements0.bitsPerSetSizeValue);
+        assertEquals(5, dataElements0.bitsPerFixedLengthSetPortion);
+        assertEquals(15, dataElements0.emptyBucketValue);
+        assertEquals(4, dataElements1.bitsPerElement); // shards have similar stats
+        assertEquals(4, dataElements1.bitsPerSetPointer);
+        assertEquals(1, dataElements1.bitsPerSetSizeValue);
+        assertEquals(5, dataElements1.bitsPerFixedLengthSetPortion);
+        assertEquals(15, dataElements1.emptyBucketValue);
+
+        long v2 = oneRunCycle(p, new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {1, 2, 3, 16}});
+        c.triggerRefreshTo(v2);
+        assertEquals(2, c.getStateEngine().getTypeState("TestSet").numShards());
+        dataElements0 = (HollowSetTypeDataElements) c.getStateEngine().getTypeState("TestSet").getShardsVolatile().getShards()[0].getDataElements();
+        dataElements1 = (HollowSetTypeDataElements) c.getStateEngine().getTypeState("TestSet").getShardsVolatile().getShards()[1].getDataElements();
+
+        assertEquals(5, dataElements0.bitsPerElement);
+        assertEquals(5, dataElements0.bitsPerSetPointer);
+        assertEquals(3, dataElements0.bitsPerSetSizeValue);
+        assertEquals(8, dataElements0.bitsPerFixedLengthSetPortion);
+        assertEquals(31, dataElements0.emptyBucketValue);
+        assertEquals(4, dataElements1.bitsPerElement); // shards have non-similar stats, thanks to withSkipTypeShardUpdateWithNoAdditions
+        assertEquals(4, dataElements1.bitsPerSetPointer);
+        assertEquals(1, dataElements1.bitsPerSetSizeValue);
+        assertEquals(5, dataElements1.bitsPerFixedLengthSetPortion);
+        assertEquals(15, dataElements1.emptyBucketValue);
+
+        long v3 = oneRunCycle(p, new int[][] {{0}, {1}, {1, 2, 3, 16}});
+        c.triggerRefreshTo(v3);
+        assertEquals(2, c.getStateEngine().getTypeState("TestSet").numShards());
+
+        long v4 = oneRunCycle(p, new int[][] {{0}});
+        c.triggerRefreshTo(v4);
+        assertEquals(1, c.getStateEngine().getTypeState("TestSet").numShards());
+        assertDataUnchanged((HollowSetTypeReadState) c.getStateEngine().getTypeState("TestSet"), new int[][] {{0}});
+
+        long v5 = oneRunCycle(p, new int[][] {{0}, {1}, {3}, {1, 2, 3, 16}});
+        c.triggerRefreshTo(v5);
+        assertDataUnchanged((HollowSetTypeReadState) c.getStateEngine().getTypeState("TestSet"), new int[][] {{0}, {1}, {3}, {1, 2, 3, 16}});
+
+        c.triggerRefreshTo(v1);
+        assertDataUnchanged((HollowSetTypeReadState) c.getStateEngine().getTypeState("TestSet"), new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}});
+
+        c.triggerRefreshTo(v2);
+        assertDataUnchanged((HollowSetTypeReadState) c.getStateEngine().getTypeState("TestSet"), new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {1, 2, 3, 16}});
+
+        c.triggerRefreshTo(v5);
+        assertDataUnchanged((HollowSetTypeReadState) c.getStateEngine().getTypeState("TestSet"), new int[][] {{0}, {1}, {3}, {1, 2, 3, 16}});
+    }
+
     private long oneRunCycle(HollowProducer p, int setContents[][]) {
         return p.runCycle(state -> {
             int maxElement = -1;
