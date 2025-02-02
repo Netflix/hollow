@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitJoinTest;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.write.HollowSetTypeWriteState;
@@ -14,7 +15,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.Assert;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -74,7 +74,9 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
 
     protected void assertDataUnchanged(HollowSetTypeReadState typeState, int[][] setContents) {
         int numSetRecords = setContents.length;
-        assertEquals(setContents.length, typeState.getPopulatedOrdinals().cardinality());   // SNAP: TODO: fix
+        if (typeState.getListener(PopulatedOrdinalListener.class) != null) {
+            assertEquals(setContents.length, typeState.getPopulatedOrdinals().cardinality());
+        }
         for(int i=0;i<numSetRecords;i++) {
             Set<Integer> expected = Arrays.stream(setContents[i]).boxed().collect(Collectors.toSet());
             boolean matched = false;

@@ -75,6 +75,7 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         assertEquals(valBig, val1);
     }
 
+    // tests data integrity and delta chain traversal when re-sharding in the presence of lopsided shards (different maxOrdinals)
     @Test
     public void testLopsidedMaxOrdinalShards() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
@@ -127,7 +128,7 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
 
         // assert lopsided shards before join
         assertEquals(2, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[0].dataElements.maxOrdinal);
-        assertEquals(3, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[1].dataElements.maxOrdinal);
+        assertEquals(3, ((HollowObjectTypeReadState) c.getStateEngine().getTypeState("TestObject")).shardsVolatile.shards[1].dataElements.maxOrdinal);  // maxOrdinal is lopsided thanks to withSkipTypeShardUpdateWithNoAdditions
         c.triggerRefreshTo(v5);
         assertEquals(1, c.getStateEngine().getTypeState("TestObject").numShards()); // joined to 1 shard
         readStateEngine = c.getStateEngine();
@@ -153,7 +154,7 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
     }
 
     @Test
-    public void testLopsidedFieldWidthShards() {
+    public void testLopsidedStatsShards() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
         HollowProducer p = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())

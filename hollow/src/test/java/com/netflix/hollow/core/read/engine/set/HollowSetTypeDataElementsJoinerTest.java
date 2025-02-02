@@ -63,6 +63,7 @@ public class HollowSetTypeDataElementsJoinerTest extends AbstractHollowSetTypeDa
         }
     }
 
+    // tests data integrity and delta chain traversal when re-sharding in the presence of lopsided shards (different maxOrdinals)
     @Test
     public void testJoinDifferentFieldWidths() throws IOException {
         HollowSetTypeReadState typeReadStateSmall = populateTypeStateWith(new int[][] {{1}});
@@ -107,7 +108,6 @@ public class HollowSetTypeDataElementsJoinerTest extends AbstractHollowSetTypeDa
     }
 
     // tests data integrity and delta chain traversal when re-sharding in the presence of lopsided shards (different maxOrdinals)
-    // SNAP: TODO: "lopsided" shards refer to different field widths across shards, not different maxOrdinals
     @Test
     public void testLopsidedMaxOrdinalShards() throws IOException {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
