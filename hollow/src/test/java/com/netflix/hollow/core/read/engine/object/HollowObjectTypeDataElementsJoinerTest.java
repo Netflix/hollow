@@ -76,7 +76,7 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
     }
 
     @Test
-    public void testLopsidedShards() {
+    public void testLopsidedMaxOrdinalShards() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
         HollowProducer p = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
@@ -150,6 +150,79 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
 
         c.triggerRefreshTo(v8);
         assertEquals(v8, c.getCurrentVersionId());
+    }
+
+    @Test
+    public void testLopsidedFieldWidthShards() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowProducer p = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withTypeResharding(true)
+                .build();
+
+        p.initializeDataModel(schema);
+        int targetSize = 64;
+        p.getWriteEngine().setTargetMaxTypeShardSize(targetSize);
+        long v1 = oneRunCycle(p, new int[] {0, 1, 4, 5, 6, 7});
+
+        HollowConsumer c = HollowConsumer
+                .withBlobRetriever(blobStore)
+                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+                    @Override
+                    public boolean allowDoubleSnapshot() {
+                        return false;
+                    }
+
+                    @Override
+                    public int maxDeltasBeforeDoubleSnapshot() {
+                        return Integer.MAX_VALUE;
+                    }
+                })
+                .withSkipTypeShardUpdateWithNoAdditions()
+                .build();
+        c.triggerRefreshTo(v1);
+
+        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
+        assertEquals(true, c.getStateEngine().isSkipTypeShardUpdateWithNoAdditions());
+        HollowObjectTypeDataElements dataElements0 = (HollowObjectTypeDataElements) c.getStateEngine().getTypeState("TestObject").getShardsVolatile().getShards()[0].getDataElements();
+        HollowObjectTypeDataElements dataElements1 = (HollowObjectTypeDataElements) c.getStateEngine().getTypeState("TestObject").getShardsVolatile().getShards()[1].getDataElements();
+        assertEquals(4, dataElements0.bitsPerField[0]);
+        assertEquals(4, dataElements1.bitsPerField[0]); // shards have equal bitsPerField
+
+
+        long v2 = oneRunCycle(p, new int[] {0, 1, 5, 7, 8});
+        c.triggerRefreshTo(v2);
+        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
+        dataElements0 = (HollowObjectTypeDataElements) c.getStateEngine().getTypeState("TestObject").getShardsVolatile().getShards()[0].getDataElements();
+        dataElements1 = (HollowObjectTypeDataElements) c.getStateEngine().getTypeState("TestObject").getShardsVolatile().getShards()[1].getDataElements();
+        assertEquals(5, dataElements0.bitsPerField[0]);
+        assertEquals(4, dataElements1.bitsPerField[0]);  // shards have non-equal bitsPerField
+
+        long v3 = oneRunCycle(p, new int[] {8});
+        c.triggerRefreshTo(v3);
+        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
+
+        long v4 = oneRunCycle(p, new int[] {0});
+        c.triggerRefreshTo(v4);
+        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
+        readStateEngine = c.getStateEngine();
+        assertDataUnchanged(0);
+
+        long v5 = oneRunCycle(p, new int[] {0, 1});
+        c.triggerRefreshTo(v5);
+        assertEquals(1, c.getStateEngine().getTypeState("TestObject").numShards()); // joined to 1 shard
+        readStateEngine = c.getStateEngine();
+        assertDataUnchanged(1);
+
+        long v6 = oneRunCycle(p, new int[] {0, 1, 8, 1024});
+        c.triggerRefreshTo(v6);
+        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards()); // split to 2 shards
+        c.triggerRefreshTo(v6);
+        c.triggerRefreshTo(v1);
+        assertEquals(v1, c.getCurrentVersionId());
+        c.triggerRefreshTo(v5);
+        assertEquals(v5, c.getCurrentVersionId());
+        assertDataUnchanged(1);
     }
 
     private long oneRunCycle(HollowProducer p, int recordIds[]) {

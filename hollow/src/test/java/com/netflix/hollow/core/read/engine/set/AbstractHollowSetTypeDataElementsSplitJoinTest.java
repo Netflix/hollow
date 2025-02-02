@@ -74,7 +74,7 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
 
     protected void assertDataUnchanged(HollowSetTypeReadState typeState, int[][] setContents) {
         int numSetRecords = setContents.length;
-        assertEquals(setContents.length, typeState.getPopulatedOrdinals().cardinality());
+        assertEquals(setContents.length, typeState.getPopulatedOrdinals().cardinality());   // SNAP: TODO: fix
         for(int i=0;i<numSetRecords;i++) {
             Set<Integer> expected = Arrays.stream(setContents[i]).boxed().collect(Collectors.toSet());
             boolean matched = false;
