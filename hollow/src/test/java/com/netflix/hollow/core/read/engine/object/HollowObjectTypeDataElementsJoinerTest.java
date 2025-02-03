@@ -153,6 +153,7 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         assertEquals(v8, c.getCurrentVersionId());
     }
 
+    // tests data integrity and delta chain traversal when re-sharding in the presence of lopsided shards (different stats like bitsPerField)
     @Test
     public void testLopsidedStatsShards() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();

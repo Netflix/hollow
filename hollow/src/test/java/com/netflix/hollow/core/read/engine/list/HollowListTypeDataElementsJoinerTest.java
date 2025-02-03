@@ -3,7 +3,12 @@ package com.netflix.hollow.core.read.engine.list;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.producer.HollowProducer;
+import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowSetWriteRecord;
+import com.netflix.hollow.test.InMemoryBlobStore;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -84,8 +89,112 @@ public class HollowListTypeDataElementsJoinerTest extends AbstractHollowListType
         assertEquals(valSmall, val0);
     }
 
-//    @Test
-//    public void testLopsidedShards() {
-//      // SNAP: TODO: implement when producer allows enabling type sharding for List types
-//    }
+    @Test
+    public void testLopsidedStatsShards() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowProducer p = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withTypeResharding(true)
+                .build();
+
+        p.initializeDataModel(listSchema, schema);
+        int targetSize = 16;
+        p.getWriteEngine().setTargetMaxTypeShardSize(targetSize);
+        long v1 = oneRunCycle(p, new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}, {15}});
+
+        HollowConsumer c = HollowConsumer
+                .withBlobRetriever(blobStore)
+                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+                    @Override
+                    public boolean allowDoubleSnapshot() {
+                        return false;
+                    }
+
+                    @Override
+                    public int maxDeltasBeforeDoubleSnapshot() {
+                        return Integer.MAX_VALUE;
+                    }
+                })
+                .withSkipTypeShardUpdateWithNoAdditions()
+                .build();
+        c.triggerRefreshTo(v1);
+
+        assertEquals(2, c.getStateEngine().getTypeState("TestList").numShards());
+        assertEquals(true, c.getStateEngine().isSkipTypeShardUpdateWithNoAdditions());
+        HollowListTypeDataElements dataElements0 = (HollowListTypeDataElements) c.getStateEngine().getTypeState("TestList").getShardsVolatile().getShards()[0].getDataElements();
+        HollowListTypeDataElements dataElements1 = (HollowListTypeDataElements) c.getStateEngine().getTypeState("TestList").getShardsVolatile().getShards()[1].getDataElements();
+        assertEquals(4, dataElements0.bitsPerElement);
+        assertEquals(4, dataElements0.bitsPerListPointer);
+        assertEquals(8, dataElements0.totalNumberOfElements);
+        assertEquals(7, dataElements0.maxOrdinal);
+        assertEquals(4, dataElements1.bitsPerElement); // shards have similar stats
+        assertEquals(4, dataElements1.bitsPerListPointer);
+        assertEquals(8, dataElements1.totalNumberOfElements);
+        assertEquals(7, dataElements1.maxOrdinal);
+
+        long v2 = oneRunCycle(p, new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}, {15}, {16}});
+        c.triggerRefreshTo(v2);
+        assertEquals(2, c.getStateEngine().getTypeState("TestList").numShards());
+        dataElements0 = (HollowListTypeDataElements) c.getStateEngine().getTypeState("TestList").getShardsVolatile().getShards()[0].getDataElements();
+        dataElements1 = (HollowListTypeDataElements) c.getStateEngine().getTypeState("TestList").getShardsVolatile().getShards()[1].getDataElements();
+        assertEquals(5, dataElements0.bitsPerElement);
+        assertEquals(4, dataElements0.bitsPerListPointer);
+        assertEquals(9, dataElements0.totalNumberOfElements);
+        assertEquals(8, dataElements0.maxOrdinal);
+        assertEquals(4, dataElements1.bitsPerElement); // shards have non-similar stats
+        assertEquals(4, dataElements1.bitsPerListPointer);
+        assertEquals(8, dataElements1.totalNumberOfElements);
+        assertEquals(7, dataElements1.maxOrdinal);
+
+        long v3 = oneRunCycle(p, new int[][] {{0}, {1}});
+        c.triggerRefreshTo(v3);
+        assertEquals(2, c.getStateEngine().getTypeState("TestList").numShards());
+
+        long v4 = oneRunCycle(p, new int[][] {{0}});
+        c.triggerRefreshTo(v4);
+        assertEquals(1, c.getStateEngine().getTypeState("TestList").numShards());
+        assertDataUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}});
+
+        long v5 = oneRunCycle(p, new int[][] {{0}, {1}, {2}});
+        c.triggerRefreshTo(v5);
+        assertDataUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}, {1}, {2}});
+
+        c.triggerRefreshTo(v1);
+        assertDataUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}, {15}});
+
+        c.triggerRefreshTo(v2);
+        assertDataUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}, {15}, {16}});
+
+        c.triggerRefreshTo(v5);
+        assertDataUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}, {1}, {2}});
+    }
+
+    private long oneRunCycle(HollowProducer p, int listContents[][]) {
+        return p.runCycle(state -> {
+            int maxElement = -1;
+            for(int[] list : listContents) {
+                for(int element : list) {
+                    if (element > maxElement) {
+                        maxElement = element;
+                    }
+                }
+            }
+            for(int i=0; i<=maxElement; i++) {
+                HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+                rec.setLong("longField", i);
+                rec.setString("stringField", "Value" + i);
+                rec.setInt("intField", i);
+                rec.setDouble("doubleField", i);
+
+                state.getStateEngine().add("TestObject", rec);
+            }
+            for(int[] list : listContents) {
+                HollowSetWriteRecord rec = new HollowSetWriteRecord();
+                for (int ordinal : list) {
+                    rec.addElement(ordinal);
+                }
+                state.getStateEngine().add("TestList", rec);
+            }
+        });
+    }
 }
