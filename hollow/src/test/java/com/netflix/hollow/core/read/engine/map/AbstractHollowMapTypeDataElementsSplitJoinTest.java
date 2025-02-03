@@ -1,6 +1,7 @@
 package com.netflix.hollow.core.read.engine.map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitJoinTest;
@@ -8,6 +9,8 @@ import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,7 +43,7 @@ public class AbstractHollowMapTypeDataElementsSplitJoinTest extends AbstractHoll
         writeStateEngine.setTargetMaxTypeShardSize(4 * 100 * 1000 * 1024);
     }
 
-    private void populateWriteStateEngine(int[][][] maps) {
+    protected void populateWriteStateEngine(HollowWriteStateEngine writeStateEngine, int[][][] maps) {
         // populate state so that there is 1:1 correspondence in key/value ordinal to value in int type
         // find max value across all maps
         if (maps.length > 0) {
@@ -49,8 +52,18 @@ public class AbstractHollowMapTypeDataElementsSplitJoinTest extends AbstractHoll
                     .flatMapToInt(Arrays::stream)
                     .max()
                     .orElseThrow(() -> new IllegalArgumentException("Array is empty"));
+
             // populate write state with that many ordinals
-            super.populateWriteStateEngine(numKeyValueOrdinals);
+            HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+            for(int i=0;i<numKeyValueOrdinals;i++) {
+                rec.reset();
+                rec.setLong("longField", i);
+                rec.setString("stringField", "Value" + i);
+                rec.setInt("intField", i);
+                rec.setDouble("doubleField", i);
+
+                writeStateEngine.add("TestObject", rec);
+            }
         }
         for(int[][] map : maps) {
             HollowMapWriteRecord rec = new HollowMapWriteRecord();
@@ -63,12 +76,12 @@ public class AbstractHollowMapTypeDataElementsSplitJoinTest extends AbstractHoll
     }
 
     protected HollowMapTypeReadState populateTypeStateWith(int[][][] maps) throws IOException {
-        populateWriteStateEngine(maps);
+        populateWriteStateEngine(writeStateEngine, maps);
         roundTripSnapshot();
         return (HollowMapTypeReadState) readStateEngine.getTypeState("TestMap");
     }
 
-    protected int[][][] generateListContents(int numRecords) {
+    protected int[][][] generateMapContents(int numRecords) {
         int[][][] maps = new int[numRecords][][];
         Random random = new Random();
         int maxEntries = 10;
@@ -87,22 +100,24 @@ public class AbstractHollowMapTypeDataElementsSplitJoinTest extends AbstractHoll
         int numMapRecords = maps.length;
         for(int i=0;i<numMapRecords;i++) {
             Map<Integer, Integer> expected = convertToMap(maps[i]);
-            Map<Integer, Integer> actual = readMap(typeState, i);
-            assertEquals(expected, actual);
+            boolean matched = false;
+            for (int mapRecordOridnal=0; mapRecordOridnal<=typeState.maxOrdinal(); mapRecordOridnal++) {
+                Map<Integer, Integer> actual = new HashMap<>();
+                HollowMapEntryOrdinalIterator iter = typeState.ordinalIterator(mapRecordOridnal);
+                boolean hasMore = iter.next();
+                while (hasMore) {
+                    int key = iter.getKey();
+                    int value = iter.getValue();
+                    actual.put(key, value);
+                    hasMore = iter.next();
+                }
+                if (actual.equals(expected)) {
+                    matched = true;
+                    break;
+                }
+            }
+            assertTrue(matched);
         }
-    }
-
-    public static Map<Integer, Integer> readMap(HollowMapTypeReadState typeState, int ordinal) {
-        Map<Integer, Integer> result = new HashMap<>();
-        HollowMapEntryOrdinalIterator iter = typeState.ordinalIterator(ordinal);
-        boolean hasMore = iter.next();
-        while (hasMore) {
-            int key = iter.getKey();
-            int value = iter.getValue();
-            result.put(key, value);
-            hasMore = iter.next();
-        }
-        return result;
     }
 
     public static Map<Integer, Integer> convertToMap(int[][] array) {

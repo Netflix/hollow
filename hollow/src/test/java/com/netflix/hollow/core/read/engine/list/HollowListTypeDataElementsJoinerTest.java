@@ -6,10 +6,17 @@ import static org.junit.Assert.assertTrue;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowSetWriteRecord;
 import com.netflix.hollow.test.InMemoryBlobStore;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -146,27 +153,27 @@ public class HollowListTypeDataElementsJoinerTest extends AbstractHollowListType
         assertEquals(8, dataElements1.totalNumberOfElements);
         assertEquals(7, dataElements1.maxOrdinal);
 
-        long v3 = oneRunCycle(p, new int[][] {{0}, {1}});
+        long v3 = oneRunCycle(p, new int[][] {{0}, {16}});
         c.triggerRefreshTo(v3);
         assertEquals(2, c.getStateEngine().getTypeState("TestList").numShards());
 
         long v4 = oneRunCycle(p, new int[][] {{0}});
         c.triggerRefreshTo(v4);
         assertEquals(1, c.getStateEngine().getTypeState("TestList").numShards());
-        assertDataUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}});
+        assertValuesUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}});
 
-        long v5 = oneRunCycle(p, new int[][] {{0}, {1}, {2}});
+        long v5 = oneRunCycle(p, new int[][] {{0}, {1}, {16}});
         c.triggerRefreshTo(v5);
-        assertDataUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}, {1}, {2}});
+        assertValuesUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}, {1}, {16}});
 
         c.triggerRefreshTo(v1);
-        assertDataUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}, {15}});
+        assertValuesUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}, {15}});
 
         c.triggerRefreshTo(v2);
-        assertDataUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}, {15}, {16}});
+        assertValuesUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}, {15}, {16}});
 
         c.triggerRefreshTo(v5);
-        assertDataUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}, {1}, {2}});
+        assertValuesUnchanged((HollowListTypeReadState) c.getStateEngine().getTypeState("TestList"), new int[][] {{0}, {1}, {16}});
     }
 
     private long oneRunCycle(HollowProducer p, int listContents[][]) {
@@ -196,5 +203,35 @@ public class HollowListTypeDataElementsJoinerTest extends AbstractHollowListType
                 state.getStateEngine().add("TestList", rec);
             }
         });
+    }
+
+    protected void assertValuesUnchanged(HollowListTypeReadState typeState, int[][] listContents) {
+        int numListRecords = listContents.length;
+        if (typeState.getListener(PopulatedOrdinalListener.class) != null) {
+            assertEquals(listContents.length, typeState.getPopulatedOrdinals().cardinality());
+        }
+        for(int i=0;i<numListRecords;i++) {
+            List<Integer> expected = Arrays.stream(listContents[i]).boxed().collect(Collectors.toList());
+            boolean matched = false;
+            List<Integer> actual = null;
+            for (int listRecordOridnal=0; listRecordOridnal<=typeState.maxOrdinal(); listRecordOridnal++) {
+                HollowOrdinalIterator iter = typeState.ordinalIterator(listRecordOridnal);
+                actual = new ArrayList<>();
+                int o = iter.next();
+                while (o != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+                    actual.add(((HollowObjectTypeReadState) typeState.getStateEngine().getTypeState("TestObject")).readInt(o, 2));
+                    o = iter.next();
+                }
+                if (actual.equals(expected)) {
+                    matched = true;
+                    break;
+                }
+            }
+            if (!actual.equals(expected)) {
+                System.out.println("// SNAP: TODO: Remove this and similar");
+            }
+
+            assertTrue(matched);
+        }
     }
 }
