@@ -13,6 +13,19 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
 *#
+<style>
+    .scrollable-column {
+        width: 300px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .scrollable-content {
+        width: 300px;
+        overflow-x: auto;
+    }
+</style>
 
 <table border="1">
     <tr>
@@ -21,7 +34,7 @@
         #foreach($overviewDisplayHeader in $overviewDisplayHeaders)
         	<th>$overviewDisplayHeader</th>
         #end
-        <th>Resharding (dev only)</th>
+        <th class="scrollable-column">Resharding (dev only)</th>
     </tr>
     
     #foreach($overviewRow in $overviewRows)
@@ -41,7 +54,11 @@
                 #end
             #end
             #if ($overviewRow.getReshardingInvocationHeader())
-                <td>$overviewRow.getReshardingInvocationHeader()</td>
+                <td class="scrollable-column">
+                    <div class="scrollable-content">
+                        $overviewRow.getReshardingInvocationHeader()
+                    </div>
+                </td>
             #else
                 <td></td>
             #end

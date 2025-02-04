@@ -1,12 +1,26 @@
 package com.netflix.hollow.diffview;
 
 import static com.netflix.hollow.diffview.FakeHollowHistoryUtil.assertUiParity;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.producer.HollowProducer;
+import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
+import com.netflix.hollow.test.InMemoryBlobStore;
 import com.netflix.hollow.test.consumer.TestBlobRetriever;
 import com.netflix.hollow.test.consumer.TestHollowConsumer;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -264,6 +278,119 @@ public class HollowHistoryUITest {
             historyUIServerExpected.start();
             historyUIServerActual.start();
             historyUIServerActual.join();
+        }
+    }
+
+    @Test
+    public void testDeltaChainWithMultipleReshardingInvocations() throws Exception {
+
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+        int numCycles = 100;
+        int numRecordsMin = 1;
+        long v = 0;
+
+        HollowProducer p = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
+                .withTypeResharding(true).withTargetMaxTypeShardSize(32).build();
+
+        HollowConsumer c = HollowConsumer.withBlobRetriever(blobStore)
+                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+                    @Override
+                    public boolean allowDoubleSnapshot() {
+                        return false;
+                    }
+                    @Override
+                    public int maxDeltasBeforeDoubleSnapshot() {
+                        return Integer.MAX_VALUE;
+                    }
+                })
+                .build();
+
+        long startVersion = 0;
+        Map<String, Set<Integer>> numShardsExercised = new HashMap<>();
+        for (int n = 0; n < numCycles; n ++) {
+            int numRecords = numRecordsMin + new Random().nextInt(100);
+            v = p.runCycle(state -> {
+                for (int i = 0; i < numRecords; i ++) {
+                    final long val = new Long(i);
+                    state.add(new HasAllTypeStates(
+                            new CustomReferenceType(val),
+                            new HashSet<>(Arrays.asList("e" + val)),
+                            Arrays.asList(i),
+                            new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                    ));
+
+                }
+            });
+            if (n == 0)
+                startVersion = v;
+
+            c.triggerRefreshTo(v);
+
+            for (HollowTypeReadState type : c.getStateEngine().getTypeStates()) {
+                String t = type.getSchema().getName();
+                if (!numShardsExercised.containsKey(t)) {
+                    numShardsExercised.put(t, new HashSet<>());
+                }
+                numShardsExercised.get(t).add(new Integer(type.numShards()));
+
+            }
+        }
+        long endVersion = v;
+
+
+        assertEquals(8, numShardsExercised.size());
+        for (HollowTypeReadState type : c.getStateEngine().getTypeStates()) {
+            assertTrue(numShardsExercised.get(type.getSchema().getName()).size() > 1);
+        }
+
+        com.netflix.hollow.history.ui.HollowHistoryUIServer server = new com.netflix.hollow.history.ui.HollowHistoryUIServer(c, 7890);
+        server.start();
+        c.triggerRefreshTo(startVersion);
+        assertEquals(startVersion, c.getCurrentVersionId());
+        c.triggerRefreshTo(endVersion);
+        assertEquals(endVersion, c.getCurrentVersionId());
+        c.triggerRefreshTo(startVersion);
+        assertEquals(startVersion, c.getCurrentVersionId());
+        server.join();
+    }
+
+
+
+    private static class HasNonObjectField {
+        public Integer objectField;
+        public Set<Long> nonObjectField;
+
+        public HasNonObjectField(int objectField, Set<Long> nonObjectField) {
+            this.objectField = objectField;
+            this.nonObjectField = nonObjectField;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @HollowTypeName(name = "TestPojo")
+    private static class TestPojoV1 {
+        public int id;
+        public int v1;
+
+        TestPojoV1(int id, int v1) {
+            super();
+            this.id = id;
+            this.v1 = v1;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @HollowTypeName(name = "TestPojo")
+    private static class TestPojoV2 {
+        int id;
+        int v1;
+        int v2;
+
+        TestPojoV2(int id, int v1, int v2) {
+            this.id = id;
+            this.v1 = v1;
+            this.v2 = v2;
         }
     }
 }

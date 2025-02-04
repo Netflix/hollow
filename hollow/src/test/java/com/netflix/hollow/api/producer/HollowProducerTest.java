@@ -910,16 +910,6 @@ public class HollowProducerTest {
         Assert.assertEquals(sVal, typeState.readString(ordinal, typeState.getSchema().getPosition("strVal")));
     }
 
-    private static class HasNonObjectField {
-        public Integer objectField;
-        public Set<Long> nonObjectField;
-
-        public HasNonObjectField(int objectField, Set<Long> nonObjectField) {
-            this.objectField = objectField;
-            this.nonObjectField = nonObjectField;
-        }
-    }
-
     @SuppressWarnings("unused")
     @HollowTypeName(name = "TestPojo")
     private static class TestPojoV1 {
