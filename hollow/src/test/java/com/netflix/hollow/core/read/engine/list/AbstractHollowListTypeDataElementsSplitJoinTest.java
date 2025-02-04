@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitJoinTest;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.write.HollowListTypeWriteState;
@@ -102,10 +101,6 @@ public class AbstractHollowListTypeDataElementsSplitJoinTest extends AbstractHol
                     break;
                 }
             }
-            if (!actual.equals(expected)) {
-                System.out.println("// SNAP: TODO: Here");
-            }
-
             assertTrue(matched);
         }
     }

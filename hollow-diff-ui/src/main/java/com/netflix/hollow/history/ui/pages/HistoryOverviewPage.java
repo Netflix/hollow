@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.history.ui.pages;
 
+import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED;
+
 import com.google.gson.Gson;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.VersionTimestampConverter;
@@ -75,8 +77,9 @@ public class HistoryOverviewPage extends HistoryPage {
             }
 
             String[] overviewDisplayHeaderValues = getOverviewDisplayHeaderValues(state, ui.getOverviewDisplayHeaders());
+            String reshardingInvocationHeader = getReshardingInvocationTag(state);
 
-            rows.add(new HistoryOverviewRow(VersionTimestampConverter.getTimestamp(state.getVersion(), ui.getTimeZone()), state.getVersion(), totalBreakdown, topLevelChangesByType, overviewDisplayHeaderValues));
+            rows.add(new HistoryOverviewRow(VersionTimestampConverter.getTimestamp(state.getVersion(), ui.getTimeZone()), state.getVersion(), totalBreakdown, topLevelChangesByType, overviewDisplayHeaderValues, reshardingInvocationHeader));
         }
         
         return rows;
@@ -94,6 +97,11 @@ public class HistoryOverviewPage extends HistoryPage {
         }
         
         return values;
+    }
+
+    private String getReshardingInvocationTag(HollowHistoricalState state) {
+        Map<String, String> nextStateHeaders = getNextStateHeaderTags(state);
+        return nextStateHeaders.get(HEADER_TAG_TYPE_RESHARDING_INVOKED);
     }
     
     private Map<String, String> getNextStateHeaderTags(HollowHistoricalState state) {

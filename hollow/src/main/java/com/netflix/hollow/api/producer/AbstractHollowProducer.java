@@ -789,7 +789,6 @@ abstract class AbstractHollowProducer {
 
                     // FIXME: timt: future cycles will fail unless both deltas validate
                     applyDelta(artifacts.delta, current);
-                    System.out.println("// SNAP: TODO: FWD to v" + readStates.pending().getVersion());
                     HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                     //out.format("  CUR => PND %s\n", forwardChecksum);
                     if (!forwardChecksum.equals(pendingChecksum)) {
@@ -797,7 +796,6 @@ abstract class AbstractHollowProducer {
                     }
 
                     applyDelta(artifacts.reverseDelta, pending);
-                    System.out.println("// SNAP: TODO: REV to v" + readStates.current().getVersion());
                     HollowChecksum reverseChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
                     //out.format("  CUR <= PND %s\n", reverseChecksum);
                     if (!reverseChecksum.equals(currentChecksum)) {

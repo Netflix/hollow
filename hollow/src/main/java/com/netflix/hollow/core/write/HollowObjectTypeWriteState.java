@@ -79,7 +79,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     private void gatherFieldStats() {
-        fieldStats = new FieldStatistics(getSchema()); // SNAP: TODO: also test resharding in tandem with schema change
+        fieldStats = new FieldStatistics(getSchema());
         for(int i=0;i<=maxOrdinal;i++) {
             discoverObjectFieldStatisticsForRecord(fieldStats, i);
         }

@@ -153,7 +153,7 @@ public class HollowObjectMapper {
     }
 
     HollowTypeMapper getTypeMapper(
-            Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited) { // SNAP: refactor all to below usage
+            Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited) { // SNAP: TODO: refactor all to below usage
         return getTypeMapper(type, declaredName, hashKeyFieldPaths, numShards, false, visited);
     }
 

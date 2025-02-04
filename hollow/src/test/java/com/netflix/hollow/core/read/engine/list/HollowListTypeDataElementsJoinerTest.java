@@ -227,10 +227,6 @@ public class HollowListTypeDataElementsJoinerTest extends AbstractHollowListType
                     break;
                 }
             }
-            if (!actual.equals(expected)) {
-                System.out.println("// SNAP: TODO: Remove this and similar");
-            }
-
             assertTrue(matched);
         }
     }

@@ -21,6 +21,7 @@
         #foreach($overviewDisplayHeader in $overviewDisplayHeaders)
         	<th>$overviewDisplayHeader</th>
         #end
+        <th>Resharding (dev only)</th>
     </tr>
     
     #foreach($overviewRow in $overviewRows)
@@ -33,7 +34,16 @@
                 </tr></table>
             </td>
             #foreach($headerValue in $overviewRow.getOverviewDisplayHeaderValues())
-            	<td>$headerValue</td>
+                #if ($headerValue)
+                    <td>$headerValue</td>
+                #else
+                    <td></td>
+                #end
+            #end
+            #if ($overviewRow.getReshardingInvocationHeader())
+                <td>$overviewRow.getReshardingInvocationHeader()</td>
+            #else
+                <td></td>
             #end
         </tr>
     #end
