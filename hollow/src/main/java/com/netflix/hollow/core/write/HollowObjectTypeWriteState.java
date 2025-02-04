@@ -194,7 +194,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     public void writeSnapshot(DataOutputStream os) throws IOException {
-        LOG.log(Level.FINE, String.format("Writing snapshot with num shards = %s, revNumShards = %s, max shard ordinals = %s", numShards, revNumShards, Arrays.toString(maxShardOrdinal)));
+        LOG.log(Level.INFO, String.format("Writing snapshot with num shards = %s, revNumShards = %s, max shard ordinals = %s", numShards, revNumShards, Arrays.toString(maxShardOrdinal)));
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
             writeSnapshotShard(os, 0);

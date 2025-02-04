@@ -335,11 +335,13 @@ public abstract class HollowTypeWriteState {
     }
 
     public void writeDelta(DataOutputStream dos) throws IOException {
-        LOG.log(Level.FINE, String.format("Writing delta with num shards = %s, max shard ordinals = %s", numShards, Arrays.toString(maxShardOrdinal)));
+        // SNAP: TODO: remove
+        LOG.log(Level.INFO, String.format("Writing delta with num shards = %s, max shard ordinals = %s", numShards, Arrays.toString(maxShardOrdinal)));
         writeCalculatedDelta(dos, false, maxShardOrdinal);
     }
 
     public void writeReverseDelta(DataOutputStream dos) throws IOException {
+        // SNAP: TODO: remove
         LOG.log(Level.FINE, String.format("Writing reversedelta with num shards = %s, max shard ordinals = %s", revNumShards, Arrays.toString(revMaxShardOrdinal)));
         writeCalculatedDelta(dos, true, revMaxShardOrdinal);
     }
