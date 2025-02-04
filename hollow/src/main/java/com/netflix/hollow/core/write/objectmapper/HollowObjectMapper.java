@@ -17,17 +17,13 @@
 package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.api.objects.HollowRecord;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
-import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordReader;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalObjectNode;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -150,11 +146,6 @@ public class HollowObjectMapper {
 
     HollowTypeMapper getTypeMapper(Type type, String declaredName, String[] hashKeyFieldPaths) {
         return getTypeMapper(type, declaredName, hashKeyFieldPaths, -1, false, null);
-    }
-
-    HollowTypeMapper getTypeMapper(
-            Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited) { // SNAP: TODO: refactor all to below usage
-        return getTypeMapper(type, declaredName, hashKeyFieldPaths, numShards, false, visited);
     }
 
     HollowTypeMapper getTypeMapper(

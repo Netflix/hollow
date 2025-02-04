@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
-import java.util.logging.Logger;
 
 /**
  * A HollowProducer is the top-level class used by producers of Hollow data to populate, publish, and announce data states.
@@ -110,8 +109,6 @@ import java.util.logging.Logger;
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
 public class HollowProducer extends AbstractHollowProducer {
-
-    private static final Logger LOG = Logger.getLogger(HollowProducer.class.getName());
 
     /*
      * HollowProducer and HollowProducer.Incremental extend from a package protected AbstractHollowProducer
@@ -913,14 +910,11 @@ public class HollowProducer extends AbstractHollowProducer {
             if (allowTypeResharding == true && doIntegrityCheck == false) { // type resharding feature rollout
                 throw new IllegalArgumentException("Enabling type re-sharding requires integrity check to also be enabled");
             }
-            if (allowTypeResharding == true) {
-                LOG.info("// SNAP: TODO: type resharding for all types enabled");
-            }
-            // if (allowTypeResharding == true && focusHoleFillInFewestShards == true) { // type re-sharding feature rollout
+            if (allowTypeResharding == true && focusHoleFillInFewestShards == true) { // type re-sharding feature rollout
                 // More thorough testing required before enabling these features to work in tandem
                 // simple test case for when features are allowed to work together passes, see {@code testReshardingWithFocusHoleFillInFewestShards}
-                // SNAP: TODO: throw new IllegalArgumentException("Producer does not yet support using both re-sharding and focusHoleFillInFewestShards features in tandem");
-            // }
+                throw new IllegalArgumentException("Producer does not yet support using both re-sharding and focusHoleFillInFewestShards features in tandem");
+            }
             if (stager != null && compressor != null) {
                 throw new IllegalArgumentException(
                         "Both a custom BlobStager and BlobCompressor were specified -- please specify only one of these.");
