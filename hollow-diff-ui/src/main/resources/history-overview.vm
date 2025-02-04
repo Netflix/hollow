@@ -14,16 +14,23 @@
  *     limitations under the License.
 *#
 <style>
+    .grey-text-border {
+        color: grey; /* Set text color to grey */
+        border: 1px solid grey; /* Set border color to grey */
+    }
+
     .scrollable-column {
         width: 300px;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+        background-color: lightgrey; /* Default grey background */
     }
 
     .scrollable-content {
         width: 300px;
         overflow-x: auto;
+        background-color: lightgrey; /* Grey background for empty columns */
     }
 </style>
 
@@ -34,7 +41,7 @@
         #foreach($overviewDisplayHeader in $overviewDisplayHeaders)
         	<th>$overviewDisplayHeader</th>
         #end
-        <th class="scrollable-column">Resharding (dev only)</th>
+        <th class="scrollable-column grey-text-border">Resharding (dev only)</th>
     </tr>
     
     #foreach($overviewRow in $overviewRows)
@@ -54,7 +61,7 @@
                 #end
             #end
             #if ($overviewRow.getReshardingInvocationHeader())
-                <td class="scrollable-column">
+                <td class="scrollable-column grey-text-border">
                     <div class="scrollable-content">
                         $overviewRow.getReshardingInvocationHeader()
                     </div>
