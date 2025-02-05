@@ -157,7 +157,7 @@ public class HollowChecksum {
         public String toString() {
             return "TypeChecksum{" +
                     "type='" + type + '\'' +
-                    ", checksum=" + checksum +
+                    ", checksum=" + Integer.toHexString(checksum) +
                     '}';
         }
     }

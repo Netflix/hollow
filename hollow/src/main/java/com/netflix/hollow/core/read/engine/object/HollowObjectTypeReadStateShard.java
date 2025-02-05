@@ -244,9 +244,58 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
                         checksum.applyInt(findVarLengthFieldHashCode(startByte, endByte, numBitsForField, fieldIdx));
                     }
                 }
+                // if (withSchema.getName().equals("TestObject")) {
+                //     System.out.println("SNAP: DEBUG: checksum=" + checksum + " ordinal= " + ordinal);
+                // }
             }
 
             ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+        }
+    }
+
+    protected void applyOrdinalToChecksum(HollowChecksum checksum, HollowSchema withSchema, int ordinal, int shardOrdinal) {
+        int numBitsForField;
+        long bitOffset;
+        long endByte;
+        long startByte;
+
+        if(!(withSchema instanceof HollowObjectSchema))
+            throw new IllegalArgumentException("HollowObjectTypeReadState can only calculate checksum with a HollowObjectSchema: " + schema.getName());
+
+        HollowObjectSchema commonSchema = schema.findCommonSchema((HollowObjectSchema)withSchema);
+
+        List<String> commonFieldNames = new ArrayList<String>();
+        for(int i=0;i<commonSchema.numFields();i++)
+            commonFieldNames.add(commonSchema.getFieldName(i));
+        Collections.sort(commonFieldNames);
+
+        int fieldIndexes[] = new int[commonFieldNames.size()];
+        for(int i=0;i<commonFieldNames.size();i++) {
+            fieldIndexes[i] = schema.getPosition(commonFieldNames.get(i));
+        }
+
+        checksum.applyInt(ordinal);
+        for(int i=0;i<fieldIndexes.length;i++) {
+            int fieldIdx = fieldIndexes[i];
+            bitOffset = fieldOffset(shardOrdinal, fieldIdx);
+            numBitsForField = dataElements.bitsPerField[fieldIdx];
+            if(!schema.getFieldType(fieldIdx).isVariableLength()) {
+                long fixedLengthValue = numBitsForField <= 56 ?
+                        dataElements.fixedLengthData.getElementValue(bitOffset, numBitsForField)
+                        : dataElements.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
+
+                if(fixedLengthValue == dataElements.nullValueForField[fieldIdx])
+                    checksum.applyInt(Integer.MAX_VALUE);
+                else
+                    checksum.applyLong(fixedLengthValue);
+            } else {
+                endByte = dataElements.fixedLengthData.getElementValue(bitOffset, numBitsForField);
+                startByte = shardOrdinal != 0 ? dataElements.fixedLengthData.getElementValue(bitOffset - dataElements.bitsPerRecord, numBitsForField) : 0;
+                checksum.applyInt(findVarLengthFieldHashCode(startByte, endByte, numBitsForField, fieldIdx));
+            }
+        }
+        if (withSchema.getName().equals("TestObject")) {
+            System.out.println("SNAP: DEBUG: checksum=" + checksum + " ordinal= " + ordinal);
         }
     }
 

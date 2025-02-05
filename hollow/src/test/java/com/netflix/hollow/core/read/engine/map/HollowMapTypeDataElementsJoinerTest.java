@@ -10,6 +10,7 @@ import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.test.InMemoryBlobStore;
+import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -489,8 +490,39 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
         assertEquals(v3, c.getCurrentVersionId());
     }
 
+    private long oneRunCycleRepro(HollowProducer p, int maps[][][]) {
+        return p.runCycle(state -> {
+            if (maps.length > 0) {
+                int numKeyValueOrdinals = 1 + Arrays.stream(maps)
+                        .flatMap(Arrays::stream)
+                        .flatMapToInt(Arrays::stream)
+                        .max()
+                        .orElseThrow(() -> new IllegalArgumentException("Array is empty"));
+                // populate write state with that many ordinals
+                for(int i=0;i<numKeyValueOrdinals;i++) {
+                    HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schemaRepro);
+                    // rec.setLong("longField", i);
+                    rec.setInt("intField", i);
+
+                    state.getStateEngine().add("TestObject", rec);
+                }
+            }
+            for(int[][] map : maps) {
+                HollowMapWriteRecord rec = new HollowMapWriteRecord();
+                for (int[] entry : map) {
+                    // assertEquals(2, entry.length);    // key value pair  // SNAP: TODO: drop this
+                    //  empty map is supported
+                    if (entry.length == 2) {
+                        rec.addEntry(entry[0], entry[1]);
+                    }
+                }
+                state.getStateEngine().add("TestMap", rec);
+            }
+        });
+    }
+
     @Test
-    public void testSimpleRepro() {
+    public void testSimplestRepro() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
         HollowInMemoryBlobStager inMemoryBlobStager = new HollowInMemoryBlobStager();
         HollowProducer p = HollowProducer.withPublisher(blobStore)
@@ -498,10 +530,10 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
                 .withTypeResharding(true)
                 .build();
 
-        p.initializeDataModel(mapSchema, schema);
+        p.initializeDataModel(schemaRepro, mapSchema);
         int targetSize = 16;
         p.getWriteEngine().setTargetMaxTypeShardSize(targetSize);
-        long v1 = oneRunCycle(p, new int[][][] {
+        long v1 = oneRunCycleRepro(p, new int[][][] {
                 { {1, 1} }
         });
 
@@ -522,15 +554,38 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
         c.triggerRefreshTo(v1);
 
         assertEquals(1, c.getStateEngine().getTypeState("TestMap").numShards());
+        // assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
 
-        long v2 = oneRunCycle(p, new int[][][] {
+        long v2 = oneRunCycleRepro(p, new int[][][] {
                 { {1, 1} },
                 { {1000, 1001}},
         });
         c.triggerRefreshTo(v2);
 
+        HollowChecksum c1 = c.getStateEngine().getTypeState("TestObject").getChecksum(schema);
+        c.triggerRefreshTo(v1);
+        c.triggerRefreshTo(v2);
+        HollowChecksum c2 = c.getStateEngine().getTypeState("TestObject").getChecksum(schema);
+        assertEquals(c1, c2);
 
-        long v3 = oneRunCycle(p, new int[][][] { // SNAP: TODO: INTEGRIY CHECK FAILURE HERE, how can we investigate delta checksum invalid here?
+        System.out.println("Here for snapshot load");
+        HollowConsumer cSnapshot = HollowConsumer
+                .withBlobRetriever(blobStore)
+                .build();
+        cSnapshot.triggerRefreshTo(v2);
+        HollowChecksum cSnapshotCheckSum = cSnapshot.getStateEngine().getTypeState("TestObject").getChecksum(schema);
+        assertEquals(c1, cSnapshotCheckSum);
+        cSnapshot.triggerRefreshTo(v1);
+        cSnapshot.triggerRefreshTo(v2);
+        cSnapshotCheckSum = cSnapshot.getStateEngine().getTypeState("TestObject").getChecksum(schema);
+        assertEquals(c1, cSnapshotCheckSum);
+        System.out.println("Done snapshot checksum comparison");
+
+
+        assertEquals(1, c.getStateEngine().getTypeState("TestMap").numShards());
+        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
+
+        long v3 = oneRunCycleRepro(p, new int[][][] { // SNAP: TODO: no shards being compared should be identical! INTEGRIY CHECK FAILURE HERE, how can we investigate delta checksum invalid here?
                 { {1, 1} },
                 { {1000, 1001}},
                 { {1, 2} }

@@ -68,6 +68,7 @@ public class HollowObjectTypeDataElementsJoiner extends HollowTypeDataElementsJo
             to.bitOffsetPerField[fieldIdx] = to.bitsPerRecord;
             to.bitsPerRecord += to.bitsPerField[fieldIdx];
         }
+        System.out.println("Hi join");
 
         // unused
         //  to.bitsPerUnfilteredField

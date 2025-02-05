@@ -33,6 +33,12 @@ public class AbstractHollowObjectTypeDataElementsSplitJoinTest extends AbstractH
         writeStateEngine.setTargetMaxTypeShardSize(4 * 1000 * 1024);
     }
 
+    protected HollowObjectTypeReadState populateTypeStateWithRepro() throws IOException {
+        populateWriteStateEngineWithRepro();
+        roundTripSnapshot();
+        return (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
+    }
+
     protected HollowObjectTypeReadState populateTypeStateWith(int numRecords) throws IOException {
         populateWriteStateEngine(numRecords);
         roundTripSnapshot();
