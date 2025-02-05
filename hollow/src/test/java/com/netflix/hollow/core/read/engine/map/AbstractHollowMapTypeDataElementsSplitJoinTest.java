@@ -126,8 +126,6 @@ public class AbstractHollowMapTypeDataElementsSplitJoinTest extends AbstractHoll
         for (int[] pair : array) {
             if (pair.length == 2) {
                 map.put(pair[0], pair[1]);
-            } else {
-                throw new IllegalArgumentException("Each sub-array must have exactly 2 elements.");
             }
         }
 

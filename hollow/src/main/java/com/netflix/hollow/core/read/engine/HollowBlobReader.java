@@ -370,7 +370,7 @@ public class HollowBlobReader {
 
         int numShards = readNumShards(in);
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
-        if(typeState != null) {// SNAP: TODO: Object type wasn't serialized in the delta???
+        if(typeState != null) {
             if (shouldReshard(typeState.numShards(), numShards)) {
                 HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(typeState);
                 reshardingStrategy.reshard(typeState, typeState.numShards(), numShards);

@@ -6,13 +6,10 @@ import static org.junit.Assert.assertTrue;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.test.InMemoryBlobStore;
-import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -272,7 +269,6 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
             for(int[][] map : maps) {
                 HollowMapWriteRecord rec = new HollowMapWriteRecord();
                 for (int[] entry : map) {
-                    // assertEquals(2, entry.length);    // key value pair  // SNAP: TODO: drop this
                     //  empty map is supported
                     if (entry.length == 2) {
                         rec.addEntry(entry[0], entry[1]);
@@ -361,124 +357,16 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
         assertEquals(1023, dataElements1.emptyBucketKeyValue);
         assertEquals(6, dataElements1.totalNumberOfBuckets);
 
-        //  SNAP: TODO: later also test with joining shards, but for now simplified to reuse same producer
-//        HollowProducer p2 = HollowProducer.withPublisher(blobStore)
-//                .withBlobStager(inMemoryBlobStager)
-//                .withTypeResharding(true)
-//                .build();
-//
-//        p2.initializeDataModel(mapSchema, schema);
-//        p2.restore(v2, blobStore);
-//        p2.getWriteEngine().setTargetMaxTypeShardSize(1024);
-        HollowProducer p2 = p;
 
-        long v3 = oneRunCycle(p2, new int[][][] {// SNAP: TODO: INTEGRIY CHECK FAILURE HERE, how can we investigate delta checksum invalid here?
-                { {1, 1}, {2, 2}, {3, 3} },
-                { {1, 3}, {2, 1}, {3, 2} },
-                { {} },
-                { {1000, 1001}},
-                { {1, 2}, {1, 3} }
-        });
-        c.triggerRefreshTo(v3);
-        assertEquals(4, c.getStateEngine().getTypeState("TestMap").numShards());
-
-//
-//        long v3 = oneRunCycle(p, new int[][][] {
-//                { {1, 1}, {2, 2}, {3, 3} }
-//        });
-//        c.triggerRefreshTo(v3);
-//        assertEquals(2, c.getStateEngine().getTypeState("TestMap").numShards());
-//        HollowMapTypeReadState typeReadState = (HollowMapTypeReadState) c.getStateEngine().getTypeState("TestMap");
-//        assertDataUnchanged(typeReadState, new int[][][] {
-//                { {1, 1}, {2, 2}, {3, 3} }
-//        });
-//
-//        long v4 = oneRunCycle(p, new int[][][] {
-//                { {1, 1}, {2, 2} }
-//        });
-//        c.triggerRefreshTo(v4);
-//        typeReadState = (HollowMapTypeReadState) c.getStateEngine().getTypeState("TestMap");
-//        assertEquals(1, typeReadState.numShards());
-//        assertDataUnchanged(typeReadState, new int[][][] {
-//                { {1, 1}, {2, 2} }
-//        });
-//
-//        long v5 = oneRunCycle(p, new int[][][] {
-//                { {1, 1}, {2, 2}, {3, 3} },
-//                { {1, 4}, {5, 1}, {13, 2} }
-//        });
-//        c.triggerRefreshTo(v5);
-//        typeReadState = (HollowMapTypeReadState) c.getStateEngine().getTypeState("TestMap");
-//        assertDataUnchanged(typeReadState, new int[][][] {
-//                { {1, 1}, {2, 2}, {3, 3} },
-//                { {1, 4}, {5, 1}, {13, 2} }
-//        });
-//
-//        c.triggerRefreshTo(v1);
-//        assertDataUnchanged((HollowMapTypeReadState) c.getStateEngine().getTypeState("TestMap"), new int[][][] {
-//                { {1, 1}, {2, 2}, {3, 3} },
-//                { {1, 3}, {2, 1}, {3, 2} },
-//        });
-//
-//        c.triggerRefreshTo(v2);
-//        assertDataUnchanged((HollowMapTypeReadState) c.getStateEngine().getTypeState("TestMap"), new int[][][] {
-//                { {1, 1}, {2, 2}, {3, 3} },
-//                { {1, 3}, {2, 1}, {3, 2} },
-//                { {1000, 1001}},
-//        });
-//
-//        c.triggerRefreshTo(v5);
-//        assertDataUnchanged((HollowMapTypeReadState) c.getStateEngine().getTypeState("TestMap"), new int[][][] {
-//                { {1, 1}, {2, 2}, {3, 3} },
-//                { {1, 4}, {5, 1}, {13, 2} }
-//        });
-    }
-
-    @Test
-    public void testEmptyMap_NoResharding() {
-        InMemoryBlobStore blobStore = new InMemoryBlobStore();
-        HollowInMemoryBlobStager inMemoryBlobStager = new HollowInMemoryBlobStager();
-        HollowProducer p = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(inMemoryBlobStager)
-                .build();
-
-        p.initializeDataModel(mapSchema, schema);
-        long v1 = oneRunCycle(p, new int[][][] {
-                { {1, 1}, {2, 2}, {3, 3} },
-                { {1, 3}, {2, 1}, {3, 2} },
-                { {} }
-        });
-
-        HollowConsumer c = HollowConsumer
-                .withBlobRetriever(blobStore)
-                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
-                    @Override
-                    public boolean allowDoubleSnapshot() {
-                        return false;
-                    }
-
-                    @Override
-                    public int maxDeltasBeforeDoubleSnapshot() {
-                        return Integer.MAX_VALUE;
-                    }
-                })
-                .build();
-        c.triggerRefreshTo(v1);
-
-        long v2 = oneRunCycle(p, new int[][][] {
-                { {1, 1}, {2, 2}, {3, 3} },
-                { {1, 3}, {2, 1}, {3, 2} },
-                { {} },
-                { {1000, 1001}},
-        });
-        c.triggerRefreshTo(v2);
-
+        // to join restore on another producer with higher target shard size
         HollowProducer p2 = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(inMemoryBlobStager)
+                .withTypeResharding(true)
                 .build();
 
         p2.initializeDataModel(mapSchema, schema);
         p2.restore(v2, blobStore);
+        p2.getWriteEngine().setTargetMaxTypeShardSize(1024 * 1024);
 
         long v3 = oneRunCycle(p2, new int[][][] {
                 { {1, 1}, {2, 2}, {3, 3} },
@@ -488,8 +376,34 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
                 { {1, 2}, {1, 3} }
         });
         c.triggerRefreshTo(v3);
+        assertEquals(1, c.getStateEngine().getTypeState("TestMap").numShards());
+        assertEquals(4, c.getStateEngine().getTypeState("TestObject").numShards());
+        dataElements0 = (HollowMapTypeDataElements) c.getStateEngine().getTypeState("TestMap").getShardsVolatile().getShards()[0].getDataElements();
+        assertEquals(4, dataElements0.maxOrdinal);  // non-similar stats thanks to withSkipTypeShardUpdateWithNoAdditions
+        assertEquals(4, dataElements0.bitsPerMapPointer);
+        assertEquals(2, dataElements0.bitsPerMapSizeValue);
+        assertEquals(6, dataElements0.bitsPerFixedLengthMapPortion);
+        assertEquals(10, dataElements0.bitsPerKeyElement);
+        assertEquals(10, dataElements0.bitsPerValueElement);
+        assertEquals(20, dataElements0.bitsPerMapEntry);
+        assertEquals(1023, dataElements0.emptyBucketKeyValue);
+        assertEquals(15, dataElements0.totalNumberOfBuckets);
 
-        assertEquals(v3, c.getCurrentVersionId());
+        HollowMapTypeReadState typeReadState = (HollowMapTypeReadState) c.getStateEngine().getTypeState("TestMap");
+        assertDataUnchanged(typeReadState, new int[][][] {
+                { {1, 1}, {2, 2}, {3, 3} },
+                { {1, 3}, {2, 1}, {3, 2} },
+                { {} },
+                { {1000, 1001}},
+                { {1, 2}, {1, 3} }
+        });
+
+        c.triggerRefreshTo(v1);
+        assertDataUnchanged((HollowMapTypeReadState) c.getStateEngine().getTypeState("TestMap"),
+                new int[][][] {
+                        { {1, 1}, {2, 2}, {3, 3} },
+                        { {1, 3}, {2, 1}, {3, 2} },
+                        { {} }
+                });
     }
-
 }

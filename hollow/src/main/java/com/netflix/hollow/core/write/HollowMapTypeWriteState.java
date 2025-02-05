@@ -252,7 +252,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
                 int size = VarInt.readVInt(data, readPointer);
                 readPointer += VarInt.sizeOfVInt(size);
 
-                int numBuckets = HashCodes.hashTableSize(size);// SNAP: TODO: perhaps a unit test for 0 bucket size / empty map split/join
+                int numBuckets = HashCodes.hashTableSize(size);
 
                 mapPointersAndSizesArray[shardNumber].setElementValue(((long)bitsPerMapFixedLengthPortion * shardOrdinal) + bitsPerMapPointer, bitsPerMapSizeValue, size);
 
