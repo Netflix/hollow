@@ -492,34 +492,4 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
         assertEquals(v3, c.getCurrentVersionId());
     }
 
-    private long oneRunCycleRepro(HollowProducer p, int maps[][][]) {
-        return p.runCycle(state -> {
-            if (maps.length > 0) {
-                int numKeyValueOrdinals = 1 + Arrays.stream(maps)
-                        .flatMap(Arrays::stream)
-                        .flatMapToInt(Arrays::stream)
-                        .max()
-                        .orElseThrow(() -> new IllegalArgumentException("Array is empty"));
-                // populate write state with that many ordinals
-                for(int i=0;i<numKeyValueOrdinals;i++) {
-                    HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schemaRepro);
-                    // rec.setLong("longField", i);
-                    rec.setInt("intField", i);
-
-                    state.getStateEngine().add("TestObject", rec);
-                }
-            }
-            for(int[][] map : maps) {
-                HollowMapWriteRecord rec = new HollowMapWriteRecord();
-                for (int[] entry : map) {
-                    // assertEquals(2, entry.length);    // key value pair  // SNAP: TODO: drop this
-                    //  empty map is supported
-                    if (entry.length == 2) {
-                        rec.addEntry(entry[0], entry[1]);
-                    }
-                }
-                state.getStateEngine().add("TestMap", rec);
-            }
-        });
-    }
 }

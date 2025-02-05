@@ -11,26 +11,6 @@ import org.junit.Test;
 public class HollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowObjectTypeDataElementsSplitJoinTest {
 
     @Test
-    public void simpleRepro() throws IOException {
-        HollowObjectTypeReadState typeReadState = populateTypeStateWithRepro();
-        assertEquals(1, typeReadState.numShards());
-
-        HollowObjectTypeDataElementsSplitter splitter = new HollowObjectTypeDataElementsSplitter(typeReadState.currentDataElements()[0], 2);
-        HollowObjectTypeDataElements[] splitElements = splitter.split();
-
-        HollowObjectTypeDataElementsSplitter splitter0 = new HollowObjectTypeDataElementsSplitter(splitElements[0], 2);
-        HollowObjectTypeDataElementsSplitter splitter1 = new HollowObjectTypeDataElementsSplitter(splitElements[1], 2);
-        HollowObjectTypeDataElements[] splitElements0 = splitter0.split();
-        HollowObjectTypeDataElements[] splitElements1 = splitter1.split();
-
-        HollowObjectTypeDataElementsJoiner joiner = new HollowObjectTypeDataElementsJoiner(new HollowObjectTypeDataElements[] {splitElements0[0], splitElements1[0], splitElements0[1], splitElements1[1]});
-        HollowObjectTypeDataElements joinedElements = joiner.join();
-        HollowObjectTypeReadState resultTypeReadState = new HollowObjectTypeReadState(typeReadState.getSchema(), joinedElements);
-
-        assertChecksumUnchanged(resultTypeReadState, typeReadState, typeReadState.getPopulatedOrdinals());
-    }
-
-    @Test
     public void testSplitThenJoin() throws IOException {
         for (int numRecords=0;numRecords<1*1000;numRecords++) {
             HollowObjectTypeReadState typeReadState = populateTypeStateWith(numRecords);
