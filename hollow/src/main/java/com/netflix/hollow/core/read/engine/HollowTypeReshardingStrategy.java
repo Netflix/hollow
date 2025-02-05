@@ -104,7 +104,8 @@ public abstract class HollowTypeReshardingStrategy {
                 // a join of original data elements.
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error in re-sharding", e);
+            throw new RuntimeException(String.format("Failed to reshard %s type %s. Requires a snapshot load to recover from.",
+                    typeState.getSchema().getSchemaType(), typeState.getSchema().getName()), e);
         }
     }
 

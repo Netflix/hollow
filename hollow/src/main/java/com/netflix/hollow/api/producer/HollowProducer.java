@@ -33,6 +33,7 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
+import com.netflix.hollow.tools.checksum.HollowChecksum;
 import com.netflix.hollow.tools.compact.HollowCompactor;
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +43,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.Executor;
 
 /**
@@ -329,8 +331,17 @@ public class HollowProducer extends AbstractHollowProducer {
     public static final class ChecksumValidationException extends IllegalStateException {
         private static final long serialVersionUID = -4399719849669674206L;
 
-        ChecksumValidationException(Blob.Type type) {
-            super(type.name() + " checksum invalid");
+        ChecksumValidationException(Blob.Type blobType, HollowChecksum applied, HollowChecksum pending) {
+            super(blobType.name() + " has invalid checksums: " + differences(applied, pending));
+        }
+
+        // symmetric difference between the 2 sets
+        static String differences(HollowChecksum applied, HollowChecksum pending) {
+            List<HollowChecksum.TypeChecksum> uniqueToApplied = new ArrayList<>(applied.getSortedTypeChecksums());
+            List<HollowChecksum.TypeChecksum> uniqueToPending = new ArrayList<>(pending.getSortedTypeChecksums());
+            uniqueToApplied.removeAll(pending.getSortedTypeChecksums());
+            uniqueToPending.removeAll(applied.getSortedTypeChecksums());
+            return "types unique in the applied state are " + uniqueToApplied + ", and unique in the pending state state=" + uniqueToPending;
         }
     }
     /**

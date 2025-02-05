@@ -776,9 +776,11 @@ abstract class AbstractHollowProducer {
                 HollowReadStateEngine current = readStates.current().getStateEngine();
 
                 log.info("CHECKSUMS");
+                // System.out.println("// SNAP: TODO: current checksum");
                 HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                 log.info("  CUR        " + currentChecksum);
 
+                // System.out.println("// SNAP: TODO: pending checksum");
                 HollowChecksum pendingChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
                 log.info("         PND " + pendingChecksum);
 
@@ -789,17 +791,19 @@ abstract class AbstractHollowProducer {
 
                     // FIXME: timt: future cycles will fail unless both deltas validate
                     applyDelta(artifacts.delta, current);
+
+                    // System.out.println("// SNAP: TODO: applied delta, now the checksum is (should match pending)");
                     HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                     //out.format("  CUR => PND %s\n", forwardChecksum);
                     if (!forwardChecksum.equals(pendingChecksum)) {
-                        throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.DELTA);
+                        throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.DELTA, forwardChecksum, pendingChecksum);
                     }
 
                     applyDelta(artifacts.reverseDelta, pending);
                     HollowChecksum reverseChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
                     //out.format("  CUR <= PND %s\n", reverseChecksum);
                     if (!reverseChecksum.equals(currentChecksum)) {
-                        throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.REVERSE_DELTA);
+                        throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.REVERSE_DELTA, reverseChecksum, currentChecksum);
                     }
                     if (!schemaChangedFromPriorVersion) {
                         // optimization - they have identical schemas, so just swap them

@@ -75,7 +75,7 @@ public class HollowListDeltaTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void testSingleEmptyList() throws IOException {
+    public void testSingleEmptyList() throws IOException {// SNAP: TODO: test for empty list also like testing for empty map
         addRecord();
 
         roundTripSnapshot();
