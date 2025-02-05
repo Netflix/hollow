@@ -44,8 +44,11 @@ import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.write.HollowMapWriteRecord;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.test.InMemoryBlobStore;
@@ -752,6 +755,92 @@ public class HollowProducerTest {
         assertEquals(8, nonReshardingProducer2.getWriteEngine().getTypeState("SetOfString").getNumShards());
         assertEquals(4, nonReshardingProducer2.getWriteEngine().getTypeState("ListOfInteger").getNumShards());
         assertEquals(8, nonReshardingProducer2.getWriteEngine().getTypeState("MapOfStringToLong").getNumShards());
+    }
+
+    // Delta should serialize type with num shard change even if there is no populated ordinal change, this is needed for
+    // consistent num shards across snapshot and delta to a version, and without this producer will fail integrity check.
+    // This can happen for e.g. when ghost records got dropped, or when a large change in type size results in num shards
+    // adjusting over a few cycles
+    @Test
+    public void testChangingNumShardsWithoutChangesInPopulatedOrdinals() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager inMemoryBlobStager = new HollowInMemoryBlobStager();
+        HollowProducer p = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(inMemoryBlobStager)
+                .withTypeResharding(true)
+                .build();
+
+        HollowObjectSchema testObjectSchema = new HollowObjectSchema("TestObject", 1);
+        testObjectSchema.addField("intField", HollowObjectSchema.FieldType.INT);
+        HollowMapSchema testMapSchema = new HollowMapSchema("TestMap", "TestObject", "String", "intField");
+
+        p.initializeDataModel(testObjectSchema, testMapSchema);
+        int targetSize = 16;
+        p.getWriteEngine().setTargetMaxTypeShardSize(targetSize);
+        long v1 = p.runCycle(state -> {
+                for (int i = 0; i <= 1; i++) {
+                    HollowObjectWriteRecord rec = new HollowObjectWriteRecord(testObjectSchema);
+                    rec.setInt("intField", i);
+                    state.getStateEngine().add("TestObject", rec);
+                }
+                HollowMapWriteRecord rec = new HollowMapWriteRecord();
+                rec.addEntry(1, 1);
+                state.getStateEngine().add("TestMap", rec);
+            });
+
+        HollowConsumer c = HollowConsumer
+                .withBlobRetriever(blobStore)
+                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+                    @Override
+                    public boolean allowDoubleSnapshot() {
+                        return false;
+                    }
+                    @Override
+                    public int maxDeltasBeforeDoubleSnapshot() {
+                        return Integer.MAX_VALUE;
+                    }
+                })
+                .build();
+        c.triggerRefreshTo(v1);
+
+        assertEquals(1, c.getStateEngine().getTypeState("TestMap").numShards());
+        assertEquals(1, c.getStateEngine().getTypeState("TestObject").numShards());
+
+        long v2 = p.runCycle(state -> {
+            for (int i=0; i<=1001; i++) {
+                HollowObjectWriteRecord rec = new HollowObjectWriteRecord(testObjectSchema);
+                rec.setInt("intField", i);
+                state.getStateEngine().add("TestObject", rec);
+            }
+            HollowMapWriteRecord rec = new HollowMapWriteRecord();
+            rec.addEntry(1, 1);
+            state.getStateEngine().add("TestMap", rec);
+            rec = new HollowMapWriteRecord();
+            rec.addEntry(1000, 1001);
+            state.getStateEngine().add("TestMap", rec);
+        });
+        c.triggerRefreshTo(v2);
+        assertEquals(1, c.getStateEngine().getTypeState("TestMap").numShards());
+        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
+
+        long v3 = p.runCycle(state -> {
+            for (int i = 0; i <= 1001; i++) {
+                HollowObjectWriteRecord rec = new HollowObjectWriteRecord(testObjectSchema);
+                rec.setInt("intField", i);
+                state.getStateEngine().add("TestObject", rec);
+            }
+            HollowMapWriteRecord rec = new HollowMapWriteRecord();
+            rec.addEntry(1, 1);
+            state.getStateEngine().add("TestMap", rec);
+            rec = new HollowMapWriteRecord();
+            rec.addEntry(1000, 1001);
+            state.getStateEngine().add("TestMap", rec);
+            rec = new HollowMapWriteRecord();
+            rec.addEntry(1, 2);
+            state.getStateEngine().add("TestMap", rec);
+        });
+        c.triggerRefreshTo(v3);
+        assertEquals(v3, c.getCurrentVersionId());
     }
 
     // @Test Disabled until producer allows both resharding and focusHolesInFewestShards features

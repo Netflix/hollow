@@ -315,7 +315,13 @@ public abstract class HollowTypeWriteState {
     }
 
     public boolean hasChangedSinceLastCycle() {
-        return (!currentCyclePopulated.equals(previousCyclePopulated)) || (numShards != revNumShards); // SNAP: TODO: num shards change should be seriallized so consumer can respond (snapshot vs delta consitency, producer integrity check)
+        if (!currentCyclePopulated.equals(previousCyclePopulated)) {
+            return true;
+        }
+        if (numShards != revNumShards) { // see {@code testChangingNumShardsWithoutChangesInPopulatedOrdinals}
+            return true;
+        }
+        return false;
 
     }
     

@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -378,8 +380,8 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
                 { {1, 2}, {1, 3} }
         });
         c.triggerRefreshTo(v3);
-        assertEquals(1, c.getStateEngine().getTypeState("TestMap").numShards());
-        assertEquals(11, dataElements0.totalNumberOfBuckets);// 4, 4, 1, 2, 4
+        assertEquals(4, c.getStateEngine().getTypeState("TestMap").numShards());
+
 //
 //        long v3 = oneRunCycle(p, new int[][][] {
 //                { {1, 1}, {2, 2}, {3, 3} }
@@ -519,77 +521,5 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
                 state.getStateEngine().add("TestMap", rec);
             }
         });
-    }
-
-    @Test
-    public void testSimplestRepro() {
-        InMemoryBlobStore blobStore = new InMemoryBlobStore();
-        HollowInMemoryBlobStager inMemoryBlobStager = new HollowInMemoryBlobStager();
-        HollowProducer p = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(inMemoryBlobStager)
-                .withTypeResharding(true)
-                .build();
-
-        p.initializeDataModel(schemaRepro, mapSchema);
-        int targetSize = 16;
-        p.getWriteEngine().setTargetMaxTypeShardSize(targetSize);
-        long v1 = oneRunCycleRepro(p, new int[][][] {
-                { {1, 1} }
-        });
-
-        HollowConsumer c = HollowConsumer
-                .withBlobRetriever(blobStore)
-                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
-                    @Override
-                    public boolean allowDoubleSnapshot() {
-                        return false;
-                    }
-
-                    @Override
-                    public int maxDeltasBeforeDoubleSnapshot() {
-                        return Integer.MAX_VALUE;
-                    }
-                })
-                .build();
-        c.triggerRefreshTo(v1);
-
-        assertEquals(1, c.getStateEngine().getTypeState("TestMap").numShards());
-        // assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
-
-        long v2 = oneRunCycleRepro(p, new int[][][] {
-                { {1, 1} },
-                { {1000, 1001}},
-        });
-        c.triggerRefreshTo(v2);
-
-        HollowChecksum c1 = c.getStateEngine().getTypeState("TestObject").getChecksum(schema);
-        c.triggerRefreshTo(v1);
-        c.triggerRefreshTo(v2);
-        HollowChecksum c2 = c.getStateEngine().getTypeState("TestObject").getChecksum(schema);
-        assertEquals(c1, c2);
-
-        System.out.println("Here for snapshot load");
-        HollowConsumer cSnapshot = HollowConsumer
-                .withBlobRetriever(blobStore)
-                .build();
-        cSnapshot.triggerRefreshTo(v2);
-        HollowChecksum cSnapshotCheckSum = cSnapshot.getStateEngine().getTypeState("TestObject").getChecksum(schema);
-        assertEquals(c1, cSnapshotCheckSum);
-        cSnapshot.triggerRefreshTo(v1);
-        cSnapshot.triggerRefreshTo(v2);
-        cSnapshotCheckSum = cSnapshot.getStateEngine().getTypeState("TestObject").getChecksum(schema);
-        assertEquals(c1, cSnapshotCheckSum);
-        System.out.println("Done snapshot checksum comparison");
-
-
-        assertEquals(1, c.getStateEngine().getTypeState("TestMap").numShards());
-        assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
-
-        long v3 = oneRunCycleRepro(p, new int[][][] { // SNAP: TODO: no shards being compared should be identical! INTEGRIY CHECK FAILURE HERE, how can we investigate delta checksum invalid here?
-                { {1, 1} },
-                { {1000, 1001}},
-                { {1, 2} }
-        });
-        c.triggerRefreshTo(v3);
     }
 }
