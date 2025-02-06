@@ -553,50 +553,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         if(!(withSchema instanceof HollowObjectSchema))
             throw new IllegalArgumentException("HollowObjectTypeReadState can only calculate checksum with a HollowObjectSchema: " + getSchema().getName());
 
-        // applyToChecksumTemp(checksum, withSchema);
-
-//        HollowChecksum newChecksum = new HollowChecksum();
-//        HollowChecksum oldChecksum = new HollowChecksum();
-//
-//        applyToChecksumTemp(newChecksum, withSchema);
-
         BitSet populatedOrdinals = getPopulatedOrdinals();
-        //if (shards.length == 8) {
-        //    shards[0].applyShardToChecksum(oldChecksum, withSchema, populatedOrdinals, 0, shardNumberMask);
-        //    shards[4].applyShardToChecksum(oldChecksum, withSchema, populatedOrdinals, 4, shardNumberMask);
-        //    shards[2].applyShardToChecksum(oldChecksum, withSchema, populatedOrdinals, 2, shardNumberMask);
-        //    shards[6].applyShardToChecksum(oldChecksum, withSchema, populatedOrdinals, 6, shardNumberMask);
-        //    shards[1].applyShardToChecksum(oldChecksum, withSchema, populatedOrdinals, 1, shardNumberMask);
-        //    shards[5].applyShardToChecksum(oldChecksum, withSchema, populatedOrdinals, 5, shardNumberMask);
-        //    shards[3].applyShardToChecksum(oldChecksum, withSchema, populatedOrdinals, 3, shardNumberMask);
-        //    shards[7].applyShardToChecksum(oldChecksum, withSchema, populatedOrdinals, 7, shardNumberMask);
-        //} else {
-            for (int i = 0; i < shards.length; i++) {
-                shards[i].applyShardToChecksum(checksum, withSchema, populatedOrdinals, i, shardNumberMask);
-            }
-        //}
-
-        // if (!newChecksum.equals(oldChecksum)) {
-        //     System.out.println("We got checksum mismatch here, newChecksum= " + newChecksum + ", oldChecksum= " + oldChecksum);
-        // }
-
-    }
-
-    protected void applyToChecksumTemp(HollowChecksum checksum, HollowSchema withSchema) {
-        final HollowObjectTypeShardsHolder shardsHolder = this.shardsVolatile;
-        final HollowObjectTypeReadStateShard[] shards = shardsHolder.shards;
-        int shardNumberMask = shardsHolder.shardNumberMask;
-        if(!(withSchema instanceof HollowObjectSchema))
-            throw new IllegalArgumentException("HollowObjectTypeReadState can only calculate checksum with a HollowObjectSchema: " + getSchema().getName());
-
-        BitSet populatedOrdinals = getPopulatedOrdinals();
-        int ordinal = populatedOrdinals.nextSetBit(0);
-        while(ordinal != ORDINAL_NONE) {
-            HollowObjectTypeReadStateShard shard = shards[ordinal & shardNumberMask];
-            int shardOrdinal = ordinal >> shard.shardOrdinalShift;
-            shard.applyOrdinalToChecksum(checksum, withSchema, ordinal, shardOrdinal);
-
-            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+        for (int i = 0; i < shards.length; i++) {
+            shards[i].applyShardToChecksum(checksum, withSchema, populatedOrdinals, i, shardNumberMask);
         }
     }
 

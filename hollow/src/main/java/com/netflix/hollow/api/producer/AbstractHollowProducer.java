@@ -779,9 +779,7 @@ abstract class AbstractHollowProducer {
                 HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                 log.info("  CUR        " + currentChecksum);
 
-                System.out.println("Pending checksum begin --- ");
                 HollowChecksum pendingChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
-                System.out.println("Pending checksum end --- ");
                 log.info("         PND " + pendingChecksum);
 
                 if (artifacts.hasDelta()) {
@@ -791,7 +789,6 @@ abstract class AbstractHollowProducer {
 
                     // FIXME: timt: future cycles will fail unless both deltas validate
                     applyDelta(artifacts.delta, current);
-
                     HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                     //out.format("  CUR => PND %s\n", forwardChecksum);
                     if (!forwardChecksum.equals(pendingChecksum)) {
