@@ -1,26 +1,12 @@
 package com.netflix.hollow.diffview;
 
 import static com.netflix.hollow.diffview.FakeHollowHistoryUtil.assertUiParity;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
-import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.producer.HollowProducer;
-import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
-import com.netflix.hollow.core.read.engine.HollowTypeReadState;
-import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
-import com.netflix.hollow.test.InMemoryBlobStore;
 import com.netflix.hollow.test.consumer.TestBlobRetriever;
 import com.netflix.hollow.test.consumer.TestHollowConsumer;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
