@@ -41,10 +41,17 @@ class HollowMapTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Hollo
         }
         to.emptyBucketKeyValue = (1 << to.bitsPerKeyElement) - 1;
 
+        long fromBucketsTotal[] = new long[2];
+        fromBucketsTotal[0] = 0l;
+        fromBucketsTotal[1] = 0l;
+
         long totalOfMapBuckets = 0;
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;
             int fromOrdinal = ordinal >> fromOrdinalShift;
+            if (fromOrdinal > from[fromIndex].maxOrdinal) {
+                continue; // could be lopsided shards resulting from skipping type shards with no additions
+            }
 
             HollowMapTypeDataElements source = from[fromIndex];
 
@@ -53,8 +60,11 @@ class HollowMapTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Hollo
             long numBuckets = endBucket - startBucket;
 
             totalOfMapBuckets += numBuckets;
+            fromBucketsTotal[fromIndex] += numBuckets;
         }
 
+        System.out.println("from[0].totalNumberOfBuckets= " + from[0].totalNumberOfBuckets + ", fromBucketsTotal[0]= " + fromBucketsTotal[0]);// always equal if disabled isSkipTypeWithNoAdditions
+        System.out.println("from[1].totalNumberOfBuckets= " + from[1].totalNumberOfBuckets + ", fromBucketsTotal[1]= " + fromBucketsTotal[1]);
         to.totalNumberOfBuckets = totalOfMapBuckets;
         to.bitsPerMapPointer = 64 - Long.numberOfLeadingZeros(to.totalNumberOfBuckets);
         to.bitsPerFixedLengthMapPortion = to.bitsPerMapSizeValue + to.bitsPerMapPointer;
