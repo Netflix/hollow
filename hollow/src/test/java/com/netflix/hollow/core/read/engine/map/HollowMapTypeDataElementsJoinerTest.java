@@ -345,7 +345,7 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
         assertEquals(10, dataElements0.bitsPerValueElement);
         assertEquals(20, dataElements0.bitsPerMapEntry);
         assertEquals(1023, dataElements0.emptyBucketKeyValue);
-        assertEquals(5, dataElements0.totalNumberOfBuckets);// SNAP: REMEOVE: thumbs up- split carried over the 1 bucket for empty map 4 + 1
+        assertEquals(5, dataElements0.totalNumberOfBuckets);
 
         assertEquals(1, dataElements1.maxOrdinal);
         assertEquals(3, dataElements1.bitsPerMapPointer);

@@ -114,7 +114,6 @@ public class HollowChecksum {
 
         HollowChecksum totalChecksum = new HollowChecksum();
         for(TypeChecksum cksum : typeChecksums) {
-            // System.out.println(" // SNAP: TODO: remove" + cksum.type + "= " + cksum.checksum);
             totalChecksum.applyType(cksum);
         }
 

@@ -61,8 +61,6 @@ public class HollowObjectTypeDataElementsSplitter extends HollowTypeDataElements
                 // to[toIndex].unfilteredFieldIsIncluded = from.unfilteredFieldIsIncluded;
             }
         }
-
-        System.out.println("Hi split");
     }
 
     @Override

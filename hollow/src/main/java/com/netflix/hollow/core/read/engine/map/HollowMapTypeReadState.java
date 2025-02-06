@@ -141,7 +141,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
                     oldRemovals.destroy();
                 } else {
                     if(!deltaData.encodedRemovals.isEmpty()) {
-                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryRecycler);// SNAP: TODO: does this uphold with resharding?
+                        currentData.encodedRemovals = GapEncodedVariableLengthIntegerReader.combine(oldRemovals, deltaData.encodedRemovals, memoryRecycler);
                         oldRemovals.destroy();
                     }
                     deltaData.encodedRemovals.destroy();

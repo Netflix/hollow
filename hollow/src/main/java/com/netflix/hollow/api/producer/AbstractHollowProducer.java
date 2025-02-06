@@ -776,11 +776,9 @@ abstract class AbstractHollowProducer {
                 HollowReadStateEngine current = readStates.current().getStateEngine();
 
                 log.info("CHECKSUMS");
-                // System.out.println("// SNAP: TODO: current checksum");
                 HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                 log.info("  CUR        " + currentChecksum);
 
-                // System.out.println("// SNAP: TODO: pending checksum");
                 System.out.println("Pending checksum begin --- ");
                 HollowChecksum pendingChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
                 System.out.println("Pending checksum end --- ");
@@ -791,16 +789,9 @@ abstract class AbstractHollowProducer {
                         throw new IllegalStateException("Both a delta and reverse delta are required");
                     }
 
-                    // SNAP: TODO: remove System.out.println("// SNAP: TODO: Before applying delta, checksum of TestObject type is " + current.getTypeState("TestObject").getChecksum(current.getTypeState("TestObject").getSchema()));
                     // FIXME: timt: future cycles will fail unless both deltas validate
-                    applyDelta(artifacts.delta, current);// SNAP: TODO: ROOT CAUSE: except: numShards should be going from 2->4 when you apply delta from current to pending, but it isn't.
-                                                         // thats because there was no data change in the TestObject type, so nothing was serialized in the delta, so no resharding was triggered.
-                                                         // it could change because of limitation in shard factor of 2, or from removal of ghost records, etc.
-                                                         // (less preferable) either the checksum computation should be agnostic of num shards,
-                                                         // resharding should be signaled in the delta regardless of if any changes in the type. That way, num shards realized by delta transition will match num shards realized by snapshot transition
-                    // SNAP: TODO: remove System.out.println("// SNAP: TODO: After applying delta, checksum of TestObject type is " + current.getTypeState("TestObject").getChecksum(current.getTypeState("TestObject").getSchema()));
+                    applyDelta(artifacts.delta, current);
 
-                    // System.o1c65a548ut.println("// SNAP: TODO: applied delta, now the checksum is (should match pending)");
                     HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                     //out.format("  CUR => PND %s\n", forwardChecksum);
                     if (!forwardChecksum.equals(pendingChecksum)) {
