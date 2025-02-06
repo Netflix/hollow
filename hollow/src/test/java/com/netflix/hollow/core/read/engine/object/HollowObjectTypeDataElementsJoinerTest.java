@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.test.InMemoryBlobStore;
 import java.io.IOException;
@@ -77,7 +79,7 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
 
     // tests data integrity and delta chain traversal when re-sharding in the presence of lopsided shards (different maxOrdinals)
     @Test
-    public void testLopsidedMaxOrdinalShards() {
+    public void testLopsidedMaxOrdinalShards() throws IOException {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
         HollowProducer p = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
@@ -112,6 +114,12 @@ public class HollowObjectTypeDataElementsJoinerTest extends AbstractHollowObject
         long v2 = oneRunCycle(p, new int[] {0, 1, 2, 3, 5, 7});
         c.triggerRefreshTo(v2);
         assertEquals(2, c.getStateEngine().getTypeState("TestObject").numShards());
+
+        // v2 snapshot was also serialized with same numShards as delta
+        HollowReadStateEngine testSnapshot = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(testSnapshot);
+        reader.readSnapshot(blobStore.retrieveSnapshotBlob(v2).getInputStream());
+        assertEquals(2, testSnapshot.getTypeState("TestObject").numShards());
 
         long v3 = oneRunCycle(p, new int[] { 0, 1, 3, 5}); // drop to 1 ordinal per shard, skipTypeShardWithNoAdds will make it so that maxOrdinal is adjusted
         c.triggerRefreshTo(v3);

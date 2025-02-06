@@ -16,6 +16,7 @@ public class AbstractHollowTypeDataElementsSplitJoinTest extends AbstractStateEn
         schema.addField("stringField", HollowObjectSchema.FieldType.STRING);
         schema.addField("intField", HollowObjectSchema.FieldType.INT);
         schema.addField("doubleField", HollowObjectSchema.FieldType.DOUBLE);
+
         super.setUp();
     }
 

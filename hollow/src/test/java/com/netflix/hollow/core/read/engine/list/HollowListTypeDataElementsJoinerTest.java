@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
@@ -97,7 +99,7 @@ public class HollowListTypeDataElementsJoinerTest extends AbstractHollowListType
     }
 
     @Test
-    public void testLopsidedStatsShards() {
+    public void testLopsidedStatsShards() throws IOException {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
         HollowProducer p = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
@@ -152,6 +154,12 @@ public class HollowListTypeDataElementsJoinerTest extends AbstractHollowListType
         assertEquals(4, dataElements1.bitsPerListPointer);
         assertEquals(8, dataElements1.totalNumberOfElements);
         assertEquals(7, dataElements1.maxOrdinal);
+
+        // v2 snapshot was also serialized with same numShards as delta
+        HollowReadStateEngine testSnapshot = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(testSnapshot);
+        reader.readSnapshot(blobStore.retrieveSnapshotBlob(v2).getInputStream());
+        assertEquals(2, testSnapshot.getTypeState("TestList").numShards());
 
         long v3 = oneRunCycle(p, new int[][] {{0}, {16}});
         c.triggerRefreshTo(v3);

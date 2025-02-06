@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -120,7 +122,7 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
     }
 
     @Test
-    public void testLopsidedStatsShards() {
+    public void testLopsidedStatsShards() throws IOException {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
         HollowProducer p = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
@@ -173,6 +175,12 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
         });
         c.triggerRefreshTo(v2);
         assertEquals(2, c.getStateEngine().getTypeState("TestMap").numShards());
+
+        // v2 snapshot was also serialized with same numShards as delta
+        HollowReadStateEngine testSnapshot = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(testSnapshot);
+        reader.readSnapshot(blobStore.retrieveSnapshotBlob(v2).getInputStream());
+        assertEquals(2, testSnapshot.getTypeState("TestMap").numShards());
 
         HollowMapTypeDataElements dataElements0 = (HollowMapTypeDataElements) c.getStateEngine().getTypeState("TestMap").getShardsVolatile().getShards()[0].getDataElements();
         HollowMapTypeDataElements dataElements1 = (HollowMapTypeDataElements) c.getStateEngine().getTypeState("TestMap").getShardsVolatile().getShards()[1].getDataElements();
