@@ -83,10 +83,10 @@ class HollowMapTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Hollo
                 to.copyBucketsFrom(bucketCounter, source, startBucket, endBucket);
                 bucketCounter += numBuckets;
 
-                mapSize = source.mapPointerAndSizeData.getElementValue((long)(fromOrdinal * source.bitsPerFixedLengthMapPortion) + source.bitsPerMapPointer, source.bitsPerMapSizeValue);
+                mapSize = source.mapPointerAndSizeData.getElementValue(((long)fromOrdinal * source.bitsPerFixedLengthMapPortion) + source.bitsPerMapPointer, source.bitsPerMapSizeValue);
             }
             to.mapPointerAndSizeData.setElementValue( (long)ordinal * to.bitsPerFixedLengthMapPortion, to.bitsPerMapPointer, bucketCounter);
-            to.mapPointerAndSizeData.setElementValue((long)(ordinal * to.bitsPerFixedLengthMapPortion) + to.bitsPerMapPointer, to.bitsPerMapSizeValue, mapSize);
+            to.mapPointerAndSizeData.setElementValue(((long)ordinal * to.bitsPerFixedLengthMapPortion) + to.bitsPerMapPointer, to.bitsPerMapSizeValue, mapSize);
         }
     }
 }

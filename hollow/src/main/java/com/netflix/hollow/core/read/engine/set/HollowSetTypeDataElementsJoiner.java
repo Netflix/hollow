@@ -80,10 +80,10 @@ class HollowSetTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Hollo
                 to.copyBucketsFrom(bucketCounter, source, startBucket, endBucket);
                 bucketCounter += numBuckets;
 
-                setSize = source.setPointerAndSizeData.getElementValue((long)(fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);
+                setSize = source.setPointerAndSizeData.getElementValue(((long)fromOrdinal * source.bitsPerFixedLengthSetPortion) + source.bitsPerSetPointer, source.bitsPerSetSizeValue);
             }
             to.setPointerAndSizeData.setElementValue((long)ordinal * to.bitsPerFixedLengthSetPortion, to.bitsPerSetPointer, bucketCounter);
-            to.setPointerAndSizeData.setElementValue((long)(ordinal * to.bitsPerFixedLengthSetPortion) + to.bitsPerSetPointer, to.bitsPerSetSizeValue, setSize);
+            to.setPointerAndSizeData.setElementValue(((long)ordinal * to.bitsPerFixedLengthSetPortion) + to.bitsPerSetPointer, to.bitsPerSetSizeValue, setSize);
         }
     }
 }
