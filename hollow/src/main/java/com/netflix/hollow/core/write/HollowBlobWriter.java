@@ -133,6 +133,7 @@ public class HollowBlobWriter {
             partStreamsByType = partStreams.getStreamsByType();
 
         stateEngine.prepareForWrite();
+
         if(stateEngine.isRestored())
             stateEngine.ensureAllNecessaryStatesRestored();
 

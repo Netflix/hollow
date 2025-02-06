@@ -25,10 +25,8 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 public class HollowListTypeWriteState extends HollowTypeWriteState {
-    private static final Logger LOG = Logger.getLogger(HollowListTypeWriteState.class.getName());
 
     /// statistics required for writing fixed length list data
     private int bitsPerListPointer;
