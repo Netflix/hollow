@@ -58,11 +58,7 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     }
 
     public HollowSetTypeWriteState(HollowSetSchema schema, int numShards) {
-        this(schema, numShards, false);
-    }
-
-    public HollowSetTypeWriteState(HollowSetSchema schema, int numShards, boolean isNumShardsPinned) {
-        super(schema, numShards, isNumShardsPinned);
+        super(schema, numShards);
     }
 
     @Override

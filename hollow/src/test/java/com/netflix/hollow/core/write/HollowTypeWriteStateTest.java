@@ -183,16 +183,107 @@ public class HollowTypeWriteStateTest {
     }
 
     @Test
-    public void testNoReshardingIfNumShardsPinnedByAnnotation() {
+    public void testReshardingDespiteNumShardsPinnedByAnnotation() {
         HollowWriteStateEngine wse = new HollowWriteStateEngine();
-        new HollowObjectMapper(wse).initializeTypeState(TypeWithPinnedNumShards.class);
-        HollowObjectTypeWriteState typeWriteState = (HollowObjectTypeWriteState) wse.getTypeState("TypeWithPinnedNumShards");
-        assertFalse(typeWriteState.allowTypeResharding());
-
-        wse = new HollowWriteStateEngine();
         new HollowObjectMapper(wse).initializeTypeState(HasAllTypesWithPinnedNumShards.class);
-        for (HollowTypeWriteState writeState : wse.getOrderedTypeStates()) {
-            assertFalse(writeState.allowTypeResharding());
+        assertFalse(wse.getTypeState("HasAllTypesWithPinnedNumShards").allowTypeResharding());
+        assertFalse(wse.getTypeState("SetOfString").allowTypeResharding());
+        assertFalse(wse.getTypeState("ListOfInteger").allowTypeResharding());
+        assertFalse(wse.getTypeState("MapOfStringToLong").allowTypeResharding());
+        wse.allowTypeResharding(true);
+        assertTrue(wse.getTypeState("HasAllTypesWithPinnedNumShards").allowTypeResharding());
+        assertTrue(wse.getTypeState("SetOfString").allowTypeResharding());
+        assertTrue(wse.getTypeState("ListOfInteger").allowTypeResharding());
+        assertTrue(wse.getTypeState("MapOfStringToLong").allowTypeResharding());
+    }
+
+    @Test
+    public void testRestoreIfNumShardsPinnedByAnnotation() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        HollowProducer p1 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
+                .withTargetMaxTypeShardSize(32).build();
+        p1.initializeDataModel(HasAllTypesWithPinnedNumShards.class);
+        long v1 = p1.runCycle(ws -> {
+            for (int i=0; i<5; i++) {
+                final long val = new Long(i);
+                ws.add(new HasAllTypesWithPinnedNumShards(
+                        new HashSet<>(Arrays.asList("e" + val)),
+                        Arrays.asList(i),
+                        new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                ));
+            }
+        });
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
+                .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+                    @Override
+                    public boolean allowDoubleSnapshot() {
+                        return false;
+                    }
+                    @Override
+                    public int maxDeltasBeforeDoubleSnapshot() {
+                        return Integer.MAX_VALUE;
+                    }
+                })
+                .build();
+        consumer.triggerRefreshTo(v1);
+        assertEquals(v1, consumer.getCurrentVersionId());
+
+        assertEquals(32, consumer.getStateEngine().getTypeState("HasAllTypesWithPinnedNumShards").numShards());
+        assertEquals(32, consumer.getStateEngine().getTypeState("SetOfString").numShards());
+        assertEquals(32, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
+        assertEquals(32, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
+
+        for (boolean allowTypeResharding : new boolean[] {false, true}) {
+            HollowProducer p2 = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
+                    .withTypeResharding(allowTypeResharding).withTargetMaxTypeShardSize(32).build();
+            p2.initializeDataModel(HasAllTypesWithPinnedNumShards.class);
+            p2.restore(v1, blobStore);
+
+            assertEquals(32, consumer.getStateEngine().getTypeState("HasAllTypesWithPinnedNumShards").numShards());
+            assertEquals(32, consumer.getStateEngine().getTypeState("SetOfString").numShards());
+            assertEquals(32, consumer.getStateEngine().getTypeState("ListOfInteger").numShards());
+            assertEquals(32, consumer.getStateEngine().getTypeState("MapOfStringToLong").numShards());
+
+            long v2 = p2.runCycle(ws -> {
+                for (int i=0; i<5000; i++) { // results in more than 32 shards at same shard size if resharding allowed
+                    final long val = new Long(i);
+                    ws.add(new HasAllTypesWithPinnedNumShards(
+                            new HashSet<>(Arrays.asList("e" + val)),
+                            Arrays.asList(i),
+                            new HashMap<String, Long>(){{put("k"+val, new Long(val));}}
+                    ));
+                }
+            });
+
+            HollowConsumer consumer2 = HollowConsumer.withBlobRetriever(blobStore)
+                    .withDoubleSnapshotConfig(new HollowConsumer.DoubleSnapshotConfig() {
+                        @Override
+                        public boolean allowDoubleSnapshot() {
+                            return false;
+                        }
+                        @Override
+                        public int maxDeltasBeforeDoubleSnapshot() {
+                            return Integer.MAX_VALUE;
+                        }
+                    })
+                    .build();
+            consumer2.triggerRefreshTo(v2);
+            assertEquals(v2, consumer2.getCurrentVersionId());
+            if (allowTypeResharding) {
+                // if type shards is allowed then the number of shards will be more than 32
+                assertTrue(32 < consumer2.getStateEngine().getTypeState("HasAllTypesWithPinnedNumShards").numShards());
+                assertTrue(32 < consumer2.getStateEngine().getTypeState("SetOfString").numShards());
+                assertTrue(32 < consumer2.getStateEngine().getTypeState("ListOfInteger").numShards());
+                assertTrue(32 < consumer2.getStateEngine().getTypeState("MapOfStringToLong").numShards());
+            } else {
+                assertEquals(32, consumer2.getStateEngine().getTypeState("HasAllTypesWithPinnedNumShards").numShards());
+                assertEquals(32, consumer2.getStateEngine().getTypeState("SetOfString").numShards());
+                assertEquals(32, consumer2.getStateEngine().getTypeState("ListOfInteger").numShards());
+                assertEquals(32, consumer2.getStateEngine().getTypeState("MapOfStringToLong").numShards());
+            }
         }
     }
 
@@ -282,18 +373,10 @@ public class HollowTypeWriteStateTest {
         assertTrue(8 < consumer2.getStateEngine().getTypeState("SetOfString").numShards());
         assertTrue(4 < consumer2.getStateEngine().getTypeState("ListOfInteger").numShards());
         assertTrue(8 < consumer2.getStateEngine().getTypeState("MapOfStringToLong").numShards());
-
-
     }
 
-    @HollowShardLargeType(numShards=4)
-    private static class TypeWithPinnedNumShards {
-        private int value;
-    }
-
-    private class HasAllTypesWithPinnedNumShards {
-        @HollowShardLargeType(numShards = 32)
-        CustomReferenceType customReferenceType;
+    @HollowShardLargeType(numShards=32)
+    public class HasAllTypesWithPinnedNumShards {
         @HollowShardLargeType(numShards = 32)
         Set<String> setOfStrings;
         @HollowShardLargeType(numShards = 32)
@@ -301,8 +384,7 @@ public class HollowTypeWriteStateTest {
         @HollowShardLargeType(numShards = 32)
         Map<String, Long> mapOfStringToLong;
 
-        private HasAllTypesWithPinnedNumShards(CustomReferenceType customReferenceType, Set<String> setOfStrings, List<Integer> listOfInt, Map<String, Long> mapOfStringToLong) {
-            this.customReferenceType = customReferenceType;
+        public HasAllTypesWithPinnedNumShards(Set<String> setOfStrings, List<Integer> listOfInt, Map<String, Long> mapOfStringToLong) {
             this.setOfStrings = setOfStrings;
             this.listOfInt = listOfInt;
             this.mapOfStringToLong = mapOfStringToLong;
