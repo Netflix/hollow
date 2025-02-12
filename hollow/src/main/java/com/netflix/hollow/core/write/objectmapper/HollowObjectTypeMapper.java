@@ -136,7 +136,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.writeState = existingWriteState;
         } else {
             int numShardsByAnnotation = getNumShardsByAnnotation(clazz);
-            this.writeState = new HollowObjectTypeWriteState(schema, numShardsByAnnotation, numShardsByAnnotation == -1 ? false : true);
+            this.writeState = new HollowObjectTypeWriteState(schema, numShardsByAnnotation);
         }
 
         this.assignedOrdinalFieldOffset = assignedOrdinalFieldOffset;
@@ -425,7 +425,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                         typeNameAnnotation != null ? typeNameAnnotation.name() : null, 
                                 hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null, 
                                         numShardsAnnotation != null ? numShardsAnnotation.numShards() : -1,
-                                        isNumShardsPinnedByAnnotation(numShardsAnnotation),
                                                 visitedTypes);
                 
                 // once we've safely returned from a leaf node in recursion, we can remove this MappedField's type
@@ -433,10 +432,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
 
             this.subTypeMapper = subTypeMapper;
-        }
-
-        private boolean isNumShardsPinnedByAnnotation(HollowShardLargeType numShardsAnnotation) {
-            return numShardsAnnotation != null && numShardsAnnotation.numShards() != -1;
         }
 
         private MappedField(MappedFieldType specialField) {

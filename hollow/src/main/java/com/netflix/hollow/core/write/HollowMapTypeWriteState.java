@@ -59,11 +59,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
     }
 
     public HollowMapTypeWriteState(HollowMapSchema schema, int numShards) {
-        super(schema, numShards, false);
-    }
-    
-    public HollowMapTypeWriteState(HollowMapSchema schema, int numShards, boolean isNumShardsPinned) {
-        super(schema, numShards, isNumShardsPinned);
+        super(schema, numShards);
     }
 
     @Override

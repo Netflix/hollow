@@ -66,23 +66,19 @@ public abstract class HollowTypeWriteState {
 
     private boolean wroteData = false;
 
-    private boolean isNumShardsPinned;  // if numShards is pinned using numShards annotation in data model
+    private final boolean isNumShardsPinned;  // if numShards is pinned in data model
     protected int maxShardOrdinal[];
     protected int revMaxShardOrdinal[];
 
 
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
-        this(schema, numShards, false);
-    }
-
-    public HollowTypeWriteState(HollowSchema schema, int numShards, boolean isNumShardsPinned) {
         this.schema = schema;
         this.ordinalMap = new ByteArrayOrdinalMap();
         this.serializedScratchSpace = new ThreadLocal<ByteDataArray>();
         this.currentCyclePopulated = new ThreadSafeBitSet();
         this.previousCyclePopulated = new ThreadSafeBitSet();
         this.numShards = numShards;
-        this.isNumShardsPinned = isNumShardsPinned;
+        this.isNumShardsPinned = (numShards != -1);
         this.resetToLastNumShards = numShards;
 
         if(numShards != -1 && ((numShards & (numShards - 1)) != 0 || numShards <= 0))
@@ -428,14 +424,16 @@ public abstract class HollowTypeWriteState {
     }
 
     public boolean allowTypeResharding() {
-        if (stateEngine.allowTypeResharding()) {
+        boolean isAllowed = stateEngine.allowTypeResharding();
+        if (isAllowed) {
             if (isNumShardsPinned()) {
-                LOG.info("Types will not re-shard automatically because num shards is pinned (likely using the " +
-                        "HollowShardLargeType annotation in the data model). Proceeding with fixed num shards.");
-                return false;
+                LOG.warning(String.format("The num shards for type %s is pinned (likely using the @HollowShardLargeType annotation " +
+                        "in the data model) but this producer is also configured for dynamically adjusting the num shards based on " +
+                        "data size during the course of the delta chain, so the pin for num shards will not be honored and it can be dropped",
+                        schema.getName()));
             }
         }
-        return stateEngine.allowTypeResharding();
+        return isAllowed;
     }
 
     protected void gatherShardingStats(int maxOrdinal) {

@@ -53,10 +53,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         super(schema, numShards);
     }
 
-    public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards, boolean isNumShardsPinned) {
-        super(schema, numShards, isNumShardsPinned);
-    }
-
     @Override
     public HollowObjectSchema getSchema() {
         return (HollowObjectSchema)schema;
