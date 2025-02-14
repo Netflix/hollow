@@ -314,7 +314,8 @@ public abstract class HollowTypeWriteState {
         if (!currentCyclePopulated.equals(previousCyclePopulated)) {
             return true;
         }
-        if (numShards != revNumShards) { // see {@code testChangingNumShardsWithoutChangesInPopulatedOrdinals}
+        if (numShards != revNumShards // see {@code testChangingNumShardsWithoutChangesInPopulatedOrdinals}
+            && revNumShards != 0) {
             return true;
         }
         return false;
