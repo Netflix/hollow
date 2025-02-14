@@ -116,7 +116,11 @@ public class HollowProducerTest {
 
     @Test
     public void testPopulateNoChangesVersion() {
-        HollowProducer producer = createProducer(tmpFolder);
+        HollowProducer producer = createProducer(tmpFolder, schema);
+        long v0 = producer.runCycle(ws -> {});
+        assertEquals(0, v0); // must not publish an empty snapshot
+
+        producer = createProducer(tmpFolder);
         long v1 = producer.runCycle(ws -> {
             ws.add(1);
         });
