@@ -31,6 +31,7 @@ import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -60,6 +61,7 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
         this.collapseAllSingleFieldObjects = collapseAllSingleFieldObjects;
         this.collapseObjectTypes = Collections.emptySet();
     }
+
 
     public HollowRecordJsonStringifier(boolean indent, String... collapseObjectTypes) {
         this.prettyPrint = indent;
@@ -145,115 +147,130 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
     }
 
     private void appendMapStringify(Writer writer, HollowDataAccess dataAccess, HollowMapTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
-        HollowMapSchema schema = typeDataAccess.getSchema();
-
         indentation++;
 
         int size = typeDataAccess.size(ordinal);
 
+        HollowMapSchema schema = typeDataAccess.getSchema();
+
+        String keyType = schema.getKeyType();
+        String valueType = schema.getValueType();
+
+        HollowMapEntryOrdinalIterator ordinalIterator = typeDataAccess.ordinalIterator(ordinal);
+
         if (size == 0) {
             writer.append("{ }");
         } else {
-            String keyType = schema.getKeyType();
-            String valueType = schema.getValueType();
-            HollowObjectTypeDataAccess keyTypeDataAccess = (HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(keyType);
-            HollowObjectSchema keySchema = keyTypeDataAccess.getSchema();
-
-            HollowMapEntryOrdinalIterator ordinalIterator = typeDataAccess.ordinalIterator(ordinal);
-
-            if (keySchema.numFields() == 1) {
-                writer.append("{");
-                if (prettyPrint) {
-                    writer.append(NEWLINE);
+            if (dataAccess.getTypeDataAccess(keyType) instanceof HollowObjectTypeDataAccess) {
+                HollowObjectTypeDataAccess keyTypeDataAccess = (HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(keyType);
+                HollowObjectSchema keySchema = keyTypeDataAccess.getSchema();
+                if(isPrimitiveWrapper(keySchema)) {
+                    keyValueAsObject(writer, dataAccess, indentation, keyTypeDataAccess, valueType, ordinalIterator);
                 }
-
-                boolean firstEntry = true;
-
-                while(ordinalIterator.next()) {
-                    if (firstEntry) {
-                        firstEntry = false;
-                    } else {
-                        writer.append(",");
-                        if (prettyPrint) {
-                            writer.append(NEWLINE);
-                        }
-                    }
-
-                    if (prettyPrint) {
-                        appendIndentation(writer, indentation);
-                    }
-
-                    boolean needToQuoteKey = keySchema.getFieldType(0) != FieldType.STRING;
-
-                    if (needToQuoteKey)
-                        writer.append("\"");
-
-                    int keyOrdinal = ordinalIterator.getKey();
-                    appendFieldStringify(writer, dataAccess, indentation, keySchema, keyTypeDataAccess, keyOrdinal, 0);
-
-                    if (needToQuoteKey)
-                        writer.append("\"");
-
-                    writer.append(": ");
-
-                    appendStringify(writer, dataAccess, valueType, ordinalIterator.getValue(), indentation);
+                else {
+                    keyValueAsList(writer, dataAccess, indentation, keyType, valueType, ordinalIterator);
                 }
-
-                if (prettyPrint && !firstEntry) {
-                    writer.append(NEWLINE);
-                    appendIndentation(writer, indentation - 1);
-                }
-                writer.append("}");
-            } else {
-                writer.append("[");
-                if (prettyPrint)
-                    writer.append(NEWLINE);
-
-                boolean firstEntry = true;
-
-                while(ordinalIterator.next()) {
-                    if (firstEntry) {
-                        firstEntry = false;
-                    } else {
-                        writer.append(",");
-                        if (prettyPrint)
-                            writer.append(NEWLINE);
-                    }
-                    if (prettyPrint) {
-                        appendIndentation(writer, indentation - 1);
-                    }
-
-                    writer.append("{");
-
-                    if (prettyPrint) {
-                        writer.append(NEWLINE);
-                        appendIndentation(writer, indentation);
-                    }
-
-                    writer.append("\"key\":");
-                    appendStringify(writer, dataAccess, keyType, ordinalIterator.getKey(), indentation + 1);
-                    writer.append(",");
-                    if (prettyPrint) {
-                        writer.append(NEWLINE);
-                        appendIndentation(writer, indentation);
-                    }
-                    writer.append("\"value\":");
-                    appendStringify(writer, dataAccess, valueType, ordinalIterator.getValue(), indentation + 1);
-
-                    if (prettyPrint) {
-                        writer.append(NEWLINE);
-                        appendIndentation(writer, indentation - 1);
-                    }
-
-                    writer.append("}");
-                }
-
-
-
-                writer.append("]");
+            }
+            else {
+                keyValueAsList(writer, dataAccess, indentation, keyType, valueType, ordinalIterator);
             }
         }
 
+    }
+
+    private void keyValueAsObject(Writer writer, HollowDataAccess dataAccess, int indentation, HollowObjectTypeDataAccess keyTypeDataAccess, String valueType, HollowMapEntryOrdinalIterator ordinalIterator) throws IOException {
+        HollowObjectSchema keySchema = keyTypeDataAccess.getSchema();
+
+        writer.append("{");
+        if (prettyPrint) {
+            writer.append(NEWLINE);
+        }
+
+        boolean firstEntry = true;
+
+        while(ordinalIterator.next()) {
+            if (firstEntry) {
+                firstEntry = false;
+            } else {
+                writer.append(",");
+                if (prettyPrint) {
+                    writer.append(NEWLINE);
+                }
+            }
+
+            if (prettyPrint) {
+                appendIndentation(writer, indentation);
+            }
+
+            boolean needToQuoteKey = keySchema.getFieldType(0) != FieldType.STRING;
+
+            if (needToQuoteKey)
+                writer.append("\"");
+
+            int keyOrdinal = ordinalIterator.getKey();
+            appendFieldStringify(writer, dataAccess, indentation, keySchema, keyTypeDataAccess, keyOrdinal, 0);
+
+            if (needToQuoteKey)
+                writer.append("\"");
+
+            writer.append(": ");
+
+            appendStringify(writer, dataAccess, valueType, ordinalIterator.getValue(), indentation);
+        }
+
+        if (prettyPrint && !firstEntry) {
+            writer.append(NEWLINE);
+            appendIndentation(writer, indentation - 1);
+        }
+        writer.append("}");
+    }
+
+    private void keyValueAsList(Writer writer, HollowDataAccess dataAccess, int indentation, String keyType, String valueType, HollowMapEntryOrdinalIterator ordinalIterator) throws IOException {
+        writer.append("[");
+        if (prettyPrint)
+            writer.append(NEWLINE);
+
+        boolean firstEntry = true;
+
+        while(ordinalIterator.next()) {
+            if (firstEntry) {
+                firstEntry = false;
+            } else {
+                writer.append(",");
+                if (prettyPrint)
+                    writer.append(NEWLINE);
+            }
+            if (prettyPrint) {
+                appendIndentation(writer, indentation - 1);
+            }
+
+            writer.append("{");
+
+            if (prettyPrint) {
+                writer.append(NEWLINE);
+                appendIndentation(writer, indentation);
+            }
+
+            writer.append("\"key\":");
+            appendStringify(writer, dataAccess, keyType, ordinalIterator.getKey(), indentation + 1);
+            writer.append(",");
+            if (prettyPrint) {
+                writer.append(NEWLINE);
+                appendIndentation(writer, indentation);
+            }
+            writer.append("\"value\":");
+            appendStringify(writer, dataAccess, valueType, ordinalIterator.getValue(), indentation + 1);
+
+            if (prettyPrint) {
+                writer.append(NEWLINE);
+                appendIndentation(writer, indentation - 1);
+            }
+
+            writer.append("}");
+        }
+
+
+        writer.append("]");
     }
 
     private void appendSetStringify(Writer writer, HollowDataAccess dataAccess, HollowSetTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
@@ -451,5 +468,19 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
                     writer.append(INDENT);
                 }
         }
+    }
+
+    private static boolean isPrimitiveWrapper(
+            HollowSchema schema) {
+        if (schema.getSchemaType() != HollowSchema.SchemaType.OBJECT) {
+            return false;
+        }
+        HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
+        boolean isSingleFieldObject = objectSchema.numFields() == 1;
+        if (isSingleFieldObject
+                && objectSchema.getFieldType(0) != HollowObjectSchema.FieldType.REFERENCE) {
+            return true;
+        }
+        return false;
     }
 }
