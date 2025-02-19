@@ -1,18 +1,21 @@
 package com.netflix.hollow.core.write.objectmapper;
 
+import java.util.List;
 import java.util.Map;
 
 public class TypeE {
     private Map<SubType, Integer> map;
+    private Map<List<SubType>, Integer> mapWithList;
+    private Map<String, List<SubType>> mapWithString;
 
     public TypeE(
-            Map<SubType, Integer> map
+            Map<SubType, Integer> map,
+            Map<List<SubType>, Integer> mapWithList,
+            Map<String, List<SubType>> mapWithString
     ) {
         this.map = map;
-    }
-
-    public Map<SubType, Integer> getMap() {
-        return map;
+        this.mapWithList = mapWithList;
+        this.mapWithString = mapWithString;
     }
 
     public static class SubType {

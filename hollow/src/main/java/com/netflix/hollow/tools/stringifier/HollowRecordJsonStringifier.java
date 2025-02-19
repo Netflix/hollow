@@ -31,6 +31,7 @@ import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -50,7 +51,6 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
     private final Set<String> excludeObjectTypes = new HashSet<String>();
     private final boolean collapseAllSingleFieldObjects;
     private final boolean prettyPrint;
-    private boolean expandMapTypes = false;
 
     public HollowRecordJsonStringifier() {
         this(true, true);
@@ -60,13 +60,6 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
         this.prettyPrint = prettyPrint;
         this.collapseAllSingleFieldObjects = collapseAllSingleFieldObjects;
         this.collapseObjectTypes = Collections.emptySet();
-    }
-
-    public HollowRecordJsonStringifier(boolean prettyPrint, boolean collapseAllSingleFieldObjects, boolean expandMapTypes) {
-        this.prettyPrint = prettyPrint;
-        this.collapseAllSingleFieldObjects = collapseAllSingleFieldObjects;
-        this.collapseObjectTypes = Collections.emptySet();
-        this.expandMapTypes = expandMapTypes;
     }
 
 
@@ -162,18 +155,19 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
 
         String keyType = schema.getKeyType();
         String valueType = schema.getValueType();
-        HollowObjectTypeDataAccess keyTypeDataAccess = (HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(keyType);
-        HollowObjectSchema keySchema = keyTypeDataAccess.getSchema();
 
         HollowMapEntryOrdinalIterator ordinalIterator = typeDataAccess.ordinalIterator(ordinal);
 
         if (size == 0) {
             writer.append("{ }");
         } else {
-            if(!expandMapTypes) {
-                if (keySchema.numFields() == 1) {
+            if (dataAccess.getTypeDataAccess(keyType) instanceof HollowObjectTypeDataAccess) {
+                HollowObjectTypeDataAccess keyTypeDataAccess = (HollowObjectTypeDataAccess) dataAccess.getTypeDataAccess(keyType);
+                HollowObjectSchema keySchema = keyTypeDataAccess.getSchema();
+                if(isPrimitiveWrapper(keySchema)) {
                     keyValueAsObject(writer, dataAccess, indentation, keyTypeDataAccess, valueType, ordinalIterator);
-                } else {
+                }
+                else {
                     keyValueAsList(writer, dataAccess, indentation, keyType, valueType, ordinalIterator);
                 }
             }
@@ -474,5 +468,19 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
                     writer.append(INDENT);
                 }
         }
+    }
+
+    private static boolean isPrimitiveWrapper(
+            HollowSchema schema) {
+        if (schema.getSchemaType() != HollowSchema.SchemaType.OBJECT) {
+            return false;
+        }
+        HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
+        boolean isSingleFieldObject = objectSchema.numFields() == 1;
+        if (isSingleFieldObject
+                && objectSchema.getFieldType(0) != HollowObjectSchema.FieldType.REFERENCE) {
+            return true;
+        }
+        return false;
     }
 }

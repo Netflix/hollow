@@ -29,8 +29,10 @@ import com.netflix.hollow.core.write.objectmapper.TypeE;
 import com.netflix.hollow.test.model.TestTypeA;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -173,20 +175,26 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
 
     @Test
     public void testStringifyTypeWithExpandMapTypes() throws IOException {
-        HollowRecordJsonStringifier stringifier = new HollowRecordJsonStringifier(false, false, true);
+        HollowRecordJsonStringifier stringifier = new HollowRecordJsonStringifier(false, false);
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
         mapper.useDefaultHashKeys();
+        Map<List<TypeE.SubType>, Integer> mapWithList = new HashMap();
+        Map<String, List<TypeE.SubType>> mapWithString = new HashMap();
+        List<TypeE.SubType> subTypes = new ArrayList();
         Map<TypeE.SubType, Integer> map = new HashMap<>();
         map.put(new TypeE.SubType("name1", 2000), 2000);
-        mapper.add(new TypeE(map));
+        subTypes.add(new TypeE.SubType("name2", 2000));
+        mapWithList.put(subTypes, 200);
+        mapWithString.put("name1", subTypes);
+        mapper.add(new TypeE(map, mapWithList, mapWithString));
 
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
 
         HollowRecord genericHollowObjects = new GenericHollowObject(readEngine, "TypeE", 0);
         StringWriter writer = new StringWriter();
         stringifier.stringify(writer, genericHollowObjects);
-        Assert.assertEquals("Map JSON should be a list of key and value", "{\"map\": [{\"key\":{\"name\": {\"value\": \"name1\"},\"year\": {\"value\": 2000}},\"value\":{\"value\": 2000}}]}", writer.toString());
+        Assert.assertEquals("Map JSON should be a list of key and value when keyNode is Reference or Non-object; Map JSON should be key:value pair when keyNode is primitive", "{\"map\": [{\"key\":{\"name\": {\"value\": \"name1\"},\"year\": {\"value\": 2000}},\"value\":{\"value\": 2000}}],\"mapWithList\": [{\"key\":[{\"name\": {\"value\": \"name2\"},\"year\": {\"value\": 2000}}],\"value\":{\"value\": 200}}],\"mapWithString\": {\"name1\": [{\"name\": {\"value\": \"name2\"},\"year\": {\"value\": 2000}}]}}", writer.toString());
     }
 
     private static <T> String stringifyType(Class<T> clazz, boolean prettyPrint, boolean expanded, T... instances) throws IOException {
