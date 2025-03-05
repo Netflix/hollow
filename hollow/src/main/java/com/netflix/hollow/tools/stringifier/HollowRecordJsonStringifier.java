@@ -427,11 +427,40 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
     }
 
     private String escapeString(String str) {
-        if (str.indexOf('\\') == -1 && str.indexOf('\"') == -1)
-            return str;
-        return str.replace("\\", "\\\\").replace("\"", "\\\"");
+        StringBuilder sb = new StringBuilder();
+        for (char c : str.toCharArray()) {
+            switch (c) {
+                case '\"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                default:
+                    if (c < 0x20) {
+                        sb.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        sb.append(c);
+                    }
+            }
+        }
+        return sb.toString();
     }
-
     private void appendIndentation(Writer writer, int indentation) throws IOException {
         switch(indentation) {
             case 0:

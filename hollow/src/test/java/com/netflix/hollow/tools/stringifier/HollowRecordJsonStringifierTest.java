@@ -197,6 +197,15 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
         Assert.assertEquals("Map JSON should be a list of key and value when keyNode is Reference or Non-object; Map JSON should be key:value pair when keyNode is primitive", "{\"map\": [{\"key\":{\"name\": {\"value\": \"name1\"},\"year\": {\"value\": 2000}},\"value\":{\"value\": 2000}}],\"mapWithList\": [{\"key\":[{\"name\": {\"value\": \"name2\"},\"year\": {\"value\": 2000}}],\"value\":{\"value\": 200}}],\"mapWithString\": {\"name1\": [{\"name\": {\"value\": \"name2\"},\"year\": {\"value\": 2000}}]}}", writer.toString());
     }
 
+    @Test
+    public void testStringifyStringWithEscapeChars() throws IOException {
+        String msg = "String with escape characters should be printed correctly";
+        String testString = "Hello \"World\"\nNew line, \t tab, \r carriage return, \b backspace, \f form feed, and Unicode: \u263A.";
+        String expectedJsonString = "\"Hello \\\"World\\\"\\nNew line, \\t tab, \\r carriage return, \\b backspace, \\f form feed, and Unicode: \u263A.\"";
+        Assert.assertEquals(msg, expectedJsonString,
+                stringifyType(TypeWithString.class, true, false, new TypeWithString(testString)));
+    }
+
     private static <T> String stringifyType(Class<T> clazz, boolean prettyPrint, boolean expanded, T... instances) throws IOException {
         HollowRecordJsonStringifier stringifier = new HollowRecordJsonStringifier(prettyPrint, !expanded);
         // HollowRecordJsonStringifier stringifier = expanded
