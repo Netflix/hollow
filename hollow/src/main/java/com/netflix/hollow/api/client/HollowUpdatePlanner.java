@@ -75,22 +75,31 @@ public class HollowUpdatePlanner {
         if (currentVersion == HollowConstants.VERSION_NONE)
             return snapshotPlan(desiredVersion);
 
-        HollowUpdatePlan deltaPlan = deltaPlan(currentVersion, desiredVersion, doubleSnapshotConfig.maxDeltasBeforeDoubleSnapshot());
+        HollowUpdatePlan updatedPlan = deltaPlan(currentVersion, desiredVersion, doubleSnapshotConfig.maxDeltasBeforeDoubleSnapshot());
 
-        long deltaDestinationVersion = deltaPlan.destinationVersion(currentVersion);
+        long deltaDestinationVersion = updatedPlan.destinationVersion(currentVersion);
 
-        if(deltaDestinationVersion != desiredVersion && allowSnapshot) {
-            HollowUpdatePlan snapshotPlan = snapshotPlan(desiredVersion);
-            long snapshotDestinationVersion = snapshotPlan.destinationVersion(currentVersion);
+        if(deltaDestinationVersion == desiredVersion || !allowSnapshot)
+            return updatedPlan;
 
-            if(snapshotDestinationVersion == desiredVersion
-                    || ((deltaDestinationVersion > desiredVersion) && (snapshotDestinationVersion < desiredVersion))
-                    || ((snapshotDestinationVersion < desiredVersion) && (snapshotDestinationVersion > deltaDestinationVersion)))
+        HollowUpdatePlan snapshotPlan = snapshotPlan(desiredVersion);
+        long snapshotDestinationVersion = snapshotPlan.destinationVersion(currentVersion);
 
-                return snapshotPlan;
+
+        boolean isDesiredVersionUpgradedVersion = (deltaDestinationVersion > desiredVersion) && (snapshotDestinationVersion < desiredVersion);
+        boolean isSnapshotVersionUpgradedVersion = (snapshotDestinationVersion < desiredVersion) && (snapshotDestinationVersion > deltaDestinationVersion);
+        if(isDesiredVersionUpgradedVersion){
+            return snapshotPlan;
+        }
+        if(isSnapshotVersionUpgradedVersion){
+            return snapshotPlan;
+        }
+        if(snapshotDestinationVersion == desiredVersion)
+        {
+            return snapshotPlan;
         }
 
-        return deltaPlan;
+        return updatedPlan;
     }
 
     /**
