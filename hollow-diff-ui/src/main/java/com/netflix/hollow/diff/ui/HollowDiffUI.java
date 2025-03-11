@@ -87,7 +87,7 @@ public class HollowDiffUI implements HollowRecordDiffUI {
             return true;
         }
 
-        resp.setContentType("text/html");
+        resp.setContentType("text/html;charset=UTF-8");
 
         if("".equals(pageName) || "overview".equals(pageName)) {
             render(overviewPage, req, resp);
