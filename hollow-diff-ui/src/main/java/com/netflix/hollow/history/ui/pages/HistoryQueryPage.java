@@ -25,9 +25,11 @@ import com.netflix.hollow.tools.history.HollowHistory;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoryTypeKeyIndex;
 import com.netflix.hollow.ui.HollowUISession;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
 
@@ -45,13 +47,19 @@ public class HistoryQueryPage extends HistoryPage {
 
         Map<String, IntList> typeQueryKeyMatches = typeQueryKeyMatches(history, query);
 
-        List<HistoryStateQueryMatches> list = new ArrayList<HistoryStateQueryMatches>();
+        List<HistoryStateQueryMatches> list = new CopyOnWriteArrayList<>();
 
-        for(HollowHistoricalState state : history.getHistoricalStates()) {
-            HistoryStateQueryMatches matches = new HistoryStateQueryMatches(state, ui, VersionTimestampConverter.getTimestamp(state.getVersion(), ui.getTimeZone()), typeQueryKeyMatches);
-            if(matches.hasMatches())
+        Arrays.stream(history.getHistoricalStates()).parallel().forEach(state -> {
+            HistoryStateQueryMatches matches = new HistoryStateQueryMatches(
+                    state,
+                    ui,
+                    VersionTimestampConverter.getTimestamp(state.getVersion(), ui.getTimeZone()),
+                    typeQueryKeyMatches
+            );
+            if (matches.hasMatches()) {
                 list.add(matches);
-        }
+            }
+        });
 
         ctx.put("stateQueryMatchesList", list);
         ctx.put("query", query);
