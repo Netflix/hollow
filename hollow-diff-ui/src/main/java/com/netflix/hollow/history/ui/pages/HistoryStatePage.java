@@ -121,11 +121,4 @@ public class HistoryStatePage extends HistoryPage {
         }
         return -1;
     }
-
-	@Override
-	protected boolean includeHeaderAndFooter() {
-		return false;
-	}
-    
-
 }
