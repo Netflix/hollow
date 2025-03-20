@@ -34,6 +34,8 @@ Lookup Key:
 
 #if($headerEntries)
     <script>
+    var isCollapsed = true;
+
     function toggleHeaderVisibility(){
         var table = document.getElementById('headers');
         var button = document.getElementById('headerButton');
@@ -45,10 +47,32 @@ Lookup Key:
             button.value='hide headers';
         }
     }
+
+    function toggleAllCollapse() {
+        var diffTable = document.getElementById("difftable");
+        var button = document.getElementById("toggleButton");
+        for (let i = 0; i < diffTable.rows.length; i++) {
+            var parentRow = document.getElementById("r" + i);
+            if (parentRow && typeof parentRow.onclick === "function") {
+                if (parentRow.onclick.toString().includes("uncollapseRow") && isCollapsed) {
+                    parentRow.onclick(i);
+                } else if (parentRow.onclick.toString().includes("collapseRow") && !isCollapsed) {
+                    parentRow.onclick(i);
+                }
+            }
+        }
+        isCollapsed = !isCollapsed;
+        if (isCollapsed) {
+            button.value = "expand all"
+        } else {
+            button.value = "collapse all"
+        }
+    }
     </script>
-    
-    <input type="button" value="show headers" onclick="toggleHeaderVisibility()" id="headerButton" / >
-    
+
+    <input type="button" value="show headers" onclick="toggleHeaderVisibility()" id="headerButton" />
+    <input type="button" value="expand all" onclick="toggleAllCollapse()" id="toggleButton" />
+
     <table border="1" cellpadding="5" id="headers" style="display:none">
         <tr><th>#</th><th>Header Name</th><th>FROM_Blob</th><th>TO_Blob</th></tr>
         
