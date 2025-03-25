@@ -24,6 +24,7 @@ import com.netflix.hollow.PublicSpi;
 import com.netflix.hollow.api.client.FailedTransitionTracker;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClientUpdater;
+import com.netflix.hollow.api.client.IHollowUpdatePlanner;
 import com.netflix.hollow.api.client.StaleHollowReferenceDetector;
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
@@ -190,16 +191,30 @@ public class HollowConsumer {
         // duplicated with HollowConsumer(...) constructor above. We cannot chain constructor calls because that
         // constructor subscribes to the announcement watcher and we have more setup to do first
         this.metrics = new HollowConsumerMetrics();
-        this.updater = new HollowClientUpdater(builder.blobRetriever,
-                builder.refreshListeners,
-                builder.apiFactory,
-                builder.doubleSnapshotConfig,
-                builder.hashCodeFinder,
-                builder.memoryMode,
-                builder.objectLongevityConfig,
-                builder.objectLongevityDetector,
-                metrics,
-                builder.metricsCollector);
+        if (builder.hollowUpdatePlanner != null) {
+            this.updater = new HollowClientUpdater(
+                    builder.refreshListeners,
+                    builder.apiFactory,
+                    builder.doubleSnapshotConfig,
+                    builder.hashCodeFinder,
+                    builder.memoryMode,
+                    builder.objectLongevityConfig,
+                    builder.objectLongevityDetector,
+                    metrics,
+                    builder.metricsCollector,
+                    builder.hollowUpdatePlanner);
+        } else {
+            this.updater = new HollowClientUpdater(builder.blobRetriever,
+                    builder.refreshListeners,
+                    builder.apiFactory,
+                    builder.doubleSnapshotConfig,
+                    builder.hashCodeFinder,
+                    builder.memoryMode,
+                    builder.objectLongevityConfig,
+                    builder.objectLongevityDetector,
+                    metrics,
+                    builder.metricsCollector);
+        }
         updater.setFilter(builder.typeFilter);
         if(builder.skipTypeShardUpdateWithNoAdditions)
             updater.setSkipShardUpdateWithNoAdditions(true);
@@ -1085,6 +1100,7 @@ public class HollowConsumer {
         protected MemoryMode memoryMode = MemoryMode.ON_HEAP;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
         protected boolean skipTypeShardUpdateWithNoAdditions = false;
+        protected IHollowUpdatePlanner hollowUpdatePlanner = null;
 
         public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -1153,6 +1169,11 @@ public class HollowConsumer {
 
         public B withRefreshListeners(HollowConsumer.RefreshListener... refreshListeners) {
             Collections.addAll(this.refreshListeners, refreshListeners);
+            return (B)this;
+        }
+
+        public B withHollowUpdatePlanner(IHollowUpdatePlanner hollowUpdatePlanner) {
+            this.hollowUpdatePlanner = hollowUpdatePlanner;
             return (B)this;
         }
 

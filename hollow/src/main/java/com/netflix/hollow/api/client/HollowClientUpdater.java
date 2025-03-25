@@ -44,7 +44,7 @@ public class HollowClientUpdater {
 
     private volatile HollowDataHolder hollowDataHolderVolatile;
 
-    private final HollowUpdatePlanner planner;
+    private final IHollowUpdatePlanner planner;
     private final CompletableFuture<Long> initialLoad;
     private boolean forceDoubleSnapshot = false;
     private final FailedTransitionTracker failedTransitionTracker;
@@ -73,7 +73,20 @@ public class HollowClientUpdater {
                                HollowConsumer.ObjectLongevityDetector objectLongevityDetector,
                                HollowConsumerMetrics metrics,
                                HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
-        this.planner = new HollowUpdatePlanner(transitionCreator, doubleSnapshotConfig);
+        this(refreshListeners, apiFactory, doubleSnapshotConfig, hashCodeFinder, memoryMode, objectLongevityConfig, objectLongevityDetector, metrics, metricsCollector, new HollowUpdatePlanner(transitionCreator, doubleSnapshotConfig));
+    }
+
+    public HollowClientUpdater(List<HollowConsumer.RefreshListener> refreshListeners,
+                               HollowAPIFactory apiFactory,
+                               HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
+                               HollowObjectHashCodeFinder hashCodeFinder,
+                               MemoryMode memoryMode,
+                               HollowConsumer.ObjectLongevityConfig objectLongevityConfig,
+                               HollowConsumer.ObjectLongevityDetector objectLongevityDetector,
+                               HollowConsumerMetrics metrics,
+                               HollowMetricsCollector<HollowConsumerMetrics> metricsCollector,
+                               IHollowUpdatePlanner planner) {
+        this.planner = planner;
         this.failedTransitionTracker = new FailedTransitionTracker();
         this.staleReferenceDetector = new StaleHollowReferenceDetector(objectLongevityConfig, objectLongevityDetector);
         // Create a copy of the listeners, removing any duplicates
@@ -146,9 +159,9 @@ public class HollowClientUpdater {
 
         try {
             HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan(requestedVersionInfo)
-                ? planner.planInitializingUpdate(requestedVersion)
-                : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersion,
-                        doubleSnapshotConfig.allowDoubleSnapshot());
+                    ? planner.planUpdate(HollowConstants.VERSION_NONE, requestedVersion, true)
+                    : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersion,
+                    doubleSnapshotConfig.allowDoubleSnapshot());
 
             for (HollowConsumer.RefreshListener listener : localListeners)
                 if (listener instanceof HollowConsumer.TransitionAwareRefreshListener)
@@ -208,7 +221,6 @@ public class HollowClientUpdater {
                 metricsCollector.collect(metrics);
 
             initialLoad.complete(getCurrentVersionId()); // only set the first time
-            metrics.setLastRefreshEndNs(System.nanoTime());
             return getCurrentVersionId() == requestedVersion;
         } catch(Throwable th) {
             forceDoubleSnapshotNextUpdate();
@@ -220,14 +232,13 @@ public class HollowClientUpdater {
 
             // intentionally omitting a call to initialLoad.completeExceptionally(th), for producers
             // that write often a consumer has a chance to try another snapshot that might succeed
-            metrics.setLastRefreshEndNs(System.nanoTime());
 
             throw th;
         }
     }
 
     public synchronized void addRefreshListener(HollowConsumer.RefreshListener refreshListener,
-            HollowConsumer c) {
+                                                HollowConsumer c) {
         if (refreshListener instanceof HollowConsumer.RefreshRegistrationListener) {
             if (!refreshListeners.contains(refreshListener)) {
                 ((HollowConsumer.RefreshRegistrationListener)refreshListener).onBeforeAddition(c);
@@ -239,7 +250,7 @@ public class HollowClientUpdater {
     }
 
     public synchronized void removeRefreshListener(HollowConsumer.RefreshListener refreshListener,
-            HollowConsumer c) {
+                                                   HollowConsumer c) {
         if (refreshListeners.remove(refreshListener)) {
             if (refreshListener instanceof HollowConsumer.RefreshRegistrationListener) {
                 ((HollowConsumer.RefreshRegistrationListener)refreshListener).onAfterRemoval(c);
@@ -250,7 +261,7 @@ public class HollowClientUpdater {
     public long getCurrentVersionId() {
         HollowDataHolder hollowDataHolderLocal = hollowDataHolderVolatile;
         return hollowDataHolderLocal != null ? hollowDataHolderLocal.getCurrentVersion()
-            : HollowConstants.VERSION_NONE;
+                : HollowConstants.VERSION_NONE;
     }
 
     public void forceDoubleSnapshotNextUpdate() {
@@ -262,14 +273,14 @@ public class HollowClientUpdater {
      */
     boolean shouldCreateSnapshotPlan(HollowConsumer.VersionInfo incomingVersionInfo) {
         if (getCurrentVersionId() == HollowConstants.VERSION_NONE
-        || (forceDoubleSnapshot && doubleSnapshotConfig.allowDoubleSnapshot())) {
+                || (forceDoubleSnapshot && doubleSnapshotConfig.allowDoubleSnapshot())) {
             return true;
         }
 
         if (doubleSnapshotConfig.doubleSnapshotOnSchemaChange() == true) {
             // double snapshot on schema change relies on presence of a header tag in incoming version metadata
             if (incomingVersionInfo.getAnnouncementMetadata() == null
-             || !incomingVersionInfo.getAnnouncementMetadata().isPresent()) {
+                    || !incomingVersionInfo.getAnnouncementMetadata().isPresent()) {
                 LOG.warning("Double snapshots on schema change are enabled and its functioning depends on " +
                         "visibility into incoming version's schema through metadata but NO metadata was available " +
                         "for version " + incomingVersionInfo.getVersion() + ". Check that the mechanism that triggered " +
