@@ -63,6 +63,7 @@ public class HollowClientUpdater {
 
     private TypeFilter filter;
 
+    @Deprecated
     public HollowClientUpdater(HollowConsumer.BlobRetriever transitionCreator,
                                List<HollowConsumer.RefreshListener> refreshListeners,
                                HollowAPIFactory apiFactory,
@@ -73,7 +74,24 @@ public class HollowClientUpdater {
                                HollowConsumer.ObjectLongevityDetector objectLongevityDetector,
                                HollowConsumerMetrics metrics,
                                HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
-        this.planner = new HollowUpdatePlanner(transitionCreator, doubleSnapshotConfig);
+        this(transitionCreator, refreshListeners, apiFactory, doubleSnapshotConfig, hashCodeFinder, memoryMode,
+                objectLongevityConfig, objectLongevityDetector, metrics, metricsCollector,
+                null, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE);
+    }
+
+    public HollowClientUpdater(HollowConsumer.BlobRetriever transitionCreator,
+                               List<HollowConsumer.RefreshListener> refreshListeners,
+                               HollowAPIFactory apiFactory,
+                               HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
+                               HollowObjectHashCodeFinder hashCodeFinder,
+                               MemoryMode memoryMode,
+                               HollowConsumer.ObjectLongevityConfig objectLongevityConfig,
+                               HollowConsumer.ObjectLongevityDetector objectLongevityDetector,
+                               HollowConsumerMetrics metrics,
+                               HollowMetricsCollector<HollowConsumerMetrics> metricsCollector,
+                               HollowConsumer.AnnouncementWatcher announcementWatcher,
+                               HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
+        this.planner = new HollowUpdatePlanner(transitionCreator, doubleSnapshotConfig, updatePlanBlobVerifier);
         this.failedTransitionTracker = new FailedTransitionTracker();
         this.staleReferenceDetector = new StaleHollowReferenceDetector(objectLongevityConfig, objectLongevityDetector);
         // Create a copy of the listeners, removing any duplicates
@@ -146,9 +164,10 @@ public class HollowClientUpdater {
 
         try {
             HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan(requestedVersionInfo)
-                ? planner.planInitializingUpdate(requestedVersion)
-                : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersion,
+                ? planner.planInitializingUpdate(requestedVersionInfo)
+                : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersionInfo,
                         doubleSnapshotConfig.allowDoubleSnapshot());
+            LOG.info(String.format("Hollow update plan: beforeVersion=%s, requestedVersion=%s, updatePlan={%s}", beforeVersion, requestedVersion, updatePlan));
 
             for (HollowConsumer.RefreshListener listener : localListeners)
                 if (listener instanceof HollowConsumer.TransitionAwareRefreshListener)

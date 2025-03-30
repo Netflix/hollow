@@ -55,7 +55,7 @@ public class HollowUpdatePlannerTest {
         addMockDelta(4, 5);
         addMockDelta(5, 6);
 
-        HollowUpdatePlan plan = planner.planInitializingUpdate(5);
+        HollowUpdatePlan plan = planner.planInitializingUpdate(new HollowConsumer.VersionInfo(5));
 
         Assert.assertEquals(plan.numTransitions(), 5);
 
@@ -175,7 +175,7 @@ public class HollowUpdatePlannerTest {
         addMockDelta(0, 3);
         addMockDelta(3, 6);
 
-        HollowUpdatePlan plan = planner.planInitializingUpdate(5);
+        HollowUpdatePlan plan = planner.planInitializingUpdate(new HollowConsumer.VersionInfo(5));
 
         Assert.assertEquals(plan.numTransitions(), 2);
 

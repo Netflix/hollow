@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class HollowUpdatePlan implements Iterable<HollowConsumer.Blob> {
 
-    public static HollowUpdatePlan DO_NOTHING = new HollowUpdatePlan(Collections.<HollowConsumer.Blob>emptyList());
+    public static HollowUpdatePlan DO_NOTHING = new HollowUpdatePlan(Collections.emptyList());
 
     private final List<HollowConsumer.Blob> transitions;
 
@@ -39,7 +39,7 @@ public class HollowUpdatePlan implements Iterable<HollowConsumer.Blob> {
     }
 
     public HollowUpdatePlan() {
-        this.transitions = new ArrayList<HollowConsumer.Blob>();
+        this.transitions = new ArrayList();
     }
 
     public boolean isSnapshotPlan() {
@@ -97,5 +97,20 @@ public class HollowUpdatePlan implements Iterable<HollowConsumer.Blob> {
     @Override
     public Iterator<HollowConsumer.Blob> iterator() {
         return transitions.iterator();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        if (transitions!= null) {
+            for (int i=0; i<transitions.size(); i++) {
+                HollowConsumer.Blob blob = transitions.get(i);
+                result.append(blob.getBlobType()).append(" to ").append(blob.getToVersion());
+                if (i < transitions.size()-1) {
+                    result.append(", ");
+                }
+            }
+        }
+        return result.toString();
     }
 }
