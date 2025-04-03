@@ -76,7 +76,7 @@ public class HollowClientUpdater {
                                HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
         this(transitionCreator, refreshListeners, apiFactory, doubleSnapshotConfig, hashCodeFinder, memoryMode,
                 objectLongevityConfig, objectLongevityDetector, metrics, metricsCollector,
-                null, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE);
+                HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE);
     }
 
     public HollowClientUpdater(HollowConsumer.BlobRetriever transitionCreator,
@@ -89,7 +89,6 @@ public class HollowClientUpdater {
                                HollowConsumer.ObjectLongevityDetector objectLongevityDetector,
                                HollowConsumerMetrics metrics,
                                HollowMetricsCollector<HollowConsumerMetrics> metricsCollector,
-                               HollowConsumer.AnnouncementWatcher announcementWatcher,
                                HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
         this.planner = new HollowUpdatePlanner(transitionCreator, doubleSnapshotConfig, updatePlanBlobVerifier);
         this.failedTransitionTracker = new FailedTransitionTracker();

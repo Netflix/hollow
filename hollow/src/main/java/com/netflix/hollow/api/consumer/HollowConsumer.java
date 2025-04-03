@@ -200,7 +200,6 @@ public class HollowConsumer {
                 builder.objectLongevityDetector,
                 metrics,
                 builder.metricsCollector,
-                builder.announcementWatcher,
                 builder.updatePlanBlobVerifier);
         updater.setFilter(builder.typeFilter);
         if(builder.skipTypeShardUpdateWithNoAdditions)
