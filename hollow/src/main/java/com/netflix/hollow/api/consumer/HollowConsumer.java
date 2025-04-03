@@ -199,7 +199,8 @@ public class HollowConsumer {
                 builder.objectLongevityConfig,
                 builder.objectLongevityDetector,
                 metrics,
-                builder.metricsCollector);
+                builder.metricsCollector,
+                builder.updatePlanBlobVerifier);
         updater.setFilter(builder.typeFilter);
         if(builder.skipTypeShardUpdateWithNoAdditions)
             updater.setSkipShardUpdateWithNoAdditions(true);
@@ -629,23 +630,32 @@ public class HollowConsumer {
     }
 
     /**
-     * This class holds an announced version, its pinned status and the announcement metadata.
-     * isPinned and announcementMetadata fields are empty unless they are populated by the AnnouncementWatcher.
+     * This class holds a version, its pinned status, associated metadata, and whether the version corresponds to an announcement.
+     * isPinned, announcementMetadata, and wasAnnounced are optional, and poopulated only when known (for e.g. by an announcement
+     * watcher implementation).
+     * {@code isPinned} powers detection of forked delta chains- a producer is not expected to regress to an older version unless it is pinned.
+     * {@code announcementMetdata} powers consumer-side features like auto double-snapshot on schema change that rely on producer setting a tag in announcement metadata.
+     * {@code wasAnnounced} powers a verification in the consumer update plan computation- when updating to an announced version only announced snapshots should be retrieved.
      * */
     public static class VersionInfo {
         long version;
         Optional<Boolean> isPinned;
         Optional<Map<String, String>> announcementMetadata;
+        Optional<Boolean> wasAnnounced;
 
         public VersionInfo(long version) {
             this(version, Optional.empty(), Optional.empty());
         }
 
         public VersionInfo(long version, Optional<Map<String, String>> announcementMetadata, Optional<Boolean> isPinned) {
+            this(version, announcementMetadata, isPinned, Optional.empty());
+        }
+
+        public VersionInfo(long version, Optional<Map<String, String>> announcementMetadata, Optional<Boolean> isPinned, Optional<Boolean> wasAnnounced) {
             this.version = version;
             this.announcementMetadata = announcementMetadata;
             this.isPinned = isPinned;
-
+            this.wasAnnounced = wasAnnounced;
         }
 
         public long getVersion() {
@@ -658,6 +668,10 @@ public class HollowConsumer {
 
         public Optional<Boolean> isPinned() {
             return isPinned;
+        }
+
+        public Optional<Boolean> wasAnnounced() {
+            return wasAnnounced;
         }
     }
 
@@ -692,8 +706,29 @@ public class HollowConsumer {
          * @return versionInfo - the latest announced version, its pinned status and announcement metadata.
          */
         default VersionInfo getLatestVersionInfo() {
-            return new VersionInfo(getLatestVersion(), Optional.empty(), Optional.empty());
+            return new VersionInfo(getLatestVersion(), Optional.empty(), Optional.empty(), Optional.of(true));
         }
+
+        /**
+         * Returns the status corresponding to if the given version was announced.
+         * @param version Namespace version
+         * @return
+         *  AnnouncementStatus.ANNOUNCED - version was announced
+         *  AnnouncementStatus.NOT_ANNOUNCED - no announcement was found for the version
+         *  AnnouncementStatus.NOT_SUPPORTED - impl does not support this method
+         */
+        default AnnouncementStatus getVersionAnnouncementStatus(long version) {
+            return AnnouncementStatus.UNKNOWN;
+        }
+    }
+
+    /**
+     * This enum captures whether a version corresponds to a previously announced version or not.
+     */
+    public enum AnnouncementStatus {
+        ANNOUNCED,
+        NOT_ANNOUNCED,
+        UNKNOWN
     }
 
     public interface DoubleSnapshotConfig {
@@ -713,6 +748,40 @@ public class HollowConsumer {
             @Override
             public boolean allowDoubleSnapshot() {
                 return true;
+            }
+        };
+    }
+
+    public interface UpdatePlanBlobVerifier {
+        // If the update plan computation requires a snapshot transition and a snapshot matching the desired version is
+        // not found, then the next-highest look back snapshot version is retrieved instead. By returning true from this
+        // method, any look back snapshots will be discarded if they did not correspond to an announced version, and then
+        // the next-highest look back snapshot will be attempted, and so on. This will repeat until an "announced" snapshot
+        // is found, or max lookback versions is breached (see {@code announcementVerificationMaxLookback}).
+        boolean announcementVerificationEnabled();
+
+        // Specifies how many past snapshot versions can be looked up if announcementVerificationEnabled is true,
+        // and an exact snapshot version matching with the update plan desired version could not be retrieved. Multiple
+        // lookups may be required in order to retrieve one that corresponds to an announced version.
+        int announcementVerificationMaxLookback();
+
+        // Announcemnet watcher impl for verifying that a retrieved blob had a corresponding announcement
+        AnnouncementWatcher announcementWatcher();
+
+        UpdatePlanBlobVerifier DEFAULT_INSTANCE = new UpdatePlanBlobVerifier() {
+            @Override
+            public boolean announcementVerificationEnabled() {
+                return false;
+            }
+
+            @Override
+            public int announcementVerificationMaxLookback() {
+                return 1;
+            }
+
+            @Override
+            public AnnouncementWatcher announcementWatcher() {
+                return null;
             }
         };
     }
@@ -1077,6 +1146,7 @@ public class HollowConsumer {
         protected HollowAPIFactory apiFactory = HollowAPIFactory.DEFAULT_FACTORY;
         protected HollowObjectHashCodeFinder hashCodeFinder = new DefaultHashCodeFinder();
         protected HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = DoubleSnapshotConfig.DEFAULT_CONFIG;
+        protected UpdatePlanBlobVerifier updatePlanBlobVerifier = UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
         protected HollowConsumer.ObjectLongevityConfig objectLongevityConfig = ObjectLongevityConfig.DEFAULT_CONFIG;
         protected HollowConsumer.ObjectLongevityDetector objectLongevityDetector = ObjectLongevityDetector.DEFAULT_DETECTOR;
         protected File localBlobStoreDir = null;
@@ -1298,6 +1368,11 @@ public class HollowConsumer {
 
         public B withDoubleSnapshotConfig(HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig) {
             this.doubleSnapshotConfig = doubleSnapshotConfig;
+            return (B)this;
+        }
+
+        public B withUpdatePlanVerifier(UpdatePlanBlobVerifier updatePlanBlobVerifier) {
+            this.updatePlanBlobVerifier = updatePlanBlobVerifier;
             return (B)this;
         }
 

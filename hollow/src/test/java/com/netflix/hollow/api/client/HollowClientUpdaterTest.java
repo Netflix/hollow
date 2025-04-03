@@ -25,6 +25,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,6 +47,7 @@ import com.netflix.hollow.test.consumer.TestBlobRetriever;
 import com.netflix.hollow.test.consumer.TestHollowConsumer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -69,6 +71,9 @@ public class HollowClientUpdaterTest {
     private HollowConsumer.ObjectLongevityConfig objectLongevityConfig;
     private HollowConsumer.ObjectLongevityDetector objectLongevityDetector;
     private HollowAPIFactory apiFactory;
+    private HollowConsumer.AnnouncementWatcher announcementWatcher;
+    private HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier;
+    private HollowConsumer.Blob blob;
 
     @Before
     public void setUp() {
@@ -78,10 +83,15 @@ public class HollowClientUpdaterTest {
         objectLongevityConfig = mock(HollowConsumer.ObjectLongevityConfig.class);
         objectLongevityDetector = mock(HollowConsumer.ObjectLongevityDetector.class);
         metrics = mock(HollowConsumerMetrics.class);
+        announcementWatcher = mock(HollowConsumer.AnnouncementWatcher.class);
+        updatePlanBlobVerifier = mock(HollowConsumer.UpdatePlanBlobVerifier.class);
+        blob = mock(HollowConsumer.Blob.class);
+
+        when(updatePlanBlobVerifier.announcementVerificationEnabled()).thenReturn(false);
         MemoryMode memoryMode = MemoryMode.ON_HEAP;
 
-        subject = new HollowClientUpdater(retriever, emptyList(), apiFactory, snapshotConfig,
-                null, memoryMode, objectLongevityConfig, objectLongevityDetector, metrics, null);
+        subject = new HollowClientUpdater(retriever, emptyList(), apiFactory, snapshotConfig,null, memoryMode,
+                objectLongevityConfig, objectLongevityDetector, metrics, null, updatePlanBlobVerifier);
     }
 
     @Test
@@ -141,14 +151,11 @@ public class HollowClientUpdaterTest {
         assertFalse(subject.getInitialLoad().isCompletedExceptionally());
     }
 
-    @Test
-    public void testInitialLoadSucceedsThenBadUpdatePlan_throwsException() throws Throwable {
-        // much setup
+    private HollowConsumer.Blob fakeSnapshotBlob() throws IOException {
         // 1. construct a real-ish snapshot blob
         HollowWriteStateEngine stateEngine = new HollowWriteStateEngineBuilder()
                 .add("hello")
                 .build();
-        // TODO(timt): DRY with TestHollowConsumer::addSnapshot
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         new HollowBlobWriter(stateEngine).writeSnapshot(os);
         ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
@@ -158,7 +165,14 @@ public class HollowClientUpdaterTest {
                 .thenReturn(true);
         when(blob.getInputStream())
                 .thenReturn(is);
-        // 3. return fake snapshot when asked
+        return blob;
+    }
+
+    @Test
+    public void testInitialLoadSucceedsThenBadUpdatePlan_throwsException() throws Throwable {
+        blob = fakeSnapshotBlob();
+
+        // return fake snapshot when asked
         when(retriever.retrieveSnapshotBlob(anyLong()))
                 .thenReturn(blob);
 
@@ -175,6 +189,131 @@ public class HollowClientUpdaterTest {
                 + "version or any qualifying previous versions could not be retrieved. Consumer will remain at current "
                 + "version %s until next update attempt.", v, subject.getCurrentVersionId()));
         subject.updateTo(v);
+    }
+
+    @Test
+    public void testInitToUnannouncedVersion_ExactSnapshot() throws Throwable {
+        long v1 = 123;
+
+        blob = fakeSnapshotBlob();
+        when(blob.getToVersion()).thenReturn(v1);
+        when(retriever.retrieveSnapshotBlob(anyLong())).thenReturn(blob);
+        when(updatePlanBlobVerifier.announcementVerificationEnabled()).thenReturn(true);
+        when(updatePlanBlobVerifier.announcementWatcher()).thenReturn(announcementWatcher);
+        when(announcementWatcher.getVersionAnnouncementStatus(anyLong())).thenReturn(HollowConsumer.AnnouncementStatus.NOT_ANNOUNCED);
+        when(snapshotConfig.allowDoubleSnapshot()).thenReturn(false);
+
+        subject.updateTo(v1);
+        assertTrue(subject.getInitialLoad().isDone());
+    }
+
+    @Test
+    public void testInitToUnannouncedVersion_LookbackSnapshotNotAnnounced() throws Throwable {
+        long v1 = 123;
+
+        blob = fakeSnapshotBlob();
+        when(blob.getToVersion()).thenReturn(v1);
+        when(retriever.retrieveSnapshotBlob(anyLong())).thenReturn(blob);
+        when(updatePlanBlobVerifier.announcementVerificationEnabled()).thenReturn(true);
+        when(updatePlanBlobVerifier.announcementVerificationMaxLookback()).thenReturn(1);
+        when(updatePlanBlobVerifier.announcementWatcher()).thenReturn(announcementWatcher);
+        when(announcementWatcher.getVersionAnnouncementStatus(anyLong())).thenReturn(HollowConsumer.AnnouncementStatus.NOT_ANNOUNCED);
+        when(snapshotConfig.allowDoubleSnapshot()).thenReturn(false);
+
+        try {
+            subject.updateTo(new HollowConsumer.VersionInfo(v1+1, Optional.empty(), Optional.empty(), Optional.of(true)));
+            fail(); // expected to throw
+        } catch (Exception e) {
+            assertTrue(e instanceof IllegalArgumentException);
+        }
+    }
+
+    @Test
+    public void testInitToAnnouncedVersion_LookbackSnapshot() throws Throwable {
+        long v1 = 123;
+
+        blob = fakeSnapshotBlob();
+        when(blob.getToVersion()).thenReturn(v1);
+        when(retriever.retrieveSnapshotBlob(anyLong())).thenReturn(blob);
+        when(updatePlanBlobVerifier.announcementVerificationEnabled()).thenReturn(true);
+        when(updatePlanBlobVerifier.announcementVerificationMaxLookback()).thenReturn(1);
+        when(updatePlanBlobVerifier.announcementWatcher()).thenReturn(announcementWatcher);
+        when(announcementWatcher.getVersionAnnouncementStatus(anyLong())).thenReturn(HollowConsumer.AnnouncementStatus.ANNOUNCED);
+        when(snapshotConfig.allowDoubleSnapshot()).thenReturn(false);
+
+        subject.updateTo(new HollowConsumer.VersionInfo(v1+1, Optional.empty(), Optional.empty(), Optional.of(true)));
+        assertTrue(subject.getInitialLoad().isDone());
+    }
+
+    @Test
+    public void testInitToAnnouncedVersion_MultipleLookbackSnapshot() throws Throwable {
+        long v1 = 123;
+        HollowConsumer.Blob blob1 = fakeSnapshotBlob();
+        HollowConsumer.Blob blob2 = fakeSnapshotBlob();
+
+        when(blob1.getToVersion()).thenReturn(v1+1);
+        when(blob2.getToVersion()).thenReturn(v1);
+
+        when(retriever.retrieveSnapshotBlob(anyLong())).thenReturn(blob1).thenReturn(blob2);
+        when(updatePlanBlobVerifier.announcementVerificationEnabled()).thenReturn(true);
+        when(updatePlanBlobVerifier.announcementVerificationMaxLookback()).thenReturn(1);
+        when(updatePlanBlobVerifier.announcementWatcher()).thenReturn(announcementWatcher);
+        when(announcementWatcher.getVersionAnnouncementStatus(eq(v1+1))).thenReturn(HollowConsumer.AnnouncementStatus.NOT_ANNOUNCED);
+        when(announcementWatcher.getVersionAnnouncementStatus(eq(v1))).thenReturn(HollowConsumer.AnnouncementStatus.ANNOUNCED);
+        when(snapshotConfig.allowDoubleSnapshot()).thenReturn(false);
+
+        when(updatePlanBlobVerifier.announcementVerificationMaxLookback()).thenReturn(2);
+        subject.updateTo(new HollowConsumer.VersionInfo(v1+2, Optional.empty(), Optional.empty(), Optional.of(true)));
+        assertTrue(subject.getInitialLoad().isDone());
+
+    }
+
+    @Test
+    public void testInitToAnnouncementUnknownVersion_LookbackSnapshotNotAnnounced() throws Throwable {
+        long v1 = 123;
+
+        blob = fakeSnapshotBlob();
+        when(blob.getToVersion()).thenReturn(v1);
+        when(retriever.retrieveSnapshotBlob(anyLong())).thenReturn(blob);
+        when(updatePlanBlobVerifier.announcementVerificationEnabled()).thenReturn(true);
+        when(updatePlanBlobVerifier.announcementVerificationMaxLookback()).thenReturn(1);
+        when(updatePlanBlobVerifier.announcementWatcher()).thenReturn(announcementWatcher);
+        when(announcementWatcher.getVersionAnnouncementStatus(anyLong())).thenReturn(HollowConsumer.AnnouncementStatus.NOT_ANNOUNCED);
+        when(snapshotConfig.allowDoubleSnapshot()).thenReturn(false);
+
+        subject.updateTo(new HollowConsumer.VersionInfo(v1+1, Optional.empty(), Optional.empty(), Optional.empty()));
+        assertTrue(subject.getInitialLoad().isDone());
+    }
+
+    @Test
+    public void testInitToAnnouncementUnknownVersion_ExactSnapshot() throws Throwable {
+        long v1 = 123;
+
+        blob = fakeSnapshotBlob();
+        when(blob.getToVersion()).thenReturn(v1);
+        when(retriever.retrieveSnapshotBlob(anyLong())).thenReturn(blob);
+        when(updatePlanBlobVerifier.announcementVerificationEnabled()).thenReturn(true);
+        when(updatePlanBlobVerifier.announcementWatcher()).thenReturn(announcementWatcher);
+        when(snapshotConfig.allowDoubleSnapshot()).thenReturn(false);
+        when(announcementWatcher.getVersionAnnouncementStatus(anyLong())).thenReturn(HollowConsumer.AnnouncementStatus.UNKNOWN);
+
+        subject.updateTo(v1);
+        assertTrue(subject.getInitialLoad().isDone());
+    }
+
+    @Test
+    public void testSnapshotAnnounceCheckDisabled_LookbackSnapshot() throws Throwable {
+        long v1 = 123;
+
+        blob = fakeSnapshotBlob();
+        when(blob.getToVersion()).thenReturn(v1);
+        when(retriever.retrieveSnapshotBlob(anyLong())).thenReturn(blob);
+        when(updatePlanBlobVerifier.announcementVerificationEnabled()).thenReturn(false);
+        when(announcementWatcher.getVersionAnnouncementStatus(anyLong())).thenReturn(HollowConsumer.AnnouncementStatus.UNKNOWN);
+        when(snapshotConfig.allowDoubleSnapshot()).thenReturn(true);
+
+        subject.updateTo(v1+1);
+        assertTrue(subject.getInitialLoad().isDone());
     }
 
     @Test
