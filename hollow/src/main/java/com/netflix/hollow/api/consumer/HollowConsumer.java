@@ -299,8 +299,8 @@ public class HollowConsumer {
 
     /**
      * Similar to {@link #triggerRefreshTo(long)} but instead of accepting a long version no. it accepts a
-     * {@link VersionInfo} instance that contains (in addition to version no.) version specific metadata and
-     * pinning status.
+     * {@link VersionInfo} instance that contains (in addition to version no.) version specific metadata,
+     * pinning status, and an indication of whether the desired version corresponds to an announcement.
      *
      * @param versionInfo version no., metadata, and pined status for the desired version
      */
@@ -636,6 +636,7 @@ public class HollowConsumer {
      * {@code isPinned} powers detection of forked delta chains- a producer is not expected to regress to an older version unless it is pinned.
      * {@code announcementMetdata} powers consumer-side features like auto double-snapshot on schema change that rely on producer setting a tag in announcement metadata.
      * {@code wasAnnounced} powers a verification in the consumer update plan computation- when updating to an announced version only announced snapshots should be retrieved.
+     *                      For impl see {@link com.netflix.hollow.api.client.HollowUpdatePlanner#planUpdate(long, VersionInfo, boolean)} and {@link UpdatePlanBlobVerifier}.
      * */
     public static class VersionInfo {
         long version;
