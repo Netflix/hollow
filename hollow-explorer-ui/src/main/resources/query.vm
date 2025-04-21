@@ -52,6 +52,21 @@ Current Query: <span style="font-family: monospace;">$esc.html($queryResult.getQ
 
 <p/>
 
+#if($queryResult.getQueryClauses().size() > 1)Modify Query:
+    <ul>
+        #foreach($clause in $queryResult.getQueryClauses())
+            <li>
+                <span style="font-family: monospace;">
+                    #if($clause.getType())$clause.getType().#end$clause.getField() = $clause.getValue()
+                    <a href="$basePath/query?removeField=$esc.url($clause.getField())">remove</a>
+                </span>
+            </li>
+        #end
+    </ul>
+#end
+
+<p/>
+
 RESULTS:
 
 <ul>
