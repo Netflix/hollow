@@ -63,9 +63,8 @@ Current Query: <span style="font-family: monospace;">$esc.html($queryResult.getQ
             </li>
         #end
     </ul>
-#end
-
 <p/>
+#end
 
 RESULTS:
 
