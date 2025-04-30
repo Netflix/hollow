@@ -95,9 +95,9 @@ abstract class AbstractHollowProducer {
     boolean isInitialized;
 
     private final long targetMaxTypeShardSize;
-    private final boolean allowTypeResharding;
     private final boolean focusHoleFillInFewestShards;
-
+    private final boolean allowTypeResharding;
+    private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
 
     @Deprecated
     public AbstractHollowProducer(
@@ -106,7 +106,7 @@ abstract class AbstractHollowProducer {
         this(new HollowFilesystemBlobStager(), publisher, announcer,
                 Collections.emptyList(),
                 new VersionMinterWithCounter(), null, 0,
-                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, null,
+                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
                 null, true);
     }
@@ -118,7 +118,8 @@ abstract class AbstractHollowProducer {
         this(b.stager, b.publisher, b.announcer,
                 b.eventListeners,
                 b.versionMinter, b.snapshotPublishExecutor,
-                b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards, b.allowTypeResharding,
+                b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
+                b.allowTypeResharding, b.forceCoverageOfTypeResharding,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
                 b.hashCodeFinder, b.doIntegrityCheck);
     }
@@ -134,6 +135,7 @@ abstract class AbstractHollowProducer {
             long targetMaxTypeShardSize,
             boolean focusHoleFillInFewestShards,
             boolean allowTypeResharding,
+            boolean forceCoverageOfTypeResharding,
             HollowMetricsCollector<HollowProducerMetrics> metricsCollector,
             HollowProducer.BlobStorageCleaner blobStorageCleaner,
             SingleProducerEnforcer singleProducerEnforcer,
@@ -150,6 +152,7 @@ abstract class AbstractHollowProducer {
         this.doIntegrityCheck = doIntegrityCheck;
         this.targetMaxTypeShardSize = targetMaxTypeShardSize;
         this.allowTypeResharding = allowTypeResharding;
+        this.forceCoverageOfTypeResharding = forceCoverageOfTypeResharding;
         this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
@@ -398,6 +401,12 @@ abstract class AbstractHollowProducer {
                 boolean schemaChangedFromPriorVersion = readStates.hasCurrent() &&
                         !writeEngine.hasIdenticalSchemas(readStates.current().getStateEngine());
                 updateHeaderTags(writeEngine, toVersion, schemaChangedFromPriorVersion);
+
+                if (allowTypeResharding && forceCoverageOfTypeResharding) {
+                    int randomFactor = (int) Math.pow(2, (int) (Math.random() * 9) - 4); // random power of 2 in the range [-4, 4]
+                    long adjustedShardSize = targetMaxTypeShardSize * randomFactor;
+                    writeEngine.setTargetMaxTypeShardSize(adjustedShardSize);
+                }
 
                 // 3a. Publish, run checks & validation, then announce new state consumers
                 publish(listeners, toVersion, artifacts);

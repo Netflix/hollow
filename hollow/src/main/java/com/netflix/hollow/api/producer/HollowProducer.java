@@ -43,7 +43,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.Executor;
 
 /**
@@ -732,6 +731,7 @@ public class HollowProducer extends AbstractHollowProducer {
         int numStatesBetweenSnapshots = 0;
         boolean focusHoleFillInFewestShards = false;
         boolean allowTypeResharding = false;
+        boolean forceCoverageOfTypeResharding = false;
         long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
         HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
         BlobStorageCleaner blobStorageCleaner = new DummyBlobStorageCleaner();
@@ -883,7 +883,20 @@ public class HollowProducer extends AbstractHollowProducer {
          * Also requires consumers of the delta chain to be on a recent Hollow library version that supports re-sharding at the time of delta application.
          */
         public B withTypeResharding(boolean allowTypeResharding) {
+            return (B) withTypeResharding(allowTypeResharding, false);
+        }
+
+        /**
+         * Experimental: Setting this will allow producer to adjust number of shards per type in the course of a delta chain.
+         *
+         * @param allowTypeResharding enable type resharding feature, see {@link #withTypeResharding(boolean)} for more details.
+         * @param forceCoverage a boolean indicating whether to attempt to induce resharding on every cycle. This a feature
+         *                                    for exercising resharding coverage frequently in test environments, and is not expected
+         *                                    to be set for production environments.
+         */
+        public B withTypeResharding(boolean allowTypeResharding, boolean forceCoverage) {
             this.allowTypeResharding = allowTypeResharding;
+            this.forceCoverageOfTypeResharding = forceCoverage;
             return (B) this;
         }
 
