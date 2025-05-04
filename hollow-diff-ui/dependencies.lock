@@ -15,8 +15,8 @@
         "com.netflix.hollow:hollow-ui-tools": {
             "project": true
         },
-        "javax.servlet:javax.servlet-api": {
-            "locked": "4.0.1"
+        "jakarta.servlet:jakarta.servlet-api": {
+            "locked": "5.0.0"
         },
         "org.apache.velocity:velocity-engine-core": {
             "firstLevelTransitive": [
@@ -51,11 +51,11 @@
             ],
             "locked": "2.11.0"
         },
-        "javax.servlet:javax.servlet-api": {
+        "jakarta.servlet:jakarta.servlet-api": {
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "4.0.1"
+            "locked": "5.0.0"
         },
         "org.apache.commons:commons-text": {
             "firstLevelTransitive": [
@@ -86,8 +86,8 @@
         "com.netflix.hollow:hollow-ui-tools": {
             "project": true
         },
-        "javax.servlet:javax.servlet-api": {
-            "locked": "4.0.1"
+        "jakarta.servlet:jakarta.servlet-api": {
+            "locked": "5.0.0"
         },
         "junit:junit": {
             "locked": "4.11"
@@ -125,11 +125,11 @@
             ],
             "locked": "2.11.0"
         },
-        "javax.servlet:javax.servlet-api": {
+        "jakarta.servlet:jakarta.servlet-api": {
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "4.0.1"
+            "locked": "5.0.0"
         },
         "junit:junit": {
             "locked": "4.11"
@@ -163,8 +163,8 @@
         "com.netflix.hollow:hollow-ui-tools": {
             "project": true
         },
-        "javax.servlet:javax.servlet-api": {
-            "locked": "4.0.1"
+        "jakarta.servlet:jakarta.servlet-api": {
+            "locked": "5.0.0"
         },
         "junit:junit": {
             "locked": "4.11"
@@ -202,11 +202,11 @@
             ],
             "locked": "2.11.0"
         },
-        "javax.servlet:javax.servlet-api": {
+        "jakarta.servlet:jakarta.servlet-api": {
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
-            "locked": "4.0.1"
+            "locked": "5.0.0"
         },
         "junit:junit": {
             "locked": "4.11"
