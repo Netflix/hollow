@@ -132,7 +132,7 @@ public class HollowIncrementalProducerTest {
         assertTypeA(idx, 4, "five", 6L);
         assertTypeA(idx, 5, "five", null);
     }
-    
+
     @Test
     public void addIfAbsentWillInitializeNewRecordsButNotOverwriteExistingRecords() {
         HollowProducer producer = createInMemoryProducer();
@@ -143,7 +143,7 @@ public class HollowIncrementalProducerTest {
         /// now we'll be incrementally updating the state by mutating individual records
         HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
 
-        incrementalProducer.addIfAbsent(new TypeA(100, "one hundred", 9999)); // new 
+        incrementalProducer.addIfAbsent(new TypeA(100, "one hundred", 9999)); // new
         incrementalProducer.addIfAbsent(new TypeA(101, "one hundred and one", 9998)); // new
         incrementalProducer.addIfAbsent(new TypeA(1, "one", 9997)); // exists in prior state
         incrementalProducer.addIfAbsent(new TypeA(2, "two", 9996)); // exists in prior state
@@ -151,15 +151,15 @@ public class HollowIncrementalProducerTest {
         incrementalProducer.addIfAbsent(new TypeA(102, "one hundred and two", 9994)); // new, but already added
         incrementalProducer.addIfAbsent(new TypeA(103, "one hundred and three", 9993)); // new
         incrementalProducer.addOrModify(new TypeA(103, "one hundred and three", 9992)); // overwrites prior call to addIfAbsent
-        
+
         long version = incrementalProducer.runCycle();
-        
+
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
         consumer.triggerRefreshTo(version);
-        
+
         HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
         Assert.assertFalse(idx.containsDuplicates());
-        
+
         assertTypeA(idx, 100, "one hundred", 9999L);
         assertTypeA(idx, 101, "one hundred and one", 9998L);
         assertTypeA(idx, 1, "one", 1L);
@@ -167,7 +167,7 @@ public class HollowIncrementalProducerTest {
         assertTypeA(idx, 102, "one hundred and two", 9995L);
         assertTypeA(idx, 103, "one hundred and three", 9992L);
     }
-    
+
     @Test
     public void updateStateWithUnavailableCollectionElementTypes() {
         // Producer is created but not initialized IncrementalProducer will directly initialize the first snapshot
@@ -184,11 +184,11 @@ public class HollowIncrementalProducerTest {
 
         FlatRecordWriter writer = new FlatRecordWriter(dataset, new FakeHollowSchemaIdentifierMapper(dataset));
         mapper.writeFlat(new TypeWithChildCollections(100, null), writer);
-        
+
         incrementalProducer.addOrModify(writer.generateFlatRecord());
-        
+
         long version = incrementalProducer.runCycle();
-        
+
         incrementalProducer.delete(new RecordPrimaryKey("TypeWithChildCollections", new Object[] {100}));
         writer.reset();
         mapper.writeFlat(new TypeWithChildCollections(101, null), writer);
@@ -197,14 +197,14 @@ public class HollowIncrementalProducerTest {
         long nextVersion = incrementalProducer.runCycle();
         Assert.assertTrue(nextVersion > 0);
     }
-    
+
     @HollowPrimaryKey(fields="id")
     public static class TypeWithChildCollections {
         int id;
         Set<ElementType> set;
         List<ElementType> list;
         Map<ElementType, ElementType> map;
-        
+
         public TypeWithChildCollections(int id, Integer val) {
             ElementType el = val == null ? null : new ElementType(val);
             this.id = id;
@@ -213,15 +213,15 @@ public class HollowIncrementalProducerTest {
             this.map = el == null ? Collections.emptyMap() : Collections.singletonMap(el, el);
         }
     }
-    
+
     public static class ElementType {
         int value;
-        
+
         public ElementType(int value) {
             this.value = value;
         }
     }
-    
+
 
     @Test
     public void publishAndLoadASnapshotDirectly() {
@@ -438,6 +438,53 @@ public class HollowIncrementalProducerTest {
         Assert.assertFalse(idx.containsDuplicates());
 
         assertTypeBOrE(idx, 3, "three");
+    }
+
+    /// Restore calls {@link com.netflix.hollow.core.util.HollowWriteStateCreator#populateUsingReadEngine} which in turn
+    /// prepares the write state for being written (incl. setting numShards), but on first runCycle since restore incr producer
+    /// will also call {@link HollowWriteStateEngine#prepareForNextCycle}, add records, and then prepare the write state for being
+    ///  written once again. In these 2 invocations to prepareForNextCycle, numShards will be determined twice, but resharding
+    /// should only kick in at the time of runCycle.
+    @Test
+    public void continuesARestoredState_reshardOnlyOnce() {
+        HollowProducer genesisProducer = createInMemoryProducerWithResharding();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        long originalVersion = genesisProducer.runCycle(new Populator() {
+            public void populate(WriteState state) throws Exception {
+                state.add(new TypeA(1, "one", 1));
+                state.add(new TypeA(2, "two", 2));
+                state.add(new TypeA(3, "three", 3));
+                state.add(new TypeA(4, "four", 4));
+            }
+        });
+        assertEquals(4, genesisProducer.getWriteEngine().getTypeState("String").getNumShards());
+
+        /// now at some point in the future, we will start up and create a new classic producer
+        /// to back the HollowIncrementalProducer.
+        HollowProducer backingProducer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withTypeResharding(true)
+                .withTargetMaxTypeShardSize(2) // smaller shard size, will trigger resharding on next runCycle
+                .build();
+
+        backingProducer.initializeDataModel(TypeA.class);
+
+        /// now create our HollowIncrementalProducer
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(backingProducer);
+        incrementalProducer.restore(originalVersion, blobStore);
+        // assert that restore didn't attempt to reshard from 4 to 8
+        assertEquals(4, backingProducer.getWriteEngine().getTypeState("String").getNumShards());
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 2));
+        long version = incrementalProducer.runCycle();
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(originalVersion);
+        consumer.triggerRefreshTo(version);
+        // runcycle resharded from 4 to 8
+        assertEquals(8, consumer.getStateEngine().getTypeState("String").numShards());
+
     }
 
     @Test

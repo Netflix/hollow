@@ -291,7 +291,7 @@ public abstract class HollowTypeWriteState {
         resetToLastNumShards = numShards; // -1 if first cycle else previous numShards. See {@code testNumShardsMaintainedWhenNoResharding}
     }
 
-    public void prepareForWrite() {
+    public void prepareForWrite(boolean canReshard) {
         /// write all of the unused objects to the current ordinalMap, without updating the current cycle bitset,
         /// this way we can do a reverse delta.
         if(isRestored() && !wroteData) {
@@ -437,13 +437,13 @@ public abstract class HollowTypeWriteState {
         return isAllowed;
     }
 
-    protected void gatherShardingStats(int maxOrdinal) {
+    public void gatherShardingStats(int maxOrdinal, boolean canReshard) {
         if(numShards == -1) {
             numShards = typeStateNumShards(maxOrdinal);
             revNumShards = numShards;
         } else {
             revNumShards = numShards;
-            if (allowTypeResharding()) {
+            if (canReshard && allowTypeResharding()) {
                 numShards = typeStateNumShards(maxOrdinal);
                 if (numShards != revNumShards) {    // re-sharding
                     // limit numShards to 2x or .5x of prevShards per producer cycle
@@ -454,7 +454,6 @@ public abstract class HollowTypeWriteState {
                 }
             }
         }
-
         maxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, numShards);
         if (revNumShards > 0) {
             revMaxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, revNumShards);

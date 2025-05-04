@@ -189,7 +189,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     /**
      * Transition from the "adding records" phase of a cycle to the "writing" phase of a cycle.
      */
-    public void prepareForWrite() {
+    public void prepareForWrite() { prepareForWrite(false); }
+    protected void prepareForWrite(boolean canReshard) {
 
         if(!preparedForNextCycle)  // this call should be a no-op if we are already prepared for write
             return;
@@ -203,7 +204,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        typeStateEntry.getValue().prepareForWrite();
+                        typeStateEntry.getValue().prepareForWrite(canReshard);
                     }
                 });
             }
