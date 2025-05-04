@@ -66,12 +66,12 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
      *
      */
     @Override
-    public void prepareForWrite() {
-        super.prepareForWrite();
+    public void prepareForWrite(boolean canReshard) {
+        super.prepareForWrite(canReshard);
 
         maxOrdinal = ordinalMap.maxOrdinal();
         gatherFieldStats();
-        gatherShardingStats(maxOrdinal);
+        gatherShardingStats(maxOrdinal, canReshard);
     }
 
     private void gatherFieldStats() {
