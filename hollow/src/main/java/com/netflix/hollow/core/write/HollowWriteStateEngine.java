@@ -423,7 +423,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
      * @param targetMaxTypeShardSize the target max type shard size, in bytes
      */
     public void setTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
-        if (targetMaxTypeShardSize < 0) {
+        if (targetMaxTypeShardSize <= 0) {
             throw new IllegalArgumentException("Invalid target max shard size specified: " + targetMaxTypeShardSize);
         }
         this.targetMaxTypeShardSize = targetMaxTypeShardSize;

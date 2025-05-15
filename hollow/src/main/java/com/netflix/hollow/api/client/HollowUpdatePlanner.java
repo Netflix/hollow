@@ -113,7 +113,6 @@ public class HollowUpdatePlanner {
             if(snapshotDestinationVersion == desiredVersion
                     || ((deltaDestinationVersion > desiredVersion) && (snapshotDestinationVersion < desiredVersion))
                     || ((snapshotDestinationVersion < desiredVersion) && (snapshotDestinationVersion > deltaDestinationVersion)))
-
                 return snapshotPlan;
         }
 

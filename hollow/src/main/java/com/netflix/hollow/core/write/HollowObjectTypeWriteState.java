@@ -88,8 +88,11 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         projectedSizeOfType += fieldStats.getTotalSizeOfAllVarLengthData();
 
         int targetNumShards = 1;
-        while(stateEngine.getTargetMaxTypeShardSize() * targetNumShards < projectedSizeOfType)
+        while(stateEngine.getTargetMaxTypeShardSize() * targetNumShards < projectedSizeOfType) {
+            LOG.info("Doubling targetNumShards from " + targetNumShards + " to " + targetNumShards*2 + " for " + getSchema().getName() + " with projected size of " + projectedSizeOfType + " and target max type shard size of " + stateEngine.getTargetMaxTypeShardSize() + " and maxOrdinal of " + maxOrdinal);
             targetNumShards *= 2;
+        }
+
 
         return targetNumShards;
     }
