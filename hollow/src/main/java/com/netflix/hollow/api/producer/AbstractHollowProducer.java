@@ -403,8 +403,15 @@ abstract class AbstractHollowProducer {
                 updateHeaderTags(writeEngine, toVersion, schemaChangedFromPriorVersion);
 
                 if (allowTypeResharding && forceCoverageOfTypeResharding) {
-                    int randomFactor = (int) Math.pow(2, (int) (Math.random() * 9) - 4); // random power of 2 in the range [-4, 4]
-                    long adjustedShardSize = targetMaxTypeShardSize * randomFactor;
+                    int shift = (int) (Math.random() * 9) - 4; // range [-4, 4]
+                    long adjustedShardSize;
+                    if (shift > 0) {
+                        adjustedShardSize = targetMaxTypeShardSize << shift;
+                    } else  if (shift < 0) {
+                        adjustedShardSize = targetMaxTypeShardSize >> -shift;
+                    } else {
+                        adjustedShardSize = targetMaxTypeShardSize;
+                    }
                     writeEngine.setTargetMaxTypeShardSize(adjustedShardSize);
                 }
 
