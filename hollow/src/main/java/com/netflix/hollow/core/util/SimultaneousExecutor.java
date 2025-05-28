@@ -21,6 +21,7 @@ import static com.netflix.hollow.core.util.Threads.daemonThread;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -39,7 +40,7 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
 
     private static final String DEFAULT_THREAD_NAME = "simultaneous-executor";
 
-    private final List<Future<?>> futures = new ArrayList<Future<?>>();
+    private final ConcurrentLinkedQueue<Future<?>> futures = new ConcurrentLinkedQueue<>();
 
     /**
      * Creates an executor with a thread per processor.
@@ -260,11 +261,10 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
      * while waiting
      */
     public void awaitSuccessfulCompletionOfCurrentTasks() throws InterruptedException, ExecutionException {
-        for(Future<?> f : futures) {
+        Future<?> f;
+        while ((f = futures.poll()) != null) {
             f.get();
         }
-
-        futures.clear();
     }
 
 }
