@@ -32,8 +32,8 @@ import java.util.concurrent.TimeUnit;
  * A convenience wrapper around ThreadPoolExecutor. Provides sane defaults to
  * constructor arguments and allows for awaitUninterruptibly().
  * 
- * <p><strong>Internal Use:</strong> This class is intended for internal framework use and
- * is not meant for external consumption.
+ * <p><strong>Internal Use:</strong> This class is intended for internal 
+ * framework use and is not meant for external consumption.
  */
 public class SimultaneousExecutor extends ThreadPoolExecutor {
 
@@ -254,10 +254,9 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
      *
      * After this call completes, the thread pool will <i>not</i> be shut down and can be reused.
      * 
-     * If tasks are being submitted concurrently from other threads while
-     * this method executes, the iteration over futures is weakly consistent and may not include
-     * all concurrently submitted tasks. Ideally this method should be called after all the tasks are 
-     * submitted.
+     * If tasks are being submitted concurrently from other threads while this method executes, 
+     * the iteration over futures is weakly consistent and may not include all concurrently submitted 
+     * tasks. Ideally this method should be called after all the tasks are submitted.
      *
      * @throws ExecutionException if a computation threw an
      * exception
