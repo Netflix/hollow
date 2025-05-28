@@ -234,7 +234,7 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
      * Await successful completion of all submitted tasks. Throw exception of the first failed task
      * if 1 or more tasks failed.
      *
-     * <p><strong>Note:</strong> If tasks are being submitted concurrently from other threads while
+     * If tasks are being submitted concurrently from other threads while
      * this method executes, the iteration over futures is weakly consistent and may not include
      * all concurrently submitted tasks. Ideally this method should be called after all the tasks are 
      * submitted.
