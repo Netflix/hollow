@@ -18,8 +18,6 @@ package com.netflix.hollow.core.util;
 
 import static com.netflix.hollow.core.util.Threads.daemonThread;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
@@ -31,10 +29,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
  * A convenience wrapper around ThreadPoolExecutor. Provides sane defaults to
  * constructor arguments and allows for awaitUninterruptibly().
- *
+ * 
+ * <p><strong>Internal Use:</strong> This class is intended for internal framework use and
+ * is not meant for external consumption.
  */
 public class SimultaneousExecutor extends ThreadPoolExecutor {
 
@@ -234,6 +233,11 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
     /**
      * Await successful completion of all submitted tasks. Throw exception of the first failed task
      * if 1 or more tasks failed.
+     *
+     * <p><strong>Note:</strong> If tasks are being submitted concurrently from other threads while
+     * this method executes, the iteration over futures is weakly consistent and may not include
+     * all concurrently submitted tasks. Ideally this method should be called after all the tasks are 
+     * submitted.
      *
      * After this call completes, the thread pool will be shut down.
      *
