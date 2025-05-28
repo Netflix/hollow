@@ -18,9 +18,8 @@ package com.netflix.hollow.core.util;
 
 import static com.netflix.hollow.core.util.Threads.daemonThread;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -30,16 +29,17 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
  * A convenience wrapper around ThreadPoolExecutor. Provides sane defaults to
  * constructor arguments and allows for awaitUninterruptibly().
- *
+ * 
+ * <p><strong>Internal Use:</strong> This class is intended for internal 
+ * framework use and is not meant for external consumption.
  */
 public class SimultaneousExecutor extends ThreadPoolExecutor {
 
     private static final String DEFAULT_THREAD_NAME = "simultaneous-executor";
 
-    private final List<Future<?>> futures = new ArrayList<Future<?>>();
+    private final ConcurrentLinkedQueue<Future<?>> futures = new ConcurrentLinkedQueue<>();
 
     /**
      * Creates an executor with a thread per processor.
@@ -253,6 +253,10 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
      * if 1 or more tasks failed.
      *
      * After this call completes, the thread pool will <i>not</i> be shut down and can be reused.
+     * 
+     * If tasks are being submitted concurrently from other threads while this method executes, 
+     * the iteration over futures is weakly consistent and may not include all concurrently submitted 
+     * tasks. Ideally this method should be called after all the tasks are submitted.
      *
      * @throws ExecutionException if a computation threw an
      * exception
@@ -260,11 +264,10 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
      * while waiting
      */
     public void awaitSuccessfulCompletionOfCurrentTasks() throws InterruptedException, ExecutionException {
-        for(Future<?> f : futures) {
+        Future<?> f;
+        while ((f = futures.poll()) != null) {
             f.get();
         }
-
-        futures.clear();
     }
 
 }
