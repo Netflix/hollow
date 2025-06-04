@@ -109,6 +109,9 @@ unexpectedly decreases or increases.
 3. An object modification validator, `ObjectModificationValidator`.
 This validator can be configured to compare the state of objects (with the same primary key)
 that have been modified (not added or removed).
+4. A minimum record count validator, `MinimumRecordCountValidator`.
+This validator can be configured to guard against large deletions, by setting a threshold for 
+allowable minimum number of records in a data type.
 
 
 ## Using the generated object API

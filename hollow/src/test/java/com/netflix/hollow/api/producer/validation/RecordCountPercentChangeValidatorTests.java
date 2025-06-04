@@ -1,15 +1,17 @@
 package com.netflix.hollow.api.producer.validation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.test.InMemoryBlobStore;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.Before;
+import org.junit.Test;
 
 public class RecordCountPercentChangeValidatorTests {
     private InMemoryBlobStore blobStore;
@@ -26,7 +28,7 @@ public class RecordCountPercentChangeValidatorTests {
                     .withAddedPercentageThreshold(() -> 0.5f)
                     .build(), 0, 0, 0);
         } catch (Exception e) {
-            Assert.fail(); //should not reach here
+            fail(); //should not reach here
         }
     }
 
@@ -37,7 +39,7 @@ public class RecordCountPercentChangeValidatorTests {
                     .withAddedPercentageThreshold(() -> 0.5f)
                     .build(), 0, 0, 3);
         } catch (Exception e) {
-            Assert.fail(); //should not reach here
+            fail(); //should not reach here
         }
     }
 
@@ -47,9 +49,11 @@ public class RecordCountPercentChangeValidatorTests {
             testHelper(RecordCountPercentChangeValidator.Threshold.builder()
                     .withAddedPercentageThreshold(() -> 0.5f)
                     .build(), 0, 4, 0);
-            Assert.fail();
-        } catch (ValidationStatusException expected) {
-            Assert.assertEquals(1, expected.getValidationStatus().getResults().size());
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof ValidationStatusException);
+            ValidationStatusException expected = (ValidationStatusException) e;
+            assertEquals(1, expected.getValidationStatus().getResults().size());
         }
     }
 
@@ -59,9 +63,11 @@ public class RecordCountPercentChangeValidatorTests {
             testHelper(RecordCountPercentChangeValidator.Threshold.builder()
                     .withRemovedPercentageThreshold(() -> 0.5f)
                     .build(), 0, 0, 4);
-            Assert.fail();
-        } catch (ValidationStatusException expected) {
-            Assert.assertEquals(1, expected.getValidationStatus().getResults().size());
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof ValidationStatusException);
+            ValidationStatusException expected = (ValidationStatusException) e;
+            assertEquals(1, expected.getValidationStatus().getResults().size());
         }
     }
 
@@ -73,9 +79,11 @@ public class RecordCountPercentChangeValidatorTests {
                     .withAddedPercentageThreshold(() -> 0.5f)
                     .withAddedPercentageThreshold(() -> 0.5f)
                     .build(), 4, 1, 1);
-            Assert.fail();
-        } catch (ValidationStatusException expected) {
-            Assert.assertEquals(1, expected.getValidationStatus().getResults().size());
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof ValidationStatusException);
+            ValidationStatusException expected = (ValidationStatusException) e;
+            assertEquals(1, expected.getValidationStatus().getResults().size());
         }
     }
 
