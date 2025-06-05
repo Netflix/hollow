@@ -20,7 +20,7 @@ import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.tools.history.HollowHistoricalState;
 import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
 import com.netflix.hollow.ui.HollowUISession;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class HollowHistoryViewProvider implements HollowObjectViewProvider {
 
