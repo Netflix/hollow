@@ -105,6 +105,11 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
         HollowSchema schema = priorReadState.getSchema();
         int populatedOrdinals = priorReadState.getPopulatedOrdinals().length();
         if(schema.getSchemaType() == HollowSchema.SchemaType.OBJECT) {
+            HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
+            if (objectSchema.getPrimaryKey() == null) {
+                throw new IllegalArgumentException("Type " + type + " does not have a primary key defined");
+            }
+
             final HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(priorStateEngine, ((HollowObjectSchema) schema).getPrimaryKey()); ///TODO: Should we scan instead?  Can we create this once and do delta updates?
 
             ThreadSafeBitSet typeRecordsToRemove = new ThreadSafeBitSet(ThreadSafeBitSet.DEFAULT_LOG2_SEGMENT_SIZE_IN_BITS, populatedOrdinals);
