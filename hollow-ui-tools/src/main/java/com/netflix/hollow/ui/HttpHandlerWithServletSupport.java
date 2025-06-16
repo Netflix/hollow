@@ -305,7 +305,7 @@ public class HttpHandlerWithServletSupport implements HttpHandler {
         Map<String, String[]> parsePostData = new HashMap<>();
 
         try {
-            parsePostData.putAll(HttpUtils.parseQueryString(ex.getRequestURI().getQuery()));
+            parsePostData.putAll(HttpUtils.parseQueryString(ex.getRequestURI().getRawQuery()));
 
             // check if any postdata to parse
             parsePostData.putAll(HttpUtils.parsePostData(inBytes.length, is));
