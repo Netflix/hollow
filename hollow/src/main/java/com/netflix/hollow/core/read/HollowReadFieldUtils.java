@@ -19,11 +19,12 @@ package com.netflix.hollow.core.read;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.util.Arrays;
 
 /**
- * Useful utility methods for interacting with a {@link HollowDataAccess}. 
+ * Useful utility methods for interacting with a {@link HollowDataAccess}.
  */
 public class HollowReadFieldUtils {
 
@@ -142,7 +143,7 @@ public class HollowReadFieldUtils {
      * @param typeAccess the type access
      * @param ordinal the ordinal
      * @param fieldPosition the field position
-     * @return a displayable String for a field from an OBJECT record. 
+     * @return a displayable String for a field from an OBJECT record.
      */
     public static String displayString(HollowObjectTypeDataAccess typeAccess, int ordinal, int fieldPosition) {
         HollowObjectSchema schema = typeAccess.getSchema();
@@ -261,6 +262,51 @@ public class HollowReadFieldUtils {
         }
 
         throw new IllegalStateException("I don't know how to test equality for a " + schema.getFieldType(fieldPosition));
+    }
+
+    /**
+     * @param typeAccess the type access
+     * @param fieldPosition the field position
+     * @param ordinal1 the first object ordinal
+     * @param ordinal2 the second object ordinal
+     * @return compareTo result for the two field values at the specified field position
+     */
+    public static int compareFieldValues(HollowObjectTypeDataAccess typeAccess, int fieldPosition, int ordinal1, int ordinal2) {
+        HollowObjectSchema schema = typeAccess.getSchema();
+
+        switch(schema.getFieldType(fieldPosition)) {
+            case BOOLEAN:
+                return Boolean.compare(typeAccess.readBoolean(ordinal1, fieldPosition), typeAccess.readBoolean(ordinal2, fieldPosition));
+            case BYTES:
+                return 0;
+            case DOUBLE:
+                return Double.compare(typeAccess.readDouble(ordinal1, fieldPosition), typeAccess.readDouble(ordinal2, fieldPosition));
+            case FLOAT:
+                return Float.compare(typeAccess.readFloat(ordinal1, fieldPosition), typeAccess.readFloat(ordinal2, fieldPosition));
+            case INT:
+                return Integer.compare(typeAccess.readInt(ordinal1, fieldPosition), typeAccess.readInt(ordinal2, fieldPosition));
+            case LONG:
+                return Long.compare(typeAccess.readLong(ordinal1, fieldPosition), typeAccess.readLong(ordinal2, fieldPosition));
+            case STRING:
+                return typeAccess.readString(ordinal1, fieldPosition).compareTo(typeAccess.readString(ordinal2, fieldPosition));
+            case REFERENCE:
+                // For reference types, if the referenced type is an object,
+                // then compare the first field of the object, otherwise assume
+                // equality.
+                HollowTypeDataAccess typeDataAccess = typeAccess.getDataAccess().getTypeDataAccess(schema.getReferencedType(fieldPosition));
+                if (typeDataAccess instanceof HollowObjectTypeDataAccess) {
+                    HollowObjectTypeDataAccess refTypeAccess = (HollowObjectTypeDataAccess) typeDataAccess;
+                    HollowObjectSchema refSchema = refTypeAccess.getSchema();
+                    if (refSchema.numFields() == 1) {
+                        return compareFieldValues(refTypeAccess, 0,
+                                typeAccess.readOrdinal(ordinal1, fieldPosition),
+                                typeAccess.readOrdinal(ordinal2, fieldPosition));
+                    }
+                }
+                return 0;
+        }
+
+        throw new IllegalStateException("I don't know how to compare a " + schema.getFieldType(fieldPosition));
     }
 
     /**

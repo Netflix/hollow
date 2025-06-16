@@ -206,8 +206,35 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
                 stringifyType(TypeWithString.class, true, false, new TypeWithString(testString)));
     }
 
+    @Test
+    public void testStringifySetOfPrimitives() throws IOException {
+        Assert.assertEquals("Set of primitives should be printed correctly",
+                "[3,200,1000]",
+                stringifyType(TypeWithSetOfPrimitives.class, false, false,
+                        new TypeWithSetOfPrimitives(
+                                new java.util.HashSet<>(Arrays.asList(
+                                        new TypeWithPrimitive(1000),
+                                        new TypeWithPrimitive(200),
+                                        new TypeWithPrimitive(3)
+                                )))));
+    }
+
+    @Test
+    public void testStringifySetOfStrings() throws IOException {
+        Assert.assertEquals("Set of strings should be printed correctly",
+                "[\"a\",\"b\",\"c\"]",
+                stringifyType(TypeWithSetOfStrings.class, false, false,
+                        new TypeWithSetOfStrings(
+                                new java.util.HashSet<>(Arrays.asList(
+                                        new TypeWithString("c"),
+                                        new TypeWithString("a"),
+                                        new TypeWithString("b")
+                                )))));
+    }
+
+
     private static <T> String stringifyType(Class<T> clazz, boolean prettyPrint, boolean expanded, T... instances) throws IOException {
-        HollowRecordJsonStringifier stringifier = new HollowRecordJsonStringifier(prettyPrint, !expanded);
+        HollowRecordJsonStringifier stringifier = new HollowRecordJsonStringifier(prettyPrint, !expanded, true);
         // HollowRecordJsonStringifier stringifier = expanded
         //    ? new HollowRecordJsonStringifier(prettyPrint, false) : new HollowRecordJsonStringifier();
         return stringifyType(clazz, stringifier, instances);

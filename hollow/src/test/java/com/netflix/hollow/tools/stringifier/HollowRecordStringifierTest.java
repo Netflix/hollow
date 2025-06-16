@@ -135,6 +135,38 @@ public class HollowRecordStringifierTest extends AbstractHollowRecordStringifier
                         "\n]", writer.toString());
     }
 
+    @Test
+    public void testStringifySetOfPrimitives() throws IOException {
+        Assert.assertEquals("Set of primitives should be printed correctly",
+                "\n  e: 3\n" +
+                        "  e: 200\n" +
+                        "  e: 1000",
+                stringifyType(TypeWithSetOfPrimitives.class,
+                        new HollowRecordStringifier(false, false, true, true),
+                        new TypeWithSetOfPrimitives(
+                                new java.util.HashSet<>(Arrays.asList(
+                                        new TypeWithPrimitive(1000),
+                                        new TypeWithPrimitive(200),
+                                        new TypeWithPrimitive(3)
+                                )))));
+    }
+
+    @Test
+    public void testStringifySetOfStrings() throws IOException {
+        Assert.assertEquals("Set of strings should be printed correctly",
+                "\n  e: a\n" +
+                        "  e: b\n" +
+                        "  e: c",
+                stringifyType(TypeWithSetOfStrings.class,
+                        new HollowRecordStringifier(false, false, true, true),
+                        new TypeWithSetOfStrings(
+                                new java.util.HashSet<>(Arrays.asList(
+                                        new TypeWithString("c"),
+                                        new TypeWithString("a"),
+                                        new TypeWithString("b")
+                                )))));
+    }
+
     private static <T> String stringifyType(Class<T> clazz, boolean expanded, T... instances) throws IOException {
         HollowRecordStringifier stringifier = expanded
             ? new HollowRecordStringifier(true, true, false) : new HollowRecordStringifier();
