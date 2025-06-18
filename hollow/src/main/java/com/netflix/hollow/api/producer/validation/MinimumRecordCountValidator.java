@@ -37,7 +37,7 @@ public class MinimumRecordCountValidator implements ValidatorListener {
         // 1<<29 is the max no. of records supported in a Hollow type
         if (minRecordCount == null || minRecordCount < 0 || minRecordCount > (1<<29)) {
             String message = String.format(INVALID_THRESHOLD, typeName, minRecordCount);
-            return vrb.failed(message);
+            return vrb.error(new IllegalArgumentException(message));
         }
 
         vrb.detail(DATA_TYPE_NAME, typeName)
@@ -53,7 +53,7 @@ public class MinimumRecordCountValidator implements ValidatorListener {
             return vrb.failed(message);
         }
 
-        return vrb.passed();
+        return vrb.passed(getName() + " " + typeName + " has >= " + minRecordCount + " records");
     }
 
 }
