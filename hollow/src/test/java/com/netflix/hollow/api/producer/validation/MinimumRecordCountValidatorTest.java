@@ -81,7 +81,7 @@ public class MinimumRecordCountValidatorTest {
 
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withListener(new MinimumRecordCountValidator("Integer", minRecordCountSupplier)).build();
+                .withListener(new MinimumRecordCountValidator("Integer", () -> true, minRecordCountSupplier)).build();
 
         producer.runCycle((state) -> {
                     for (int i = 0; i < currentRecordCount; i++) {

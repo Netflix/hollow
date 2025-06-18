@@ -883,6 +883,7 @@ abstract class AbstractHollowProducer {
             // Stream over the concatenation of the old and new validators
             List<ValidationResult> results =
                     listeners.getListeners(ValidatorListener.class)
+                            .filter(v -> v.isEnabled() != null && v.isEnabled().get())
                             .map(v -> {
                                 try {
                                     return v.onValidate(readState);

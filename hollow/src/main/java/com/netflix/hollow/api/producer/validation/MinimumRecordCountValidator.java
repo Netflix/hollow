@@ -18,15 +18,26 @@ public class MinimumRecordCountValidator implements ValidatorListener {
 
     private final String typeName;
     private final Supplier<Integer> minRecordCountSupplier;
+    private final Supplier<Boolean> isEnabledSupplier;
 
     public MinimumRecordCountValidator(String typeName, Supplier<Integer> minRecordCountSupplier) {
+        this(typeName, () -> true, minRecordCountSupplier);
+    }
+
+    public MinimumRecordCountValidator(String typeName, Supplier<Boolean> isEnabledSupplier, Supplier<Integer> minRecordCountSupplier) {
         this.typeName = typeName;
+        this.isEnabledSupplier = isEnabledSupplier;
         this.minRecordCountSupplier = minRecordCountSupplier;
     }
 
     @Override
     public String getName() {
         return MinimumRecordCountValidator.class.getName() + "_" + typeName;
+    }
+
+    @Override
+    public Supplier<Boolean> isEnabled() {
+        return isEnabledSupplier;
     }
 
     @Override

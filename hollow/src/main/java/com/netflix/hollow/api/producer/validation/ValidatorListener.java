@@ -18,6 +18,7 @@ package com.netflix.hollow.api.producer.validation;
 
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.listener.HollowProducerEventListener;
+import java.util.function.Supplier;
 
 /**
  * A validator of {@link com.netflix.hollow.api.producer.HollowProducer.ReadState read state}.  This type is a
@@ -47,4 +48,12 @@ public interface ValidatorListener extends HollowProducerEventListener {
      * @return the validation result
      */
     ValidationResult onValidate(HollowProducer.ReadState readState);
+
+    /**
+     * A validator can be enabled or disabled by overriding this method
+     * @return false if validator must be disabled
+     */
+    default Supplier<Boolean> isEnabled() {
+        return () -> true;
+    }
 }
