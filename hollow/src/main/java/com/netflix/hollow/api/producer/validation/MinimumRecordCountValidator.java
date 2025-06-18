@@ -26,7 +26,7 @@ public class MinimumRecordCountValidator implements ValidatorListener {
 
     @Override
     public String getName() {
-        return MinimumRecordCountValidator.class.getName() + "_" + typeName;
+        return MinimumRecordCountValidator.class.getSimpleName() + "_" + typeName;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class MinimumRecordCountValidator implements ValidatorListener {
             return vrb.failed(message);
         }
 
-        return vrb.passed(getName() + " " + typeName + " has >= " + minRecordCount + " records");
+        return vrb.passed(getName() + " numRecords=" + recordCount + ", threshold=" + minRecordCount);
     }
 
 }
