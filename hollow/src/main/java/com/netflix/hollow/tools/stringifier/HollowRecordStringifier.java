@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.tools.stringifier;
 
+import static com.netflix.hollow.core.read.HollowReadFieldUtils.compareFieldValues;
 import static com.netflix.hollow.core.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
 
 import com.netflix.hollow.api.objects.HollowRecord;
@@ -38,6 +39,7 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -48,15 +50,21 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
     private final boolean showOrdinals;
     private final boolean showTypes;
     private final boolean collapseSingleFieldObjects;
+    private final boolean sortSingleFieldSetElements;
 
     public HollowRecordStringifier() {
-        this(false, false, true);
+        this(false, false, true, false);
     }
 
     public HollowRecordStringifier(boolean showOrdinals, boolean showTypes, boolean collapseSingleFieldObjects) {
+        this(showOrdinals, showTypes, collapseSingleFieldObjects, false);
+    }
+
+    public HollowRecordStringifier(boolean showOrdinals, boolean showTypes, boolean collapseSingleFieldObjects, boolean sortSingleFieldSetElements) {
         this.showOrdinals = showOrdinals;
         this.showTypes = showTypes;
         this.collapseSingleFieldObjects = collapseSingleFieldObjects;
+        this.sortSingleFieldSetElements = sortSingleFieldSetElements;
     }
 
     @Override
@@ -184,15 +192,28 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
 
         int elementOrdinal = iter.next();
 
+        List<Integer> elementOrdinals = new java.util.ArrayList<>();
         while(elementOrdinal != NO_MORE_ORDINALS) {
+            elementOrdinals.add(elementOrdinal);
+            elementOrdinal = iter.next();
+        }
+
+        HollowTypeDataAccess elementTypeDataAccess = dataAccess.getTypeDataAccess(elementType);
+        if (sortSingleFieldSetElements && elementTypeDataAccess instanceof HollowObjectTypeDataAccess) {
+            HollowObjectSchema elementSchema = ((HollowObjectTypeDataAccess) elementTypeDataAccess).getSchema();
+            if (elementSchema.numFields() == 1) {
+                elementOrdinals.sort((o1, o2) ->
+                        compareFieldValues((HollowObjectTypeDataAccess) elementTypeDataAccess, 0, o1, o2));
+            }
+        }
+
+        for (Integer ord : elementOrdinals) {
             writer.append(NEWLINE);
 
             appendIndentation(writer, indentation);
             writer.append("e: ");
 
-            appendStringify(writer, dataAccess, elementType, elementOrdinal, indentation);
-
-            elementOrdinal = iter.next();
+            appendStringify(writer, dataAccess, elementType, ord, indentation);
         }
     }
 

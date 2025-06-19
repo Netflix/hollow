@@ -17,6 +17,7 @@
 package com.netflix.hollow.tools.stringifier;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.core.read.HollowReadFieldUtils.compareFieldValues;
 
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
@@ -40,6 +41,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -51,21 +53,28 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
     private final Set<String> excludeObjectTypes = new HashSet<String>();
     private final boolean collapseAllSingleFieldObjects;
     private final boolean prettyPrint;
+    private final boolean sortSingleFieldSetElements;
 
     public HollowRecordJsonStringifier() {
-        this(true, true);
+        this(true, true, false);
     }
 
     public HollowRecordJsonStringifier(boolean prettyPrint, boolean collapseAllSingleFieldObjects) {
+        this(prettyPrint, collapseAllSingleFieldObjects, false);
+    }
+
+    public HollowRecordJsonStringifier(boolean prettyPrint, boolean collapseAllSingleFieldObjects, boolean sortSingleFieldSetElements) {
         this.prettyPrint = prettyPrint;
         this.collapseAllSingleFieldObjects = collapseAllSingleFieldObjects;
         this.collapseObjectTypes = Collections.emptySet();
+        this.sortSingleFieldSetElements = sortSingleFieldSetElements;
     }
 
 
     public HollowRecordJsonStringifier(boolean indent, String... collapseObjectTypes) {
         this.prettyPrint = indent;
         this.collapseAllSingleFieldObjects = false;
+        this.sortSingleFieldSetElements = false;
         this.collapseObjectTypes = new HashSet<String>();
 
         for (String collapseObjectType : collapseObjectTypes) {
@@ -284,7 +293,22 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
 
         int elementOrdinal = iter.next();
 
-        if (elementOrdinal == HollowOrdinalIterator.NO_MORE_ORDINALS) {
+        List<Integer> elementOrdinals = new java.util.ArrayList<>();
+        while (elementOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+            elementOrdinals.add(elementOrdinal);
+            elementOrdinal = iter.next();
+        }
+
+        HollowTypeDataAccess elementTypeDataAccess = dataAccess.getTypeDataAccess(elementType);
+        if (sortSingleFieldSetElements && elementTypeDataAccess instanceof HollowObjectTypeDataAccess) {
+            HollowObjectSchema elementSchema = ((HollowObjectTypeDataAccess) elementTypeDataAccess).getSchema();
+            if (elementSchema.numFields() == 1) {
+                elementOrdinals.sort((o1, o2) ->
+                        compareFieldValues((HollowObjectTypeDataAccess) elementTypeDataAccess, 0, o1, o2));
+            }
+        }
+
+        if (elementOrdinals.isEmpty()) {
             writer.append("[]");
         } else {
             boolean firstElement = true;
@@ -292,7 +316,7 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
             if (prettyPrint)
                 writer.append(NEWLINE);
 
-            while(elementOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+            for (Integer ord : elementOrdinals) {
                 if (firstElement)
                     firstElement = false;
                 else
@@ -301,9 +325,7 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
                 if (prettyPrint)
                     appendIndentation(writer, indentation);
 
-                appendStringify(writer, dataAccess, elementType, elementOrdinal, indentation);
-
-                elementOrdinal = iter.next();
+                appendStringify(writer, dataAccess, elementType, ord, indentation);
             }
 
             if (prettyPrint) {

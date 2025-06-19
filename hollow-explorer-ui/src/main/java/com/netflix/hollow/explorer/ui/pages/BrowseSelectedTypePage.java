@@ -136,7 +136,7 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
                 htmlEscapingWriter.append("ERROR: Key " + key + " was not found!");
             } else if (ordinal != null && !ordinal.equals(ORDINAL_NONE)) {
                 HollowStringifier stringifier = "json".equals(req.getParameter("display"))
-                    ? new HollowRecordJsonStringifier() : new HollowRecordStringifier();
+                    ? new HollowRecordJsonStringifier(true, true, true) : new HollowRecordStringifier(false, false, true, true);
                 stringifier.stringify(htmlEscapingWriter, ui.getStateEngine(),
                     getTypeState(req).getSchema().getName(), ordinal);
             }

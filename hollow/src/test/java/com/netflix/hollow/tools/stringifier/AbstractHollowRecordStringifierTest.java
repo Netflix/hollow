@@ -24,6 +24,7 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Set;
 
 /**
  * Code shared between HollowRecordStringifierTest and HollowRecordJsonStringifierTest.
@@ -73,6 +74,21 @@ public class AbstractHollowRecordStringifierTest {
         }
     }
 
+    static class TypeWithSetOfPrimitives {
+        private final Set<TypeWithPrimitive> values;
+
+        public TypeWithSetOfPrimitives(Set<TypeWithPrimitive> values) {
+            this.values = values;
+        }
+    }
+
+    static class TypeWithSetOfStrings {
+        private final Set<TypeWithString> values;
+
+        public TypeWithSetOfStrings(Set<TypeWithString> values) {
+            this.values = values;
+        }
+    }
 
     /**
      * Sends instances of a type through the HollowRecordStringifier. This concatenates records
