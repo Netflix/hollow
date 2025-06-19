@@ -167,6 +167,15 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
                     delimiterEscapedKeyBuilder.append(MULTI_FIELD_KEY_DELIMITER);
                 }
 
+                if (curOrdinal == ORDINAL_NONE) {
+                    // Handle the case where the field is null, display "null"
+                    // as the key so the user can take action on it, while still
+                    // rendering the key's non-null fields.
+                    keyBuilder.append("null");
+                    delimiterEscapedKeyBuilder.append("null");
+                    continue;
+                }
+
                 Object fieldValueObject = HollowReadFieldUtils.fieldValueObject(curState, curOrdinal, fieldPathIndexes[i][fieldPathIndexes[i].length - 1]);
                 keyBuilder.append(fieldValueObject);
                 if (fieldValueObject instanceof String) {
