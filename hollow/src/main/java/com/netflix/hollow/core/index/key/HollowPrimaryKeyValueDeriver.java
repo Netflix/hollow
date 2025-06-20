@@ -24,6 +24,8 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.Arrays;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 /**
  * Used to retrieve and test equality of PrimaryKey values for records.
  */
@@ -144,9 +146,18 @@ public class HollowPrimaryKeyValueDeriver {
         int lastFieldPath = fieldPathIndexes[fieldIdx].length - 1;
         for (int i = 0; i < lastFieldPath; i++) {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
+            if (ordinal == ORDINAL_NONE) {
+                // The ordinal must have referenced a null record.
+                return null;
+            }
             ordinal = typeState.readOrdinal(ordinal, fieldPosition);
             typeState = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition);
             schema = typeState.getSchema();
+        }
+
+        if (ordinal == ORDINAL_NONE) {
+            // The ordinal must have referenced a record with a null value for this field.
+            return null;
         }
 
         return HollowReadFieldUtils.fieldValueObject(typeState, ordinal, fieldPathIndexes[fieldIdx][lastFieldPath]);
