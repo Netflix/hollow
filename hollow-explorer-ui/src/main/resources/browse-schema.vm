@@ -14,9 +14,10 @@
  *     limitations under the License.
 *#
 
-<b>TYPE:</b> &nbsp;&nbsp; <span style="font-family: monospace;">$esc.html($schemaDisplay.getSchema().getName())</span>
-
-#showSchema($schemaDisplay "")
+#foreach($schemaDisplay in $schemaDisplays)
+	<b>TYPE:</b> &nbsp;&nbsp; <span style="font-family: monospace;">$esc.html($schemaDisplay.getSchema().getName())</span>
+	#showSchema($schemaDisplay)
+#end
 
 #macro(showSchema $schemaDisplay)
 	
@@ -28,9 +29,11 @@
 				<span style="font-family: monospace;">
 					#if($field.getReferencedType())
 						#if($field.getReferencedType().isExpanded())
-							<a href="$basePath/schema?type=$esc.url($type)&collapse=$esc.url($field.getFieldPath())">$esc.html($field.getFieldName())</a>
+							<a href="$basePath/schema?#foreach($t in $type)type=$esc.url($t)#if($foreach.hasNext)&amp;
+#end#end&collapse=$esc.url($field.getFieldPath())">$esc.html($field.getFieldName())</a>
 						#else
-							<a href="$basePath/schema?type=$esc.url($type)&expand=$esc.url($field.getFieldPath())">$esc.html($field.getFieldName())</a>
+							<a href="$basePath/schema?#foreach($t in $type)type=$esc.url($t)#if($foreach.hasNext)&amp;
+#end#end&expand=$esc.url($field.getFieldPath())">$esc.html($field.getFieldName())</a>
 						#end
 						
 						($esc.html($field.getReferencedType().getTypeName()) - $esc.html($field.getReferencedType().getSchema().getSchemaType()))

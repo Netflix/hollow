@@ -34,10 +34,15 @@
 			#end
 			#if($stateVersion)
 				<td class="nav">[ State Version: $stateVersion ]</td>
-			#end			
-			#if($type)
+			#end
+			## When $type is defined and is not a list, display links to browse
+			## data and schema for that type.
+			#if($type && !($type.size() > 0))
 				<td class="nav">[ Type: <span style="font-family: monospace;">$esc.html($type)</span> ]</td>
 				<td class="nav">[ <a href="$basePath/type?type=$esc.url($type)">Browse Data</a> | <a href="$basePath/schema?type=$esc.url($type)">Browse Schema</a> ]</td>
+			#end
+			#if(!$type && $topLevelTypes && $topLevelTypes.size() > 0)
+				<td class="nav">[ <a href="$basePath/schema?#foreach($t in $topLevelTypes)type=$esc.url($t)#if($foreach.hasNext)&amp;#end#end">Browse Top Level Schemas</a> ]</td>
 			#end
 			<td class="nav">[ <a href="$basePath/query">SEARCH</a> ]</td>
 		</tr>
