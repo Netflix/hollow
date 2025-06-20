@@ -27,7 +27,7 @@ import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrd
 import com.netflix.hollow.ui.HollowUISession;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
 
 public class HistoricalObjectDiffPage extends HistoryPage {

@@ -40,8 +40,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffUI {
 

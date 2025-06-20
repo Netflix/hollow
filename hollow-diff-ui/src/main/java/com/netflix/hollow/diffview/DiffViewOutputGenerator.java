@@ -20,8 +20,8 @@ import com.netflix.hollow.diffview.effigy.HollowEffigy.Field;
 import com.netflix.hollow.ui.HollowUISession;
 import java.io.IOException;
 import java.io.Writer;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class DiffViewOutputGenerator {
 
