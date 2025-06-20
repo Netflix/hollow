@@ -53,7 +53,7 @@ public class MinimumRecordCountValidator implements ValidatorListener {
             return vrb.failed(message);
         }
 
-        return vrb.passed(getName() + " numRecords=" + recordCount + ", threshold=" + minRecordCount);
+        return vrb.passed("MinimumRecordCount type=" + typeName + ", numRecords=" + recordCount + ", threshold=" + minRecordCount);
     }
 
 }
