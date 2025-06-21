@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A HollowReadStateEngine is our main handle to the current state of a Hollow dataset as a data consumer.
@@ -198,6 +199,43 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
             typeShardSizes.put(type, typeState.getApproximateShardSizeInBytes());
         }
         return typeShardSizes;
+    }
+
+    /* *
+     * Finds the top-level types in the Hollow dataset. A top-level type is one that is not a
+     * reference from another type, i.e., it is not an element of a list, set, or map, nor is it
+     * a field in an object schema.
+     *
+     * @return a set of top-level type names
+     */
+    public Set<String> topLevelTypes() {
+        List<HollowSchema> schemas = getSchemas();
+        Set<String> topLevelTypes = new HashSet<>(this.getAllTypes());
+        for (HollowSchema schema : schemas) {
+            switch (schema.getSchemaType()) {
+                case LIST:
+                    HollowListSchema listSchema = (HollowListSchema) schema;
+                    topLevelTypes.remove(listSchema.getElementType());
+                    break;
+                case SET:
+                    HollowSetSchema setSchema = (HollowSetSchema) schema;
+                    topLevelTypes.remove(setSchema.getElementType());
+                    break;
+                case MAP:
+                    HollowMapSchema mapSchema = (HollowMapSchema) schema;
+                    topLevelTypes.remove(mapSchema.getKeyType());
+                    topLevelTypes.remove(mapSchema.getValueType());
+                    break;
+                case OBJECT:
+                    HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
+                    for (int fieldIdx=0; fieldIdx < objectSchema.numFields(); fieldIdx++) {
+                        if (objectSchema.getFieldType(fieldIdx) == HollowObjectSchema.FieldType.REFERENCE) {
+                            topLevelTypes.remove(objectSchema.getReferencedType(fieldIdx));
+                        }
+                    }
+            }
+        }
+        return topLevelTypes;
     }
 
     @Override
