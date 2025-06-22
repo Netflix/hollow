@@ -52,6 +52,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     private final Class<?> clazz;
     private final HollowObjectSchema schema;
     private final HollowObjectTypeWriteState writeState;
+    private final boolean[] fieldIsPrimaryKey;
 
     private final boolean hasAssignedOrdinalField;
     private final long assignedOrdinalFieldOffset;
@@ -118,7 +119,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         }
 
         this.schema = new HollowObjectSchema(typeName, mappedFields.size(), getKeyFieldPaths(clazz));
-
         Set<String> fieldNamesSeen = new HashSet<>();
         for(MappedField field : mappedFields) {
             if(!fieldNamesSeen.add(field.getFieldName()))
@@ -128,6 +128,16 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 schema.addField(field.getFieldName(), field.getFieldType().getSchemaFieldType(), field.getReferencedTypeName());
             } else {
                 schema.addField(field.getFieldName(), field.getFieldType().getSchemaFieldType());
+            }
+        }
+
+        this.fieldIsPrimaryKey = new boolean[schema.numFields()];
+        List<String> primaryKeyFieldPaths = Arrays.asList(schema.getPrimaryKey().getFieldPaths());
+        if (this.schema.getPrimaryKey() != null && this.schema.getPrimaryKey().getFieldPaths() != null) {
+            for (int i = 0; i < this.schema.numFields(); i++) {
+                if (primaryKeyFieldPaths.contains(schema.getFieldName(i))) {
+                    fieldIsPrimaryKey[i] = true;
+                }
             }
         }
 
@@ -194,7 +204,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         HollowObjectWriteRecord rec = (HollowObjectWriteRecord) writeRecord();
 
         for (int i = 0; i < mappedFields.size(); i++) {
-            mappedFields.get(i).copy(obj, rec, flatRecordWriter);
+            mappedFields.get(i).copy(obj, rec, flatRecordWriter, fieldIsPrimaryKey[i]);
         }
         return rec;
     }
@@ -461,7 +471,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         }
 
         @SuppressWarnings("deprecation")
-        public void copy(Object obj, HollowObjectWriteRecord rec, FlatRecordWriter flatRecordWriter) {
+        public void copy(Object obj, HollowObjectWriteRecord rec, FlatRecordWriter flatRecordWriter, boolean throwOnNull) {
             Object fieldObject;
             
             switch(fieldType) {
@@ -512,61 +522,97 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
                         rec.setString(fieldName, getStringFromField(obj, fieldObject));
+                    else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
+                    }
                     break;
                 case BYTES:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
                         rec.setBytes(fieldName, (byte[])fieldObject);
+                    else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
+                    }
                     break;
                 case INLINED_BOOLEAN:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
                         rec.setBoolean(fieldName, ((Boolean)fieldObject).booleanValue());
+                    else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
+                    }
                     break;
                 case INLINED_INT:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
                         rec.setInt(fieldName, ((Integer)fieldObject).intValue());
+                    else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
+                    }
                     break;
                 case INLINED_SHORT:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
                         rec.setInt(fieldName, ((Short)fieldObject).intValue());
+                    else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
+                    }
                     break;
                 case INLINED_BYTE:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
                         rec.setInt(fieldName, ((Byte)fieldObject).intValue());
+                    else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
+                    }
                     break;
                 case INLINED_CHAR:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
                         rec.setInt(fieldName, (int)((Character)fieldObject).charValue());
+                    else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
+                    }
                     break;
                 case INLINED_LONG:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
                         rec.setLong(fieldName, ((Long)fieldObject).longValue());
+                    else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
+                    }
                     break;
                 case INLINED_DOUBLE:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
                         rec.setDouble(fieldName, ((Double)fieldObject).doubleValue());
+                    else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
+                    }
                     break;
                 case INLINED_FLOAT:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
                         rec.setFloat(fieldName, ((Float)fieldObject).floatValue());
+                    else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
+                    }
                     break;
                 case INLINED_STRING:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
                         rec.setString(fieldName, (String)fieldObject);
+                    else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
+                    }
                     break;
                 case NULLABLE_PRIMITIVE_BOOLEAN:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
                         rec.setBoolean(fieldName, ((NullablePrimitiveBoolean)fieldObject).getBooleanValue());
+                    else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
+                    }
                     break;
                 case DATE_TIME:
                     rec.setLong(fieldName, ((Date)obj).getTime());
@@ -581,6 +627,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     		rec.setReference(fieldName, subTypeMapper.write(fieldObject));
                     	else
                     		rec.setReference(fieldName, subTypeMapper.writeFlat(fieldObject, flatRecordWriter));
+                    } else if (throwOnNull) {
+                        throw new NullPointerException("Null value found for non-nullable field " + fieldName + " on object of type " + clazz.getName());
                     }
                     break;
             }
