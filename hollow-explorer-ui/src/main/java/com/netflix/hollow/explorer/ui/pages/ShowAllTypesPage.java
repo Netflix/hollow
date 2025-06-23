@@ -21,8 +21,9 @@ import static com.netflix.hollow.ui.HollowDiffUtil.formatBytes;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchemaUtil;
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.explorer.ui.model.TypeOverview;
 import com.netflix.hollow.ui.HollowUISession;
@@ -47,7 +48,7 @@ public class ShowAllTypesPage extends HollowExplorerPage {
         String sort = req.getParameter("sort") == null ? "primaryKey" : req.getParameter("sort");
         
         List<TypeOverview> typeOverviews = new ArrayList<TypeOverview>();
-        
+
         for(HollowTypeReadState typeState : ui.getStateEngine().getTypeStates()) {
             String typeName = typeState.getSchema().getName();
             BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
@@ -58,7 +59,7 @@ public class ShowAllTypesPage extends HollowExplorerPage {
             long approxHeapFootprint = typeState.getApproximateHeapFootprintInBytes();
             HollowSchema schema = typeState.getSchema();
             int numShards = typeState.numShards();
-            
+
             typeOverviews.add(new TypeOverview(typeName, numRecords, numHoles, approxHoleFootprint, approxHeapFootprint, primaryKey, schema, numShards));
         }
 
@@ -109,6 +110,7 @@ public class ShowAllTypesPage extends HollowExplorerPage {
         ctx.put("totalHoleFootprint", totalApproximateHoleFootprint(typeOverviews));
         ctx.put("totalHeapFootprint", totalApproximateHeapFootprint(typeOverviews));
         ctx.put("typeOverviews", typeOverviews);
+        ctx.put("topLevelTypes", HollowSchemaUtil.getTopLevelTypes(ui.getStateEngine()));
     }
 
     @Override

@@ -21,6 +21,8 @@ import com.netflix.hollow.explorer.ui.model.SchemaDisplay;
 import com.netflix.hollow.explorer.ui.model.SchemaDisplayField;
 import com.netflix.hollow.ui.HollowUISession;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
 
@@ -32,24 +34,29 @@ public class BrowseSchemaPage extends HollowExplorerPage {
 
     @Override
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
-        String type = req.getParameter("type");
+        String[] types = req.getParameterValues("type");
         String expand = req.getParameter("expand");
         String collapse = req.getParameter("collapse");
-        
-        SchemaDisplay schemaDisplay = (SchemaDisplay) session.getAttribute("schema-display-" + type);
 
-        if(schemaDisplay == null) {
-            schemaDisplay = new SchemaDisplay(ui.getStateEngine().getSchema(type));
-            schemaDisplay.setExpanded(true);
+        List<SchemaDisplay> schemaDisplays = new ArrayList<SchemaDisplay>();
+        for (String type : types) {
+            SchemaDisplay schemaDisplay = (SchemaDisplay) session.getAttribute("schema-display-" + type);
+
+            if(schemaDisplay == null) {
+                schemaDisplay = new SchemaDisplay(ui.getStateEngine().getSchema(type));
+                schemaDisplay.setExpanded(true);
+            }
+
+            if(expand != null) expandOrCollapse(schemaDisplay, expand.split("\\."), 1, true);
+            if(collapse != null) expandOrCollapse(schemaDisplay, collapse.split("\\."), 1, false);
+
+            session.setAttribute("schema-display-" + type, schemaDisplay);
+
+            schemaDisplays.add(schemaDisplay);
         }
-        
-        if(expand != null) expandOrCollapse(schemaDisplay, expand.split("\\."), 1, true);
-        if(collapse != null) expandOrCollapse(schemaDisplay, collapse.split("\\."), 1, false);
-        
-        session.setAttribute("schema-display-" + type, schemaDisplay);
-        
-        ctx.put("schemaDisplay", schemaDisplay);
-        ctx.put("type", type);
+
+        ctx.put("schemaDisplays", schemaDisplays);
+        ctx.put("type", types);
     }
 
     @Override

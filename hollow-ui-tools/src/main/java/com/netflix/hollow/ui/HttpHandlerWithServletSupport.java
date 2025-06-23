@@ -164,6 +164,11 @@ public class HttpHandlerWithServletSupport implements HttpHandler {
         }
 
         @Override
+        public String[] getParameterValues(String name) {
+            return postData.get(name);
+        }
+
+        @Override
         public Map<String, String[]> getParameterMap() {
             return postData;
         }
