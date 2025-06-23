@@ -335,6 +335,19 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         Assert.assertEquals(0, validPki.getMatchingOrdinal(1L));
     }
 
+
+    @Test
+    public void testNullPKeyIdx() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.add(new TypeNullPKey());
+        roundTripSnapshot();
+
+        try {
+            HollowPrimaryKeyIndex invalidPkIdx = new HollowPrimaryKeyIndex(this.readStateEngine, "TypeNullPKey", "id");
+            fail("Index on type with null fields is expected to fail construction");
+        } catch (NullPointerException e) {}
+    }
+
     private static void addDataForDupTesting(HollowWriteStateEngine writeStateEngine, int a1Start, double a2, int size) {
         TypeB typeB = new TypeB("commonTypeB");
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
@@ -377,6 +390,15 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         public TypeB(String b1, boolean isDuplicate) {
             this.b1 = b1;
             this.isDuplicate = isDuplicate;
+        }
+    }
+
+    @HollowPrimaryKey(fields = {"id"})
+    private static class TypeNullPKey {
+        private final Long id;
+
+        public TypeNullPKey() {
+            this.id = null;
         }
     }
 
