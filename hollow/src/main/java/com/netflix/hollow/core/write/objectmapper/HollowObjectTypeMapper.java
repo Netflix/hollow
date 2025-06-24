@@ -131,6 +131,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
         }
 
+        // util array to help indicate which field is part of the primary key
         this.fieldIsPrimaryKey = new boolean[schema.numFields()];
         List<String> primaryKeyFieldPaths = Arrays.asList(schema.getPrimaryKey().getFieldPaths());
         if (this.schema.getPrimaryKey() != null && this.schema.getPrimaryKey().getFieldPaths() != null) {
