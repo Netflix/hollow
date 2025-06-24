@@ -15,7 +15,7 @@ import static java.util.Objects.requireNonNull;
  * this only works for types that have a primary key definition
  */
 public class RecordCountPercentChangeValidator implements ValidatorListener {
-    private static final String NAME = RecordCountVarianceValidator.class.getName();
+    private static final String NAME = RecordCountPercentChangeValidator.class.getName();
     private final Logger log = Logger.getLogger(RecordCountPercentChangeValidator.class.getName());
 
     private final String typeName;
