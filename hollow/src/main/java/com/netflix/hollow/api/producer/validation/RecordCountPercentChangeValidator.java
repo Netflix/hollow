@@ -30,7 +30,7 @@ public class RecordCountPercentChangeValidator implements ValidatorListener {
 
     @Override
     public String getName() {
-        return NAME;
+        return NAME + "_" + typeName;
     }
 
     @Override
@@ -79,7 +79,10 @@ public class RecordCountPercentChangeValidator implements ValidatorListener {
                         (removedPercentageThreshold < 0 || removedPercent < removedPercentageThreshold) &&
                         (updatedPercentageThreshold < 0 || updatedPercent < updatedPercentageThreshold);
         if (pass) {
-            return builder.passed();
+            return builder.passed(String.format(
+                    "%s added=%.2f%% (<%.2f%%), removed=%.2f%% (<%.2f%%), updated=%.2f%% (<%.2f%%)",
+                    getName(), addedPercent * 100, addedPercentageThreshold * 100,  removedPercent * 100,
+                    removedPercentageThreshold * 100, updatedPercent * 100, updatedPercentageThreshold * 100));
         }
         return builder.failed("record count change is more than threshold");
     }
