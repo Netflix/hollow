@@ -123,7 +123,8 @@ public class RecordCountVarianceValidator implements ValidatorListener {
             return vrb.failed(message);
         }
 
-        return vrb.passed();
+        return vrb.passed(String.format("%s percentChange=%.2f%%, threshold=%.2f%%",
+                getName(), actualChangePercent, allowableVariancePercent));
     }
 
     // protected for tests
