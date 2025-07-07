@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +45,8 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
     private final HollowConsumer.BlobRetriever fallbackBlobRetriever;
     private final boolean useExistingStaleSnapshot;
     private final Set<String> optionalBlobParts;
+    // Default to -1, which means no cleanup of local blobs.
+    private Duration existingBlobMaxAge = Duration.ofSeconds(-1);
 
     /**
      * A new HollowFilesystemBlobRetriever which is not backed by a remote store.
@@ -83,10 +86,31 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
      *                               returned and the fallback blob retriever (if present) is not queried.
      */
     public HollowFilesystemBlobRetriever(Path blobStorePath, HollowConsumer.BlobRetriever fallbackBlobRetriever, boolean useExistingStaleSnapshot) {
+        this(blobStorePath, fallbackBlobRetriever, useExistingStaleSnapshot, Duration.ofSeconds(-1));
+        ensurePathExists(blobStorePath);
+    }
+
+
+    /**
+     * A new HollowFileSystemBlobRetriever which is backed by a remote store.  When a blob from the remote store
+     * is requested which exists locally, then the local copy is used.  When a blob from the remote store is
+     * requested which does not exist locally, it is copied to the filesystem right before it is loaded.
+     *
+     * @param blobStorePath          The directory from which to retrieve blobs, if available
+     * @param fallbackBlobRetriever  The remote blob retriever from which to retrieve blobs if they are not already
+     *                               available on the filesystem.
+     * @param useExistingStaleSnapshot  If true and a snapshot blob is requested then if there exists a local snapshot
+     *                               blob present for a version older than the desired version then that snapshot blob is
+     *                               returned and the fallback blob retriever (if present) is not queried.
+     * @param existingBlobMaxAge     If greater than zero and a blob there exists a local blob present that is older than
+     *                               this duration then that blob is deleted from the filesystem and not returned.
+     */
+    public HollowFilesystemBlobRetriever(Path blobStorePath, HollowConsumer.BlobRetriever fallbackBlobRetriever, boolean useExistingStaleSnapshot, Duration existingBlobMaxAge) {
         this.blobStorePath = blobStorePath;
         this.fallbackBlobRetriever = fallbackBlobRetriever;
         this.useExistingStaleSnapshot = useExistingStaleSnapshot;
         this.optionalBlobParts = fallbackBlobRetriever == null ? null : fallbackBlobRetriever.configuredOptionalBlobParts();
+        this.existingBlobMaxAge = existingBlobMaxAge;
 
         ensurePathExists(blobStorePath);
     }
@@ -120,6 +144,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
 
     @Override
     public HollowConsumer.HeaderBlob retrieveHeaderBlob(long desiredVersion) {
+        cleanupOldBlobs("header-");
         Path exactPath = blobStorePath.resolve("header-" + desiredVersion);
         if (Files.exists(exactPath))
             return new FilesystemHeaderBlob(exactPath, desiredVersion);
@@ -157,6 +182,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
 
     @Override
     public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion) {
+        cleanupOldBlobs("snapshot-");
         Path exactPath = blobStorePath.resolve("snapshot-" + desiredVersion);
 
         if(Files.exists(exactPath) && allRequestedPartsExist(BlobType.SNAPSHOT, -1L, desiredVersion))
@@ -242,7 +268,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
 
     @Override
     public HollowConsumer.Blob retrieveDeltaBlob(long currentVersion) {
-
+        cleanupOldBlobs("delta-");
         try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(blobStorePath)) {
             for (Path path : directoryStream) {
                 String filename = path.getFileName().toString();
@@ -267,6 +293,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
 
     @Override
     public HollowConsumer.Blob retrieveReverseDeltaBlob(long currentVersion) {
+        cleanupOldBlobs("reversedelta-");
         try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(blobStorePath)) {
             for (Path path : directoryStream) {
                 String filename = path.getFileName().toString();
@@ -312,7 +339,30 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         }
 
         return true;
-    }    
+    }
+
+    private void cleanupOldBlobs(String prefix) {
+        if (existingBlobMaxAge == null || existingBlobMaxAge.isNegative()) {
+            return;
+        }
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(blobStorePath)) {
+            for (Path blobPath : directoryStream) {
+                String filename = blobPath.getFileName().toString();
+                if (!filename.startsWith(prefix)) {
+                    continue;
+                }
+                long lastModifiedTime = Files.getLastModifiedTime(blobPath).toMillis();
+                long currentTime = System.currentTimeMillis();
+                if ((currentTime - lastModifiedTime) > existingBlobMaxAge.toMillis()) {
+                    Files.delete(blobPath);
+                    LOG.info("Deleted old blob: " + blobPath + " last modified at " +
+                            lastModifiedTime + " max age " + existingBlobMaxAge);
+                }
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException("Error cleaning up old blobs; path=" + blobStorePath, ex);
+        }
+    }
 
     private static class FilesystemHeaderBlob extends HollowConsumer.HeaderBlob {
         private final Path path;

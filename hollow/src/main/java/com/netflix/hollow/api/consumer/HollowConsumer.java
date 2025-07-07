@@ -42,6 +42,7 @@ import com.netflix.hollow.tools.history.HollowHistory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -1152,6 +1153,7 @@ public class HollowConsumer {
         protected HollowConsumer.ObjectLongevityDetector objectLongevityDetector = ObjectLongevityDetector.DEFAULT_DETECTOR;
         protected File localBlobStoreDir = null;
         protected boolean useExistingStaleSnapshot;
+        protected Duration existingBlobMaxAge = Duration.ofSeconds(-1); // Disabled by default, no existing blob will be deleted.
         protected Executor refreshExecutor = null;
         protected MemoryMode memoryMode = MemoryMode.ON_HEAP;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
@@ -1210,6 +1212,25 @@ public class HollowConsumer {
          */
         public B withLocalBlobStore(String localBlobStoreDir, boolean useExistingStaleSnapshot) {
             return withLocalBlobStore(new File(localBlobStoreDir), useExistingStaleSnapshot);
+        }
+
+        /**
+         * Provide a directory that will be used to cache blobs.
+         *
+         * This is the same as {@link #withLocalBlobStore(File, boolean)} but also allows
+         * specifying the maximum age of an existing local blob. When a local blob is found
+         * that is older than the specified maximum age, it will not be used and Hollow will
+         * delete it, falling back to retrieving the blob using the configured blobRetriever.
+         *
+         * @param existingBlobMaxAge the maximum age an existing local blob can be before
+         *   it is deleted and not used. When set to null, or a negative duration, no maximum age
+         *   is applied and existing blobs are never deleted.
+         */
+        public B withLocalBlobStore(File localBlobStoreDir, boolean useExistingStaleSnapshot, Duration existingBlobMaxAge) {
+            this.localBlobStoreDir = localBlobStoreDir;
+            this.useExistingStaleSnapshot = useExistingStaleSnapshot;
+            this.existingBlobMaxAge = existingBlobMaxAge;
+            return (B)this;
         }
 
         public B withAnnouncementWatcher(HollowConsumer.AnnouncementWatcher announcementWatcher) {
@@ -1437,7 +1458,7 @@ public class HollowConsumer {
             BlobRetriever blobRetriever = this.blobRetriever;
             if (localBlobStoreDir != null) {
                 this.blobRetriever = new HollowFilesystemBlobRetriever(
-                        localBlobStoreDir.toPath(), blobRetriever, useExistingStaleSnapshot);
+                        localBlobStoreDir.toPath(), blobRetriever, useExistingStaleSnapshot, existingBlobMaxAge);
             }
 
             if (refreshExecutor == null) {
