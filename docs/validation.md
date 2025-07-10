@@ -112,6 +112,9 @@ that have been modified (not added or removed).
 4. A minimum record count validator, `MinimumRecordCountValidator`.
 This validator can be configured to guard against large deletions, by setting a threshold for 
 allowable minimum number of records in a data type.
+5. A null primary key field validator, `NullPrimaryKeyFieldValidator`.
+This validator can be configured to check if any fields of an object that are part of the
+primary key are null. This is useful to enforce the non-nullability of primary key fields.
 
 
 ## Using the generated object API
