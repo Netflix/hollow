@@ -39,7 +39,7 @@ publishing {
         maven {
             url "s3://s3-maven-repository-prelive"
             credentials(AwsCredentials) {
-                def profile = System.getenv("AWS_PROFILE");
+                def profile = System.getProperty("aws.profile") ?: System.getenv("AWS_PROFILE")
                 def creds = software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider.builder()
                                 .profileName(profile).build().resolveCredentials()
                 accessKey = creds.accessKeyId()
