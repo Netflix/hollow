@@ -23,11 +23,12 @@ import java.nio.channels.FileChannel;
 public class HollowBlobInput implements Closeable {
     private final MemoryMode memoryMode;
 
-    private Object input;
+    private final Closeable input;
     private BlobByteBuffer buffer;
 
-    private HollowBlobInput(MemoryMode memoryMode) {
+    private HollowBlobInput(MemoryMode memoryMode, Closeable input) {
         this.memoryMode = memoryMode;
+        this.input = input;
     }
 
     public MemoryMode getMemoryMode() {
@@ -89,11 +90,15 @@ public class HollowBlobInput implements Closeable {
      * Useful for testing with custom buffer capacity
      */
     public static HollowBlobInput randomAccess(File f,int singleBufferCapacity) throws IOException {
-        HollowBlobInput hbi = new HollowBlobInput(SHARED_MEMORY_LAZY);
         RandomAccessFile raf = new RandomAccessFile(f, "r");
-        hbi.input = raf;
+        HollowBlobInput hbi = new HollowBlobInput(SHARED_MEMORY_LAZY, raf);
         FileChannel channel = ((RandomAccessFile) hbi.input).getChannel();
-        hbi.buffer = BlobByteBuffer.mmapBlob(channel, singleBufferCapacity);
+        try {
+            hbi.buffer = BlobByteBuffer.mmapBlob(channel, singleBufferCapacity);
+        } catch (IOException e) {
+            hbi.close();
+            throw e;
+        }
         return hbi;
     }
 
@@ -113,8 +118,7 @@ public class HollowBlobInput implements Closeable {
      * @return a serial access HollowBlobInput object
      */
     public static HollowBlobInput serial(InputStream is) {
-        HollowBlobInput hbi = new HollowBlobInput(ON_HEAP);
-        hbi.input = new DataInputStream(is);
+        HollowBlobInput hbi = new HollowBlobInput(ON_HEAP, new DataInputStream(is));
         return hbi;
     }
 
@@ -293,16 +297,12 @@ public class HollowBlobInput implements Closeable {
      */
     @Override
     public void close() throws IOException {
-        if (input instanceof RandomAccessFile) {
-            ((RandomAccessFile) input).close();
-        } else if (input instanceof DataInputStream) {
-            ((DataInputStream) input).close();
-        } else {
-            throw new UnsupportedOperationException("Unknown Hollow Blob Input type");
+        if (input != null) {
+            input.close();
         }
     }
 
-    public Object getInput() {
+    public Closeable getInput() {
         return input;
     }
 
