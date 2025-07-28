@@ -158,23 +158,17 @@ public final class BlobByteBuffer {
      * @return long value
      */
     public long getLong(long startByteIndex) throws BufferUnderflowException {
-
         int alignmentOffset = (int)((startByteIndex - this.position()) % Long.BYTES);
         long nextAlignedPos = startByteIndex - alignmentOffset + Long.BYTES;
 
-        byte[] bytes = new byte[Long.BYTES];
-        for (int i = 0; i < Long.BYTES; i ++ ) {
-            bytes[i] = getByte(bigEndian(startByteIndex + i, nextAlignedPos));
-        }
-
-        return ((((long) (bytes[7]       )) << 56) |
-                (((long) (bytes[6] & 0xff)) << 48) |
-                (((long) (bytes[5] & 0xff)) << 40) |
-                (((long) (bytes[4] & 0xff)) << 32) |
-                (((long) (bytes[3] & 0xff)) << 24) |
-                (((long) (bytes[2] & 0xff)) << 16) |
-                (((long) (bytes[1] & 0xff)) <<  8) |
-                (((long) (bytes[0] & 0xff))      ));
+        return (getByte(bigEndian(startByteIndex + 7, nextAlignedPos)) & 0xFFL) << 56
+                | (getByte(bigEndian(startByteIndex + 6, nextAlignedPos)) & 0xFFL) << 48
+                | (getByte(bigEndian(startByteIndex + 5, nextAlignedPos)) & 0xFFL) << 40
+                | (getByte(bigEndian(startByteIndex + 4, nextAlignedPos)) & 0xFFL) << 32
+                | (getByte(bigEndian(startByteIndex + 3, nextAlignedPos)) & 0xFFL) << 24
+                | (getByte(bigEndian(startByteIndex + 2, nextAlignedPos)) & 0xFFL) << 16
+                | (getByte(bigEndian(startByteIndex + 1, nextAlignedPos)) & 0xFFL) << 8
+                | (getByte(bigEndian(startByteIndex, nextAlignedPos)) & 0xFFL);
     }
 
     /**
