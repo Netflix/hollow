@@ -63,7 +63,6 @@ public class KitchenSink {
   public Map<MapKey, SubType> subTypeMap;
   public Map<ComplexMapKey, SubType> complexMapKeyMap;
 
-
   @HollowHashKey(fields = {"value1"})
   public Set<HashableKey> hashableSet;
   @HollowHashKey(fields = {"value1"})

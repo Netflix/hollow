@@ -249,6 +249,39 @@ public class FlatRecordOrdinalReader {
     return b;
   }
 
+  public boolean isNull(int ordinal, String field) {
+    HollowSchema schema = readSchema(ordinal);
+    if (schema.getSchemaType() != HollowSchema.SchemaType.OBJECT) {
+      throw new IllegalArgumentException(String.format("Ordinal %d is not an OBJECT type (found %s)", ordinal, schema.getSchemaType()));
+    }
+
+    HollowObjectSchema.FieldType fieldType = ((HollowObjectSchema) schema).getFieldType(field);
+    if (fieldType == null) {
+      return true; // Field does not exist
+    }
+
+    int offset = skipToField(ordinal, fieldType, field);
+    if (offset == -1) {
+      return true; // Field does not exist
+    }
+
+    switch (fieldType) {
+      case BOOLEAN:
+      case INT:
+      case LONG:
+      case REFERENCE:
+      case BYTES:
+      case STRING:
+        return VarInt.readVNull(record.data, offset);
+      case FLOAT:
+        return record.data.readIntBits(offset) == HollowObjectWriteRecord.NULL_FLOAT_BITS;
+      case DOUBLE:
+        return record.data.readLongBits(offset) == HollowObjectWriteRecord.NULL_DOUBLE_BITS;
+      default:
+        throw new IllegalArgumentException("Unsupported field type: " + fieldType);
+    }
+  }
+
   private int skipToField(int ordinal, HollowObjectSchema.FieldType fieldType, String field) {
     int offset = getOrdinalOffset(ordinal);
 

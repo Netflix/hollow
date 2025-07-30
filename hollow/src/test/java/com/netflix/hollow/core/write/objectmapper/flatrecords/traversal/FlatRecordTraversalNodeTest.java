@@ -1,7 +1,9 @@
 package com.netflix.hollow.core.write.objectmapper.flatrecords.traversal;
 
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.SimpleHollowDataset;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FakeHollowSchemaIdentifierMapper;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
@@ -18,6 +20,7 @@ import com.netflix.hollow.test.dto.movie.TagValue;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -455,6 +458,33 @@ public class FlatRecordTraversalNodeTest {
             tuple(70, 72, 73L, 74.0f));
   }
 
+  @Test
+  public void testObjectNodeFieldNullability() {
+    HollowObjectSchema schema = new HollowObjectSchema("TestSchema", 8);
+    schema.addField("f1", HollowObjectSchema.FieldType.REFERENCE, "TestReference");
+    schema.addField("f2", HollowObjectSchema.FieldType.INT);
+    schema.addField("f3", HollowObjectSchema.FieldType.LONG);
+    schema.addField("f4", HollowObjectSchema.FieldType.BOOLEAN);
+    schema.addField("f5", HollowObjectSchema.FieldType.FLOAT);
+    schema.addField("f6", HollowObjectSchema.FieldType.DOUBLE);
+    schema.addField("f7", HollowObjectSchema.FieldType.STRING);
+    schema.addField("f8", HollowObjectSchema.FieldType.BYTES);
+
+    HollowObjectWriteRecord record = new HollowObjectWriteRecord(schema);
+
+    SimpleHollowDataset dataset = new SimpleHollowDataset(Collections.singletonList(schema));
+    FlatRecordWriter flatRecordWriter = new FlatRecordWriter(dataset, new FakeHollowSchemaIdentifierMapper(dataset));
+    flatRecordWriter.write(schema, record);
+    FlatRecord flatRecord = flatRecordWriter.generateFlatRecord();
+
+    FlatRecordTraversalObjectNode node = new FlatRecordTraversalObjectNode(flatRecord);
+    for (int i = 0; i < schema.numFields(); i++) {
+      String fieldName = schema.getFieldName(i);
+      assertThat(node.isFieldNull(fieldName))
+        .as("Field '%s' should be null", fieldName)
+        .isTrue();
+    }
+  }
 
   private FlatRecord createMovieFlatRecord() {
     Movie movie1 = new Movie();
