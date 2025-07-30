@@ -58,6 +58,10 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
     return (FlatRecordTraversalMapNode) getFieldNode(field);
   }
 
+  public boolean isFieldNull(String field) {
+    return reader.isNull(ordinal, field);
+  }
+
   public FlatRecordTraversalNode getFieldNode(String field) {
     HollowObjectSchema.FieldType fieldType = schema.getFieldType(field);
     if (fieldType == null) {

@@ -86,6 +86,15 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
         }
     }
 
+    /**
+     * !!WARNING!! There is a bug in HollowObjectWriteRecord.writeDataTo(ByteDataArray buf)
+     * that causes it to incorrectly serialize variable-length fields (e.g. STRING, BYTES) that
+     * have been set to null using this method. These fields are written out as a byte array of
+     * `[1, 0x80]` instead of the expected `[0x80]`. In non-null values, the leading byte
+     * indicates the length of the field. It is incorrectly written as `1` for null values. This
+     * only affects use case that copy HollowObjectWriteRecord data to another buffer, it DOES NOT
+     * affect typical Hollow Producer based mechanisms.
+     */
     public void setNull(String fieldName) {
         int fieldIndex = getSchema().getPosition(fieldName);
 
