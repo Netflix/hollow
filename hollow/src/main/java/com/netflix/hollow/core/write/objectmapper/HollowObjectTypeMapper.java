@@ -589,7 +589,9 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         public void copy(Object pojo, GenericHollowObject rec) {
             switch (fieldType) {
                 case BOOLEAN:
-                    unsafe.putBoolean(pojo, fieldOffset, rec.getBoolean(fieldName));
+                    if (!rec.isNull(fieldName)) {
+                        unsafe.putBoolean(pojo, fieldOffset, rec.getBoolean(fieldName));
+                    }
                     break;
                 case INT:
                     int intValue = rec.getInt(fieldName);
@@ -833,9 +835,9 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         private void copy(Object obj, FlatRecordTraversalObjectNode node) {
             switch (fieldType) {
                 case BOOLEAN: {
-                    Boolean value = node.getFieldValueBooleanBoxed(fieldName);
-                    if (value != null) {
-                        unsafe.putBoolean(obj, fieldOffset, value == Boolean.TRUE);
+                    if (!node.isFieldNull(fieldName)) {
+                        boolean value = node.getFieldValueBoolean(fieldName);
+                        unsafe.putBoolean(obj, fieldOffset, value);
                     }
                     break;
                 }
@@ -901,8 +903,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     break;
                 }
                 case INLINED_BOOLEAN: {
-                    Boolean value = node.getFieldValueBooleanBoxed(fieldName);
-                    if (value != null) {
+                    if (!node.isFieldNull(fieldName)) {
+                        boolean value = node.getFieldValueBoolean(fieldName);
                         unsafe.putObject(obj, fieldOffset, value);
                     }
                     break;

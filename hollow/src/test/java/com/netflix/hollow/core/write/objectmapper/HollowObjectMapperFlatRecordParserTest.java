@@ -53,6 +53,30 @@ public class HollowObjectMapperFlatRecordParserTest {
   }
 
   @Test
+  public void roundTripPreservesNullability() {
+    TypeWithAllSimpleTypes obj = new TypeWithAllSimpleTypes();
+    // set PK
+    obj.boxedIntegerField = 1;
+    obj.stringField = "hello";
+    // all inlined values are null
+
+    flatRecordWriter.reset();
+    mapper.writeFlat(obj, flatRecordWriter);
+    FlatRecord fr = flatRecordWriter.generateFlatRecord();
+
+    TypeWithAllSimpleTypes result = mapper.readFlat(fr);
+    Assert.assertEquals(obj, result);
+
+    // round trip the record: obj -> flatRecord -> obj -> flatRecord -> obj
+    flatRecordWriter.reset();
+    mapper.writeFlat(result, flatRecordWriter);
+    FlatRecord roundTrippedFr = flatRecordWriter.generateFlatRecord();
+
+    TypeWithAllSimpleTypes roundTrippedResult = mapper.readFlat(roundTrippedFr);
+    Assert.assertEquals(obj, roundTrippedResult);
+  }
+
+  @Test
   public void testSimpleTypes() {
     TypeWithAllSimpleTypes typeWithAllSimpleTypes = new TypeWithAllSimpleTypes();
     typeWithAllSimpleTypes.boxedIntegerField = 1;
