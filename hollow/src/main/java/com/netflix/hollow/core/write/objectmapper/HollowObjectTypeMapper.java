@@ -698,7 +698,12 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 case ENUM_NAME:
                     String enumNameValue = rec.getString(fieldName);
                     if (enumNameValue != null) {
-                        unsafe.putObject(pojo, fieldOffset, Enum.valueOf((Class<Enum>) type, enumNameValue));
+                        try {
+                            Object val = Enum.valueOf((Class<Enum>) type, enumNameValue);
+                            unsafe.putObject(pojo, fieldOffset, val);
+                        } catch (IllegalArgumentException e) {
+                            // If the enum value is not found, we leave the field as null
+                        }
                     }
                     break;
                 case REFERENCE:
@@ -715,7 +720,10 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         private Object parseBoxedWrapper(GenericHollowObject record) {
             switch (fieldType) {
                 case BOOLEAN:
-                    return Boolean.valueOf(record.getBoolean(fieldName));
+                    if (record.isNull(fieldName)) {
+                        return null;
+                    }
+                    return record.getBoolean(fieldName);
                 case INT:
                     int intValue = record.getInt(fieldName);
                     if (intValue == Integer.MIN_VALUE) {
@@ -767,7 +775,11 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     if (enumName == null) {
                         return null;
                     }
-                    return Enum.valueOf((Class<Enum>) clazz, enumName);
+                    try {
+                        return Enum.valueOf((Class<Enum>) clazz, enumName);
+                    } catch (IllegalArgumentException e) {
+                        return null;
+                    }
                 case DATE_TIME: {
                     long dateValue = record.getLong(fieldName);
                     if (dateValue == Long.MIN_VALUE) {
@@ -783,7 +795,10 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         private Object parseBoxedWrapper(FlatRecordTraversalObjectNode record) {
             switch (fieldType) {
                 case BOOLEAN:
-                    return record.getFieldValueBooleanBoxed(fieldName);
+                    if (record.isFieldNull(fieldName)) {
+                        return null;
+                    }
+                    return record.getFieldValueBoolean(fieldName);
                 case INT:
                     return record.getFieldValueIntBoxed(fieldName);
                 case SHORT:
@@ -819,7 +834,11 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     if (enumName == null) {
                         return null;
                     }
-                    return Enum.valueOf((Class<Enum>) clazz, enumName);
+                    try {
+                        return Enum.valueOf((Class<Enum>) clazz, enumName);
+                    } catch (IllegalArgumentException e) {
+                        return null;
+                    }
                 case DATE_TIME: {
                     long dateValue = record.getFieldValueLong(fieldName);
                     if (dateValue == Long.MIN_VALUE) {
@@ -975,7 +994,12 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 case ENUM_NAME: {
                     String value = node.getFieldValueString(fieldName);
                     if (value != null) {
-                        unsafe.putObject(obj, fieldOffset, Enum.valueOf((Class) type, value));
+                        try {
+                            Object val = Enum.valueOf((Class) type, value);
+                            unsafe.putObject(obj, fieldOffset, val);
+                        } catch (IllegalArgumentException e) {
+                            // If the enum value is not found, we leave the field as null
+                        }
                     }
                     break;
                 }

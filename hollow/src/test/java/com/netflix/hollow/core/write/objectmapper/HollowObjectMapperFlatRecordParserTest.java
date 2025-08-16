@@ -28,6 +28,7 @@ public class HollowObjectMapperFlatRecordParserTest {
     mapper.initializeTypeState(TypeWithCollections.class);
     mapper.initializeTypeState(VersionedType2.class);
     mapper.initializeTypeState(SpecialWrapperTypesTest.class);
+    mapper.initializeTypeState(UnknownEnumTypeTestV2.class);
 
     flatRecordWriter = new FlatRecordWriter(
         mapper.getStateEngine(), new FakeHollowSchemaIdentifierMapper(mapper.getStateEngine()));
@@ -74,6 +75,45 @@ public class HollowObjectMapperFlatRecordParserTest {
 
     TypeWithAllSimpleTypes roundTrippedResult = mapper.readFlat(roundTrippedFr);
     Assert.assertEquals(obj, roundTrippedResult);
+  }
+
+  @Test
+  public void unknownEnums() {
+    HollowObjectMapper readerMapper = new HollowObjectMapper(new HollowWriteStateEngine());
+    readerMapper.initializeTypeState(UnknownEnumTypeTestV1.class);
+
+    UnknownEnumTypeTestV2 obj = new UnknownEnumTypeTestV2();
+    obj.id = 1;
+    obj.enumField = AnEnum.SOME_VALUE_C;
+
+    flatRecordWriter.reset();
+    mapper.writeFlat(obj, flatRecordWriter);
+    FlatRecord fr = flatRecordWriter.generateFlatRecord();
+
+    UnknownEnumTypeTestV1 result = readerMapper.readFlat(fr);
+    Assert.assertNull(result.enumField);
+  }
+
+  @Test
+  public void nullableBoxedWrappers() {
+    TypeWithAllSimpleTypes obj = new TypeWithAllSimpleTypes();
+    // set PK
+    obj.boxedIntegerField = 1;
+    obj.stringField = "hello";
+    // all inlined values are null
+
+    flatRecordWriter.reset();
+    mapper.writeFlat(obj, flatRecordWriter);
+    FlatRecord fr = flatRecordWriter.generateFlatRecord();
+
+    TypeWithAllSimpleTypes result = mapper.readFlat(fr);
+    Assert.assertNull(result.boxedBooleanField);
+    Assert.assertNull(result.boxedDoubleField);
+    Assert.assertNull(result.boxedFloatField);
+    Assert.assertNull(result.boxedLongField);
+    Assert.assertNull(result.boxedShortField);
+    Assert.assertNull(result.boxedByteField);
+    Assert.assertNull(result.boxedCharField);
   }
 
   @Test
@@ -605,6 +645,11 @@ public class HollowObjectMapperFlatRecordParserTest {
     public String anotherValue;
   }
 
+  enum OlderAnEnum {
+    SOME_VALUE_A,
+    SOME_VALUE_B,
+  }
+
   enum AnEnum {
     SOME_VALUE_A,
     SOME_VALUE_B,
@@ -623,6 +668,22 @@ public class HollowObjectMapperFlatRecordParserTest {
       this.value = value;
       this.anotherValue = anotherValue;
     }
+  }
+
+  @HollowTypeName(name = "UnknownEnumTypeTest")
+  @HollowPrimaryKey(fields = {"id"})
+  static class UnknownEnumTypeTestV1 {
+    long id;
+    @HollowTypeName(name = "AnEnum")
+    OlderAnEnum enumField;
+  }
+
+  @HollowTypeName(name = "UnknownEnumTypeTest")
+  @HollowPrimaryKey(fields = {"id"})
+  static class UnknownEnumTypeTestV2 {
+    long id;
+    @HollowTypeName(name = "AnEnum")
+    AnEnum enumField;
   }
 
   @HollowTypeName(name = "SpecialWrapperTypesTest")
