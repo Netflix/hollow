@@ -57,18 +57,21 @@ public class FlatRecordExtractor {
         
         HollowTypeReadState typeState = extractFrom.getTypeState(type);
         
-        extractHollowRecord(typeState, ordinal);
+        extractHollowRecord(type, typeState, ordinal);
         
         return writer.generateFlatRecord();
     }
     
-    private void extractHollowRecord(HollowTypeReadState typeState, int ordinal) {
-        if(ordinal == -1)
+    private void extractHollowRecord(String type, HollowTypeReadState typeState, int ordinal) {
+        if (ordinal == -1) {
             return;
+        }
+
+        if (typeState == null) {
+            throw new IllegalArgumentException("Type '" + type + "' not found in HollowReadStateEngine");
+        }
 
         traverse(typeState, ordinal);
-        
-        String type = typeState.getSchema().getName();
         
         HollowRecordCopier recordCopier = recordCopier(type);
         HollowWriteRecord rec = recordCopier.copy(ordinal);
@@ -100,9 +103,10 @@ public class FlatRecordExtractor {
         
         for(int i=0;i<schema.numFields();i++) {
             if(schema.getFieldType(i) == FieldType.REFERENCE) {
+                String refType = schema.getReferencedType(i);;
                 HollowTypeReadState refTypeState = schema.getReferencedTypeState(i);
                 int refOrdinal = typeState.readOrdinal(ordinal, i);
-                extractHollowRecord(refTypeState, refOrdinal);
+                extractHollowRecord(refType, refTypeState, refOrdinal);
             }
         }
     }
@@ -115,7 +119,7 @@ public class FlatRecordExtractor {
         for(int i=0;i<size;i++) {
             int refOrdinal = typeState.getElementOrdinal(ordinal, i);
             if(refOrdinal != HollowConstants.ORDINAL_NONE)
-                extractHollowRecord(schema.getElementTypeState(), refOrdinal);
+                extractHollowRecord(schema.getElementType(), schema.getElementTypeState(), refOrdinal);
         }
     }
     
@@ -127,7 +131,7 @@ public class FlatRecordExtractor {
         int refOrdinal = iter.next();
         while(refOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
             if(refOrdinal != HollowConstants.ORDINAL_NONE)
-                extractHollowRecord(schema.getElementTypeState(), refOrdinal);
+                extractHollowRecord(schema.getElementType(), schema.getElementTypeState(), refOrdinal);
             refOrdinal = iter.next();
         }
     }
@@ -139,9 +143,9 @@ public class FlatRecordExtractor {
         
         while(iter.next()) {
             if(iter.getKey() != HollowConstants.ORDINAL_NONE)
-                extractHollowRecord(schema.getKeyTypeState(), iter.getKey());
+                extractHollowRecord(schema.getKeyType(), schema.getKeyTypeState(), iter.getKey());
             if(iter.getValue() != HollowConstants.ORDINAL_NONE)
-                extractHollowRecord(schema.getValueTypeState(), iter.getValue());
+                extractHollowRecord(schema.getValueType(), schema.getValueTypeState(), iter.getValue());
         }
     }
     
