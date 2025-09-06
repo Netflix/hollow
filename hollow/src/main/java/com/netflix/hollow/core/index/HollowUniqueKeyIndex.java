@@ -697,6 +697,14 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
         return results;
     }
 
+    public long approxHeapFootprintInBytes() {
+        PrimaryKeyIndexHashTable state = hashTableVolatile;
+        if (state == null) {
+            return 0;
+        }
+        return state.hashTable.approxHeapFootprintInBytes();
+    }
+
     /**
      * @param ordinal ordinal of root object
      * @param field   field to traverse

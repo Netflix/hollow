@@ -88,6 +88,15 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
     }
 
     @Test
+    public void testApproxHeapFootprint() throws Exception {
+        mapper.add(new TypeB(null));
+        mapper.add(new TypeB("onez:"));
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeB", "", "b1.value");
+        Assert.assertTrue(index.approxHeapFootprintInBytes() > 0);
+    }
+
+    @Test
     public void testIndexingBytesTypeFieldWithNullValues() throws Exception {
         byte[] bytes = {-120,0,0,0};
         mapper.add(new TypeBytes(null));

@@ -296,6 +296,15 @@ public class HollowHashIndex implements HollowTypeStateListener {
         return matchFields;
     }
 
+    public long approxHeapFootprintInBytes() {
+        HollowHashIndexState hashState = hashStateVolatile;
+        if (hashState == null) {
+            return 0;
+        }
+        return hashState.getMatchHashTable().approxHeapFootprintInBytes() +
+          hashState.getSelectHashArray().approxHeapFootprintInBytes();
+    }
+
     protected static class HollowHashIndexState {
 
         final FixedLengthElementArray selectHashArray;
