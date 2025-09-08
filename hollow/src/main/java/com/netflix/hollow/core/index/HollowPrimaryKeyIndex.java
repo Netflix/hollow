@@ -656,6 +656,14 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         return keyDeriver.getRecordKey(ordinal);
     }
 
+    public long approxHeapFootprintInBytes() {
+        PrimaryKeyIndexHashTable state = hashTableVolatile;
+        if (state == null) {
+            return 0;
+        }
+        return state.hashTable.approxHeapFootprintInBytes();
+    }
+
     private boolean recordsHaveEqualKeys(int ordinal1, int ordinal2) {
         for(int i=0;i<fieldPathIndexes.length;i++) {
             if(!fieldsAreEqual(ordinal1, ordinal2, i))

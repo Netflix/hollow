@@ -88,6 +88,17 @@ public class HollowUniqueKeyIndexTest extends HollowPrimaryKeyIndexTest {
         assertEquals(idx.getRecordKey(3), 3, 3.3d, "three");
     }
 
+    @Test
+    public void testApproxHeapFootprint() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("1")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        roundTripSnapshot();
+        HollowUniqueKeyIndex idx = (HollowUniqueKeyIndex) createIndex("TypeA");
+        Assert.assertTrue(idx.approxHeapFootprintInBytes() > 0);
+    }
 
     @Test
     public void indicatesWhetherOrNotDuplicateKeysExist() throws IOException {
