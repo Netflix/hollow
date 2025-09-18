@@ -18,6 +18,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
@@ -51,6 +52,7 @@ public class HollowObjectMapperHollowRecordParserTest {
     wrapperTypesTest.type = AnEnum.SOME_VALUE_C;
     wrapperTypesTest.complexEnum = ComplexEnum.SOME_VALUE_A;
     wrapperTypesTest.dateCreated = new Date();
+    wrapperTypesTest.instantCreated = Instant.now();
 
     HollowReadStateEngine stateEngine = createReadStateEngine(wrapperTypesTest);
     GenericHollowObject obj = new GenericHollowObject(stateEngine, "SpecialWrapperTypesTest", 0);
@@ -59,6 +61,8 @@ public class HollowObjectMapperHollowRecordParserTest {
     Assert.assertEquals(wrapperTypesTest, result);
     Assert.assertEquals(wrapperTypesTest.complexEnum.value, result.complexEnum.value);
     Assert.assertEquals(wrapperTypesTest.complexEnum.anotherValue, result.complexEnum.anotherValue);
+    Assert.assertEquals(wrapperTypesTest.dateCreated, result.dateCreated);
+    Assert.assertEquals(wrapperTypesTest.instantCreated, result.instantCreated);
   }
 
   @Test
@@ -842,6 +846,7 @@ public class HollowObjectMapperHollowRecordParserTest {
     @HollowTypeName(name = "ComplexEnum")
     ComplexEnum complexEnum;
     Date dateCreated;
+    Instant instantCreated;
 
     @Override
     public boolean equals(Object o) {
@@ -850,7 +855,8 @@ public class HollowObjectMapperHollowRecordParserTest {
         return Objects.equals(id, other.id) &&
                 Objects.equals(type, other.type) &&
                 Objects.equals(complexEnum, other.complexEnum) &&
-                Objects.equals(dateCreated, other.dateCreated);
+                Objects.equals(dateCreated, other.dateCreated) &&
+                Objects.equals(instantCreated, other.instantCreated);
       }
       return false;
     }
