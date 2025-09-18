@@ -34,7 +34,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -262,24 +261,22 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
             else if (SPECIAL_WRAPPERS.contains(clazz)) {
                 // Multi-field reconstruction for special wrapper types
+                // for these types, the field names are known, no need to iterate the object to find the fieldName
                 if (clazz == UUID.class) {
                     Long mostSigBits = null;
                     Long leastSigBits = null;
-                    for (int i = 0; i < objectSchema.numFields(); i++) {
-                        String fieldName = objectSchema.getFieldName(i);
-                        int posInPojoSchema = schema.getPosition(fieldName);
-                        if (posInPojoSchema != -1) {
-                            if ("mostSigBits".equals(fieldName)) {
-                                long value = hollowObject.getLong(fieldName);
-                                if (value != Long.MIN_VALUE) {
-                                    mostSigBits = value;
-                                }
-                            } else if ("leastSigBits".equals(fieldName)) {
-                                long value = hollowObject.getLong(fieldName);
-                                if (value != Long.MIN_VALUE) {
-                                    leastSigBits = value;
-                                }
-                            }
+                    int mostSigBitsPosInPojoSchema = schema.getPosition(MappedFieldType.UUID_MOST_SIG_BITS.getSpecialFieldName());
+                    if(mostSigBitsPosInPojoSchema != -1) {
+                        long value = hollowObject.getLong(MappedFieldType.UUID_MOST_SIG_BITS.getSpecialFieldName());
+                        if(value != Long.MIN_VALUE) {
+                            mostSigBits = value;
+                        }
+                    }
+                    int leastSigBitsPosInPojoSchema = schema.getPosition(MappedFieldType.UUID_LEAST_SIG_BITS.getSpecialFieldName());
+                    if(leastSigBitsPosInPojoSchema != -1) {
+                        long value = hollowObject.getLong(MappedFieldType.UUID_LEAST_SIG_BITS.getSpecialFieldName());
+                        if(value != Long.MIN_VALUE) {
+                            leastSigBits = value;
                         }
                     }
                     if (mostSigBits != null && leastSigBits != null) {
@@ -288,21 +285,18 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 } else if (clazz == Instant.class) {
                     Long seconds = null;
                     Integer nanos = null;
-                    for (int i = 0; i < objectSchema.numFields(); i++) {
-                        String fieldName = objectSchema.getFieldName(i);
-                        int posInPojoSchema = schema.getPosition(fieldName);
-                        if (posInPojoSchema != -1) {
-                            if ("seconds".equals(fieldName)) {
-                                long value = hollowObject.getLong(fieldName);
-                                if (value != Long.MIN_VALUE) {
-                                    seconds = value;
-                                }
-                            } else if ("nanos".equals(fieldName)) {
-                                int value = hollowObject.getInt(fieldName);
-                                if (value != Integer.MIN_VALUE) {
-                                    nanos = value;
-                                }
-                            }
+                    int secondsPosInPojoSchema = schema.getPosition(MappedFieldType.INSTANT_SECONDS.getSpecialFieldName());
+                    if (secondsPosInPojoSchema != -1) {
+                        long value = hollowObject.getLong(MappedFieldType.INSTANT_SECONDS.getSpecialFieldName());
+                        if (value != Long.MIN_VALUE) {
+                            seconds = value;
+                        }
+                    }
+                    int nanoPosInPojoSchema = schema.getPosition(MappedFieldType.INSTANT_NANOS.getSpecialFieldName());
+                    if (nanoPosInPojoSchema != -1) {
+                        int value = hollowObject.getInt(MappedFieldType.INSTANT_NANOS.getSpecialFieldName());
+                        if (value != Integer.MIN_VALUE) {
+                            nanos = value;
                         }
                     }
                     if (seconds != null && nanos != null) {
@@ -312,26 +306,25 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     Integer year = null;
                     Integer month = null;
                     Integer day = null;
-                    for (int i = 0; i < objectSchema.numFields(); i++) {
-                        String fieldName = objectSchema.getFieldName(i);
-                        int posInPojoSchema = schema.getPosition(fieldName);
-                        if (posInPojoSchema != -1) {
-                            if ("year".equals(fieldName)) {
-                                int value = hollowObject.getInt(fieldName);
-                                if (value != Integer.MIN_VALUE) {
-                                    year = value;
-                                }
-                            } else if ("month".equals(fieldName)) {
-                                int value = hollowObject.getInt(fieldName);
-                                if (value != Integer.MIN_VALUE) {
-                                    month = value;
-                                }
-                            } else if ("day".equals(fieldName)) {
-                                int value = hollowObject.getInt(fieldName);
-                                if (value != Integer.MIN_VALUE) {
-                                    day = value;
-                                }
-                            }
+                    int yearPosInPojoSchema = schema.getPosition(MappedFieldType.LOCAL_DATE_YEAR.getSpecialFieldName());
+                    if (yearPosInPojoSchema != -1) {
+                        int value = hollowObject.getInt(MappedFieldType.LOCAL_DATE_YEAR.getSpecialFieldName());
+                        if (value != Integer.MIN_VALUE) {
+                            year = value;
+                        }
+                    }
+                    int monthPosInPojoSchema = schema.getPosition(MappedFieldType.LOCAL_DATE_MONTH.getSpecialFieldName());
+                    if (monthPosInPojoSchema != -1) {
+                        int value = hollowObject.getInt(MappedFieldType.LOCAL_DATE_MONTH.getSpecialFieldName());
+                        if (value != Integer.MIN_VALUE) {
+                            month = value;
+                        }
+                    }
+                    int dayPosInPojoSchema = schema.getPosition(MappedFieldType.LOCAL_DATE_DAY.getSpecialFieldName());
+                    if (dayPosInPojoSchema != -1) {
+                        int value = hollowObject.getInt(MappedFieldType.LOCAL_DATE_DAY.getSpecialFieldName());
+                        if (value != Integer.MIN_VALUE) {
+                            day = value;
                         }
                     }
                     if (year != null && month != null && day != null) {
