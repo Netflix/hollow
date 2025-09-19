@@ -739,6 +739,7 @@ public class HollowProducer extends AbstractHollowProducer {
         HollowObjectHashCodeFinder hashCodeFinder = null;
         boolean doIntegrityCheck = true;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
+        HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
 
         public B withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;
@@ -930,6 +931,12 @@ public class HollowProducer extends AbstractHollowProducer {
             return (B) this;
         }
 
+        public B withUpdatePlanVerifier(HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
+            this.updatePlanBlobVerifier = updatePlanBlobVerifier;
+            return (B) this;
+        }
+
+
         protected void checkArguments() {
             if (allowTypeResharding == true && doIntegrityCheck == false) { // type resharding feature rollout
                 throw new IllegalArgumentException("Enabling type re-sharding requires integrity check to also be enabled");
@@ -979,6 +986,8 @@ public class HollowProducer extends AbstractHollowProducer {
             checkArguments();
             return new HollowProducer.Incremental(this);
         }
+
+
     }
 
     /**
