@@ -22,7 +22,7 @@
     </a><br/>
 #end
 
-#if($previousDiffPairPageBeginIdx)
+#if($previousDiffPairPageBeginIdx >= 0)
     <a href="$path/fielddiff?type=$typeDiff.getTypeName()&fieldIdx=$fieldIdx&diffPairBeginIdx=$previousDiffPairPageBeginIdx#objectDiffs">&lt;&lt; Previous</a>
 #end
 #if($nextDiffPairPageBeginIdx)
