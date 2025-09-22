@@ -53,7 +53,7 @@ Number of Fields With Diffs: $typeDiff.getFieldDiffs().size() <br/>
     </a><br/>
 #end
 
-#if($previousDiffPairPageBeginIdx)
+#if($previousDiffPairPageBeginIdx >= 0)
     <a href="$path/typediff?type=$typeDiff.getTypeName()&diffPairBeginIdx=$previousDiffPairPageBeginIdx#objectDiffs">&lt;&lt; Previous</a>
 #end
 #if($nextDiffPairPageBeginIdx)
@@ -76,7 +76,7 @@ Number of Fields With Diffs: $typeDiff.getFieldDiffs().size() <br/>
                     $object.getDisplayKey()
                 </a><br/>           
             #end
-            #if($previousUnmatchedFromPageBeginIdx)
+            #if($previousUnmatchedFromPageBeginIdx >= 0)
                 <a href="$path/typediff?type=$typeDiff.getTypeName()&unmatchedFromBeginIdx=$previousUnmatchedFromPageBeginIdx#unmatchedObjects">&lt;&lt; Previous</a>
             #end
             #if($nextUnmatchedFromPageBeginIdx)
@@ -90,7 +90,7 @@ Number of Fields With Diffs: $typeDiff.getFieldDiffs().size() <br/>
                     $object.getDisplayKey()
                 </a><br/>        
             #end
-            #if($previousUnmatchedToPageBeginIdx)
+            #if($previousUnmatchedToPageBeginIdx >= 0)
                 <a href="$path/typediff?type=$typeDiff.getTypeName()&unmatchedToBeginIdx=$previousUnmatchedToPageBeginIdx#unmatchedObjects">&lt;&lt; Previous</a>
             #end
             #if($nextUnmatchedToPageBeginIdx)
