@@ -85,6 +85,7 @@ abstract class AbstractHollowProducer {
     HollowProducerMetrics metrics;
     HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
     final SingleProducerEnforcer singleProducerEnforcer;
+    final HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier;
     long lastSuccessfulCycle = 0;
     final HollowObjectHashCodeFinder hashCodeFinder;
     final boolean doIntegrityCheck;
@@ -108,7 +109,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true);
+                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE);
     }
 
     // The only constructor should be that which accepts a builder
@@ -121,7 +122,7 @@ abstract class AbstractHollowProducer {
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
                 b.allowTypeResharding, b.forceCoverageOfTypeResharding,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
-                b.hashCodeFinder, b.doIntegrityCheck);
+                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier);
     }
 
     private AbstractHollowProducer(
@@ -140,7 +141,8 @@ abstract class AbstractHollowProducer {
             HollowProducer.BlobStorageCleaner blobStorageCleaner,
             SingleProducerEnforcer singleProducerEnforcer,
             HollowObjectHashCodeFinder hashCodeFinder,
-            boolean doIntegrityCheck) {
+            boolean doIntegrityCheck,
+            HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
         this.publisher = publisher;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
@@ -173,6 +175,7 @@ abstract class AbstractHollowProducer {
 
         this.metrics = new HollowProducerMetrics();
         this.metricsCollector = metricsCollector;
+        this.updatePlanBlobVerifier = updatePlanBlobVerifier;
     }
 
     /**
@@ -288,7 +291,8 @@ abstract class AbstractHollowProducer {
         Status.RestoreStageBuilder status = localListeners.fireProducerRestoreStart(versionDesired);
         try {
             if (versionDesired != HollowConstants.VERSION_NONE) {
-                HollowConsumer client = HollowConsumer.withBlobRetriever(blobRetriever).build();
+                HollowConsumer client = HollowConsumer.withBlobRetriever(blobRetriever)
+                        .withUpdatePlanVerifier(updatePlanBlobVerifier).build();
                 client.triggerRefreshTo(versionDesired);
                 readState = ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
                 readStates = ReadStateHelper.restored(readState);

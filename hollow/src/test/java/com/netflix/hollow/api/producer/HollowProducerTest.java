@@ -21,7 +21,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
@@ -97,8 +99,22 @@ public class HollowProducerTest {
     }
 
     private HollowProducer createProducer(File tmpFolder, HollowObjectSchema... schemas) {
-        HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
-            .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath())).build();
+        return createProducer(tmpFolder, null, null, schemas);
+    }
+
+    private HollowProducer createProducer(File tmpFolder,
+                                          HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier,
+                                          HollowProducer.VersionMinter versionMinter,
+                                          HollowObjectSchema... schemas) {
+         HollowProducer.Builder producerBuilder = HollowProducer.withPublisher(new FakeBlobPublisher())
+            .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath()));
+        if(updatePlanBlobVerifier != null) {
+            producerBuilder = producerBuilder.withUpdatePlanVerifier(updatePlanBlobVerifier);
+        }
+        if (versionMinter != null) {
+            producerBuilder = producerBuilder.withVersionMinter(versionMinter);
+        }
+        HollowProducer producer = producerBuilder.build();
         if (schemas != null && schemas.length > 0) {
             producer.initializeDataModel(schemas);
         }
@@ -978,6 +994,38 @@ public class HollowProducerTest {
         assertRecordOrdinal(consumer, 32, "val33", 33); // shard1
         assertRecordOrdinal(consumer,  9, "val10", 10); // shard2
         assertRecordOrdinal(consumer, 11, "val12", 12);
+    }
+
+    @Test
+    public void testHollowProducerRestoreWithBlobVerifier() {
+        HollowConsumer.UpdatePlanBlobVerifier blobVerifier = new HollowConsumer.UpdatePlanBlobVerifier() {
+            @Override
+            public boolean announcementVerificationEnabled() {
+                return true;
+            }
+
+            @Override
+            public int announcementVerificationMaxLookback() {
+                return 1;
+            }
+
+            @Override
+            public HollowConsumer.AnnouncementWatcher announcementWatcher() {
+                HollowConsumer.AnnouncementWatcher watcher = mock(HollowConsumer.AnnouncementWatcher.class);
+                when(watcher.getVersionAnnouncementStatus(1001L)).thenReturn(HollowConsumer.AnnouncementStatus.NOT_ANNOUNCED);
+                when(watcher.getVersionAnnouncementStatus(1000L)).thenReturn(HollowConsumer.AnnouncementStatus.ANNOUNCED);
+                return null;
+            }
+        };
+        HollowProducer.VersionMinter mockVersionMinter = mock(HollowProducer.VersionMinter.class);
+        when(mockVersionMinter.mint()).thenReturn(1000L).thenReturn(1001L);
+        HollowProducer producer = createProducer(tmpFolder,
+                blobVerifier, mockVersionMinter, schema);
+        long version1 = testPublishV1(producer, 2, 10);
+        long version2 = testPublishV1(producer, 2, 10);
+
+        HollowProducer.ReadState readState = producer.restore(version2, blobRetriever);
+        assertEquals(version1, readState.getVersion());
     }
 
     private void add(HollowProducer.WriteState state, String sVal, int iVal) {
