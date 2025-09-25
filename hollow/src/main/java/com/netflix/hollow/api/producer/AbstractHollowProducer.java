@@ -265,19 +265,25 @@ abstract class AbstractHollowProducer {
      * @see #initializeDataModel(Class[])
      */
     public HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
+        return restore(new HollowConsumer.VersionInfo(versionDesired), blobRetriever,
+                (restoreFrom, restoreTo) -> restoreTo.restoreFrom(restoreFrom));
+    }
+
+    public HollowProducer.ReadState restore(HollowConsumer.VersionInfo versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
         return restore(versionDesired, blobRetriever,
                 (restoreFrom, restoreTo) -> restoreTo.restoreFrom(restoreFrom));
     }
 
     HollowProducer.ReadState hardRestore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
-        return restore(versionDesired, blobRetriever,
+        return restore(new HollowConsumer.VersionInfo(versionDesired), blobRetriever,
                 (restoreFrom, restoreTo) -> HollowWriteStateCreator.
                         populateUsingReadEngine(restoreTo, restoreFrom, false));
     }
 
     private HollowProducer.ReadState restore(
-            long versionDesired, HollowConsumer.BlobRetriever blobRetriever,
+            HollowConsumer.VersionInfo versionInfoDesired, HollowConsumer.BlobRetriever blobRetriever,
             BiConsumer<HollowReadStateEngine, HollowWriteStateEngine> restoreAction) {
+        long versionDesired = versionInfoDesired.getVersion();
         Objects.requireNonNull(blobRetriever);
         Objects.requireNonNull(restoreAction);
 
@@ -292,8 +298,9 @@ abstract class AbstractHollowProducer {
         try {
             if (versionDesired != HollowConstants.VERSION_NONE) {
                 HollowConsumer client = HollowConsumer.withBlobRetriever(blobRetriever)
-                        .withUpdatePlanVerifier(updatePlanBlobVerifier).build();
-                client.triggerRefreshTo(versionDesired);
+                        .withUpdatePlanVerifier(updatePlanBlobVerifier)
+                        .build();
+                client.triggerRefreshTo(versionInfoDesired);
                 readState = ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
                 readStates = ReadStateHelper.restored(readState);
 

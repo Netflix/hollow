@@ -62,10 +62,12 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -1006,25 +1008,26 @@ public class HollowProducerTest {
 
             @Override
             public int announcementVerificationMaxLookback() {
-                return 1;
+                return 5;
             }
 
             @Override
             public HollowConsumer.AnnouncementWatcher announcementWatcher() {
                 HollowConsumer.AnnouncementWatcher watcher = mock(HollowConsumer.AnnouncementWatcher.class);
                 when(watcher.getVersionAnnouncementStatus(1001L)).thenReturn(HollowConsumer.AnnouncementStatus.NOT_ANNOUNCED);
-                when(watcher.getVersionAnnouncementStatus(1000L)).thenReturn(HollowConsumer.AnnouncementStatus.ANNOUNCED);
-                return null;
+                when(watcher.getVersionAnnouncementStatus(990L)).thenReturn(HollowConsumer.AnnouncementStatus.ANNOUNCED);
+                return watcher;
             }
         };
         HollowProducer.VersionMinter mockVersionMinter = mock(HollowProducer.VersionMinter.class);
-        when(mockVersionMinter.mint()).thenReturn(1000L).thenReturn(1001L);
+        when(mockVersionMinter.mint()).thenReturn(990L).thenReturn(1001L);
         HollowProducer producer = createProducer(tmpFolder,
                 blobVerifier, mockVersionMinter, schema);
         long version1 = testPublishV1(producer, 2, 10);
-        long version2 = testPublishV1(producer, 2, 10);
+        long version2 = testPublishV1(producer, 2, 11);
 
-        HollowProducer.ReadState readState = producer.restore(version2, blobRetriever);
+        HollowProducer.ReadState readState = producer.restore(new HollowConsumer.VersionInfo(1003l, Optional.empty(), Optional.empty(), Optional.of(true)), blobRetriever);
+        //the mocked blob retriever does not have delta blob so restore should go to the latest verified snapshot prior to 1003 which is 990
         assertEquals(version1, readState.getVersion());
     }
 

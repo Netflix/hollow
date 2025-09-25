@@ -208,6 +208,11 @@ public class HollowProducer extends AbstractHollowProducer {
     }
 
     @Override
+    public HollowProducer.ReadState restore(HollowConsumer.VersionInfo versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
+        return super.restore(versionDesired, blobRetriever);
+    }
+
+    @Override
     public HollowWriteStateEngine getWriteEngine() {
         return super.getWriteEngine();
     }
