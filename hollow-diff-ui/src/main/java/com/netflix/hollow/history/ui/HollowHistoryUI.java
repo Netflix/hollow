@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -63,6 +64,15 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     private final TimeZone timeZone;
 
     private String[] overviewDisplayHeaders;
+    /** General purpose map to store header string and corresponding values used in HollowExplorer. It also stores headerDisplayString
+     *  for backwards compatibility.
+     *  use thread-safe map as value writer and renders may perform concurrent reads/writes.
+     **/
+    private final ConcurrentHashMap<String, String> commonHeadersDisplayMap = new ConcurrentHashMap<>();
+    private final static String HEADER_DISPLAY_NAMESPACE = "headerDisplayNamespace";
+    private final static String HEADER_DISPLAY_ENV="headerDisplayEnv";
+    private final static String HEADER_DISPLAY_ENV_COLOR="headerDisplayEnvColor";
+    private final static String HEADER_DISPLAY_PINNED_VERSION="headerDisplayPinnedVersion";
 
     /**
      * HollowHistoryUI constructor that builds history for a consumer that transitions forwards i.e. in increasing
@@ -260,4 +270,37 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     public TimeZone getTimeZone() {
         return timeZone;
     }
+
+    public String getHeaderDisplayNamespace() {
+        return commonHeadersDisplayMap.get(HEADER_DISPLAY_NAMESPACE);
+    }
+
+    public void setHeaderDisplayNamespace(String str) {
+        this.commonHeadersDisplayMap.put(HEADER_DISPLAY_NAMESPACE, str);
+    }
+
+    public String getHeaderDisplayEnv() {
+        return commonHeadersDisplayMap.get(HEADER_DISPLAY_ENV);
+    }
+
+    public void setHeaderDisplayEnv(String str) {
+        this.commonHeadersDisplayMap.put(HEADER_DISPLAY_ENV, str);
+    }
+
+    public String getHeaderDisplayEnvColor() {
+        return this.commonHeadersDisplayMap.get(HEADER_DISPLAY_ENV_COLOR);
+    }
+
+    public String setHeaderDisplayEnvColor(String str) {
+        return this.commonHeadersDisplayMap.put(HEADER_DISPLAY_ENV_COLOR, str);
+    }
+
+    public String getHeaderDisplayPinnedVersion() {
+        return commonHeadersDisplayMap.get(HEADER_DISPLAY_PINNED_VERSION);
+    }
+
+    public void setHeaderDisplayPinnedVersion(long version) {
+        this.commonHeadersDisplayMap.put(HEADER_DISPLAY_PINNED_VERSION, Long.toString(version));
+    }
+
 }

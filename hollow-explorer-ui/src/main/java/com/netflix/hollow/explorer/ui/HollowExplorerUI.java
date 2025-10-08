@@ -26,7 +26,7 @@ import com.netflix.hollow.explorer.ui.pages.ShowAllTypesPage;
 import com.netflix.hollow.ui.HollowUIRouter;
 import com.netflix.hollow.ui.HollowUISession;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,9 +38,13 @@ public class HollowExplorerUI extends HollowUIRouter {
     private final HollowReadStateEngine stateEngine;
     /** General purpose map to store header string and corresponding values used in HollowExplorer. It also stores headerDisplayString
      *  for backwards compatibility.
+     *  use thread-safe map as value writer and renders may perform concurrent reads/writes.
      **/
-    private final HashMap<String, String> headerDisplayMap = new HashMap<>();
+    private final ConcurrentHashMap<String, String> headerDisplayMap = new ConcurrentHashMap<>();
     private final static String HEADER_DISPLAY_STRING = "headerDisplayString";
+    private final static String HEADER_DISPLAY_ENV="headerDisplayEnv";
+    private final static String HEADER_DISPLAY_ENV_COLOR="headerDisplayEnvColor";
+    private final static String HEADER_DISPLAY_PINNED_VERSION="headerDisplayPinnedVersion";
 
     private final ShowAllTypesPage showAllTypesPage;
     private final BrowseSelectedTypePage browseTypePage;
@@ -116,6 +120,30 @@ public class HollowExplorerUI extends HollowUIRouter {
 
     public void setHeaderDisplayString(String str) {
         this.headerDisplayMap.put(HEADER_DISPLAY_STRING, str);
+    }
+
+    public String getHeaderDisplayEnv() {
+        return headerDisplayMap.get(HEADER_DISPLAY_ENV);
+    }
+
+    public void setHeaderDisplayEnv(String str) {
+        this.headerDisplayMap.put(HEADER_DISPLAY_ENV, str);
+    }
+
+    public String getHeaderDisplayEnvColor() {
+        return this.headerDisplayMap.get(HEADER_DISPLAY_ENV_COLOR);
+    }
+
+    public String setHeaderDisplayEnvColor(String str) {
+        return this.headerDisplayMap.put(HEADER_DISPLAY_ENV_COLOR, str);
+    }
+
+    public String getHeaderDisplayPinnedVersion() {
+        return headerDisplayMap.get(HEADER_DISPLAY_PINNED_VERSION);
+    }
+
+    public void setHeaderDisplayPinnedVersion(long version) {
+        this.headerDisplayMap.put(HEADER_DISPLAY_PINNED_VERSION, Long.toString(version));
     }
 
     public void addToHeaderDisplayMap(String key, String value) {

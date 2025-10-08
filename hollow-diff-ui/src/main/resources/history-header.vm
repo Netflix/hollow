@@ -18,13 +18,28 @@
 
 <head>
     <title>Hollow Data History</title>
+    <style>
+        .nav { text-align: left; padding-left: 5px; padding-right: 80px; border-left:1px solid #DCDCDC; }
+    </style>
 </head>
 
 <body>
-
-#if($showHomeLink)
-    <a href="$basePath/overview">Home</a>
-#end
+<table>
+    <tr>
+        #if($showHomeLink)
+        <td class="nav"><a href="$basePath/overview">Home</a> </td>
+        #end
+        #if($headerDisplayEnv)
+            <td class="nav">[ <span#if($headerDisplayEnvColor != "") style="color: $headerDisplayEnvColor;"#end>$headerDisplayEnv</span> ]</td>
+        #end
+        #if($headerDisplayNamespace)
+        <td class="nav">[ $headerDisplayNamespace ]</td>
+        #end
+        #if($headerDisplayPinnedVersion)
+        <td class="nav">[ Explorer is Pinned To: $headerDisplayPinnedVersion ]</td>
+        #end
+    </tr>
+</table>
 
 <form action="$basePath/query">
 Lookup Key: 
