@@ -415,7 +415,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     int nanoPosInPojoSchema = schema.getPosition(MappedFieldType.INSTANT_SECONDS.getSpecialFieldName());
                     if(nanoPosInPojoSchema != -1) {
                         int nanoValue = objectNode.getFieldValueInt(MappedFieldType.INSTANT_SECONDS.getSpecialFieldName());
-                        if(nanoValue != Long.MIN_VALUE) {
+                        if(nanoValue != Integer.MIN_VALUE) {
                             nanos = nanoValue;
                         }
                     }
@@ -1327,8 +1327,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         REFERENCE(FieldType.REFERENCE),
         ENUM_NAME(FieldType.STRING, "_name"),
         DATE_TIME(FieldType.LONG, "value"),
-        UUID_MOST_SIG_BITS(FieldType.LONG, "mostSigBits"),
-        UUID_LEAST_SIG_BITS(FieldType.LONG, "leastSigBits"),
+        UUID_MOST_SIG_BITS(FieldType.UUID_LONG, "mostSigBits"),
+        UUID_LEAST_SIG_BITS(FieldType.UUID_LONG, "leastSigBits"),
         INSTANT_SECONDS(FieldType.LONG, "seconds"),
         INSTANT_NANOS(FieldType.INT, "nanos"),
         LOCAL_DATE_YEAR(FieldType.INT, "year"),

@@ -117,6 +117,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             pointer += 4;
             break;
         case DOUBLE:
+        case UUID_LONG:
             addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 64);
             pointer += 8;
             break;
@@ -385,6 +386,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             readPointer += 4;
             break;
         case DOUBLE:
+        case UUID_LONG:
             long longValue = data.readLongBits(readPointer);
             fixedLengthLongArray.setElementValue(fieldBitOffset, 64, longValue);
             readPointer += 8;
