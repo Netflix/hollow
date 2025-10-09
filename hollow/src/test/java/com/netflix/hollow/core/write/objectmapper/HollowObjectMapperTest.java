@@ -222,6 +222,23 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     }
 
     @Test
+    public void testUUIDNull() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithNullUUID type = new TypeWithNullUUID(null, 0);
+
+        mapper.add(type);
+
+        roundTripSnapshot();
+
+        int theOrdinal = readStateEngine.getTypeState("TypeWithNullUUID").maxOrdinal();
+
+        GenericHollowObject obj = new GenericHollowObject(readStateEngine, "TypeWithNullUUID", theOrdinal);
+
+        Assert.assertEquals(null, obj.getObject("uuid"));
+        Assert.assertEquals(0, obj.getInt("id"));
+    }
+
+    @Test
     public void testTransient() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
@@ -645,5 +662,14 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
 
     static class Child extends Parent {
         String myField1;
+    }
+
+    static class TypeWithNullUUID {
+        UUID uuid;
+        int id;
+        public TypeWithNullUUID(UUID uuid, int id) {
+            this.uuid = uuid;
+            this.id = id;
+        }
     }
 }

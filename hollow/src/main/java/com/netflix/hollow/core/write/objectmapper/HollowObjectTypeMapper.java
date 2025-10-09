@@ -267,14 +267,14 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     Long leastSigBits = null;
                     int mostSigBitsPosInPojoSchema = schema.getPosition(MappedFieldType.UUID_MOST_SIG_BITS.getSpecialFieldName());
                     if(mostSigBitsPosInPojoSchema != -1) {
-                        long value = hollowObject.getLong(MappedFieldType.UUID_MOST_SIG_BITS.getSpecialFieldName());
+                        long value =  hollowObject.getTypeDataAccess().readLong(hollowObject.getOrdinal(), mostSigBitsPosInPojoSchema);
                         if(value != Long.MIN_VALUE) {
                             mostSigBits = value;
                         }
                     }
                     int leastSigBitsPosInPojoSchema = schema.getPosition(MappedFieldType.UUID_LEAST_SIG_BITS.getSpecialFieldName());
                     if(leastSigBitsPosInPojoSchema != -1) {
-                        long value = hollowObject.getLong(MappedFieldType.UUID_LEAST_SIG_BITS.getSpecialFieldName());
+                        long value = hollowObject.getTypeDataAccess().readLong(hollowObject.getOrdinal(), leastSigBitsPosInPojoSchema);
                         if(value != Long.MIN_VALUE) {
                             leastSigBits = value;
                         }
@@ -287,14 +287,14 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     Integer nanos = null;
                     int secondsPosInPojoSchema = schema.getPosition(MappedFieldType.INSTANT_SECONDS.getSpecialFieldName());
                     if (secondsPosInPojoSchema != -1) {
-                        long value = hollowObject.getLong(MappedFieldType.INSTANT_SECONDS.getSpecialFieldName());
+                        long value = hollowObject.getTypeDataAccess().readLong(hollowObject.getOrdinal(), secondsPosInPojoSchema);
                         if (value != Long.MIN_VALUE) {
                             seconds = value;
                         }
                     }
                     int nanoPosInPojoSchema = schema.getPosition(MappedFieldType.INSTANT_NANOS.getSpecialFieldName());
                     if (nanoPosInPojoSchema != -1) {
-                        int value = hollowObject.getInt(MappedFieldType.INSTANT_NANOS.getSpecialFieldName());
+                        int value = hollowObject.getTypeDataAccess().readInt(hollowObject.getOrdinal(), nanoPosInPojoSchema);
                         if (value != Integer.MIN_VALUE) {
                             nanos = value;
                         }
@@ -308,21 +308,21 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     Integer day = null;
                     int yearPosInPojoSchema = schema.getPosition(MappedFieldType.LOCAL_DATE_YEAR.getSpecialFieldName());
                     if (yearPosInPojoSchema != -1) {
-                        int value = hollowObject.getInt(MappedFieldType.LOCAL_DATE_YEAR.getSpecialFieldName());
+                        int value = hollowObject.getTypeDataAccess().readInt(hollowObject.getOrdinal(), yearPosInPojoSchema);
                         if (value != Integer.MIN_VALUE) {
                             year = value;
                         }
                     }
                     int monthPosInPojoSchema = schema.getPosition(MappedFieldType.LOCAL_DATE_MONTH.getSpecialFieldName());
                     if (monthPosInPojoSchema != -1) {
-                        int value = hollowObject.getInt(MappedFieldType.LOCAL_DATE_MONTH.getSpecialFieldName());
+                        int value = hollowObject.getTypeDataAccess().readInt(hollowObject.getOrdinal(), monthPosInPojoSchema);
                         if (value != Integer.MIN_VALUE) {
                             month = value;
                         }
                     }
                     int dayPosInPojoSchema = schema.getPosition(MappedFieldType.LOCAL_DATE_DAY.getSpecialFieldName());
                     if (dayPosInPojoSchema != -1) {
-                        int value = hollowObject.getInt(MappedFieldType.LOCAL_DATE_DAY.getSpecialFieldName());
+                        int value = hollowObject.getTypeDataAccess().readInt(hollowObject.getOrdinal(), dayPosInPojoSchema);
                         if (value != Integer.MIN_VALUE) {
                             day = value;
                         }
@@ -755,27 +755,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     break;
                 case DATE_TIME:
                     rec.setLong(fieldName, ((Date)obj).getTime());
-                    break;
-                case INSTANT_NANOS:
-                    rec.setInt(fieldName, ((Instant)obj).getNano());
-                    break;
-                case INSTANT_SECONDS:
-                    rec.setLong(fieldName, ((Instant)obj).getEpochSecond());
-                    break;
-                case UUID_MOST_SIG_BITS:
-                    rec.setLong(fieldName, ((UUID)obj).getMostSignificantBits());
-                    break;
-                case UUID_LEAST_SIG_BITS:
-                    rec.setLong(fieldName, ((UUID)obj).getLeastSignificantBits());
-                    break;
-                case LOCAL_DATE_YEAR:
-                    rec.setInt(fieldName, ((LocalDate)obj).getYear());
-                    break;
-                case LOCAL_DATE_MONTH:
-                    rec.setInt(fieldName, ((LocalDate)obj).getMonthValue());
-                    break;
-                case LOCAL_DATE_DAY:
-                    rec.setInt(fieldName, ((LocalDate)obj).getDayOfMonth());
                     break;
                 case ENUM_NAME:
                     rec.setString(fieldName, ((Enum<?>)obj).name());
