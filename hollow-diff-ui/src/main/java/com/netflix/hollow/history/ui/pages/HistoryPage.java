@@ -57,6 +57,25 @@ public abstract class HistoryPage {
             throw e;
         }
 
+        String headerDisplayNamespace = ui.getHeaderDisplayNamespace();
+        if (headerDisplayNamespace != null) {
+            ctx.put("headerDisplayNamespace", headerDisplayNamespace);
+        }
+
+        String headerDisplayEnv = ui.getHeaderDisplayEnv();
+        if (headerDisplayEnv != null) {
+            ctx.put("headerDisplayEnv", headerDisplayEnv);
+            String headerDisplayEnvColor = ui.getHeaderDisplayEnvColor();
+            if (headerDisplayEnvColor != null) {
+                ctx.put("headerDisplayEnvColor", headerDisplayEnvColor);
+            }
+        }
+
+        String headerDisplayPinnedVersion = ui.getHeaderDisplayPinnedVersion();
+        if (headerDisplayPinnedVersion != null) {
+            ctx.put("headerDisplayPinnedVersion", headerDisplayPinnedVersion);
+        }
+
         if(includeHeaderAndFooter())
             headerTemplate.merge(ctx, writer);
         template.merge(ctx, writer);

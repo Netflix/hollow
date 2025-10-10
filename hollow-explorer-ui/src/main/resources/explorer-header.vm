@@ -29,11 +29,17 @@
 	<table>
 		<tr>
 			<td class="nav"><a href="$basePath/home">[ Hollow Data Explorer ]</a></td>
+			#if($headerDisplayEnv)
+				<td class="nav">[ <span#if($headerDisplayEnvColor != "") style="color: $headerDisplayEnvColor;"#end>$headerDisplayEnv</span> ]</td>
+			#end
 			#if($headerDisplayString)
 				<td class="nav">[ <a target="_blank" href="$headerStringURL">$esc.html($headerDisplayString)</a> ]</td>
 			#end
 			#if($stateVersion)
 				<td class="nav">[ State Version: $stateVersion ]</td>
+			#end
+			#if($headerDisplayPinnedVersion)
+				<td class="nav">[ Explorer is Pinned To: $headerDisplayPinnedVersion ]</td>
 			#end
 			## When $type is defined and is not a list, display links to browse
 			## data and schema for that type.

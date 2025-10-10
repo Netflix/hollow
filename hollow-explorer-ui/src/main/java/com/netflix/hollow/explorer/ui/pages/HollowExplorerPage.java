@@ -54,6 +54,20 @@ public abstract class HollowExplorerPage {
             ctx.put("headerStringURL", headerDisplayURL);
         }
 
+        String headerDisplayEnv = ui.getHeaderDisplayEnv();
+        if (headerDisplayEnv != null) {
+            ctx.put("headerDisplayEnv", headerDisplayEnv);
+            String headerDisplayEnvColor = ui.getHeaderDisplayEnvColor();
+            if (headerDisplayEnvColor != null) {
+                ctx.put("headerDisplayEnvColor", headerDisplayEnvColor);
+            }
+        }
+
+        String headerDisplayPinnedVersion = ui.getHeaderDisplayPinnedVersion();
+        if (headerDisplayPinnedVersion != null) {
+            ctx.put("headerDisplayPinnedVersion", headerDisplayPinnedVersion);
+        }
+
         ctx.put("basePath", ui.getBaseURLPath());
 
         ctx.put("esc", new EscapingTool());
@@ -76,5 +90,4 @@ public abstract class HollowExplorerPage {
      * Populates the provided VelocityContext.
      */
     protected abstract void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx);
-
 }
