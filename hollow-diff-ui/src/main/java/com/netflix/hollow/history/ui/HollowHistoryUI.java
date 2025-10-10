@@ -299,6 +299,10 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
         return commonHeadersDisplayMap.get(HEADER_DISPLAY_PINNED_VERSION);
     }
 
+    public void removeHeaderDisplayPinnedVersion() {
+        this.commonHeadersDisplayMap.remove(HEADER_DISPLAY_PINNED_VERSION);
+    }
+
     public void setHeaderDisplayPinnedVersion(long version) {
         this.commonHeadersDisplayMap.put(HEADER_DISPLAY_PINNED_VERSION, Long.toString(version));
     }

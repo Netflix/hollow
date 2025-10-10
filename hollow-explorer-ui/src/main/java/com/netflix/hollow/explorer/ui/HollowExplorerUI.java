@@ -142,8 +142,12 @@ public class HollowExplorerUI extends HollowUIRouter {
         return headerDisplayMap.get(HEADER_DISPLAY_PINNED_VERSION);
     }
 
-    public void setHeaderDisplayPinnedVersion(long version) {
+    public void setHeaderDisplayPinnedVersion(Long version) {
         this.headerDisplayMap.put(HEADER_DISPLAY_PINNED_VERSION, Long.toString(version));
+    }
+
+    public void removeHeaderDisplayPinnedVersion() {
+        this.headerDisplayMap.remove(HEADER_DISPLAY_PINNED_VERSION);
     }
 
     public void addToHeaderDisplayMap(String key, String value) {
