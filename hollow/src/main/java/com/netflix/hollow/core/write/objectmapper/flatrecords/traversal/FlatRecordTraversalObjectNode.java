@@ -93,6 +93,8 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
         return reader.readFieldInt(ordinal, field);
       case LONG:
         return reader.readFieldLong(ordinal, field);
+      case UUID_LONG:
+        return reader.readFieldUuidLong(ordinal, field);
       case FLOAT:
         return reader.readFieldFloat(ordinal, field);
       case DOUBLE:
@@ -138,6 +140,10 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
       return null;
     }
     return value;
+  }
+
+  public long getFieldValueUuidLong(String field) {
+    return reader.readFieldUuidLong(ordinal, field);
   }
 
   public float getFieldValueFloat(String field) {

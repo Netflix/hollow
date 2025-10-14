@@ -20,6 +20,10 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.UUID;
+
 public class HollowObjectMapperPrimaryKeyExtractionTests {
     
     @Test
@@ -101,6 +105,6 @@ public class HollowObjectMapperPrimaryKeyExtractionTests {
             this.name = name;
         }
     }
-    
+
 
 }

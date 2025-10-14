@@ -176,6 +176,19 @@ public class FlatRecordOrdinalReader {
     return ZigZag.decodeLong(value);
   }
 
+  public long readFieldUuidLong(int ordinal, String field) {
+    int offset = skipToField(ordinal, HollowObjectSchema.FieldType.UUID_LONG, field);
+    if (offset == -1) {
+      return Long.MIN_VALUE;
+    }
+
+    long value = record.data.readLongBits(offset);
+    if (value == Long.MIN_VALUE) {
+      return Long.MIN_VALUE;
+    }
+    return value;
+  }
+
   public float readFieldFloat(int ordinal, String field) {
     int offset = skipToField(ordinal, HollowObjectSchema.FieldType.FLOAT, field);
     if (offset == -1) {
@@ -269,6 +282,7 @@ public class FlatRecordOrdinalReader {
       case BOOLEAN:
       case INT:
       case LONG:
+      case UUID_LONG:
       case REFERENCE:
       case BYTES:
       case STRING:
@@ -365,6 +379,7 @@ public class FlatRecordOrdinalReader {
       case BOOLEAN:
         return 1;
       case DOUBLE:
+      case UUID_LONG:
         return 8;
       case FLOAT:
         return 4;

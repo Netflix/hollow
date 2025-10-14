@@ -4,6 +4,9 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FakeHollowSchemaIdentifierMapper;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -11,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,6 +45,9 @@ public class HollowObjectMapperFlatRecordParserTest {
     wrapperTypesTest.type = AnEnum.SOME_VALUE_C;
     wrapperTypesTest.complexEnum = ComplexEnum.SOME_VALUE_A;
     wrapperTypesTest.dateCreated = new Date();
+    wrapperTypesTest.instant = Instant.now();
+    wrapperTypesTest.uuid = UUID.randomUUID();
+    wrapperTypesTest.localDate = LocalDate.now();
 
     flatRecordWriter.reset();
     mapper.writeFlat(wrapperTypesTest, flatRecordWriter);
@@ -51,6 +58,11 @@ public class HollowObjectMapperFlatRecordParserTest {
     Assert.assertEquals(wrapperTypesTest, result);
     Assert.assertEquals(wrapperTypesTest.complexEnum.value, result.complexEnum.value);
     Assert.assertEquals(wrapperTypesTest.complexEnum.anotherValue, result.complexEnum.anotherValue);
+    Assert.assertEquals(wrapperTypesTest.dateCreated, result.dateCreated);
+    Assert.assertEquals(wrapperTypesTest.instant, result.instant);
+    Assert.assertEquals(wrapperTypesTest.uuid, result.uuid);
+    Assert.assertEquals(wrapperTypesTest.localDate, result.localDate);
+
   }
 
   @Test
@@ -695,12 +707,15 @@ public class HollowObjectMapperFlatRecordParserTest {
     @HollowTypeName(name = "ComplexEnum")
     ComplexEnum complexEnum;
     Date dateCreated;
+    Instant instant;
+    LocalDate localDate;
+    UUID uuid;
 
     @Override
     public boolean equals(Object o) {
       if(o instanceof SpecialWrapperTypesTest) {
         SpecialWrapperTypesTest other = (SpecialWrapperTypesTest)o;
-        return id == other.id && complexEnum == other.complexEnum && type == other.type && dateCreated.equals(other.dateCreated);
+        return id == other.id && complexEnum == other.complexEnum && type == other.type && dateCreated.equals(other.dateCreated) && instant.equals(other.instant) && localDate.equals(other.localDate) && uuid.equals(other.uuid);
       }
       return false;
     }
