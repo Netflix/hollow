@@ -18,13 +18,21 @@
 
 <head>
     <title>Hollow Data History</title>
+    <style>
+        .nav { text-align: left; padding-left: 5px; padding-right: 80px; border-left:1px solid #DCDCDC; }
+    </style>
 </head>
 
 <body>
 
-#if($showHomeLink)
-    <a href="$basePath/overview">Home</a>
-#end
+<table>
+    <tr>
+        #if($showHomeLink)
+            <td class="nav"><a href="$basePath/overview">Home</a> </td>
+        #end
+        $commonHeaderEntries
+    </tr>
+</table>
 
 <form action="$basePath/query">
 Lookup Key: 

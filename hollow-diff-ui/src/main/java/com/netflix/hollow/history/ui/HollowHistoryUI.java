@@ -36,10 +36,14 @@ import com.netflix.hollow.history.ui.pages.HistoryStateTypeExpandGroupPage;
 import com.netflix.hollow.history.ui.pages.HistoryStateTypePage;
 import com.netflix.hollow.tools.history.HollowHistory;
 import com.netflix.hollow.ui.HollowUIRouter;
+import com.netflix.hollow.ui.ValuePositionPair;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -61,6 +65,14 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     private final Map<String, HollowHistoryRecordNamer> customHollowRecordNamers;
     private final Map<String, PrimaryKey> matchHints;
     private final TimeZone timeZone;
+
+    /** General purpose map to store common header table data cell to be displayed on all pages rendered by HollowExplorerPage.
+     * ValuePosition.value stores the string value of the html table data cell.
+     * ValuePosition.position stores the relative position of the table data cell.
+     * They are placed in ascending order of position.
+     * Use ConcurrentMap, as rendering and header table data cell updates can happen asynchronously.
+     **/
+    public final ConcurrentMap<String, ValuePositionPair> commonHeaderEntries = new ConcurrentHashMap<>();
 
     private String[] overviewDisplayHeaders;
 
@@ -259,5 +271,13 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
 
     public TimeZone getTimeZone() {
         return timeZone;
+    }
+
+    public void addNewCommonHeaderEntry(String key, String value, int position) {
+        commonHeaderEntries.put(key, new ValuePositionPair(value, position));
+    }
+
+    public void removeCommonHeaderEntry(String key) {
+        commonHeaderEntries.remove(key);
     }
 }
