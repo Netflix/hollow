@@ -25,14 +25,17 @@ import com.netflix.hollow.explorer.ui.pages.QueryPage;
 import com.netflix.hollow.explorer.ui.pages.ShowAllTypesPage;
 import com.netflix.hollow.ui.HollowUIRouter;
 import com.netflix.hollow.ui.HollowUISession;
+import com.netflix.hollow.ui.ValuePositionPair;
+
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("deprecation")
 public class HollowExplorerUI extends HollowUIRouter {
-    
     private final HollowConsumer consumer;
     private final HollowClient client;
     private final HollowReadStateEngine stateEngine;
@@ -40,6 +43,14 @@ public class HollowExplorerUI extends HollowUIRouter {
      *  for backwards compatibility.
      **/
     private final HashMap<String, String> headerDisplayMap = new HashMap<>();
+    /** General purpose map to store common header table data cell to be displayed on all pages rendered by HollowExplorerPage.
+     * ValuePosition.value stores the string value of the html table data cell.
+     * ValuePosition.position stores the relative position of the table data cell.
+     * They are placed in ascending order of position.
+     * Use a different map than headerDisplayMap for backwards compatibility.
+     * Use ConcurrentMap, as rendering and header table data cell updates can happen asynchronously.
+     **/
+    public final ConcurrentMap<String, ValuePositionPair> commonHeaderEntries = new ConcurrentHashMap<>();
     private final static String HEADER_DISPLAY_STRING = "headerDisplayString";
 
     private final ShowAllTypesPage showAllTypesPage;
@@ -125,5 +136,12 @@ public class HollowExplorerUI extends HollowUIRouter {
     public String getFromHeaderDisplayMap(String key) {
         return headerDisplayMap.get(key);
     }
-    
+
+    public void addNewCommonHeaderEntry(String key, String value, int position) {
+        commonHeaderEntries.put(key, new ValuePositionPair(value, position));
+    }
+
+    public void removeCommonHeaderEntry(String key) {
+        commonHeaderEntries.remove(key);
+    }
 }

@@ -29,6 +29,7 @@
 	<table>
 		<tr>
 			<td class="nav"><a href="$basePath/home">[ Hollow Data Explorer ]</a></td>
+			$commonHeaderEntries
 			#if($headerDisplayString)
 				<td class="nav">[ <a target="_blank" href="$headerStringURL">$esc.html($headerDisplayString)</a> ]</td>
 			#end

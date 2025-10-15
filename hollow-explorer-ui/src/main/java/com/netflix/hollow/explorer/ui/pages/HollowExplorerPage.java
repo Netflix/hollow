@@ -58,6 +58,12 @@ public abstract class HollowExplorerPage {
 
         ctx.put("esc", new EscapingTool());
 
+        String commonHeaderEntries = ui.commonHeaderEntries.values().stream()
+                        .sorted((a, b) -> Integer.compare(a.position, b.position))
+                                .map(pair->pair.value)
+                                        .reduce("", (a, b) -> a + b);
+        ctx.put("commonHeaderEntries", commonHeaderEntries);
+
         setUpContext(req, session, ctx);
 
         resp.setContentType("text/html;charset=UTF-8");
