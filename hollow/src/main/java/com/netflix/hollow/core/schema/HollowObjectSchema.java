@@ -404,7 +404,15 @@ public class HollowObjectSchema extends HollowSchema {
          * array range containing the value for the specific record.  The beginning of the range is determined by
          * reading the pointer from the previous record.
          */
-        BYTES(-1, true);
+        BYTES(-1, true),
+        /**
+         * A 64-bit long value used for UUID components. UUID_LONG fields are always encoded as fixed-length
+         * 64-bit fields to avoid affecting the variable-width compression of regular LONG fields.
+         * This ensures that UUID components, which require the full 64-bit range, do not force all other
+         * long values in the dataset to use 64 bits.
+         */
+        UUID_LONG(8, false);
+
 
         private final int fixedLength;
         private final boolean varIntEncodesLength;

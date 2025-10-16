@@ -204,6 +204,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             case FLOAT:
                 return (int)fixedLengthValue == HollowObjectWriteRecord.NULL_FLOAT_BITS;
             case DOUBLE:
+            case UUID_LONG:
                 return fixedLengthValue == HollowObjectWriteRecord.NULL_DOUBLE_BITS;
             default:
                 return fixedLengthValue == shard.dataElements.nullValueForField[fieldIndex];
@@ -300,6 +301,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             value = shard.readLong(ordinal >> shard.shardOrdinalShift, fieldIndex);
         } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
+        if(getSchema().getFieldType(fieldIndex) == HollowObjectSchema.FieldType.UUID_LONG) {
+            return value;
+        }
         if(value == shard.dataElements.nullValueForField[fieldIndex])
             return Long.MIN_VALUE;
         return ZigZag.decodeLong(value);

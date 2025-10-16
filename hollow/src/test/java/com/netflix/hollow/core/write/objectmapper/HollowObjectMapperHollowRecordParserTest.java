@@ -18,7 +18,10 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,6 +54,9 @@ public class HollowObjectMapperHollowRecordParserTest {
     wrapperTypesTest.type = AnEnum.SOME_VALUE_C;
     wrapperTypesTest.complexEnum = ComplexEnum.SOME_VALUE_A;
     wrapperTypesTest.dateCreated = new Date();
+    wrapperTypesTest.instantCreated = Instant.now();
+    wrapperTypesTest.uuid = UUID.randomUUID();
+    wrapperTypesTest.localDate = LocalDate.now();
 
     HollowReadStateEngine stateEngine = createReadStateEngine(wrapperTypesTest);
     GenericHollowObject obj = new GenericHollowObject(stateEngine, "SpecialWrapperTypesTest", 0);
@@ -59,6 +65,10 @@ public class HollowObjectMapperHollowRecordParserTest {
     Assert.assertEquals(wrapperTypesTest, result);
     Assert.assertEquals(wrapperTypesTest.complexEnum.value, result.complexEnum.value);
     Assert.assertEquals(wrapperTypesTest.complexEnum.anotherValue, result.complexEnum.anotherValue);
+    Assert.assertEquals(wrapperTypesTest.dateCreated, result.dateCreated);
+    Assert.assertEquals(wrapperTypesTest.instantCreated, result.instantCreated);
+    Assert.assertEquals(wrapperTypesTest.uuid, result.uuid);
+    Assert.assertEquals(wrapperTypesTest.localDate, result.localDate);
   }
 
   @Test
@@ -842,6 +852,9 @@ public class HollowObjectMapperHollowRecordParserTest {
     @HollowTypeName(name = "ComplexEnum")
     ComplexEnum complexEnum;
     Date dateCreated;
+    Instant instantCreated;
+    UUID uuid;
+    LocalDate localDate;
 
     @Override
     public boolean equals(Object o) {
@@ -850,7 +863,10 @@ public class HollowObjectMapperHollowRecordParserTest {
         return Objects.equals(id, other.id) &&
                 Objects.equals(type, other.type) &&
                 Objects.equals(complexEnum, other.complexEnum) &&
-                Objects.equals(dateCreated, other.dateCreated);
+                Objects.equals(dateCreated, other.dateCreated) &&
+                Objects.equals(instantCreated, other.instantCreated) &&
+                Objects.equals(uuid, other.uuid) &&
+                Objects.equals(localDate, other.localDate);
       }
       return false;
     }

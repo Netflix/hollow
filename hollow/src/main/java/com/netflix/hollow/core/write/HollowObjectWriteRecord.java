@@ -124,13 +124,19 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
             setNull(fieldName);
         } else {
             int fieldIndex = getSchema().getPosition(fieldName);
+            FieldType fieldType = getSchema().getFieldType(fieldIndex);
 
-            validateFieldType(fieldIndex, fieldName, FieldType.LONG);
-
-            ByteDataArray buf = getFieldBuffer(fieldIndex);
-
-            // zig zag encoding
-            VarInt.writeVLong(buf, ZigZag.encodeLong(value));
+            if(fieldType == FieldType.LONG) {
+                ByteDataArray buf = getFieldBuffer(fieldIndex);
+                // zig zag encoding
+                VarInt.writeVLong(buf, ZigZag.encodeLong(value));
+            } else if(fieldType == FieldType.UUID_LONG) {
+                ByteDataArray buf = getFieldBuffer(fieldIndex);
+                // fixed-length encoding for UUID components
+                writeFixedLengthLong(buf, value);
+            } else {
+                throw new IllegalArgumentException("Attempting to serialize LONG in field " + fieldName + ".  Carefully check your schema for type " + getSchema().getName() + ".");
+            }
         }
     }
 
@@ -207,7 +213,8 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
     private void writeNull(ByteDataArray buf, FieldType fieldType) {
         if(fieldType == FieldType.FLOAT) {
             writeNullFloat(buf);
-        } else if(fieldType == FieldType.DOUBLE) {
+        } else if(fieldType == FieldType.DOUBLE || fieldType == FieldType.UUID_LONG) {
+            // UUID_LONG is fixed length 8 bits, so same as DOUBLE null
             writeNullDouble(buf);
         } else {
             VarInt.writeVNull(buf);
