@@ -200,15 +200,33 @@ public class HollowOrdinalMapper {
         return hashKeyRecord(fieldObjects);
     }
 
+    // We want to keep hash table sizes prime numbers, but we don't want to have to compute very large primes during
+    // runtime. These are precomputed primes, each ~2x the size of the previous
+    private static int nextLargestPrime(int num) {
+        int[] precomputedPrimes = new int[]
+                {4139, 8287, 16553, 33107, 66221, 132421, 264839, 529673, 1059343, 2118661, 4237319, 8474633,
+                        16949269, 33898507, 67796999, 135593987, 271187993, 542375947, 1084751881, Integer.MAX_VALUE};
+
+        for(int prime : precomputedPrimes) {
+            if(prime >= num) {
+                return prime;
+            }
+        }
+
+        return Integer.MAX_VALUE;
+    }
+
     private void expandAndRehashTable() {
         prepareForRead();
 
-        int[] newTable = new int[hashToAssignedOrdinal.length*2];
+        int newTableSize = nextLargestPrime(hashToAssignedOrdinal.length*2);
+
+        int[] newTable = new int[newTableSize];
         Arrays.fill(newTable, ORDINAL_NONE);
 
-        int[][] newFieldMappings = new int[primaryKey.numFields()][hashToAssignedOrdinal.length*2];
-        IntList[][] newFieldHashToOrdinal = new IntList[primaryKey.numFields()][hashToAssignedOrdinal.length*2];
-        assignedOrdinalToIndex = Arrays.copyOf(assignedOrdinalToIndex, hashToAssignedOrdinal.length*2);
+        int[][] newFieldMappings = new int[primaryKey.numFields()][newTableSize];
+        IntList[][] newFieldHashToOrdinal = new IntList[primaryKey.numFields()][newTableSize];
+        assignedOrdinalToIndex = Arrays.copyOf(assignedOrdinalToIndex, newTableSize);
 
         for(int fieldIdx=0;fieldIdx<primaryKey.numFields();fieldIdx++) {
             IntList[] hashToOrdinal = fieldHashToAssignedOrdinal[fieldIdx];
