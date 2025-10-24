@@ -60,8 +60,8 @@ public class HollowBlobHeaderReader {
         if(oldBytesToSkip != 0) {
             header.setSchemas(readSchemas(in));
 
-            /// forwards-compatibility, new data can be added here.
-            skipForwardCompatibilityBytes(in);
+            /// forwards-compatibility, read partition metadata if available.
+            readForwardCompatibilityBytes(in, header);
         }
 
         Map<String, String> headerTags = readHeaderTags(in);
@@ -105,6 +105,26 @@ public class HollowBlobHeaderReader {
         return schemas;
     }
     
+    private void readForwardCompatibilityBytes(HollowBlobInput in, HollowBlobHeader header) throws IOException {
+        int bytesToRead = VarInt.readVInt(in);
+        if(bytesToRead > 0) {
+            // Read partition metadata
+            Map<String, Integer> partitionCounts = readPartitionMetadata(in);
+            header.setTypePartitionCounts(partitionCounts);
+        }
+    }
+
+    private Map<String, Integer> readPartitionMetadata(HollowBlobInput in) throws IOException {
+        Map<String, Integer> partitionCounts = new HashMap<String, Integer>();
+        int numTypes = VarInt.readVInt(in);
+        for(int i=0; i<numTypes; i++) {
+            String typeName = in.readUTF();
+            int numPartitions = VarInt.readVInt(in);
+            partitionCounts.put(typeName, numPartitions);
+        }
+        return partitionCounts;
+    }
+
     private void skipForwardCompatibilityBytes(HollowBlobInput in) throws IOException, EOFException {
         int bytesToSkip = VarInt.readVInt(in);
         while(bytesToSkip > 0) {

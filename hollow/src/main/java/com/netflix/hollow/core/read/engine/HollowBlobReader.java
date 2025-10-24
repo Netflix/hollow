@@ -267,6 +267,7 @@ public class HollowBlobReader {
         stateEngine.setCurrentRandomizedTag(header.getDestinationRandomizedTag());
         stateEngine.setOriginRandomizedTag(header.getOriginRandomizedTag());
         stateEngine.setHeaderTags(header.getHeaderTags());
+        stateEngine.setCurrentHeader(header);
         return header;
     }
 
@@ -323,37 +324,74 @@ public class HollowBlobReader {
         int numShards = readNumShards(in);
         String typeName = schema.getName();
 
+        // Check if this type has multiple partitions from header
+        int numPartitions = stateEngine.getHeaderPartitionCount(typeName);
 
-        if(schema instanceof HollowObjectSchema) {
-            if(!filter.includes(typeName)) {
-                HollowObjectTypeReadState.discardSnapshot(in, (HollowObjectSchema)schema, numShards);
-
-            } else {
-                HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
-                HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
-                populateTypeStateSnapshotWithNumShards(in, new HollowObjectTypeReadState(stateEngine, memoryMode, filteredSchema, unfilteredSchema), numShards);
-            }
-        } else if (schema instanceof HollowListSchema) {
-            if(!filter.includes(typeName)) {
-                HollowListTypeReadState.discardSnapshot(in, numShards);
-            } else {
-                populateTypeStateSnapshotWithNumShards(in, new HollowListTypeReadState(stateEngine, memoryMode, (HollowListSchema)schema), numShards);
-            }
-        } else if(schema instanceof HollowSetSchema) {
-            if(!filter.includes(typeName)) {
-                HollowSetTypeReadState.discardSnapshot(in, numShards);
-            } else {
-                populateTypeStateSnapshotWithNumShards(in, new HollowSetTypeReadState(stateEngine, memoryMode, (HollowSetSchema)schema), numShards);
-            }
-        } else if(schema instanceof HollowMapSchema) {
-            if(!filter.includes(typeName)) {
-                HollowMapTypeReadState.discardSnapshot(in, numShards);
-            } else {
-                populateTypeStateSnapshotWithNumShards(in, new HollowMapTypeReadState(stateEngine, memoryMode, (HollowMapSchema)schema), numShards);
+        if(numPartitions > 1) {
+            // Multi-partition format - for now, read first partition only and skip rest
+            // TODO: Implement full multi-partition read state support
+            readMultiPartitionSnapshotLimited(in, filter, schema, numShards, numPartitions, typeName);
+        } else {
+            // Single partition or legacy format
+            if(schema instanceof HollowObjectSchema) {
+                if(!filter.includes(typeName)) {
+                    HollowObjectTypeReadState.discardSnapshot(in, (HollowObjectSchema)schema, numShards);
+                } else {
+                    HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
+                    HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
+                    populateTypeStateSnapshotWithNumShards(in, new HollowObjectTypeReadState(stateEngine, memoryMode, filteredSchema, unfilteredSchema), numShards);
+                }
+            } else if (schema instanceof HollowListSchema) {
+                if(!filter.includes(typeName)) {
+                    HollowListTypeReadState.discardSnapshot(in, numShards);
+                } else {
+                    populateTypeStateSnapshotWithNumShards(in, new HollowListTypeReadState(stateEngine, memoryMode, (HollowListSchema)schema), numShards);
+                }
+            } else if(schema instanceof HollowSetSchema) {
+                if(!filter.includes(typeName)) {
+                    HollowSetTypeReadState.discardSnapshot(in, numShards);
+                } else {
+                    populateTypeStateSnapshotWithNumShards(in, new HollowSetTypeReadState(stateEngine, memoryMode, (HollowSetSchema)schema), numShards);
+                }
+            } else if(schema instanceof HollowMapSchema) {
+                if(!filter.includes(typeName)) {
+                    HollowMapTypeReadState.discardSnapshot(in, numShards);
+                } else {
+                    populateTypeStateSnapshotWithNumShards(in, new HollowMapTypeReadState(stateEngine, memoryMode, (HollowMapSchema)schema), numShards);
+                }
             }
         }
 
         return typeName;
+    }
+
+    private void readMultiPartitionSnapshotLimited(HollowBlobInput in, TypeFilter filter, HollowSchema schema,
+                                                    int numShards, int numPartitions, String typeName) throws IOException {
+        // For now, only Object types support multi-partition
+        if(!(schema instanceof HollowObjectSchema)) {
+            throw new IOException("Multi-partition format only supported for Object types, got: " + schema.getClass().getSimpleName());
+        }
+
+        HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
+
+        // Read first partition (partition 0)
+        int partitionIndex = VarInt.readVInt(in);
+        if(partitionIndex != 0) {
+            throw new IOException("Expected partition 0, got partition " + partitionIndex);
+        }
+
+        if(!filter.includes(typeName)) {
+            HollowObjectTypeReadState.discardSnapshot(in, unfilteredSchema, numShards);
+        } else {
+            HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
+            populateTypeStateSnapshotWithNumShards(in, new HollowObjectTypeReadState(stateEngine, memoryMode, filteredSchema, unfilteredSchema), numShards);
+        }
+
+        // Skip remaining partitions
+        for(int p=1; p<numPartitions; p++) {
+            partitionIndex = VarInt.readVInt(in);
+            HollowObjectTypeReadState.discardSnapshot(in, unfilteredSchema, numShards);
+        }
     }
 
     private void populateTypeStateSnapshotWithNumShards(HollowBlobInput in, HollowTypeReadState typeState, int numShards) throws IOException {

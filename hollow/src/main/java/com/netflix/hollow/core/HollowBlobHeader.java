@@ -49,6 +49,7 @@ public class HollowBlobHeader {
     private long originRandomizedTag;
     private long destinationRandomizedTag;
     private int blobFormatVersion = HOLLOW_BLOB_VERSION_HEADER;
+    private Map<String, Integer> typePartitionCounts = new HashMap<String, Integer>();
 
     public Map<String, String> getHeaderTags() {
         return headerTags;
@@ -88,6 +89,18 @@ public class HollowBlobHeader {
 
     public int getBlobFormatVersion() {
         return blobFormatVersion;
+    }
+
+    public Map<String, Integer> getTypePartitionCounts() {
+        return typePartitionCounts;
+    }
+
+    public void setTypePartitionCounts(Map<String, Integer> typePartitionCounts) {
+        this.typePartitionCounts = typePartitionCounts;
+    }
+
+    public int getPartitionCount(String typeName) {
+        return typePartitionCounts.getOrDefault(typeName, 1); // default to 1 for backward compat
     }
 
     @Override

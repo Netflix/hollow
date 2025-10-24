@@ -23,6 +23,7 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class HollowBlobHeaderWriter {
@@ -51,9 +52,15 @@ public class HollowBlobHeaderWriter {
         
         VarInt.writeVInt(dos, schemasData.length + 1); // plus one byte for new backwards compatibility envelope.
         dos.write(schemasData);
-        
-        ///backwards compatibility -- new data can be added here by first indicating number of bytes used, will be skipped by existing readers.
-        VarInt.writeVInt(dos, 0);
+
+        ///backwards compatibility -- write partition metadata, will be skipped by existing readers.
+        ByteArrayOutputStream partitionMetadata = new ByteArrayOutputStream();
+        writePartitionMetadata(header, new DataOutputStream(partitionMetadata));
+        byte[] partitionData = partitionMetadata.toByteArray();
+        VarInt.writeVInt(dos, partitionData.length);
+        if(partitionData.length > 0) {
+            dos.write(partitionData);
+        }
 
         /// write the header tags -- intended to include input source data versions
         dos.writeShort(header.getHeaderTags().size());
@@ -78,6 +85,24 @@ public class HollowBlobHeaderWriter {
 
         ///backwards compatibility -- new data can be added here by first indicating number of bytes used, will be skipped by existing readers.
         VarInt.writeVInt(dos, 0);
+    }
+
+    private void writePartitionMetadata(HollowBlobHeader header, DataOutputStream dos) throws IOException {
+        Map<String, Integer> partitionCounts = header.getTypePartitionCounts();
+
+        // Only write types with > 1 partition
+        Map<String, Integer> multiPartitionTypes = new HashMap<String, Integer>();
+        for(Map.Entry<String, Integer> entry : partitionCounts.entrySet()) {
+            if(entry.getValue() > 1) {
+                multiPartitionTypes.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        VarInt.writeVInt(dos, multiPartitionTypes.size());
+        for(Map.Entry<String, Integer> entry : multiPartitionTypes.entrySet()) {
+            dos.writeUTF(entry.getKey());
+            VarInt.writeVInt(dos, entry.getValue());
+        }
     }
 
 }

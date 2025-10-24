@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -171,17 +172,27 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     public void calculateSnapshot() {
         int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
 
+        if(numPartitions == 1) {
+            // Single partition - use legacy calculation
+            calculateSnapshotSinglePartition(numBitsPerRecord);
+        } else {
+            // Multi-partition - calculate per partition
+            calculateSnapshotMultiPartition(numBitsPerRecord);
+        }
+    }
+
+    private void calculateSnapshotSinglePartition(int numBitsPerRecord) {
         fixedLengthLongArray = new FixedLengthElementArray[numShards];
         varLengthByteArrays = new ByteDataArray[numShards][];
         recordBitOffset = new long[numShards];
-        
+
         for(int i=0;i<numShards;i++) {
             fixedLengthLongArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numBitsPerRecord * (maxShardOrdinal[i] + 1));
             varLengthByteArrays[i] = new ByteDataArray[getSchema().numFields()];
         }
-        
+
         int shardMask = numShards - 1;
-    
+
         for(int i=0;i<=maxOrdinal;i++) {
             int shardNumber = i & shardMask;
             if(currentCyclePopulated.get(i)) {
@@ -193,8 +204,31 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         }
     }
 
+    private void calculateSnapshotMultiPartition(int numBitsPerRecord) {
+        // For multi-partition, we'll calculate data on-demand during writePartitionShard
+        // This avoids allocating memory for all partitions at once
+        // The calculation will be done per-partition in writePartitionShard
+    }
+
     public void writeSnapshot(DataOutputStream os) throws IOException {
-        LOG.log(Level.FINE, String.format("Writing snapshot with num shards = %s, revNumShards = %s, max shard ordinals = %s", numShards, revNumShards, Arrays.toString(maxShardOrdinal)));
+        LOG.log(Level.FINE, String.format("Writing snapshot with numPartitions=%s, numShards=%s, revNumShards=%s, max shard ordinals=%s",
+                numPartitions, numShards, revNumShards, Arrays.toString(maxShardOrdinal)));
+
+        if(numPartitions == 1) {
+            // Single partition - use legacy format for backward compatibility
+            writeSinglePartitionSnapshot(os);
+        } else {
+            // Multi-partition format
+            writeMultiPartitionSnapshot(os);
+        }
+
+        // Cleanup
+        fixedLengthLongArray = null;
+        varLengthByteArrays = null;
+        recordBitOffset = null;
+    }
+
+    private void writeSinglePartitionSnapshot(DataOutputStream os) throws IOException {
         /// for unsharded blobs, support pre v2.1.0 clients
         if(numShards == 1) {
             writeSnapshotShard(os, 0);
@@ -208,6 +242,55 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
         /// Populated bits
         currentCyclePopulated.serializeBitsTo(os);
+    }
+
+    private void writeMultiPartitionSnapshot(DataOutputStream os) throws IOException {
+        // Write each partition sequentially
+        for(int p=0; p<numPartitions; p++) {
+            HollowTypeWriteStatePartition partition = partitions[p];
+
+            // Write partition index
+            VarInt.writeVInt(os, p);
+
+            // Write partition data with shards
+            writePartitionSnapshotData(os, p, partition);
+
+            // Write partition populated bits
+            partition.getCurrentCyclePopulated().serializeBitsTo(os);
+        }
+    }
+
+    private void writePartitionSnapshotData(DataOutputStream os, int partitionIndex, HollowTypeWriteStatePartition partition) throws IOException {
+        int partMaxOrdinal = partition.getMaxOrdinal();
+
+        // Temporarily swap to partition's data and calculate snapshot using existing logic
+        ByteArrayOrdinalMap savedOrdinalMap = this.ordinalMap;
+        ThreadSafeBitSet savedPopulated = this.currentCyclePopulated;
+        int savedMaxOrdinal = this.maxOrdinal;
+
+        this.ordinalMap = partition.getOrdinalMap();
+        this.currentCyclePopulated = partition.getCurrentCyclePopulated();
+        this.maxOrdinal = partMaxOrdinal;
+
+        // Reuse existing calculateSnapshotSinglePartition logic
+        calculateSnapshotSinglePartition(fieldStats.getNumBitsPerRecord());
+
+        // Write using existing logic
+        if(numShards == 1) {
+            writeSnapshotShard(os, 0);
+        } else {
+            VarInt.writeVInt(os, partMaxOrdinal);
+            for(int i=0; i<numShards; i++) {
+                writeSnapshotShard(os, i);
+            }
+        }
+
+        // Restore original references
+        this.ordinalMap = savedOrdinalMap;
+        this.currentCyclePopulated = savedPopulated;
+        this.maxOrdinal = savedMaxOrdinal;
+
+        // Clean up temporary arrays
         fixedLengthLongArray = null;
         varLengthByteArrays = null;
         recordBitOffset = null;

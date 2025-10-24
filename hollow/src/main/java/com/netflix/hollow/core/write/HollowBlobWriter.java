@@ -302,6 +302,17 @@ public class HollowBlobWriter {
             header.setDestinationRandomizedTag(stateEngine.getNextStateRandomizedTag());
         }
         header.setSchemas(mainSchemas);
+
+        /// Collect partition counts from state engine
+        Map<String, Integer> typePartitionCounts = new HashMap<>();
+        for(HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
+            int numPartitions = typeState.getNumPartitions();
+            if(numPartitions > 1) {
+                typePartitionCounts.put(typeState.getSchema().getName(), numPartitions);
+            }
+        }
+        header.setTypePartitionCounts(typePartitionCounts);
+
         return new HollowBlobHeaderWrapper(header, schemasByPartName);
     }
 

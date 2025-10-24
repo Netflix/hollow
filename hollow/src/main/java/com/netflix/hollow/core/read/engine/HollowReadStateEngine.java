@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.api.error.SchemaNotFoundException;
+import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.memory.pool.GarbageCollectorAwareRecycler;
@@ -59,6 +60,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     private ArraySegmentRecycler memoryRecycler;
     private Map<String,String> headerTags;
     private Set<String> typesWithDefinedHashCodes = new HashSet<String>();
+    private HollowBlobHeader currentHeader;
 
     private long currentRandomizedTag;
     private long originRandomizedTag;
@@ -292,6 +294,21 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     @Override
     public String getHeaderTag(String name) {
         return headerTags.get(name);
+    }
+
+    public void setCurrentHeader(HollowBlobHeader header) {
+        this.currentHeader = header;
+    }
+
+    public HollowBlobHeader getCurrentHeader() {
+        return currentHeader;
+    }
+
+    public int getHeaderPartitionCount(String typeName) {
+        if(currentHeader != null) {
+            return currentHeader.getPartitionCount(typeName);
+        }
+        return 1; // default for old blobs without partition metadata
     }
 
     public void invalidate() {
