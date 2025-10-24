@@ -1,5 +1,10 @@
 apply plugin: 'java-library'
- 
+
+configurations.all {
+    exclude group: 'com.netflix.nebula.testcontainers', module: 'testcontainers-cloud-configurer'
+}
+
+
 dependencies {
     api project(':hollow')
 

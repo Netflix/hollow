@@ -21,6 +21,7 @@ import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.memory.encoding.ZigZag;
 import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -90,9 +91,23 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
 
     private long readFixedLengthFieldValue(int ordinal, int fieldIndex) {
         long bitOffset = fieldOffset(ordinal, fieldIndex);
-        int numBitsForField = dataElements.bitsPerField[fieldIndex];
 
+        int numBitsForField = dataElements.bitsPerField[fieldIndex];
         long value = dataElements.fixedLengthData.getElementValue(bitOffset, numBitsForField);
+
+        System.out.println("SNAP: value= " + value);
+        System.out.println("SNAP: value as int= " + (int) value);
+        System.out.println("SNAP: value as zigzag decode int= " + ZigZag.decodeInt((int) value));
+
+        long partition = dataElements.fixedLengthData.getElementValue(bitOffset, 3);
+        System.out.println("SNAP: partition= " + partition);
+        long partitionOrdinal = dataElements.fixedLengthData.getElementValue(bitOffset+3, numBitsForField-3);
+        System.out.println("SNAP: partitionOrdinal= " + partitionOrdinal);
+
+        System.out.println("SNAP: Expected= " + ((0xE0000000) & 0x1FFFFFFF));
+
+        System.exit(0);
+
 
         return value;
     }

@@ -1,6 +1,11 @@
 apply plugin: 'java-library'
 apply plugin: 'com.netflix.nebula.facet'
 
+configurations.all {
+    exclude group: 'com.netflix.nebula.testcontainers', module: 'testcontainers-cloud-configurer'
+}
+
+
 facets {
     tools {
         parentSourceSet = 'test'

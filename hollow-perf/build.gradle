@@ -2,6 +2,11 @@ plugins {
     id "me.champeau.jmh" version "0.7.2"
 }
 
+configurations.all {
+  exclude group: 'com.netflix.nebula.testcontainers', module: 'testcontainers-cloud-configurer'
+}
+
+
 apply plugin: 'java'
 
 dependencies {

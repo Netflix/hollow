@@ -1,5 +1,9 @@
 apply plugin: 'java-library'
 
+configurations.all {
+    exclude group: 'com.netflix.nebula.testcontainers', module: 'testcontainers-cloud-configurer'
+}
+
 dependencies {
     testImplementation project(":hollow-test")
     testImplementation 'junit:junit:4.11'

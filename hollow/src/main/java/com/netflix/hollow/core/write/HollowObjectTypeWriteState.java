@@ -53,6 +53,10 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         super(schema, numShards);
     }
 
+    public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards, int numPartitions) {
+        super(schema, numShards, numPartitions);
+    }
+
     @Override
     public HollowObjectSchema getSchema() {
         return (HollowObjectSchema)schema;
