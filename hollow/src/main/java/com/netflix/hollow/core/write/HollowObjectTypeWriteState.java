@@ -74,9 +74,16 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     public void prepareForWrite(boolean canReshard) {
         super.prepareForWrite(canReshard);
 
-        maxOrdinal = ordinalMap.maxOrdinal();
-        gatherFieldStats();
-        gatherShardingStats(maxOrdinal, canReshard);
+        if(numPartitions == 1) {
+            // Single partition: use main ordinalMap
+            maxOrdinal = ordinalMap.maxOrdinal();
+            gatherFieldStats();
+            gatherShardingStats(maxOrdinal, canReshard);
+        } else {
+            // Multi-partition: gather stats from all partitions
+            gatherFieldStatsMultiPartition();
+            gatherShardingStatsMultiPartition(canReshard);
+        }
     }
 
     private void gatherFieldStats() {
@@ -85,6 +92,80 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             discoverObjectFieldStatisticsForRecord(fieldStats, i);
         }
         fieldStats.completeCalculations();
+    }
+
+    private void gatherFieldStatsMultiPartition() {
+        fieldStats = new FieldStatistics(getSchema());
+        for(int p=0; p<numPartitions; p++) {
+            HollowTypeWriteStatePartition partition = partitions[p];
+            int partitionMaxOrdinal = partition.getMaxOrdinal();
+            for(int i=0; i<=partitionMaxOrdinal; i++) {
+                discoverObjectFieldStatisticsForRecordInPartition(fieldStats, partition, i);
+            }
+        }
+        fieldStats.completeCalculations();
+    }
+
+    private void discoverObjectFieldStatisticsForRecordInPartition(FieldStatistics fieldStats, HollowTypeWriteStatePartition partition, int ordinal) {
+        if(partition.getCurrentCyclePopulated().get(ordinal) || partition.getPreviousCyclePopulated().get(ordinal)) {
+            long pointer = partition.getOrdinalMap().getPointerForData(ordinal);
+
+            for(int fieldIndex=0; fieldIndex<((HollowObjectSchema)schema).numFields(); fieldIndex++) {
+                pointer = discoverObjectFieldStatisticsForFieldInPartition(fieldStats, partition, pointer, fieldIndex);
+            }
+        }
+    }
+
+    private long discoverObjectFieldStatisticsForFieldInPartition(FieldStatistics fieldStats, HollowTypeWriteStatePartition partition, long pointer, int fieldIndex) {
+        ByteData data = partition.getOrdinalMap().getByteData().getUnderlyingArray();
+
+        switch(getSchema().getFieldType(fieldIndex)) {
+        case BOOLEAN:
+            addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 2);
+            pointer += 1;
+            break;
+        case FLOAT:
+            addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 32);
+            pointer += 4;
+            break;
+        case DOUBLE:
+            addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 64);
+            pointer += 8;
+            break;
+        case INT:
+        case LONG:
+            long value = VarInt.readVLong(data, pointer);
+            addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, (int)value);
+            pointer += VarInt.sizeOfVLong(value);
+            break;
+        case REFERENCE:
+            long refValue = VarInt.readVLong(data, pointer);
+            addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, (int)refValue);
+            pointer += VarInt.sizeOfVLong(refValue);
+            break;
+        case BYTES:
+        case STRING:
+            int length = VarInt.readVInt(data, pointer);
+            pointer += VarInt.sizeOfVInt(length);
+            addVarLengthFieldSizeInBytes(fieldStats, fieldIndex, length);
+            pointer += length;
+            break;
+        }
+
+        return pointer;
+    }
+
+    private void gatherShardingStatsMultiPartition(boolean canReshard) {
+        // For multi-partition, numShards is uniform across all partitions
+        // Calculate based on largest partition
+        int maxPartitionOrdinal = -1;
+        for(int p=0; p<numPartitions; p++) {
+            if(partitions[p].getMaxOrdinal() > maxPartitionOrdinal) {
+                maxPartitionOrdinal = partitions[p].getMaxOrdinal();
+            }
+        }
+        maxOrdinal = maxPartitionOrdinal;  // Set for partition writing logic
+        gatherShardingStats(maxPartitionOrdinal, canReshard);
     }
 
     @Override

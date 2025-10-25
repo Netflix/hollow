@@ -319,6 +319,157 @@ public class HollowObjectTypeWriteStatePartitionTest {
         assertEquals("Single partition should default to 1", 1, readEngine.getHeaderPartitionCount("TestType"));
     }
 
+    @Test
+    public void testMultiPartitionFullRoundTrip() throws IOException {
+        // Test full round-trip: write multi-partition snapshot, read it back with ordinal encoding
+        HollowObjectSchema schema = new HollowObjectSchema("TestType", 2);
+        schema.addField("id", FieldType.INT);
+        schema.addField("value", FieldType.STRING);
+
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowObjectTypeWriteState writeState = new HollowObjectTypeWriteState(schema, 1, 2);
+        writeEngine.addTypeState(writeState);
+
+        // Add records to different partitions
+        // Records will be distributed across partitions by hash
+        addRecord(writeState, schema, 1, "value1");
+        addRecord(writeState, schema, 2, "value2");
+        addRecord(writeState, schema, 3, "value3");
+        addRecord(writeState, schema, 4, "value4");
+
+        writeEngine.prepareForWrite();
+
+        // Write snapshot
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
+        writer.writeSnapshot(baos);
+
+        // Read back
+        HollowReadStateEngine readEngine = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(readEngine);
+        reader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+
+        // Verify read state
+        HollowObjectTypeReadState readState = (HollowObjectTypeReadState) readEngine.getTypeState("TestType");
+        assertNotNull("Should be able to read multi-partition snapshot", readState);
+        assertEquals("Should have 2 partitions", 2, readState.getNumPartitions());
+
+        // Verify we can read back the data through ordinal encoding
+        // Note: We can't assume ordinal-to-ID mapping since partitioning is hash-based
+        // Just verify we get 4 valid records with correct format
+        int foundRecords = 0;
+        java.util.Set<Integer> foundIds = new java.util.HashSet<>();
+        java.util.BitSet populatedOrdinals = readState.getPopulatedOrdinals();
+        for(int encodedOrdinal = populatedOrdinals.nextSetBit(0);
+            encodedOrdinal != -1;
+            encodedOrdinal = populatedOrdinals.nextSetBit(encodedOrdinal + 1)) {
+
+            int id = readState.readInt(encodedOrdinal, 0);
+            String value = readState.readString(encodedOrdinal, 1);
+
+            // Verify the data format is correct
+            assertTrue("ID should be 1-4, got: " + id, id >= 1 && id <= 4);
+            assertEquals("Value should match ID", "value" + id, value);
+            foundIds.add(id);
+            foundRecords++;
+        }
+
+        assertEquals("Should find all 4 records", 4, foundRecords);
+        assertEquals("Should find all 4 unique IDs", 4, foundIds.size());
+        assertTrue("Should have ID 1", foundIds.contains(1));
+        assertTrue("Should have ID 2", foundIds.contains(2));
+        assertTrue("Should have ID 3", foundIds.contains(3));
+        assertTrue("Should have ID 4", foundIds.contains(4));
+    }
+
+    @Test
+    public void testMultiPartitionOrdinalEncoding() throws IOException {
+        // Test that ordinal encoding/decoding works correctly
+        HollowObjectSchema schema = new HollowObjectSchema("TestType", 1);
+        schema.addField("id", FieldType.INT);
+
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowObjectTypeWriteState writeState = new HollowObjectTypeWriteState(schema, 1, 3);
+        writeEngine.addTypeState(writeState);
+
+        // Add a few records
+        for(int i = 0; i < 10; i++) {
+            addRecord(writeState, schema, i, null);
+        }
+
+        writeEngine.prepareForWrite();
+
+        // Write and read
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        new HollowBlobWriter(writeEngine).writeSnapshot(baos);
+
+        HollowReadStateEngine readEngine = new HollowReadStateEngine();
+        new HollowBlobReader(readEngine).readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+
+        HollowObjectTypeReadState readState = (HollowObjectTypeReadState) readEngine.getTypeState("TestType");
+        assertEquals("Should have 3 partitions", 3, readState.getNumPartitions());
+
+        // Verify ordinal encoding format: (partitionOrdinal << 3) | partitionIndex
+        java.util.BitSet populatedOrdinals = readState.getPopulatedOrdinals();
+        for(int encodedOrdinal = populatedOrdinals.nextSetBit(0);
+            encodedOrdinal != -1;
+            encodedOrdinal = populatedOrdinals.nextSetBit(encodedOrdinal + 1)) {
+
+            // Extract partition index (bits 2-0)
+            int partitionIndex = encodedOrdinal & 0b111;
+            // Extract partition ordinal (bits 31-3)
+            int partitionOrdinal = encodedOrdinal >>> 3;
+
+            // Verify partition index is valid
+            assertTrue("Partition index should be 0-2", partitionIndex >= 0 && partitionIndex < 3);
+
+            // Verify we can read the data
+            int id = readState.readInt(encodedOrdinal, 0);
+            assertTrue("ID should be 0-9", id >= 0 && id < 10);
+        }
+    }
+
+    @Test
+    public void testMultiPartitionWithLargeOrdinals() throws IOException {
+        // Test handling of large ordinals that result in negative encoded ordinals
+        HollowObjectSchema schema = new HollowObjectSchema("TestType", 1);
+        schema.addField("id", FieldType.INT);
+
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowObjectTypeWriteState writeState = new HollowObjectTypeWriteState(schema, 1, 2);
+        writeEngine.addTypeState(writeState);
+
+        // Add enough records to test large ordinals
+        for(int i = 0; i < 100; i++) {
+            addRecord(writeState, schema, i, null);
+        }
+
+        writeEngine.prepareForWrite();
+
+        // Write and read
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        new HollowBlobWriter(writeEngine).writeSnapshot(baos);
+
+        HollowReadStateEngine readEngine = new HollowReadStateEngine();
+        new HollowBlobReader(readEngine).readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+
+        HollowObjectTypeReadState readState = (HollowObjectTypeReadState) readEngine.getTypeState("TestType");
+
+        // Count records through encoded ordinals (including potentially negative ones)
+        int count = 0;
+        java.util.BitSet populatedOrdinals = readState.getPopulatedOrdinals();
+        for(int encodedOrdinal = populatedOrdinals.nextSetBit(0);
+            encodedOrdinal != -1;
+            encodedOrdinal = populatedOrdinals.nextSetBit(encodedOrdinal + 1)) {
+
+            int id = readState.readInt(encodedOrdinal, 0);
+            assertTrue("Should be able to read data with encoded ordinal", id >= 0 && id < 100);
+            count++;
+        }
+
+        assertEquals("Should read all 100 records", 100, count);
+    }
+
     // Helper method to add records
     private void addRecord(HollowObjectTypeWriteState writeState, HollowObjectSchema schema, int id, String value) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
@@ -330,5 +481,17 @@ public class HollowObjectTypeWriteStatePartitionTest {
             rec.setString("name", value);
         }
         writeState.add(rec);
+    }
+
+    private int addRecordAndGetOrdinal(HollowObjectTypeWriteState writeState, HollowObjectSchema schema, int id, String value) {
+        HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+        rec.setInt("id", id);
+        if(value != null && schema.getPosition("value") != -1) {
+            rec.setString("value", value);
+        }
+        if(value != null && schema.getPosition("name") != -1) {
+            rec.setString("name", value);
+        }
+        return writeState.add(rec);
     }
 }

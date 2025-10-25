@@ -102,7 +102,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
      *
      * @param partitions the array of partitions
      */
-    void setPartitions(HollowObjectTypeReadStatePartition[] partitions) {
+    public void setPartitions(HollowObjectTypeReadStatePartition[] partitions) {
         this.partitions = partitions;
         this.numPartitions = partitions.length;
 
@@ -174,6 +174,37 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     @Override
     public int maxOrdinal() {
         return maxOrdinal;
+    }
+
+    /**
+     * Static helper to read partition snapshot data from input stream.
+     * Used by HollowBlobReader to read multi-partition snapshots.
+     */
+    public static HollowObjectTypeReadStatePartition readPartitionSnapshotData(HollowBlobInput in, HollowObjectSchema filteredSchema,
+                                                                         HollowObjectSchema unfilteredSchema, int numShards,
+                                                                         MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) throws IOException {
+        // Read max ordinal if multiple shards
+        int maxOrdinal = 0;
+        if(numShards > 1) {
+            maxOrdinal = VarInt.readVInt(in);
+        }
+
+        // Read shards for this partition
+        HollowObjectTypeReadStateShard[] shards = new HollowObjectTypeReadStateShard[numShards];
+        int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
+
+        for(int i=0; i<numShards; i++) {
+            HollowObjectTypeDataElements shardDataElements = new HollowObjectTypeDataElements(filteredSchema, memoryMode, memoryRecycler);
+            shardDataElements.readSnapshot(in, unfilteredSchema);
+            shards[i] = new HollowObjectTypeReadStateShard(filteredSchema, shardDataElements, shardOrdinalShift);
+
+            // For single shard, get maxOrdinal from the shard
+            if(numShards == 1) {
+                maxOrdinal = shardDataElements.maxOrdinal;
+            }
+        }
+
+        return new HollowObjectTypeReadStatePartition(shards, maxOrdinal);
     }
 
     @Override
@@ -363,10 +394,12 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         // Multi-partition path: decode ordinal
         int partitionIndex = extractPartitionIndex(ordinal);
         int partitionOrdinal = extractPartitionOrdinal(ordinal);
+
         HollowObjectTypeReadStatePartition partition = partitions[partitionIndex];
         HollowObjectTypeReadStateShard shard = partition.getShard(partitionOrdinal);
+        int shardOrdinal = partitionOrdinal >> shard.shardOrdinalShift;
 
-        long value = shard.readInt(partitionOrdinal >> shard.shardOrdinalShift, fieldIndex);
+        long value = shard.readInt(shardOrdinal, fieldIndex);
 
         if(value == shard.dataElements.nullValueForField[fieldIndex])
             return Integer.MIN_VALUE;
@@ -505,19 +538,45 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             return readStringSinglePartition(ordinal, fieldIndex);
         }
 
-        // Multi-partition path: decode ordinal
+        // Multi-partition path: decode ordinal and delegate to partition shard
         int partitionIndex = extractPartitionIndex(ordinal);
         int partitionOrdinal = extractPartitionOrdinal(ordinal);
+
         HollowObjectTypeReadStatePartition partition = partitions[partitionIndex];
-        HollowObjectTypeReadStateShard shard = partition.getShard(partitionOrdinal);
-        int shardOrdinal = partitionOrdinal >> shard.shardOrdinalShift;
+        HollowObjectTypeReadStateShard[] partitionShards = partition.getShards();
+        int shardNumberMask = partition.shardNumberMask;
 
-        int numBitsForField = shard.dataElements.bitsPerField[fieldIndex];
-        long currentBitOffset = shard.fieldOffset(shardOrdinal, fieldIndex);
-        long endByte = shard.dataElements.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
-        long startByte = shardOrdinal != 0 ? shard.dataElements.fixedLengthData.getElementValue(currentBitOffset - shard.dataElements.bitsPerRecord, numBitsForField) : 0;
+        // Use the same pattern as single partition for thread safety
+        HollowObjectTypeReadStateShard shard;
+        String result;
+        int numBitsForField;
+        long currentBitOffset;
+        long endByte;
+        long startByte;
+        int shardOrdinal;
 
-        return shard.readString(startByte, endByte, numBitsForField, fieldIndex);
+        do {
+            do {
+                shard = partitionShards[partitionOrdinal & shardNumberMask];
+                shardOrdinal = partitionOrdinal >> shard.shardOrdinalShift;
+
+                numBitsForField = shard.dataElements.bitsPerField[fieldIndex];
+                currentBitOffset = shard.fieldOffset(shardOrdinal, fieldIndex);
+                endByte = shard.dataElements.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
+                startByte = shardOrdinal != 0 ? shard.dataElements.fixedLengthData.getElementValue(currentBitOffset - shard.dataElements.bitsPerRecord, numBitsForField) : 0;
+            } while (readWasUnsafeForPartition(partition, partitionOrdinal, shard));
+
+            result = shard.readString(startByte, endByte, numBitsForField, fieldIndex);
+        } while (readWasUnsafeForPartition(partition, partitionOrdinal, shard));
+
+        return result;
+    }
+
+    private boolean readWasUnsafeForPartition(HollowObjectTypeReadStatePartition partition, int partitionOrdinal, HollowObjectTypeReadStateShard shard) {
+        // For now, partitions are immutable after construction (no delta support yet)
+        // So no need for volatile checks - just verify shard matches
+        HollowObjectTypeReadStateShard expectedShard = partition.getShards()[partitionOrdinal & partition.shardNumberMask];
+        return shard != expectedShard;
     }
 
     private String readStringSinglePartition(int ordinal, int fieldIndex) {

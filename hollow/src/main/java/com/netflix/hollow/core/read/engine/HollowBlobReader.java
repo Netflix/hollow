@@ -24,10 +24,8 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.OptionalBlobPartInput;
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadStatePartition;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadStateShard;
 import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
@@ -438,28 +436,8 @@ public class HollowBlobReader {
 
     private HollowObjectTypeReadStatePartition readPartitionSnapshot(HollowBlobInput in, HollowObjectSchema filteredSchema,
                                                                       HollowObjectSchema unfilteredSchema, int numShards) throws IOException {
-        // Read max ordinal if multiple shards
-        int maxOrdinal = 0;
-        if(numShards > 1) {
-            maxOrdinal = VarInt.readVInt(in);
-        }
-
-        // Read shards for this partition
-        HollowObjectTypeReadStateShard[] shards = new HollowObjectTypeReadStateShard[numShards];
-        int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
-
-        for(int i=0; i<numShards; i++) {
-            HollowObjectTypeDataElements shardDataElements = new HollowObjectTypeDataElements(filteredSchema, memoryMode, stateEngine.getMemoryRecycler());
-            shardDataElements.readSnapshot(in, unfilteredSchema);
-            shards[i] = new HollowObjectTypeReadStateShard(filteredSchema, shardDataElements, shardOrdinalShift);
-
-            // For single shard, get maxOrdinal from the shard
-            if(numShards == 1) {
-                maxOrdinal = shardDataElements.maxOrdinal;
-            }
-        }
-
-        return new HollowObjectTypeReadStatePartition(shards, maxOrdinal);
+        // Delegate to HollowObjectTypeReadState to create partition with shards
+        return HollowObjectTypeReadState.readPartitionSnapshotData(in, filteredSchema, unfilteredSchema, numShards, memoryMode, stateEngine.getMemoryRecycler());
     }
 
     private void populateTypeStateSnapshotWithNumShards(HollowBlobInput in, HollowTypeReadState typeState, int numShards) throws IOException {
