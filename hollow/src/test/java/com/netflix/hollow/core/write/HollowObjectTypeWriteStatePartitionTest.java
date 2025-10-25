@@ -218,7 +218,7 @@ public class HollowObjectTypeWriteStatePartitionTest {
 
     @Test
     public void testMultiPartitionRoundTripLimitedToPartition0() throws IOException {
-        // This tests the current limited implementation that reads only partition 0
+        // This tests multi-partition reading with data only in partition 0
         HollowObjectSchema schema = new HollowObjectSchema("TestType", 2);
         schema.addField("id", FieldType.INT);
         schema.addField("value", FieldType.STRING);
@@ -238,15 +238,32 @@ public class HollowObjectTypeWriteStatePartitionTest {
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
         writer.writeSnapshot(baos);
 
-        // Read back (will only read partition 0 due to current limitation)
+        // Read back
         HollowReadStateEngine readEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(readEngine);
         reader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
 
-        // Verify partition 0 was read
+        // Verify both partitions were read with correct encoding
         HollowObjectTypeReadState readState = (HollowObjectTypeReadState) readEngine.getTypeState("TestType");
-        assertNotNull("Should be able to read partition 0", readState);
-        assertEquals("Should have records from partition 0", 1, readState.maxOrdinal());
+        assertNotNull("Should be able to read multi-partition snapshot", readState);
+        assertEquals("Should have 2 partitions", 2, readState.getNumPartitions());
+
+        // maxOrdinal() now returns the maximum encoded ordinal, which includes partition bits
+        // With partition 0 having ordinals 0 and 1, encoded ordinals are 0 and 8
+        assertTrue("Max encoded ordinal should be >= 8", readState.maxOrdinal() >= 8);
+
+        // Verify we can read the data
+        java.util.BitSet populatedOrdinals = readState.getPopulatedOrdinals();
+        int recordCount = 0;
+        for(int encodedOrdinal = populatedOrdinals.nextSetBit(0);
+            encodedOrdinal != -1;
+            encodedOrdinal = populatedOrdinals.nextSetBit(encodedOrdinal + 1)) {
+
+            // All populated ordinals should be in partition 0 (low 3 bits = 0)
+            assertEquals("All records should be in partition 0", 0, encodedOrdinal & 0x7);
+            recordCount++;
+        }
+        assertEquals("Should have 2 records", 2, recordCount);
     }
 
     @Test

@@ -17,12 +17,16 @@
 package com.netflix.hollow.core.write;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.write.HollowBlobWriter;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -267,6 +271,55 @@ public class HollowTypeWriteStatePartitionTest {
 
         assertTrue("Multiple partitions should have ordinal 0 (ordinals are scoped per partition)",
                 partitionsWithOrdinal0 > 1);
+    }
+
+    @Test
+    public void testBackwardCompatibilityWithMultiplePartitions() throws Exception {
+        // Create schema
+        HollowObjectSchema schema = new HollowObjectSchema("Movie", 2, "id");
+        schema.addField("id", HollowObjectSchema.FieldType.INT);
+        schema.addField("title", HollowObjectSchema.FieldType.STRING);
+
+        // Create write state with 8 partitions
+        HollowObjectTypeWriteState writeState = new HollowObjectTypeWriteState(schema, -1, 8);
+        writeState.setStateEngine(createMockStateEngine());
+        writeState.setPrimaryKey(new PrimaryKey("Movie", "id"));
+
+        writeState.prepareForNextCycle();
+
+        // Add 100 records
+        for (int i = 0; i < 100; i++) {
+            HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+            rec.setInt("id", i);
+            rec.setString("title", "Movie " + i);
+            writeState.add(rec, i);
+        }
+
+        // Write to blob
+        HollowWriteStateEngine engine = createMockStateEngine();
+        engine.addTypeState(writeState);
+        HollowBlobWriter writer = new HollowBlobWriter(engine);
+
+        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        writer.writeSnapshot(baos);
+
+        // Read back with HollowReadStateEngine
+        com.netflix.hollow.core.read.engine.HollowReadStateEngine readEngine =
+            new com.netflix.hollow.core.read.engine.HollowReadStateEngine();
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        HollowBlobReader reader = new HollowBlobReader(readEngine);
+        reader.readSnapshot(bais);
+
+        // Verify backward compatibility: old consumers should be able to access data via shardsVolatile
+        com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState readState =
+            (com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState) readEngine.getTypeState("Movie");
+
+        // Verify numShards() works (uses shardsVolatile internally - should not throw NPE)
+        assertTrue("numShards should return a positive value", readState.numShards() > 0);
+
+        // Verify that we can read records (new partition-aware consumers)
+        assertTrue("Should have at least some records", readState.maxOrdinal() >= 0);
     }
 
     private HollowWriteStateEngine createMockStateEngine() {

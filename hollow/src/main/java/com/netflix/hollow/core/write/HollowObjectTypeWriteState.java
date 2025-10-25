@@ -98,7 +98,8 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         fieldStats = new FieldStatistics(getSchema());
         for(int p=0; p<numPartitions; p++) {
             HollowTypeWriteStatePartition partition = partitions[p];
-            int partitionMaxOrdinal = partition.getMaxOrdinal();
+            int partitionMaxOrdinal = partition.getOrdinalMap().maxOrdinal();
+            partition.setMaxOrdinal(partitionMaxOrdinal);  // Set partition's maxOrdinal
             for(int i=0; i<=partitionMaxOrdinal; i++) {
                 discoverObjectFieldStatisticsForRecordInPartition(fieldStats, partition, i);
             }
@@ -348,10 +349,12 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         ByteArrayOrdinalMap savedOrdinalMap = this.ordinalMap;
         ThreadSafeBitSet savedPopulated = this.currentCyclePopulated;
         int savedMaxOrdinal = this.maxOrdinal;
+        int[] savedMaxShardOrdinal = this.maxShardOrdinal;
 
         this.ordinalMap = partition.getOrdinalMap();
         this.currentCyclePopulated = partition.getCurrentCyclePopulated();
         this.maxOrdinal = partMaxOrdinal;
+        this.maxShardOrdinal = calcMaxShardOrdinal(partMaxOrdinal, numShards);
 
         // Reuse existing calculateSnapshotSinglePartition logic
         calculateSnapshotSinglePartition(fieldStats.getNumBitsPerRecord());
@@ -370,6 +373,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         this.ordinalMap = savedOrdinalMap;
         this.currentCyclePopulated = savedPopulated;
         this.maxOrdinal = savedMaxOrdinal;
+        this.maxShardOrdinal = savedMaxShardOrdinal;
 
         // Clean up temporary arrays
         fixedLengthLongArray = null;

@@ -131,7 +131,7 @@ public abstract class HollowTypeWriteState {
 
     /**
      * Sets the primary key for this type. This is used for consistent hashing across partitions.
-     * When a primary key is set and numPartitions > 1, records with the same primary key value
+     * When a primary key is set and numPartitions is greater than 1, records with the same primary key value
      * will always be assigned to the same partition.
      *
      * @param primaryKey the primary key definition, or null to use hash of full record

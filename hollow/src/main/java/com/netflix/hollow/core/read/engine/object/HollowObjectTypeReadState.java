@@ -106,8 +106,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         this.partitions = partitions;
         this.numPartitions = partitions.length;
 
-        // For backward compatibility: if single partition, also set shardsVolatile
-        if(numPartitions == 1) {
+        // For backward compatibility: always set shardsVolatile to first partition's shards
+        // This allows old consumers that don't understand partitioning to at least read partition 0
+        if(numPartitions >= 1) {
             this.shardsVolatile = new HollowObjectTypeShardsHolder(partitions[0].getShards());
         }
 
