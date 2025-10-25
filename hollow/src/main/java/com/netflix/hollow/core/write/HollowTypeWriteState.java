@@ -155,7 +155,7 @@ public abstract class HollowTypeWriteState {
      */
     protected void syncBackwardCompatibilityFields() {
         HollowTypeWriteStatePartition partition0 = partitions[0];
-        this.maxOrdinal = partition0.getMaxOrdinal();
+        this.maxOrdinal = partition0.getMaxOrdinal();// SNAP: TODO: this is where we lose maxOrdinal for non partitioned types
         this.numShards = partition0.getNumShards();
         this.revNumShards = partition0.getRevNumShards();
         this.restoredMap = partition0.getRestoredMap();

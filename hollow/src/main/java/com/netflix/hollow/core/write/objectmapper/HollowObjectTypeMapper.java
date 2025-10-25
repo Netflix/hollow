@@ -136,7 +136,13 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.writeState = existingWriteState;
         } else {
             int numShardsByAnnotation = getNumShardsByAnnotation(clazz);
-            this.writeState = new HollowObjectTypeWriteState(schema, numShardsByAnnotation);
+            int numPartitionsByAnnotation = getNumPartitionsByAnnotation(clazz);
+            this.writeState = new HollowObjectTypeWriteState(schema, numShardsByAnnotation, numPartitionsByAnnotation);
+
+            // Set primary key on write state if partitioning is enabled
+            if (numPartitionsByAnnotation > 1 && schema.getPrimaryKey() != null) {
+                this.writeState.setPrimaryKey(schema.getPrimaryKey());
+            }
         }
 
         this.assignedOrdinalFieldOffset = assignedOrdinalFieldOffset;
@@ -159,6 +165,13 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         return -1;
     }
 
+    private static int getNumPartitionsByAnnotation(Class<?> clazz) {
+        HollowPartitions numPartitionsAnnotation = clazz.getAnnotation(HollowPartitions.class);
+        if(numPartitionsAnnotation != null)
+            return numPartitionsAnnotation.numPartitions();
+        return 1;
+    }
+
     @Override
     public String getTypeName() {
         return typeName;
@@ -174,11 +187,37 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
         HollowObjectWriteRecord rec = copyToWriteRecord(obj, null);
 
-        int assignedOrdinal = writeState.add(rec);
+        int assignedOrdinal;
+        // If type has partitions and a primary key, extract primary key values for partition selection
+        if (writeState.getNumPartitions() > 1 && schema.getPrimaryKey() != null) {
+            Object[] primaryKeyValues = extractPrimaryKeyValues(obj);
+            assignedOrdinal = writeState.add(rec, primaryKeyValues);
+        } else {
+            assignedOrdinal = writeState.add(rec);
+        }
+
         if (hasAssignedOrdinalField) {
             unsafe.putLong(obj, assignedOrdinalFieldOffset, (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits());
         }
         return assignedOrdinal;
+    }
+
+    private Object[] extractPrimaryKeyValues(Object obj) {
+        String[] keyFieldPaths = schema.getPrimaryKey().getFieldPaths();
+        Object[] values = new Object[keyFieldPaths.length];
+
+        for (int i = 0; i < keyFieldPaths.length; i++) {
+            String fieldPath = keyFieldPaths[i];
+            // Find the mapped field for this key field
+            for (MappedField field : mappedFields) {
+                if (field.getFieldName().equals(fieldPath)) {
+                    values[i] = field.getFieldValue(obj);
+                    break;
+                }
+            }
+        }
+
+        return values;
     }
 
     @Override
@@ -458,6 +497,53 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             if(typeNameAnnotation != null)
                 return typeNameAnnotation.name();
             return subTypeMapper.getTypeName();
+        }
+
+        @SuppressWarnings("deprecation")
+        public Object getFieldValue(Object obj) {
+            switch(fieldType) {
+                case BOOLEAN:
+                    return unsafe.getBoolean(obj, fieldOffset);
+                case INT:
+                    return unsafe.getInt(obj, fieldOffset);
+                case SHORT:
+                    return (int) unsafe.getShort(obj, fieldOffset);
+                case BYTE:
+                    return (int) unsafe.getByte(obj, fieldOffset);
+                case CHAR:
+                    return (int) unsafe.getChar(obj, fieldOffset);
+                case LONG:
+                    return unsafe.getLong(obj, fieldOffset);
+                case FLOAT:
+                    return unsafe.getFloat(obj, fieldOffset);
+                case DOUBLE:
+                    return unsafe.getDouble(obj, fieldOffset);
+                case STRING:
+                    Object stringObj = unsafe.getObject(obj, fieldOffset);
+                    if (stringObj == null) return null;
+                    if (stringObj instanceof char[]) {
+                        return new String((char[]) stringObj);
+                    } else if (stringObj instanceof byte[]) {
+                        return new String((byte[]) stringObj);
+                    }
+                    return stringObj.toString();
+                case BYTES:
+                    return unsafe.getObject(obj, fieldOffset);
+                case INLINED_INT:
+                case INLINED_SHORT:
+                case INLINED_BYTE:
+                case INLINED_CHAR:
+                case INLINED_LONG:
+                case INLINED_BOOLEAN:
+                case INLINED_FLOAT:
+                case INLINED_DOUBLE:
+                case INLINED_STRING:
+                case REFERENCE:
+                case NULLABLE_PRIMITIVE_BOOLEAN:
+                    return unsafe.getObject(obj, fieldOffset);
+                default:
+                    throw new IllegalStateException("Unhandled field type: " + fieldType);
+            }
         }
 
         @SuppressWarnings("deprecation")

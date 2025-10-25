@@ -427,6 +427,26 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     public float readFloat(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
 
+        // Fast path for single partition (backward compatible)
+        if(numPartitions == 1) {
+            return readFloatSinglePartition(ordinal, fieldIndex);
+        }
+
+        // Multi-partition path: decode ordinal and delegate to partition shard
+        int partitionIndex = extractPartitionIndex(ordinal);
+        int partitionOrdinal = extractPartitionOrdinal(ordinal);
+
+        HollowObjectTypeReadStatePartition partition = partitions[partitionIndex];
+        HollowObjectTypeReadStateShard shard = partition.getShard(partitionOrdinal);
+
+        int value = shard.readFloat(partitionOrdinal >> shard.shardOrdinalShift, fieldIndex);
+
+        if(value == HollowObjectWriteRecord.NULL_FLOAT_BITS)
+            return Float.NaN;
+        return Float.intBitsToFloat(value);
+    }
+
+    private float readFloatSinglePartition(int ordinal, int fieldIndex) {
         HollowObjectTypeShardsHolder shardsHolder;
         HollowObjectTypeReadStateShard shard;
         int value;
@@ -446,6 +466,26 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     public double readDouble(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
 
+        // Fast path for single partition (backward compatible)
+        if(numPartitions == 1) {
+            return readDoubleSinglePartition(ordinal, fieldIndex);
+        }
+
+        // Multi-partition path: decode ordinal and delegate to partition shard
+        int partitionIndex = extractPartitionIndex(ordinal);
+        int partitionOrdinal = extractPartitionOrdinal(ordinal);
+
+        HollowObjectTypeReadStatePartition partition = partitions[partitionIndex];
+        HollowObjectTypeReadStateShard shard = partition.getShard(partitionOrdinal);
+
+        long value = shard.readDouble(partitionOrdinal >> shard.shardOrdinalShift, fieldIndex);
+
+        if(value == HollowObjectWriteRecord.NULL_DOUBLE_BITS)
+            return Double.NaN;
+        return Double.longBitsToDouble(value);
+    }
+
+    private double readDoubleSinglePartition(int ordinal, int fieldIndex) {
         HollowObjectTypeShardsHolder shardsHolder;
         HollowObjectTypeReadStateShard shard;
         long value;
@@ -465,6 +505,26 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     public long readLong(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
 
+        // Fast path for single partition (backward compatible)
+        if(numPartitions == 1) {
+            return readLongSinglePartition(ordinal, fieldIndex);
+        }
+
+        // Multi-partition path: decode ordinal and delegate to partition shard
+        int partitionIndex = extractPartitionIndex(ordinal);
+        int partitionOrdinal = extractPartitionOrdinal(ordinal);
+
+        HollowObjectTypeReadStatePartition partition = partitions[partitionIndex];
+        HollowObjectTypeReadStateShard shard = partition.getShard(partitionOrdinal);
+
+        long value = shard.readLong(partitionOrdinal >> shard.shardOrdinalShift, fieldIndex);
+
+        if(value == shard.dataElements.nullValueForField[fieldIndex])
+            return Long.MIN_VALUE;
+        return ZigZag.decodeLong(value);
+    }
+
+    private long readLongSinglePartition(int ordinal, int fieldIndex) {
         HollowObjectTypeShardsHolder shardsHolder;
         HollowObjectTypeReadStateShard shard;
         long value;
@@ -484,6 +544,26 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     public Boolean readBoolean(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
 
+        // Fast path for single partition (backward compatible)
+        if(numPartitions == 1) {
+            return readBooleanSinglePartition(ordinal, fieldIndex);
+        }
+
+        // Multi-partition path: decode ordinal and delegate to partition shard
+        int partitionIndex = extractPartitionIndex(ordinal);
+        int partitionOrdinal = extractPartitionOrdinal(ordinal);
+
+        HollowObjectTypeReadStatePartition partition = partitions[partitionIndex];
+        HollowObjectTypeReadStateShard shard = partition.getShard(partitionOrdinal);
+
+        long value = shard.readBoolean(partitionOrdinal >> shard.shardOrdinalShift, fieldIndex);
+
+        if(value == shard.dataElements.nullValueForField[fieldIndex])
+            return null;
+        return value == 1 ? Boolean.TRUE : Boolean.FALSE;
+    }
+
+    private Boolean readBooleanSinglePartition(int ordinal, int fieldIndex) {
         HollowObjectTypeShardsHolder shardsHolder;
         HollowObjectTypeReadStateShard shard;
         long value;
@@ -503,6 +583,28 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     public byte[] readBytes(int ordinal, int fieldIndex) {
         sampler.recordFieldAccess(fieldIndex);
 
+        // Fast path for single partition (backward compatible)
+        if(numPartitions == 1) {
+            return readBytesSinglePartition(ordinal, fieldIndex);
+        }
+
+        // Multi-partition path: decode ordinal and delegate to partition shard
+        int partitionIndex = extractPartitionIndex(ordinal);
+        int partitionOrdinal = extractPartitionOrdinal(ordinal);
+
+        HollowObjectTypeReadStatePartition partition = partitions[partitionIndex];
+        HollowObjectTypeReadStateShard shard = partition.getShard(partitionOrdinal);
+        int shardOrdinal = partitionOrdinal >> shard.shardOrdinalShift;
+
+        int numBitsForField = shard.dataElements.bitsPerField[fieldIndex];
+        long currentBitOffset = shard.fieldOffset(shardOrdinal, fieldIndex);
+        long endByte = shard.dataElements.fixedLengthData.getElementValue(currentBitOffset, numBitsForField);
+        long startByte = shardOrdinal != 0 ? shard.dataElements.fixedLengthData.getElementValue(currentBitOffset - shard.dataElements.bitsPerRecord, numBitsForField) : 0;
+
+        return shard.readBytes(startByte, endByte, numBitsForField, fieldIndex);
+    }
+
+    private byte[] readBytesSinglePartition(int ordinal, int fieldIndex) {
         HollowObjectTypeShardsHolder shardsHolder;
         HollowObjectTypeReadStateShard shard;
         byte[] result;
