@@ -18,6 +18,7 @@ package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
+import java.util.BitSet;
 
 public class SnapshotPopulatedOrdinalsReader {
 
@@ -55,6 +56,37 @@ public class SnapshotPopulatedOrdinalsReader {
                 }
             }
             ordinal++;
+        }
+    }
+
+    /**
+     * Read populated ordinals as a bit set from a {@code HollowBlobInput} into a BitSet.
+     * This is useful for multi-partition reading where ordinals need to be encoded.
+     *
+     * @param in the Hollow blob input data
+     * @param populatedOrdinals the BitSet to populate with ordinal bits
+     * @throws IOException if the ordinals cannot be read
+     */
+    public static void readOrdinals(HollowBlobInput in, BitSet populatedOrdinals) throws IOException {
+        int numLongs = in.readInt();
+
+        int currentOrdinal = 0;
+
+        for(int i=0; i<numLongs; i++) {
+            long l = in.readLong();
+            populateBitSet(l, currentOrdinal, populatedOrdinals);
+            currentOrdinal += 64;
+        }
+    }
+
+    private static void populateBitSet(long l, int startOrdinal, BitSet bitSet) {
+        if(l == 0)
+            return;
+
+        for(int offset = 0; offset < 64; offset++) {
+            if((l & (1L << offset)) != 0) {
+                bitSet.set(startOrdinal + offset);
+            }
         }
     }
 

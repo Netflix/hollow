@@ -24,7 +24,10 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.OptionalBlobPartInput;
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadStatePartition;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadStateShard;
 import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
@@ -373,25 +376,90 @@ public class HollowBlobReader {
         }
 
         HollowObjectSchema unfilteredSchema = (HollowObjectSchema)schema;
-
-        // Read first partition (partition 0)
-        int partitionIndex = VarInt.readVInt(in);
-        if(partitionIndex != 0) {
-            throw new IOException("Expected partition 0, got partition " + partitionIndex);
-        }
+        HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
 
         if(!filter.includes(typeName)) {
-            HollowObjectTypeReadState.discardSnapshot(in, unfilteredSchema, numShards);
-        } else {
-            HollowObjectSchema filteredSchema = unfilteredSchema.filterSchema(filter);
-            populateTypeStateSnapshotWithNumShards(in, new HollowObjectTypeReadState(stateEngine, memoryMode, filteredSchema, unfilteredSchema), numShards);
+            // Discard all partitions if type is filtered out
+            for(int p=0; p<numPartitions; p++) {
+                VarInt.readVInt(in);  // read and discard partition index
+                HollowObjectTypeReadState.discardSnapshot(in, unfilteredSchema, numShards);
+            }
+            return;
         }
 
-        // Skip remaining partitions
-        for(int p=1; p<numPartitions; p++) {
-            partitionIndex = VarInt.readVInt(in);
-            HollowObjectTypeReadState.discardSnapshot(in, unfilteredSchema, numShards);
+        // Read all partitions
+        HollowObjectTypeReadStatePartition[] partitions = new HollowObjectTypeReadStatePartition[numPartitions];
+
+        // Create read state and add to engine
+        HollowObjectTypeReadState readState = new HollowObjectTypeReadState(stateEngine, memoryMode, filteredSchema, unfilteredSchema);
+        stateEngine.addTypeState(readState);
+
+        // Combined encoded populated ordinals bitset
+        java.util.BitSet encodedPopulatedOrdinals = new java.util.BitSet();
+
+        for(int p=0; p<numPartitions; p++) {
+            int partitionIndex = VarInt.readVInt(in);
+            if(partitionIndex != p) {
+                throw new IOException("Expected partition " + p + ", got partition " + partitionIndex);
+            }
+
+            // Read partition data
+            partitions[p] = readPartitionSnapshot(in, filteredSchema, unfilteredSchema, numShards);
+
+            // Read partition-specific populated ordinals (partition-local ordinals)
+            java.util.BitSet partitionPopulated = new java.util.BitSet();
+            SnapshotPopulatedOrdinalsReader.readOrdinals(in, partitionPopulated);
+
+            // Encode and merge into combined bitset
+            // Encoding: encodedOrdinal = (partitionOrdinal << 3) | partitionIndex
+            // Note: encodedOrdinal can overflow to negative when partitionOrdinal is large
+            for(int partitionOrdinal = partitionPopulated.nextSetBit(0);
+                partitionOrdinal != -1;  // -1 means no more set bits
+                partitionOrdinal = partitionPopulated.nextSetBit(partitionOrdinal + 1)) {
+                int encodedOrdinal = (partitionOrdinal << 3) | p;
+                encodedPopulatedOrdinals.set(encodedOrdinal);
+            }
         }
+
+        // Set partitions after reading all data
+        readState.setPartitions(partitions);
+
+        // Notify listeners with encoded populated ordinals
+        // Note: encoded ordinals can be negative ints (when > Integer.MAX_VALUE), this is expected
+        HollowTypeStateListener[] listeners = readState.getListeners();
+        for(int encodedOrdinal = encodedPopulatedOrdinals.nextSetBit(0);
+            encodedOrdinal != -1;  // -1 means no more set bits
+            encodedOrdinal = encodedPopulatedOrdinals.nextSetBit(encodedOrdinal + 1)) {
+            for(HollowTypeStateListener listener : listeners) {
+                listener.addedOrdinal(encodedOrdinal);
+            }
+        }
+    }
+
+    private HollowObjectTypeReadStatePartition readPartitionSnapshot(HollowBlobInput in, HollowObjectSchema filteredSchema,
+                                                                      HollowObjectSchema unfilteredSchema, int numShards) throws IOException {
+        // Read max ordinal if multiple shards
+        int maxOrdinal = 0;
+        if(numShards > 1) {
+            maxOrdinal = VarInt.readVInt(in);
+        }
+
+        // Read shards for this partition
+        HollowObjectTypeReadStateShard[] shards = new HollowObjectTypeReadStateShard[numShards];
+        int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
+
+        for(int i=0; i<numShards; i++) {
+            HollowObjectTypeDataElements shardDataElements = new HollowObjectTypeDataElements(filteredSchema, memoryMode, stateEngine.getMemoryRecycler());
+            shardDataElements.readSnapshot(in, unfilteredSchema);
+            shards[i] = new HollowObjectTypeReadStateShard(filteredSchema, shardDataElements, shardOrdinalShift);
+
+            // For single shard, get maxOrdinal from the shard
+            if(numShards == 1) {
+                maxOrdinal = shardDataElements.maxOrdinal;
+            }
+        }
+
+        return new HollowObjectTypeReadStatePartition(shards, maxOrdinal);
     }
 
     private void populateTypeStateSnapshotWithNumShards(HollowBlobInput in, HollowTypeReadState typeState, int numShards) throws IOException {
