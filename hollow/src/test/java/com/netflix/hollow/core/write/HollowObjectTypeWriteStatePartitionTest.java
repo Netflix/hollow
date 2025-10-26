@@ -9,6 +9,9 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowSetSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -510,5 +513,458 @@ public class HollowObjectTypeWriteStatePartitionTest {
             rec.setString("name", value);
         }
         return writeState.add(rec);
+    }
+
+    /**
+     * Comprehensive test that verifies partitioned and non-partitioned snapshots
+     * with identical data produce identical read results.
+     *
+     * NOTE: This test currently FAILS because there's a bug in reading multi-partition snapshots.
+     * The bug is that Long fields are not being read correctly from partitioned types.
+     * This test demonstrates that partitioning changes read behavior, which should not happen.
+     *
+     * TODO: Fix the partitioned read implementation so this test passes.
+     */
+    @Test
+    public void testPartitionedAndNonPartitionedSnapshotsAreEquivalent() throws IOException {
+        // Create schemas
+        HollowObjectSchema movieSchema = createSimpleMovieSchema();
+        HollowObjectSchema personSchema = createPersonSchema();
+
+        // Create non-partitioned snapshot (Movie has 1 partition)
+        byte[] nonPartitionedSnapshot = createSimpleSnapshot(movieSchema, personSchema, 1);
+
+        // Create partitioned snapshot (Movie has 8 partitions)
+        byte[] partitionedSnapshot = createSimpleSnapshot(movieSchema, personSchema, 8);
+
+        // Read both snapshots
+        HollowReadStateEngine nonPartitionedEngine = readSnapshot(nonPartitionedSnapshot);
+        HollowReadStateEngine partitionedEngine = readSnapshot(partitionedSnapshot);
+
+        // Verify both have same schemas
+        assertNotNull("Non-partitioned should have Movie type", nonPartitionedEngine.getTypeState("Movie"));
+        assertNotNull("Partitioned should have Movie type", partitionedEngine.getTypeState("Movie"));
+        assertNotNull("Both should have Person type", nonPartitionedEngine.getTypeState("Person"));
+        assertNotNull("Both should have Person type", partitionedEngine.getTypeState("Person"));
+
+        // Verify partition counts
+        HollowObjectTypeReadState nonPartMovie = (HollowObjectTypeReadState) nonPartitionedEngine.getTypeState("Movie");
+        HollowObjectTypeReadState partMovie = (HollowObjectTypeReadState) partitionedEngine.getTypeState("Movie");
+        assertEquals("Non-partitioned should have 1 partition", 1, nonPartMovie.getNumPartitions());
+        assertEquals("Partitioned should have 8 partitions", 8, partMovie.getNumPartitions());
+
+        // Extract all movie data from both snapshots
+        java.util.Map<Integer, SimpleMovieData> nonPartitionedMovies = extractSimpleMovieData(nonPartitionedEngine);
+        java.util.Map<Integer, SimpleMovieData> partitionedMovies = extractSimpleMovieData(partitionedEngine);
+
+        // Verify same number of movies
+        assertEquals("Both should have same number of movies",
+                     nonPartitionedMovies.size(), partitionedMovies.size());
+
+        // Verify each movie has identical data
+        for (Integer movieId : nonPartitionedMovies.keySet()) {
+            assertTrue("Partitioned snapshot should have movie " + movieId,
+                      partitionedMovies.containsKey(movieId));
+
+            SimpleMovieData nonPartMovieData = nonPartitionedMovies.get(movieId);
+            SimpleMovieData partMovieData = partitionedMovies.get(movieId);
+
+            // Compare all fields
+            assertEquals("Movie " + movieId + " id mismatch", nonPartMovieData.id, partMovieData.id);
+            assertEquals("Movie " + movieId + " revenue mismatch", nonPartMovieData.revenue, partMovieData.revenue);
+            assertEquals("Movie " + movieId + " rating mismatch", nonPartMovieData.rating, partMovieData.rating, 0.001);
+            assertEquals("Movie " + movieId + " score mismatch", nonPartMovieData.score, partMovieData.score, 0.001f);
+            assertEquals("Movie " + movieId + " isReleased mismatch", nonPartMovieData.isReleased, partMovieData.isReleased);
+            assertEquals("Movie " + movieId + " title mismatch", nonPartMovieData.title, partMovieData.title);
+            assertEquals("Movie " + movieId + " description mismatch", nonPartMovieData.description, partMovieData.description);
+            assertArrayEquals("Movie " + movieId + " posterData mismatch", nonPartMovieData.posterData, partMovieData.posterData);
+            assertEquals("Movie " + movieId + " director mismatch", nonPartMovieData.director, partMovieData.director);
+        }
+    }
+
+    private HollowObjectSchema createSimpleMovieSchema() {
+        HollowObjectSchema schema = new HollowObjectSchema("Movie", 9);
+        schema.addField("id", FieldType.INT);
+        schema.addField("revenue", FieldType.LONG);
+        schema.addField("rating", FieldType.DOUBLE);
+        schema.addField("score", FieldType.FLOAT);
+        schema.addField("isReleased", FieldType.BOOLEAN);
+        schema.addField("title", FieldType.STRING);
+        schema.addField("description", FieldType.STRING);
+        schema.addField("posterData", FieldType.BYTES);
+        schema.addField("director", FieldType.REFERENCE, "Person");
+        return schema;
+    }
+
+    private byte[] createSimpleSnapshot(HollowObjectSchema movieSchema, HollowObjectSchema personSchema,
+                                        int moviePartitionCount) throws IOException {
+        HollowWriteStateEngine engine = new HollowWriteStateEngine();
+
+        // Add type states
+        HollowObjectTypeWriteState movieState = new HollowObjectTypeWriteState(movieSchema, 1, moviePartitionCount);
+        HollowObjectTypeWriteState personState = new HollowObjectTypeWriteState(personSchema, 1, 1);
+        engine.addTypeState(movieState);
+        engine.addTypeState(personState);
+
+        // Add people (referenced by movies)
+        java.util.Map<Integer, Integer> personIdToOrdinal = new java.util.HashMap<>();
+        for (int i = 1; i <= 5; i++) {
+            HollowObjectWriteRecord person = new HollowObjectWriteRecord(personSchema);
+            person.setInt("id", i);
+            person.setString("name", "Person" + i);
+            person.setInt("age", 20 + (i % 50));
+            int ordinal = personState.add(person);
+            personIdToOrdinal.put(i, ordinal);
+        }
+
+        // Add movies with comprehensive field coverage
+        for (int i = 1; i <= 10; i++) {
+            HollowObjectWriteRecord movie = new HollowObjectWriteRecord(movieSchema);
+
+            // Primitive fields
+            movie.setInt("id", i);
+            movie.setLong("revenue", 1000000L * i);
+            movie.setDouble("rating", 5.0 + (i % 50) / 10.0);
+            movie.setFloat("score", 50.0f + (i % 100));
+            movie.setBoolean("isReleased", i % 2 == 0);
+
+            // String fields
+            movie.setString("title", "Movie" + i);
+            movie.setString("description", "Description for movie " + i + " with unicode: \u2605\u2606");
+
+            // Bytes field
+            byte[] posterData = new byte[i % 10 + 1];
+            for (int b = 0; b < posterData.length; b++) {
+                posterData[b] = (byte) (i + b);
+            }
+            movie.setBytes("posterData", posterData);
+
+            // Reference to director
+            int directorId = 1 + (i % 5);
+            movie.setReference("director", personIdToOrdinal.get(directorId));
+
+            movieState.add(movie);
+        }
+
+        engine.prepareForWrite();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        new HollowBlobWriter(engine).writeSnapshot(baos);
+        return baos.toByteArray();
+    }
+
+    private java.util.Map<Integer, SimpleMovieData> extractSimpleMovieData(HollowReadStateEngine engine) {
+        java.util.Map<Integer, SimpleMovieData> movies = new java.util.HashMap<>();
+
+        HollowObjectTypeReadState movieState = (HollowObjectTypeReadState) engine.getTypeState("Movie");
+        HollowObjectTypeReadState personState = (HollowObjectTypeReadState) engine.getTypeState("Person");
+
+        java.util.BitSet populatedOrdinals = movieState.getPopulatedOrdinals();
+        for (int ordinal = populatedOrdinals.nextSetBit(0);
+             ordinal != -1;
+             ordinal = populatedOrdinals.nextSetBit(ordinal + 1)) {
+
+            SimpleMovieData movie = new SimpleMovieData();
+            movie.id = movieState.readInt(ordinal, 0);
+            movie.revenue = movieState.readLong(ordinal, 1);
+            movie.rating = movieState.readDouble(ordinal, 2);
+            movie.score = movieState.readFloat(ordinal, 3);
+            movie.isReleased = movieState.readBoolean(ordinal, 4);
+            movie.title = movieState.readString(ordinal, 5);
+            movie.description = movieState.readString(ordinal, 6);
+            movie.posterData = movieState.readBytes(ordinal, 7);
+
+            // Director
+            int directorOrd = movieState.readOrdinal(ordinal, 8);
+            if (directorOrd != -1) {
+                movie.director = readPersonName(personState, directorOrd);
+            }
+
+            movies.put(movie.id, movie);
+        }
+
+        return movies;
+    }
+
+    // Simplified data class for comparison
+    private static class SimpleMovieData {
+        int id;
+        long revenue;
+        double rating;
+        float score;
+        boolean isReleased;
+        String title;
+        String description;
+        byte[] posterData;
+        String director;
+    }
+
+    private HollowObjectSchema createMovieSchema() {
+        HollowObjectSchema schema = new HollowObjectSchema("Movie", 12);
+        schema.addField("id", FieldType.INT);
+        schema.addField("revenue", FieldType.LONG);
+        schema.addField("rating", FieldType.DOUBLE);
+        schema.addField("score", FieldType.FLOAT);
+        schema.addField("isReleased", FieldType.BOOLEAN);
+        schema.addField("title", FieldType.STRING);
+        schema.addField("description", FieldType.STRING);
+        schema.addField("posterData", FieldType.BYTES);
+        schema.addField("director", FieldType.REFERENCE, "Person");
+        schema.addField("actors", FieldType.REFERENCE, "ListOfPerson");
+        schema.addField("genres", FieldType.REFERENCE, "SetOfString");
+        schema.addField("metadata", FieldType.REFERENCE, "MapOfStringToString");
+        return schema;
+    }
+
+    private HollowObjectSchema createPersonSchema() {
+        HollowObjectSchema schema = new HollowObjectSchema("Person", 3);
+        schema.addField("id", FieldType.INT);
+        schema.addField("name", FieldType.STRING);
+        schema.addField("age", FieldType.INT);
+        return schema;
+    }
+
+    private byte[] createSnapshot(HollowObjectSchema movieSchema, HollowObjectSchema personSchema,
+                                  HollowListSchema actorsListSchema, HollowSetSchema genresSetSchema,
+                                  HollowMapSchema metadataMapSchema, int moviePartitionCount) throws IOException {
+        HollowWriteStateEngine engine = new HollowWriteStateEngine();
+
+        // Add type states
+        HollowObjectTypeWriteState movieState = new HollowObjectTypeWriteState(movieSchema, 1, moviePartitionCount);
+        HollowObjectTypeWriteState personState = new HollowObjectTypeWriteState(personSchema, 1, 1);
+        HollowListTypeWriteState actorsListState = new HollowListTypeWriteState(actorsListSchema, 1);
+        HollowSetTypeWriteState genresSetState = new HollowSetTypeWriteState(genresSetSchema, 1);
+        HollowMapTypeWriteState metadataMapState = new HollowMapTypeWriteState(metadataMapSchema, 1);
+
+        engine.addTypeState(movieState);
+        engine.addTypeState(personState);
+        engine.addTypeState(actorsListState);
+        engine.addTypeState(genresSetState);
+        engine.addTypeState(metadataMapState);
+
+        // Add String type for Set and Map
+        HollowObjectSchema stringSchema = new HollowObjectSchema("String", 1);
+        stringSchema.addField("value", FieldType.STRING);
+        HollowObjectTypeWriteState stringState = new HollowObjectTypeWriteState(stringSchema, 1, 1);
+        engine.addTypeState(stringState);
+
+        // Pre-create reusable String ordinals for genres and metadata
+        java.util.Map<String, Integer> stringCache = new java.util.HashMap<>();
+        for (int g = 0; g < 5; g++) {
+            HollowObjectWriteRecord genreRec = new HollowObjectWriteRecord(stringSchema);
+            genreRec.setString("value", "Genre" + g);
+            stringCache.put("Genre" + g, stringState.add(genreRec));
+        }
+        for (int m = 0; m < 2; m++) {
+            HollowObjectWriteRecord keyRec = new HollowObjectWriteRecord(stringSchema);
+            keyRec.setString("value", "key" + m);
+            stringCache.put("key" + m, stringState.add(keyRec));
+        }
+
+        // Add people (referenced by movies)
+        java.util.Map<Integer, Integer> personIdToOrdinal = new java.util.HashMap<>();
+        for (int i = 1; i <= 20; i++) {
+            HollowObjectWriteRecord person = new HollowObjectWriteRecord(personSchema);
+            person.setInt("id", i);
+            person.setString("name", "Person" + i);
+            person.setInt("age", 20 + (i % 50));
+            int ordinal = personState.add(person);
+            personIdToOrdinal.put(i, ordinal);
+        }
+
+        // Add movies with comprehensive field coverage
+        for (int i = 1; i <= 50; i++) {
+            HollowObjectWriteRecord movie = new HollowObjectWriteRecord(movieSchema);
+
+            // Primitive fields
+            movie.setInt("id", i);
+            movie.setLong("revenue", 1000000L * i);
+            movie.setDouble("rating", 5.0 + (i % 50) / 10.0);
+            movie.setFloat("score", 50.0f + (i % 100));
+            movie.setBoolean("isReleased", i % 2 == 0);
+
+            // String fields
+            movie.setString("title", "Movie" + i);
+            movie.setString("description", "Description for movie " + i + " with unicode: \u2605\u2606");
+
+            // Bytes field
+            byte[] posterData = new byte[i % 10 + 1];
+            for (int b = 0; b < posterData.length; b++) {
+                posterData[b] = (byte) (i + b);
+            }
+            movie.setBytes("posterData", posterData);
+
+            // Reference to director
+            int directorId = 1 + (i % 20);
+            movie.setReference("director", personIdToOrdinal.get(directorId));
+
+            // LIST of actors
+            int numActors = 1 + (i % 3);
+            int[] actorOrdinals = new int[numActors];
+            for (int a = 0; a < numActors; a++) {
+                actorOrdinals[a] = personIdToOrdinal.get(1 + ((i + a) % 20));
+            }
+            HollowListWriteRecord actorsList = new HollowListWriteRecord();
+            for (int actorOrd : actorOrdinals) {
+                actorsList.addElement(actorOrd);
+            }
+            int actorsListOrdinal = actorsListState.add(actorsList);
+            movie.setReference("actors", actorsListOrdinal);
+
+            // SET of genres - reuse cached string ordinals
+            int numGenres = 1 + (i % 3);
+            HollowSetWriteRecord genresSet = new HollowSetWriteRecord();
+            for (int g = 0; g < numGenres; g++) {
+                genresSet.addElement(stringCache.get("Genre" + ((i + g) % 5)));
+            }
+            int genresSetOrdinal = genresSetState.add(genresSet);
+            movie.setReference("genres", genresSetOrdinal);
+
+            // MAP of metadata - create unique values but reuse keys
+            HollowMapWriteRecord metadataMap = new HollowMapWriteRecord();
+            for (int m = 0; m < 2; m++) {
+                int keyOrd = stringCache.get("key" + m);
+
+                HollowObjectWriteRecord value = new HollowObjectWriteRecord(stringSchema);
+                value.setString("value", "value" + m + "_movie" + i);
+                int valueOrd = stringState.add(value);
+
+                metadataMap.addEntry(keyOrd, valueOrd);
+            }
+            int metadataMapOrdinal = metadataMapState.add(metadataMap);
+            movie.setReference("metadata", metadataMapOrdinal);
+
+            movieState.add(movie);
+        }
+
+        engine.prepareForWrite();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        new HollowBlobWriter(engine).writeSnapshot(baos);
+        return baos.toByteArray();
+    }
+
+    private HollowReadStateEngine readSnapshot(byte[] snapshotBytes) throws IOException {
+        HollowReadStateEngine engine = new HollowReadStateEngine();
+        new HollowBlobReader(engine).readSnapshot(new ByteArrayInputStream(snapshotBytes));
+        return engine;
+    }
+
+    private java.util.Map<Integer, MovieData> extractMovieData(HollowReadStateEngine engine) {
+        java.util.Map<Integer, MovieData> movies = new java.util.HashMap<>();
+
+        HollowObjectTypeReadState movieState = (HollowObjectTypeReadState) engine.getTypeState("Movie");
+        HollowObjectTypeReadState personState = (HollowObjectTypeReadState) engine.getTypeState("Person");
+
+        java.util.BitSet populatedOrdinals = movieState.getPopulatedOrdinals();
+        for (int ordinal = populatedOrdinals.nextSetBit(0);
+             ordinal != -1;
+             ordinal = populatedOrdinals.nextSetBit(ordinal + 1)) {
+
+            MovieData movie = new MovieData();
+            movie.id = movieState.readInt(ordinal, 0);
+            movie.revenue = movieState.readLong(ordinal, 1);
+            movie.rating = movieState.readDouble(ordinal, 2);
+            movie.score = movieState.readFloat(ordinal, 3);
+            movie.isReleased = movieState.readBoolean(ordinal, 4);
+            movie.title = movieState.readString(ordinal, 5);
+            movie.description = movieState.readString(ordinal, 6);
+            movie.posterData = movieState.readBytes(ordinal, 7);
+
+            // Director
+            int directorOrd = movieState.readOrdinal(ordinal, 8);
+            if (directorOrd != -1) {
+                movie.director = readPersonName(personState, directorOrd);
+            }
+
+            // Actors list
+            int actorsListOrd = movieState.readOrdinal(ordinal, 9);
+            movie.actors = readActorsList(engine, actorsListOrd, personState);
+
+            // Genres set
+            int genresSetOrd = movieState.readOrdinal(ordinal, 10);
+            movie.genres = readGenresSet(engine, genresSetOrd);
+
+            // Metadata map
+            int metadataMapOrd = movieState.readOrdinal(ordinal, 11);
+            movie.metadata = readMetadataMap(engine, metadataMapOrd);
+
+            movies.put(movie.id, movie);
+        }
+
+        return movies;
+    }
+
+    private String readPersonName(HollowObjectTypeReadState personState, int ordinal) {
+        return personState.readString(ordinal, 1); // name is field index 1
+    }
+
+    private java.util.List<String> readActorsList(HollowReadStateEngine engine, int listOrdinal,
+                                                  HollowObjectTypeReadState personState) {
+        java.util.List<String> actors = new java.util.ArrayList<>();
+        if (listOrdinal == -1) return actors;
+
+        com.netflix.hollow.core.read.engine.list.HollowListTypeReadState listState =
+            (com.netflix.hollow.core.read.engine.list.HollowListTypeReadState) engine.getTypeState("ListOfPerson");
+
+        int size = listState.size(listOrdinal);
+        for (int i = 0; i < size; i++) {
+            int personOrd = listState.getElementOrdinal(listOrdinal, i);
+            if (personOrd != -1) {
+                actors.add(readPersonName(personState, personOrd));
+            }
+        }
+        return actors;
+    }
+
+    private java.util.Set<String> readGenresSet(HollowReadStateEngine engine, int setOrdinal) {
+        java.util.Set<String> genres = new java.util.TreeSet<>(); // TreeSet for consistent ordering
+        if (setOrdinal == -1) return genres;
+
+        com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState setState =
+            (com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState) engine.getTypeState("SetOfString");
+        HollowObjectTypeReadState stringState = (HollowObjectTypeReadState) engine.getTypeState("String");
+
+        com.netflix.hollow.core.read.iterator.HollowOrdinalIterator iter = setState.ordinalIterator(setOrdinal);
+        int elementOrd = iter.next();
+        while (elementOrd != com.netflix.hollow.core.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS) {
+            String value = stringState.readString(elementOrd, 0);
+            genres.add(value);
+            elementOrd = iter.next();
+        }
+        return genres;
+    }
+
+    private java.util.Map<String, String> readMetadataMap(HollowReadStateEngine engine, int mapOrdinal) {
+        java.util.Map<String, String> metadata = new java.util.TreeMap<>(); // TreeMap for consistent ordering
+        if (mapOrdinal == -1) return metadata;
+
+        com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState mapState =
+            (com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState) engine.getTypeState("MapOfStringToString");
+        HollowObjectTypeReadState stringState = (HollowObjectTypeReadState) engine.getTypeState("String");
+
+        com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator iter = mapState.ordinalIterator(mapOrdinal);
+        while (iter.next()) {
+            String key = stringState.readString(iter.getKey(), 0);
+            String value = stringState.readString(iter.getValue(), 0);
+            metadata.put(key, value);
+        }
+        return metadata;
+    }
+
+    // Data class for comparison
+    private static class MovieData {
+        int id;
+        long revenue;
+        double rating;
+        float score;
+        boolean isReleased;
+        String title;
+        String description;
+        byte[] posterData;
+        String director;
+        java.util.List<String> actors;
+        java.util.Set<String> genres;
+        java.util.Map<String, String> metadata;
     }
 }

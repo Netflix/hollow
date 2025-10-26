@@ -137,12 +137,14 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         case INT:
         case LONG:
             long value = VarInt.readVLong(data, pointer);
-            addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, (int)value);
+            int requiredBitsForFieldValue = 64 - Long.numberOfLeadingZeros(value + 1);
+            addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, requiredBitsForFieldValue);
             pointer += VarInt.sizeOfVLong(value);
             break;
         case REFERENCE:
             long refValue = VarInt.readVLong(data, pointer);
-            addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, (int)refValue);
+            int requiredBitsForRef = 64 - Long.numberOfLeadingZeros(refValue + 1);
+            addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, requiredBitsForRef);
             pointer += VarInt.sizeOfVLong(refValue);
             break;
         case BYTES:

@@ -123,6 +123,8 @@ public abstract class HollowTypeWriteState {
         return numPartitions;
     }
 
+
+
     /**
      * Gets a specific partition by index.
      *
