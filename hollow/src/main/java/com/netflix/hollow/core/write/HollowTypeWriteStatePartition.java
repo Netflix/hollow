@@ -31,9 +31,7 @@ public class HollowTypeWriteStatePartition {
     protected final ByteArrayOrdinalMap ordinalMap;
     protected int maxOrdinal;
 
-    protected int numShards;
-    protected int revNumShards;
-    protected int resetToLastNumShards;
+    protected final HollowTypeWriteState parentTypeState;
 
     protected ByteArrayOrdinalMap restoredMap;
 
@@ -41,16 +39,16 @@ public class HollowTypeWriteStatePartition {
     protected ThreadSafeBitSet previousCyclePopulated;
 
     /**
-     * Creates a new partition with the specified number of shards.
+     * Creates a new partition with a reference to its parent type state.
+     * The partition will use the parent's numShards configuration.
      *
-     * @param numShards the number of shards for this partition, or -1 for dynamic sharding
+     * @param parentTypeState the parent type write state
      */
-    public HollowTypeWriteStatePartition(int numShards) {
+    public HollowTypeWriteStatePartition(HollowTypeWriteState parentTypeState) {
+        this.parentTypeState = parentTypeState;
         this.ordinalMap = new ByteArrayOrdinalMap();
         this.currentCyclePopulated = new ThreadSafeBitSet();
         this.previousCyclePopulated = new ThreadSafeBitSet();
-        this.numShards = numShards;
-        this.resetToLastNumShards = numShards;
     }
 
     /**
@@ -81,57 +79,30 @@ public class HollowTypeWriteStatePartition {
     }
 
     /**
-     * Gets the number of shards for this partition.
+     * Gets the number of shards for this partition (from parent type state).
      *
      * @return the number of shards
      */
     public int getNumShards() {
-        return numShards;
+        return parentTypeState.getNumShards();
     }
 
     /**
-     * Sets the number of shards for this partition.
-     *
-     * @param numShards the number of shards
-     */
-    public void setNumShards(int numShards) {
-        this.numShards = numShards;
-    }
-
-    /**
-     * Gets the previous number of shards (for reverse delta).
+     * Gets the previous number of shards (for reverse delta) from parent type state.
      *
      * @return the previous number of shards
      */
     public int getRevNumShards() {
-        return revNumShards;
+        return parentTypeState.getRevNumShards();
     }
 
     /**
-     * Sets the previous number of shards (for reverse delta).
-     *
-     * @param revNumShards the previous number of shards
-     */
-    public void setRevNumShards(int revNumShards) {
-        this.revNumShards = revNumShards;
-    }
-
-    /**
-     * Gets the number of shards to reset to after a cycle.
+     * Gets the number of shards to reset to after a cycle (from parent type state).
      *
      * @return the reset number of shards
      */
     public int getResetToLastNumShards() {
-        return resetToLastNumShards;
-    }
-
-    /**
-     * Sets the number of shards to reset to after a cycle.
-     *
-     * @param resetToLastNumShards the reset number of shards
-     */
-    public void setResetToLastNumShards(int resetToLastNumShards) {
-        this.resetToLastNumShards = resetToLastNumShards;
+        return parentTypeState.getResetToLastNumShards();
     }
 
     /**
@@ -195,7 +166,7 @@ public class HollowTypeWriteStatePartition {
      * @param focusHoleFillInFewestShards whether to focus hole filling in fewest shards
      */
     public void prepareForNextCycle(boolean focusHoleFillInFewestShards) {
-        ordinalMap.compact(currentCyclePopulated, numShards, focusHoleFillInFewestShards);
+        ordinalMap.compact(currentCyclePopulated, getNumShards(), focusHoleFillInFewestShards);
 
         ThreadSafeBitSet temp = previousCyclePopulated;
         previousCyclePopulated = currentCyclePopulated;
@@ -204,7 +175,6 @@ public class HollowTypeWriteStatePartition {
         currentCyclePopulated.clearAll();
 
         restoredMap = null;
-        resetToLastNumShards = numShards;
     }
 
     /**
@@ -220,9 +190,8 @@ public class HollowTypeWriteStatePartition {
      * @param focusHoleFillInFewestShards whether to focus hole filling in fewest shards
      */
     public void resetToLastPrepareForNextCycle(boolean focusHoleFillInFewestShards) {
-        numShards = resetToLastNumShards;
         currentCyclePopulated.clearAll();
-        ordinalMap.compact(previousCyclePopulated, numShards, focusHoleFillInFewestShards);
+        ordinalMap.compact(previousCyclePopulated, getResetToLastNumShards(), focusHoleFillInFewestShards);
     }
 
     /**

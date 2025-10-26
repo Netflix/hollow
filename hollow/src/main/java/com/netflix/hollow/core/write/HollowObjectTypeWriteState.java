@@ -75,8 +75,9 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         super.prepareForWrite(canReshard);
 
         if(numPartitions == 1) {
-            // Single partition: use main ordinalMap
+            // Single partition: use main ordinalMap and set partition 0's maxOrdinal
             maxOrdinal = ordinalMap.maxOrdinal();
+            partitions[0].setMaxOrdinal(maxOrdinal);
             gatherFieldStats();
             gatherShardingStats(maxOrdinal, canReshard);
         } else {

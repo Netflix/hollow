@@ -69,11 +69,14 @@ public abstract class HollowTypeWriteState {
     protected int maxShardOrdinal[];
     protected int revMaxShardOrdinal[];
 
+    // Type-level sharding state (uniform across all partitions)
+    protected int numShards;
+    protected int revNumShards;
+    protected int resetToLastNumShards;
+
     // Convenience accessors for backward compatibility (delegate to partition 0)
     protected ByteArrayOrdinalMap ordinalMap;
     protected int maxOrdinal;
-    protected int numShards;
-    protected int revNumShards;
     protected ByteArrayOrdinalMap restoredMap;
     protected ThreadSafeBitSet currentCyclePopulated;
     protected ThreadSafeBitSet previousCyclePopulated;
@@ -94,18 +97,21 @@ public abstract class HollowTypeWriteState {
         if(numShards != -1 && ((numShards & (numShards - 1)) != 0 || numShards <= 0))
             throw new IllegalArgumentException("Number of shards must be a power of 2!  Check configuration for type " + schema.getName());
 
+        // Initialize type-level sharding state
+        this.numShards = numShards;
+        this.resetToLastNumShards = numShards;
+
         // Initialize partitions
         this.numPartitions = numPartitions;
         this.partitions = new HollowTypeWriteStatePartition[MAX_PARTITIONS];
         for(int i = 0; i < numPartitions; i++) {
-            this.partitions[i] = new HollowTypeWriteStatePartition(numShards);
+            this.partitions[i] = new HollowTypeWriteStatePartition(this);
         }
 
         // Set up backward compatibility references to partition 0
         this.ordinalMap = this.partitions[0].getOrdinalMap();
         this.currentCyclePopulated = this.partitions[0].getCurrentCyclePopulated();
         this.previousCyclePopulated = this.partitions[0].getPreviousCyclePopulated();
-        this.numShards = numShards;
     }
     
     /**
@@ -150,15 +156,30 @@ public abstract class HollowTypeWriteState {
     }
 
     /**
-     * Syncs backward compatibility fields with partition 0.
-     * This should be called after operations that modify partition 0's state.
+     * Gets the number of shards for this type (uniform across all partitions).
+     *
+     * @return the number of shards
      */
-    protected void syncBackwardCompatibilityFields() {
-        HollowTypeWriteStatePartition partition0 = partitions[0];
-        this.maxOrdinal = partition0.getMaxOrdinal();// SNAP: TODO: this is where we lose maxOrdinal for non partitioned types
-        this.numShards = partition0.getNumShards();
-        this.revNumShards = partition0.getRevNumShards();
-        this.restoredMap = partition0.getRestoredMap();
+    public int getNumShards() {
+        return numShards;
+    }
+
+    /**
+     * Gets the previous number of shards for this type (for reverse delta).
+     *
+     * @return the previous number of shards
+     */
+    public int getRevNumShards() {
+        return revNumShards;
+    }
+
+    /**
+     * Gets the number of shards to reset to after a cycle.
+     *
+     * @return the reset number of shards
+     */
+    public int getResetToLastNumShards() {
+        return resetToLastNumShards;
     }
 
     /**
@@ -456,7 +477,12 @@ public abstract class HollowTypeWriteState {
             wroteData = false;
         }
 
-        syncBackwardCompatibilityFields();
+        // For backward compatibility: update fields from partition 0
+        // Only Object types maintain partition-level maxOrdinal
+        if(this instanceof HollowObjectTypeWriteState) {
+            this.maxOrdinal = partitions[0].getMaxOrdinal();
+        }
+        this.restoredMap = partitions[0].getRestoredMap();
     }
 
     public void addAllObjectsFromPreviousCycle() {
@@ -540,29 +566,17 @@ public abstract class HollowTypeWriteState {
     public HollowSchema getSchema() {
         return schema;
     }
-    
-    public int getNumShards() {
-        return numShards;
-    }
 
     boolean isNumShardsPinned() {
         return isNumShardsPinned;
     }
 
-    int getRevNumShards() {
-        return revNumShards;
-    }
-
     public void setNumShards(int numShards) {
-        HollowTypeWriteStatePartition partition0 = partitions[0];
-        if(partition0.getNumShards() == -1) {
-            for(int i = 0; i < numPartitions; i++) {
-                partitions[i].setNumShards(numShards);
-                partitions[i].setResetToLastNumShards(numShards);
-            }
+        if(this.numShards == -1) {
             this.numShards = numShards;
-        } else if(partition0.getNumShards() != numShards) {
-            throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + partition0.getNumShards() + ".  Cannot reset to " + numShards + ".");
+            this.resetToLastNumShards = numShards;
+        } else if(this.numShards != numShards) {
+            throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + this.numShards + ".  Cannot reset to " + numShards + ".");
         }
     }
 
@@ -589,7 +603,12 @@ public abstract class HollowTypeWriteState {
         restoredReadState = null;
 
         // Update backward compatibility references to partition 0
-        syncBackwardCompatibilityFields();
+        // Only Object types maintain partition-level maxOrdinal
+        if(this instanceof HollowObjectTypeWriteState) {
+            this.maxOrdinal = partitions[0].getMaxOrdinal();
+        }
+        this.restoredMap = partitions[0].getRestoredMap();
+        this.resetToLastNumShards = numShards;
         currentCyclePopulated = partitions[0].getCurrentCyclePopulated();
         previousCyclePopulated = partitions[0].getPreviousCyclePopulated();
     }
@@ -705,8 +724,14 @@ public abstract class HollowTypeWriteState {
         partition0.resizeOrdinalMap(size);
         partition0.getOrdinalMap().reservePreviouslyPopulatedOrdinals(populatedOrdinals);
 
-        // Update backward compatibility fields
-        syncBackwardCompatibilityFields();
+        // Update backward compatibility fields to use partition 0
+        // maxOrdinal is the highest populated ordinal
+        int maxOrdinal = populatedOrdinals.length() - 1;
+        if(this instanceof HollowObjectTypeWriteState) {
+            partition0.setMaxOrdinal(maxOrdinal);
+        }
+        this.maxOrdinal = maxOrdinal;
+        this.restoredMap = partition0.getRestoredMap();
         previousCyclePopulated = partition0.getPreviousCyclePopulated();
         currentCyclePopulated = partition0.getCurrentCyclePopulated();
     }
@@ -768,37 +793,33 @@ public abstract class HollowTypeWriteState {
     }
 
     public void gatherShardingStats(int maxOrdinal, boolean canReshard) {
-        // Update sharding stats for all partitions
-        for(int i = 0; i < numPartitions; i++) {
-            HollowTypeWriteStatePartition partition = partitions[i];
-            int partitionNumShards = partition.getNumShards();
-            int partitionRevNumShards;
+        // numShards and revNumShards are uniform across all partitions, so compute them once at type level
+        int typeNumShards = this.numShards;
+        int typeRevNumShards;
 
-            if(partitionNumShards == -1) {
-                partitionNumShards = typeStateNumShards(maxOrdinal);
-                partitionRevNumShards = partitionNumShards;
-            } else {
-                partitionRevNumShards = partitionNumShards;
-                if (canReshard && allowTypeResharding()) {
-                    int newNumShards = typeStateNumShards(maxOrdinal);
-                    if (newNumShards != partitionRevNumShards) {    // re-sharding
-                        // limit numShards to 2x or .5x of prevShards per producer cycle
-                        partitionNumShards = newNumShards > partitionRevNumShards ? partitionRevNumShards * 2 : partitionRevNumShards / 2;
+        if(typeNumShards == -1) {
+            typeNumShards = typeStateNumShards(maxOrdinal);
+            typeRevNumShards = typeNumShards;
+        } else {
+            typeRevNumShards = typeNumShards;
+            if (canReshard && allowTypeResharding()) {
+                int newNumShards = typeStateNumShards(maxOrdinal);
+                if (newNumShards != typeRevNumShards) {    // re-sharding
+                    // limit numShards to 2x or .5x of prevShards per producer cycle
+                    typeNumShards = newNumShards > typeRevNumShards ? typeRevNumShards * 2 : typeRevNumShards / 2;
 
-                        if(i == 0) {  // Only log once for partition 0
-                            LOG.info(String.format("Num shards for type %s changing from %s to %s", schema.getName(), partitionRevNumShards, partitionNumShards));
-                            addReshardingHeader(partitionRevNumShards, partitionNumShards);
-                        }
-                    }
+                    LOG.info(String.format("Num shards for type %s changing from %s to %s", schema.getName(), typeRevNumShards, typeNumShards));
+                    addReshardingHeader(typeRevNumShards, typeNumShards);
                 }
             }
-
-            partition.setNumShards(partitionNumShards);
-            partition.setRevNumShards(partitionRevNumShards);
         }
 
-        // Use partition 0 values for backward compatibility
-        syncBackwardCompatibilityFields();
+        // Set type-level sharding stats (uniform across all partitions)
+        this.numShards = typeNumShards;
+        this.revNumShards = typeRevNumShards;
+
+        // Set type-level maxOrdinal from parameter (already computed by subclass)
+        this.maxOrdinal = maxOrdinal;
 
         maxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, numShards);
         if (revNumShards > 0) {
