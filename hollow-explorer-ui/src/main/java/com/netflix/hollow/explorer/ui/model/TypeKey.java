@@ -17,17 +17,33 @@
 package com.netflix.hollow.explorer.ui.model;
 
 public class TypeKey {
-    
+
+    private static final int PARTITION_INDEX_BITS = 3;  // supports up to 8 partitions
+    private static final int PARTITION_INDEX_MASK = (1 << PARTITION_INDEX_BITS) - 1;  // 0b111
+
     private final int idx;
     private final String keyStr;
     private final String keyDisplayStr;
     private final int ordinal;
-    
-    public TypeKey(int idx, int ordinal, String keyStr, String keyDisplayStr) {
+    private final int partitionIndex;
+    private final int partitionOrdinal;
+    private final int numPartitions;
+
+    public TypeKey(int idx, int ordinal, String keyStr, String keyDisplayStr, int numPartitions) {
         this.idx = idx;
         this.ordinal = ordinal;
         this.keyStr = keyStr;
         this.keyDisplayStr = keyDisplayStr;
+        this.numPartitions = numPartitions;
+
+        // Extract partition information from ordinal if type is partitioned
+        if (numPartitions > 1) {
+            this.partitionIndex = ordinal & PARTITION_INDEX_MASK;
+            this.partitionOrdinal = ordinal >> PARTITION_INDEX_BITS;
+        } else {
+            this.partitionIndex = 0;
+            this.partitionOrdinal = ordinal;
+        }
     }
 
     public int getIdx() {
@@ -44,6 +60,22 @@ public class TypeKey {
     
     public String getKeyDisplay() {
         return keyDisplayStr;
+    }
+
+    public int getPartitionIndex() {
+        return partitionIndex;
+    }
+
+    public int getPartitionOrdinal() {
+        return partitionOrdinal;
+    }
+
+    public int getNumPartitions() {
+        return numPartitions;
+    }
+
+    public boolean isPartitioned() {
+        return numPartitions > 1;
     }
 
 }

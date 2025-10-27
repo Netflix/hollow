@@ -30,7 +30,12 @@
     
     #foreach($typeOverview in $typeOverviews)
         <tr>
-            <td><a href="$basePath/type?type=$esc.url($typeOverview.getTypeName())">$esc.html($typeOverview.getTypeName())</a></th>
+            <td>
+                <a href="$basePath/type?type=$esc.url($typeOverview.getTypeName())">$esc.html($typeOverview.getTypeName())</a>
+                #if($typeOverview.isPartitioned())
+                    <br/><span style="color: #888888; font-size: 0.9em;">($typeOverview.getNumPartitions() partitions)</span>
+                #end
+            </td>
             <td>$typeOverview.getNumRecords()</td>
             <td>$typeOverview.getNumHoles()</td>
             <td>$typeOverview.getApproxHoleFootprint()</td>

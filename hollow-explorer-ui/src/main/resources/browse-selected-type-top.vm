@@ -59,12 +59,18 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$esc.h
 				<tr>
 					<th>#</th>
 					<th>Key</th>
+					#if($keys.size() > 0 && $keys.get(0).isPartitioned())
+						<th style="color: #888888;">P</th>
+					#end
 				</tr>
-				
+
 				#foreach($key in $keys)
 					<tr>
 						<td>$key.getIdx()</td>
 						<td nowrap><a href="$basePath/type?type=$esc.url($type)&page=$page&pageSize=$pageSize&display=$display&ordinal=$key.getOrdinal()&key=$esc.url($key.getKey())">$esc.html($key.getKeyDisplay())</a></td>
+						#if($key.isPartitioned())
+							<td style="color: #888888;" title="Partition $key.getPartitionIndex() of $key.getNumPartitions() (Partition Ordinal: $key.getPartitionOrdinal())">$key.getPartitionIndex()</td>
+						#end
 					</tr>
 				#end
 			</table>
@@ -94,6 +100,14 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$esc.h
 						<th align=right nowrap>Showing Record: </th>
 						<td id="recLink">
 							ordinal: $ordinal
+							#if($keys.size() > 0 && $keys.get(0).isPartitioned())
+								#foreach($key in $keys)
+									#if($key.getOrdinal() == $ordinal)
+										<br/><span style="color: #888888;">partition: $key.getPartitionIndex() (partition ordinal: $key.getPartitionOrdinal())</span>
+										#break
+									#end
+								#end
+							#end
 							#if($key)	<!-- not null and not empty -->
 								<br/>key: $esc.html($key)
 							#end

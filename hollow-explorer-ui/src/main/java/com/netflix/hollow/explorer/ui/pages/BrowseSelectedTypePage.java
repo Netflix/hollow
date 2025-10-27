@@ -147,6 +147,12 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
     }
 
     private TypeKey getKey(int recordIdx, HollowTypeReadState typeState, int ordinal, int[][] fieldPathIndexes) {
+        // Get number of partitions for this type
+        int numPartitions = 1;
+        if (typeState instanceof HollowObjectTypeReadState) {
+            numPartitions = ((HollowObjectTypeReadState) typeState).getNumPartitions();
+        }
+
         if(fieldPathIndexes != null) {
             StringBuilder keyBuilder = new StringBuilder();
             StringBuilder delimiterEscapedKeyBuilder = new StringBuilder();
@@ -187,10 +193,10 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
                 }
             }
 
-            return new TypeKey(recordIdx, ordinal, delimiterEscapedKeyBuilder.toString(), keyBuilder.toString());
+            return new TypeKey(recordIdx, ordinal, delimiterEscapedKeyBuilder.toString(), keyBuilder.toString(), numPartitions);
         }
 
-        return new TypeKey(recordIdx, ordinal, "", "ORDINAL:" + ordinal);
+        return new TypeKey(recordIdx, ordinal, "", "ORDINAL:" + ordinal, numPartitions);
     }
 
     private HollowTypeReadState getTypeState(HttpServletRequest req) {

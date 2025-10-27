@@ -31,9 +31,10 @@ public class TypeOverview {
     private final PrimaryKey primaryKey;
     private final HollowSchema schema;
     private final int numShards;
-    
+    private final int numPartitions;
+
     public TypeOverview(String typeName, int numRecords, int numHoles, long approxHoleFootprint,  long approxHeapFootprint,
-                        PrimaryKey primaryKey, HollowSchema schema, int numShards) {
+                        PrimaryKey primaryKey, HollowSchema schema, int numShards, int numPartitions) {
         this.typeName = typeName;
         this.numRecords = numRecords;
         this.numHoles = numHoles;
@@ -42,6 +43,7 @@ public class TypeOverview {
         this.primaryKey = primaryKey;
         this.schema = schema;
         this.numShards = numShards;
+        this.numPartitions = numPartitions;
     }
 
     public String getTypeName() {
@@ -77,5 +79,15 @@ public class TypeOverview {
     }
     public String getNumShards() {
         return NumberFormat.getIntegerInstance().format(numShards);
+    }
+
+    public int getNumPartitionsInt() {
+        return numPartitions;
+    }
+    public String getNumPartitions() {
+        return NumberFormat.getIntegerInstance().format(numPartitions);
+    }
+    public boolean isPartitioned() {
+        return numPartitions > 1;
     }
 }

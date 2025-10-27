@@ -20,6 +20,7 @@ import static com.netflix.hollow.ui.HollowDiffUtil.formatBytes;
 
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -60,7 +61,13 @@ public class ShowAllTypesPage extends HollowExplorerPage {
             HollowSchema schema = typeState.getSchema();
             int numShards = typeState.numShards();
 
-            typeOverviews.add(new TypeOverview(typeName, numRecords, numHoles, approxHoleFootprint, approxHeapFootprint, primaryKey, schema, numShards));
+            // Get number of partitions for object types
+            int numPartitions = 1;
+            if (typeState instanceof HollowObjectTypeReadState) {
+                numPartitions = ((HollowObjectTypeReadState) typeState).getNumPartitions();
+            }
+
+            typeOverviews.add(new TypeOverview(typeName, numRecords, numHoles, approxHoleFootprint, approxHeapFootprint, primaryKey, schema, numShards, numPartitions));
         }
 
         switch(sort) {
