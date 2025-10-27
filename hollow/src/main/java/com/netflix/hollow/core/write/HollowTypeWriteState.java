@@ -309,6 +309,30 @@ public abstract class HollowTypeWriteState {
     }
 
     /**
+     * Encodes a partition index and partition-local ordinal into a single encoded ordinal.
+     * This encoding allows cross-type references to work correctly when the referenced type
+     * is partitioned.
+     * <p>
+     * Format: [partition ordinal][partition index]
+     *         [bits 31-3]        [bits 2-0]
+     * <p>
+     * The low 3 bits store the partition index (0-7), and the remaining high bits store
+     * the partition-local ordinal.
+     * <p>
+     * For non-partitioned types (numPartitions==1), no encoding is performed.
+     *
+     * @param partitionIndex the partition index (0 to numPartitions-1)
+     * @param partitionOrdinal the ordinal within the partition
+     * @return the encoded ordinal that can be used in references
+     */
+    private int encodeOrdinal(int partitionIndex, int partitionOrdinal) {
+        if (numPartitions == 1) {
+            return partitionOrdinal;  // no encoding needed for single partition
+        }
+        return (partitionOrdinal << 3) | partitionIndex;
+    }
+
+    /**
      * Add an object to this state with explicit primary key values for optimized partition selection.
      * This method is more efficient when partitioning is enabled, as it avoids extracting the primary
      * key from the serialized record.
@@ -352,10 +376,11 @@ public abstract class HollowTypeWriteState {
             }
         }
 
+        int encodedOrdinal = encodeOrdinal(partitionIndex, ordinal);
         partition.getCurrentCyclePopulated().set(ordinal);
         scratch.reset();
 
-        return ordinal;
+        return encodedOrdinal;
     }
 
     /**
@@ -410,10 +435,11 @@ public abstract class HollowTypeWriteState {
             }
         }
 
+        int encodedOrdinal = encodeOrdinal(partitionIndex, ordinal);
         partition.getCurrentCyclePopulated().set(ordinal);
         scratch.reset();
 
-        return ordinal;
+        return encodedOrdinal;
     }
 
     private int assignOrdinal(HollowWriteRecord rec) {

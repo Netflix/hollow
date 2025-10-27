@@ -1,0 +1,198 @@
+{
+    "compileClasspath": {
+        "com.github.javafaker:javafaker": {
+            "locked": "1.0.2"
+        },
+        "com.netflix.hollow:hollow": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-explorer-ui",
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-diff-ui": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-explorer-ui": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-explorer-ui"
+            ],
+            "project": true
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.3"
+        }
+    },
+    "runtimeClasspath": {
+        "com.github.javafaker:javafaker": {
+            "locked": "1.0.2"
+        },
+        "com.google.code.gson:gson": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.10.1"
+        },
+        "com.netflix.hollow:hollow": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-explorer-ui",
+                "com.netflix.hollow:hollow-test",
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-diff-ui": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-explorer-ui": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-test": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-explorer-ui"
+            ],
+            "project": true
+        },
+        "commons-io:commons-io": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.11.0"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-explorer-ui",
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "4.0.1"
+        },
+        "org.apache.commons:commons-text": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.3"
+        }
+    },
+    "testCompileClasspath": {
+        "com.github.javafaker:javafaker": {
+            "locked": "1.0.2"
+        },
+        "com.netflix.hollow:hollow": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-explorer-ui",
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-diff-ui": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-explorer-ui": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-explorer-ui"
+            ],
+            "project": true
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.3"
+        }
+    },
+    "testRuntimeClasspath": {
+        "com.github.javafaker:javafaker": {
+            "locked": "1.0.2"
+        },
+        "com.google.code.gson:gson": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.10.1"
+        },
+        "com.netflix.hollow:hollow": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-explorer-ui",
+                "com.netflix.hollow:hollow-test",
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-diff-ui": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-explorer-ui": {
+            "project": true
+        },
+        "com.netflix.hollow:hollow-test": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui"
+            ],
+            "project": true
+        },
+        "com.netflix.hollow:hollow-ui-tools": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-explorer-ui"
+            ],
+            "project": true
+        },
+        "commons-io:commons-io": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.11.0"
+        },
+        "javax.servlet:javax.servlet-api": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-diff-ui",
+                "com.netflix.hollow:hollow-explorer-ui",
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "4.0.1"
+        },
+        "org.apache.commons:commons-text": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "1.10.0"
+        },
+        "org.apache.velocity:velocity-engine-core": {
+            "firstLevelTransitive": [
+                "com.netflix.hollow:hollow-ui-tools"
+            ],
+            "locked": "2.3"
+        }
+    }
+}

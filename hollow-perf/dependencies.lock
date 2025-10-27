@@ -12,10 +12,10 @@
     },
     "jmh": {
         "org.openjdk.jmh:jmh-core": {
-            "locked": "1.25"
+            "locked": "1.36"
         },
         "org.openjdk.jmh:jmh-generator-bytecode": {
-            "locked": "1.25"
+            "locked": "1.36"
         }
     },
     "jmhCompileClasspath": {
@@ -23,13 +23,13 @@
             "project": true
         },
         "org.openjdk.jmh:jmh-core": {
-            "locked": "1.25"
+            "locked": "1.36"
         },
         "org.openjdk.jmh:jmh-generator-annprocess": {
             "locked": "1.21"
         },
         "org.openjdk.jmh:jmh-generator-bytecode": {
-            "locked": "1.25"
+            "locked": "1.36"
         }
     },
     "jmhRuntimeClasspath": {
@@ -37,10 +37,10 @@
             "project": true
         },
         "org.openjdk.jmh:jmh-core": {
-            "locked": "1.25"
+            "locked": "1.36"
         },
         "org.openjdk.jmh:jmh-generator-bytecode": {
-            "locked": "1.25"
+            "locked": "1.36"
         }
     },
     "runtimeClasspath": {
