@@ -883,31 +883,58 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
 	@Override
 	public long getApproximateHeapFootprintInBytes() {
-        final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
 	    long totalApproximateHeapFootprintInBytes = 0;
-	    
-	    for(int i=0;i<shards.length;i++)
-            totalApproximateHeapFootprintInBytes += shards[i].getApproximateHeapFootprintInBytes();
-	    
+
+	    if(numPartitions > 1) {
+	        // Multi-partition path: iterate over all partition shards
+	        for(int p = 0; p < numPartitions; p++) {
+	            HollowObjectTypeReadStateShard[] partitionShards = partitions[p].getShards();
+	            for(int i = 0; i < partitionShards.length; i++) {
+	                totalApproximateHeapFootprintInBytes += partitionShards[i].getApproximateHeapFootprintInBytes();
+	            }
+	        }
+	    } else {
+	        // Single partition path: use shardsVolatile
+	        final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
+	        for(int i=0;i<shards.length;i++)
+                totalApproximateHeapFootprintInBytes += shards[i].getApproximateHeapFootprintInBytes();
+	    }
+
 	    return totalApproximateHeapFootprintInBytes;
 	}
 	
 	@Override
 	public long getApproximateHoleCostInBytes() {
-        final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
 	    long totalApproximateHoleCostInBytes = 0;
-	    
 	    BitSet populatedOrdinals = getPopulatedOrdinals();
 
-	    for(int i=0;i<shards.length;i++)
-	        totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, shards.length);
-        
+	    if(numPartitions > 1) {
+	        // Multi-partition path: iterate over all partition shards
+	        for(int p = 0; p < numPartitions; p++) {
+	            HollowObjectTypeReadStateShard[] partitionShards = partitions[p].getShards();
+	            for(int i = 0; i < partitionShards.length; i++) {
+	                totalApproximateHoleCostInBytes += partitionShards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, partitionShards.length);
+	            }
+	        }
+	    } else {
+	        // Single partition path: use shardsVolatile
+	        final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
+	        for(int i=0;i<shards.length;i++)
+	            totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, shards.length);
+	    }
+
 	    return totalApproximateHoleCostInBytes;
 	}
 
     @Override
     public int numShards() {// SNAP: TODO: at some point in future we'll make numShards partition-level (when we support delta changes)
-        return this.shardsVolatile.shards.length;
+        if(numPartitions > 1) {
+            // Multi-partition path: return number of shards from first partition (all partitions have same number of shards)
+            return partitions[0].getShards().length;
+        } else {
+            // Single partition path: use shardsVolatile
+            return this.shardsVolatile.shards.length;
+        }
     }
 	
 }
