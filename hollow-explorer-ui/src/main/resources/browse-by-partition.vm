@@ -1,0 +1,104 @@
+#**
+ *  Copyright 2023 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+*#
+
+<h2>Browse by Partition: $esc.html($type)</h2>
+
+#if($error)
+    <p style="color: red;">$esc.html($error)</p>
+    <p><a href="$basePath/type?type=$esc.url($type)">Back to type browsing</a></p>
+#else
+    <p><b>Total Records:</b> $totalRecords across $numPartitions partitions</p>
+    <p><a href="$basePath/type?type=$esc.url($type)">Back to standard type browsing</a></p>
+
+    <table border="1" cellpadding="5" cellspacing="0">
+        <tr>
+            <th style="color: #888888;">Partition Index</th>
+            <th>Record Count</th>
+            <th>Partition Ordinal Range</th>
+            <th>Actions</th>
+        </tr>
+
+        #foreach($partition in $partitions)
+            <tr>
+                <td style="color: #888888; text-align: center;">$partition.getPartitionIndex()</td>
+                <td style="text-align: right;">$partition.getRecordCount()</td>
+                <td style="text-align: center;">
+                    #if($partition.isEmpty())
+                        <span style="color: #888888;">Empty</span>
+                    #else
+                        $partition.getOrdinalRange()
+                    #end
+                </td>
+                <td>
+                    #if(!$partition.isEmpty())
+                        <a href="$basePath/partitions?type=$esc.url($type)&partition=$partition.getPartitionIndex()&expand=true">View Records</a>
+                    #else
+                        <span style="color: #888888;">N/A</span>
+                    #end
+                </td>
+            </tr>
+
+            #if($selectedPartition != $null && $partition.getPartitionIndex() == $selectedPartition && $expand == "true")
+                <tr>
+                    <td colspan="4" style="background-color: #f5f5f5; padding: 10px;">
+                        <h3 style="color: #888888;">Partition $partition.getPartitionIndex() Records</h3>
+                        <p><b>Record Count:</b> $partition.getRecordCount() | <b>Ordinal Range:</b> $partition.getOrdinalRange()</p>
+
+                        #if($partition.getRecordCount() > 100)
+                            <p><i>Showing first 100 records (of $partition.getRecordCount() total)</i></p>
+                        #end
+
+                        <table border="1" cellpadding="3" cellspacing="0" style="margin-top: 10px;">
+                            <tr>
+                                <th>#</th>
+                                <th>Encoded Ordinal</th>
+                                <th style="color: #888888;">Partition Ordinal</th>
+                                <th>Actions</th>
+                            </tr>
+
+                            #set($maxDisplay = 100)
+                            #set($count = 0)
+                            #foreach($encodedOrd in $partition.getEncodedOrdinals())
+                                #if($count < $maxDisplay)
+                                    #set($partOrd = $partition.getPartitionOrdinals().get($foreach.index))
+                                    <tr>
+                                        <td>$foreach.count</td>
+                                        <td>$encodedOrd</td>
+                                        <td style="color: #888888;">$partOrd</td>
+                                        <td><a href="$basePath/type?type=$esc.url($type)&ordinal=$encodedOrd">View</a></td>
+                                    </tr>
+                                    #set($count = $count + 1)
+                                #end
+                            #end
+                        </table>
+
+                        #if($partition.getRecordCount() > 100)
+                            <p style="margin-top: 10px;"><i>... and $math.sub($partition.getRecordCount(), 100) more records</i></p>
+                        #end
+
+                        <p style="margin-top: 10px;">
+                            <a href="$basePath/partitions?type=$esc.url($type)">Collapse</a>
+                        </p>
+                    </td>
+                </tr>
+            #end
+        #end
+    </table>
+
+    <p style="margin-top: 20px; color: #888888; font-size: 0.9em;">
+        <i>Note: Partition information is for operator/debugging purposes. Encoded ordinals combine partition index (low 3 bits) with partition-local ordinal (high bits).</i>
+    </p>
+#end

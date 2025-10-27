@@ -18,6 +18,13 @@
 NOTE: Results are filtered by query <span style="font-family: monospace;">$esc.html($filteredByQuery)</span>.  <a href="$basePath/type?type=$esc.url($type)&key=$esc.url($key)&ordinal=$ordinal&display=$display&clearQuery=true">clear</a>
 #end
 
+#if($isPartitioned)
+<p style="color: #888888; font-size: 0.95em;">
+	This type is partitioned ($numPartitions partitions).
+	<a href="$basePath/partitions?type=$esc.url($type)" style="color: #666666;">Browse by partition</a>
+</p>
+#end
+
 <!-- navigation -->
 <table>
 	<tr>

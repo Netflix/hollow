@@ -19,6 +19,7 @@ package com.netflix.hollow.explorer.ui;
 import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.explorer.ui.pages.BrowseByPartitionPage;
 import com.netflix.hollow.explorer.ui.pages.BrowseSchemaPage;
 import com.netflix.hollow.explorer.ui.pages.BrowseSelectedTypePage;
 import com.netflix.hollow.explorer.ui.pages.QueryPage;
@@ -57,29 +58,31 @@ public class HollowExplorerUI extends HollowUIRouter {
     private final BrowseSelectedTypePage browseTypePage;
     private final BrowseSchemaPage browseSchemaPage;
     private final QueryPage queryPage;
-    
+    private final BrowseByPartitionPage browseByPartitionPage;
+
     public HollowExplorerUI(String baseUrlPath, HollowConsumer consumer) {
         this(baseUrlPath, consumer, null, null);
     }
-    
+
     public HollowExplorerUI(String baseUrlPath, HollowClient client) {
         this(baseUrlPath, null, client, null);
     }
-    
+
     public HollowExplorerUI(String baseUrlPath, HollowReadStateEngine stateEngine) {
         this(baseUrlPath, null, null, stateEngine);
     }
-    
+
     private HollowExplorerUI(String baseUrlPath, HollowConsumer consumer, HollowClient client, HollowReadStateEngine stateEngine) {
         super(baseUrlPath);
         this.consumer = consumer;
         this.client = client;
         this.stateEngine = stateEngine;
-        
+
         this.showAllTypesPage = new ShowAllTypesPage(this);
         this.browseTypePage = new BrowseSelectedTypePage(this);
         this.browseSchemaPage = new BrowseSchemaPage(this);
         this.queryPage = new QueryPage(this);
+        this.browseByPartitionPage = new BrowseByPartitionPage(this);
     }
 
     @Override
@@ -100,6 +103,9 @@ public class HollowExplorerUI extends HollowUIRouter {
             return true;
         } else if("query".equals(pageName)) {
             queryPage.render(req, resp, session);
+            return true;
+        } else if("partitions".equals(pageName)) {
+            browseByPartitionPage.render(req, resp, session);
             return true;
         }
         return false;

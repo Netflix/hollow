@@ -114,6 +114,12 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
 
         int numRecords = selectedOrdinals.cardinality();
 
+        // Check if type is partitioned
+        int numPartitions = 1;
+        if (typeState instanceof HollowObjectTypeReadState) {
+            numPartitions = ((HollowObjectTypeReadState) typeState).getNumPartitions();
+        }
+
         ctx.put("keys", keys);
         ctx.put("page", page);
         ctx.put("pageSize", pageSize);
@@ -123,6 +129,8 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         ctx.put("key", key);
         ctx.put("ordinal", ordinal);
         ctx.put("display", displayFormat);
+        ctx.put("isPartitioned", numPartitions > 1);
+        ctx.put("numPartitions", numPartitions);
     }
 
     @Override
