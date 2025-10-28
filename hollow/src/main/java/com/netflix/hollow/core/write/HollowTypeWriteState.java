@@ -20,6 +20,7 @@ import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
+import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -89,6 +90,11 @@ public abstract class HollowTypeWriteState {
     public HollowTypeWriteState(HollowSchema schema, int numShards, int numPartitions) {
         if(numPartitions < 1 || numPartitions > MAX_PARTITIONS)
             throw new IllegalArgumentException("Number of partitions must be between 1 and " + MAX_PARTITIONS);
+
+        if (schema.getName().equals("StreamData")
+        || schema.getName().equals("DownloadableId")) {
+            numPartitions = 8;  // SNAP: TODO:
+        }
 
         this.schema = schema;
         this.serializedScratchSpace = new ThreadLocal<ByteDataArray>();
@@ -197,6 +203,7 @@ public abstract class HollowTypeWriteState {
 
     /**
      * Computes a hash code for primary key fields of an Object record.
+     * Uses Hollow's deterministic serialization + HashCodes.hashCode() for consistent hashing.
      * Falls back to 0 if primary key is not set or record is not an Object type.
      *
      * @param rec the write record
@@ -216,49 +223,11 @@ public abstract class HollowTypeWriteState {
         HollowObjectWriteRecord objRec = (HollowObjectWriteRecord) rec;
         HollowObjectSchema objSchema = objRec.getSchema();
 
-        int hash = 0;
+        // Serialize only the primary key fields to a temporary buffer
+        ByteDataArray pkScratch = new ByteDataArray();
 
-        // Hash each primary key field
-        for(int i = 0; i < primaryKey.numFields(); i++) {
-            String fieldPath = primaryKey.getFieldPath(i);
-
-            // For now, only support simple (non-hierarchical) primary key fields
-            // Hierarchical fields (with dots) would require following references
-            if(fieldPath.contains(".")) {
-                // Fall back to partition 0 for complex primary keys
-                return 0;
-            }
-
-            int fieldPosition = objSchema.getPosition(fieldPath);
-            if(fieldPosition == -1) {
-                // Field not found, fall back to partition 0
-                return 0;
-            }
-
-            // Hash this field's data
-            hash = hash * 31 + hashField(objRec, fieldPosition, objSchema.getFieldType(fieldPosition));
-        }
-
-        return hash;
-    }
-
-    /**
-     * Computes a hash code for a single field in an Object record.
-     *
-     * @param rec the write record
-     * @param fieldPosition the position of the field in the schema
-     * @param fieldType the type of the field
-     * @return hash code for this field
-     */
-    private int hashField(HollowObjectWriteRecord rec, int fieldPosition, HollowObjectSchema.FieldType fieldType) {
-        // Access the field data through reflection or by serializing just that field
-        // For now, we'll serialize just this field to a temp buffer and hash it
-        ByteDataArray scratch = scratch();
-        long startPos = scratch.length();
-
-        // Use package-private access to fieldData if possible, otherwise serialize
-        // For simplicity, hash the field by writing it and hashing the bytes
         try {
+            // Use reflection to access the field data arrays
             java.lang.reflect.Field fieldDataField = HollowObjectWriteRecord.class.getDeclaredField("fieldData");
             java.lang.reflect.Field isNonNullField = HollowObjectWriteRecord.class.getDeclaredField("isNonNull");
             fieldDataField.setAccessible(true);
@@ -267,16 +236,38 @@ public abstract class HollowTypeWriteState {
             ByteDataArray[] fieldData = (ByteDataArray[]) fieldDataField.get(rec);
             boolean[] isNonNull = (boolean[]) isNonNullField.get(rec);
 
-            if(!isNonNull[fieldPosition]) {
-                return 0; // null hash
+            // Serialize each primary key field in order
+            for(int i = 0; i < primaryKey.numFields(); i++) {
+                String fieldPath = primaryKey.getFieldPath(i);
+
+                // For now, only support simple (non-hierarchical) primary key fields
+                // Hierarchical fields (with dots) would require following references
+                if(fieldPath.contains(".")) {
+                    // Fall back to partition 0 for complex primary keys
+                    return 0;
+                }
+
+                int fieldPosition = objSchema.getPosition(fieldPath);
+                if(fieldPosition == -1) {
+                    // Field not found, fall back to partition 0
+                    return 0;
+                }
+
+                // Write null marker (1 byte: 0 for null, 1 for non-null)
+                if(!isNonNull[fieldPosition]) {
+                    pkScratch.write((byte)0);
+                } else {
+                    pkScratch.write((byte)1);
+                    // Copy the serialized field data
+                    ByteDataArray fieldBytes = fieldData[fieldPosition];
+                    for(long j = 0; j < fieldBytes.length(); j++) {
+                        pkScratch.write(fieldBytes.get(j));
+                    }
+                }
             }
 
-            ByteDataArray fieldBytes = fieldData[fieldPosition];
-            int hash = 0;
-            for(long i = 0; i < fieldBytes.length(); i++) {
-                hash = hash * 31 + fieldBytes.get(i);
-            }
-            return hash;
+            // Use Hollow's deterministic HashCodes.hashCode() on the serialized primary key
+            return HashCodes.hashCode(pkScratch);
 
         } catch(Exception e) {
             // Fall back to 0 if reflection fails

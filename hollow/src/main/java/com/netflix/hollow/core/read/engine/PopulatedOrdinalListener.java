@@ -63,5 +63,4 @@ public class PopulatedOrdinalListener implements HollowTypeStateListener {
     public BitSet getPreviousOrdinals() {
         return previousOrdinals;
     }
-
 }
