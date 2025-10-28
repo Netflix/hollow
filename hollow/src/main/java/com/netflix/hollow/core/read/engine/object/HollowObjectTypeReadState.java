@@ -149,11 +149,15 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
                 deltaData.encodedAdditions.destroy();
             } else {
-                HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
+                // Use delta schema if it differs from current schema (indicating schema evolution) 
+                boolean useDeltaSchema = !getSchema().equals(deltaSchema);
+                HollowObjectTypeDataElements nextData = useDeltaSchema ?
+                        new HollowObjectTypeDataElements((HollowObjectSchema) deltaSchema, memoryMode, memoryRecycler)
+                        : new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
                 HollowObjectTypeDataElements oldData = shardsVolatile.shards[i].dataElements;
                 nextData.applyDelta(oldData, deltaData);
 
-                HollowObjectTypeReadStateShard newShard = new HollowObjectTypeReadStateShard(getSchema(), nextData, shardsVolatile.shards[i].shardOrdinalShift);
+                HollowObjectTypeReadStateShard newShard = new HollowObjectTypeReadStateShard(nextData.schema, nextData, shardsVolatile.shards[i].shardOrdinalShift);
                 shardsVolatile = new HollowObjectTypeShardsHolder(shardsVolatile.shards, newShard, i);
 
                 notifyListenerAboutDeltaChanges(deltaData.encodedRemovals, deltaData.encodedAdditions, i, shardsVolatile.shards.length);
@@ -166,6 +170,11 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         if(shardsVolatile.shards.length == 1)
             maxOrdinal = shardsVolatile.shards[0].dataElements.maxOrdinal;
+            
+        // Update schema if delta schema was used (schema evolution)
+        if(shardsVolatile.shards.length > 0 && !getSchema().equals(shardsVolatile.shards[0].dataElements.schema)) {
+            this.schema = shardsVolatile.shards[0].dataElements.schema;
+        }
     }
 
     public static void discardSnapshot(HollowBlobInput in, HollowObjectSchema schema, int numShards) throws IOException {

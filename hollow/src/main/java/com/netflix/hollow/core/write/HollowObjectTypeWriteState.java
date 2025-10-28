@@ -244,6 +244,12 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         int numBitsPerRecord = fieldStats.getNumBitsPerRecord();
 
         ThreadSafeBitSet deltaAdditions = toCyclePopulated.andNot(fromCyclePopulated);
+        
+        // Check if there's a schema change - if so, treat all populated ordinals as additions
+        boolean schemaChanged = restoredSchema != null && !getSchema().equals(restoredSchema);
+        if (schemaChanged) {
+            deltaAdditions = toCyclePopulated; // All populated ordinals treated as additions
+        }
 
         fixedLengthLongArray = new FixedLengthElementArray[numShards];
         deltaAddedOrdinals = new ByteDataArray[numShards];
