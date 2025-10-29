@@ -176,6 +176,30 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     }
 
     /**
+     * Computes the hash code for a primary key lookup.
+     * Delegates to {@link com.netflix.hollow.core.index.key.HollowPartitionSelector} for consistency.
+     *
+     * @param primaryKey the primary key definition
+     * @param primaryKeyFieldValues the values of the primary key fields in order
+     * @return hash code for the primary key
+     */
+    public int computePrimaryKeyHashForLookup(com.netflix.hollow.core.index.key.PrimaryKey primaryKey, Object... primaryKeyFieldValues) {
+        return com.netflix.hollow.core.index.key.HollowPartitionSelector.computePrimaryKeyHash(primaryKey, primaryKeyFieldValues);
+    }
+
+    /**
+     * Determines which partition contains a record with the given primary key.
+     * Delegates to {@link com.netflix.hollow.core.index.key.HollowPartitionSelector} for consistency.
+     *
+     * @param primaryKey the primary key definition
+     * @param primaryKeyFieldValues the values of the primary key fields in order
+     * @return the partition index (0 to numPartitions-1) where this record would be stored
+     */
+    public int getPartitionForPrimaryKey(com.netflix.hollow.core.index.key.PrimaryKey primaryKey, Object... primaryKeyFieldValues) {
+        return com.netflix.hollow.core.index.key.HollowPartitionSelector.getPartitionForPrimaryKey(numPartitions, primaryKey, primaryKeyFieldValues);
+    }
+
+    /**
      * Static helper to read partition snapshot data from input stream.
      * Used by HollowBlobReader to read multi-partition snapshots.
      */

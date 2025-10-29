@@ -87,14 +87,17 @@ public class HollowTypeWriteStatePartitionTest {
             int ordinal = writeState.add(rec, i);
 
             // Determine which partition this ID should be in
-            int expectedPartition = HollowTypeWriteStatePartitionSelector.selectPartition(8, i);
+            PrimaryKey pk = new PrimaryKey("Movie", "id");
+            int expectedPartition = HollowTypeWriteStatePartitionSelector.selectPartition(8, pk, i);
 
             // Track which partition has this ID
             partitionToIds.computeIfAbsent(expectedPartition, k -> new HashSet<>()).add(i);
 
             // Verify the record was added to the expected partition
+            // Extract partition-local ordinal from encoded ordinal
+            int partitionOrdinal = ordinal >> 3;  // Shift right by 3 bits to get partition-local ordinal
             assertTrue("Record with id=" + i + " should be in partition " + expectedPartition,
-                    writeState.getPartition(expectedPartition).getCurrentCyclePopulated().get(ordinal));
+                    writeState.getPartition(expectedPartition).getCurrentCyclePopulated().get(partitionOrdinal));
         }
 
         // Verify records are distributed across multiple partitions
@@ -141,13 +144,13 @@ public class HollowTypeWriteStatePartitionTest {
             int ordinal = writeState.add(rec, testId);
 
             // Find which partition has this ordinal
-            int partitionIndex = -1;
-            for (int i = 0; i < 8; i++) {
-                if (writeState.getPartition(i).getCurrentCyclePopulated().get(ordinal)) {
-                    partitionIndex = i;
-                    break;
-                }
-            }
+            // Extract partition index and partition-local ordinal from encoded ordinal
+            int partitionIndex = ordinal & 0b111;  // Last 3 bits contain partition index
+            int partitionOrdinal = ordinal >> 3;    // Remaining bits contain partition-local ordinal
+
+            // Verify the ordinal is actually in the extracted partition
+            assertTrue("Partition " + partitionIndex + " should have ordinal " + partitionOrdinal,
+                    writeState.getPartition(partitionIndex).getCurrentCyclePopulated().get(partitionOrdinal));
 
             if (firstPartition == null) {
                 firstPartition = partitionIndex;
@@ -159,26 +162,28 @@ public class HollowTypeWriteStatePartitionTest {
         }
 
         // Verify using the selector utility directly
-        int expectedPartition = HollowTypeWriteStatePartitionSelector.selectPartition(8, testId);
+        PrimaryKey pk = new PrimaryKey("Movie", "id");
+        int expectedPartition = HollowTypeWriteStatePartitionSelector.selectPartition(8, pk, testId);
         assertEquals(firstPartition.intValue(), expectedPartition);
     }
 
     @Test
     public void testPartitionSelectorUtility() {
         // Test that the selector utility gives consistent results
+        PrimaryKey pk = new PrimaryKey("TestType", "id");
 
         // Test with single partition
-        assertEquals(0, HollowTypeWriteStatePartitionSelector.selectPartition(1, 123));
+        assertEquals(0, HollowTypeWriteStatePartitionSelector.selectPartition(1, pk, 123));
 
         // Test with multiple partitions - same input should give same output
-        int partition1 = HollowTypeWriteStatePartitionSelector.selectPartition(8, 42);
-        int partition2 = HollowTypeWriteStatePartitionSelector.selectPartition(8, 42);
+        int partition1 = HollowTypeWriteStatePartitionSelector.selectPartition(8, pk, 42);
+        int partition2 = HollowTypeWriteStatePartitionSelector.selectPartition(8, pk, 42);
         assertEquals(partition1, partition2);
 
         // Test different keys give different partitions (at least sometimes)
         Set<Integer> partitions = new HashSet<>();
         for (int i = 0; i < 100; i++) {
-            int partition = HollowTypeWriteStatePartitionSelector.selectPartition(8, i);
+            int partition = HollowTypeWriteStatePartitionSelector.selectPartition(8, pk, i);
             assertTrue("Partition index should be in valid range", partition >= 0 && partition < 8);
             partitions.add(partition);
         }
@@ -217,7 +222,8 @@ public class HollowTypeWriteStatePartitionTest {
             rec.setInt("age", 30);
 
             // Calculate expected partition before adding
-            int expectedPartition = HollowTypeWriteStatePartitionSelector.selectPartition(8, user[0], user[1]);
+            PrimaryKey pk = new PrimaryKey("User", "firstName", "lastName");
+            int expectedPartition = HollowTypeWriteStatePartitionSelector.selectPartition(8, pk, user[0], user[1]);
             String key = user[0] + "|" + user[1];
             userToExpectedPartition.put(key, expectedPartition);
 
@@ -225,14 +231,17 @@ public class HollowTypeWriteStatePartitionTest {
             int ordinal = writeState.add(rec, user[0], user[1]);
 
             // Verify the record was added to the expected partition by checking that partition has the ordinal
+            // Extract partition-local ordinal from encoded ordinal
+            int partitionOrdinal = ordinal >> 3;  // Shift right by 3 bits to get partition-local ordinal
             assertTrue("Partition " + expectedPartition + " should have ordinal " + ordinal,
-                    writeState.getPartition(expectedPartition).getCurrentCyclePopulated().get(ordinal));
+                    writeState.getPartition(expectedPartition).getCurrentCyclePopulated().get(partitionOrdinal));
         }
 
         // Verify same composite key always goes to same partition
+        PrimaryKey pk = new PrimaryKey("User", "firstName", "lastName");
         for (String[] user : users) {
-            int partition1 = HollowTypeWriteStatePartitionSelector.selectPartition(8, user[0], user[1]);
-            int partition2 = HollowTypeWriteStatePartitionSelector.selectPartition(8, user[0], user[1]);
+            int partition1 = HollowTypeWriteStatePartitionSelector.selectPartition(8, pk, user[0], user[1]);
+            int partition2 = HollowTypeWriteStatePartitionSelector.selectPartition(8, pk, user[0], user[1]);
             assertEquals(partition1, partition2);
 
             String key = user[0] + "|" + user[1];
