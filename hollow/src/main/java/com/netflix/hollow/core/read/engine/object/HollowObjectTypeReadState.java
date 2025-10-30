@@ -60,6 +60,11 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     private static final int PARTITION_INDEX_BITS = 3;  // supports up to 8 partitions
     private static final int PARTITION_INDEX_MASK = (1 << PARTITION_INDEX_BITS) - 1;  // 0b111
 
+    // SNAP: TODO: only for testing or exposing a by-partition ordinal iterator
+    public HollowObjectTypeReadStatePartition[] getPartitions() {
+        return partitions;
+    }
+
     @Override
     public HollowObjectTypeShardsHolder getShardsVolatile() {
         return shardsVolatile;

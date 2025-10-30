@@ -19,6 +19,7 @@ package com.netflix.hollow.core.write;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
+import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
@@ -276,9 +277,14 @@ public abstract class HollowTypeWriteState {
                     primaryKeyValues[i] = null;
                 } else {
                     // Deserialize the field value based on its type
+                    HollowObjectSchema.FieldType fieldType = objSchema.getFieldType(fieldPosition);
+
+                    // For REFERENCE fields, we just return the ordinal
+                    // This is a fallback path - callers should use add(rec, primaryKeyValues...)
+                    // to provide the actual values and avoid expensive dereferencing
                     primaryKeyValues[i] = deserializeFieldValue(
                         fieldData[fieldPosition],
-                        objSchema.getFieldType(fieldPosition)
+                        fieldType
                     );
                 }
             }
@@ -292,37 +298,59 @@ public abstract class HollowTypeWriteState {
 
     /**
      * Deserializes a field value from a ByteDataArray based on its type.
-     * For simplicity, we hash the serialized bytes directly for most types.
+     * Returns the actual deserialized value so it can be properly hashed by the partition selector.
+     * For REFERENCE types, returns the ordinal as an Integer.
      *
      * @param data the serialized field data
      * @param fieldType the type of the field
-     * @return the deserialized value (as hash code for primitive types)
+     * @return the deserialized value
      */
     private Object deserializeFieldValue(ByteDataArray data, HollowObjectSchema.FieldType fieldType) {
         if(data == null || data.length() == 0) {
             return null;
         }
 
-        // For primitive types, we return an Integer hash code
-        // For byte arrays and strings, we return the actual bytes/string
         switch(fieldType) {
             case BOOLEAN:
+                // Boolean is stored as a single byte (0 or 1)
+                return data.get(0) != 0;
+
             case INT:
+                // Int is stored as a VarInt
+                return VarInt.readVInt(data.getUnderlyingArray(), 0);
+
             case LONG:
+                // Long is stored as a VarInt
+                return VarInt.readVLong(data.getUnderlyingArray(), 0L);
+
             case FLOAT:
+                // Float is stored as 4 bytes
+                int intBits = 0;
+                for(int i = 0; i < 4; i++) {
+                    intBits = (intBits << 8) | (data.get(i) & 0xFF);
+                }
+                return Float.intBitsToFloat(intBits);
+
             case DOUBLE:
+                // Double is stored as 8 bytes
+                long longBits = 0;
+                for(int i = 0; i < 8; i++) {
+                    longBits = (longBits << 8) | (data.get(i) & 0xFF);
+                }
+                return Double.longBitsToDouble(longBits);
+
             case REFERENCE:
-                // For all numeric/boolean/reference types, hash the serialized bytes
-                return HashCodes.hashCode(data);
+                // Reference is stored as a VarInt ordinal
+                // Return the ordinal - callers should use add(rec, primaryKeyValues...) to provide actual values
+                // return VarInt.readVInt(data.getUnderlyingArray(), 0);
+                throw new IllegalStateException("// SNAP: TODO: Expected to follow refernce to actually serialize the value in the field");
 
             case STRING:
-                // For strings, we need the actual string for proper hashing
-                // Convert serialized bytes to string
+                // For strings, convert serialized bytes to string
                 byte[] strBytes = new byte[(int) data.length()];
                 for(int i = 0; i < strBytes.length; i++) {
                     strBytes[i] = data.get(i);
                 }
-                // Return the actual string so keyHashCode can hash it properly
                 return new String(strBytes);
 
             case BYTES:
@@ -458,41 +486,42 @@ public abstract class HollowTypeWriteState {
 
             currentCyclePopulated.set(ordinal);
             return ordinal;
-        }
-
-        // Multi-partition path: select partition based on primary key hash
-        int partitionIndex = selectPartitionForRecord(rec);
-        HollowTypeWriteStatePartition partition = partitions[partitionIndex];
-
-        if(!partition.getOrdinalMap().isReadyForAddingObjects())
-            throw new RuntimeException("The HollowWriteStateEngine is not ready to add more Objects.  Did you remember to call stateEngine.prepareForNextCycle()?");
-
-        // Serialize the record
-        ByteDataArray scratch = scratch();
-        rec.writeDataTo(scratch);
-
-        int ordinal;
-        if(partition.getRestoredMap() == null) {
-            ordinal = partition.getOrdinalMap().getOrAssignOrdinal(scratch);
         } else {
-            // Handle restored state: try to reuse ordinals if possible
-            if(schema instanceof HollowObjectSchema && rec instanceof HollowObjectWriteRecord) {
-                ((HollowObjectWriteRecord)rec).writeDataTo(scratch, (HollowObjectSchema)restoredSchema);
-                int preferredOrdinal = partition.getRestoredMap().get(scratch);
-                scratch.reset();
-                rec.writeDataTo(scratch);
-                ordinal = partition.getOrdinalMap().getOrAssignOrdinal(scratch, preferredOrdinal);
-            } else {
-                int preferredOrdinal = partition.getRestoredMap().get(scratch);
-                ordinal = partition.getOrdinalMap().getOrAssignOrdinal(scratch, preferredOrdinal);
-            }
+            throw new UnsupportedOperationException("For partitioned types only the code path which also passes the primary key fields is implemented atm");
         }
 
-        int encodedOrdinal = encodeOrdinal(partitionIndex, ordinal);
-        partition.getCurrentCyclePopulated().set(ordinal);
-        scratch.reset();
-
-        return encodedOrdinal;
+//        // Multi-partition path: select partition based on primary key hash
+//        int partitionIndex = selectPartitionForRecord(rec);
+//        HollowTypeWriteStatePartition partition = partitions[partitionIndex];
+//
+//        if(!partition.getOrdinalMap().isReadyForAddingObjects())
+//            throw new RuntimeException("The HollowWriteStateEngine is not ready to add more Objects.  Did you remember to call stateEngine.prepareForNextCycle()?");
+//
+//        // Serialize the record
+//        ByteDataArray scratch = scratch();
+//        rec.writeDataTo(scratch);
+//
+//        int ordinal;
+//        if(partition.getRestoredMap() == null) {
+//            ordinal = partition.getOrdinalMap().getOrAssignOrdinal(scratch);
+//        } else {
+//            // Handle restored state: try to reuse ordinals if possible
+//            if(schema instanceof HollowObjectSchema && rec instanceof HollowObjectWriteRecord) {
+//                ((HollowObjectWriteRecord)rec).writeDataTo(scratch, (HollowObjectSchema)restoredSchema);
+//                int preferredOrdinal = partition.getRestoredMap().get(scratch);
+//                scratch.reset();
+//                rec.writeDataTo(scratch);
+//                ordinal = partition.getOrdinalMap().getOrAssignOrdinal(scratch, preferredOrdinal);
+//            } else {
+//                int preferredOrdinal = partition.getRestoredMap().get(scratch);
+//                ordinal = partition.getOrdinalMap().getOrAssignOrdinal(scratch, preferredOrdinal);
+//            }
+//        }
+//
+//        int encodedOrdinal = encodeOrdinal(partitionIndex, ordinal);
+//        partition.getCurrentCyclePopulated().set(ordinal);
+//        scratch.reset();
+//        return encodedOrdinal;
     }
 
     private int assignOrdinal(HollowWriteRecord rec) {

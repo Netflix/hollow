@@ -94,7 +94,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     }
 
     /**
-     * Add a record to the state. 
+     * Add a record to the state.
      * @param type the type name
      * @param rec the record
      * @return the ordinal of the added record
@@ -104,6 +104,20 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         if(hollowTypeWriteState == null)
             throw new IllegalArgumentException("Type " + type + " does not exist!");
         return hollowTypeWriteState.add(rec);
+    }
+
+    /**
+     * Add a record to the state with primary key field values for partition selection.
+     * @param type the type name
+     * @param rec the record
+     * @param primaryKeyFieldValues the values of the primary key fields in order (for partition selection)
+     * @return the ordinal of the added record
+     */
+    public int add(String type, HollowWriteRecord rec, Object... primaryKeyFieldValues) {
+        HollowTypeWriteState hollowTypeWriteState = writeStates.get(type);
+        if(hollowTypeWriteState == null)
+            throw new IllegalArgumentException("Type " + type + " does not exist!");
+        return hollowTypeWriteState.add(rec, primaryKeyFieldValues);
     }
 
     /**

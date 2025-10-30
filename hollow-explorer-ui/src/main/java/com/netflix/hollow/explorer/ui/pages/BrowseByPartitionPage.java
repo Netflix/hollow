@@ -17,7 +17,11 @@
 package com.netflix.hollow.explorer.ui.pages;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.tools.util.SearchUtils.getFieldPathIndexes;
+import static com.netflix.hollow.tools.util.SearchUtils.getPrimaryKey;
 
+import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
@@ -62,12 +66,16 @@ public class BrowseByPartitionPage extends HollowExplorerPage {
             return;
         }
 
+        // Get primary key information
+        PrimaryKey primaryKey = getPrimaryKey(objTypeState.getSchema());
+        int[][] fieldPathIndexes = getFieldPathIndexes(ui.getStateEngine(), primaryKey);
+
         // Collect ordinals per partition
         BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
         List<PartitionInfo> partitions = new ArrayList<>();
 
         for (int p = 0; p < numPartitions; p++) {
-            partitions.add(new PartitionInfo(p));
+            partitions.add(new PartitionInfo(p, objTypeState, primaryKey, fieldPathIndexes));
         }
 
         // Iterate through all populated ordinals and group by partition
@@ -117,11 +125,19 @@ public class BrowseByPartitionPage extends HollowExplorerPage {
         private final int partitionIndex;
         private final List<Integer> encodedOrdinals = new ArrayList<>();
         private final List<Integer> partitionOrdinals = new ArrayList<>();
+        private final List<String> primaryKeys = new ArrayList<>();
+        private final HollowObjectTypeReadState typeState;
+        private final PrimaryKey primaryKey;
+        private final int[][] fieldPathIndexes;
         private int minPartitionOrdinal = Integer.MAX_VALUE;
         private int maxPartitionOrdinal = Integer.MIN_VALUE;
 
-        public PartitionInfo(int partitionIndex) {
+        public PartitionInfo(int partitionIndex, HollowObjectTypeReadState typeState,
+                           PrimaryKey primaryKey, int[][] fieldPathIndexes) {
             this.partitionIndex = partitionIndex;
+            this.typeState = typeState;
+            this.primaryKey = primaryKey;
+            this.fieldPathIndexes = fieldPathIndexes;
         }
 
         public void addOrdinal(int encodedOrdinal, int partitionOrdinal) {
@@ -129,6 +145,48 @@ public class BrowseByPartitionPage extends HollowExplorerPage {
             partitionOrdinals.add(partitionOrdinal);
             minPartitionOrdinal = Math.min(minPartitionOrdinal, partitionOrdinal);
             maxPartitionOrdinal = Math.max(maxPartitionOrdinal, partitionOrdinal);
+
+            // Extract primary key for this ordinal
+            String pkValue = extractPrimaryKey(encodedOrdinal);
+            primaryKeys.add(pkValue);
+        }
+
+        private String extractPrimaryKey(int ordinal) {
+            if (fieldPathIndexes == null || primaryKey == null) {
+                return "N/A";
+            }
+
+            try {
+                StringBuilder keyBuilder = new StringBuilder();
+
+                for (int i = 0; i < fieldPathIndexes.length; i++) {
+                    int curOrdinal = ordinal;
+                    HollowObjectTypeReadState curState = typeState;
+
+                    for (int j = 0; j < fieldPathIndexes[i].length - 1; j++) {
+                        curOrdinal = curState.readOrdinal(curOrdinal, fieldPathIndexes[i][j]);
+                        curState = (HollowObjectTypeReadState) curState.getSchema()
+                            .getReferencedTypeState(fieldPathIndexes[i][j]);
+                    }
+
+                    if (i > 0) {
+                        keyBuilder.append(", ");
+                    }
+
+                    if (curOrdinal == ORDINAL_NONE) {
+                        keyBuilder.append("null");
+                        continue;
+                    }
+
+                    Object fieldValue = HollowReadFieldUtils.fieldValueObject(curState, curOrdinal,
+                        fieldPathIndexes[i][fieldPathIndexes[i].length - 1]);
+                    keyBuilder.append(fieldValue);
+                }
+
+                return keyBuilder.toString();
+            } catch (Exception e) {
+                return "Error: " + e.getMessage();
+            }
         }
 
         public int getPartitionIndex() {
@@ -165,8 +223,17 @@ public class BrowseByPartitionPage extends HollowExplorerPage {
             return partitionOrdinals;
         }
 
-        public boolean isEmpty() {
-            return encodedOrdinals.isEmpty();
+        public List<String> getPrimaryKeys() {
+            return primaryKeys;
+        }
+
+        public int getNumHoles() {
+            if (encodedOrdinals.isEmpty()) {
+                return 0;
+            }
+            // Holes are the gaps in the ordinal range
+            // Number of holes = (maxOrdinal - minOrdinal + 1) - number of records
+            return (maxPartitionOrdinal - minPartitionOrdinal + 1) - encodedOrdinals.size();
         }
     }
 }

@@ -53,9 +53,9 @@
 
             #if($selectedPartition != $null && $partition.getPartitionIndex() == $selectedPartition && $expand == "true")
                 <tr>
-                    <td colspan="4" style="background-color: #f5f5f5; padding: 10px;">
+                    <td colspan="5" style="background-color: #f5f5f5; padding: 10px;">
                         <h3 style="color: #888888;">Partition $partition.getPartitionIndex() Records</h3>
-                        <p><b>Record Count:</b> $partition.getRecordCount() | <b>Ordinal Range:</b> $partition.getOrdinalRange()</p>
+                        <p><b>Record Count:</b> $partition.getRecordCount() | <b>Max Populated Ordinal:</b> $partition.getMaxPopulatedOrdinal() | <b>Ordinal Range:</b> $partition.getOrdinalRange()</p>
 
                         #if($partition.getRecordCount() > 100)
                             <p><i>Showing first 100 records (of $partition.getRecordCount() total)</i></p>
@@ -66,6 +66,7 @@
                                 <th>#</th>
                                 <th>Encoded Ordinal</th>
                                 <th style="color: #888888;">Partition Ordinal</th>
+                                <th>Primary Key</th>
                                 <th>Actions</th>
                             </tr>
 
@@ -74,10 +75,12 @@
                             #foreach($encodedOrd in $partition.getEncodedOrdinals())
                                 #if($count < $maxDisplay)
                                     #set($partOrd = $partition.getPartitionOrdinals().get($foreach.index))
+                                    #set($primaryKey = $partition.getPrimaryKeys().get($foreach.index))
                                     <tr>
                                         <td>$foreach.count</td>
                                         <td>$encodedOrd</td>
                                         <td style="color: #888888;">$partOrd</td>
+                                        <td><b>$esc.html($primaryKey)</b></td>
                                         <td><a href="$basePath/type?type=$esc.url($type)&ordinal=$encodedOrd">View</a></td>
                                     </tr>
                                     #set($count = $count + 1)
