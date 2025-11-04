@@ -116,6 +116,20 @@ public class ByteArrayOrdinalMap {
         return ordinal != -1 ? ordinal : assignOrdinal(serializedRepresentation, hash, preferredOrdinal);
     }
 
+    /**
+     * Adds a sequence of bytes to this map using a pre-computed hash.
+     * This avoids re-computing the hash when it's already been calculated for routing purposes.
+     *
+     * @param serializedRepresentation the sequence of bytes
+     * @param hash the pre-computed hash of the serialized representation
+     * @param preferredOrdinal the preferred ordinal to assign
+     * @return the assigned ordinal
+     */
+    public int getOrAssignOrdinal(ByteDataArray serializedRepresentation, int hash, int preferredOrdinal) {
+        int ordinal = get(serializedRepresentation, hash);
+        return ordinal != -1 ? ordinal : assignOrdinal(serializedRepresentation, hash, preferredOrdinal);
+    }
+
     /// acquire the lock before writing.
     private synchronized int assignOrdinal(ByteDataArray serializedRepresentation, int hash, int preferredOrdinal) {
         if (preferredOrdinal < -1 || preferredOrdinal > ORDINAL_MASK) {
@@ -292,7 +306,15 @@ public class ByteArrayOrdinalMap {
         return get(serializedRepresentation, HashCodes.hashCode(serializedRepresentation));
     }
 
-    private int get(ByteDataArray serializedRepresentation, int hash) {
+    /**
+     * Public method to get an ordinal using a pre-computed hash.
+     * Used by HollowTypeWriteState for efficient multi-map routing.
+     *
+     * @param serializedRepresentation the serialized representation
+     * @param hash the pre-computed hash of the serialized representation
+     * @return the ordinal for this serialized representation, or -1 if not found
+     */
+    public int get(ByteDataArray serializedRepresentation, int hash) {
         AtomicLongArray pao = pointersAndOrdinals;
 
         int modBitmask = pao.length() - 1;

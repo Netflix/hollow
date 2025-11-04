@@ -23,6 +23,7 @@ import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
+import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -46,6 +47,11 @@ public abstract class HollowTypeWriteState {
 
     protected final HollowSchema schema;
 
+    // Multi-map configuration for scaling beyond 2^29 ordinals
+    protected final ByteArrayOrdinalMap[] ordinalMaps;
+    protected final int numMaps = 8;
+
+    // Backward compatibility: delegate to first map
     protected final ByteArrayOrdinalMap ordinalMap;
     protected int maxOrdinal;
 
@@ -54,7 +60,8 @@ public abstract class HollowTypeWriteState {
     private int resetToLastNumShards;
 
     protected HollowSchema restoredSchema;
-    protected ByteArrayOrdinalMap restoredMap;
+    protected ByteArrayOrdinalMap[] restoredMaps;  // One per map for restoration
+    protected ByteArrayOrdinalMap restoredMap;  // Backward compatibility delegate
     protected HollowTypeReadState restoredReadState;
 
     protected ThreadSafeBitSet currentCyclePopulated;
@@ -73,7 +80,16 @@ public abstract class HollowTypeWriteState {
 
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
         this.schema = schema;
-        this.ordinalMap = new ByteArrayOrdinalMap();
+
+        // Initialize multiple ordinal maps for scaling
+        this.ordinalMaps = new ByteArrayOrdinalMap[numMaps];
+        for (int i = 0; i < numMaps; i++) {
+            this.ordinalMaps[i] = new ByteArrayOrdinalMap();
+        }
+
+        // Backward compatibility: delegate to first map
+        this.ordinalMap = this.ordinalMaps[0];
+
         this.serializedScratchSpace = new ThreadLocal<ByteDataArray>();
         this.currentCyclePopulated = new ThreadSafeBitSet();
         this.previousCyclePopulated = new ThreadSafeBitSet();
@@ -92,12 +108,12 @@ public abstract class HollowTypeWriteState {
      * @return the ordinal of the added record
      */
     public int add(HollowWriteRecord rec) {
-        if(!ordinalMap.isReadyForAddingObjects())
+        if(!ordinalMaps[0].isReadyForAddingObjects())
             throw new RuntimeException("The HollowWriteStateEngine is not ready to add more Objects.  Did you remember to call stateEngine.prepareForNextCycle()?");
 
         int ordinal;
 
-        if(restoredMap == null) {
+        if(restoredMaps == null) {
             ordinal = assignOrdinal(rec);
         } else {
             ordinal = reuseOrdinalFromRestoredState(rec);
@@ -111,9 +127,22 @@ public abstract class HollowTypeWriteState {
     private int assignOrdinal(HollowWriteRecord rec) {
         ByteDataArray scratch = scratch();
         rec.writeDataTo(scratch);
-        int ordinal = ordinalMap.getOrAssignOrdinal(scratch);
+
+        // Compute hash once for both routing and deduplication
+        int hash = HashCodes.hashCode(scratch);
+        int mapIndex = (hash & Integer.MAX_VALUE) % numMaps;
+
+        // Get local ordinal from the selected map, passing pre-computed hash
+        int localOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, -1);
+
+        // Convert local ordinal to global interleaved ordinal
+        // Map 0: local 0,1,2 → global 0,8,16
+        // Map 1: local 0,1,2 → global 1,9,17
+        // etc.
+        int globalOrdinal = (localOrdinal * numMaps) + mapIndex;
+
         scratch.reset();
-        return ordinal;
+        return globalOrdinal;
     }
 
 
@@ -124,21 +153,65 @@ public abstract class HollowTypeWriteState {
 
         if(restoredSchema instanceof HollowObjectSchema) {
             ((HollowObjectWriteRecord)rec).writeDataTo(scratch, (HollowObjectSchema)restoredSchema);
-            int preferredOrdinal = restoredMap.get(scratch);
+
+            // Compute hash to route to correct map
+            int hash = HashCodes.hashCode(scratch);
+            int mapIndex = (hash & Integer.MAX_VALUE) % numMaps;
+
+            // Look up in restored map for this index (returns local ordinal)
+            int localOrdinal = restoredMaps[mapIndex].get(scratch, hash);
+
             scratch.reset();
             rec.writeDataTo(scratch);
-            ordinal = ordinalMap.getOrAssignOrdinal(scratch, preferredOrdinal);
+
+            // Recompute hash for new schema (content may differ)
+            hash = HashCodes.hashCode(scratch);
+            mapIndex = (hash & Integer.MAX_VALUE) % numMaps;
+
+            if (localOrdinal != -1) {
+                // Reuse the same local ordinal for stability
+                int newLocalOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, localOrdinal);
+                ordinal = (newLocalOrdinal * numMaps) + mapIndex;
+            } else {
+                // New record, assign new ordinal
+                int newLocalOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, -1);
+                ordinal = (newLocalOrdinal * numMaps) + mapIndex;
+            }
         } else {
             if(rec instanceof HollowHashableWriteRecord) {
                 ((HollowHashableWriteRecord) rec).writeDataTo(scratch, IGNORED_HASHES);
-                int preferredOrdinal = restoredMap.get(scratch);
+
+                int hash = HashCodes.hashCode(scratch);
+                int mapIndex = (hash & Integer.MAX_VALUE) % numMaps;
+                int localOrdinal = restoredMaps[mapIndex].get(scratch, hash);
+
                 scratch.reset();
                 rec.writeDataTo(scratch);
-                ordinal = ordinalMap.getOrAssignOrdinal(scratch, preferredOrdinal);
+
+                hash = HashCodes.hashCode(scratch);
+                mapIndex = (hash & Integer.MAX_VALUE) % numMaps;
+
+                if (localOrdinal != -1) {
+                    int newLocalOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, localOrdinal);
+                    ordinal = (newLocalOrdinal * numMaps) + mapIndex;
+                } else {
+                    int newLocalOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, -1);
+                    ordinal = (newLocalOrdinal * numMaps) + mapIndex;
+                }
             } else {
                 rec.writeDataTo(scratch);
-                int preferredOrdinal = restoredMap.get(scratch);
-                ordinal = ordinalMap.getOrAssignOrdinal(scratch, preferredOrdinal);
+
+                int hash = HashCodes.hashCode(scratch);
+                int mapIndex = (hash & Integer.MAX_VALUE) % numMaps;
+                int localOrdinal = restoredMaps[mapIndex].get(scratch, hash);
+
+                if (localOrdinal != -1) {
+                    int newLocalOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, localOrdinal);
+                    ordinal = (newLocalOrdinal * numMaps) + mapIndex;
+                } else {
+                    int newLocalOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, -1);
+                    ordinal = (newLocalOrdinal * numMaps) + mapIndex;
+                }
             }
         }
 
@@ -154,43 +227,47 @@ public abstract class HollowTypeWriteState {
         numShards = resetToLastNumShards;
         if(restoredReadState == null) {
             currentCyclePopulated.clearAll();
-            ordinalMap.compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
+            for (int i = 0; i < numMaps; i++) {
+                ordinalMaps[i].compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
+            }
         } else {
             /// this state engine began the cycle as a restored state engine
             currentCyclePopulated.clearAll();
             previousCyclePopulated.clearAll();
-            ordinalMap.compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
+            for (int i = 0; i < numMaps; i++) {
+                ordinalMaps[i].compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
+            }
             restoreFrom(restoredReadState);
             wroteData = false;
         }
     }
 
     public void addAllObjectsFromPreviousCycle() {
-        if(!ordinalMap.isReadyForAddingObjects())
+        if(!ordinalMaps[0].isReadyForAddingObjects())
             throw new RuntimeException("The HollowWriteStateEngine is not ready to add more Objects.  Did you remember to call stateEngine.prepareForNextCycle()?");
 
         currentCyclePopulated = ThreadSafeBitSet.orAll(previousCyclePopulated, currentCyclePopulated);
     }
-    
+
     public void addOrdinalFromPreviousCycle(int ordinal) {
-        if(!ordinalMap.isReadyForAddingObjects())
+        if(!ordinalMaps[0].isReadyForAddingObjects())
             throw new RuntimeException("The HollowWriteStateEngine is not ready to add more Objects.  Did you remember to call stateEngine.prepareForNextCycle()?");
 
         if(!previousCyclePopulated.get(ordinal))
             throw new IllegalArgumentException("Ordinal " + ordinal + " was not present in the previous cycle");
-        
+
         currentCyclePopulated.set(ordinal);
     }
 
     public void removeOrdinalFromThisCycle(int ordinalToRemove) {
-        if(!ordinalMap.isReadyForAddingObjects())
+        if(!ordinalMaps[0].isReadyForAddingObjects())
             throw new RuntimeException("The HollowWriteStateEngine is not ready to add more Objects.  Did you remember to call stateEngine.prepareForNextCycle()?");
 
         currentCyclePopulated.clear(ordinalToRemove);
     }
-    
+
     public void removeAllOrdinalsFromThisCycle() {
-        if(!ordinalMap.isReadyForAddingObjects())
+        if(!ordinalMaps[0].isReadyForAddingObjects())
             throw new RuntimeException("The HollowWriteStateEngine is not ready to add more Objects.  Did you remember to call stateEngine.prepareForNextCycle()?");
 
         currentCyclePopulated.clearAll();
@@ -212,12 +289,17 @@ public abstract class HollowTypeWriteState {
      * @param markCurrentCycle true if the current populated cycle should be updated
      */
     public void mapOrdinal(HollowWriteRecord rec, int newOrdinal, boolean markPreviousCycle, boolean markCurrentCycle) {
-        if(!ordinalMap.isReadyForAddingObjects())
+        if(!ordinalMaps[0].isReadyForAddingObjects())
             throw new RuntimeException("The HollowWriteStateEngine is not ready to add more Objects.  Did you remember to call stateEngine.prepareForNextCycle()?");
 
         ByteDataArray scratch = scratch();
         rec.writeDataTo(scratch);
-        ordinalMap.put(scratch, newOrdinal);
+
+        // Decode the newOrdinal to determine which map and local ordinal
+        int mapIndex = newOrdinal % numMaps;
+        int localOrdinal = newOrdinal / numMaps;
+
+        ordinalMaps[mapIndex].put(scratch, localOrdinal);
         if(markPreviousCycle)
             previousCyclePopulated.set(newOrdinal);
         if(markCurrentCycle)
@@ -229,7 +311,9 @@ public abstract class HollowTypeWriteState {
      * Correct the free ordinal list after using mapOrdinal()
      */
     public void recalculateFreeOrdinals() {
-        ordinalMap.recalculateFreeOrdinals();
+        for (int i = 0; i < numMaps; i++) {
+            ordinalMaps[i].recalculateFreeOrdinals();
+        }
     }
 
     public ThreadSafeBitSet getPopulatedBitSet() {
@@ -266,7 +350,10 @@ public abstract class HollowTypeWriteState {
     }
 
     public void resizeOrdinalMap(int size) {
-        ordinalMap.resize(size);
+        // Resize all maps
+        for (int i = 0; i < numMaps; i++) {
+            ordinalMaps[i].resize(size / numMaps);
+        }
     }
 
     /**
@@ -276,7 +363,16 @@ public abstract class HollowTypeWriteState {
      * Postcondition: We are ready to add objects to this state engine for the next server cycle.
      */
     public void prepareForNextCycle() {
-        ordinalMap.compact(currentCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
+        // Compact each ordinal map independently
+        for (int i = 0; i < numMaps; i++) {
+            ordinalMaps[i].compact(currentCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
+        }
+
+        // Save current maps as restored maps for next cycle
+        restoredMaps = ordinalMaps.clone();
+
+        // Backward compatibility: set restoredMap to first map
+        restoredMap = restoredMaps[0];
 
         ThreadSafeBitSet temp = previousCyclePopulated;
         previousCyclePopulated = currentCyclePopulated;
@@ -284,7 +380,6 @@ public abstract class HollowTypeWriteState {
 
         currentCyclePopulated.clearAll();
 
-        restoredMap = null;
         restoredSchema = null;
         restoredReadState = null;
 
@@ -297,16 +392,26 @@ public abstract class HollowTypeWriteState {
         if(isRestored() && !wroteData) {
             HollowRecordCopier copier = HollowRecordCopier.createCopier(restoredReadState, schema);
 
-            BitSet unusedPreviousOrdinals = ordinalMap.getUnusedPreviousOrdinals();
-            int ordinal = unusedPreviousOrdinals.nextSetBit(0);
+            // Process unused ordinals for each map
+            for (int mapIdx = 0; mapIdx < numMaps; mapIdx++) {
+                BitSet unusedPreviousOrdinals = ordinalMaps[mapIdx].getUnusedPreviousOrdinals();
+                if (unusedPreviousOrdinals != null) {
+                    int localOrdinal = unusedPreviousOrdinals.nextSetBit(0);
 
-            while(ordinal != -1) {
-                restoreOrdinal(ordinal, copier, ordinalMap, UNMIXED_HASHES);
-                ordinal = unusedPreviousOrdinals.nextSetBit(ordinal + 1);
+                    while(localOrdinal != -1) {
+                        // Convert local ordinal to global interleaved ordinal
+                        int globalOrdinal = (localOrdinal * numMaps) + mapIdx;
+                        restoreOrdinal(globalOrdinal, copier, ordinalMaps[mapIdx], UNMIXED_HASHES);
+                        localOrdinal = unusedPreviousOrdinals.nextSetBit(localOrdinal + 1);
+                    }
+                }
             }
         }
 
-        ordinalMap.prepareForWrite();
+        // Prepare all maps for writing
+        for (int i = 0; i < numMaps; i++) {
+            ordinalMaps[i].prepareForWrite();
+        }
         wroteData = true;
     }
 
@@ -323,7 +428,13 @@ public abstract class HollowTypeWriteState {
     }
     
     public boolean isRestored() {
-        return ordinalMap.getUnusedPreviousOrdinals() != null;
+        // Check if any map has unused previous ordinals
+        for (int i = 0; i < numMaps; i++) {
+            if (ordinalMaps[i].getUnusedPreviousOrdinals() != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public abstract void calculateSnapshot();
@@ -355,7 +466,7 @@ public abstract class HollowTypeWriteState {
     protected void restoreFrom(HollowTypeReadState readState) {
         if(previousCyclePopulated.cardinality() != 0 || currentCyclePopulated.cardinality() != 0)
             throw new IllegalStateException("Attempting to restore into a non-empty state (type " + schema.getName() + ")");
-        
+
         PopulatedOrdinalListener listener = readState.getListener(PopulatedOrdinalListener.class);
         BitSet populatedOrdinals = listener.getPopulatedOrdinals();
 
@@ -366,19 +477,42 @@ public abstract class HollowTypeWriteState {
             restoredSchema = readState.getSchema();
         HollowRecordCopier copier = HollowRecordCopier.createCopier(restoredReadState, restoredSchema);
 
-        // Size the restore ordinal map to avoid resizing when adding ordinals
+        // Size the restore ordinal maps to avoid resizing when adding ordinals
         int size = populatedOrdinals.cardinality();
-        restoredMap = new ByteArrayOrdinalMap(size);
+        restoredMaps = new ByteArrayOrdinalMap[numMaps];
+        for (int i = 0; i < numMaps; i++) {
+            restoredMaps[i] = new ByteArrayOrdinalMap(size / numMaps);
+        }
+
+        // Backward compatibility
+        restoredMap = restoredMaps[0];
+
+        // Restore ordinals to appropriate maps
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != -1) {
             previousCyclePopulated.set(ordinal);
-            restoreOrdinal(ordinal, copier, restoredMap, IGNORED_HASHES);
+
+            // Decode which map this ordinal belongs to
+            int mapIndex = ordinal % numMaps;
+            int localOrdinal = ordinal / numMaps;
+
+            restoreOrdinal(ordinal, copier, restoredMaps[mapIndex], IGNORED_HASHES);
             ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
         }
 
-        // Resize the ordinal map to avoid resizing when populating
-        ordinalMap.resize(size);
-        ordinalMap.reservePreviouslyPopulatedOrdinals(populatedOrdinals);
+        // Resize the ordinal maps to avoid resizing when populating
+        for (int i = 0; i < numMaps; i++) {
+            ordinalMaps[i].resize(size / numMaps);
+
+            // Create a bitset with only the ordinals for this map
+            BitSet mapSpecificOrdinals = new BitSet();
+            for (int ord = populatedOrdinals.nextSetBit(0); ord >= 0; ord = populatedOrdinals.nextSetBit(ord + 1)) {
+                if (ord % numMaps == i) {
+                    mapSpecificOrdinals.set(ord / numMaps);  // Set local ordinal
+                }
+            }
+            ordinalMaps[i].reservePreviouslyPopulatedOrdinals(mapSpecificOrdinals);
+        }
     }
 
     protected void restoreOrdinal(int ordinal, HollowRecordCopier copier, ByteArrayOrdinalMap destinationMap, HashBehavior hashBehavior) {
