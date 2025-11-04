@@ -69,7 +69,19 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     public void prepareForWrite(boolean canReshard) {
         super.prepareForWrite(canReshard);
 
-        maxOrdinal = ordinalMap.maxOrdinal();
+        // Compute maxOrdinal based on the max translated ordinal across all ordinal maps
+        maxOrdinal = -1;
+        for (int mapIdx = 0; mapIdx < ordinalMaps.length; mapIdx++) {
+            int localMaxOrdinal = ordinalMaps[mapIdx].maxOrdinal();
+            if (localMaxOrdinal != -1) {
+                // Convert local ordinal to global interleaved ordinal
+                int globalOrdinal = (localMaxOrdinal * numMaps) + mapIdx;
+                if (globalOrdinal > maxOrdinal) {
+                    maxOrdinal = globalOrdinal;
+                }
+            }
+        }
+
         gatherFieldStats();
         gatherShardingStats(maxOrdinal, canReshard);
     }
@@ -96,16 +108,16 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     private void discoverObjectFieldStatisticsForRecord(FieldStatistics fieldStats, int ordinal) {
         if(currentCyclePopulated.get(ordinal) || previousCyclePopulated.get(ordinal)) {
-            long pointer = ordinalMap.getPointerForData(ordinal);
+            long pointer = getPointerForData(ordinal);
 
             for(int fieldIndex=0; fieldIndex<((HollowObjectSchema)schema).numFields(); fieldIndex++) {
-                pointer = discoverObjectFieldStatisticsForField(fieldStats, pointer, fieldIndex);
+                pointer = discoverObjectFieldStatisticsForField(fieldStats, pointer, fieldIndex, ordinal);
             }
         }
     }
 
-    private long discoverObjectFieldStatisticsForField(FieldStatistics fieldStats, long pointer, int fieldIndex) {
-        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
+    private long discoverObjectFieldStatisticsForField(FieldStatistics fieldStats, long pointer, int fieldIndex, int ordinal) {
+        ByteData data = getByteDataForOrdinal(ordinal);
 
         switch(getSchema().getFieldType(fieldIndex)) {
         case BOOLEAN:
@@ -357,18 +369,18 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     private void addRecord(int ordinal, long recordBitOffset, FixedLengthElementArray fixedLengthLongArray, ByteDataArray varLengthByteArrays[]) {
-        long pointer = ordinalMap.getPointerForData(ordinal);
+        long pointer = getPointerForData(ordinal);
 
         for(int fieldIndex=0; fieldIndex < getSchema().numFields(); fieldIndex++) {
-            pointer = addRecordField(pointer, recordBitOffset, fieldIndex, fixedLengthLongArray, varLengthByteArrays);
+            pointer = addRecordField(pointer, recordBitOffset, fieldIndex, fixedLengthLongArray, varLengthByteArrays, ordinal);
         }
     }
 
-    private long addRecordField(long readPointer, long recordBitOffset, int fieldIndex, FixedLengthElementArray fixedLengthLongArray, ByteDataArray varLengthByteArrays[]) {
+    private long addRecordField(long readPointer, long recordBitOffset, int fieldIndex, FixedLengthElementArray fixedLengthLongArray, ByteDataArray varLengthByteArrays[], int ordinal) {
         FieldType fieldType = getSchema().getFieldType(fieldIndex);
         long fieldBitOffset = recordBitOffset + fieldStats.getFieldBitOffset(fieldIndex);
         int bitsPerElement = fieldStats.getMaxBitsForField(fieldIndex);
-        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
+        ByteData data = getByteDataForOrdinal(ordinal);
 
         switch(fieldType) {
         case BOOLEAN:

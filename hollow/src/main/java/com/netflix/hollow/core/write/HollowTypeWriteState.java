@@ -22,6 +22,7 @@ import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavi
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.memory.ByteDataArray;
+import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
@@ -51,8 +52,6 @@ public abstract class HollowTypeWriteState {
     protected final ByteArrayOrdinalMap[] ordinalMaps;
     protected final int numMaps = 8;
 
-    // Backward compatibility: delegate to first map
-    protected final ByteArrayOrdinalMap ordinalMap;
     protected int maxOrdinal;
 
     protected int numShards;
@@ -61,7 +60,6 @@ public abstract class HollowTypeWriteState {
 
     protected HollowSchema restoredSchema;
     protected ByteArrayOrdinalMap[] restoredMaps;  // One per map for restoration
-    protected ByteArrayOrdinalMap restoredMap;  // Backward compatibility delegate
     protected HollowTypeReadState restoredReadState;
 
     protected ThreadSafeBitSet currentCyclePopulated;
@@ -86,9 +84,6 @@ public abstract class HollowTypeWriteState {
         for (int i = 0; i < numMaps; i++) {
             this.ordinalMaps[i] = new ByteArrayOrdinalMap();
         }
-
-        // Backward compatibility: delegate to first map
-        this.ordinalMap = this.ordinalMaps[0];
 
         this.serializedScratchSpace = new ThreadLocal<ByteDataArray>();
         this.currentCyclePopulated = new ThreadSafeBitSet();
@@ -371,9 +366,6 @@ public abstract class HollowTypeWriteState {
         // Save current maps as restored maps for next cycle
         restoredMaps = ordinalMaps.clone();
 
-        // Backward compatibility: set restoredMap to first map
-        restoredMap = restoredMaps[0];
-
         ThreadSafeBitSet temp = previousCyclePopulated;
         previousCyclePopulated = currentCyclePopulated;
         currentCyclePopulated = temp;
@@ -484,9 +476,6 @@ public abstract class HollowTypeWriteState {
             restoredMaps[i] = new ByteArrayOrdinalMap(size / numMaps);
         }
 
-        // Backward compatibility
-        restoredMap = restoredMaps[0];
-
         // Restore ordinals to appropriate maps
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != -1) {
@@ -494,7 +483,6 @@ public abstract class HollowTypeWriteState {
 
             // Decode which map this ordinal belongs to
             int mapIndex = ordinal % numMaps;
-            int localOrdinal = ordinal / numMaps;
 
             restoreOrdinal(ordinal, copier, restoredMaps[mapIndex], IGNORED_HASHES);
             ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
@@ -526,6 +514,27 @@ public abstract class HollowTypeWriteState {
 
         destinationMap.put(scratch, ordinal);
         scratch.reset();
+    }
+
+    /**
+     * Get the pointer to the data for a given ordinal by routing to the correct ordinal map.
+     * @param ordinal the global ordinal
+     * @return the pointer to the data
+     */
+    protected long getPointerForData(int ordinal) {
+        int mapIndex = ordinal % numMaps;
+        int localOrdinal = ordinal / numMaps;
+        return ordinalMaps[mapIndex].getPointerForData(localOrdinal);
+    }
+
+    /**
+     * Get the SegmentedByteArray for a given ordinal by routing to the correct ordinal map.
+     * @param ordinal the global ordinal
+     * @return the SegmentedByteArray containing the serialized data
+     */
+    protected SegmentedByteArray getByteDataForOrdinal(int ordinal) {
+        int mapIndex = ordinal % numMaps;
+        return ordinalMaps[mapIndex].getByteData().getUnderlyingArray();
     }
 
     /**
