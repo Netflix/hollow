@@ -61,7 +61,7 @@ public class HollowBlobHeaderReader {
             header.setSchemas(readSchemas(in));
 
             /// forwards-compatibility, new data can be added here.
-            skipForwardCompatibilityBytes(in);
+            readForwardCompatibilityBytes(in, header);
         }
 
         Map<String, String> headerTags = readHeaderTags(in);
@@ -112,6 +112,26 @@ public class HollowBlobHeaderReader {
             if(skippedBytes < 0)
                 throw new EOFException();
             bytesToSkip -= skippedBytes;
+        }
+    }
+
+    private void readForwardCompatibilityBytes(HollowBlobInput in, HollowBlobHeader header) throws IOException, EOFException {
+        int bytesToSkip = VarInt.readVInt(in);
+
+        // Check if there's the hasAppendedSchemaData flag
+        if (bytesToSkip > 0) {
+            // Read the hasAppendedSchemaData flag
+            int flagValue = in.read();
+            header.setHasAppendedSchemaData(flagValue == 1);
+            bytesToSkip--; // We consumed 1 byte
+
+            // Skip any remaining bytes for forward compatibility
+            while(bytesToSkip > 0) {
+                int skippedBytes = (int)in.skipBytes(bytesToSkip);
+                if(skippedBytes < 0)
+                    throw new EOFException();
+                bytesToSkip -= skippedBytes;
+            }
         }
     }
 
