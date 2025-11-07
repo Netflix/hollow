@@ -21,6 +21,7 @@ import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
@@ -29,6 +30,7 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +76,10 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private boolean focusHoleFillInFewestShards = false;
     //// adjust number of shards per type during the course of the delta chain to realize consumer-side delta applications at constant space overhead
     private boolean allowTypeResharding = false;
+    //// configuration for delta schema append feature
+    private HollowDeltaSchemaAppendConfig deltaSchemaAppendConfig = new HollowDeltaSchemaAppendConfig(false);
+    //// previous schemas for delta schema append schema evolution detection
+    private Map<String, HollowObjectSchema> previousSchemas;
 
     private List<String> restoredStates;
     private boolean preparedForNextCycle = true;
@@ -184,6 +190,23 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         } catch(Exception e){
             throw new HollowWriteStateException("Unable to restore write state from read state engine", e);
         }
+
+        // Capture previous schemas for Delta Schema Append schema evolution detection
+        if (deltaSchemaAppendConfig != null && deltaSchemaAppendConfig.isEnabled()) {
+            for (HollowTypeReadState typeState : readStateEngine.getTypeStates()) {
+                if (typeState.getSchema() instanceof HollowObjectSchema) {
+                    String typeName = typeState.getSchema().getName();
+                    HollowObjectSchema previousSchema = (HollowObjectSchema) typeState.getSchema();
+
+                    // Store schema for later comparison during data collection
+                    // This will be used by DeltaSchemaAppendDataCollector
+                    if (previousSchemas == null) {
+                        previousSchemas = new HashMap<>();
+                    }
+                    previousSchemas.put(typeName, previousSchema);
+                }
+            }
+        }
     }
 
     /**
@@ -247,6 +270,9 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
         preparedForNextCycle = true;
         restoredStates = null;
+        // Clear previous schemas to prevent memory leaks and stale schema usage in subsequent cycles
+        // These schemas are only needed during the write phase for delta schema append operations
+        previousSchemas = null;
     }
 
     /**
@@ -463,6 +489,34 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
     boolean isFocusHoleFillInFewestShards() {
         return focusHoleFillInFewestShards;
+    }
+
+    /**
+     * Set the delta schema append configuration.
+     * When enabled, delta blobs will include appended data for new fields on preserved ordinals.
+     *
+     * @param config the configuration
+     */
+    public void setDeltaSchemaAppendConfig(HollowDeltaSchemaAppendConfig config) {
+        this.deltaSchemaAppendConfig = config;
+    }
+
+    /**
+     * Get the delta schema append configuration.
+     *
+     * @return the configuration
+     */
+    public HollowDeltaSchemaAppendConfig getDeltaSchemaAppendConfig() {
+        return deltaSchemaAppendConfig;
+    }
+
+    /**
+     * Get the previous schemas captured during restoreFrom for schema evolution detection.
+     *
+     * @return the previous schemas map (empty if none captured)
+     */
+    public Map<String, HollowObjectSchema> getPreviousSchemas() {
+        return previousSchemas != null ? previousSchemas : Collections.emptyMap();
     }
 
     private long mintNewRandomizedStateTag() {
