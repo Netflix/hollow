@@ -173,6 +173,28 @@ public class FilteredHollowBlobWriter {
                 }
             }
         }
+
+        // Handle appended schema data section if present
+        if (delta && header.hasAppendedSchemaData()) {
+            // Read and skip the appended data from input
+            long totalByteLength = VarInt.readVLong(in);
+            if (totalByteLength > 0) {
+                // Skip the appended data section
+                long bytesToSkip = totalByteLength;
+                while (bytesToSkip > 0) {
+                    long skipped = in.skipBytes(bytesToSkip);
+                    if (skipped <= 0) {
+                        throw new EOFException("Failed to skip appended schema data section");
+                    }
+                    bytesToSkip -= skipped;
+                }
+            }
+
+            // Write zero-length section to all output streams (no appended data)
+            for (FilteredHollowBlobWriterStreamAndFilter streamAndFilter : allStreamAndFilters) {
+                VarInt.writeVLong(streamAndFilter.getStream(), 0L);
+            }
+        }
     }
 
     private int readNumShards(HollowBlobInput in) throws IOException {

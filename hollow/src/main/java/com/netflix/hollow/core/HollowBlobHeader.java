@@ -49,6 +49,7 @@ public class HollowBlobHeader {
     private long originRandomizedTag;
     private long destinationRandomizedTag;
     private int blobFormatVersion = HOLLOW_BLOB_VERSION_HEADER;
+    private boolean hasAppendedSchemaData = false;
 
     public Map<String, String> getHeaderTags() {
         return headerTags;
@@ -90,6 +91,22 @@ public class HollowBlobHeader {
         return blobFormatVersion;
     }
 
+    /**
+     * @return true if this blob has appended schema data section
+     */
+    public boolean hasAppendedSchemaData() {
+        return hasAppendedSchemaData;
+    }
+
+    /**
+     * Set whether this blob has appended schema data.
+     *
+     * @param hasAppendedSchemaData true if blob has appended data
+     */
+    public void setHasAppendedSchemaData(boolean hasAppendedSchemaData) {
+        this.hasAppendedSchemaData = hasAppendedSchemaData;
+    }
+
     @Override
     public boolean equals(Object other) {
         if(other instanceof HollowBlobHeader) {
@@ -97,7 +114,8 @@ public class HollowBlobHeader {
             return blobFormatVersion == oh.blobFormatVersion
                     && headerTags.equals(oh.getHeaderTags())
                     && originRandomizedTag == oh.originRandomizedTag
-                    && destinationRandomizedTag == oh.destinationRandomizedTag;
+                    && destinationRandomizedTag == oh.destinationRandomizedTag
+                    && hasAppendedSchemaData == oh.hasAppendedSchemaData;
         }
         return false;
     }
@@ -108,7 +126,8 @@ public class HollowBlobHeader {
         result = 31 * result + Objects.hash(headerTags,
                 originRandomizedTag,
                 destinationRandomizedTag,
-                blobFormatVersion);
+                blobFormatVersion,
+                hasAppendedSchemaData);
         return result;
     }
 }

@@ -41,10 +41,12 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.BitSet;
+import java.util.Map;
 
 /**
- * A {@link HollowTypeReadState} for OBJECT type records. 
+ * A {@link HollowTypeReadState} for OBJECT type records.
  */
 public class HollowObjectTypeReadState extends HollowTypeReadState implements HollowObjectTypeDataAccess {
     private final HollowObjectSchema unfilteredSchema;
@@ -166,6 +168,21 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         if(shardsVolatile.shards.length == 1)
             maxOrdinal = shardsVolatile.shards[0].dataElements.maxOrdinal;
+
+        // Prepare data elements for appended field writes if delta schema append is enabled
+        if (stateEngine != null && stateEngine.getDeltaSchemaAppendConfig() != null &&
+            stateEngine.getDeltaSchemaAppendConfig().isEnabled()) {
+
+            // Prepare all shards for potential appended field writes
+            for (HollowObjectTypeReadStateShard shard : shardsVolatile.shards) {
+                HollowObjectTypeDataElements dataElements = shard.dataElements;
+
+                // Check if data elements need write preparation
+                if (dataElements.bitsPerRecord == 0) {
+                    dataElements.prepareForWrite();
+                }
+            }
+        }
     }
 
     public static void discardSnapshot(HollowBlobInput in, HollowObjectSchema schema, int numShards) throws IOException {
@@ -587,5 +604,52 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     public int numShards() {
         return this.shardsVolatile.shards.length;
     }
-	
+
+    /**
+     * Update the schema of this type read state during delta application.
+     */
+    public void updateSchema(HollowObjectSchema newSchema) {
+        validateSchemaUpdate(this.schema, newSchema);
+
+        try {
+            Field schemaField = HollowTypeReadState.class.getDeclaredField("schema");
+            schemaField.setAccessible(true);
+            schemaField.set(this, newSchema);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to update schema", e);
+        }
+
+        for (HollowObjectTypeReadStateShard shard : shardsVolatile.shards) {
+            shard.updateSchema(newSchema);
+        }
+
+        try {
+            Field samplerField = HollowObjectTypeReadState.class.getDeclaredField("sampler");
+            samplerField.setAccessible(true);
+            samplerField.set(this, new HollowObjectSampler(newSchema, DisabledSamplingDirector.INSTANCE));
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to update sampler", e);
+        }
+    }
+
+    private void validateSchemaUpdate(HollowSchema oldSchema, HollowObjectSchema newSchema) {
+        HollowObjectSchema oldObjectSchema = (HollowObjectSchema) oldSchema;
+
+        // Ensure all old fields exist in new schema with same types
+        for (int i = 0; i < oldObjectSchema.numFields(); i++) {
+            String fieldName = oldObjectSchema.getFieldName(i);
+            HollowObjectSchema.FieldType oldType = oldObjectSchema.getFieldType(i);
+
+            int newPosition = newSchema.getPosition(fieldName);
+            if (newPosition == -1) {
+                throw new IllegalStateException("Schema update removed field: " + fieldName);
+            }
+
+            HollowObjectSchema.FieldType newType = newSchema.getFieldType(newPosition);
+            if (oldType != newType) {
+                throw new IllegalStateException("Schema update changed field type: " + fieldName);
+            }
+        }
+    }
+
 }
