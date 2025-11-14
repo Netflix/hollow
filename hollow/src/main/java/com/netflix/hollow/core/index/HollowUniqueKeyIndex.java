@@ -538,7 +538,7 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
 
         int ordinal = ordinals.nextSetBit(0);
         while (ordinal != ORDINAL_NONE) {
-            int hashCode = generateRecordHash(ordinal, typeState.getSchema());
+            int hashCode = generateRecordHash(ordinal);
             int bucket = hashCode & hashMask;
 
             while (hashedArray.getElementValue((long) bucket * (long) bitsPerElement, bitsPerElement) != 0)
@@ -575,7 +575,7 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
         while (prevOrdinal != ORDINAL_NONE) {
             if (!ordinals.get(prevOrdinal)) {
                 /// find and remove this ordinal
-                int hashCode = generateRecordHash(prevOrdinal, typeState.getSchema());
+                int hashCode = generateRecordHash(prevOrdinal);
                 int bucket = findOrdinalBucket(bitsPerElement, hashedArray, hashCode, hashMask, prevOrdinal);
 
                 hashedArray.clearElementValue((long) bucket * (long) bitsPerElement, bitsPerElement);
@@ -584,7 +584,7 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
                 int moveOrdinal = (int) hashedArray.getElementValue((long) bucket * (long) bitsPerElement, bitsPerElement) - 1;
 
                 while (moveOrdinal != ORDINAL_NONE) {
-                    int naturalHash = generateRecordHash(moveOrdinal, typeState.getSchema());
+                    int naturalHash = generateRecordHash(moveOrdinal);
                     int naturalBucket = naturalHash & hashMask;
 
                     if (!bucketInRange(emptyBucket, bucket, naturalBucket)) {
@@ -606,7 +606,7 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
         int ordinal = ordinals.nextSetBit(0);
         while (ordinal != ORDINAL_NONE) {
             if (!prevOrdinals.get(ordinal)) {
-                int hashCode = generateRecordHash(ordinal, typeState.getSchema());
+                int hashCode = generateRecordHash(ordinal);
                 int bucket = hashCode & hashMask;
 
                 while (hashedArray.getElementValue((long) bucket * (long) bitsPerElement, bitsPerElement) != 0) {
@@ -653,15 +653,15 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
         }
     }
 
-    private int generateRecordHash(int ordinal, HollowObjectSchema schema) {
+    private int generateRecordHash(int ordinal) {
         int hashCode = 0;
         for (int i = 0; i < fields.length; i++) {
-            hashCode ^= generateFieldHash(ordinal, i, schema);
+            hashCode ^= generateFieldHash(ordinal, i);
         }
         return hashCode;
     }
 
-    private int generateFieldHash(int ordinal, int fieldIdx, HollowObjectSchema schema) {
+    private int generateFieldHash(int ordinal, int fieldIdx) {
         //It is super important that all references to data accessors originated
         //from a HollowAPI to maintain support for object longevity. Do not get an accessor
         //from a Schema.
@@ -673,9 +673,10 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
             FieldPathSegment pathElement = field.getSchemaFieldPositionPath()[pathIdx];
             ordinal = pathElement.getOrdinalForField(ordinal);
             if (ordinal == ORDINAL_NONE) {
+                HollowObjectSchema fieldSchema = pathElement.getObjectTypeDataAccess().getSchema();
                 throw new NullPointerException("Cannot hash null field " +
-                        schema.getFieldName(fieldIdx) + " in type " +
-                        schema.getName() + " at ordinal " + parentOrdinal);
+                        fieldSchema.getFieldName(pathElement.getSegmentFieldPosition()) + " in type " +
+                        fieldSchema.getName() + " at ordinal " + parentOrdinal);
             }
         }
 
