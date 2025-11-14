@@ -27,6 +27,8 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
+
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
  *
@@ -61,6 +63,10 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
             FieldType ft = pk.getFieldType(dataset, i);
             if (FieldType.REFERENCE.equals(ft)) {
                 HollowObjectSchema refSchema = pk.getFieldSchema(dataset, i);
+                if (!includeType(schema, dataset)) {
+                    // Primary key references a type that does not exist in the dataset.
+                    throw new IllegalStateException("Primary key references a type that does not exist in the dataset: " + schema.getName());
+                }
                 params.add(refSchema.getName() + " " + fn);
             } else {
                 params.add(HollowCodeGenerationUtils.getJavaScalarType(ft) + " " + fn);

@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.api.codegen.indexes;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
 
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
@@ -82,6 +83,9 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
         builder.append("    }\n\n");
 
         for(HollowSchema schema : schemaList) {
+            if (!includeType(schema, dataset))
+                continue;
+
             builder.append("    public Iterable<" + hollowImplClassname(schema.getName()) + "> find" + substituteInvalidChars(schema.getName()) + "Matches(Object... keys) {\n");
             builder.append("        HollowHashIndexResult matches = idx.findMatches(keys);\n");
             builder.append("        if(matches == null) return Collections.emptySet();\n\n");
