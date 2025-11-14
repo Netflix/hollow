@@ -36,6 +36,7 @@ import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -537,7 +538,7 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
 
         int ordinal = ordinals.nextSetBit(0);
         while (ordinal != ORDINAL_NONE) {
-            int hashCode = generateRecordHash(ordinal);
+            int hashCode = generateRecordHash(ordinal, typeState.getSchema());
             int bucket = hashCode & hashMask;
 
             while (hashedArray.getElementValue((long) bucket * (long) bitsPerElement, bitsPerElement) != 0)
@@ -574,7 +575,7 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
         while (prevOrdinal != ORDINAL_NONE) {
             if (!ordinals.get(prevOrdinal)) {
                 /// find and remove this ordinal
-                int hashCode = generateRecordHash(prevOrdinal);
+                int hashCode = generateRecordHash(prevOrdinal, typeState.getSchema());
                 int bucket = findOrdinalBucket(bitsPerElement, hashedArray, hashCode, hashMask, prevOrdinal);
 
                 hashedArray.clearElementValue((long) bucket * (long) bitsPerElement, bitsPerElement);
@@ -583,7 +584,7 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
                 int moveOrdinal = (int) hashedArray.getElementValue((long) bucket * (long) bitsPerElement, bitsPerElement) - 1;
 
                 while (moveOrdinal != ORDINAL_NONE) {
-                    int naturalHash = generateRecordHash(moveOrdinal);
+                    int naturalHash = generateRecordHash(moveOrdinal, typeState.getSchema());
                     int naturalBucket = naturalHash & hashMask;
 
                     if (!bucketInRange(emptyBucket, bucket, naturalBucket)) {
@@ -605,7 +606,7 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
         int ordinal = ordinals.nextSetBit(0);
         while (ordinal != ORDINAL_NONE) {
             if (!prevOrdinals.get(ordinal)) {
-                int hashCode = generateRecordHash(ordinal);
+                int hashCode = generateRecordHash(ordinal, typeState.getSchema());
                 int bucket = hashCode & hashMask;
 
                 while (hashedArray.getElementValue((long) bucket * (long) bitsPerElement, bitsPerElement) != 0) {
@@ -652,25 +653,32 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
         }
     }
 
-    private int generateRecordHash(int ordinal) {
+    private int generateRecordHash(int ordinal, HollowObjectSchema schema) {
         int hashCode = 0;
         for (int i = 0; i < fields.length; i++) {
-            hashCode ^= generateFieldHash(ordinal, i);
+            hashCode ^= generateFieldHash(ordinal, i, schema);
         }
         return hashCode;
     }
 
-    private int generateFieldHash(int ordinal, int fieldIdx) {
+    private int generateFieldHash(int ordinal, int fieldIdx, HollowObjectSchema schema) {
         //It is super important that all references to data accessors originated
         //from a HollowAPI to maintain support for object longevity. Do not get an accessor
         //from a Schema.
 
+        int parentOrdinal = ordinal;
         HollowHashIndexField field = fields[fieldIdx];
         int lastPathIdx = field.getSchemaFieldPositionPath().length - 1;
         for (int pathIdx = 0; pathIdx < lastPathIdx; pathIdx++) {
             FieldPathSegment pathElement = field.getSchemaFieldPositionPath()[pathIdx];
             ordinal = pathElement.getOrdinalForField(ordinal);
+            if (ordinal == ORDINAL_NONE) {
+                throw new NullPointerException("Cannot hash null field " +
+                        schema.getFieldName(fieldIdx) + " in type " +
+                        schema.getName() + " at ordinal " + parentOrdinal);
+            }
         }
+
         //When the loop finishes, we should have the ordinal of the object containing the last field.
         FieldPathSegment lastPathElement = field.getLastFieldPositionPathElement();
 
