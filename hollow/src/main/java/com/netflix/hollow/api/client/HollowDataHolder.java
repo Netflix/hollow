@@ -19,6 +19,7 @@ package com.netflix.hollow.api.client;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.TransitionAwareRefreshListener;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -31,8 +32,13 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.tools.history.HollowHistoricalStateCreator;
 import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -49,6 +55,9 @@ class HollowDataHolder {
     private final FailedTransitionTracker failedTransitionTracker;
     private final StaleHollowReferenceDetector staleReferenceDetector;
     private final HollowConsumer.ObjectLongevityConfig objLongevityConfig;
+    private final HollowRepairApplier repairApplier;
+    private final HollowConsumerMetrics metrics;
+    private final com.netflix.hollow.core.read.engine.metrics.TypeMemoryProfiler memoryProfiler;
 
     private TypeFilter filter;
 
@@ -62,9 +71,11 @@ class HollowDataHolder {
                             HollowAPIFactory apiFactory,
                             MemoryMode memoryMode,
                             HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
-                            FailedTransitionTracker failedTransitionTracker, 
-                            StaleHollowReferenceDetector staleReferenceDetector, 
-                            HollowConsumer.ObjectLongevityConfig objLongevityConfig) {
+                            FailedTransitionTracker failedTransitionTracker,
+                            StaleHollowReferenceDetector staleReferenceDetector,
+                            HollowConsumer.ObjectLongevityConfig objLongevityConfig,
+                            HollowRepairApplier repairApplier,
+                            HollowConsumerMetrics metrics) {
         this.stateEngine = stateEngine;
         this.apiFactory = apiFactory;
         this.memoryMode = memoryMode;
@@ -73,6 +84,9 @@ class HollowDataHolder {
         this.failedTransitionTracker = failedTransitionTracker;
         this.staleReferenceDetector = staleReferenceDetector;
         this.objLongevityConfig = objLongevityConfig;
+        this.repairApplier = repairApplier;
+        this.metrics = metrics;
+        this.memoryProfiler = new com.netflix.hollow.core.read.engine.metrics.TypeMemoryProfiler();
     }
 
     HollowReadStateEngine getStateEngine() {
@@ -166,6 +180,11 @@ class HollowDataHolder {
     }
 
     private void applyStateEngineTransition(HollowBlobInput in, OptionalBlobPartInput optionalPartIn, HollowConsumer.Blob transition, HollowConsumer.RefreshListener[] refreshListeners) throws IOException {
+        // Before reading snapshot
+        if (LOG.isLoggable(Level.FINE)) {
+            memoryProfiler.startProfiling(stateEngine);
+        }
+
         if(transition.isSnapshot()) {
             if(filter == null) {
                 reader.readSnapshot(in, optionalPartIn);
@@ -175,6 +194,13 @@ class HollowDataHolder {
             }
         } else {
             reader.applyDelta(in, optionalPartIn);
+        }
+
+        // After reading snapshot
+        if (LOG.isLoggable(Level.FINE)) {
+            com.netflix.hollow.core.read.engine.metrics.TypeMemoryProfiler.ProfileResult result =
+                memoryProfiler.endProfiling();
+            result.printSummary();
         }
 
         setVersion(transition.getToVersion());
@@ -262,6 +288,157 @@ class HollowDataHolder {
 
     private void setVersion(long version) {
         currentVersion = version;
+    }
+
+    /**
+     * Applies a repair transition using snapshot as source of truth.
+     * Analyzes checksums to identify corruption, then reinitializes consumer state from snapshot.
+     *
+     * @param repairBlob the repair blob containing snapshot data
+     * @param refreshListeners listeners to notify of repair completion
+     * @throws Exception if repair fails
+     */
+    void applyRepairTransition(HollowConsumer.Blob repairBlob,
+                               HollowConsumer.RefreshListener[] refreshListeners) throws Exception {
+        long startTime = System.currentTimeMillis();
+        long version = repairBlob.getToVersion();
+
+        LOG.log(Level.INFO, "Applying REPAIR transition to version " + version);
+
+        if (metrics != null) {
+            metrics.recordRepairTriggered(version);
+        }
+
+        if (repairApplier == null) {
+            throw new IllegalStateException("RepairApplier not configured");
+        }
+
+        byte[] snapshotBytes = cacheSnapshotBlob(repairBlob);
+        HollowRepairApplier.RepairResult result = analyzeRepair(snapshotBytes);
+
+        if (!result.isSuccess()) {
+            throw new IllegalStateException("Repair analysis failed for version " + version);
+        }
+
+        replaceStateFromSnapshot(snapshotBytes, version);
+
+        long duration = System.currentTimeMillis() - startTime;
+        emitRepairMetrics(version, duration, result);
+
+        int ordinalsRepaired = result.getOrdinalsRepairedByType().values().stream()
+            .mapToInt(Integer::intValue).sum();
+        LOG.log(Level.INFO, String.format(
+            "Repair complete: %d types, %d ordinals repaired in %dms",
+            result.getTypesNeedingRepair(), ordinalsRepaired, duration));
+
+        notifyRepairListeners(refreshListeners, version);
+    }
+
+    private byte[] cacheSnapshotBlob(HollowConsumer.Blob repairBlob) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (InputStream is = repairBlob.getInputStream()) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                baos.write(buffer, 0, bytesRead);
+            }
+        }
+        return baos.toByteArray();
+    }
+
+    private HollowRepairApplier.RepairResult analyzeRepair(byte[] snapshotBytes) throws IOException {
+        HollowReadStateEngine snapshotState = new HollowReadStateEngine();
+        HollowBlobReader snapshotReader = new HollowBlobReader(snapshotState, memoryMode);
+
+        try (InputStream is = new ByteArrayInputStream(snapshotBytes)) {
+            if (filter == null) {
+                snapshotReader.readSnapshot(is);
+            } else {
+                snapshotReader.readSnapshot(is, filter);
+            }
+        }
+
+        return repairApplier.repair(stateEngine, snapshotState);
+    }
+
+    private void replaceStateFromSnapshot(byte[] snapshotBytes, long version) throws IOException {
+        if (filter == null) {
+            reader.readSnapshot(new ByteArrayInputStream(snapshotBytes));
+        } else {
+            reader.readSnapshot(new ByteArrayInputStream(snapshotBytes), filter);
+        }
+
+        try {
+            updateAPIAfterRepair();
+            setVersion(version);
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Failed to update API after repair - consumer in inconsistent state", e);
+            throw new IllegalStateException("Repair replaced state but API update failed - consumer unusable", e);
+        }
+    }
+
+    private void updateAPIAfterRepair() {
+        if (currentAPI == null) {
+            initializeAPIForRepair();
+        } else if (objLongevityConfig.enableLongLivedObjectSupport()) {
+            updateProxyDataAccess();
+        } else {
+            recreateAPIIfNeeded();
+        }
+
+        if (!staleReferenceDetector.isKnownAPIHandle(currentAPI)) {
+            staleReferenceDetector.newAPIHandle(currentAPI);
+        }
+    }
+
+    private void initializeAPIForRepair() {
+        if (objLongevityConfig.enableLongLivedObjectSupport()) {
+            HollowProxyDataAccess dataAccess = new HollowProxyDataAccess();
+            dataAccess.setDataAccess(stateEngine);
+            currentAPI = apiFactory.createAPI(dataAccess);
+        } else {
+            currentAPI = apiFactory.createAPI(stateEngine);
+        }
+    }
+
+    private void updateProxyDataAccess() {
+        HollowDataAccess dataAccess = currentAPI.getDataAccess();
+        if (dataAccess instanceof HollowProxyDataAccess) {
+            ((HollowProxyDataAccess) dataAccess).setDataAccess(stateEngine);
+        } else {
+            HollowProxyDataAccess newDataAccess = new HollowProxyDataAccess();
+            newDataAccess.setDataAccess(stateEngine);
+            currentAPI = apiFactory.createAPI(newDataAccess, currentAPI);
+        }
+    }
+
+    private void recreateAPIIfNeeded() {
+        if (currentAPI.getDataAccess() != stateEngine) {
+            currentAPI = apiFactory.createAPI(stateEngine);
+        }
+    }
+
+    private void emitRepairMetrics(long version, long duration, HollowRepairApplier.RepairResult result) {
+        if (metrics == null) return;
+
+        metrics.recordRepairDuration(version, duration);
+        for (Map.Entry<String, Integer> entry : result.getOrdinalsRepairedByType().entrySet()) {
+            metrics.recordRepairOrdinals(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void notifyRepairListeners(HollowConsumer.RefreshListener[] refreshListeners, long version) {
+        for (HollowConsumer.RefreshListener listener : refreshListeners) {
+            if (listener instanceof TransitionAwareRefreshListener) {
+                try {
+                    ((TransitionAwareRefreshListener) listener)
+                        .repairApplied(currentAPI, stateEngine, version);
+                } catch (Exception e) {
+                    LOG.log(Level.SEVERE, "Listener " + listener.getClass().getName() +
+                        " failed after successful repair", e);
+                }
+            }
+        }
     }
 
 }
