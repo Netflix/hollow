@@ -19,11 +19,15 @@ package com.netflix.hollow.core.util;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_METRIC_CYCLE_START;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchemaParser;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
@@ -31,6 +35,8 @@ import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -176,6 +182,52 @@ public class HollowWriteStateCreatorTest {
         assertEquals("Should have no type states", 0, engine.getOrderedTypeStates().size());
         HollowWriteStateCreator.readSchemaFileIntoWriteState("schema1.txt", engine);
         assertEquals("Should now have types", 2, engine.getOrderedTypeStates().size());
+    }
+
+    @Test
+    public void populateStateEngineWithTypeWriteStates_populatesInDependencyOrder() throws IOException {
+        String schemaStr = "TypeA { Long id; TypeB b; }"
+            + "TypeB { ListOfLong ids; }"
+            + "Long { long value; }"
+            + "ListOfLong List<Long>;";
+        List<HollowSchema> schemas = HollowSchemaParser.parseCollectionOfSchemas(schemaStr);
+        assertThat(schemas).extracting(HollowSchema::getName)
+            .containsExactly("TypeA", "TypeB", "Long", "ListOfLong");
+        HollowWriteStateEngine engine = new HollowWriteStateEngine();
+        HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(engine, schemas);
+        assertThat(engine.getSchemas()).extracting(HollowSchema::getName)
+            .containsExactly("Long", "ListOfLong", "TypeB", "TypeA");
+    }
+
+    @Test
+    public void populateStateEngineWithTypeWriteStates_failsOnCircularDependencies() throws IOException {
+        String schemaStr = "TypeA { Long id; TypeB b; }"
+            + "TypeB { ListOfLong ids; TypeA circular; }"
+            + "Long { long value; }"
+            + "ListOfLong List<Long>;";
+        List<HollowSchema> schemas = HollowSchemaParser.parseCollectionOfSchemas(schemaStr);
+        assertThat(schemas).extracting(HollowSchema::getName)
+            .containsExactly("TypeA", "TypeB", "Long", "ListOfLong");
+        HollowWriteStateEngine engine = new HollowWriteStateEngine();
+        assertThatThrownBy(() -> HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(engine, schemas))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("Missing schema(s)");
+    }
+
+    @Test
+    public void populateStateEngineWithTypeWriteStates_failsOnDuplicateSchemas() throws IOException {
+        String schemaStr = "TypeA { Long id; TypeB b; }"
+            + "TypeB { ListOfLong ids; }"
+            + "Long { long value; }"
+            + "ListOfLong List<Long>;"
+            + "TypeA { int id; }";
+        List<HollowSchema> schemas = HollowSchemaParser.parseCollectionOfSchemas(schemaStr);
+        assertThat(schemas).extracting(HollowSchema::getName)
+            .containsExactly("TypeA", "TypeB", "Long", "ListOfLong", "TypeA");
+        HollowWriteStateEngine engine = new HollowWriteStateEngine();
+        assertThatThrownBy(() -> HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(engine, schemas))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("Duplicate schema name(s)");
     }
     
     @SuppressWarnings("unused")
