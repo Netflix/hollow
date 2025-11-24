@@ -28,7 +28,6 @@ import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import java.util.Arrays;
 
 public class FlatRecord {
-
     final HollowSchemaIdentifierMapper schemaIdMapper;
     final ByteData data;
     final int dataStartByte;
@@ -66,7 +65,11 @@ public class FlatRecord {
                     int locationOfField = VarInt.readVInt(recordData, primaryKeyRecordPointer);
                     primaryKeyRecordPointer += VarInt.sizeOfVInt(locationOfField);
 
-                    recordPrimaryKey[i] = readPrimaryKeyField(locationOfField + dataStartByte, primaryKeyFieldTypes[i]);
+                    Object pkValue = readPrimaryKeyField(locationOfField + dataStartByte, primaryKeyFieldTypes[i]);
+                    if (pkValue == null) {
+                        throw new IllegalStateException("Primary key field '" + primaryKey.getFieldPath(i) + "' cannot be null");
+                    }
+                    recordPrimaryKey[i] = pkValue;
                 }
                 
                 this.recordPrimaryKey = new RecordPrimaryKey(topRecordSchema.getName(), recordPrimaryKey);
@@ -93,7 +96,10 @@ public class FlatRecord {
     }
 
     private Object readPrimaryKeyField(int location, FieldType fieldType) {
-        /// assumption: primary key fields are never null
+        if (VarInt.readVNull(data, location)) {
+            return null;
+        }
+
         switch (fieldType) {
         case BOOLEAN:
             return data.get(location) == 1;
@@ -141,11 +147,9 @@ public class FlatRecord {
         default:
             throw new IllegalStateException("Should not have encoded primary key with REFERENCE type fields.");
         }
-
     }
     
     public RecordPrimaryKey getRecordPrimaryKey() {
         return recordPrimaryKey;
     }
-
 }

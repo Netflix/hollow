@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 public class FlatRecordWriter {
-
     private final HollowDataset dataset;
     private final HollowSchemaIdentifierMapper schemaIdMapper;
     private final ByteDataArray buf;
@@ -53,6 +52,12 @@ public class FlatRecordWriter {
         this.buf = new ByteDataArray();
         this.recordLocationsByOrdinal = new IntList();
         this.recordLocationsByHashCode = new HashMap<>();
+    }
+
+    public void reset() {
+        buf.reset();
+        recordLocationsByHashCode.clear();
+        recordLocationsByOrdinal.clear();
     }
 
     public int write(HollowSchema schema, HollowWriteRecord rec) {
@@ -133,7 +138,11 @@ public class FlatRecordWriter {
                 for (int i = 0; i < primaryKey.numFields(); i++) {
                     int[] fieldPathIndex = primaryKey.getFieldPathIndex(dataset, i);
 
-                    pkFieldValueLocations[i] = locatePrimaryKeyField(locationOfTopRecord, fieldPathIndex, 0);
+                    int pkFieldOffset = locatePrimaryKeyField(locationOfTopRecord, fieldPathIndex, 0);
+                    if (pkFieldOffset == -1) {
+                        throw new IllegalStateException("Cannot write FlatRecord: primary key field '" + primaryKey.getFieldPath(i) + "' is null");
+                    }
+                    pkFieldValueLocations[i] = pkFieldOffset;
                 }
             }
         }
@@ -155,11 +164,19 @@ public class FlatRecordWriter {
         locationOfCurrentRecord += VarInt.sizeOfVInt(schemaIdOfRecord);
 
         int fieldOffset = navigateToField(recordSchema, fieldPathIndex[idx], locationOfCurrentRecord);
+        if (VarInt.readVNull(buf.getUnderlyingArray(), fieldOffset)) {
+            return -1;
+        }
 
-        if (idx == fieldPathIndex.length - 1)
+        if (idx == fieldPathIndex.length - 1) {
             return fieldOffset;
+        }
 
         int ordinalOfNextRecord = VarInt.readVInt(buf.getUnderlyingArray(), fieldOffset);
+        if (ordinalOfNextRecord == -1) {
+            return -1;
+        }
+
         int offsetOfNextRecord = recordLocationsByOrdinal.get(ordinalOfNextRecord);
 
         return locatePrimaryKeyField(offsetOfNextRecord, fieldPathIndex, idx + 1);
@@ -192,12 +209,6 @@ public class FlatRecordWriter {
         }
 
         return offset;
-    }
-
-    public void reset() {
-        buf.reset();
-        recordLocationsByHashCode.clear();
-        recordLocationsByOrdinal.clear();
     }
 
     private static class RecordLocation {
