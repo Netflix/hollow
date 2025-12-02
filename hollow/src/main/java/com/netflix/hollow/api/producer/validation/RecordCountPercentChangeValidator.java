@@ -84,7 +84,25 @@ public class RecordCountPercentChangeValidator implements ValidatorListener {
                     getName(), addedPercent * 100, addedPercentageThreshold * 100,  removedPercent * 100,
                     removedPercentageThreshold * 100, updatedPercent * 100, updatedPercentageThreshold * 100));
         }
-        return builder.failed("record count change is more than threshold");
+
+        StringBuilder details = new StringBuilder();
+        if (addedPercentageThreshold >= 0 && addedPercent >= addedPercentageThreshold) {
+            details.append(String.format("added %.2f%% > %.2f%%",
+                    addedPercent * 100, addedPercentageThreshold * 100));
+        }
+        if (removedPercentageThreshold >= 0 && removedPercent >= removedPercentageThreshold) {
+            if (details.length() > 0) details.append(", ");
+            details.append(String.format("removed %.2f%% > %.2f%%",
+                    removedPercent * 100, removedPercentageThreshold * 100));
+        }
+        if (updatedPercentageThreshold >= 0 && updatedPercent >= updatedPercentageThreshold) {
+            if (details.length() > 0) details.append(", ");
+            details.append(String.format("updated %.2f%% > %.2f%%",
+                    updatedPercent * 100, updatedPercentageThreshold * 100));
+        }
+
+        return builder.failed(String.format("'%s' record count change exceeds threshold: %s",
+                typeName, details));
     }
 
     /**
