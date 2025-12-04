@@ -111,6 +111,12 @@ import java.util.concurrent.Executor;
  */
 public class HollowProducer extends AbstractHollowProducer {
 
+
+    static HollowProducerAccessor ACCESSOR;
+    static void setAccessor(HollowProducerAccessor accessor) {
+        ACCESSOR = accessor;
+    }
+
     /*
      * HollowProducer and HollowProducer.Incremental extend from a package protected AbstractHollowProducer
      * for sharing common functionality.
@@ -745,6 +751,19 @@ public class HollowProducer extends AbstractHollowProducer {
         boolean doIntegrityCheck = true;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
+
+        private HollowProducerEventListener customProducerMetricsListener = null;
+
+        public B withListenersFromExisting(HollowProducer producer) {
+            // Trigger loading of the helper class
+            try {
+                Class.forName("com.netflix.hollow.api.producer.HollowProducerAccessHelper");
+            } catch (ClassNotFoundException e) {
+                throw new IllegalStateException("HollowProducerAccessHelper missing", e);
+            }
+            this.customProducerMetricsListener = HollowProducer.ACCESSOR.getProducerMetricsListener(producer);
+            return (B) this;
+        }
 
         public B withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;

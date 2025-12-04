@@ -30,6 +30,7 @@ import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
 import com.netflix.hollow.api.producer.listener.CycleListener;
 import com.netflix.hollow.api.producer.listener.HollowProducerEventListener;
+import com.netflix.hollow.api.producer.metrics.AbstractProducerMetricsListener;
 import com.netflix.hollow.api.producer.validation.ValidationResult;
 import com.netflix.hollow.api.producer.validation.ValidationStatus;
 import com.netflix.hollow.api.producer.validation.ValidationStatusException;
@@ -125,6 +126,11 @@ abstract class AbstractHollowProducer {
                 b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier);
     }
 
+    private final HollowProducerListener producerMetricsListener;
+    HollowProducerListener getProducerMetricsListener() {
+        return producerMetricsListener;
+    }
+
     private AbstractHollowProducer(
             HollowProducer.BlobStager blobStager,
             HollowProducer.Publisher publisher,
@@ -172,6 +178,14 @@ abstract class AbstractHollowProducer {
         this.blobStorageCleaner = blobStorageCleaner;
 
         this.listeners = new ProducerListenerSupport(eventListeners.stream().distinct().collect(toList()));
+        HollowProducerEventListener temp = null;
+        for (HollowProducerEventListener l : eventListeners) {
+            if (l instanceof AbstractProducerMetricsListener) {
+                temp = l;
+            }
+        }
+        this.producerMetricsListener = (HollowProducerListener) temp;
+
 
         this.metrics = new HollowProducerMetrics();
         this.metricsCollector = metricsCollector;
