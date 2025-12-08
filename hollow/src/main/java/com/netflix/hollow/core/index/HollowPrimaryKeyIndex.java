@@ -630,14 +630,15 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         for(int i=0;i<lastFieldPath;i++) {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
             ordinal = typeState.readOrdinal(ordinal, fieldPosition);
-            if (ordinal == ORDINAL_NONE) {
-                HollowObjectSchema parentSchema =  this.typeState.getSchema();
-                throw new NullPointerException("Cannot hash null field " +
-                        parentSchema.getFieldName(fieldIdx) + " in type " +
-                        parentSchema.getName() + " at ordinal " + parentOrdinal);
-            }
             typeState = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition); //This causes an incompatibility with object longevity.
             schema = typeState.getSchema();
+        }
+
+        if (ordinal == ORDINAL_NONE) {
+            HollowObjectSchema parentSchema =  this.typeState.getSchema();
+            throw new NullPointerException("Cannot hash null field " +
+                    parentSchema.getFieldName(fieldIdx) + " in type " +
+                    parentSchema.getName() + " at ordinal " + parentOrdinal);
         }
 
         int hashCode = HollowReadFieldUtils.fieldHashCode(typeState, ordinal, fieldPathIndexes[fieldIdx][lastFieldPath]);
