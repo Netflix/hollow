@@ -371,6 +371,34 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         } catch (NullPointerException e) {}
     }
 
+
+    @Test
+    public void testNullFieldErrorMessageBug() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.add(new TypeC("test1", "test2", "test3", new TypeD("d1")));
+        mapper.add(new TypeC("test1", "test2", "test3", null));  // cd is null
+        roundTripSnapshot();
+
+        try {
+            HollowPrimaryKeyIndex invalidPkIdx = new HollowPrimaryKeyIndex(this.readStateEngine, "TypeC", "c1", "cd.d1");
+            fail("Index on type with null fields is expected to fail construction");
+        } catch (NullPointerException e) {
+            // The bug: error message will say "Cannot hash null field c2"
+            // when it should say "Cannot hash null field cd"
+            System.out.println("Error message: " + e.getMessage());
+
+            if (e.getMessage().contains("c2")) {
+                fail("BUG DETECTED: Error message incorrectly mentions 'c2' instead of 'cd'. " +
+                        "This is because fieldIdx (1) is used instead of fieldPosition (3). " +
+                        "Actual message: " + e.getMessage());
+            }
+
+            // The correct error message should mention "cd" not "c2"
+            Assert.assertTrue("Error message should mention the null field 'cd'",
+                    e.getMessage().contains("cd"));
+        }
+    }
+
     private static void addDataForDupTesting(HollowWriteStateEngine writeStateEngine, int a1Start, double a2, int size) {
         TypeB typeB = new TypeB("commonTypeB");
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
@@ -415,6 +443,31 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
             this.isDuplicate = isDuplicate;
         }
     }
+
+    // Test classes to expose the fieldIdx vs fieldPosition bug
+    @HollowPrimaryKey(fields = {"c1", "cd.d1"})
+    private static class TypeC {
+        private final String c1;  // position 0, fieldIdx 0
+        private final String c2;  // position 1, not in primary key
+        private final String c3;  // position 2, not in primary key
+        private final TypeD cd;   // position 3, fieldIdx 1
+
+        public TypeC(String c1, String c2, String c3, TypeD cd) {
+            this.c1 = c1;
+            this.c2 = c2;
+            this.c3 = c3;
+            this.cd = cd;
+        }
+    }
+
+    private static class TypeD {
+        private final String d1;  // position 0
+
+        public TypeD(String d1) {
+            this.d1 = d1;
+        }
+    }
+
 
     @HollowPrimaryKey(fields = {"id"})
     private static class TypeNullPKey {
