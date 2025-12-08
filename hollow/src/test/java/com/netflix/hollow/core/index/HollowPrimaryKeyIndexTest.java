@@ -371,6 +371,8 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         } catch (NullPointerException e) {}
     }
 
+
+    @Test
     public void testNullFieldErrorMessageBug() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
         mapper.add(new TypeC("test1", "test2", "test3", new TypeD("d1")));
