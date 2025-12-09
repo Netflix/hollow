@@ -30,6 +30,7 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowDeltaSchemaAppendConfig;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
@@ -745,6 +746,8 @@ public class HollowProducer extends AbstractHollowProducer {
         boolean doIntegrityCheck = true;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
+        HollowDeltaSchemaAppendConfig deltaSchemaAppendConfig =
+            new HollowDeltaSchemaAppendConfig(false);
 
         public B withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;
@@ -938,6 +941,20 @@ public class HollowProducer extends AbstractHollowProducer {
 
         public B withUpdatePlanVerifier(HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
             this.updatePlanBlobVerifier = updatePlanBlobVerifier;
+            return (B) this;
+        }
+
+        /**
+         * Enable or disable the delta schema append feature.
+         * When enabled, delta blobs will include appended data for new fields on preserved ordinals.
+         * This allows consumers with updated schemas to get field values while consumers without
+         * new fields can efficiently skip the appended data.
+         *
+         * @param enabled true to enable, false to disable (default is false)
+         * @return this builder
+         */
+        public B withDeltaSchemaAppendEnabled(boolean enabled) {
+            this.deltaSchemaAppendConfig = new HollowDeltaSchemaAppendConfig(enabled);
             return (B) this;
         }
 
