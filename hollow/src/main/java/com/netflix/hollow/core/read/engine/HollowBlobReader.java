@@ -229,6 +229,7 @@ public class HollowBlobReader {
 
         long startTime = System.currentTimeMillis();
 
+        // Apply type state deltas first
         int numStates = VarInt.readVInt(in);
 
         Collection<String> typeNames = new TreeSet<String>();
@@ -250,12 +251,60 @@ public class HollowBlobReader {
             }
         }
 
+        // Read and apply appended schema data if present
+        // This includes both schema updates and field values
+        if (header.hasAppendedSchemaData()) {
+            DeltaSchemaAppendDataApplicator applicator = new DeltaSchemaAppendDataApplicator(stateEngine, in);
+            applicator.readAndApplySchemaDiffs();
+            applicator.readAndApplyFieldValues();
+        }
+
         long endTime = System.currentTimeMillis();
 
         log.info("DELTA COMPLETED IN " + (endTime - startTime) + "ms");
         log.info("TYPES: " + typeNames);
 
         notifyEndUpdate();
+    }
+
+    /**
+     * Skip type state deltas to reach the appended schema data section.
+     * Reads and discards all type state delta data.
+     */
+    private void skipToAppendedSchemaData(HollowBlobInput in) throws IOException {
+        // Read number of type states
+        int numStates = VarInt.readVInt(in);
+
+        // Skip each type state delta
+        for (int i = 0; i < numStates; i++) {
+            // Read type name length and name
+            int typeNameLength = VarInt.readVInt(in);
+            byte[] typeNameBytes = new byte[typeNameLength];
+            for (int j = 0; j < typeNameLength; j++) {
+                typeNameBytes[j] = (byte) in.read();
+            }
+            String typeName = new String(typeNameBytes, java.nio.charset.StandardCharsets.UTF_8);
+
+            // Get schema for this type
+            HollowTypeReadState typeState = stateEngine.getTypeState(typeName);
+            if (typeState == null) {
+                throw new IOException("Type state not found for type: " + typeName);
+            }
+
+            // Discard the delta data for this type
+            if (typeState instanceof HollowObjectTypeReadState) {
+                HollowObjectTypeReadState objectState = (HollowObjectTypeReadState) typeState;
+                HollowObjectTypeReadState.discardDelta(in, objectState.getSchema(), objectState.numShards());
+            } else if (typeState instanceof HollowListTypeReadState) {
+                HollowListTypeReadState.discardDelta(in, typeState.numShards());
+            } else if (typeState instanceof HollowSetTypeReadState) {
+                HollowSetTypeReadState.discardDelta(in, typeState.numShards());
+            } else if (typeState instanceof HollowMapTypeReadState) {
+                HollowMapTypeReadState.discardDelta(in, typeState.numShards());
+            }
+        }
+
+        // Now we're at the start of the appended schema data section
     }
 
     private HollowBlobHeader readHeader(HollowBlobInput in, boolean isDelta) throws IOException {

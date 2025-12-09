@@ -38,6 +38,7 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
+import com.netflix.hollow.core.write.HollowDeltaSchemaAppendConfig;
 import com.netflix.hollow.tools.history.HollowHistory;
 import java.io.File;
 import java.io.IOException;
@@ -1158,6 +1159,8 @@ public class HollowConsumer {
         protected MemoryMode memoryMode = MemoryMode.ON_HEAP;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
         protected boolean skipTypeShardUpdateWithNoAdditions = false;
+        protected HollowDeltaSchemaAppendConfig deltaSchemaAppendConfig =
+            new HollowDeltaSchemaAppendConfig(false);
 
         public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -1436,6 +1439,20 @@ public class HollowConsumer {
          */
         public B withSkipTypeShardUpdateWithNoAdditions() {
             this.skipTypeShardUpdateWithNoAdditions = true;
+            return (B)this;
+        }
+
+        /**
+         * Enable or disable the delta schema append feature.
+         * When enabled, the consumer will read and apply appended data for new fields from delta blobs.
+         * This allows consumers with updated schemas to get field values while consumers without
+         * new fields can efficiently skip the appended data.
+         *
+         * @param enabled true to enable, false to disable (default is false)
+         * @return this builder
+         */
+        public B withDeltaSchemaAppendEnabled(boolean enabled) {
+            this.deltaSchemaAppendConfig = new HollowDeltaSchemaAppendConfig(enabled);
             return (B)this;
         }
 

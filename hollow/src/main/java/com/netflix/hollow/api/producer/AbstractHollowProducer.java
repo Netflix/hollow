@@ -45,6 +45,7 @@ import com.netflix.hollow.core.schema.HollowSchemaHash;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowDeltaSchemaAppendConfig;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
@@ -109,7 +110,8 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE);
+                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE,
+                new HollowDeltaSchemaAppendConfig(false));
     }
 
     // The only constructor should be that which accepts a builder
@@ -122,7 +124,8 @@ abstract class AbstractHollowProducer {
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
                 b.allowTypeResharding, b.forceCoverageOfTypeResharding,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
-                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier);
+                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier,
+                b.deltaSchemaAppendConfig);
     }
 
     private AbstractHollowProducer(
@@ -142,7 +145,8 @@ abstract class AbstractHollowProducer {
             SingleProducerEnforcer singleProducerEnforcer,
             HollowObjectHashCodeFinder hashCodeFinder,
             boolean doIntegrityCheck,
-            HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
+            HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier,
+            HollowDeltaSchemaAppendConfig deltaSchemaAppendConfig) {
         this.publisher = publisher;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
@@ -163,6 +167,7 @@ abstract class AbstractHollowProducer {
         writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
         writeEngine.allowTypeResharding(allowTypeResharding);
         writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
+        writeEngine.setDeltaSchemaAppendConfig(deltaSchemaAppendConfig);
 
         this.objectMapper = new HollowObjectMapper(writeEngine);
         if (hashCodeFinder != null) {
