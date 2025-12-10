@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
+
 class HollowObjectTypeTestDataAPIClassGenerator {
     
     private final HollowDataset dataset;
@@ -109,6 +111,10 @@ class HollowObjectTypeTestDataAPIClassGenerator {
                 break;
             case REFERENCE:
                 String refType = schema.getReferencedType(i);
+                if (!includeType(refType, dataset)) {
+                    break;
+                }
+
                 String returnType = className(refType) + "<" + className + "<T>>";
                 builder.append("    public " + returnType + " " + fieldName + "() {\n");
                 builder.append("        " + returnType + " __x = new " + returnType + "(this);\n");

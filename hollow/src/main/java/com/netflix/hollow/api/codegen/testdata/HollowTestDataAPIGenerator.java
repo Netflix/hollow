@@ -29,6 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
+
 public class HollowTestDataAPIGenerator {
     
     private HollowDataset dataset;
@@ -90,6 +92,10 @@ public class HollowTestDataAPIGenerator {
         }
 
         for(HollowSchema schema : dataset.getSchemas()) {
+            if (!includeType(schema, dataset)) {
+                continue;
+            }
+
             File classDestination = destination.resolve(schema.getName() + "TestData.java").toFile();
             String classContent = null;
             switch(schema.getSchemaType()) {

@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.netflix.hollow.HollowGenerated;
+import com.netflix.hollow.api.codegen.testdata.HollowTestDataAPIGenerator;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchemaParser;
 import com.netflix.hollow.core.schema.SimpleHollowDataset;
@@ -60,8 +61,8 @@ public class AbstractHollowAPIGeneratorTest {
         if(generator.config.isUseMetaInfo()) {
             metaInfoPath = generator.config.getMetaInfoPath();
         }
-        
-        compileGeneratedFiles();
+
+        HollowCodeGenerationCompileUtil.compileSrcFilesAndCheckForBugs(sourceFolder, clazzFolder);
     }
 
     protected void assertNonEmptyFileExists(Path absolutePath) {
@@ -104,7 +105,7 @@ public class AbstractHollowAPIGeneratorTest {
                 .build();
         generator.generateSourceFiles();
 
-        compileGeneratedFiles();
+        HollowCodeGenerationCompileUtil.compileSrcFilesAndCheckForBugs(sourceFolder, clazzFolder);
     }
 
     protected void runGeneratorFromSchemaString(String apiClassName, String packageName, String schemaContentAsStr,
@@ -124,7 +125,7 @@ public class AbstractHollowAPIGeneratorTest {
             metaInfoPath = generator.config.getMetaInfoPath();
         }
 
-        compileGeneratedFiles();
+        HollowCodeGenerationCompileUtil.compileSrcFilesAndCheckForBugs(sourceFolder, clazzFolder);
     }
 
     protected void runGeneratorFromSchemaFile(String apiClassName, String packageName, String schemaFilePathOrResource,
@@ -146,12 +147,11 @@ public class AbstractHollowAPIGeneratorTest {
             metaInfoPath = generator.config.getMetaInfoPath();
         }
 
-        compileGeneratedFiles();
+        HollowCodeGenerationCompileUtil.compileSrcFilesAndCheckForBugs(sourceFolder, clazzFolder);
     }
 
     protected void runPerformanceGeneratorFromSchemaFile(String apiClassName, String packageName, String schemaFilePathOrResource) throws Exception {
         setupFolders();
-
         SimpleHollowDataset dataset = readSchemaFile(schemaFilePathOrResource);
 
         // Run Generator
@@ -162,9 +162,28 @@ public class AbstractHollowAPIGeneratorTest {
                 .withPackageName(packageName)
                 .withDestination(sourceFolder)
                 .build();
+
+        generator.generateSourceFiles();
+        HollowCodeGenerationCompileUtil.compileSrcFilesAndCheckForBugs(sourceFolder, clazzFolder);
+    }
+
+
+    protected void runTestDataAPIGeneratorFromSchemaFile(String apiClassName, String packageName, String schemaFilePathOrResource) throws Exception {
+        setupFolders();
+        SimpleHollowDataset dataset = readSchemaFile(schemaFilePathOrResource);
+        com.netflix.hollow.api.codegen.testdata.HollowTestDataAPIGenerator generator = HollowTestDataAPIGenerator.newBuilder()
+                .withDataset(dataset)
+                .withPackageName(packageName)
+                .withAPIClassname(apiClassName)
+                .withDestination(sourceFolder)
+                .build();
+
         generator.generateSourceFiles();
 
-        compileGeneratedFiles();
+        // For TestDataAPIGenerator, the generated code may contain warnings which would cause exception if
+        // HollowCodeGenerationCompileUtil.compileSrcFilesAndCheckForBugs is used, even though it's compilable.
+        // For now just skip running FindBugs2.
+        HollowCodeGenerationCompileUtil.compileSrcFiles(sourceFolder, clazzFolder);
     }
 
     private void setupFolders() {
@@ -191,10 +210,6 @@ public class AbstractHollowAPIGeneratorTest {
         }
         List<HollowSchema> schemaList = HollowSchemaParser.parseCollectionOfSchemas(schemaContent);
         return new SimpleHollowDataset(schemaList);
-    }
-
-    private void compileGeneratedFiles() throws Exception {
-        HollowCodeGenerationCompileUtil.compileSrcFiles(sourceFolder, clazzFolder);
     }
 
     @After
