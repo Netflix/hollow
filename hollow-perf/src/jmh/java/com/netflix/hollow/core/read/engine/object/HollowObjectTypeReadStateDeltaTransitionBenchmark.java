@@ -2,6 +2,7 @@ package com.netflix.hollow.core.read.engine.object;
 
 
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -18,6 +19,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -76,6 +80,7 @@ public class HollowObjectTypeReadStateDeltaTransitionBenchmark {
         final List<String> readStrings = new ArrayList<>();
         final Set<Integer> readKeys = new HashSet<>();
         refreshExecutor = Executors.newSingleThreadExecutor();
+        LogManager.getLogManager().reset();
 
         refreshExecutor.submit(() -> {
             writeStateEngine = new HollowWriteStateEngine();

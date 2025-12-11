@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package com.netflix.hollow;
+
+option java_package = "com.netflix.hollow.protoadapter";
+option java_outer_classname = "HollowOptions";
+
+import "google/protobuf/descriptor.proto";
+
+// Custom message option to define primary key field paths
+// Similar to @HollowPrimaryKey(fields = {"id", "version"}) in Java
+extend google.protobuf.MessageOptions {
+  repeated string hollow_primary_key = 50000;
+}
+
+// Custom field option to mark repeated fields as unordered
+// When true, list order is ignored for deduplication (treated like a set)
+// Example: ["a", "b", "c"] and ["c", "a", "b"] are considered identical
+// Default: false (preserve order)
+// Similar to HollowObjectMapper.ignoreListOrdering() in Java
+extend google.protobuf.FieldOptions {
+  bool hollow_ignore_list_ordering = 50001;
+}
