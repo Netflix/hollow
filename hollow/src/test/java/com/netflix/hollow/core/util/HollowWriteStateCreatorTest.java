@@ -229,6 +229,22 @@ public class HollowWriteStateCreatorTest {
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("Duplicate schema name(s)");
     }
+
+    @Test
+    public void populateStateEngineWithTypeWriteStates_acceptsIdenticalSchemas() throws IOException {
+        String schemaStr = "TypeA { Long id; TypeB b; }"
+            + "TypeB { ListOfLong ids; }"
+            + "Long { long value; }"
+            + "ListOfLong List<Long>;"
+            + "ListOfLong List<Long>;";
+        List<HollowSchema> schemas = HollowSchemaParser.parseCollectionOfSchemas(schemaStr);
+        assertThat(schemas).extracting(HollowSchema::getName)
+            .containsExactly("TypeA", "TypeB", "Long", "ListOfLong", "ListOfLong");
+        HollowWriteStateEngine engine = new HollowWriteStateEngine();
+        HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(engine, schemas);
+        assertThat(engine.getSchemas()).extracting(HollowSchema::getName)
+            .containsExactly("Long", "ListOfLong", "TypeB", "TypeA");
+    }
     
     @SuppressWarnings("unused")
     @HollowTypeName(name="Integer")

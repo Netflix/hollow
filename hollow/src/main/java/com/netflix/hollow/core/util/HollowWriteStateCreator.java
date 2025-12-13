@@ -41,6 +41,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -115,19 +117,21 @@ public class HollowWriteStateCreator {
     }
 
     private static List<HollowSchema> getDependencyOrderedSchemas(Collection<HollowSchema> schemas) {
-        Set<String> duplicateSchemaNames = schemas.stream()
-            .map(HollowSchema::getName)
-            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() > 1)
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toSet());
+        Set<String> duplicateSchemaNames = new HashSet<>();
+        Map<String, HollowSchema> schemasByName = new HashMap<>();
+        for (HollowSchema schema : schemas) {
+            HollowSchema existingSchema = schemasByName.get(schema.getName());
+            if (existingSchema == null) {
+                schemasByName.put(schema.getName(), schema);
+            } else if (!existingSchema.equals(schema)) {
+                duplicateSchemaNames.add(schema.getName());
+            }
+        }
         if (!duplicateSchemaNames.isEmpty()) {
             throw new IllegalStateException("Duplicate schema name(s): " + duplicateSchemaNames);
         }
-        List<HollowSchema> dependencyOrderedSchemas = HollowSchemaSorter.dependencyOrderedSchemaList(schemas);
-        if (schemas.size() != dependencyOrderedSchemas.size()) {
+        List<HollowSchema> dependencyOrderedSchemas = HollowSchemaSorter.dependencyOrderedSchemaList(schemasByName.values());
+        if (schemasByName.size() != dependencyOrderedSchemas.size()) {
             Set<String> missingSchemaNames = schemas.stream()
                 .map(HollowSchema::getName)
                 .collect(Collectors.toSet());
