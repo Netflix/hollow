@@ -54,6 +54,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
+
 /**
  * This class is used to generate java code which defines an implementation of a {@link HollowAPI}.
  *
@@ -430,13 +432,13 @@ public class HollowAPIGenerator {
                 dataset, parameterizeClassNames, config);
         HollowAPIFactoryJavaGenerator apiFactoryGenerator = new HollowAPIFactoryJavaGenerator(packageName,
                 apiClassname, dataset, config);
-
         HollowHashIndexGenerator hashIndexGenerator = new HollowHashIndexGenerator(packageName, apiClassname, dataset, config);
 
         generateFile(directory, apiClassGenerator);
         generateFile(directory, apiFactoryGenerator);
         generateFile(directory, hashIndexGenerator);
 
+        // generate other java classes
         generateFilesForHollowSchemas(directory);
 
         if (config.isUseMetaInfo()) {
@@ -463,7 +465,10 @@ public class HollowAPIGenerator {
     protected void generateFilesForHollowSchemas(File directory) throws IOException {
         for(HollowSchema schema : dataset.getSchemas()) {
             String type = schema.getName();
-            if (config.isUseHollowPrimitiveTypes() && HollowCodeGenerationUtils.isPrimitiveType(type)) continue; // skip if using hollow primitive type
+            if ((config.isUseHollowPrimitiveTypes() && HollowCodeGenerationUtils.isPrimitiveType(type))
+                || !includeType(schema, dataset)) {
+                continue;
+            }
 
             generateFile(directory, getStaticAPIGenerator(schema));
             generateFile(directory, getHollowObjectGenerator(schema));
@@ -541,6 +546,8 @@ public class HollowAPIGenerator {
         writer.close();
     }
 
+    // invoked from HollowAPIGenerator.generateFilesForHollowSchemas, the input schema has been validated via
+    // {@code HollowCodeGenerationUtils.includeType}
     protected HollowJavaFileGenerator getStaticAPIGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
             return new TypeAPIObjectJavaGenerator(apiClassname, packageName, (HollowObjectSchema) schema, dataset, config);
@@ -555,6 +562,8 @@ public class HollowAPIGenerator {
         throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getName() + "?");
     }
 
+    // invoked from HollowAPIGenerator.generateFilesForHollowSchemas, the input schema has been validated via
+    // {@code HollowCodeGenerationUtils.includeType}
     protected HollowJavaFileGenerator getHollowObjectGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
             return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema,
@@ -572,6 +581,8 @@ public class HollowAPIGenerator {
         throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getName() + "?");
     }
 
+    // invoked from HollowAPIGenerator.generateFilesForHollowSchemas, the input schema has been validated via
+    // {@code HollowCodeGenerationUtils.includeType}
     protected HollowFactoryJavaGenerator getHollowFactoryGenerator(HollowSchema schema) {
         return new HollowFactoryJavaGenerator(packageName, schema, dataset, config);
     }

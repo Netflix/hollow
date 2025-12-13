@@ -17,20 +17,34 @@
 package com.netflix.hollow.api.codegen.perfapi;
 
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.Set;
+
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
 
 class HollowObjectTypePerfAPIClassGenerator {
 
     private final HollowObjectSchema schema;
     private final String packageName;
     private final Set<String> checkFieldExistsMethods;
+    private HollowDataset dataset;
 
+    /**
+     * @deprecated This constructor does not allow specifying a {@link HollowDataset}.
+     *             Use {@link #HollowObjectTypePerfAPIClassGenerator(HollowObjectSchema, String, Set, HollowDataset)} instead.
+     */
+    @Deprecated
     public HollowObjectTypePerfAPIClassGenerator(HollowObjectSchema schema, String packageName, Set<String> checkFieldExistsMethods) {
         this.schema = schema;
         this.packageName = packageName;
         this.checkFieldExistsMethods = checkFieldExistsMethods;
+    }
+
+    public HollowObjectTypePerfAPIClassGenerator(HollowObjectSchema schema, String packageName, Set<String> checkFieldExistsMethods, HollowDataset dataset) {
+        this(schema, packageName, checkFieldExistsMethods);
+        this.dataset = dataset;
     }
 
     public String generate() {
@@ -47,10 +61,18 @@ class HollowObjectTypePerfAPIClassGenerator {
         builder.append("public class " + schema.getName() + "PerfAPI extends HollowObjectTypePerfAPI {\n\n");
 
         builder.append("    public static final String fieldNames[] = { ");
+        int addedFields = 0;
         for(int i=0;i<schema.numFields();i++) {
-            if(i > 0)
+            if (dataset != null && schema.getFieldType(i) == HollowObjectSchema.FieldType.REFERENCE &&
+                !includeType(schema.getReferencedType(i), dataset)) {
+                continue;
+            }
+
+            if(addedFields > 0) {
                 builder.append(", ");
-            builder.append("\"" + schema.getFieldName(i) + "\"");
+            }
+            builder.append("\"").append(schema.getFieldName(i)).append("\"");
+            addedFields++;
         }
 
         builder.append(" };\n\n");
@@ -60,6 +82,10 @@ class HollowObjectTypePerfAPIClassGenerator {
         builder.append("    }\n\n");
 
         for(int i=0;i<schema.numFields();i++) {
+            if (dataset != null && schema.getFieldType(i) == HollowObjectSchema.FieldType.REFERENCE && !includeType(schema.getReferencedType(i), dataset)) {
+                continue;
+            }
+
             FieldType fieldType = schema.getFieldType(i);
             String fieldName = schema.getFieldName(i);
             String referencedType = schema.getReferencedType(i);
@@ -187,7 +213,7 @@ class HollowObjectTypePerfAPIClassGenerator {
                 builder.append("    }\n\n");
                 break;
         }
-        
+
         if(checkFieldExistsMethods.contains(schema.getName() + "." + fieldName)) {
             builder.append("    public boolean " + fieldName + "FieldExists() {\n");
             builder.append("        return fieldIdx[" + fieldIdx + "] != -1;\n");

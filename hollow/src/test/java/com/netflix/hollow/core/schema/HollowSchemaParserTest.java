@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.schema;
 
+import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.io.BufferedReader;
@@ -27,7 +28,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowSchemaParserTest {
-
     @Test
     public void parsesObjectSchema() throws IOException {
         String objectSchema =

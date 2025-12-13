@@ -26,6 +26,7 @@ import com.netflix.hollow.api.objects.delegate.HollowSetCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
 import com.netflix.hollow.core.HollowDataset;
+import com.netflix.hollow.core.schema.HollowCollectionSchema;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -401,5 +402,35 @@ public class HollowCodeGenerationUtils {
 
     public static boolean isCollectionType(String schemaName, HollowDataset dataset) {
         return dataset.getSchema(schemaName).getSchemaType() != HollowSchema.SchemaType.OBJECT;
+    }
+
+    // decide whether the type defined by the HollowSchema is valid and should be included for code generation.
+    // If the HollowSchema itself is null or if it's a parameterized type with an invalid type argument, they cannot
+    // be included.
+    public static boolean includeType(String refTypeName, HollowDataset dataset) {
+        HollowSchema refSchema = dataset.getSchema(refTypeName);
+        if (refSchema == null) {
+            return false;
+        }
+
+        return includeType(refSchema, dataset);
+    }
+
+    public static boolean includeType(HollowSchema schema, HollowDataset dataset) {
+        if (schema == null) {
+            return false;
+        }
+
+        switch(schema.getSchemaType()) {
+            case LIST:
+            case SET:
+                return includeType(((HollowCollectionSchema)schema).getElementType(), dataset);
+            case MAP:
+                HollowMapSchema mapSchema = (HollowMapSchema)schema;
+                return includeType(mapSchema.getKeyType(), dataset) && includeType(mapSchema.getValueType(), dataset);
+            case OBJECT:
+            default:
+                return true;
+        }
     }
 }

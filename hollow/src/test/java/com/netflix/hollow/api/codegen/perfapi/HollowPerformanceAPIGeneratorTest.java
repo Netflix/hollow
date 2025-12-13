@@ -1,9 +1,6 @@
 package com.netflix.hollow.api.codegen.perfapi;
 
 import com.netflix.hollow.api.codegen.AbstractHollowAPIGeneratorTest;
-import com.netflix.hollow.api.codegen.HollowCodeGenerationCompileUtil;
-import com.netflix.hollow.core.schema.SimpleHollowDataset;
-import java.io.File;
 import java.nio.file.Paths;
 import org.junit.Test;
 
@@ -11,36 +8,39 @@ public class HollowPerformanceAPIGeneratorTest extends AbstractHollowAPIGenerato
 
   @Test
   public void testGeneratePerformanceApi() throws Exception {
-    runGenerator("API", "com.netflix.hollow.example.api.performance.generated", MyClass.class);
+    runPerformanceGenerator("API", "com.netflix.hollow.example.api.performance.generated", MyClass.class);
   }
 
   @Test
   public void testGeneratedFilesArePlacedInPackageDirectory() throws Exception {
-    runGenerator("API", "codegen.api", MyClass.class);
+    runPerformanceGenerator("API", "codegen.api", MyClass.class);
     assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/api/MyClassPerfAPI.java"));
     assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/api/StringPerfAPI.java"));
     assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/api/API.java"));
   }
 
-  private void runGenerator(String apiClassName, String packageName, Class<?> clazz) throws Exception {
-    System.out.println(String.format("Folders (%s) : \n\tsource=%s \n\tclasses=%s",
-        getClass().getSimpleName(), sourceFolder, clazzFolder));
+  @Test
+  public void testGeneratedFilesDontIncludeUndefinedTypes() throws Exception {
+    String schemaResourcePath = "/hollow_code_gen_test.schema";
 
-    // Setup Folders
-    HollowCodeGenerationCompileUtil.cleanupFolder(new File(sourceFolder), null);
-    HollowCodeGenerationCompileUtil.cleanupFolder(new File(clazzFolder), null);
+    // Generate code from schema file
+    runPerformanceGeneratorFromSchemaFile("TestSchemaAPI", "codegen.perfapi", schemaResourcePath);
 
-    // Run generator
-    HollowPerformanceAPIGenerator generator = HollowPerformanceAPIGenerator.newBuilder()
-        .withDestination(sourceFolder)
-        .withPackageName(packageName)
-        .withAPIClassname(apiClassName)
-        .withDataset(SimpleHollowDataset.fromClassDefinitions(clazz))
-        .build();
-    generator.generateSourceFiles();
+    // Verify valid types exist (types that have complete definitions)
+    // Performance API generates PerfAPI classes only for OBJECT types
+    assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/perfapi/TopLevelObjectPerfAPI.java"));
+    assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/perfapi/Object1PerfAPI.java"));
+    assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/perfapi/StringPerfAPI.java"));
+    assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/perfapi/TestSchemaAPI.java"));
 
-    // Compile to validate generated files
-    HollowCodeGenerationCompileUtil.compileSrcFiles(sourceFolder, clazzFolder);
+    // Verify invalid types do NOT exist (Object2 is undefined, so these should not be generated)
+    // Note: Collection types (List, Set, Map) don't generate individual PerfAPI files anyway,
+    // but we verify that Object2 itself is not generated
+    assertFileDoesNotExist("codegen/perfapi/Object2PerfAPI.java");
+    assertFileDoesNotExist("codegen/perfapi/ListOfObject2PerfAPI.java");
+    assertFileDoesNotExist("codegen/perfapi/SetOfObject2PerfAPI.java");
+    assertFileDoesNotExist("codegen/perfapi/MapOfStringToObject2PerfAPI.java");
+    assertFileDoesNotExist("codegen/perfapi/MapOfObject2ToStringPerfAPI.java");
   }
 
   @SuppressWarnings("unused")

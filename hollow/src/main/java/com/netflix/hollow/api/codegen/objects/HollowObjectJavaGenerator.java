@@ -18,6 +18,7 @@ package com.netflix.hollow.api.codegen.objects;
 
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateInterfaceName;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.generateBooleanAccessorMethodName;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.isPrimitiveType;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
@@ -165,7 +166,10 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
                     classBuilder.append(generateLongFieldAccessor(i));
                     break;
                 case REFERENCE:
-                    classBuilder.append(generateReferenceFieldAccessor(i));
+                    if (includeType(schema.getReferencedType(i), this.dataset)) {
+                        classBuilder.append(generateReferenceFieldAccessor(i));
+                    }
+
                     break;
                 case STRING:
                     classBuilder.append(generateStringFieldAccessors(i));
