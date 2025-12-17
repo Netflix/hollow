@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,7 +45,6 @@ public class HollowObjectMapperFlatRecordParserTest {
     wrapperTypesTest.complexEnum = ComplexEnum.SOME_VALUE_A;
     wrapperTypesTest.dateCreated = new Date();
     wrapperTypesTest.instant = Instant.now();
-    wrapperTypesTest.uuid = UUID.randomUUID();
     wrapperTypesTest.localDate = LocalDate.now();
 
     flatRecordWriter.reset();
@@ -60,7 +58,6 @@ public class HollowObjectMapperFlatRecordParserTest {
     Assert.assertEquals(wrapperTypesTest.complexEnum.anotherValue, result.complexEnum.anotherValue);
     Assert.assertEquals(wrapperTypesTest.dateCreated, result.dateCreated);
     Assert.assertEquals(wrapperTypesTest.instant, result.instant);
-    Assert.assertEquals(wrapperTypesTest.uuid, result.uuid);
     Assert.assertEquals(wrapperTypesTest.localDate, result.localDate);
 
   }
@@ -709,13 +706,12 @@ public class HollowObjectMapperFlatRecordParserTest {
     Date dateCreated;
     Instant instant;
     LocalDate localDate;
-    UUID uuid;
 
     @Override
     public boolean equals(Object o) {
       if(o instanceof SpecialWrapperTypesTest) {
         SpecialWrapperTypesTest other = (SpecialWrapperTypesTest)o;
-        return id == other.id && complexEnum == other.complexEnum && type == other.type && dateCreated.equals(other.dateCreated) && instant.equals(other.instant) && localDate.equals(other.localDate) && uuid.equals(other.uuid);
+        return id == other.id && complexEnum == other.complexEnum && type == other.type && dateCreated.equals(other.dateCreated) && instant.equals(other.instant) && localDate.equals(other.localDate);
       }
       return false;
     }

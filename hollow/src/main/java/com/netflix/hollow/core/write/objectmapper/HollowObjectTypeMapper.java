@@ -40,7 +40,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import sun.misc.Unsafe;
 
@@ -49,7 +48,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     
     private static final Set<Class<?>> BOXED_WRAPPERS = new HashSet<>(Arrays.asList(Boolean.class, Integer.class, Short.class, Byte.class, Character.class, Long.class, Float.class, Double.class, String.class, byte[].class, Date.class));
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
-    private static final Set<Class<?>> SPECIAL_WRAPPERS = new HashSet<>(Arrays.asList(UUID.class, LocalDate.class, Instant.class));
+    private static final Set<Class<?>> SPECIAL_WRAPPERS = new HashSet<>(Arrays.asList(LocalDate.class, Instant.class));
 
     private final HollowObjectMapper parentMapper;
 
@@ -89,14 +88,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             try {
                 mappedFields.add(new MappedField(MappedFieldType.INSTANT_NANOS));
                 mappedFields.add(new MappedField(MappedFieldType.INSTANT_SECONDS));
-            }
-            catch(Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else if(clazz == UUID.class) {
-            try {
-                mappedFields.add(new MappedField(MappedFieldType.UUID_MOST_SIG_BITS));
-                mappedFields.add(new MappedField(MappedFieldType.UUID_LEAST_SIG_BITS));
             }
             catch(Exception e) {
                 throw new RuntimeException(e);
@@ -262,27 +253,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             else if (SPECIAL_WRAPPERS.contains(clazz)) {
                 // Multi-field reconstruction for special wrapper types
                 // for these types, the field names are known, no need to iterate the object to find the fieldName
-                if (clazz == UUID.class) {
-                    Long mostSigBits = null;
-                    Long leastSigBits = null;
-                    int mostSigBitsPosInPojoSchema = schema.getPosition(MappedFieldType.UUID_MOST_SIG_BITS.getSpecialFieldName());
-                    if(mostSigBitsPosInPojoSchema != -1) {
-                        long value =  hollowObject.getTypeDataAccess().readLong(hollowObject.getOrdinal(), mostSigBitsPosInPojoSchema);
-                        if(value != Long.MIN_VALUE) {
-                            mostSigBits = value;
-                        }
-                    }
-                    int leastSigBitsPosInPojoSchema = schema.getPosition(MappedFieldType.UUID_LEAST_SIG_BITS.getSpecialFieldName());
-                    if(leastSigBitsPosInPojoSchema != -1) {
-                        long value = hollowObject.getTypeDataAccess().readLong(hollowObject.getOrdinal(), leastSigBitsPosInPojoSchema);
-                        if(value != Long.MIN_VALUE) {
-                            leastSigBits = value;
-                        }
-                    }
-                    if (mostSigBits != null && leastSigBits != null) {
-                        obj = new UUID(mostSigBits, leastSigBits);
-                    }
-                } else if (clazz == Instant.class) {
+                if (clazz == Instant.class) {
                     Long seconds = null;
                     Integer nanos = null;
                     int secondsPosInPojoSchema = schema.getPosition(MappedFieldType.INSTANT_SECONDS.getSpecialFieldName());
@@ -378,29 +349,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
             else if (SPECIAL_WRAPPERS.contains(clazz)) {
                 // Multi-field reconstruction for special wrapper types
-                if (clazz == UUID.class) {
-                    Long mostSigBits = null;
-                    Long leastSigBits = null;
-
-                    int mostSigBitsPosInPojoSchema = schema.getPosition("mostSigBits");
-                    if (mostSigBitsPosInPojoSchema != -1) {
-                        long value = objectNode.getFieldValueUuidLong("mostSigBits");
-                        if (value != Long.MIN_VALUE) {
-                            mostSigBits = value;
-                        }
-                    }
-                    int leastSigBitsPosInPojoSchema = schema.getPosition("leastSigBits");
-                    if (leastSigBitsPosInPojoSchema != -1) {
-                        long value = objectNode.getFieldValueUuidLong("leastSigBits");
-                        if (value != Long.MIN_VALUE) {
-                            leastSigBits = value;
-                        }
-                    }
-                    if (mostSigBits != null && leastSigBits != null) {
-                        obj = new UUID(mostSigBits, leastSigBits);
-                    }
-                } else if (clazz == Instant.class) {
-                    Long seconds = null;
+                if (clazz == Instant.class) {
+                      Long seconds = null;
                     Integer nanos = null;
                     int secondsPosInPojoSchema = schema.getPosition("seconds");
                     if(secondsPosInPojoSchema != -1) {
@@ -767,18 +717,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     		rec.setReference(fieldName, subTypeMapper.write(fieldObject));
                     	else
                     		rec.setReference(fieldName, subTypeMapper.writeFlat(fieldObject, flatRecordWriter));
-                    }
-                    break;
-                case UUID_LEAST_SIG_BITS:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null) {
-                        rec.setLong(fieldName, ((UUID) obj).getLeastSignificantBits());
-                    }
-                    break;
-                case UUID_MOST_SIG_BITS:
-                    fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null) {
-                        rec.setLong(fieldName, ((UUID) obj).getMostSignificantBits());
                     }
                     break;
                 case LOCAL_DATE_DAY:
@@ -1347,8 +1285,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         REFERENCE(FieldType.REFERENCE),
         ENUM_NAME(FieldType.STRING, "_name"),
         DATE_TIME(FieldType.LONG, "value"),
-        UUID_MOST_SIG_BITS(FieldType.UUID_LONG, "mostSigBits"),
-        UUID_LEAST_SIG_BITS(FieldType.UUID_LONG, "leastSigBits"),
         INSTANT_SECONDS(FieldType.LONG, "seconds"),
         INSTANT_NANOS(FieldType.INT, "nanos"),
         LOCAL_DATE_YEAR(FieldType.INT, "year"),

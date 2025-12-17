@@ -36,7 +36,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -205,40 +204,6 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void testUUID() throws IOException {
-        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-
-        UUID uuid = UUID.randomUUID();
-
-        mapper.add(uuid);
-
-        roundTripSnapshot();
-
-        int theOrdinal = readStateEngine.getTypeState("UUID").maxOrdinal();
-
-        GenericHollowObject obj = new GenericHollowObject(readStateEngine, "UUID", theOrdinal);
-
-        Assert.assertEquals(uuid, new UUID(obj.getLong("mostSigBits"), obj.getLong("leastSigBits")));
-    }
-
-    @Test
-    public void testUUIDNull() throws IOException {
-        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        TypeWithNullUUID type = new TypeWithNullUUID(null, 0);
-
-        mapper.add(type);
-
-        roundTripSnapshot();
-
-        int theOrdinal = readStateEngine.getTypeState("TypeWithNullUUID").maxOrdinal();
-
-        GenericHollowObject obj = new GenericHollowObject(readStateEngine, "TypeWithNullUUID", theOrdinal);
-
-        Assert.assertEquals(null, obj.getObject("uuid"));
-        Assert.assertEquals(0, obj.getInt("id"));
-    }
-
-    @Test
     public void testTransient() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
@@ -266,11 +231,10 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         Date date = new Date(time);
         // what if the DateTimeException is thrown?
         Instant instant = Instant.now();
-        UUID randomedUUID = UUID.randomUUID();
         LocalDate localDate = LocalDate.now();
 
         mapper.initializeTypeState(TypeWithSpecialTypes.class);
-        mapper.add(new TypeWithSpecialTypes(date, instant, randomedUUID, localDate));
+        mapper.add(new TypeWithSpecialTypes(date, instant, localDate));
 
         roundTripSnapshot();
 
@@ -282,7 +246,6 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         String schemeText = baos.toString();
         Assert.assertTrue(schemeText.contains("date"));
         Assert.assertTrue(schemeText.contains("instant"));
-        Assert.assertTrue(schemeText.contains("uuid"));
         Assert.assertTrue(schemeText.contains("localDate"));
 
         int theOrdinal = readStateEngine.getTypeState("TypeWithSpecialTypes").maxOrdinal();
@@ -291,9 +254,6 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
 
         Assert.assertEquals(instant.getEpochSecond(), obj.getObject("instant").getLong("seconds"));
         Assert.assertEquals(instant.getNano(), obj.getObject("instant").getInt("nanos"));
-
-        Assert.assertEquals(randomedUUID.getLeastSignificantBits(), obj.getObject("uuid").getLong("leastSigBits"));
-        Assert.assertEquals(randomedUUID.getMostSignificantBits(), obj.getObject("uuid").getLong("mostSigBits"));
 
         Assert.assertEquals(localDate.getYear(), obj.getObject("localDate").getInt("year"));
         Assert.assertEquals(localDate.getMonthValue(), obj.getObject("localDate").getInt("month"));
@@ -662,14 +622,5 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
 
     static class Child extends Parent {
         String myField1;
-    }
-
-    static class TypeWithNullUUID {
-        UUID uuid;
-        int id;
-        public TypeWithNullUUID(UUID uuid, int id) {
-            this.uuid = uuid;
-            this.id = id;
-        }
     }
 }
