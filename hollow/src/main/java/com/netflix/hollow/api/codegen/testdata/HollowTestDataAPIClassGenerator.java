@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
+
 class HollowTestDataAPIClassGenerator {
     
     private final HollowDataset dataset;
@@ -47,6 +49,9 @@ class HollowTestDataAPIClassGenerator {
         schemas.sort(Comparator.comparing(HollowSchema::getName));
 
         for(HollowSchema schema : schemas) {
+            if (!includeType(schema, dataset)) {
+                continue;
+            }
             builder.append("    public " + schema.getName() + "TestData<Void> " + schema.getName() + "() {\n");
             builder.append("        " + schema.getName() + "TestData<Void> rec = new " + schema.getName() + "TestData<>(null);\n");
             builder.append("        add(rec);\n");

@@ -24,6 +24,7 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchemaParser;
+import com.netflix.hollow.core.schema.HollowSchemaSorter;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
@@ -40,6 +41,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Use to pre-populate, or create a {@link HollowWriteStateEngine} which is pre-populated, with a particular data model.  
@@ -87,8 +95,8 @@ public class HollowWriteStateCreator {
      * @param schemas The schemas from the data model.
      */
     public static void populateStateEngineWithTypeWriteStates(HollowWriteStateEngine stateEngine, Collection<HollowSchema> schemas) {
-
-        for(HollowSchema schema : schemas) {
+        List<HollowSchema> dependencyOrderedSchemas = getDependencyOrderedSchemas(schemas);
+        for(HollowSchema schema : dependencyOrderedSchemas) {
             if(stateEngine.getTypeState(schema.getName()) == null) {
                 switch(schema.getSchemaType()) {
                 case OBJECT:
@@ -106,6 +114,34 @@ public class HollowWriteStateCreator {
                 }
             }
         }
+    }
+
+    private static List<HollowSchema> getDependencyOrderedSchemas(Collection<HollowSchema> schemas) {
+        Set<String> duplicateSchemaNames = new HashSet<>();
+        Map<String, HollowSchema> schemasByName = new HashMap<>();
+        for (HollowSchema schema : schemas) {
+            HollowSchema existingSchema = schemasByName.get(schema.getName());
+            if (existingSchema == null) {
+                schemasByName.put(schema.getName(), schema);
+            } else if (!existingSchema.equals(schema)) {
+                duplicateSchemaNames.add(schema.getName());
+            }
+        }
+        if (!duplicateSchemaNames.isEmpty()) {
+            throw new IllegalStateException("Duplicate schema name(s): " + duplicateSchemaNames);
+        }
+        List<HollowSchema> dependencyOrderedSchemas = HollowSchemaSorter.dependencyOrderedSchemaList(schemasByName.values());
+        if (schemasByName.size() != dependencyOrderedSchemas.size()) {
+            Set<String> missingSchemaNames = schemas.stream()
+                .map(HollowSchema::getName)
+                .collect(Collectors.toSet());
+            dependencyOrderedSchemas.forEach(schema -> missingSchemaNames.remove(schema.getName()));
+            throw new IllegalStateException(String.format(
+                "Missing schema(s) for %s in dependency ordered list (likely due to circular dependencies). This is unexpected and warrants investigation.",
+                missingSchemaNames
+            ));
+        }
+        return dependencyOrderedSchemas;
     }
     
     /**

@@ -36,6 +36,7 @@ import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -665,12 +666,20 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
         //from a HollowAPI to maintain support for object longevity. Do not get an accessor
         //from a Schema.
 
+        int parentOrdinal = ordinal;
         HollowHashIndexField field = fields[fieldIdx];
         int lastPathIdx = field.getSchemaFieldPositionPath().length - 1;
         for (int pathIdx = 0; pathIdx < lastPathIdx; pathIdx++) {
             FieldPathSegment pathElement = field.getSchemaFieldPositionPath()[pathIdx];
             ordinal = pathElement.getOrdinalForField(ordinal);
+            if (ordinal == ORDINAL_NONE) {
+                HollowObjectSchema fieldSchema = pathElement.getObjectTypeDataAccess().getSchema();
+                throw new NullPointerException("Cannot hash null field " +
+                        fieldSchema.getFieldName(pathElement.getSegmentFieldPosition()) + " in type " +
+                        fieldSchema.getName() + " at ordinal " + parentOrdinal);
+            }
         }
+
         //When the loop finishes, we should have the ordinal of the object containing the last field.
         FieldPathSegment lastPathElement = field.getLastFieldPositionPathElement();
 

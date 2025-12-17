@@ -88,6 +88,28 @@ public class HollowAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
         assertClassHasGeneratedAnnotation("codegen.api.MyClassTestAPI");
     }
 
+    @Test
+    public void testGenerateFromSchemaFileWithMissingTypes() throws Exception {
+        String schemaResourcePath = "/hollow_code_gen_test.schema";
+
+        // Generate code from schema file
+        runGeneratorFromSchemaFile("TestSchemaAPI", "codegen.api", schemaResourcePath, b->b);
+
+        // Verify valid types exist (types that have complete definitions)
+        assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/api/TopLevelObject.java"));
+        assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/api/Object1.java"));
+        assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/api/ListOfObject1.java"));
+        assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/api/SetOfObject1.java"));
+        assertNonEmptyFileExists(Paths.get(sourceFolder, "codegen/api/MapOfStringToObject1.java"));
+
+        // Verify invalid types do NOT exist (Object2 is undefined, so these should not be generated)
+        assertFileDoesNotExist("codegen/api/Object2.java");
+        assertFileDoesNotExist("codegen/api/ListOfObject2.java");
+        assertFileDoesNotExist("codegen/api/SetOfObject2.java");
+        assertFileDoesNotExist("codegen/api/MapOfStringToObject2.java");
+        assertFileDoesNotExist("codegen/api/MapOfObject2ToString.java");
+    }
+
 
     @SuppressWarnings("unused")
     @HollowPrimaryKey(fields = "id")

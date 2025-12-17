@@ -54,6 +54,9 @@ public class RecordCountPercentChangeValidatorTests {
             assertTrue(e instanceof ValidationStatusException);
             ValidationStatusException expected = (ValidationStatusException) e;
             assertEquals(1, expected.getValidationStatus().getResults().size());
+            String message = expected.getValidationStatus().getResults().get(0).getMessage();
+            assertTrue(message.startsWith("'TypeWithPrimaryKey' record count change exceeds threshold: "));
+            assertTrue(message.contains("added 80.00% > 50.00%"));
         }
     }
 
@@ -68,6 +71,9 @@ public class RecordCountPercentChangeValidatorTests {
             assertTrue(e instanceof ValidationStatusException);
             ValidationStatusException expected = (ValidationStatusException) e;
             assertEquals(1, expected.getValidationStatus().getResults().size());
+            String message = expected.getValidationStatus().getResults().get(0).getMessage();
+            assertTrue(message.startsWith("'TypeWithPrimaryKey' record count change exceeds threshold: "));
+            assertTrue(message.contains("removed 80.00% > 50.00%"));
         }
     }
 
@@ -76,14 +82,35 @@ public class RecordCountPercentChangeValidatorTests {
         try {
             testHelper(RecordCountPercentChangeValidator.Threshold.builder()
                     .withUpdatedPercentageThreshold(() ->0.5f)
-                    .withAddedPercentageThreshold(() -> 0.5f)
-                    .withAddedPercentageThreshold(() -> 0.5f)
-                    .build(), 4, 1, 1);
+                    .build(), 4, 0, 0);
             fail();
         } catch (Exception e) {
             assertTrue(e instanceof ValidationStatusException);
             ValidationStatusException expected = (ValidationStatusException) e;
             assertEquals(1, expected.getValidationStatus().getResults().size());
+            String message = expected.getValidationStatus().getResults().get(0).getMessage();
+            assertTrue(message.startsWith("'TypeWithPrimaryKey' record count change exceeds threshold: "));
+            assertTrue(message.contains("updated 80.00% > 50.00%"));
+        }
+    }
+
+    @Test
+    public void testMultipleThresholdsExceeded() {
+        try {
+            testHelper(RecordCountPercentChangeValidator.Threshold.builder()
+                    .withAddedPercentageThreshold(() -> 0.5f)
+                    .withRemovedPercentageThreshold(() -> 0.3f)
+                    .build(), 0, 4, 3);
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof ValidationStatusException);
+            ValidationStatusException expected = (ValidationStatusException) e;
+            assertEquals(1, expected.getValidationStatus().getResults().size());
+            String message = expected.getValidationStatus().getResults().get(0).getMessage();
+            assertTrue(message.startsWith("'TypeWithPrimaryKey' record count change exceeds threshold: "));
+            assertTrue(message.contains("added 80.00% > 50.00%"));
+            assertTrue(message.contains("removed 60.00% > 30.00%"));
+            assertTrue(message.contains(", "));
         }
     }
 

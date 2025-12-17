@@ -109,7 +109,7 @@ public class HollowPerformanceAPIGenerator {
         for (HollowSchema schema : dataset.getSchemas()) {
             if (schema.getSchemaType() == SchemaType.OBJECT) {
                 Path objClassDestination = destination.resolve(schema.getName() + "PerfAPI.java");
-                String objClassContent = new HollowObjectTypePerfAPIClassGenerator((HollowObjectSchema) schema, packageName, checkFieldExistsMethods).generate();
+                String objClassContent = new HollowObjectTypePerfAPIClassGenerator((HollowObjectSchema) schema, packageName, checkFieldExistsMethods, dataset).generate();
                 try (FileWriter writer = new FileWriter(objClassDestination.toFile())) {
                     writer.write(objClassContent);
                 }

@@ -6,6 +6,25 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 
+/**
+ * A sequential, single-pass reader for accessing data within a {@link FlatRecord}.
+ *
+ * <p>This reader maintains an internal pointer that advances as data is read,
+ * allowing efficient streaming through the record in a single pass. The caller
+ * is responsible for reading fields in the correct order as defined by the schema.
+ *
+ * <p><b>Trade-offs:</b>
+ * <ul>
+ *   <li>Not thread-safe—the internal pointer is mutable shared state</li>
+ *   <li>Must read data sequentially; random access requires manual repositioning
+ *       via {@link #resetTo(int)}</li>
+ * </ul>
+ *
+ * <p>Use this reader when processing records sequentially in a single thread
+ * and optimal single-pass performance is desired.
+ *
+ * @see FlatRecordOrdinalReader for a thread-safe random-access reader
+ */
 public class FlatRecordReader {
   private final FlatRecord record;
 
@@ -144,60 +163,12 @@ public class FlatRecordReader {
   }
 
   public void skipSchema(HollowSchema schema) {
-    switch (schema.getSchemaType()) {
-      case OBJECT: {
-        HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
-        int numFields = objectSchema.numFields();
-        for (int i = 0; i < numFields; i++) {
-          skipField(objectSchema.getFieldType(i));
-        }
-        break;
-      }
-      case LIST:
-      case SET: {
-        int numElements = readCollectionSize();
-        for (int i = 0; i < numElements; i++) {
-          readOrdinal();
-        }
-        break;
-      }
-      case MAP: {
-        int numElements = readCollectionSize();
-        for (int i = 0; i < numElements; i++) {
-          readOrdinal(); // key
-          readOrdinal(); // value
-        }
-        break;
-      }
-    }
+    int size = Sizing.sizeOfSchema(schema, record, pointer);
+    this.pointer += size;
   }
 
   public void skipField(HollowObjectSchema.FieldType fieldType) {
-    switch(fieldType) {
-      case BOOLEAN:
-        readBoolean();
-        break;
-      case BYTES:
-        readBytes();
-        break;
-      case DOUBLE:
-        readDouble();
-        break;
-      case FLOAT:
-        readFloat();
-        break;
-      case INT:
-        readInt();
-        break;
-      case LONG:
-        readLong();
-        break;
-      case REFERENCE:
-        readOrdinal();
-        break;
-      case STRING:
-        readString();
-        break;
-    }
+    int size = Sizing.sizeOfFieldValue(fieldType, record, pointer);
+    this.pointer += size;
   }
 }

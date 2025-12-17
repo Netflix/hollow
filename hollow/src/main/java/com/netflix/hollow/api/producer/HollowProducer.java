@@ -208,6 +208,11 @@ public class HollowProducer extends AbstractHollowProducer {
     }
 
     @Override
+    public HollowProducer.ReadState restore(HollowConsumer.VersionInfo versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
+        return super.restore(versionDesired, blobRetriever);
+    }
+
+    @Override
     public HollowWriteStateEngine getWriteEngine() {
         return super.getWriteEngine();
     }
@@ -739,6 +744,7 @@ public class HollowProducer extends AbstractHollowProducer {
         HollowObjectHashCodeFinder hashCodeFinder = null;
         boolean doIntegrityCheck = true;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
+        HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
 
         public B withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;
@@ -927,6 +933,11 @@ public class HollowProducer extends AbstractHollowProducer {
         
         public B noIntegrityCheck() {
             this.doIntegrityCheck = false;
+            return (B) this;
+        }
+
+        public B withUpdatePlanVerifier(HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
+            this.updatePlanBlobVerifier = updatePlanBlobVerifier;
             return (B) this;
         }
 

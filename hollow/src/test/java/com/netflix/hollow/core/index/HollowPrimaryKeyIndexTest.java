@@ -345,7 +345,6 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         Assert.assertEquals(0, validPki.getMatchingOrdinal(1L));
     }
 
-
     @Test
     public void testNullPKeyIdx() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);

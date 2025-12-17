@@ -30,6 +30,7 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,8 +40,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class FlatRecordWriterTests {
-
-    
     private HollowObjectMapper mapper;
     private HollowSchemaIdentifierMapper schemaIdMapper;
 
@@ -54,6 +53,7 @@ public class FlatRecordWriterTests {
         mapper = new HollowObjectMapper(new HollowWriteStateEngine());
         mapper.initializeTypeState(TypeA.class);
         mapper.initializeTypeState(TypeC.class);
+        mapper.initializeTypeState(TypeD.class);
         schemaIdMapper = new FakeHollowSchemaIdentifierMapper(mapper.getStateEngine());
         blobStore = new InMemoryBlobStore();
 
@@ -163,7 +163,23 @@ public class FlatRecordWriterTests {
         
         Assert.assertEquals(typeC0.getObject("c2").getOrdinal(), typeA0.getObject("a3").getOrdinal());
     }
-    
+
+    @Test(expected = IllegalStateException.class)
+    public void properExceptionHandlingOnMissingPKValue_generate() {
+        TypeD r = new TypeD(1, null);
+        flatten(r);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void properExceptionHandlingOnMissingPKValue_writeTo() throws IOException {
+        TypeD r = new TypeD(1, null);
+        flatRecordWriter.reset();
+        mapper.writeFlat(r, flatRecordWriter);
+        try (OutputStream os = new ByteArrayOutputStream()) {
+            flatRecordWriter.writeTo(os);
+        }
+    }
+
     private FlatRecord flatten(Object obj) {
         flatRecordWriter.reset();
         mapper.writeFlat(obj, flatRecordWriter);
@@ -224,4 +240,15 @@ public class FlatRecordWriterTests {
         }
     }
 
+    @HollowPrimaryKey(fields = { "a1", "a2" })
+    public static class TypeD {
+        int a1;
+        @HollowInline
+        String a2;
+
+        public TypeD(int a1, String a2) {
+            this.a1 = a1;
+            this.a2 = a2;
+        }
+    }
 }

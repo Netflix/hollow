@@ -18,6 +18,7 @@ package com.netflix.hollow.api.codegen.delegate;
 
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateCachedImplName;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateInterfaceName;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
@@ -85,10 +86,12 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
                 builder.append("    private final Long ").append(substituteInvalidChars(schema.getFieldName(i))).append(";\n");
                 break;
             case REFERENCE:
-                Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
-                if(shortcut != null)
-                    builder.append("    private final ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(substituteInvalidChars(schema.getFieldName(i))).append(";\n");
-                builder.append("    private final int ").append(substituteInvalidChars(schema.getFieldName(i))).append("Ordinal;\n");
+                if (includeType(schema.getReferencedType(i), dataset)) {
+                    Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
+                    if(shortcut != null)
+                        builder.append("    private final ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(substituteInvalidChars(schema.getFieldName(i))).append(";\n");
+                    builder.append("    private final int ").append(substituteInvalidChars(schema.getFieldName(i))).append("Ordinal;\n");
+                }
                 break;
             case STRING:
                 builder.append("    private final String ").append(substituteInvalidChars(schema.getFieldName(i))).append(";\n");
@@ -115,20 +118,22 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
                 builder.append("        this.").append(fieldName).append(" = typeAPI.get").append(uppercase(fieldName)).append("Boxed(ordinal);\n");
                 break;
             case REFERENCE:
-                builder.append("        this.").append(fieldName).append("Ordinal = typeAPI.get").append(uppercase(fieldName)).append("Ordinal(ordinal);\n");
-                Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
-                if(shortcut != null) {
-                    String ordinalVariableName = fieldName + "TempOrdinal";
+                if (includeType(schema.getReferencedType(i), dataset)) {
+                    builder.append("        this.").append(fieldName).append("Ordinal = typeAPI.get").append(uppercase(fieldName)).append("Ordinal(ordinal);\n");
+                    Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
+                    if(shortcut != null) {
+                        String ordinalVariableName = fieldName + "TempOrdinal";
 
-                    builder.append("        int ").append(ordinalVariableName).append(" = ").append(fieldName).append("Ordinal;\n");
+                        builder.append("        int ").append(ordinalVariableName).append(" = ").append(fieldName).append("Ordinal;\n");
 
-                    for(int j=0;j<shortcut.getPath().length-1;j++) {
-                        String typeAPIName = HollowCodeGenerationUtils.typeAPIClassname(shortcut.getPathTypes()[j]);
-                        builder.append("        " + ordinalVariableName + " = " + ordinalVariableName + " == -1 ? -1 : typeAPI.getAPI().get").append(typeAPIName).append("().get").append(uppercase(shortcut.getPath()[j])).append("Ordinal(").append(ordinalVariableName).append(");\n");
+                        for(int j=0;j<shortcut.getPath().length-1;j++) {
+                            String typeAPIName = HollowCodeGenerationUtils.typeAPIClassname(shortcut.getPathTypes()[j]);
+                            builder.append("        " + ordinalVariableName + " = " + ordinalVariableName + " == -1 ? -1 : typeAPI.getAPI().get").append(typeAPIName).append("().get").append(uppercase(shortcut.getPath()[j])).append("Ordinal(").append(ordinalVariableName).append(");\n");
+                        }
+
+                        String typeAPIName = HollowCodeGenerationUtils.typeAPIClassname(shortcut.getPathTypes()[shortcut.getPathTypes().length-1]);
+                        builder.append("        this.").append(fieldName).append(" = ").append(ordinalVariableName).append(" == -1 ? null : ").append("typeAPI.getAPI().get").append(typeAPIName).append("().get").append(uppercase(shortcut.getPath()[shortcut.getPath().length-1])).append("(").append(ordinalVariableName).append(");\n");
                     }
-
-                    String typeAPIName = HollowCodeGenerationUtils.typeAPIClassname(shortcut.getPathTypes()[shortcut.getPathTypes().length-1]);
-                    builder.append("        this.").append(fieldName).append(" = ").append(ordinalVariableName).append(" == -1 ? null : ").append("typeAPI.getAPI().get").append(typeAPIName).append("().get").append(uppercase(shortcut.getPath()[shortcut.getPath().length-1])).append("(").append(ordinalVariableName).append(");\n");
                 }
             }
         }
@@ -140,6 +145,10 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
             FieldType fieldType = schema.getFieldType(i);
             String fieldName = substituteInvalidChars(schema.getFieldName(i));
             if(schema.getFieldType(i) == FieldType.REFERENCE) {
+                if (!includeType(schema.getReferencedType(i), dataset)) {
+                    continue;
+                }
+
                 Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
                 if(shortcut != null)
                     addAccessor(builder, shortcut.getType(), fieldName);

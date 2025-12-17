@@ -50,6 +50,12 @@ public abstract class HistoryPage {
         ctx.put("showHomeLink", !(this instanceof HistoryOverviewPage));
         ctx.put("basePath", ui.getBaseURLPath());
 
+        String commonHeaderEntries = ui.commonHeaderEntries.values().stream()
+                .sorted((a, b) -> Integer.compare(a.position, b.position))
+                .map(pair->pair.value)
+                .reduce("", (a, b) -> a + b);
+        ctx.put("commonHeaderEntries", commonHeaderEntries);
+
         try {
             setUpContext(req, session, ctx);
         } catch (Exception e) {

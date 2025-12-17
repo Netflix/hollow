@@ -7,6 +7,26 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 
+/**
+ * A thread-safe reader for accessing data within a {@link FlatRecord} by ordinal.
+ *
+ * <p>This reader provides random access to any ordinal within the record. Thread safety
+ * is achieved because all read operations require passing in the ordinal, and the byte
+ * offset is recalculated on-the-fly within the scope of each method call—no mutable
+ * cursor state is shared across threads.
+ *
+ * <p><b>Trade-offs:</b>
+ * <ul>
+ *   <li>Requires an initial full scan of the record during construction to build
+ *       the ordinal-to-offset index</li>
+ *   <li>Random access reads may require repositioning through the record data</li>
+ * </ul>
+ *
+ * <p>Use this reader when thread safety is required or when you need random access
+ * to ordinals within the record.
+ *
+ * @see FlatRecordReader for a non-thread-safe sequential reader
+ */
 public class FlatRecordOrdinalReader {
   private final FlatRecord record;
   private final IntList ordinalOffsets = new IntList();
@@ -318,73 +338,20 @@ public class FlatRecordOrdinalReader {
     }
 
     for (int i = 0; i < fieldIndex; i++) {
-      offset += sizeOfFieldValue(objectSchema.getFieldType(i), offset);
+      offset += Sizing.sizeOfFieldValue(objectSchema.getFieldType(i), record, offset);
     }
 
     return offset;
   }
 
-  private int sizeOfOrdinal(int ordinal) {
-    int offset = getOrdinalOffset(ordinal);
-    int start = offset;
+    private int sizeOfOrdinal(int ordinal) {
+        int offset = getOrdinalOffset(ordinal);
 
-    int schemaId = VarInt.readVInt(record.data, offset);
-    offset += VarInt.sizeOfVInt(schemaId);
+        int schemaId = VarInt.readVInt(record.data, offset);
+        int schemaIdSize = VarInt.sizeOfVInt(schemaId);
+        offset += schemaIdSize;
+        HollowSchema schema = record.schemaIdMapper.getSchema(schemaId);
 
-    HollowSchema schema = record.schemaIdMapper.getSchema(schemaId);
-    switch (schema.getSchemaType()) {
-      case OBJECT: {
-        HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
-        for (int i = 0; i < objectSchema.numFields(); i++) {
-          offset += sizeOfFieldValue(objectSchema.getFieldType(i), offset);
-        }
-        break;
-      }
-      case LIST:
-      case SET: {
-        int size = VarInt.readVInt(record.data, offset);
-        offset += VarInt.sizeOfVInt(size);
-        for (int i = 0; i < size; i++) {
-          offset += VarInt.nextVLongSize(record.data, offset);
-        }
-        break;
-      }
-      case MAP: {
-        int size = VarInt.readVInt(record.data, offset);
-        offset += VarInt.sizeOfVInt(size);
-        for (int i = 0; i < size; i++) {
-          offset += VarInt.nextVLongSize(record.data, offset); // key
-          offset += VarInt.nextVLongSize(record.data, offset); // value
-        }
-        break;
-      }
+        return schemaIdSize + Sizing.sizeOfSchema(schema, record, offset);
     }
-
-    return offset - start;
-  }
-
-  private int sizeOfFieldValue(HollowObjectSchema.FieldType fieldType, int offset) {
-    switch (fieldType) {
-      case INT:
-      case LONG:
-      case REFERENCE:
-        return VarInt.nextVLongSize(record.data, offset);
-      case BYTES:
-      case STRING:
-        if (VarInt.readVNull(record.data, offset)) {
-          return 1;
-        }
-        int fieldLength = VarInt.readVInt(record.data, offset);
-        return VarInt.sizeOfVInt(fieldLength) + fieldLength;
-      case BOOLEAN:
-        return 1;
-      case DOUBLE:
-      case UUID_LONG:
-        return 8;
-      case FLOAT:
-        return 4;
-      default:
-        throw new IllegalArgumentException("Unsupported field type: " + fieldType);
-    }
-  }
 }

@@ -28,6 +28,8 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 
 @SuppressWarnings("unused")
 public class HollowUniqueKeyIndexTest extends HollowPrimaryKeyIndexTest {
@@ -345,6 +347,65 @@ public class HollowUniqueKeyIndexTest extends HollowPrimaryKeyIndexTest {
         public TypeB(String b1, boolean isDuplicate) {
             this.b1 = b1;
             this.isDuplicate = isDuplicate;
+        }
+    }
+
+    @Test
+    public void testNullFieldValue() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.add(new TypeB("test", false));
+        mapper.add(new TypeB(null, true));
+
+        roundTripSnapshot();
+
+        try {
+            createIndex("TypeB", "b1", "isDuplicate");
+            fail("Unique key index on type with null fields is expected to fail construction");
+        } catch (NullPointerException e) {}
+    }
+
+    @Test
+    public void testNullFieldValueNested() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 3.3d, new TypeB("three")));
+        mapper.add(new TypeA(3, 2.2d, null));
+
+        roundTripSnapshot();
+
+        try {
+            createIndex("TypeA", "a1", "a2", "ab.b1");
+            fail("UniqueKeyIndex on type with null fields is expected to fail construction");
+        } catch (NullPointerException e) {}
+    }
+
+    @Test
+    public void testNullFieldValueDeepNested() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB(null, true)));
+
+        roundTripSnapshot();
+
+        try {
+            createIndex("TypeA", "a1", "a2", "ab.b1");
+            fail("UniqueKeyIndex on type with null fields is expected to fail construction");
+        } catch (NullPointerException e) {}
+    }
+
+
+    @Test
+    public void testNullFieldValueNotInFieldPath() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, null));
+
+        roundTripSnapshot();
+
+        try {
+            createIndex("TypeA", "a1", "a2");
+        } catch (NullPointerException e) {
+            fail("UniqueKeyIndex on type with null fields not in the field path is not expected to fail construction");
         }
     }
 
