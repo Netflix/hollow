@@ -1,0 +1,1493 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>HollowAPIGenerator File Generation Guide - Hollow (Netflix OSS)</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Robot:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Robot";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="brown">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#hollowapigenerator-file-generation-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Hollow (Netflix OSS)" class="md-header__button md-logo" aria-label="Hollow (Netflix OSS)" data-md-component="logo">
+      
+  <img src="../img/logo_white_bg.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Hollow (Netflix OSS)
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              HollowAPIGenerator File Generation Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="brown"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="brown"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Hollow (Netflix OSS)" class="md-nav__button md-logo" aria-label="Hollow (Netflix OSS)" data-md-component="logo">
+      
+  <img src="../img/logo_white_bg.png" alt="logo">
+
+    </a>
+    Hollow (Netflix OSS)
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../indexing-querying/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Indexing/Querying
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../infrastructure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Infrastructure Hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../producer-consumer-apis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Producers and Consumers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tooling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tooling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Modeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../diving-deeper/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diving Deeper
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interacting-with-a-dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interacting with a Hollow Dataset
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-ingestion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Ingestion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced-topics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced Topics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../community/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acknowledgements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Acknowledgements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#top-level-api-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top-Level API Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Top-Level API Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-apiclassnamejava-eg-testschemaapijava" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. {ApiClassName}.java (e.g., TestSchemaAPI.java)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-apiclassnamefactoryjava-eg-testschemaapifactoryjava" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. {ApiClassName}Factory.java (e.g., TestSchemaAPIFactory.java)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-apiclassnamehashindexjava-eg-testschemaapihashindexjava" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. {ApiClassName}HashIndex.java (e.g., TestSchemaAPIHashIndex.java)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#per-type-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-Type Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Per-Type Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4-typenamejava-eg-object1java" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. {TypeName}.java (e.g., Object1.java)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-typenametypeapijava-eg-object1typeapijava" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. {TypeName}TypeAPI.java (e.g., Object1TypeAPI.java)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-typenamehollowfactoryjava-eg-object1hollowfactoryjava" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. {TypeName}HollowFactory.java (e.g., Object1HollowFactory.java)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#object-schema-specific-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Object Schema-Specific Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Object Schema-Specific Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-typenamedelegatejava-eg-object1delegatejava" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. {TypeName}Delegate.java (e.g., Object1Delegate.java)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-typenamedelegatecachedimpljava-eg-object1delegatecachedimpljava" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. {TypeName}DelegateCachedImpl.java (e.g., Object1DelegateCachedImpl.java)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-typenamedelegatelookupimpljava-eg-object1delegatelookupimpljava" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. {TypeName}DelegateLookupImpl.java (e.g., Object1DelegateLookupImpl.java)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-typenamedataaccessorjava-eg-object1dataaccessorjava" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. {TypeName}DataAccessor.java (e.g., Object1DataAccessor.java)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-typenameprimarykeyindexjava-eg-object1primarykeyindexjava" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. {TypeName}PrimaryKeyIndex.java (e.g., Object1PrimaryKeyIndex.java)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-typenameuniquekeyindexjava" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. {TypeName}UniqueKeyIndex.java
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-count-by-schema-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Count by Schema Type
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-from-codegentestschematxt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example from CodeGenTestSchema.txt
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Example from CodeGenTestSchema.txt">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#generated-files-37-total" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generated Files (37 total)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-of-file-purposes-by-category" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary of File Purposes by Category
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typical-usage-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typical Usage Pattern
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benefits
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="hollowapigenerator-file-generation-guide">HollowAPIGenerator File Generation Guide<a class="headerlink" href="#hollowapigenerator-file-generation-guide" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p><code>HollowAPIGenerator.generateFiles</code> generates a complete Java API layer for consuming Hollow datasets. This document explains what files are generated and the purpose of each file type.</p>
+<h2 id="top-level-api-files">Top-Level API Files<a class="headerlink" href="#top-level-api-files" title="Permanent link">&para;</a></h2>
+<p>These files are generated once per API, regardless of the number of schema types.</p>
+<h3 id="1-apiclassnamejava-eg-testschemaapijava">1. <code>{ApiClassName}.java</code> (e.g., <code>TestSchemaAPI.java</code>)<a class="headerlink" href="#1-apiclassnamejava-eg-testschemaapijava" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose:</strong> Main entry point API class that extends <code>HollowAPI</code></p>
+<ul>
+<li>Initializes and manages all type-specific APIs</li>
+<li>Provides factory methods to instantiate Hollow objects by ordinal (e.g., <code>getObject1(int ordinal)</code>)</li>
+<li>Manages object providers (cached vs factory-based)</li>
+<li>Provides <code>getAll{TypeName}()</code> methods to iterate over all records of a type</li>
+<li>Handles sampling and caching lifecycle</li>
+</ul>
+<p><strong>Example methods:</strong>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">public</span><span class="w"> </span><span class="n">Object1</span><span class="w"> </span><span class="nf">getObject1</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">ordinal</span><span class="p">)</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">Collection</span><span class="o">&lt;</span><span class="n">Object1</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getAllObject1</span><span class="p">()</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">detachCaches</span><span class="p">()</span>
+</span></code></pre></div></p>
+<h3 id="2-apiclassnamefactoryjava-eg-testschemaapifactoryjava">2. <code>{ApiClassName}Factory.java</code> (e.g., <code>TestSchemaAPIFactory.java</code>)<a class="headerlink" href="#2-apiclassnamefactoryjava-eg-testschemaapifactoryjava" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose:</strong> Factory for creating API instances</p>
+<ul>
+<li>Creates the main API object from a <code>HollowDataAccess</code></li>
+<li>Simplifies API instantiation</li>
+</ul>
+<h3 id="3-apiclassnamehashindexjava-eg-testschemaapihashindexjava">3. <code>{ApiClassName}HashIndex.java</code> (e.g., <code>TestSchemaAPIHashIndex.java</code>)<a class="headerlink" href="#3-apiclassnamehashindexjava-eg-testschemaapihashindexjava" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose:</strong> Generic hash index builder for ad-hoc queries</p>
+<ul>
+<li>Allows building custom hash indexes on any type</li>
+<li>Provides <code>find{TypeName}Matches()</code> methods for each schema type</li>
+<li>Useful for creating indexes on fields not covered by primary keys</li>
+</ul>
+<p><strong>Example methods:</strong>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">public</span><span class="w"> </span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Object1</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findObject1Matches</span><span class="p">(</span><span class="n">Object</span><span class="p">...</span><span class="w"> </span><span class="n">keys</span><span class="p">)</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">TopLevelObject</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">findTopLevelObjectMatches</span><span class="p">(</span><span class="n">Object</span><span class="p">...</span><span class="w"> </span><span class="n">keys</span><span class="p">)</span>
+</span></code></pre></div></p>
+<h2 id="per-type-files">Per-Type Files<a class="headerlink" href="#per-type-files" title="Permanent link">&para;</a></h2>
+<p>These files are generated for each schema type in your data model (e.g., <code>Object1</code>, <code>String</code>, <code>ListOfObject1</code>, etc.).</p>
+<h3 id="4-typenamejava-eg-object1java">4. <code>{TypeName}.java</code> (e.g., <code>Object1.java</code>)<a class="headerlink" href="#4-typenamejava-eg-object1java" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose:</strong> The main business object representing a record in the dataset</p>
+<ul>
+<li>Extends <code>HollowObject</code></li>
+<li>Provides strongly-typed getter methods for all fields (e.g., <code>getVal()</code>)</li>
+<li>Methods delegate to the underlying delegate for data access</li>
+<li>Provides access to the API and TypeAPI</li>
+</ul>
+<p><strong>Example:</strong>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Object1</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">HollowObject</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">HString</span><span class="w"> </span><span class="nf">getVal</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">refOrdinal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">delegate</span><span class="p">().</span><span class="na">getValOrdinal</span><span class="p">(</span><span class="n">ordinal</span><span class="p">);</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="n">refOrdinal</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">api</span><span class="p">().</span><span class="na">getHString</span><span class="p">(</span><span class="n">refOrdinal</span><span class="p">);</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">TestSchemaAPI</span><span class="w"> </span><span class="nf">api</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">typeApi</span><span class="p">().</span><span class="na">getAPI</span><span class="p">();</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">}</span>
+</span></code></pre></div></p>
+<h3 id="5-typenametypeapijava-eg-object1typeapijava">5. <code>{TypeName}TypeAPI.java</code> (e.g., <code>Object1TypeAPI.java</code>)<a class="headerlink" href="#5-typenametypeapijava-eg-object1typeapijava" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose:</strong> Type-specific API for low-level data access</p>
+<ul>
+<li>Extends <code>HollowObjectTypeAPI</code> (or <code>HollowListTypeAPI</code>, <code>HollowSetTypeAPI</code>, <code>HollowMapTypeAPI</code>)</li>
+<li>Provides ordinal-based field access (e.g., <code>getValOrdinal(int ordinal)</code>)</li>
+<li>Maps field names to field indices</li>
+<li>Provides references to related type APIs</li>
+</ul>
+<p><strong>Example methods:</strong>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getValOrdinal</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">ordinal</span><span class="p">)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">StringTypeAPI</span><span class="w"> </span><span class="nf">getValTypeAPI</span><span class="p">()</span>
+</span></code></pre></div></p>
+<h3 id="6-typenamehollowfactoryjava-eg-object1hollowfactoryjava">6. <code>{TypeName}HollowFactory.java</code> (e.g., <code>Object1HollowFactory.java</code>)<a class="headerlink" href="#6-typenamehollowfactoryjava-eg-object1hollowfactoryjava" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose:</strong> Factory for creating instances of the Hollow object</p>
+<ul>
+<li>Creates new hollow objects (lookup-based implementation)</li>
+<li>Creates cached hollow objects (snapshot-based implementation)</li>
+<li>Used by the API's object provider system</li>
+</ul>
+<p><strong>Example methods:</strong>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">public</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="nf">newHollowObject</span><span class="p">(</span><span class="n">HollowTypeDataAccess</span><span class="w"> </span><span class="n">dataAccess</span><span class="p">,</span><span class="w"> </span><span class="n">HollowTypeAPI</span><span class="w"> </span><span class="n">typeAPI</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ordinal</span><span class="p">)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="nf">newCachedHollowObject</span><span class="p">(</span><span class="n">HollowTypeDataAccess</span><span class="w"> </span><span class="n">dataAccess</span><span class="p">,</span><span class="w"> </span><span class="n">HollowTypeAPI</span><span class="w"> </span><span class="n">typeAPI</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ordinal</span><span class="p">)</span>
+</span></code></pre></div></p>
+<h2 id="object-schema-specific-files">Object Schema-Specific Files<a class="headerlink" href="#object-schema-specific-files" title="Permanent link">&para;</a></h2>
+<p>These files are only generated for <code>OBJECT</code> type schemas (not for <code>LIST</code>, <code>SET</code>, or <code>MAP</code> types).</p>
+<h3 id="7-typenamedelegatejava-eg-object1delegatejava">7. <code>{TypeName}Delegate.java</code> (e.g., <code>Object1Delegate.java</code>)<a class="headerlink" href="#7-typenamedelegatejava-eg-object1delegatejava" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose:</strong> Interface for accessing object data</p>
+<ul>
+<li>Defines methods to get ordinals of referenced fields</li>
+<li>Allows different implementations (lookup vs cached)</li>
+<li>Abstracts the data access strategy</li>
+</ul>
+<p><strong>Example:</strong>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Object1Delegate</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">HollowObjectDelegate</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">getValOrdinal</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">ordinal</span><span class="p">);</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Object1TypeAPI</span><span class="w"> </span><span class="nf">getTypeAPI</span><span class="p">();</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">}</span>
+</span></code></pre></div></p>
+<h3 id="8-typenamedelegatecachedimpljava-eg-object1delegatecachedimpljava">8. <code>{TypeName}DelegateCachedImpl.java</code> (e.g., <code>Object1DelegateCachedImpl.java</code>)<a class="headerlink" href="#8-typenamedelegatecachedimpljava-eg-object1delegatecachedimpljava" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose:</strong> Caches field values at object creation time</p>
+<ul>
+<li>Reads all field values eagerly when object is created</li>
+<li>Faster repeated access but uses more memory</li>
+<li>Useful for objects accessed multiple times</li>
+<li>Immutable snapshot of the object's state</li>
+</ul>
+<p><strong>Use case:</strong> When you need to access the same object's fields many times</p>
+<h3 id="9-typenamedelegatelookupimpljava-eg-object1delegatelookupimpljava">9. <code>{TypeName}DelegateLookupImpl.java</code> (e.g., <code>Object1DelegateLookupImpl.java</code>)<a class="headerlink" href="#9-typenamedelegatelookupimpljava-eg-object1delegatelookupimpljava" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose:</strong> Looks up field values on-demand</p>
+<ul>
+<li>Reads field values lazily from the dataset</li>
+<li>Lower memory footprint</li>
+<li>Good for one-time access patterns</li>
+<li>Always reflects current dataset state</li>
+</ul>
+<p><strong>Use case:</strong> When you access objects once or infrequently</p>
+<h3 id="10-typenamedataaccessorjava-eg-object1dataaccessorjava">10. <code>{TypeName}DataAccessor.java</code> (e.g., <code>Object1DataAccessor.java</code>)<a class="headerlink" href="#10-typenamedataaccessorjava-eg-object1dataaccessorjava" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose:</strong> High-level accessor for iterating and querying objects</p>
+<ul>
+<li>Extends <code>AbstractHollowDataAccessor</code></li>
+<li>Provides convenient access to records by ordinal</li>
+<li>Used for bulk operations and traversals</li>
+<li>Integrates with <code>HollowConsumer</code></li>
+</ul>
+<p><strong>Example usage:</strong>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">Object1DataAccessor</span><span class="w"> </span><span class="n">accessor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object1DataAccessor</span><span class="p">(</span><span class="n">consumer</span><span class="p">);</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">Object1</span><span class="w"> </span><span class="n">obj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">accessor</span><span class="p">.</span><span class="na">getRecord</span><span class="p">(</span><span class="n">ordinal</span><span class="p">);</span>
+</span></code></pre></div></p>
+<h3 id="11-typenameprimarykeyindexjava-eg-object1primarykeyindexjava">11. <code>{TypeName}PrimaryKeyIndex.java</code> (e.g., <code>Object1PrimaryKeyIndex.java</code>)<a class="headerlink" href="#11-typenameprimarykeyindexjava-eg-object1primarykeyindexjava" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose:</strong> Unique key index for lookups</p>
+<ul>
+<li>Generated when:</li>
+<li><code>reservePrimaryKeyIndexForTypeWithPrimaryKey</code> is <code>false</code> (legacy mode - always generated), OR</li>
+<li><code>reservePrimaryKeyIndexForTypeWithPrimaryKey</code> is <code>true</code> AND the schema has a primary key defined</li>
+<li>Provides <code>findMatch(Object... keys)</code> method for unique key lookups</li>
+<li>Automatically listens to data refreshes to stay up-to-date</li>
+<li>Marked as <code>@Deprecated</code> in favor of newer <code>UniqueKeyIndex</code> API</li>
+</ul>
+<p><strong>Example usage:</strong>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">Object1PrimaryKeyIndex</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object1PrimaryKeyIndex</span><span class="p">(</span><span class="n">consumer</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;val&quot;</span><span class="p">);</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">Object1</span><span class="w"> </span><span class="n">obj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">index</span><span class="p">.</span><span class="na">findMatch</span><span class="p">(</span><span class="s">&quot;someValue&quot;</span><span class="p">);</span>
+</span></code></pre></div></p>
+<h3 id="12-typenameuniquekeyindexjava">12. <code>{TypeName}UniqueKeyIndex.java</code><a class="headerlink" href="#12-typenameuniquekeyindexjava" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose:</strong> Modern unique key index (when primary key exists)</p>
+<ul>
+<li>Only generated when <code>reservePrimaryKeyIndexForTypeWithPrimaryKey</code> is <code>true</code> AND schema has a primary key</li>
+<li>Provides similar functionality to <code>PrimaryKeyIndex</code> but with newer API patterns</li>
+<li>Recommended for new code</li>
+</ul>
+<h2 id="file-count-by-schema-type">File Count by Schema Type<a class="headerlink" href="#file-count-by-schema-type" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Schema Type</th>
+<th>Number of Generated Files</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>OBJECT</strong> (no primary key)</td>
+<td>9 files</td>
+<td>TypeName.java, TypeNameTypeAPI.java, TypeNameHollowFactory.java, TypeNameDelegate.java, TypeNameDelegateCachedImpl.java, TypeNameDelegateLookupImpl.java, TypeNameDataAccessor.java, TypeNamePrimaryKeyIndex.java (legacy mode only)</td>
+</tr>
+<tr>
+<td><strong>OBJECT</strong> (with primary key)</td>
+<td>10-11 files</td>
+<td>Above + TypeNamePrimaryKeyIndex.java and TypeNameUniqueKeyIndex.java (depending on config)</td>
+</tr>
+<tr>
+<td><strong>LIST</strong></td>
+<td>3 files</td>
+<td>TypeName.java, TypeNameTypeAPI.java, TypeNameHollowFactory.java</td>
+</tr>
+<tr>
+<td><strong>SET</strong></td>
+<td>3 files</td>
+<td>TypeName.java, TypeNameTypeAPI.java, TypeNameHollowFactory.java</td>
+</tr>
+<tr>
+<td><strong>MAP</strong></td>
+<td>3 files</td>
+<td>TypeName.java, TypeNameTypeAPI.java, TypeNameHollowFactory.java</td>
+</tr>
+</tbody>
+</table>
+<h2 id="example-from-codegentestschematxt">Example from CodeGenTestSchema.txt<a class="headerlink" href="#example-from-codegentestschematxt" title="Permanent link">&para;</a></h2>
+<p>Given the schema:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>TopLevelObject {
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    ListOfObject1 validListField;
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    SetOfObject1 validSetField;
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    MapOfStringToObject1 validMapField;
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    Object1 validMemberField;
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>}
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>Object1 {
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    String val;
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>}
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>ListOfObject1 List&lt;Object1&gt;;
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>SetOfObject1 Set&lt;Object1&gt;;
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>MapOfStringToObject1 Map&lt;String,Object1&gt;;
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>String {
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>    string value;
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>}
+</span></code></pre></div>
+<h3 id="generated-files-37-total">Generated Files (37 total)<a class="headerlink" href="#generated-files-37-total" title="Permanent link">&para;</a></h3>
+<p><strong>Top-level files (3):</strong>
+- <code>TestSchemaAPI.java</code>
+- <code>TestSchemaAPIFactory.java</code>
+- <code>TestSchemaAPIHashIndex.java</code></p>
+<p><strong>For TopLevelObject (OBJECT type - 9 files):</strong>
+- <code>TopLevelObject.java</code>
+- <code>TopLevelObjectTypeAPI.java</code>
+- <code>TopLevelObjectHollowFactory.java</code>
+- <code>TopLevelObjectDelegate.java</code>
+- <code>TopLevelObjectDelegateCachedImpl.java</code>
+- <code>TopLevelObjectDelegateLookupImpl.java</code>
+- <code>TopLevelObjectDataAccessor.java</code>
+- <code>TopLevelObjectPrimaryKeyIndex.java</code></p>
+<p><strong>For Object1 (OBJECT type - 9 files):</strong>
+- <code>Object1.java</code>
+- <code>Object1TypeAPI.java</code>
+- <code>Object1HollowFactory.java</code>
+- <code>Object1Delegate.java</code>
+- <code>Object1DelegateCachedImpl.java</code>
+- <code>Object1DelegateLookupImpl.java</code>
+- <code>Object1DataAccessor.java</code>
+- <code>Object1PrimaryKeyIndex.java</code></p>
+<p><strong>For String (OBJECT type - 9 files):</strong>
+- <code>HString.java</code> (note: renamed to avoid Java keyword conflict)
+- <code>StringTypeAPI.java</code>
+- <code>StringHollowFactory.java</code>
+- <code>StringDelegate.java</code>
+- <code>StringDelegateCachedImpl.java</code>
+- <code>StringDelegateLookupImpl.java</code>
+- <code>StringDataAccessor.java</code>
+- <code>StringPrimaryKeyIndex.java</code></p>
+<p><strong>For ListOfObject1 (LIST type - 3 files):</strong>
+- <code>ListOfObject1.java</code>
+- <code>ListOfObject1TypeAPI.java</code>
+- <code>ListOfObject1HollowFactory.java</code></p>
+<p><strong>For SetOfObject1 (SET type - 3 files):</strong>
+- <code>SetOfObject1.java</code>
+- <code>SetOfObject1TypeAPI.java</code>
+- <code>SetOfObject1HollowFactory.java</code></p>
+<p><strong>For MapOfStringToObject1 (MAP type - 3 files):</strong>
+- <code>MapOfStringToObject1.java</code>
+- <code>MapOfStringToObject1TypeAPI.java</code>
+- <code>MapOfStringToObject1HollowFactory.java</code></p>
+<h2 id="summary-of-file-purposes-by-category">Summary of File Purposes by Category<a class="headerlink" href="#summary-of-file-purposes-by-category" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>File Category</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Main API</strong></td>
+<td>Entry point for consuming data, manages all types</td>
+</tr>
+<tr>
+<td><strong>Hollow Objects</strong></td>
+<td>Business objects with type-safe getters</td>
+</tr>
+<tr>
+<td><strong>Type APIs</strong></td>
+<td>Low-level ordinal-based field access</td>
+</tr>
+<tr>
+<td><strong>Factories</strong></td>
+<td>Create object instances (cached or lookup-based)</td>
+</tr>
+<tr>
+<td><strong>Delegates</strong></td>
+<td>Abstract data access (cached vs lookup strategies)</td>
+</tr>
+<tr>
+<td><strong>Data Accessors</strong></td>
+<td>High-level iterators and bulk operations</td>
+</tr>
+<tr>
+<td><strong>Indexes</strong></td>
+<td>Efficient lookups by primary/unique keys or hash-based queries</td>
+</tr>
+</tbody>
+</table>
+<h2 id="configuration-options">Configuration Options<a class="headerlink" href="#configuration-options" title="Permanent link">&para;</a></h2>
+<p>The <code>HollowAPIGenerator</code> can be configured with various options that affect which files are generated:</p>
+<ul>
+<li><code>setClassPostfix(String)</code>: Changes the postfix for generated class names (default: "Hollow")</li>
+<li><code>setGetterPrefix(String)</code>: Changes the prefix for getter methods (default: "_")</li>
+<li><code>setUsePackageGrouping(boolean)</code>: Organizes files into sub-packages</li>
+<li><code>reservePrimaryKeyIndexForTypeWithPrimaryKey(boolean)</code>: Only generate PrimaryKeyIndex for types with primary keys defined</li>
+<li><code>setUseHollowPrimitiveTypes(boolean)</code>: Use built-in primitive types instead of generating them</li>
+<li><code>setUseBooleanFieldErgonomics(boolean)</code>: Use improved boolean field naming conventions</li>
+<li><code>setRestrictApiToFieldType(boolean)</code>: Restrict generated API methods to exact field types</li>
+</ul>
+<h2 id="typical-usage-pattern">Typical Usage Pattern<a class="headerlink" href="#typical-usage-pattern" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p><strong>Generate the API:</strong>
+   <div class="language-java highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">HollowAPIGenerator</span><span class="w"> </span><span class="n">generator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HollowAPIGenerator</span><span class="p">.</span><span class="na">Builder</span><span class="p">()</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="p">.</span><span class="na">withAPIClassname</span><span class="p">(</span><span class="s">&quot;MyAPI&quot;</span><span class="p">)</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="p">.</span><span class="na">withPackageName</span><span class="p">(</span><span class="s">&quot;com.example.api&quot;</span><span class="p">)</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="p">.</span><span class="na">withDataModel</span><span class="p">(</span><span class="n">writeStateEngine</span><span class="p">)</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="p">.</span><span class="na">withDestination</span><span class="p">(</span><span class="s">&quot;/path/to/output&quot;</span><span class="p">)</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">generator</span><span class="p">.</span><span class="na">generateSourceFiles</span><span class="p">();</span>
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Consume data:</strong>
+   <div class="language-java highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// Initialize</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">TestSchemaAPI</span><span class="w"> </span><span class="n">api</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TestSchemaAPI</span><span class="p">(</span><span class="n">dataAccess</span><span class="p">);</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1">// Access objects</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">TopLevelObject</span><span class="w"> </span><span class="n">obj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">api</span><span class="p">.</span><span class="na">getTopLevelObject</span><span class="p">(</span><span class="n">ordinal</span><span class="p">);</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="n">Object1</span><span class="w"> </span><span class="n">member</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">obj</span><span class="p">.</span><span class="na">getValidMemberField</span><span class="p">();</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">HString</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">member</span><span class="p">.</span><span class="na">getVal</span><span class="p">();</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="c1">// Use indexes</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="n">Object1PrimaryKeyIndex</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object1PrimaryKeyIndex</span><span class="p">(</span><span class="n">consumer</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;val&quot;</span><span class="p">);</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="n">Object1</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">index</span><span class="p">.</span><span class="na">findMatch</span><span class="p">(</span><span class="s">&quot;searchKey&quot;</span><span class="p">);</span>
+</span></code></pre></div></p>
+</li>
+</ol>
+<h2 id="benefits">Benefits<a class="headerlink" href="#benefits" title="Permanent link">&para;</a></h2>
+<p>This generated code provides:</p>
+<ul>
+<li><strong>Type safety</strong>: Compile-time checking of field access</li>
+<li><strong>Performance</strong>: Efficient ordinal-based access with optional caching</li>
+<li><strong>Flexibility</strong>: Choice between cached and lookup delegates</li>
+<li><strong>Convenience</strong>: High-level APIs for common operations</li>
+<li><strong>Efficiency</strong>: Optimized indexes for fast lookups</li>
+<li><strong>Maintainability</strong>: Generated code stays in sync with schema changes</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/Netflix/hollow" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M202.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M496 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://gitter.im/Netflix/hollow" target="_blank" rel="noopener" title="gitter.im" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M66.4 322.5H16V0h50.4zM166.9 76.1h-50.4V512h50.4zm100.6 0h-50.4V512h50.4zM368 76h-50.4v247H368z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.annotate", "content.code.copy", "navigation.indexes", "navigation.instant", "navigation.top", "navigation.tracking", "search.share", "search.highlight", "search.suggest"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
