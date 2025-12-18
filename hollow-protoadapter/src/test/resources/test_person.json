@@ -1,0 +1,28 @@
+{
+  "id": 123,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phoneNumbers": [
+    "555-1234",
+    "555-5678"
+  ],
+  "status": "ACTIVE",
+  "address": {
+    "street": "123 Main St",
+    "city": "San Francisco",
+    "state": "CA",
+    "zipCode": 94105
+  },
+  "hobbies": [
+    {
+      "name": "Programming",
+      "yearsExperience": 10,
+      "skillLevel": "EXPERT"
+    },
+    {
+      "name": "Photography",
+      "yearsExperience": 3,
+      "skillLevel": "INTERMEDIATE"
+    }
+  ]
+}

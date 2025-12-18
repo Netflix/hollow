@@ -1,0 +1,108 @@
+apply plugin: 'java-library'
+
+// Compile hollow_options.proto for the main library
+tasks.register('compileMainProtos', Exec) {
+    description = 'Compile hollow_options.proto for library distribution'
+
+    def protoSrcDir = file('src/main/proto')
+    def protoOutputDir = file("${buildDir}/generated/source/proto/main/java")
+
+    inputs.dir(protoSrcDir)
+    outputs.dir(protoOutputDir)
+
+    doFirst {
+        protoOutputDir.mkdirs()
+    }
+
+    commandLine 'protoc',
+            "--proto_path=${protoSrcDir}",
+            "--java_out=${protoOutputDir}",
+            "${protoSrcDir}/hollow_options.proto"
+}
+
+// Add generated proto sources to main source set
+sourceSets {
+    main {
+        java {
+            srcDir "${buildDir}/generated/source/proto/main/java"
+        }
+    }
+}
+
+// Ensure proto compilation happens before Java compilation
+compileJava.dependsOn compileMainProtos
+
+// Ensure proto compilation happens before sources jar creation
+tasks.named('sourcesJar').configure {
+    dependsOn compileMainProtos
+}
+
+// Ensure proto compilation happens before license check
+tasks.named('licenseMain').configure {
+    dependsOn compileMainProtos
+}
+
+// Include .proto files in the published JAR so users can import them
+processResources {
+    from('src/main/proto') {
+        include '**/*.proto'
+        into 'proto'
+    }
+}
+
+// Custom task to compile test proto files separately
+tasks.register('compileTestProtos', Exec) {
+    dependsOn compileMainProtos
+    description = 'Compile test .proto files to a separate directory for dynamic loading'
+
+    def protoSrcDir = file('src/test/resources')
+    def mainProtoDir = file('src/main/proto')
+    def protoOutputDir = file("${buildDir}/test-proto-classes")
+
+    inputs.dir(protoSrcDir)
+    inputs.dir(mainProtoDir)
+    outputs.dir(protoOutputDir)
+
+    doFirst {
+        protoOutputDir.mkdirs()
+    }
+
+    commandLine 'protoc',
+            "--proto_path=${mainProtoDir}",
+            "--proto_path=${protoSrcDir}",
+            "--java_out=${protoOutputDir}",
+            "${protoSrcDir}/test_person.proto"
+}
+
+// Custom task to compile the generated Java proto classes
+tasks.register('compileTestProtoClasses', JavaCompile) {
+    dependsOn compileTestProtos, classes
+    description = 'Compile generated test proto Java classes'
+
+    source = fileTree("${buildDir}/test-proto-classes")
+    classpath = configurations.testRuntimeClasspath + sourceSets.main.output
+    destinationDirectory = file("${buildDir}/test-proto-bin")
+
+    // Use the same Java version as the project
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+
+    options.warnings = false
+}
+
+// Make test task depend on proto compilation
+test.dependsOn compileTestProtoClasses
+
+// Exclude .proto files from test resources to avoid duplication
+processTestResources {
+    exclude '**/*.proto'
+}
+
+dependencies {
+    api project(':hollow')
+
+    implementation 'com.google.protobuf:protobuf-java:3.+'
+
+    testImplementation 'junit:junit:4.11'
+    testImplementation 'com.google.protobuf:protobuf-java-util:3.+'
+}
