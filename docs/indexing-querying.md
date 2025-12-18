@@ -1,5 +1,7 @@
 # Indexing/Querying
 Hollow supports indexing of your dataset for quick retrieval. This guide demonstrates on usages of different indexes available and how they could be used to query for faster retrieval.
+However, indexes by default do not recalculate their state when the consumer refreshes to a new data state. As such, results for queries may become stale or corrupt if the consumer is refreshed.
+Refer to [Keeping an index up-to-date](diving-deeper.md#keeping-an-index-up-to-date) for more details.
 
 ## A Data Model
 
@@ -46,7 +48,7 @@ Once we have loaded a dataset into a `HollowConsumer`, we can use the `Movie` in
 
 HollowConsumer consumer = ...;
 
-MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIndex(consumer, true); // param isListenToDataRefresh set to true
+MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIndex(consumer, true); // param isListenToDataRefresh set to true to enable listening to data refresh
 
 int knownMovieId = ...;
 
@@ -64,7 +66,7 @@ Note that keeping the primary key index up-to-date with the `HollowConsumer` dat
 In the prior example, our primary key index was using the default primary key defined in the data model.  A primary key index is not restricted to just default primary keys.  For example, we could _also_ index movies by their title:
 
 ```java
-MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIndex(consumer, "title");
+MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIndex(consumer, "title", true); // param isListenToDataRefresh set to true to enable listening to data refresh
 
 String knownMovieTitle = ...;
 
@@ -137,47 +139,6 @@ for(ActorRole role : idx.findActorRoleMatches(knownActorId, knownMovieTitle)) {
 
 ```
 Similarly, if we want to include an enum type like releaseCountry in the fields, then its field path in the index construction can be specified as `releaseCountry._name`. Note, in field paths, an enum type is treated slightly differently from a String reference type which is expanded using `.value`.
-
-## Prefix Index (experimental)
-
-A prefix index is used for indexing string values to records containing them. Prefix index in hollow also supports partial matching of string values enabling quick development of features like auto-complete, spell-checkers and others. In order to create a new prefix index, use this class by providing the following arguments in the constructor:
-- An instance of `HollowReadStateEngine`
-- A type on which the index will record the ordinals
-- A field path that leads to a string value.
-
-For example, in order to build a prefix index of movie titles to retrieve `Movie` records, we can create the prefix index as follows:
-
-```java
-
-HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "Movie", "title.value");
-HollowOrdinalIterator it = prefixIndex.findKeysWithPrefix("A");
-
-MovieAPI movieApi = (MovieAPI) consumer.getAPI();
-int ordinal = it.next();
-while(ordinal != HollowOrdinalIterator.NO_MORE_ORDINAL)
-    MovieHollow movieHollow = movieApi.getMovieHollow(ordinal);
-    System.out.println(movieHollow.getTitle().getValue());
-    ordinal = it.next();
-}
-
-```
-The above code will print out all the movie titles that begin with the letter "A". Field path could be a reference to an `OBJECT`, `LIST`, or a `SET`, it has to ultimately lead to a String type.
-
-You can also keep this index updated when a new delta blob is received on the consumer. 
-When a new delta is available, a new prefix is built completely from scratch. 
-While a new prefix index is being built, the current index can continue to answer queries. 
-The implementation of the index takes care of swapping the new updated index with old one. 
-In order to keep your index updated with delta changes, use the following:
-
-```java
-// add the index object as listener for delta updates for type "Movie".
-prefixIndex.listenForDeltaUpdates();
-
-// remove the index object as listener for delta updates for type "Movie".
-prefixIndex.detachFromDeltaUpdates();
-
-```
-Also see section on [Keeping an index up-to-date](diving-deeper.md#keeping-an-index-up-to-date)
 
 ## Field Paths
 
