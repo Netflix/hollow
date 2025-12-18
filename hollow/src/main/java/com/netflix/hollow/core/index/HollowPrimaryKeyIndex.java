@@ -49,7 +49,7 @@ import java.util.logging.Logger;
  * not have to be the same as declared as the default in the data model.
  *
  * <b>This class is not safe to use with object longevity if the index is not being updated for each delta. The internal
- * implementation of this class uses the type state retrieved through the schema. That resutls in certain operations
+ * implementation of this class uses the type state retrieved through the schema. That results in certain operations
  * always being performed against the current version. As such, this class is only valid for up to 2 updates.</b>
  *
  * If you need an index that will survive 2 or more deltas (without being updated), then use {@link HollowUniqueKeyIndex}
