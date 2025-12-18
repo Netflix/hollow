@@ -1,4 +1,6 @@
-<center>![Logo](img/logo.png)</center>
+<p align="center">
+  <img src="img/logo.png" alt="log"/>
+</p>
 
 ## The Problem
 
