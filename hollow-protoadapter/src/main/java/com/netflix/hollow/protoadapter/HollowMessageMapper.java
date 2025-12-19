@@ -23,7 +23,9 @@ import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -34,6 +36,7 @@ public class HollowMessageMapper {
 
     private final HollowWriteStateEngine stateEngine;
     private final Set<String> processedTypes = new HashSet<String>();
+    private final Map<String, HollowProtoAdapter> adapters = new HashMap<String, HollowProtoAdapter>();
     private boolean ignoreListOrdering = false;
 
     public HollowMessageMapper(HollowWriteStateEngine stateEngine) {
@@ -84,8 +87,13 @@ public class HollowMessageMapper {
             initializeTypeState(descriptor);
         }
 
-        // Create adapter and process message
-        HollowProtoAdapter adapter = new HollowProtoAdapter(stateEngine, typeName, ignoreListOrdering);
+        // Get or create adapter for this type (cached for reuse)
+        HollowProtoAdapter adapter = adapters.get(typeName);
+        if (adapter == null) {
+            adapter = new HollowProtoAdapter(stateEngine, typeName, ignoreListOrdering);
+            adapters.put(typeName, adapter);
+        }
+
         try {
             return adapter.processMessage(message);
         } catch (Exception e) {
@@ -175,7 +183,7 @@ public class HollowMessageMapper {
                     case INT64:
                     case SINT64:
                     case SFIXED64:
-                    case UINT64:
+                    case UINT64:  // Unsigned 64-bit mapped to signed long per protobuf spec
                     case FIXED64:
                         if (hasNamespacedType) {
                             ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.LONG);
@@ -185,6 +193,10 @@ public class HollowMessageMapper {
                         }
                         break;
 
+                    // Unsigned integers: use signed counterparts per protobuf spec
+                    // "In Java, unsigned 32-bit and 64-bit integers are represented using
+                    // their signed counterparts, with the top bit simply being stored in the sign bit."
+                    // https://protobuf.dev/programming-guides/proto3/#scalar
                     case UINT32:
                     case FIXED32:
                         if (hasNamespacedType) {
@@ -223,12 +235,20 @@ public class HollowMessageMapper {
                         break;
 
                     case STRING:
-                    case BYTES:
                         if (hasNamespacedType) {
                             ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.STRING);
                             schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
                         } else {
                             schema.addField(fieldName, HollowObjectSchema.FieldType.STRING);
+                        }
+                        break;
+
+                    case BYTES:
+                        if (hasNamespacedType) {
+                            ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.BYTES);
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
+                        } else {
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.BYTES);
                         }
                         break;
 
@@ -323,8 +343,10 @@ public class HollowMessageMapper {
                 return "Boolean";
 
             case STRING:
-            case BYTES:
                 return "String";
+
+            case BYTES:
+                return "Bytes";
 
             default:
                 return "String";
@@ -353,6 +375,8 @@ public class HollowMessageMapper {
             wrapperSchema.addField("value", HollowObjectSchema.FieldType.BOOLEAN);
         } else if (wrapperType.equals("String")) {
             wrapperSchema.addField("value", HollowObjectSchema.FieldType.STRING);
+        } else if (wrapperType.equals("Bytes")) {
+            wrapperSchema.addField("value", HollowObjectSchema.FieldType.BYTES);
         }
 
         stateEngine.addTypeState(new HollowObjectTypeWriteState(wrapperSchema));
@@ -410,7 +434,7 @@ public class HollowMessageMapper {
         } else if (name.equals("StringValue")) {
             return "String";
         } else if (name.equals("BytesValue")) {
-            return "String"; // Bytes stored as String
+            return "Bytes";
         }
         return null;
     }
@@ -430,8 +454,10 @@ public class HollowMessageMapper {
             return HollowObjectSchema.FieldType.DOUBLE;
         } else if (name.equals("BoolValue")) {
             return HollowObjectSchema.FieldType.BOOLEAN;
-        } else if (name.equals("StringValue") || name.equals("BytesValue")) {
+        } else if (name.equals("StringValue")) {
             return HollowObjectSchema.FieldType.STRING;
+        } else if (name.equals("BytesValue")) {
+            return HollowObjectSchema.FieldType.BYTES;
         }
         return null;
     }
@@ -477,8 +503,13 @@ public class HollowMessageMapper {
             initializeTypeState(descriptor);
         }
 
-        // Create adapter and write to flat records
-        HollowProtoAdapter adapter = new HollowProtoAdapter(stateEngine, typeName, ignoreListOrdering);
+        // Get or create adapter for this type (cached for reuse)
+        HollowProtoAdapter adapter = adapters.get(typeName);
+        if (adapter == null) {
+            adapter = new HollowProtoAdapter(stateEngine, typeName, ignoreListOrdering);
+            adapters.put(typeName, adapter);
+        }
+
         try {
             adapter.processMessage(message, flatRecordWriter);
         } catch (Exception e) {
@@ -702,15 +733,19 @@ public class HollowMessageMapper {
                 break;
 
             case STRING:
-            case BYTES:
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
                     String stringValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getString(fieldName);
                     if (stringValue != null) {
-                        if (field.getType() == Descriptors.FieldDescriptor.Type.BYTES) {
-                            builder.setField(field, com.google.protobuf.ByteString.copyFromUtf8(stringValue));
-                        } else {
-                            builder.setField(field, stringValue);
-                        }
+                        builder.setField(field, stringValue);
+                    }
+                }
+                break;
+
+            case BYTES:
+                if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
+                    byte[] bytesValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getBytes(fieldName);
+                    if (bytesValue != null) {
+                        builder.setField(field, com.google.protobuf.ByteString.copyFrom(bytesValue));
                     }
                 }
                 break;
@@ -795,15 +830,19 @@ public class HollowMessageMapper {
                 break;
 
             case STRING:
-            case BYTES:
                 if (element instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
                     String stringValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) element).getString("value");
                     if (stringValue != null) {
-                        if (field.getType() == Descriptors.FieldDescriptor.Type.BYTES) {
-                            return com.google.protobuf.ByteString.copyFromUtf8(stringValue);
-                        } else {
-                            return stringValue;
-                        }
+                        return stringValue;
+                    }
+                }
+                break;
+
+            case BYTES:
+                if (element instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
+                    byte[] bytesValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) element).getBytes("value");
+                    if (bytesValue != null) {
+                        return com.google.protobuf.ByteString.copyFrom(bytesValue);
                     }
                 }
                 break;
@@ -902,14 +941,16 @@ public class HollowMessageMapper {
                 break;
 
             case STRING:
-            case BYTES:
                 String stringValue = node.getFieldValueString(fieldName);
                 if (stringValue != null) {
-                    if (field.getType() == Descriptors.FieldDescriptor.Type.BYTES) {
-                        builder.setField(field, com.google.protobuf.ByteString.copyFromUtf8(stringValue));
-                    } else {
-                        builder.setField(field, stringValue);
-                    }
+                    builder.setField(field, stringValue);
+                }
+                break;
+
+            case BYTES:
+                byte[] bytesValue = node.getFieldValueBytes(fieldName);
+                if (bytesValue != null) {
+                    builder.setField(field, com.google.protobuf.ByteString.copyFrom(bytesValue));
                 }
                 break;
 
@@ -974,14 +1015,16 @@ public class HollowMessageMapper {
                 return objNode.getFieldValueBooleanBoxed("value");
 
             case STRING:
-            case BYTES:
                 String stringValue = objNode.getFieldValueString("value");
                 if (stringValue != null) {
-                    if (field.getType() == Descriptors.FieldDescriptor.Type.BYTES) {
-                        return com.google.protobuf.ByteString.copyFromUtf8(stringValue);
-                    } else {
-                        return stringValue;
-                    }
+                    return stringValue;
+                }
+                break;
+
+            case BYTES:
+                byte[] bytesValue = objNode.getFieldValueBytes("value");
+                if (bytesValue != null) {
+                    return com.google.protobuf.ByteString.copyFrom(bytesValue);
                 }
                 break;
 

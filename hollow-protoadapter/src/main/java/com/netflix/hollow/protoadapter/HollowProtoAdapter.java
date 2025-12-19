@@ -266,8 +266,7 @@ import java.util.Set;
                     writeRec.setString(fieldName, (String) value);
                     break;
                 case BYTE_STRING:
-                    // Convert ByteString to String for storage
-                    writeRec.setString(fieldName, ((ByteString) value).toStringUtf8());
+                    writeRec.setBytes(fieldName, ((ByteString) value).toByteArray());
                     break;
                 case ENUM:
                     // Store enum as string
@@ -355,7 +354,7 @@ import java.util.Set;
                 writeRec.setString(fieldName, (String) value);
                 break;
             case BYTE_STRING:
-                writeRec.setString(fieldName, ((ByteString) value).toStringUtf8());
+                writeRec.setBytes(fieldName, ((ByteString) value).toByteArray());
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported primitive type: " + javaType);
@@ -390,7 +389,7 @@ import java.util.Set;
                 wrapperRec.setString("value", (String) value);
                 break;
             case BYTE_STRING:
-                wrapperRec.setString("value", ((ByteString) value).toStringUtf8());
+                wrapperRec.setBytes("value", ((ByteString) value).toByteArray());
                 break;
             case ENUM:
                 wrapperRec.setString("value", value.toString());
