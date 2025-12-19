@@ -7,10 +7,16 @@ option java_outer_classname = "HollowOptions";
 
 import "google/protobuf/descriptor.proto";
 
+// Message type for hollow primary key configuration
+message HollowPrimaryKey {
+  repeated string fields = 1;
+}
+
 // Custom message option to define primary key field paths
 // Similar to @HollowPrimaryKey(fields = {"id", "version"}) in Java
+// Usage: option (com.netflix.hollow.hollow_primary_key) = {fields: ["account_id", "region"]};
 extend google.protobuf.MessageOptions {
-  repeated string hollow_primary_key = 50000;
+  HollowPrimaryKey hollow_primary_key = 50000;
 }
 
 // Custom field option to mark repeated fields as unordered

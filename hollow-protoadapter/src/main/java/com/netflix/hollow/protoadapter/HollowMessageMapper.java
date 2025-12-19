@@ -551,10 +551,17 @@ public class HollowMessageMapper {
      * import "hollow_options.proto";
      *
      * message Person {
-     *   option (com.netflix.hollow.hollow_primary_key) = "id";
+     *   option (com.netflix.hollow.hollow_primary_key) = {fields: ["id"]};
      *
      *   int32 id = 1;
      *   string name = 2;
+     * }
+     *
+     * message Account {
+     *   option (com.netflix.hollow.hollow_primary_key) = {fields: ["account_id", "region"]};
+     *
+     *   string account_id = 1;
+     *   string region = 2;
      * }
      * </pre>
      *
@@ -569,13 +576,14 @@ public class HollowMessageMapper {
         java.util.List<Object> keyValues = new java.util.ArrayList<Object>();
 
         // Try to read the hollow_primary_key option
-        // Note: hollow_primary_key is a repeated field, so we can't use hasExtension()
-        // Just call getExtension() which returns empty list if not set
         com.google.protobuf.DescriptorProtos.MessageOptions options = descriptor.getOptions();
         java.util.List<String> keyFieldNames = null;
 
         try {
-            keyFieldNames = options.getExtension(HollowOptions.hollowPrimaryKey);
+            if (options.hasExtension(HollowOptions.hollowPrimaryKey)) {
+                HollowOptions.HollowPrimaryKey pkOption = options.getExtension(HollowOptions.hollowPrimaryKey);
+                keyFieldNames = pkOption.getFieldsList();
+            }
         } catch (Exception e) {
             // Extension not available
         }

@@ -227,7 +227,9 @@ public class HollowProtoAdapterTest {
         Object accountTypeValue = stringValueOf.invoke(null, "CHECKING");
 
         accountBuilder.setField(
-            accountBuilder.getDescriptorForType().findFieldByName("id"), 1);
+            accountBuilder.getDescriptorForType().findFieldByName("account_id"), "ACC123");
+        accountBuilder.setField(
+            accountBuilder.getDescriptorForType().findFieldByName("region"), "us-west-2");
         accountBuilder.setField(
             accountBuilder.getDescriptorForType().findFieldByName("balance"), balanceValue);
         accountBuilder.setField(

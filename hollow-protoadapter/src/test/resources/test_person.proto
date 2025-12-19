@@ -11,7 +11,7 @@ import "google/protobuf/wrappers.proto";
 
 // Example message with various field types
 message Person {
-  option (com.netflix.hollow.hollow_primary_key) = "id";
+  option (com.netflix.hollow.hollow_primary_key) = {fields: ["id"]};
 
   int32 id = 1;
   string name = 2;
@@ -60,13 +60,16 @@ message Product {
   string name = 2 [(com.netflix.hollow.hollow_type_name) = "ProductTitle"];
 }
 
-// Test message for hollow_inline option
+// Test message for hollow_inline option and composite primary key
 message Account {
-  int32 id = 1;
+  option (com.netflix.hollow.hollow_primary_key) = {fields: ["account_id", "region"]};
+
+  string account_id = 1;
+  string region = 2;
   // Boxed types should be references by default
-  google.protobuf.Int32Value balance = 2;
+  google.protobuf.Int32Value balance = 3;
   // This should be inlined instead of being a reference
-  google.protobuf.StringValue account_type = 3 [(com.netflix.hollow.hollow_inline) = true];
+  google.protobuf.StringValue account_type = 4 [(com.netflix.hollow.hollow_inline) = true];
 }
 
 // Test message for google.protobuf.Struct and Value
