@@ -20,6 +20,17 @@ message Person {
   Status status = 5;
   Address address = 6;
   repeated Hobby hobbies = 7;
+  // Metadata field should be treated as reference (like boxed types in Java)
+  google.protobuf.Struct metadata = 8;
+
+  // Test hollow_type_name: creates namespaced wrapper "EmployeeCode" instead of String
+  string employee_code = 9 [(com.netflix.hollow.hollow_type_name) = "EmployeeCode"];
+
+  // Test google.protobuf.*Value fields - default is reference
+  google.protobuf.Int32Value age_years = 10;
+
+  // Test hollow_inline: this Int32Value should be inlined instead of reference
+  google.protobuf.Int32Value priority = 11 [(com.netflix.hollow.hollow_inline) = true];
 }
 
 // Nested message
@@ -72,11 +83,9 @@ message Account {
   google.protobuf.StringValue account_type = 4 [(com.netflix.hollow.hollow_inline) = true];
 }
 
-// Test message for google.protobuf.Struct and Value
-message Document {
-  int32 id = 1;
-  string title = 2;
-  // These should be treated as references (like boxed types in Java)
-  google.protobuf.Struct metadata = 3;
-  google.protobuf.Value data = 4;
+// Test message for circular reference detection
+// This should fail during schema generation since Hollow doesn't support cycles
+message Node {
+  string value = 1;
+  Node next = 2;  // Circular reference: Node references itself
 }

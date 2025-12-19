@@ -1,28 +1,174 @@
-{
-  "id": 123,
-  "name": "John Doe",
-  "email": "john@example.com",
-  "phoneNumbers": [
-    "555-1234",
-    "555-5678"
-  ],
-  "status": "ACTIVE",
-  "address": {
-    "street": "123 Main St",
-    "city": "San Francisco",
-    "state": "CA",
-    "zipCode": 94105
-  },
-  "hobbies": [
-    {
-      "name": "Programming",
-      "yearsExperience": 10,
-      "skillLevel": "EXPERT"
+[
+  {
+    "id": 123,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phoneNumbers": [
+      "555-1234",
+      "555-5678"
+    ],
+    "status": "ACTIVE",
+    "address": {
+      "street": "123 Main St",
+      "city": "San Francisco",
+      "state": "CA",
+      "zipCode": 94105
     },
-    {
-      "name": "Photography",
-      "yearsExperience": 3,
-      "skillLevel": "INTERMEDIATE"
+    "hobbies": [
+      {
+        "name": "Programming",
+        "yearsExperience": 10,
+        "skillLevel": "EXPERT"
+      },
+      {
+        "name": "Photography",
+        "yearsExperience": 3,
+        "skillLevel": "INTERMEDIATE"
+      }
+    ],
+    "metadata": {
+      "age": 35,
+      "department": "Engineering",
+      "employeeId": "EMP001",
+      "active": true
     }
-  ]
-}
+  },
+  {
+    "id": 2,
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "phoneNumbers": [
+      "555-9999"
+    ],
+    "status": "ACTIVE",
+    "address": {
+      "street": "456 Oak Ave",
+      "city": "Seattle",
+      "state": "WA",
+      "zipCode": 98101
+    },
+    "hobbies": [
+      {
+        "name": "Hiking",
+        "yearsExperience": 5,
+        "skillLevel": "ADVANCED"
+      }
+    ],
+    "metadata": {
+      "fullTime": "yes",
+      "department": "Product",
+      "remote": true,
+      "level": "Senior"
+    }
+  },
+  {
+    "id": 3,
+    "name": "Bob Wilson",
+    "email": "bob@example.com",
+    "phoneNumbers": [],
+    "status": "INACTIVE",
+    "address": {
+      "street": "789 Pine Rd",
+      "city": "Austin",
+      "state": "TX",
+      "zipCode": 78701
+    },
+    "hobbies": [],
+    "metadata": {
+      "retired": true,
+      "yearsOfService": 25,
+      "exitDate": "2024-12-31"
+    }
+  },
+  {
+    "id": 4,
+    "name": "Alice Chen",
+    "email": "alice@example.com",
+    "phoneNumbers": [
+      "555-0001",
+      "555-0002",
+      "555-0003"
+    ],
+    "status": "ACTIVE",
+    "address": {
+      "street": "321 Elm St",
+      "city": "New York",
+      "state": "NY",
+      "zipCode": 10001
+    },
+    "hobbies": [
+      {
+        "name": "Painting",
+        "yearsExperience": 7,
+        "skillLevel": "EXPERT"
+      },
+      {
+        "name": "Music",
+        "yearsExperience": 15,
+        "skillLevel": "EXPERT"
+      },
+      {
+        "name": "Cooking",
+        "yearsExperience": 2,
+        "skillLevel": "BEGINNER"
+      }
+    ],
+    "metadata": {
+      "languages": ["English", "Mandarin", "Spanish"],
+      "certifications": 5,
+      "startDate": "2020-03-15",
+      "permanent": true
+    }
+  },
+  {
+    "id": 5,
+    "name": "Carlos Rodriguez",
+    "email": "carlos@example.com",
+    "phoneNumbers": [
+      "555-7777"
+    ],
+    "status": "SUSPENDED",
+    "address": {
+      "street": "555 Beach Blvd",
+      "city": "Miami",
+      "state": "FL",
+      "zipCode": 33139
+    },
+    "hobbies": [
+      {
+        "name": "Swimming",
+        "yearsExperience": 1,
+        "skillLevel": "BEGINNER"
+      }
+    ],
+    "metadata": {}
+  },
+  {
+    "id": 6,
+    "name": "Diana Park",
+    "email": "diana@example.com",
+    "phoneNumbers": [
+      "555-4444",
+      "555-5555"
+    ],
+    "status": "ACTIVE",
+    "address": {
+      "street": "888 Valley Dr",
+      "city": "Denver",
+      "state": "CO",
+      "zipCode": 80202
+    },
+    "hobbies": [
+      {
+        "name": "Skiing",
+        "yearsExperience": 8,
+        "skillLevel": "EXPERT"
+      },
+      {
+        "name": "Reading",
+        "yearsExperience": 20,
+        "skillLevel": "EXPERT"
+      }
+    ]
+  }
+]

@@ -18,8 +18,10 @@ package com.netflix.hollow.protoadapter;
 
 import com.google.protobuf.Descriptors;
 import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowListTypeWriteState;
+import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 
@@ -31,6 +33,30 @@ import java.util.Set;
 /**
  * Maps Protocol Buffer message descriptors to Hollow schemas.
  * Similar to HollowObjectMapper for POJOs, but works with protobuf Descriptors.
+ *
+ * <h2>Lazy Schema Creation for Well-Known Types</h2>
+ * <p>
+ * Google Protocol Buffers defines well-known types like {@code google.protobuf.Struct},
+ * {@code google.protobuf.Value}, and {@code google.protobuf.ListValue} that have intentional
+ * circular references in their schema definitions (e.g., Struct contains Value, Value can
+ * contain Struct). Hollow does not support circular references in schemas.
+ * <p>
+ * To handle this, these well-known dynamic types use <b>lazy schema creation</b>:
+ * <ul>
+ *   <li>During initial schema generation, these types are skipped</li>
+ *   <li>Schemas are created on-demand when actual data is first encountered</li>
+ *   <li>This breaks the circular dependency and allows the types to be supported</li>
+ * </ul>
+ * <p>
+ * The lazy approach is safe for Hollow's snapshot/delta model. Schemas can appear dynamically
+ * across cycles, and consumers will receive schema updates correctly. See
+ * {@code HollowProtoAdapterTest.testLazySchemaCreationAcrossCycles()} for validation.
+ *
+ * <h2>Circular Reference Detection</h2>
+ * <p>
+ * For user-defined messages, circular references are detected during schema generation using
+ * a backtracking algorithm. If detected, an {@link IllegalStateException} is thrown since
+ * Hollow cannot represent such schemas. This matches the behavior of {@code HollowObjectTypeMapper}.
  */
 public class HollowMessageMapper {
 
@@ -38,6 +64,10 @@ public class HollowMessageMapper {
     private final Set<String> processedTypes = new HashSet<String>();
     private final Map<String, HollowProtoAdapter> adapters = new HashMap<String, HollowProtoAdapter>();
     private boolean ignoreListOrdering = false;
+
+    // Track field types for Struct fields to validate consistency across instances
+    // Maps "ParentType.fieldPath.structFieldName" -> Value type (e.g., "Person.metadata.age" -> "numberValue")
+    private final Map<String, String> structFieldTypes = new HashMap<String, String>();
 
     public HollowMessageMapper(HollowWriteStateEngine stateEngine) {
         this.stateEngine = stateEngine;
@@ -90,7 +120,7 @@ public class HollowMessageMapper {
         // Get or create adapter for this type (cached for reuse)
         HollowProtoAdapter adapter = adapters.get(typeName);
         if (adapter == null) {
-            adapter = new HollowProtoAdapter(stateEngine, typeName, ignoreListOrdering);
+            adapter = new HollowProtoAdapter(stateEngine, typeName, ignoreListOrdering, this);
             adapters.put(typeName, adapter);
         }
 
@@ -105,12 +135,17 @@ public class HollowMessageMapper {
      * Recursively creates Hollow schemas from a protobuf Descriptor.
      */
     private void createSchemas(Descriptors.Descriptor descriptor) {
-        String typeName = descriptor.getName();
+        createSchemas(descriptor, new HashSet<String>());
+    }
 
-        // Skip if already processed
-        if (processedTypes.contains(typeName)) {
-            return;
-        }
+    /**
+     * Recursively creates Hollow schemas from a protobuf Descriptor with cycle detection.
+     *
+     * @param descriptor the protobuf message descriptor
+     * @param visitedInPath types currently being processed in this traversal path (for cycle detection)
+     */
+    private void createSchemas(Descriptors.Descriptor descriptor, Set<String> visitedInPath) {
+        String typeName = descriptor.getName();
 
         // Skip google.protobuf.*Value types - they are unwrapped, not stored as separate types
         if (isProtoValueType(descriptor)) {
@@ -118,15 +153,37 @@ public class HollowMessageMapper {
             return;
         }
 
+        // Skip google.protobuf dynamic types (Struct, Value, ListValue) during initial schema generation
+        // These have intentional circular references and will be handled lazily during data writes
+        if (isWellKnownDynamicType(descriptor)) {
+            processedTypes.add(typeName);
+            return;
+        }
+
+        // Detect direct circular references (e.g., message Node { Node next = 1; })
+        // Hollow doesn't support circular references in schemas
+        if (visitedInPath.contains(typeName)) {
+            throw new IllegalStateException(
+                "Circular reference detected: message type '" + typeName + "' references itself. " +
+                "Hollow does not support circular references in schemas. " +
+                "Consider using a reference ID pattern instead.");
+        }
+
+        // Skip if already processed (after cycle check, before adding to path)
+        if (processedTypes.contains(typeName)) {
+            return;
+        }
+
+        visitedInPath.add(typeName);
         processedTypes.add(typeName);
 
-        // First, process all nested message types (except *Value types)
+        // First, process all nested message types (except *Value types and dynamic types)
         for (Descriptors.FieldDescriptor field : descriptor.getFields()) {
             if (field.getType() == Descriptors.FieldDescriptor.Type.MESSAGE) {
                 Descriptors.Descriptor msgType = field.getMessageType();
-                // Skip *Value types - they are unwrapped
-                if (!isProtoValueType(msgType)) {
-                    createSchemas(msgType);
+                // Skip *Value types (unwrapped) and dynamic types (handled lazily)
+                if (!isProtoValueType(msgType) && !isWellKnownDynamicType(msgType)) {
+                    createSchemas(msgType, visitedInPath);
                 }
             }
         }
@@ -283,6 +340,11 @@ public class HollowMessageMapper {
                                 ensurePrimitiveWrapperSchema(wrapperType);
                                 schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, wrapperType);
                             }
+                        } else if (isWellKnownDynamicType(messageType)) {
+                            // google.protobuf.Struct, Value, ListValue - treat as references
+                            // Their schemas will be created lazily on first data write
+                            String referencedType = messageType.getName();
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, referencedType);
                         } else {
                             // Regular nested messages are references
                             String referencedType = messageType.getName();
@@ -298,6 +360,170 @@ public class HollowMessageMapper {
 
         // Add the schema to the state engine
         stateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
+
+        // Remove from visited path (backtrack) to allow this type to be referenced
+        // from other branches of the schema tree (just not from itself)
+        visitedInPath.remove(typeName);
+    }
+
+    /**
+     * Ensure schema exists for google.protobuf.Struct/Value/ListValue based on actual data.
+     * Creates or validates schemas dynamically as data is encountered.
+     *
+     * @param message the Struct/Value/ListValue message instance
+     * @param parentTypeName the parent type containing this field (for error messages)
+     * @param fieldPath the field path in parent (for tracking/validation)
+     */
+    void ensureDynamicTypeSchema(com.google.protobuf.Message message, String parentTypeName, String fieldPath) {
+        Descriptors.Descriptor descriptor = message.getDescriptorForType();
+        String fullName = descriptor.getFullName();
+
+        if (fullName.equals("google.protobuf.Struct")) {
+            ensureStructSchema(message, parentTypeName, fieldPath);
+        } else if (fullName.equals("google.protobuf.Value")) {
+            ensureValueSchema(message, parentTypeName, fieldPath);
+        } else if (fullName.equals("google.protobuf.ListValue")) {
+            ensureListValueSchema(message, parentTypeName, fieldPath);
+        }
+    }
+
+    /**
+     * Ensure schema for google.protobuf.Struct based on actual field values.
+     * Struct is an object with a map<string, Value> field.
+     * Also validates that field types are consistent across all instances.
+     */
+    private void ensureStructSchema(com.google.protobuf.Message structMessage, String parentTypeName, String fieldPath) {
+        // Ensure Value schema exists (will create if needed)
+        ensureValueSchemaExists();
+
+        // Validate field type consistency across instances
+        validateStructFields(structMessage, parentTypeName, fieldPath);
+    }
+
+    /**
+     * Validate that Struct field types are consistent across all instances.
+     * Throws IllegalStateException if the same field name has different types.
+     */
+    private void validateStructFields(com.google.protobuf.Message structMessage, String parentTypeName, String fieldPath) {
+        Descriptors.Descriptor descriptor = structMessage.getDescriptorForType();
+        Descriptors.FieldDescriptor fieldsDescriptor = descriptor.findFieldByName("fields");
+
+        if (fieldsDescriptor == null) return;
+
+        // Get the fields map from the Struct
+        Object fieldsObj = structMessage.getField(fieldsDescriptor);
+        if (!(fieldsObj instanceof java.util.List)) return;
+
+        @SuppressWarnings("unchecked")
+        java.util.List<com.google.protobuf.Message> entries = (java.util.List<com.google.protobuf.Message>) fieldsObj;
+
+        for (com.google.protobuf.Message entry : entries) {
+            // Each entry has "key" (string) and "value" (Value message)
+            Descriptors.Descriptor entryDescriptor = entry.getDescriptorForType();
+            Descriptors.FieldDescriptor keyField = entryDescriptor.findFieldByName("key");
+            Descriptors.FieldDescriptor valueField = entryDescriptor.findFieldByName("value");
+
+            if (keyField == null || valueField == null) continue;
+
+            String key = (String) entry.getField(keyField);
+            com.google.protobuf.Message value = (com.google.protobuf.Message) entry.getField(valueField);
+
+            // Determine which Value type this is
+            String valueType = getValueType(value);
+            if (valueType == null) continue;
+
+            // Check for conflicts
+            String fieldKey = parentTypeName + "." + fieldPath + "." + key;
+            String existingType = structFieldTypes.get(fieldKey);
+
+            if (existingType != null && !existingType.equals(valueType)) {
+                throw new IllegalStateException(
+                    "Conflicting types for Struct field '" + key + "' in " + parentTypeName + "." + fieldPath +
+                    ": previously " + existingType + ", now " + valueType);
+            }
+
+            structFieldTypes.put(fieldKey, valueType);
+        }
+    }
+
+    /**
+     * Determine which type a Value message contains.
+     * Returns the field name (e.g., "numberValue", "stringValue") or null if empty.
+     */
+    private String getValueType(com.google.protobuf.Message value) {
+        Descriptors.Descriptor descriptor = value.getDescriptorForType();
+
+        // Check each possible Value field
+        for (Descriptors.FieldDescriptor field : descriptor.getFields()) {
+            if (value.hasField(field)) {
+                return field.getName();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Create the Value schema if it doesn't exist.
+     * Value schema is fixed - it has all possible fields for the oneof.
+     */
+    private void ensureValueSchemaExists() {
+        String valueTypeName = "Value";
+
+        // Create Value schema if it doesn't exist
+        if (stateEngine.getSchema(valueTypeName) == null) {
+            // Value has a oneof "kind" with different types
+            // We'll model it as an object with nullable fields for each possible type
+            HollowObjectSchema schema = new HollowObjectSchema(valueTypeName, 6);
+            schema.addField("nullValue", HollowObjectSchema.FieldType.BOOLEAN);  // true if null
+            schema.addField("numberValue", HollowObjectSchema.FieldType.DOUBLE);
+            schema.addField("stringValue", HollowObjectSchema.FieldType.STRING);
+            schema.addField("boolValue", HollowObjectSchema.FieldType.BOOLEAN);
+            schema.addField("structValue", HollowObjectSchema.FieldType.REFERENCE, "Struct");
+            schema.addField("listValue", HollowObjectSchema.FieldType.REFERENCE, "ListValue");
+            stateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
+        }
+
+        // Ensure prerequisite schemas exist
+        if (stateEngine.getSchema("Struct") == null) {
+            // Create Struct schema - it's an object with a map<string, Value> field called "fields"
+            HollowObjectSchema structSchema = new HollowObjectSchema("Struct", 1);
+            structSchema.addField("fields", HollowObjectSchema.FieldType.REFERENCE, "MapOfStringToValue");
+            stateEngine.addTypeState(new HollowObjectTypeWriteState(structSchema));
+
+            // Create the map schema for the fields
+            HollowMapSchema fieldsMapSchema = new HollowMapSchema("MapOfStringToValue", "String", "Value");
+            stateEngine.addTypeState(new HollowMapTypeWriteState(fieldsMapSchema));
+
+            ensurePrimitiveWrapperSchema("String");
+        }
+
+        if (stateEngine.getSchema("ListValue") == null) {
+            // Create ListValue schema
+            HollowObjectSchema listValueSchema = new HollowObjectSchema("ListValue", 1);
+            listValueSchema.addField("values", HollowObjectSchema.FieldType.REFERENCE, "ListOfValue");
+            stateEngine.addTypeState(new HollowObjectTypeWriteState(listValueSchema));
+
+            // Create list schema
+            HollowListSchema listSchema = new HollowListSchema("ListOfValue", "Value");
+            stateEngine.addTypeState(new HollowListTypeWriteState(listSchema));
+        }
+    }
+
+    /**
+     * Ensure schema for google.protobuf.Value based on actual oneof choice.
+     * Value can be: null, number, string, bool, struct, or list.
+     */
+    private void ensureValueSchema(com.google.protobuf.Message valueMessage, String parentTypeName, String fieldPath) {
+        ensureValueSchemaExists();
+    }
+
+    /**
+     * Ensure schema for google.protobuf.ListValue based on actual element types.
+     * ListValue is repeated Value.
+     */
+    private void ensureListValueSchema(com.google.protobuf.Message listValueMessage, String parentTypeName, String fieldPath) {
+        ensureValueSchemaExists();
     }
 
     /**
@@ -416,6 +642,18 @@ public class HollowMessageMapper {
     }
 
     /**
+     * Check if a message type is a google.protobuf dynamic type (Struct, Value, ListValue).
+     * These types have circular references by design and must be handled lazily during data writes.
+     */
+    private boolean isWellKnownDynamicType(Descriptors.Descriptor descriptor) {
+        if (descriptor == null) return false;
+        String fullName = descriptor.getFullName();
+        return fullName.equals("google.protobuf.Struct")
+            || fullName.equals("google.protobuf.Value")
+            || fullName.equals("google.protobuf.ListValue");
+    }
+
+    /**
      * Get the Hollow wrapper type name for a google.protobuf.*Value type.
      * E.g., Int32Value -> Integer, StringValue -> String
      */
@@ -506,7 +744,7 @@ public class HollowMessageMapper {
         // Get or create adapter for this type (cached for reuse)
         HollowProtoAdapter adapter = adapters.get(typeName);
         if (adapter == null) {
-            adapter = new HollowProtoAdapter(stateEngine, typeName, ignoreListOrdering);
+            adapter = new HollowProtoAdapter(stateEngine, typeName, ignoreListOrdering, this);
             adapters.put(typeName, adapter);
         }
 

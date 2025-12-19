@@ -56,18 +56,24 @@ import java.util.Set;
     private final ThreadLocal<PassthroughWriteRecords> passthroughRecords;
 
     private final boolean ignoreListOrdering;
+    private HollowMessageMapper mapper; // For dynamic schema creation (Struct/Value/ListValue)
 
     public HollowProtoAdapter(HollowWriteStateEngine stateEngine, String typeName) {
         this(stateEngine, typeName, false);
     }
 
     public HollowProtoAdapter(HollowWriteStateEngine stateEngine, String typeName, boolean ignoreListOrdering) {
+        this(stateEngine, typeName, ignoreListOrdering, null);
+    }
+
+    public HollowProtoAdapter(HollowWriteStateEngine stateEngine, String typeName, boolean ignoreListOrdering, HollowMessageMapper mapper) {
         super(typeName, "populate");
         this.stateEngine = stateEngine;
         this.hollowSchemas = new HashMap<String, HollowSchema>();
         this.canonicalObjectFieldMappings = new HashMap<String, ObjectFieldMapping>();
         this.passthroughDecoratedTypes = new HashSet<String>();
         this.ignoreListOrdering = ignoreListOrdering;
+        this.mapper = mapper;
 
         for(HollowSchema schema : stateEngine.getSchemas()) {
             hollowSchemas.put(schema.getName(), schema);
@@ -117,6 +123,19 @@ import java.util.Set;
 
     private int parseMessage(Message message, FlatRecordWriter flatRecordWriter, String typeName) throws IOException {
         HollowSchema typeSchema = hollowSchemas.get(typeName);
+        // For dynamically created schemas (Struct/Value/ListValue), look up from state engine
+        if (typeSchema == null) {
+            typeSchema = stateEngine.getSchema(typeName);
+            if (typeSchema != null) {
+                hollowSchemas.put(typeName, typeSchema);
+                if (typeSchema instanceof HollowObjectSchema) {
+                    canonicalObjectFieldMappings.put(typeName, new ObjectFieldMapping(typeName, this));
+                }
+            }
+        }
+        if (typeSchema == null) {
+            throw new IOException("Schema not found for type: " + typeName);
+        }
         switch(typeSchema.getSchemaType()) {
             case OBJECT:
                 return addObject(message, flatRecordWriter, typeName);
@@ -233,6 +252,15 @@ import java.util.Set;
                     // Inline the primitive value
                     writePrimitiveValue(writeRec, fieldName, unwrappedType, unwrappedValue);
                 }
+            } else if (isWellKnownDynamicType(msgValue.getDescriptorForType())) {
+                // Handle google.protobuf.Struct, Value, ListValue
+                // Ensure their schemas exist based on actual data
+                if (mapper != null) {
+                    mapper.ensureDynamicTypeSchema(msgValue, typeName, fieldName);
+                }
+                // Now process the message
+                int refOrdinal = parseMessage(msgValue, flatRecordWriter, schema.getReferencedType(fieldPosition));
+                writeRec.setReference(fieldName, refOrdinal);
             } else {
                 // Regular nested message
                 int refOrdinal = parseMessage(msgValue, flatRecordWriter, schema.getReferencedType(fieldPosition));
@@ -295,6 +323,18 @@ import java.util.Set;
             || fullName.equals("google.protobuf.BoolValue")
             || fullName.equals("google.protobuf.StringValue")
             || fullName.equals("google.protobuf.BytesValue");
+    }
+
+    /**
+     * Check if a message type is a google.protobuf dynamic type (Struct, Value, ListValue).
+     * These types have circular references by design and are handled lazily.
+     */
+    private boolean isWellKnownDynamicType(com.google.protobuf.Descriptors.Descriptor descriptor) {
+        if (descriptor == null) return false;
+        String fullName = descriptor.getFullName();
+        return fullName.equals("google.protobuf.Struct")
+            || fullName.equals("google.protobuf.Value")
+            || fullName.equals("google.protobuf.ListValue");
     }
 
     /**
@@ -555,7 +595,20 @@ import java.util.Set;
         Map<String, ObjectFieldMapping> objectFieldMappings = objectFieldMappingHolder.get();
         ObjectFieldMapping mapping = objectFieldMappings.get(type);
         if (mapping == null) {
-            throw new IOException("WriteRecord for " + type + " not found. Make sure Schema Discovery is done correctly.");
+            // For dynamically created object schemas, create the mapping on demand
+            HollowSchema schema = stateEngine.getSchema(type);
+            if (schema instanceof HollowObjectSchema) {
+                mapping = canonicalObjectFieldMappings.get(type);
+                if (mapping == null) {
+                    mapping = new ObjectFieldMapping(type, this);
+                    canonicalObjectFieldMappings.put(type, mapping);
+                }
+                objectFieldMappings.put(type, mapping.clone());
+                mapping = objectFieldMappings.get(type);
+            }
+        }
+        if (mapping == null) {
+            throw new IOException("ObjectFieldMapping for " + type + " not found. Make sure Schema Discovery is done correctly.");
         }
         return mapping;
     }
@@ -563,6 +616,29 @@ import java.util.Set;
     HollowWriteRecord getWriteRecord(String type) throws IOException {
         Map<String, HollowWriteRecord> hollowWriteRecords = hollowWriteRecordsHolder.get();
         HollowWriteRecord wRec = hollowWriteRecords.get(type);
+        if (wRec == null) {
+            // For dynamically created schemas, create the write record on demand
+            HollowSchema schema = stateEngine.getSchema(type);
+            if (schema != null) {
+                switch (schema.getSchemaType()) {
+                    case LIST:
+                        wRec = new HollowListWriteRecord();
+                        break;
+                    case MAP:
+                        wRec = new HollowMapWriteRecord();
+                        break;
+                    case OBJECT:
+                        wRec = new HollowObjectWriteRecord((HollowObjectSchema) schema);
+                        break;
+                    case SET:
+                        wRec = new HollowSetWriteRecord();
+                        break;
+                }
+                if (wRec != null) {
+                    hollowWriteRecords.put(type, wRec);
+                }
+            }
+        }
         if (wRec == null) {
             throw new IOException("WriteRecord for " + type + " not found. Make sure Schema Discovery is done correctly.");
         }
