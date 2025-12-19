@@ -103,12 +103,23 @@ public class HollowMessageMapper {
         if (processedTypes.contains(typeName)) {
             return;
         }
+
+        // Skip google.protobuf.*Value types - they are unwrapped, not stored as separate types
+        if (isProtoValueType(descriptor)) {
+            processedTypes.add(typeName);
+            return;
+        }
+
         processedTypes.add(typeName);
 
-        // First, process all nested message types
+        // First, process all nested message types (except *Value types)
         for (Descriptors.FieldDescriptor field : descriptor.getFields()) {
             if (field.getType() == Descriptors.FieldDescriptor.Type.MESSAGE) {
-                createSchemas(field.getMessageType());
+                Descriptors.Descriptor msgType = field.getMessageType();
+                // Skip *Value types - they are unwrapped
+                if (!isProtoValueType(msgType)) {
+                    createSchemas(msgType);
+                }
             }
         }
 
@@ -144,12 +155,21 @@ public class HollowMessageMapper {
                 schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, listTypeName);
 
             } else {
+                // Check if field has hollow_type_name option (for namespaced wrapper types)
+                String namespacedTypeName = getHollowFieldName(field);
+                boolean hasNamespacedType = !fieldName.equals(namespacedTypeName);
+
                 // Non-repeated fields
                 switch (field.getType()) {
                     case INT32:
                     case SINT32:
                     case SFIXED32:
-                        schema.addField(fieldName, HollowObjectSchema.FieldType.INT);
+                        if (hasNamespacedType) {
+                            ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.INT);
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
+                        } else {
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.INT);
+                        }
                         break;
 
                     case INT64:
@@ -157,40 +177,97 @@ public class HollowMessageMapper {
                     case SFIXED64:
                     case UINT64:
                     case FIXED64:
-                        schema.addField(fieldName, HollowObjectSchema.FieldType.LONG);
+                        if (hasNamespacedType) {
+                            ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.LONG);
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
+                        } else {
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.LONG);
+                        }
                         break;
 
                     case UINT32:
                     case FIXED32:
-                        schema.addField(fieldName, HollowObjectSchema.FieldType.INT);
+                        if (hasNamespacedType) {
+                            ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.INT);
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
+                        } else {
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.INT);
+                        }
                         break;
 
                     case FLOAT:
-                        schema.addField(fieldName, HollowObjectSchema.FieldType.FLOAT);
+                        if (hasNamespacedType) {
+                            ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.FLOAT);
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
+                        } else {
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.FLOAT);
+                        }
                         break;
 
                     case DOUBLE:
-                        schema.addField(fieldName, HollowObjectSchema.FieldType.DOUBLE);
+                        if (hasNamespacedType) {
+                            ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.DOUBLE);
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
+                        } else {
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.DOUBLE);
+                        }
                         break;
 
                     case BOOL:
-                        schema.addField(fieldName, HollowObjectSchema.FieldType.BOOLEAN);
+                        if (hasNamespacedType) {
+                            ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.BOOLEAN);
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
+                        } else {
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.BOOLEAN);
+                        }
                         break;
 
                     case STRING:
                     case BYTES:
-                        schema.addField(fieldName, HollowObjectSchema.FieldType.STRING);
+                        if (hasNamespacedType) {
+                            ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.STRING);
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
+                        } else {
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.STRING);
+                        }
                         break;
 
                     case ENUM:
                         // Enums stored as strings
-                        schema.addField(fieldName, HollowObjectSchema.FieldType.STRING);
+                        if (hasNamespacedType) {
+                            ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.STRING);
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
+                        } else {
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.STRING);
+                        }
                         break;
 
                     case MESSAGE:
-                        // Nested messages are references
-                        String referencedType = field.getMessageType().getName();
-                        schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, referencedType);
+                        // Check if this is a google.protobuf.*Value type
+                        Descriptors.Descriptor messageType = field.getMessageType();
+                        if (isProtoValueType(messageType)) {
+                            // Unwrap *Value types
+                            if (shouldInlineField(field)) {
+                                // hollow_inline: unwrap to inline primitive
+                                HollowObjectSchema.FieldType inlineType = getValueTypeInline(messageType);
+                                if (inlineType == null) {
+                                    throw new IllegalArgumentException("Unsupported *Value type for inlining: " + messageType.getName());
+                                }
+                                schema.addField(fieldName, inlineType);
+                            } else {
+                                // Default: unwrap to reference to wrapper type (e.g., Integer, String)
+                                String wrapperType = getValueTypeWrapper(messageType);
+                                if (wrapperType == null) {
+                                    throw new IllegalArgumentException("Unsupported *Value type: " + messageType.getName());
+                                }
+                                ensurePrimitiveWrapperSchema(wrapperType);
+                                schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, wrapperType);
+                            }
+                        } else {
+                            // Regular nested messages are references
+                            String referencedType = messageType.getName();
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, referencedType);
+                        }
                         break;
 
                     default:
@@ -279,6 +356,108 @@ public class HollowMessageMapper {
         }
 
         stateEngine.addTypeState(new HollowObjectTypeWriteState(wrapperSchema));
+    }
+
+    /**
+     * Ensure a primitive wrapper schema exists with a custom name (for namespaced types).
+     * Used when hollow_type_name option is specified on a primitive field.
+     */
+    private void ensurePrimitiveWrapperSchema(String wrapperTypeName, HollowObjectSchema.FieldType primitiveType) {
+        if (stateEngine.getSchema(wrapperTypeName) != null) {
+            return;
+        }
+
+        HollowObjectSchema wrapperSchema = new HollowObjectSchema(wrapperTypeName, 1);
+        wrapperSchema.addField("value", primitiveType);
+        stateEngine.addTypeState(new HollowObjectTypeWriteState(wrapperSchema));
+    }
+
+    /**
+     * Check if a message type is a google.protobuf.*Value wrapper type.
+     * Note: google.protobuf.Value (without a prefix) is NOT a wrapper type - it's a union type.
+     */
+    private boolean isProtoValueType(Descriptors.Descriptor descriptor) {
+        if (descriptor == null) return false;
+        String fullName = descriptor.getFullName();
+        // Only match specific wrapper types, not google.protobuf.Value or google.protobuf.Struct
+        return fullName.equals("google.protobuf.Int32Value")
+            || fullName.equals("google.protobuf.Int64Value")
+            || fullName.equals("google.protobuf.UInt32Value")
+            || fullName.equals("google.protobuf.UInt64Value")
+            || fullName.equals("google.protobuf.FloatValue")
+            || fullName.equals("google.protobuf.DoubleValue")
+            || fullName.equals("google.protobuf.BoolValue")
+            || fullName.equals("google.protobuf.StringValue")
+            || fullName.equals("google.protobuf.BytesValue");
+    }
+
+    /**
+     * Get the Hollow wrapper type name for a google.protobuf.*Value type.
+     * E.g., Int32Value -> Integer, StringValue -> String
+     */
+    private String getValueTypeWrapper(Descriptors.Descriptor descriptor) {
+        String name = descriptor.getName();
+        if (name.equals("Int32Value") || name.equals("UInt32Value")) {
+            return "Integer";
+        } else if (name.equals("Int64Value") || name.equals("UInt64Value")) {
+            return "Long";
+        } else if (name.equals("FloatValue")) {
+            return "Float";
+        } else if (name.equals("DoubleValue")) {
+            return "Double";
+        } else if (name.equals("BoolValue")) {
+            return "Boolean";
+        } else if (name.equals("StringValue")) {
+            return "String";
+        } else if (name.equals("BytesValue")) {
+            return "String"; // Bytes stored as String
+        }
+        return null;
+    }
+
+    /**
+     * Get the Hollow inline field type for a google.protobuf.*Value type.
+     */
+    private HollowObjectSchema.FieldType getValueTypeInline(Descriptors.Descriptor descriptor) {
+        String name = descriptor.getName();
+        if (name.equals("Int32Value") || name.equals("UInt32Value")) {
+            return HollowObjectSchema.FieldType.INT;
+        } else if (name.equals("Int64Value") || name.equals("UInt64Value")) {
+            return HollowObjectSchema.FieldType.LONG;
+        } else if (name.equals("FloatValue")) {
+            return HollowObjectSchema.FieldType.FLOAT;
+        } else if (name.equals("DoubleValue")) {
+            return HollowObjectSchema.FieldType.DOUBLE;
+        } else if (name.equals("BoolValue")) {
+            return HollowObjectSchema.FieldType.BOOLEAN;
+        } else if (name.equals("StringValue") || name.equals("BytesValue")) {
+            return HollowObjectSchema.FieldType.STRING;
+        }
+        return null;
+    }
+
+    /**
+     * Get the hollow field name, checking for hollow_type_name custom option.
+     */
+    private String getHollowFieldName(Descriptors.FieldDescriptor field) {
+        // Check for hollow_type_name custom option
+        if (field.getOptions().hasExtension(HollowOptions.hollowTypeName)) {
+            String customName = field.getOptions().getExtension(HollowOptions.hollowTypeName);
+            if (customName != null && !customName.isEmpty()) {
+                return customName;
+            }
+        }
+        return field.getName();
+    }
+
+    /**
+     * Check if a field should be inlined (has hollow_inline option set to true).
+     */
+    private boolean shouldInlineField(Descriptors.FieldDescriptor field) {
+        if (field.getOptions().hasExtension(HollowOptions.hollowInline)) {
+            return field.getOptions().getExtension(HollowOptions.hollowInline);
+        }
+        return false;
     }
 
     /**

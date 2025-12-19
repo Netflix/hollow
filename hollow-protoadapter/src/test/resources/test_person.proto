@@ -6,6 +6,8 @@ option java_package = "com.netflix.hollow.test.proto";
 option java_outer_classname = "PersonProtos";
 
 import "hollow_options.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
 
 // Example message with various field types
 message Person {
@@ -49,4 +51,29 @@ enum SkillLevel {
   INTERMEDIATE = 1;
   ADVANCED = 2;
   EXPERT = 3;
+}
+
+// Test message for hollow_type_name option
+message Product {
+  int32 id = 1;
+  // This creates a namespaced wrapper type "ProductTitle" for better memory efficiency
+  string name = 2 [(com.netflix.hollow.hollow_type_name) = "ProductTitle"];
+}
+
+// Test message for hollow_inline option
+message Account {
+  int32 id = 1;
+  // Boxed types should be references by default
+  google.protobuf.Int32Value balance = 2;
+  // This should be inlined instead of being a reference
+  google.protobuf.StringValue account_type = 3 [(com.netflix.hollow.hollow_inline) = true];
+}
+
+// Test message for google.protobuf.Struct and Value
+message Document {
+  int32 id = 1;
+  string title = 2;
+  // These should be treated as references (like boxed types in Java)
+  google.protobuf.Struct metadata = 3;
+  google.protobuf.Value data = 4;
 }

@@ -20,4 +20,15 @@ extend google.protobuf.MessageOptions {
 // Similar to HollowObjectMapper.ignoreListOrdering() in Java
 extend google.protobuf.FieldOptions {
   bool hollow_ignore_list_ordering = 50001;
+
+  // Custom field option to override the hollow field name
+  // Similar to @HollowTypeName(name = "customName") in Java
+  // When set, uses this name instead of the proto field name
+  string hollow_type_name = 50002;
+
+  // Custom field option to inline a field as a value rather than a reference
+  // Similar to @HollowInline in Java
+  // When true, the field is stored inline (like primitive int vs boxed Integer)
+  // Only applicable to boxed primitive types (e.g., google.protobuf.Int32Value, StringValue)
+  bool hollow_inline = 50003;
 }

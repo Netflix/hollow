@@ -138,7 +138,7 @@ import java.util.Set;
             FieldDescriptor field = entry.getKey();
             Object value = entry.getValue();
             String fieldName = field.getName();
-            
+
             ObjectMappedFieldPath mappedFieldPath = objectMapping.getMappedFieldPath(fieldName);
 
             if (mappedFieldPath != null) {
@@ -215,11 +215,37 @@ import java.util.Set;
             int refOrdinal = parseCollection(message, (List<?>) value, flatRecordWriter, schema.getReferencedType(fieldPosition));
             writeRec.setReference(fieldName, refOrdinal);
         } else if (field.getJavaType() == FieldDescriptor.JavaType.MESSAGE) {
-            // Handle nested message
-            int refOrdinal = parseMessage((Message) value, flatRecordWriter, schema.getReferencedType(fieldPosition));
-            writeRec.setReference(fieldName, refOrdinal);
+            // Check if this is a google.protobuf.*Value type that needs unwrapping
+            Message msgValue = (Message) value;
+            String msgTypeName = msgValue.getDescriptorForType().getName();
+            if (isProtoValueType(msgValue.getDescriptorForType())) {
+                // Unwrap *Value type
+                Object unwrappedValue = unwrapValueType(msgValue);
+                FieldDescriptor.JavaType unwrappedType = getUnwrappedJavaType(msgTypeName);
+
+                // Check if field should be inlined or referenced
+                if (schema.getFieldType(fieldPosition) == HollowObjectSchema.FieldType.REFERENCE) {
+                    // Wrap in Hollow wrapper type (e.g., Integer, String)
+                    String wrapperTypeName = schema.getReferencedType(fieldPosition);
+                    int wrapperOrdinal = wrapPrimitiveValue(unwrappedType, unwrappedValue, wrapperTypeName, flatRecordWriter);
+                    writeRec.setReference(fieldName, wrapperOrdinal);
+                } else {
+                    // Inline the primitive value
+                    writePrimitiveValue(writeRec, fieldName, unwrappedType, unwrappedValue);
+                }
+            } else {
+                // Regular nested message
+                int refOrdinal = parseMessage(msgValue, flatRecordWriter, schema.getReferencedType(fieldPosition));
+                writeRec.setReference(fieldName, refOrdinal);
+            }
+        } else if (schema.getFieldType(fieldPosition) == HollowObjectSchema.FieldType.REFERENCE) {
+            // Primitive field with namespaced wrapper type (hollow_type_name option)
+            // Wrap the primitive value in a wrapper object
+            String wrapperTypeName = schema.getReferencedType(fieldPosition);
+            int wrapperOrdinal = wrapPrimitiveValue(field.getJavaType(), value, wrapperTypeName, flatRecordWriter);
+            writeRec.setReference(fieldName, wrapperOrdinal);
         } else {
-            // Handle primitive types
+            // Handle primitive types (inline)
             switch (field.getJavaType()) {
                 case BOOLEAN:
                     writeRec.setBoolean(fieldName, (Boolean) value);
@@ -251,6 +277,129 @@ import java.util.Set;
                     throw new IOException("Unsupported field type: " + field.getJavaType());
             }
         }
+    }
+
+    /**
+     * Check if a descriptor is a google.protobuf.*Value wrapper type.
+     * Note: google.protobuf.Value (without a prefix) is NOT a wrapper type - it's a union type.
+     */
+    private boolean isProtoValueType(com.google.protobuf.Descriptors.Descriptor descriptor) {
+        if (descriptor == null) return false;
+        String fullName = descriptor.getFullName();
+        // Only match specific wrapper types, not google.protobuf.Value or google.protobuf.Struct
+        return fullName.equals("google.protobuf.Int32Value")
+            || fullName.equals("google.protobuf.Int64Value")
+            || fullName.equals("google.protobuf.UInt32Value")
+            || fullName.equals("google.protobuf.UInt64Value")
+            || fullName.equals("google.protobuf.FloatValue")
+            || fullName.equals("google.protobuf.DoubleValue")
+            || fullName.equals("google.protobuf.BoolValue")
+            || fullName.equals("google.protobuf.StringValue")
+            || fullName.equals("google.protobuf.BytesValue");
+    }
+
+    /**
+     * Unwrap a google.protobuf.*Value message to get the underlying value.
+     */
+    private Object unwrapValueType(Message valueMessage) {
+        // All *Value types have a "value" field
+        com.google.protobuf.Descriptors.FieldDescriptor valueField =
+            valueMessage.getDescriptorForType().findFieldByName("value");
+        return valueMessage.getField(valueField);
+    }
+
+    /**
+     * Get the JavaType for the unwrapped value of a *Value type.
+     */
+    private FieldDescriptor.JavaType getUnwrappedJavaType(String valueTypeName) {
+        if (valueTypeName.equals("Int32Value") || valueTypeName.equals("UInt32Value")) {
+            return FieldDescriptor.JavaType.INT;
+        } else if (valueTypeName.equals("Int64Value") || valueTypeName.equals("UInt64Value")) {
+            return FieldDescriptor.JavaType.LONG;
+        } else if (valueTypeName.equals("FloatValue")) {
+            return FieldDescriptor.JavaType.FLOAT;
+        } else if (valueTypeName.equals("DoubleValue")) {
+            return FieldDescriptor.JavaType.DOUBLE;
+        } else if (valueTypeName.equals("BoolValue")) {
+            return FieldDescriptor.JavaType.BOOLEAN;
+        } else if (valueTypeName.equals("StringValue")) {
+            return FieldDescriptor.JavaType.STRING;
+        } else if (valueTypeName.equals("BytesValue")) {
+            return FieldDescriptor.JavaType.BYTE_STRING;
+        }
+        throw new IllegalArgumentException("Unknown *Value type: " + valueTypeName);
+    }
+
+    /**
+     * Write a primitive value to a record field.
+     */
+    private void writePrimitiveValue(HollowObjectWriteRecord writeRec, String fieldName,
+                                      FieldDescriptor.JavaType javaType, Object value) {
+        switch (javaType) {
+            case BOOLEAN:
+                writeRec.setBoolean(fieldName, (Boolean) value);
+                break;
+            case INT:
+                writeRec.setInt(fieldName, (Integer) value);
+                break;
+            case LONG:
+                writeRec.setLong(fieldName, (Long) value);
+                break;
+            case FLOAT:
+                writeRec.setFloat(fieldName, (Float) value);
+                break;
+            case DOUBLE:
+                writeRec.setDouble(fieldName, (Double) value);
+                break;
+            case STRING:
+                writeRec.setString(fieldName, (String) value);
+                break;
+            case BYTE_STRING:
+                writeRec.setString(fieldName, ((ByteString) value).toStringUtf8());
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported primitive type: " + javaType);
+        }
+    }
+
+    /**
+     * Wrap a primitive value in a wrapper object (for namespaced types created by hollow_type_name).
+     */
+    private int wrapPrimitiveValue(FieldDescriptor.JavaType javaType, Object value, String wrapperTypeName, FlatRecordWriter flatRecordWriter) throws IOException {
+        HollowObjectWriteRecord wrapperRec = (HollowObjectWriteRecord) getWriteRecord(wrapperTypeName);
+        wrapperRec.reset();
+
+        // Write the value to the wrapper's "value" field
+        switch (javaType) {
+            case BOOLEAN:
+                wrapperRec.setBoolean("value", (Boolean) value);
+                break;
+            case INT:
+                wrapperRec.setInt("value", (Integer) value);
+                break;
+            case LONG:
+                wrapperRec.setLong("value", (Long) value);
+                break;
+            case FLOAT:
+                wrapperRec.setFloat("value", (Float) value);
+                break;
+            case DOUBLE:
+                wrapperRec.setDouble("value", (Double) value);
+                break;
+            case STRING:
+                wrapperRec.setString("value", (String) value);
+                break;
+            case BYTE_STRING:
+                wrapperRec.setString("value", ((ByteString) value).toStringUtf8());
+                break;
+            case ENUM:
+                wrapperRec.setString("value", value.toString());
+                break;
+            default:
+                throw new IOException("Unsupported primitive type for wrapper: " + javaType);
+        }
+
+        return addRecord(wrapperTypeName, wrapperRec, flatRecordWriter);
     }
 
     private int parseCollection(Message message, List<?> values, FlatRecordWriter flatRecordWriter, String collectionType) throws IOException {

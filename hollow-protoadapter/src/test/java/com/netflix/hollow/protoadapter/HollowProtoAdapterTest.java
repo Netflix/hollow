@@ -139,6 +139,213 @@ public class HollowProtoAdapterTest {
     }
 
     @Test
+    public void testHollowTypeNameOption() throws Exception {
+        // Load Product proto class
+        File protoClassesDir = new File("build/test-proto-bin");
+        File mainClassesDir = new File("build/classes/java/main");
+        URLClassLoader protoClassLoader = new URLClassLoader(
+            new URL[]{protoClassesDir.toURI().toURL(), mainClassesDir.toURI().toURL()},
+            this.getClass().getClassLoader()
+        );
+        Class<?> productClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Product");
+        Method newBuilder = productClass.getMethod("newBuilder");
+        Message.Builder productBuilder = (Message.Builder) newBuilder.invoke(null);
+
+        // Set product fields
+        productBuilder.setField(
+            productBuilder.getDescriptorForType().findFieldByName("id"), 1);
+        productBuilder.setField(
+            productBuilder.getDescriptorForType().findFieldByName("name"), "Test Product");
+        Message product = productBuilder.build();
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+        int ordinal = mapper.add(product);
+
+        // Verify schema structure
+        HollowObjectSchema productSchema = (HollowObjectSchema) writeStateEngine.getSchema("Product");
+        assertNotNull("Product schema should exist", productSchema);
+
+        // Field should still be named "name" but reference "ProductTitle" instead of "String"
+        int nameFieldPos = productSchema.getPosition("name");
+        assertTrue("Field 'name' should exist", nameFieldPos >= 0);
+        assertEquals("name field should be REFERENCE",
+            HollowObjectSchema.FieldType.REFERENCE,
+            productSchema.getFieldType(nameFieldPos));
+        assertEquals("name field should reference ProductTitle (namespaced type)",
+            "ProductTitle",
+            productSchema.getReferencedType(nameFieldPos));
+
+        // Verify ProductTitle wrapper type exists
+        HollowObjectSchema productTitleSchema = (HollowObjectSchema) writeStateEngine.getSchema("ProductTitle");
+        assertNotNull("ProductTitle wrapper schema should exist", productTitleSchema);
+        int valueFieldPos = productTitleSchema.getPosition("value");
+        assertTrue("ProductTitle should have 'value' field", valueFieldPos >= 0);
+        assertEquals("ProductTitle.value should be STRING",
+            HollowObjectSchema.FieldType.STRING,
+            productTitleSchema.getFieldType(valueFieldPos));
+
+        // Round-trip and verify data
+        writeStateEngine.prepareForWrite();
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        // Verify data - read through the wrapper
+        HollowObjectTypeReadState productState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("Product");
+        int productTitleOrdinal = productState.readOrdinal(ordinal, nameFieldPos);
+        assertTrue("ProductTitle ordinal should be valid", productTitleOrdinal >= 0);
+
+        HollowObjectTypeReadState productTitleState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("ProductTitle");
+        String productName = productTitleState.readString(productTitleOrdinal, valueFieldPos);
+        assertEquals("Test Product", productName);
+    }
+
+    @Test
+    public void testHollowInlineOption() throws Exception {
+        // Load Account proto class
+        File protoClassesDir = new File("build/test-proto-bin");
+        File mainClassesDir = new File("build/classes/java/main");
+        URLClassLoader protoClassLoader = new URLClassLoader(
+            new URL[]{protoClassesDir.toURI().toURL(), mainClassesDir.toURI().toURL()},
+            this.getClass().getClassLoader()
+        );
+        Class<?> accountClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Account");
+        Class<?> int32ValueClass = protoClassLoader.loadClass("com.google.protobuf.Int32Value");
+        Class<?> stringValueClass = protoClassLoader.loadClass("com.google.protobuf.StringValue");
+
+        Method newBuilder = accountClass.getMethod("newBuilder");
+        Message.Builder accountBuilder = (Message.Builder) newBuilder.invoke(null);
+
+        // Create Int32Value for balance (should be reference)
+        Method int32ValueOf = int32ValueClass.getMethod("of", int.class);
+        Object balanceValue = int32ValueOf.invoke(null, 1000);
+
+        // Create StringValue for account_type (should be inline due to hollow_inline option)
+        Method stringValueOf = stringValueClass.getMethod("of", String.class);
+        Object accountTypeValue = stringValueOf.invoke(null, "CHECKING");
+
+        accountBuilder.setField(
+            accountBuilder.getDescriptorForType().findFieldByName("id"), 1);
+        accountBuilder.setField(
+            accountBuilder.getDescriptorForType().findFieldByName("balance"), balanceValue);
+        accountBuilder.setField(
+            accountBuilder.getDescriptorForType().findFieldByName("account_type"), accountTypeValue);
+        Message account = accountBuilder.build();
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+        mapper.add(account);
+
+        // Verify schema structure
+        HollowObjectSchema accountSchema = (HollowObjectSchema) writeStateEngine.getSchema("Account");
+        assertNotNull("Account schema should exist", accountSchema);
+
+        // balance field should be REFERENCE to Integer (boxed int, no inline option)
+        // Int32Value unwraps to reference to the underlying int type
+        int balanceFieldPos = accountSchema.getPosition("balance");
+        assertEquals("balance field should be REFERENCE",
+            HollowObjectSchema.FieldType.REFERENCE,
+            accountSchema.getFieldType(balanceFieldPos));
+        assertEquals("balance field should reference Integer (unwrapped from Int32Value)",
+            "Integer",
+            accountSchema.getReferencedType(balanceFieldPos));
+
+        // account_type field should be STRING (inlined due to hollow_inline option)
+        // StringValue with hollow_inline unwraps to inline String
+        int accountTypeFieldPos = accountSchema.getPosition("account_type");
+        assertEquals("account_type field should be STRING (inlined)",
+            HollowObjectSchema.FieldType.STRING,
+            accountSchema.getFieldType(accountTypeFieldPos));
+
+        // Verify no Int32Value or StringValue object schemas exist (they should be unwrapped)
+        assertNull("Int32Value schema should not exist (unwrapped)",
+            writeStateEngine.getSchema("Int32Value"));
+        assertNull("StringValue schema should not exist (unwrapped)",
+            writeStateEngine.getSchema("StringValue"));
+
+        // Round-trip and verify data
+        writeStateEngine.prepareForWrite();
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        HollowObjectTypeReadState accountState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("Account");
+        // balance should be a reference ordinal
+        int balanceOrdinal = accountState.readOrdinal(0, balanceFieldPos);
+        assertTrue("balance should be a reference (ordinal >= 0)", balanceOrdinal >= 0);
+
+        // account_type should be an inline string
+        String accountType = accountState.readString(0, accountTypeFieldPos);
+        assertEquals("CHECKING", accountType);
+    }
+
+    @Test
+    public void testGoogleStructAndValueAsReferences() throws Exception {
+        // Load Document proto class
+        File protoClassesDir = new File("build/test-proto-bin");
+        File mainClassesDir = new File("build/classes/java/main");
+        URLClassLoader protoClassLoader = new URLClassLoader(
+            new URL[]{protoClassesDir.toURI().toURL(), mainClassesDir.toURI().toURL()},
+            this.getClass().getClassLoader()
+        );
+        Class<?> documentClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Document");
+        Class<?> structClass = protoClassLoader.loadClass("com.google.protobuf.Struct");
+        Class<?> valueClass = protoClassLoader.loadClass("com.google.protobuf.Value");
+
+        Method newBuilder = documentClass.getMethod("newBuilder");
+        Message.Builder documentBuilder = (Message.Builder) newBuilder.invoke(null);
+
+        // Create a Struct
+        Method structNewBuilder = structClass.getMethod("newBuilder");
+        Message.Builder structBuilder = (Message.Builder) structNewBuilder.invoke(null);
+        Message struct = structBuilder.build();
+
+        // Create a Value
+        Method valueNewBuilder = valueClass.getMethod("newBuilder");
+        Message.Builder valueBuilder = (Message.Builder) valueNewBuilder.invoke(null);
+        // Set it to a string value
+        valueBuilder.setField(
+            valueBuilder.getDescriptorForType().findFieldByName("string_value"), "test");
+        Message value = valueBuilder.build();
+
+        documentBuilder.setField(
+            documentBuilder.getDescriptorForType().findFieldByName("id"), 1);
+        documentBuilder.setField(
+            documentBuilder.getDescriptorForType().findFieldByName("title"), "Test Doc");
+        documentBuilder.setField(
+            documentBuilder.getDescriptorForType().findFieldByName("metadata"), struct);
+        documentBuilder.setField(
+            documentBuilder.getDescriptorForType().findFieldByName("data"), value);
+        Message document = documentBuilder.build();
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+        mapper.add(document);
+
+        // Verify schema structure
+        HollowObjectSchema documentSchema = (HollowObjectSchema) writeStateEngine.getSchema("Document");
+        assertNotNull("Document schema should exist", documentSchema);
+
+        // metadata field (Struct) should be REFERENCE (like boxed types)
+        int metadataFieldPos = documentSchema.getPosition("metadata");
+        assertEquals("metadata field (Struct) should be REFERENCE",
+            HollowObjectSchema.FieldType.REFERENCE,
+            documentSchema.getFieldType(metadataFieldPos));
+
+        // data field (Value) should be REFERENCE (like boxed types)
+        int dataFieldPos = documentSchema.getPosition("data");
+        assertEquals("data field (Value) should be REFERENCE",
+            HollowObjectSchema.FieldType.REFERENCE,
+            documentSchema.getFieldType(dataFieldPos));
+
+        // Verify that Struct and Value schemas exist (they are separate types)
+        assertNotNull("Struct schema should exist", writeStateEngine.getSchema("Struct"));
+        assertNotNull("Value schema should exist", writeStateEngine.getSchema("Value"));
+    }
+
+    @Test
     public void testIgnoreListOrdering() throws Exception {
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
         HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
