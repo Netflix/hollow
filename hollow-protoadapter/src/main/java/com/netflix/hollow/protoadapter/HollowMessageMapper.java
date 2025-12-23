@@ -25,14 +25,23 @@ import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Maps Protocol Buffer message descriptors to Hollow schemas.
  * Similar to HollowObjectMapper for POJOs, but works with protobuf Descriptors.
+ *
+ * <h2>Thread Safety</h2>
+ * <p>
+ * This class is thread-safe and can be used concurrently by multiple threads:
+ * <ul>
+ *   <li>Internal collections use {@link ConcurrentHashMap} for concurrent access</li>
+ *   <li>Schema creation uses double-checked locking to prevent duplicate schemas</li>
+ *   <li>Struct field type tracking uses atomic operations ({@code putIfAbsent}) for conflict detection</li>
+ * </ul>
  *
  * <h2>Lazy Schema Creation for Well-Known Types</h2>
  * <p>
@@ -61,13 +70,19 @@ import java.util.Set;
 public class HollowMessageMapper {
 
     private final HollowWriteStateEngine stateEngine;
-    private final Set<String> processedTypes = new HashSet<String>();
-    private final Map<String, HollowProtoAdapter> adapters = new HashMap<String, HollowProtoAdapter>();
+    private final Set<String> processedTypes = ConcurrentHashMap.newKeySet();
+    private final Map<String, HollowProtoAdapter> adapters = new ConcurrentHashMap<String, HollowProtoAdapter>();
     private boolean ignoreListOrdering = false;
 
     // Track field types for Struct fields to validate consistency across instances
     // Maps "ParentType.fieldPath.structFieldName" -> Value type (e.g., "Person.metadata.age" -> "numberValue")
-    private final Map<String, String> structFieldTypes = new HashMap<String, String>();
+    // Thread-safe: uses ConcurrentHashMap with atomic putIfAbsent for conflict detection
+    private final ConcurrentHashMap<String, String> structFieldTypes = new ConcurrentHashMap<String, String>();
+
+    // Lock objects for schema creation synchronization
+    private final Object valueSchemaLock = new Object();
+    private final Object structSchemaLock = new Object();
+    private final Object listValueSchemaLock = new Object();
 
     public HollowMessageMapper(HollowWriteStateEngine stateEngine) {
         this.stateEngine = stateEngine;
@@ -432,17 +447,16 @@ public class HollowMessageMapper {
             String valueType = getValueType(value);
             if (valueType == null) continue;
 
-            // Check for conflicts
+            // Check for conflicts using atomic putIfAbsent for thread safety
             String fieldKey = parentTypeName + "." + fieldPath + "." + key;
-            String existingType = structFieldTypes.get(fieldKey);
+            String existingType = structFieldTypes.putIfAbsent(fieldKey, valueType);
 
+            // If putIfAbsent returned non-null, the field already existed - check for conflict
             if (existingType != null && !existingType.equals(valueType)) {
                 throw new IllegalStateException(
                     "Conflicting types for Struct field '" + key + "' in " + parentTypeName + "." + fieldPath +
                     ": previously " + existingType + ", now " + valueType);
             }
-
-            structFieldTypes.put(fieldKey, valueType);
         }
     }
 
@@ -466,47 +480,60 @@ public class HollowMessageMapper {
     /**
      * Create the Value schema if it doesn't exist.
      * Value schema is fixed - it has all possible fields for the oneof.
+     * Thread-safe using double-checked locking.
      */
     private void ensureValueSchemaExists() {
         String valueTypeName = "Value";
 
-        // Create Value schema if it doesn't exist
+        // Create Value schema if it doesn't exist (double-checked locking for thread safety)
         if (stateEngine.getSchema(valueTypeName) == null) {
-            // Value has a oneof "kind" with different types
-            // We'll model it as an object with nullable fields for each possible type
-            HollowObjectSchema schema = new HollowObjectSchema(valueTypeName, 6);
-            schema.addField("nullValue", HollowObjectSchema.FieldType.BOOLEAN);  // true if null
-            schema.addField("numberValue", HollowObjectSchema.FieldType.DOUBLE);
-            schema.addField("stringValue", HollowObjectSchema.FieldType.STRING);
-            schema.addField("boolValue", HollowObjectSchema.FieldType.BOOLEAN);
-            schema.addField("structValue", HollowObjectSchema.FieldType.REFERENCE, "Struct");
-            schema.addField("listValue", HollowObjectSchema.FieldType.REFERENCE, "ListValue");
-            stateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
+            synchronized (valueSchemaLock) {
+                if (stateEngine.getSchema(valueTypeName) == null) {
+                    // Value has a oneof "kind" with different types
+                    // We'll model it as an object with nullable fields for each possible type
+                    HollowObjectSchema schema = new HollowObjectSchema(valueTypeName, 6);
+                    schema.addField("nullValue", HollowObjectSchema.FieldType.BOOLEAN);  // true if null
+                    schema.addField("numberValue", HollowObjectSchema.FieldType.DOUBLE);
+                    schema.addField("stringValue", HollowObjectSchema.FieldType.STRING);
+                    schema.addField("boolValue", HollowObjectSchema.FieldType.BOOLEAN);
+                    schema.addField("structValue", HollowObjectSchema.FieldType.REFERENCE, "Struct");
+                    schema.addField("listValue", HollowObjectSchema.FieldType.REFERENCE, "ListValue");
+                    stateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
+                }
+            }
         }
 
-        // Ensure prerequisite schemas exist
+        // Ensure prerequisite schemas exist (double-checked locking for thread safety)
         if (stateEngine.getSchema("Struct") == null) {
-            // Create Struct schema - it's an object with a map<string, Value> field called "fields"
-            HollowObjectSchema structSchema = new HollowObjectSchema("Struct", 1);
-            structSchema.addField("fields", HollowObjectSchema.FieldType.REFERENCE, "MapOfStringToValue");
-            stateEngine.addTypeState(new HollowObjectTypeWriteState(structSchema));
+            synchronized (structSchemaLock) {
+                if (stateEngine.getSchema("Struct") == null) {
+                    // Create Struct schema - it's an object with a map<string, Value> field called "fields"
+                    HollowObjectSchema structSchema = new HollowObjectSchema("Struct", 1);
+                    structSchema.addField("fields", HollowObjectSchema.FieldType.REFERENCE, "MapOfStringToValue");
+                    stateEngine.addTypeState(new HollowObjectTypeWriteState(structSchema));
 
-            // Create the map schema for the fields
-            HollowMapSchema fieldsMapSchema = new HollowMapSchema("MapOfStringToValue", "String", "Value");
-            stateEngine.addTypeState(new HollowMapTypeWriteState(fieldsMapSchema));
+                    // Create the map schema for the fields
+                    HollowMapSchema fieldsMapSchema = new HollowMapSchema("MapOfStringToValue", "String", "Value");
+                    stateEngine.addTypeState(new HollowMapTypeWriteState(fieldsMapSchema));
 
-            ensurePrimitiveWrapperSchema("String");
+                    ensurePrimitiveWrapperSchema("String");
+                }
+            }
         }
 
         if (stateEngine.getSchema("ListValue") == null) {
-            // Create ListValue schema
-            HollowObjectSchema listValueSchema = new HollowObjectSchema("ListValue", 1);
-            listValueSchema.addField("values", HollowObjectSchema.FieldType.REFERENCE, "ListOfValue");
-            stateEngine.addTypeState(new HollowObjectTypeWriteState(listValueSchema));
+            synchronized (listValueSchemaLock) {
+                if (stateEngine.getSchema("ListValue") == null) {
+                    // Create ListValue schema
+                    HollowObjectSchema listValueSchema = new HollowObjectSchema("ListValue", 1);
+                    listValueSchema.addField("values", HollowObjectSchema.FieldType.REFERENCE, "ListOfValue");
+                    stateEngine.addTypeState(new HollowObjectTypeWriteState(listValueSchema));
 
-            // Create list schema
-            HollowListSchema listSchema = new HollowListSchema("ListOfValue", "Value");
-            stateEngine.addTypeState(new HollowListTypeWriteState(listSchema));
+                    // Create list schema
+                    HollowListSchema listSchema = new HollowListSchema("ListOfValue", "Value");
+                    stateEngine.addTypeState(new HollowListTypeWriteState(listSchema));
+                }
+            }
         }
     }
 

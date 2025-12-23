@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Populate a HollowWriteStateEngine based on data encoded in Protocol Buffers.
@@ -69,8 +70,8 @@ import java.util.Set;
     public HollowProtoAdapter(HollowWriteStateEngine stateEngine, String typeName, boolean ignoreListOrdering, HollowMessageMapper mapper) {
         super(typeName, "populate");
         this.stateEngine = stateEngine;
-        this.hollowSchemas = new HashMap<String, HollowSchema>();
-        this.canonicalObjectFieldMappings = new HashMap<String, ObjectFieldMapping>();
+        this.hollowSchemas = new ConcurrentHashMap<String, HollowSchema>();
+        this.canonicalObjectFieldMappings = new ConcurrentHashMap<String, ObjectFieldMapping>();
         this.passthroughDecoratedTypes = new HashSet<String>();
         this.ignoreListOrdering = ignoreListOrdering;
         this.mapper = mapper;
@@ -122,17 +123,15 @@ import java.util.Set;
     }
 
     private int parseMessage(Message message, FlatRecordWriter flatRecordWriter, String typeName) throws IOException {
-        HollowSchema typeSchema = hollowSchemas.get(typeName);
-        // For dynamically created schemas (Struct/Value/ListValue), look up from state engine
-        if (typeSchema == null) {
-            typeSchema = stateEngine.getSchema(typeName);
-            if (typeSchema != null) {
-                hollowSchemas.put(typeName, typeSchema);
-                if (typeSchema instanceof HollowObjectSchema) {
-                    canonicalObjectFieldMappings.put(typeName, new ObjectFieldMapping(typeName, this));
-                }
+        // For dynamically created schemas (Struct/Value/ListValue), look up from state engine atomically
+        HollowSchema typeSchema = hollowSchemas.computeIfAbsent(typeName, key -> {
+            HollowSchema schema = stateEngine.getSchema(key);
+            if (schema != null && schema instanceof HollowObjectSchema) {
+                canonicalObjectFieldMappings.computeIfAbsent(key, k -> new ObjectFieldMapping(k, this));
             }
-        }
+            return schema;
+        });
+
         if (typeSchema == null) {
             throw new IOException("Schema not found for type: " + typeName);
         }
@@ -595,15 +594,12 @@ import java.util.Set;
         Map<String, ObjectFieldMapping> objectFieldMappings = objectFieldMappingHolder.get();
         ObjectFieldMapping mapping = objectFieldMappings.get(type);
         if (mapping == null) {
-            // For dynamically created object schemas, create the mapping on demand
+            // For dynamically created object schemas, create the mapping on demand atomically
             HollowSchema schema = stateEngine.getSchema(type);
             if (schema instanceof HollowObjectSchema) {
-                mapping = canonicalObjectFieldMappings.get(type);
-                if (mapping == null) {
-                    mapping = new ObjectFieldMapping(type, this);
-                    canonicalObjectFieldMappings.put(type, mapping);
-                }
-                objectFieldMappings.put(type, mapping.clone());
+                ObjectFieldMapping canonical = canonicalObjectFieldMappings.computeIfAbsent(
+                    type, k -> new ObjectFieldMapping(k, this));
+                objectFieldMappings.put(type, canonical.clone());
                 mapping = objectFieldMappings.get(type);
             }
         }
