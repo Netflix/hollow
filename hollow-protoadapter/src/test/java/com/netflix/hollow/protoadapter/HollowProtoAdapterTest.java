@@ -829,5 +829,86 @@ public class HollowProtoAdapterTest {
                 message.contains("string_value"));
         }
     }
+
+    /**
+     * Test that unsigned integer fields without the required annotation are rejected.
+     * UINT32 and UINT64 must have hollow_unsigned_to_signed=true to acknowledge
+     * that large values will appear negative.
+     */
+    @Test
+    public void testUnsignedFieldValidation() throws Exception {
+        // Load BadUnsigned proto class which has uint32 without annotation
+        Class<?> badUnsignedClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$BadUnsigned");
+        Method newBuilder = badUnsignedClass.getMethod("newBuilder");
+        Class<?> builderClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$BadUnsigned$Builder");
+        Method build = builderClass.getMethod("build");
+
+        Message.Builder builder = (Message.Builder) newBuilder.invoke(null);
+        builder.setField(builder.getDescriptorForType().findFieldByName("id"), 1);
+        builder.setField(builder.getDescriptorForType().findFieldByName("counter"), (int)3000000000L); // Large unsigned value > INT32_MAX
+        Message badMessage = (Message) build.invoke(builder);
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+
+        // Should throw IllegalStateException because counter is uint32 without annotation
+        try {
+            mapper.add(badMessage);
+            fail("Expected IllegalStateException for unsigned field without annotation");
+        } catch (IllegalStateException e) {
+            assertTrue("Error message should mention uint32",
+                e.getMessage().contains("uint32"));
+            assertTrue("Error message should mention the field name",
+                e.getMessage().contains("counter"));
+            assertTrue("Error message should mention negative numbers",
+                e.getMessage().contains("negative"));
+            assertTrue("Error message should mention the required annotation",
+                e.getMessage().contains("hollow_unsigned_to_signed"));
+        }
+    }
+
+    /**
+     * Test that unsigned integer fields WITH the required annotation are accepted.
+     */
+    @Test
+    public void testUnsignedFieldWithAnnotation() throws Exception {
+        // Person has visitor_count (uint32) and total_revenue (uint64) with annotations
+        Class<?> personClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Person");
+        Method newBuilder = personClass.getMethod("newBuilder");
+        Class<?> builderClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Person$Builder");
+        Method build = builderClass.getMethod("build");
+
+        Message.Builder builder = (Message.Builder) newBuilder.invoke(null);
+        builder.setField(builder.getDescriptorForType().findFieldByName("id"), 1);
+        builder.setField(builder.getDescriptorForType().findFieldByName("name"), "Test Person");
+        // Set large unsigned values
+        builder.setField(builder.getDescriptorForType().findFieldByName("visitor_count"), (int)3000000000L); // > INT32_MAX
+        builder.setField(builder.getDescriptorForType().findFieldByName("total_revenue"), 9000000000000000000L); // Large uint64
+        Message person = (Message) build.invoke(builder);
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+
+        // Should succeed because fields have the annotation
+        int ordinal = mapper.add(person);
+        assertTrue("Should successfully add person with annotated unsigned fields", ordinal >= 0);
+
+        // Verify schema was created with INT and LONG types
+        writeStateEngine.prepareForWrite();
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        HollowObjectTypeReadState personState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("Person");
+        HollowObjectSchema personSchema = personState.getSchema();
+
+        int visitorCountPos = personSchema.getPosition("visitor_count");
+        assertEquals("visitor_count should be INT",
+            HollowObjectSchema.FieldType.INT, personSchema.getFieldType(visitorCountPos));
+
+        int totalRevenuePos = personSchema.getPosition("total_revenue");
+        assertEquals("total_revenue should be LONG",
+            HollowObjectSchema.FieldType.LONG, personSchema.getFieldType(totalRevenuePos));
+    }
 }
 

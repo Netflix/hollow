@@ -31,6 +31,11 @@ message Person {
 
   // Test hollow_inline: this Int32Value should be inlined instead of reference
   google.protobuf.Int32Value priority = 11 [(com.netflix.hollow.hollow_inline) = true];
+
+  // Test unsigned integers with required annotation
+  // Large unsigned values (> 2^31-1 or 2^63-1) will appear as negative in signed types
+  uint32 visitor_count = 12 [(com.netflix.hollow.hollow_unsigned_to_signed) = true];
+  uint64 total_revenue = 13 [(com.netflix.hollow.hollow_unsigned_to_signed) = true];
 }
 
 // Nested message
@@ -88,4 +93,11 @@ message Account {
 message Node {
   string value = 1;
   Node next = 2;  // Circular reference: Node references itself
+}
+
+// Test message for unsigned validation
+// This should fail during schema generation without the required annotation
+message BadUnsigned {
+  int32 id = 1;
+  uint32 counter = 2;  // Missing required annotation - should fail
 }

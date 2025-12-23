@@ -255,8 +255,17 @@ public class HollowMessageMapper {
                     case INT64:
                     case SINT64:
                     case SFIXED64:
-                    case UINT64:  // Unsigned 64-bit mapped to signed long per protobuf spec
                     case FIXED64:
+                        if (hasNamespacedType) {
+                            ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.LONG);
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
+                        } else {
+                            schema.addField(fieldName, HollowObjectSchema.FieldType.LONG);
+                        }
+                        break;
+
+                    case UINT64:  // Unsigned 64-bit mapped to signed long - requires explicit acknowledgement
+                        validateUnsignedField(field, typeName);
                         if (hasNamespacedType) {
                             ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.LONG);
                             schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
@@ -271,6 +280,7 @@ public class HollowMessageMapper {
                     // https://protobuf.dev/programming-guides/proto3/#scalar
                     case UINT32:
                     case FIXED32:
+                        validateUnsignedField(field, typeName);
                         if (hasNamespacedType) {
                             ensurePrimitiveWrapperSchema(namespacedTypeName, HollowObjectSchema.FieldType.INT);
                             schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, namespacedTypeName);
@@ -739,6 +749,34 @@ public class HollowMessageMapper {
             }
         }
         return field.getName();
+    }
+
+    /**
+     * Validate unsigned integer field has required annotation.
+     * UINT32 and UINT64 must have hollow_unsigned_to_signed=true to acknowledge
+     * that large values will appear negative when mapped to signed types.
+     *
+     * @throws IllegalStateException if unsigned field lacks required annotation
+     */
+    private void validateUnsignedField(Descriptors.FieldDescriptor field, String typeName) {
+        boolean hasAcknowledgement = field.getOptions().hasExtension(HollowOptions.hollowUnsignedToSigned)
+            && field.getOptions().getExtension(HollowOptions.hollowUnsignedToSigned);
+
+        if (!hasAcknowledgement) {
+            String typeStr = field.getType() == Descriptors.FieldDescriptor.Type.UINT32 ? "uint32" : "uint64";
+            String hollowType = field.getType() == Descriptors.FieldDescriptor.Type.UINT32 ? "INT" : "LONG";
+            throw new IllegalStateException(
+                "Field '" + field.getName() + "' in message '" + typeName + "' is " + typeStr +
+                " which maps to signed " + hollowType + ". Large unsigned values (> " +
+                (field.getType() == Descriptors.FieldDescriptor.Type.UINT32 ? "2^31-1" : "2^63-1") +
+                ") will appear as negative numbers.\n" +
+                "To acknowledge this limitation and allow the field, add:\n" +
+                "  [(com.netflix.hollow.hollow_unsigned_to_signed) = true]\n" +
+                "Example:\n" +
+                "  " + typeStr + " " + field.getName() + " = " + field.getNumber() +
+                " [(com.netflix.hollow.hollow_unsigned_to_signed) = true];"
+            );
+        }
     }
 
     /**
