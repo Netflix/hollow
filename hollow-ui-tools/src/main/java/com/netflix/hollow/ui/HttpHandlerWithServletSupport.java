@@ -88,6 +88,7 @@ public class HttpHandlerWithServletSupport implements HttpHandler {
         @Override
         public Cookie[] getCookies() {
             Headers headers = ex.getRequestHeaders();
+            boolean isSecure = "https".equals(ex.getProtocol());
             if (headers != null) {
                 List<String> strCookies = headers.get("Cookie");
                 if (strCookies != null) {
@@ -97,7 +98,9 @@ public class HttpHandlerWithServletSupport implements HttpHandler {
                         for (String token : tokens) {
                             String[] keyVal = token.split("\\s*=\\s*");
                             if(keyVal.length == 2){
-                                cookies.add(new Cookie(keyVal[0], keyVal[1]));
+                                Cookie cookie = new Cookie(keyVal[0], keyVal[1]);
+                                cookie.setSecure(isSecure);
+                                cookies.add(cookie);
                             }
                         }
                    }
