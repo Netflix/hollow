@@ -277,7 +277,7 @@ public class HollowConsumer {
                 triggerRefresh();
             } catch (Error | RuntimeException e) {
                 // Ensure exceptions are propagated to the executor
-                LOG.log(Level.SEVERE, "Async refresh failed", e);
+                LOG.log(Level.WARNING, "Async refresh failed", e);
                 throw e;
             }
         });
