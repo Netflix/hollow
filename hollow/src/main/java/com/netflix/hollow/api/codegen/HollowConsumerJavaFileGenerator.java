@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
+
 /**
  * Not intended for external consumption.
  *
@@ -95,6 +97,9 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
                 }
                 Set<String> schemaNameSet = new HashSet<>();
                 for (HollowSchema schema : schemasToImport) {
+                    if (!includeType(schema, this.dataset))
+                        continue;
+
                     switch (schema.getSchemaType()) {
                         case OBJECT:
                             addToSetIfNotPrimitiveOrCollection(schemaNameSet, schema.getName());

@@ -32,6 +32,12 @@ public class HollowCodeGenerationCompileUtil {
     private static final String FILENAME_FINDBUGS = "findbugs.xml";
     private static final String PROPERTY_CLASSPATH = "java.class.path";
 
+    public static void compileSrcFilesAndCheckForBugs(String sourceDirPath, String classDirPath) throws Exception {
+        compileSrcFiles(sourceDirPath, classDirPath);
+        File classDir = new File(classDirPath);
+        runFindbugs(classDir);
+    }
+
     /**
      * Compiles java source files in the provided source directory, to the provided class directory.
      * This also runs findbugs on the compiled classes, throwing an exception if findbugs fails.
@@ -60,7 +66,6 @@ public class HollowCodeGenerationCompileUtil {
         int err = compiler.run(null, System.out, System.out, args);
         if (err != 0)
             throw new RuntimeException("compiler errors, see system.out");
-        runFindbugs(classDir);
     }
 
     /**

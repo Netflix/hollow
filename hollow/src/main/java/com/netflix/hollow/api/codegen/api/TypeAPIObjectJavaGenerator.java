@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.codegen.api;
 
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateLookupClassname;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
@@ -95,7 +96,9 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
                     classBodyBuilder.append(generateLongFieldAccessor(i));
                     break;
                 case REFERENCE:
-                    classBodyBuilder.append(generateReferenceFieldAccessors(i));
+                    if (includeType(objectSchema.getReferencedType(i), this.dataset)) {
+                        classBodyBuilder.append(generateReferenceFieldAccessors(i));
+                    }
                     break;
                 case STRING:
                     classBodyBuilder.append(generateStringFieldAccessors(i));

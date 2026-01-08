@@ -345,7 +345,6 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         Assert.assertEquals(0, validPki.getMatchingOrdinal(1L));
     }
 
-
     @Test
     public void testNullPKeyIdx() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
@@ -354,19 +353,6 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
 
         try {
             HollowPrimaryKeyIndex invalidPkIdx = new HollowPrimaryKeyIndex(this.readStateEngine, "TypeNullPKey", "id");
-            fail("Index on type with null fields is expected to fail construction");
-        } catch (NullPointerException e) {}
-    }
-
-    @Test
-    public void testNullPKeyIdxNested() throws IOException {
-        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.add(new TypeA(1, 1.1d, new TypeB("test", true)));
-        mapper.add(new TypeA(1, 1.1d, null));
-        roundTripSnapshot();
-
-        try {
-            HollowPrimaryKeyIndex invalidPkIdx = new HollowPrimaryKeyIndex(this.readStateEngine, "TypeA", "a1", "a2", "ab.b1");
             fail("Index on type with null fields is expected to fail construction");
         } catch (NullPointerException e) {}
     }

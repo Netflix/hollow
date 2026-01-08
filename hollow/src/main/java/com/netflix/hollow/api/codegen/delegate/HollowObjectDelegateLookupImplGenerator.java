@@ -18,6 +18,7 @@ package com.netflix.hollow.api.codegen.delegate;
 
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateInterfaceName;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateLookupImplName;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
@@ -122,14 +123,16 @@ public class HollowObjectDelegateLookupImplGenerator extends HollowObjectDelegat
                 builder.append("    }\n\n");
                 break;
             case REFERENCE:
-                Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
-                if(shortcut != null) {
-                    addShortcutAccessMethod(builder, methodFieldName, shortcut);
-                }
+                if (includeType(schema.getReferencedType(i), dataset)) {
+                    Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
+                    if(shortcut != null) {
+                        addShortcutAccessMethod(builder, methodFieldName, shortcut);
+                    }
 
-                builder.append("    public int get").append(methodFieldName).append("Ordinal(int ordinal) {\n");
-                builder.append("        return typeAPI.get").append(methodFieldName).append("Ordinal(ordinal);\n");
-                builder.append("    }\n\n");
+                    builder.append("    public int get").append(methodFieldName).append("Ordinal(int ordinal) {\n");
+                    builder.append("        return typeAPI.get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                    builder.append("    }\n\n");
+                }
                 break;
             }
         }

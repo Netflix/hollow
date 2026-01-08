@@ -49,7 +49,7 @@ import java.util.logging.Logger;
  * not have to be the same as declared as the default in the data model.
  *
  * <b>This class is not safe to use with object longevity if the index is not being updated for each delta. The internal
- * implementation of this class uses the type state retrieved through the schema. That resutls in certain operations
+ * implementation of this class uses the type state retrieved through the schema. That results in certain operations
  * always being performed against the current version. As such, this class is only valid for up to 2 updates.</b>
  *
  * If you need an index that will survive 2 or more deltas (without being updated), then use {@link HollowUniqueKeyIndex}
@@ -630,14 +630,15 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         for(int i=0;i<lastFieldPath;i++) {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
             ordinal = typeState.readOrdinal(ordinal, fieldPosition);
-            if (ordinal == ORDINAL_NONE) {
-                HollowObjectSchema parentSchema =  this.typeState.getSchema();
-                throw new NullPointerException("Cannot hash null field " +
-                        parentSchema.getFieldName(fieldIdx) + " in type " +
-                        parentSchema.getName() + " at ordinal " + parentOrdinal);
-            }
             typeState = (HollowObjectTypeReadState) schema.getReferencedTypeState(fieldPosition); //This causes an incompatibility with object longevity.
             schema = typeState.getSchema();
+        }
+
+        if (ordinal == ORDINAL_NONE) {
+            HollowObjectSchema parentSchema =  this.typeState.getSchema();
+            throw new NullPointerException("Cannot hash null field " +
+                    parentSchema.getFieldName(fieldIdx) + " in type " +
+                    parentSchema.getName() + " at ordinal " + parentOrdinal);
         }
 
         int hashCode = HollowReadFieldUtils.fieldHashCode(typeState, ordinal, fieldPathIndexes[fieldIdx][lastFieldPath]);

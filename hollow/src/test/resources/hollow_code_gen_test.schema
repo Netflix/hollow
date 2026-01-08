@@ -1,0 +1,34 @@
+/*
+ * This schema contains an undefined type, Object2.
+ * When generate API from this schema, Object2 as well List/Map/Set that has Object2 as its type argument, should be
+ * skipped and not have their type files generated. They should not be referenced by other types as well.
+ */
+TopLevelObject {
+	ListOfObject1 validListField;
+	SetOfObject1 validSetField;
+	MapOfStringToObject1 validMapField;
+	Object1 validMemberField;
+	ListOfObject2 invalidListField;
+	SetOfObject2 invalidSetField;
+	MapOfStringToObject2 invalidMapField1;
+	MapOfObject2ToString invalidMapField2;
+	Object2 invalidMemberField;
+}
+
+ListOfObject1 List<Object1>;
+SetOfObject1 Set<Object1>;
+MapOfStringToObject1 Map<String,Object1>;
+
+Object1 {
+	String val;
+}
+
+String {
+    string value;
+}
+
+/* invalid types that should not be generated */
+ListOfObject2 List<Object2>;
+SetOfObject2 Set<Object2>;
+MapOfStringToObject2 Map<String,Object2>;
+MapOfObject2ToString Map<Object2,String>;
