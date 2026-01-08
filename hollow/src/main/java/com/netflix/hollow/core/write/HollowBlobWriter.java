@@ -138,9 +138,9 @@ public class HollowBlobWriter {
             stateEngine.ensureAllNecessaryStatesRestored();
 
         List<HollowSchema> changedTypes = changedTypes();
-        
+
         DataOutputStream dos = new DataOutputStream(os);
-        HollowBlobHeaderWrapper hollowBlobHeaderWrapper = buildHeader(partStreams, changedTypes, false);
+        HollowBlobHeaderWrapper hollowBlobHeaderWrapper = buildHeader(partStreams, changedTypes, false, true);
         writeHeaders(dos, partStreams, false, hollowBlobHeaderWrapper);
 
         SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-delta");
@@ -173,6 +173,15 @@ public class HollowBlobWriter {
 
                 typeState.writeDelta(partStream);
             }
+        }
+
+        // Write appended schema data if feature is enabled
+        if (hollowBlobHeaderWrapper.header.hasAppendedSchemaData()) {
+            DeltaSchemaAppendDataCollector collector = new DeltaSchemaAppendDataCollector(stateEngine);
+            collector.collect();
+
+            DeltaSchemaAppendDataWriter appendWriter = new DeltaSchemaAppendDataWriter(dos);
+            appendWriter.writeAppendedData(collector);
         }
 
         os.flush();
@@ -303,6 +312,17 @@ public class HollowBlobWriter {
         }
         header.setSchemas(mainSchemas);
         return new HollowBlobHeaderWrapper(header, schemasByPartName);
+    }
+
+    public HollowBlobHeaderWrapper buildHeader(ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams partStreams, List<HollowSchema> schemasToInclude, boolean isReverseDelta, boolean isDelta) {
+        HollowBlobHeaderWrapper wrapper = buildHeader(partStreams, schemasToInclude, isReverseDelta);
+
+        // Set hasAppendedSchemaData flag if delta schema append feature is enabled and this is a delta (not snapshot or reverse delta)
+        if (isDelta && !isReverseDelta && stateEngine.getDeltaSchemaAppendConfig() != null && stateEngine.getDeltaSchemaAppendConfig().isEnabled()) {
+            wrapper.header.setHasAppendedSchemaData(true);
+        }
+
+        return wrapper;
     }
 
     private void writeHeaders(DataOutputStream os, ProducerOptionalBlobPartConfig.OptionalBlobPartOutputStreams partStreams, boolean isReverseDelta, HollowBlobHeaderWrapper hollowBlobHeaderWrapper) throws IOException {

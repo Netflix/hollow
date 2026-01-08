@@ -19,6 +19,7 @@ package com.netflix.hollow.core.read.engine.object;
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.VariableLengthData;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
@@ -29,6 +30,8 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.BitSet;
 
 /**
  * This class holds the data for a {@link HollowObjectTypeReadState}.
@@ -277,5 +280,501 @@ public class HollowObjectTypeDataElements extends HollowTypeDataElements {
 
     static void writeNullFixedLengthField(HollowObjectTypeDataElements target, int fieldIndex, long currentWriteFixedLengthStartBit) {
         target.fixedLengthData.setElementValue(currentWriteFixedLengthStartBit, target.bitsPerField[fieldIndex], target.nullValueForField[fieldIndex]);
+    }
+
+    /**
+     * Prepare data elements for writing field values.
+     * Must be called before using write methods.
+     * Initializes fixed-length and variable-length data structures.
+     */
+    public void prepareForWrite() {
+        // Calculate bits per record
+        bitsPerRecord = 0;
+        for (int i = 0; i < schema.numFields(); i++) {
+            bitOffsetPerField[i] = bitsPerRecord;
+
+            HollowObjectSchema.FieldType fieldType = schema.getFieldType(i);
+            if (fieldType == HollowObjectSchema.FieldType.REFERENCE ||
+                fieldType == HollowObjectSchema.FieldType.INT) {
+                // INT and REFERENCE use 32 bits
+                bitsPerField[i] = 32;
+                nullValueForField[i] = (1L << 32) - 1;
+            } else if (fieldType == HollowObjectSchema.FieldType.LONG) {
+                // LONG uses 64 bits
+                bitsPerField[i] = 64;
+                nullValueForField[i] = -1L;
+            } else if (fieldType == HollowObjectSchema.FieldType.BOOLEAN) {
+                // BOOLEAN uses 2 bits (null, false, true)
+                bitsPerField[i] = 2;
+                nullValueForField[i] = 3;
+            } else if (fieldType == HollowObjectSchema.FieldType.FLOAT) {
+                // FLOAT uses 32 bits
+                bitsPerField[i] = 32;
+                nullValueForField[i] = (1L << 32) - 1;
+            } else if (fieldType == HollowObjectSchema.FieldType.DOUBLE) {
+                // DOUBLE uses 64 bits
+                bitsPerField[i] = 64;
+                nullValueForField[i] = -1L;
+            } else {
+                // STRING and BYTES use pointers (40 bits for reasonable data size)
+                bitsPerField[i] = 40;
+                nullValueForField[i] = (1L << 40) - 1;
+            }
+
+            bitsPerRecord += bitsPerField[i];
+        }
+
+        // Allocate fixed-length data - note: parameter order is (numBits, memoryMode, recycler)
+        long numBitsRequired = (long) bitsPerRecord * (maxOrdinal + 1);
+        fixedLengthData = FixedLengthDataFactory.get(numBitsRequired, memoryMode, memoryRecycler);
+
+        // Allocate variable-length data for STRING and BYTES fields
+        for (int i = 0; i < schema.numFields(); i++) {
+            HollowObjectSchema.FieldType fieldType = schema.getFieldType(i);
+            if (fieldType == HollowObjectSchema.FieldType.STRING ||
+                fieldType == HollowObjectSchema.FieldType.BYTES) {
+                // Initialize with default size - will grow automatically
+                varLengthData[i] = VariableLengthDataFactory.get(memoryMode, memoryRecycler);
+            }
+        }
+    }
+
+    /**
+     * Write an INT value to the specified ordinal and field.
+     *
+     * @param ordinal the ordinal to write to
+     * @param fieldIndex the field index
+     * @param value the int value
+     */
+    public void writeInt(int ordinal, int fieldIndex, int value) {
+        long bitOffset = ((long) ordinal * bitsPerRecord) + bitOffsetPerField[fieldIndex];
+        long elementValue = value & 0xFFFFFFFFL; // Convert to unsigned long
+        fixedLengthData.setElementValue(bitOffset, bitsPerField[fieldIndex], elementValue);
+    }
+
+    /**
+     * Write a REFERENCE value (ordinal) to the specified ordinal and field.
+     *
+     * @param ordinal the ordinal to write to
+     * @param fieldIndex the field index
+     * @param referenceOrdinal the ordinal being referenced
+     */
+    public void writeReference(int ordinal, int fieldIndex, int referenceOrdinal) {
+        writeInt(ordinal, fieldIndex, referenceOrdinal);
+    }
+
+    /**
+     * Write a LONG value to the specified ordinal and field.
+     *
+     * @param ordinal the ordinal to write to
+     * @param fieldIndex the field index
+     * @param value the long value
+     */
+    public void writeLong(int ordinal, int fieldIndex, long value) {
+        long bitOffset = ((long) ordinal * bitsPerRecord) + bitOffsetPerField[fieldIndex];
+        // For 64-bit values, we need to handle them specially
+        int whichLong = (int)(bitOffset >>> 6);
+        int whichBit = (int)(bitOffset & 0x3F);
+
+        FixedLengthElementArray array = (FixedLengthElementArray) fixedLengthData;
+
+        // Clear the bits first to avoid OR corruption
+        long clearMask = ~(0xFFFFFFFFFFFFFFFFL << whichBit);
+        array.set(whichLong, array.get(whichLong) & clearMask);
+        // Now set the new value
+        array.set(whichLong, array.get(whichLong) | (value << whichBit));
+
+        int bitsRemaining = 64 - whichBit;
+        if (bitsRemaining < 64) {
+            // Clear the bits in the next long
+            long clearMaskNext = ~(0xFFFFFFFFFFFFFFFFL >>> bitsRemaining);
+            array.set(whichLong + 1, array.get(whichLong + 1) & clearMaskNext);
+            // Now set the new value
+            array.set(whichLong + 1, array.get(whichLong + 1) | (value >>> bitsRemaining));
+        }
+    }
+
+    /**
+     * Write a FLOAT value to the specified ordinal and field.
+     *
+     * @param ordinal the ordinal to write to
+     * @param fieldIndex the field index
+     * @param value the float value
+     */
+    public void writeFloat(int ordinal, int fieldIndex, float value) {
+        int bits = Float.floatToIntBits(value);
+        writeInt(ordinal, fieldIndex, bits);
+    }
+
+    /**
+     * Write a DOUBLE value to the specified ordinal and field.
+     *
+     * @param ordinal the ordinal to write to
+     * @param fieldIndex the field index
+     * @param value the double value
+     */
+    public void writeDouble(int ordinal, int fieldIndex, double value) {
+        long bits = Double.doubleToLongBits(value);
+        writeLong(ordinal, fieldIndex, bits);
+    }
+
+    /**
+     * Write a BOOLEAN value to the specified ordinal and field.
+     *
+     * @param ordinal the ordinal to write to
+     * @param fieldIndex the field index
+     * @param value the boolean value
+     */
+    public void writeBoolean(int ordinal, int fieldIndex, boolean value) {
+        long bitOffset = ((long) ordinal * bitsPerRecord) + bitOffsetPerField[fieldIndex];
+        // 0 = false, 1 = true, 3 = null (see nullValueForField)
+        long elementValue = value ? 1 : 0;
+        fixedLengthData.setElementValue(bitOffset, bitsPerField[fieldIndex], elementValue);
+    }
+
+    /**
+     * Write a STRING value to the specified ordinal and field.
+     *
+     * Encoding format: Each character is encoded as a VarInt (variable-length integer).
+     * No length prefix is written - the string length is implicitly determined by the
+     * difference between consecutive byte pointers in the fixed-length data.
+     *
+     * This format matches the encoding used by HollowObjectWriteRecord.setString(),
+     * ensuring compatibility with normal snapshot/delta creation.
+     *
+     * @param ordinal the ordinal to write to
+     * @param fieldIndex the field index
+     * @param value the string value
+     */
+    public void writeString(int ordinal, int fieldIndex, String value) {
+        if (varLengthData[fieldIndex] == null) {
+            throw new IllegalStateException("Variable length data not initialized for field " + fieldIndex);
+        }
+
+        // Get previous end position as start position
+        long startByte;
+        if (ordinal == 0) {
+            startByte = 0;
+        } else {
+            long prevBitOffset = ((long) (ordinal - 1) * bitsPerRecord) + bitOffsetPerField[fieldIndex];
+            startByte = fixedLengthData.getElementValue(prevBitOffset, bitsPerField[fieldIndex]);
+        }
+
+        SegmentedByteArray byteArray = (SegmentedByteArray) varLengthData[fieldIndex];
+
+        // Write string as VarInt encoded characters (no length prefix - length is implicit from pointers)
+        long currentByte = startByte;
+        for (int i = 0; i < value.length(); i++) {
+            currentByte = writeVarInt(byteArray, currentByte, value.charAt(i));
+        }
+
+        // Write end byte pointer to fixed-length data
+        long bitOffset = ((long) ordinal * bitsPerRecord) + bitOffsetPerField[fieldIndex];
+        fixedLengthData.setElementValue(bitOffset, bitsPerField[fieldIndex], currentByte);
+    }
+
+    /**
+     * Helper method to write a variable-length integer to a SegmentedByteArray.
+     * Returns the next byte position after writing.
+     */
+    private long writeVarInt(SegmentedByteArray data, long position, int value) {
+        if (value > 0x0FFFFFFF || value < 0) data.set(position++, (byte)(0x80 | ((value >>> 28))));
+        if (value > 0x1FFFFF || value < 0)   data.set(position++, (byte)(0x80 | ((value >>> 21) & 0x7F)));
+        if (value > 0x3FFF || value < 0)     data.set(position++, (byte)(0x80 | ((value >>> 14) & 0x7F)));
+        if (value > 0x7F || value < 0)       data.set(position++, (byte)(0x80 | ((value >>>  7) & 0x7F)));
+        data.set(position++, (byte)(value & 0x7F));
+        return position;
+    }
+
+    /**
+     * Write a BYTES value to the specified ordinal and field.
+     *
+     * @param ordinal the ordinal to write to
+     * @param fieldIndex the field index
+     * @param value the byte array
+     */
+    public void writeBytes(int ordinal, int fieldIndex, byte[] value) {
+        if (varLengthData[fieldIndex] == null) {
+            throw new IllegalStateException("Variable length data not initialized for field " + fieldIndex);
+        }
+
+        // Get previous end position as start position
+        long startByte;
+        if (ordinal == 0) {
+            startByte = 0;
+        } else {
+            long prevBitOffset = ((long) (ordinal - 1) * bitsPerRecord) + bitOffsetPerField[fieldIndex];
+            startByte = fixedLengthData.getElementValue(prevBitOffset, bitsPerField[fieldIndex]);
+        }
+
+        SegmentedByteArray byteArray = (SegmentedByteArray) varLengthData[fieldIndex];
+
+        // Write byte data directly
+        for (int i = 0; i < value.length; i++) {
+            byteArray.set(startByte + i, value[i]);
+        }
+
+        long endByte = startByte + value.length;
+
+        // Write end byte pointer to fixed-length data
+        long bitOffset = ((long) ordinal * bitsPerRecord) + bitOffsetPerField[fieldIndex];
+        fixedLengthData.setElementValue(bitOffset, bitsPerField[fieldIndex], endByte);
+    }
+
+    /**
+     * Write a NULL value to the specified ordinal and field.
+     *
+     * @param ordinal the ordinal to write to
+     * @param fieldIndex the field index
+     */
+    public void writeNull(int ordinal, int fieldIndex) {
+        long bitOffset = ((long) ordinal * bitsPerRecord) + bitOffsetPerField[fieldIndex];
+
+        HollowObjectSchema.FieldType fieldType = schema.getFieldType(fieldIndex);
+        if (fieldType == HollowObjectSchema.FieldType.STRING ||
+            fieldType == HollowObjectSchema.FieldType.BYTES) {
+            // For variable-length fields, set high bit to indicate null
+            long prevEndByte;
+            if (ordinal == 0) {
+                prevEndByte = 0;
+            } else {
+                long prevBitOffset = ((long) (ordinal - 1) * bitsPerRecord) + bitOffsetPerField[fieldIndex];
+                prevEndByte = fixedLengthData.getElementValue(prevBitOffset, bitsPerField[fieldIndex]);
+            }
+            // Set high bit to mark as null, preserve pointer
+            long nullMarker = prevEndByte | (1L << (bitsPerField[fieldIndex] - 1));
+            fixedLengthData.setElementValue(bitOffset, bitsPerField[fieldIndex], nullMarker);
+        } else {
+            // For fixed-length fields, write null sentinel value
+            if (bitsPerField[fieldIndex] == 64) {
+                // Use the same approach as writeLong for 64-bit values
+                int whichLong = (int)(bitOffset >>> 6);
+                int whichBit = (int)(bitOffset & 0x3F);
+                long value = nullValueForField[fieldIndex];
+
+                FixedLengthElementArray array = (FixedLengthElementArray) fixedLengthData;
+
+                // Clear the bits first to avoid OR corruption
+                long clearMask = ~(0xFFFFFFFFFFFFFFFFL << whichBit);
+                array.set(whichLong, array.get(whichLong) & clearMask);
+                // Now set the new value
+                array.set(whichLong, array.get(whichLong) | (value << whichBit));
+
+                int bitsRemaining = 64 - whichBit;
+                if (bitsRemaining < 64) {
+                    // Clear the bits in the next long
+                    long clearMaskNext = ~(0xFFFFFFFFFFFFFFFFL >>> bitsRemaining);
+                    array.set(whichLong + 1, array.get(whichLong + 1) & clearMaskNext);
+                    // Now set the new value
+                    array.set(whichLong + 1, array.get(whichLong + 1) | (value >>> bitsRemaining));
+                }
+            } else {
+                fixedLengthData.setElementValue(bitOffset, bitsPerField[fieldIndex], nullValueForField[fieldIndex]);
+            }
+        }
+    }
+
+    /**
+     * Update the schema of this data elements during delta application.
+     * Migrates the buffer layout to accommodate new fields.
+     */
+    public void updateSchema(HollowObjectSchema newSchema) {
+        int oldNumFields = schema.numFields();
+        int newNumFields = newSchema.numFields();
+
+        if (newNumFields <= oldNumFields) {
+            // No new fields, just update schema reference
+            try {
+                Field schemaField = HollowObjectTypeDataElements.class.getDeclaredField("schema");
+                schemaField.setAccessible(true);
+                schemaField.set(this, newSchema);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new RuntimeException("Failed to update data elements schema", e);
+            }
+            return;
+        }
+
+        // Save old layout before updating
+        int oldBitsPerRecord = bitsPerRecord;
+        int[] oldBitsPerField = new int[oldNumFields];
+        int[] oldBitOffsetPerField = new int[oldNumFields];
+        System.arraycopy(bitsPerField, 0, oldBitsPerField, 0, oldNumFields);
+        System.arraycopy(bitOffsetPerField, 0, oldBitOffsetPerField, 0, oldNumFields);
+
+        // Expand arrays to accommodate new fields
+        VariableLengthData[] newVarLengthData = new VariableLengthData[newNumFields];
+        int[] newBitsPerField = new int[newNumFields];
+        int[] newBitOffsetPerField = new int[newNumFields];
+        long[] newNullValueForField = new long[newNumFields];
+
+        // Copy existing field metadata
+        System.arraycopy(varLengthData, 0, newVarLengthData, 0, oldNumFields);
+        System.arraycopy(oldBitsPerField, 0, newBitsPerField, 0, oldNumFields);
+        System.arraycopy(oldBitOffsetPerField, 0, newBitOffsetPerField, 0, oldNumFields);
+        System.arraycopy(nullValueForField, 0, newNullValueForField, 0, oldNumFields);
+
+        // Initialize new fields with default metadata (appended at end of record)
+        int currentBitsPerRecord = bitsPerRecord;
+        for (int i = oldNumFields; i < newNumFields; i++) {
+            newBitOffsetPerField[i] = currentBitsPerRecord;
+
+            HollowObjectSchema.FieldType fieldType = newSchema.getFieldType(i);
+            if (fieldType == HollowObjectSchema.FieldType.REFERENCE ||
+                fieldType == HollowObjectSchema.FieldType.INT) {
+                newBitsPerField[i] = 32;
+                newNullValueForField[i] = (1L << 32) - 1;
+            } else if (fieldType == HollowObjectSchema.FieldType.LONG) {
+                newBitsPerField[i] = 64;
+                newNullValueForField[i] = -1L;
+            } else if (fieldType == HollowObjectSchema.FieldType.BOOLEAN) {
+                newBitsPerField[i] = 2;
+                newNullValueForField[i] = 3;
+            } else if (fieldType == HollowObjectSchema.FieldType.FLOAT) {
+                newBitsPerField[i] = 32;
+                newNullValueForField[i] = (1L << 32) - 1;
+            } else if (fieldType == HollowObjectSchema.FieldType.DOUBLE) {
+                newBitsPerField[i] = 64;
+                newNullValueForField[i] = -1L;
+            } else {
+                // STRING and BYTES use pointers
+                newBitsPerField[i] = 40;
+                newNullValueForField[i] = (1L << 40) - 1;
+            }
+
+            currentBitsPerRecord += newBitsPerField[i];
+        }
+
+        // Update schema and arrays using reflection (fields are final)
+        try {
+            Field schemaField = HollowObjectTypeDataElements.class.getDeclaredField("schema");
+            schemaField.setAccessible(true);
+            schemaField.set(this, newSchema);
+
+            Field varLengthDataField = HollowObjectTypeDataElements.class.getDeclaredField("varLengthData");
+            varLengthDataField.setAccessible(true);
+            varLengthDataField.set(this, newVarLengthData);
+
+            Field bitsPerFieldField = HollowObjectTypeDataElements.class.getDeclaredField("bitsPerField");
+            bitsPerFieldField.setAccessible(true);
+            bitsPerFieldField.set(this, newBitsPerField);
+
+            Field bitOffsetPerFieldField = HollowObjectTypeDataElements.class.getDeclaredField("bitOffsetPerField");
+            bitOffsetPerFieldField.setAccessible(true);
+            bitOffsetPerFieldField.set(this, newBitOffsetPerField);
+
+            Field nullValueForFieldField = HollowObjectTypeDataElements.class.getDeclaredField("nullValueForField");
+            nullValueForFieldField.setAccessible(true);
+            nullValueForFieldField.set(this, newNullValueForField);
+
+            // Update bitsPerRecord
+            Field bitsPerRecordField = HollowObjectTypeDataElements.class.getDeclaredField("bitsPerRecord");
+            bitsPerRecordField.setAccessible(true);
+            bitsPerRecordField.set(this, currentBitsPerRecord);
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to update data elements arrays", e);
+        }
+
+        // Allocate variable length data for new STRING/BYTES fields
+        for (int i = oldNumFields; i < newNumFields; i++) {
+            HollowObjectSchema.FieldType fieldType = newSchema.getFieldType(i);
+            if (fieldType == HollowObjectSchema.FieldType.STRING ||
+                fieldType == HollowObjectSchema.FieldType.BYTES) {
+                newVarLengthData[i] = VariableLengthDataFactory.get(memoryMode, memoryRecycler);
+            }
+        }
+
+        // Migrate buffer to new layout, skipping removed ordinals
+        migrateDataAfterSchemaUpdate(oldNumFields, oldBitsPerRecord, oldBitsPerField, oldBitOffsetPerField,
+                                      newBitsPerField, newBitOffsetPerField, currentBitsPerRecord);
+    }
+
+    /**
+     * Migrate buffer from old layout to new layout after schema update.
+     * Skips ordinals that were removed in the delta to avoid bringing them back.
+     */
+    private void migrateDataAfterSchemaUpdate(int oldNumFields, int oldBitsPerRecord, int[] oldBitsPerField,
+                                               int[] oldBitOffsetPerField, int[] newBitsPerField,
+                                               int[] newBitOffsetPerField, int newBitsPerRecord) {
+        if (fixedLengthData == null || maxOrdinal < 0) {
+            return;
+        }
+
+        // Build set of removed ordinals to skip during migration
+        BitSet removedOrdinals = new BitSet();
+        if (encodedRemovals != null && !encodedRemovals.isEmpty()) {
+            encodedRemovals.reset();
+            int removedOrdinal = encodedRemovals.nextElement();
+            while (removedOrdinal < Integer.MAX_VALUE) {
+                removedOrdinals.set(removedOrdinal);
+                encodedRemovals.advance();
+                removedOrdinal = encodedRemovals.nextElement();
+            }
+        }
+
+        // Save old buffer
+        FixedLengthData oldBuffer = fixedLengthData;
+
+        // Allocate new buffer with new layout
+        long numBitsRequired = (long) newBitsPerRecord * (maxOrdinal + 1);
+        fixedLengthData = FixedLengthDataFactory.get(numBitsRequired, memoryMode, memoryRecycler);
+
+        // Migrate all ordinals from 0 to maxOrdinal, skipping removed ones
+        for (int ordinal = 0; ordinal <= maxOrdinal; ordinal++) {
+            // Skip removed ordinals - don't copy them back
+            if (removedOrdinals.get(ordinal)) {
+                // Initialize all fields to null for removed ordinals
+                // For variable-length fields, we need to preserve the END pointer from the OLD buffer
+                // to maintain pointer chain continuity for subsequent ordinals
+                for (int fieldIndex = 0; fieldIndex < schema.numFields(); fieldIndex++) {
+                    long newBitOffset = ((long) ordinal * newBitsPerRecord) + newBitOffsetPerField[fieldIndex];
+
+                    // For variable-length fields within old schema, preserve the old END pointer with NULL bit
+                    if (fieldIndex < oldNumFields && fieldIndex < varLengthData.length && varLengthData[fieldIndex] != null) {
+                        // Get this ordinal's END pointer from OLD buffer
+                        long oldBitOffset = ((long) ordinal * oldBitsPerRecord) + oldBitOffsetPerField[fieldIndex];
+                        long oldEndPointer = oldBuffer.getElementValue(oldBitOffset, oldBitsPerField[fieldIndex]);
+                        // Set NULL bit and preserve old END pointer
+                        long nullPointer = oldEndPointer | (1L << (newBitsPerField[fieldIndex] - 1));
+                        fixedLengthData.setElementValue(newBitOffset, newBitsPerField[fieldIndex], nullPointer);
+                    } else if (fieldIndex >= oldNumFields && fieldIndex < varLengthData.length && varLengthData[fieldIndex] != null) {
+                        // New field that doesn't exist in old buffer - use previous ordinal's END pointer
+                        if (ordinal > 0) {
+                            long prevBitOffset = ((long) (ordinal - 1) * newBitsPerRecord) + newBitOffsetPerField[fieldIndex];
+                            long prevEndPointer = fixedLengthData.getElementValue(prevBitOffset, newBitsPerField[fieldIndex]);
+                            long nullPointer = prevEndPointer | (1L << (newBitsPerField[fieldIndex] - 1));
+                            fixedLengthData.setElementValue(newBitOffset, newBitsPerField[fieldIndex], nullPointer);
+                        } else {
+                            fixedLengthData.setElementValue(newBitOffset, newBitsPerField[fieldIndex], 1L << (newBitsPerField[fieldIndex] - 1));
+                        }
+                    } else {
+                        // Fixed-length field, use null value
+                        fixedLengthData.setElementValue(newBitOffset, newBitsPerField[fieldIndex], nullValueForField[fieldIndex]);
+                    }
+                }
+                continue;
+            }
+
+            // Copy old field values
+            for (int fieldIndex = 0; fieldIndex < oldNumFields; fieldIndex++) {
+                long oldBitOffset = ((long) ordinal * oldBitsPerRecord) + oldBitOffsetPerField[fieldIndex];
+                long newBitOffset = ((long) ordinal * newBitsPerRecord) + newBitOffsetPerField[fieldIndex];
+
+                int oldNumBits = oldBitsPerField[fieldIndex];
+                int newNumBits = newBitsPerField[fieldIndex];
+
+                long value = (oldNumBits <= 56)
+                    ? oldBuffer.getElementValue(oldBitOffset, oldNumBits)
+                    : oldBuffer.getLargeElementValue(oldBitOffset, oldNumBits);
+
+                fixedLengthData.setElementValue(newBitOffset, newNumBits, value);
+            }
+
+            // Initialize new fields to null
+            for (int fieldIndex = oldNumFields; fieldIndex < schema.numFields(); fieldIndex++) {
+                long newBitOffset = ((long) ordinal * newBitsPerRecord) + newBitOffsetPerField[fieldIndex];
+                fixedLengthData.setElementValue(newBitOffset, newBitsPerField[fieldIndex], nullValueForField[fieldIndex]);
+            }
+        }
     }
 }
