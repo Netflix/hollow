@@ -4,6 +4,9 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FakeHollowSchemaIdentifierMapper;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -41,6 +44,8 @@ public class HollowObjectMapperFlatRecordParserTest {
     wrapperTypesTest.type = AnEnum.SOME_VALUE_C;
     wrapperTypesTest.complexEnum = ComplexEnum.SOME_VALUE_A;
     wrapperTypesTest.dateCreated = new Date();
+    wrapperTypesTest.instant = Instant.now();
+    wrapperTypesTest.localDate = LocalDate.now();
 
     flatRecordWriter.reset();
     mapper.writeFlat(wrapperTypesTest, flatRecordWriter);
@@ -51,6 +56,10 @@ public class HollowObjectMapperFlatRecordParserTest {
     Assert.assertEquals(wrapperTypesTest, result);
     Assert.assertEquals(wrapperTypesTest.complexEnum.value, result.complexEnum.value);
     Assert.assertEquals(wrapperTypesTest.complexEnum.anotherValue, result.complexEnum.anotherValue);
+    Assert.assertEquals(wrapperTypesTest.dateCreated, result.dateCreated);
+    Assert.assertEquals(wrapperTypesTest.instant, result.instant);
+    Assert.assertEquals(wrapperTypesTest.localDate, result.localDate);
+
   }
 
   @Test
@@ -695,12 +704,14 @@ public class HollowObjectMapperFlatRecordParserTest {
     @HollowTypeName(name = "ComplexEnum")
     ComplexEnum complexEnum;
     Date dateCreated;
+    Instant instant;
+    LocalDate localDate;
 
     @Override
     public boolean equals(Object o) {
       if(o instanceof SpecialWrapperTypesTest) {
         SpecialWrapperTypesTest other = (SpecialWrapperTypesTest)o;
-        return id == other.id && complexEnum == other.complexEnum && type == other.type && dateCreated.equals(other.dateCreated);
+        return id == other.id && complexEnum == other.complexEnum && type == other.type && dateCreated.equals(other.dateCreated) && instant.equals(other.instant) && localDate.equals(other.localDate);
       }
       return false;
     }
