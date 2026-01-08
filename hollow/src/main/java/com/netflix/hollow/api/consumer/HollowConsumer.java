@@ -21,6 +21,7 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 import com.netflix.hollow.PublicApi;
 import com.netflix.hollow.PublicSpi;
+import com.netflix.hollow.api.client.ChecksumValidator;
 import com.netflix.hollow.api.client.FailedTransitionTracker;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClientUpdater;
@@ -130,6 +131,8 @@ public class HollowConsumer {
 
     private final Executor refreshExecutor;
     private final MemoryMode memoryMode;
+    private final boolean repairEnabled;
+    private final boolean checksumValidationEnabled;
 
     /**
      * @deprecated use {@link HollowConsumer.Builder}
@@ -185,6 +188,8 @@ public class HollowConsumer {
         if (announcementWatcher != null)
             announcementWatcher.subscribeToUpdates(this);
         this.memoryMode = memoryMode;
+        this.repairEnabled = false;
+        this.checksumValidationEnabled = false;
     }
 
     protected  <B extends Builder<B>> HollowConsumer(B builder) {
@@ -201,6 +206,8 @@ public class HollowConsumer {
                 builder.objectLongevityDetector,
                 metrics,
                 builder.metricsCollector,
+                builder.checksumValidationEnabled ? new ChecksumValidator() : null,
+                builder.repairEnabled,
                 builder.updatePlanBlobVerifier);
         updater.setFilter(builder.typeFilter);
         if(builder.skipTypeShardUpdateWithNoAdditions)
@@ -209,6 +216,8 @@ public class HollowConsumer {
         this.refreshExecutor = builder.refreshExecutor;
         this.refreshLock = new ReentrantReadWriteLock();
         this.memoryMode = builder.memoryMode;
+        this.repairEnabled = builder.repairEnabled;
+        this.checksumValidationEnabled = builder.checksumValidationEnabled;
         if (announcementWatcher != null)
             announcementWatcher.subscribeToUpdates(this);
     }
@@ -458,6 +467,20 @@ public class HollowConsumer {
     }
 
     /**
+     * @return true if automatic repair transitions are enabled, false otherwise
+     */
+    public boolean isRepairEnabled() {
+        return repairEnabled;
+    }
+
+    /**
+     * @return true if checksum validation is enabled, false otherwise
+     */
+    public boolean isChecksumValidationEnabled() {
+        return checksumValidationEnabled;
+    }
+
+    /**
      * An interface which defines the necessary interactions of Hollow with a blob data store.
      * <p>
      * Implementations will define how to retrieve blob data from a data store.
@@ -552,15 +575,30 @@ public class HollowConsumer {
          * @param toVersion the version to end the delta from
          */
         public Blob(long fromVersion, long toVersion) {
+            this(fromVersion, toVersion, null);
+        }
+
+        /**
+         * Protected constructor that allows subclasses to explicitly set the blob type.
+         *
+         * @param fromVersion the version to start the delta from
+         * @param toVersion the version to end the delta from
+         * @param blobType the explicit blob type, or null to auto-determine
+         */
+        protected Blob(long fromVersion, long toVersion, BlobType blobType) {
             this.fromVersion = fromVersion;
             this.toVersion = toVersion;
 
-            if (this.isSnapshot())
-                this.blobType = BlobType.SNAPSHOT;
-            else if (this.isReverseDelta())
-                this.blobType = BlobType.REVERSE_DELTA;
-            else
-                this.blobType = BlobType.DELTA;
+            if (blobType != null) {
+                this.blobType = blobType;
+            } else {
+                if (this.isSnapshot())
+                    this.blobType = BlobType.SNAPSHOT;
+                else if (this.isReverseDelta())
+                    this.blobType = BlobType.REVERSE_DELTA;
+                else
+                    this.blobType = BlobType.DELTA;
+            }
         }
 
         /**
@@ -588,12 +626,13 @@ public class HollowConsumer {
         }
 
         /**
-         * Blobs can be of types {@code SNAPSHOT}, {@code DELTA} or {@code REVERSE_DELTA}.
+         * Blobs can be of types {@code SNAPSHOT}, {@code DELTA}, {@code REVERSE_DELTA}, or {@code REPAIR}.
          */
         public enum BlobType {
             SNAPSHOT("snapshot"),
             DELTA("delta"),
-            REVERSE_DELTA("reversedelta");
+            REVERSE_DELTA("reversedelta"),
+            REPAIR("repair");
 
             private final String type;
             BlobType(String type) {
@@ -614,7 +653,11 @@ public class HollowConsumer {
         }
 
         public boolean isDelta() {
-            return !isSnapshot() && !isReverseDelta();
+            return !isSnapshot() && !isReverseDelta() && !isRepair();
+        }
+
+        public boolean isRepair() {
+            return getBlobType() == BlobType.REPAIR;
         }
 
         public long getFromVersion() {
@@ -1038,6 +1081,19 @@ public class HollowConsumer {
          * @param transitionSequence List of transitions comprising the refresh
          */
         default void transitionsPlanned(long beforeVersion, long desiredVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {}
+
+        /**
+         * Called after a repair transition is applied.
+         * Repair transitions have fromVersion == toVersion and use snapshot data
+         * to surgically fix integrity violations detected via checksum validation.
+         * @implSpec The default implementation provided does nothing for backward compatibility.
+         *
+         * @param api the {@link HollowAPI} instance
+         * @param stateEngine the {@link HollowReadStateEngine}
+         * @param version the current state version
+         * @throws Exception thrown if an error occurs in processing
+         */
+        default void repairApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {}
     }
 
     /**
@@ -1158,6 +1214,8 @@ public class HollowConsumer {
         protected MemoryMode memoryMode = MemoryMode.ON_HEAP;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
         protected boolean skipTypeShardUpdateWithNoAdditions = false;
+        protected boolean repairEnabled = false;
+        protected boolean checksumValidationEnabled = false;
 
         public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -1436,6 +1494,33 @@ public class HollowConsumer {
          */
         public B withSkipTypeShardUpdateWithNoAdditions() {
             this.skipTypeShardUpdateWithNoAdditions = true;
+            return (B)this;
+        }
+
+        /**
+         * Enable automatic repair transitions on checksum mismatch.
+         * When enabled along with checksumValidation, repair transitions will be triggered
+         * automatically when a checksum mismatch is detected after delta application.
+         * Default is false.
+         *
+         * @param enabled true to enable automatic repair, false otherwise
+         * @return this builder
+         */
+        public B withRepairEnabled(boolean enabled) {
+            this.repairEnabled = enabled;
+            return (B)this;
+        }
+
+        /**
+         * Enable checksum validation after delta transitions.
+         * When enabled, consumer will validate state checksums against producer checksums
+         * after each delta application. Default is false.
+         *
+         * @param enabled true to enable checksum validation, false otherwise
+         * @return this builder
+         */
+        public B withChecksumValidation(boolean enabled) {
+            this.checksumValidationEnabled = enabled;
             return (B)this;
         }
 
