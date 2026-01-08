@@ -250,6 +250,12 @@ public class HollowBlobReader {
             }
         }
 
+        // Read and apply appended schema data if present
+        if (header.hasAppendedSchemaData()) {
+            DeltaSchemaAppendDataApplicator applicator = new DeltaSchemaAppendDataApplicator(stateEngine, in);
+            applicator.readAndApply();
+        }
+
         long endTime = System.currentTimeMillis();
 
         log.info("DELTA COMPLETED IN " + (endTime - startTime) + "ms");
