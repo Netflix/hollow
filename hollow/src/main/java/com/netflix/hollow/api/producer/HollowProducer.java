@@ -25,6 +25,7 @@ import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
 import com.netflix.hollow.api.producer.listener.HollowProducerEventListener;
+import com.netflix.hollow.api.producer.metrics.AbstractProducerMetricsListener;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -110,6 +111,12 @@ import java.util.concurrent.Executor;
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
 public class HollowProducer extends AbstractHollowProducer {
+
+
+    static HollowProducerAccessor ACCESSOR;
+    static void setAccessor(HollowProducerAccessor accessor) {
+        ACCESSOR = accessor;
+    }
 
     /*
      * HollowProducer and HollowProducer.Incremental extend from a package protected AbstractHollowProducer
@@ -746,6 +753,31 @@ public class HollowProducer extends AbstractHollowProducer {
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
 
+        protected HollowProducerEventListener customProducerMetricsListener = null;
+
+        public B withMetricsListenerFromExisting(HollowProducer producer) {
+            HollowProducerAccessHelper.ensureInit();
+            this.customProducerMetricsListener = HollowProducer.ACCESSOR.getProducerMetricsListener(producer);
+            return (B) this;
+        }
+
+        protected HollowProducerEventListener getCustomProducerMetricsListener() {
+            return customProducerMetricsListener;
+        }
+
+        private void overrideProducerMetricsListenerIfNeeded() {
+            if (customProducerMetricsListener == null) {
+                return;
+            }
+
+            // If the builder already has configured a producer metrics listener, do not override it.
+            boolean hasProducerMetricsListener = eventListeners.stream()
+                    .anyMatch(l -> l instanceof AbstractProducerMetricsListener);
+            if (!hasProducerMetricsListener) {
+                eventListeners.add(customProducerMetricsListener);
+            }
+        }
+
         public B withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;
             return (B) this;
@@ -977,6 +1009,7 @@ public class HollowProducer extends AbstractHollowProducer {
          */
         public HollowProducer build() {
             checkArguments();
+            overrideProducerMetricsListenerIfNeeded();
             return new HollowProducer(this);
         }
 
@@ -988,6 +1021,7 @@ public class HollowProducer extends AbstractHollowProducer {
          */
         public HollowProducer.Incremental buildIncremental() {
             checkArguments();
+            overrideProducerMetricsListenerIfNeeded();
             return new HollowProducer.Incremental(this);
         }
     }
