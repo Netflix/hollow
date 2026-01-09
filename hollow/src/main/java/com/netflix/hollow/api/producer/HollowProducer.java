@@ -755,7 +755,7 @@ public class HollowProducer extends AbstractHollowProducer {
 
         protected HollowProducerEventListener customProducerMetricsListener = null;
 
-        public B withListenersFromExisting(HollowProducer producer) {
+        public B withMetricsListenersFromExisting(HollowProducer producer) {
             HollowProducerAccessHelper.ensureInit();
             this.customProducerMetricsListener = HollowProducer.ACCESSOR.getProducerMetricsListener(producer);
             return (B) this;
