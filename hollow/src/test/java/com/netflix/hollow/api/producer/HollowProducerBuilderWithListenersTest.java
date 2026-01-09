@@ -28,7 +28,7 @@ public class HollowProducerBuilderWithListenersTest {
         assertSame(metricsListener, producer1.getProducerMetricsListener());
 
         HollowProducer producer2 = HollowProducer.withPublisher(new NoopPublisher())
-                .withMetricsListenersFromExisting(producer1)
+                .withMetricsListenerFromExisting(producer1)
                 .build();
 
         assertSame(producer1.getProducerMetricsListener(), producer2.getProducerMetricsListener());
@@ -44,7 +44,7 @@ public class HollowProducerBuilderWithListenersTest {
         TestMetricsListener metricsListener2 = new TestMetricsListener();
         HollowProducer producer2 = HollowProducer.withPublisher(new NoopPublisher())
                 .withListener(metricsListener2)
-                .withMetricsListenersFromExisting(producer1)
+                .withMetricsListenerFromExisting(producer1)
                 .build();
 
         assertSame(metricsListener2, producer2.getProducerMetricsListener());
