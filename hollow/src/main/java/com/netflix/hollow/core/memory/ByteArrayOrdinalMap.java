@@ -16,12 +16,16 @@
  */
 package com.netflix.hollow.core.memory;
 
+import com.netflix.hollow.api.error.HollowException;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicLongArray;
+import java.util.stream.IntStream;
 
 /**
  * This data structure maps byte sequences to ordinals.  This is a hash table.
@@ -371,7 +375,7 @@ public class ByteArrayOrdinalMap {
             }
         }
 
-        Arrays.sort(populatedReverseKeys);
+        Arrays.parallelSort(populatedReverseKeys);
 
         SegmentedByteArray arr = byteData.getUnderlyingArray();
         long currentCopyPointer = 0;
@@ -547,18 +551,25 @@ public class ByteArrayOrdinalMap {
 
         int modBitmask = newKeys.length() - 1;
 
-        for (int i = 0; i < length; i++) {
-            long value = valuesToAdd[i];
-            if (value != EMPTY_BUCKET_VALUE) {
-                int hash = rehashPreviouslyAddedData(value);
-                int bucket = hash & modBitmask;
-                while (newKeys.get(bucket) != EMPTY_BUCKET_VALUE) {
-                    bucket = (bucket + 1) & modBitmask;
-                }
-                // Volatile store not required, could use plain store
-                // See VarHandles for JDK >= 9
-                newKeys.lazySet(bucket, value);
-            }
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
+
+        try {
+            forkJoinPool.submit(()->{
+                IntStream.range(0,length).parallel().forEach(i->{
+                    long value = valuesToAdd[i];
+                    if (value != EMPTY_BUCKET_VALUE) {
+                        int hash = rehashPreviouslyAddedData(value);
+                        int bucket = hash & modBitmask;
+                        boolean isSet = false;
+                        while(!isSet){
+                            isSet = newKeys.compareAndSet(bucket,EMPTY_BUCKET_VALUE,value);
+                            bucket = (bucket + 1) & modBitmask;
+                        }
+                    }
+                });
+            }).get();
+        } catch (Exception e) {
+            throw new HollowException("Unable to populate byte array map", e);
         }
     }
 
