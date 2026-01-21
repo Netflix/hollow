@@ -460,6 +460,14 @@ public abstract class HollowTypeWriteState {
         }
     }
 
+    public int getMaxOrdinalAfterWritePreparation() {
+        if (!wroteData) {
+            throw new IllegalStateException("");
+        }
+
+        return this.maxOrdinal;
+    }
+
     protected abstract int typeStateNumShards(int maxOrdinal);
 
     /**

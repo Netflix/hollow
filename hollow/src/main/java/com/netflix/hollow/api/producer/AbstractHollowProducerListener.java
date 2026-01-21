@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.api.producer;
 
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+
 import java.util.concurrent.TimeUnit;
 
 /**

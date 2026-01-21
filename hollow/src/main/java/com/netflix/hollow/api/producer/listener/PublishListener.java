@@ -18,6 +18,8 @@ package com.netflix.hollow.api.producer.listener;
 
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -71,6 +73,9 @@ public interface PublishListener extends HollowProducerEventListener {
      * @param elapsed time taken to publish the blob
      */
     void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed);
+
+    default void onPublishHeaderBlob(HollowWriteStateEngine writeStateEngine) {
+    }
 
     /**
      * Called if a blob is to be published asynchronously.

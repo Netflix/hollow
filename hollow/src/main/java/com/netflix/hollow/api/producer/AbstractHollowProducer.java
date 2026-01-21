@@ -645,7 +645,7 @@ abstract class AbstractHollowProducer {
             if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
                 artifacts.snapshot = stageBlob(listeners, blobStager.openSnapshot(toVersion));
 
-            publishHeaderBlob(artifacts.header);
+            publishHeaderBlob(listeners, artifacts.header);
             if (readStates.hasCurrent()) {
                 artifacts.delta = stageBlob(listeners,
                         blobStager.openDelta(readStates.current().getVersion(), toVersion));
@@ -781,11 +781,13 @@ abstract class AbstractHollowProducer {
         }
     }
 
-    private void publishHeaderBlob(HollowProducer.HeaderBlob b) {
+    private void publishHeaderBlob(ProducerListeners listeners, HollowProducer.HeaderBlob b) {
         try {
-            HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
+            HollowWriteStateEngine writeStateEngine = getWriteEngine();
+            HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
             b.write(writer);
             publisher.publish(b);
+            listeners.fireHeaderBlobPublish(writeStateEngine);
         } catch (IOException e){
             throw new RuntimeException(e);
         }
