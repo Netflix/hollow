@@ -186,7 +186,7 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
             return true;
         }
 
-        resp.setContentType("text/html");
+        resp.setContentType("text/html;charset=UTF-8");
 
         if("resource".equals(pageName)) {
             if(serveResource(req, resp, getResourceName(target)))
