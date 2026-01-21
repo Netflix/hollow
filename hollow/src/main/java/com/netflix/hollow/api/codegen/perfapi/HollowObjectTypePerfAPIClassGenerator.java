@@ -20,6 +20,9 @@ import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.includeType;
@@ -60,17 +63,18 @@ class HollowObjectTypePerfAPIClassGenerator {
         builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class " + schema.getName() + "PerfAPI extends HollowObjectTypePerfAPI {\n\n");
 
+        List<Integer> fieldPositions = new ArrayList<>(schema.numFields());
+
         builder.append("    public static final String fieldNames[] = { ");
         int addedFields = 0;
         for(int i=0;i<schema.numFields();i++) {
-            if (dataset != null && schema.getFieldType(i) == HollowObjectSchema.FieldType.REFERENCE &&
-                !includeType(schema.getReferencedType(i), dataset)) {
+            if (dataset != null && schema.getFieldType(i) == HollowObjectSchema.FieldType.REFERENCE && !includeType(schema.getReferencedType(i), dataset)) {
                 continue;
             }
-
             if(addedFields > 0) {
                 builder.append(", ");
             }
+            fieldPositions.add(i);
             builder.append("\"").append(schema.getFieldName(i)).append("\"");
             addedFields++;
         }
@@ -81,14 +85,11 @@ class HollowObjectTypePerfAPIClassGenerator {
         builder.append("        super(dataAccess, typeName, api, fieldNames);\n");
         builder.append("    }\n\n");
 
-        for(int i=0;i<schema.numFields();i++) {
-            if (dataset != null && schema.getFieldType(i) == HollowObjectSchema.FieldType.REFERENCE && !includeType(schema.getReferencedType(i), dataset)) {
-                continue;
-            }
-
-            FieldType fieldType = schema.getFieldType(i);
-            String fieldName = schema.getFieldName(i);
-            String referencedType = schema.getReferencedType(i);
+        for(int i=0;i<fieldPositions.size();i++) {
+            int position = fieldPositions.get(i);
+            String fieldName = schema.getFieldName(position);
+            FieldType fieldType = schema.getFieldType(position);
+            String referencedType = schema.getReferencedType(position);
             appendFieldMethod(builder, fieldType, fieldName, i, referencedType);
         }
 
