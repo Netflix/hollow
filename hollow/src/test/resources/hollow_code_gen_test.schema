@@ -13,6 +13,7 @@ TopLevelObject {
 	MapOfStringToObject2 invalidMapField1;
 	MapOfObject2ToString invalidMapField2;
 	Object2 invalidMemberField;
+	String validStringField;
 }
 
 ListOfObject1 List<Object1>;
