@@ -17,7 +17,9 @@
 package com.netflix.hollow.api.producer.listener;
 
 import com.netflix.hollow.api.producer.HollowProducer;
+import com.netflix.hollow.api.producer.PublishStageStats;
 import com.netflix.hollow.api.producer.Status;
+
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -71,7 +73,6 @@ public interface PublishListener extends HollowProducerEventListener {
      * @param elapsed time taken to publish the blob
      */
     void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed);
-
     /**
      * Called if a blob is to be published asynchronously.
      * This method is called for a {@link HollowProducer.Blob.Type#SNAPSHOT snapshot} blob when the
@@ -88,13 +89,34 @@ public interface PublishListener extends HollowProducerEventListener {
     }
 
     /**
-     * Called after the publish stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
-     * the {@code HollowBlob}s produced this cycle has been published to the blob store.
+     * Deprecated in favor of
+     * {@code onPublishComplete(Status status, long version, Duration elapsed, PublishStageStats stats)}.
      *
      * @param status CycleStatus of the publish stage. {@link Status#getType()} will return {@code SUCCESS}
      * when the publish was successful; @{code FAIL} otherwise.
      * @param version version that was published.
      * @param elapsed duration of the publish stage in {@code unit} units
      */
+    @Deprecated
     void onPublishComplete(Status status, long version, Duration elapsed);
+
+    /**
+     * Called when the publish stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
+     * the {@code HollowBlob}s produced this cycle has been published to the blob store.
+     * <p>
+     * This method provides access to publish stage statistics including ordinal map metrics for each type.
+     * The stats parameter will be {@code null} if the publish stage encountered errors before statistics
+     * could be collected (e.g., during blob staging or publishing failures).
+     *
+     * @param status CycleStatus of the publish stage. {@link Status#getType()} will return {@code SUCCESS}
+     * when the publish was successful; {@code FAIL} otherwise.
+     * @param version version that was published.
+     * @param elapsed duration of the publish stage
+     * @param stats stats collected upon publish stage completion, including
+     * {@link com.netflix.hollow.core.memory.ByteArrayOrdinalMapStats} for each type.
+     * Will be {@code null} if the stage encountered errors before stats could be collected.
+     */
+    default void onPublishComplete(Status status, long version, Duration elapsed, PublishStageStats stats) {
+        onPublishComplete(status, version, elapsed);
+    }
 }

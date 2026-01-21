@@ -51,6 +51,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.test.InMemoryBlobStore;
@@ -62,7 +63,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -71,6 +71,9 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -100,16 +103,22 @@ public class HollowProducerTest {
         blobRetriever = new FakeBlobRetriever(NAMESPACE, tmpFolder.getAbsolutePath());
     }
 
+    private HollowProducer createProducer(File tmpFolder, Supplier<Boolean> ignoreSoftLimits, HollowObjectSchema... schemas) {
+        return createProducer(tmpFolder, ignoreSoftLimits, null, null, schemas);
+    }
+
     private HollowProducer createProducer(File tmpFolder, HollowObjectSchema... schemas) {
-        return createProducer(tmpFolder, null, null, schemas);
+        return createProducer(tmpFolder, null, null, null, schemas);
     }
 
     private HollowProducer createProducer(File tmpFolder,
+                                          Supplier<Boolean> ignoreSoftLimits,
                                           HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier,
                                           HollowProducer.VersionMinter versionMinter,
                                           HollowObjectSchema... schemas) {
          HollowProducer.Builder producerBuilder = HollowProducer.withPublisher(new FakeBlobPublisher())
-            .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath()));
+            .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath()))
+            .withIgnoreSoftLimits(ignoreSoftLimits);
         if(updatePlanBlobVerifier != null) {
             producerBuilder = producerBuilder.withUpdatePlanVerifier(updatePlanBlobVerifier);
         }
@@ -124,6 +133,23 @@ public class HollowProducerTest {
         return producer;
     }
 
+     // check if ByteArrayOrdinalMap.ignoreSoftLimits has been updated to the expected value.
+    private void checkBaomIgnoreOrdinalSoftLimit(boolean expected, HollowProducer producer) {
+        for (HollowTypeWriteState hollowTypeWriteState : producer.getWriteEngine().getOrderedTypeStates()) {
+            try {
+                java.lang.reflect.Field ordinalMapField = HollowTypeWriteState.class.getDeclaredField("ordinalMap");
+                ordinalMapField.setAccessible(true);
+                com.netflix.hollow.core.memory.ByteArrayOrdinalMap ordinalMap =
+                        (com.netflix.hollow.core.memory.ByteArrayOrdinalMap) ordinalMapField.get(hollowTypeWriteState);
+
+                assertEquals("ByteArrayOrdinalMap.ignoreSoftLimits should be " + expected,
+                        expected, ordinalMap.getIgnoreSoftLimits());
+            } catch (NoSuchFieldException | IllegalAccessException ex) {
+                Assert.fail(ex.getMessage());
+            }
+        }
+    }
+
     @After
     public void tearDown() {
         for (File file : blobFileMap.values()) {
@@ -134,20 +160,29 @@ public class HollowProducerTest {
 
     @Test
     public void testPopulateNoChangesVersion() {
-        HollowProducer producer = createProducer(tmpFolder, schema);
+        AtomicBoolean ignoreOrdinalSoftLimits = new AtomicBoolean(false);
+        Supplier<Boolean> ignoreSoftLimits = ignoreOrdinalSoftLimits::get;
+        HollowProducer producer = createProducer(tmpFolder, ignoreSoftLimits, schema);
         long v0 = producer.runCycle(ws -> {});
         assertEquals(0, v0); // must not publish an empty snapshot
 
-        producer = createProducer(tmpFolder);
+        producer = createProducer(tmpFolder, ignoreSoftLimits);
         long v1 = producer.runCycle(ws -> {
             ws.add(1);
         });
         assertEquals(producer.getCycleCountWithPrimaryStatus(), 1);
+        checkBaomIgnoreOrdinalSoftLimit(false, producer);
+
+        // to flip ByteArrayOrdinalMap.ignoreOrdinalSoftLimits value at the end of the next cycle.
+        ignoreOrdinalSoftLimits.set(true);
         // Run cycle with no changes
         long v2 = producer.runCycle(ws -> {
             ws.add(1);
         });
         assertEquals(producer.getCycleCountWithPrimaryStatus(), 2);
+        checkBaomIgnoreOrdinalSoftLimit(true, producer);
+
+        // Add changes
         long v3 = producer.runCycle(ws -> {
             ws.add(2);
         });
@@ -277,35 +312,58 @@ public class HollowProducerTest {
 
     @Test
     public void testMultipleRestores() throws Exception {
-        HollowProducer producer = createProducer(tmpFolder, schema);
+        boolean ignoreOrdinalSoftLimitsVal = false;
+        AtomicBoolean ignoreOrdinalSoftLimits = new AtomicBoolean(ignoreOrdinalSoftLimitsVal);
+        Supplier<Boolean> ignoreSoftLimits = ignoreOrdinalSoftLimits::get;
+        HollowProducer producer = createProducer(tmpFolder, ignoreSoftLimits, schema);
 
         System.out.println("\n\n------------ Publish a few versions ------------\n");
         List<Long> versions = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
+            checkBaomIgnoreOrdinalSoftLimit(ignoreOrdinalSoftLimitsVal, producer);
+            if (i == 4) {
+                ignoreOrdinalSoftLimitsVal = !ignoreOrdinalSoftLimitsVal;
+                ignoreOrdinalSoftLimits.set(ignoreOrdinalSoftLimitsVal);
+            }
+
             int size = i + 1;
             int valueMultiplier = i + 10;
             long version = testPublishV1(producer, size, valueMultiplier);
             versions.add(version);
         }
+
+        checkBaomIgnoreOrdinalSoftLimit(ignoreOrdinalSoftLimitsVal, producer);
         assertEquals(producer.getCycleCountWithPrimaryStatus(), 5);
 
         System.out.println("\n\n------------ Restore and validate ------------\n");
         for (int i = 0; i < versions.size(); i++) {
+            checkBaomIgnoreOrdinalSoftLimit(ignoreOrdinalSoftLimitsVal, producer);
+            if (i == 4){
+                ignoreOrdinalSoftLimitsVal = !ignoreOrdinalSoftLimitsVal;
+                ignoreOrdinalSoftLimits.set(ignoreOrdinalSoftLimitsVal);
+            }
             long version = versions.get(i);
             int size = i + 1;
             int valueMultiplier = i + 10;
-
             restoreAndAssert(producer, version, size, valueMultiplier);
         }
 
+        checkBaomIgnoreOrdinalSoftLimit(ignoreOrdinalSoftLimitsVal, producer);
         System.out.println("\n\n------------ Restore in reverse order and validate ------------\n");
         for (int i = versions.size() - 1; i >= 0; i--) {
+            checkBaomIgnoreOrdinalSoftLimit(ignoreOrdinalSoftLimitsVal, producer);
+            if (i == 0) {
+                ignoreOrdinalSoftLimitsVal = !ignoreOrdinalSoftLimitsVal;
+                ignoreOrdinalSoftLimits.set(ignoreOrdinalSoftLimitsVal);
+            }
             long version = versions.get(i);
             int size = i + 1;
             int valueMultiplier = i + 10;
 
             restoreAndAssert(producer, version, size, valueMultiplier);
         }
+
+        checkBaomIgnoreOrdinalSoftLimit(ignoreOrdinalSoftLimitsVal, producer);
     }
 
     @Test
@@ -1021,7 +1079,7 @@ public class HollowProducerTest {
         };
         HollowProducer.VersionMinter mockVersionMinter = mock(HollowProducer.VersionMinter.class);
         when(mockVersionMinter.mint()).thenReturn(990L).thenReturn(1001L);
-        HollowProducer producer = createProducer(tmpFolder,
+        HollowProducer producer = createProducer(tmpFolder, null,
                 blobVerifier, mockVersionMinter, schema);
         long version1 = testPublishV1(producer, 2, 10);
         long version2 = testPublishV1(producer, 2, 11);

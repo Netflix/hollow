@@ -35,6 +35,7 @@ import com.netflix.hollow.api.producer.listener.RestoreListener;
 import com.netflix.hollow.api.producer.validation.ValidationStatus;
 import com.netflix.hollow.api.producer.validation.ValidationStatusListener;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
+
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -213,7 +214,6 @@ final class ProducerListenerSupport extends ListenerSupport {
                     l -> l.onBlobStage(s, blob, elapsed));
         }
 
-
         void fireBlobPublishAsync(CompletableFuture<HollowProducer.Blob> f) {
             fire(PublishListener.class,
                     l -> l.onBlobPublishAsync(f));
@@ -228,13 +228,13 @@ final class ProducerListenerSupport extends ListenerSupport {
                     l -> l.onBlobPublish(s, blob, elapsed));
         }
 
-        void firePublishComplete(Status.StageBuilder b) {
+        void firePublishComplete(Status.StageBuilder b, PublishStageStats stats) {
             Status s = b.build();
             long version = b.version;
             Duration elapsed = b.elapsed();
 
             fire(PublishListener.class,
-                    l -> l.onPublishComplete(s, version, elapsed));
+                    l -> l.onPublishComplete(s, version, elapsed, stats));
         }
 
         Status.StageWithStateBuilder fireIntegrityCheckStart(HollowProducer.ReadState readState) {

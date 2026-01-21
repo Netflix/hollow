@@ -58,7 +58,8 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
         this.hashCodeFinder = stateEngine.getHashCodeFinder();
 
         HollowSetTypeWriteState existingTypeState = (HollowSetTypeWriteState) parentMapper.getStateEngine().getTypeState(typeName);
-        this.writeState = existingTypeState != null ? existingTypeState : new HollowSetTypeWriteState(schema, numShards);
+        this.writeState = existingTypeState != null ? existingTypeState : new HollowSetTypeWriteState(schema, numShards,
+                parentMapper.getStateEngine().getIgnoreOrdinalLimitsSupplier());
     }
 
     @Override
@@ -70,7 +71,7 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
     protected int write(Object obj) {
         if(obj instanceof MemoizedSet) {
             long assignedOrdinal = ((MemoizedSet<?>)obj).__assigned_ordinal;
-            
+
             if((assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
                 return (int)assignedOrdinal & Integer.MAX_VALUE;
         }

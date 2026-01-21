@@ -22,6 +22,8 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicLongArray;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This data structure maps byte sequences to ordinals.  This is a hash table.
@@ -37,6 +39,8 @@ import java.util.concurrent.atomic.AtomicLongArray;
  */
 public class ByteArrayOrdinalMap {
 
+    private static final Logger LOG = Logger.getLogger(ByteArrayOrdinalMap.class.getName());
+
     private static final long EMPTY_BUCKET_VALUE = -1L;
 
     private static final int BITS_PER_ORDINAL = 29;
@@ -44,14 +48,24 @@ public class ByteArrayOrdinalMap {
     private static final long POINTER_MASK = (1L << BITS_PER_POINTER) - 1;
     private static final long ORDINAL_MASK = (1L << BITS_PER_ORDINAL) - 1;
     private static final long MAX_BYTE_DATA_LENGTH = 1L << BITS_PER_POINTER;
+    /// A safe limit for the ordinal. Even though the ordinal value range is [0, (1<<29) - 1], the cycle should fail
+    /// if the ordinal value exceeds (1<<28) - 1, unless {@code ignoreSoftLimits} is overwritten to true.
+    /// This limit can fend the cases where all the records are modified in the next version from exhausting the
+    /// ordinal's value space and forcing a broken delta chain.
+    /// NOTE: not using final to allow value modification through reflection for test purpose.
+    private static int SOFT_ORDINAL_LIMIT = 1 << (BITS_PER_ORDINAL - 1);
 
     /// Thread safety:  We need volatile access semantics to the individual elements in the
     /// pointersAndOrdinals array.
     /// Ordinal is the high 29 bits.  Pointer to byte data is the low 35 bits.
-    /// In addition need volatile access to the reference when resize occurs
+    /// In addition, need volatile access to the reference when resize occurs
     private volatile AtomicLongArray pointersAndOrdinals;
     private final ByteDataArray byteData;
     private final FreeOrdinalTracker freeOrdinalTracker;
+    /// Whether to ignore the breach of SOFT_ORDINAL_LIMIT
+    private boolean ignoreSoftLimits;
+    /// Flag used to prevent excessive soft limits breach logging when the user choose to ignore it.
+    private boolean logSoftLimitsBreach;
     private int size;
     private int sizeBeforeGrow;
 
@@ -60,7 +74,7 @@ public class ByteArrayOrdinalMap {
     private long[] pointersByOrdinal;
 
     /**
-     * Creates a byte array ordinal map with a an initial capacity of 256 elements,
+     * Creates a byte array ordinal map with an initial capacity of 256 elements,
      * and a load factor of 70%.
      */
     public ByteArrayOrdinalMap() {
@@ -68,10 +82,26 @@ public class ByteArrayOrdinalMap {
     }
 
     /**
-     * Creates a byte array ordinal map with an initial capacity of a given size
-     * rounded up to the nearest power of two, and a load factor of 70%.
+     * @param ignoreSoftLimits whether to log a warning instead of
+     * throwing an exception when SOFT_ORDINAL_LIMIT is exceeded
+     */
+    public ByteArrayOrdinalMap(boolean ignoreSoftLimits) {
+        this(256, ignoreSoftLimits);
+    }
+
+    /**
+     * @param size the initial capacity of the byte array ordinal map.
      */
     public ByteArrayOrdinalMap(int size) {
+        this(size, true);
+    }
+
+    /**
+     * @param size the initial capacity of the byte array ordinal map.
+     * @param ignoreSoftLimits whether to log a warning instead of
+     * throwing an exception when SOFT_ORDINAL_LIMIT is exceeded
+     */
+    public ByteArrayOrdinalMap(int size, boolean ignoreSoftLimits) {
         size = bucketSize(size);
 
         this.freeOrdinalTracker = new FreeOrdinalTracker();
@@ -79,6 +109,28 @@ public class ByteArrayOrdinalMap {
         this.pointersAndOrdinals = emptyKeyArray(size);
         this.sizeBeforeGrow = (int) (((float) size) * 0.7); /// 70% load factor
         this.size = 0;
+        this.ignoreSoftLimits = ignoreSoftLimits;
+        this.logSoftLimitsBreach = true;
+    }
+
+    /**
+     * Used to update ignoreSoftLimits between cycles.
+     * @param ignoreSoftLimits whether to ignore ordinal threshold breach.
+     */
+    public void setIgnoreSoftLimits(boolean ignoreSoftLimits) {
+        this.ignoreSoftLimits = ignoreSoftLimits;
+    }
+
+    public boolean getIgnoreSoftLimits() {
+        return this.ignoreSoftLimits;
+    }
+
+    /**
+     * Resets the soft limits breach logging flag to re-enable logging of ordinal threshold violations, so that for the
+     * same ByteArrayOrdinalMap, it can log breaches for across different cycles instead of the initial one.
+     */
+    public void resetLogSoftLimitsBreach() {
+        this.logSoftLimitsBreach = true;
     }
 
     private static int bucketSize(int x) {
@@ -152,6 +204,26 @@ public class ByteArrayOrdinalMap {
             throw new IllegalStateException(String.format(
                     "Ordinal cannot be assigned. The to be assigned ordinal, %s, is greater than the maximum supported ordinal value of %s",
                     ordinal, ORDINAL_MASK));
+        }
+
+        if (ordinal >= SOFT_ORDINAL_LIMIT) {
+            if (ignoreSoftLimits) {
+                if (logSoftLimitsBreach) {
+                    logSoftLimitsBreach = false;
+                    LOG.log(Level.INFO, String.format("Ordinal %d exceeds the soft ordinal limit of %d. " +
+                            "To enable failure for the limit breach check, refer to " +
+                            "HollowProducer.Builder.withIgnoreSoftLimits",
+                            ordinal, SOFT_ORDINAL_LIMIT));
+                }
+                // continue silently after first log
+            } else {
+                String message = String.format("Ordinal %d exceeds the soft ordinal limit of %d. " +
+                                "To ignore the soft limit instead of failing check, refer to" +
+                                "HollowProducer.Builder.withIgnoreSoftLimits",
+                        ordinal, SOFT_ORDINAL_LIMIT);
+                LOG.log(Level.SEVERE, message);
+                throw new IllegalStateException(message);
+            }
         }
 
         long pointer = byteData.length();
@@ -320,9 +392,10 @@ public class ByteArrayOrdinalMap {
     /**
      * Create an array mapping the ordinals to pointers, so that they can be easily looked up
      * when writing to blob streams.
+     * @return the largest ordinal that has been assigned.
      */
-    public void prepareForWrite() {
-        int maxOrdinal = 0;
+    public int prepareForWrite() {
+        int maxOrdinal = -1;
         AtomicLongArray pao = pointersAndOrdinals;
 
         for (int i = 0; i < pao.length(); i++) {
@@ -335,7 +408,13 @@ public class ByteArrayOrdinalMap {
             }
         }
 
-        long[] pbo = new long[maxOrdinal + 1];
+        long[] pbo;
+        if (maxOrdinal == -1) {
+            pbo = new long[1];
+        } else {
+            pbo = new long[maxOrdinal + 1];
+        }
+
         Arrays.fill(pbo, -1);
 
         for (int i = 0; i < pao.length(); i++) {
@@ -347,6 +426,7 @@ public class ByteArrayOrdinalMap {
         }
 
         pointersByOrdinal = pbo;
+        return maxOrdinal;
     }
 
     /**
@@ -432,22 +512,6 @@ public class ByteArrayOrdinalMap {
 
     public long getDataSize() {
         return byteData.length();
-    }
-
-    public int maxOrdinal() {
-        int maxOrdinal = -1;
-        AtomicLongArray pao = pointersAndOrdinals;
-
-        for (int i = 0; i < pao.length(); i++) {
-            long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
-                int ordinal = (int) (key >>> BITS_PER_POINTER);
-                if (ordinal > maxOrdinal) {
-                    maxOrdinal = ordinal;
-                }
-            }
-        }
-        return maxOrdinal;
     }
 
     /**
@@ -607,4 +671,11 @@ public class ByteArrayOrdinalMap {
         return (int) (pointerAndOrdinal >>> BITS_PER_POINTER);
     }
 
+    public long getByteDataLength() {
+        return byteData.length();
+    }
+
+    public float getLoadFactor() {
+        return (float) size / pointersAndOrdinals.length();
+    }
 }
