@@ -22,8 +22,8 @@ package com.netflix.hollow.core.memory.pool;
  */
 public class WastefulRecycler implements ArraySegmentRecycler {
 
-    public static WastefulRecycler DEFAULT_INSTANCE = new WastefulRecycler(11, 8);
-    public static WastefulRecycler SMALL_ARRAY_RECYCLER = new WastefulRecycler(5, 2);
+    public static final WastefulRecycler DEFAULT_INSTANCE = new WastefulRecycler(11, 8);
+    public static final WastefulRecycler SMALL_ARRAY_RECYCLER = new WastefulRecycler(5, 2);
 
     private final int log2OfByteSegmentSize;
     private final int log2OfLongSegmentSize;
