@@ -18,6 +18,9 @@ package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.HollowConstants;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -107,14 +110,22 @@ public class HollowUpdatePlanner {
         long deltaDestinationVersion = deltaPlan.destinationVersion(currentVersion);
 
         if(deltaDestinationVersion != desiredVersion && allowSnapshot) {
+            LOG.log(Level.INFO, String.format(
+                "Delta path cannot reach desired version %d (reaches %d), attempting snapshot fallback",
+                desiredVersion, deltaDestinationVersion));
+
             HollowUpdatePlan snapshotPlan = snapshotPlan(desiredVersionInfo);
             long snapshotDestinationVersion = snapshotPlan.destinationVersion(currentVersion);
 
             if(snapshotDestinationVersion == desiredVersion
                     || ((deltaDestinationVersion > desiredVersion) && (snapshotDestinationVersion < desiredVersion))
-                    || ((snapshotDestinationVersion < desiredVersion) && (snapshotDestinationVersion > deltaDestinationVersion)))
+                    || ((snapshotDestinationVersion < desiredVersion) && (snapshotDestinationVersion > deltaDestinationVersion))) {
 
+                LOG.log(Level.INFO, String.format(
+                    "Using snapshot transition fallback to version %d (snapshot transition - checksum validation not required)",
+                    snapshotDestinationVersion));
                 return snapshotPlan;
+            }
         }
 
         return deltaPlan;
@@ -267,5 +278,123 @@ public class HollowUpdatePlanner {
             }
         }
         return HollowConstants.VERSION_LATEST;
+    }
+
+    /**
+     * Plans an update with an additional repair transition if needed.
+     *
+     * This method creates a regular update plan (delta or snapshot based) and then
+     * appends a REPAIR transition at the end. The repair transition uses the snapshot
+     * at the target version to surgically repair any integrity violations.
+     *
+     * @param currentVersion version to transition from
+     * @param desiredVersion version to transition to
+     * @return update plan with delta/snapshot + repair transitions
+     */
+    public HollowUpdatePlan planUpdateWithRepair(long currentVersion, long desiredVersion) {
+        // First get regular update plan
+        HollowUpdatePlan basePlan;
+        try {
+            basePlan = planUpdate(currentVersion, desiredVersion, true);
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Failed to create base plan for repair", e);
+            return null;
+        }
+
+        if (basePlan == null || basePlan == HollowUpdatePlan.DO_NOTHING) {
+            return basePlan;
+        }
+
+        // Add repair transition at the end using snapshot at desired version
+        HollowConsumer.Blob snapshotBlob = transitionCreator.retrieveSnapshotBlob(desiredVersion);
+        if (snapshotBlob == null) {
+            LOG.log(Level.WARNING,
+                "Cannot create repair plan: snapshot not available for version " + desiredVersion);
+            return basePlan;
+        }
+
+        // Create repair blob wrapper
+        HollowConsumer.Blob repairBlob = new RepairBlob(desiredVersion, snapshotBlob);
+
+        // Build new plan with repair
+        return basePlan.withAdditionalTransition(repairBlob);
+    }
+
+    /**
+     * Plans an update with a repair transition for version jumping.
+     *
+     * When delta chains are broken or unavailable, this method creates a REPAIR transition
+     * that uses a snapshot to jump directly from currentVersion to desiredVersion.
+     *
+     * This differs from snapshot transitions in that:
+     * - SNAPSHOT: fromVersion=-1 or VERSION_NONE, toVersion=N (initialization)
+     * - REPAIR: fromVersion=M, toVersion=N (version jump using snapshot, M != N)
+     *
+     * @param currentVersion version to transition from
+     * @param desiredVersion version to transition to
+     * @return update plan with REPAIR transition for version jumping, or null if snapshot unavailable
+     */
+    public HollowUpdatePlan planUpdateWithRepairJump(long currentVersion, long desiredVersion) {
+        // Special case: if already at desired version, nothing to do
+        if (currentVersion == desiredVersion) {
+            return HollowUpdatePlan.DO_NOTHING;
+        }
+
+        // Try to get snapshot at desired version for repair
+        HollowConsumer.Blob snapshotBlob = transitionCreator.retrieveSnapshotBlob(desiredVersion);
+        if (snapshotBlob == null) {
+            LOG.log(Level.WARNING,
+                "Cannot create repair plan: snapshot not available for version " + desiredVersion);
+
+            // Fall back to regular update plan (might use deltas or snapshot)
+            try {
+                return planUpdate(currentVersion, desiredVersion, true);
+            } catch (Exception e) {
+                LOG.log(Level.WARNING, "Failed to create fallback plan", e);
+                return null;
+            }
+        }
+
+        // Create repair blob with version jump
+        HollowConsumer.Blob repairBlob = new RepairBlob(currentVersion, desiredVersion, snapshotBlob);
+
+        // Create plan with single repair transition
+        HollowUpdatePlan plan = new HollowUpdatePlan();
+        plan.add(repairBlob);
+
+        LOG.log(Level.INFO, String.format(
+            "Created repair transition plan for version jump: %d -> %d",
+            currentVersion, desiredVersion));
+
+        return plan;
+    }
+
+    /**
+     * Wrapper blob that represents a repair transition.
+     * A repair transition uses snapshot data to jump between versions.
+     *
+     * Two modes:
+     * 1. Same-version repair: fromVersion == toVersion (fix corruption at same version)
+     * 2. Version jumping: fromVersion != toVersion (jump using snapshot when delta unavailable)
+     */
+    private static class RepairBlob extends HollowConsumer.Blob {
+        private final HollowConsumer.Blob snapshotBlob;
+
+        // Same-version repair constructor (existing behavior)
+        RepairBlob(long version, HollowConsumer.Blob snapshotBlob) {
+            super(version, version, BlobType.REPAIR);
+            this.snapshotBlob = snapshotBlob;
+        }
+
+        // Version jumping constructor (new behavior for planUpdateWithRepairJump)
+        RepairBlob(long fromVersion, long toVersion, HollowConsumer.Blob snapshotBlob) {
+            super(fromVersion, toVersion, BlobType.REPAIR);
+            this.snapshotBlob = snapshotBlob;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return snapshotBlob.getInputStream();
+        }
     }
 }
