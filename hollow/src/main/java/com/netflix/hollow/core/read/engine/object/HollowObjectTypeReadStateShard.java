@@ -25,6 +25,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -265,16 +266,33 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
 
     public long getApproximateHoleCostInBytes(BitSet populatedOrdinals, int shardNumber, int numShards) {
         long holeBits = 0;
-        
+
         int holeOrdinal = populatedOrdinals.nextClearBit(0);
         while(holeOrdinal <= dataElements.maxOrdinal) {
             if((holeOrdinal & (numShards - 1)) == shardNumber)
                 holeBits += dataElements.bitsPerRecord;
-            
+
             holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
         }
-        
+
         return holeBits / 8;
     }
-    
+
+    /**
+     * Update the schema of this shard during delta application.
+     */
+    public void updateSchema(HollowObjectSchema newSchema) {
+        try {
+            Field schemaField = HollowObjectTypeReadStateShard.class.getDeclaredField("schema");
+            schemaField.setAccessible(true);
+            schemaField.set(this, newSchema);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to update shard schema", e);
+        }
+
+        if (dataElements != null) {
+            dataElements.updateSchema(newSchema);
+        }
+    }
+
 }
