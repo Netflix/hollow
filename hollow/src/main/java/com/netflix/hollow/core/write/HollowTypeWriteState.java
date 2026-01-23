@@ -34,6 +34,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -72,8 +73,12 @@ public abstract class HollowTypeWriteState {
 
 
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
+        this(schema, numShards, null);
+    }
+
+    public HollowTypeWriteState(HollowSchema schema, int numShards, Supplier<Boolean> ignoreOrdinalThresholdBreach) {
         this.schema = schema;
-        this.ordinalMap = new ByteArrayOrdinalMap();
+        this.ordinalMap = new ByteArrayOrdinalMap(256, ignoreOrdinalThresholdBreach);
         this.serializedScratchSpace = new ThreadLocal<ByteDataArray>();
         this.currentCyclePopulated = new ThreadSafeBitSet();
         this.previousCyclePopulated = new ThreadSafeBitSet();

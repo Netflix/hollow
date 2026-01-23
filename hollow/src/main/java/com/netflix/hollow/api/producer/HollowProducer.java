@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 /**
  * A HollowProducer is the top-level class used by producers of Hollow data to populate, publish, and announce data states.
@@ -752,6 +753,7 @@ public class HollowProducer extends AbstractHollowProducer {
         boolean doIntegrityCheck = true;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
+        Supplier<Boolean> ignoreOrdinalThresholdBreach = null;
 
         protected HollowProducerEventListener customProducerMetricsListener = null;
 
@@ -970,6 +972,19 @@ public class HollowProducer extends AbstractHollowProducer {
 
         public B withUpdatePlanVerifier(HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
             this.updatePlanBlobVerifier = updatePlanBlobVerifier;
+            return (B) this;
+        }
+
+        /**
+         * Configures the producer to use a supplier that determines whether to ignore ordinal threshold breaches.
+         * When the supplier returns true, a warning will be logged instead of throwing an exception
+         * when the SINGLE_PARTITION_ORDINAL_LIMIT is exceeded.
+         *
+         * @param ignoreOrdinalThresholdBreach the supplier that returns true to ignore threshold breaches
+         * @return this builder
+         */
+        public B withIgnoreOrdinalThresholdBreachConfig(Supplier<Boolean> ignoreOrdinalThresholdBreach) {
+            this.ignoreOrdinalThresholdBreach = ignoreOrdinalThresholdBreach;
             return (B) this;
         }
 

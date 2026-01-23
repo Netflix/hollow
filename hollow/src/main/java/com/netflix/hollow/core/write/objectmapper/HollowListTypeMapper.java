@@ -55,7 +55,8 @@ public class HollowListTypeMapper extends HollowTypeMapper {
         this.ignoreListOrdering = ignoreListOrdering;
 
         HollowListTypeWriteState existingTypeState = (HollowListTypeWriteState)parentMapper.getStateEngine().getTypeState(typeName);
-        this.writeState = existingTypeState != null ? existingTypeState : new HollowListTypeWriteState(schema, numShards);
+        this.writeState = existingTypeState != null ? existingTypeState : new HollowListTypeWriteState(schema, numShards,
+                parentMapper.getStateEngine().getIgnoreOrdinalThresholdBreach());
     }
 
     @Override
