@@ -177,10 +177,10 @@ public class ByteArrayOrdinalMap {
 
         if (ordinal > SINGLE_PARTITION_ORDINAL_LIMIT) {
             String message = String.format(
-                    "Ordinal %s exceeds the single partition ordinal limit of %s. " +
-                    "Consider using multiple partitions or reducing the data size.",
+                    "Ordinal %d exceeds the ordinal limit of %d.",
                     ordinal, SINGLE_PARTITION_ORDINAL_LIMIT);
-            if (ignoreOrdinalThresholdBreach != null && Boolean.TRUE.equals(ignoreOrdinalThresholdBreach.get())) {
+            if (ignoreOrdinalThresholdBreach != null &&
+                    Boolean.TRUE.equals(ignoreOrdinalThresholdBreach.get())) {
                 LOG.log(Level.WARNING, message);
             } else {
                 throw new IllegalStateException(message);
@@ -354,7 +354,7 @@ public class ByteArrayOrdinalMap {
      * Create an array mapping the ordinals to pointers, so that they can be easily looked up
      * when writing to blob streams.
      */
-    public void prepareForWrite() {
+    public int prepareForWrite() {
         int maxOrdinal = 0;
         AtomicLongArray pao = pointersAndOrdinals;
 
@@ -380,6 +380,7 @@ public class ByteArrayOrdinalMap {
         }
 
         pointersByOrdinal = pbo;
+        return maxOrdinal;
     }
 
     /**
@@ -640,4 +641,11 @@ public class ByteArrayOrdinalMap {
         return (int) (pointerAndOrdinal >>> BITS_PER_POINTER);
     }
 
+    public long getByteDataLength() {
+        return byteData.length();
+    }
+
+    public float getLoadFactor() {
+        return (float) size / pointersAndOrdinals.length();
+    }
 }

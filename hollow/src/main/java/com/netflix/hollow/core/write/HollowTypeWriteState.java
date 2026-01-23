@@ -21,6 +21,7 @@ import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavi
 
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
+import com.netflix.hollow.core.memory.ByteArrayOrdinalMapStats;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
@@ -311,7 +312,8 @@ public abstract class HollowTypeWriteState {
             }
         }
 
-        ordinalMap.prepareForWrite();
+        this.maxOrdinal = ordinalMap.prepareForWrite();
+        gatherShardingStats(maxOrdinal, canReshard);
         wroteData = true;
     }
 
@@ -465,12 +467,18 @@ public abstract class HollowTypeWriteState {
         }
     }
 
-    public int getMaxOrdinalAfterWritePreparation() {
+    /**
+     * Returns statistics for this instance {@link ordinalMap}.
+     *
+     * @return a {@link ByteArrayOrdinalMapStats} containing map statistics
+     */
+    public ByteArrayOrdinalMapStats getOrdinalMapStatsAfterPreparation() {
         if (!wroteData) {
-            throw new IllegalStateException("");
+            throw new IllegalStateException("This HollowTypeWriteState instance has not been prepare for write yet."
+            + " Invoke this method after the completion of prepareForWrite.");
         }
 
-        return this.maxOrdinal;
+        return new ByteArrayOrdinalMapStats(maxOrdinal, ordinalMap.getByteDataLength(), ordinalMap.getLoadFactor());
     }
 
     protected abstract int typeStateNumShards(int maxOrdinal);
