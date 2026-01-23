@@ -75,6 +75,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         super.prepareForWrite(canReshard);
 
         gatherFieldStats();
+        gatherShardingStats(maxOrdinal, canReshard);
     }
 
     private void gatherFieldStats() {

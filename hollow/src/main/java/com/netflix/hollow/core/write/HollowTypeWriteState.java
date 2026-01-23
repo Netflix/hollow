@@ -313,7 +313,6 @@ public abstract class HollowTypeWriteState {
         }
 
         this.maxOrdinal = ordinalMap.prepareForWrite();
-        gatherShardingStats(maxOrdinal, canReshard);
         wroteData = true;
     }
 

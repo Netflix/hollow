@@ -67,6 +67,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     public void prepareForWrite(boolean canReshard) {
         super.prepareForWrite(canReshard);
 
+        gatherShardingStats(maxOrdinal, canReshard);
         gatherStatistics(numShards != revNumShards);
     }
 
