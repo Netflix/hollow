@@ -50,6 +50,7 @@ public abstract class HollowTypeWriteState {
 
     protected final ByteArrayOrdinalMap ordinalMap;
     protected int maxOrdinal;
+    private final Supplier<Boolean> ignoreOrdinalThresholdBreach;
 
     protected int numShards;
     protected int revNumShards;
@@ -79,7 +80,8 @@ public abstract class HollowTypeWriteState {
 
     public HollowTypeWriteState(HollowSchema schema, int numShards, Supplier<Boolean> ignoreOrdinalThresholdBreach) {
         this.schema = schema;
-        this.ordinalMap = new ByteArrayOrdinalMap(256, ignoreOrdinalThresholdBreach);
+        this.ignoreOrdinalThresholdBreach = ignoreOrdinalThresholdBreach;
+        this.ordinalMap = new ByteArrayOrdinalMap(ignoreOrdinalThresholdBreach);
         this.serializedScratchSpace = new ThreadLocal<ByteDataArray>();
         this.currentCyclePopulated = new ThreadSafeBitSet();
         this.previousCyclePopulated = new ThreadSafeBitSet();
@@ -374,7 +376,7 @@ public abstract class HollowTypeWriteState {
 
         // Size the restore ordinal map to avoid resizing when adding ordinals
         int size = populatedOrdinals.cardinality();
-        restoredMap = new ByteArrayOrdinalMap(size);
+        restoredMap = new ByteArrayOrdinalMap(size, ignoreOrdinalThresholdBreach);
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != -1) {
             previousCyclePopulated.set(ordinal);

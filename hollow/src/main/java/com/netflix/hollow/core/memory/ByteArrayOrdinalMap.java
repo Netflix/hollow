@@ -67,11 +67,23 @@ public class ByteArrayOrdinalMap {
     private long[] pointersByOrdinal;
 
     /**
-     * Creates a byte array ordinal map with a an initial capacity of 256 elements,
+     * Creates a byte array ordinal map with an initial capacity of 256 elements,
      * and a load factor of 70%.
      */
     public ByteArrayOrdinalMap() {
         this(256);
+    }
+
+    /**
+     * Creates a byte array ordinal map with an initial capacity of a given size
+     * rounded up to the nearest power of two, a load factor of 70%, and a configurable
+     * supplier to determine whether to ignore ordinal threshold breaches.
+     *
+     * @param ignoreOrdinalThresholdBreach a supplier that returns true to log a warning instead of
+     *                                      throwing an exception when SINGLE_PARTITION_ORDINAL_LIMIT is exceeded
+     */
+    public ByteArrayOrdinalMap(Supplier<Boolean> ignoreOrdinalThresholdBreach) {
+        this(256, ignoreOrdinalThresholdBreach);
     }
 
     /**

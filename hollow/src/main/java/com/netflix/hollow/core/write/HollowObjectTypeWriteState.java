@@ -50,6 +50,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         this(schema, -1);
     }
 
+    // visible for test purpose
     public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards) {
         super(schema, numShards);
     }
