@@ -367,7 +367,7 @@ public class ByteArrayOrdinalMap {
      * when writing to blob streams.
      */
     public int prepareForWrite() {
-        int maxOrdinal = 0;
+        int maxOrdinal = -1;
         AtomicLongArray pao = pointersAndOrdinals;
 
         for (int i = 0; i < pao.length(); i++) {
@@ -380,7 +380,13 @@ public class ByteArrayOrdinalMap {
             }
         }
 
-        long[] pbo = new long[maxOrdinal + 1];
+        long[] pbo;
+        if (maxOrdinal == -1) {
+            pbo = new long[1];
+        } else {
+            pbo = new long[maxOrdinal + 1];
+        }
+
         Arrays.fill(pbo, -1);
 
         for (int i = 0; i < pao.length(); i++) {
@@ -478,22 +484,6 @@ public class ByteArrayOrdinalMap {
 
     public long getDataSize() {
         return byteData.length();
-    }
-
-    public int maxOrdinal() {
-        int maxOrdinal = -1;
-        AtomicLongArray pao = pointersAndOrdinals;
-
-        for (int i = 0; i < pao.length(); i++) {
-            long key = pao.get(i);
-            if (key != EMPTY_BUCKET_VALUE) {
-                int ordinal = (int) (key >>> BITS_PER_POINTER);
-                if (ordinal > maxOrdinal) {
-                    maxOrdinal = ordinal;
-                }
-            }
-        }
-        return maxOrdinal;
     }
 
     /**
