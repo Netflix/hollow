@@ -21,6 +21,7 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -49,7 +50,8 @@ public class ByteArrayOrdinalMap {
     private static final long POINTER_MASK = (1L << BITS_PER_POINTER) - 1;
     private static final long ORDINAL_MASK = (1L << BITS_PER_ORDINAL) - 1;
     private static final long MAX_BYTE_DATA_LENGTH = 1L << BITS_PER_POINTER;
-    private static final int SINGLE_PARTITION_ORDINAL_LIMIT = 1 << 28;
+    //
+    private static final int SOFT_ORDINAL_LIMIT = 1 << (BITS_PER_ORDINAL - 1);
 
     /// Thread safety:  We need volatile access semantics to the individual elements in the
     /// pointersAndOrdinals array.
@@ -187,15 +189,13 @@ public class ByteArrayOrdinalMap {
                     ordinal, ORDINAL_MASK));
         }
 
-        if (ordinal > SINGLE_PARTITION_ORDINAL_LIMIT) {
-            String message = String.format(
-                    "Ordinal %d exceeds the ordinal limit of %d.",
-                    ordinal, SINGLE_PARTITION_ORDINAL_LIMIT);
-            if (ignoreOrdinalThresholdBreach != null &&
-                    Boolean.TRUE.equals(ignoreOrdinalThresholdBreach.get())) {
-                LOG.log(Level.WARNING, message);
+        if (ordinal > SOFT_ORDINAL_LIMIT) {
+            if (ignoreOrdinalThresholdBreach != null && Boolean.TRUE.equals(ignoreOrdinalThresholdBreach.get())) {
+                LOG.log(Level.WARNING, String.format("Ordinal %d exceeds the soft ordinal limit of %d.",
+                        ordinal, SOFT_ORDINAL_LIMIT));
             } else {
-                throw new IllegalStateException(message);
+                throw new IllegalStateException(String.format("Ordinal %d exceeds the soft ordinal limit of %d.",
+                        ordinal, SOFT_ORDINAL_LIMIT));
             }
         }
 
