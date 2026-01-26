@@ -25,7 +25,6 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.function.Supplier;
 
 public class HollowListTypeWriteState extends HollowTypeWriteState {
 
@@ -52,10 +51,6 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
     
     public HollowListTypeWriteState(HollowListSchema schema, int numShards) {
         super(schema, numShards);
-    }
-
-    public HollowListTypeWriteState(HollowListSchema schema, int numShards, Supplier<Boolean> ignoreOrdinalThresholdBreach) {
-        super(schema, numShards, ignoreOrdinalThresholdBreach);
     }
 
     @Override

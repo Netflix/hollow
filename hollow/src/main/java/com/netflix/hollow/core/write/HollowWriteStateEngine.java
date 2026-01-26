@@ -36,7 +36,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 /**
@@ -75,8 +74,6 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private boolean focusHoleFillInFewestShards = false;
     //// adjust number of shards per type during the course of the delta chain to realize consumer-side delta applications at constant space overhead
     private boolean allowTypeResharding = false;
-    //// supplier to determine whether to ignore ordinal threshold breaches (log warning instead of throwing exception)
-    private Supplier<Boolean> ignoreOrdinalThresholdBreach;
 
     private List<String> restoredStates;
     private boolean preparedForNextCycle = true;
@@ -466,21 +463,6 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
     boolean isFocusHoleFillInFewestShards() {
         return focusHoleFillInFewestShards;
-    }
-
-    /**
-     * Sets a supplier that determines whether to ignore ordinal threshold breaches.
-     * When the supplier returns true, a warning will be logged instead of throwing an exception
-     * when the SINGLE_PARTITION_ORDINAL_LIMIT is exceeded.
-     *
-     * @param ignoreOrdinalThresholdBreach the supplier that returns true to ignore threshold breaches
-     */
-    public void setIgnoreOrdinalThresholdBreach(Supplier<Boolean> ignoreOrdinalThresholdBreach) {
-        this.ignoreOrdinalThresholdBreach = ignoreOrdinalThresholdBreach;
-    }
-
-    public Supplier<Boolean> getIgnoreOrdinalThresholdBreach() {
-        return ignoreOrdinalThresholdBreach;
     }
 
     private long mintNewRandomizedStateTag() {

@@ -21,11 +21,7 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLongArray;
-import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This data structure maps byte sequences to ordinals.  This is a hash table.
@@ -41,8 +37,6 @@ import java.util.logging.Logger;
  */
 public class ByteArrayOrdinalMap {
 
-    private static final Logger LOG = Logger.getLogger(ByteArrayOrdinalMap.class.getName());
-
     private static final long EMPTY_BUCKET_VALUE = -1L;
 
     private static final int BITS_PER_ORDINAL = 29;
@@ -50,8 +44,6 @@ public class ByteArrayOrdinalMap {
     private static final long POINTER_MASK = (1L << BITS_PER_POINTER) - 1;
     private static final long ORDINAL_MASK = (1L << BITS_PER_ORDINAL) - 1;
     private static final long MAX_BYTE_DATA_LENGTH = 1L << BITS_PER_POINTER;
-    //
-    private static final int SOFT_ORDINAL_LIMIT = 1 << (BITS_PER_ORDINAL - 1);
 
     /// Thread safety:  We need volatile access semantics to the individual elements in the
     /// pointersAndOrdinals array.
@@ -60,7 +52,6 @@ public class ByteArrayOrdinalMap {
     private volatile AtomicLongArray pointersAndOrdinals;
     private final ByteDataArray byteData;
     private final FreeOrdinalTracker freeOrdinalTracker;
-    private final Supplier<Boolean> ignoreOrdinalThresholdBreach;
     private int size;
     private int sizeBeforeGrow;
 
@@ -78,34 +69,9 @@ public class ByteArrayOrdinalMap {
 
     /**
      * Creates a byte array ordinal map with an initial capacity of a given size
-     * rounded up to the nearest power of two, a load factor of 70%, and a configurable
-     * supplier to determine whether to ignore ordinal threshold breaches.
-     *
-     * @param ignoreOrdinalThresholdBreach a supplier that returns true to log a warning instead of
-     *                                      throwing an exception when SINGLE_PARTITION_ORDINAL_LIMIT is exceeded
-     */
-    public ByteArrayOrdinalMap(Supplier<Boolean> ignoreOrdinalThresholdBreach) {
-        this(256, ignoreOrdinalThresholdBreach);
-    }
-
-    /**
-     * Creates a byte array ordinal map with an initial capacity of a given size
      * rounded up to the nearest power of two, and a load factor of 70%.
      */
     public ByteArrayOrdinalMap(int size) {
-        this(size, null);
-    }
-
-    /**
-     * Creates a byte array ordinal map with an initial capacity of a given size
-     * rounded up to the nearest power of two, a load factor of 70%, and a configurable
-     * supplier to determine whether to ignore ordinal threshold breaches.
-     *
-     * @param size the initial capacity
-     * @param ignoreOrdinalThresholdBreach a supplier that returns true to log a warning instead of
-     *                                      throwing an exception when SINGLE_PARTITION_ORDINAL_LIMIT is exceeded
-     */
-    public ByteArrayOrdinalMap(int size, Supplier<Boolean> ignoreOrdinalThresholdBreach) {
         size = bucketSize(size);
 
         this.freeOrdinalTracker = new FreeOrdinalTracker();
@@ -113,7 +79,6 @@ public class ByteArrayOrdinalMap {
         this.pointersAndOrdinals = emptyKeyArray(size);
         this.sizeBeforeGrow = (int) (((float) size) * 0.7); /// 70% load factor
         this.size = 0;
-        this.ignoreOrdinalThresholdBreach = ignoreOrdinalThresholdBreach;
     }
 
     private static int bucketSize(int x) {
@@ -187,16 +152,6 @@ public class ByteArrayOrdinalMap {
             throw new IllegalStateException(String.format(
                     "Ordinal cannot be assigned. The to be assigned ordinal, %s, is greater than the maximum supported ordinal value of %s",
                     ordinal, ORDINAL_MASK));
-        }
-
-        if (ordinal > SOFT_ORDINAL_LIMIT) {
-            if (ignoreOrdinalThresholdBreach != null && Boolean.TRUE.equals(ignoreOrdinalThresholdBreach.get())) {
-                LOG.log(Level.WARNING, String.format("Ordinal %d exceeds the soft ordinal limit of %d.",
-                        ordinal, SOFT_ORDINAL_LIMIT));
-            } else {
-                throw new IllegalStateException(String.format("Ordinal %d exceeds the soft ordinal limit of %d.",
-                        ordinal, SOFT_ORDINAL_LIMIT));
-            }
         }
 
         long pointer = byteData.length();

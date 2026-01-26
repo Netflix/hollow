@@ -35,7 +35,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,7 +49,6 @@ public abstract class HollowTypeWriteState {
 
     protected final ByteArrayOrdinalMap ordinalMap;
     protected int maxOrdinal;
-    private final Supplier<Boolean> ignoreOrdinalThresholdBreach;
 
     protected int numShards;
     protected int revNumShards;
@@ -75,13 +73,8 @@ public abstract class HollowTypeWriteState {
 
 
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
-        this(schema, numShards, null);
-    }
-
-    public HollowTypeWriteState(HollowSchema schema, int numShards, Supplier<Boolean> ignoreOrdinalThresholdBreach) {
         this.schema = schema;
-        this.ignoreOrdinalThresholdBreach = ignoreOrdinalThresholdBreach;
-        this.ordinalMap = new ByteArrayOrdinalMap(ignoreOrdinalThresholdBreach);
+        this.ordinalMap = new ByteArrayOrdinalMap();
         this.serializedScratchSpace = new ThreadLocal<ByteDataArray>();
         this.currentCyclePopulated = new ThreadSafeBitSet();
         this.previousCyclePopulated = new ThreadSafeBitSet();
@@ -376,7 +369,7 @@ public abstract class HollowTypeWriteState {
 
         // Size the restore ordinal map to avoid resizing when adding ordinals
         int size = populatedOrdinals.cardinality();
-        restoredMap = new ByteArrayOrdinalMap(size, ignoreOrdinalThresholdBreach);
+        restoredMap = new ByteArrayOrdinalMap(size);
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != -1) {
             previousCyclePopulated.set(ordinal);
@@ -469,7 +462,7 @@ public abstract class HollowTypeWriteState {
     }
 
     /**
-     * Returns statistics for this instance {@link ordinalMap}.
+     * Returns statistics for this instance's {@link ByteArrayOrdinalMap}.
      *
      * @return a {@link ByteArrayOrdinalMapStats} containing map statistics
      */

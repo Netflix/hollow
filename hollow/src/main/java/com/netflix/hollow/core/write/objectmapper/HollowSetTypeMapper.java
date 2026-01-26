@@ -58,8 +58,7 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
         this.hashCodeFinder = stateEngine.getHashCodeFinder();
 
         HollowSetTypeWriteState existingTypeState = (HollowSetTypeWriteState) parentMapper.getStateEngine().getTypeState(typeName);
-        this.writeState = existingTypeState != null ? existingTypeState : new HollowSetTypeWriteState(schema, numShards,
-                parentMapper.getStateEngine().getIgnoreOrdinalThresholdBreach());
+        this.writeState = existingTypeState != null ? existingTypeState : new HollowSetTypeWriteState(schema, numShards);
     }
 
     @Override
