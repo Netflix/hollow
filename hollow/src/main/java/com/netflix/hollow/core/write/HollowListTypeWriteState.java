@@ -68,7 +68,7 @@ public class HollowListTypeWriteState extends HollowTypeWriteState {
             int localMaxOrdinal = ordinalMaps[mapIdx].maxOrdinal();
             if (localMaxOrdinal != -1) {
                 // Convert local ordinal to global interleaved ordinal
-                int globalOrdinal = (localMaxOrdinal * numMaps) + mapIdx;
+                int globalOrdinal = (localMaxOrdinal * ORDINAL_MAP_NUM) + mapIdx;
                 if (globalOrdinal > maxOrdinal) {
                     maxOrdinal = globalOrdinal;
                 }
