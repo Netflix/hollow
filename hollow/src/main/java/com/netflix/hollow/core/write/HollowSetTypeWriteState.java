@@ -27,6 +27,7 @@ import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.schema.HollowSetSchema;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -67,8 +68,8 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     }
 
     @Override
-    public void prepareForWrite(boolean canReshard) {
-        super.prepareForWrite(canReshard);
+    public void prepareForWrite(boolean canReshard, SimultaneousExecutor executor) {
+        super.prepareForWrite(canReshard, executor);
 
         // Compute maxOrdinal based on the max translated ordinal across all ordinal maps
         maxOrdinal = -1;

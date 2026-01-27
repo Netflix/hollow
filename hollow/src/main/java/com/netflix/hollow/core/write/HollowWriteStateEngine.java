@@ -198,18 +198,23 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         addTypeNamesWithDefinedHashCodesToHeader();
 
         try {
-            SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "prepare-for-write");
+            // Use a larger thread pool to accommodate nested ordinal map tasks
+            // Each type task may submit up to ORDINAL_MAP_NUM (4) additional tasks
+            SimultaneousExecutor executor = new SimultaneousExecutor(2.0d, getClass(), "prepare-for-write");
 
             for(final Map.Entry<String, HollowTypeWriteState> typeStateEntry : writeStates.entrySet()) {
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        typeStateEntry.getValue().prepareForWrite(canReshard);
+                        typeStateEntry.getValue().prepareForWrite(canReshard, executor);
                     }
                 });
             }
 
-            executor.awaitSuccessfulCompletion();
+            // Wait for all submitted tasks including nested ordinal map tasks
+            // This method doesn't shutdown the executor, allowing nested tasks to be submitted
+            executor.awaitSuccessfulCompletionOfCurrentTasks();
+            executor.shutdown();
         } catch(Exception ex) {
             throw new HollowWriteStateException("Failed to prepare for write", ex);
         }

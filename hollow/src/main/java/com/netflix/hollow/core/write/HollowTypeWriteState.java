@@ -31,6 +31,7 @@ import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.copy.HollowRecordCopier;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -364,7 +365,7 @@ public abstract class HollowTypeWriteState {
         resetToLastNumShards = numShards; // -1 if first cycle else previous numShards. See {@code testNumShardsMaintainedWhenNoResharding}
     }
 
-    public void prepareForWrite(boolean canReshard) {
+    public void prepareForWrite(boolean canReshard, SimultaneousExecutor executor) {
         /// write all the unused objects to the current ordinalMap, without updating the current cycle bitset,
         /// this way we can do a reverse delta.
         if(isRestored() && !wroteData) {
@@ -386,9 +387,16 @@ public abstract class HollowTypeWriteState {
             }
         }
 
-        // Prepare all maps for writing
-        for (int i = 0; i < ORDINAL_MAP_NUM; i++) {
-            ordinalMaps[i].prepareForWrite();
+        // Prepare all maps for writing - run concurrently if executor is provided
+        if (executor != null) {
+            for (int i = 0; i < ORDINAL_MAP_NUM; i++) {
+                final int mapIdx = i;
+                executor.execute(() -> ordinalMaps[mapIdx].prepareForWrite());
+            }
+        } else {
+            for (int i = 0; i < ORDINAL_MAP_NUM; i++) {
+                ordinalMaps[i].prepareForWrite();
+            }
         }
         wroteData = true;
     }
