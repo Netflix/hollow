@@ -101,6 +101,7 @@ abstract class AbstractHollowProducer {
     private final boolean focusHoleFillInFewestShards;
     private final boolean allowTypeResharding;
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
+    private final Supplier<Boolean> ignoreOrdinalThresholdBreach;
 
     @Deprecated
     public AbstractHollowProducer(
@@ -164,6 +165,7 @@ abstract class AbstractHollowProducer {
         this.allowTypeResharding = allowTypeResharding;
         this.forceCoverageOfTypeResharding = forceCoverageOfTypeResharding;
         this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
+        this.ignoreOrdinalThresholdBreach = ignoreOrdinalThresholdBreach;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
                 ? new HollowWriteStateEngine()
@@ -329,6 +331,7 @@ abstract class AbstractHollowProducer {
                 writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
                 writeEngine.allowTypeResharding(allowTypeResharding);
                 writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
+                writeEngine.setIgnoreOrdinalThresholdBreach(ignoreOrdinalThresholdBreach);
                 HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, schemas);
                 HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);
                 if (hashCodeFinder != null) {
