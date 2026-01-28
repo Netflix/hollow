@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
  * record's type will never fail.
  */
 public class DuplicateDataDetectionValidator implements ValidatorListener {
+    private static final int MAX_DISPLAYED_DUPLICATE_KEYS = 100;
     private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT =
             "Duplicate keys found for type %s. Primarykey in schema is %s. "
                     + "Duplicate IDs are: %s";
@@ -189,7 +190,17 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
     }
 
     private String duplicateKeysToString(Collection<Object[]> duplicateKeys) {
-        return duplicateKeys.stream().map(Arrays::toString).collect(Collectors.joining(","));
+        long totalCount = duplicateKeys.size();
+        String duplicateKeysString = duplicateKeys.stream()
+                .limit(MAX_DISPLAYED_DUPLICATE_KEYS)
+                .map(Arrays::toString)
+                .collect(Collectors.joining(", "));
+
+        if (totalCount > MAX_DISPLAYED_DUPLICATE_KEYS) {
+            return String.format("%s ... (showing %d of %d duplicates)",
+                    duplicateKeysString, MAX_DISPLAYED_DUPLICATE_KEYS, totalCount);
+        }
+        return duplicateKeysString;
     }
 
     /**
