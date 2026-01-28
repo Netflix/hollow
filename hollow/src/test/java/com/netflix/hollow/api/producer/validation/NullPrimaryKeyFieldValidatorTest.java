@@ -154,6 +154,29 @@ public class NullPrimaryKeyFieldValidatorTest {
         }
     }
 
+    @Test
+    public void test_errorMessageIsTruncatedWhenThereAreManyNullKeys() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(new NullPrimaryKeyFieldValidator(TypeWithNullablePrimaryKeyAndData.class))
+                .build();
+
+        try {
+            producer.runCycle(state -> {
+                // Add 1000 records with null primary keys but different data fields
+                for (int i = 0; i < 1000; i++) {
+                    state.add(new TypeWithNullablePrimaryKeyAndData(null, "data" + i));
+                }
+            });
+            fail("Expected ValidationStatusException");
+        } catch (Exception e) {
+            assertTrue(e instanceof ValidationStatusException);
+            ValidationStatusException expected = (ValidationStatusException) e;
+            String message = expected.getValidationStatus().getResults().get(0).getMessage();
+            assertTrue(message.contains("showing 100 of 1000 null keys"));
+        }
+    }
+
 
     @HollowPrimaryKey(fields = "id")
     static class TypeWithSinglePrimaryKey {
@@ -189,6 +212,17 @@ public class NullPrimaryKeyFieldValidatorTest {
 
         public TypeWithoutPrimaryKey(Integer id) {
             this.id = id;
+        }
+    }
+
+    @HollowPrimaryKey(fields = "id")
+    static class TypeWithNullablePrimaryKeyAndData {
+        private final Integer id;
+        private final String data;
+
+        public TypeWithNullablePrimaryKeyAndData(Integer id, String data) {
+            this.id = id;
+            this.data = data;
         }
     }
 }

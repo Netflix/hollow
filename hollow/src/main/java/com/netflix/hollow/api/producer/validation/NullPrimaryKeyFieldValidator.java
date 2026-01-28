@@ -27,6 +27,7 @@ import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
  * instantiating this validator.
  */
 public class NullPrimaryKeyFieldValidator implements ValidatorListener {
+    private static final int MAX_DISPLAYED_NULL_KEYS = 100;
     private static final String NAME = NullPrimaryKeyFieldValidator.class.getName();
     private static final String NULL_PRIMARY_KEYS_FOUND_ERROR_MSG_FORMAT =
             "Null primary key fields found for type %s. Primary Key in schema is %s. "
@@ -171,10 +172,18 @@ public class NullPrimaryKeyFieldValidator implements ValidatorListener {
     }
 
     private String nullKeysToString(Map<Integer, Object[]> nullPrimaryKeyValues) {
-        return nullPrimaryKeyValues.entrySet().stream()
+        long totalCount = nullPrimaryKeyValues.size();
+        String nullPrimaryKeysString = nullPrimaryKeyValues.entrySet().stream()
+                .limit(MAX_DISPLAYED_NULL_KEYS)
                 .map(entry -> {
                     return "(ordinal=" + entry.getKey() + ", key=" + Arrays.toString(entry.getValue()) + ")";
                 })
                 .collect(Collectors.joining(", "));
+
+        if (totalCount > MAX_DISPLAYED_NULL_KEYS) {
+            return String.format("%s ... (showing %d of %d null keys)",
+                    nullPrimaryKeysString, MAX_DISPLAYED_NULL_KEYS, totalCount);
+        }
+        return nullPrimaryKeysString;
     }
 }
