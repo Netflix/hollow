@@ -27,6 +27,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,8 +50,13 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
         this(schema, -1);
     }
 
+    // visible for test purpose
     public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards) {
         super(schema, numShards);
+    }
+
+    public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards, Supplier<Boolean> ignoreOrdinalThresholdBreach) {
+        super(schema, numShards, ignoreOrdinalThresholdBreach);
     }
 
     @Override
@@ -69,7 +75,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     public void prepareForWrite(boolean canReshard) {
         super.prepareForWrite(canReshard);
 
-        maxOrdinal = ordinalMap.maxOrdinal();
         gatherFieldStats();
         gatherShardingStats(maxOrdinal, canReshard);
     }

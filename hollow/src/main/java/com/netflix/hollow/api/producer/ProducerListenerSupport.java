@@ -35,6 +35,8 @@ import com.netflix.hollow.api.producer.listener.RestoreListener;
 import com.netflix.hollow.api.producer.validation.ValidationStatus;
 import com.netflix.hollow.api.producer.validation.ValidationStatusListener;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -211,6 +213,10 @@ final class ProducerListenerSupport extends ListenerSupport {
 
             fire(PublishListener.class,
                     l -> l.onBlobStage(s, blob, elapsed));
+        }
+
+        void fireHeaderBlobPublish(HollowWriteStateEngine writeStateEngine) {
+            fire(PublishListener.class, l->l.onPublishHeaderBlob(writeStateEngine));
         }
 
 

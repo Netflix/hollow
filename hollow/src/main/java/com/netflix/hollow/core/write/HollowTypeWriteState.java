@@ -21,6 +21,7 @@ import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavi
 
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
+import com.netflix.hollow.core.memory.ByteArrayOrdinalMapStats;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
@@ -34,6 +35,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,6 +50,7 @@ public abstract class HollowTypeWriteState {
 
     protected final ByteArrayOrdinalMap ordinalMap;
     protected int maxOrdinal;
+    private final Supplier<Boolean> ignoreOrdinalThresholdBreachSupplier;
 
     protected int numShards;
     protected int revNumShards;
@@ -72,8 +75,13 @@ public abstract class HollowTypeWriteState {
 
 
     public HollowTypeWriteState(HollowSchema schema, int numShards) {
+        this(schema, numShards, null);
+    }
+
+    public HollowTypeWriteState(HollowSchema schema, int numShards, Supplier<Boolean> ignoreOrdinalThresholdBreachSupplier) {
         this.schema = schema;
-        this.ordinalMap = new ByteArrayOrdinalMap();
+        this.ignoreOrdinalThresholdBreachSupplier = ignoreOrdinalThresholdBreachSupplier;
+        this.ordinalMap = new ByteArrayOrdinalMap(ignoreOrdinalThresholdBreachSupplier == null ? false : ignoreOrdinalThresholdBreachSupplier.get());
         this.serializedScratchSpace = new ThreadLocal<ByteDataArray>();
         this.currentCyclePopulated = new ThreadSafeBitSet();
         this.previousCyclePopulated = new ThreadSafeBitSet();
@@ -155,11 +163,13 @@ public abstract class HollowTypeWriteState {
         if(restoredReadState == null) {
             currentCyclePopulated.clearAll();
             ordinalMap.compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
+            ordinalMap.setIgnoreOrdinalThresholdBreach(ignoreOrdinalThresholdBreachSupplier == null ? false : ignoreOrdinalThresholdBreachSupplier.get());
         } else {
             /// this state engine began the cycle as a restored state engine
             currentCyclePopulated.clearAll();
             previousCyclePopulated.clearAll();
             ordinalMap.compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
+            ordinalMap.setIgnoreOrdinalThresholdBreach(ignoreOrdinalThresholdBreachSupplier == null ? false : ignoreOrdinalThresholdBreachSupplier.get());
             restoreFrom(restoredReadState);
             wroteData = false;
         }
@@ -277,6 +287,7 @@ public abstract class HollowTypeWriteState {
      */
     public void prepareForNextCycle() {
         ordinalMap.compact(currentCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards());
+        ordinalMap.setIgnoreOrdinalThresholdBreach(ignoreOrdinalThresholdBreachSupplier == null ? false : ignoreOrdinalThresholdBreachSupplier.get());
 
         ThreadSafeBitSet temp = previousCyclePopulated;
         previousCyclePopulated = currentCyclePopulated;
@@ -306,7 +317,7 @@ public abstract class HollowTypeWriteState {
             }
         }
 
-        ordinalMap.prepareForWrite();
+        this.maxOrdinal = ordinalMap.prepareForWrite();
         wroteData = true;
     }
 
@@ -368,7 +379,7 @@ public abstract class HollowTypeWriteState {
 
         // Size the restore ordinal map to avoid resizing when adding ordinals
         int size = populatedOrdinals.cardinality();
-        restoredMap = new ByteArrayOrdinalMap(size);
+        restoredMap = new ByteArrayOrdinalMap(size, ignoreOrdinalThresholdBreachSupplier == null ? false : ignoreOrdinalThresholdBreachSupplier.get());
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != -1) {
             previousCyclePopulated.set(ordinal);
@@ -458,6 +469,16 @@ public abstract class HollowTypeWriteState {
         if (revNumShards > 0) {
             revMaxShardOrdinal = calcMaxShardOrdinal(maxOrdinal, revNumShards);
         }
+    }
+
+    /**
+     * Returns statistics for this instance {@code ordinalMap}.
+     * Should be invoked after {@code prepareForWrite}
+     *
+     * @return a {@link ByteArrayOrdinalMapStats} containing map statistics
+     */
+    public ByteArrayOrdinalMapStats getOrdinalMapStatsAfterPreparation() {
+        return new ByteArrayOrdinalMapStats(maxOrdinal, ordinalMap.getByteDataLength(), ordinalMap.getLoadFactor());
     }
 
     protected abstract int typeStateNumShards(int maxOrdinal);

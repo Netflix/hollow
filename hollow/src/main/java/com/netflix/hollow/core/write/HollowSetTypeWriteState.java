@@ -29,6 +29,7 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,6 +62,10 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         super(schema, numShards);
     }
 
+    public HollowSetTypeWriteState(HollowSetSchema schema, int numShards, Supplier<Boolean> ignoreOrdinalThresholdBreach) {
+        super(schema, numShards, ignoreOrdinalThresholdBreach);
+    }
+
     @Override
     public HollowSetSchema getSchema() {
         return (HollowSetSchema)schema;
@@ -70,7 +75,6 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     public void prepareForWrite(boolean canReshard) {
         super.prepareForWrite(canReshard);
 
-        maxOrdinal = ordinalMap.maxOrdinal();
         gatherShardingStats(maxOrdinal, canReshard);
         gatherStatistics(numShards != revNumShards);
     }
