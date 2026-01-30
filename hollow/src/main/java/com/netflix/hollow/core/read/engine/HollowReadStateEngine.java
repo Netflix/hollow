@@ -33,6 +33,7 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
+import com.netflix.hollow.core.write.HollowDeltaSchemaAppendConfig;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,6 +60,8 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     private ArraySegmentRecycler memoryRecycler;
     private Map<String,String> headerTags;
     private Set<String> typesWithDefinedHashCodes = new HashSet<String>();
+    private HollowDeltaSchemaAppendConfig deltaSchemaAppendConfig =
+        new HollowDeltaSchemaAppendConfig(false);
 
     private long currentRandomizedTag;
     private long originRandomizedTag;
@@ -277,6 +280,25 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     @Override
     public MissingDataHandler getMissingDataHandler() {
         return missingDataHandler;
+    }
+
+    /**
+     * Set the delta schema append configuration.
+     * When enabled, the consumer will read and apply appended data for new fields from delta blobs.
+     *
+     * @param config the configuration
+     */
+    public void setDeltaSchemaAppendConfig(HollowDeltaSchemaAppendConfig config) {
+        this.deltaSchemaAppendConfig = config;
+    }
+
+    /**
+     * Get the delta schema append configuration.
+     *
+     * @return the configuration
+     */
+    public HollowDeltaSchemaAppendConfig getDeltaSchemaAppendConfig() {
+        return deltaSchemaAppendConfig;
     }
 
     public void setHeaderTags(Map<String, String> headerTags) {

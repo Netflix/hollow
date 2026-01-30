@@ -42,9 +42,10 @@ import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.Map;
 
 /**
- * A {@link HollowTypeReadState} for OBJECT type records. 
+ * A {@link HollowTypeReadState} for OBJECT type records.
  */
 public class HollowObjectTypeReadState extends HollowTypeReadState implements HollowObjectTypeDataAccess {
     private final HollowObjectSchema unfilteredSchema;
@@ -166,6 +167,21 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
         if(shardsVolatile.shards.length == 1)
             maxOrdinal = shardsVolatile.shards[0].dataElements.maxOrdinal;
+
+        // Prepare data elements for appended field writes if delta schema append is enabled
+        if (stateEngine != null && stateEngine.getDeltaSchemaAppendConfig() != null &&
+            stateEngine.getDeltaSchemaAppendConfig().isEnabled()) {
+
+            // Prepare all shards for potential appended field writes
+            for (HollowObjectTypeReadStateShard shard : shardsVolatile.shards) {
+                HollowObjectTypeDataElements dataElements = shard.dataElements;
+
+                // Check if data elements need write preparation
+                if (dataElements.bitsPerRecord == 0) {
+                    dataElements.prepareForWrite();
+                }
+            }
+        }
     }
 
     public static void discardSnapshot(HollowBlobInput in, HollowObjectSchema schema, int numShards) throws IOException {

@@ -51,9 +51,14 @@ public class HollowBlobHeaderWriter {
         
         VarInt.writeVInt(dos, schemasData.length + 1); // plus one byte for new backwards compatibility envelope.
         dos.write(schemasData);
-        
+
         ///backwards compatibility -- new data can be added here by first indicating number of bytes used, will be skipped by existing readers.
-        VarInt.writeVInt(dos, 0);
+        if (header.hasAppendedSchemaData()) {
+            VarInt.writeVInt(dos, 1); // 1 byte follows
+            dos.writeByte(1); // flag value: 1 = has appended schema data
+        } else {
+            VarInt.writeVInt(dos, 0); // no bytes follow
+        }
 
         /// write the header tags -- intended to include input source data versions
         dos.writeShort(header.getHeaderTags().size());
