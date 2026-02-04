@@ -243,7 +243,7 @@ public class VarInt {
      * @param arr the byte data to read from
      * @param position the position in the byte data to read from
      * @param length the number of bytes that should be read
-     * @param output an array where outputs will be placed, which should be at least {@code length} long and zero.
+     * @param output an array where outputs will be placed, which should be at least {@code length} long.
      * @return the number of values written
      */
     public static int readVIntsInto(ByteData arr, long position, int length, int[] output) {
@@ -256,12 +256,24 @@ public class VarInt {
             output[i] = b;
         }
 
+        // Second loop handles multi-byte encoded values using branchless logic
         int count = i;
+        int accumulator = 0;
         for(; i < length; i++) {
             int b = arr.get(position + i);
 
-            output[count] = (output[count] << 7) | (b & 0x7f);
-            count += (~b >> 7) & 0x1;
+            // Accumulate the next 7 bits into the value
+            accumulator = (accumulator << 7) | (b & 0x7f);
+
+            // Check if this byte completes a value (continuation bit not set)
+            int isComplete = (~b >> 7) & 0x1;  // 1 if complete, 0 if continuing
+            output[count] = accumulator;        // Write current accumulator (may overwrite same position)
+            count += isComplete;                // Advance output position only when value is complete
+
+            // Clear accumulator for next value using sign extension trick:
+            // - If b has continuation bit (b negative): b >> 7 = 0xFFFFFFFF, keeps accumulator
+            // - If b completes value (b positive): b >> 7 = 0, clears accumulator
+            accumulator &= (b >> 7);
         }
 
         return count;
@@ -272,7 +284,7 @@ public class VarInt {
      * @param arr the byte data to read from
      * @param position the position in the byte data to read from
      * @param length the number of bytes that should be read
-     * @param output an array where outputs will be placed, which should be at least {@code length} long and zero.
+     * @param output an array where outputs will be placed, which should be at least {@code length} long.
      * @return the number of values written
      */
     public static int readVIntsInto(ByteData arr, long position, int length, char[] output) {
@@ -286,11 +298,22 @@ public class VarInt {
         }
 
         int count = i;
+        int accumulator = 0;
         for(; i < length; i++) {
             int b = arr.get(position + i);
 
-            output[count] = (char) ((output[count] << 7) | (b & 0x7f));
-            count += (~b >> 7) & 0x1;
+            // Accumulate the next 7 bits into the value
+            accumulator = (accumulator << 7) | (b & 0x7f);
+
+            // Check if this byte completes a value (continuation bit not set)
+            int isComplete = (~b >> 7) & 0x1;  // 1 if complete, 0 if continuing
+            output[count] = (char) accumulator; // Write current accumulator (may overwrite same position)
+            count += isComplete;                // Advance output position only when value is complete
+
+            // Clear accumulator for next value using sign extension trick:
+            // - If b has continuation bit (b negative): b >> 7 = 0xFFFFFFFF, keeps accumulator
+            // - If b completes value (b positive): b >> 7 = 0, clears accumulator
+            accumulator &= (b >> 7);
         }
 
         return count;

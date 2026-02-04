@@ -170,8 +170,6 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
         char[] chararr = HollowObjectTypeReadStateShard.chararr.get();
         if (length > chararr.length) {
             chararr = new char[length];
-        } else {
-            Arrays.fill(chararr, 0, length, '\0');
         }
 
         int count = VarInt.readVIntsInto(data, position, length, chararr);
