@@ -1,5 +1,7 @@
 package com.netflix.hollow.core.index;
 
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex.DuplicateKeyInfo;
+
 import java.util.Collection;
 
 /**
@@ -22,5 +24,5 @@ interface TestableUniqueKeyIndex {
 
     boolean containsDuplicates();
 
-    Collection<Object[]> getDuplicateKeys();
+    Collection<DuplicateKeyInfo> getDuplicateKeys();
 }

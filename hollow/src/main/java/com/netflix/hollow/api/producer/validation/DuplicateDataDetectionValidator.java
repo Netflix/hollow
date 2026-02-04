@@ -19,6 +19,7 @@ package com.netflix.hollow.api.producer.validation;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex.DuplicateKeyInfo;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -150,7 +151,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         String fieldPaths = Arrays.toString(primaryKey.getFieldPaths());
         vrb.detail(FIELD_PATH_NAME, fieldPaths);
 
-        Collection<Object[]> duplicateKeys = getDuplicateKeys(readState.getStateEngine(), primaryKey);
+        Collection<DuplicateKeyInfo> duplicateKeys = getDuplicateKeys(readState.getStateEngine(), primaryKey);
         if (!duplicateKeys.isEmpty()) {
             String message = String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths,
                     duplicateKeysToString(duplicateKeys));
@@ -160,7 +161,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         return vrb.passed();
     }
 
-    private Collection<Object[]> getDuplicateKeys(HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
+    private Collection<DuplicateKeyInfo> getDuplicateKeys(HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
         HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
         HollowPrimaryKeyIndex hollowPrimaryKeyIndex = typeState.getListener(HollowPrimaryKeyIndex.class);
         if (hollowPrimaryKeyIndex == null) {
@@ -189,18 +190,23 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         return result;
     }
 
-    private String duplicateKeysToString(Collection<Object[]> duplicateKeys) {
-        long totalCount = duplicateKeys.size();
+    private String duplicateKeysToString(Collection<DuplicateKeyInfo> duplicateKeys) {
+        long totalUniqueKeys = duplicateKeys.size();
+        long totalAffectedRecords = duplicateKeys.stream()
+                .mapToLong(DuplicateKeyInfo::getCount)
+                .sum();
+
         String duplicateKeysString = duplicateKeys.stream()
                 .limit(MAX_DISPLAYED_DUPLICATE_KEYS)
-                .map(Arrays::toString)
+                .map(DuplicateKeyInfo::toString)
                 .collect(Collectors.joining(", "));
 
-        if (totalCount > MAX_DISPLAYED_DUPLICATE_KEYS) {
-            return String.format("%s ... (showing %d of %d duplicates)",
-                    duplicateKeysString, MAX_DISPLAYED_DUPLICATE_KEYS, totalCount);
+        if (totalUniqueKeys > MAX_DISPLAYED_DUPLICATE_KEYS) {
+            return String.format("%s ... (%d unique duplicate keys affecting %d total records, showing %d)",
+                    duplicateKeysString, totalUniqueKeys, totalAffectedRecords, MAX_DISPLAYED_DUPLICATE_KEYS);
         }
-        return duplicateKeysString;
+        return String.format("%s (%d duplicate keys affecting %d records)",
+                duplicateKeysString, totalUniqueKeys, totalAffectedRecords);
     }
 
     /**

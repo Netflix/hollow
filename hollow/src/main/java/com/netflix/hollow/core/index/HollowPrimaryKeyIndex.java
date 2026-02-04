@@ -382,25 +382,36 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
     /**
      * @return any keys which are mapped to two or more records.
      */
-    public synchronized Collection<Object[]> getDuplicateKeys() {
+    public synchronized Collection<DuplicateKeyInfo> getDuplicateKeys() {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(hashTable.bitsPerElement == 0)
             return Collections.emptyList();
 
-        List<Object[]> duplicateKeys = new ArrayList<Object[]>();
+        BitSet counted = new BitSet();
+        List<DuplicateKeyInfo> duplicateKeys = new ArrayList<>();
 
         for(int i=0;i<hashTable.hashTableSize;i++) {
             int ordinal = (int)hashTable.hashTable.getElementValue((long)i * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
 
-            if(ordinal != -1) {
+            if(ordinal != -1 && !counted.get(ordinal)) {
+                Object[] currentKey = keyDeriver.getRecordKey(ordinal);
+                long count = 1;
+                counted.set(ordinal);
+
                 int compareBucket = (i+1) & hashTable.hashMask;
                 int compareOrdinal = (int)hashTable.hashTable.getElementValue((long)compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
                 while(compareOrdinal != -1) {
-                    if(recordsHaveEqualKeys(ordinal, compareOrdinal))
-                        duplicateKeys.add(keyDeriver.getRecordKey(ordinal));
+                    if(recordsHaveEqualKeys(ordinal, compareOrdinal)) {
+                        count++;
+                        counted.set(compareOrdinal);
+                    }
 
                     compareBucket = (compareBucket + 1) & hashTable.hashMask;
                     compareOrdinal = (int)hashTable.hashTable.getElementValue((long)compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+                }
+
+                if (count > 1) {
+                    duplicateKeys.add(new DuplicateKeyInfo(currentKey, count));
                 }
             }
         }
@@ -711,6 +722,30 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
             return false;
         return true;
     }
+
+    public static class DuplicateKeyInfo {
+        private final Object[] key;
+        private final long count;
+
+        public DuplicateKeyInfo(Object[] key, long count) {
+            this.key = key;
+            this.count = count;
+        }
+
+        public Object[] getKey() {
+            return key;
+        }
+
+        public long getCount() {
+            return count;
+        }
+
+        @Override
+        public String toString() {
+            return Arrays.toString(key) + " (count=" + count + ")";
+        }
+    }
+
 
     static class PrimaryKeyIndexHashTable {
         final FixedLengthElementArray hashTable;
