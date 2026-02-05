@@ -131,7 +131,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
         public void cleanup() {
             if (path != null) {
                 try {
-                    Files.delete(path);
+                    Files.deleteIfExists(path);
                 } catch (IOException e) {
                     throw new RuntimeException("Could not cleanup file: " + this.path, e);
                 }
@@ -299,7 +299,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
         private void cleanupFile(Path path) {
             try {
                 if (path != null)
-                    Files.delete(path);
+                    Files.deleteIfExists(path);
             } catch (IOException e) {
                 throw new RuntimeException("Could not cleanup file: " + this.path.toString(), e);
             }
