@@ -62,6 +62,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -100,6 +101,7 @@ abstract class AbstractHollowProducer {
     private final boolean focusHoleFillInFewestShards;
     private final boolean allowTypeResharding;
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
+    private final Supplier<Boolean> ignoreSoftLimits;
 
     @Deprecated
     public AbstractHollowProducer(
@@ -110,7 +112,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE);
+                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null);
     }
 
     // The only constructor should be that which accepts a builder
@@ -123,7 +125,7 @@ abstract class AbstractHollowProducer {
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
                 b.allowTypeResharding, b.forceCoverageOfTypeResharding,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
-                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier);
+                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits);
     }
 
     private final HollowProducerListener producerMetricsListener;
@@ -148,7 +150,8 @@ abstract class AbstractHollowProducer {
             SingleProducerEnforcer singleProducerEnforcer,
             HollowObjectHashCodeFinder hashCodeFinder,
             boolean doIntegrityCheck,
-            HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
+            HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier,
+            Supplier<Boolean> ignoreSoftLimits) {
         this.publisher = publisher;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
@@ -162,6 +165,7 @@ abstract class AbstractHollowProducer {
         this.allowTypeResharding = allowTypeResharding;
         this.forceCoverageOfTypeResharding = forceCoverageOfTypeResharding;
         this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
+        this.ignoreSoftLimits = ignoreSoftLimits;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
                 ? new HollowWriteStateEngine()
@@ -169,6 +173,7 @@ abstract class AbstractHollowProducer {
         writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
         writeEngine.allowTypeResharding(allowTypeResharding);
         writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
+        writeEngine.setIgnoreOrdinalLimits(ignoreSoftLimits);
 
         this.objectMapper = new HollowObjectMapper(writeEngine);
         if (hashCodeFinder != null) {
@@ -326,6 +331,7 @@ abstract class AbstractHollowProducer {
                 writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
                 writeEngine.allowTypeResharding(allowTypeResharding);
                 writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
+                writeEngine.setIgnoreOrdinalLimits(ignoreSoftLimits);
                 HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, schemas);
                 HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);
                 if (hashCodeFinder != null) {
@@ -639,6 +645,7 @@ abstract class AbstractHollowProducer {
      */
     void publish(ProducerListeners listeners, long toVersion, Artifacts artifacts) throws IOException {
         Status.StageBuilder psb = listeners.firePublishStart(toVersion);
+        PublishStageStats stats = null;
         try {
             // We want a header to be created for all states.
             artifacts.header = blobStager.openHeader(toVersion);
@@ -672,12 +679,16 @@ abstract class AbstractHollowProducer {
                 artifacts.markSnapshotPublishComplete();
                 numStatesUntilNextSnapshot = numStatesBetweenSnapshots;
             }
+
+            stats = new PublishStageStats.Builder().withStats(
+                    getWriteEngine().getOrdinalMapStats()
+            ).build();
             psb.success();
         } catch (Throwable throwable) {
             psb.fail(throwable);
             throw throwable;
         } finally {
-            listeners.firePublishComplete(psb);
+            listeners.firePublishComplete(psb, stats);
         }
     }
 

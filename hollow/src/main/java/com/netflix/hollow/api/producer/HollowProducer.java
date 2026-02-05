@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 /**
  * A HollowProducer is the top-level class used by producers of Hollow data to populate, publish, and announce data states.
@@ -752,6 +753,7 @@ public class HollowProducer extends AbstractHollowProducer {
         boolean doIntegrityCheck = true;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
+        Supplier<Boolean> ignoreSoftLimits = null;
 
         protected HollowProducerEventListener customProducerMetricsListener = null;
 
@@ -970,6 +972,18 @@ public class HollowProducer extends AbstractHollowProducer {
 
         public B withUpdatePlanVerifier(HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
             this.updatePlanBlobVerifier = updatePlanBlobVerifier;
+            return (B) this;
+        }
+
+        /**
+         * set the ignoreSoftLimits. When set to true, ignore soft limits like
+         * {@link com.netflix.hollow.core.memory.ByteArrayOrdinalMap} ordinal limit, instead of failing.
+         * @param ignoreSoftLimits the supplier for whether to ignore
+         * {@link com.netflix.hollow.core.memory.ByteArrayOrdinalMap} ordinal soft limit breaches
+         * @return this builder
+         */
+        public B withIgnoreSoftLimits(Supplier<Boolean> ignoreSoftLimits) {
+            this.ignoreSoftLimits = ignoreSoftLimits;
             return (B) this;
         }
 

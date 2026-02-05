@@ -100,16 +100,16 @@ public class HollowWriteStateCreator {
             if(stateEngine.getTypeState(schema.getName()) == null) {
                 switch(schema.getSchemaType()) {
                 case OBJECT:
-                    stateEngine.addTypeState(new HollowObjectTypeWriteState((HollowObjectSchema)schema));
+                    stateEngine.addTypeState(new HollowObjectTypeWriteState((HollowObjectSchema)schema, -1, stateEngine.getIgnoreOrdinalLimitsSupplier()));
                     break;
                 case LIST:
-                    stateEngine.addTypeState(new HollowListTypeWriteState((HollowListSchema)schema));
+                    stateEngine.addTypeState(new HollowListTypeWriteState((HollowListSchema)schema, -1, stateEngine.getIgnoreOrdinalLimitsSupplier()));
                     break;
                 case SET:
-                    stateEngine.addTypeState(new HollowSetTypeWriteState((HollowSetSchema)schema));
+                    stateEngine.addTypeState(new HollowSetTypeWriteState((HollowSetSchema)schema, -1, stateEngine.getIgnoreOrdinalLimitsSupplier()));
                     break;
                 case MAP:
-                    stateEngine.addTypeState(new HollowMapTypeWriteState((HollowMapSchema)schema));
+                    stateEngine.addTypeState(new HollowMapTypeWriteState((HollowMapSchema)schema, -1, stateEngine.getIgnoreOrdinalLimitsSupplier()));
                     break;
                 }
             }

@@ -19,6 +19,7 @@ package com.netflix.hollow.core.write;
 import com.netflix.hollow.api.error.HollowWriteStateException;
 import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.HollowStateEngine;
+import com.netflix.hollow.core.memory.ByteArrayOrdinalMapStats;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -36,6 +37,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 /**
@@ -74,6 +76,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private boolean focusHoleFillInFewestShards = false;
     //// adjust number of shards per type during the course of the delta chain to realize consumer-side delta applications at constant space overhead
     private boolean allowTypeResharding = false;
+    //// supplier to determine whether to ignore ordinal threshold breaches (log instead of throwing exception)
+    private Supplier<Boolean> ignoreSoftLimits;
 
     private List<String> restoredStates;
     private boolean preparedForNextCycle = true;
@@ -463,6 +467,42 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
     boolean isFocusHoleFillInFewestShards() {
         return focusHoleFillInFewestShards;
+    }
+
+    /**
+     * Sets a supplier that determines whether to ignore ordinal threshold breaches.
+     *
+     * @param ignoreSoftLimits the supplier that returns true to ignore threshold breaches
+     */
+    public void setIgnoreOrdinalLimits(Supplier<Boolean> ignoreSoftLimits) {
+        this.ignoreSoftLimits = ignoreSoftLimits;
+    }
+
+    public Supplier<Boolean> getIgnoreOrdinalLimitsSupplier() {
+        return ignoreSoftLimits;
+    }
+
+    /**
+     * Collect {@link ByteArrayOrdinalMapStats} for all the write states.
+     * Should only after {@code prepareForWrite} completes.
+     * @return a mapping from type name to {@link ByteArrayOrdinalMapStats}.
+     * Key and value from the mapping cannot be null.
+     */
+    public Map<String, ByteArrayOrdinalMapStats> getOrdinalMapStats() {
+        if (preparedForNextCycle) {
+            throw new IllegalStateException("Stats are only available during the write phase. " +
+                    "Call prepareForWrite() first to transition from 'adding records' phase to 'writing' phase.");
+        }
+
+        Map<String, ByteArrayOrdinalMapStats> stats = new HashMap<>();
+        for (Map.Entry<String, HollowTypeWriteState> typeStateEntry : writeStates.entrySet()) {
+            HollowTypeWriteState writeState = typeStateEntry.getValue();
+            if (writeState != null) {
+                stats.put(typeStateEntry.getKey(),  writeState.getOrdinalMapStats());
+            }
+        }
+
+        return stats;
     }
 
     private long mintNewRandomizedStateTag() {

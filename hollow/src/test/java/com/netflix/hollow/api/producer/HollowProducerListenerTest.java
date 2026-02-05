@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 
+import com.netflix.hollow.core.memory.ByteArrayOrdinalMapStats;
 import com.netflix.hollow.test.InMemoryBlobStore;
 import org.junit.Assert;
 import org.junit.Before;
@@ -247,9 +248,15 @@ public class HollowProducerListenerTest {
             }
 
             @Override public void onPublishComplete(Status status, long version, Duration elapsed) {
-                if (status.getCause() instanceof AssertionError) {
-                    return;
+                Assert.fail("onPublishComplete(Status status, long version, Duration elapsed) is deprecated.");
+            }
+
+            @Override public void onPublishComplete(Status status, long version, Duration elapsed, PublishStageStats publishStageStats) {
+                Map<String, ByteArrayOrdinalMapStats> stats = publishStageStats.getOrdinalMapStats();
+                for (Map.Entry<String, ByteArrayOrdinalMapStats> stat : stats.entrySet()) {
+                    Assert.assertTrue(stat.getValue().getMaxOrdinal() >= 0);
                 }
+
                 reportCaller();
                 Assert.assertTrue(callCount.containsKey("onBlobPublish"));
                 Assert.assertEquals(Status.StatusType.SUCCESS, status.getType());
@@ -299,8 +306,10 @@ public class HollowProducerListenerTest {
 
         producer.runCycle(ws -> ws.add(new Top(1)));
 
-        Assert.assertTrue(ls.callCount.entrySet().stream().filter(c -> !c.getKey().equals("onAnnouncementStart")).allMatch(c -> c.getValue() == 1));
-        Assert.assertEquals(ls.callCount.get("onAnnouncementStart").intValue(), 2);
+        Assert.assertTrue(ls.callCount.entrySet().stream().
+                filter(c -> !c.getKey().equals("onAnnouncementStart")).
+                allMatch(c -> c.getValue() == 1));
+        Assert.assertEquals(2, ls.callCount.get("onAnnouncementStart").intValue());
         Assert.assertEquals(16, ls.callCount.size());
 
     }
@@ -431,9 +440,15 @@ public class HollowProducerListenerTest {
             }
 
             @Override public void onPublishComplete(Status status, long version, Duration elapsed) {
-                if (status.getCause() instanceof AssertionError) {
-                    return;
+                Assert.fail("onPublishComplete(Status status, long version, Duration elapsed) is deprecated.");
+            }
+
+            @Override public void onPublishComplete(Status status, long version, Duration elapsed, PublishStageStats publishStageStats) {
+                Map<String, ByteArrayOrdinalMapStats> stats = publishStageStats.getOrdinalMapStats();
+                for (Map.Entry<String, ByteArrayOrdinalMapStats> stat : stats.entrySet()) {
+                    Assert.assertTrue(stat.getValue().getMaxOrdinal() >= 0);
                 }
+
                 reportCaller();
                 Assert.assertTrue(callCount.containsKey("onBlobPublish"));
                 Assert.assertEquals(Status.StatusType.SUCCESS, status.getType());
@@ -487,6 +502,8 @@ public class HollowProducerListenerTest {
                 .filter(e -> !e.getKey().equals("onBlobPublish"))
                 .map(Map.Entry::getValue)
                 .allMatch(c -> c == 1));
+        // onBlobStage and onBlobPublish invoked 3 times as for the second cycle, there are 3 blobs to be published:
+        // snapshot, delta, and reverse delta.
         Assert.assertEquals(3, ls.callCount.get("onBlobStage").intValue());
         Assert.assertEquals(3, ls.callCount.get("onBlobPublish").intValue());
         Assert.assertEquals(12, ls.callCount.size());
@@ -610,10 +627,14 @@ public class HollowProducerListenerTest {
             }
 
             @Override public void onPublishComplete(Status status, long version, Duration elapsed) {
-                if (status.getCause() instanceof AssertionError) {
-                    return;
-                }
-                Assert.fail();
+                Assert.fail("onPublishComplete(Status status, long version, Duration elapsed) is deprecated.");
+            }
+
+            @Override public void onPublishComplete(Status status, long version, Duration elapsed, PublishStageStats publishStageStats) {
+                reportCaller();
+                Assert.assertNull(publishStageStats);
+                Assert.assertEquals(Status.StatusType.FAIL, status.getType());
+                Assert.assertTrue(status.getCause() instanceof RejectedExecutionException);
             }
 
             @Override public void onValidationStatusStart(long version) {
@@ -838,6 +859,13 @@ public class HollowProducerListenerTest {
 
             @Override public void onPublishComplete(Status status, long version, Duration elapsed) {
                 reportCaller();
+                Assert.assertEquals(Status.StatusType.FAIL, status.getType());
+                Assert.assertTrue(status.getCause() instanceof RejectedExecutionException);
+            }
+
+            @Override public void onPublishComplete(Status status, long version, Duration elapsed, PublishStageStats publishStageStats) {
+                reportCaller();
+                Assert.assertNull(publishStageStats);
                 Assert.assertEquals(Status.StatusType.FAIL, status.getType());
                 Assert.assertTrue(status.getCause() instanceof RejectedExecutionException);
             }
