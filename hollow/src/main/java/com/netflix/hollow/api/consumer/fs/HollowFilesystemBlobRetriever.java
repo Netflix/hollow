@@ -354,9 +354,10 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                 long lastModifiedTime = Files.getLastModifiedTime(blobPath).toMillis();
                 long currentTime = System.currentTimeMillis();
                 if ((currentTime - lastModifiedTime) > existingBlobMaxAge.toMillis()) {
-                    Files.delete(blobPath);
-                    LOG.info("Deleted old blob: " + blobPath + " last modified at " +
-                            lastModifiedTime + " max age " + existingBlobMaxAge);
+                    boolean deleted = Files.deleteIfExists(blobPath);
+                    if (deleted) {
+                        LOG.info("Deleted old blob: " + blobPath + " last modified at " + lastModifiedTime + " max age " + existingBlobMaxAge);
+                    }
                 }
             }
         } catch (IOException ex) {
