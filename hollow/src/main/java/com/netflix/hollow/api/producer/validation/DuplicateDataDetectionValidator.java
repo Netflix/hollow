@@ -167,7 +167,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         if (hollowPrimaryKeyIndex == null) {
             hollowPrimaryKeyIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
         }
-        return hollowPrimaryKeyIndex.getDuplicateKeys();
+        return hollowPrimaryKeyIndex.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
     }
 
     @Override

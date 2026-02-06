@@ -24,5 +24,7 @@ interface TestableUniqueKeyIndex {
 
     boolean containsDuplicates();
 
-    Collection<DuplicateKeyInfo> getDuplicateKeys();
+    Collection<Object[]> getDuplicateKeys();
+
+    Collection<DuplicateKeyInfo> getDuplicateKeys(int maxDuplicateKeys);
 }

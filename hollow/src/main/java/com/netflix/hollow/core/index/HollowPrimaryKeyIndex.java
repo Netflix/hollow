@@ -382,15 +382,45 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
     /**
      * @return any keys which are mapped to two or more records.
      */
-    public synchronized Collection<DuplicateKeyInfo> getDuplicateKeys() {
+    public synchronized Collection<Object[]> getDuplicateKeys() {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(hashTable.bitsPerElement == 0)
+            return Collections.emptyList();
+
+        List<Object[]> duplicateKeys = new ArrayList<Object[]>();
+
+        for(int i=0;i<hashTable.hashTableSize;i++) {
+            int ordinal = (int)hashTable.hashTable.getElementValue((long)i * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+
+            if(ordinal != -1) {
+                int compareBucket = (i+1) & hashTable.hashMask;
+                int compareOrdinal = (int)hashTable.hashTable.getElementValue((long)compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+                while(compareOrdinal != -1) {
+                    if(recordsHaveEqualKeys(ordinal, compareOrdinal))
+                        duplicateKeys.add(keyDeriver.getRecordKey(ordinal));
+
+                    compareBucket = (compareBucket + 1) & hashTable.hashMask;
+                    compareOrdinal = (int)hashTable.hashTable.getElementValue((long)compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+                }
+            }
+        }
+
+        return duplicateKeys;
+    }
+
+    /**
+     * @param maxDuplicateKeys the maximum number of duplicate keys to find before stopping
+     * @return any keys which are mapped to two or more records, up to maxDuplicateKeys
+     */
+    public synchronized Collection<DuplicateKeyInfo> getDuplicateKeys(int maxDuplicateKeys) {
+        PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
+        if(hashTable.bitsPerElement == 0 || maxDuplicateKeys <= 0)
             return Collections.emptyList();
 
         BitSet counted = new BitSet();
         List<DuplicateKeyInfo> duplicateKeys = new ArrayList<>();
 
-        for(int i=0;i<hashTable.hashTableSize;i++) {
+        for(int i=0;i<hashTable.hashTableSize && duplicateKeys.size() < maxDuplicateKeys;i++) {
             int ordinal = (int)hashTable.hashTable.getElementValue((long)i * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
 
             if(ordinal != -1 && !counted.get(ordinal)) {
@@ -723,6 +753,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         return true;
     }
 
+    /**
+     * Represents a primary key that has duplicate entries in the index.
+     * Contains the key values and the count of records sharing this key.
+     */
     public static class DuplicateKeyInfo {
         private final Object[] key;
         private final long count;
