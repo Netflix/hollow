@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package com.netflix.hollow;
+
+option java_package = "com.netflix.hollow.protoadapter";
+option java_outer_classname = "HollowOptions";
+
+import "google/protobuf/descriptor.proto";
+
+// Message type for hollow primary key configuration
+message HollowPrimaryKey {
+  repeated string fields = 1;
+}
+
+// Custom message option to define primary key field paths
+// Similar to @HollowPrimaryKey(fields = {"id", "version"}) in Java
+// Usage: option (com.netflix.hollow.hollow_primary_key) = {fields: ["account_id", "region"]};
+extend google.protobuf.MessageOptions {
+  HollowPrimaryKey hollow_primary_key = 50000;
+}
+
+// Custom field option to mark repeated fields as unordered
+// When true, list order is ignored for deduplication (treated like a set)
+// Example: ["a", "b", "c"] and ["c", "a", "b"] are considered identical
+// Default: false (preserve order)
+// Similar to HollowObjectMapper.ignoreListOrdering() in Java
+extend google.protobuf.FieldOptions {
+  bool hollow_ignore_list_ordering = 50001;
+
+  // Custom field option to override the hollow field name
+  // Similar to @HollowTypeName(name = "customName") in Java
+  // When set, uses this name instead of the proto field name
+  string hollow_type_name = 50002;
+
+  // Custom field option to inline a field as a value rather than a reference
+  // Similar to @HollowInline in Java
+  // When true, the field is stored inline (like primitive int vs boxed Integer)
+  // Only applicable to boxed primitive types (e.g., google.protobuf.Int32Value, StringValue)
+  bool hollow_inline = 50003;
+
+  // Custom field option to acknowledge unsigned integer limitations
+  // REQUIRED for uint32 and uint64 fields due to mapping to signed Hollow types
+  // WARNING: Large unsigned values (> INT32_MAX/INT64_MAX) will appear as negative
+  // Example: uint32 value 3000000000 (0xB2D05E00) becomes -1294967296 in signed int32
+  // Set to true to explicitly acknowledge this behavior and allow the field
+  bool hollow_unsigned_to_signed = 50004;
+}

@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package com.netflix.hollow.test;
+
+option java_package = "com.netflix.hollow.test.proto";
+option java_outer_classname = "PersonProtos";
+
+import "hollow_options.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
+
+// Example message with various field types
+message Person {
+  option (com.netflix.hollow.hollow_primary_key) = {fields: ["id"]};
+
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+  repeated string phone_numbers = 4;
+  Status status = 5;
+  Address address = 6;
+  repeated Hobby hobbies = 7;
+  // Metadata field should be treated as reference (like boxed types in Java)
+  google.protobuf.Struct metadata = 8;
+
+  // Test hollow_type_name: creates namespaced wrapper "EmployeeCode" instead of String
+  string employee_code = 9 [(com.netflix.hollow.hollow_type_name) = "EmployeeCode"];
+
+  // Test google.protobuf.*Value fields - default is reference
+  google.protobuf.Int32Value age_years = 10;
+
+  // Test hollow_inline: this Int32Value should be inlined instead of reference
+  google.protobuf.Int32Value priority = 11 [(com.netflix.hollow.hollow_inline) = true];
+
+  // Test unsigned integers with required annotation
+  // Large unsigned values (> 2^31-1 or 2^63-1) will appear as negative in signed types
+  uint32 visitor_count = 12 [(com.netflix.hollow.hollow_unsigned_to_signed) = true];
+  uint64 total_revenue = 13 [(com.netflix.hollow.hollow_unsigned_to_signed) = true];
+}
+
+// Nested message
+message Address {
+  string street = 1;
+  string city = 2;
+  string state = 3;
+  int32 zip_code = 4;
+}
+
+// Another nested message
+message Hobby {
+  string name = 1;
+  int32 years_experience = 2;
+  SkillLevel skill_level = 3;
+}
+
+// Example enum
+enum Status {
+  UNKNOWN = 0;
+  ACTIVE = 1;
+  INACTIVE = 2;
+  SUSPENDED = 3;
+}
+
+// Another enum
+enum SkillLevel {
+  BEGINNER = 0;
+  INTERMEDIATE = 1;
+  ADVANCED = 2;
+  EXPERT = 3;
+}
+
+// Test message for hollow_type_name option
+message Product {
+  int32 id = 1;
+  // This creates a namespaced wrapper type "ProductTitle" for better memory efficiency
+  string name = 2 [(com.netflix.hollow.hollow_type_name) = "ProductTitle"];
+}
+
+// Test message for hollow_inline option and composite primary key
+message Account {
+  option (com.netflix.hollow.hollow_primary_key) = {fields: ["account_id", "region"]};
+
+  string account_id = 1;
+  string region = 2;
+  // Boxed types should be references by default
+  google.protobuf.Int32Value balance = 3;
+  // This should be inlined instead of being a reference
+  google.protobuf.StringValue account_type = 4 [(com.netflix.hollow.hollow_inline) = true];
+}
+
+// Test message for circular reference detection
+// This should fail during schema generation since Hollow doesn't support cycles
+message Node {
+  string value = 1;
+  Node next = 2;  // Circular reference: Node references itself
+}
+
+// Test message for unsigned validation
+// This should fail during schema generation without the required annotation
+message BadUnsigned {
+  int32 id = 1;
+  uint32 counter = 2;  // Missing required annotation - should fail
+}
