@@ -24,6 +24,7 @@ import static java.util.stream.Collectors.toList;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.index.HollowHashIndexField.FieldPathSegment;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex.DuplicateKeyInfo;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex.PrimaryKeyIndexHashTable;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.index.key.PrimaryKey;
@@ -442,6 +443,46 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
 
                     compareBucket = (compareBucket + 1) & hashTable.hashMask;
                     compareOrdinal = (int) hashTable.hashTable.getElementValue((long) compareBucket * (long) hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+                }
+            }
+        }
+
+        return duplicateKeys;
+    }
+
+    /**
+     * @param maxDuplicateKeys the maximum number of duplicate keys to find before stopping
+     * @return any keys which are mapped to two or more records, up to maxDuplicateKeys
+     */
+    public synchronized Collection<DuplicateKeyInfo> getDuplicateKeys(int maxDuplicateKeys) {
+        PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
+        if (hashTable.bitsPerElement == 0 || maxDuplicateKeys <= 0)
+            return Collections.emptyList();
+
+        BitSet counted = new BitSet();
+        List<DuplicateKeyInfo> duplicateKeys = new ArrayList<>();
+
+        for (int i = 0; i < hashTable.hashTableSize && duplicateKeys.size() < maxDuplicateKeys; i++) {
+            int ordinal = (int) hashTable.hashTable.getElementValue((long) i * (long) hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+
+            if (ordinal != -1 && !counted.get(ordinal)) {
+                long count = 1;
+                counted.set(ordinal);
+
+                int compareBucket = (i + 1) & hashTable.hashMask;
+                int compareOrdinal = (int) hashTable.hashTable.getElementValue((long) compareBucket * (long) hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+                while (compareOrdinal != -1) {
+                    if (recordsHaveEqualKeys(ordinal, compareOrdinal)) {
+                        count++;
+                        counted.set(compareOrdinal);
+                    }
+
+                    compareBucket = (compareBucket + 1) & hashTable.hashMask;
+                    compareOrdinal = (int) hashTable.hashTable.getElementValue((long) compareBucket * (long) hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+                }
+
+                if (count > 1) {
+                    duplicateKeys.add(new DuplicateKeyInfo(getRecordKey(ordinal), count));
                 }
             }
         }

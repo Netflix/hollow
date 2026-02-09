@@ -63,7 +63,7 @@ public class DuplicateDataDetectionValidatorTests {
             Assert.fail("Expected ValidationStatusException");
         } catch (ValidationStatusException expected) {
             String message = expected.getValidationStatus().getResults().get(0).getMessage();
-            Assert.assertTrue(message.contains("showing 100 of 499500 duplicates")); // 499500 is the number of duplicate pairs for 1000 identical keys (n * (n-1)/2)
+            Assert.assertTrue(message.contains("1 distinct keys that each have duplicate records affecting 1000 records")); // All 1000 records share the same primary key
         }
     }
 

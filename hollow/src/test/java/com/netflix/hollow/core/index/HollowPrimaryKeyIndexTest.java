@@ -133,6 +133,78 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
     }
 
     @Test
+    public void getDuplicateKeysWithMaxReturnsCorrectCounts() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one", false)));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one", true)));
+
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two", false)));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two", true)));
+
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three", false)));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three", true)));
+
+        // Non-duplicate key
+        mapper.add(new TypeA(4, 4.4d, new TypeB("four")));
+
+        roundTripSnapshot();
+
+        TestableUniqueKeyIndex idx = createIndex("TypeA");
+
+        java.util.Collection<HollowPrimaryKeyIndex.DuplicateKeyInfo> allDuplicates = idx.getDuplicateKeys(Integer.MAX_VALUE);
+        Assert.assertEquals(3, allDuplicates.size());
+
+        for (HollowPrimaryKeyIndex.DuplicateKeyInfo info : allDuplicates) {
+            Assert.assertEquals(2L, info.getCount());
+        }
+    }
+
+    @Test
+    public void getDuplicateKeysWithMaxRespectsLimit() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        // Create 5 different duplicate keys
+        for (int i = 1; i <= 5; i++) {
+            mapper.add(new TypeA(i, i * 1.1d, new TypeB("value" + i)));
+            mapper.add(new TypeA(i, i * 1.1d, new TypeB("value" + i, true)));
+        }
+
+        roundTripSnapshot();
+
+        TestableUniqueKeyIndex idx = createIndex("TypeA");
+
+        java.util.Collection<HollowPrimaryKeyIndex.DuplicateKeyInfo> limited = idx.getDuplicateKeys(3);
+        Assert.assertEquals(3, limited.size());
+
+        java.util.Collection<HollowPrimaryKeyIndex.DuplicateKeyInfo> single = idx.getDuplicateKeys(1);
+        Assert.assertEquals(1, single.size());
+
+        java.util.Collection<HollowPrimaryKeyIndex.DuplicateKeyInfo> none = idx.getDuplicateKeys(0);
+        Assert.assertEquals(0, none.size());
+
+        java.util.Collection<HollowPrimaryKeyIndex.DuplicateKeyInfo> all = idx.getDuplicateKeys(Integer.MAX_VALUE);
+        Assert.assertEquals(5, all.size());
+    }
+
+    @Test
+    public void getDuplicateKeysWithMaxHandlesNoDuplicates() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three")));
+
+        roundTripSnapshot();
+
+        TestableUniqueKeyIndex idx = createIndex("TypeA");
+
+        java.util.Collection<HollowPrimaryKeyIndex.DuplicateKeyInfo> duplicates = idx.getDuplicateKeys(100);
+        Assert.assertEquals(0, duplicates.size());
+        Assert.assertFalse(idx.containsDuplicates());
+    }
+
+    @Test
     public void handlesEmptyTypes() throws IOException {
         HollowObjectSchema testSchema = new HollowObjectSchema("Test", 1);
         testSchema.addField("test1", FieldType.INT);
