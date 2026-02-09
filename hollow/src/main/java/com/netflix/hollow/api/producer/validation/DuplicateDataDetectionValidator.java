@@ -197,16 +197,11 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
                 .sum();
 
         String duplicateKeysString = duplicateKeys.stream()
-                .limit(MAX_DISPLAYED_DUPLICATE_KEYS)
                 .map(DuplicateKeyInfo::toString)
                 .collect(Collectors.joining(", "));
 
-        if (totalUniqueKeys > MAX_DISPLAYED_DUPLICATE_KEYS) {
-            return String.format("%s ... (%d unique duplicate keys affecting %d total records, showing %d)",
-                    duplicateKeysString, totalUniqueKeys, totalAffectedRecords, MAX_DISPLAYED_DUPLICATE_KEYS);
-        }
-        return String.format("%s (%d duplicate keys affecting %d records)",
-                duplicateKeysString, totalUniqueKeys, totalAffectedRecords);
+        return String.format("%s ... (%d distinct keys that each have duplicate records affecting %d records; showing at most %d keys)",
+                duplicateKeysString, totalUniqueKeys, totalAffectedRecords, MAX_DISPLAYED_DUPLICATE_KEYS);
     }
 
     /**

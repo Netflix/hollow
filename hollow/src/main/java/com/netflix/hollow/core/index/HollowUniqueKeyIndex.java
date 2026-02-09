@@ -466,7 +466,6 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
             int ordinal = (int) hashTable.hashTable.getElementValue((long) i * (long) hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
 
             if (ordinal != -1 && !counted.get(ordinal)) {
-                Object[] currentKey = getRecordKey(ordinal);
                 long count = 1;
                 counted.set(ordinal);
 
@@ -483,7 +482,7 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
                 }
 
                 if (count > 1) {
-                    duplicateKeys.add(new DuplicateKeyInfo(currentKey, count));
+                    duplicateKeys.add(new DuplicateKeyInfo(getRecordKey(ordinal), count));
                 }
             }
         }

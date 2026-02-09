@@ -424,7 +424,6 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
             int ordinal = (int)hashTable.hashTable.getElementValue((long)i * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
 
             if(ordinal != -1 && !counted.get(ordinal)) {
-                Object[] currentKey = keyDeriver.getRecordKey(ordinal);
                 long count = 1;
                 counted.set(ordinal);
 
@@ -441,7 +440,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
                 }
 
                 if (count > 1) {
-                    duplicateKeys.add(new DuplicateKeyInfo(currentKey, count));
+                    duplicateKeys.add(new DuplicateKeyInfo(keyDeriver.getRecordKey(ordinal), count));
                 }
             }
         }
