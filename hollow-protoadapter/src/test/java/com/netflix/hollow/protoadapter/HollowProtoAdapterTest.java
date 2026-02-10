@@ -32,40 +32,26 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
 /**
  * Functional test for HollowProtoAdapter using dynamically loaded Protocol Buffer classes.
+ * Generated test proto classes are on the test classpath (from src/test/proto via protobuf plugin).
  */
 public class HollowProtoAdapterTest {
 
     private Message personMessage;
-    private URLClassLoader protoClassLoader;
+    private ClassLoader protoClassLoader;
 
     @Before
     public void setUp() throws Exception {
-        // Load the compiled proto classes dynamically
-        File protoClassesDir = new File("build/test-proto-bin");
-        assertTrue("Proto classes directory should exist: " + protoClassesDir.getAbsolutePath(),
-                   protoClassesDir.exists());
-
-        // Also need main classes for HollowOptions
-        File mainClassesDir = new File("build/classes/java/main");
-        assertTrue("Main classes directory should exist: " + mainClassesDir.getAbsolutePath(),
-                   mainClassesDir.exists());
-
-        protoClassLoader = new URLClassLoader(
-            new URL[]{protoClassesDir.toURI().toURL(), mainClassesDir.toURI().toURL()},
-            this.getClass().getClassLoader()
-        );
+        // Use test classloader; generated proto classes are on classpath (build/generated/source/proto/test/java)
+        protoClassLoader = getClass().getClassLoader();
 
         // Load the generated proto classes using reflection
         Class<?> personClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Person");
@@ -166,13 +152,7 @@ public class HollowProtoAdapterTest {
 
     @Test
     public void testHollowTypeNameOption() throws Exception {
-        // Load Product proto class
-        File protoClassesDir = new File("build/test-proto-bin");
-        File mainClassesDir = new File("build/classes/java/main");
-        URLClassLoader protoClassLoader = new URLClassLoader(
-            new URL[]{protoClassesDir.toURI().toURL(), mainClassesDir.toURI().toURL()},
-            this.getClass().getClassLoader()
-        );
+        // Load Product proto class from test classpath
         Class<?> productClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Product");
         Method newBuilder = productClass.getMethod("newBuilder");
         Message.Builder productBuilder = (Message.Builder) newBuilder.invoke(null);
@@ -231,12 +211,6 @@ public class HollowProtoAdapterTest {
     @Test
     public void testHollowInlineOption() throws Exception {
         // Load Account proto class
-        File protoClassesDir = new File("build/test-proto-bin");
-        File mainClassesDir = new File("build/classes/java/main");
-        URLClassLoader protoClassLoader = new URLClassLoader(
-            new URL[]{protoClassesDir.toURI().toURL(), mainClassesDir.toURI().toURL()},
-            this.getClass().getClassLoader()
-        );
         Class<?> accountClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Account");
         Class<?> int32ValueClass = protoClassLoader.loadClass("com.google.protobuf.Int32Value");
         Class<?> stringValueClass = protoClassLoader.loadClass("com.google.protobuf.StringValue");
