@@ -34,6 +34,11 @@ jobs:
           path: |
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradlewrapper-${{ hashFiles('gradle/wrapper/*') }}
+      - name: Install protoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+          protoc --version
       - name: Build
         run: ./gradlew build snapshot
         env:
