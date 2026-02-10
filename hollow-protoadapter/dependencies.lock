@@ -1,73 +1,53 @@
 {
     "compileClasspath": {
-        "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.4.3"
-        },
-        "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.4.3"
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.25.8"
         },
         "com.netflix.hollow:hollow": {
             "project": true
-        },
-        "commons-io:commons-io": {
-            "locked": "2.6"
-        },
-        "commons-lang:commons-lang": {
-            "locked": "2.6"
+        }
+    },
+    "protobufIncludes": {
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.25.8"
+        }
+    },
+    "protocBinary": {
+        "com.google.protobuf:protoc": {
+            "locked": "3.25.8"
         }
     },
     "runtimeClasspath": {
-        "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.4.3"
-        },
-        "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.4.3"
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.25.8"
         },
         "com.netflix.hollow:hollow": {
             "project": true
-        },
-        "commons-io:commons-io": {
-            "locked": "2.6"
-        },
-        "commons-lang:commons-lang": {
-            "locked": "2.6"
         }
     },
     "testCompileClasspath": {
-        "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.4.3"
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.25.8"
         },
-        "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.4.3"
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.25.8"
         },
         "com.netflix.hollow:hollow": {
             "project": true
-        },
-        "commons-io:commons-io": {
-            "locked": "2.6"
-        },
-        "commons-lang:commons-lang": {
-            "locked": "2.6"
         },
         "junit:junit": {
             "locked": "4.11"
         }
     },
     "testRuntimeClasspath": {
-        "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.4.3"
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.25.8"
         },
-        "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.4.3"
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.25.8"
         },
         "com.netflix.hollow:hollow": {
             "project": true
-        },
-        "commons-io:commons-io": {
-            "locked": "2.6"
-        },
-        "commons-lang:commons-lang": {
-            "locked": "2.6"
         },
         "junit:junit": {
             "locked": "4.11"
