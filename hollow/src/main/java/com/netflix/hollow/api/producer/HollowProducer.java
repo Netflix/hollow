@@ -751,6 +751,7 @@ public class HollowProducer extends AbstractHollowProducer {
         SingleProducerEnforcer singleProducerEnforcer = new BasicSingleProducerEnforcer();
         HollowObjectHashCodeFinder hashCodeFinder = null;
         boolean doIntegrityCheck = true;
+        boolean partitionedOrdinalMap = false;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
         Supplier<Boolean> ignoreSoftLimits = null;
@@ -970,6 +971,11 @@ public class HollowProducer extends AbstractHollowProducer {
             return (B) this;
         }
 
+        public B withPartitionedOrdinalMap(boolean partitionedOrdinalMap) {
+            this.partitionedOrdinalMap = partitionedOrdinalMap;
+            return (B) this;
+        }
+
         public B withUpdatePlanVerifier(HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
             this.updatePlanBlobVerifier = updatePlanBlobVerifier;
             return (B) this;
@@ -995,6 +1001,13 @@ public class HollowProducer extends AbstractHollowProducer {
                 // More thorough testing required before enabling these features to work in tandem
                 // simple test case for when features are allowed to work together passes, see {@code testReshardingWithFocusHoleFillInFewestShards}
                 throw new IllegalArgumentException("Producer does not yet support using both re-sharding and focusHoleFillInFewestShards features in tandem");
+            }
+            ///  TODO: remove this mutual exclusive cond
+            if (partitionedOrdinalMap == true && focusHoleFillInFewestShards == true) {
+                // partitionedOrdinalMap feature rollout.
+                // Changes in {@code FreeOrdinalTracker.sort(int)} and more testings are needed before enabling these
+                // features together.
+                throw new IllegalArgumentException("Producer does not yet support using both partitioned ByteArrayOrdinalMap and focusHoleFillInFewestShards features in tandem");
             }
             if (stager != null && compressor != null) {
                 throw new IllegalArgumentException(

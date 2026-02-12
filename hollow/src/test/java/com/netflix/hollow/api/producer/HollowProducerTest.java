@@ -137,13 +137,14 @@ public class HollowProducerTest {
     private void checkBaomIgnoreOrdinalSoftLimit(boolean expected, HollowProducer producer) {
         for (HollowTypeWriteState hollowTypeWriteState : producer.getWriteEngine().getOrderedTypeStates()) {
             try {
-                java.lang.reflect.Field ordinalMapField = HollowTypeWriteState.class.getDeclaredField("ordinalMap");
-                ordinalMapField.setAccessible(true);
-                com.netflix.hollow.core.memory.ByteArrayOrdinalMap ordinalMap =
-                        (com.netflix.hollow.core.memory.ByteArrayOrdinalMap) ordinalMapField.get(hollowTypeWriteState);
-
-                assertEquals("ByteArrayOrdinalMap.ignoreSoftLimits should be " + expected,
-                        expected, ordinalMap.getIgnoreSoftLimits());
+                java.lang.reflect.Field ordinalMapsField = HollowTypeWriteState.class.getDeclaredField("ordinalMaps");
+                ordinalMapsField.setAccessible(true);
+                com.netflix.hollow.core.memory.ByteArrayOrdinalMap[] ordinalMaps =
+                        (com.netflix.hollow.core.memory.ByteArrayOrdinalMap[]) ordinalMapsField.get(hollowTypeWriteState);
+                for (com.netflix.hollow.core.memory.ByteArrayOrdinalMap baom : ordinalMaps) {
+                    assertEquals("ByteArrayOrdinalMap.ignoreSoftLimits should be " + expected,
+                            expected, baom.getIgnoreSoftLimits());
+                }
             } catch (NoSuchFieldException | IllegalAccessException ex) {
                 Assert.fail(ex.getMessage());
             }

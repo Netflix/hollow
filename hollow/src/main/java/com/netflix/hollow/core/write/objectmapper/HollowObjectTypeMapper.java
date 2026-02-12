@@ -136,8 +136,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.writeState = existingWriteState;
         } else {
             int numShardsByAnnotation = getNumShardsByAnnotation(clazz);
-            this.writeState = new HollowObjectTypeWriteState(schema, numShardsByAnnotation,
-                    parentMapper.getStateEngine().getIgnoreOrdinalLimitsSupplier());
+            this.writeState = new HollowObjectTypeWriteState(schema, numShardsByAnnotation, parentMapper.getStateEngine().isPartitionedOrdinalMap(), parentMapper.getStateEngine().getIgnoreOrdinalLimitsSupplier());
         }
 
         this.assignedOrdinalFieldOffset = assignedOrdinalFieldOffset;

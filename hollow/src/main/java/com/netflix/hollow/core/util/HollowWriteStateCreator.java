@@ -96,20 +96,22 @@ public class HollowWriteStateCreator {
      */
     public static void populateStateEngineWithTypeWriteStates(HollowWriteStateEngine stateEngine, Collection<HollowSchema> schemas) {
         List<HollowSchema> dependencyOrderedSchemas = getDependencyOrderedSchemas(schemas);
+        boolean partitioned = stateEngine.isPartitionedOrdinalMap();
+
         for(HollowSchema schema : dependencyOrderedSchemas) {
             if(stateEngine.getTypeState(schema.getName()) == null) {
                 switch(schema.getSchemaType()) {
                 case OBJECT:
-                    stateEngine.addTypeState(new HollowObjectTypeWriteState((HollowObjectSchema)schema, -1, stateEngine.getIgnoreOrdinalLimitsSupplier()));
+                    stateEngine.addTypeState(new HollowObjectTypeWriteState((HollowObjectSchema)schema, -1, partitioned, stateEngine.getIgnoreOrdinalLimitsSupplier()));
                     break;
                 case LIST:
-                    stateEngine.addTypeState(new HollowListTypeWriteState((HollowListSchema)schema, -1, stateEngine.getIgnoreOrdinalLimitsSupplier()));
+                    stateEngine.addTypeState(new HollowListTypeWriteState((HollowListSchema)schema, -1, partitioned, stateEngine.getIgnoreOrdinalLimitsSupplier()));
                     break;
                 case SET:
-                    stateEngine.addTypeState(new HollowSetTypeWriteState((HollowSetSchema)schema, -1, stateEngine.getIgnoreOrdinalLimitsSupplier()));
+                    stateEngine.addTypeState(new HollowSetTypeWriteState((HollowSetSchema)schema, -1, partitioned, stateEngine.getIgnoreOrdinalLimitsSupplier()));
                     break;
                 case MAP:
-                    stateEngine.addTypeState(new HollowMapTypeWriteState((HollowMapSchema)schema, -1, stateEngine.getIgnoreOrdinalLimitsSupplier()));
+                    stateEngine.addTypeState(new HollowMapTypeWriteState((HollowMapSchema)schema, -1, partitioned, stateEngine.getIgnoreOrdinalLimitsSupplier()));
                     break;
                 }
             }
@@ -204,7 +206,7 @@ public class HollowWriteStateCreator {
                         
                         BitSet populatedOrdinals = readState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
-                        writeState.resizeOrdinalMap(populatedOrdinals.cardinality());
+                        writeState.resizeOrdinalMaps(populatedOrdinals.cardinality() >> writeState.getOrdinalMapIndexBits());
                         int ordinal = populatedOrdinals.nextSetBit(0);
                         while(ordinal != -1) {
                             HollowWriteRecord rec = copier.copy(ordinal);
