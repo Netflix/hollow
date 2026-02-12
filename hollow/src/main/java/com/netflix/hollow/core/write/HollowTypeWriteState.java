@@ -37,8 +37,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,7 +50,6 @@ public abstract class HollowTypeWriteState {
     protected final HollowSchema schema;
 
     // Instance fields for configurable ordinal map count
-    private final boolean usePartitionedOrdinalMap;
     protected final int ordinalMapNum;
     protected final int ordinalMapIndexBits;
     protected final int ordinalMapIndexMask;
@@ -89,7 +86,6 @@ public abstract class HollowTypeWriteState {
 
     public HollowTypeWriteState(HollowSchema schema, int numShards, boolean usePartitionedOrdinalMap, Supplier<Boolean> ignoreSoftLimits) {
         this.schema = schema;
-        this.usePartitionedOrdinalMap = usePartitionedOrdinalMap;
         this.ignoreSoftLimits = ignoreSoftLimits;
 
         // Configure ordinal map count based on partitioning flag
@@ -142,6 +138,13 @@ public abstract class HollowTypeWriteState {
         return ordinal;
     }
 
+    /*
+     * Assign an ordinal to a record. Use the record hash to determine the which ordinal map it belongs to and
+     * its ordinal within that map (localOrdinal). Then convert the local ordinal to a global ordinal and return.
+     * 
+     * @param rec the record to assign an ordinal to
+     * @return the ordinal of the record
+     */
     private int assignOrdinal(HollowWriteRecord rec) {
         ByteDataArray scratch = scratch();
         rec.writeDataTo(scratch);
@@ -181,10 +184,10 @@ public abstract class HollowTypeWriteState {
             // Look up in restored map for this index (returns local ordinal)
             int preferredLocalOrdinal = restoredMaps[mapIndex].get(scratch, hash);
 
+            // rewrite the byte representation, as the current schema can be different from the restored schema.
+            // i.e. new fields added into this type.
             scratch.reset();
             rec.writeDataTo(scratch);
-
-            // Recompute hash for new schema (content may differ)
             hash = HashCodes.hashCode(scratch);
             mapIndex = hash & ordinalMapIndexMask;
 
@@ -306,7 +309,7 @@ public abstract class HollowTypeWriteState {
 
         // Decode the newOrdinal to determine which map and local ordinal
         int mapIndex = newOrdinal & ordinalMapIndexMask;
-        int localOrdinal = newOrdinal >> ordinalMapIndexBits;
+        int localOrdinal = newOrdinal >>> ordinalMapIndexBits;
 
         ordinalMaps[mapIndex].put(scratch, localOrdinal);
         if(markPreviousCycle)
@@ -424,7 +427,7 @@ public abstract class HollowTypeWriteState {
         // Prepare all maps for writing
         maxOrdinal = -1;
         for (int i = 0; i < ordinalMapNum; i++) {
-            maxOrdinal = (ordinalMaps[i].prepareForWrite() << ordinalMapIndexBits) | i;
+            maxOrdinal = Math.max(maxOrdinal, (ordinalMaps[i].prepareForWrite() << ordinalMapIndexBits) | i);
         }
         wroteData = true;
     }
@@ -495,31 +498,31 @@ public abstract class HollowTypeWriteState {
         int size = populatedOrdinals.cardinality();
         restoredMaps = new ByteArrayOrdinalMap[ordinalMapNum];
         for (int i = 0; i < ordinalMapNum; i++) {
-            restoredMaps[i] = new ByteArrayOrdinalMap(size >> ordinalMapIndexBits,
+            restoredMaps[i] = new ByteArrayOrdinalMap(size >>> ordinalMapIndexBits,
                     ignoreSoftLimits == null || ignoreSoftLimits.get());
         }
 
         // Restore ordinals to appropriate maps
-        int ordinal = populatedOrdinals.nextSetBit(0);
-        while(ordinal != -1) {
-            previousCyclePopulated.set(ordinal);
+        int globalOrdinal = populatedOrdinals.nextSetBit(0);
+        while(globalOrdinal != -1) {
+            previousCyclePopulated.set(globalOrdinal);
 
             // Decode which map this ordinal belongs to
-            int mapIndex = ordinal & ordinalMapIndexMask;
+            int mapIndex = globalOrdinal & ordinalMapIndexMask;
 
-            restoreOrdinal(ordinal, copier, restoredMaps[mapIndex], IGNORED_HASHES);
-            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+            restoreOrdinal(globalOrdinal, copier, restoredMaps[mapIndex], IGNORED_HASHES);
+            globalOrdinal = populatedOrdinals.nextSetBit(globalOrdinal + 1);
         }
 
         // Resize the ordinal maps to avoid resizing when populating
         for (int i = 0; i < ordinalMapNum; i++) {
-            ordinalMaps[i].resize(size  >> ordinalMapIndexBits);
+            ordinalMaps[i].resize(size  >>> ordinalMapIndexBits);
 
             // Create a bitset with only the ordinals for this map
             BitSet mapSpecificOrdinals = new BitSet();
             for (int ord = populatedOrdinals.nextSetBit(0); ord >= 0; ord = populatedOrdinals.nextSetBit(ord + 1)) {
                 if ((ord & ordinalMapIndexMask) == i) {
-                    mapSpecificOrdinals.set(ord >> ordinalMapIndexBits);  // Set local ordinal
+                    mapSpecificOrdinals.set(ord >>> ordinalMapIndexBits);  // Set local ordinal
                 }
             }
             ordinalMaps[i].reservePreviouslyPopulatedOrdinals(mapSpecificOrdinals);
@@ -544,7 +547,7 @@ public abstract class HollowTypeWriteState {
             rec.writeDataTo(scratch);
 
         // Convert global ordinal to local ordinal for the destination map
-        int localOrdinal = globalOrdinal >> ordinalMapIndexBits;
+        int localOrdinal = globalOrdinal >>> ordinalMapIndexBits;
         destinationMap.put(scratch, localOrdinal);
         scratch.reset();
     }
@@ -556,7 +559,7 @@ public abstract class HollowTypeWriteState {
      */
     protected long getPointerForData(int ordinal) {
         int mapIndex = ordinal & ordinalMapIndexMask;
-        int localOrdinal = ordinal >> ordinalMapIndexBits;
+        int localOrdinal = ordinal >>> ordinalMapIndexBits;
         return ordinalMaps[mapIndex].getPointerForData(localOrdinal);
     }
 
@@ -590,33 +593,6 @@ public abstract class HollowTypeWriteState {
     
     public HollowWriteStateEngine getStateEngine() {
         return stateEngine;
-    }
-
-    /**
-     * TODO: 1. initialize the size of the BitSet 2. reuse the same ThreadSafeBitSet by passing it in thru parameter.
-     * Extract ordinals for a specific map from a global ordinal BitSet.
-     * Converts global ordinals to local ordinals for the specified map.
-     *
-     * @param globalOrdinals BitSet containing global ordinals
-     * @param mapIndex the map index (0-3)
-     * @return ThreadSafeBitSet containing local ordinals for the specified map
-     */
-    private ThreadSafeBitSet extractOrdinalsForMap(ThreadSafeBitSet globalOrdinals, int mapIndex) {
-        ThreadSafeBitSet localOrdinals = new ThreadSafeBitSet();
-
-        // Iterate through all set bits in the global ordinals
-        int globalOrdinal = globalOrdinals.nextSetBit(0);
-        while (globalOrdinal != -1) {
-            // Check if this ordinal belongs to the specified map
-            if ((globalOrdinal & ordinalMapIndexMask) == mapIndex) {
-                // Convert to local ordinal
-                int localOrdinal = globalOrdinal >> ordinalMapIndexBits;
-                localOrdinals.set(localOrdinal);
-            }
-            globalOrdinal = globalOrdinals.nextSetBit(globalOrdinal + 1);
-        }
-
-        return localOrdinals;
     }
 
     protected static int[] calcMaxShardOrdinal(int maxOrdinal, int numShards) {

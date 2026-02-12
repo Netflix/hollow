@@ -206,7 +206,7 @@ public class HollowWriteStateCreator {
                         
                         BitSet populatedOrdinals = readState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
-                        writeState.resizeOrdinalMaps(populatedOrdinals.cardinality() >> writeState.getOrdinalMapIndexBits());
+                        writeState.resizeOrdinalMaps(populatedOrdinals.cardinality() >>> writeState.getOrdinalMapIndexBits());
                         int ordinal = populatedOrdinals.nextSetBit(0);
                         while(ordinal != -1) {
                             HollowWriteRecord rec = copier.copy(ordinal);
