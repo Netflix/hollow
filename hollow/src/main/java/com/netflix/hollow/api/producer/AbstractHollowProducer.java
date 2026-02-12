@@ -102,6 +102,7 @@ abstract class AbstractHollowProducer {
     private final boolean allowTypeResharding;
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
     private final Supplier<Boolean> ignoreSoftLimits;
+    private final boolean partitionedOrdinalMap;
 
     @Deprecated
     public AbstractHollowProducer(
@@ -110,7 +111,7 @@ abstract class AbstractHollowProducer {
         this(new HollowFilesystemBlobStager(), publisher, announcer,
                 Collections.emptyList(),
                 new VersionMinterWithCounter(), null, 0,
-                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, null,
+                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
                 null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null);
     }
@@ -123,7 +124,7 @@ abstract class AbstractHollowProducer {
                 b.eventListeners,
                 b.versionMinter, b.snapshotPublishExecutor,
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
-                b.allowTypeResharding, b.forceCoverageOfTypeResharding,
+                b.allowTypeResharding, b.forceCoverageOfTypeResharding, b.partitionedOrdinalMap,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
                 b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits);
     }
@@ -145,6 +146,7 @@ abstract class AbstractHollowProducer {
             boolean focusHoleFillInFewestShards,
             boolean allowTypeResharding,
             boolean forceCoverageOfTypeResharding,
+            boolean partitionedOrdinalMap,
             HollowMetricsCollector<HollowProducerMetrics> metricsCollector,
             HollowProducer.BlobStorageCleaner blobStorageCleaner,
             SingleProducerEnforcer singleProducerEnforcer,
@@ -166,6 +168,7 @@ abstract class AbstractHollowProducer {
         this.forceCoverageOfTypeResharding = forceCoverageOfTypeResharding;
         this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
         this.ignoreSoftLimits = ignoreSoftLimits;
+        this.partitionedOrdinalMap = partitionedOrdinalMap;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
                 ? new HollowWriteStateEngine()
@@ -174,6 +177,7 @@ abstract class AbstractHollowProducer {
         writeEngine.allowTypeResharding(allowTypeResharding);
         writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
         writeEngine.setIgnoreOrdinalLimits(ignoreSoftLimits);
+        writeEngine.setPartitionedOrdinalMap(partitionedOrdinalMap);
 
         this.objectMapper = new HollowObjectMapper(writeEngine);
         if (hashCodeFinder != null) {
@@ -332,6 +336,7 @@ abstract class AbstractHollowProducer {
                 writeEngine.allowTypeResharding(allowTypeResharding);
                 writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
                 writeEngine.setIgnoreOrdinalLimits(ignoreSoftLimits);
+                writeEngine.setPartitionedOrdinalMap(partitionedOrdinalMap);
                 HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, schemas);
                 HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);
                 if (hashCodeFinder != null) {

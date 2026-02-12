@@ -64,18 +64,16 @@ class HollowWriteStateEnginePrimaryKeyHasher {
         int lastFieldPath = fieldPathIndexes[fieldIdx].length - 1;
         for (int i = 0; i < lastFieldPath; i++) {
             int fieldPosition = fieldPathIndexes[fieldIdx][i];
-            ByteArrayOrdinalMap ordinalMap = typeStates[fieldIdx][i].ordinalMap;
-            long offset = ordinalMap.getPointerForData(ordinal);
-            SegmentedByteArray recordDataArray = ordinalMap.getByteData().getUnderlyingArray();
-            
+            long offset = typeStates[fieldIdx][i].getPointerForData(ordinal);
+            SegmentedByteArray recordDataArray = typeStates[fieldIdx][i].getByteDataForOrdinal(ordinal);
+
             offset = navigateToField(typeStates[fieldIdx][i].getSchema(), fieldPosition, recordDataArray, offset);
             ordinal = VarInt.readVInt(recordDataArray, offset);
         }
 
         int fieldPosition = fieldPathIndexes[fieldIdx][lastFieldPath];
-        ByteArrayOrdinalMap ordinalMap = typeStates[fieldIdx][lastFieldPath].ordinalMap;
-        long offset = ordinalMap.getPointerForData(ordinal);
-        SegmentedByteArray recordDataArray = ordinalMap.getByteData().getUnderlyingArray();
+        long offset = typeStates[fieldIdx][lastFieldPath].getPointerForData(ordinal);
+        SegmentedByteArray recordDataArray = typeStates[fieldIdx][lastFieldPath].getByteDataForOrdinal(ordinal);
         HollowObjectSchema schema = typeStates[fieldIdx][lastFieldPath].getSchema();
 
         offset = navigateToField(schema, fieldPosition, recordDataArray, offset);

@@ -41,29 +41,30 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     private int revBitsPerSetPointer;
     private int bitsPerElement;
     private int bitsPerSetSizeValue;
-    private long totalOfSetBuckets[];
-    private long revTotalOfSetBuckets[];
+    private long[] totalOfSetBuckets;
+    private long[] revTotalOfSetBuckets;
 
     /// data required for writing snapshot or delta
-    private FixedLengthElementArray setPointersAndSizesArray[];
-    private FixedLengthElementArray elementArray[];
+    private FixedLengthElementArray[] setPointersAndSizesArray;
+    private FixedLengthElementArray[] elementArray;
 
     /// additional data required for writing delta
-    private int numSetsInDelta[];
-    private long numBucketsInDelta[];
-    private ByteDataArray deltaAddedOrdinals[];
-    private ByteDataArray deltaRemovedOrdinals[];
+    private int[] numSetsInDelta;
+    private long[] numBucketsInDelta;
+    private ByteDataArray[] deltaAddedOrdinals;
+    private ByteDataArray[] deltaRemovedOrdinals;
 
     public HollowSetTypeWriteState(HollowSetSchema schema) {
         this(schema, -1);
     }
 
+    @Deprecated
     public HollowSetTypeWriteState(HollowSetSchema schema, int numShards) {
-        this(schema, numShards, null);
+        this(schema, numShards, false, null);
     }
 
-    public HollowSetTypeWriteState(HollowSetSchema schema, int numShards, Supplier<Boolean> ignoreSoftLimits) {
-        super(schema, numShards, ignoreSoftLimits);
+    public HollowSetTypeWriteState(HollowSetSchema schema, int numShards, boolean usePartitionedOrdinalMap, Supplier<Boolean> ignoreSoftLimits) {
+        super(schema, numShards, usePartitionedOrdinalMap, ignoreSoftLimits);
     }
 
     @Override
@@ -82,7 +83,6 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
     private void gatherStatistics(boolean numShardsChanged) {
         int maxElementOrdinal = 0;
         int maxSetSize = 0;
-        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
         totalOfSetBuckets = new long[numShards];
         if (numShardsChanged) {
@@ -91,7 +91,8 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
 
         for(int i=0;i<=maxOrdinal;i++) {
             if(currentCyclePopulated.get(i) || previousCyclePopulated.get(i)) {
-                long pointer = ordinalMap.getPointerForData(i);
+                long pointer = getPointerForData(i);
+                ByteData data = getByteDataForOrdinal(i);
                 int size = VarInt.readVInt(data, pointer);
 
                 int numBuckets = HashCodes.hashTableSize(size);
@@ -143,13 +144,14 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         int maxSetSize = 0;
         int maxElementOrdinal = 0;
         
-        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
+        
 
         long totalOfSetBuckets = 0;
 
         for(int i=0;i<=maxOrdinal;i++) {
             if(currentCyclePopulated.get(i) || previousCyclePopulated.get(i)) {
-                long pointer = ordinalMap.getPointerForData(i);
+                long pointer = getPointerForData(i);
+                ByteData data = getByteDataForOrdinal(i);
                 int size = VarInt.readVInt(data, pointer);
 
                 int numBuckets = HashCodes.hashTableSize(size);
@@ -199,8 +201,6 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
             elementArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)bitsPerElement * totalOfSetBuckets[i]);
         }
 
-        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
-
         int bucketCounter[] = new int[numShards];
         int shardMask = numShards - 1;
 
@@ -222,9 +222,10 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         for(int ordinal=0;ordinal<=maxOrdinal;ordinal++) {
             int shardNumber = ordinal & shardMask;
             int shardOrdinal = ordinal / numShards;
-            
+
             if(currentCyclePopulated.get(ordinal)) {
-                long readPointer = ordinalMap.getPointerForData(ordinal);
+                long readPointer = getPointerForData(ordinal);
+                ByteData data = getByteDataForOrdinal(ordinal);
 
                 int size = VarInt.readVInt(data, readPointer);
                 readPointer += VarInt.sizeOfVInt(size);
@@ -339,21 +340,19 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         int addedOrdinal = deltaAdditions.nextSetBit(0);
         while(addedOrdinal != -1) {
             numSetsInDelta[addedOrdinal & shardMask]++;
-            long readPointer = ordinalMap.getPointerForData(addedOrdinal);
-            int size = VarInt.readVInt(ordinalMap.getByteData().getUnderlyingArray(), readPointer);
+            long readPointer = getPointerForData(addedOrdinal);
+            int size = VarInt.readVInt(getByteDataForOrdinal(addedOrdinal), readPointer);
             numBucketsInDelta[addedOrdinal & shardMask] += HashCodes.hashTableSize(size);
 
             addedOrdinal = deltaAdditions.nextSetBit(addedOrdinal + 1);
         }
-        
+
         for(int i=0;i<numShards;i++) {
             setPointersAndSizesArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numSetsInDelta[i] * bitsPerSetFixedLengthPortion);
             elementArray[i] = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, (long)numBucketsInDelta[i] * bitsPerElement);
             deltaAddedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
             deltaRemovedOrdinals[i] = new ByteDataArray(WastefulRecycler.DEFAULT_INSTANCE);
         }
-
-        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
 
         int setCounter[] = new int[numShards];
         long bucketCounter[] = new long[numShards];
@@ -378,7 +377,8 @@ public class HollowSetTypeWriteState extends HollowTypeWriteState {
         for(int ordinal=0;ordinal<=maxOrdinal;ordinal++) {
             int shardNumber = ordinal & shardMask;
             if(deltaAdditions.get(ordinal)) {
-                long readPointer = ordinalMap.getPointerForData(ordinal);
+                long readPointer = getPointerForData(ordinal);
+                ByteData data = getByteDataForOrdinal(ordinal);
 
                 int size = VarInt.readVInt(data, readPointer);
                 readPointer += VarInt.sizeOfVInt(size);
