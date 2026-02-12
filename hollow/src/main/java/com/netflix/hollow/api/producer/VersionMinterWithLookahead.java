@@ -4,8 +4,8 @@ import com.netflix.hollow.api.producer.HollowProducer.VersionMinter;
 
 public class VersionMinterWithLookahead implements VersionMinter {
 
-    private final VersionMinter delegateTo;
-    private long peekValue = -1L;
+    protected final VersionMinter delegateTo;
+    protected long peekValue = -1L;
 
     public VersionMinterWithLookahead(VersionMinter delegateTo) {
         this.delegateTo = delegateTo;
