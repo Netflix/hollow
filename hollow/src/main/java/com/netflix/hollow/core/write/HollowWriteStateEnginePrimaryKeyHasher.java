@@ -17,7 +17,6 @@
 package com.netflix.hollow.core.write;
 
 import com.netflix.hollow.core.index.key.PrimaryKey;
-import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;

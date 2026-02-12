@@ -505,7 +505,6 @@ public class ByteArrayOrdinalMap {
         byteData.setPosition(currentCopyPointer);
 
         if(focusHoleFillInFewestShards && numShards > 1)
-            // TODO: fix to be compatible with multi-ByteArrayOrdinalMap
             freeOrdinalTracker.sort(numShards);
         else
             freeOrdinalTracker.sort();

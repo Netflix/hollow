@@ -971,6 +971,12 @@ public class HollowProducer extends AbstractHollowProducer {
             return (B) this;
         }
 
+        /*
+         * By partitioning a {@link HollowTypeWriteState} into 4 {@link com.netflix.hollow.core.memory.ByteArrayOrdinalMap} instead of 1,
+         * we can increase the ordinal limit (record cardinality limit) of the {@link HollowTypeWriteState} by 4 times.
+         * @param partitionedOrdinalMap true to enable the partition.
+         * @return this builder
+         */
         public B withPartitionedOrdinalMap(boolean partitionedOrdinalMap) {
             this.partitionedOrdinalMap = partitionedOrdinalMap;
             return (B) this;
@@ -1001,13 +1007,6 @@ public class HollowProducer extends AbstractHollowProducer {
                 // More thorough testing required before enabling these features to work in tandem
                 // simple test case for when features are allowed to work together passes, see {@code testReshardingWithFocusHoleFillInFewestShards}
                 throw new IllegalArgumentException("Producer does not yet support using both re-sharding and focusHoleFillInFewestShards features in tandem");
-            }
-            ///  TODO: remove this mutual exclusive cond
-            if (partitionedOrdinalMap == true && focusHoleFillInFewestShards == true) {
-                // partitionedOrdinalMap feature rollout.
-                // Changes in {@code FreeOrdinalTracker.sort(int)} and more testings are needed before enabling these
-                // features together.
-                throw new IllegalArgumentException("Producer does not yet support using both partitioned ByteArrayOrdinalMap and focusHoleFillInFewestShards features in tandem");
             }
             if (stager != null && compressor != null) {
                 throw new IllegalArgumentException(
