@@ -80,6 +80,11 @@ public interface HollowStateEngine extends HollowDataset {
      */
     String HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER = "hollow.delta.chain.version.counter";
 
+    /**
+     * A header tag indicating whether the producer used partitioned ordinal maps.
+     */
+    String HEADER_TAG_PARTITIONED_ORDINAL_MAP = "hollow.partitioned.ordinal.map";
+
     @Override
     List<HollowSchema> getSchemas();
 

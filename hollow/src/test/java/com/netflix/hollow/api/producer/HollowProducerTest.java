@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.producer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -509,6 +510,41 @@ public class HollowProducerTest {
             ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
         }
         System.out.println("Asserted Correctness of version:" + version + "\n\n");
+    }
+
+    @Test
+    public void testRestorePartitionedOrdinalMapMatch() {
+        // restore is expected to fail if datasetEnabled != producerEnabled
+        verifyRestorePartitionedOrdinalMap(true, false);
+        verifyRestorePartitionedOrdinalMap(false, true);
+        verifyRestorePartitionedOrdinalMap(false, false);
+        verifyRestorePartitionedOrdinalMap(true, true);
+    }
+
+    private void verifyRestorePartitionedOrdinalMap( boolean datasetEnabled, boolean producerEnabled) {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(datasetEnabled)
+                .build();
+        producer1.initializeDataModel(TestPojoV1.class);
+        long version = producer1.runCycle(ws -> ws.add(new TestPojoV1(1, 1)));
+
+        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(producerEnabled)
+                .build();
+        producer2.initializeDataModel(TestPojoV1.class);
+
+        try {
+            HollowProducer.ReadState readState = producer2.restore(version, blobStore);
+            Assert.assertNotNull(readState);
+            assertEquals(version, readState.getVersion());
+        } catch (IllegalStateException e) {
+            Assert.assertNotEquals(datasetEnabled, producerEnabled);
+        }
     }
 
     @Test
