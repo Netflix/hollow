@@ -326,6 +326,7 @@ abstract class AbstractHollowProducer {
                 client.triggerRefreshTo(versionInfoDesired);
                 readState = ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
                 readStates = ReadStateHelper.restored(readState);
+                verifyPartitionOrdinalMapCompatability();
 
                 // Need to restore data to new ObjectMapper since can't restore to non empty Write State Engine
                 Collection<HollowSchema> schemas = objectMapper.getStateEngine().getSchemas();
@@ -591,6 +592,7 @@ abstract class AbstractHollowProducer {
         }
         long deltaChainVersionCounter = prevDeltaChainVersionCounter + 1;
         writeEngine.addHeaderTag(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER, String.valueOf(deltaChainVersionCounter));
+        writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_PARTITIONED_ORDINAL_MAP, Boolean.toString(partitionedOrdinalMap));
     }
 
     void populate(
@@ -979,6 +981,27 @@ abstract class AbstractHollowProducer {
             } finally {
                 listeners.fireAnnouncementComplete(status);
             }
+        }
+    }
+
+    private void verifyPartitionOrdinalMapCompatability() throws  IllegalStateException {
+        String datasetTag = readStates.current().getStateEngine()
+                .getHeaderTag(HollowStateEngine.HEADER_TAG_PARTITIONED_ORDINAL_MAP);
+        boolean datasetPartitionedOrdinalMap = Boolean.parseBoolean(datasetTag);
+        String message;
+        if (partitionedOrdinalMap && !datasetPartitionedOrdinalMap) {
+            message = String.format("trying to restore a HollowProducer with partitionedOrdinalMap enabled to version %d " +
+                    "that is produced with this feature disabled. In order to enable partitionedOrdinalMap " +
+                    "feature, please start a new delta chain.", readStates.current().getVersion());
+            log.log(Level.SEVERE, message);
+            throw new IllegalStateException(message);
+        }
+        if (!partitionedOrdinalMap && datasetPartitionedOrdinalMap) {
+            message = String.format("trying to restore a HollowProducer with partitionedOrdinalMap disabled to version %d " +
+                    "that is produced with this feature enabled. In order to disable partitionedOrdinalMap " +
+                    "feature, please start a new delta chain.", readStates.current().getVersion());
+            log.log(Level.SEVERE, message);
+            throw new IllegalStateException(message);
         }
     }
 
