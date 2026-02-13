@@ -511,6 +511,93 @@ public class HollowProducerTest {
         System.out.println("Asserted Correctness of version:" + version + "\n\n");
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testRestorePartitionedOrdinalMapMismatch_producerEnabledDatasetDisabled() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        // Produce dataset with partitionedOrdinalMap disabled (default)
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .build();
+        producer1.initializeDataModel(TestPojoV1.class);
+        long version = producer1.runCycle(ws -> ws.add(new TestPojoV1(1, 1)));
+
+        // Restore with partitionedOrdinalMap enabled → should fail
+        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(true)
+                .build();
+        producer2.initializeDataModel(TestPojoV1.class);
+        producer2.restore(version, blobStore);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testRestorePartitionedOrdinalMapMismatch_producerDisabledDatasetEnabled() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        // Produce dataset with partitionedOrdinalMap enabled
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(true)
+                .build();
+        producer1.initializeDataModel(TestPojoV1.class);
+        long version = producer1.runCycle(ws -> ws.add(new TestPojoV1(1, 1)));
+
+        // Restore with partitionedOrdinalMap disabled → should fail
+        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .build();
+        producer2.initializeDataModel(TestPojoV1.class);
+        producer2.restore(version, blobStore);
+    }
+
+    @Test
+    public void testRestorePartitionedOrdinalMapMatch_bothEnabled() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        // Produce dataset with partitionedOrdinalMap enabled
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(true)
+                .build();
+        producer1.initializeDataModel(TestPojoV1.class);
+        long version = producer1.runCycle(ws -> ws.add(new TestPojoV1(1, 1)));
+
+        // Restore with partitionedOrdinalMap enabled → should not throw IllegalStateException
+        // from our validation check (partitioned ordinal map mismatch)
+        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(true)
+                .build();
+        producer2.initializeDataModel(TestPojoV1.class);
+        producer2.restore(version, blobStore);
+    }
+
+    @Test
+    public void testRestorePartitionedOrdinalMapMatch_bothDisabled() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        // Produce dataset with partitionedOrdinalMap disabled (default)
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .build();
+        producer1.initializeDataModel(TestPojoV1.class);
+        long version = producer1.runCycle(ws -> ws.add(new TestPojoV1(1, 1)));
+
+        // Restore with partitionedOrdinalMap disabled → should succeed
+        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .build();
+        producer2.initializeDataModel(TestPojoV1.class);
+        HollowProducer.ReadState readState = producer2.restore(version, blobStore);
+        Assert.assertNotNull(readState);
+        assertEquals(version, readState.getVersion());
+    }
+
     @Test
     public void testReshardingAllTypes() {
         HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
