@@ -406,6 +406,7 @@ public class HollowObjectSchema extends HollowSchema {
          */
         BYTES(-1, true);
 
+
         private final int fixedLength;
         private final boolean varIntEncodesLength;
 

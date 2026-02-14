@@ -25,6 +25,8 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -183,6 +186,24 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     }
 
     @Test
+    public void testInstant() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        long time = System.currentTimeMillis();
+        Instant currentInstant = Instant.ofEpochMilli(time);
+
+        mapper.add(currentInstant);
+
+        roundTripSnapshot();
+
+        int theOrdinal = readStateEngine.getTypeState("Instant").maxOrdinal();
+
+        GenericHollowObject obj = new GenericHollowObject(readStateEngine, "Instant", theOrdinal);
+
+        Assert.assertEquals(currentInstant, Instant.ofEpochSecond(obj.getLong("seconds"), obj.getInt("nanos")));
+    }
+
+    @Test
     public void testTransient() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
@@ -200,6 +221,43 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         Assert.assertTrue(schemeText.contains("notTransient"));
         Assert.assertFalse(schemeText.contains("transientKeyword"));
         Assert.assertFalse(schemeText.contains("annotatedTransient"));
+    }
+
+    @Test
+    public void testTypeWithSpecialTypes() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        long time = System.currentTimeMillis();
+        Date date = new Date(time);
+        // what if the DateTimeException is thrown?
+        Instant instant = Instant.now();
+        LocalDate localDate = LocalDate.now();
+
+        mapper.initializeTypeState(TypeWithSpecialTypes.class);
+        mapper.add(new TypeWithSpecialTypes(date, instant, localDate));
+
+        roundTripSnapshot();
+
+        HollowSchema schema = readStateEngine.getSchema("TypeWithSpecialTypes");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        schema.writeTo(baos);
+
+        String schemeText = baos.toString();
+        Assert.assertTrue(schemeText.contains("date"));
+        Assert.assertTrue(schemeText.contains("instant"));
+        Assert.assertTrue(schemeText.contains("localDate"));
+
+        int theOrdinal = readStateEngine.getTypeState("TypeWithSpecialTypes").maxOrdinal();
+
+        GenericHollowObject obj = new GenericHollowObject(readStateEngine, "TypeWithSpecialTypes", theOrdinal);
+
+        Assert.assertEquals(instant.getEpochSecond(), obj.getObject("instant").getLong("seconds"));
+        Assert.assertEquals(instant.getNano(), obj.getObject("instant").getInt("nanos"));
+
+        Assert.assertEquals(localDate.getYear(), obj.getObject("localDate").getInt("year"));
+        Assert.assertEquals(localDate.getMonthValue(), obj.getObject("localDate").getInt("month"));
+        Assert.assertEquals(localDate.getDayOfMonth(), obj.getObject("localDate").getInt("day"));
     }
 
     @Test

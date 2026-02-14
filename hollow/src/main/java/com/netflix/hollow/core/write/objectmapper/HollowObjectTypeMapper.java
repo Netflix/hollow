@@ -32,12 +32,15 @@ import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatReco
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
@@ -45,6 +48,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     
     private static final Set<Class<?>> BOXED_WRAPPERS = new HashSet<>(Arrays.asList(Boolean.class, Integer.class, Short.class, Byte.class, Character.class, Long.class, Float.class, Double.class, String.class, byte[].class, Date.class));
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
+    private static final Set<Class<?>> SPECIAL_WRAPPERS = new HashSet<>(Arrays.asList(LocalDate.class, Instant.class));
 
     private final HollowObjectMapper parentMapper;
 
@@ -80,7 +84,26 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             } catch(Exception e) {
                 throw new RuntimeException(e);
             }
-        } else {
+        } else if(clazz == Instant.class) {
+            try {
+                mappedFields.add(new MappedField(MappedFieldType.INSTANT_NANOS));
+                mappedFields.add(new MappedField(MappedFieldType.INSTANT_SECONDS));
+            }
+            catch(Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else if(clazz == LocalDate.class) {
+            try {
+                mappedFields.add(new MappedField(MappedFieldType.LOCAL_DATE_YEAR));
+                mappedFields.add(new MappedField(MappedFieldType.LOCAL_DATE_MONTH));
+                mappedFields.add(new MappedField(MappedFieldType.LOCAL_DATE_DAY));
+            }
+            catch(Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        else {
             /// gather fields from type hierarchy
             Class<?> currentClass = clazz;
 
@@ -227,7 +250,61 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                         obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(hollowObject);
                     }
                 }
-            } else {
+            }
+            else if (SPECIAL_WRAPPERS.contains(clazz)) {
+                // Multi-field reconstruction for special wrapper types
+                // for these types, the field names are known, no need to iterate the object to find the fieldName
+                if (clazz == Instant.class) {
+                    Long seconds = null;
+                    Integer nanos = null;
+                    int secondsPosInPojoSchema = schema.getPosition(MappedFieldType.INSTANT_SECONDS.getSpecialFieldName());
+                    if (secondsPosInPojoSchema != -1) {
+                        long value = hollowObject.getTypeDataAccess().readLong(hollowObject.getOrdinal(), secondsPosInPojoSchema);
+                        if (value != Long.MIN_VALUE) {
+                            seconds = value;
+                        }
+                    }
+                    int nanoPosInPojoSchema = schema.getPosition(MappedFieldType.INSTANT_NANOS.getSpecialFieldName());
+                    if (nanoPosInPojoSchema != -1) {
+                        int value = hollowObject.getTypeDataAccess().readInt(hollowObject.getOrdinal(), nanoPosInPojoSchema);
+                        if (value != Integer.MIN_VALUE) {
+                            nanos = value;
+                        }
+                    }
+                    if (seconds != null && nanos != null) {
+                        obj = Instant.ofEpochSecond(seconds, nanos);
+                    }
+                } else if (clazz == LocalDate.class) {
+                    Integer year = null;
+                    Integer month = null;
+                    Integer day = null;
+                    int yearPosInPojoSchema = schema.getPosition(MappedFieldType.LOCAL_DATE_YEAR.getSpecialFieldName());
+                    if (yearPosInPojoSchema != -1) {
+                        int value = hollowObject.getTypeDataAccess().readInt(hollowObject.getOrdinal(), yearPosInPojoSchema);
+                        if (value != Integer.MIN_VALUE) {
+                            year = value;
+                        }
+                    }
+                    int monthPosInPojoSchema = schema.getPosition(MappedFieldType.LOCAL_DATE_MONTH.getSpecialFieldName());
+                    if (monthPosInPojoSchema != -1) {
+                        int value = hollowObject.getTypeDataAccess().readInt(hollowObject.getOrdinal(), monthPosInPojoSchema);
+                        if (value != Integer.MIN_VALUE) {
+                            month = value;
+                        }
+                    }
+                    int dayPosInPojoSchema = schema.getPosition(MappedFieldType.LOCAL_DATE_DAY.getSpecialFieldName());
+                    if (dayPosInPojoSchema != -1) {
+                        int value = hollowObject.getTypeDataAccess().readInt(hollowObject.getOrdinal(), dayPosInPojoSchema);
+                        if (value != Integer.MIN_VALUE) {
+                            day = value;
+                        }
+                    }
+                    if (year != null && month != null && day != null) {
+                        obj = LocalDate.of(year, month, day);
+                    }
+                }
+            }
+            else {
                 obj = unsafe.allocateInstance(clazz);
                 for (int i = 0; i < objectSchema.numFields(); i++) {
                     int posInPojoSchema = schema.getPosition(objectSchema.getFieldName(i));
@@ -268,6 +345,65 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     int posInPojoSchema = schema.getPosition(fieldName);
                     if (fieldName.equals(MappedFieldType.ENUM_NAME.getSpecialFieldName()) && posInPojoSchema != -1) {
                         obj = mappedFields.get(posInPojoSchema).parseBoxedWrapper(objectNode);
+                    }
+                }
+            }
+            else if (SPECIAL_WRAPPERS.contains(clazz)) {
+                // Multi-field reconstruction for special wrapper types
+                if (clazz == Instant.class) {
+                      Long seconds = null;
+                    Integer nanos = null;
+                    int secondsPosInPojoSchema = schema.getPosition("seconds");
+                    if(secondsPosInPojoSchema != -1) {
+                        long secondsValue = objectNode.getFieldValueLong("seconds");
+                        if(secondsValue != Long.MIN_VALUE) {
+                            seconds = secondsValue;
+                        }
+                    }
+
+                    int nanoPosInPojoSchema = schema.getPosition("nanos");
+                    if(nanoPosInPojoSchema != -1) {
+                        int nanoValue = objectNode.getFieldValueInt("nanos");
+                        if(nanoValue != Integer.MIN_VALUE) {
+                            nanos = nanoValue;
+                        }
+                    }
+
+                    if(seconds != null && nanos != null) {
+                        obj = Instant.ofEpochSecond(seconds, nanos);
+                    }
+
+                } else if (clazz == LocalDate.class) {
+                    Integer year = null;
+                    Integer month = null;
+                    Integer day = null;
+
+                    int yearPosInPojoSchema = schema.getPosition("year");
+                    if (yearPosInPojoSchema != -1) {
+                        int value = objectNode.getFieldValueInt("year");
+                        if (value != Integer.MIN_VALUE) {
+                            year = value;
+                        }
+                    }
+
+                    int monthPosInPojoSchema = schema.getPosition("month");
+                    if (monthPosInPojoSchema != -1) {
+                        int value = objectNode.getFieldValueInt("month");
+                        if (value != Integer.MIN_VALUE) {
+                            month = value;
+                        }
+                    }
+
+                    int dayPosInPojoSchema = schema.getPosition("day");
+                    if (dayPosInPojoSchema != -1) {
+                        int value = objectNode.getFieldValueInt("day");
+                        if (value != Integer.MIN_VALUE) {
+                            day = value;
+                        }
+                    }
+
+                    if (year != null && month != null && day != null) {
+                        obj = LocalDate.of(year, month, day);
                     }
                 }
             } else {
@@ -584,8 +720,39 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     		rec.setReference(fieldName, subTypeMapper.writeFlat(fieldObject, flatRecordWriter));
                     }
                     break;
+                case LOCAL_DATE_DAY:
+                    fieldObject = unsafe.getObject(obj, fieldOffset);
+                    if(fieldObject != null) {
+                        rec.setInt(fieldName, ((LocalDate)obj).getDayOfMonth());
+                    }
+                    break;
+                case LOCAL_DATE_MONTH:
+                    fieldObject = unsafe.getObject(obj, fieldOffset);
+                    if(fieldObject != null) {
+                        rec.setInt(fieldName, ((LocalDate)obj).getMonthValue());
+                    }
+                    break;
+                case LOCAL_DATE_YEAR:
+                    fieldObject = unsafe.getObject(obj, fieldOffset);
+                    if(fieldObject != null) {
+                        rec.setInt(fieldName, ((LocalDate)obj).getYear());
+                    }
+                    break;
+                case INSTANT_NANOS:
+                    fieldObject = unsafe.getObject(obj, fieldOffset);
+                    if(fieldObject != null) {
+                        rec.setInt(fieldName, ((Instant)obj).getNano());
+                    }
+                    break;
+                case INSTANT_SECONDS:
+                    fieldObject = unsafe.getObject(obj, fieldOffset);
+                    if(fieldObject != null) {
+                        rec.setLong(fieldName, ((Instant)obj).getEpochSecond());
+                    }
+                    break;
             }
         }
+
 
         public void copy(Object pojo, GenericHollowObject rec) {
             switch (fieldType) {
@@ -1118,7 +1285,12 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         INLINED_STRING(FieldType.STRING),
         REFERENCE(FieldType.REFERENCE),
         ENUM_NAME(FieldType.STRING, "_name"),
-        DATE_TIME(FieldType.LONG, "value");
+        DATE_TIME(FieldType.LONG, "value"),
+        INSTANT_SECONDS(FieldType.LONG, "seconds"),
+        INSTANT_NANOS(FieldType.INT, "nanos"),
+        LOCAL_DATE_YEAR(FieldType.INT, "year"),
+        LOCAL_DATE_MONTH(FieldType.INT, "month"),
+        LOCAL_DATE_DAY(FieldType.INT, "day");
         
         private final FieldType schemaFieldType;
         private final String specialFieldName;
@@ -1132,7 +1304,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.schemaFieldType = schemaFieldType;
             this.specialFieldName = specialFieldName;
         }
-        
+
         public String getSpecialFieldName() {
             return specialFieldName;
         }
