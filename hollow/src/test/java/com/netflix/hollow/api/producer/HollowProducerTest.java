@@ -137,13 +137,14 @@ public class HollowProducerTest {
     private void checkBaomIgnoreOrdinalSoftLimit(boolean expected, HollowProducer producer) {
         for (HollowTypeWriteState hollowTypeWriteState : producer.getWriteEngine().getOrderedTypeStates()) {
             try {
-                java.lang.reflect.Field ordinalMapField = HollowTypeWriteState.class.getDeclaredField("ordinalMap");
-                ordinalMapField.setAccessible(true);
-                com.netflix.hollow.core.memory.ByteArrayOrdinalMap ordinalMap =
-                        (com.netflix.hollow.core.memory.ByteArrayOrdinalMap) ordinalMapField.get(hollowTypeWriteState);
-
-                assertEquals("ByteArrayOrdinalMap.ignoreSoftLimits should be " + expected,
-                        expected, ordinalMap.getIgnoreSoftLimits());
+                java.lang.reflect.Field ordinalMapsField = HollowTypeWriteState.class.getDeclaredField("ordinalMaps");
+                ordinalMapsField.setAccessible(true);
+                com.netflix.hollow.core.memory.ByteArrayOrdinalMap[] ordinalMaps =
+                        (com.netflix.hollow.core.memory.ByteArrayOrdinalMap[]) ordinalMapsField.get(hollowTypeWriteState);
+                for (com.netflix.hollow.core.memory.ByteArrayOrdinalMap baom : ordinalMaps) {
+                    assertEquals("ByteArrayOrdinalMap.ignoreSoftLimits should be " + expected,
+                            expected, baom.getIgnoreSoftLimits());
+                }
             } catch (NoSuchFieldException | IllegalAccessException ex) {
                 Assert.fail(ex.getMessage());
             }
@@ -508,6 +509,93 @@ public class HollowProducerTest {
             ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
         }
         System.out.println("Asserted Correctness of version:" + version + "\n\n");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testRestorePartitionedOrdinalMapMismatch_producerEnabledDatasetDisabled() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        // Produce dataset with partitionedOrdinalMap disabled (default)
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .build();
+        producer1.initializeDataModel(TestPojoV1.class);
+        long version = producer1.runCycle(ws -> ws.add(new TestPojoV1(1, 1)));
+
+        // Restore with partitionedOrdinalMap enabled → should fail
+        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(true)
+                .build();
+        producer2.initializeDataModel(TestPojoV1.class);
+        producer2.restore(version, blobStore);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testRestorePartitionedOrdinalMapMismatch_producerDisabledDatasetEnabled() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        // Produce dataset with partitionedOrdinalMap enabled
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(true)
+                .build();
+        producer1.initializeDataModel(TestPojoV1.class);
+        long version = producer1.runCycle(ws -> ws.add(new TestPojoV1(1, 1)));
+
+        // Restore with partitionedOrdinalMap disabled → should fail
+        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .build();
+        producer2.initializeDataModel(TestPojoV1.class);
+        producer2.restore(version, blobStore);
+    }
+
+    @Test
+    public void testRestorePartitionedOrdinalMapMatch_bothEnabled() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        // Produce dataset with partitionedOrdinalMap enabled
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(true)
+                .build();
+        producer1.initializeDataModel(TestPojoV1.class);
+        long version = producer1.runCycle(ws -> ws.add(new TestPojoV1(1, 1)));
+
+        // Restore with partitionedOrdinalMap enabled → should not throw IllegalStateException
+        // from our validation check (partitioned ordinal map mismatch)
+        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(true)
+                .build();
+        producer2.initializeDataModel(TestPojoV1.class);
+        producer2.restore(version, blobStore);
+    }
+
+    @Test
+    public void testRestorePartitionedOrdinalMapMatch_bothDisabled() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        // Produce dataset with partitionedOrdinalMap disabled (default)
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .build();
+        producer1.initializeDataModel(TestPojoV1.class);
+        long version = producer1.runCycle(ws -> ws.add(new TestPojoV1(1, 1)));
+
+        // Restore with partitionedOrdinalMap disabled → should succeed
+        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .build();
+        producer2.initializeDataModel(TestPojoV1.class);
+        HollowProducer.ReadState readState = producer2.restore(version, blobStore);
+        Assert.assertNotNull(readState);
+        assertEquals(version, readState.getVersion());
     }
 
     @Test
