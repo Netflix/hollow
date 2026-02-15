@@ -27,8 +27,12 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
+import com.netflix.hollow.api.objects.generic.GenericHollowList;
+import com.netflix.hollow.api.objects.generic.GenericHollowMap;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
+import com.netflix.hollow.api.objects.generic.GenericHollowSet;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.Blob.Type;
 import com.netflix.hollow.api.producer.HollowProducer.HeaderBlob;
@@ -53,7 +57,9 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.test.InMemoryBlobStore;
 import java.io.File;
@@ -545,6 +551,170 @@ public class HollowProducerTest {
         } catch (IllegalStateException e) {
             Assert.assertNotEquals(datasetEnabled, producerEnabled);
         }
+    }
+
+    @Test
+    public void testPartitionedOrdinalMapProducerOps() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        // --- Producer 1: run 2 cycles with partitionedOrdinalMap enabled ---
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(true)
+                .build();
+        producer1.initializeDataModel(PartitionedTestType.class);
+
+        // Cycle 1
+        producer1.runCycle(ws -> {
+            for (int i = 0; i < 2048; i++) {
+                ws.add(buildPartitionedTestType(i));
+            }
+        });
+
+        // Cycle 2: track ordinals via primaryKeyToOrdinal map
+        Map<String, Integer> primaryKeyToOrdinal = new HashMap<>();
+        Map<Integer, PartitionedTestType> ordinalToObject = new HashMap<>();
+        long version2 = producer1.runCycle(ws -> {
+            for (int i = 0; i < 4096; i++) {
+                PartitionedTestType obj = buildPartitionedTestType(i);
+                int ordinal = ws.add(obj);
+                String key = i + ":" + "name_" + i;
+                primaryKeyToOrdinal.put(key, ordinal);
+                ordinalToObject.put(ordinal, obj);
+            }
+        });
+
+        // --- Producer 2: restore from producer1's blob ---
+        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(true)
+                .build();
+        producer2.initializeDataModel(PartitionedTestType.class);
+        HollowProducer.ReadState readState = producer2.restore(version2, blobStore);
+        assertEquals(version2, readState.getVersion());
+
+        // --- Verify ordinals via iteration ---
+        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState)
+                readState.getStateEngine().getTypeState("PartitionedTestType");
+        BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
+        assertEquals(4096, populatedOrdinals.cardinality());
+        
+        // --- Cycle 3 on producer2: remove 10 records (ids 100-109) and verify ---
+        Set<String> removedKeys = new HashSet<>();
+        for (int i = 100; i < 110; i++) {
+            removedKeys.add(i + ":" + "name_" + i);
+        }
+
+        long version3 = producer2.runCycle(ws -> {
+            for (int i = 0; i < 4096; i++) {
+                String key = i + ":" + "name_" + i;
+                if (!removedKeys.contains(key)) {
+                    ws.add(buildPartitionedTestType(i));
+                }
+            }
+        });
+
+        // Restore to a new producer to get the read state after removals
+        HollowProducer producer3 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(true)
+                .build();
+        producer3.initializeDataModel(PartitionedTestType.class);
+        HollowProducer.ReadState readState3 = producer3.restore(version3, blobStore);
+        assertEquals(version3, readState3.getVersion());
+
+        // Verify removals via populated ordinals
+        HollowObjectTypeReadState typeState2 = (HollowObjectTypeReadState)
+                readState3.getStateEngine().getTypeState("PartitionedTestType");
+        BitSet populatedOrdinals2 = typeState2.getPopulatedOrdinals();
+        assertEquals(4086, populatedOrdinals2.cardinality());
+
+        // Verify none of the removed keys appear in populated ordinals
+        int ord2 = populatedOrdinals2.nextSetBit(0);
+        while (ord2 != -1) {
+            GenericHollowObject obj2 = new GenericHollowObject(
+                    new HollowObjectGenericDelegate(typeState2), ord2);
+            int id2 = obj2.getInt("id");
+            String name2 = obj2.getObject("name").getString("value");
+            String key2 = id2 + ":" + name2;
+            assertFalse("Removed key " + key2 + " should not be present",
+                    removedKeys.contains(key2));
+            ord2 = populatedOrdinals2.nextSetBit(ord2 + 1);
+        }
+
+        // Verify via HollowPrimaryKeyIndex that removed records return -1
+        HollowPrimaryKeyIndex primaryKeyIndex2 = new HollowPrimaryKeyIndex(
+                readState3.getStateEngine(), "PartitionedTestType", "id", "name.value");
+        for (String removedKey : removedKeys) {
+            String[] parts = removedKey.split(":", 2);
+            int id = Integer.parseInt(parts[0]);
+            String name = parts[1];
+            int matchingOrdinal = primaryKeyIndex2.getMatchingOrdinal(id, name);
+            assertEquals("Removed record id=" + id + " name=" + name + " should not be found",
+                    -1, matchingOrdinal);
+        }
+
+        // Verify remaining records still resolve correctly
+        for (Map.Entry<String, Integer> entry : primaryKeyToOrdinal.entrySet()) {
+            if (removedKeys.contains(entry.getKey())) continue;
+            String[] parts = entry.getKey().split(":", 2);
+            int id = Integer.parseInt(parts[0]);
+            String name = parts[1];
+            int actualOrdinal = primaryKeyIndex2.getMatchingOrdinal(id, name);
+            assertTrue("Remaining record id=" + id + " name=" + name + " should still be found",
+                    actualOrdinal != -1);
+        }
+    }
+
+    private static void assertPartitionedTestTypeFields(GenericHollowObject obj, PartitionedTestType expected) {
+        assertEquals(expected.id, obj.getInt("id"));
+        assertEquals(expected.name, obj.getObject("name").getString("value"));
+        assertEquals(expected.longField, obj.getLong("longField"));
+        assertEquals(expected.floatField, obj.getFloat("floatField"), 0.0001f);
+        assertEquals(expected.doubleField, obj.getDouble("doubleField"), 0.0001);
+        assertEquals(expected.boolField, obj.getBoolean("boolField"));
+
+        // Set<String>
+        GenericHollowSet hollowSet = obj.getSet("setOfStrings");
+        Set<String> actualSet = new HashSet<>();
+        for (HollowRecord element : hollowSet) {
+            actualSet.add(((GenericHollowObject) element).getString("value"));
+        }
+        assertEquals(expected.setOfStrings, actualSet);
+
+        // List<Integer>
+        GenericHollowList hollowList = obj.getList("listOfInts");
+        assertEquals(expected.listOfInts.size(), hollowList.size());
+        for (int i = 0; i < hollowList.size(); i++) {
+            assertEquals((int) expected.listOfInts.get(i),
+                    ((GenericHollowObject) hollowList.get(i)).getInt("value"));
+        }
+
+        // Map<Integer, String>
+        GenericHollowMap hollowMap = obj.getMap("mapOfIntToString");
+        assertEquals(expected.mapOfIntToString.size(), hollowMap.size());
+        Map<Integer, String> actualMap = new HashMap<>();
+        for (Map.Entry<HollowRecord, HollowRecord> entry : hollowMap.entrySet()) {
+            int key = ((GenericHollowObject) entry.getKey()).getInt("value");
+            String value = ((GenericHollowObject) entry.getValue()).getString("value");
+            actualMap.put(key, value);
+        }
+        assertEquals(expected.mapOfIntToString, actualMap);
+    }
+
+    private static PartitionedTestType buildPartitionedTestType(int i) {
+        return new PartitionedTestType(
+                i,
+                "name_" + i,
+                (long) i * 100,
+                (float) i * 1.1f,
+                (double) i * 2.2,
+                i % 2 == 0,
+                new HashSet<>(Arrays.asList("s_" + i, "s2_" + i, "s3_" + i)),
+                Arrays.asList(i, i + 1),
+                new HashMap<Integer, String>() {{ put(i, "v_0_" + i); put(i+1, "v_1_" + i); put(i+2, "v_2_" + i);}}
+        );
     }
 
     @Test
@@ -1147,6 +1317,34 @@ public class HollowProducerTest {
 
         Assert.assertEquals(iVal, typeState.readInt(ordinal, typeState.getSchema().getPosition("intVal")));
         Assert.assertEquals(sVal, typeState.readString(ordinal, typeState.getSchema().getPosition("strVal")));
+    }
+
+    @HollowPrimaryKey(fields = {"id", "name"})
+    private static class PartitionedTestType {
+        int id;
+        String name;
+        long longField;
+        float floatField;
+        double doubleField;
+        boolean boolField;
+        Set<String> setOfStrings;
+        List<Integer> listOfInts;
+        Map<Integer, String> mapOfIntToString;
+
+        PartitionedTestType(int id, String name, long longField, float floatField,
+                            double doubleField, boolean boolField,
+                            Set<String> setOfStrings, List<Integer> listOfInts,
+                            Map<Integer, String> mapOfIntToString) {
+            this.id = id;
+            this.name = name;
+            this.longField = longField;
+            this.floatField = floatField;
+            this.doubleField = doubleField;
+            this.boolField = boolField;
+            this.setOfStrings = setOfStrings;
+            this.listOfInts = listOfInts;
+            this.mapOfIntToString = mapOfIntToString;
+        }
     }
 
     @SuppressWarnings("unused")
