@@ -751,6 +751,7 @@ public class HollowProducer extends AbstractHollowProducer {
         SingleProducerEnforcer singleProducerEnforcer = new BasicSingleProducerEnforcer();
         HollowObjectHashCodeFinder hashCodeFinder = null;
         boolean doIntegrityCheck = true;
+        boolean partitionedOrdinalMap = false;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
         Supplier<Boolean> ignoreSoftLimits = null;
@@ -967,6 +968,17 @@ public class HollowProducer extends AbstractHollowProducer {
         
         public B noIntegrityCheck() {
             this.doIntegrityCheck = false;
+            return (B) this;
+        }
+
+        /*
+         * By partitioning a {@link HollowTypeWriteState} into 4 {@link com.netflix.hollow.core.memory.ByteArrayOrdinalMap} instead of 1,
+         * we can increase the ordinal limit (record cardinality limit) of the {@link HollowTypeWriteState} by 4 times.
+         * @param partitionedOrdinalMap true to enable the partition.
+         * @return this builder
+         */
+        public B withPartitionedOrdinalMap(boolean partitionedOrdinalMap) {
+            this.partitionedOrdinalMap = partitionedOrdinalMap;
             return (B) this;
         }
 
