@@ -168,11 +168,20 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
 
     private String readString(ByteData data, long position, int length) {
         char[] chararr = HollowObjectTypeReadStateShard.chararr.get();
+        final boolean needToClear;
         if (length > chararr.length) {
             chararr = new char[length];
+            needToClear = false;
+        } else if (!VarInt.USE_OPTIMIZATION) {
+//            System.out.println("TOO SMALL non opt");
+            Arrays.fill(chararr, 0, length, '\0');
+            needToClear = false;
+        } else {
+    //        System.out.println("TOO small opt");
+            needToClear = true;
         }
 
-        int count = VarInt.readVIntsInto(data, position, length, chararr);
+        int count = VarInt.readVIntsInto(data, position, length, chararr, needToClear);
 
         // The number of chars may be fewer than the number of bytes in the serialized data
         return new String(chararr, 0, count);

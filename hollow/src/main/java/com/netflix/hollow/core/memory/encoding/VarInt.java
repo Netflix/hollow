@@ -23,6 +23,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * Variable-byte integer encoding and decoding logic
@@ -31,6 +32,7 @@ import java.io.OutputStream;
  */
 public class VarInt {
 
+    public static boolean USE_OPTIMIZATION = false;
 
     /**
      * Write a 'null' variable length integer into the supplied {@link ByteDataArray}
@@ -247,6 +249,7 @@ public class VarInt {
      * @return the number of values written
      */
     public static int readVIntsInto(ByteData arr, long position, int length, int[] output) {
+
         // two loops, first for single-byte encodes, falling back to second full-featured loop
         int i = 0;
         for(; i < length; i++) {
@@ -287,7 +290,7 @@ public class VarInt {
      * @param output an array where outputs will be placed, which should be at least {@code length} long.
      * @return the number of values written
      */
-    public static int readVIntsInto(ByteData arr, long position, int length, char[] output) {
+    public static int readVIntsInto(ByteData arr, long position, int length, char[] output, boolean needToClear) {
         // two loops, first for single-byte encodes, falling back to second full-featured loop
         int i = 0;
         for(; i < length; i++) {
@@ -296,25 +299,21 @@ public class VarInt {
                 break;
             output[i] = (char) b;
         }
-
-        int count = i;
-        int accumulator = 0;
-        for(; i < length; i++) {
-            int b = arr.get(position + i);
-
-            // Accumulate the next 7 bits into the value
-            accumulator = (accumulator << 7) | (b & 0x7f);
-
-            // Check if this byte completes a value (continuation bit not set)
-            int isComplete = (~b >> 7) & 0x1;  // 1 if complete, 0 if continuing
-            output[count] = (char) accumulator; // Write current accumulator (may overwrite same position)
-            count += isComplete;                // Advance output position only when value is complete
-
-            // Clear accumulator for next value using sign extension trick:
-            // - If b has continuation bit (b negative): b >> 7 = 0xFFFFFFFF, keeps accumulator
-            // - If b completes value (b positive): b >> 7 = 0, clears accumulator
-            accumulator &= (b >> 7);
+        if (i == length) {
+            return i;
         }
+
+        if (USE_OPTIMIZATION && needToClear) {
+            Arrays.fill(output, i, length, '\0');
+        }
+        int count = i;
+        for(; i < length; i++) {
+                int b = arr.get(position + i);
+
+                output[count] = (char) ((output[count] << 7) | (b & 0x7f));
+                count += (~b >> 7) & 0x1;
+        }
+
 
         return count;
     }

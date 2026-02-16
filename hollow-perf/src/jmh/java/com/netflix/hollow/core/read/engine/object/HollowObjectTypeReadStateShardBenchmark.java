@@ -1,5 +1,6 @@
 package com.netflix.hollow.core.read.engine.object;
 
+import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
@@ -24,10 +25,10 @@ import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @Warmup(iterations = 10, time = 1)
-@Measurement(iterations = 10, time = 1)
-@Fork(1)
+@Measurement(iterations = 20, time = 1)
+@Fork(5)
 public class HollowObjectTypeReadStateShardBenchmark {
     HollowWriteStateEngine writeStateEngine;
     HollowReadStateEngine readStateEngine;
@@ -40,16 +41,20 @@ public class HollowObjectTypeReadStateShardBenchmark {
     @Param({ "100000" })
     int countStringsDb;
 
-    ArrayList<Integer> readOrder;
+    int[] readOrder;
 
-    @Param({ "5", "25", "50", "150", "1000" })
+    @Param({ "5", "25", "50", "90", "150", "1000" })
     int maxStringLength;
 
-    @Param({ "10" })
+    @Param({ "0", "5", "10", "50", "90" })
     int probabilityUnicode;
+
+    @Param({"false", "true"})
+    boolean useOptimization;
 
     @Setup
     public void setUp() throws IOException {
+        VarInt.USE_OPTIMIZATION = useOptimization;
         writeStateEngine = new HollowWriteStateEngine();
         objectMapper = new HollowObjectMapper(writeStateEngine);
         objectMapper.initializeTypeState(String.class);
@@ -59,7 +64,7 @@ public class HollowObjectTypeReadStateShardBenchmark {
             StringBuilder sb = new StringBuilder();
             sb.append("string_");
             sb.append(i);
-            sb.append("_");
+            sb.append('_');
             int thisStringLength = r.nextInt(maxStringLength) - sb.length() + 1;
             for (int j = 0; j < thisStringLength; j++) {
                 if (r.nextInt(100) < probabilityUnicode) {
@@ -71,9 +76,9 @@ public class HollowObjectTypeReadStateShardBenchmark {
             objectMapper.add(sb.toString());
         }
 
-        readOrder = new ArrayList<>(countStrings);
+        readOrder = new int[countStrings];
         for (int i = 0; i < countStrings; i++) {
-            readOrder.add(r.nextInt(countStringsDb));
+            readOrder[i] = r.nextInt(countStringsDb);
         }
 
         readStateEngine = new HollowReadStateEngine();
