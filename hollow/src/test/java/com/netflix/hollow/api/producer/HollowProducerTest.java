@@ -599,7 +599,7 @@ public class HollowProducerTest {
                 readState.getStateEngine().getTypeState("PartitionedTestType");
         BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
         assertEquals(4096, populatedOrdinals.cardinality());
-        
+
         // --- Cycle 3 on producer2: remove 10 records (ids 100-109) and verify ---
         Set<String> removedKeys = new HashSet<>();
         for (int i = 100; i < 110; i++) {
