@@ -33,6 +33,7 @@ import com.netflix.hollow.test.InMemoryBlobStore;
 import com.netflix.hollow.tools.compact.HollowCompactor.CompactionConfig;
 import java.time.Duration;
 import java.util.BitSet;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Before;
@@ -486,6 +487,28 @@ public class HollowProducerConsumerTests {
             return;
         }
         Assert.fail();  // fail if UnsupportedOperationException was not thrown
+    }
+
+    @Test
+    public void consumerErrorsDuringRefreshArePropagated() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+            .withAnnouncer(announcement)
+            .withBlobStager(new HollowInMemoryBlobStager())
+            .build();
+        long v1 = runCycle(producer, 1);
+
+        InMemoryBlobStore otherBlobStore = new InMemoryBlobStore();
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(otherBlobStore)
+            .withAnnouncementWatcher(announcement)
+            .build();
+
+        try {
+            consumer.triggerAsyncRefresh().toCompletableFuture().join();
+            Assert.fail("Expected exception to be thrown by async refresh.");
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof CompletionException);
+            Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
+        }
     }
 
     private long runCycle(HollowProducer producer, final int cycleNumber) {
