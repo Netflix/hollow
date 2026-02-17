@@ -4,7 +4,7 @@
 
 ## The Problem
 
-Software engineers often encounter problems which require the dissemination of small or moderately sized data sets which don’t fit the label “big data”.  To solve these problems, we often send the data to an RDBMS or nosql data store and query it at runtime, or serialize the data as json or xml, distribute it, and keep a local copy on each consumer.
+Software engineers often encounter problems that require the dissemination of small or moderately sized data sets that don’t fit the label “big data”.  To solve these problems, we often send the data to an RDBMS or nosql data store and query it at runtime, or serialize the data as json or xml, distribute it, and keep a local copy on each consumer.
 
 
 Scaling each of these solutions presents different challenges.  Sending the data to an RDBMS, nosql data store, or even a memcached cluster may allow your dataset to grow indefinitely large, but there are limitations on the latency and frequency with which you can interact with that dataset.  Serializing and keeping a local copy (if in RAM) can allow many orders of magnitude lower latency and higher frequency access, but this approach has many scaling challenges:
