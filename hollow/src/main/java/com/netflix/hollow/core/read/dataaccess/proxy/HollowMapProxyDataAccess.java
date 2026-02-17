@@ -17,7 +17,6 @@
 package com.netflix.hollow.core.read.dataaccess.proxy;
 
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
-import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.map.PotentialMatchHollowMapEntryOrdinalIteratorImpl;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIteratorImpl;
@@ -28,49 +27,45 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
  * 
  * @see HollowProxyDataAccess
  */
-public class HollowMapProxyDataAccess extends HollowTypeProxyDataAccess implements HollowMapTypeDataAccess{
+public class HollowMapProxyDataAccess extends HollowTypeProxyDataAccess<HollowMapTypeDataAccess> implements HollowMapTypeDataAccess{
 
-    public HollowMapProxyDataAccess(HollowProxyDataAccess dataAccess) {
+    HollowMapProxyDataAccess(HollowProxyDataAccess dataAccess) {
         super(dataAccess);
-    }
-
-    public void setCurrentDataAccess(HollowTypeDataAccess currentDataAccess) {
-        this.currentDataAccess = (HollowMapTypeDataAccess) currentDataAccess;
     }
 
     @Override
     public HollowMapSchema getSchema() {
-        return currentDataAccess().getSchema();
+        return currentDataAccess.getSchema();
     }
 
     @Override
     public int size(int ordinal) {
-        return currentDataAccess().size(ordinal);
+        return currentDataAccess.size(ordinal);
     }
 
     @Override
     public int get(int ordinal, int keyOrdinal) {
-        return currentDataAccess().get(ordinal, keyOrdinal);
+        return currentDataAccess.get(ordinal, keyOrdinal);
     }
 
     @Override
     public int get(int ordinal, int keyOrdinal, int hashCode) {
-        return currentDataAccess().get(ordinal, keyOrdinal, hashCode);
+        return currentDataAccess.get(ordinal, keyOrdinal, hashCode);
     }
     
     @Override
     public int findKey(int ordinal, Object... hashKey) {
-        return currentDataAccess().findKey(ordinal, hashKey);
+        return currentDataAccess.findKey(ordinal, hashKey);
     }
 
     @Override
     public int findValue(int ordinal, Object... hashKey) {
-        return currentDataAccess().findValue(ordinal, hashKey);
+        return currentDataAccess.findValue(ordinal, hashKey);
     }
 
     @Override
     public long findEntry(int ordinal, Object... hashKey) {
-        return currentDataAccess().findEntry(ordinal, hashKey);
+        return currentDataAccess.findEntry(ordinal, hashKey);
     }
 
     @Override
@@ -85,11 +80,6 @@ public class HollowMapProxyDataAccess extends HollowTypeProxyDataAccess implemen
 
     @Override
     public long relativeBucket(int ordinal, int bucketIndex) {
-        return currentDataAccess().relativeBucket(ordinal, bucketIndex);
+        return currentDataAccess.relativeBucket(ordinal, bucketIndex);
     }
-
-    private HollowMapTypeDataAccess currentDataAccess() {
-        return (HollowMapTypeDataAccess)currentDataAccess;
-    }
-
 }

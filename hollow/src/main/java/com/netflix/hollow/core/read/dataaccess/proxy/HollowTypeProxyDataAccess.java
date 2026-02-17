@@ -28,17 +28,17 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
  * 
  * @see HollowProxyDataAccess
  */
-public abstract class HollowTypeProxyDataAccess implements HollowTypeDataAccess {
+public abstract class HollowTypeProxyDataAccess<T extends HollowTypeDataAccess> implements HollowTypeDataAccess {
 
     protected final HollowProxyDataAccess dataAccess;
-    protected HollowTypeDataAccess currentDataAccess;
+    protected T currentDataAccess;
 
-    public HollowTypeProxyDataAccess(HollowProxyDataAccess dataAccess) {
+    protected HollowTypeProxyDataAccess(HollowProxyDataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 
-    public void setCurrentDataAccess(HollowTypeDataAccess typeDataAccess) {
-        this.currentDataAccess = typeDataAccess;
+    public final void setCurrentDataAccess(T currentDataAccess) {
+        this.currentDataAccess = currentDataAccess;
     }
 
     public HollowTypeDataAccess getCurrentDataAccess() {
@@ -46,32 +46,32 @@ public abstract class HollowTypeProxyDataAccess implements HollowTypeDataAccess 
     }
 
     @Override
-    public HollowDataAccess getDataAccess() {
+    public final HollowDataAccess getDataAccess() {
         return dataAccess;
     }
 
     @Override
-    public HollowTypeReadState getTypeState() {
+    public final HollowTypeReadState getTypeState() {
         return currentDataAccess.getTypeState();
     }
 
     @Override
-    public void setSamplingDirector(HollowSamplingDirector director) {
+    public final void setSamplingDirector(HollowSamplingDirector director) {
         currentDataAccess.setSamplingDirector(director);
     }
     
     @Override
-    public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
+    public final void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director) {
         currentDataAccess.setFieldSpecificSamplingDirector(fieldSpec, director);
     }
     
     @Override
-    public void ignoreUpdateThreadForSampling(Thread t) {
+    public final void ignoreUpdateThreadForSampling(Thread t) {
         currentDataAccess.ignoreUpdateThreadForSampling(t);
     }
 
     @Override
-    public HollowSampler getSampler() {
+    public final HollowSampler getSampler() {
         return currentDataAccess.getSampler();
     }
 
