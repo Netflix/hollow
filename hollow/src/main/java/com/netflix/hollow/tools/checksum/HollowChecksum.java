@@ -83,6 +83,36 @@ public class HollowChecksum {
         return Integer.toHexString(currentChecksum);
     }
 
+    /**
+     * Get checksum for a specific type.
+     * @param typeName the type name
+     * @return checksum value for the type, or 0 if type not found
+     */
+    public int getTypeChecksum(String typeName) {
+        if (sortedTypeChecksums == null) {
+            return 0;
+        }
+        for (int i = 0; i < sortedTypeChecksums.size(); i++) {
+            TypeChecksum tc = sortedTypeChecksums.elementAt(i);
+            if (tc.getTypeName().equals(typeName)) {
+                return tc.getChecksum();
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Get all type checksums.
+     * @return list of type checksums
+     */
+    public java.util.List<TypeChecksum> getTypeChecksums() {
+        if (sortedTypeChecksums == null) {
+            return java.util.Collections.emptyList();
+        }
+        return java.util.Collections.unmodifiableList(
+            new java.util.ArrayList<TypeChecksum>(sortedTypeChecksums));
+    }
+
     public static HollowChecksum forStateEngine(HollowReadStateEngine stateEngine) {
         return forStateEngineWithCommonSchemas(stateEngine, stateEngine);
     }
@@ -128,6 +158,10 @@ public class HollowChecksum {
         public TypeChecksum(String type, HollowChecksum cksum) {
             this.type = type;
             this.checksum = cksum.intValue();
+        }
+
+        public String getTypeName() {
+            return type;
         }
 
         public int getChecksum() {
