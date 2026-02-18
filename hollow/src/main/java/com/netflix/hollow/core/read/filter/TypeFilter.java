@@ -415,9 +415,12 @@ final class Resolver {
                             if (descendantAction.recursive && os.getFieldType(i) == REFERENCE) {
                                 String refType = os.getReferencedType(i);
                                 HollowSchema refSchema = schemas.get(refType);
-                                assert refSchema != null;
-                                Stream<TypeActions> descendants = descendants((t,f) -> descendantAction, refSchema);
-                                return Stream.concat(Stream.of(parent, child), descendants);
+                                if (refSchema != null) {
+                                    Stream<TypeActions> descendants = descendants((t,f) -> descendantAction, refSchema);
+                                    return Stream.concat(Stream.of(parent, child), descendants);
+                                }
+                                // Referenced type not in blob (e.g. optional ref never populated); skip recursion
+                                return Stream.of(parent, child);
                             } else {
                                 return Stream.of(parent, child);
                             }
@@ -431,10 +434,12 @@ final class Resolver {
                     HollowCollectionSchema cs = (HollowCollectionSchema) schema;
 
                     HollowSchema elemSchema = schemas.get(cs.getElementType());
-                    assert elemSchema != null;
-
-                    Stream<TypeActions> descendants = descendants((t, f) -> action, elemSchema);
-                    return Stream.concat(Stream.of(parent), descendants);
+                    if (elemSchema != null) {
+                        Stream<TypeActions> descendants = descendants((t, f) -> action, elemSchema);
+                        return Stream.concat(Stream.of(parent), descendants);
+                    }
+                    // Element type not in blob; skip recursion
+                    return Stream.of(parent);
                 } else {
                     return Stream.of(parent);
                 }
@@ -446,9 +451,9 @@ final class Resolver {
                     HollowMapSchema ms = (HollowMapSchema) schema;
                     HollowSchema kSchema = schemas.get(ms.getKeyType());
                     HollowSchema vSchema = schemas.get(ms.getValueType());
-                    Stream<TypeActions> descendants = Stream.concat(
-                            descendants((t, f) -> action, kSchema),
-                            descendants((t1, f1) -> action, vSchema));
+                    Stream<TypeActions> kDesc = kSchema != null ? descendants((t, f) -> action, kSchema) : Stream.empty();
+                    Stream<TypeActions> vDesc = vSchema != null ? descendants((t1, f1) -> action, vSchema) : Stream.empty();
+                    Stream<TypeActions> descendants = Stream.concat(kDesc, vDesc);
                     return Stream.concat(Stream.of(parent), descendants);
                 } else {
                     return Stream.of(parent);
@@ -503,8 +508,8 @@ class TypeActions {
 
         Action all = m.get(ALL);
         m = m.entrySet().stream()
-             .filter(entry -> entry.getKey() == ALL || entry.getValue() != all)
-             .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .filter(entry -> entry.getKey() == ALL || entry.getValue() != all)
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         return new TypeActions(type, m);
     }
