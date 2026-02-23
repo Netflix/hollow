@@ -138,30 +138,42 @@ public abstract class HollowTypeWriteState {
         return ordinal;
     }
 
+    /**
+     * Search all maps in the given array for a record matching the scratch bytes.
+     * @return the global ordinal if found, or -1 if not found
+     */
+    private int searchAllMaps(ByteArrayOrdinalMap[] maps, ByteDataArray scratch, int hash) {
+        for (int i = 0; i < maps.length; i++) {
+            int found = maps[i].get(scratch, hash);
+            if (found != -1) {
+                return (found << ordinalMapIndexBits) | i;
+            }
+        }
+        return -1;
+    }
+
     /*
      * Assign an ordinal to a record. Use the record hash to determine the which ordinal map it belongs to and
      * its ordinal within that map (localOrdinal). Then convert the local ordinal to a global ordinal and return.
-     * 
+     *
      * @param rec the record to assign an ordinal to
      * @return the ordinal of the record
      */
     private int assignOrdinal(HollowWriteRecord rec) {
         ByteDataArray scratch = scratch();
         rec.writeDataTo(scratch);
-
-        // Compute hash once for both routing and deduplication
         int hash = HashCodes.hashCode(scratch);
+
+        // Search ALL maps for existing record (dedup across maps)
+        int existingGlobal = searchAllMaps(ordinalMaps, scratch, hash);
+        if (existingGlobal != -1) {
+            scratch.reset();
+            return existingGlobal;
+        }
+
+        // Not found — assign in hash-routed map
         int mapIndex = hash & ordinalMapIndexMask;
-
-        // Get local ordinal from the selected map, passing pre-computed hash
-        // NOTE: non empty ordinal value is in [0, 2<<29 -1], hence even shifted left by 2, it'd still be a positive
-        // integer.
         int localOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, -1);
-
-        // Convert local ordinal to global interleaved ordinal
-        // Map 0: local 0,1,2 → global 0,8,16
-        // Map 1: local 0,1,2 → global 1,9,17
-        // etc.
         int globalOrdinal = (localOrdinal << ordinalMapIndexBits) | mapIndex;
 
         scratch.reset();
@@ -172,58 +184,42 @@ public abstract class HollowTypeWriteState {
     private int reuseOrdinalFromRestoredState(HollowWriteRecord rec) {
         ByteDataArray scratch = scratch();
 
-        int ordinal;
-
+        // Serialize with restored-compatible format and find preferred ordinal
+        int preferredGlobal;
         if(restoredSchema instanceof HollowObjectSchema) {
             ((HollowObjectWriteRecord)rec).writeDataTo(scratch, (HollowObjectSchema)restoredSchema);
+        } else if(rec instanceof HollowHashableWriteRecord) {
+            ((HollowHashableWriteRecord) rec).writeDataTo(scratch, IGNORED_HASHES);
+        } else {
+            rec.writeDataTo(scratch);
+        }
+        preferredGlobal = searchAllMaps(restoredMaps, scratch, HashCodes.hashCode(scratch));
 
-            // Compute hash to route to correct map
-            int hash = HashCodes.hashCode(scratch);
-            int mapIndex = hash & ordinalMapIndexMask;
-
-            // Look up in restored map for this index (returns local ordinal)
-            int preferredLocalOrdinal = restoredMaps[mapIndex].get(scratch, hash);
-
-            // rewrite the byte representation, as the current schema can be different from the restored schema.
-            // i.e. new fields added into this type.
+        // Re-serialize with current schema if it could differ from the restored format
+        if(restoredSchema instanceof HollowObjectSchema || rec instanceof HollowHashableWriteRecord) {
             scratch.reset();
             rec.writeDataTo(scratch);
-            hash = HashCodes.hashCode(scratch);
-            mapIndex = hash & ordinalMapIndexMask;
-
-            int newLocalOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, preferredLocalOrdinal);
-            ordinal = (newLocalOrdinal << ordinalMapIndexBits) | mapIndex;
-        } else {
-            if(rec instanceof HollowHashableWriteRecord) {
-                ((HollowHashableWriteRecord) rec).writeDataTo(scratch, IGNORED_HASHES);
-
-                int hash = HashCodes.hashCode(scratch);
-                int mapIndex = hash & ordinalMapIndexMask;
-                int preferredLocalOrdinal = restoredMaps[mapIndex].get(scratch, hash);
-
-                scratch.reset();
-                rec.writeDataTo(scratch);
-
-                hash = HashCodes.hashCode(scratch);
-                mapIndex = hash & ordinalMapIndexMask;
-
-                int newLocalOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, preferredLocalOrdinal);
-                ordinal = (newLocalOrdinal << ordinalMapIndexBits) | mapIndex;
-            } else {
-                rec.writeDataTo(scratch);
-
-                int hash = HashCodes.hashCode(scratch);
-                int mapIndex = hash & ordinalMapIndexMask;
-                int preferredLocalOrdinal = restoredMaps[mapIndex].get(scratch, hash);
-
-                int newLocalOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, preferredLocalOrdinal);
-                ordinal = (newLocalOrdinal << ordinalMapIndexBits) | mapIndex;
-            }
         }
 
+        int ordinal = assignToPreferredMap(scratch, preferredGlobal);
         scratch.reset();
-
         return ordinal;
+    }
+
+    /**
+     * Assign a record (already serialized in scratch) into the ordinal map corresponding to
+     * the preferred global ordinal, or hash-route if no preferred ordinal exists.
+     */
+    private int assignToPreferredMap(ByteDataArray scratch, int preferredGlobal) {
+        int hash = HashCodes.hashCode(scratch);
+        int mapIndex = preferredGlobal != -1
+            ? (preferredGlobal & ordinalMapIndexMask)
+            : (hash & ordinalMapIndexMask);
+        int preferredLocal = preferredGlobal != -1
+            ? (preferredGlobal >>> ordinalMapIndexBits)
+            : -1;
+        int newLocal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, preferredLocal);
+        return (newLocal << ordinalMapIndexBits) | mapIndex;
     }
 
     /**
@@ -387,8 +383,8 @@ public abstract class HollowTypeWriteState {
             ordinalMaps[i].resetLogSoftLimitsBreach();
         }
 
-        // Save current maps as restored maps for next cycle
-        restoredMaps = ordinalMaps.clone();
+        // Null out restored maps — cycle 2+ uses assignOrdinal() with search-all dedup
+        restoredMaps = null;
 
         ThreadSafeBitSet temp = previousCyclePopulated;
         previousCyclePopulated = currentCyclePopulated;
