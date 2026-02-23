@@ -38,25 +38,26 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     private FieldStatistics fieldStats;
 
     /// data required for writing snapshot or delta
-    private FixedLengthElementArray fixedLengthLongArray[];
-    private ByteDataArray varLengthByteArrays[][];
-    private long recordBitOffset[];
+    private FixedLengthElementArray[] fixedLengthLongArray;
+    private ByteDataArray[][] varLengthByteArrays;
+    private long[] recordBitOffset;
 
     /// additional data required for writing delta
-    private ByteDataArray deltaAddedOrdinals[];
-    private ByteDataArray deltaRemovedOrdinals[];
+    private ByteDataArray[] deltaAddedOrdinals;
+    private ByteDataArray[] deltaRemovedOrdinals;
 
     public HollowObjectTypeWriteState(HollowObjectSchema schema) {
         this(schema, -1);
     }
 
+    @Deprecated
     // visible for test purpose
     public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards) {
-        this(schema, numShards, null);
+        this(schema, numShards, false, null);
     }
 
-    public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards, Supplier<Boolean> ignoreSoftLimits) {
-        super(schema, numShards, ignoreSoftLimits);
+    public HollowObjectTypeWriteState(HollowObjectSchema schema, int numShards, boolean usePartitionedOrdinalMap, Supplier<Boolean> ignoreSoftLimits) {
+        super(schema, numShards, usePartitionedOrdinalMap, ignoreSoftLimits);
     }
 
     @Override
@@ -101,16 +102,16 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     private void discoverObjectFieldStatisticsForRecord(FieldStatistics fieldStats, int ordinal) {
         if(currentCyclePopulated.get(ordinal) || previousCyclePopulated.get(ordinal)) {
-            long pointer = ordinalMap.getPointerForData(ordinal);
+            long pointer = getPointerForData(ordinal);
 
             for(int fieldIndex=0; fieldIndex<((HollowObjectSchema)schema).numFields(); fieldIndex++) {
-                pointer = discoverObjectFieldStatisticsForField(fieldStats, pointer, fieldIndex);
+                pointer = discoverObjectFieldStatisticsForField(fieldStats, pointer, fieldIndex, ordinal);
             }
         }
     }
 
-    private long discoverObjectFieldStatisticsForField(FieldStatistics fieldStats, long pointer, int fieldIndex) {
-        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
+    private long discoverObjectFieldStatisticsForField(FieldStatistics fieldStats, long pointer, int fieldIndex, int ordinal) {
+        ByteData data = getByteDataForOrdinal(ordinal);
 
         switch(getSchema().getFieldType(fieldIndex)) {
         case BOOLEAN:
@@ -362,18 +363,18 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     }
 
     private void addRecord(int ordinal, long recordBitOffset, FixedLengthElementArray fixedLengthLongArray, ByteDataArray varLengthByteArrays[]) {
-        long pointer = ordinalMap.getPointerForData(ordinal);
+        long pointer = getPointerForData(ordinal);
 
         for(int fieldIndex=0; fieldIndex < getSchema().numFields(); fieldIndex++) {
-            pointer = addRecordField(pointer, recordBitOffset, fieldIndex, fixedLengthLongArray, varLengthByteArrays);
+            pointer = addRecordField(pointer, recordBitOffset, fieldIndex, fixedLengthLongArray, varLengthByteArrays, ordinal);
         }
     }
 
-    private long addRecordField(long readPointer, long recordBitOffset, int fieldIndex, FixedLengthElementArray fixedLengthLongArray, ByteDataArray varLengthByteArrays[]) {
+    private long addRecordField(long readPointer, long recordBitOffset, int fieldIndex, FixedLengthElementArray fixedLengthLongArray, ByteDataArray varLengthByteArrays[], int ordinal) {
         FieldType fieldType = getSchema().getFieldType(fieldIndex);
         long fieldBitOffset = recordBitOffset + fieldStats.getFieldBitOffset(fieldIndex);
         int bitsPerElement = fieldStats.getMaxBitsForField(fieldIndex);
-        ByteData data = ordinalMap.getByteData().getUnderlyingArray();
+        ByteData data = getByteDataForOrdinal(ordinal);
 
         switch(fieldType) {
         case BOOLEAN:

@@ -102,6 +102,7 @@ abstract class AbstractHollowProducer {
     private final boolean allowTypeResharding;
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
     private final Supplier<Boolean> ignoreSoftLimits;
+    private final boolean partitionedOrdinalMap;
 
     @Deprecated
     public AbstractHollowProducer(
@@ -110,7 +111,7 @@ abstract class AbstractHollowProducer {
         this(new HollowFilesystemBlobStager(), publisher, announcer,
                 Collections.emptyList(),
                 new VersionMinterWithCounter(), null, 0,
-                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, null,
+                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
                 null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null);
     }
@@ -123,7 +124,7 @@ abstract class AbstractHollowProducer {
                 b.eventListeners,
                 b.versionMinter, b.snapshotPublishExecutor,
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
-                b.allowTypeResharding, b.forceCoverageOfTypeResharding,
+                b.allowTypeResharding, b.forceCoverageOfTypeResharding, b.partitionedOrdinalMap,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
                 b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits);
     }
@@ -145,6 +146,7 @@ abstract class AbstractHollowProducer {
             boolean focusHoleFillInFewestShards,
             boolean allowTypeResharding,
             boolean forceCoverageOfTypeResharding,
+            boolean partitionedOrdinalMap,
             HollowMetricsCollector<HollowProducerMetrics> metricsCollector,
             HollowProducer.BlobStorageCleaner blobStorageCleaner,
             SingleProducerEnforcer singleProducerEnforcer,
@@ -166,6 +168,7 @@ abstract class AbstractHollowProducer {
         this.forceCoverageOfTypeResharding = forceCoverageOfTypeResharding;
         this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
         this.ignoreSoftLimits = ignoreSoftLimits;
+        this.partitionedOrdinalMap = partitionedOrdinalMap;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
                 ? new HollowWriteStateEngine()
@@ -174,6 +177,7 @@ abstract class AbstractHollowProducer {
         writeEngine.allowTypeResharding(allowTypeResharding);
         writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
         writeEngine.setIgnoreOrdinalLimits(ignoreSoftLimits);
+        writeEngine.setPartitionedOrdinalMap(partitionedOrdinalMap);
 
         this.objectMapper = new HollowObjectMapper(writeEngine);
         if (hashCodeFinder != null) {
@@ -322,6 +326,7 @@ abstract class AbstractHollowProducer {
                 client.triggerRefreshTo(versionInfoDesired);
                 readState = ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
                 readStates = ReadStateHelper.restored(readState);
+                verifyPartitionOrdinalMapCompatability();
 
                 // Need to restore data to new ObjectMapper since can't restore to non empty Write State Engine
                 Collection<HollowSchema> schemas = objectMapper.getStateEngine().getSchemas();
@@ -332,6 +337,7 @@ abstract class AbstractHollowProducer {
                 writeEngine.allowTypeResharding(allowTypeResharding);
                 writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
                 writeEngine.setIgnoreOrdinalLimits(ignoreSoftLimits);
+                writeEngine.setPartitionedOrdinalMap(partitionedOrdinalMap);
                 HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, schemas);
                 HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);
                 if (hashCodeFinder != null) {
@@ -586,6 +592,7 @@ abstract class AbstractHollowProducer {
         }
         long deltaChainVersionCounter = prevDeltaChainVersionCounter + 1;
         writeEngine.addHeaderTag(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER, String.valueOf(deltaChainVersionCounter));
+        writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_PARTITIONED_ORDINAL_MAP, Boolean.toString(partitionedOrdinalMap));
     }
 
     void populate(
@@ -974,6 +981,27 @@ abstract class AbstractHollowProducer {
             } finally {
                 listeners.fireAnnouncementComplete(status);
             }
+        }
+    }
+
+    private void verifyPartitionOrdinalMapCompatability() throws  IllegalStateException {
+        String datasetTag = readStates.current().getStateEngine()
+                .getHeaderTag(HollowStateEngine.HEADER_TAG_PARTITIONED_ORDINAL_MAP);
+        boolean datasetPartitionedOrdinalMap = Boolean.parseBoolean(datasetTag);
+        String message;
+        if (partitionedOrdinalMap && !datasetPartitionedOrdinalMap) {
+            message = String.format("trying to restore a HollowProducer with partitionedOrdinalMap enabled to version %d " +
+                    "that is produced with this feature disabled. In order to enable partitionedOrdinalMap " +
+                    "feature, please start a new delta chain.", readStates.current().getVersion());
+            log.log(Level.SEVERE, message);
+            throw new IllegalStateException(message);
+        }
+        if (!partitionedOrdinalMap && datasetPartitionedOrdinalMap) {
+            message = String.format("trying to restore a HollowProducer with partitionedOrdinalMap disabled to version %d " +
+                    "that is produced with this feature enabled. In order to disable partitionedOrdinalMap " +
+                    "feature, please start a new delta chain.", readStates.current().getVersion());
+            log.log(Level.SEVERE, message);
+            throw new IllegalStateException(message);
         }
     }
 

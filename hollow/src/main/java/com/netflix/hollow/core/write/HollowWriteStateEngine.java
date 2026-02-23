@@ -78,6 +78,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private boolean allowTypeResharding = false;
     //// supplier to determine whether to ignore ordinal threshold breaches (log instead of throwing exception)
     private Supplier<Boolean> ignoreSoftLimits;
+    //// whether to partition each type into 4 {@link com.netflix.hollow.core.memory.ByteArrayOrdinalMap} instead of 1
+    private boolean partitionedOrdinalMap = false;
 
     private List<String> restoredStates;
     private boolean preparedForNextCycle = true;
@@ -455,6 +457,13 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         return this.allowTypeResharding;
     }
 
+    public void setPartitionedOrdinalMap(boolean partitionedOrdinalMap) {
+        this.partitionedOrdinalMap = partitionedOrdinalMap;
+    }
+
+    public boolean isPartitionedOrdinalMap() {
+        return this.partitionedOrdinalMap;
+    }
 
     /**
      * Experimental: Setting this will focus the holes returned by the FreeOrdinalTracker for each state into as few shards as possible.

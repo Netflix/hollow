@@ -75,7 +75,7 @@ public class RestoreWriteStateEngineSetTest extends AbstractStateEngineTest {
         roundTripSnapshot();
         
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
-        HollowSetTypeWriteState misconfiguredTypeState = new HollowSetTypeWriteState(new HollowSetSchema("TestSet", "TestObject"), 16);
+        HollowSetTypeWriteState misconfiguredTypeState = new HollowSetTypeWriteState(new HollowSetSchema("TestSet", "TestObject"), 16, false, null);
         writeStateEngine.addTypeState(misconfiguredTypeState);
 
         try {
