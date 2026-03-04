@@ -168,6 +168,20 @@ public class ByteArrayOrdinalMap {
         return ordinal != -1 ? ordinal : assignOrdinal(serializedRepresentation, hash, preferredOrdinal);
     }
 
+    /**
+     * Adds a sequence of bytes to this map using a pre-computed hash.
+     * This avoids re-computing the hash when it's already been calculated for routing purposes.
+     *
+     * @param serializedRepresentation the sequence of bytes
+     * @param hash the pre-computed hash of the serialized representation
+     * @param preferredOrdinal the preferred ordinal to assign
+     * @return the assigned ordinal
+     */
+    public int getOrAssignOrdinal(ByteDataArray serializedRepresentation, int hash, int preferredOrdinal) {
+        int ordinal = get(serializedRepresentation, hash);
+        return ordinal != -1 ? ordinal : assignOrdinal(serializedRepresentation, hash, preferredOrdinal);
+    }
+
     /// acquire the lock before writing.
     private synchronized int assignOrdinal(ByteDataArray serializedRepresentation, int hash, int preferredOrdinal) {
         if (preferredOrdinal < -1 || preferredOrdinal > ORDINAL_MASK) {
@@ -364,7 +378,15 @@ public class ByteArrayOrdinalMap {
         return get(serializedRepresentation, HashCodes.hashCode(serializedRepresentation));
     }
 
-    private int get(ByteDataArray serializedRepresentation, int hash) {
+    /**
+     * Public method to get an ordinal using a pre-computed hash.
+     * Used by HollowTypeWriteState for efficient multi-map routing.
+     *
+     * @param serializedRepresentation the serialized representation
+     * @param hash the pre-computed hash of the serialized representation
+     * @return the ordinal for this serialized representation, or -1 if not found
+     */
+    public int get(ByteDataArray serializedRepresentation, int hash) {
         AtomicLongArray pao = pointersAndOrdinals;
 
         int modBitmask = pao.length() - 1;
@@ -436,9 +458,9 @@ public class ByteArrayOrdinalMap {
      * the key array to reflect the new pointers and exclude the removed entries.  This is also where ordinals
      * which are unused are returned to the pool.<p>
      *
-     * @param usedOrdinals a bit set representing the ordinals which are currently referenced by any image.
+     * @param usedGlobalOrdinals a bit set representing the ordinals which are currently referenced.
      */
-    public void compact(ThreadSafeBitSet usedOrdinals, int numShards, boolean focusHoleFillInFewestShards) {
+    public void compact(ThreadSafeBitSet usedGlobalOrdinals, int numShards, boolean focusHoleFillInFewestShards, int mapIdx, int mapIndexBits) {
         long[] populatedReverseKeys = new long[size];
 
         int counter = 0;
@@ -456,10 +478,12 @@ public class ByteArrayOrdinalMap {
         SegmentedByteArray arr = byteData.getUnderlyingArray();
         long currentCopyPointer = 0;
 
+        int currMapUsedOrdinalCnt = 0;
         for (int i = 0; i < populatedReverseKeys.length; i++) {
             int ordinal = (int) (populatedReverseKeys[i] & ORDINAL_MASK);
+            int globalOrdinal = (ordinal << mapIndexBits) | mapIdx;
 
-            if (usedOrdinals.get(ordinal)) {
+            if (usedGlobalOrdinals.get(globalOrdinal)) {
                 long pointer = populatedReverseKeys[i] >>> BITS_PER_ORDINAL;
                 int length = VarInt.readVInt(arr, pointer);
                 length += VarInt.sizeOfVInt(length);
@@ -471,6 +495,7 @@ public class ByteArrayOrdinalMap {
                 populatedReverseKeys[i] = populatedReverseKeys[i] << BITS_PER_POINTER | currentCopyPointer;
 
                 currentCopyPointer += length;
+                currMapUsedOrdinalCnt++;
             } else {
                 freeOrdinalTracker.returnOrdinalToPool(ordinal);
                 populatedReverseKeys[i] = EMPTY_BUCKET_VALUE;
@@ -491,7 +516,7 @@ public class ByteArrayOrdinalMap {
             pao.lazySet(i, EMPTY_BUCKET_VALUE);
         }
         populateNewHashArray(pao, populatedReverseKeys);
-        size = usedOrdinals.cardinality();
+        size = currMapUsedOrdinalCnt;
 
         pointersByOrdinal = null;
         unusedPreviousOrdinals = null;

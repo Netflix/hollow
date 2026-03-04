@@ -1,0 +1,10 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+application {
+    mainClass = 'com.netflix.hollow.perf.producer.ProducerPerfTest'
+}
+
+dependencies {
+    implementation project(':hollow')
+}
