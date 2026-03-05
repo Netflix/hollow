@@ -219,3 +219,47 @@ Results are written to `perf-results-<label>.json` in the module's working direc
 ```
 
 The **summary** section aggregates across non-warmup runs, giving avg/p50/p95 for cycle duration and averages for populate and publish phases.
+
+## Experiment Results
+
+Results from comparing **non-partitioned** (baseline) vs **partitioned ordinal map** populate performance. All times are `avgPopulateDurationMs` averaged across non-warmup runs.
+
+Common config: countriesPerBook=10, chaptersPerBook=3, chapterContentSize=1024, scenesPerChapter=2, charactersPerScene=3, numArtists=5000.
+
+### Thread Scaling (100k books, 3 cycles, 6 runs)
+
+| Threads | Baseline (ms) | Partitioned (ms) | Overhead |
+|---------|---------------|-------------------|----------|
+| 1       | 26,398        | 33,368            | +26.4%   |
+| 2       | 15,555        | 18,256            | +17.4%   |
+| 4       | 9,240         | 11,019            | +19.2%   |
+| 6       | 7,076         | 7,779             | +9.9%    |
+| 8       | 6,090         | 6,717             | +10.3%   |
+| 10      | 5,351         | 5,818             | +8.7%    |
+| 12      | 5,065         | 5,286             | +4.4%    |
+
+### Data Volume Scaling (4 threads, 3 cycles, 6 runs)
+
+| Books | Baseline (ms) | Partitioned (ms) | Overhead |
+|-------|---------------|-------------------|----------|
+| 50k   | 4,413         | 5,186             | +17.5%   |
+| 100k  | 8,722         | 10,319            | +18.3%   |
+| 150k  | 13,526        | 16,469            | +21.8%   |
+| 200k  | 18,901        | 22,484            | +19.0%   |
+| 250k  | 24,890        | 29,381            | +18.0%   |
+| 300k  | 31,340        | 37,718            | +20.3%   |
+
+### Key Findings
+
+1. **Overhead decreases with concurrency**: From +26% at 1 thread down to +4% at 12 threads. The partitioned ordinal map's single-threaded merge phase becomes proportionally smaller as parallel populate work increases.
+2. **Overhead is stable across data volumes**: Stays in the 17-22% range regardless of dataset size (at 4 threads), indicating the overhead scales linearly with data.
+3. **Both implementations scale well with threads**: Baseline drops from 26.4s (1 thread) to 5.1s (12 threads); partitioned drops from 33.4s to 5.3s — a ~5x speedup for both.
+
+### Plots
+
+![Performance Plots](perf-plots.png)
+
+- **Top-left**: Absolute populate time vs thread count — both curves converge at higher thread counts
+- **Top-right**: Absolute populate time vs data volume — linear scaling for both
+- **Bottom-left**: Overhead ratio vs data volume — flat around 1.18-1.21x
+- **Bottom-right**: Overhead ratio vs thread count — decreasing from 1.26x to 1.04x

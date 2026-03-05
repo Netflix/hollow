@@ -3,6 +3,7 @@ apply plugin: 'application'
 
 application {
     mainClass = 'com.netflix.hollow.perf.producer.ProducerPerfTest'
+    applicationDefaultJvmArgs = ['-Xmx48g', '-XX:+UseG1GC']
 }
 
 dependencies {

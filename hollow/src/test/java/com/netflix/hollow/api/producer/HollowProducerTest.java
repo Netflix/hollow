@@ -42,7 +42,10 @@ import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
 import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
+import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemPublisher;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.api.producer.listener.VetoableListener;
 import com.netflix.hollow.api.producer.model.CustomReferenceType;
@@ -67,6 +70,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -77,6 +81,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
@@ -84,6 +92,7 @@ import java.util.function.Supplier;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class HollowProducerTest {
@@ -664,6 +673,134 @@ public class HollowProducerTest {
             int actualOrdinal = primaryKeyIndex2.getMatchingOrdinal(id, name);
             assertTrue("Remaining record id=" + id + " name=" + name + " should still be found",
                     actualOrdinal != -1);
+        }
+    }
+
+    @Test
+//    @Ignore
+    public void testLargeCardinalityFailsWithoutPartitionedOrdinalMap() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withPartitionedOrdinalMap(false)
+                .withIgnoreSoftLimits(() -> true)
+                .build();
+        producer.initializeDataModel(SimpleRecord.class);
+        int limit = (1<<29) + 10000;
+
+        try {
+            producer.runCycle(ws -> {
+                int numThreads = 4;
+                ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+                int chunkSize = limit / numThreads;
+                List<Future<?>> futures = new ArrayList<>();
+                for (int t = 0; t < numThreads; t++) {
+                    final int start = t * chunkSize;
+                    final int end = (t == numThreads - 1) ? limit : start + chunkSize;
+                    futures.add(executor.submit(() -> {
+                        for (int i = start; i < end; i++) {
+                            ws.add(new SimpleRecord(i));
+                        }
+                    }));
+                }
+                try {
+                    for (Future<?> f : futures) {
+                        f.get();
+                    }
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e.getCause());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(e);
+                } finally {
+                    executor.shutdown();
+                }
+            });
+            fail("Expected exception during population");
+        } catch (Exception e) {
+            System.out.println(e);
+            // Expected: ordinal hard limit exceeded at (1<<29)-1 ordinals
+        }
+    }
+
+    @Test
+//    @Ignore
+    public void testLargeCardinalitySucceedsWithPartitionedOrdinalMap() throws IOException {
+        Runtime rt = Runtime.getRuntime();
+        System.out.println("=== JVM Memory Stats ===");
+        System.out.println("Max memory (Xmx):   " + (rt.maxMemory() / (1024 * 1024)) + " MB");
+        System.out.println("Total memory:       " + (rt.totalMemory() / (1024 * 1024)) + " MB");
+        System.out.println("Free memory:        " + (rt.freeMemory() / (1024 * 1024)) + " MB");
+        System.out.println("Available processors: " + rt.availableProcessors());
+        System.out.println("========================");
+
+        Path blobDir = Files.createTempDirectory("hollow-large-cardinality-test");
+        HollowFilesystemPublisher publisher = new HollowFilesystemPublisher(blobDir);
+        HollowFilesystemBlobStager blobStager = new HollowFilesystemBlobStager();
+        try {
+            HollowProducer producer = HollowProducer.withPublisher(publisher)
+                    .withBlobStager(blobStager)
+                    .withPartitionedOrdinalMap(true)
+                    .withIgnoreSoftLimits(() -> true)
+                    .build();
+            producer.initializeDataModel(SimpleRecord.class);
+            int limit = (1<<29) + 10000;
+
+            long version = producer.runCycle(ws -> {
+                int numThreads = 4;
+                ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+                int chunkSize = limit / numThreads;
+                List<Future<?>> futures = new ArrayList<>();
+                for (int t = 0; t < numThreads; t++) {
+                    final int start = t * chunkSize;
+                    final int end = (t == numThreads - 1) ? limit : start + chunkSize;
+                    futures.add(executor.submit(() -> {
+                        for (int i = start; i < end; i++) {
+                            ws.add(new SimpleRecord(i));
+                        }
+                    }));
+                }
+                try {
+                    for (Future<?> f : futures) {
+                        f.get();
+                    }
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e.getCause());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(e);
+                } finally {
+                    executor.shutdown();
+                }
+            });
+
+            // make it available for GC.
+            producer = null;
+
+            // Reload from snapshot
+            HollowFilesystemBlobRetriever retriever = new HollowFilesystemBlobRetriever(blobDir);
+            HollowProducer producer2 = HollowProducer.withPublisher(publisher)
+                    .withBlobStager(blobStager)
+                    .withPartitionedOrdinalMap(true)
+                    .withIgnoreSoftLimits(() -> true)
+                    .build();
+            producer2.initializeDataModel(SimpleRecord.class);
+            HollowProducer.ReadState readState = producer2.restore(version, retriever);
+            assertEquals(version, readState.getVersion());
+
+            // Verify record count
+            HollowObjectTypeReadState typeState = (HollowObjectTypeReadState)
+                    readState.getStateEngine().getTypeState("SimpleRecord");
+            BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
+            assertEquals(limit, populatedOrdinals.cardinality());
+        } finally {
+            File[] files = blobDir.toFile().listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    f.delete();
+                }
+            }
+            blobDir.toFile().delete();
         }
     }
 
@@ -1447,6 +1584,13 @@ public class HollowProducerTest {
             this.extraStringField = extraStringField;
             this.extraLongField = extraLongField;
             this.extraListOfInts = extraListOfInts;
+        }
+    }
+
+    private static class SimpleRecord {
+        int id;
+        SimpleRecord(int id) {
+            this.id = id;
         }
     }
 

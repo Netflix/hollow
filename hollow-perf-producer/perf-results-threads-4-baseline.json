@@ -1,0 +1,338 @@
+{
+  "label": "threads-4-baseline",
+  "timestamp": "2026-03-02T08:27:16.969Z",
+  "config": {
+    "numBooks": 100000,
+    "countriesPerBook": 10,
+    "chaptersPerBook": 3,
+    "chapterContentSize": 1024,
+    "numCycles": 3,
+    "numRuns": 6,
+    "threads": 4,
+    "partitionedOrdinalMap": false
+  },
+  "runs": [
+    {
+      "runIndex": 1,
+      "cycles": [
+        {
+          "cycleNum": 0,
+          "version": 20260302082830005,
+          "cycleDurationMs": 16399,
+          "populateDurationMs": 14141,
+          "publishDurationMs": 1925,
+          "blobStagingMs": {
+            "SNAPSHOT": 1385
+          },
+          "blobPublishMs": {
+            "SNAPSHOT": 539
+          },
+          "snapshotSizeBytes": 494499376,
+          "heapUsedBytes": 14080080728
+        },
+        {
+          "cycleNum": 1,
+          "version": 20260302082846006,
+          "cycleDurationMs": 9545,
+          "populateDurationMs": 6877,
+          "publishDurationMs": 1759,
+          "blobStagingMs": {
+            "SNAPSHOT": 1176,
+            "DELTA": 23,
+            "REVERSE_DELTA": 20
+          },
+          "blobPublishMs": {
+            "DELTA": 3,
+            "REVERSE_DELTA": 2,
+            "SNAPSHOT": 534
+          },
+          "snapshotSizeBytes": 496367472,
+          "heapUsedBytes": 15233647088
+        },
+        {
+          "cycleNum": 2,
+          "version": 20260302082856007,
+          "cycleDurationMs": 9703,
+          "populateDurationMs": 6508,
+          "publishDurationMs": 1769,
+          "blobStagingMs": {
+            "SNAPSHOT": 1150,
+            "DELTA": 23,
+            "REVERSE_DELTA": 20
+          },
+          "blobPublishMs": {
+            "DELTA": 4,
+            "REVERSE_DELTA": 1,
+            "SNAPSHOT": 571
+          },
+          "snapshotSizeBytes": 497871207,
+          "heapUsedBytes": 15948861432
+        }
+      ],
+      "restore": {
+        "restoreDurationMs": 2788,
+        "restoredVersion": 20260302082856007,
+        "postRestoreCycleDurationMs": 16578
+      }
+    },
+    {
+      "runIndex": 2,
+      "cycles": [
+        {
+          "cycleNum": 0,
+          "version": 20260302082933009,
+          "cycleDurationMs": 17072,
+          "populateDurationMs": 14678,
+          "publishDurationMs": 2027,
+          "blobStagingMs": {
+            "SNAPSHOT": 1143
+          },
+          "blobPublishMs": {
+            "SNAPSHOT": 883
+          },
+          "snapshotSizeBytes": 494499376,
+          "heapUsedBytes": 14789755000
+        },
+        {
+          "cycleNum": 1,
+          "version": 20260302082951010,
+          "cycleDurationMs": 9896,
+          "populateDurationMs": 6596,
+          "publishDurationMs": 1783,
+          "blobStagingMs": {
+            "SNAPSHOT": 1153,
+            "DELTA": 66,
+            "REVERSE_DELTA": 20
+          },
+          "blobPublishMs": {
+            "DELTA": 4,
+            "REVERSE_DELTA": 1,
+            "SNAPSHOT": 538
+          },
+          "snapshotSizeBytes": 496367472,
+          "heapUsedBytes": 14340303496
+        },
+        {
+          "cycleNum": 2,
+          "version": 20260302083001011,
+          "cycleDurationMs": 9725,
+          "populateDurationMs": 6543,
+          "publishDurationMs": 1752,
+          "blobStagingMs": {
+            "SNAPSHOT": 1161,
+            "DELTA": 22,
+            "REVERSE_DELTA": 21
+          },
+          "blobPublishMs": {
+            "DELTA": 3,
+            "REVERSE_DELTA": 1,
+            "SNAPSHOT": 543
+          },
+          "snapshotSizeBytes": 497871207,
+          "heapUsedBytes": 14923595784
+        }
+      ],
+      "restore": {
+        "restoreDurationMs": 2671,
+        "restoredVersion": 20260302083001011,
+        "postRestoreCycleDurationMs": 16242
+      }
+    },
+    {
+      "runIndex": 3,
+      "cycles": [
+        {
+          "cycleNum": 0,
+          "version": 20260302083038013,
+          "cycleDurationMs": 17241,
+          "populateDurationMs": 14679,
+          "publishDurationMs": 1818,
+          "blobStagingMs": {
+            "SNAPSHOT": 1173
+          },
+          "blobPublishMs": {
+            "SNAPSHOT": 644
+          },
+          "snapshotSizeBytes": 494499376,
+          "heapUsedBytes": 14092663648
+        },
+        {
+          "cycleNum": 1,
+          "version": 20260302083055014,
+          "cycleDurationMs": 9916,
+          "populateDurationMs": 6631,
+          "publishDurationMs": 1883,
+          "blobStagingMs": {
+            "SNAPSHOT": 1241,
+            "DELTA": 21,
+            "REVERSE_DELTA": 20
+          },
+          "blobPublishMs": {
+            "DELTA": 3,
+            "REVERSE_DELTA": 2,
+            "SNAPSHOT": 595
+          },
+          "snapshotSizeBytes": 496367472,
+          "heapUsedBytes": 14872936944
+        },
+        {
+          "cycleNum": 2,
+          "version": 20260302083105015,
+          "cycleDurationMs": 9809,
+          "populateDurationMs": 6650,
+          "publishDurationMs": 1765,
+          "blobStagingMs": {
+            "SNAPSHOT": 1164,
+            "DELTA": 22,
+            "REVERSE_DELTA": 21
+          },
+          "blobPublishMs": {
+            "DELTA": 3,
+            "REVERSE_DELTA": 2,
+            "SNAPSHOT": 553
+          },
+          "snapshotSizeBytes": 497871207,
+          "heapUsedBytes": 15397571336
+        }
+      ],
+      "restore": {
+        "restoreDurationMs": 2936,
+        "restoredVersion": 20260302083105015,
+        "postRestoreCycleDurationMs": 16574
+      }
+    },
+    {
+      "runIndex": 4,
+      "cycles": [
+        {
+          "cycleNum": 0,
+          "version": 20260302083143017,
+          "cycleDurationMs": 16631,
+          "populateDurationMs": 14314,
+          "publishDurationMs": 1978,
+          "blobStagingMs": {
+            "SNAPSHOT": 1445
+          },
+          "blobPublishMs": {
+            "SNAPSHOT": 532
+          },
+          "snapshotSizeBytes": 494499376,
+          "heapUsedBytes": 14713418560
+        },
+        {
+          "cycleNum": 1,
+          "version": 20260302083200018,
+          "cycleDurationMs": 10040,
+          "populateDurationMs": 6853,
+          "publishDurationMs": 1745,
+          "blobStagingMs": {
+            "SNAPSHOT": 1145,
+            "DELTA": 21,
+            "REVERSE_DELTA": 21
+          },
+          "blobPublishMs": {
+            "DELTA": 3,
+            "REVERSE_DELTA": 2,
+            "SNAPSHOT": 552
+          },
+          "snapshotSizeBytes": 496367472,
+          "heapUsedBytes": 15715992040
+        },
+        {
+          "cycleNum": 2,
+          "version": 20260302083210019,
+          "cycleDurationMs": 9708,
+          "populateDurationMs": 6512,
+          "publishDurationMs": 1778,
+          "blobStagingMs": {
+            "SNAPSHOT": 1148,
+            "DELTA": 22,
+            "REVERSE_DELTA": 47
+          },
+          "blobPublishMs": {
+            "DELTA": 3,
+            "REVERSE_DELTA": 2,
+            "SNAPSHOT": 555
+          },
+          "snapshotSizeBytes": 497871207,
+          "heapUsedBytes": 14659383408
+        }
+      ],
+      "restore": {
+        "restoreDurationMs": 2733,
+        "restoredVersion": 20260302083210019,
+        "postRestoreCycleDurationMs": 16253
+      }
+    },
+    {
+      "runIndex": 5,
+      "cycles": [
+        {
+          "cycleNum": 0,
+          "version": 20260302083247021,
+          "cycleDurationMs": 16672,
+          "populateDurationMs": 14311,
+          "publishDurationMs": 2012,
+          "blobStagingMs": {
+            "SNAPSHOT": 1438
+          },
+          "blobPublishMs": {
+            "SNAPSHOT": 573
+          },
+          "snapshotSizeBytes": 494499376,
+          "heapUsedBytes": 14109440864
+        },
+        {
+          "cycleNum": 1,
+          "version": 20260302083303022,
+          "cycleDurationMs": 10011,
+          "populateDurationMs": 6831,
+          "publishDurationMs": 1757,
+          "blobStagingMs": {
+            "SNAPSHOT": 1159,
+            "DELTA": 22,
+            "REVERSE_DELTA": 20
+          },
+          "blobPublishMs": {
+            "DELTA": 3,
+            "REVERSE_DELTA": 2,
+            "SNAPSHOT": 551
+          },
+          "snapshotSizeBytes": 496367472,
+          "heapUsedBytes": 15049126496
+        },
+        {
+          "cycleNum": 2,
+          "version": 20260302083314023,
+          "cycleDurationMs": 9676,
+          "populateDurationMs": 6484,
+          "publishDurationMs": 1769,
+          "blobStagingMs": {
+            "SNAPSHOT": 1158,
+            "DELTA": 49,
+            "REVERSE_DELTA": 20
+          },
+          "blobPublishMs": {
+            "DELTA": 3,
+            "REVERSE_DELTA": 2,
+            "SNAPSHOT": 536
+          },
+          "snapshotSizeBytes": 497871207,
+          "heapUsedBytes": 13933740528
+        }
+      ],
+      "restore": {
+        "restoreDurationMs": 2771,
+        "restoredVersion": 20260302083314023,
+        "postRestoreCycleDurationMs": 16172
+      }
+    }
+  ],
+  "summary": {
+    "avgCycleDurationMs": 12136,
+    "p50CycleDurationMs": 9916,
+    "p95CycleDurationMs": 17241,
+    "avgPopulateDurationMs": 9240,
+    "avgPublishDurationMs": 1834
+  }
+}

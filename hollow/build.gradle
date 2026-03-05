@@ -19,4 +19,5 @@ javadoc {
 
 test {
     environment 'FB_NO_UPDATE_CHECKS', 'true' // https://github.com/findbugsproject/findbugs/issues/137#issuecomment-256604616
+    maxHeapSize = '48g'
 }
