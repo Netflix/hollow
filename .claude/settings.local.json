@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(./gradlew :hollow-protoadapter:test:*)",
-      "Bash(./gradlew:*)"
-    ]
-  }
-}

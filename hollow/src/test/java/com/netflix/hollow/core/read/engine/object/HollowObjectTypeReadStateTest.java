@@ -3,6 +3,9 @@ package com.netflix.hollow.core.read.engine.object;
 import static junit.framework.TestCase.assertEquals;
 
 import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
+import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.util.Random;
 import org.junit.Test;
 
@@ -40,6 +43,32 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
                 assertDataUnchanged(objectTypeReadState, numRecords);
             }
         }
+    }
+
+    @Test
+    public void testApproximateHoleCountWithShards() throws Exception {
+        // Setup with 2 shards
+        writeStateEngine = new HollowWriteStateEngine();
+        writeStateEngine.addTypeState(new HollowObjectTypeWriteState(schema, 2));
+
+        // Cycle 1: snapshot with 6 records (ordinals 0-5)
+        // note that the ordinal assigned would be also be 0-4.
+        HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+        populateWriteStateEngine(writeStateEngine, schema, 6);
+        roundTripSnapshot();
+        // Cycle 2: keep only records 2 and 4, creating holes at 0, 1, 3, 5
+        populateWriteStateEngine(writeStateEngine, schema, new int[]{2, 4});
+        roundTripDelta();
+
+        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("TestObject");
+        assertEquals(2, typeState.numShards());
+        assertEquals(2, typeState.getPopulatedOrdinals().cardinality());
+
+        // Shard 0 (even: 0=hole, 2=pop, 4=pop) -> 1 hole
+        // Shard 1 (odd: 1=hole, 3=hole, 5=hole) -> 3 holes
+        HollowObjectTypeReadStateShard[] shards = (HollowObjectTypeReadStateShard[])typeState.getShardsVolatile().getShards();
+        long holeCost = shards[0].dataElements.bitsPerRecord/8L + shards[1].dataElements.bitsPerRecord*3L/8;
+        assertEquals(holeCost, typeState.getApproximateHoleCostInBytes());
     }
 
     @Test

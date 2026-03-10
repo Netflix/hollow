@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -43,7 +45,7 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
         writeStateEngine.setTargetMaxTypeShardSize(4 * 100 * 1000 * 1024);
     }
 
-    int[][] generateSetContents(int numRecords) {
+    protected int[][] generateSetContents(int numRecords) {
         int[][] setContents = new int[numRecords][];
         for (int i=0;i<numRecords;i++) {
             setContents[i] = new int[i+1];
@@ -61,6 +63,12 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
                 .orElse(0);
         // populate write state with that many ordinals
         super.populateWriteStateEngine(numOrdinals);
+        populateTypeStateWith(writeStateEngine, setContents);
+        roundTripSnapshot();
+        return (HollowSetTypeReadState) readStateEngine.getTypeState("TestSet");
+    }
+
+    protected void populateTypeStateWith(HollowWriteStateEngine writeStateEngine, int[][] setContents) {
         for(int[] set : setContents) {
             HollowSetWriteRecord rec = new HollowSetWriteRecord();
             for(int ordinal : set) {
@@ -68,8 +76,6 @@ public class AbstractHollowSetTypeDataElementsSplitJoinTest extends AbstractHoll
             }
             writeStateEngine.add("TestSet", rec);
         }
-        roundTripSnapshot();
-        return (HollowSetTypeReadState) readStateEngine.getTypeState("TestSet");
     }
 
     protected void assertDataUnchanged(HollowSetTypeReadState typeState, int[][] setContents) {

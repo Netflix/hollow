@@ -43,7 +43,7 @@ public class AbstractHollowListTypeDataElementsSplitJoinTest extends AbstractHol
         writeStateEngine.setTargetMaxTypeShardSize(4 * 100 * 1000 * 1024);
     }
 
-    private void populateWriteStateEngine(int[][] listContents) {
+    protected void populateWriteStateEngineWithListRecords(int[][] listContents) {
         for(int[] list : listContents) {
             addRecord(Arrays.stream(list).toArray());
         }
@@ -63,7 +63,7 @@ public class AbstractHollowListTypeDataElementsSplitJoinTest extends AbstractHol
         for (int[] list : listContents) {
             populateWriteStateEngine(list);
         }
-        populateWriteStateEngine(listContents);
+        populateWriteStateEngineWithListRecords(listContents);
         roundTripSnapshot();
         return (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
     }
