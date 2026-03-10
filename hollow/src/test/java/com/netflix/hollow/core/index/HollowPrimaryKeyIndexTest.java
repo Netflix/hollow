@@ -188,6 +188,67 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
     }
 
     @Test
+    public void getDuplicateKeysWithMaxDetectsDuplicatesIntroducedByDelta() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three")));
+
+        roundTripSnapshot();
+
+        TestableUniqueKeyIndex idx = createIndex("TypeA");
+        idx.listenForDeltaUpdates();
+
+        Assert.assertEquals(0, idx.getDuplicateKeys(100).size());
+
+        // Delta introduces duplicates for keys 2 and 3
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two", true)));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three")));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three", true)));
+
+        roundTripDelta();
+
+        java.util.Collection<HollowPrimaryKeyIndex.DuplicateKeyInfo> duplicates = idx.getDuplicateKeys(100);
+        Assert.assertEquals(2, duplicates.size());
+        for (HollowPrimaryKeyIndex.DuplicateKeyInfo info : duplicates) {
+            Assert.assertEquals(2L, info.getCount());
+        }
+
+        // Delta removes duplicates
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three")));
+
+        roundTripDelta();
+
+        Assert.assertEquals(0, idx.getDuplicateKeys(100).size());
+    }
+
+    @Test
+    public void getDuplicateKeysWithMaxReturnsEmptyWhenDeltaHasNoNewOrdinals() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+
+        roundTripSnapshot();
+
+        TestableUniqueKeyIndex idx = createIndex("TypeA");
+        idx.listenForDeltaUpdates();
+
+        // Delta with identical data — no new ordinals
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+
+        roundTripDelta();
+
+        Assert.assertEquals(0, idx.getDuplicateKeys(100).size());
+    }
+
+    @Test
     public void getDuplicateKeysWithMaxHandlesNoDuplicates() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
