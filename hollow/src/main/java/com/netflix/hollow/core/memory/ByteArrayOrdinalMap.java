@@ -380,7 +380,6 @@ public class ByteArrayOrdinalMap {
 
     /**
      * Public method to get an ordinal using a pre-computed hash.
-     * Used by HollowTypeWriteState for efficient multi-map routing.
      *
      * @param serializedRepresentation the serialized representation
      * @param hash the pre-computed hash of the serialized representation
@@ -505,13 +504,14 @@ public class ByteArrayOrdinalMap {
         byteData.setPosition(currentCopyPointer);
 
         if(focusHoleFillInFewestShards && numShards > 1)
-            freeOrdinalTracker.sort(numShards);
+            freeOrdinalTracker.sort(numShards, mapIndexBits, mapIdx);
         else
             freeOrdinalTracker.sort();
 
         // Reset the array then fill with compacted values
         // Volatile store not required, could use plain store
         // See VarHandles for JDK >= 9
+        // TODO: why not just swap pao with populatedReverseKeys?
         for (int i = 0; i < pao.length(); i++) {
             pao.lazySet(i, EMPTY_BUCKET_VALUE);
         }

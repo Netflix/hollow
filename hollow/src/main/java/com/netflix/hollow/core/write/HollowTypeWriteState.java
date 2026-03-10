@@ -173,6 +173,8 @@ public abstract class HollowTypeWriteState {
 
         // Not found — assign in hash-routed map
         int mapIndex = hash & ordinalMapIndexMask;
+        // TODO: getOrAssignOrdinal performs a redundant check to see if rec exists in the specified
+        // ByteArrayOrdinalMap, which has been done via searchAllMaps.
         int localOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, -1);
         int globalOrdinal = (localOrdinal << ordinalMapIndexBits) | mapIndex;
 
