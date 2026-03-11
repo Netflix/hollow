@@ -259,7 +259,7 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
             objWith.noise = "unrelated-string-" + (key.length() % 500);
             mapperWith.add(objWith);
         }
-        // Populate 500 additional strings into the global pool
+        // Populate 5000 additional strings into the global pool
         for (int i = 0; i < 5000; i++) {
             TypeWithGlobalStringPool obj = new TypeWithGlobalStringPool();
             obj.data = new HashMap<>();
