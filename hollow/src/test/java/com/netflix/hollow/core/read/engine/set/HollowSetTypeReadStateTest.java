@@ -18,11 +18,10 @@ public class HollowSetTypeReadStateTest extends AbstractHollowSetTypeDataElement
         writeStateEngine.addTypeState(new HollowObjectTypeWriteState(schema, 2));
         writeStateEngine.addTypeState(new HollowSetTypeWriteState(setSchema, 2));
 
-        // Cycle 1: add TestObject records and 5 set records with varying sizes
-        // Cycle 1
-        // populate TestObject with ordinal values 0 - 4
+        // Cycle 1:
+        // populate TestObject with ordinal values 0 - 5
         populateWriteStateEngine(writeStateEngine, schema, 6);
-        // populate TestSet with ordinal values 0 - 4
+        // populate TestSet with ordinal values 0 - 5
         populateTypeStateWith(writeStateEngine, new int[][] {{0}, {1}, {2}, {3}, {4}, {5}});
         roundTripSnapshot();
 

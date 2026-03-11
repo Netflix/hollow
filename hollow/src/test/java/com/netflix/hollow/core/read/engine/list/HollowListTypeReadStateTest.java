@@ -12,7 +12,7 @@ import org.junit.Test;
 public class HollowListTypeReadStateTest extends AbstractHollowListTypeDataElementsSplitJoinTest {
 
     @Test
-    public void testApproximateHoleCountWithShards() throws Exception {
+    public void testApproximateHoleCostWithShards() throws Exception {
         // Setup with 2 shards
         writeStateEngine = new HollowWriteStateEngine();
         writeStateEngine.addTypeState(new HollowObjectTypeWriteState(schema, 2));
@@ -32,7 +32,7 @@ public class HollowListTypeReadStateTest extends AbstractHollowListTypeDataEleme
         // for TestList:
         // Shard 0 (even: 0=hole, 2=pop, 4=pop, 6=hole) -> 2 hole
         // Shard 1 (odd: 1=hole, 3=hole, 5=hole, 7=hole) -> 4 holes
-        populateWriteStateEngine(writeStateEngine, schema, 6);
+        populateWriteStateEngine(writeStateEngine, schema, 8);
         populateWriteStateEngineWithListRecords(new int[][]{
                 {2}, {4}
         });

@@ -4,7 +4,6 @@ import static junit.framework.TestCase.assertEquals;
 
 import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
-import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.util.Random;
 import org.junit.Test;
@@ -46,14 +45,13 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
     }
 
     @Test
-    public void testApproximateHoleCountWithShards() throws Exception {
+    public void testApproximateHoleCostWithShards() throws Exception {
         // Setup with 2 shards
         writeStateEngine = new HollowWriteStateEngine();
         writeStateEngine.addTypeState(new HollowObjectTypeWriteState(schema, 2));
 
         // Cycle 1: snapshot with 6 records (ordinals 0-5)
         // note that the ordinal assigned would be also be 0-4.
-        HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
         populateWriteStateEngine(writeStateEngine, schema, 6);
         roundTripSnapshot();
         // Cycle 2: keep only records 2 and 4, creating holes at 0, 1, 3, 5
