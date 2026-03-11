@@ -101,6 +101,7 @@ abstract class AbstractHollowProducer {
     private final boolean focusHoleFillInFewestShards;
     private final boolean allowTypeResharding;
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
+    private final boolean collectionTypeNamingEnabled;
     private final Supplier<Boolean> ignoreSoftLimits;
 
     @Deprecated
@@ -112,7 +113,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null);
+                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, false);
     }
 
     // The only constructor should be that which accepts a builder
@@ -125,7 +126,8 @@ abstract class AbstractHollowProducer {
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
                 b.allowTypeResharding, b.forceCoverageOfTypeResharding,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
-                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits);
+                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits,
+                b.collectionTypeNamingEnabled);
     }
 
     private final HollowProducerListener producerMetricsListener;
@@ -151,7 +153,8 @@ abstract class AbstractHollowProducer {
             HollowObjectHashCodeFinder hashCodeFinder,
             boolean doIntegrityCheck,
             HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier,
-            Supplier<Boolean> ignoreSoftLimits) {
+            Supplier<Boolean> ignoreSoftLimits,
+            boolean collectionTypeNamingEnabled) {
         this.publisher = publisher;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
@@ -166,6 +169,7 @@ abstract class AbstractHollowProducer {
         this.forceCoverageOfTypeResharding = forceCoverageOfTypeResharding;
         this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
         this.ignoreSoftLimits = ignoreSoftLimits;
+        this.collectionTypeNamingEnabled = collectionTypeNamingEnabled;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
                 ? new HollowWriteStateEngine()
@@ -178,6 +182,9 @@ abstract class AbstractHollowProducer {
         this.objectMapper = new HollowObjectMapper(writeEngine);
         if (hashCodeFinder != null) {
             objectMapper.doNotUseDefaultHashKeys();
+        }
+        if (collectionTypeNamingEnabled) {
+            objectMapper.enableCollectionTypeNaming();
         }
         this.readStates = ReadStateHelper.newDeltaChain();
         this.blobStorageCleaner = blobStorageCleaner;
@@ -336,6 +343,9 @@ abstract class AbstractHollowProducer {
                 HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);
                 if (hashCodeFinder != null) {
                     newObjectMapper.doNotUseDefaultHashKeys();
+                }
+                if (collectionTypeNamingEnabled) {
+                    newObjectMapper.enableCollectionTypeNaming();
                 }
 
                 restoreAction.accept(readStates.current().getStateEngine(), writeEngine);
