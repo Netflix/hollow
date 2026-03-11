@@ -31,12 +31,14 @@ import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatReco
 import com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalObjectNode;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import sun.misc.Unsafe;
 
@@ -163,6 +165,11 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     @Override
     public String getTypeName() {
         return typeName;
+    }
+
+    @Override
+    protected Class<?> getJavaType() {
+        return clazz;
     }
 
     @Override
@@ -352,11 +359,13 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         private final HollowHashKey hashKeyAnnotation;
         private final HollowShardLargeType numShardsAnnotation;
         private final boolean isInlinedField;
+        private final HollowCollectionTypeName collectionTypeNameAnnotation;
+        private final HollowMapTypeName mapTypeNameAnnotation;
 
         private MappedField(Field f) {
             this(f, new HashSet<Type>());
         }
-        
+
         @SuppressWarnings("deprecation")
         private MappedField(Field f, Set<Type> visitedTypes) {
             this.fieldOffset = unsafe.objectFieldOffset(f);
@@ -366,6 +375,10 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.hashKeyAnnotation = f.getAnnotation(HollowHashKey.class);
             this.numShardsAnnotation = f.getAnnotation(HollowShardLargeType.class);
             this.isInlinedField = f.isAnnotationPresent(HollowInline.class);
+            this.collectionTypeNameAnnotation = parentMapper.isCollectionTypeNamingEnabled()
+                    ? f.getAnnotation(HollowCollectionTypeName.class) : null;
+            this.mapTypeNameAnnotation = parentMapper.isCollectionTypeNamingEnabled()
+                    ? f.getAnnotation(HollowMapTypeName.class) : null;
             
 
             HollowTypeMapper subTypeMapper = null;
@@ -422,11 +435,16 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 }
                 // guard recursion here
                 visitedTypes.add(this.type);
-                subTypeMapper = parentMapper.getTypeMapper(type, 
-                        typeNameAnnotation != null ? typeNameAnnotation.name() : null, 
-                                hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null, 
-                                        numShardsAnnotation != null ? numShardsAnnotation.numShards() : -1,
-                                                visitedTypes);
+                String elementTypeName = collectionTypeNameAnnotation != null ? resolveElementTypeName() : null;
+                String keyTypeName = mapTypeNameAnnotation != null ? resolveKeyTypeName() : null;
+                String valueTypeName = mapTypeNameAnnotation != null ? resolveValueTypeName() : null;
+                subTypeMapper = parentMapper.getTypeMapper(type,
+                        typeNameAnnotation != null ? typeNameAnnotation.name() : null,
+                        hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null,
+                        numShardsAnnotation != null ? numShardsAnnotation.numShards() : -1,
+                        visitedTypes,
+                        elementTypeName != null ? elementTypeName : keyTypeName,
+                        valueTypeName);
                 
                 // once we've safely returned from a leaf node in recursion, we can remove this MappedField's type
                 visitedTypes.remove(this.type);
@@ -441,6 +459,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.typeNameAnnotation = null;
             this.hashKeyAnnotation = null;
             this.numShardsAnnotation = null;
+            this.collectionTypeNameAnnotation = null;
+            this.mapTypeNameAnnotation = null;
             this.fieldName = specialField.getSpecialFieldName();
             this.fieldType = specialField;
             this.subTypeMapper = null;
@@ -459,6 +479,45 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             if(typeNameAnnotation != null)
                 return typeNameAnnotation.name();
             return subTypeMapper.getTypeName();
+        }
+
+        private String resolveElementTypeName() {
+            if (collectionTypeNameAnnotation == null) return null;
+            if (!isListOrSetType(type)) {
+                throw new IllegalStateException("@HollowCollectionTypeName on field '" + fieldName +
+                        "' is only valid for List or Set fields");
+            }
+            return nullIfEmpty(collectionTypeNameAnnotation.elementTypeName());
+        }
+
+        private String resolveKeyTypeName() {
+            if (mapTypeNameAnnotation == null) return null;
+            if (!isMapType(type)) {
+                throw new IllegalStateException("@HollowMapTypeName on field '" + fieldName +
+                        "' is only valid for Map fields");
+            }
+            return nullIfEmpty(mapTypeNameAnnotation.keyTypeName());
+        }
+
+        private String resolveValueTypeName() {
+            if (mapTypeNameAnnotation == null) return null;
+            if (!isMapType(type)) {
+                throw new IllegalStateException("@HollowMapTypeName on field '" + fieldName +
+                        "' is only valid for Map fields");
+            }
+            return nullIfEmpty(mapTypeNameAnnotation.valueTypeName());
+        }
+
+        private boolean isListOrSetType(Type t) {
+            if (!(t instanceof ParameterizedType)) return false;
+            Type raw = ((ParameterizedType) t).getRawType();
+            return raw == List.class || raw == Set.class;
+        }
+
+        private boolean isMapType(Type t) {
+            if (!(t instanceof ParameterizedType)) return false;
+            Type raw = ((ParameterizedType) t).getRawType();
+            return raw == Map.class;
         }
 
         @SuppressWarnings("deprecation")

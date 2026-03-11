@@ -745,6 +745,7 @@ public class HollowProducer extends AbstractHollowProducer {
         boolean focusHoleFillInFewestShards = false;
         boolean allowTypeResharding = false;
         boolean forceCoverageOfTypeResharding = false;
+        boolean collectionTypeNamingEnabled = false;
         long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
         HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
         BlobStorageCleaner blobStorageCleaner = new DummyBlobStorageCleaner();
@@ -937,6 +938,18 @@ public class HollowProducer extends AbstractHollowProducer {
         public B withTypeResharding(boolean allowTypeResharding, boolean forceCoverage) {
             this.allowTypeResharding = allowTypeResharding;
             this.forceCoverageOfTypeResharding = forceCoverage;
+            return (B) this;
+        }
+
+        /**
+         * Enables collection type naming, allowing {@code @HollowCollectionTypeName} and
+         * {@code @HollowMapTypeName} annotations to assign dedicated type states to collection
+         * element/key/value types. Disabled by default.
+         *
+         * <p>See {@link com.netflix.hollow.core.write.objectmapper.HollowObjectMapper#enableCollectionTypeNaming()}.
+         */
+        public B withCollectionTypeNaming() {
+            this.collectionTypeNamingEnabled = true;
             return (B) this;
         }
 

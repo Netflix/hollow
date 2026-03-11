@@ -48,8 +48,8 @@ public class HollowListTypeMapper extends HollowTypeMapper {
     private final HollowTypeMapper elementMapper;
 
     public HollowListTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, int numShards,
-                                boolean ignoreListOrdering, Set<Type> visited) {
-        this.elementMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], null, null, -1, visited);
+                                boolean ignoreListOrdering, Set<Type> visited, String elementTypeName) {
+        this.elementMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], nullIfEmpty(elementTypeName), null, -1, visited);
         String typeName = declaredName != null ? declaredName : getDefaultTypeName(type);
         this.schema = new HollowListSchema(typeName, elementMapper.getTypeName());
         this.ignoreListOrdering = ignoreListOrdering;
@@ -62,6 +62,11 @@ public class HollowListTypeMapper extends HollowTypeMapper {
     @Override
     public String getTypeName() {
         return schema.getName();
+    }
+
+    @Override
+    protected Class<?> getJavaType() {
+        return List.class;
     }
 
     @Override

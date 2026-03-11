@@ -52,6 +52,20 @@ public abstract class HollowTypeMapper {
 
     protected abstract HollowTypeWriteState getTypeWriteState();
 
+    /**
+     * Returns the Java class this mapper was built from.
+     * Used to detect type name conflicts across fields.
+     */
+    protected abstract Class<?> getJavaType();
+
+    /**
+     * Returns {@code null} if the string is null or empty, otherwise returns the string.
+     * Used to treat annotation default values ("") as "not specified".
+     */
+    protected static String nullIfEmpty(String s) {
+        return (s == null || s.isEmpty()) ? null : s;
+    }
+
     protected void addTypeState(HollowWriteStateEngine stateEngine) {
         if(stateEngine.getTypeState(getTypeName()) == null)
             stateEngine.addTypeState(getTypeWriteState());

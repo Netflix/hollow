@@ -43,6 +43,7 @@ public class HollowObjectMapper {
 
     private boolean ignoreListOrdering = false;
     private boolean useDefaultHashKeys = true;
+    private boolean collectionTypeNamingEnabled = false;
 
     public HollowObjectMapper(HollowWriteStateEngine stateEngine) {
         this.stateEngine = stateEngine;
@@ -60,6 +61,24 @@ public class HollowObjectMapper {
 
     public void doNotUseDefaultHashKeys() {
         this.useDefaultHashKeys = false;
+    }
+
+    /**
+     * Enables processing of {@link HollowCollectionTypeName} and {@link HollowMapTypeName}
+     * annotations. When enabled, these annotations allow users to namespace element, key,
+     * and value types in collections for improved compression.
+     *
+     * <p>Disabled by default to preserve backward compatibility.
+     * Adding these annotations to existing fields changes the Hollow schema — coordinate
+     * producer and consumer updates before enabling.
+     */
+    public void enableCollectionTypeNaming() {
+        this.collectionTypeNamingEnabled = true;
+    }
+
+    /** Package-private feature gate used by {@link com.netflix.hollow.core.write.objectmapper.HollowObjectTypeMapper.MappedField} to read collection-type annotations. */
+    boolean isCollectionTypeNamingEnabled() {
+        return collectionTypeNamingEnabled;
     }
 
     /**
@@ -150,12 +169,33 @@ public class HollowObjectMapper {
 
     HollowTypeMapper getTypeMapper(
             Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited) {
+        return getTypeMapper(type, declaredName, hashKeyFieldPaths, numShards, visited, null, null);
+    }
+
+    // elementOrKeyTypeName: element type name for List/Set; key type name for Map
+    // valueTypeName:        value type name for Map; ignored for List/Set
+    HollowTypeMapper getTypeMapper(
+            Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited,
+            String elementOrKeyTypeName, String valueTypeName) {
 
         // Compute the type name
         String typeName = declaredName != null
                 ? declaredName
                 : findTypeName(type);
         HollowTypeMapper typeMapper = typeMappers.get(typeName);
+
+        if (typeMapper != null && declaredName != null) {
+            Class<?> expectedJavaType = type instanceof ParameterizedType
+                    ? (Class<?>) ((ParameterizedType) type).getRawType()
+                    : (Class<?>) type;
+            if (!typeMapper.getJavaType().equals(expectedJavaType)) {
+                throw new IllegalStateException(
+                        "Hollow type name '" + typeName + "' is already registered for Java type " +
+                        typeMapper.getJavaType().getName() + " but is being redeclared for " +
+                        expectedJavaType.getName() +
+                        ". Check @HollowCollectionTypeName / @HollowMapTypeName annotations for conflicting type names.");
+            }
+        }
 
         if (typeMapper == null) {
             if (visited == null) {
@@ -170,13 +210,13 @@ public class HollowObjectMapper {
 
                 if (List.class.isAssignableFrom(clazz)) {
                     typeMapper = new HollowListTypeMapper(this, parameterizedType, typeName,
-                            numShards, ignoreListOrdering, visited);
+                            numShards, ignoreListOrdering, visited, elementOrKeyTypeName);
                 } else if (Set.class.isAssignableFrom(clazz)) {
                     typeMapper = new HollowSetTypeMapper(this, parameterizedType, typeName, hashKeyFieldPaths,
-                            numShards, stateEngine, useDefaultHashKeys, visited);
+                            numShards, stateEngine, useDefaultHashKeys, visited, elementOrKeyTypeName);
                 } else if (Map.class.isAssignableFrom(clazz)) {
                     typeMapper = new HollowMapTypeMapper(this, parameterizedType, typeName, hashKeyFieldPaths,
-                            numShards, stateEngine, useDefaultHashKeys, visited);
+                            numShards, stateEngine, useDefaultHashKeys, visited, elementOrKeyTypeName, valueTypeName);
                 } else {
                     typeMapper = new HollowObjectTypeMapper(this, clazz, typeName, visited);
                 }
@@ -186,6 +226,13 @@ public class HollowObjectMapper {
 
             HollowTypeMapper existing = typeMappers.putIfAbsent(typeName, typeMapper);
             if (existing != null) {
+                if (!existing.getJavaType().equals(typeMapper.getJavaType())) {
+                    throw new IllegalStateException(
+                            "Hollow type name '" + typeName + "' is already registered for Java type " +
+                            existing.getJavaType().getName() + " but is being redeclared for " +
+                            typeMapper.getJavaType().getName() +
+                            ". Check @HollowCollectionTypeName / @HollowMapTypeName annotations for conflicting type names.");
+                }
                 typeMapper = existing;
             } else {
                 typeMapper.addTypeState(stateEngine);
