@@ -490,4 +490,150 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
         @HollowMapTypeName(keyTypeName = "SubTypeKey")
         Map<String, String> data;
     }
+
+    // -------------------------------------------------------------------------
+    // Migration: custom @HollowTypeName pins outer name across workaround→annotation
+    // -------------------------------------------------------------------------
+
+    @Test
+    public void migration_customOuterTypeName_preservedWhenSwitchingFromWrapperPojo() {
+        // Wrapper-POJO approach with a custom outer collection name
+        HollowWriteStateEngine pojoEngine = new HollowWriteStateEngine();
+        HollowObjectMapper pojoMapper = new HollowObjectMapper(pojoEngine);
+        pojoMapper.initializeTypeState(TypeUsingWrapperPojoWithCustomName.class);
+
+        // Annotation approach with the same custom outer collection name
+        HollowWriteStateEngine annotationEngine = new HollowWriteStateEngine();
+        HollowObjectMapper annotationMapper = new HollowObjectMapper(annotationEngine);
+        annotationMapper.enableCollectionTypeNaming();
+        annotationMapper.initializeTypeState(TypeUsingAnnotationWithCustomName.class);
+
+        // Both produce the same outer collection name
+        Assert.assertNotNull(pojoEngine.getTypeState("MyCustomMap"));
+        Assert.assertNotNull(annotationEngine.getTypeState("MyCustomMap"));
+
+        // Both produce identical map schemas (key type, value type, outer name)
+        HollowMapSchema pojoSchema = (HollowMapSchema) pojoEngine.getTypeState("MyCustomMap").getSchema();
+        HollowMapSchema annotationSchema = (HollowMapSchema) annotationEngine.getTypeState("MyCustomMap").getSchema();
+        Assert.assertEquals(pojoSchema.getKeyType(), annotationSchema.getKeyType());
+        Assert.assertEquals(pojoSchema.getValueType(), annotationSchema.getValueType());
+    }
+
+    static class TypeUsingWrapperPojoWithCustomName {
+        @HollowTypeName(name = "MyCustomMap")
+        Map<SubTypeKeyPojo, String> data;
+    }
+
+    static class TypeUsingAnnotationWithCustomName {
+        @HollowTypeName(name = "MyCustomMap")
+        @HollowMapTypeName(keyTypeName = "SubTypeKey")
+        Map<String, String> data;
+    }
+
+    // -------------------------------------------------------------------------
+    // End-to-end migration: workaround cycle → annotation cycle, no schema change
+    // -------------------------------------------------------------------------
+
+    @Test
+    public void migration_endToEnd_noSchemaChange() throws IOException {
+        // --- Cycle 1: wrapper-POJO workaround (no @HollowTypeName on the collection fields) ---
+        HollowObjectMapper cycle1Mapper = new HollowObjectMapper(writeStateEngine);
+        TypeUsingWrapperPojoAutoName obj1 = new TypeUsingWrapperPojoAutoName();
+
+        obj1.mapData = new HashMap<>();
+        SubTypeKeyPojoAutoName key = new SubTypeKeyPojoAutoName();
+        key.value = "hello";
+        obj1.mapData.put(key, "world");
+
+        obj1.listData = new ArrayList<>();
+        SubTypeElemPojoAutoName elem = new SubTypeElemPojoAutoName();
+        elem.value = "item1";
+        obj1.listData.add(elem);
+
+        obj1.setData = new HashSet<>();
+        SubTypeElemPojoAutoName setElem = new SubTypeElemPojoAutoName();
+        setElem.value = "tag1";
+        obj1.setData.add(setElem);
+
+        cycle1Mapper.add(obj1);
+        roundTripSnapshot();
+
+        // Verify cycle 1 schemas — auto-generated names include the element types
+        Assert.assertEquals("SubTypeKeyAutoName",
+                ((HollowMapSchema) readStateEngine.getTypeState("MapOfSubTypeKeyAutoNameToString").getSchema()).getKeyType());
+        Assert.assertEquals("SubTypeElemAutoName",
+                ((HollowListSchema) readStateEngine.getTypeState("ListOfSubTypeElemAutoName").getSchema()).getElementType());
+        Assert.assertEquals("SubTypeElemAutoName",
+                ((HollowSetSchema) readStateEngine.getTypeState("SetOfSubTypeElemAutoName").getSchema()).getElementType());
+
+        // --- Cycle 2: annotation approach ---
+        // @HollowTypeName on each field pins the outer collection name to match cycle 1's auto-generated name.
+        // @HollowMapTypeName / @HollowCollectionTypeName match the POJO's @HollowTypeName names.
+        HollowObjectMapper cycle2Mapper = new HollowObjectMapper(writeStateEngine);
+        cycle2Mapper.enableCollectionTypeNaming();
+        TypeUsingAnnotationAutoName obj2 = new TypeUsingAnnotationAutoName();
+        obj2.mapData = new HashMap<>();
+        obj2.mapData.put("hello", "world");
+        obj2.listData = new ArrayList<>(Arrays.asList("item1"));
+        obj2.setData = new HashSet<>(Arrays.asList("tag1"));
+        cycle2Mapper.add(obj2);
+        roundTripDelta();
+
+        // The collection and element schemas are unchanged — consumers see no schema change.
+        // (In a real migration the container class has the same name too; here we use two
+        // different Java classes to simulate the before/after state, so we assert only the
+        // schemas that consumers of the collection depend on.)
+        Assert.assertEquals(
+                readStateEngine.getTypeState("MapOfSubTypeKeyAutoNameToString").getSchema(),
+                writeStateEngine.getTypeState("MapOfSubTypeKeyAutoNameToString").getSchema());
+        Assert.assertEquals(
+                readStateEngine.getTypeState("SubTypeKeyAutoName").getSchema(),
+                writeStateEngine.getTypeState("SubTypeKeyAutoName").getSchema());
+
+        Assert.assertEquals(
+                readStateEngine.getTypeState("ListOfSubTypeElemAutoName").getSchema(),
+                writeStateEngine.getTypeState("ListOfSubTypeElemAutoName").getSchema());
+        Assert.assertEquals(
+                readStateEngine.getTypeState("SubTypeElemAutoName").getSchema(),
+                writeStateEngine.getTypeState("SubTypeElemAutoName").getSchema());
+
+        Assert.assertEquals(
+                readStateEngine.getTypeState("SetOfSubTypeElemAutoName").getSchema(),
+                writeStateEngine.getTypeState("SetOfSubTypeElemAutoName").getSchema());
+
+        // Data reads back correctly after migration
+        Assert.assertEquals(1, new GenericHollowMap(readStateEngine, "MapOfSubTypeKeyAutoNameToString", 0).size());
+        Assert.assertEquals(1, new GenericHollowList(readStateEngine, "ListOfSubTypeElemAutoName", 0).size());
+        Assert.assertEquals(1, new GenericHollowSet(readStateEngine, "SetOfSubTypeElemAutoName", 0).size());
+    }
+
+    @HollowTypeName(name = "SubTypeKeyAutoName")
+    static class SubTypeKeyPojoAutoName {
+        @HollowInline String value;
+    }
+
+    @HollowTypeName(name = "SubTypeElemAutoName")
+    static class SubTypeElemPojoAutoName {
+        @HollowInline String value;
+    }
+
+    static class TypeUsingWrapperPojoAutoName {
+        Map<SubTypeKeyPojoAutoName, String> mapData;
+        List<SubTypeElemPojoAutoName> listData;
+        Set<SubTypeElemPojoAutoName> setData;
+    }
+
+    static class TypeUsingAnnotationAutoName {
+        @HollowTypeName(name = "MapOfSubTypeKeyAutoNameToString")
+        @HollowMapTypeName(keyTypeName = "SubTypeKeyAutoName")
+        Map<String, String> mapData;
+
+        @HollowTypeName(name = "ListOfSubTypeElemAutoName")
+        @HollowCollectionTypeName(elementTypeName = "SubTypeElemAutoName")
+        List<String> listData;
+
+        @HollowTypeName(name = "SetOfSubTypeElemAutoName")
+        @HollowCollectionTypeName(elementTypeName = "SubTypeElemAutoName")
+        Set<String> setData;
+    }
 }
