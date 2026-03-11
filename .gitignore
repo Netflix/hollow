@@ -14,4 +14,7 @@ venv
 # publishing secrets
 secrets/signing-key
 
+# IDE related files
 **/.DS_Store
+**/.claude
+**/.cursor

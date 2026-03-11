@@ -93,7 +93,7 @@ class HollowListTypeReadStateShard implements HollowTypeReadStateShard {
         long holeBits = 0;
         
         int holeOrdinal = populatedOrdinals.nextClearBit(0);
-        while(holeOrdinal <= dataElements.maxOrdinal) {
+        while((holeOrdinal >>> shardOrdinalShift) <= dataElements.maxOrdinal) {
             if((holeOrdinal & (numShards - 1)) == shardNumber)
                 holeBits += dataElements.bitsPerListPointer;
             
