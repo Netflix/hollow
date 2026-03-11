@@ -188,6 +188,8 @@ public abstract class HollowTypeWriteState {
 
         // Serialize with restored-compatible format and find preferred ordinal
         int preferredGlobal;
+        // Special handling for potential schema change -- use the restored schema so that the same records can be
+        // properly found from the restoreMaps, even if some new fields get added.
         if(restoredSchema instanceof HollowObjectSchema) {
             ((HollowObjectWriteRecord)rec).writeDataTo(scratch, (HollowObjectSchema)restoredSchema);
         } else if(rec instanceof HollowHashableWriteRecord) {
@@ -385,7 +387,7 @@ public abstract class HollowTypeWriteState {
             ordinalMaps[i].resetLogSoftLimitsBreach();
         }
 
-        // Null out restored maps — cycle 2+ uses assignOrdinal() with search-all dedup
+        // Null out restored maps — the cycle 2+ uses assignOrdinal() with search-all dedup
         restoredMaps = null;
 
         ThreadSafeBitSet temp = previousCyclePopulated;
@@ -563,7 +565,7 @@ public abstract class HollowTypeWriteState {
 
     /**
      * Get the SegmentedByteArray for a given ordinal by routing to the correct ordinal map.
-     * @param ordinal the global ordinal
+     * @param ordinal the global ordinal across ordinalMaps
      * @return the SegmentedByteArray containing the serialized data
      */
     protected SegmentedByteArray getByteDataForOrdinal(int ordinal) {
