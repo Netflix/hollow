@@ -18,6 +18,7 @@ package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import java.util.Arrays;
 import java.util.Spliterator;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
@@ -34,6 +35,7 @@ public class HollowHashIndexResult {
     private final int selectTableSize;
     private final int selectTableBuckets;
     private final int selectBucketMask;
+    private final int[] directOrdinals;
 
     HollowHashIndexResult(HollowHashIndex.HollowHashIndexState hashIndexState, long selectTableStartPointer, int selectTableSize) {
         this.hashIndexState = hashIndexState;
@@ -41,13 +43,23 @@ public class HollowHashIndexResult {
         this.selectTableSize = selectTableSize;
         this.selectTableBuckets = HashCodes.hashTableSize(selectTableSize);
         this.selectBucketMask = selectTableBuckets - 1;
+        this.directOrdinals = null;
+    }
+
+    HollowHashIndexResult(int[] directOrdinals) {
+        this.hashIndexState = null;
+        this.selectTableStartPointer = 0;
+        this.selectTableSize = directOrdinals.length;
+        this.selectTableBuckets = 0;
+        this.selectBucketMask = 0;
+        this.directOrdinals = directOrdinals;
     }
 
     /**
      * @return the number of matched records
      */
     public int numResults() {
-        return selectTableSize;
+        return directOrdinals != null ? directOrdinals.length : selectTableSize;
     }
 
     /**
@@ -55,6 +67,10 @@ public class HollowHashIndexResult {
      * @return {@code true} if the ordinal is matched, otherwise {@code false}
      */
     public boolean contains(int value) {
+        if (directOrdinals != null) {
+            return Arrays.stream(directOrdinals).anyMatch(ordinal -> ordinal == value);
+        }
+
         int hash = HashCodes.hashInt(value);
         int bucket = hash & selectBucketMask;
 
@@ -75,6 +91,20 @@ public class HollowHashIndexResult {
      * the matched records.
      */
     public HollowOrdinalIterator iterator() {
+        if (directOrdinals != null) {
+            return new HollowOrdinalIterator() {
+                int index;
+
+                @Override
+                public int next() {
+                    if (index >= directOrdinals.length) {
+                        return NO_MORE_ORDINALS;
+                    }
+                    return directOrdinals[index++];
+                }
+            };
+        }
+
         return new HollowOrdinalIterator() {
             final long endBucket = selectTableStartPointer + selectTableBuckets;
             long currentBucket = selectTableStartPointer;
@@ -101,6 +131,10 @@ public class HollowHashIndexResult {
      * @return an {@code IntStream} of matching ordinals
      */
     public IntStream stream() {
+        if (directOrdinals != null) {
+            return Arrays.stream(directOrdinals);
+        }
+
         Spliterator.OfInt si = new Spliterator.OfInt() {
             final long endBucket = selectTableStartPointer + selectTableBuckets;
             long currentBucket = selectTableStartPointer;
