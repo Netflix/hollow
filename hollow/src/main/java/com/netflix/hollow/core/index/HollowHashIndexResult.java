@@ -52,7 +52,8 @@ public class HollowHashIndexResult {
         this.selectTableSize = directOrdinals.length;
         this.selectTableBuckets = 0;
         this.selectBucketMask = 0;
-        this.directOrdinals = directOrdinals;
+        this.directOrdinals = directOrdinals.clone();
+        Arrays.sort(this.directOrdinals);
     }
 
     /**
@@ -68,7 +69,7 @@ public class HollowHashIndexResult {
      */
     public boolean contains(int value) {
         if (directOrdinals != null) {
-            return Arrays.stream(directOrdinals).anyMatch(ordinal -> ordinal == value);
+            return Arrays.binarySearch(directOrdinals, value) >= 0;
         }
 
         int hash = HashCodes.hashInt(value);
