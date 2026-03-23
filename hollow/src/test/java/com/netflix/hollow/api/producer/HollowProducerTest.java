@@ -677,7 +677,77 @@ public class HollowProducerTest {
     }
 
     @Test
-    public void testOrdinalStabilityAfterSchemaChange() {
+    public void testOrdinalStabilityWithPartitionedOrdinalMapToggledOnAndOff() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+        // --- ProducerA: publish 100 records with withPartitionedOrdinalMap feature off ---
+        HollowProducer producerA = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(false)
+                .build();
+        producerA.initializeDataModel(PartitionedTestType.class);
+
+        Map<String, Integer> primaryKeyToOrdinalCycle1 = new HashMap<>();
+        long versionA = producerA.runCycle(ws -> {
+            for (int i = 0; i < 100; i++) {
+                int ordinal = ws.add(buildPartitionedTestType(i));
+                String key = i + ":" + "name_" + i;
+                primaryKeyToOrdinalCycle1.put(key, ordinal);
+            }
+        });
+
+        // --- ProducerB: restore from versionA, publish 200 records with withPartitionedOrdinalMap feature on ---
+        HollowProducer producerB = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(true)
+                .build();
+        producerB.initializeDataModel(PartitionedTestType.class);
+        HollowProducer.ReadState readStateB = producerB.restore(versionA, blobStore);
+        assertEquals(versionA, readStateB.getVersion());
+        Map<String, Integer> primaryKeyToOrdinalCycle2 = new HashMap<>();
+        long versionB = producerB.runCycle(ws -> {
+            for (int i = 0; i < 200; i++) {
+                int ordinal = ws.add(buildPartitionedTestType(i));
+                String key = i + ":" + "name_" + i;
+                primaryKeyToOrdinalCycle2.put(key, ordinal);
+            }
+        });
+
+        // --- verify that the same 100 records have the same ordinal in both versionA and versionB ---
+        for (Map.Entry<String, Integer> entry : primaryKeyToOrdinalCycle1.entrySet()) {
+            Integer ordCycle2 = primaryKeyToOrdinalCycle2.get(entry.getKey());
+            assertEquals("Ordinal mismatch for key " + entry.getKey(),
+                    entry.getValue(), ordCycle2);
+        }
+
+        // --- ProducerC: restore from versionB, publish 300 records with withPartitionedOrdinalMap feature off ---
+        HollowProducer producerC = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .withPartitionedOrdinalMap(false)
+                .build();
+        producerC.initializeDataModel(PartitionedTestType.class);
+        HollowProducer.ReadState readStateC = producerC.restore(versionB, blobStore);
+        assertEquals(versionB, readStateC.getVersion());
+
+        Map<String, Integer> primaryKeyToOrdinalCycle3 = new HashMap<>();
+        long versionC = producerC.runCycle(ws -> {
+            for (int i = 0; i < 300; i++) {
+                int ordinal = ws.add(buildPartitionedTestType(i));
+                String key = i + ":" + "name_" + i;
+                primaryKeyToOrdinalCycle3.put(key, ordinal);
+            }
+        });
+
+        // --- verify that the same 200 records have the same ordinal in both versionA and versionB ---
+        for (Map.Entry<String, Integer> entry : primaryKeyToOrdinalCycle2.entrySet()) {
+            Integer ordCycle3 = primaryKeyToOrdinalCycle3.get(entry.getKey());
+            assertEquals("Ordinal mismatch for key " + entry.getKey(),
+                    entry.getValue(), ordCycle3);
+        }
+    }
+
+    @Test
+    public void testOrdinalStabilityAfterSchemaChangeWithPartitionedOrdinalMap() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
         HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
 
@@ -1434,6 +1504,7 @@ public class HollowProducerTest {
         Set<String> setOfStrings;
         List<Integer> listOfInts;
         Map<Integer, String> mapOfIntToString;
+        // extra fields added to PartitionedTestType
         String extraStringField;
         long extraLongField;
         List<Integer> extraListOfInts;
