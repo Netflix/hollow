@@ -183,7 +183,7 @@ public class ByteArrayOrdinalMap {
     }
 
     /// acquire the lock before writing.
-    private synchronized int assignOrdinal(ByteDataArray serializedRepresentation, int hash, int preferredOrdinal) {
+    public synchronized int assignOrdinal(ByteDataArray serializedRepresentation, int hash, int preferredOrdinal) {
         if (preferredOrdinal < -1 || preferredOrdinal > ORDINAL_MASK) {
             throw new IllegalArgumentException(String.format(
                     "The given preferred ordinal %s is out of bounds and not within the closed interval [-1, %s]",
@@ -379,7 +379,7 @@ public class ByteArrayOrdinalMap {
     }
 
     /**
-     * Public method to get an ordinal using a pre-computed hash.
+     * Public method to find the ordinal for the serializedRepresentation with its pre-computed hash.
      *
      * @param serializedRepresentation the serialized representation
      * @param hash the pre-computed hash of the serialized representation
@@ -511,7 +511,6 @@ public class ByteArrayOrdinalMap {
         // Reset the array then fill with compacted values
         // Volatile store not required, could use plain store
         // See VarHandles for JDK >= 9
-        // TODO: why not just swap pao with populatedReverseKeys?
         for (int i = 0; i < pao.length(); i++) {
             pao.lazySet(i, EMPTY_BUCKET_VALUE);
         }

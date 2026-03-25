@@ -143,12 +143,18 @@ public abstract class HollowTypeWriteState {
      * @return the global ordinal if found, or -1 if not found
      */
     private int searchAllMaps(ByteArrayOrdinalMap[] maps, ByteDataArray scratch, int hash) {
-        for (int i = 0; i < maps.length; i++) {
-            int found = maps[i].get(scratch, hash);
+        // small optimization -- assignOrdinal would use record hash to determine which ByteArrayOrdinalMap to route to.
+        // If the record was assigned the ordinal with assignOrdinal, the first look-up at
+        // maps[hash & ordinalMapIndexMask] would find it.
+        int startMapIdx = hash & ordinalMapIndexMask;
+        for (int i = startMapIdx; i < startMapIdx + ordinalMapNum; i++) {
+            int mapIdx = i % ordinalMapNum;
+            int found = maps[mapIdx].get(scratch, hash);
             if (found != -1) {
-                return (found << ordinalMapIndexBits) | i;
+                return (found << ordinalMapIndexBits) | mapIdx;
             }
         }
+
         return -1;
     }
 
@@ -173,9 +179,9 @@ public abstract class HollowTypeWriteState {
 
         // Not found — assign in hash-routed map
         int mapIndex = hash & ordinalMapIndexMask;
-        // TODO: getOrAssignOrdinal performs a redundant check to see if rec exists in the specified
-        // ByteArrayOrdinalMap, which has been done via searchAllMaps.
-        int localOrdinal = ordinalMaps[mapIndex].getOrAssignOrdinal(scratch, hash, -1);
+        // NOTE: assignOrdinal is a synchronized method. Directly invoke it instead of using getOrAssignOrdinal, as the
+        // record is not found across all ordinalMaps, no need to perform another search.
+        int localOrdinal = ordinalMaps[mapIndex].assignOrdinal(scratch, hash, -1);
         int globalOrdinal = (localOrdinal << ordinalMapIndexBits) | mapIndex;
 
         scratch.reset();
