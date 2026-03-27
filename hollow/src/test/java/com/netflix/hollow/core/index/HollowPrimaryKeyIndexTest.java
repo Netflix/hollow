@@ -188,7 +188,7 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void getDuplicateKeysWithMaxDetectsDuplicatesIntroducedByDelta() throws IOException {
+    public void getDuplicateKeysWithMaxHandlesNoDuplicates() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
         mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
@@ -198,11 +198,29 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         roundTripSnapshot();
 
         TestableUniqueKeyIndex idx = createIndex("TypeA");
-        idx.listenForDeltaUpdates();
 
+        java.util.Collection<HollowPrimaryKeyIndex.DuplicateKeyInfo> duplicates = idx.getDuplicateKeys(100);
+        Assert.assertEquals(0, duplicates.size());
+        Assert.assertFalse(idx.containsDuplicates());
+    }
+
+    @Test
+    public void getDuplicateKeysWithMaxDetectsDuplicatesIntroducedByDelta() throws IOException {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        // Snapshot: 3 unique records
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three")));
+
+        roundTripSnapshot();
+
+        TestableUniqueKeyIndex idx = createIndex("TypeA");
+        idx.listenForDeltaUpdates();
         Assert.assertEquals(0, idx.getDuplicateKeys(100).size());
 
-        // Delta introduces duplicates for keys 2 and 3
+        // Delta: introduce duplicates for keys (2,2.2,"two") and (3,3.3,"three")
+        // Duplicates must match all 3 primary key fields but differ in non-key field (isDuplicate)
         mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
         mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
         mapper.add(new TypeA(2, 2.2d, new TypeB("two", true)));
@@ -214,10 +232,10 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         java.util.Collection<HollowPrimaryKeyIndex.DuplicateKeyInfo> duplicates = idx.getDuplicateKeys(100);
         Assert.assertEquals(2, duplicates.size());
         for (HollowPrimaryKeyIndex.DuplicateKeyInfo info : duplicates) {
-            Assert.assertEquals(2L, info.getCount());
+            Assert.assertEquals(2, info.getCount());
         }
 
-        // Delta removes duplicates
+        // Another delta: remove duplicates
         mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
         mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
         mapper.add(new TypeA(3, 3.3d, new TypeB("three")));
@@ -249,20 +267,31 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void getDuplicateKeysWithMaxHandlesNoDuplicates() throws IOException {
+    public void forceFullScanDetectsDuplicatesEvenOnDeltaCycle() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
+        // Snapshot with duplicates (same key fields, differ in non-key isDuplicate)
         mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one", true)));
         mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
-        mapper.add(new TypeA(3, 3.3d, new TypeB("three")));
 
         roundTripSnapshot();
 
-        TestableUniqueKeyIndex idx = createIndex("TypeA");
+        HollowPrimaryKeyIndex idx = (HollowPrimaryKeyIndex) createIndex("TypeA");
+        idx.listenForDeltaUpdates();
 
-        java.util.Collection<HollowPrimaryKeyIndex.DuplicateKeyInfo> duplicates = idx.getDuplicateKeys(100);
-        Assert.assertEquals(0, duplicates.size());
-        Assert.assertFalse(idx.containsDuplicates());
+        // Delta: keep the duplicates, just add a new unique record
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one", true)));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three")));
+
+        roundTripDelta();
+
+        // forceFullScan: always detects all duplicates regardless of delta state
+        java.util.Collection<HollowPrimaryKeyIndex.DuplicateKeyInfo> fullScanDuplicates = idx.getDuplicateKeys(100, true);
+        Assert.assertEquals(1, fullScanDuplicates.size());
+        Assert.assertEquals(2, fullScanDuplicates.iterator().next().getCount());
     }
 
     @Test

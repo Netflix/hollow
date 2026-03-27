@@ -413,29 +413,44 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * @return any keys which are mapped to two or more records, up to maxDuplicateKeys
      */
     public synchronized Collection<DuplicateKeyInfo> getDuplicateKeys(int maxDuplicateKeys) {
+        return getDuplicateKeys(maxDuplicateKeys, false);
+    }
+
+    /**
+     * @param maxDuplicateKeys the maximum number of duplicate keys to find before stopping
+     * @param forceFullScan if true, always perform a full hash table scan regardless of whether
+     *                      a delta optimization is possible. Useful for snapshot validation or when
+     *                      pre-existing duplicates need to be detected.
+     * @return any keys which are mapped to two or more records, up to maxDuplicateKeys
+     */
+    public synchronized Collection<DuplicateKeyInfo> getDuplicateKeys(int maxDuplicateKeys, boolean forceFullScan) {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(hashTable.bitsPerElement == 0 || maxDuplicateKeys <= 0)
             return Collections.emptyList();
 
-        PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
-        BitSet previousOrdinals = listener.getPreviousOrdinals();
+        if (!forceFullScan) {
+            BitSet previousOrdinals = typeState.getPreviousOrdinals();
 
-        if (previousOrdinals.isEmpty()) {
-            return findDuplicatesByBucketScan(hashTable, maxDuplicateKeys);
+            if (!previousOrdinals.isEmpty()) {
+                // delta path, if previousOrdinals was empty, automatically switch
+                // to the full hash table scan (snapshot path)
+                BitSet newOrdinals = new BitSet();
+                newOrdinals.or(typeState.getPopulatedOrdinals());
+                newOrdinals.andNot(previousOrdinals);
+                if (newOrdinals.isEmpty())
+                    return Collections.emptyList();
+
+                return findDuplicatesByOrdinalProbe(hashTable, newOrdinals, maxDuplicateKeys);
+            }
         }
 
-        BitSet newOrdinals = new BitSet();
-        newOrdinals.or(listener.getPopulatedOrdinals());
-        newOrdinals.andNot(previousOrdinals);
-        if (newOrdinals.isEmpty())
-            return Collections.emptyList();
-
-        return findDuplicatesByOrdinalProbe(hashTable, newOrdinals, maxDuplicateKeys);
+        // snapshot path
+        return findDuplicatesByBucketScan(hashTable, maxDuplicateKeys);
     }
 
     /**
-     * Snapshot path: sequentially scan hash table buckets, comparing adjacent entries.
-     * Cache-friendly due to linear access pattern.
+     * Sequentially scan hash table buckets, comparing adjacent entries.
+     * Finds any pre-existing or new duplicates. Provides exact duplicate counts.
      */
     private List<DuplicateKeyInfo> findDuplicatesByBucketScan(PrimaryKeyIndexHashTable hashTable, int maxDuplicateKeys) {
         BitSet counted = new BitSet();
