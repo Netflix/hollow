@@ -23,15 +23,22 @@ import com.netflix.hollow.core.index.HollowPrimaryKeyIndex.DuplicateKeyInfo;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -47,10 +54,14 @@ import java.util.stream.Collectors;
  * record's type will never fail.
  */
 public class DuplicateDataDetectionValidator implements ValidatorListener {
+    private static final Logger LOG = Logger.getLogger(DuplicateDataDetectionValidator.class.getName());
     private static final int MAX_DISPLAYED_DUPLICATE_KEYS = 100;
     private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT =
             "Duplicate keys found for type %s. Primarykey in schema is %s. "
                     + "Duplicate IDs are: %s";
+    private static final String DUPLICATE_KEYS_FOUND_DELTA_MSG_FORMAT =
+            "Duplicate keys found for type %s (delta check - exact counts available on snapshot cycles). "
+                    + "Primarykey in schema is %s. Duplicate keys: %s";
     private static final String NO_PRIMARY_KEY_ERROR_MSG_FORMAT =
             "DuplicateDataDetectionValidator defined but unable to find primary key "
                     + "for data type %s. Please check schema definition.";
@@ -70,6 +81,9 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
 
     private final String dataTypeName;
     private final String[] fieldPathNames;
+
+    /** Lagged index reflecting the last successful cycle; advanced via {@code endUpdate()} on pass. */
+    private HollowPrimaryKeyIndex previousCycleIndex;
 
     /**
      * Creates a validator to detect duplicate records of the type that corresponds to the given data type class
@@ -151,23 +165,104 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         String fieldPaths = Arrays.toString(primaryKey.getFieldPaths());
         vrb.detail(FIELD_PATH_NAME, fieldPaths);
 
-        Collection<DuplicateKeyInfo> duplicateKeys = getDuplicateKeys(readState.getStateEngine(), primaryKey);
-        if (!duplicateKeys.isEmpty()) {
-            String message = String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths,
-                    duplicateKeysToString(duplicateKeys));
-            return vrb.failed(message);
+        HollowReadStateEngine stateEngine = readState.getStateEngine();
+        ValidationResult result;
+
+        if (previousCycleIndex == null) {
+            // Snapshot path
+            previousCycleIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
+            LOG.info(String.format("Duplicate detection for type '%s': snapshot mode (full scan).", dataTypeName));
+
+            Collection<DuplicateKeyInfo> duplicateKeys = previousCycleIndex.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
+            if (!duplicateKeys.isEmpty()) {
+                String message = String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths,
+                        duplicateKeysToString(duplicateKeys));
+                result = vrb.failed(message);
+            } else {
+                result = vrb.passed();
+            }
+        } else {
+            // Delta path
+            HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
+            PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
+            BitSet populatedOrdinals = listener.getPopulatedOrdinals();
+
+            BitSet newOrdinals = new BitSet();
+            newOrdinals.or(populatedOrdinals);
+            newOrdinals.andNot(listener.getPreviousOrdinals());
+
+            LOG.info(String.format("Duplicate detection for type '%s': delta mode (%d total, %d new ordinals).",
+                    dataTypeName, populatedOrdinals.cardinality(), newOrdinals.cardinality()));
+
+            if (!newOrdinals.isEmpty()) {
+                List<Object[]> duplicateKeys = findDuplicateKeysInDelta(
+                        previousCycleIndex, newOrdinals, populatedOrdinals);
+                if (!duplicateKeys.isEmpty()) {
+                    String message = String.format(DUPLICATE_KEYS_FOUND_DELTA_MSG_FORMAT, dataTypeName, fieldPaths,
+                            deltaDuplicateKeysToString(duplicateKeys));
+                    result = vrb.failed(message);
+                } else {
+                    result = vrb.passed();
+                }
+            } else {
+                result = vrb.passed();
+            }
         }
 
-        return vrb.passed();
+        // Advance index only on pass — failed cycles don't change published state
+        if (result.isPassed()) {
+            previousCycleIndex.endUpdate();
+        }
+
+        return result;
     }
 
-    private Collection<DuplicateKeyInfo> getDuplicateKeys(HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
-        HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
-        HollowPrimaryKeyIndex hollowPrimaryKeyIndex = typeState.getListener(HollowPrimaryKeyIndex.class);
-        if (hollowPrimaryKeyIndex == null) {
-            hollowPrimaryKeyIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
+    /**
+     * Delta-aware duplicate detection using a lagged index. Detects new-vs-new
+     * and new-vs-existing duplicates among the given new ordinals.
+     *
+     * @param laggedIndex an index whose hash table reflects the previous cycle's state
+     * @param newOrdinals ordinals added in the current delta
+     * @param populatedOrdinals all currently populated ordinals
+     * @return duplicate keys found among new ordinals
+     */
+    List<Object[]> findDuplicateKeysInDelta(
+            HollowPrimaryKeyIndex laggedIndex, BitSet newOrdinals, BitSet populatedOrdinals) {
+        // Maps each key to its first ordinal, or -1 if already reported as duplicate
+        Map<List<Object>, Integer> seen = new HashMap<>();
+        List<Object[]> duplicateKeys = new ArrayList<>();
+
+        int ordinal = newOrdinals.nextSetBit(0);
+        while (ordinal != -1 && duplicateKeys.size() < MAX_DISPLAYED_DUPLICATE_KEYS) {
+            Object[] key = laggedIndex.getRecordKey(ordinal);
+            List<Object> keyList = Arrays.asList(key);
+
+            Integer existingOrdinal = seen.get(keyList);
+            if (existingOrdinal != null) {
+                if (existingOrdinal >= 0) {
+                    duplicateKeys.add(key);
+                    seen.put(keyList, -1);
+                }
+            } else {
+                seen.put(keyList, ordinal);
+            }
+            ordinal = newOrdinals.nextSetBit(ordinal + 1);
         }
-        return hollowPrimaryKeyIndex.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
+
+        // Check new-vs-existing: matched ordinal must still be populated (not removed in this delta)
+        for (Map.Entry<List<Object>, Integer> entry : seen.entrySet()) {
+            if (duplicateKeys.size() >= MAX_DISPLAYED_DUPLICATE_KEYS) break;
+            int newOrdinal = entry.getValue();
+            if (newOrdinal < 0) continue;
+
+            Object[] key = entry.getKey().toArray();
+            int matched = laggedIndex.getMatchingOrdinal(key);
+            if (matched != -1 && populatedOrdinals.get(matched)) {
+                duplicateKeys.add(key);
+            }
+        }
+
+        return duplicateKeys;
     }
 
     @Override
@@ -202,6 +297,15 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
 
         return String.format("%s ... (%d distinct keys that each have duplicate records affecting %d records; showing at most %d keys)",
                 duplicateKeysString, totalUniqueKeys, totalAffectedRecords, MAX_DISPLAYED_DUPLICATE_KEYS);
+    }
+
+    private String deltaDuplicateKeysToString(List<Object[]> duplicateKeys) {
+        String keysString = duplicateKeys.stream()
+                .map(Arrays::toString)
+                .collect(Collectors.joining(", "));
+
+        return String.format("%s ... (%d distinct duplicate keys detected; showing at most %d keys)",
+                keysString, duplicateKeys.size(), MAX_DISPLAYED_DUPLICATE_KEYS);
     }
 
     /**

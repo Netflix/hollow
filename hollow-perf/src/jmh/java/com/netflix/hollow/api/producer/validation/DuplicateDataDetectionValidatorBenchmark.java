@@ -2,12 +2,15 @@ package com.netflix.hollow.api.producer.validation;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import java.io.IOException;
+import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -27,15 +30,16 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 /**
- * Compares three approaches to duplicate key detection:
+ * Compares duplicate key detection approaches:
  * <ul>
- *   <li>{@code snapshotFullScan} — getDuplicateKeys() with no max, full hash table scan (baseline)</li>
- *   <li>{@code snapshotBounded} — getDuplicateKeys(100) on a snapshot, iterates all populated ordinals</li>
- *   <li>{@code deltaBounded} — getDuplicateKeys(100) after a delta, iterates only newly added ordinals</li>
+ *   <li>{@code snapshotFullScan} — getDuplicateKeys() full hash table scan (baseline)</li>
+ *   <li>{@code snapshotBounded} — getDuplicateKeys(100) on a snapshot</li>
+ *   <li>{@code deltaLaggedIndex} — validator's delta path using a lagged index that reflects
+ *       the prior cycle, probing only new ordinals</li>
  * </ul>
  *
- * All three use the same numRecords. The snapshot benchmarks are unaffected by deltaFraction
- * (they'll show constant cost across that axis), which makes the delta speedup easy to see.
+ * The snapshot benchmarks are unaffected by deltaFraction (constant cost), which makes
+ * the delta speedup easy to see.
  */
 public class DuplicateDataDetectionValidatorBenchmark {
 
@@ -47,13 +51,19 @@ public class DuplicateDataDetectionValidatorBenchmark {
         @Param({"0.001", "0.01", "0.1"})
         public double deltaFraction;
 
+        // For snapshot benchmarks
         private HollowPrimaryKeyIndex snapshotIndex;
-        private HollowPrimaryKeyIndex deltaIndex;
+
+        // For delta benchmark: lagged index (pre-delta state) + new/populated ordinals
+        private HollowPrimaryKeyIndex laggedIndex;
+        private BitSet newOrdinals;
+        private BitSet populatedOrdinals;
+        private DuplicateDataDetectionValidator validator;
 
         @Setup(Level.Trial)
         public void setUp() throws IOException {
             snapshotIndex = buildSnapshotIndex();
-            deltaIndex = buildDeltaIndex();
+            buildDeltaState();
         }
 
         private HollowPrimaryKeyIndex buildSnapshotIndex() throws IOException {
@@ -67,7 +77,7 @@ public class DuplicateDataDetectionValidatorBenchmark {
             return new HollowPrimaryKeyIndex(readEngine, "Movie", "id");
         }
 
-        private HollowPrimaryKeyIndex buildDeltaIndex() throws IOException {
+        private void buildDeltaState() throws IOException {
             HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
             HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
             for (int i = 0; i < numRecords; i++) {
@@ -77,6 +87,10 @@ public class DuplicateDataDetectionValidatorBenchmark {
             HollowReadStateEngine readEngine = new HollowReadStateEngine();
             StateEngineRoundTripper.roundTripSnapshot(writeEngine, readEngine);
 
+            // Build the lagged index on the snapshot state (before delta)
+            laggedIndex = new HollowPrimaryKeyIndex(readEngine, "Movie", "id");
+
+            // Apply delta — update a fraction of records
             writeEngine.prepareForNextCycle();
             int deltaSize = Math.max(1, (int) (numRecords * deltaFraction));
             for (int i = 0; i < numRecords; i++) {
@@ -85,7 +99,14 @@ public class DuplicateDataDetectionValidatorBenchmark {
             }
             StateEngineRoundTripper.roundTripDelta(writeEngine, readEngine);
 
-            return new HollowPrimaryKeyIndex(readEngine, "Movie", "id");
+            PopulatedOrdinalListener listener = readEngine.getTypeState("Movie")
+                    .getListener(PopulatedOrdinalListener.class);
+            populatedOrdinals = listener.getPopulatedOrdinals();
+            newOrdinals = new BitSet();
+            newOrdinals.or(populatedOrdinals);
+            newOrdinals.andNot(listener.getPreviousOrdinals());
+
+            validator = new DuplicateDataDetectionValidator("Movie");
         }
     }
 
@@ -115,8 +136,8 @@ public class DuplicateDataDetectionValidatorBenchmark {
     @Warmup(iterations = 3, time = 3)
     @Measurement(iterations = 5, time = 3)
     @Fork(1)
-    public Collection<?> deltaBounded(BenchmarkState state) {
-        return state.deltaIndex.getDuplicateKeys(100);
+    public List<Object[]> deltaLaggedIndex(BenchmarkState state) {
+        return state.validator.findDuplicateKeysInDelta(state.laggedIndex, state.newOrdinals, state.populatedOrdinals);
     }
 
     @HollowPrimaryKey(fields = {"id"})

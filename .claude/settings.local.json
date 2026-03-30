@@ -3,7 +3,9 @@
     "allow": [
       "Bash(./gradlew :hollow-protoadapter:test:*)",
       "Bash(./gradlew:*)",
-      "Bash(gh pr:*)"
+      "Bash(gh pr:*)",
+      "Bash(GH_HOST=github.com gh api repos/Netflix/hollow/issues/802/comments)",
+      "Bash(python3 -c \":*)"
     ]
   }
 }
