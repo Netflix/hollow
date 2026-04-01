@@ -486,6 +486,50 @@ public class FlatRecordTraversalNodeTest {
     }
   }
 
+  @Test
+  public void testGetFieldValueBooleanBoxedReturnsNullForUnsetField() {
+    HollowObjectSchema schema = new HollowObjectSchema("TestSchema", 1);
+    schema.addField("boolField", HollowObjectSchema.FieldType.BOOLEAN);
+
+    HollowObjectWriteRecord record = new HollowObjectWriteRecord(schema);
+    // don't set the boolean field — it should be null
+
+    SimpleHollowDataset dataset = new SimpleHollowDataset(Collections.singletonList(schema));
+    FlatRecordWriter flatRecordWriter = new FlatRecordWriter(dataset, new FakeHollowSchemaIdentifierMapper(dataset));
+    flatRecordWriter.write(schema, record);
+    FlatRecord flatRecord = flatRecordWriter.generateFlatRecord();
+
+    FlatRecordTraversalObjectNode node = new FlatRecordTraversalObjectNode(flatRecord);
+    assertThat(node.getFieldValueBooleanBoxed("boolField")).isNull();
+  }
+
+  @Test
+  public void testGetFieldValueBooleanBoxedReturnsValueWhenSet() {
+    HollowObjectSchema schema = new HollowObjectSchema("TestSchema", 1);
+    schema.addField("boolField", HollowObjectSchema.FieldType.BOOLEAN);
+
+    HollowObjectWriteRecord trueRecord = new HollowObjectWriteRecord(schema);
+    trueRecord.setBoolean("boolField", true);
+
+    SimpleHollowDataset dataset = new SimpleHollowDataset(Collections.singletonList(schema));
+    FlatRecordWriter flatRecordWriter = new FlatRecordWriter(dataset, new FakeHollowSchemaIdentifierMapper(dataset));
+    flatRecordWriter.write(schema, trueRecord);
+    FlatRecord trueFlatRecord = flatRecordWriter.generateFlatRecord();
+
+    FlatRecordTraversalObjectNode trueNode = new FlatRecordTraversalObjectNode(trueFlatRecord);
+    assertThat(trueNode.getFieldValueBooleanBoxed("boolField")).isTrue();
+
+    HollowObjectWriteRecord falseRecord = new HollowObjectWriteRecord(schema);
+    falseRecord.setBoolean("boolField", false);
+
+    flatRecordWriter = new FlatRecordWriter(dataset, new FakeHollowSchemaIdentifierMapper(dataset));
+    flatRecordWriter.write(schema, falseRecord);
+    FlatRecord falseFlatRecord = flatRecordWriter.generateFlatRecord();
+
+    FlatRecordTraversalObjectNode falseNode = new FlatRecordTraversalObjectNode(falseFlatRecord);
+    assertThat(falseNode.getFieldValueBooleanBoxed("boolField")).isFalse();
+  }
+
   private FlatRecord createMovieFlatRecord() {
     Movie movie1 = new Movie();
     movie1.id = 1;
