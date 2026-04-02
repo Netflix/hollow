@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -58,6 +59,8 @@ public class HollowClientUpdater {
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
     private final HollowConsumerMetrics metrics;
     private final HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
+    private final ChecksumValidator checksumValidator;
+    private final boolean repairEnabled;
 
     private boolean skipTypeShardUpdateWithNoAdditions;
 
@@ -76,7 +79,7 @@ public class HollowClientUpdater {
                                HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
         this(transitionCreator, refreshListeners, apiFactory, doubleSnapshotConfig, hashCodeFinder, memoryMode,
                 objectLongevityConfig, objectLongevityDetector, metrics, metricsCollector,
-                HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE);
+                null, false, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE);
     }
 
     public HollowClientUpdater(HollowConsumer.BlobRetriever transitionCreator,
@@ -89,6 +92,8 @@ public class HollowClientUpdater {
                                HollowConsumer.ObjectLongevityDetector objectLongevityDetector,
                                HollowConsumerMetrics metrics,
                                HollowMetricsCollector<HollowConsumerMetrics> metricsCollector,
+                               ChecksumValidator checksumValidator,
+                               boolean repairEnabled,
                                HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
         this.planner = new HollowUpdatePlanner(transitionCreator, doubleSnapshotConfig, updatePlanBlobVerifier);
         this.failedTransitionTracker = new FailedTransitionTracker();
@@ -104,6 +109,8 @@ public class HollowClientUpdater {
         this.staleReferenceDetector.startMonitoring();
         this.metrics = metrics;
         this.metricsCollector = metricsCollector;
+        this.checksumValidator = checksumValidator;
+        this.repairEnabled = repairEnabled;
         this.initialLoad = new CompletableFuture<>();
     }
 
@@ -218,6 +225,18 @@ public class HollowClientUpdater {
                 hollowDataHolderVolatile.update(updatePlan, localListeners, () -> {});
             }
 
+            // Log transition type used
+            if (updatePlan.isSnapshotPlan()) {
+                LOG.log(Level.INFO, String.format(
+                    "Completed update using snapshot transition to version %d",
+                    getCurrentVersionId()));
+            }
+
+            // Validate checksum after delta transitions
+            if (checksumValidator != null && !updatePlan.isSnapshotPlan() && requestedVersionInfo.getAnnouncementMetadata().isPresent()) {
+                validateChecksumAfterUpdate(requestedVersionInfo.getAnnouncementMetadata().get(), updatePlan.destinationVersion(requestedVersion));
+            }
+
             for(HollowConsumer.RefreshListener refreshListener : localListeners)
                 refreshListener.refreshSuccessful(beforeVersion, getCurrentVersionId(), requestedVersion);
 
@@ -321,7 +340,9 @@ public class HollowClientUpdater {
     private HollowDataHolder newHollowDataHolder() {
         return new HollowDataHolder(newStateEngine(), apiFactory, memoryMode,
                 doubleSnapshotConfig, failedTransitionTracker,
-                staleReferenceDetector, objectLongevityConfig)
+                staleReferenceDetector, objectLongevityConfig,
+                repairEnabled ? new HollowRepairApplier() : null,
+                metrics)
                 .setFilter(filter)
                 .setSkipTypeShardUpdateWithNoAdditions(skipTypeShardUpdateWithNoAdditions);
     }
@@ -385,5 +406,74 @@ public class HollowClientUpdater {
      */
     public CompletableFuture<Long> getInitialLoad() {
         return this.initialLoad;
+    }
+
+    /**
+     * Validates checksum after delta update and triggers repair if mismatch detected.
+     */
+    private void validateChecksumAfterUpdate(Map<String, String> announcementMetadata, long version) throws Throwable {
+        HollowReadStateEngine stateEngine = getStateEngine();
+        if (stateEngine == null) {
+            LOG.warning("Cannot validate checksum: state engine is null");
+            return;
+        }
+
+        com.netflix.hollow.tools.checksum.HollowChecksum computedChecksum =
+            com.netflix.hollow.tools.checksum.HollowChecksum.forStateEngine(stateEngine);
+
+        boolean isValid = checksumValidator.validate(stateEngine, announcementMetadata, computedChecksum);
+
+        if (isValid) {
+            LOG.log(Level.INFO, String.format(
+                "Checksum validation passed after delta transition to version %d", version));
+        }
+
+        if (!isValid) {
+            LOG.warning("Checksum mismatch detected after delta to version " + version);
+
+            if (!repairEnabled) {
+                LOG.warning("Repair is not enabled. Checksum mismatch will not be automatically repaired.");
+                return;
+            }
+
+            LOG.warning("Triggering repair transition for version " + version);
+
+            // Create repair plan
+            HollowUpdatePlan repairPlan = planner.planUpdateWithRepair(version, version);
+
+            if (repairPlan != null && repairPlan.hasRepairTransition()) {
+                HollowConsumer.Blob repairBlob = repairPlan.getRepairTransition();
+
+                // Take a snapshot of the listeners to ensure additions or removals may occur concurrently
+                final HollowConsumer.RefreshListener[] localListeners =
+                        refreshListeners.toArray(new HollowConsumer.RefreshListener[0]);
+
+                // Apply repair
+                hollowDataHolderVolatile.applyRepairTransition(repairBlob, localListeners);
+
+                // Re-validate checksum after repair
+                com.netflix.hollow.tools.checksum.HollowChecksum afterRepairChecksum =
+                    com.netflix.hollow.tools.checksum.HollowChecksum.forStateEngine(stateEngine);
+                boolean validAfterRepair = checksumValidator.validate(
+                    stateEngine,
+                    announcementMetadata,
+                    afterRepairChecksum
+                );
+
+                if (!validAfterRepair) {
+                    throw new RuntimeException(
+                        "Checksum still invalid after repair at version " + version
+                    );
+                }
+
+                LOG.info("Repair successful, checksum now valid at version " + version);
+            } else {
+                LOG.severe("Cannot repair: snapshot unavailable for version " + version);
+                throw new RuntimeException(
+                    "Checksum mismatch detected at version " + version +
+                    " but repair impossible: snapshot unavailable"
+                );
+            }
+        }
     }
 }

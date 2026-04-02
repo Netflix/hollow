@@ -66,4 +66,44 @@ public class HollowConsumerMetrics extends HollowMetrics {
     public int getRefreshSucceded() {
         return this.refreshSucceeded;
     }
+
+    /**
+     * Records that a repair transition was triggered due to checksum mismatch.
+     *
+     * @param version the version being repaired
+     */
+    public void recordRepairTriggered(long version) {
+        // Default implementation (subclasses override)
+    }
+
+    /**
+     * Records the duration of a repair operation.
+     *
+     * @param version the version being repaired
+     * @param durationMs duration in milliseconds
+     */
+    public void recordRepairDuration(long version, long durationMs) {
+        // Default implementation
+    }
+
+    /**
+     * Records the number of ordinals repaired for a specific type.
+     *
+     * @param typeName the type name
+     * @param ordinalsRepaired count of ordinals repaired
+     */
+    public void recordRepairOrdinals(String typeName, int ordinalsRepaired) {
+        // Default implementation
+    }
+
+    /**
+     * Records that checksum validation failed.
+     *
+     * @param version the version at which checksum mismatch occurred
+     * @param producerChecksum the producer's checksum
+     * @param consumerChecksum the consumer's checksum
+     */
+    public void recordChecksumMismatch(long version, long producerChecksum, long consumerChecksum) {
+        // Default implementation
+    }
 }

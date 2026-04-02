@@ -963,6 +963,17 @@ abstract class AbstractHollowProducer {
                     announcementMetadata.put(HollowStateEngine.HEADER_TAG_METRIC_ANNOUNCEMENT, String.valueOf(System.currentTimeMillis()));
                     announcementMetadata.putAll(readState.getStateEngine().getHeaderTags());
                     announcementMetadata.put(ANNOUNCE_TAG_HEAP_FOOTPRINT, String.valueOf(readState.getStateEngine().calcApproxDataSize()));
+
+                    // Compute and publish full state checksum
+                    HollowChecksum checksum = HollowChecksum.forStateEngine(readState.getStateEngine());
+                    announcementMetadata.put("hollow.checksum", String.valueOf(checksum.intValue()));
+
+                    // Publish per-type checksums for incremental validation
+                    for (HollowChecksum.TypeChecksum typeChecksum : checksum.getTypeChecksums()) {
+                        String key = "hollow.checksum." + typeChecksum.getTypeName();
+                        announcementMetadata.put(key, String.valueOf(typeChecksum.getChecksum()));
+                    }
+
                     announcer.announce(readState.getVersion(), announcementMetadata);
                 } finally {
                     singleProducerEnforcer.unlock();
