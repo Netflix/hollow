@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.junit.Test;
@@ -297,6 +298,89 @@ public class TypeFilterTest {
         }
 
         return wse.getSchemas();
+    }
+    /**
+     * Tests that resolve() does not throw when the schema list omits a type that is
+     * referenced by another (e.g. optional ref not in blob, or excluded type).
+     */
+    public static class MissingReferencedType extends TypeFilterTest {
+
+        private static List<HollowSchema> schemasWithout(List<HollowSchema> schemas, String... typeNames) {
+            Set<String> omit = Arrays.stream(typeNames).collect(Collectors.toSet());
+            return schemas.stream()
+                    .filter(s -> !omit.contains(s.getName()))
+                    .collect(Collectors.toList());
+        }
+
+        @Test
+        public void objectRefMissing_includeRecursive_doesNotThrow() {
+            List<HollowSchema> full = generateSchema(l(Alpha.class));
+            List<HollowSchema> withoutCharlie = schemasWithout(full, "Charlie");
+
+            TypeFilter subject = newTypeFilter()
+                    .excludeAll()
+                    .includeRecursive("Alpha")
+                    .resolve(withoutCharlie);
+
+            Set<String> included = withoutCharlie.stream()
+                    .map(HollowSchema::getName)
+                    .filter(subject::includes)
+                    .collect(toSet());
+            assertThat(included).containsExactlyInAnyOrder("Alpha", "Beta", "Long");
+        }
+
+        @Test
+        public void listElementTypeMissing_includeRecursive_doesNotThrow() {
+            List<HollowSchema> full = generateSchema(l(Omega.class));
+            List<HollowSchema> withoutLE = schemasWithout(full, "LE", "LERef");
+
+            TypeFilter subject = newTypeFilter()
+                    .excludeAll()
+                    .includeRecursive("Omega")
+                    .resolve(withoutLE);
+
+            Set<String> included = withoutLE.stream()
+                    .map(HollowSchema::getName)
+                    .filter(subject::includes)
+                    .collect(toSet());
+            assertThat(included).contains("Omega", "ListOfLE");
+            assertThat(included).containsAll(Arrays.asList("SetOfSE", "SE", "SERef", "MapOfKToV", "K", "KRef", "V", "VRef"));
+        }
+
+        @Test
+        public void mapKeyOrValueTypeMissing_includeRecursive_doesNotThrow() {
+            List<HollowSchema> full = generateSchema(l(Omega.class));
+            List<HollowSchema> withoutK = schemasWithout(full, "K", "KRef");
+
+            TypeFilter subject = newTypeFilter()
+                    .excludeAll()
+                    .includeRecursive("Omega")
+                    .resolve(withoutK);
+
+            Set<String> included = withoutK.stream()
+                    .map(HollowSchema::getName)
+                    .filter(subject::includes)
+                    .collect(toSet());
+            assertThat(included).contains("Omega", "MapOfKToV");
+            assertThat(included).containsAll(Arrays.asList("ListOfLE", "LE", "LERef", "SetOfSE", "SE", "SERef", "V", "VRef"));
+        }
+
+        @Test
+        public void excludeRecursive_withMissingRef_doesNotThrow() {
+            List<HollowSchema> full = generateSchema(l(Alpha.class));
+            List<HollowSchema> withoutCharlie = schemasWithout(full, "Charlie");
+
+            TypeFilter subject = newTypeFilter()
+                    .excludeRecursive("Beta")
+                    .resolve(withoutCharlie);
+
+            Set<String> included = withoutCharlie.stream()
+                    .map(HollowSchema::getName)
+                    .filter(subject::includes)
+                    .collect(toSet());
+            // Beta and Long (reachable from Beta) are excluded; Charlie is missing from schema so not present
+            assertThat(included).containsExactlyInAnyOrder("Alpha");
+        }
     }
 }
 
