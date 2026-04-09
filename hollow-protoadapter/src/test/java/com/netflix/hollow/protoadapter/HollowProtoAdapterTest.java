@@ -910,5 +910,134 @@ public class HollowProtoAdapterTest {
         assertEquals("total_revenue should be LONG",
             HollowObjectSchema.FieldType.LONG, personSchema.getFieldType(totalRevenuePos));
     }
+
+    /**
+     * Test that repeated google.protobuf.*Value fields (e.g., repeated StringValue, repeated Int32Value)
+     * are correctly unwrapped in collections. These wrapper types should be stored as their primitive
+     * wrapper schemas (String, Integer) in Hollow lists, not as StringValue/Int32Value schemas.
+     */
+    @Test
+    public void testRepeatedValueTypeFields() throws Exception {
+        Class<?> inventoryClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Inventory");
+        Class<?> stringValueClass = protoClassLoader.loadClass("com.google.protobuf.StringValue");
+        Class<?> int32ValueClass = protoClassLoader.loadClass("com.google.protobuf.Int32Value");
+
+        Method newBuilder = inventoryClass.getMethod("newBuilder");
+        Method stringValueOf = stringValueClass.getMethod("of", String.class);
+        Method int32ValueOf = int32ValueClass.getMethod("of", int.class);
+
+        // Build an Inventory with repeated StringValue tags and repeated Int32Value quantities
+        Message.Builder builder = (Message.Builder) newBuilder.invoke(null);
+        builder.setField(builder.getDescriptorForType().findFieldByName("id"), "INV-001");
+        builder.addRepeatedField(builder.getDescriptorForType().findFieldByName("tags"),
+            stringValueOf.invoke(null, "electronics"));
+        builder.addRepeatedField(builder.getDescriptorForType().findFieldByName("tags"),
+            stringValueOf.invoke(null, "sale"));
+        builder.addRepeatedField(builder.getDescriptorForType().findFieldByName("quantities"),
+            int32ValueOf.invoke(null, 10));
+        builder.addRepeatedField(builder.getDescriptorForType().findFieldByName("quantities"),
+            int32ValueOf.invoke(null, 25));
+        Message inventory = builder.build();
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+        mapper.add(inventory);
+
+        // Verify schemas: StringValue and Int32Value should NOT exist as separate types
+        assertNull("StringValue schema should not exist (unwrapped)", writeStateEngine.getSchema("StringValue"));
+        assertNull("Int32Value schema should not exist (unwrapped)", writeStateEngine.getSchema("Int32Value"));
+
+        // String and Integer wrapper schemas should exist
+        assertNotNull("String schema should exist", writeStateEngine.getSchema("String"));
+        assertNotNull("Integer schema should exist", writeStateEngine.getSchema("Integer"));
+
+        // List schemas should reference the wrapper types
+        HollowListSchema tagsListSchema = (HollowListSchema) writeStateEngine.getSchema("ListOfString");
+        assertNotNull("ListOfString schema should exist", tagsListSchema);
+        assertEquals("ListOfString element type should be String", "String", tagsListSchema.getElementType());
+
+        HollowListSchema quantitiesListSchema = (HollowListSchema) writeStateEngine.getSchema("ListOfInteger");
+        assertNotNull("ListOfInteger schema should exist", quantitiesListSchema);
+        assertEquals("ListOfInteger element type should be Integer", "Integer", quantitiesListSchema.getElementType());
+
+        // Round-trip and verify data
+        writeStateEngine.prepareForWrite();
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        // Verify Inventory record exists
+        HollowObjectTypeReadState inventoryState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("Inventory");
+        assertNotNull("Inventory state should exist", inventoryState);
+        assertEquals("Should have 1 inventory", 1, inventoryState.maxOrdinal() + 1);
+
+        // Verify String values are readable
+        HollowObjectTypeReadState stringState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("String");
+        assertNotNull("String state should exist", stringState);
+        // Should have "electronics", "sale", and "INV-001" (from the id field's primary key)
+        assertTrue("Should have String values", stringState.maxOrdinal() >= 1);
+
+        // Verify Integer values are readable
+        HollowObjectTypeReadState integerState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("Integer");
+        assertNotNull("Integer state should exist", integerState);
+        assertTrue("Should have Integer values", integerState.maxOrdinal() >= 1);
+    }
+
+    /**
+     * Test that map fields with google.protobuf.*Value values (e.g., map<string, StringValue>)
+     * correctly unwrap the value type. Proto maps are internally represented as repeated entry
+     * messages, so the *Value is a singular field on the entry — handled by the existing singular
+     * unwrap path in addObjectField.
+     */
+    @Test
+    public void testMapWithValueTypeValues() throws Exception {
+        Class<?> inventoryClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Inventory");
+        Class<?> stringValueClass = protoClassLoader.loadClass("com.google.protobuf.StringValue");
+
+        Method newBuilder = inventoryClass.getMethod("newBuilder");
+        Method stringValueOf = stringValueClass.getMethod("of", String.class);
+
+        // Build an Inventory with map<string, StringValue> attributes
+        Message.Builder builder = (Message.Builder) newBuilder.invoke(null);
+        builder.setField(builder.getDescriptorForType().findFieldByName("id"), "INV-002");
+
+        // Proto maps use putAllXxx or the builder's mutable map
+        // Use reflection to call putAttributes(String, StringValue)
+        Descriptors.FieldDescriptor attributesField = builder.getDescriptorForType().findFieldByName("attributes");
+
+        // Proto3 map entries are added as repeated message fields
+        Descriptors.Descriptor entryDescriptor = attributesField.getMessageType();
+        Message.Builder entryBuilder1 = builder.newBuilderForField(attributesField);
+        entryBuilder1.setField(entryDescriptor.findFieldByName("key"), "color");
+        entryBuilder1.setField(entryDescriptor.findFieldByName("value"), stringValueOf.invoke(null, "red"));
+        builder.addRepeatedField(attributesField, entryBuilder1.build());
+
+        Message.Builder entryBuilder2 = builder.newBuilderForField(attributesField);
+        entryBuilder2.setField(entryDescriptor.findFieldByName("key"), "size");
+        entryBuilder2.setField(entryDescriptor.findFieldByName("value"), stringValueOf.invoke(null, "large"));
+        builder.addRepeatedField(attributesField, entryBuilder2.build());
+
+        Message inventory = builder.build();
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+        mapper.add(inventory);
+
+        // StringValue should not exist as a schema
+        assertNull("StringValue schema should not exist (unwrapped)", writeStateEngine.getSchema("StringValue"));
+        assertNotNull("String schema should exist", writeStateEngine.getSchema("String"));
+
+        // Round-trip and verify data
+        writeStateEngine.prepareForWrite();
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        HollowObjectTypeReadState inventoryState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("Inventory");
+        assertNotNull("Inventory state should exist", inventoryState);
+        assertEquals("Should have 1 inventory", 1, inventoryState.maxOrdinal() + 1);
+    }
 }
 

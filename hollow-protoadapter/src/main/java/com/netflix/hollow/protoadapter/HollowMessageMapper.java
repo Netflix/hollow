@@ -220,7 +220,8 @@ public class HollowMessageMapper {
 
                 // Ensure the element type schema exists
                 if (field.getType() == Descriptors.FieldDescriptor.Type.MESSAGE) {
-                    // Already created above
+                    // *Value types are unwrapped by getElementTypeName() which also creates
+                    // the wrapper schema. Regular messages are created in the recursion above.
                 } else {
                     // For primitive repeated fields, create wrapper if needed
                     ensurePrimitiveWrapperSchema(elementType);
@@ -568,7 +569,16 @@ public class HollowMessageMapper {
      */
     private String getElementTypeName(Descriptors.FieldDescriptor field) {
         if (field.getType() == Descriptors.FieldDescriptor.Type.MESSAGE) {
-            return field.getMessageType().getName();
+            Descriptors.Descriptor messageType = field.getMessageType();
+            // Unwrap google.protobuf.*Value types to their wrapper names (e.g., StringValue -> String)
+            if (isProtoValueType(messageType)) {
+                String wrapperType = getValueTypeWrapper(messageType);
+                if (wrapperType != null) {
+                    ensurePrimitiveWrapperSchema(wrapperType);
+                    return wrapperType;
+                }
+            }
+            return messageType.getName();
         } else if (field.getType() == Descriptors.FieldDescriptor.Type.ENUM) {
             return "String"; // Enums stored as strings
         } else {

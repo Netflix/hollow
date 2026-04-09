@@ -454,7 +454,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
             for (Object value : values) {
                 int elementOrdinal;
-                if (value instanceof Message) {
+                if (value instanceof Message && isProtoValueType(((Message) value).getDescriptorForType())) {
+                    // Unwrap google.protobuf.*Value wrapper types (e.g., StringValue, Int32Value)
+                    // These are stored as primitive wrapper schemas (String, Integer, etc.)
+                    Message msgValue = (Message) value;
+                    Object unwrappedValue = unwrapValueType(msgValue);
+                    FieldDescriptor.JavaType unwrappedType = getUnwrappedJavaType(msgValue.getDescriptorForType().getName());
+                    elementOrdinal = wrapPrimitiveValue(unwrappedType, unwrappedValue, elementType, flatRecordWriter);
+                } else if (value instanceof Message) {
                     elementOrdinal = parseMessage((Message) value, flatRecordWriter, elementType);
                 } else {
                     // Handle primitive types in collections
