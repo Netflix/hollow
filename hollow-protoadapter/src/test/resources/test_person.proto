@@ -76,6 +76,16 @@ message Product {
   string name = 2 [(com.netflix.hollow.hollow_type_name) = "ProductTitle"];
 }
 
+// Test message for repeated google.protobuf.*Value fields
+message Inventory {
+  option (com.netflix.hollow.hollow_primary_key) = {fields: ["id"]};
+
+  string id = 1;
+  repeated google.protobuf.StringValue tags = 2;
+  repeated google.protobuf.Int32Value quantities = 3;
+  map<string, google.protobuf.StringValue> attributes = 4;
+}
+
 // Test message for hollow_inline option and composite primary key
 message Account {
   option (com.netflix.hollow.hollow_primary_key) = {fields: ["account_id", "region"]};
