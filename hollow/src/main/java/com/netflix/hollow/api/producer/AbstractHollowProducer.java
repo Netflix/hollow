@@ -41,6 +41,9 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.schema.HollowCollectionSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchemaHash;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
@@ -54,7 +57,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -324,7 +329,15 @@ abstract class AbstractHollowProducer {
                 readStates = ReadStateHelper.restored(readState);
 
                 // Need to restore data to new ObjectMapper since can't restore to non empty Write State Engine
-                Collection<HollowSchema> schemas = objectMapper.getStateEngine().getSchemas();
+                // Start with the producer's registered schemas, then resolve any missing type
+                // dependencies from the restored snapshot. This handles types created dynamically
+                // (e.g., by HollowMessageMapper's lazy schema creation for Struct/Value/ListValue)
+                // that exist in the snapshot but weren't registered at init time via initializeDataModel().
+                // Only types transitively referenced by the producer's schemas are adopted — types
+                // intentionally removed by the producer are not re-added.
+                Collection<HollowSchema> schemas = resolveMissingDependencies(
+                        objectMapper.getStateEngine().getSchemas(),
+                        readState.getStateEngine().getSchemas());
                 HollowWriteStateEngine writeEngine = hashCodeFinder == null
                         ? new HollowWriteStateEngine()
                         : new HollowWriteStateEngine(hashCodeFinder);
@@ -351,6 +364,60 @@ abstract class AbstractHollowProducer {
             localListeners.fireProducerRestoreComplete(status);
         }
         return readState;
+    }
+
+    /**
+     * Resolve missing type dependencies by checking the producer's schemas for references
+     * to types not in the producer's model, and adopting those types from the snapshot.
+     * This handles dynamically-created types (e.g., HollowMessageMapper's lazy Struct/Value)
+     * without re-adding types the producer intentionally removed.
+     */
+    static Collection<HollowSchema> resolveMissingDependencies(
+            Collection<HollowSchema> producerSchemas,
+            Collection<HollowSchema> snapshotSchemas) {
+        Map<String, HollowSchema> result = new LinkedHashMap<>();
+        for (HollowSchema s : producerSchemas) {
+            result.put(s.getName(), s);
+        }
+        Map<String, HollowSchema> snapshotByName = new HashMap<>();
+        for (HollowSchema s : snapshotSchemas) {
+            snapshotByName.put(s.getName(), s);
+        }
+
+        // Iteratively resolve: find referenced types missing from result, adopt from snapshot
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            for (HollowSchema schema : new ArrayList<>(result.values())) {
+                for (String refType : getReferencedTypeNames(schema)) {
+                    if (!result.containsKey(refType) && snapshotByName.containsKey(refType)) {
+                        result.put(refType, snapshotByName.get(refType));
+                        changed = true;
+                    }
+                }
+            }
+        }
+        return result.values();
+    }
+
+    private static List<String> getReferencedTypeNames(HollowSchema schema) {
+        List<String> refs = new ArrayList<>();
+        if (schema instanceof HollowObjectSchema) {
+            HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
+            for (int i = 0; i < objectSchema.numFields(); i++) {
+                if (objectSchema.getFieldType(i) == HollowObjectSchema.FieldType.REFERENCE) {
+                    refs.add(objectSchema.getReferencedType(i));
+                }
+            }
+        } else if (schema instanceof com.netflix.hollow.core.schema.HollowCollectionSchema) {
+            refs.add(((com.netflix.hollow.core.schema.HollowCollectionSchema) schema).getElementType());
+        } else if (schema instanceof com.netflix.hollow.core.schema.HollowMapSchema) {
+            com.netflix.hollow.core.schema.HollowMapSchema mapSchema =
+                    (com.netflix.hollow.core.schema.HollowMapSchema) schema;
+            refs.add(mapSchema.getKeyType());
+            refs.add(mapSchema.getValueType());
+        }
+        return refs;
     }
 
     public HollowWriteStateEngine getWriteEngine() {
