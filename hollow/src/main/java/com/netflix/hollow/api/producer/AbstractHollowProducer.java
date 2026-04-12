@@ -41,10 +41,8 @@ import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.schema.HollowCollectionSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchemaUtil;
 import com.netflix.hollow.core.schema.HollowSchemaHash;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
@@ -389,7 +387,7 @@ abstract class AbstractHollowProducer {
         while (changed) {
             changed = false;
             for (HollowSchema schema : new ArrayList<>(result.values())) {
-                for (String refType : getReferencedTypeNames(schema)) {
+                for (String refType : HollowSchemaUtil.getReferencedTypeNames(schema)) {
                     if (!result.containsKey(refType) && snapshotByName.containsKey(refType)) {
                         result.put(refType, snapshotByName.get(refType));
                         changed = true;
@@ -400,25 +398,6 @@ abstract class AbstractHollowProducer {
         return result.values();
     }
 
-    private static List<String> getReferencedTypeNames(HollowSchema schema) {
-        List<String> refs = new ArrayList<>();
-        if (schema instanceof HollowObjectSchema) {
-            HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
-            for (int i = 0; i < objectSchema.numFields(); i++) {
-                if (objectSchema.getFieldType(i) == HollowObjectSchema.FieldType.REFERENCE) {
-                    refs.add(objectSchema.getReferencedType(i));
-                }
-            }
-        } else if (schema instanceof com.netflix.hollow.core.schema.HollowCollectionSchema) {
-            refs.add(((com.netflix.hollow.core.schema.HollowCollectionSchema) schema).getElementType());
-        } else if (schema instanceof com.netflix.hollow.core.schema.HollowMapSchema) {
-            com.netflix.hollow.core.schema.HollowMapSchema mapSchema =
-                    (com.netflix.hollow.core.schema.HollowMapSchema) schema;
-            refs.add(mapSchema.getKeyType());
-            refs.add(mapSchema.getValueType());
-        }
-        return refs;
-    }
 
     public HollowWriteStateEngine getWriteEngine() {
         return objectMapper.getStateEngine();
