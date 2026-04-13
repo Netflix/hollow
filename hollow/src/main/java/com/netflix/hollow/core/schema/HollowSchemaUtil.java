@@ -3,6 +3,7 @@ package com.netflix.hollow.core.schema;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,5 +45,31 @@ public class HollowSchemaUtil {
             }
         }
         return topLevelTypes;
+    }
+
+    /**
+     * Get the names of all types referenced by a schema (via REFERENCE fields,
+     * collection element types, or map key/value types).
+     *
+     * @param schema the schema to inspect
+     * @return list of referenced type names
+     */
+    public static List<String> getReferencedTypeNames(HollowSchema schema) {
+        List<String> refs = new ArrayList<>();
+        if (schema instanceof HollowObjectSchema) {
+            HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
+            for (int i = 0; i < objectSchema.numFields(); i++) {
+                if (objectSchema.getFieldType(i) == HollowObjectSchema.FieldType.REFERENCE) {
+                    refs.add(objectSchema.getReferencedType(i));
+                }
+            }
+        } else if (schema instanceof HollowCollectionSchema) {
+            refs.add(((HollowCollectionSchema) schema).getElementType());
+        } else if (schema instanceof HollowMapSchema) {
+            HollowMapSchema mapSchema = (HollowMapSchema) schema;
+            refs.add(mapSchema.getKeyType());
+            refs.add(mapSchema.getValueType());
+        }
+        return refs;
     }
 }
