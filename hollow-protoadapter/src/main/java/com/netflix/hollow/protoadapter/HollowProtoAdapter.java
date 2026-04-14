@@ -441,11 +441,52 @@ import java.util.concurrent.ConcurrentHashMap;
     }
 
     private int parseCollection(Message message, List<?> values, FlatRecordWriter flatRecordWriter, String collectionType) throws IOException {
-        HollowSchema schema = hollowSchemas.get(collectionType);
+        // Use computeIfAbsent for lazily created schemas (e.g., MapOfStringToValue for Struct)
+        HollowSchema schema = hollowSchemas.computeIfAbsent(collectionType, key -> stateEngine.getSchema(key));
         HollowWriteRecord collectionRec = getWriteRecord(collectionType);
         collectionRec.reset();
 
-        if (schema instanceof HollowCollectionSchema) {
+        if (schema instanceof HollowMapSchema) {
+            HollowMapSchema mapSchema = (HollowMapSchema) schema;
+            HollowMapWriteRecord mapRec = (HollowMapWriteRecord) collectionRec;
+            String keyType = mapSchema.getKeyType();
+            String valueType = mapSchema.getValueType();
+
+            for (Object value : values) {
+                if (value instanceof Message) {
+                    Message entry = (Message) value;
+                    com.google.protobuf.Descriptors.Descriptor entryDesc = entry.getDescriptorForType();
+                    com.google.protobuf.Descriptors.FieldDescriptor keyField = entryDesc.findFieldByName("key");
+                    com.google.protobuf.Descriptors.FieldDescriptor valueField = entryDesc.findFieldByName("value");
+
+                    // Process key
+                    Object keyValue = entry.getField(keyField);
+                    int keyOrdinal;
+                    if (keyValue instanceof Message) {
+                        keyOrdinal = parseMessage((Message) keyValue, flatRecordWriter, keyType);
+                    } else {
+                        keyOrdinal = wrapPrimitiveValue(keyField.getJavaType(), keyValue, keyType, flatRecordWriter);
+                    }
+
+                    // Process value
+                    Object valValue = entry.getField(valueField);
+                    int valueOrdinal;
+                    if (valValue instanceof Message) {
+                        Message valMsg = (Message) valValue;
+                        if (isWellKnownDynamicType(valMsg.getDescriptorForType())) {
+                            if (mapper != null) {
+                                mapper.ensureDynamicTypeSchema(valMsg, collectionType, "value");
+                            }
+                        }
+                        valueOrdinal = parseMessage(valMsg, flatRecordWriter, valueType);
+                    } else {
+                        valueOrdinal = wrapPrimitiveValue(valueField.getJavaType(), valValue, valueType, flatRecordWriter);
+                    }
+
+                    mapRec.addEntry(keyOrdinal, valueOrdinal);
+                }
+            }
+        } else if (schema instanceof HollowCollectionSchema) {
             HollowCollectionSchema collectionSchema = (HollowCollectionSchema) schema;
             String elementType = collectionSchema.getElementType();
 

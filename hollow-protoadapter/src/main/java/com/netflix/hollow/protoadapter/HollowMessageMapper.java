@@ -503,12 +503,12 @@ public class HollowMessageMapper {
                     // Value has a oneof "kind" with different types
                     // We'll model it as an object with nullable fields for each possible type
                     HollowObjectSchema schema = new HollowObjectSchema(valueTypeName, 6);
-                    schema.addField("nullValue", HollowObjectSchema.FieldType.BOOLEAN);  // true if null
-                    schema.addField("numberValue", HollowObjectSchema.FieldType.DOUBLE);
-                    schema.addField("stringValue", HollowObjectSchema.FieldType.STRING);
-                    schema.addField("boolValue", HollowObjectSchema.FieldType.BOOLEAN);
-                    schema.addField("structValue", HollowObjectSchema.FieldType.REFERENCE, "Struct");
-                    schema.addField("listValue", HollowObjectSchema.FieldType.REFERENCE, "ListValue");
+                    schema.addField("null_value", HollowObjectSchema.FieldType.STRING);  // NullValue enum stored as string
+                    schema.addField("number_value", HollowObjectSchema.FieldType.DOUBLE);
+                    schema.addField("string_value", HollowObjectSchema.FieldType.STRING);
+                    schema.addField("bool_value", HollowObjectSchema.FieldType.BOOLEAN);
+                    schema.addField("struct_value", HollowObjectSchema.FieldType.REFERENCE, "Struct");
+                    schema.addField("list_value", HollowObjectSchema.FieldType.REFERENCE, "ListValue");
                     stateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
                 }
             }

@@ -529,12 +529,12 @@ public class HollowProtoAdapterTest {
 
         // Verify Value schema has all expected fields for handling different types
         HollowObjectSchema valueSchema = (HollowObjectSchema) writeStateEngine.getSchema("Value");
-        assertTrue("Value should have nullValue field", valueSchema.getPosition("nullValue") >= 0);
-        assertTrue("Value should have numberValue field", valueSchema.getPosition("numberValue") >= 0);
-        assertTrue("Value should have stringValue field", valueSchema.getPosition("stringValue") >= 0);
-        assertTrue("Value should have boolValue field", valueSchema.getPosition("boolValue") >= 0);
-        assertTrue("Value should have structValue field", valueSchema.getPosition("structValue") >= 0);
-        assertTrue("Value should have listValue field", valueSchema.getPosition("listValue") >= 0);
+        assertTrue("Value should have null_value field", valueSchema.getPosition("null_value") >= 0);
+        assertTrue("Value should have number_value field", valueSchema.getPosition("number_value") >= 0);
+        assertTrue("Value should have string_value field", valueSchema.getPosition("string_value") >= 0);
+        assertTrue("Value should have bool_value field", valueSchema.getPosition("bool_value") >= 0);
+        assertTrue("Value should have struct_value field", valueSchema.getPosition("struct_value") >= 0);
+        assertTrue("Value should have list_value field", valueSchema.getPosition("list_value") >= 0);
 
         // Verify we can have nested Structs (tested in Person 3's metadata.contact field)
         // This demonstrates that the lazy schema creation handles recursive Struct references correctly
@@ -1038,6 +1038,183 @@ public class HollowProtoAdapterTest {
             (HollowObjectTypeReadState) readStateEngine.getTypeState("Inventory");
         assertNotNull("Inventory state should exist", inventoryState);
         assertEquals("Should have 1 inventory", 1, inventoryState.maxOrdinal() + 1);
+    }
+
+    /**
+     * Reproduces the delta chain detection issue: when using HollowMessageMapper with
+     * google.protobuf.Struct fields, changing a Struct value (e.g., adding a nonce) between
+     * cycles should result in hasChangedSinceLastCycle() returning true.
+     *
+     * This test simulates the dgw-control Cinder producer flow:
+     * 1. Cycle 1: populate with Person + metadata Struct
+     * 2. prepareForNextCycle
+     * 3. Cycle 2: populate with Person + DIFFERENT metadata Struct (nonce changed)
+     * 4. Assert hasChangedSinceLastCycle() == true
+     */
+    @Test
+    public void testDeltaDetectionWithStructFieldChange() throws Exception {
+        Class<?> personClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Person");
+        Class<?> structClass = protoClassLoader.loadClass("com.google.protobuf.Struct");
+        Class<?> valueClass = protoClassLoader.loadClass("com.google.protobuf.Value");
+
+        Method personNewBuilder = personClass.getMethod("newBuilder");
+        Method structNewBuilder = structClass.getMethod("newBuilder");
+        Method valueNewBuilder = valueClass.getMethod("newBuilder");
+        Method structBuilderPutFields = structClass.getDeclaredClasses()[0].getMethod("putFields", String.class, valueClass);
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+
+        // --- Cycle 1: Person with metadata containing nonce_v1 ---
+        Message.Builder person1Builder = (Message.Builder) personNewBuilder.invoke(null);
+        person1Builder.setField(person1Builder.getDescriptorForType().findFieldByName("id"), 1);
+        person1Builder.setField(person1Builder.getDescriptorForType().findFieldByName("name"), "Alice");
+
+        Message.Builder struct1Builder = (Message.Builder) structNewBuilder.invoke(null);
+        structBuilderPutFields.invoke(struct1Builder, "department",
+            createStringValue(valueNewBuilder, "Engineering"));
+        structBuilderPutFields.invoke(struct1Builder, "nonce",
+            createStringValue(valueNewBuilder, "nonce-value-1"));
+        person1Builder.setField(person1Builder.getDescriptorForType().findFieldByName("metadata"),
+            struct1Builder.build());
+
+        mapper.add(person1Builder.build());
+
+        // Check if map has data after cycle 1 populate
+        com.netflix.hollow.core.write.HollowTypeWriteState mapState = writeStateEngine.getTypeState("MapOfStringToValue");
+        assertNotNull("MapOfStringToValue type should exist", mapState);
+
+        // Complete cycle 1
+        writeStateEngine.prepareForWrite();
+        HollowReadStateEngine readStateEngine1 = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine1);
+
+        // Verify map data exists in read state
+        assertNotNull("MapOfStringToValue should be in read state",
+            readStateEngine1.getTypeState("MapOfStringToValue"));
+        int mapMaxOrdinal = readStateEngine1.getTypeState("MapOfStringToValue").maxOrdinal();
+        assertTrue("MapOfStringToValue should have at least 1 entry, but maxOrdinal=" + mapMaxOrdinal,
+            mapMaxOrdinal >= 0);
+
+        // --- Prepare for cycle 2 ---
+        writeStateEngine.prepareForNextCycle();
+
+        // --- Cycle 2: Same Person but metadata nonce changed ---
+        Message.Builder person2Builder = (Message.Builder) personNewBuilder.invoke(null);
+        person2Builder.setField(person2Builder.getDescriptorForType().findFieldByName("id"), 1);
+        person2Builder.setField(person2Builder.getDescriptorForType().findFieldByName("name"), "Alice");
+
+        Message.Builder struct2Builder = (Message.Builder) structNewBuilder.invoke(null);
+        structBuilderPutFields.invoke(struct2Builder, "department",
+            createStringValue(valueNewBuilder, "Engineering"));
+        structBuilderPutFields.invoke(struct2Builder, "nonce",
+            createStringValue(valueNewBuilder, "nonce-value-2"));  // DIFFERENT
+        person2Builder.setField(person2Builder.getDescriptorForType().findFieldByName("metadata"),
+            struct2Builder.build());
+
+        mapper.add(person2Builder.build());
+
+        // Debug: check each type for changes
+        StringBuilder debug = new StringBuilder("Per-type changes: ");
+        for (com.netflix.hollow.core.schema.HollowSchema s : writeStateEngine.getSchemas()) {
+            com.netflix.hollow.core.write.HollowTypeWriteState ts = writeStateEngine.getTypeState(s.getName());
+            debug.append(s.getName()).append("(changed=").append(ts.hasChangedSinceLastCycle()).append(") ");
+        }
+
+        assertTrue(debug.toString(),
+            writeStateEngine.hasChangedSinceLastCycle());
+
+        // Verify delta produces different data
+        writeStateEngine.prepareForWrite();
+        HollowReadStateEngine readStateEngine2 = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine2);
+
+        // Also test: same data should NOT trigger a change
+        writeStateEngine.prepareForNextCycle();
+
+        Message.Builder person3Builder = (Message.Builder) personNewBuilder.invoke(null);
+        person3Builder.setField(person3Builder.getDescriptorForType().findFieldByName("id"), 1);
+        person3Builder.setField(person3Builder.getDescriptorForType().findFieldByName("name"), "Alice");
+
+        Message.Builder struct3Builder = (Message.Builder) structNewBuilder.invoke(null);
+        structBuilderPutFields.invoke(struct3Builder, "department",
+            createStringValue(valueNewBuilder, "Engineering"));
+        structBuilderPutFields.invoke(struct3Builder, "nonce",
+            createStringValue(valueNewBuilder, "nonce-value-2"));  // SAME as cycle 2
+        person3Builder.setField(person3Builder.getDescriptorForType().findFieldByName("metadata"),
+            struct3Builder.build());
+
+        mapper.add(person3Builder.build());
+
+        assertFalse("Should NOT detect changes when data is identical",
+            writeStateEngine.hasChangedSinceLastCycle());
+    }
+
+    /**
+     * Same as above but simulates the restore flow: cycle 1 publishes, then a new
+     * HollowWriteStateEngine restores from the snapshot and runs cycle 2 with different data.
+     * This is closer to the actual production flow where withRestore() is used.
+     */
+    @Test
+    public void testDeltaDetectionAfterRestoreWithStructFieldChange() throws Exception {
+        Class<?> personClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Person");
+        Class<?> structClass = protoClassLoader.loadClass("com.google.protobuf.Struct");
+        Class<?> valueClass = protoClassLoader.loadClass("com.google.protobuf.Value");
+
+        Method personNewBuilder = personClass.getMethod("newBuilder");
+        Method structNewBuilder = structClass.getMethod("newBuilder");
+        Method valueNewBuilder = valueClass.getMethod("newBuilder");
+        Method structBuilderPutFields = structClass.getDeclaredClasses()[0].getMethod("putFields", String.class, valueClass);
+
+        // --- Cycle 1: publish initial data ---
+        HollowWriteStateEngine writeEngine1 = new HollowWriteStateEngine();
+        HollowMessageMapper mapper1 = new HollowMessageMapper(writeEngine1);
+
+        Message person1 = buildPersonWithNonce(personNewBuilder, structNewBuilder, valueNewBuilder,
+            structBuilderPutFields, 1, "Alice", "nonce-value-1");
+        mapper1.add(person1);
+
+        writeEngine1.prepareForWrite();
+        HollowReadStateEngine readEngine1 = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeEngine1, readEngine1);
+
+        // --- Simulate restart: new write engine, restore from snapshot ---
+        HollowWriteStateEngine writeEngine2 = new HollowWriteStateEngine();
+        HollowMessageMapper mapper2 = new HollowMessageMapper(writeEngine2);
+
+        // Initialize type states (same as producer @PostConstruct)
+        Descriptors.Descriptor personDescriptor = person1.getDescriptorForType();
+        mapper2.initializeTypeState(personDescriptor);
+
+        // Restore from snapshot (simulates withRestore)
+        writeEngine2.restoreFrom(readEngine1);
+        writeEngine2.prepareForNextCycle();
+
+        // --- Cycle 2: populate with DIFFERENT nonce ---
+        Message person2 = buildPersonWithNonce(personNewBuilder, structNewBuilder, valueNewBuilder,
+            structBuilderPutFields, 1, "Alice", "nonce-value-2");
+        mapper2.add(person2);
+
+        assertTrue("Should detect changes after restore when Struct field value differs",
+            writeEngine2.hasChangedSinceLastCycle());
+    }
+
+    private Message buildPersonWithNonce(
+            Method personNewBuilder, Method structNewBuilder, Method valueNewBuilder,
+            Method structBuilderPutFields, int id, String name, String nonce) throws Exception {
+        Message.Builder personBuilder = (Message.Builder) personNewBuilder.invoke(null);
+        personBuilder.setField(personBuilder.getDescriptorForType().findFieldByName("id"), id);
+        personBuilder.setField(personBuilder.getDescriptorForType().findFieldByName("name"), name);
+
+        Message.Builder structBuilder = (Message.Builder) structNewBuilder.invoke(null);
+        structBuilderPutFields.invoke(structBuilder, "department",
+            createStringValue(valueNewBuilder, "Engineering"));
+        structBuilderPutFields.invoke(structBuilder, "nonce",
+            createStringValue(valueNewBuilder, nonce));
+        personBuilder.setField(personBuilder.getDescriptorForType().findFieldByName("metadata"),
+            structBuilder.build());
+
+        return personBuilder.build();
     }
 }
 
