@@ -39,6 +39,10 @@ import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.HollowConstants;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.api.producer.listener.VetoableListener;
 import com.netflix.hollow.api.producer.model.CustomReferenceType;
 import com.netflix.hollow.api.producer.model.HasAllTypeStates;
@@ -55,6 +59,8 @@ import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.test.InMemoryBlobStore;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -1089,6 +1095,27 @@ public class HollowProducerTest {
         assertEquals(version1, readState.getVersion());
     }
 
+    @Test
+    public void integrityCheckFailsWhenSnapshotReadsBackZeroRecords() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowObjectSchema testSchema = new HollowObjectSchema("TestObject", 1);
+        testSchema.addField("id", FieldType.INT);
+
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new CorruptedSnapshotBlobStager(testSchema))
+                .build();
+        producer.initializeDataModel(testSchema);
+
+        try {
+            producer.runCycle(ws -> {
+                HollowObjectWriteRecord rec = new HollowObjectWriteRecord(testSchema);
+                rec.setInt("id", 1);
+                ws.getStateEngine().add("TestObject", rec);
+            });
+            fail("Expected integrity check to fail when snapshot reads back zero records");
+        } catch (RuntimeException e) {}
+    }
+
     private void add(HollowProducer.WriteState state, String sVal, int iVal) {
         TestRec rec = new TestRec(sVal, iVal);
         state.add(rec);
@@ -1181,6 +1208,39 @@ public class HollowProducerTest {
         @Override
         public void onValidationStart(long version) {
             singleProducerEnforcer.disable();
+        }
+    }
+
+    private static class CorruptedSnapshotBlobStager extends HollowInMemoryBlobStager {
+        private final HollowObjectSchema schema;
+
+        CorruptedSnapshotBlobStager(HollowObjectSchema schema) {
+            this.schema = schema;
+        }
+
+        @Override
+        public HollowProducer.Blob openSnapshot(long version) {
+            return new HollowProducer.Blob(HollowConstants.VERSION_NONE, version, HollowProducer.Blob.Type.SNAPSHOT) {
+                private byte[] data;
+
+                @Override
+                public void write(HollowBlobWriter writer) throws IOException {
+                    // Produce empty snapshot to simulate corruption
+                    HollowWriteStateEngine emptyEngine = new HollowWriteStateEngine();
+                    emptyEngine.addTypeState(new HollowObjectTypeWriteState(schema));
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    new HollowBlobWriter(emptyEngine).writeSnapshot(baos);
+                    data = baos.toByteArray();
+                }
+
+                @Override
+                public InputStream newInputStream() throws IOException {
+                    return new ByteArrayInputStream(data);
+                }
+
+                @Override
+                public void cleanup() {}
+            };
         }
     }
 
