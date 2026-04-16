@@ -56,7 +56,13 @@ public class HollowBlobHeaderWriter {
         VarInt.writeVInt(dos, 0);
 
         /// write the header tags -- intended to include input source data versions
-        dos.writeShort(header.getHeaderTags().size());
+        int numHeaderTags = header.getHeaderTags().size();
+        if (numHeaderTags > Short.MAX_VALUE) {
+            throw new IOException("Cannot write blob header: number of header tags (" + numHeaderTags
+                    + ") exceeds the maximum supported (" + Short.MAX_VALUE + "). "
+                    + "Exceeding this limit causes data corruption.");
+        }
+        dos.writeShort(numHeaderTags);
 
         for (Map.Entry<String, String> headerTag : header.getHeaderTags().entrySet()) {
             dos.writeUTF(headerTag.getKey());

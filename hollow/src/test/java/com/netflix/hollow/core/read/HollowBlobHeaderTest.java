@@ -81,6 +81,15 @@ public class HollowBlobHeaderTest {
         Assert.assertEquals(HEADER_VAL2, readStateEngine.getHeaderTag(HEADER_NAME2));
     }
 
+    @Test(expected = IOException.class)
+    public void writeSnapshotFailsWhenHeaderTagCountExceedsShortMax() throws IOException {
+        HollowWriteStateEngine engine = new HollowWriteStateEngine();
+        for (int i = 0; i <= Short.MAX_VALUE; i++) {
+            engine.addHeaderTag("key_" + i, "val_" + i);
+        }
+        new HollowBlobWriter(engine).writeSnapshot(baos);
+    }
+
     private void roundTripSnapshot() throws IOException {
         blobWriter.writeSnapshot(baos);
         writeStateEngine.prepareForNextCycle();
