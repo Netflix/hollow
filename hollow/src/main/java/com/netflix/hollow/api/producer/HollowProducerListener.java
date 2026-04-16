@@ -137,7 +137,7 @@ public interface HollowProducerListener extends
      *
      * @param status ProducerStatus of this cycle. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
      * when the a new data state has been announced to consumers or when there were no changes to the data; it will return @{code FAIL}
-     * when any stage failed or any other failure occured during the cycle.
+     * when any stage failed or any other failure occurred during the cycle.
      * @param elapsed duration of the cycle in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
