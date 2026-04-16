@@ -870,6 +870,18 @@ abstract class AbstractHollowProducer {
             HollowReadStateEngine pending = readStates.pending().getStateEngine();
             readSnapshot(artifacts.snapshot, pending);
 
+            long writtenOrdinals = getWriteEngine().getOrderedTypeStates().stream()
+                    .mapToLong(ts -> ts.getPopulatedBitSet().cardinality())
+                    .sum();
+            long pendingOrdinals = pending.getTypeStates().stream()
+                    .mapToLong(ts -> ts.getPopulatedOrdinals().cardinality())
+                    .sum();
+            if (writtenOrdinals > 0 && pendingOrdinals == 0) {
+                throw new IllegalStateException(
+                        "Integrity check failed: snapshot produced zero records (wrote " + writtenOrdinals + " records)."
+                                + " This indicates possible blob corruption.");
+            }
+
             if (readStates.hasCurrent()) {
                 HollowReadStateEngine current = readStates.current().getStateEngine();
 
