@@ -51,6 +51,9 @@ message Hobby {
   string name = 1;
   int32 years_experience = 2;
   SkillLevel skill_level = 3;
+  // Struct nested inside a repeated message — mirrors
+  // Namespace.persistence_configurations.persistence_configuration[*].config
+  google.protobuf.Struct config = 4;
 }
 
 // Example enum

@@ -206,8 +206,16 @@ public class HollowMessageMapper {
         // Count fields to size the schema
         int fieldCount = descriptor.getFields().size();
 
+        // Propagate the hollow_primary_key proto option into the schema so that downstream
+        // tools (HollowPrimaryKeyIndex, HollowHistoricalStateCreator, the hollow-history UI
+        // Lookup Key form, Cinder UI diff counters) can identify records by their logical
+        // primary key rather than by ordinal.
+        String[] pkFieldPaths = readHollowPrimaryKeyFields(descriptor);
+
         // Create the object schema for this message
-        HollowObjectSchema schema = new HollowObjectSchema(typeName, fieldCount);
+        HollowObjectSchema schema = pkFieldPaths.length == 0
+            ? new HollowObjectSchema(typeName, fieldCount)
+            : new HollowObjectSchema(typeName, fieldCount, pkFieldPaths);
 
         // Add fields to the schema
         for (Descriptors.FieldDescriptor field : descriptor.getFields()) {
@@ -503,12 +511,12 @@ public class HollowMessageMapper {
                     // Value has a oneof "kind" with different types
                     // We'll model it as an object with nullable fields for each possible type
                     HollowObjectSchema schema = new HollowObjectSchema(valueTypeName, 6);
-                    schema.addField("nullValue", HollowObjectSchema.FieldType.BOOLEAN);  // true if null
-                    schema.addField("numberValue", HollowObjectSchema.FieldType.DOUBLE);
-                    schema.addField("stringValue", HollowObjectSchema.FieldType.STRING);
-                    schema.addField("boolValue", HollowObjectSchema.FieldType.BOOLEAN);
-                    schema.addField("structValue", HollowObjectSchema.FieldType.REFERENCE, "Struct");
-                    schema.addField("listValue", HollowObjectSchema.FieldType.REFERENCE, "ListValue");
+                    schema.addField("null_value", HollowObjectSchema.FieldType.STRING);  // NullValue enum stored as string
+                    schema.addField("number_value", HollowObjectSchema.FieldType.DOUBLE);
+                    schema.addField("string_value", HollowObjectSchema.FieldType.STRING);
+                    schema.addField("bool_value", HollowObjectSchema.FieldType.BOOLEAN);
+                    schema.addField("struct_value", HollowObjectSchema.FieldType.REFERENCE, "Struct");
+                    schema.addField("list_value", HollowObjectSchema.FieldType.REFERENCE, "ListValue");
                     stateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
                 }
             }
@@ -912,6 +920,28 @@ public class HollowMessageMapper {
      * @param message the protobuf message
      * @return primary key containing the type name and field values
      */
+    /**
+     * Read the {@code hollow_primary_key} option's {@code fields} list from a message
+     * descriptor. Returns an empty array when the option is not set (the mapper's
+     * schemas then have no primary key, matching prior behavior).
+     */
+    private static String[] readHollowPrimaryKeyFields(Descriptors.Descriptor descriptor) {
+        try {
+            com.google.protobuf.DescriptorProtos.MessageOptions options = descriptor.getOptions();
+            if (options.hasExtension(HollowOptions.hollowPrimaryKey)) {
+                HollowOptions.HollowPrimaryKey pkOption =
+                    options.getExtension(HollowOptions.hollowPrimaryKey);
+                java.util.List<String> fields = pkOption.getFieldsList();
+                if (fields != null && !fields.isEmpty()) {
+                    return fields.toArray(new String[0]);
+                }
+            }
+        } catch (Exception e) {
+            // HollowOptions extension not available on the classpath — treat as no PK.
+        }
+        return new String[0];
+    }
+
     public com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey extractPrimaryKey(
             com.google.protobuf.Message message) {
 

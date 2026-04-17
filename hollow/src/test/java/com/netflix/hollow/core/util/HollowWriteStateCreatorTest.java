@@ -200,7 +200,11 @@ public class HollowWriteStateCreatorTest {
     }
 
     @Test
-    public void populateStateEngineWithTypeWriteStates_failsOnCircularDependencies() throws IOException {
+    public void populateStateEngineWithTypeWriteStates_tolerates_circular_dependencies() throws IOException {
+        // google.protobuf.Struct <-> Value is an intentional cycle; schemas like that must
+        // still end up in the write state engine. Order inside the cycle is unspecified
+        // (HollowSchemaSorter appends cyclic types after the DAG prefix in name order),
+        // but every schema must be present.
         String schemaStr = "TypeA { Long id; TypeB b; }"
             + "TypeB { ListOfLong ids; TypeA circular; }"
             + "Long { long value; }"
@@ -209,9 +213,9 @@ public class HollowWriteStateCreatorTest {
         assertThat(schemas).extracting(HollowSchema::getName)
             .containsExactly("TypeA", "TypeB", "Long", "ListOfLong");
         HollowWriteStateEngine engine = new HollowWriteStateEngine();
-        assertThatThrownBy(() -> HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(engine, schemas))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("Missing schema(s)");
+        HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(engine, schemas);
+        assertThat(engine.getSchemas()).extracting(HollowSchema::getName)
+            .containsExactlyInAnyOrder("Long", "ListOfLong", "TypeA", "TypeB");
     }
 
     @Test
