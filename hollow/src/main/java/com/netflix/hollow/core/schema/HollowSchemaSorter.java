@@ -58,6 +58,19 @@ public class HollowSchemaSorter {
         while(idx.hasMoreTypes())
             orderedSchemas.add(schemaMap.get(idx.getNextType()));
 
+        // Types participating in cycles (e.g. google.protobuf.Struct <-> Value) never have empty
+        // dependency sets, so the topological pass above leaves them out. Emit any remaining
+        // types in deterministic (name) order so callers get a complete list instead of silently
+        // dropped schemas. Callers that truly require a strict DAG ordering are responsible for
+        // validating that the graph is acyclic themselves.
+        if(!idx.dependencyIndex.isEmpty()) {
+            List<String> remaining = new ArrayList<String>(idx.dependencyIndex.keySet());
+            java.util.Collections.sort(remaining);
+            for(String typeName : remaining) {
+                orderedSchemas.add(schemaMap.get(typeName));
+            }
+        }
+
         return orderedSchemas;
     }
 
