@@ -246,8 +246,8 @@ public class HollowConsumer {
      * <p>
      * This is an asynchronous call.
      */
-    public void triggerAsyncRefresh() {
-        triggerAsyncRefreshWithDelay(0);
+    public CompletableFuture<Void> triggerAsyncRefresh() {
+        return triggerAsyncRefreshWithDelay(0);
     }
 
     /**
@@ -258,10 +258,10 @@ public class HollowConsumer {
      *
      * @param delayMillis the delay, in millseconds, before triggering the refresh
      */
-    public void triggerAsyncRefreshWithDelay(int delayMillis) {
+    public CompletableFuture<Void> triggerAsyncRefreshWithDelay(int delayMillis) {
         final long targetBeginTime = System.currentTimeMillis() + delayMillis;
 
-        refreshExecutor.execute(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 long delay = targetBeginTime - System.currentTimeMillis();
                 if (delay > 0)
@@ -280,7 +280,7 @@ public class HollowConsumer {
                 LOG.log(Level.WARNING, "Async refresh failed", e);
                 throw e;
             }
-        });
+        }, refreshExecutor);
     }
 
     /**
