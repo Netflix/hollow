@@ -12,7 +12,6 @@ Hollow is a java library and toolset for disseminating in-memory datasets from a
 Documentation is available at [http://hollow.how](http://hollow.how).  
 
 ## Getting Started
-
 We recommend jumping into the [quick start guide](http://hollow.how/quick-start) — you'll have a demo up and running in minutes, and a fully production-scalable implementation of Hollow at your fingertips in about an hour.  From there, you can plug in your data model and it's off to the races.
 
 ## Get Hollow
