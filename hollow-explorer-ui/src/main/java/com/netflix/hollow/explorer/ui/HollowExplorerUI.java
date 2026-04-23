@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -119,6 +120,14 @@ public class HollowExplorerUI extends HollowUIRouter {
         if(client != null)
             return client.getStateEngine();
         return stateEngine;
+    }
+
+    /**
+     * Precomputes each type's heap footprint and hole cost and caches them to serve future requests.
+     * If executor is non-null, the computation is parallelized across it; otherwise it runs synchronously.
+     */
+    public void prefillHeapStatsCache(Executor executor) {
+        showAllTypesPage.prefillHeapStatsCache(executor);
     }
 
     public String getHeaderDisplayString() {
