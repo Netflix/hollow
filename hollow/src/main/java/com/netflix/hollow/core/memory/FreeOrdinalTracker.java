@@ -90,14 +90,16 @@ public class FreeOrdinalTracker {
      * Focus returned ordinal holes in as few shards as possible.
      * Within each shard, return ordinals in ascending order.
      */
-    public void sort(int numShards) {
+    public void sort(int numShards, int mapIndexBits, int mapIdx) {
         int shardNumberMask = numShards - 1;
         Shard shards[] = new Shard[numShards];
         for(int i=0;i<shards.length;i++)
             shards[i] = new Shard();
 
-        for(int i=0;i<size;i++)
-            shards[freeOrdinals[i] & shardNumberMask].freeOrdinalCount++;
+        for(int i=0;i<size;i++) {
+            int freeGlobalOrdinal = (freeOrdinals[i] << mapIndexBits) | mapIdx;
+            shards[freeGlobalOrdinal & shardNumberMask].freeOrdinalCount++;
+        }
 
         Shard orderedShards[] = Arrays.copyOf(shards, shards.length);
         Arrays.sort(orderedShards, (s1, s2) -> s2.freeOrdinalCount - s1.freeOrdinalCount);
@@ -110,7 +112,8 @@ public class FreeOrdinalTracker {
 
         int newFreeOrdinals[] = new int[freeOrdinals.length];
         for(int i=0;i<size;i++) {
-            Shard shard = shards[freeOrdinals[i] & shardNumberMask];
+            int freeGlobalOrdinal = (freeOrdinals[i] << mapIndexBits) | mapIdx;
+            Shard shard = shards[freeGlobalOrdinal & shardNumberMask];
             newFreeOrdinals[shard.currentPos] = freeOrdinals[i];
             shard.currentPos++;
         }
