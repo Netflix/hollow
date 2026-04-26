@@ -1417,6 +1417,61 @@ public class HollowProtoAdapterTest {
             writeEngine2.hasChangedSinceLastCycle());
     }
 
+    /**
+     * readHollowRecord must leave hollow-null int32/float scalar fields absent on the reconstructed
+     * proto rather than hydrating Integer.MIN_VALUE / NaN sentinels. Regression guard for the case
+     * where PersistenceConfiguration.level came back as NaN because the read path skipped the
+     * isNull check.
+     */
+    @Test
+    public void testReadHollowRecordLeavesUnsetInt32FieldAbsent() throws Exception {
+        Class<?> addressClass = protoClassLoader.loadClass(
+            "com.netflix.hollow.test.proto.PersonProtos$Address");
+        Message.Builder addressBuilder = (Message.Builder)
+            addressClass.getMethod("newBuilder").invoke(null);
+        Descriptors.Descriptor addressDescriptor = addressBuilder.getDescriptorForType();
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+        mapper.initializeTypeState(addressDescriptor);
+
+        HollowObjectSchema addressSchema =
+            (HollowObjectSchema) writeStateEngine.getSchema("Address");
+        assertNotNull("Address schema should exist", addressSchema);
+
+        // Write an Address directly with zip_code explicitly null — simulating a producer
+        // that never populated the int32 field. This is the shape PersistenceConfiguration
+        // arrives in when level is unset upstream.
+        com.netflix.hollow.core.write.HollowObjectWriteRecord rec =
+            new com.netflix.hollow.core.write.HollowObjectWriteRecord(addressSchema);
+        rec.setString("street", "123 Main St");
+        rec.setString("city", "San Francisco");
+        rec.setString("state", "CA");
+        rec.setNull("zip_code");
+
+        HollowObjectTypeWriteState addressWriteState =
+            (HollowObjectTypeWriteState) writeStateEngine.getTypeState("Address");
+        int ordinal = addressWriteState.add(rec);
+
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        HollowObjectTypeReadState addressReadState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("Address");
+        com.netflix.hollow.api.objects.generic.GenericHollowObject genericAddress =
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(
+                addressReadState, ordinal);
+
+        Message reconstructed = mapper.readHollowRecord(genericAddress, addressDescriptor);
+
+        Descriptors.FieldDescriptor zipCode = addressDescriptor.findFieldByName("zip_code");
+        assertEquals(
+            "zip_code was hollow-null; readHollowRecord must leave it at the proto3 default (0) "
+                + "rather than writing Integer.MIN_VALUE sentinel back into the message",
+            0,
+            ((Integer) reconstructed.getField(zipCode)).intValue());
+    }
+
     private Message buildPersonWithNonce(
             Method personNewBuilder, Method structNewBuilder, Method valueNewBuilder,
             Method structBuilderPutFields, int id, String name, String nonce) throws Exception {
