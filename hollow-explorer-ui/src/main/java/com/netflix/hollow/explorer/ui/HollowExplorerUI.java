@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -124,13 +123,18 @@ public class HollowExplorerUI extends HollowUIRouter {
 
     /**
      * Precomputes each type's heap footprint and hole cost and caches them to serve future requests.
-     * If executor is non-null, the computation is parallelized across it; otherwise it runs synchronously.
      */
-    public void prefillHeapStatsCache(Executor executor) {
-        showAllTypesPage.prefillHeapStatsCache(executor);
+    public void prefillHeapStatsCache() {
+        showAllTypesPage.prefillHeapStatsCache();
     }
 
-    public void clearCache() {showAllTypesPage.clearCache();}
+    /**
+     * Invalidates the cached heap stats so the next request recomputes them.
+     * Should be called after each delta transition.
+     */
+    public void clearCache() {
+        showAllTypesPage.clearCache();
+    }
 
     public String getHeaderDisplayString() {
         return headerDisplayMap.get(HEADER_DISPLAY_STRING);

@@ -469,25 +469,11 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     @Override
     public long getApproximateHoleCostInBytes() {
         final HollowMapTypeReadStateShard[] shards = this.shardsVolatile.shards;
-        BitSet populatedOrdinals = getPopulatedOrdinals();
-        int[] shardHoleCnts = new int[shards.length];
-        int[] shardBitsPerFixedLengthMapPortion = new int[shards.length];
+        int[] bitsPerShardRecord = new int[shards.length];
         for (int i = 0; i < shards.length; i++) {
-            shardBitsPerFixedLengthMapPortion[i] = shards[i].dataElements.bitsPerFixedLengthMapPortion;
+            bitsPerShardRecord[i] = shards[i].dataElements.bitsPerFixedLengthMapPortion;
         }
-
-        int shardNumberMask = shards.length - 1;
-        int holeOrdinal = populatedOrdinals.nextClearBit(0);
-        while (holeOrdinal <= maxOrdinal) {
-            shardHoleCnts[holeOrdinal & shardNumberMask]++;
-            holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
-        }
-
-        long approximateHoleCostInBits = 0;
-        for (int i = 0; i < shards.length; i++) {
-            approximateHoleCostInBits += (long) shardHoleCnts[i] * shardBitsPerFixedLengthMapPortion[i];
-        }
-        return approximateHoleCostInBits >>> 3;
+        return approximateHoleCostInBytes(bitsPerShardRecord);
     }
     
     public HollowPrimaryKeyValueDeriver getKeyDeriver() {

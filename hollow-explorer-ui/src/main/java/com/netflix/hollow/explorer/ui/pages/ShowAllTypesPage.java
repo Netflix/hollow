@@ -35,10 +35,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
 
@@ -56,7 +53,7 @@ public class ShowAllTypesPage extends HollowExplorerPage {
         cachedHeapStats = null;
     }
 
-    public void prefillHeapStatsCache(Executor executor) {
+    public void prefillHeapStatsCache() {
         HollowReadStateEngine engine = ui.getStateEngine();
         long currentTag = engine.getCurrentRandomizedTag();
         if (cachedHeapStats != null && currentTag == cachedRandomizedTag) {
@@ -64,26 +61,17 @@ public class ShowAllTypesPage extends HollowExplorerPage {
         }
 
         synchronized (this) {
-            // double null check in case previous monitor holder has completed the computation.
+            // double-checked locking: re-read under the lock in case another thread already populated the cache.
             if (cachedHeapStats != null && currentTag == cachedRandomizedTag) {
                 return;
             }
+
             Collection<HollowTypeReadState> typeStates = engine.getTypeStates();
             ConcurrentHashMap<String, HeapStats> newCache = new ConcurrentHashMap<>(typeStates.size() * 2);
-            if (executor == null) {
-                for (HollowTypeReadState ts : typeStates) {
-                    newCache.put(ts.getSchema().getName(), computeHeapStats(ts));
-                }
-            } else {
-                CompletableFuture<?>[] futures = new CompletableFuture<?>[typeStates.size()];
-                int i = 0;
-                for (HollowTypeReadState ts : typeStates) {
-                    futures[i++] = CompletableFuture.runAsync(
-                            () -> newCache.put(ts.getSchema().getName(), computeHeapStats(ts)),
-                            executor);
-                }
-                CompletableFuture.allOf(futures).join();
+            for (HollowTypeReadState ts : typeStates) {
+                newCache.put(ts.getSchema().getName(), computeHeapStats(ts));
             }
+
             cachedHeapStats = newCache;
             cachedRandomizedTag = currentTag;
         }
@@ -110,18 +98,16 @@ public class ShowAllTypesPage extends HollowExplorerPage {
 
         String sort = req.getParameter("sort") == null ? "primaryKey" : req.getParameter("sort");
 
-        List<TypeOverview> typeOverviews = new ArrayList<TypeOverview>();
-
-
-        prefillHeapStatsCache(null);
-        Map<String, HeapStats> heapStats = cachedHeapStats;
-        HollowReadStateEngine readStateEngine =  ui.getStateEngine();
+        List<TypeOverview> typeOverviews = new ArrayList<>();
+        prefillHeapStatsCache();
+        ConcurrentHashMap<String, HeapStats> heapStatsSnapshot = this.cachedHeapStats;
+        HollowReadStateEngine readStateEngine = ui.getStateEngine();
         for(HollowTypeReadState typeState : readStateEngine.getTypeStates()) {
             String typeName = typeState.getSchema().getName();
             BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
             int numRecords = populatedOrdinals == null ? Integer.MIN_VALUE : populatedOrdinals.cardinality();
             int numHoles = populatedOrdinals == null ? Integer.MIN_VALUE : populatedOrdinals.length()-populatedOrdinals.cardinality();
-            HeapStats stats = heapStats.get(typeName);
+            HeapStats stats = heapStatsSnapshot != null ? heapStatsSnapshot.get(typeName) : null;
             long approxHeapFootprint = stats != null ? stats.approxHeapFootprint : typeState.getApproximateHeapFootprintInBytes();
             long approxHoleFootprint = stats != null ? stats.approxHoleFootprint : typeState.getApproximateHoleCostInBytes();
             PrimaryKey primaryKey = typeState.getSchema().getSchemaType() == SchemaType.OBJECT ? ((HollowObjectSchema)typeState.getSchema()).getPrimaryKey() : null;

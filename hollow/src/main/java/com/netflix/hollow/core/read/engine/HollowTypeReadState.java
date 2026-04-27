@@ -189,6 +189,31 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     public abstract long getApproximateHoleCostInBytes();
 
     /**
+     * Counts holes per shard and returns the total cost in bytes.
+     * Each element of {@code bitsPerShardRecord} is the fixed-length bits consumed per record in that shard;
+     * var-length data costs are excluded, so the result is an approximation.
+     *
+     * <p>Requires that {@code bitsPerShardRecord.length} is a power of two, which is enforced by
+     * the write side and holds for all valid Hollow type states.
+     */
+    protected long approximateHoleCostInBytes(int[] bitsPerShardRecord) {
+        BitSet populatedOrdinals = getPopulatedOrdinals();
+        int numShards = bitsPerShardRecord.length;
+        int[] shardHoleCnts = new int[numShards];
+        int shardNumberMask = numShards - 1;
+        int holeOrdinal = populatedOrdinals.nextClearBit(0);
+        while (holeOrdinal <= maxOrdinal()) {
+            shardHoleCnts[holeOrdinal & shardNumberMask]++;
+            holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
+        }
+        long holeCostInBits = 0;
+        for (int i = 0; i < numShards; i++) {
+            holeCostInBits += (long) shardHoleCnts[i] * bitsPerShardRecord[i];
+        }
+        return holeCostInBits >>> 3;
+    }
+
+    /**
      * @return an approximate accounting of the current heap footprint occupied by each shard of this type state.
      */
     public long getApproximateShardSizeInBytes() {

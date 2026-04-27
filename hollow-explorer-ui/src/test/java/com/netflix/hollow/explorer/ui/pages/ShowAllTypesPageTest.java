@@ -16,8 +16,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
@@ -92,17 +90,6 @@ public class ShowAllTypesPageTest {
 
         Map<String, Footprints> after = parseRowsFromRender();
         assertFootprintsMatchEngine(after);
-    }
-
-    @Test
-    public void renderedFootprintsMatchAfterExecutorPrefill() throws Exception {
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        try {
-            page.prefillHeapStatsCache(executor);
-        } finally {
-            executor.shutdown();
-        }
-        assertFootprintsMatchEngine(parseRowsFromRender());
     }
 
     private void assertFootprintsMatchEngine(Map<String, Footprints> rendered) {

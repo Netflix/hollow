@@ -573,25 +573,11 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     @Override
     public long getApproximateHoleCostInBytes() {
         final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;
-        BitSet populatedOrdinals = getPopulatedOrdinals();
-        int[] shardHoleCnts = new int[shards.length];
-        int[] shardBitsPerRecords = new int[shards.length];
+        int[] bitsPerShardRecord = new int[shards.length];
         for (int i = 0; i < shards.length; i++) {
-            shardBitsPerRecords[i] = shards[i].dataElements.bitsPerRecord;
+            bitsPerShardRecord[i] = shards[i].dataElements.bitsPerRecord;
         }
-
-        int shardNumberMask = shards.length - 1;
-        int holeOrdinal = populatedOrdinals.nextClearBit(0);
-        while (holeOrdinal <= maxOrdinal) {
-            shardHoleCnts[holeOrdinal & shardNumberMask]++;
-            holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
-        }
-
-        long approximateHoleCostInBits = 0;
-        for (int i = 0; i < shards.length; i++) {
-            approximateHoleCostInBits += (long) shardHoleCnts[i] * shardBitsPerRecords[i];
-        }
-        return approximateHoleCostInBits >>> 3;
+        return approximateHoleCostInBytes(bitsPerShardRecord);
     }
 
     @Override
