@@ -560,7 +560,11 @@ import java.util.concurrent.ConcurrentHashMap;
             }
         }
 
-        return addRecord(collectionType, collectionRec, flatRecordWriter);
+        int ordinal = addRecord(collectionType, collectionRec, flatRecordWriter);
+        // Reset after committing so recursive calls to parseCollection for the same type
+        // (e.g., nested google.protobuf.Struct) don't leak stale entries into the outer record.
+        collectionRec.reset();
+        return ordinal;
     }
 
     private int addCollection(Message message, FlatRecordWriter flatRecordWriter, String collectionType, HollowWriteRecord collectionRec) throws IOException {

@@ -1038,8 +1038,11 @@ public class HollowMessageMapper {
             case UINT32:
             case FIXED32:
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
-                    int intValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getInt(fieldName);
-                    builder.setField(field, intValue);
+                    com.netflix.hollow.api.objects.generic.GenericHollowObject obj =
+                        (com.netflix.hollow.api.objects.generic.GenericHollowObject) record;
+                    if (!obj.isNull(fieldName)) {
+                        builder.setField(field, obj.getInt(fieldName));
+                    }
                 }
                 break;
 
@@ -1049,29 +1052,41 @@ public class HollowMessageMapper {
             case UINT64:
             case FIXED64:
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
-                    long longValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getLong(fieldName);
-                    builder.setField(field, longValue);
+                    com.netflix.hollow.api.objects.generic.GenericHollowObject obj =
+                        (com.netflix.hollow.api.objects.generic.GenericHollowObject) record;
+                    if (!obj.isNull(fieldName)) {
+                        builder.setField(field, obj.getLong(fieldName));
+                    }
                 }
                 break;
 
             case FLOAT:
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
-                    float floatValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getFloat(fieldName);
-                    builder.setField(field, floatValue);
+                    com.netflix.hollow.api.objects.generic.GenericHollowObject obj =
+                        (com.netflix.hollow.api.objects.generic.GenericHollowObject) record;
+                    if (!obj.isNull(fieldName)) {
+                        builder.setField(field, obj.getFloat(fieldName));
+                    }
                 }
                 break;
 
             case DOUBLE:
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
-                    double doubleValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getDouble(fieldName);
-                    builder.setField(field, doubleValue);
+                    com.netflix.hollow.api.objects.generic.GenericHollowObject obj =
+                        (com.netflix.hollow.api.objects.generic.GenericHollowObject) record;
+                    if (!obj.isNull(fieldName)) {
+                        builder.setField(field, obj.getDouble(fieldName));
+                    }
                 }
                 break;
 
             case BOOL:
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
-                    boolean boolValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getBoolean(fieldName);
-                    builder.setField(field, boolValue);
+                    com.netflix.hollow.api.objects.generic.GenericHollowObject obj =
+                        (com.netflix.hollow.api.objects.generic.GenericHollowObject) record;
+                    if (!obj.isNull(fieldName)) {
+                        builder.setField(field, obj.getBoolean(fieldName));
+                    }
                 }
                 break;
 
@@ -1106,17 +1121,132 @@ public class HollowMessageMapper {
                 break;
 
             case MESSAGE:
-                // Handle nested messages recursively
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
                     com.netflix.hollow.api.objects.HollowRecord nestedRecord =
                         ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getReferencedGenericRecord(fieldName);
                     if (nestedRecord != null) {
-                        com.google.protobuf.Message nestedMessage = readHollowRecord(nestedRecord, field.getMessageType());
+                        String fullName = field.getMessageType().getFullName();
+                        com.google.protobuf.Message nestedMessage;
+                        if (fullName.equals("google.protobuf.Struct")) {
+                            nestedMessage = readHollowStruct(nestedRecord);
+                        } else if (fullName.equals("google.protobuf.Value")) {
+                            nestedMessage = readHollowValue(nestedRecord);
+                        } else if (fullName.equals("google.protobuf.ListValue")) {
+                            nestedMessage = readHollowListValue(nestedRecord);
+                        } else {
+                            nestedMessage = readHollowRecord(nestedRecord, field.getMessageType());
+                        }
                         builder.setField(field, nestedMessage);
                     }
                 }
                 break;
         }
+    }
+
+    /**
+     * Reconstruct a {@code google.protobuf.Struct} from its Hollow representation.
+     *
+     * <p>The Struct is stored as a Hollow object with a single {@code fields} reference pointing
+     * to a {@code MapOfStringToValue} Hollow MAP. Each map entry has a String key and a Value
+     * object. This cannot go through the generic {@link #readHollowRecord} path because the
+     * proto descriptor for Struct uses a repeated MapEntry message for its fields field, while
+     * the Hollow schema stores it as a native MAP type.
+     */
+    private com.google.protobuf.Struct readHollowStruct(com.netflix.hollow.api.objects.HollowRecord structRecord) {
+        com.google.protobuf.Struct.Builder structBuilder = com.google.protobuf.Struct.newBuilder();
+        if (!(structRecord instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject)) {
+            return structBuilder.build();
+        }
+        com.netflix.hollow.api.objects.HollowRecord mapRecord =
+            ((com.netflix.hollow.api.objects.generic.GenericHollowObject) structRecord).getReferencedGenericRecord("fields");
+        if (!(mapRecord instanceof com.netflix.hollow.api.objects.generic.GenericHollowMap)) {
+            return structBuilder.build();
+        }
+        com.netflix.hollow.api.objects.generic.GenericHollowMap hollowMap =
+            (com.netflix.hollow.api.objects.generic.GenericHollowMap) mapRecord;
+        for (java.util.Map.Entry<com.netflix.hollow.api.objects.HollowRecord, com.netflix.hollow.api.objects.HollowRecord> entry :
+                hollowMap.<com.netflix.hollow.api.objects.HollowRecord, com.netflix.hollow.api.objects.HollowRecord>entries()) {
+            if (!(entry.getKey() instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject)) {
+                continue;
+            }
+            String key = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) entry.getKey()).getString("value");
+            if (key == null || entry.getValue() == null) {
+                continue;
+            }
+            com.google.protobuf.Value value = readHollowValue(entry.getValue());
+            structBuilder.putFields(key, value);
+        }
+        return structBuilder.build();
+    }
+
+    /**
+     * Reconstruct a {@code google.protobuf.Value} from its Hollow representation.
+     *
+     * <p>The Value Hollow object has nullable fields for each oneof case: {@code number_value}
+     * (double), {@code string_value} (String), {@code bool_value} (boolean), {@code struct_value}
+     * (→ Struct), {@code list_value} (→ ListValue). The first non-null field wins.
+     */
+    private com.google.protobuf.Value readHollowValue(com.netflix.hollow.api.objects.HollowRecord valueRecord) {
+        com.google.protobuf.Value.Builder valueBuilder = com.google.protobuf.Value.newBuilder();
+        if (!(valueRecord instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject)) {
+            return valueBuilder.build();
+        }
+        com.netflix.hollow.api.objects.generic.GenericHollowObject obj =
+            (com.netflix.hollow.api.objects.generic.GenericHollowObject) valueRecord;
+
+        if (!obj.isNull("string_value")) {
+            String sv = obj.getString("string_value");
+            if (sv != null) {
+                valueBuilder.setStringValue(sv);
+                return valueBuilder.build();
+            }
+        }
+        if (!obj.isNull("number_value")) {
+            valueBuilder.setNumberValue(obj.getDouble("number_value"));
+            return valueBuilder.build();
+        }
+        if (!obj.isNull("bool_value")) {
+            valueBuilder.setBoolValue(obj.getBoolean("bool_value"));
+            return valueBuilder.build();
+        }
+        com.netflix.hollow.api.objects.HollowRecord structRef = obj.getReferencedGenericRecord("struct_value");
+        if (structRef != null) {
+            valueBuilder.setStructValue(readHollowStruct(structRef));
+            return valueBuilder.build();
+        }
+        com.netflix.hollow.api.objects.HollowRecord listRef = obj.getReferencedGenericRecord("list_value");
+        if (listRef != null) {
+            valueBuilder.setListValue(readHollowListValue(listRef));
+            return valueBuilder.build();
+        }
+        return valueBuilder.build();
+    }
+
+    /**
+     * Reconstruct a {@code google.protobuf.ListValue} from its Hollow representation.
+     *
+     * <p>The ListValue Hollow object has a {@code values} field referencing a {@code ListOfValue}
+     * Hollow LIST. Each element is a Value Hollow object.
+     */
+    private com.google.protobuf.ListValue readHollowListValue(com.netflix.hollow.api.objects.HollowRecord listValueRecord) {
+        com.google.protobuf.ListValue.Builder builder = com.google.protobuf.ListValue.newBuilder();
+        if (!(listValueRecord instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject)) {
+            return builder.build();
+        }
+        com.netflix.hollow.api.objects.HollowRecord listRecord =
+            ((com.netflix.hollow.api.objects.generic.GenericHollowObject) listValueRecord).getReferencedGenericRecord("values");
+        if (!(listRecord instanceof com.netflix.hollow.api.objects.generic.GenericHollowList)) {
+            return builder.build();
+        }
+        com.netflix.hollow.api.objects.generic.GenericHollowList list =
+            (com.netflix.hollow.api.objects.generic.GenericHollowList) listRecord;
+        for (int i = 0; i < list.size(); i++) {
+            com.netflix.hollow.api.objects.HollowRecord element = list.get(i);
+            if (element != null) {
+                builder.addValues(readHollowValue(element));
+            }
+        }
+        return builder.build();
     }
 
     /**
