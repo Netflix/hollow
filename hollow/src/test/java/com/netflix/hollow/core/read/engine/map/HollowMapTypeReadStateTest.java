@@ -39,8 +39,8 @@ public class HollowMapTypeReadStateTest extends AbstractHollowMapTypeDataElement
         assertEquals(2, typeState.numShards());
         assertEquals(2, typeState.getPopulatedOrdinals().cardinality());
         HollowMapTypeReadStateShard[] shards = (HollowMapTypeReadStateShard[])typeState.getShardsVolatile().getShards();
-        long holeCost = shards[0].dataElements.bitsPerFixedLengthMapPortion/8L +
-                shards[1].dataElements.bitsPerFixedLengthMapPortion*3L/8;
+        long holeCost = (shards[0].dataElements.bitsPerFixedLengthMapPortion +
+                shards[1].dataElements.bitsPerFixedLengthMapPortion*3L) >>> 3;
         assertEquals(holeCost, typeState.getApproximateHoleCostInBytes());
     }
 

@@ -42,8 +42,8 @@ public class HollowListTypeReadStateTest extends AbstractHollowListTypeDataEleme
         assertEquals(2, typeState.numShards());
         assertEquals(2, typeState.getPopulatedOrdinals().cardinality());
         HollowListTypeReadStateShard[] shards = (HollowListTypeReadStateShard[])typeState.getShardsVolatile().getShards();
-        long holeCost = shards[0].dataElements.bitsPerListPointer*2L/8 +
-                shards[1].dataElements.bitsPerListPointer*4L/8;
+        long holeCost = (shards[0].dataElements.bitsPerListPointer*2L +
+                shards[1].dataElements.bitsPerListPointer*4L) >>> 3;
         assertEquals(holeCost, typeState.getApproximateHoleCostInBytes());
     }
 

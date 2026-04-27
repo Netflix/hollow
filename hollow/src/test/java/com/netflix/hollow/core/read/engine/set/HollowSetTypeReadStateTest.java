@@ -38,8 +38,8 @@ public class HollowSetTypeReadStateTest extends AbstractHollowSetTypeDataElement
         assertEquals(2, typeState.numShards());
         assertEquals(2, typeState.getPopulatedOrdinals().cardinality());
         HollowSetTypeReadStateShard[] shards = (HollowSetTypeReadStateShard[])typeState.getShardsVolatile().getShards();
-        long holeCost = shards[0].dataElements.bitsPerFixedLengthSetPortion/8L +
-                shards[1].dataElements.bitsPerFixedLengthSetPortion*3L/8;
+        long holeCost = (shards[0].dataElements.bitsPerFixedLengthSetPortion +
+                shards[1].dataElements.bitsPerFixedLengthSetPortion*3L) >>> 3;
         assertEquals(holeCost, typeState.getApproximateHoleCostInBytes());
     }
 

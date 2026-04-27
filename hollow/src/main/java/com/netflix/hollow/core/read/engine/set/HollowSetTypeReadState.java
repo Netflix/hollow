@@ -412,14 +412,11 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 	@Override
 	public long getApproximateHoleCostInBytes() {
         final HollowSetTypeReadStateShard[] shards = this.shardsVolatile.shards;
-        long totalApproximateHoleCostInBytes = 0;
-        
-        BitSet populatedOrdinals = getPopulatedOrdinals();
-
-        for(int i=0;i<shards.length;i++)
-            totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, shards.length);
-        
-        return totalApproximateHoleCostInBytes;
+        int[] bitsPerShardRecord = new int[shards.length];
+        for (int i = 0; i < shards.length; i++) {
+            bitsPerShardRecord[i] = shards[i].dataElements.bitsPerFixedLengthSetPortion;
+        }
+        return approximateHoleCostInBytes(bitsPerShardRecord);
 	}
 	
 	public HollowPrimaryKeyValueDeriver getKeyDeriver() {
