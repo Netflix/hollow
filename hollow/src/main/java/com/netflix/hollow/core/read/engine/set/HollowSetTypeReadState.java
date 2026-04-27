@@ -412,14 +412,25 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 	@Override
 	public long getApproximateHoleCostInBytes() {
         final HollowSetTypeReadStateShard[] shards = this.shardsVolatile.shards;
-        long totalApproximateHoleCostInBytes = 0;
-        
         BitSet populatedOrdinals = getPopulatedOrdinals();
+        int[] shardHoleCnts = new int[shards.length];
+        int[] shardBitsPerFixedLengthSetPortion = new int[shards.length];
+        for (int i = 0; i < shards.length; i++) {
+            shardBitsPerFixedLengthSetPortion[i] = shards[i].dataElements.bitsPerFixedLengthSetPortion;
+        }
 
-        for(int i=0;i<shards.length;i++)
-            totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, shards.length);
-        
-        return totalApproximateHoleCostInBytes;
+        int shardNumberMask = shards.length - 1;
+        int holeOrdinal = populatedOrdinals.nextClearBit(0);
+        while (holeOrdinal <= maxOrdinal) {
+            shardHoleCnts[holeOrdinal & shardNumberMask]++;
+            holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
+        }
+
+        long approximateHoleCostInBits = 0;
+        for (int i = 0; i < shards.length; i++) {
+            approximateHoleCostInBits += (long) shardHoleCnts[i] * shardBitsPerFixedLengthSetPortion[i];
+        }
+        return approximateHoleCostInBits >>> 3;
 	}
 	
 	public HollowPrimaryKeyValueDeriver getKeyDeriver() {

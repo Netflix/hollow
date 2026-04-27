@@ -51,6 +51,11 @@ public class ShowAllTypesPage extends HollowExplorerPage {
         super(ui);
     }
 
+    public void clearCache() {
+        cachedRandomizedTag = -1;
+        cachedHeapStats = null;
+    }
+
     public void prefillHeapStatsCache(Executor executor) {
         HollowReadStateEngine engine = ui.getStateEngine();
         long currentTag = engine.getCurrentRandomizedTag();

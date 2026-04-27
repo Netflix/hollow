@@ -65,7 +65,7 @@ public class HollowObjectTypeReadStateTest extends AbstractHollowObjectTypeDataE
         // Shard 0 (even: 0=hole, 2=pop, 4=pop) -> 1 hole
         // Shard 1 (odd: 1=hole, 3=hole, 5=hole) -> 3 holes
         HollowObjectTypeReadStateShard[] shards = (HollowObjectTypeReadStateShard[])typeState.getShardsVolatile().getShards();
-        long holeCost = shards[0].dataElements.bitsPerRecord/8L + shards[1].dataElements.bitsPerRecord*3L/8;
+        long holeCost = (shards[0].dataElements.bitsPerRecord + shards[1].dataElements.bitsPerRecord*3L) >>> 3;
         assertEquals(holeCost, typeState.getApproximateHoleCostInBytes());
     }
 

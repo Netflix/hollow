@@ -130,6 +130,8 @@ public class HollowExplorerUI extends HollowUIRouter {
         showAllTypesPage.prefillHeapStatsCache(executor);
     }
 
+    public void clearCache() {showAllTypesPage.clearCache();}
+
     public String getHeaderDisplayString() {
         return headerDisplayMap.get(HEADER_DISPLAY_STRING);
     }

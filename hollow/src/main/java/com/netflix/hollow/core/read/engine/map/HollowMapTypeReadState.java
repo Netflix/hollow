@@ -468,15 +468,26 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     
     @Override
     public long getApproximateHoleCostInBytes() {
-        HollowMapTypeReadStateShard[] shards = this.shardsVolatile.shards;
-        long totalApproximateHoleCostInBytes = 0;
-        
+        final HollowMapTypeReadStateShard[] shards = this.shardsVolatile.shards;
         BitSet populatedOrdinals = getPopulatedOrdinals();
+        int[] shardHoleCnts = new int[shards.length];
+        int[] shardBitsPerFixedLengthMapPortion = new int[shards.length];
+        for (int i = 0; i < shards.length; i++) {
+            shardBitsPerFixedLengthMapPortion[i] = shards[i].dataElements.bitsPerFixedLengthMapPortion;
+        }
 
-        for(int i=0; i<shards.length; i++)
-            totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, shards.length);
-        
-        return totalApproximateHoleCostInBytes;
+        int shardNumberMask = shards.length - 1;
+        int holeOrdinal = populatedOrdinals.nextClearBit(0);
+        while (holeOrdinal <= maxOrdinal) {
+            shardHoleCnts[holeOrdinal & shardNumberMask]++;
+            holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
+        }
+
+        long approximateHoleCostInBits = 0;
+        for (int i = 0; i < shards.length; i++) {
+            approximateHoleCostInBits += (long) shardHoleCnts[i] * shardBitsPerFixedLengthMapPortion[i];
+        }
+        return approximateHoleCostInBits >>> 3;
     }
     
     public HollowPrimaryKeyValueDeriver getKeyDeriver() {

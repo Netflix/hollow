@@ -304,14 +304,25 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
 	@Override
     public long getApproximateHoleCostInBytes() {
         final HollowListTypeReadStateShard[] shards = this.shardsVolatile.shards;
-        long totalApproximateHoleCostInBytes = 0;
-        
         BitSet populatedOrdinals = getPopulatedOrdinals();
+        int[] shardHoleCnts = new int[shards.length];
+        int[] shardBitsPerListPointer = new int[shards.length];
+        for (int i = 0; i < shards.length; i++) {
+            shardBitsPerListPointer[i] = shards[i].dataElements.bitsPerListPointer;
+        }
 
-        for(int i=0; i<shards.length; i++)
-            totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, shards.length);
-        
-        return totalApproximateHoleCostInBytes;
+        int shardNumberMask = shards.length - 1;
+        int holeOrdinal = populatedOrdinals.nextClearBit(0);
+        while (holeOrdinal <= maxOrdinal) {
+            shardHoleCnts[holeOrdinal & shardNumberMask]++;
+            holeOrdinal = populatedOrdinals.nextClearBit(holeOrdinal + 1);
+        }
+
+        long approximateHoleCostInBits = 0;
+        for (int i = 0; i < shards.length; i++) {
+            approximateHoleCostInBits += (long) shardHoleCnts[i] * shardBitsPerListPointer[i];
+        }
+        return approximateHoleCostInBits >>> 3;
     }
 
     @Override
