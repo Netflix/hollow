@@ -798,9 +798,17 @@ public class HollowProtoAdapterTest {
      * Test that conflicting types for the same Struct field are detected and rejected.
      * If two instances have the same field name with different types, an error should be thrown.
      */
+    /**
+     * google.protobuf.Struct allows the same field name to hold different Value types across
+     * different Struct instances — that is the entire point of Struct, which is how dgw-control's
+     * persistence_config holds heterogeneous data such as ttls being numeric in some namespaces
+     * and string in others. The Hollow Value object schema declares one nullable column per
+     * Value oneof case, so any case round-trips through the same Hollow type. This test pins
+     * that contract: heterogeneous Struct field types must write and read back without error
+     * and preserve the exact Value oneof case per record.
+     */
     @Test
-    public void testStructFieldTypeConflictDetection() throws Exception {
-        // Load Person and Struct classes
+    public void testStructFieldHeterogeneousTypesRoundTrip() throws Exception {
         Class<?> personClass = protoClassLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Person");
         Class<?> structClass = protoClassLoader.loadClass("com.google.protobuf.Struct");
         Class<?> valueClass = protoClassLoader.loadClass("com.google.protobuf.Value");
@@ -813,55 +821,141 @@ public class HollowProtoAdapterTest {
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
         HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
 
-        // Person 1: age as NUMBER
+        // Person 1: age as NUMBER (35.0)
         Message.Builder person1Builder = (Message.Builder) personNewBuilder.invoke(null);
         Message.Builder struct1Builder = (Message.Builder) structNewBuilder.invoke(null);
-
-        Message.Builder numberValueBuilder = (Message.Builder) valueNewBuilder.invoke(null);
-        numberValueBuilder.setField(
-            numberValueBuilder.getDescriptorForType().findFieldByName("number_value"),
-            35.0);
-        structBuilderPutFields.invoke(struct1Builder, "age", numberValueBuilder.build());
-
+        structBuilderPutFields.invoke(struct1Builder, "age", createNumberValue(valueNewBuilder, 35.0));
         person1Builder.setField(person1Builder.getDescriptorForType().findFieldByName("id"), 1);
         person1Builder.setField(person1Builder.getDescriptorForType().findFieldByName("name"), "Person 1");
         person1Builder.setField(person1Builder.getDescriptorForType().findFieldByName("metadata"), struct1Builder.build());
+        int ordinal1 = mapper.add(person1Builder.build());
 
-        mapper.add(person1Builder.build());
-
-        // Person 2: age as STRING (conflict!)
+        // Person 2: age as STRING ("twenty-eight") — same field name, different oneof case
         Message.Builder person2Builder = (Message.Builder) personNewBuilder.invoke(null);
         Message.Builder struct2Builder = (Message.Builder) structNewBuilder.invoke(null);
-
-        Message.Builder stringValueBuilder = (Message.Builder) valueNewBuilder.invoke(null);
-        stringValueBuilder.setField(
-            stringValueBuilder.getDescriptorForType().findFieldByName("string_value"),
-            "twenty-eight");
-        structBuilderPutFields.invoke(struct2Builder, "age", stringValueBuilder.build());
-
+        structBuilderPutFields.invoke(struct2Builder, "age", createStringValue(valueNewBuilder, "twenty-eight"));
         person2Builder.setField(person2Builder.getDescriptorForType().findFieldByName("id"), 2);
         person2Builder.setField(person2Builder.getDescriptorForType().findFieldByName("name"), "Person 2");
         person2Builder.setField(person2Builder.getDescriptorForType().findFieldByName("metadata"), struct2Builder.build());
+        int ordinal2 = mapper.add(person2Builder.build());
 
-        // Should throw RuntimeException wrapping IllegalStateException due to conflicting types for "age"
-        try {
-            mapper.add(person2Builder.build());
-            fail("Expected RuntimeException for conflicting Struct field types");
-        } catch (RuntimeException e) {
-            Throwable cause = e.getCause();
-            assertNotNull("Should have a cause", cause);
-            assertTrue("Cause should be IllegalStateException",
-                cause instanceof IllegalStateException);
-            String message = cause.getMessage();
-            assertTrue("Error message should mention conflicting types",
-                message.contains("Conflicting types"));
-            assertTrue("Error message should mention the field name 'age'",
-                message.contains("age"));
-            assertTrue("Error message should mention number_value",
-                message.contains("number_value"));
-            assertTrue("Error message should mention string_value",
-                message.contains("string_value"));
+        // Person 3: age as BOOL (true) — third oneof case for the same key
+        Message.Builder person3Builder = (Message.Builder) personNewBuilder.invoke(null);
+        Message.Builder struct3Builder = (Message.Builder) structNewBuilder.invoke(null);
+        structBuilderPutFields.invoke(struct3Builder, "age", createBoolValue(valueNewBuilder, true));
+        person3Builder.setField(person3Builder.getDescriptorForType().findFieldByName("id"), 3);
+        person3Builder.setField(person3Builder.getDescriptorForType().findFieldByName("name"), "Person 3");
+        person3Builder.setField(person3Builder.getDescriptorForType().findFieldByName("metadata"), struct3Builder.build());
+        int ordinal3 = mapper.add(person3Builder.build());
+
+        // Round-trip and read back
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        // Each Person's metadata Struct -> Struct.fields map -> Value entry for "age"
+        // should have only the corresponding oneof case populated on Hollow Value.
+        assertAgeValueCase(readStateEngine, ordinal1, "number_value", 35.0);
+        assertAgeValueCase(readStateEngine, ordinal2, "string_value", "twenty-eight");
+        assertAgeValueCase(readStateEngine, ordinal3, "bool_value", true);
+
+        // Sanity: full readHollowRecord round-trip rebuilds the exact proto Value case
+        Descriptors.Descriptor personDescriptor = ((Message) personClass.getMethod("getDefaultInstance")
+            .invoke(null)).getDescriptorForType();
+        Message reconstructed1 = mapper.readHollowRecord(
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(readStateEngine, "Person", ordinal1),
+            personDescriptor);
+        Message reconstructed2 = mapper.readHollowRecord(
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(readStateEngine, "Person", ordinal2),
+            personDescriptor);
+        Message reconstructed3 = mapper.readHollowRecord(
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(readStateEngine, "Person", ordinal3),
+            personDescriptor);
+
+        assertEquals(35.0, getStructFieldNumber(reconstructed1, "age"), 0.0);
+        assertEquals("twenty-eight", getStructFieldString(reconstructed2, "age"));
+        assertEquals(Boolean.TRUE, getStructFieldBool(reconstructed3, "age"));
+    }
+
+    private void assertAgeValueCase(HollowReadStateEngine readStateEngine, int personOrdinal,
+                                    String expectedSetField, Object expectedValue) {
+        HollowObjectTypeReadState personState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("Person");
+        int metadataPos = personState.getSchema().getPosition("metadata");
+        int structOrdinal = personState.readOrdinal(personOrdinal, metadataPos);
+        assertTrue("Struct ordinal should be valid for person " + personOrdinal, structOrdinal >= 0);
+
+        HollowObjectTypeReadState structState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("Struct");
+        // Struct.fields is a map field; iterate via the map type to find the "age" entry.
+        // Simpler path: scan Struct's fields list type for an entry whose key is "age".
+        int fieldsPos = structState.getSchema().getPosition("fields");
+        int fieldsOrdinal = structState.readOrdinal(structOrdinal, fieldsPos);
+        assertTrue("fields ordinal should be valid", fieldsOrdinal >= 0);
+
+        // Find the Value referenced by key "age"
+        com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState mapState =
+            (com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState)
+                readStateEngine.getTypeState(structState.getSchema().getReferencedType(fieldsPos));
+        com.netflix.hollow.api.objects.generic.GenericHollowMap mapObj =
+            new com.netflix.hollow.api.objects.generic.GenericHollowMap(mapState, fieldsOrdinal);
+        com.netflix.hollow.api.objects.generic.GenericHollowObject ageValueObj = null;
+        for (java.util.Map.Entry<com.netflix.hollow.api.objects.HollowRecord, com.netflix.hollow.api.objects.HollowRecord> entry : mapObj.entrySet()) {
+            com.netflix.hollow.api.objects.generic.GenericHollowObject key =
+                (com.netflix.hollow.api.objects.generic.GenericHollowObject) entry.getKey();
+            if ("age".equals(key.getString("value"))) {
+                ageValueObj = (com.netflix.hollow.api.objects.generic.GenericHollowObject) entry.getValue();
+                break;
+            }
         }
+        assertNotNull("Should have an 'age' entry in Struct.fields", ageValueObj);
+
+        // Exactly the expected oneof column should be populated; the others must be null.
+        for (String field : new String[]{"number_value", "string_value", "bool_value", "null_value", "struct_value", "list_value"}) {
+            boolean isNull = ageValueObj.isNull(field);
+            if (field.equals(expectedSetField)) {
+                assertFalse("Expected " + field + " to be set", isNull);
+            } else {
+                assertTrue("Expected " + field + " to be null when " + expectedSetField + " is set",
+                    isNull);
+            }
+        }
+        if ("number_value".equals(expectedSetField)) {
+            assertEquals(((Number) expectedValue).doubleValue(), ageValueObj.getDouble("number_value"), 0.0);
+        } else if ("string_value".equals(expectedSetField)) {
+            assertEquals(expectedValue, ageValueObj.getString("string_value"));
+        } else if ("bool_value".equals(expectedSetField)) {
+            assertEquals(((Boolean) expectedValue).booleanValue(), ageValueObj.getBoolean("bool_value"));
+        }
+    }
+
+    private double getStructFieldNumber(Message message, String key) throws Exception {
+        Message valueMessage = getStructFieldValue(message, key);
+        return (double) valueMessage.getField(valueMessage.getDescriptorForType().findFieldByName("number_value"));
+    }
+
+    private String getStructFieldString(Message message, String key) throws Exception {
+        Message valueMessage = getStructFieldValue(message, key);
+        return (String) valueMessage.getField(valueMessage.getDescriptorForType().findFieldByName("string_value"));
+    }
+
+    private Boolean getStructFieldBool(Message message, String key) throws Exception {
+        Message valueMessage = getStructFieldValue(message, key);
+        return (Boolean) valueMessage.getField(valueMessage.getDescriptorForType().findFieldByName("bool_value"));
+    }
+
+    private Message getStructFieldValue(Message personMessage, String key) {
+        Message metadataStruct = (Message) personMessage.getField(
+            personMessage.getDescriptorForType().findFieldByName("metadata"));
+        Descriptors.FieldDescriptor fieldsDescriptor = metadataStruct.getDescriptorForType().findFieldByName("fields");
+        @SuppressWarnings("unchecked")
+        java.util.List<Message> entries = (java.util.List<Message>) metadataStruct.getField(fieldsDescriptor);
+        for (Message entry : entries) {
+            String entryKey = (String) entry.getField(entry.getDescriptorForType().findFieldByName("key"));
+            if (key.equals(entryKey)) {
+                return (Message) entry.getField(entry.getDescriptorForType().findFieldByName("value"));
+            }
+        }
+        throw new AssertionError("No Struct entry for key " + key);
     }
 
     /**

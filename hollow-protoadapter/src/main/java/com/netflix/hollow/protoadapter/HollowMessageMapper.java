@@ -74,11 +74,6 @@ public class HollowMessageMapper {
     private final Map<String, HollowProtoAdapter> adapters = new ConcurrentHashMap<String, HollowProtoAdapter>();
     private boolean ignoreListOrdering = false;
 
-    // Track field types for Struct fields to validate consistency across instances
-    // Maps "ParentType.fieldPath.structFieldName" -> Value type (e.g., "Person.metadata.age" -> "numberValue")
-    // Thread-safe: uses ConcurrentHashMap with atomic putIfAbsent for conflict detection
-    private final ConcurrentHashMap<String, String> structFieldTypes = new ConcurrentHashMap<String, String>();
-
     // Lock objects for schema creation synchronization
     private final Object valueSchemaLock = new Object();
     private final Object structSchemaLock = new Object();
@@ -422,78 +417,22 @@ public class HollowMessageMapper {
     }
 
     /**
-     * Ensure schema for google.protobuf.Struct based on actual field values.
-     * Struct is an object with a map<string, Value> field.
-     * Also validates that field types are consistent across all instances.
+     * Ensure schema for google.protobuf.Struct.
+     *
+     * <p>{@code google.protobuf.Struct} is an object with a {@code map<string, Value>} field. Each
+     * {@code Value} is a {@code oneof} that may hold any scalar, list, struct, or null. The Hollow
+     * {@code Value} object schema declares one nullable column per oneof case (number_value,
+     * string_value, bool_value, struct_value, list_value, null_value), so a single Hollow Value
+     * record can express any oneof case and the reader picks whichever case is non-null. That is
+     * already the design that was put in place for Value schema generation.
+     *
+     * <p>Therefore the same Struct field name (e.g. {@code config.data_ttl_secs}) is allowed to be
+     * a number in one record and a string in another — both round-trip correctly through Hollow.
+     * Earlier versions of this code rejected that as a conflict, which broke any namespace dataset
+     * where the same Struct key legitimately holds different scalar types across rows.
      */
     private void ensureStructSchema(com.google.protobuf.Message structMessage, String parentTypeName, String fieldPath) {
-        // Ensure Value schema exists (will create if needed)
         ensureValueSchemaExists();
-
-        // Validate field type consistency across instances
-        validateStructFields(structMessage, parentTypeName, fieldPath);
-    }
-
-    /**
-     * Validate that Struct field types are consistent across all instances.
-     * Throws IllegalStateException if the same field name has different types.
-     */
-    private void validateStructFields(com.google.protobuf.Message structMessage, String parentTypeName, String fieldPath) {
-        Descriptors.Descriptor descriptor = structMessage.getDescriptorForType();
-        Descriptors.FieldDescriptor fieldsDescriptor = descriptor.findFieldByName("fields");
-
-        if (fieldsDescriptor == null) return;
-
-        // Get the fields map from the Struct
-        Object fieldsObj = structMessage.getField(fieldsDescriptor);
-        if (!(fieldsObj instanceof java.util.List)) return;
-
-        @SuppressWarnings("unchecked")
-        java.util.List<com.google.protobuf.Message> entries = (java.util.List<com.google.protobuf.Message>) fieldsObj;
-
-        for (com.google.protobuf.Message entry : entries) {
-            // Each entry has "key" (string) and "value" (Value message)
-            Descriptors.Descriptor entryDescriptor = entry.getDescriptorForType();
-            Descriptors.FieldDescriptor keyField = entryDescriptor.findFieldByName("key");
-            Descriptors.FieldDescriptor valueField = entryDescriptor.findFieldByName("value");
-
-            if (keyField == null || valueField == null) continue;
-
-            String key = (String) entry.getField(keyField);
-            com.google.protobuf.Message value = (com.google.protobuf.Message) entry.getField(valueField);
-
-            // Determine which Value type this is
-            String valueType = getValueType(value);
-            if (valueType == null) continue;
-
-            // Check for conflicts using atomic putIfAbsent for thread safety
-            String fieldKey = parentTypeName + "." + fieldPath + "." + key;
-            String existingType = structFieldTypes.putIfAbsent(fieldKey, valueType);
-
-            // If putIfAbsent returned non-null, the field already existed - check for conflict
-            if (existingType != null && !existingType.equals(valueType)) {
-                throw new IllegalStateException(
-                    "Conflicting types for Struct field '" + key + "' in " + parentTypeName + "." + fieldPath +
-                    ": previously " + existingType + ", now " + valueType);
-            }
-        }
-    }
-
-    /**
-     * Determine which type a Value message contains.
-     * Returns the field name (e.g., "numberValue", "stringValue") or null if empty.
-     */
-    private String getValueType(com.google.protobuf.Message value) {
-        Descriptors.Descriptor descriptor = value.getDescriptorForType();
-
-        // Check each possible Value field
-        for (Descriptors.FieldDescriptor field : descriptor.getFields()) {
-            if (value.hasField(field)) {
-                return field.getName();
-            }
-        }
-
-        return null;
     }
 
     /**
