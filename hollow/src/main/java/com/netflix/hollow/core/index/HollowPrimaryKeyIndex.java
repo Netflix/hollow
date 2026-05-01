@@ -59,6 +59,7 @@ import java.util.logging.Logger;
 public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableUniqueKeyIndex {
     private static final Logger LOG = Logger.getLogger(HollowPrimaryKeyIndex.class.getName());
 
+
     private final HollowObjectTypeReadState typeState;
     private final int[][] fieldPathIndexes;
     private final FieldType[] fieldTypes;
@@ -460,6 +461,9 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
     private static final boolean ALLOW_DELTA_UPDATE =
             Boolean.getBoolean("com.netflix.hollow.core.index.HollowPrimaryKeyIndex.allowDeltaUpdate");
 
+    private static final int PARALLEL_HASH_THRESHOLD =
+            Integer.getInteger("com.netflix.hollow.core.index.HollowPrimaryKeyIndex.parallelHashThreshold", 4096);
+
     @Override
     public synchronized void endUpdate() {
         if (hashTableVolatile == null) {
@@ -488,7 +492,6 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
                 well fix that.  Attempts to reproduce this locally has so far failed.
                 Given the importance of indexing a full reindex is performed on such a failure.  This, however,
                 will make it more difficult to detect such issues.
-
                 This approach does not protect against the case where the index is corrupt and not yet
                 detected, until a further update.  In such cases it may be possible for clients, in the interim
                 of a forced reindex, to operate on a corrupt index: queries may incorrectly return no match.  As such
@@ -528,24 +531,45 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
             ordinals = listener.getPopulatedOrdinals();
         }
 
-        int hashTableSize = HashCodes.hashTableSize(ordinals.cardinality());
+        int cardinality = ordinals.cardinality();
+        int hashTableSize = HashCodes.hashTableSize(cardinality);
         int bitsPerElement = (32 - Integer.numberOfLeadingZeros(typeState.maxOrdinal() + 1));
 
         FixedLengthElementArray hashedArray = new FixedLengthElementArray(memoryRecycler, (long)hashTableSize * (long)bitsPerElement);
 
         int hashMask = hashTableSize - 1;
 
-        int ordinal = ordinals.nextSetBit(0);
-        while(ordinal != ORDINAL_NONE) {
-            int hashCode = recordHash(ordinal);
-            int bucket = hashCode & hashMask;
+        if (shouldComputeHashesInParallel(cardinality)) {
+            int[] ordinalArray = new int[cardinality];
+            int pos = 0;
+            for (int o = ordinals.nextSetBit(0); o >= 0; o = ordinals.nextSetBit(o + 1)) {
+                ordinalArray[pos++] = o;
+            }
+            int[] hashCodes = new int[cardinality];
+            Arrays.parallelSetAll(hashCodes, i -> recordHash(ordinalArray[i]));
+            for (int i = 0; i < cardinality; i++) {
+                int hashCode = hashCodes[i];
+                int ordinal = ordinalArray[i];
+                int bucket = hashCode & hashMask;
+                while (hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) != 0) {
+                    bucket = (bucket + 1) & hashMask;
+                }
+                hashedArray.setElementValue((long)bucket * (long)bitsPerElement, bitsPerElement, ordinal + 1);
+            }
+        } else {
+            int ordinal = ordinals.nextSetBit(0);
+            while (ordinal != ORDINAL_NONE) {
+                int hashCode = recordHash(ordinal);
+                int bucket = hashCode & hashMask;
 
-            while(hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) != 0)
-                bucket = (bucket + 1) & hashMask;
+                while (hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) != 0) {
+                    bucket = (bucket + 1) & hashMask;
+                }
 
-            hashedArray.setElementValue((long)bucket * (long)bitsPerElement, bitsPerElement, ordinal + 1);
+                hashedArray.setElementValue((long)bucket * (long)bitsPerElement, bitsPerElement, ordinal + 1);
 
-            ordinal = ordinals.nextSetBit(ordinal + 1);
+                ordinal = ordinals.nextSetBit(ordinal + 1);
+            }
         }
 
         setHashTable(new PrimaryKeyIndexHashTable(hashedArray, hashTableSize, hashMask, bitsPerElement));
@@ -649,6 +673,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         } else {
             return testBucket > fromBucket || testBucket <= toBucket;
         }
+    }
+
+    private boolean shouldComputeHashesInParallel(int cardinality) {
+        return cardinality >= PARALLEL_HASH_THRESHOLD;
     }
 
     private int recordHash(int ordinal) {
