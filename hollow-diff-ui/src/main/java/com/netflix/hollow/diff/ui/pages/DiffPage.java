@@ -25,10 +25,10 @@ import com.netflix.hollow.tools.diff.HollowTypeDiff;
 import com.netflix.hollow.ui.HollowUISession;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.Template;
@@ -141,7 +141,7 @@ public abstract class DiffPage {
         Map<String, String> fromTags = diffUI.getDiff().getFromStateEngine().getHeaderTags();
         Map<String, String> toTags = diffUI.getDiff().getToStateEngine().getHeaderTags();
 
-        Set<String> allKeys = new HashSet<String>();
+        Set<String> allKeys = new TreeSet<String>();
         allKeys.addAll(fromTags.keySet());
         allKeys.addAll(toTags.keySet());
 

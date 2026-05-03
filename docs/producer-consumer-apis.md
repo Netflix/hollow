@@ -26,6 +26,7 @@ HollowProducer
    .withNumStatesBetweenSnapshots(n) /// optional: an int
    .withTargetMaxTypeShardSize(size) /// optional: a long
    .withBlobStorageCleaner(blobStorageCleaner) //optional: a BlobStorageCleaner
+   .withPartitionedOrdinalMap(enabled) /// optional: a boolean
    .withMetricsCollector(hollowMetricsCollector) //optional: a HollowMetricsCollector<HollowProducerMetrics>
 ```
 
@@ -58,9 +59,12 @@ only every `(n+1)th` cycle.
 * `VersionMinter`: Allows for a custom version identifier minting strategy.
 * __Target max type shard size__: Specify a [target max type shard size](advanced-topics.md#type-sharding).  Defaults to 
 16MB.
-* `BlobStorageCleaner`: Using the [blob storage cleaning](tooling.md#blob-storage-manipulation) capability, it's 
+* `BlobStorageCleaner`: Using the [blob storage cleaning](tooling.md#blob-storage-manipulation) capability, it's
 possible to free up the blob storage and prevent running out of space because of old snapshots/deltas.
-* `HollowMetricsCollector`: Implementing a [`HollowMetricsCollector`](tooling.md#metrics) allows to either store or 
+* __Partitioned ordinal map__: Enables partitioning each type's internal ordinal map into 4 partitions, raising the
+per-type record limit from ~500M to ~2B. See [Partitioned Ordinal Map](advanced-topics.md#partitioned-ordinal-map).
+Defaults to `false`.
+* `HollowMetricsCollector`: Implementing a [`HollowMetricsCollector`](tooling.md#metrics) allows to either store or
 publish those metrics to your preferred provider, such as Prometheus.
 
 Each time a new _data state_ should be produced, users should call `.runCycle(Populator)`.  See 

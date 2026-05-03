@@ -121,6 +121,21 @@ public class HollowExplorerUI extends HollowUIRouter {
         return stateEngine;
     }
 
+    /**
+     * Precomputes each type's heap footprint and hole cost and caches them to serve future requests.
+     */
+    public void prefillHeapStatsCache() {
+        showAllTypesPage.prefillHeapStatsCache();
+    }
+
+    /**
+     * Invalidates the cached heap stats so the next request recomputes them.
+     * Should be called after each delta transition.
+     */
+    public void clearCache() {
+        showAllTypesPage.clearCache();
+    }
+
     public String getHeaderDisplayString() {
         return headerDisplayMap.get(HEADER_DISPLAY_STRING);
     }

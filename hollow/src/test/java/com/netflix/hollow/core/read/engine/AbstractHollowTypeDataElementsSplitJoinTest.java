@@ -4,6 +4,7 @@ import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import org.junit.Before;
 
 public class AbstractHollowTypeDataElementsSplitJoinTest extends AbstractStateEngineTest {
@@ -27,6 +28,11 @@ public class AbstractHollowTypeDataElementsSplitJoinTest extends AbstractStateEn
 
     protected void populateWriteStateEngine(int numRecords) {
         initWriteStateEngine();
+        populateWriteStateEngine(writeStateEngine, schema, numRecords);
+    }
+
+    protected void populateWriteStateEngine(HollowWriteStateEngine writeStateEngine, HollowObjectSchema schema,
+                                            int numRecords) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
         for(int i=0;i<numRecords;i++) {
             rec.reset();
@@ -41,6 +47,11 @@ public class AbstractHollowTypeDataElementsSplitJoinTest extends AbstractStateEn
 
     protected void populateWriteStateEngine(int[] recordIds) {
         initWriteStateEngine();
+        populateWriteStateEngine(writeStateEngine, schema, recordIds);
+    }
+
+    protected void populateWriteStateEngine(HollowWriteStateEngine writeStateEngine, HollowObjectSchema schema,
+                                            int[] recordIds) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
         for(int recordId : recordIds) {
             rec.reset();

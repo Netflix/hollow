@@ -17,6 +17,7 @@
 package com.netflix.hollow.protoadapter;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import com.netflix.hollow.core.schema.HollowCollectionSchema;
@@ -441,11 +442,52 @@ import java.util.concurrent.ConcurrentHashMap;
     }
 
     private int parseCollection(Message message, List<?> values, FlatRecordWriter flatRecordWriter, String collectionType) throws IOException {
-        HollowSchema schema = hollowSchemas.get(collectionType);
+        // Use computeIfAbsent for lazily created schemas (e.g., MapOfStringToValue for Struct)
+        HollowSchema schema = hollowSchemas.computeIfAbsent(collectionType, key -> stateEngine.getSchema(key));
         HollowWriteRecord collectionRec = getWriteRecord(collectionType);
         collectionRec.reset();
 
-        if (schema instanceof HollowCollectionSchema) {
+        if (schema instanceof HollowMapSchema) {
+            HollowMapSchema mapSchema = (HollowMapSchema) schema;
+            HollowMapWriteRecord mapRec = (HollowMapWriteRecord) collectionRec;
+            String keyType = mapSchema.getKeyType();
+            String valueType = mapSchema.getValueType();
+
+            for (Object value : values) {
+                if (value instanceof Message) {
+                    Message entry = (Message) value;
+                    Descriptors.Descriptor entryDesc = entry.getDescriptorForType();
+                    Descriptors.FieldDescriptor keyField = entryDesc.findFieldByName("key");
+                    Descriptors.FieldDescriptor valueField = entryDesc.findFieldByName("value");
+
+                    // Process key
+                    Object keyValue = entry.getField(keyField);
+                    int keyOrdinal;
+                    if (keyValue instanceof Message) {
+                        keyOrdinal = parseMessage((Message) keyValue, flatRecordWriter, keyType);
+                    } else {
+                        keyOrdinal = wrapPrimitiveValue(keyField.getJavaType(), keyValue, keyType, flatRecordWriter);
+                    }
+
+                    // Process value
+                    Object valValue = entry.getField(valueField);
+                    int valueOrdinal;
+                    if (valValue instanceof Message) {
+                        Message valMsg = (Message) valValue;
+                        if (isWellKnownDynamicType(valMsg.getDescriptorForType())) {
+                            if (mapper != null) {
+                                mapper.ensureDynamicTypeSchema(valMsg, collectionType, "value");
+                            }
+                        }
+                        valueOrdinal = parseMessage(valMsg, flatRecordWriter, valueType);
+                    } else {
+                        valueOrdinal = wrapPrimitiveValue(valueField.getJavaType(), valValue, valueType, flatRecordWriter);
+                    }
+
+                    mapRec.addEntry(keyOrdinal, valueOrdinal);
+                }
+            }
+        } else if (schema instanceof HollowCollectionSchema) {
             HollowCollectionSchema collectionSchema = (HollowCollectionSchema) schema;
             String elementType = collectionSchema.getElementType();
 
@@ -454,7 +496,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
             for (Object value : values) {
                 int elementOrdinal;
-                if (value instanceof Message) {
+                if (value instanceof Message && isProtoValueType(((Message) value).getDescriptorForType())) {
+                    // Unwrap google.protobuf.*Value wrapper types (e.g., StringValue, Int32Value)
+                    // These are stored as primitive wrapper schemas (String, Integer, etc.)
+                    Message msgValue = (Message) value;
+                    Object unwrappedValue = unwrapValueType(msgValue);
+                    FieldDescriptor.JavaType unwrappedType = getUnwrappedJavaType(msgValue.getDescriptorForType().getName());
+                    elementOrdinal = wrapPrimitiveValue(unwrappedType, unwrappedValue, elementType, flatRecordWriter);
+                } else if (value instanceof Message) {
                     elementOrdinal = parseMessage((Message) value, flatRecordWriter, elementType);
                 } else {
                     // Handle primitive types in collections
@@ -511,7 +560,11 @@ import java.util.concurrent.ConcurrentHashMap;
             }
         }
 
-        return addRecord(collectionType, collectionRec, flatRecordWriter);
+        int ordinal = addRecord(collectionType, collectionRec, flatRecordWriter);
+        // Reset after committing so recursive calls to parseCollection for the same type
+        // (e.g., nested google.protobuf.Struct) don't leak stale entries into the outer record.
+        collectionRec.reset();
+        return ordinal;
     }
 
     private int addCollection(Message message, FlatRecordWriter flatRecordWriter, String collectionType, HollowWriteRecord collectionRec) throws IOException {

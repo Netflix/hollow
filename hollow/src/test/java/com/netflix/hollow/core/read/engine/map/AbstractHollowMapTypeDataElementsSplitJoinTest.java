@@ -65,6 +65,10 @@ public class AbstractHollowMapTypeDataElementsSplitJoinTest extends AbstractHoll
                 writeStateEngine.add("TestObject", rec);
             }
         }
+        populateWriteStateEngineWithMap(writeStateEngine, maps);
+    }
+
+    protected void populateWriteStateEngineWithMap(HollowWriteStateEngine writeStateEngine, int[][][] maps) {
         for(int[][] map : maps) {
             HollowMapWriteRecord rec = new HollowMapWriteRecord();
             for (int[] entry : map) {

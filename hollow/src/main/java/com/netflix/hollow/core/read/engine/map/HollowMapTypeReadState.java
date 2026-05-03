@@ -468,15 +468,12 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     
     @Override
     public long getApproximateHoleCostInBytes() {
-        HollowMapTypeReadStateShard[] shards = this.shardsVolatile.shards;
-        long totalApproximateHoleCostInBytes = 0;
-        
-        BitSet populatedOrdinals = getPopulatedOrdinals();
-
-        for(int i=0; i<shards.length; i++)
-            totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, shards.length);
-        
-        return totalApproximateHoleCostInBytes;
+        final HollowMapTypeReadStateShard[] shards = this.shardsVolatile.shards;
+        int[] bitsPerShardRecord = new int[shards.length];
+        for (int i = 0; i < shards.length; i++) {
+            bitsPerShardRecord[i] = shards[i].dataElements.bitsPerFixedLengthMapPortion;
+        }
+        return approximateHoleCostInBytes(bitsPerShardRecord);
     }
     
     public HollowPrimaryKeyValueDeriver getKeyDeriver() {

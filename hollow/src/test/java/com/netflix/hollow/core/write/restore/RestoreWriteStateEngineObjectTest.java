@@ -93,7 +93,7 @@ public class RestoreWriteStateEngineObjectTest extends AbstractStateEngineTest {
         roundTripSnapshot();
         
         HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
-        HollowObjectTypeWriteState misconfiguredTypeState = new HollowObjectTypeWriteState(schema, 4);
+        HollowObjectTypeWriteState misconfiguredTypeState = new HollowObjectTypeWriteState(schema, 4, false, null);
         writeStateEngine.addTypeState(misconfiguredTypeState);
 
         try {

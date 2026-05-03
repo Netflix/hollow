@@ -44,7 +44,7 @@ public class FreeOrdinalTrackerTest {
         tracker.returnOrdinalToPool(14);
 
         /// sort for 4 shards
-        tracker.sort(4);
+        tracker.sort(4, 0, 0);
 
         Assert.assertEquals(1, tracker.getFreeOrdinal());
         Assert.assertEquals(5, tracker.getFreeOrdinal());

@@ -113,7 +113,7 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
   }
 
   public Boolean getFieldValueBooleanBoxed(String field) {
-    return getFieldValueBoolean(field);
+    return reader.readFieldBoolean(ordinal, field);
   }
 
   public int getFieldValueInt(String field) {

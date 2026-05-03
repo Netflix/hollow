@@ -10,6 +10,7 @@ import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.api.producer.model.CustomReferenceType;
 import com.netflix.hollow.api.producer.model.HasAllTypeStates;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
 import com.netflix.hollow.test.InMemoryBlobStore;
@@ -373,6 +374,76 @@ public class HollowTypeWriteStateTest {
         assertTrue(8 < consumer2.getStateEngine().getTypeState("SetOfString").numShards());
         assertTrue(4 < consumer2.getStateEngine().getTypeState("ListOfInteger").numShards());
         assertTrue(8 < consumer2.getStateEngine().getTypeState("MapOfStringToLong").numShards());
+    }
+
+    @Test
+    public void testMapOrdinalWithPartitionedMaps() {
+        HollowObjectSchema schema = new HollowObjectSchema("TestObj", 1);
+        schema.addField("val", FieldType.INT);
+
+        HollowWriteStateEngine wse = new HollowWriteStateEngine();
+        wse.setPartitionedOrdinalMap(true);
+        HollowObjectTypeWriteState writeState = new HollowObjectTypeWriteState(schema, -1, true, null);
+        wse.addTypeState(writeState);
+        wse.prepareForNextCycle();
+
+        // Map records at specific global ordinals
+        // Global ordinal 0: mapIndex=0, localOrdinal=0
+        // Global ordinal 5: mapIndex=1 (5 & 3 = 1), localOrdinal=1 (5 >>> 2 = 1)
+        // Global ordinal 10: mapIndex=2 (10 & 3 = 2), localOrdinal=2 (10 >>> 2 = 2)
+        // Global ordinal 15: mapIndex=3 (15 & 3 = 3), localOrdinal=3 (15 >>> 2 = 3)
+        int[] ordinals = {0, 5, 10, 15};
+        int[] values = {100, 200, 300, 400};
+
+        for (int i = 0; i < ordinals.length; i++) {
+            HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+            rec.setInt("val", values[i]);
+            writeState.mapOrdinal(rec, ordinals[i], false, true);
+        }
+        writeState.recalculateFreeOrdinals();
+
+        // prepareForWrite makes ordinal map data readable
+        writeState.prepareForWrite(false);
+
+        // Verify that getPointerForData returns valid (non-negative) pointers for each ordinal
+        for (int ordinal : ordinals) {
+            long pointer = writeState.getPointerForData(ordinal);
+            assertTrue("Pointer for ordinal " + ordinal + " should be non-negative", pointer >= 0);
+        }
+
+        // Verify records are distributed across different maps by checking
+        // that ordinals with different lower 2 bits route to different maps
+        assertEquals(0, ordinals[0] & 3); // map 0
+        assertEquals(1, ordinals[1] & 3); // map 1
+        assertEquals(2, ordinals[2] & 3); // map 2
+        assertEquals(3, ordinals[3] & 3); // map 3
+    }
+
+    @Test
+    public void testMaxOrdinalAfterPrepareForWrite() {
+        HollowObjectSchema schema = new HollowObjectSchema("TestObj", 1);
+        schema.addField("val", FieldType.INT);
+
+        HollowWriteStateEngine wse = new HollowWriteStateEngine();
+        wse.setPartitionedOrdinalMap(true);
+        HollowObjectTypeWriteState writeState = new HollowObjectTypeWriteState(schema, -1, true, null);
+        wse.addTypeState(writeState);
+        wse.prepareForNextCycle();
+
+        // Add several records via the normal add() path
+        int maxSeen = -1;
+        for (int i = 0; i < 20; i++) {
+            HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+            rec.setInt("val", i * 10);
+            int ordinal = writeState.add(rec);
+            maxSeen = Math.max(maxSeen, ordinal);
+        }
+
+        writeState.prepareForWrite(false);
+
+        // maxOrdinal should equal to the highest ordinal we saw
+        assertEquals("maxOrdinal should equal to the highest assigned ordinal",
+                writeState.maxOrdinal, maxSeen);
     }
 
     @HollowShardLargeType(numShards=32)

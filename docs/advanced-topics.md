@@ -251,6 +251,38 @@ Within a continuous delta chain, the type sharding configuration cannot be chang
 
 
 
+### Partitioned Ordinal Map
+
+Each type in Hollow is backed by a `ByteArrayOrdinalMap` that assigns ordinals to records. By default, a single map is used per type, limiting ordinals to the range `[0, 2^29 - 1]` — approximately 500 million unique records per type.
+
+When the partitioned ordinal map feature is enabled, each type's ordinal map is split into 4 internal partitions. Records are hash-routed to one of the 4 maps, and the 32-bit ordinal encodes both the partition index and the within-partition ordinal:
+
+```
+|  1 unused bit  |  29 bits (ordinal within partition)  |  2 bits (partition index)  |
+```
+
+This raises the effective per-type record limit to approximately 2 billion.
+
+#### Enabling
+
+Enable the partitioned ordinal map on the `HollowProducer` builder:
+
+```java
+HollowProducer producer = HollowProducer
+    .withPublisher(publisher)
+    .withPartitionedOrdinalMap(true)
+    .build();
+```
+
+The feature is disabled by default.
+
+#### Compatibility
+
+The partitioned ordinal map is a **write-path-only** change. No blob format changes are introduced, so:
+
+* Consumers at older version can read blobs produced with the feature enabled.
+* Producers at the new version can read blobs produced without the feature.
+
 ### Object Longevity
 
 A Hollow object returned from a generated API contains a reference to the Hollow data store, and an ordinal.  For this reason, if a reference to a Hollow object is retained by the consumer for an extended period of time, and the underlying record changes unexpected results may begin to be returned from these references.  We call Hollow objects which were obtained from a no longer current state stale references.
