@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
  * collection type:
  * <pre>
  * {@code
- *  &#64;HollowTypeName("MyMovieIds")
+ *  &#64;HollowTypeName(name = "MyMovieIds")
  *  &#64;HollowCollectionTypeName(elementTypeName = "MovieId")
  *  private List<Integer> movieIds;
  * }
