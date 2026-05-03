@@ -376,6 +376,18 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             HollowMapTypeName mapTypeNameAnnotation = parentMapper.isCollectionTypeNamingEnabled()
                     ? f.getAnnotation(HollowMapTypeName.class) : null;
 
+            if (collectionTypeNameAnnotation != null && mapTypeNameAnnotation != null) {
+                throw new IllegalStateException("Field '" + this.fieldName +
+                        "' has both @HollowCollectionTypeName and @HollowMapTypeName; only one may be applied.");
+            }
+            if (collectionTypeNameAnnotation != null && !isListOrSetType(this.type)) {
+                throw new IllegalStateException("@HollowCollectionTypeName on field '" + this.fieldName +
+                        "' is only valid for List or Set fields");
+            }
+            if (mapTypeNameAnnotation != null && !isMapType(this.type)) {
+                throw new IllegalStateException("@HollowMapTypeName on field '" + this.fieldName +
+                        "' is only valid for Map fields");
+            }
 
             HollowTypeMapper subTypeMapper = null;
             
