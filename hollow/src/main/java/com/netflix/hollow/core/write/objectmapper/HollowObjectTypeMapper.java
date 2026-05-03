@@ -510,13 +510,15 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         private boolean isListOrSetType(Type t) {
             if (!(t instanceof ParameterizedType)) return false;
             Type raw = ((ParameterizedType) t).getRawType();
-            return raw == List.class || raw == Set.class;
+            if (!(raw instanceof Class<?>)) return false;
+            Class<?> rawClass = (Class<?>) raw;
+            return List.class.isAssignableFrom(rawClass) || Set.class.isAssignableFrom(rawClass);
         }
 
         private boolean isMapType(Type t) {
             if (!(t instanceof ParameterizedType)) return false;
             Type raw = ((ParameterizedType) t).getRawType();
-            return raw == Map.class;
+            return raw instanceof Class<?> && Map.class.isAssignableFrom((Class<?>) raw);
         }
 
         @SuppressWarnings("deprecation")
