@@ -141,6 +141,104 @@ Namespacing fields is also useful if some consumers don't need the contents of a
 !!! hint "Changing default _type names_"
     The `@HollowTypeName` annotation can also be used at the class level to select a default type name for a class other than its simple name. Custom type names should begin with an upper case character to avoid ambiguity in naming in the generated API, although this is not enforced by Hollow due to backwards compatibility reasons.
 
+#### Namespacing Collection Element and Key/Value Types
+
+The same compression benefit applies to element types inside `List` and `Set` fields, and to key and/or value types inside `Map` fields.  By default, `List<String>` shares the global `String` type state with every other `String` field in the data model, so references into that pool are wide.  The `@HollowCollectionTypeName` and `@HollowMapTypeName` annotations create a dedicated, scoped type state for the element, key, or value type, resulting in a smaller ordinal pool and narrower references — without requiring a wrapper POJO.
+
+**Opting in**
+
+These annotations are disabled by default.  Enable them on the producer before adding any data:
+
+```java
+// Using HollowObjectMapper directly
+HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+mapper.enableCollectionTypeNaming();
+
+// Using HollowProducer.Builder
+HollowProducer producer = HollowProducer.withPublisher(blobStore)
+        .withCollectionTypeNaming()
+        .build();
+```
+
+!!! warning "Call before registering any types"
+    `enableCollectionTypeNaming()` must be called before any call to `add()` or `initializeTypeState()`.  Types registered before this call will not respect the annotations.
+
+**`@HollowCollectionTypeName` — for `List` and `Set` fields**
+
+```java
+// Dedicated "MovieId" pool instead of the global "Integer" pool
+@HollowCollectionTypeName(elementTypeName = "MovieId")
+List<Integer> movieIds;
+
+// Dedicated "TagString" pool instead of the global "String" pool
+@HollowCollectionTypeName(elementTypeName = "TagString")
+Set<String> tags;
+```
+
+**`@HollowMapTypeName` — for `Map` fields**
+
+Either or both of `keyTypeName` and `valueTypeName` may be specified; omitting one (or leaving it as `""`) keeps the auto-generated name for that side.
+
+```java
+// Name only the key type
+@HollowMapTypeName(keyTypeName = "SubTypeKey")
+Map<String, SomeSubType> subTypesByKey;
+
+// Name both key and value
+@HollowMapTypeName(keyTypeName = "TagKey", valueTypeName = "TagValue")
+Map<String, String> tags;
+```
+
+**Composing with `@HollowTypeName`**
+
+Both annotations can appear on the same field.  `@HollowTypeName` renames the outer collection type; `@HollowCollectionTypeName` / `@HollowMapTypeName` rename the inner element/key/value type:
+
+```java
+@HollowTypeName(name = "MyMovieIds")
+@HollowCollectionTypeName(elementTypeName = "MovieId")
+List<Integer> movieIds;
+```
+
+**Constraints**
+
+* Only one of `@HollowCollectionTypeName` or `@HollowMapTypeName` may appear on the same field.
+* `@HollowCollectionTypeName` is valid only on `List` and `Set` fields (including concrete subtypes such as `ArrayList` or `HashSet`).
+* `@HollowMapTypeName` is valid only on `Map` fields (including concrete subtypes such as `HashMap` or `TreeMap`).
+* Neither annotation has any effect on primitive, inlined (`@HollowInline`), or non-collection fields — placing them on such fields throws `IllegalStateException` at initialization time.
+* Two fields may share the same custom type name if and only if their element/key/value Java types are the same; otherwise initialization throws `IllegalStateException`.
+* Nested collections (e.g. `Map<String, List<Integer>>`) are out of scope — only the immediate element/key/value type of the annotated field is affected.
+
+!!! warning "Schema change"
+    Adding these annotations to an **already-deployed** field changes the Hollow schema: the element/key/value type state is renamed.  Coordinate producer and consumer updates before deploying.  For a schema-transparent migration from the wrapper-POJO workaround, pin the outer collection name with `@HollowTypeName` and set the element/key/value name to match the POJO's `@HollowTypeName` value.
+
+    For example, given this existing model using a wrapper POJO:
+
+    ```java
+    // Existing wrapper POJO — @HollowTypeName renames "SubTypeKeyPojo" to "SubTypeKey"
+    // in the Hollow schema, making the key type name "SubTypeKey".
+    @HollowTypeName(name = "SubTypeKey")
+    public class SubTypeKeyPojo {
+        @HollowInline String value;
+    }
+
+    // Existing field — the outer map name auto-generates to "MapOfSubTypeKeyToString"
+    // because getDefaultTypeName uses the @HollowTypeName value ("SubTypeKey"),
+    // not the Java class name ("SubTypeKeyPojo").
+    Map<SubTypeKeyPojo, String> subTypesByKey;
+    ```
+
+    The equivalent annotation-based model that produces an identical schema is:
+
+    ```java
+    // Pin the outer map name to the one that was previously auto-generated.
+    // Set keyTypeName to match the POJO's @HollowTypeName value.
+    @HollowTypeName(name = "MapOfSubTypeKeyToString")
+    @HollowMapTypeName(keyTypeName = "SubTypeKey")
+    Map<String, String> subTypesByKey;
+    ```
+
+    No consumer schema changes are required — both models produce the same `MapOfSubTypeKeyToString` map schema with the same `SubTypeKey` key type.  Delete the wrapper POJO class once all producers have migrated.
+
 ### Grouping Associated Fields
 
 Referencing fields can save space because the same field values do not have to be repeated for every record in which they occur.  Similarly, we can _group_ fields which have covarying values, and pull these out from larger objects as their own types.  For example, imagine we started with a `Movie` type which included the following fields:
@@ -193,6 +291,8 @@ The `List` must explicitly define its parameterized element type.  The default _
 
 A `List` schema indicates a record type which is an ordered collection of `REFERENCE` fields.  Each record will have a variable number of references.  The referenced type must be defined by the schema, and all references in all records will encode only the _ordinals_ of the referenced records as the values for these references.
 
+To give the element type a dedicated, scoped type state for better compression, see [`@HollowCollectionTypeName`](#namespacing-collection-element-and-keyvalue-types).
+
 ## Set Schemas
 
 You can define `Set` schemas by adding a member variable of type `Set` in your data model.  The `Set` must explicitly define its parameterized element type.  For example:
@@ -211,6 +311,8 @@ A `Set` schema indicates a record type which is an unordered collection of `REFE
 
 References in `Set` records can be hashed by some specific element fields for O(1) retrieval.  In order to enable this feature, a `Set` schema will define an optional _hash key_, which defines how its elements are hashed/indexed.
 
+To give the element type a dedicated, scoped type state for better compression, see [`@HollowCollectionTypeName`](#namespacing-collection-element-and-keyvalue-types).
+
 ## Map Schemas
 
 You can define `Map` schemas by adding a member variable of type `Map` in your data model.  The `Map` must explicitly define it parameterized key and values types.  For example:
@@ -228,6 +330,8 @@ public class Movie {
 A `Map` schema indicates a record type which is an unordered collection of pairs of `REFERENCE` fields, used to represent a key/value mapping.  Each record will have a variable number of key/value pairs.  Both the key reference type and the value reference type must be defined by the schema.  The key reference type does not have to be the same as the value reference type.  Within a single map record, each key reference must be unique.  
 
 Entries in `Map` records can be hashed by some specific key fields for O(1) retrieval of the keys, values, and/or entries.  In order to enable this feature, a `Map` schema will define an optional _hash key_, which defines how its entries are hashed/indexed.
+
+To give the key and/or value types dedicated, scoped type states for better compression, see [`@HollowMapTypeName`](#namespacing-collection-element-and-keyvalue-types).
 
 ## Hash Keys
 
