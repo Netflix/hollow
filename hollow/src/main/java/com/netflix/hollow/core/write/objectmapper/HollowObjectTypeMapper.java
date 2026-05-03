@@ -358,9 +358,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         private final HollowHashKey hashKeyAnnotation;
         private final HollowShardLargeType numShardsAnnotation;
         private final boolean isInlinedField;
-        private final HollowCollectionTypeName collectionTypeNameAnnotation;
-        private final HollowMapTypeName mapTypeNameAnnotation;
-
         private MappedField(Field f) {
             this(f, new HashSet<Type>());
         }
@@ -374,11 +371,11 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.hashKeyAnnotation = f.getAnnotation(HollowHashKey.class);
             this.numShardsAnnotation = f.getAnnotation(HollowShardLargeType.class);
             this.isInlinedField = f.isAnnotationPresent(HollowInline.class);
-            this.collectionTypeNameAnnotation = parentMapper.isCollectionTypeNamingEnabled()
+            HollowCollectionTypeName collectionTypeNameAnnotation = parentMapper.isCollectionTypeNamingEnabled()
                     ? f.getAnnotation(HollowCollectionTypeName.class) : null;
-            this.mapTypeNameAnnotation = parentMapper.isCollectionTypeNamingEnabled()
+            HollowMapTypeName mapTypeNameAnnotation = parentMapper.isCollectionTypeNamingEnabled()
                     ? f.getAnnotation(HollowMapTypeName.class) : null;
-            
+
 
             HollowTypeMapper subTypeMapper = null;
             
@@ -434,9 +431,9 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 }
                 // guard recursion here
                 visitedTypes.add(this.type);
-                String elementTypeName = collectionTypeNameAnnotation != null ? resolveElementTypeName() : null;
-                String keyTypeName = mapTypeNameAnnotation != null ? resolveKeyTypeName() : null;
-                String valueTypeName = mapTypeNameAnnotation != null ? resolveValueTypeName() : null;
+                String elementTypeName = collectionTypeNameAnnotation != null ? resolveElementTypeName(collectionTypeNameAnnotation, this.type, this.fieldName) : null;
+                String keyTypeName = mapTypeNameAnnotation != null ? resolveKeyTypeName(mapTypeNameAnnotation, this.type, this.fieldName) : null;
+                String valueTypeName = mapTypeNameAnnotation != null ? resolveValueTypeName(mapTypeNameAnnotation, this.type, this.fieldName) : null;
                 subTypeMapper = parentMapper.getTypeMapper(type,
                         typeNameAnnotation != null ? typeNameAnnotation.name() : null,
                         hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null,
@@ -458,8 +455,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.typeNameAnnotation = null;
             this.hashKeyAnnotation = null;
             this.numShardsAnnotation = null;
-            this.collectionTypeNameAnnotation = null;
-            this.mapTypeNameAnnotation = null;
             this.fieldName = specialField.getSpecialFieldName();
             this.fieldType = specialField;
             this.subTypeMapper = null;
@@ -480,31 +475,28 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             return subTypeMapper.getTypeName();
         }
 
-        private String resolveElementTypeName() {
-            if (collectionTypeNameAnnotation == null) return null;
-            if (!isListOrSetType(type)) {
+        private String resolveElementTypeName(HollowCollectionTypeName annotation, Type fieldType, String fieldName) {
+            if (!isListOrSetType(fieldType)) {
                 throw new IllegalStateException("@HollowCollectionTypeName on field '" + fieldName +
                         "' is only valid for List or Set fields");
             }
-            return nullIfEmpty(collectionTypeNameAnnotation.elementTypeName());
+            return nullIfEmpty(annotation.elementTypeName());
         }
 
-        private String resolveKeyTypeName() {
-            if (mapTypeNameAnnotation == null) return null;
-            if (!isMapType(type)) {
+        private String resolveKeyTypeName(HollowMapTypeName annotation, Type fieldType, String fieldName) {
+            if (!isMapType(fieldType)) {
                 throw new IllegalStateException("@HollowMapTypeName on field '" + fieldName +
                         "' is only valid for Map fields");
             }
-            return nullIfEmpty(mapTypeNameAnnotation.keyTypeName());
+            return nullIfEmpty(annotation.keyTypeName());
         }
 
-        private String resolveValueTypeName() {
-            if (mapTypeNameAnnotation == null) return null;
-            if (!isMapType(type)) {
+        private String resolveValueTypeName(HollowMapTypeName ann, Type fieldType, String fieldName) {
+            if (!isMapType(fieldType)) {
                 throw new IllegalStateException("@HollowMapTypeName on field '" + fieldName +
                         "' is only valid for Map fields");
             }
-            return nullIfEmpty(mapTypeNameAnnotation.valueTypeName());
+            return nullIfEmpty(ann.valueTypeName());
         }
 
         private boolean isListOrSetType(Type t) {

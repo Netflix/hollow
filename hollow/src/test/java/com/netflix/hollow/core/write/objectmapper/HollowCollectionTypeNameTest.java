@@ -34,9 +34,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
 
@@ -635,5 +637,118 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
         @HollowTypeName(name = "SetOfSubTypeElemAutoName")
         @HollowCollectionTypeName(elementTypeName = "SubTypeElemAutoName")
         Set<String> setData;
+    }
+
+    // -------------------------------------------------------------------------
+    // Concrete collection subtypes (ArrayList, LinkedList, HashSet, HashMap, TreeMap)
+    // isAssignableFrom fix: concrete implementations were previously rejected
+    // -------------------------------------------------------------------------
+
+    @Test
+    public void flagOn_arrayList_elementTypeNamed() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.enableCollectionTypeNaming();
+        mapper.initializeTypeState(TypeWithArrayList.class);
+
+        HollowListSchema schema = (HollowListSchema) writeStateEngine.getTypeState("ListOfInteger").getSchema();
+        Assert.assertEquals("ConcreteElem", schema.getElementType());
+        Assert.assertNotNull(writeStateEngine.getTypeState("ConcreteElem"));
+    }
+
+    @Test
+    public void flagOn_linkedList_elementTypeNamed() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.enableCollectionTypeNaming();
+        mapper.initializeTypeState(TypeWithLinkedList.class);
+
+        HollowListSchema schema = (HollowListSchema) writeStateEngine.getTypeState("ListOfInteger").getSchema();
+        Assert.assertEquals("LinkedElem", schema.getElementType());
+        Assert.assertNotNull(writeStateEngine.getTypeState("LinkedElem"));
+    }
+
+    @Test
+    public void flagOn_hashSet_elementTypeNamed() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.enableCollectionTypeNaming();
+        mapper.initializeTypeState(TypeWithHashSet.class);
+
+        HollowSetSchema schema = (HollowSetSchema) writeStateEngine.getTypeState("SetOfString").getSchema();
+        Assert.assertEquals("ConcreteSetElem", schema.getElementType());
+        Assert.assertNotNull(writeStateEngine.getTypeState("ConcreteSetElem"));
+    }
+
+    @Test
+    public void flagOn_hashMap_keyAndValueTypeNamed() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.enableCollectionTypeNaming();
+        mapper.initializeTypeState(TypeWithHashMap.class);
+
+        HollowMapSchema schema = (HollowMapSchema) writeStateEngine.getTypeState("MapOfStringToString").getSchema();
+        Assert.assertEquals("ConcreteKey", schema.getKeyType());
+        Assert.assertEquals("ConcreteValue", schema.getValueType());
+        Assert.assertNotNull(writeStateEngine.getTypeState("ConcreteKey"));
+        Assert.assertNotNull(writeStateEngine.getTypeState("ConcreteValue"));
+    }
+
+    @Test
+    public void flagOn_treeMap_keyTypeNamed() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.enableCollectionTypeNaming();
+        mapper.initializeTypeState(TypeWithTreeMap.class);
+
+        HollowMapSchema schema = (HollowMapSchema) writeStateEngine.getTypeState("MapOfStringToString").getSchema();
+        Assert.assertEquals("TreeKey", schema.getKeyType());
+        Assert.assertNotNull(writeStateEngine.getTypeState("TreeKey"));
+    }
+
+    // Validation still fires correctly for concrete types
+
+    @Test(expected = IllegalStateException.class)
+    public void flagOn_mapAnnotationOnArrayList_throws() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.enableCollectionTypeNaming();
+        mapper.initializeTypeState(TypeWithMapAnnotationOnArrayList.class);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void flagOn_collectionAnnotationOnHashMap_throws() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.enableCollectionTypeNaming();
+        mapper.initializeTypeState(TypeWithCollectionAnnotationOnHashMap.class);
+    }
+
+    static class TypeWithArrayList {
+        @HollowCollectionTypeName(elementTypeName = "ConcreteElem")
+        ArrayList<Integer> ids;
+    }
+
+    static class TypeWithLinkedList {
+        @HollowCollectionTypeName(elementTypeName = "LinkedElem")
+        LinkedList<Integer> ids;
+    }
+
+    static class TypeWithHashSet {
+        @HollowCollectionTypeName(elementTypeName = "ConcreteSetElem")
+        HashSet<String> tags;
+    }
+
+    static class TypeWithHashMap {
+        @HollowMapTypeName(keyTypeName = "ConcreteKey", valueTypeName = "ConcreteValue")
+        HashMap<String, String> data;
+    }
+
+    static class TypeWithTreeMap {
+        @HollowMapTypeName(keyTypeName = "TreeKey")
+        TreeMap<String, String> data;
+    }
+
+    static class TypeWithMapAnnotationOnArrayList {
+        @HollowMapTypeName(keyTypeName = "K")
+        ArrayList<Integer> ids;
+    }
+
+    static class TypeWithCollectionAnnotationOnHashMap {
+        @HollowCollectionTypeName(elementTypeName = "E")
+        HashMap<String, String> data;
     }
 }
