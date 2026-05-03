@@ -188,6 +188,11 @@ public class HollowObjectMapper {
             Class<?> expectedJavaType = type instanceof ParameterizedType
                     ? (Class<?>) ((ParameterizedType) type).getRawType()
                     : (Class<?>) type;
+            // Normalize concrete collection implementations to their canonical interface,
+            // matching what the collection mappers return from getJavaType().
+            if (List.class.isAssignableFrom(expectedJavaType)) expectedJavaType = List.class;
+            else if (Set.class.isAssignableFrom(expectedJavaType)) expectedJavaType = Set.class;
+            else if (Map.class.isAssignableFrom(expectedJavaType)) expectedJavaType = Map.class;
             if (!typeMapper.getJavaType().equals(expectedJavaType)) {
                 throw new IllegalStateException(
                         "Hollow type name '" + typeName + "' is already registered for Java type " +
