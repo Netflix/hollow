@@ -74,11 +74,6 @@ public class HollowMessageMapper {
     private final Map<String, HollowProtoAdapter> adapters = new ConcurrentHashMap<String, HollowProtoAdapter>();
     private boolean ignoreListOrdering = false;
 
-    // Track field types for Struct fields to validate consistency across instances
-    // Maps "ParentType.fieldPath.structFieldName" -> Value type (e.g., "Person.metadata.age" -> "numberValue")
-    // Thread-safe: uses ConcurrentHashMap with atomic putIfAbsent for conflict detection
-    private final ConcurrentHashMap<String, String> structFieldTypes = new ConcurrentHashMap<String, String>();
-
     // Lock objects for schema creation synchronization
     private final Object valueSchemaLock = new Object();
     private final Object structSchemaLock = new Object();
@@ -206,8 +201,16 @@ public class HollowMessageMapper {
         // Count fields to size the schema
         int fieldCount = descriptor.getFields().size();
 
+        // Propagate the hollow_primary_key proto option into the schema so that downstream
+        // tools (HollowPrimaryKeyIndex, HollowHistoricalStateCreator, the hollow-history UI
+        // Lookup Key form, Cinder UI diff counters) can identify records by their logical
+        // primary key rather than by ordinal.
+        String[] pkFieldPaths = readHollowPrimaryKeyFields(descriptor);
+
         // Create the object schema for this message
-        HollowObjectSchema schema = new HollowObjectSchema(typeName, fieldCount);
+        HollowObjectSchema schema = pkFieldPaths.length == 0
+            ? new HollowObjectSchema(typeName, fieldCount)
+            : new HollowObjectSchema(typeName, fieldCount, pkFieldPaths);
 
         // Add fields to the schema
         for (Descriptors.FieldDescriptor field : descriptor.getFields()) {
@@ -220,7 +223,8 @@ public class HollowMessageMapper {
 
                 // Ensure the element type schema exists
                 if (field.getType() == Descriptors.FieldDescriptor.Type.MESSAGE) {
-                    // Already created above
+                    // *Value types are unwrapped by getElementTypeName() which also creates
+                    // the wrapper schema. Regular messages are created in the recursion above.
                 } else {
                     // For primitive repeated fields, create wrapper if needed
                     ensurePrimitiveWrapperSchema(elementType);
@@ -413,78 +417,22 @@ public class HollowMessageMapper {
     }
 
     /**
-     * Ensure schema for google.protobuf.Struct based on actual field values.
-     * Struct is an object with a map<string, Value> field.
-     * Also validates that field types are consistent across all instances.
+     * Ensure schema for google.protobuf.Struct.
+     *
+     * <p>{@code google.protobuf.Struct} is an object with a {@code map<string, Value>} field. Each
+     * {@code Value} is a {@code oneof} that may hold any scalar, list, struct, or null. The Hollow
+     * {@code Value} object schema declares one nullable column per oneof case (number_value,
+     * string_value, bool_value, struct_value, list_value, null_value), so a single Hollow Value
+     * record can express any oneof case and the reader picks whichever case is non-null. That is
+     * already the design that was put in place for Value schema generation.
+     *
+     * <p>Therefore the same Struct field name (e.g. {@code config.data_ttl_secs}) is allowed to be
+     * a number in one record and a string in another — both round-trip correctly through Hollow.
+     * Earlier versions of this code rejected that as a conflict, which broke any namespace dataset
+     * where the same Struct key legitimately holds different scalar types across rows.
      */
     private void ensureStructSchema(com.google.protobuf.Message structMessage, String parentTypeName, String fieldPath) {
-        // Ensure Value schema exists (will create if needed)
         ensureValueSchemaExists();
-
-        // Validate field type consistency across instances
-        validateStructFields(structMessage, parentTypeName, fieldPath);
-    }
-
-    /**
-     * Validate that Struct field types are consistent across all instances.
-     * Throws IllegalStateException if the same field name has different types.
-     */
-    private void validateStructFields(com.google.protobuf.Message structMessage, String parentTypeName, String fieldPath) {
-        Descriptors.Descriptor descriptor = structMessage.getDescriptorForType();
-        Descriptors.FieldDescriptor fieldsDescriptor = descriptor.findFieldByName("fields");
-
-        if (fieldsDescriptor == null) return;
-
-        // Get the fields map from the Struct
-        Object fieldsObj = structMessage.getField(fieldsDescriptor);
-        if (!(fieldsObj instanceof java.util.List)) return;
-
-        @SuppressWarnings("unchecked")
-        java.util.List<com.google.protobuf.Message> entries = (java.util.List<com.google.protobuf.Message>) fieldsObj;
-
-        for (com.google.protobuf.Message entry : entries) {
-            // Each entry has "key" (string) and "value" (Value message)
-            Descriptors.Descriptor entryDescriptor = entry.getDescriptorForType();
-            Descriptors.FieldDescriptor keyField = entryDescriptor.findFieldByName("key");
-            Descriptors.FieldDescriptor valueField = entryDescriptor.findFieldByName("value");
-
-            if (keyField == null || valueField == null) continue;
-
-            String key = (String) entry.getField(keyField);
-            com.google.protobuf.Message value = (com.google.protobuf.Message) entry.getField(valueField);
-
-            // Determine which Value type this is
-            String valueType = getValueType(value);
-            if (valueType == null) continue;
-
-            // Check for conflicts using atomic putIfAbsent for thread safety
-            String fieldKey = parentTypeName + "." + fieldPath + "." + key;
-            String existingType = structFieldTypes.putIfAbsent(fieldKey, valueType);
-
-            // If putIfAbsent returned non-null, the field already existed - check for conflict
-            if (existingType != null && !existingType.equals(valueType)) {
-                throw new IllegalStateException(
-                    "Conflicting types for Struct field '" + key + "' in " + parentTypeName + "." + fieldPath +
-                    ": previously " + existingType + ", now " + valueType);
-            }
-        }
-    }
-
-    /**
-     * Determine which type a Value message contains.
-     * Returns the field name (e.g., "numberValue", "stringValue") or null if empty.
-     */
-    private String getValueType(com.google.protobuf.Message value) {
-        Descriptors.Descriptor descriptor = value.getDescriptorForType();
-
-        // Check each possible Value field
-        for (Descriptors.FieldDescriptor field : descriptor.getFields()) {
-            if (value.hasField(field)) {
-                return field.getName();
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -502,12 +450,12 @@ public class HollowMessageMapper {
                     // Value has a oneof "kind" with different types
                     // We'll model it as an object with nullable fields for each possible type
                     HollowObjectSchema schema = new HollowObjectSchema(valueTypeName, 6);
-                    schema.addField("nullValue", HollowObjectSchema.FieldType.BOOLEAN);  // true if null
-                    schema.addField("numberValue", HollowObjectSchema.FieldType.DOUBLE);
-                    schema.addField("stringValue", HollowObjectSchema.FieldType.STRING);
-                    schema.addField("boolValue", HollowObjectSchema.FieldType.BOOLEAN);
-                    schema.addField("structValue", HollowObjectSchema.FieldType.REFERENCE, "Struct");
-                    schema.addField("listValue", HollowObjectSchema.FieldType.REFERENCE, "ListValue");
+                    schema.addField("null_value", HollowObjectSchema.FieldType.STRING);  // NullValue enum stored as string
+                    schema.addField("number_value", HollowObjectSchema.FieldType.DOUBLE);
+                    schema.addField("string_value", HollowObjectSchema.FieldType.STRING);
+                    schema.addField("bool_value", HollowObjectSchema.FieldType.BOOLEAN);
+                    schema.addField("struct_value", HollowObjectSchema.FieldType.REFERENCE, "Struct");
+                    schema.addField("list_value", HollowObjectSchema.FieldType.REFERENCE, "ListValue");
                     stateEngine.addTypeState(new HollowObjectTypeWriteState(schema));
                 }
             }
@@ -568,7 +516,16 @@ public class HollowMessageMapper {
      */
     private String getElementTypeName(Descriptors.FieldDescriptor field) {
         if (field.getType() == Descriptors.FieldDescriptor.Type.MESSAGE) {
-            return field.getMessageType().getName();
+            Descriptors.Descriptor messageType = field.getMessageType();
+            // Unwrap google.protobuf.*Value types to their wrapper names (e.g., StringValue -> String)
+            if (isProtoValueType(messageType)) {
+                String wrapperType = getValueTypeWrapper(messageType);
+                if (wrapperType != null) {
+                    ensurePrimitiveWrapperSchema(wrapperType);
+                    return wrapperType;
+                }
+            }
+            return messageType.getName();
         } else if (field.getType() == Descriptors.FieldDescriptor.Type.ENUM) {
             return "String"; // Enums stored as strings
         } else {
@@ -902,6 +859,28 @@ public class HollowMessageMapper {
      * @param message the protobuf message
      * @return primary key containing the type name and field values
      */
+    /**
+     * Read the {@code hollow_primary_key} option's {@code fields} list from a message
+     * descriptor. Returns an empty array when the option is not set (the mapper's
+     * schemas then have no primary key, matching prior behavior).
+     */
+    private static String[] readHollowPrimaryKeyFields(Descriptors.Descriptor descriptor) {
+        try {
+            com.google.protobuf.DescriptorProtos.MessageOptions options = descriptor.getOptions();
+            if (options.hasExtension(HollowOptions.hollowPrimaryKey)) {
+                HollowOptions.HollowPrimaryKey pkOption =
+                    options.getExtension(HollowOptions.hollowPrimaryKey);
+                java.util.List<String> fields = pkOption.getFieldsList();
+                if (fields != null && !fields.isEmpty()) {
+                    return fields.toArray(new String[0]);
+                }
+            }
+        } catch (Exception e) {
+            // HollowOptions extension not available on the classpath — treat as no PK.
+        }
+        return new String[0];
+    }
+
     public com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey extractPrimaryKey(
             com.google.protobuf.Message message) {
 
@@ -998,8 +977,11 @@ public class HollowMessageMapper {
             case UINT32:
             case FIXED32:
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
-                    int intValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getInt(fieldName);
-                    builder.setField(field, intValue);
+                    com.netflix.hollow.api.objects.generic.GenericHollowObject obj =
+                        (com.netflix.hollow.api.objects.generic.GenericHollowObject) record;
+                    if (!obj.isNull(fieldName)) {
+                        builder.setField(field, obj.getInt(fieldName));
+                    }
                 }
                 break;
 
@@ -1009,29 +991,41 @@ public class HollowMessageMapper {
             case UINT64:
             case FIXED64:
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
-                    long longValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getLong(fieldName);
-                    builder.setField(field, longValue);
+                    com.netflix.hollow.api.objects.generic.GenericHollowObject obj =
+                        (com.netflix.hollow.api.objects.generic.GenericHollowObject) record;
+                    if (!obj.isNull(fieldName)) {
+                        builder.setField(field, obj.getLong(fieldName));
+                    }
                 }
                 break;
 
             case FLOAT:
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
-                    float floatValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getFloat(fieldName);
-                    builder.setField(field, floatValue);
+                    com.netflix.hollow.api.objects.generic.GenericHollowObject obj =
+                        (com.netflix.hollow.api.objects.generic.GenericHollowObject) record;
+                    if (!obj.isNull(fieldName)) {
+                        builder.setField(field, obj.getFloat(fieldName));
+                    }
                 }
                 break;
 
             case DOUBLE:
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
-                    double doubleValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getDouble(fieldName);
-                    builder.setField(field, doubleValue);
+                    com.netflix.hollow.api.objects.generic.GenericHollowObject obj =
+                        (com.netflix.hollow.api.objects.generic.GenericHollowObject) record;
+                    if (!obj.isNull(fieldName)) {
+                        builder.setField(field, obj.getDouble(fieldName));
+                    }
                 }
                 break;
 
             case BOOL:
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
-                    boolean boolValue = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getBoolean(fieldName);
-                    builder.setField(field, boolValue);
+                    com.netflix.hollow.api.objects.generic.GenericHollowObject obj =
+                        (com.netflix.hollow.api.objects.generic.GenericHollowObject) record;
+                    if (!obj.isNull(fieldName)) {
+                        builder.setField(field, obj.getBoolean(fieldName));
+                    }
                 }
                 break;
 
@@ -1066,17 +1060,132 @@ public class HollowMessageMapper {
                 break;
 
             case MESSAGE:
-                // Handle nested messages recursively
                 if (record instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject) {
                     com.netflix.hollow.api.objects.HollowRecord nestedRecord =
                         ((com.netflix.hollow.api.objects.generic.GenericHollowObject) record).getReferencedGenericRecord(fieldName);
                     if (nestedRecord != null) {
-                        com.google.protobuf.Message nestedMessage = readHollowRecord(nestedRecord, field.getMessageType());
+                        String fullName = field.getMessageType().getFullName();
+                        com.google.protobuf.Message nestedMessage;
+                        if (fullName.equals("google.protobuf.Struct")) {
+                            nestedMessage = readHollowStruct(nestedRecord);
+                        } else if (fullName.equals("google.protobuf.Value")) {
+                            nestedMessage = readHollowValue(nestedRecord);
+                        } else if (fullName.equals("google.protobuf.ListValue")) {
+                            nestedMessage = readHollowListValue(nestedRecord);
+                        } else {
+                            nestedMessage = readHollowRecord(nestedRecord, field.getMessageType());
+                        }
                         builder.setField(field, nestedMessage);
                     }
                 }
                 break;
         }
+    }
+
+    /**
+     * Reconstruct a {@code google.protobuf.Struct} from its Hollow representation.
+     *
+     * <p>The Struct is stored as a Hollow object with a single {@code fields} reference pointing
+     * to a {@code MapOfStringToValue} Hollow MAP. Each map entry has a String key and a Value
+     * object. This cannot go through the generic {@link #readHollowRecord} path because the
+     * proto descriptor for Struct uses a repeated MapEntry message for its fields field, while
+     * the Hollow schema stores it as a native MAP type.
+     */
+    private com.google.protobuf.Struct readHollowStruct(com.netflix.hollow.api.objects.HollowRecord structRecord) {
+        com.google.protobuf.Struct.Builder structBuilder = com.google.protobuf.Struct.newBuilder();
+        if (!(structRecord instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject)) {
+            return structBuilder.build();
+        }
+        com.netflix.hollow.api.objects.HollowRecord mapRecord =
+            ((com.netflix.hollow.api.objects.generic.GenericHollowObject) structRecord).getReferencedGenericRecord("fields");
+        if (!(mapRecord instanceof com.netflix.hollow.api.objects.generic.GenericHollowMap)) {
+            return structBuilder.build();
+        }
+        com.netflix.hollow.api.objects.generic.GenericHollowMap hollowMap =
+            (com.netflix.hollow.api.objects.generic.GenericHollowMap) mapRecord;
+        for (java.util.Map.Entry<com.netflix.hollow.api.objects.HollowRecord, com.netflix.hollow.api.objects.HollowRecord> entry :
+                hollowMap.<com.netflix.hollow.api.objects.HollowRecord, com.netflix.hollow.api.objects.HollowRecord>entries()) {
+            if (!(entry.getKey() instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject)) {
+                continue;
+            }
+            String key = ((com.netflix.hollow.api.objects.generic.GenericHollowObject) entry.getKey()).getString("value");
+            if (key == null || entry.getValue() == null) {
+                continue;
+            }
+            com.google.protobuf.Value value = readHollowValue(entry.getValue());
+            structBuilder.putFields(key, value);
+        }
+        return structBuilder.build();
+    }
+
+    /**
+     * Reconstruct a {@code google.protobuf.Value} from its Hollow representation.
+     *
+     * <p>The Value Hollow object has nullable fields for each oneof case: {@code number_value}
+     * (double), {@code string_value} (String), {@code bool_value} (boolean), {@code struct_value}
+     * (→ Struct), {@code list_value} (→ ListValue). The first non-null field wins.
+     */
+    private com.google.protobuf.Value readHollowValue(com.netflix.hollow.api.objects.HollowRecord valueRecord) {
+        com.google.protobuf.Value.Builder valueBuilder = com.google.protobuf.Value.newBuilder();
+        if (!(valueRecord instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject)) {
+            return valueBuilder.build();
+        }
+        com.netflix.hollow.api.objects.generic.GenericHollowObject obj =
+            (com.netflix.hollow.api.objects.generic.GenericHollowObject) valueRecord;
+
+        if (!obj.isNull("string_value")) {
+            String sv = obj.getString("string_value");
+            if (sv != null) {
+                valueBuilder.setStringValue(sv);
+                return valueBuilder.build();
+            }
+        }
+        if (!obj.isNull("number_value")) {
+            valueBuilder.setNumberValue(obj.getDouble("number_value"));
+            return valueBuilder.build();
+        }
+        if (!obj.isNull("bool_value")) {
+            valueBuilder.setBoolValue(obj.getBoolean("bool_value"));
+            return valueBuilder.build();
+        }
+        com.netflix.hollow.api.objects.HollowRecord structRef = obj.getReferencedGenericRecord("struct_value");
+        if (structRef != null) {
+            valueBuilder.setStructValue(readHollowStruct(structRef));
+            return valueBuilder.build();
+        }
+        com.netflix.hollow.api.objects.HollowRecord listRef = obj.getReferencedGenericRecord("list_value");
+        if (listRef != null) {
+            valueBuilder.setListValue(readHollowListValue(listRef));
+            return valueBuilder.build();
+        }
+        return valueBuilder.build();
+    }
+
+    /**
+     * Reconstruct a {@code google.protobuf.ListValue} from its Hollow representation.
+     *
+     * <p>The ListValue Hollow object has a {@code values} field referencing a {@code ListOfValue}
+     * Hollow LIST. Each element is a Value Hollow object.
+     */
+    private com.google.protobuf.ListValue readHollowListValue(com.netflix.hollow.api.objects.HollowRecord listValueRecord) {
+        com.google.protobuf.ListValue.Builder builder = com.google.protobuf.ListValue.newBuilder();
+        if (!(listValueRecord instanceof com.netflix.hollow.api.objects.generic.GenericHollowObject)) {
+            return builder.build();
+        }
+        com.netflix.hollow.api.objects.HollowRecord listRecord =
+            ((com.netflix.hollow.api.objects.generic.GenericHollowObject) listValueRecord).getReferencedGenericRecord("values");
+        if (!(listRecord instanceof com.netflix.hollow.api.objects.generic.GenericHollowList)) {
+            return builder.build();
+        }
+        com.netflix.hollow.api.objects.generic.GenericHollowList list =
+            (com.netflix.hollow.api.objects.generic.GenericHollowList) listRecord;
+        for (int i = 0; i < list.size(); i++) {
+            com.netflix.hollow.api.objects.HollowRecord element = list.get(i);
+            if (element != null) {
+                builder.addValues(readHollowValue(element));
+            }
+        }
+        return builder.build();
     }
 
     /**

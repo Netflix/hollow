@@ -42,6 +42,7 @@ import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchemaUtil;
 import com.netflix.hollow.core.schema.HollowSchemaHash;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
@@ -54,7 +55,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -103,6 +106,7 @@ abstract class AbstractHollowProducer {
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
     private final boolean collectionTypeNamingEnabled;
     private final Supplier<Boolean> ignoreSoftLimits;
+    private final boolean partitionedOrdinalMap;
 
     @Deprecated
     public AbstractHollowProducer(
@@ -111,7 +115,7 @@ abstract class AbstractHollowProducer {
         this(new HollowFilesystemBlobStager(), publisher, announcer,
                 Collections.emptyList(),
                 new VersionMinterWithCounter(), null, 0,
-                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, null,
+                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
                 null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, false);
     }
@@ -124,7 +128,7 @@ abstract class AbstractHollowProducer {
                 b.eventListeners,
                 b.versionMinter, b.snapshotPublishExecutor,
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
-                b.allowTypeResharding, b.forceCoverageOfTypeResharding,
+                b.allowTypeResharding, b.forceCoverageOfTypeResharding, b.partitionedOrdinalMap,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
                 b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits,
                 b.collectionTypeNamingEnabled);
@@ -147,6 +151,7 @@ abstract class AbstractHollowProducer {
             boolean focusHoleFillInFewestShards,
             boolean allowTypeResharding,
             boolean forceCoverageOfTypeResharding,
+            boolean partitionedOrdinalMap,
             HollowMetricsCollector<HollowProducerMetrics> metricsCollector,
             HollowProducer.BlobStorageCleaner blobStorageCleaner,
             SingleProducerEnforcer singleProducerEnforcer,
@@ -169,6 +174,7 @@ abstract class AbstractHollowProducer {
         this.forceCoverageOfTypeResharding = forceCoverageOfTypeResharding;
         this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
         this.ignoreSoftLimits = ignoreSoftLimits;
+        this.partitionedOrdinalMap = partitionedOrdinalMap;
         this.collectionTypeNamingEnabled = collectionTypeNamingEnabled;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
@@ -178,6 +184,7 @@ abstract class AbstractHollowProducer {
         writeEngine.allowTypeResharding(allowTypeResharding);
         writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
         writeEngine.setIgnoreOrdinalLimits(ignoreSoftLimits);
+        writeEngine.setPartitionedOrdinalMap(partitionedOrdinalMap);
 
         this.objectMapper = new HollowObjectMapper(writeEngine);
         if (hashCodeFinder != null) {
@@ -331,7 +338,15 @@ abstract class AbstractHollowProducer {
                 readStates = ReadStateHelper.restored(readState);
 
                 // Need to restore data to new ObjectMapper since can't restore to non empty Write State Engine
-                Collection<HollowSchema> schemas = objectMapper.getStateEngine().getSchemas();
+                // Start with the producer's registered schemas, then resolve any missing type
+                // dependencies from the restored snapshot. This handles types created dynamically
+                // (e.g., by HollowMessageMapper's lazy schema creation for Struct/Value/ListValue)
+                // that exist in the snapshot but weren't registered at init time via initializeDataModel().
+                // Only types transitively referenced by the producer's schemas are adopted — types
+                // intentionally removed by the producer are not re-added.
+                Collection<HollowSchema> schemas = resolveMissingDependencies(
+                        objectMapper.getStateEngine().getSchemas(),
+                        readState.getStateEngine().getSchemas());
                 HollowWriteStateEngine writeEngine = hashCodeFinder == null
                         ? new HollowWriteStateEngine()
                         : new HollowWriteStateEngine(hashCodeFinder);
@@ -339,6 +354,7 @@ abstract class AbstractHollowProducer {
                 writeEngine.allowTypeResharding(allowTypeResharding);
                 writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
                 writeEngine.setIgnoreOrdinalLimits(ignoreSoftLimits);
+                writeEngine.setPartitionedOrdinalMap(partitionedOrdinalMap);
                 HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, schemas);
                 HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);
                 if (hashCodeFinder != null) {
@@ -362,6 +378,41 @@ abstract class AbstractHollowProducer {
         }
         return readState;
     }
+
+    /**
+     * Resolve missing type dependencies by checking the producer's schemas for references
+     * to types not in the producer's model, and adopting those types from the snapshot.
+     * This handles dynamically-created types (e.g., HollowMessageMapper's lazy Struct/Value)
+     * without re-adding types the producer intentionally removed.
+     */
+    static Collection<HollowSchema> resolveMissingDependencies(
+            Collection<HollowSchema> producerSchemas,
+            Collection<HollowSchema> snapshotSchemas) {
+        Map<String, HollowSchema> result = new LinkedHashMap<>();
+        for (HollowSchema s : producerSchemas) {
+            result.put(s.getName(), s);
+        }
+        Map<String, HollowSchema> snapshotByName = new HashMap<>();
+        for (HollowSchema s : snapshotSchemas) {
+            snapshotByName.put(s.getName(), s);
+        }
+
+        // Iteratively resolve: find referenced types missing from result, adopt from snapshot
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            for (HollowSchema schema : new ArrayList<>(result.values())) {
+                for (String refType : HollowSchemaUtil.getReferencedTypeNames(schema)) {
+                    if (!result.containsKey(refType) && snapshotByName.containsKey(refType)) {
+                        result.put(refType, snapshotByName.get(refType));
+                        changed = true;
+                    }
+                }
+            }
+        }
+        return result.values();
+    }
+
 
     public HollowWriteStateEngine getWriteEngine() {
         return objectMapper.getStateEngine();
@@ -596,6 +647,7 @@ abstract class AbstractHollowProducer {
         }
         long deltaChainVersionCounter = prevDeltaChainVersionCounter + 1;
         writeEngine.addHeaderTag(HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER, String.valueOf(deltaChainVersionCounter));
+        writeEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_PARTITIONED_ORDINAL_MAP, Boolean.toString(partitionedOrdinalMap));
     }
 
     void populate(
