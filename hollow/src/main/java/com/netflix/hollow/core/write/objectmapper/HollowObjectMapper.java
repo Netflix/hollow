@@ -71,6 +71,10 @@ public class HollowObjectMapper {
      * <p>Disabled by default to preserve backward compatibility.
      * Adding these annotations to existing fields changes the Hollow schema — coordinate
      * producer and consumer updates before enabling.
+     *
+     * <p>Must be called before any call to {@link #add(Object)} or
+     * {@link #initializeTypeState(Class)}; types registered before this call will not
+     * respect the annotations.
      */
     public void enableCollectionTypeNaming() {
         this.collectionTypeNamingEnabled = true;
