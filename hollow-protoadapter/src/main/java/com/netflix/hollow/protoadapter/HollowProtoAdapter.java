@@ -444,8 +444,17 @@ import java.util.concurrent.ConcurrentHashMap;
     private int parseCollection(Message message, List<?> values, FlatRecordWriter flatRecordWriter, String collectionType) throws IOException {
         // Use computeIfAbsent for lazily created schemas (e.g., MapOfStringToValue for Struct)
         HollowSchema schema = hollowSchemas.computeIfAbsent(collectionType, key -> stateEngine.getSchema(key));
-        HollowWriteRecord collectionRec = getWriteRecord(collectionType);
-        collectionRec.reset();
+        // Always create a fresh write record rather than reusing the cached one. Reusing is
+        // incorrect when the same collection type (e.g. MapOfStringToValue) can appear at multiple
+        // nesting levels within a single record: processing a nested struct-valued map entry
+        // recursively calls parseCollection for the same type, which would reset the parent call's
+        // in-progress entries and corrupt the outer map.
+        HollowWriteRecord collectionRec;
+        switch (schema.getSchemaType()) {
+            case MAP: collectionRec = new HollowMapWriteRecord(); break;
+            case LIST: collectionRec = new HollowListWriteRecord(); break;
+            default: collectionRec = new HollowSetWriteRecord(); break;
+        }
 
         if (schema instanceof HollowMapSchema) {
             HollowMapSchema mapSchema = (HollowMapSchema) schema;
@@ -561,9 +570,6 @@ import java.util.concurrent.ConcurrentHashMap;
         }
 
         int ordinal = addRecord(collectionType, collectionRec, flatRecordWriter);
-        // Reset after committing so recursive calls to parseCollection for the same type
-        // (e.g., nested google.protobuf.Struct) don't leak stale entries into the outer record.
-        collectionRec.reset();
         return ordinal;
     }
 

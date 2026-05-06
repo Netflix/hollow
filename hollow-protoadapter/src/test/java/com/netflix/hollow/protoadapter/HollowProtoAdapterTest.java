@@ -1566,6 +1566,89 @@ public class HollowProtoAdapterTest {
             ((Integer) reconstructed.getField(zipCode)).intValue());
     }
 
+    /**
+     * Regression test for parseCollection reentrancy: when a Struct map contains both plain
+     * string/number values AND a nested-struct value, the inner parseCollection call for the
+     * nested Struct previously reset the shared HollowMapWriteRecord, silently dropping all
+     * outer-map entries that had already been accumulated before the nested call.
+     *
+     * <p>The result was that only the LAST struct-valued key survived the round-trip; all earlier
+     * entries (regardless of type) were lost because their ordinals were wiped from the shared
+     * write record before {@code addRecord} committed the outer map.
+     */
+    @Test
+    public void testStructWithNestedStructPreservesAllKeys() throws Exception {
+        ClassLoader protoLoader = this.protoClassLoader;
+        Class<?> personClass = protoLoader.loadClass("com.netflix.hollow.test.proto.PersonProtos$Person");
+        Class<?> structClass  = protoLoader.loadClass("com.google.protobuf.Struct");
+        Class<?> valueClass   = protoLoader.loadClass("com.google.protobuf.Value");
+
+        Method personNewBuilder = personClass.getMethod("newBuilder");
+        Method structNewBuilder = structClass.getMethod("newBuilder");
+        Method valueNewBuilder  = valueClass.getMethod("newBuilder");
+
+        Class<?> structBuilderClass = protoLoader.loadClass("com.google.protobuf.Struct$Builder");
+        Method structBuilderPutFields = structBuilderClass.getMethod("putFields", String.class, valueClass);
+
+        // Build a Struct that mixes plain string values with a nested-Struct value.
+        // This is exactly the shape that exposed the shared-write-record corruption:
+        //   string keys before the nested struct key are wiped when the inner parseCollection
+        //   resets the shared HollowMapWriteRecord for MapOfStringToValue.
+        Message.Builder nestedStructBuilder = (Message.Builder) structNewBuilder.invoke(null);
+        structBuilderPutFields.invoke(nestedStructBuilder, "host", createStringValue(valueNewBuilder, "localhost"));
+        structBuilderPutFields.invoke(nestedStructBuilder, "port", createNumberValue(valueNewBuilder, 5432.0));
+
+        Message.Builder nestedValueBuilder = (Message.Builder) valueNewBuilder.invoke(null);
+        nestedValueBuilder.setField(
+            nestedValueBuilder.getDescriptorForType().findFieldByName("struct_value"),
+            nestedStructBuilder.build());
+        Message nestedValue = nestedValueBuilder.build();
+
+        Message.Builder outerStructBuilder = (Message.Builder) structNewBuilder.invoke(null);
+        structBuilderPutFields.invoke(outerStructBuilder, "alpha",   createStringValue(valueNewBuilder, "aaa"));
+        structBuilderPutFields.invoke(outerStructBuilder, "beta",    createStringValue(valueNewBuilder, "bbb"));
+        structBuilderPutFields.invoke(outerStructBuilder, "gamma",   createStringValue(valueNewBuilder, "ccc"));
+        structBuilderPutFields.invoke(outerStructBuilder, "nested",  nestedValue);               // struct_value
+        structBuilderPutFields.invoke(outerStructBuilder, "delta",   createStringValue(valueNewBuilder, "ddd"));
+
+        Message.Builder personBuilder = (Message.Builder) personNewBuilder.invoke(null);
+        personBuilder.setField(personBuilder.getDescriptorForType().findFieldByName("id"),   1);
+        personBuilder.setField(personBuilder.getDescriptorForType().findFieldByName("name"), "Test");
+        personBuilder.setField(personBuilder.getDescriptorForType().findFieldByName("metadata"), outerStructBuilder.build());
+        Message original = personBuilder.build();
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+        mapper.initializeTypeState(((Message) personClass.getMethod("getDefaultInstance").invoke(null))
+            .getDescriptorForType());
+        mapper.add(original);
+
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        Descriptors.Descriptor personDesc = ((Message) personClass.getMethod("getDefaultInstance")
+            .invoke(null)).getDescriptorForType();
+        Message reconstructed = mapper.readHollowRecord(
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(readStateEngine, "Person", 0),
+            personDesc);
+
+        assertEquals("alpha must survive round-trip",  "aaa", getStructFieldString(reconstructed, "alpha"));
+        assertEquals("beta must survive round-trip",   "bbb", getStructFieldString(reconstructed, "beta"));
+        assertEquals("gamma must survive round-trip",  "ccc", getStructFieldString(reconstructed, "gamma"));
+        assertEquals("delta must survive round-trip",  "ddd", getStructFieldString(reconstructed, "delta"));
+
+        // Verify the nested struct value is intact
+        Message nestedRead = getStructFieldValue(reconstructed, "nested");
+        Descriptors.FieldDescriptor structValueField =
+            nestedRead.getDescriptorForType().findFieldByName("struct_value");
+        Message nestedStructRead = (Message) nestedRead.getField(structValueField);
+        Descriptors.FieldDescriptor fieldsField =
+            nestedStructRead.getDescriptorForType().findFieldByName("fields");
+        @SuppressWarnings("unchecked")
+        java.util.List<Message> nestedEntries = (java.util.List<Message>) nestedStructRead.getField(fieldsField);
+        assertEquals("nested struct must have 2 entries", 2, nestedEntries.size());
+    }
+
     private Message buildPersonWithNonce(
             Method personNewBuilder, Method structNewBuilder, Method valueNewBuilder,
             Method structBuilderPutFields, int id, String name, String nonce) throws Exception {
