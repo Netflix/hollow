@@ -1,7 +1,7 @@
 {
     "compileClasspath": {
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.25.8"
+            "locked": "3.25.9"
         },
         "com.netflix.hollow:hollow": {
             "project": true
@@ -9,17 +9,17 @@
     },
     "protobufIncludes": {
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.25.8"
+            "locked": "3.25.9"
         }
     },
     "protocBinary": {
         "com.google.protobuf:protoc": {
-            "locked": "3.25.8"
+            "locked": "3.25.9"
         }
     },
     "runtimeClasspath": {
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.25.8"
+            "locked": "3.25.9"
         },
         "com.netflix.hollow:hollow": {
             "project": true
@@ -27,10 +27,10 @@
     },
     "testCompileClasspath": {
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.25.8"
+            "locked": "3.25.9"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.25.8"
+            "locked": "3.25.9"
         },
         "com.netflix.hollow:hollow": {
             "project": true
@@ -41,10 +41,10 @@
     },
     "testRuntimeClasspath": {
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.25.8"
+            "locked": "3.25.9"
         },
         "com.google.protobuf:protobuf-java-util": {
-            "locked": "3.25.8"
+            "locked": "3.25.9"
         },
         "com.netflix.hollow:hollow": {
             "project": true
