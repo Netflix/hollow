@@ -18,6 +18,8 @@ package com.netflix.hollow.api.producer.validation;
 
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
+import com.netflix.hollow.api.producer.Status;
+import com.netflix.hollow.api.producer.listener.RestoreListener;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex.DuplicateKeyInfo;
 import com.netflix.hollow.core.index.key.PrimaryKey;
@@ -30,6 +32,7 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -53,7 +56,7 @@ import java.util.stream.Collectors;
  * stage will be naturally de-duped resulting in just one record present.  Therefore a validator created for such a
  * record's type will never fail.
  */
-public class DuplicateDataDetectionValidator implements ValidatorListener {
+public class DuplicateDataDetectionValidator implements ValidatorListener, RestoreListener {
     private static final Logger LOG = Logger.getLogger(DuplicateDataDetectionValidator.class.getName());
     private static final int MAX_DISPLAYED_DUPLICATE_KEYS = 100;
     private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT =
@@ -79,8 +82,22 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
 
     private static final String NAME = DuplicateDataDetectionValidator.class.getName();
 
+    /**
+     * System property; when set to {@code true} forces full-scan mode at runtime even if
+     * incremental detection has been enabled on the producer. Read at the start of every
+     * {@code onValidate} call so flips take effect on the next cycle without redeploy.
+     */
+    public static final String DISABLE_INCREMENTAL_PROPERTY =
+            "com.netflix.hollow.api.producer.validation.DuplicateDataDetectionValidator.disableIncremental";
+
     private final String dataTypeName;
     private final String[] fieldPathNames;
+
+    /**
+     * Toggled by the producer each cycle from its {@code incrementalDuplicateDataDetection}
+     * builder flag. Default {@code false} means full-scan-per-cycle (pre-incremental behavior).
+     */
+    private volatile boolean incrementalEnabled;
 
     /** Lagged index reflecting the last successful cycle; advanced via {@code endUpdate()} on pass. */
     private HollowPrimaryKeyIndex previousCycleIndex;
@@ -166,12 +183,29 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         vrb.detail(FIELD_PATH_NAME, fieldPaths);
 
         HollowReadStateEngine stateEngine = readState.getStateEngine();
-        ValidationResult result;
+        boolean useIncremental = incrementalEnabled && !Boolean.getBoolean(DISABLE_INCREMENTAL_PROPERTY);
 
+        if (!useIncremental) {
+            // Full-scan-per-cycle path. Drop any stale lagged index so a later flip back to
+            // incremental rebuilds from a fresh baseline. The fresh index built here is discarded.
+            previousCycleIndex = null;
+            LOG.info(String.format("Duplicate detection for type '%s': full-scan mode.", dataTypeName));
+            HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
+            Collection<DuplicateKeyInfo> duplicateKeys = index.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
+            if (!duplicateKeys.isEmpty()) {
+                return vrb.failed(String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths,
+                        duplicateKeysToString(duplicateKeys)));
+            }
+            return vrb.passed();
+        }
+
+        ValidationResult result;
         if (previousCycleIndex == null) {
-            // Snapshot path
+            // Incremental mode, first cycle (or after restore / kill-switch toggle): full snapshot,
+            // and retain the index so subsequent cycles can run the delta path.
             previousCycleIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
-            LOG.info(String.format("Duplicate detection for type '%s': snapshot mode (full scan).", dataTypeName));
+            LOG.info(String.format("Duplicate detection for type '%s': incremental mode, snapshot baseline.",
+                    dataTypeName));
 
             Collection<DuplicateKeyInfo> duplicateKeys = previousCycleIndex.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
             if (!duplicateKeys.isEmpty()) {
@@ -182,7 +216,6 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
                 result = vrb.passed();
             }
         } else {
-            // Delta path
             HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
             PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
             BitSet populatedOrdinals = listener.getPopulatedOrdinals();
@@ -191,7 +224,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
             newOrdinals.or(populatedOrdinals);
             newOrdinals.andNot(listener.getPreviousOrdinals());
 
-            LOG.info(String.format("Duplicate detection for type '%s': delta mode (%d total, %d new ordinals).",
+            LOG.info(String.format("Duplicate detection for type '%s': incremental mode, delta (%d total, %d new ordinals).",
                     dataTypeName, populatedOrdinals.cardinality(), newOrdinals.cardinality()));
 
             if (!newOrdinals.isEmpty()) {
@@ -215,6 +248,14 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         }
 
         return result;
+    }
+
+    /**
+     * Producer-side hook; invoked each cycle to push the {@code incrementalDuplicateDataDetection}
+     * builder flag onto every registered DDD validator. Not intended for direct caller use.
+     */
+    public void setIncrementalEnabled(boolean enabled) {
+        this.incrementalEnabled = enabled;
     }
 
     /**
@@ -263,6 +304,26 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         }
 
         return duplicateKeys;
+    }
+
+    /**
+     * On restore the producer's read state may move to an arbitrary version (e.g. pinned back to
+     * fork a delta chain), so the lagged index built from the prior cycle no longer corresponds
+     * to the read state ordinal space. Drop it; the next cycle will rebuild via the snapshot path.
+     */
+    @Override
+    public void onProducerRestoreStart(long restoreVersion) {
+        if (previousCycleIndex != null) {
+            LOG.info(String.format(
+                    "Duplicate detection for type '%s': dropping lagged index due to producer restore to version %d.",
+                    dataTypeName, restoreVersion));
+            previousCycleIndex = null;
+        }
+    }
+
+    @Override
+    public void onProducerRestoreComplete(Status status, long versionDesired, long versionReached, Duration elapsed) {
+        // no-op
     }
 
     @Override

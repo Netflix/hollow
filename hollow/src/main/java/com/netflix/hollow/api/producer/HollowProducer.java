@@ -745,6 +745,7 @@ public class HollowProducer extends AbstractHollowProducer {
         boolean focusHoleFillInFewestShards = false;
         boolean allowTypeResharding = false;
         boolean forceCoverageOfTypeResharding = false;
+        boolean incrementalDuplicateDataDetection = false;
         long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
         HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
         BlobStorageCleaner blobStorageCleaner = new DummyBlobStorageCleaner();
@@ -937,6 +938,23 @@ public class HollowProducer extends AbstractHollowProducer {
         public B withTypeResharding(boolean allowTypeResharding, boolean forceCoverage) {
             this.allowTypeResharding = allowTypeResharding;
             this.forceCoverageOfTypeResharding = forceCoverage;
+            return (B) this;
+        }
+
+        /**
+         * Enables incremental (delta-aware) mode for every {@link
+         * com.netflix.hollow.api.producer.validation.DuplicateDataDetectionValidator
+         * DuplicateDataDetectionValidator} registered with this producer. The first cycle (and any cycle
+         * after a producer restore) does a full snapshot scan and retains a primary-key index; subsequent
+         * cycles validate only the new ordinals against that index. Trades a steady-state memory cost
+         * (one primary-key index per validated type) for cycle-time savings on large datasets.
+         * <p>
+         * Default: off — every DDD validator does a full scan per cycle, matching the pre-incremental
+         * behavior. Can be disabled at runtime even when this flag is on by setting the system property
+         * {@code com.netflix.hollow.api.producer.validation.DuplicateDataDetectionValidator.disableIncremental=true}.
+         */
+        public B withIncrementalDuplicateDataDetection() {
+            this.incrementalDuplicateDataDetection = true;
             return (B) this;
         }
 

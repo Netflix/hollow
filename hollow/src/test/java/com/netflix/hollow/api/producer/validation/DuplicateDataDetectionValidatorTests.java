@@ -71,6 +71,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void deltaDetectsNewVsExistingDuplicate() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
+                .withIncrementalDuplicateDataDetection()
                 .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
                 .build();
 
@@ -103,6 +104,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void deltaDetectsNewVsNewDuplicate() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
+                .withIncrementalDuplicateDataDetection()
                 .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
                 .build();
 
@@ -132,6 +134,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void deltaWithNoNewOrdinalsPassesValidation() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
+                .withIncrementalDuplicateDataDetection()
                 .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
                 .build();
 
@@ -174,6 +177,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void deltaWithModifiedRecordPassesValidation() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
+                .withIncrementalDuplicateDataDetection()
                 .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
                 .build();
 
@@ -194,6 +198,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void deltaAfterFailedValidationPassesCorrectly() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
+                .withIncrementalDuplicateDataDetection()
                 .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
                 .build();
 
@@ -221,6 +226,211 @@ public class DuplicateDataDetectionValidatorTests {
             writeState.add(new TypeWithPrimaryKey(2, "B"));
             writeState.add(new TypeWithPrimaryKey(3, "C"));
         });
+    }
+
+    @Test
+    public void restoreToOlderVersionDropsLaggedIndex() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withIncrementalDuplicateDataDetection()
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .build();
+        producer.initializeDataModel(TypeWithPrimaryKey.class);
+
+        // Cycle 1 → v1: records {1, 2}
+        long v1 = producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+        });
+
+        // Cycle 2 → v2: adds key 3. Lagged index now reflects v2.
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+            writeState.add(new TypeWithPrimaryKey(3, "C"));
+        });
+
+        // Restore to v1 — must drop the lagged index (which is aligned to v2 ordinal space).
+        producer.restore(v1, blobStore);
+
+        // Post-restore cycle on a fresh producer state. With the index dropped this runs the
+        // snapshot (full-scan) path; introducing a duplicate must still be caught.
+        try {
+            producer.runCycle(writeState -> {
+                writeState.add(new TypeWithPrimaryKey(1, "A"));
+                writeState.add(new TypeWithPrimaryKey(2, "B"));
+                writeState.add(new TypeWithPrimaryKey(2, "B_dup"));
+            });
+            Assert.fail("Expected ValidationStatusException");
+        } catch (ValidationStatusException expected) {
+            String message = expected.getValidationStatus().getResults().get(0).getMessage();
+            Assert.assertTrue("Post-restore cycle should run snapshot path, not delta",
+                    message.contains("distinct keys that each have duplicate records affecting"));
+        }
+    }
+
+    @Test
+    public void restoreThenCleanCyclePassesAndResumesIncrementalNextCycle() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withIncrementalDuplicateDataDetection()
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .build();
+        producer.initializeDataModel(TypeWithPrimaryKey.class);
+
+        long v1 = producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+        });
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+            writeState.add(new TypeWithPrimaryKey(3, "C"));
+        });
+
+        producer.restore(v1, blobStore);
+
+        // Clean post-restore cycle (snapshot path); rebuilds the lagged index for next cycle.
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+            writeState.add(new TypeWithPrimaryKey(4, "D"));
+        });
+
+        // Next cycle should run the delta path against the rebuilt index and catch a new-vs-new dup.
+        try {
+            producer.runCycle(writeState -> {
+                writeState.add(new TypeWithPrimaryKey(1, "A"));
+                writeState.add(new TypeWithPrimaryKey(2, "B"));
+                writeState.add(new TypeWithPrimaryKey(4, "D"));
+                writeState.add(new TypeWithPrimaryKey(5, "E"));
+                writeState.add(new TypeWithPrimaryKey(5, "E_dup"));
+            });
+            Assert.fail("Expected ValidationStatusException");
+        } catch (ValidationStatusException expected) {
+            String message = expected.getValidationStatus().getResults().get(0).getMessage();
+            Assert.assertTrue("Should resume delta path after rebuilding index",
+                    message.contains("delta check"));
+            Assert.assertTrue(message.contains("[5]"));
+        }
+    }
+
+    @Test
+    public void defaultBuilderRunsFullScanEveryCycle() {
+        // No withIncrementalDuplicateDataDetection() → every cycle is full-scan.
+        // Verify by introducing a duplicate on cycle 2 and checking the message format
+        // (full-scan reports "distinct keys ... affecting N records", delta reports "delta check").
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .build();
+
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+        });
+
+        try {
+            producer.runCycle(writeState -> {
+                writeState.add(new TypeWithPrimaryKey(1, "A"));
+                writeState.add(new TypeWithPrimaryKey(2, "B"));
+                writeState.add(new TypeWithPrimaryKey(2, "B_dup"));
+            });
+            Assert.fail("Expected ValidationStatusException");
+        } catch (ValidationStatusException expected) {
+            String message = expected.getValidationStatus().getResults().get(0).getMessage();
+            Assert.assertTrue("Default mode should produce full-scan error message, not delta",
+                    message.contains("distinct keys that each have duplicate records affecting"));
+            Assert.assertFalse("Default mode should not be running the delta path",
+                    message.contains("delta check"));
+        }
+    }
+
+    @Test
+    public void systemPropertyDisablesIncrementalAtRuntime() {
+        System.setProperty(DuplicateDataDetectionValidator.DISABLE_INCREMENTAL_PROPERTY, "true");
+        try {
+            HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                    .withBlobStager(new HollowInMemoryBlobStager())
+                    .withIncrementalDuplicateDataDetection()
+                    .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                    .build();
+
+            producer.runCycle(writeState -> {
+                writeState.add(new TypeWithPrimaryKey(1, "A"));
+                writeState.add(new TypeWithPrimaryKey(2, "B"));
+            });
+
+            try {
+                producer.runCycle(writeState -> {
+                    writeState.add(new TypeWithPrimaryKey(1, "A"));
+                    writeState.add(new TypeWithPrimaryKey(2, "B"));
+                    writeState.add(new TypeWithPrimaryKey(2, "B_dup"));
+                });
+                Assert.fail("Expected ValidationStatusException");
+            } catch (ValidationStatusException expected) {
+                String message = expected.getValidationStatus().getResults().get(0).getMessage();
+                Assert.assertTrue("Property should force full-scan path",
+                        message.contains("distinct keys that each have duplicate records affecting"));
+                Assert.assertFalse(message.contains("delta check"));
+            }
+        } finally {
+            System.clearProperty(DuplicateDataDetectionValidator.DISABLE_INCREMENTAL_PROPERTY);
+        }
+    }
+
+    @Test
+    public void systemPropertyFlipResumesIncrementalOnNextCycle() {
+        // With incremental enabled at the builder, flip the kill switch on, run a full-scan cycle,
+        // flip it back off, and confirm the next cycle is back on the delta path.
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withIncrementalDuplicateDataDetection()
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .build();
+
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+        });
+
+        // Kill switch on for one cycle.
+        System.setProperty(DuplicateDataDetectionValidator.DISABLE_INCREMENTAL_PROPERTY, "true");
+        try {
+            producer.runCycle(writeState -> {
+                writeState.add(new TypeWithPrimaryKey(1, "A"));
+                writeState.add(new TypeWithPrimaryKey(2, "B"));
+                writeState.add(new TypeWithPrimaryKey(3, "C"));
+            });
+        } finally {
+            System.clearProperty(DuplicateDataDetectionValidator.DISABLE_INCREMENTAL_PROPERTY);
+        }
+
+        // Property cleared. The kill-switched cycle dropped previousCycleIndex, so the next cycle
+        // rebuilds the baseline (snapshot under incremental mode). The cycle after that is delta.
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+            writeState.add(new TypeWithPrimaryKey(3, "C"));
+            writeState.add(new TypeWithPrimaryKey(4, "D"));
+        });
+
+        try {
+            producer.runCycle(writeState -> {
+                writeState.add(new TypeWithPrimaryKey(1, "A"));
+                writeState.add(new TypeWithPrimaryKey(2, "B"));
+                writeState.add(new TypeWithPrimaryKey(3, "C"));
+                writeState.add(new TypeWithPrimaryKey(4, "D"));
+                writeState.add(new TypeWithPrimaryKey(5, "E"));
+                writeState.add(new TypeWithPrimaryKey(5, "E_dup"));
+            });
+            Assert.fail("Expected ValidationStatusException");
+        } catch (ValidationStatusException expected) {
+            String message = expected.getValidationStatus().getResults().get(0).getMessage();
+            Assert.assertTrue("Should be back on delta path after clearing the property",
+                    message.contains("delta check"));
+            Assert.assertTrue(message.contains("[5]"));
+        }
     }
 
     @HollowPrimaryKey(fields = {"id"})
