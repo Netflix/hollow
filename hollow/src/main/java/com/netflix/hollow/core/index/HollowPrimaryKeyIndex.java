@@ -59,6 +59,7 @@ import java.util.logging.Logger;
 public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableUniqueKeyIndex {
     private static final Logger LOG = Logger.getLogger(HollowPrimaryKeyIndex.class.getName());
 
+    public static final int DEFAULT_PARALLEL_HASH_THRESHOLD = 4096;
 
     private final HollowObjectTypeReadState typeState;
     private final int[][] fieldPathIndexes;
@@ -69,6 +70,8 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
     private final ArraySegmentRecycler memoryRecycler;
 
     private final BitSet specificOrdinalsToIndex;
+
+    private final int parallelHashThreshold;
 
     private volatile PrimaryKeyIndexHashTable hashTableVolatile;
 
@@ -97,6 +100,21 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * @param specificOrdinalsToIndex the bit set
      */
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler, BitSet specificOrdinalsToIndex) {
+        this(stateEngine, primaryKey, memoryRecycler, specificOrdinalsToIndex, DEFAULT_PARALLEL_HASH_THRESHOLD);
+    }
+
+    /**
+     * This initializer can be used to create a HollowPrimaryKeyIndex which will only index a subset of the records in the specified type,
+     * and to override the cardinality threshold at which hash codes are computed in parallel during (re)indexing.
+     *
+     * @param stateEngine the read state engine
+     * @param primaryKey the primary key
+     * @param memoryRecycler the memory recycler
+     * @param specificOrdinalsToIndex the bit set, or null to index all populated ordinals
+     * @param parallelHashThreshold the minimum cardinality at which hash code computation runs in parallel; pass
+     *                              {@link Integer#MAX_VALUE} to disable parallel hashing entirely
+     */
+    public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler, BitSet specificOrdinalsToIndex, int parallelHashThreshold) {
         requireNonNull(primaryKey, "Hollow Primary Key Index creation failed because primaryKey was null");
         requireNonNull(stateEngine, "Hollow Primary Key Index creation for type [" + primaryKey.getType()
                 + "] failed because read state wasn't initialized");
@@ -107,6 +125,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
         this.memoryRecycler = memoryRecycler;
         this.specificOrdinalsToIndex = specificOrdinalsToIndex;
+        this.parallelHashThreshold = parallelHashThreshold;
         this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
 
         if (typeState == null) {
@@ -461,9 +480,6 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
     private static final boolean ALLOW_DELTA_UPDATE =
             Boolean.getBoolean("com.netflix.hollow.core.index.HollowPrimaryKeyIndex.allowDeltaUpdate");
 
-    private static final int PARALLEL_HASH_THRESHOLD =
-            Integer.getInteger("com.netflix.hollow.core.index.HollowPrimaryKeyIndex.parallelHashThreshold", 4096);
-
     @Override
     public synchronized void endUpdate() {
         if (hashTableVolatile == null) {
@@ -676,7 +692,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
     }
 
     private boolean shouldComputeHashesInParallel(int cardinality) {
-        return cardinality >= PARALLEL_HASH_THRESHOLD;
+        return cardinality >= parallelHashThreshold;
     }
 
     private int recordHash(int ordinal) {
