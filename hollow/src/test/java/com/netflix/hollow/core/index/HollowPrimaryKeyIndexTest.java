@@ -429,6 +429,94 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         } catch (NullPointerException e) {}
     }
 
+    // Default PARALLEL_HASH_THRESHOLD is 4096
+    private static final int PARALLEL_HASH_THRESHOLD = 4096;
+
+    @Test
+    public void testParallelHashMatchesSerialHashForSameLookups() throws IOException {
+        // Parallel path: cardinality >= PARALLEL_HASH_THRESHOLD
+        int parallelCount = PARALLEL_HASH_THRESHOLD + 1000;
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        for (int i = 0; i < parallelCount; i++) {
+            mapper.add(new TypeA(i, i * 0.1d, new TypeB("val" + i)));
+        }
+        roundTripSnapshot();
+
+        TestableUniqueKeyIndex parallelIdx = createIndex("TypeA");
+        for (int i = 0; i < parallelCount; i += 100) {
+            int ordinal = parallelIdx.getMatchingOrdinal(i, i * 0.1d, "val" + i);
+            Assert.assertTrue("Expected valid ordinal for parallel-hashed key " + i, ordinal >= 0);
+            Object[] key = parallelIdx.getRecordKey(ordinal);
+            Assert.assertEquals(i, key[0]);
+            Assert.assertEquals(i * 0.1d, (Double) key[1], 0.0);
+            Assert.assertEquals("val" + i, key[2]);
+        }
+        Assert.assertEquals(-1, parallelIdx.getMatchingOrdinal(parallelCount, parallelCount * 0.1d, "val" + parallelCount));
+
+        // Serial path: cardinality < PARALLEL_HASH_THRESHOLD
+        int serialCount = 100;
+        HollowWriteStateEngine serialWriteEngine = new HollowWriteStateEngine();
+        HollowObjectMapper serialMapper = new HollowObjectMapper(serialWriteEngine);
+        for (int i = 0; i < serialCount; i++) {
+            serialMapper.add(new TypeA(i, i * 0.1d, new TypeB("val" + i)));
+        }
+        HollowReadStateEngine serialReadEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(serialWriteEngine, serialReadEngine);
+
+        HollowPrimaryKeyIndex serialIdx = new HollowPrimaryKeyIndex(serialReadEngine, "TypeA");
+        for (int i = 0; i < serialCount; i++) {
+            int ordinal = serialIdx.getMatchingOrdinal(i, i * 0.1d, "val" + i);
+            Assert.assertTrue("Expected valid ordinal for serial-hashed key " + i, ordinal >= 0);
+            Object[] key = serialIdx.getRecordKey(ordinal);
+            Assert.assertEquals(i, key[0]);
+            Assert.assertEquals(i * 0.1d, (Double) key[1], 0.0);
+            Assert.assertEquals("val" + i, key[2]);
+        }
+        Assert.assertEquals(-1, serialIdx.getMatchingOrdinal(serialCount, serialCount * 0.1d, "val" + serialCount));
+    }
+
+    @Test
+    public void testParallelHashThresholdBoundary() throws IOException {
+        // Just below threshold — serial path
+        int belowThreshold = PARALLEL_HASH_THRESHOLD - 1;
+        HollowWriteStateEngine writeBelow = new HollowWriteStateEngine();
+        HollowObjectMapper mapperBelow = new HollowObjectMapper(writeBelow);
+        for (int i = 0; i < belowThreshold; i++) {
+            mapperBelow.add(new TypeA(i, i * 0.1d, new TypeB("val" + i)));
+        }
+        HollowReadStateEngine readBelow = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeBelow, readBelow);
+        HollowPrimaryKeyIndex idxBelow = new HollowPrimaryKeyIndex(readBelow, "TypeA");
+        for (int i = 0; i < belowThreshold; i += 500) {
+            int ordinal = idxBelow.getMatchingOrdinal(i, i * 0.1d, "val" + i);
+            Assert.assertTrue("Expected valid ordinal below threshold for key " + i, ordinal >= 0);
+            Object[] key = idxBelow.getRecordKey(ordinal);
+            Assert.assertEquals(i, key[0]);
+            Assert.assertEquals(i * 0.1d, (Double) key[1], 0.0);
+            Assert.assertEquals("val" + i, key[2]);
+        }
+        Assert.assertEquals(-1, idxBelow.getMatchingOrdinal(belowThreshold, belowThreshold * 0.1d, "val" + belowThreshold));
+
+        // At threshold — parallel path
+        HollowWriteStateEngine writeAt = new HollowWriteStateEngine();
+        HollowObjectMapper mapperAt = new HollowObjectMapper(writeAt);
+        for (int i = 0; i < PARALLEL_HASH_THRESHOLD; i++) {
+            mapperAt.add(new TypeA(i, i * 0.1d, new TypeB("val" + i)));
+        }
+        HollowReadStateEngine readAt = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeAt, readAt);
+        HollowPrimaryKeyIndex idxAt = new HollowPrimaryKeyIndex(readAt, "TypeA");
+        for (int i = 0; i < PARALLEL_HASH_THRESHOLD; i += 500) {
+            int ordinal = idxAt.getMatchingOrdinal(i, i * 0.1d, "val" + i);
+            Assert.assertTrue("Expected valid ordinal at threshold for key " + i, ordinal >= 0);
+            Object[] key = idxAt.getRecordKey(ordinal);
+            Assert.assertEquals(i, key[0]);
+            Assert.assertEquals(i * 0.1d, (Double) key[1], 0.0);
+            Assert.assertEquals("val" + i, key[2]);
+        }
+        Assert.assertEquals(-1, idxAt.getMatchingOrdinal(PARALLEL_HASH_THRESHOLD, PARALLEL_HASH_THRESHOLD * 0.1d, "val" + PARALLEL_HASH_THRESHOLD));
+    }
+
     private static void addDataForDupTesting(HollowWriteStateEngine writeStateEngine, int a1Start, double a2, int size) {
         TypeB typeB = new TypeB("commonTypeB");
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
