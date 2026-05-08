@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -82,20 +83,13 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
 
     private static final String NAME = DuplicateDataDetectionValidator.class.getName();
 
-    /**
-     * System property; when set to {@code true} forces full-scan mode at runtime even if
-     * incremental detection has been enabled on the producer. Read at the start of every
-     * {@code onValidate} call so flips take effect on the next cycle without redeploy.
-     */
-    public static final String DISABLE_INCREMENTAL_PROPERTY =
-            "com.netflix.hollow.api.producer.validation.DuplicateDataDetectionValidator.disableIncremental";
-
     private final String dataTypeName;
     private final String[] fieldPathNames;
 
     /**
-     * Toggled by the producer each cycle from its {@code incrementalDuplicateDataDetection}
-     * builder flag. Default {@code false} means full-scan-per-cycle (pre-incremental behavior).
+     * Resolved each cycle by the producer from its {@code incrementalDuplicateDataDetection}
+     * builder flag combined with any caller-supplied kill switch. Default {@code false} means
+     * full-scan-per-cycle (pre-incremental behavior).
      */
     private volatile boolean incrementalEnabled;
 
@@ -183,13 +177,12 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
         vrb.detail(FIELD_PATH_NAME, fieldPaths);
 
         HollowReadStateEngine stateEngine = readState.getStateEngine();
-        boolean useIncremental = incrementalEnabled && !Boolean.getBoolean(DISABLE_INCREMENTAL_PROPERTY);
 
-        if (!useIncremental) {
+        if (!incrementalEnabled) {
             // Full-scan-per-cycle path. Drop any stale lagged index so a later flip back to
             // incremental rebuilds from a fresh baseline. The fresh index built here is discarded.
             previousCycleIndex = null;
-            LOG.info(String.format("Duplicate detection for type '%s': full-scan mode.", dataTypeName));
+            LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': full-scan mode.", dataTypeName));
             HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
             Collection<DuplicateKeyInfo> duplicateKeys = index.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
             if (!duplicateKeys.isEmpty()) {
@@ -204,7 +197,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
             // Incremental mode, first cycle (or after restore / kill-switch toggle): full snapshot,
             // and retain the index so subsequent cycles can run the delta path.
             previousCycleIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
-            LOG.info(String.format("Duplicate detection for type '%s': incremental mode, snapshot baseline.",
+            LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, snapshot baseline.",
                     dataTypeName));
 
             Collection<DuplicateKeyInfo> duplicateKeys = previousCycleIndex.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
@@ -224,7 +217,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
             newOrdinals.or(populatedOrdinals);
             newOrdinals.andNot(listener.getPreviousOrdinals());
 
-            LOG.info(String.format("Duplicate detection for type '%s': incremental mode, delta (%d total, %d new ordinals).",
+            LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, delta (%d total, %d new ordinals).",
                     dataTypeName, populatedOrdinals.cardinality(), newOrdinals.cardinality()));
 
             if (!newOrdinals.isEmpty()) {
