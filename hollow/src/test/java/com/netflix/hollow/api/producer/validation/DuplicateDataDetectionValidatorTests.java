@@ -51,7 +51,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void test_errorMessageIsTruncatedWhenThereAreManyDuplicates() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
                 .build();
 
         try {
@@ -72,8 +72,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void deltaDetectsNewVsExistingDuplicate() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withIncrementalDuplicateDataDetection(() -> false)
-                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
                 .build();
 
         // Snapshot: unique records
@@ -105,8 +104,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void deltaDetectsNewVsNewDuplicate() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withIncrementalDuplicateDataDetection(() -> false)
-                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
                 .build();
 
         // Snapshot: unique records
@@ -135,8 +133,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void deltaWithNoNewOrdinalsPassesValidation() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withIncrementalDuplicateDataDetection(() -> false)
-                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
                 .build();
 
         // Snapshot
@@ -156,7 +153,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void snapshotDetectsPreExistingDuplicates() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
                 .build();
 
         // Snapshot with duplicates — caught by full scan
@@ -178,8 +175,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void deltaWithModifiedRecordPassesValidation() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withIncrementalDuplicateDataDetection(() -> false)
-                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
                 .build();
 
         // Snapshot
@@ -199,8 +195,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void deltaAfterFailedValidationPassesCorrectly() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withIncrementalDuplicateDataDetection(() -> false)
-                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
                 .build();
 
         // Cycle 1 (snapshot): unique records — passes
@@ -233,8 +228,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void restoreToOlderVersionDropsLaggedIndex() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withIncrementalDuplicateDataDetection(() -> false)
-                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
                 .build();
         producer.initializeDataModel(TypeWithPrimaryKey.class);
 
@@ -274,8 +268,7 @@ public class DuplicateDataDetectionValidatorTests {
     public void restoreThenCleanCyclePassesAndResumesIncrementalNextCycle() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withIncrementalDuplicateDataDetection(() -> false)
-                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
                 .build();
         producer.initializeDataModel(TypeWithPrimaryKey.class);
 
@@ -317,10 +310,10 @@ public class DuplicateDataDetectionValidatorTests {
     }
 
     @Test
-    public void defaultBuilderRunsFullScanEveryCycle() {
-        // No withIncrementalDuplicateDataDetection → every cycle is full-scan.
-        // Verify by introducing a duplicate on cycle 2 and checking the message format
-        // (full-scan reports "distinct keys ... affecting N records", delta reports "delta check").
+    public void defaultConstructorRunsFullScanEveryCycle() {
+        // No-supplier constructor → every cycle is full-scan. Verify by introducing a duplicate on
+        // cycle 2 and checking the message format (full-scan reports "distinct keys ... affecting N
+        // records", delta reports "delta check").
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
                 .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
@@ -348,12 +341,11 @@ public class DuplicateDataDetectionValidatorTests {
     }
 
     @Test
-    public void killSwitchSupplierDisablesIncrementalAtRuntime() {
-        AtomicBoolean disabled = new AtomicBoolean(true);
+    public void supplierReturningFalseRunsFullScan() {
+        AtomicBoolean enabled = new AtomicBoolean(false);
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withIncrementalDuplicateDataDetection(disabled::get)
-                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, enabled::get))
                 .build();
 
         producer.runCycle(writeState -> {
@@ -370,21 +362,20 @@ public class DuplicateDataDetectionValidatorTests {
             Assert.fail("Expected ValidationStatusException");
         } catch (ValidationStatusException expected) {
             String message = expected.getValidationStatus().getResults().get(0).getMessage();
-            Assert.assertTrue("Kill switch should force full-scan path",
+            Assert.assertTrue("Supplier returning false should force full-scan path",
                     message.contains("distinct keys that each have duplicate records affecting"));
             Assert.assertFalse(message.contains("delta check"));
         }
     }
 
     @Test
-    public void killSwitchSupplierFlipResumesIncrementalOnNextCycle() {
-        // With incremental enabled at the builder, flip the kill switch on, run a full-scan cycle,
-        // flip it back off, and confirm the next cycle is back on the delta path.
-        AtomicBoolean disabled = new AtomicBoolean(false);
+    public void supplierFlipResumesIncrementalOnNextCycle() {
+        // With incremental enabled, flip the supplier off, run a full-scan cycle, flip it back on,
+        // and confirm the next cycle returns to the delta path.
+        AtomicBoolean enabled = new AtomicBoolean(true);
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withIncrementalDuplicateDataDetection(disabled::get)
-                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class))
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, enabled::get))
                 .build();
 
         producer.runCycle(writeState -> {
@@ -392,17 +383,17 @@ public class DuplicateDataDetectionValidatorTests {
             writeState.add(new TypeWithPrimaryKey(2, "B"));
         });
 
-        // Kill switch on for one cycle.
-        disabled.set(true);
+        // Supplier off for one cycle.
+        enabled.set(false);
         producer.runCycle(writeState -> {
             writeState.add(new TypeWithPrimaryKey(1, "A"));
             writeState.add(new TypeWithPrimaryKey(2, "B"));
             writeState.add(new TypeWithPrimaryKey(3, "C"));
         });
-        disabled.set(false);
+        enabled.set(true);
 
-        // The kill-switched cycle dropped previousCycleIndex, so the next cycle rebuilds the
-        // baseline (snapshot under incremental mode). The cycle after that is delta.
+        // The full-scan cycle dropped previousCycleIndex, so the next cycle rebuilds the baseline
+        // (snapshot under incremental mode). The cycle after that is delta.
         producer.runCycle(writeState -> {
             writeState.add(new TypeWithPrimaryKey(1, "A"));
             writeState.add(new TypeWithPrimaryKey(2, "B"));
@@ -422,7 +413,7 @@ public class DuplicateDataDetectionValidatorTests {
             Assert.fail("Expected ValidationStatusException");
         } catch (ValidationStatusException expected) {
             String message = expected.getValidationStatus().getResults().get(0).getMessage();
-            Assert.assertTrue("Should be back on delta path after clearing the kill switch",
+            Assert.assertTrue("Should be back on delta path after flipping supplier back on",
                     message.contains("delta check"));
             Assert.assertTrue(message.contains("[5]"));
         }

@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -83,15 +84,17 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
 
     private static final String NAME = DuplicateDataDetectionValidator.class.getName();
 
+    private static final Supplier<Boolean> ALWAYS_DISABLED = () -> false;
+
     private final String dataTypeName;
     private final String[] fieldPathNames;
 
     /**
-     * Resolved each cycle by the producer from its {@code incrementalDuplicateDataDetection}
-     * builder flag combined with any caller-supplied kill switch. Default {@code false} means
-     * full-scan-per-cycle (pre-incremental behavior).
+     * Consulted once per cycle. {@code true} = delta-aware (incremental) mode; {@code false} = full-scan.
+     * Defaults to {@link #ALWAYS_DISABLED} when constructed without a supplier, matching pre-incremental
+     * behavior. Wrap a dynamic config flag (e.g. an Archaius / Spring property) to enable runtime opt-out.
      */
-    private volatile boolean incrementalEnabled;
+    private final Supplier<Boolean> incrementalEnabled;
 
     /** Lagged index reflecting the last successful cycle; advanced via {@code endUpdate()} on pass. */
     private HollowPrimaryKeyIndex previousCycleIndex;
@@ -104,6 +107,24 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
      * @throws IllegalArgumentException if the data type class is not annotated with {@link HollowPrimaryKey}
      */
     public DuplicateDataDetectionValidator(Class<?> dataType) {
+        this(dataType, ALWAYS_DISABLED);
+    }
+
+    /**
+     * Creates a validator to detect duplicate records, with delta-aware (incremental) mode gated by the
+     * supplied flag. See {@link #DuplicateDataDetectionValidator(Class)} for the base requirements on the
+     * data type class.
+     * <p>
+     * When {@code incrementalEnabled} returns {@code true} the validator validates only new ordinals each
+     * cycle against a retained primary-key index built from the prior cycle, trading a steady-state memory
+     * cost for cycle-time savings. When it returns {@code false}, every cycle does a full scan. The
+     * supplier is consulted once per cycle so flips via dynamic config take effect on the next cycle.
+     *
+     * @param dataType the data type class
+     * @param incrementalEnabled supplier returning {@code true} for incremental, {@code false} for full-scan
+     * @throws IllegalArgumentException if the data type class is not annotated with {@link HollowPrimaryKey}
+     */
+    public DuplicateDataDetectionValidator(Class<?> dataType, Supplier<Boolean> incrementalEnabled) {
         Objects.requireNonNull(dataType);
 
         if (!dataType.isAnnotationPresent(HollowPrimaryKey.class)) {
@@ -114,6 +135,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
 
         this.dataTypeName = HollowTypeMapper.getDefaultTypeName(dataType);
         this.fieldPathNames = null;
+        this.incrementalEnabled = Objects.requireNonNull(incrementalEnabled);
     }
 
     /**
@@ -125,8 +147,17 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
      * @param dataTypeName the data type name
      */
     public DuplicateDataDetectionValidator(String dataTypeName) {
+        this(dataTypeName, ALWAYS_DISABLED);
+    }
+
+    /**
+     * Same as {@link #DuplicateDataDetectionValidator(String)} with delta-aware mode gated by the supplied
+     * flag. See {@link #DuplicateDataDetectionValidator(Class, Supplier)} for the supplier semantics.
+     */
+    public DuplicateDataDetectionValidator(String dataTypeName, Supplier<Boolean> incrementalEnabled) {
         this.dataTypeName = Objects.requireNonNull(dataTypeName);
         this.fieldPathNames = null;
+        this.incrementalEnabled = Objects.requireNonNull(incrementalEnabled);
     }
 
     /**
@@ -140,8 +171,17 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
      * @param fieldPathNames the field paths defining the primary key
      */
     public DuplicateDataDetectionValidator(String dataTypeName, String[] fieldPathNames) {
+        this(dataTypeName, fieldPathNames, ALWAYS_DISABLED);
+    }
+
+    /**
+     * Same as {@link #DuplicateDataDetectionValidator(String, String[])} with delta-aware mode gated by the
+     * supplied flag. See {@link #DuplicateDataDetectionValidator(Class, Supplier)} for the supplier semantics.
+     */
+    public DuplicateDataDetectionValidator(String dataTypeName, String[] fieldPathNames, Supplier<Boolean> incrementalEnabled) {
         this.dataTypeName = Objects.requireNonNull(dataTypeName);
         this.fieldPathNames = fieldPathNames.clone();
+        this.incrementalEnabled = Objects.requireNonNull(incrementalEnabled);
     }
 
     @Override
@@ -177,8 +217,9 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
         vrb.detail(FIELD_PATH_NAME, fieldPaths);
 
         HollowReadStateEngine stateEngine = readState.getStateEngine();
+        boolean useIncremental = Boolean.TRUE.equals(incrementalEnabled.get());
 
-        if (!incrementalEnabled) {
+        if (!useIncremental) {
             // Full-scan-per-cycle path. Drop any stale lagged index so a later flip back to
             // incremental rebuilds from a fresh baseline. The fresh index built here is discarded.
             previousCycleIndex = null;
@@ -244,14 +285,6 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
     }
 
     /**
-     * Producer-side hook; invoked each cycle to push the {@code incrementalDuplicateDataDetection}
-     * builder flag onto every registered DDD validator. Not intended for direct caller use.
-     */
-    public void setIncrementalEnabled(boolean enabled) {
-        this.incrementalEnabled = enabled;
-    }
-
-    /**
      * Delta-aware duplicate detection using a lagged index. Detects new-vs-new
      * and new-vs-existing duplicates among the given new ordinals.
      *
@@ -308,7 +341,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
     public void onProducerRestoreStart(long restoreVersion) {
         if (previousCycleIndex != null) {
             LOG.info(String.format(
-                    "Duplicate detection for type '%s': dropping lagged index due to producer restore to version %d.",
+                    "Incremental duplicate data detection for type '%s': dropping lagged index due to producer restore to version %d.",
                     dataTypeName, restoreVersion));
             previousCycleIndex = null;
         }

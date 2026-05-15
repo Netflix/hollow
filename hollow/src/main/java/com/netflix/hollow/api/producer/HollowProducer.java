@@ -44,7 +44,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
@@ -746,7 +745,6 @@ public class HollowProducer extends AbstractHollowProducer {
         boolean focusHoleFillInFewestShards = false;
         boolean allowTypeResharding = false;
         boolean forceCoverageOfTypeResharding = false;
-        Supplier<Boolean> incrementalDuplicateDataDetectionDisabled = null;
         long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
         HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
         BlobStorageCleaner blobStorageCleaner = new DummyBlobStorageCleaner();
@@ -939,31 +937,6 @@ public class HollowProducer extends AbstractHollowProducer {
         public B withTypeResharding(boolean allowTypeResharding, boolean forceCoverage) {
             this.allowTypeResharding = allowTypeResharding;
             this.forceCoverageOfTypeResharding = forceCoverage;
-            return (B) this;
-        }
-
-        /**
-         * Enables incremental (delta-aware) mode for every {@link
-         * com.netflix.hollow.api.producer.validation.DuplicateDataDetectionValidator
-         * DuplicateDataDetectionValidator} registered with this producer. The first cycle (and any cycle
-         * after a producer restore) does a full snapshot scan and retains a primary-key index; subsequent
-         * cycles validate only the new ordinals against that index. Trades a steady-state memory cost
-         * (one primary-key index per validated type) for cycle-time savings on large datasets.
-         * <p>
-         * The supplier is consulted once per validator cycle as a runtime kill switch; when it returns
-         * {@code true} the cycle falls back to the full-scan path (and drops any retained lagged index,
-         * so a later flip back to incremental rebuilds from a fresh baseline). Wrap a dynamic config flag
-         * (e.g. an Archaius / Spring property) so operators can disable incremental detection without a
-         * redeploy. Pass {@code () -> false} to opt in without a runtime toggle.
-         * <p>
-         * Default: off — every DDD validator does a full scan per cycle, matching the pre-incremental
-         * behavior.
-         *
-         * @param disabled supplier returning {@code true} to force full-scan; {@code false} to use
-         *                 incremental. Must be non-null and safe to invoke from the producer cycle thread.
-         */
-        public B withIncrementalDuplicateDataDetection(Supplier<Boolean> disabled) {
-            this.incrementalDuplicateDataDetectionDisabled = Objects.requireNonNull(disabled);
             return (B) this;
         }
 

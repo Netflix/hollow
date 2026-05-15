@@ -101,7 +101,6 @@ abstract class AbstractHollowProducer {
     private final boolean focusHoleFillInFewestShards;
     private final boolean allowTypeResharding;
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
-    private final Supplier<Boolean> incrementalDuplicateDataDetectionDisabled;
     private final Supplier<Boolean> ignoreSoftLimits;
 
     @Deprecated
@@ -113,7 +112,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, null);
+                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null);
     }
 
     // The only constructor should be that which accepts a builder
@@ -126,8 +125,7 @@ abstract class AbstractHollowProducer {
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
                 b.allowTypeResharding, b.forceCoverageOfTypeResharding,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
-                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits,
-                b.incrementalDuplicateDataDetectionDisabled);
+                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits);
     }
 
     private final HollowProducerListener producerMetricsListener;
@@ -153,8 +151,7 @@ abstract class AbstractHollowProducer {
             HollowObjectHashCodeFinder hashCodeFinder,
             boolean doIntegrityCheck,
             HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier,
-            Supplier<Boolean> ignoreSoftLimits,
-            Supplier<Boolean> incrementalDuplicateDataDetectionDisabled) {
+            Supplier<Boolean> ignoreSoftLimits) {
         this.publisher = publisher;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
@@ -168,7 +165,6 @@ abstract class AbstractHollowProducer {
         this.allowTypeResharding = allowTypeResharding;
         this.forceCoverageOfTypeResharding = forceCoverageOfTypeResharding;
         this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
-        this.incrementalDuplicateDataDetectionDisabled = incrementalDuplicateDataDetectionDisabled;
         this.ignoreSoftLimits = ignoreSoftLimits;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
@@ -920,18 +916,6 @@ abstract class AbstractHollowProducer {
 
         ValidationStatus status = null;
         try {
-            // Push the producer-wide incremental flag onto every DDD validator so the builder option
-            // globally controls behavior regardless of how the validator was constructed. A null
-            // supplier means incremental wasn't enabled at build time; otherwise the supplier is
-            // consulted once per cycle as a kill switch so dynamic-config flips take effect on the
-            // next cycle without a redeploy.
-            boolean incrementalThisCycle = incrementalDuplicateDataDetectionDisabled != null
-                    && !Boolean.TRUE.equals(incrementalDuplicateDataDetectionDisabled.get());
-            listeners.getListeners(ValidatorListener.class)
-                    .filter(com.netflix.hollow.api.producer.validation.DuplicateDataDetectionValidator.class::isInstance)
-                    .map(com.netflix.hollow.api.producer.validation.DuplicateDataDetectionValidator.class::cast)
-                    .forEach(v -> v.setIncrementalEnabled(incrementalThisCycle));
-
             // Stream over the concatenation of the old and new validators
             List<ValidationResult> results =
                     listeners.getListeners(ValidatorListener.class)
