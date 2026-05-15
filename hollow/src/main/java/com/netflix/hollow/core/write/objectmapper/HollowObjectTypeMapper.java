@@ -371,10 +371,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.hashKeyAnnotation = f.getAnnotation(HollowHashKey.class);
             this.numShardsAnnotation = f.getAnnotation(HollowShardLargeType.class);
             this.isInlinedField = f.isAnnotationPresent(HollowInline.class);
-            HollowCollectionTypeName collectionTypeNameAnnotation = parentMapper.isCollectionTypeNamingEnabled()
-                    ? f.getAnnotation(HollowCollectionTypeName.class) : null;
-            HollowMapTypeName mapTypeNameAnnotation = parentMapper.isCollectionTypeNamingEnabled()
-                    ? f.getAnnotation(HollowMapTypeName.class) : null;
+            HollowCollectionTypeName collectionTypeNameAnnotation = f.getAnnotation(HollowCollectionTypeName.class);
+            HollowMapTypeName mapTypeNameAnnotation = f.getAnnotation(HollowMapTypeName.class);
 
             if (collectionTypeNameAnnotation != null && mapTypeNameAnnotation != null) {
                 throw new IllegalStateException("Field '" + this.fieldName +

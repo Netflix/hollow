@@ -29,8 +29,6 @@ import java.lang.annotation.Target;
  * for its key. Specifying {@code keyTypeName} creates a dedicated type state with that name,
  * resulting in a smaller ordinal pool and fewer bits per reference.
  *
- * <p>Only processed when {@link HollowObjectMapper#enableCollectionTypeNaming()} has been called.
- *
  * <p><b>Schema change warning:</b> Adding this annotation to an existing field changes the
  * Hollow schema. Coordinate producer and consumer updates before deploying.
  *

@@ -43,7 +43,6 @@ public class HollowObjectMapper {
 
     private boolean ignoreListOrdering = false;
     private boolean useDefaultHashKeys = true;
-    private boolean collectionTypeNamingEnabled = false;
 
     public HollowObjectMapper(HollowWriteStateEngine stateEngine) {
         this.stateEngine = stateEngine;
@@ -61,28 +60,6 @@ public class HollowObjectMapper {
 
     public void doNotUseDefaultHashKeys() {
         this.useDefaultHashKeys = false;
-    }
-
-    /**
-     * Enables processing of {@link HollowCollectionTypeName} and {@link HollowMapTypeName}
-     * annotations. When enabled, these annotations allow users to namespace element, key,
-     * and value types in collections for improved compression.
-     *
-     * <p>Disabled by default to preserve backward compatibility.
-     * Adding these annotations to existing fields changes the Hollow schema — coordinate
-     * producer and consumer updates before enabling.
-     *
-     * <p>Must be called before any call to {@link #add(Object)} or
-     * {@link #initializeTypeState(Class)}; types registered before this call will not
-     * respect the annotations.
-     */
-    public void enableCollectionTypeNaming() {
-        this.collectionTypeNamingEnabled = true;
-    }
-
-    /** Package-private feature gate used by {@link com.netflix.hollow.core.write.objectmapper.HollowObjectTypeMapper.MappedField} to read collection-type annotations. */
-    boolean isCollectionTypeNamingEnabled() {
-        return collectionTypeNamingEnabled;
     }
 
     /**
