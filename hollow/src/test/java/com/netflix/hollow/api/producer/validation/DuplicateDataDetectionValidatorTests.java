@@ -419,6 +419,87 @@ public class DuplicateDataDetectionValidatorTests {
         }
     }
 
+    @Test
+    public void deltaWithOrdinalReuseDoesNotProduceFalsePositive() {
+        // Regression: when a record is modified across cycles its old ordinal is freed and may
+        // be reused by Hollow's allocator for a brand-new record in a later cycle. The new-vs-
+        // existing check in findDuplicateKeysInDelta probes the lagged index for the new record's
+        // key and gates on populatedOrdinals.get(matchedOrdinal). The concern was that if the
+        // matched (lagged) ordinal had been repopulated this cycle with an unrelated record, the
+        // gate would pass and produce a false positive.
+        //
+        // In practice this is unreachable: compact() only frees ordinals that were NOT in the
+        // prior cycle's populated set, so any ordinal the lagged index points to (which by
+        // definition WAS populated last cycle) cannot enter the free pool for the current cycle.
+        // This test pins that invariant.
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
+                .build();
+
+        // Cycle 1 (snapshot): (1,"A") and (2,"B") get ordinals 0 and 1.
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+        });
+
+        // Cycle 2: (1,"A") is modified to (1,"A_v2"). The new bytes get a fresh ordinal;
+        // (1,"A")'s old ordinal becomes unused-in-current and is eligible for the free pool
+        // at the START of cycle 3 (when compact runs against cycle 2's populated set).
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A_v2"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+        });
+
+        // Cycle 3: modify (1,"A_v2") again and add a brand-new (3,"C"). At start-of-cycle
+        // compact, ordinal 0 (originally (1,"A")) is freed. The allocator may hand ordinal 0
+        // to (1,"A_v3"). The lagged index from cycle 2 maps key [1] to whatever ordinal
+        // (1,"A_v2") landed on in cycle 2 — that ordinal is freed this cycle, so the
+        // new-vs-existing check correctly sees populatedOrdinals.get(matched) == false and
+        // does not report a duplicate. No real duplicates exist here.
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A_v3"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+            writeState.add(new TypeWithPrimaryKey(3, "C"));
+        });
+    }
+
+    @Test
+    public void deltaWithOrdinalReuseStillDetectsRealDuplicate() {
+        // Companion to deltaWithOrdinalReuseDoesNotProduceFalsePositive: the same cycle that
+        // exercises ordinal reuse must still flag a genuine duplicate introduced alongside it.
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
+                .build();
+
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+        });
+
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A_v2"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+        });
+
+        // Cycle 3 mixes ordinal reuse (via (1,"A_v3")) with a real new-vs-existing duplicate
+        // on key [2].
+        try {
+            producer.runCycle(writeState -> {
+                writeState.add(new TypeWithPrimaryKey(1, "A_v3"));
+                writeState.add(new TypeWithPrimaryKey(2, "B"));
+                writeState.add(new TypeWithPrimaryKey(2, "B_dup"));
+            });
+            Assert.fail("Expected ValidationStatusException");
+        } catch (ValidationStatusException expected) {
+            String message = expected.getValidationStatus().getResults().get(0).getMessage();
+            Assert.assertTrue("Should still detect the real duplicate on delta path",
+                    message.contains("delta check"));
+            Assert.assertTrue(message.contains("[2]"));
+        }
+    }
+
     @HollowPrimaryKey(fields = {"id"})
     static class TypeWithPrimaryKey {
         int id;

@@ -86,6 +86,9 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
 
     private static final Supplier<Boolean> ALWAYS_DISABLED = () -> false;
 
+    /** Sentinel value in the per-cycle {@code seen} map indicating a key has already been reported as a duplicate. */
+    private static final int REPORTED = -1;
+
     private final String dataTypeName;
     private final String[] fieldPathNames;
 
@@ -295,7 +298,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
      */
     List<Object[]> findDuplicateKeysInDelta(
             HollowPrimaryKeyIndex laggedIndex, BitSet newOrdinals, BitSet populatedOrdinals) {
-        // Maps each key to its first ordinal, or -1 if already reported as duplicate
+        // Maps each key to its first ordinal, or REPORTED once it has been added to duplicateKeys.
         Map<List<Object>, Integer> seen = new HashMap<>();
         List<Object[]> duplicateKeys = new ArrayList<>();
 
@@ -306,9 +309,9 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
 
             Integer existingOrdinal = seen.get(keyList);
             if (existingOrdinal != null) {
-                if (existingOrdinal >= 0) {
+                if (existingOrdinal != REPORTED) {
                     duplicateKeys.add(key);
-                    seen.put(keyList, -1);
+                    seen.put(keyList, REPORTED);
                 }
             } else {
                 seen.put(keyList, ordinal);
@@ -320,7 +323,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
         for (Map.Entry<List<Object>, Integer> entry : seen.entrySet()) {
             if (duplicateKeys.size() >= MAX_DISPLAYED_DUPLICATE_KEYS) break;
             int newOrdinal = entry.getValue();
-            if (newOrdinal < 0) continue;
+            if (newOrdinal == REPORTED) continue;
 
             Object[] key = entry.getKey().toArray();
             int matched = laggedIndex.getMatchingOrdinal(key);
