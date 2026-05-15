@@ -145,24 +145,6 @@ Namespacing fields is also useful if some consumers don't need the contents of a
 
 The same compression benefit applies to element types inside `List` and `Set` fields, and to key and/or value types inside `Map` fields.  By default, `List<String>` shares the global `String` type state with every other `String` field in the data model, so references into that pool are wide.  The `@HollowCollectionTypeName` and `@HollowMapTypeName` annotations create a dedicated, scoped type state for the element, key, or value type, resulting in a smaller ordinal pool and narrower references — without requiring a wrapper POJO.
 
-**Opting in**
-
-These annotations are disabled by default.  Enable them on the producer before adding any data:
-
-```java
-// Using HollowObjectMapper directly
-HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-mapper.enableCollectionTypeNaming();
-
-// Using HollowProducer.Builder
-HollowProducer producer = HollowProducer.withPublisher(blobStore)
-        .withCollectionTypeNaming()
-        .build();
-```
-
-!!! warning "Call before registering any types"
-    `enableCollectionTypeNaming()` must be called before any call to `add()` or `initializeTypeState()`.  Types registered before this call will not respect the annotations.
-
 **`@HollowCollectionTypeName` — for `List` and `Set` fields**
 
 ```java
