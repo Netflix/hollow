@@ -46,14 +46,13 @@ public class HollowCollectionTypeNameProducerTest {
     }
 
     // -------------------------------------------------------------------------
-    // withCollectionTypeNaming() on HollowProducer.Builder — populate path
+    // HollowProducer.Builder — populate path
     // -------------------------------------------------------------------------
 
     @Test
-    public void builderFlag_listElementTypeNamed() {
+    public void listElementTypeNamed() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withCollectionTypeNaming()
                 .build();
 
         long version = producer.runCycle(ws -> {
@@ -72,10 +71,9 @@ public class HollowCollectionTypeNameProducerTest {
     }
 
     @Test
-    public void builderFlag_setElementTypeNamed() {
+    public void setElementTypeNamed() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withCollectionTypeNaming()
                 .build();
 
         long version = producer.runCycle(ws -> {
@@ -91,10 +89,9 @@ public class HollowCollectionTypeNameProducerTest {
     }
 
     @Test
-    public void builderFlag_mapKeyAndValueTypeNamed() {
+    public void mapKeyAndValueTypeNamed() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withCollectionTypeNaming()
                 .build();
 
         long version = producer.runCycle(ws -> {
@@ -112,40 +109,17 @@ public class HollowCollectionTypeNameProducerTest {
         Assert.assertNotNull(readState.getTypeState("MapValue"));
     }
 
-    @Test
-    public void builderFlag_off_annotationsIgnored() {
-        HollowProducer producer = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(new HollowInMemoryBlobStager())
-                // withCollectionTypeNaming() NOT called
-                .build();
-
-        long version = producer.runCycle(ws -> {
-            TypeWithAnnotatedMap obj = new TypeWithAnnotatedMap();
-            obj.data = new HashMap<>();
-            obj.data.put("key", "value");
-            ws.add(obj);
-        });
-
-        HollowReadStateEngine readState = loadAtVersion(version);
-        HollowMapSchema schema = (HollowMapSchema) readState.getTypeState("MapOfStringToString").getSchema();
-        Assert.assertEquals("String", schema.getKeyType());
-        Assert.assertEquals("String", schema.getValueType());
-        Assert.assertNull("No custom 'MapKey' type state should exist when flag is off",
-                readState.getTypeState("MapKey"));
-    }
-
     // -------------------------------------------------------------------------
-    // Restore path: flag must be re-applied to the new objectMapper after restore
+    // Restore path
     // -------------------------------------------------------------------------
 
     @Test
-    public void restorePath_flagPropagatedToNewMapper() {
+    public void restorePath_namedTypesActiveAfterRestore() {
         HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
 
         // Cycle 1: produce a snapshot
         HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(blobStager)
-                .withCollectionTypeNaming()
                 .build();
         long snapshotVersion = producer1.runCycle(ws -> {
             TypeWithAnnotatedMap obj = new TypeWithAnnotatedMap();
@@ -157,7 +131,6 @@ public class HollowCollectionTypeNameProducerTest {
         // New producer restores from that snapshot, then runs a delta cycle
         HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(blobStager)
-                .withCollectionTypeNaming()
                 .build();
         producer2.initializeDataModel(TypeWithAnnotatedMap.class);
         producer2.restore(snapshotVersion, blobStore);
@@ -175,40 +148,6 @@ public class HollowCollectionTypeNameProducerTest {
         Assert.assertEquals("MapKey", schema.getKeyType());
         Assert.assertEquals("MapValue", schema.getValueType());
         Assert.assertNotNull("MapKey type state must survive the restore path",
-                readState.getTypeState("MapKey"));
-    }
-
-    @Test
-    public void restorePath_flagOff_annotationsStillIgnoredAfterRestore() {
-        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
-
-        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(blobStager)
-                .build();
-        long snapshotVersion = producer1.runCycle(ws -> {
-            TypeWithAnnotatedMap obj = new TypeWithAnnotatedMap();
-            obj.data = new HashMap<>();
-            ws.add(obj);
-        });
-
-        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(blobStager)
-                // no withCollectionTypeNaming()
-                .build();
-        producer2.initializeDataModel(TypeWithAnnotatedMap.class);
-        producer2.restore(snapshotVersion, blobStore);
-
-        long deltaVersion = producer2.runCycle(ws -> {
-            TypeWithAnnotatedMap obj = new TypeWithAnnotatedMap();
-            obj.data = new HashMap<>();
-            obj.data.put("k", "v");
-            ws.add(obj);
-        });
-
-        HollowReadStateEngine readState = loadAtVersion(deltaVersion);
-        HollowMapSchema schema = (HollowMapSchema) readState.getTypeState("MapOfStringToString").getSchema();
-        Assert.assertEquals("String", schema.getKeyType());
-        Assert.assertNull("MapKey should not exist when flag is off",
                 readState.getTypeState("MapKey"));
     }
 

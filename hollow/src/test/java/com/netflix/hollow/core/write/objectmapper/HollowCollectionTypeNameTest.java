@@ -46,54 +46,12 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     protected void initializeTypeStates() { }
 
     // -------------------------------------------------------------------------
-    // Feature flag: annotations are ignored when flag is off (default)
-    // -------------------------------------------------------------------------
-
-    // These tests verify the permanent flag-off behavior: annotations are completely
-    // ignored when enableCollectionTypeNaming() has not been called. They serve as
-    // regression tests confirming that element/key/value type name wiring is properly
-    // gated behind the feature flag.
-
-    @Test
-    public void flagOff_listAnnotationIgnored() {
-        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.initializeTypeState(TypeWithAnnotatedList.class);
-
-        HollowListSchema schema = (HollowListSchema) writeStateEngine.getTypeState("ListOfInteger").getSchema();
-        Assert.assertEquals("Integer", schema.getElementType());
-        Assert.assertNull(writeStateEngine.getTypeState("MovieId"));
-    }
-
-    @Test
-    public void flagOff_setAnnotationIgnored() {
-        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.initializeTypeState(TypeWithAnnotatedSet.class);
-
-        HollowSetSchema schema = (HollowSetSchema) writeStateEngine.getTypeState("SetOfString").getSchema();
-        Assert.assertEquals("String", schema.getElementType());
-        Assert.assertNull(writeStateEngine.getTypeState("TagString"));
-    }
-
-    @Test
-    public void flagOff_mapAnnotationIgnored() {
-        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.initializeTypeState(TypeWithAnnotatedMap.class);
-
-        HollowMapSchema schema = (HollowMapSchema) writeStateEngine.getTypeState("MapOfStringToString").getSchema();
-        Assert.assertEquals("String", schema.getKeyType());
-        Assert.assertEquals("String", schema.getValueType());
-        Assert.assertNull(writeStateEngine.getTypeState("MapKey"));
-        Assert.assertNull(writeStateEngine.getTypeState("MapValue"));
-    }
-
-    // -------------------------------------------------------------------------
-    // Schema generation with flag on
+    // Schema generation
     // -------------------------------------------------------------------------
 
     @Test
-    public void flagOn_listElementTypeNamed() {
+    public void listElementTypeNamed() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithAnnotatedList.class);
 
         HollowListSchema schema = (HollowListSchema) writeStateEngine.getTypeState("ListOfInteger").getSchema();
@@ -105,9 +63,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_setElementTypeNamed() {
+    public void setElementTypeNamed() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithAnnotatedSet.class);
 
         HollowSetSchema schema = (HollowSetSchema) writeStateEngine.getTypeState("SetOfString").getSchema();
@@ -117,9 +74,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_mapKeyAndValueTypeNamed() {
+    public void mapKeyAndValueTypeNamed() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithAnnotatedMap.class);
 
         HollowMapSchema schema = (HollowMapSchema) writeStateEngine.getTypeState("MapOfStringToString").getSchema();
@@ -132,9 +88,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_mapKeyOnlyNamed() {
+    public void mapKeyOnlyNamed() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithKeyOnlyAnnotation.class);
 
         HollowMapSchema schema = (HollowMapSchema) writeStateEngine.getTypeState("MapOfStringToString").getSchema();
@@ -143,9 +98,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_mapValueOnlyNamed() {
+    public void mapValueOnlyNamed() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithValueOnlyAnnotation.class);
 
         HollowMapSchema schema = (HollowMapSchema) writeStateEngine.getTypeState("MapOfStringToString").getSchema();
@@ -155,9 +109,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_outerTypeNameComposesWithElementTypeName() {
+    public void outerTypeNameComposesWithElementTypeName() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithBothAnnotations.class);
 
         Assert.assertNotNull("Outer type 'MyMovieIds' should exist",
@@ -167,9 +120,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_twoFieldsSameNameSameType_shareOneTypeState() {
+    public void twoFieldsSameNameSameType_shareOneTypeState() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithTwoSameElementNameFields.class);
 
         Assert.assertNotNull(writeStateEngine.getTypeState("MovieId"));
@@ -180,9 +132,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     // -------------------------------------------------------------------------
 
     @Test
-    public void flagOn_list_writesAndReadsCorrectly() throws IOException {
+    public void list_writesAndReadsCorrectly() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
 
         TypeWithAnnotatedList obj = new TypeWithAnnotatedList();
         obj.ids = new ArrayList<>(Arrays.asList(10, 20, 30));
@@ -196,9 +147,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_map_writesAndReadsCorrectly() throws IOException {
+    public void map_writesAndReadsCorrectly() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
 
         TypeWithAnnotatedMap obj = new TypeWithAnnotatedMap();
         obj.data = new HashMap<>();
@@ -216,9 +166,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_set_writesAndReadsCorrectly() throws IOException {
+    public void set_writesAndReadsCorrectly() throws IOException {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
 
         TypeWithAnnotatedSet obj = new TypeWithAnnotatedSet();
         obj.tags = new HashSet<>(Arrays.asList("action", "drama"));
@@ -244,7 +193,6 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
         // Model WITH annotation: map keys go into dedicated "MapKey" pool
         HollowWriteStateEngine engineWith = new HollowWriteStateEngine();
         HollowObjectMapper mapperWith = new HollowObjectMapper(engineWith);
-        mapperWith.enableCollectionTypeNaming();
 
         String[] mapKeys = {"action", "drama", "comedy", "thriller", "sci-fi"};
 
@@ -286,58 +234,50 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     // -------------------------------------------------------------------------
 
     @Test(expected = IllegalStateException.class)
-    public void flagOn_mapAnnotationOnListField_throws() {
+    public void mapAnnotationOnListField_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithMapAnnotationOnList.class);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void flagOn_mapAnnotationOnSetField_throws() {
+    public void mapAnnotationOnSetField_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithMapAnnotationOnSet.class);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void flagOn_collectionAnnotationOnMapField_throws() {
+    public void collectionAnnotationOnMapField_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithCollectionAnnotationOnMap.class);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void flagOn_collectionAnnotationOnStringField_throws() {
+    public void collectionAnnotationOnStringField_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithCollectionAnnotationOnString.class);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void flagOn_collectionAnnotationOnPrimitiveIntField_throws() {
+    public void collectionAnnotationOnPrimitiveIntField_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithCollectionAnnotationOnInt.class);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void flagOn_mapAnnotationOnPrimitiveLongField_throws() {
+    public void mapAnnotationOnPrimitiveLongField_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithMapAnnotationOnLong.class);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void flagOn_collectionAnnotationOnInlinedBoxedField_throws() {
+    public void collectionAnnotationOnInlinedBoxedField_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithCollectionAnnotationOnInlinedInteger.class);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void flagOn_sameNameDifferentJavaTypes_throws() {
+    public void sameNameDifferentJavaTypes_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithConflictingTypeNames.class);
     }
 
@@ -444,9 +384,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     // -------------------------------------------------------------------------
 
     @Test
-    public void flagOn_hashKeyOnNamedElementType_worksUnchanged() {
+    public void hashKeyOnNamedElementType_worksUnchanged() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithHashKeyOnNamedSet.class);
 
         // The Set schema should reference the named element type
@@ -460,9 +399,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_hashKeyOnNamedMapKeyType_worksUnchanged() {
+    public void hashKeyOnNamedMapKeyType_worksUnchanged() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithHashKeyOnNamedMap.class);
 
         HollowMapSchema mapSchema = (HollowMapSchema) writeStateEngine.getTypeState("MapOfStringToString").getSchema();
@@ -499,7 +437,6 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
         // --- Annotation approach (new feature) ---
         HollowWriteStateEngine annotationEngine = new HollowWriteStateEngine();
         HollowObjectMapper annotationMapper = new HollowObjectMapper(annotationEngine);
-        annotationMapper.enableCollectionTypeNaming();
         annotationMapper.initializeTypeState(TypeUsingAnnotation.class);
 
         // Both produce a map whose key type is "SubTypeKey"
@@ -544,7 +481,6 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
         // Annotation approach with the same custom outer collection name
         HollowWriteStateEngine annotationEngine = new HollowWriteStateEngine();
         HollowObjectMapper annotationMapper = new HollowObjectMapper(annotationEngine);
-        annotationMapper.enableCollectionTypeNaming();
         annotationMapper.initializeTypeState(TypeUsingAnnotationWithCustomName.class);
 
         // Both produce the same outer collection name
@@ -609,7 +545,6 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
         // @HollowTypeName on each field pins the outer collection name to match cycle 1's auto-generated name.
         // @HollowMapTypeName / @HollowCollectionTypeName match the POJO's @HollowTypeName names.
         HollowObjectMapper cycle2Mapper = new HollowObjectMapper(writeStateEngine);
-        cycle2Mapper.enableCollectionTypeNaming();
         TypeUsingAnnotationAutoName obj2 = new TypeUsingAnnotationAutoName();
         obj2.mapData = new HashMap<>();
         obj2.mapData.put("hello", "world");
@@ -682,9 +617,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     // -------------------------------------------------------------------------
 
     @Test
-    public void flagOn_arrayList_elementTypeNamed() {
+    public void arrayList_elementTypeNamed() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithArrayList.class);
 
         HollowListSchema schema = (HollowListSchema) writeStateEngine.getTypeState("ListOfInteger").getSchema();
@@ -693,9 +627,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_linkedList_elementTypeNamed() {
+    public void linkedList_elementTypeNamed() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithLinkedList.class);
 
         HollowListSchema schema = (HollowListSchema) writeStateEngine.getTypeState("ListOfInteger").getSchema();
@@ -704,9 +637,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_hashSet_elementTypeNamed() {
+    public void hashSet_elementTypeNamed() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithHashSet.class);
 
         HollowSetSchema schema = (HollowSetSchema) writeStateEngine.getTypeState("SetOfString").getSchema();
@@ -715,9 +647,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_hashMap_keyAndValueTypeNamed() {
+    public void hashMap_keyAndValueTypeNamed() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithHashMap.class);
 
         HollowMapSchema schema = (HollowMapSchema) writeStateEngine.getTypeState("MapOfStringToString").getSchema();
@@ -728,9 +659,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_treeMap_keyTypeNamed() {
+    public void treeMap_keyTypeNamed() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithTreeMap.class);
 
         HollowMapSchema schema = (HollowMapSchema) writeStateEngine.getTypeState("MapOfStringToString").getSchema();
@@ -741,16 +671,14 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     // Validation still fires correctly for concrete types
 
     @Test(expected = IllegalStateException.class)
-    public void flagOn_mapAnnotationOnArrayList_throws() {
+    public void mapAnnotationOnArrayList_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithMapAnnotationOnArrayList.class);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void flagOn_collectionAnnotationOnHashMap_throws() {
+    public void collectionAnnotationOnHashMap_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithCollectionAnnotationOnHashMap.class);
     }
 
@@ -794,23 +722,20 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     // -------------------------------------------------------------------------
 
     @Test(expected = IllegalStateException.class)
-    public void flagOn_bothAnnotationsOnListField_throws() {
+    public void bothAnnotationsOnListField_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithBothAnnotationsOnList.class);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void flagOn_bothAnnotationsOnMapField_throws() {
+    public void bothAnnotationsOnMapField_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithBothAnnotationsOnMap.class);
     }
 
     @Test
-    public void flagOn_bothAnnotationsOnListField_errorMentionsBothAnnotations() {
+    public void bothAnnotationsOnListField_errorMentionsBothAnnotations() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         try {
             mapper.initializeTypeState(TypeWithBothAnnotationsOnList.class);
             Assert.fail("Expected IllegalStateException");
@@ -839,9 +764,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     // -------------------------------------------------------------------------
 
     @Test
-    public void flagOn_emptyElementTypeName_usesAutoGeneratedName() {
+    public void emptyElementTypeName_usesAutoGeneratedName() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithEmptyElementTypeName.class);
 
         HollowListSchema schema = (HollowListSchema) writeStateEngine.getTypeState("ListOfInteger").getSchema();
@@ -850,9 +774,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_emptyKeyTypeName_usesAutoGeneratedKeyName() {
+    public void emptyKeyTypeName_usesAutoGeneratedKeyName() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithEmptyKeyTypeName.class);
 
         HollowMapSchema schema = (HollowMapSchema) writeStateEngine.getTypeState("MapOfStringToString").getSchema();
@@ -861,9 +784,8 @@ public class HollowCollectionTypeNameTest extends AbstractStateEngineTest {
     }
 
     @Test
-    public void flagOn_emptyValueTypeName_onlyKeyIsNamed() {
+    public void emptyValueTypeName_onlyKeyIsNamed() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithEmptyValueTypeName.class);
 
         HollowMapSchema schema = (HollowMapSchema) writeStateEngine.getTypeState("MapOfStringToString").getSchema();

@@ -629,7 +629,6 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     @Test
     public void getTypeMapper_conflictingDeclaredNameForDifferentJavaTypes_throws() {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         try {
             mapper.initializeTypeState(TypeWithConflictingCollectionNames.class);
             Assert.fail("Expected IllegalStateException for conflicting type names");
@@ -643,7 +642,6 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     public void getTypeMapper_conflictingDeclaredNameSameJavaType_doesNotThrow() {
         // Same name, same Java type → share one type state; no conflict
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.enableCollectionTypeNaming();
         mapper.initializeTypeState(TypeWithTwoListsSameElementName.class);
 
         Assert.assertNotNull(writeStateEngine.getTypeState("SharedId"));
