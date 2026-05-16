@@ -150,12 +150,38 @@ public class HollowObjectMapper {
 
     HollowTypeMapper getTypeMapper(
             Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited) {
+        return getTypeMapper(type, declaredName, hashKeyFieldPaths, numShards, visited, null, null);
+    }
+
+    // elementOrKeyTypeName: element type name for List/Set; key type name for Map
+    // valueTypeName:        value type name for Map; ignored for List/Set
+    HollowTypeMapper getTypeMapper(
+            Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited,
+            String elementOrKeyTypeName, String valueTypeName) {
 
         // Compute the type name
         String typeName = declaredName != null
                 ? declaredName
                 : findTypeName(type);
         HollowTypeMapper typeMapper = typeMappers.get(typeName);
+
+        if (typeMapper != null && declaredName != null) {
+            Class<?> expectedJavaType = type instanceof ParameterizedType
+                    ? (Class<?>) ((ParameterizedType) type).getRawType()
+                    : (Class<?>) type;
+            // Normalize concrete collection implementations to their canonical interface,
+            // matching what the collection mappers return from getJavaType().
+            if (List.class.isAssignableFrom(expectedJavaType)) expectedJavaType = List.class;
+            else if (Set.class.isAssignableFrom(expectedJavaType)) expectedJavaType = Set.class;
+            else if (Map.class.isAssignableFrom(expectedJavaType)) expectedJavaType = Map.class;
+            if (!typeMapper.getJavaType().equals(expectedJavaType)) {
+                throw new IllegalStateException(
+                        "Hollow type name '" + typeName + "' is already registered for Java type " +
+                        typeMapper.getJavaType().getName() + " but is being redeclared for " +
+                        expectedJavaType.getName() +
+                        ". Check @HollowCollectionTypeName / @HollowMapTypeName annotations for conflicting type names.");
+            }
+        }
 
         if (typeMapper == null) {
             if (visited == null) {
@@ -170,13 +196,13 @@ public class HollowObjectMapper {
 
                 if (List.class.isAssignableFrom(clazz)) {
                     typeMapper = new HollowListTypeMapper(this, parameterizedType, typeName,
-                            numShards, ignoreListOrdering, visited);
+                            numShards, ignoreListOrdering, visited, elementOrKeyTypeName);
                 } else if (Set.class.isAssignableFrom(clazz)) {
                     typeMapper = new HollowSetTypeMapper(this, parameterizedType, typeName, hashKeyFieldPaths,
-                            numShards, stateEngine, useDefaultHashKeys, visited);
+                            numShards, stateEngine, useDefaultHashKeys, visited, elementOrKeyTypeName);
                 } else if (Map.class.isAssignableFrom(clazz)) {
                     typeMapper = new HollowMapTypeMapper(this, parameterizedType, typeName, hashKeyFieldPaths,
-                            numShards, stateEngine, useDefaultHashKeys, visited);
+                            numShards, stateEngine, useDefaultHashKeys, visited, elementOrKeyTypeName, valueTypeName);
                 } else {
                     typeMapper = new HollowObjectTypeMapper(this, clazz, typeName, visited);
                 }
@@ -186,6 +212,13 @@ public class HollowObjectMapper {
 
             HollowTypeMapper existing = typeMappers.putIfAbsent(typeName, typeMapper);
             if (existing != null) {
+                if (!existing.getJavaType().equals(typeMapper.getJavaType())) {
+                    throw new IllegalStateException(
+                            "Hollow type name '" + typeName + "' is already registered for Java type " +
+                            existing.getJavaType().getName() + " but is being redeclared for " +
+                            typeMapper.getJavaType().getName() +
+                            ". Check @HollowCollectionTypeName / @HollowMapTypeName annotations for conflicting type names.");
+                }
                 typeMapper = existing;
             } else {
                 typeMapper.addTypeState(stateEngine);
