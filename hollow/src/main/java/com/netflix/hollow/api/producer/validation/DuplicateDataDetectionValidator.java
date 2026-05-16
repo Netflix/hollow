@@ -256,10 +256,13 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
             HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
             PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
             BitSet populatedOrdinals = listener.getPopulatedOrdinals();
+            BitSet previousOrdinals = listener.getPreviousOrdinals();
 
-            BitSet newOrdinals = new BitSet();
+            // Pre-size to avoid resizing during the or/andNot below; BitSet.size() returns allocated
+            // bit capacity (a multiple of 64), which is what the BitSet(int) constructor expects.
+            BitSet newOrdinals = new BitSet(Math.max(populatedOrdinals.size(), previousOrdinals.size()));
             newOrdinals.or(populatedOrdinals);
-            newOrdinals.andNot(listener.getPreviousOrdinals());
+            newOrdinals.andNot(previousOrdinals);
 
             LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, delta (%d total, %d new ordinals).",
                     dataTypeName, populatedOrdinals.cardinality(), newOrdinals.cardinality()));
@@ -375,27 +378,29 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
         return result;
     }
 
+    private static String formatDuplicateKeys(String keysJoined, String summary) {
+        return String.format("%s ... (%s; showing at most %d keys)",
+                keysJoined, summary, MAX_DISPLAYED_DUPLICATE_KEYS);
+    }
+
     private String duplicateKeysToString(Collection<DuplicateKeyInfo> duplicateKeys) {
-        long totalUniqueKeys = duplicateKeys.size();
         long totalAffectedRecords = duplicateKeys.stream()
                 .mapToLong(DuplicateKeyInfo::getCount)
                 .sum();
-
-        String duplicateKeysString = duplicateKeys.stream()
+        String keysJoined = duplicateKeys.stream()
                 .map(DuplicateKeyInfo::toString)
                 .collect(Collectors.joining(", "));
-
-        return String.format("%s ... (%d distinct keys that each have duplicate records affecting %d records; showing at most %d keys)",
-                duplicateKeysString, totalUniqueKeys, totalAffectedRecords, MAX_DISPLAYED_DUPLICATE_KEYS);
+        String summary = String.format("%d distinct keys that each have duplicate records affecting %d records",
+                duplicateKeys.size(), totalAffectedRecords);
+        return formatDuplicateKeys(keysJoined, summary);
     }
 
     private String deltaDuplicateKeysToString(List<Object[]> duplicateKeys) {
-        String keysString = duplicateKeys.stream()
+        String keysJoined = duplicateKeys.stream()
                 .map(Arrays::toString)
                 .collect(Collectors.joining(", "));
-
-        return String.format("%s ... (%d distinct duplicate keys detected; showing at most %d keys)",
-                keysString, duplicateKeys.size(), MAX_DISPLAYED_DUPLICATE_KEYS);
+        String summary = String.format("%d distinct duplicate keys detected", duplicateKeys.size());
+        return formatDuplicateKeys(keysJoined, summary);
     }
 
     /**
