@@ -18,20 +18,32 @@ package com.netflix.hollow.api.producer.validation;
 
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
+import com.netflix.hollow.api.producer.Status;
+import com.netflix.hollow.api.producer.listener.RestoreListener;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex.DuplicateKeyInfo;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -46,11 +58,15 @@ import java.util.stream.Collectors;
  * stage will be naturally de-duped resulting in just one record present.  Therefore a validator created for such a
  * record's type will never fail.
  */
-public class DuplicateDataDetectionValidator implements ValidatorListener {
+public class DuplicateDataDetectionValidator implements ValidatorListener, RestoreListener {
+    private static final Logger LOG = Logger.getLogger(DuplicateDataDetectionValidator.class.getName());
     private static final int MAX_DISPLAYED_DUPLICATE_KEYS = 100;
     private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT =
             "Duplicate keys found for type %s. Primarykey in schema is %s. "
                     + "Duplicate IDs are: %s";
+    private static final String DUPLICATE_KEYS_FOUND_DELTA_MSG_FORMAT =
+            "Duplicate keys found for type %s (delta check - exact counts available on snapshot cycles). "
+                    + "Primarykey in schema is %s. Duplicate keys: %s";
     private static final String NO_PRIMARY_KEY_ERROR_MSG_FORMAT =
             "DuplicateDataDetectionValidator defined but unable to find primary key "
                     + "for data type %s. Please check schema definition.";
@@ -68,8 +84,23 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
 
     private static final String NAME = DuplicateDataDetectionValidator.class.getName();
 
+    private static final Supplier<Boolean> ALWAYS_DISABLED = () -> false;
+
+    /** Sentinel value in the per-cycle {@code seen} map indicating a key has already been reported as a duplicate. */
+    private static final int REPORTED = -1;
+
     private final String dataTypeName;
     private final String[] fieldPathNames;
+
+    /**
+     * Consulted once per cycle. {@code true} = delta-aware (incremental) mode; {@code false} = full-scan.
+     * Defaults to {@link #ALWAYS_DISABLED} when constructed without a supplier, matching pre-incremental
+     * behavior. Wrap a dynamic config flag (e.g. an Archaius / Spring property) to enable runtime opt-out.
+     */
+    private final Supplier<Boolean> incrementalEnabled;
+
+    /** Lagged index reflecting the last successful cycle; advanced via {@code endUpdate()} on pass. */
+    private HollowPrimaryKeyIndex previousCycleIndex;
 
     /**
      * Creates a validator to detect duplicate records of the type that corresponds to the given data type class
@@ -79,6 +110,24 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
      * @throws IllegalArgumentException if the data type class is not annotated with {@link HollowPrimaryKey}
      */
     public DuplicateDataDetectionValidator(Class<?> dataType) {
+        this(dataType, ALWAYS_DISABLED);
+    }
+
+    /**
+     * Creates a validator to detect duplicate records, with delta-aware (incremental) mode gated by the
+     * supplied flag. See {@link #DuplicateDataDetectionValidator(Class)} for the base requirements on the
+     * data type class.
+     * <p>
+     * When {@code incrementalEnabled} returns {@code true} the validator validates only new ordinals each
+     * cycle against a retained primary-key index built from the prior cycle, trading a steady-state memory
+     * cost for cycle-time savings. When it returns {@code false}, every cycle does a full scan. The
+     * supplier is consulted once per cycle so flips via dynamic config take effect on the next cycle.
+     *
+     * @param dataType the data type class
+     * @param incrementalEnabled supplier returning {@code true} for incremental, {@code false} for full-scan
+     * @throws IllegalArgumentException if the data type class is not annotated with {@link HollowPrimaryKey}
+     */
+    public DuplicateDataDetectionValidator(Class<?> dataType, Supplier<Boolean> incrementalEnabled) {
         Objects.requireNonNull(dataType);
 
         if (!dataType.isAnnotationPresent(HollowPrimaryKey.class)) {
@@ -89,6 +138,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
 
         this.dataTypeName = HollowTypeMapper.getDefaultTypeName(dataType);
         this.fieldPathNames = null;
+        this.incrementalEnabled = Objects.requireNonNull(incrementalEnabled);
     }
 
     /**
@@ -100,8 +150,17 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
      * @param dataTypeName the data type name
      */
     public DuplicateDataDetectionValidator(String dataTypeName) {
+        this(dataTypeName, ALWAYS_DISABLED);
+    }
+
+    /**
+     * Same as {@link #DuplicateDataDetectionValidator(String)} with delta-aware mode gated by the supplied
+     * flag. See {@link #DuplicateDataDetectionValidator(Class, Supplier)} for the supplier semantics.
+     */
+    public DuplicateDataDetectionValidator(String dataTypeName, Supplier<Boolean> incrementalEnabled) {
         this.dataTypeName = Objects.requireNonNull(dataTypeName);
         this.fieldPathNames = null;
+        this.incrementalEnabled = Objects.requireNonNull(incrementalEnabled);
     }
 
     /**
@@ -115,8 +174,17 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
      * @param fieldPathNames the field paths defining the primary key
      */
     public DuplicateDataDetectionValidator(String dataTypeName, String[] fieldPathNames) {
+        this(dataTypeName, fieldPathNames, ALWAYS_DISABLED);
+    }
+
+    /**
+     * Same as {@link #DuplicateDataDetectionValidator(String, String[])} with delta-aware mode gated by the
+     * supplied flag. See {@link #DuplicateDataDetectionValidator(Class, Supplier)} for the supplier semantics.
+     */
+    public DuplicateDataDetectionValidator(String dataTypeName, String[] fieldPathNames, Supplier<Boolean> incrementalEnabled) {
         this.dataTypeName = Objects.requireNonNull(dataTypeName);
         this.fieldPathNames = fieldPathNames.clone();
+        this.incrementalEnabled = Objects.requireNonNull(incrementalEnabled);
     }
 
     @Override
@@ -151,23 +219,143 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         String fieldPaths = Arrays.toString(primaryKey.getFieldPaths());
         vrb.detail(FIELD_PATH_NAME, fieldPaths);
 
-        Collection<DuplicateKeyInfo> duplicateKeys = getDuplicateKeys(readState.getStateEngine(), primaryKey);
-        if (!duplicateKeys.isEmpty()) {
-            String message = String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths,
-                    duplicateKeysToString(duplicateKeys));
-            return vrb.failed(message);
+        HollowReadStateEngine stateEngine = readState.getStateEngine();
+        boolean useIncremental = Boolean.TRUE.equals(incrementalEnabled.get());
+
+        if (!useIncremental) {
+            // Full-scan-per-cycle path. Drop any stale lagged index so a later flip back to
+            // incremental rebuilds from a fresh baseline. The fresh index built here is discarded.
+            previousCycleIndex = null;
+            LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': full-scan mode.", dataTypeName));
+            HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
+            Collection<DuplicateKeyInfo> duplicateKeys = index.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
+            if (!duplicateKeys.isEmpty()) {
+                return vrb.failed(String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths,
+                        duplicateKeysToString(duplicateKeys)));
+            }
+            return vrb.passed();
         }
 
-        return vrb.passed();
+        ValidationResult result;
+        if (previousCycleIndex == null) {
+            // Incremental mode, first cycle (or after restore / kill-switch toggle): full snapshot,
+            // and retain the index so subsequent cycles can run the delta path.
+            previousCycleIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
+            LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, snapshot baseline.",
+                    dataTypeName));
+
+            Collection<DuplicateKeyInfo> duplicateKeys = previousCycleIndex.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
+            if (!duplicateKeys.isEmpty()) {
+                String message = String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths,
+                        duplicateKeysToString(duplicateKeys));
+                result = vrb.failed(message);
+            } else {
+                result = vrb.passed();
+            }
+        } else {
+            HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
+            PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
+            BitSet populatedOrdinals = listener.getPopulatedOrdinals();
+            BitSet previousOrdinals = listener.getPreviousOrdinals();
+
+            // Pre-size to avoid resizing during the or/andNot below; BitSet.size() returns allocated
+            // bit capacity (a multiple of 64), which is what the BitSet(int) constructor expects.
+            BitSet newOrdinals = new BitSet(Math.max(populatedOrdinals.size(), previousOrdinals.size()));
+            newOrdinals.or(populatedOrdinals);
+            newOrdinals.andNot(previousOrdinals);
+
+            LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, delta (%d total, %d new ordinals).",
+                    dataTypeName, populatedOrdinals.cardinality(), newOrdinals.cardinality()));
+
+            if (!newOrdinals.isEmpty()) {
+                List<Object[]> duplicateKeys = findDuplicateKeysInDelta(
+                        previousCycleIndex, newOrdinals, populatedOrdinals);
+                if (!duplicateKeys.isEmpty()) {
+                    String message = String.format(DUPLICATE_KEYS_FOUND_DELTA_MSG_FORMAT, dataTypeName, fieldPaths,
+                            deltaDuplicateKeysToString(duplicateKeys));
+                    result = vrb.failed(message);
+                } else {
+                    result = vrb.passed();
+                }
+            } else {
+                result = vrb.passed();
+            }
+        }
+
+        // Advance index only on pass — failed cycles don't change published state
+        if (result.isPassed()) {
+            previousCycleIndex.endUpdate();
+        }
+
+        return result;
     }
 
-    private Collection<DuplicateKeyInfo> getDuplicateKeys(HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
-        HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
-        HollowPrimaryKeyIndex hollowPrimaryKeyIndex = typeState.getListener(HollowPrimaryKeyIndex.class);
-        if (hollowPrimaryKeyIndex == null) {
-            hollowPrimaryKeyIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
+    /**
+     * Delta-aware duplicate detection using a lagged index. Detects new-vs-new
+     * and new-vs-existing duplicates among the given new ordinals.
+     *
+     * @param laggedIndex an index whose hash table reflects the previous cycle's state
+     * @param newOrdinals ordinals added in the current delta
+     * @param populatedOrdinals all currently populated ordinals
+     * @return duplicate keys found among new ordinals
+     */
+    List<Object[]> findDuplicateKeysInDelta(
+            HollowPrimaryKeyIndex laggedIndex, BitSet newOrdinals, BitSet populatedOrdinals) {
+        // Maps each key to its first ordinal, or REPORTED once it has been added to duplicateKeys.
+        Map<List<Object>, Integer> seen = new HashMap<>();
+        List<Object[]> duplicateKeys = new ArrayList<>();
+
+        int ordinal = newOrdinals.nextSetBit(0);
+        while (ordinal != -1 && duplicateKeys.size() < MAX_DISPLAYED_DUPLICATE_KEYS) {
+            Object[] key = laggedIndex.getRecordKey(ordinal);
+            List<Object> keyList = Arrays.asList(key);
+
+            Integer existingOrdinal = seen.get(keyList);
+            if (existingOrdinal != null) {
+                if (existingOrdinal != REPORTED) {
+                    duplicateKeys.add(key);
+                    seen.put(keyList, REPORTED);
+                }
+            } else {
+                seen.put(keyList, ordinal);
+            }
+            ordinal = newOrdinals.nextSetBit(ordinal + 1);
         }
-        return hollowPrimaryKeyIndex.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
+
+        // Check new-vs-existing: matched ordinal must still be populated (not removed in this delta)
+        for (Map.Entry<List<Object>, Integer> entry : seen.entrySet()) {
+            if (duplicateKeys.size() >= MAX_DISPLAYED_DUPLICATE_KEYS) break;
+            int newOrdinal = entry.getValue();
+            if (newOrdinal == REPORTED) continue;
+
+            Object[] key = entry.getKey().toArray();
+            int matched = laggedIndex.getMatchingOrdinal(key);
+            if (matched != -1 && populatedOrdinals.get(matched)) {
+                duplicateKeys.add(key);
+            }
+        }
+
+        return duplicateKeys;
+    }
+
+    /**
+     * On restore the producer's read state may move to an arbitrary version (e.g. pinned back to
+     * fork a delta chain), so the lagged index built from the prior cycle no longer corresponds
+     * to the read state ordinal space. Drop it; the next cycle will rebuild via the snapshot path.
+     */
+    @Override
+    public void onProducerRestoreStart(long restoreVersion) {
+        if (previousCycleIndex != null) {
+            LOG.info(String.format(
+                    "Incremental duplicate data detection for type '%s': dropping lagged index due to producer restore to version %d.",
+                    dataTypeName, restoreVersion));
+            previousCycleIndex = null;
+        }
+    }
+
+    @Override
+    public void onProducerRestoreComplete(Status status, long versionDesired, long versionReached, Duration elapsed) {
+        // no-op
     }
 
     @Override
@@ -190,18 +378,29 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         return result;
     }
 
+    private static String formatDuplicateKeys(String keysJoined, String summary) {
+        return String.format("%s ... (%s; showing at most %d keys)",
+                keysJoined, summary, MAX_DISPLAYED_DUPLICATE_KEYS);
+    }
+
     private String duplicateKeysToString(Collection<DuplicateKeyInfo> duplicateKeys) {
-        long totalUniqueKeys = duplicateKeys.size();
         long totalAffectedRecords = duplicateKeys.stream()
                 .mapToLong(DuplicateKeyInfo::getCount)
                 .sum();
-
-        String duplicateKeysString = duplicateKeys.stream()
+        String keysJoined = duplicateKeys.stream()
                 .map(DuplicateKeyInfo::toString)
                 .collect(Collectors.joining(", "));
+        String summary = String.format("%d distinct keys that each have duplicate records affecting %d records",
+                duplicateKeys.size(), totalAffectedRecords);
+        return formatDuplicateKeys(keysJoined, summary);
+    }
 
-        return String.format("%s ... (%d distinct keys that each have duplicate records affecting %d records; showing at most %d keys)",
-                duplicateKeysString, totalUniqueKeys, totalAffectedRecords, MAX_DISPLAYED_DUPLICATE_KEYS);
+    private String deltaDuplicateKeysToString(List<Object[]> duplicateKeys) {
+        String keysJoined = duplicateKeys.stream()
+                .map(Arrays::toString)
+                .collect(Collectors.joining(", "));
+        String summary = String.format("%d distinct duplicate keys detected", duplicateKeys.size());
+        return formatDuplicateKeys(keysJoined, summary);
     }
 
     /**
