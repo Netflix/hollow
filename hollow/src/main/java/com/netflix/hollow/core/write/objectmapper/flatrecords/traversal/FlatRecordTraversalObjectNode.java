@@ -4,27 +4,24 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordOrdinalReader;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-
 public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
   private final FlatRecordOrdinalReader reader;
   private final HollowObjectSchema schema;
   private final int ordinal;
-
-  private Map<String, HollowObjectSchema> commonSchemaMap;
+  private final FlatRecord record; // only populated for root node
 
   public FlatRecordTraversalObjectNode(FlatRecordOrdinalReader reader, HollowObjectSchema schema, int ordinal) {
     this.reader = reader;
     this.schema = schema;
     this.ordinal = ordinal;
+    this.record = null;
   }
 
   public FlatRecordTraversalObjectNode(FlatRecord rec) {
     this.reader = new FlatRecordOrdinalReader(rec);
     this.ordinal = reader.getOrdinalCount() - 1;
     this.schema = (HollowObjectSchema) reader.readSchema(ordinal);
+    this.record = rec;
   }
 
   @Override
@@ -37,9 +34,11 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
     return ordinal;
   }
 
-  @Override
-  public void setCommonSchema(Map<String, HollowObjectSchema> commonSchema) {
-    this.commonSchemaMap = commonSchema;
+  /**
+   * @return the underlying FlatRecord if this node is the root of a traversal, otherwise null
+   */
+  public FlatRecord getFlatRecord() {
+    return record;
   }
 
   public FlatRecordTraversalObjectNode getObjectFieldNode(String field) {
@@ -170,18 +169,5 @@ public class FlatRecordTraversalObjectNode implements FlatRecordTraversalNode {
 
   public byte[] getFieldValueBytes(String field) {
     return reader.readFieldBytes(ordinal, field);
-  }
-
-  @Override
-  public int hashCode() {
-    HollowObjectSchema commonSchema = commonSchemaMap.get(schema.getName());
-    Object[] fields = new Object[commonSchema.numFields()];
-    for (int i = 0; i < commonSchema.numFields(); i++) {
-      String fieldName = commonSchema.getFieldName(i);
-      if (commonSchema.getFieldType(fieldName) != HollowObjectSchema.FieldType.REFERENCE) {
-        fields[i] = getFieldValue(fieldName);
-      }
-    }
-    return Objects.hash(schema.getName(), Arrays.deepHashCode(fields));
   }
 }
