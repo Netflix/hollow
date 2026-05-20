@@ -675,10 +675,9 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         }
 
         if (ordinal == ORDINAL_NONE) {
-            HollowObjectSchema parentSchema =  this.typeState.getSchema();
-            throw new NullPointerException("Cannot hash null field " +
-                    parentSchema.getFieldName(fieldIdx) + " in type " +
-                    parentSchema.getName() + " at ordinal " + parentOrdinal);
+            throw new NullPointerException("Cannot hash null primary-key field \"" +
+                    primaryKey.getFieldPath(fieldIdx) + "\" in type " +
+                    primaryKey.getType() + " at ordinal " + parentOrdinal);
         }
 
         int hashCode = HollowReadFieldUtils.fieldHashCode(typeState, ordinal, fieldPathIndexes[fieldIdx][lastFieldPath]);
