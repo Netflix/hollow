@@ -133,6 +133,37 @@ public class HollowHistoryKeyIndexTest extends AbstractStateEngineTest {
         assertResults(keyIdx, "B", "five!", 3);
     }
 
+    @Test
+    public void nullPrimaryKeyFieldThrowsWithTypeAndFieldContext() throws IOException {
+        HollowObjectWriteRecord bRec = new HollowObjectWriteRecord(bSchema);
+        bRec.setString("id", null);
+        bRec.setDouble("anotherField", 1.1D);
+        writeStateEngine.add("B", bRec);
+
+        roundTripSnapshot();
+        HollowHistory history = new HollowHistory(readStateEngine, 1L, 1);
+        HollowHistoryKeyIndex keyIdx = new HollowHistoryKeyIndex(history);
+        keyIdx.addTypeIndex("B", "id");
+        keyIdx.indexTypeField("B", "id");
+
+        try {
+            keyIdx.update(readStateEngine, false);
+            Assert.fail("Expected IllegalArgumentException for null primary key field");
+        } catch (RuntimeException e) {
+            Throwable root = e;
+            while (root.getCause() != null && !(root instanceof IllegalArgumentException)) {
+                root = root.getCause();
+            }
+            Assert.assertTrue("Expected IllegalArgumentException, got " + root,
+                    root instanceof IllegalArgumentException);
+            String msg = root.getMessage();
+            Assert.assertNotNull(msg);
+            Assert.assertTrue("Message should include type, was: " + msg, msg.contains("type='B'"));
+            Assert.assertTrue("Message should include fieldPath, was: " + msg, msg.contains("fieldPath='id'"));
+            Assert.assertTrue("Message should include recordOrdinal, was: " + msg, msg.contains("recordOrdinal="));
+        }
+    }
+
     private void assertResults(HollowHistoryKeyIndex keyIdx, String type, String query, int... expectedResults) {
         IntList actualResults = keyIdx.getTypeKeyIndexes().get(type).queryIndexedFields(query);
 
