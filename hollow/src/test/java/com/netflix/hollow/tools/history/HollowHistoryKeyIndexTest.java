@@ -134,6 +134,40 @@ public class HollowHistoryKeyIndexTest extends AbstractStateEngineTest {
     }
 
     @Test
+    public void escapedColonInKeyIsUnescapedBeforeLookup() throws IOException {
+        // B has a single-field STRING primary key; A has a composite float:string key.
+        // When a key value contains ':', the UI requires the user to type '\:'.
+        // The escaped form must be unescaped before hash-index lookup, otherwise the
+        // hash of "Video\:1234" != hash of stored "Video:1234" and no match is found.
+        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
+        HollowHistory history = new HollowHistory(readEngine, 1L, 1);
+        HollowHistoryKeyIndex keyIdx = new HollowHistoryKeyIndex(history);
+        keyIdx.addTypeIndex("A", "id", "bRef.id");
+        keyIdx.addTypeIndex("B", "id");
+        keyIdx.indexTypeField("A", "bRef");
+        keyIdx.indexTypeField("A", "id");
+        keyIdx.indexTypeField("B", "id");
+
+        addRecord(1.0F, "Video:1234", 1L, 1.0D);
+        addRecord(2.0F, "A:B:C", 2L, 2.0D);
+
+        roundTripSnapshot();
+        keyIdx.update(readStateEngine, false);
+
+        // Non-composite path (single-field STRING PK): escaped colon is unescaped before hash lookup
+        assertResults(keyIdx, "B", "Video\\:1234", 0);
+        assertResults(keyIdx, "B", "A\\:B\\:C", 1);
+
+        // Composite path (float:string PK): escaped colon in the string component is unescaped
+        assertResults(keyIdx, "A", "1.0:Video\\:1234", 0);
+        assertResults(keyIdx, "A", "2.0:A\\:B\\:C", 1);
+
+        // Non-existent key returns no results
+        assertResults(keyIdx, "B", "notfound");
+        assertResults(keyIdx, "A", "9.9:notfound");
+    }
+
+    @Test
     public void nullPrimaryKeyFieldThrowsWithTypeAndFieldContext() throws IOException {
         HollowObjectWriteRecord bRec = new HollowObjectWriteRecord(bSchema);
         bRec.setString("id", null);

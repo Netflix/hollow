@@ -79,12 +79,6 @@ public class HollowDiffUI implements HollowRecordDiffUI {
     }
     
     public boolean serveRequest(String pageName, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        if ("diffresult".equals(pageName)) {
-            resp.setContentType("text/json");
-            resp.getWriter().write("json object");
-            return true;
-        }
-
         if("diffrowdata".equals(pageName)) {
             diffViewOutputGenerator.uncollapseRow(req, resp);
             return true;
