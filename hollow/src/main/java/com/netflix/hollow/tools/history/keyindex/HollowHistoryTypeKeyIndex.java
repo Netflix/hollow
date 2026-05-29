@@ -257,10 +257,15 @@ public class HollowHistoryTypeKeyIndex {
         }
 
         String[] keyComponents = query.split("(?<!\\\\)" + MULTI_FIELD_KEY_DELIMITER, primaryKey.numFields());
+
         if (keyComponents.length > 1 && keyComponents.length == primaryKey.numFields()) {
+            for (int i = 0; i < keyComponents.length; i++) {
+                keyComponents[i] = keyComponents[i].replace("\\:", ":");
+            }
             return queryIndexedFieldsForCompositeKey(keyComponents);
         } else {
-            return queryIndexedFieldsForNonCompositeKey(query);
+            String unescapedQuery = query.replace("\\:", ":");
+            return queryIndexedFieldsForNonCompositeKey(unescapedQuery);
         }
     }
 
