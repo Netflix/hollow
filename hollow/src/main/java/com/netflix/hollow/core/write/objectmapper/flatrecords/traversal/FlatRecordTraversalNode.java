@@ -7,8 +7,6 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordOrdinalReader;
 
-import java.util.Map;
-
 /**
  * An abstraction that allows for the traversal of a flat record from the root type to a specific sub-path.
  */
@@ -16,8 +14,6 @@ public interface FlatRecordTraversalNode {
   int getOrdinal();
 
   HollowSchema getSchema();
-
-  void setCommonSchema(Map<String, HollowObjectSchema> commonSchema);
 
   default FlatRecordTraversalNode createNode(FlatRecordOrdinalReader reader, int ordinal) {
     HollowSchema schema = reader.readSchema(ordinal);

@@ -178,6 +178,13 @@ public class HollowOrdinalMapper {
                 continue;
 
             Object objectToStore = readValueInState(typeState, ordinal, i);
+            if (objectToStore == null) {
+                throw new IllegalArgumentException(
+                        "Null value in primary key field for type='" + primaryKey.getType()
+                                + "', fieldPath='" + primaryKey.getFieldPath(i)
+                                + "', recordOrdinal=" + ordinal
+                                + ". Primary key fields cannot be null.");
+            }
             int objectOrdinal = memoizedPool.writeAndGetOrdinal(objectToStore);
             fieldHashToObjectOrdinal[i][index] = objectOrdinal;
         }
