@@ -163,7 +163,6 @@ public class HollowObjectMapper {
     }
 
     /**
-     *
      * @param type
      * @param declaredName
      * @param hashKeyFieldPaths
@@ -171,10 +170,13 @@ public class HollowObjectMapper {
      * @param visited
      * @param elementOrKeyTypeName
      * @param valueTypeName
-     * @param enforceTypeNameConflictCheck when true, validate that {@code declaredName} is not already
-     * registered for a different Java type. This is only set for type names introduced by the
-     * @HollowCollectionTypeName / @HollowMapTypeName annotations.
-     * @return
+     * @param enforceTypeNameConflictCheck when {@code true}, the resolved type name must be unique to a single
+     *        Java type: if it is already registered for a different Java type, an {@link IllegalStateException}
+     *        is thrown. When {@code false}, no such check is performed — if the name is already registered, the
+     *        existing mapper is returned regardless of its Java type, allowing multiple Java types to share one
+     *        Hollow type name.
+     * @return the resolved type mapper for {@code type} (or the pre-existing mapper registered under the
+     *         resolved type name)
      */
     HollowTypeMapper getTypeMapper(
             Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited,

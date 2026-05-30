@@ -657,8 +657,13 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
         mapper.initializeTypeState(TypeWithSharedHollowTypeName.class);
 
+        // The shared name resolves to a single, reused type state — the second Java type does
+        // not create a separate one, matching the legacy reuse behavior.
         Assert.assertNotNull("First type registered under the shared name should exist",
                 writeStateEngine.getTypeState("Shared"));
+        Assert.assertEquals("Both fields must share one type state under the reused name",
+                1, writeStateEngine.getOrderedTypeStates().stream()
+                        .filter(ts -> ts.getSchema().getName().equals("Shared")).count());
     }
 
     @HollowTypeName(name = "CustomType")
