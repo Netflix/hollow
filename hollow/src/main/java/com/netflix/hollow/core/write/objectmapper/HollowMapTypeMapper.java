@@ -54,8 +54,12 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
     public HollowMapTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, String[] hashKeyFieldPaths,
                                int numShards, HollowWriteStateEngine stateEngine, boolean useDefaultHashKeys, Set<Type> visited,
                                String keyTypeName, String valueTypeName) {
-        this.keyMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], nullIfEmpty(keyTypeName), null, -1, visited);
-        this.valueMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[1], nullIfEmpty(valueTypeName), null, -1, visited);
+        String resolvedKeyTypeName = nullIfEmpty(keyTypeName);
+        String resolvedValueTypeName = nullIfEmpty(valueTypeName);
+        this.keyMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], resolvedKeyTypeName, null, -1, visited,
+                null, null, resolvedKeyTypeName != null);
+        this.valueMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[1], resolvedValueTypeName, null, -1, visited,
+                null, null, resolvedValueTypeName != null);
         String typeName = declaredName != null ? declaredName : getDefaultTypeName(type);
         
         if(hashKeyFieldPaths == null && useDefaultHashKeys && (keyMapper instanceof HollowObjectTypeMapper))

@@ -158,6 +158,27 @@ public class HollowObjectMapper {
     HollowTypeMapper getTypeMapper(
             Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited,
             String elementOrKeyTypeName, String valueTypeName) {
+        return getTypeMapper(type, declaredName, hashKeyFieldPaths, numShards, visited,
+                elementOrKeyTypeName, valueTypeName, false);
+    }
+
+    /**
+     *
+     * @param type
+     * @param declaredName
+     * @param hashKeyFieldPaths
+     * @param numShards
+     * @param visited
+     * @param elementOrKeyTypeName
+     * @param valueTypeName
+     * @param enforceTypeNameConflictCheck when true, validate that {@code declaredName} is not already
+     * registered for a different Java type. This is only set for type names introduced by the
+     * @HollowCollectionTypeName / @HollowMapTypeName annotations.
+     * @return
+     */
+    HollowTypeMapper getTypeMapper(
+            Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited,
+            String elementOrKeyTypeName, String valueTypeName, boolean enforceTypeNameConflictCheck) {
 
         // Compute the type name
         String typeName = declaredName != null
@@ -165,7 +186,7 @@ public class HollowObjectMapper {
                 : findTypeName(type);
         HollowTypeMapper typeMapper = typeMappers.get(typeName);
 
-        if (typeMapper != null && declaredName != null) {
+        if (enforceTypeNameConflictCheck && typeMapper != null) {
             Class<?> expectedJavaType = type instanceof ParameterizedType
                     ? (Class<?>) ((ParameterizedType) type).getRawType()
                     : (Class<?>) type;
@@ -212,7 +233,7 @@ public class HollowObjectMapper {
 
             HollowTypeMapper existing = typeMappers.putIfAbsent(typeName, typeMapper);
             if (existing != null) {
-                if (!existing.getJavaType().equals(typeMapper.getJavaType())) {
+                if (enforceTypeNameConflictCheck && !existing.getJavaType().equals(typeMapper.getJavaType())) {
                     throw new IllegalStateException(
                             "Hollow type name '" + typeName + "' is already registered for Java type " +
                             existing.getJavaType().getName() + " but is being redeclared for " +

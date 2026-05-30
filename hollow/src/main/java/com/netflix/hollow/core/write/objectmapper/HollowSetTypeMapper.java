@@ -49,7 +49,9 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
     public HollowSetTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, String[] hashKeyFieldPaths,
                                int numShards, HollowWriteStateEngine stateEngine, boolean useDefaultHashKeys, Set<Type> visited,
                                String elementTypeName) {
-        this.elementMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], nullIfEmpty(elementTypeName), null, -1, visited);
+        String resolvedElementTypeName = nullIfEmpty(elementTypeName);
+        this.elementMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], resolvedElementTypeName, null, -1, visited,
+                null, null, resolvedElementTypeName != null);
         String typeName = declaredName != null ? declaredName : getDefaultTypeName(type);
         
         if(hashKeyFieldPaths == null && useDefaultHashKeys && (elementMapper instanceof HollowObjectTypeMapper))

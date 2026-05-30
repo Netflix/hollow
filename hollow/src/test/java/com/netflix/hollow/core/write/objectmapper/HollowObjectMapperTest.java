@@ -647,9 +647,41 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         Assert.assertNotNull(writeStateEngine.getTypeState("SharedId"));
     }
 
+    @Test
+    public void getTypeMapper_sameHollowTypeNameDifferentJavaTypes_withoutNewAnnotations_doesNotThrow() {
+        // Regression guard: without @HollowCollectionTypeName / @HollowMapTypeName, the
+        // type-name conflict check must NOT fire. Pre-feature behavior was to silently reuse
+        // the first registered mapper when two different Java types share a @HollowTypeName,
+        // so initialization must not throw. The new conflict validation is scoped strictly to
+        // the collection-type-naming annotations.
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.initializeTypeState(TypeWithSharedHollowTypeName.class);
+
+        Assert.assertNotNull("First type registered under the shared name should exist",
+                writeStateEngine.getTypeState("Shared"));
+    }
+
     @HollowTypeName(name = "CustomType")
     static class TypeWithDeclaredName {
         String value;
+    }
+
+    @HollowTypeName(name = "Shared")
+    static class SharedTypeA {
+        int value;
+    }
+
+    @HollowTypeName(name = "Shared")
+    static class SharedTypeB {
+        int value;
+    }
+
+    static class TypeWithSharedHollowTypeName {
+        @HollowTypeName(name = "Shared")
+        SharedTypeA first;
+
+        @HollowTypeName(name = "Shared")
+        SharedTypeB second;
     }
 
     static class TypeWithConflictingCollectionNames {
