@@ -195,7 +195,7 @@ public class HollowHistoryTypeKeyIndex {
                 break;
             case STRING:
                 hashCode = HashCodes.hashCode(strVal);
-                objectToFind = strVal.replaceAll(ESCAPED_MULTI_FIELD_KEY_DELIMITER, MULTI_FIELD_KEY_DELIMITER);
+                objectToFind = strVal;
                 break;
             case DOUBLE:
                 final double queryDouble = Double.parseDouble(strVal);
@@ -257,10 +257,15 @@ public class HollowHistoryTypeKeyIndex {
         }
 
         String[] keyComponents = query.split("(?<!\\\\)" + MULTI_FIELD_KEY_DELIMITER, primaryKey.numFields());
+
         if (keyComponents.length > 1 && keyComponents.length == primaryKey.numFields()) {
+            for (int i = 0; i < keyComponents.length; i++) {
+                keyComponents[i] = keyComponents[i].replaceAll(ESCAPED_MULTI_FIELD_KEY_DELIMITER, MULTI_FIELD_KEY_DELIMITER);
+            }
             return queryIndexedFieldsForCompositeKey(keyComponents);
         } else {
-            return queryIndexedFieldsForNonCompositeKey(query);
+            String unescapedQuery = query.replaceAll(ESCAPED_MULTI_FIELD_KEY_DELIMITER, MULTI_FIELD_KEY_DELIMITER);
+            return queryIndexedFieldsForNonCompositeKey(unescapedQuery);
         }
     }
 
