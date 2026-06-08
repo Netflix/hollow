@@ -169,7 +169,7 @@ Similar to `HollowObjectMapper.ignoreListOrdering()`.
 Define primary keys using the `hollow_primary_key` message option:
 
 ```protobuf
-import "hollow_options.proto";
+import "com/netflix/hollow/hollow_options.proto";
 
 message Person {
   option (com.netflix.hollow.hollow_primary_key) = "id";
@@ -251,10 +251,10 @@ dependencies {
 }
 ```
 
-The `hollow_options.proto` file is included in the JAR at `proto/hollow_options.proto` and can be imported in your proto files using:
+The `hollow_options.proto` file is included in the JAR at `com/netflix/hollow/hollow_options.proto` and can be imported in your proto files using:
 
 ```protobuf
-import "hollow_options.proto";
+import "com/netflix/hollow/hollow_options.proto";
 ```
 
 **Available options:**

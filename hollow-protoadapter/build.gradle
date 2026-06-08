@@ -64,7 +64,7 @@ tasks.register('compileMainProtos', Exec) {
                 "--proto_path=${protoIncludeDir}",
                 "--proto_path=${protoSrcDir}",
                 "--java_out=${protoOutputDir}",
-                "${protoSrcDir}/hollow_options.proto"
+                "${protoSrcDir}/com/netflix/hollow/hollow_options.proto"
     }
 }
 
@@ -90,11 +90,12 @@ tasks.named('licenseMain').configure {
     dependsOn compileMainProtos
 }
 
-// Include .proto files in the published JAR so users can import them
+// Include .proto files in the published JAR so users can import them.
+// They are packaged at their import path (e.g. com/netflix/hollow/hollow_options.proto)
+// so that `import "com/netflix/hollow/hollow_options.proto";` resolves when the JAR is on protoc's proto_path.
 processResources {
     from('src/main/proto') {
         include '**/*.proto'
-        into 'proto'
     }
 }
 
