@@ -5,7 +5,7 @@ package com.netflix.hollow.test;
 option java_package = "com.netflix.hollow.test.proto";
 option java_outer_classname = "PersonProtos";
 
-import "hollow_options.proto";
+import "com/netflix/hollow/hollow_options.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/wrappers.proto";
 

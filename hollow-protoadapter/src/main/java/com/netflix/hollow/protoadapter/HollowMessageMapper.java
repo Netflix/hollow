@@ -839,7 +839,7 @@ public class HollowMessageMapper {
      * <p>
      * Example proto definition:
      * <pre>
-     * import "hollow_options.proto";
+     * import "com/netflix/hollow/hollow_options.proto";
      *
      * message Person {
      *   option (com.netflix.hollow.hollow_primary_key) = {fields: ["id"]};
