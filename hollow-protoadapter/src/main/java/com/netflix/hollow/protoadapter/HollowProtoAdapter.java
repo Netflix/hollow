@@ -544,6 +544,9 @@ import java.util.concurrent.ConcurrentHashMap;
                         case STRING:
                             writeRec.setString(fieldName, value.toString());
                             break;
+                        case BYTES:
+                            writeRec.setBytes(fieldName, ((ByteString) value).toByteArray());
+                            break;
                         default:
                             throw new IOException("Unsupported field type in collection: " + objSchema.getFieldType(fieldPosition));
                     }
