@@ -20,9 +20,11 @@ import com.google.protobuf.Descriptors;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
+import com.netflix.hollow.core.write.HollowSetTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 
 import java.util.HashSet;
@@ -217,8 +219,6 @@ public class HollowMessageMapper {
             String fieldName = field.getName();
 
             if (field.isRepeated()) {
-                // Repeated fields map to Hollow lists
-                String listTypeName = "ListOf" + getElementTypeName(field);
                 String elementType = getElementTypeName(field);
 
                 // Ensure the element type schema exists
@@ -230,13 +230,28 @@ public class HollowMessageMapper {
                     ensurePrimitiveWrapperSchema(elementType);
                 }
 
-                // Create list schema if not exists
-                if (stateEngine.getSchema(listTypeName) == null) {
-                    HollowListSchema listSchema = new HollowListSchema(listTypeName, elementType);
-                    stateEngine.addTypeState(new HollowListTypeWriteState(listSchema));
+                String[] hashKeyFields = readHollowHashKeyFields(field);
+                if (hashKeyFields != null) {
+                    // A hollow_hash_key option promotes the repeated field to a Hollow Set
+                    // (keyed lookup of elements within the set's scope), mirroring
+                    // @HollowHashKey on a Set<T> field in the POJO mapper. The type name
+                    // matches HollowObjectMapper's POJO naming ("SetOf<Element>") so the same
+                    // data can round-trip across the proto and POJO mappers.
+                    String setTypeName = "SetOf" + elementType;
+                    if (stateEngine.getSchema(setTypeName) == null) {
+                        HollowSetSchema setSchema = new HollowSetSchema(setTypeName, elementType, hashKeyFields);
+                        stateEngine.addTypeState(new HollowSetTypeWriteState(setSchema));
+                    }
+                    schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, setTypeName);
+                } else {
+                    // Default: repeated fields map to Hollow lists (element order preserved)
+                    String listTypeName = "ListOf" + elementType;
+                    if (stateEngine.getSchema(listTypeName) == null) {
+                        HollowListSchema listSchema = new HollowListSchema(listTypeName, elementType);
+                        stateEngine.addTypeState(new HollowListTypeWriteState(listSchema));
+                    }
+                    schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, listTypeName);
                 }
-
-                schema.addField(fieldName, HollowObjectSchema.FieldType.REFERENCE, listTypeName);
 
             } else {
                 // Check if field has hollow_type_name option (for namespaced wrapper types)
@@ -881,6 +896,27 @@ public class HollowMessageMapper {
         return new String[0];
     }
 
+    /**
+     * Reads the {@code hollow_hash_key} field option, which promotes a repeated field to a
+     * Hollow Set keyed by the given element field paths (mirrors {@code @HollowHashKey} on a
+     * {@code Set<T>} field in the POJO mapper). Returns the hash-key field paths when the
+     * option is present (an empty array means an unkeyed Set hashed by element ordinal), or
+     * {@code null} when the option is absent (the repeated field stays a Hollow List).
+     */
+    private static String[] readHollowHashKeyFields(Descriptors.FieldDescriptor field) {
+        try {
+            com.google.protobuf.DescriptorProtos.FieldOptions options = field.getOptions();
+            if (options.hasExtension(HollowOptions.hollowHashKey)) {
+                HollowOptions.HollowHashKey hashKeyOption =
+                    options.getExtension(HollowOptions.hollowHashKey);
+                return hashKeyOption.getFieldsList().toArray(new String[0]);
+            }
+        } catch (Exception e) {
+            // HollowOptions extension not available on the classpath — treat as no hash key.
+        }
+        return null;
+    }
+
     public com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey extractPrimaryKey(
             com.google.protobuf.Message message) {
 
@@ -960,9 +996,21 @@ public class HollowMessageMapper {
                         (com.netflix.hollow.api.objects.generic.GenericHollowList) listRecord;
 
                     for (int i = 0; i < list.size(); i++) {
-                        Object element = readListElement(list, i, field);
+                        Object element = convertCollectionElement(list.get(i), field);
                         if (element != null) {
                             builder.addRepeatedField(field, element);
+                        }
+                    }
+                } else if (listRecord instanceof com.netflix.hollow.api.objects.generic.GenericHollowSet) {
+                    // A field marked with hollow_hash_key is stored as a Hollow Set; iterate its
+                    // element objects (the proto field is still repeated on the read side).
+                    com.netflix.hollow.api.objects.generic.GenericHollowSet set =
+                        (com.netflix.hollow.api.objects.generic.GenericHollowSet) listRecord;
+
+                    for (com.netflix.hollow.api.objects.generic.GenericHollowObject element : set.objects()) {
+                        Object converted = convertCollectionElement(element, field);
+                        if (converted != null) {
+                            builder.addRepeatedField(field, converted);
                         }
                     }
                 }
@@ -1189,14 +1237,13 @@ public class HollowMessageMapper {
     }
 
     /**
-     * Read an element from a Hollow list and convert to the appropriate protobuf type.
+     * Convert a single Hollow collection element (from a List or Set) to the appropriate
+     * protobuf value for a repeated field.
      */
-    private Object readListElement(
-            com.netflix.hollow.api.objects.generic.GenericHollowList list,
-            int index,
+    private Object convertCollectionElement(
+            com.netflix.hollow.api.objects.HollowRecord element,
             Descriptors.FieldDescriptor field) {
 
-        com.netflix.hollow.api.objects.HollowRecord element = list.get(index);
         if (element == null) {
             return null;
         }
@@ -1300,6 +1347,17 @@ public class HollowMessageMapper {
 
                 for (int i = 0; i < list.size(); i++) {
                     Object element = readFlatListElement(list.get(i), field);
+                    if (element != null) {
+                        builder.addRepeatedField(field, element);
+                    }
+                }
+            } else if (listNode instanceof com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalSetNode) {
+                // A field marked with hollow_hash_key is stored as a Hollow Set.
+                com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalSetNode set =
+                    (com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalSetNode) listNode;
+
+                for (com.netflix.hollow.core.write.objectmapper.flatrecords.traversal.FlatRecordTraversalNode elementNode : set) {
+                    Object element = readFlatListElement(elementNode, field);
                     if (element != null) {
                         builder.addRepeatedField(field, element);
                     }

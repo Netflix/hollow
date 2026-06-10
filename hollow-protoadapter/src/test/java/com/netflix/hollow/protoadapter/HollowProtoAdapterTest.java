@@ -202,6 +202,79 @@ public class HollowProtoAdapterTest {
             new String[] {"account_id", "region"}, accountPk.getFieldPaths());
     }
 
+    /**
+     * The {@code hollow_hash_key} field option promotes a repeated field to a Hollow Set
+     * (named {@code SetOf<Element>} to match the POJO mapper) carrying the given hash key,
+     * mirroring {@code @HollowHashKey(fields={...})} on a {@code Set<T>} field. This verifies
+     * the schema shape, the round-trip through the proto field, and that the hash key is
+     * functional via {@code findElement} keyed lookup within the set's scope.
+     */
+    @Test
+    public void testHollowHashKeyProducesKeyedSet() throws Exception {
+        Class<?> niClass = protoClassLoader.loadClass(
+            "com.netflix.hollow.test.proto.PersonProtos$NetworkInterface");
+        Message.Builder niBuilder = (Message.Builder) niClass.getMethod("newBuilder").invoke(null);
+        JsonFormat.parser().merge(
+            "{ \"name\": \"eth0\", \"neighbors\": ["
+                + " {\"target\": \"r1\", \"addr\": \"10.0.0.1\"},"
+                + " {\"target\": \"r2\", \"addr\": \"10.0.0.2\"} ] }",
+            niBuilder);
+        Message networkInterface = niBuilder.build();
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+        mapper.initializeTypeState(networkInterface.getDescriptorForType());
+
+        // The neighbors field must be inferred as a Hollow Set, not a List.
+        com.netflix.hollow.core.schema.HollowSchema neighborsSchema =
+            writeStateEngine.getSchema("SetOfNeighbor");
+        assertNotNull("hollow_hash_key must produce a SetOf<Element> schema", neighborsSchema);
+        assertTrue("a repeated field with hollow_hash_key must be a Hollow Set, not a List",
+            neighborsSchema instanceof com.netflix.hollow.core.schema.HollowSetSchema);
+        com.netflix.hollow.core.schema.HollowSetSchema setSchema =
+            (com.netflix.hollow.core.schema.HollowSetSchema) neighborsSchema;
+        assertEquals("Neighbor", setSchema.getElementType());
+        com.netflix.hollow.core.index.key.PrimaryKey hashKey = setSchema.getHashKey();
+        assertNotNull("the Set must carry the hash key declared by hollow_hash_key", hashKey);
+        assertArrayEquals(new String[] {"addr"}, hashKey.getFieldPaths());
+        assertNull("a plain List type must not be created for a hash-keyed field",
+            writeStateEngine.getSchema("ListOfNeighbor"));
+
+        // The parent object references the Set type.
+        HollowObjectSchema niSchema = (HollowObjectSchema) writeStateEngine.getSchema("NetworkInterface");
+        assertEquals("SetOfNeighbor",
+            niSchema.getReferencedType(niSchema.getPosition("neighbors")));
+
+        // Round-trip the data.
+        int ordinal = mapper.add(networkInterface);
+        assertTrue("Ordinal should be non-negative", ordinal >= 0);
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        // Both neighbors round-trip back through the (still repeated) proto field.
+        Message readBack = mapper.readHollowRecord(
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(
+                readStateEngine, "NetworkInterface", ordinal),
+            networkInterface.getDescriptorForType());
+        Descriptors.FieldDescriptor neighborsField =
+            networkInterface.getDescriptorForType().findFieldByName("neighbors");
+        assertEquals("both set elements must round-trip", 2,
+            readBack.getRepeatedFieldCount(neighborsField));
+
+        // The hash key is functional: look up an element by addr within the set's scope.
+        com.netflix.hollow.api.objects.generic.GenericHollowObject niRecord =
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(
+                readStateEngine, "NetworkInterface", ordinal);
+        com.netflix.hollow.api.objects.generic.GenericHollowSet neighborSet =
+            (com.netflix.hollow.api.objects.generic.GenericHollowSet)
+                niRecord.getReferencedGenericRecord("neighbors");
+        assertNotNull("neighbors must be a Set on the read side", neighborSet);
+        com.netflix.hollow.api.objects.HollowRecord found = neighborSet.findElement("10.0.0.2");
+        assertNotNull("findElement by hash key (addr) must locate the neighbor", found);
+        assertEquals("10.0.0.2",
+            ((com.netflix.hollow.api.objects.generic.GenericHollowObject) found).getString("addr"));
+    }
+
     @Test
     public void testHollowTypeNameOption() throws Exception {
         // Load Product proto class
