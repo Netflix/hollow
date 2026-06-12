@@ -47,7 +47,7 @@ public abstract class HollowDiffCountingNode {
     public HollowDiffCountingNode(HollowDiff diff, HollowTypeDiff topLevelTypeDiff, HollowDiffNodeIdentifier nodeId) {
         this.diff = diff;
         this.topLevelTypeDiff = topLevelTypeDiff;
-        this.equalityMapping = diff.getEqualityMapping();
+        this.equalityMapping = diff == null ? null : diff.getEqualityMapping();
         this.nodeId = nodeId;
     }
 

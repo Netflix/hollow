@@ -12,6 +12,11 @@ message HollowPrimaryKey {
   repeated string fields = 1;
 }
 
+// Message type for hollow set hash key configuration
+message HollowHashKey {
+  repeated string fields = 1;
+}
+
 // Custom message option to define primary key field paths
 // Similar to @HollowPrimaryKey(fields = {"id", "version"}) in Java
 // Usage: option (com.netflix.hollow.hollow_primary_key) = {fields: ["account_id", "region"]};
@@ -44,4 +49,15 @@ extend google.protobuf.FieldOptions {
   // Example: uint32 value 3000000000 (0xB2D05E00) becomes -1294967296 in signed int32
   // Set to true to explicitly acknowledge this behavior and allow the field
   bool hollow_unsigned_to_signed = 50004;
+
+  // Custom field option to map a repeated field to a Hollow Set (instead of a List)
+  // with a hash key, enabling keyed lookup of elements within the set's scope.
+  // Similar to @HollowHashKey(fields = {...}) in Java, which annotates a Set field.
+  // The presence of this option makes the repeated field a Hollow Set named
+  // "SetOf<Element>" (matching HollowObjectMapper's POJO naming); the listed fields
+  // become the set's hash key (paths into the element type). An empty fields list
+  // produces an unkeyed Set hashed by element ordinal.
+  // Example:
+  //   repeated Neighbor neighbors = 2 [(com.netflix.hollow.hollow_hash_key) = {fields: ["addr"]}];
+  HollowHashKey hollow_hash_key = 50005;
 }

@@ -114,3 +114,21 @@ message BadUnsigned {
   int32 id = 1;
   uint32 counter = 2;  // Missing required annotation - should fail
 }
+
+// Test messages for the hollow_hash_key option — a keyed Hollow Set.
+// Mirrors @HollowHashKey(fields={"addr"}) on a Set<Neighbor> in the POJO model:
+// Neighbor has its own compound primary key (globally unique), but within a
+// NetworkInterface the neighbors are a Set keyed by addr (unique in that scope).
+message NetworkInterface {
+  option (com.netflix.hollow.hollow_primary_key) = {fields: ["name"]};
+
+  string name = 1;
+  repeated Neighbor neighbors = 2 [(com.netflix.hollow.hollow_hash_key) = {fields: ["addr"]}];
+}
+
+message Neighbor {
+  option (com.netflix.hollow.hollow_primary_key) = {fields: ["target", "addr"]};
+
+  string target = 1;
+  string addr = 2;
+}

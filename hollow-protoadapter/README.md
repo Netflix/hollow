@@ -200,6 +200,46 @@ RecordPrimaryKey key = mapper.extractPrimaryKey(myMessage);
 
 If no `hollow_primary_key` option is specified, all scalar (non-repeated, non-message) fields are used as the primary key.
 
+## Hash Keys (Keyed Sets)
+
+Mark a `repeated` field with the `hollow_hash_key` field option to store it as a Hollow **Set** (instead of a List) with a hash key, enabling keyed lookup of elements within that field's scope. This mirrors `@HollowHashKey(fields = {...})` on a `Set<T>` field in the POJO mapper, and the generated Set type is named `SetOf<Element>` to match `HollowObjectMapper` — so the same data round-trips across the proto and POJO mappers.
+
+```protobuf
+import "hollow_options.proto";
+
+message NetworkInterface {
+  option (com.netflix.hollow.hollow_primary_key) = {fields: ["name"]};
+
+  string name = 1;
+  // Stored as a Hollow Set "SetOfNeighbor" keyed by the element's addr field.
+  repeated Neighbor neighbors = 2 [(com.netflix.hollow.hollow_hash_key) = {fields: ["addr"]}];
+}
+
+message Neighbor {
+  // Globally unique by its own composite primary key ...
+  option (com.netflix.hollow.hollow_primary_key) = {fields: ["target", "addr"]};
+
+  string target = 1;
+  string addr = 2;   // ... but keyed by addr alone within a NetworkInterface's set
+}
+```
+
+On the read side the field is still a normal repeated field; the hash key powers `findElement` lookups on the underlying Hollow Set:
+
+```java
+GenericHollowSet neighbors = (GenericHollowSet)
+    networkInterfaceRecord.getReferencedGenericRecord("neighbors");
+HollowRecord neighbor = neighbors.findElement("10.0.0.2"); // look up by addr
+```
+
+**Notes:**
+- The element type's own `hollow_primary_key` is independent of the set's hash key — both can coexist (as above).
+- Hash-key field paths reference the element's (proto) field names.
+- An empty `fields` list produces an unkeyed Set hashed by element ordinal.
+- Without this option, a repeated field maps to a Hollow `LIST` (element order preserved).
+
+Similar to `@HollowHashKey` in Java.
+
 ## Field Path Remapping
 
 Remap field paths if your Hollow schema structure differs from your Protocol Buffer structure:
@@ -259,6 +299,7 @@ import "hollow_options.proto";
 
 **Available options:**
 - `hollow_primary_key` (message option): Define primary key fields
+- `hollow_hash_key` (field option): Store a repeated field as a keyed Hollow Set
 - `hollow_ignore_list_ordering` (field option): Reserved for future per-field control
 
 **Note**: Currently, `ignoreListOrdering()` applies globally to all repeated fields. The field-level option is defined for future use but not yet implemented.

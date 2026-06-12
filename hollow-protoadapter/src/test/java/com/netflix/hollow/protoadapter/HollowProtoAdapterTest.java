@@ -16,7 +16,11 @@
  */
 package com.netflix.hollow.protoadapter;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.DescriptorProtos;
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.DynamicMessage;
+import com.google.protobuf.Int64Value;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
 import com.google.protobuf.util.JsonFormat;
@@ -196,6 +200,79 @@ public class HollowProtoAdapterTest {
         assertNotNull("Account composite PK must round-trip into schema", accountPk);
         assertArrayEquals(
             new String[] {"account_id", "region"}, accountPk.getFieldPaths());
+    }
+
+    /**
+     * The {@code hollow_hash_key} field option promotes a repeated field to a Hollow Set
+     * (named {@code SetOf<Element>} to match the POJO mapper) carrying the given hash key,
+     * mirroring {@code @HollowHashKey(fields={...})} on a {@code Set<T>} field. This verifies
+     * the schema shape, the round-trip through the proto field, and that the hash key is
+     * functional via {@code findElement} keyed lookup within the set's scope.
+     */
+    @Test
+    public void testHollowHashKeyProducesKeyedSet() throws Exception {
+        Class<?> niClass = protoClassLoader.loadClass(
+            "com.netflix.hollow.test.proto.PersonProtos$NetworkInterface");
+        Message.Builder niBuilder = (Message.Builder) niClass.getMethod("newBuilder").invoke(null);
+        JsonFormat.parser().merge(
+            "{ \"name\": \"eth0\", \"neighbors\": ["
+                + " {\"target\": \"r1\", \"addr\": \"10.0.0.1\"},"
+                + " {\"target\": \"r2\", \"addr\": \"10.0.0.2\"} ] }",
+            niBuilder);
+        Message networkInterface = niBuilder.build();
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+        mapper.initializeTypeState(networkInterface.getDescriptorForType());
+
+        // The neighbors field must be inferred as a Hollow Set, not a List.
+        com.netflix.hollow.core.schema.HollowSchema neighborsSchema =
+            writeStateEngine.getSchema("SetOfNeighbor");
+        assertNotNull("hollow_hash_key must produce a SetOf<Element> schema", neighborsSchema);
+        assertTrue("a repeated field with hollow_hash_key must be a Hollow Set, not a List",
+            neighborsSchema instanceof com.netflix.hollow.core.schema.HollowSetSchema);
+        com.netflix.hollow.core.schema.HollowSetSchema setSchema =
+            (com.netflix.hollow.core.schema.HollowSetSchema) neighborsSchema;
+        assertEquals("Neighbor", setSchema.getElementType());
+        com.netflix.hollow.core.index.key.PrimaryKey hashKey = setSchema.getHashKey();
+        assertNotNull("the Set must carry the hash key declared by hollow_hash_key", hashKey);
+        assertArrayEquals(new String[] {"addr"}, hashKey.getFieldPaths());
+        assertNull("a plain List type must not be created for a hash-keyed field",
+            writeStateEngine.getSchema("ListOfNeighbor"));
+
+        // The parent object references the Set type.
+        HollowObjectSchema niSchema = (HollowObjectSchema) writeStateEngine.getSchema("NetworkInterface");
+        assertEquals("SetOfNeighbor",
+            niSchema.getReferencedType(niSchema.getPosition("neighbors")));
+
+        // Round-trip the data.
+        int ordinal = mapper.add(networkInterface);
+        assertTrue("Ordinal should be non-negative", ordinal >= 0);
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        // Both neighbors round-trip back through the (still repeated) proto field.
+        Message readBack = mapper.readHollowRecord(
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(
+                readStateEngine, "NetworkInterface", ordinal),
+            networkInterface.getDescriptorForType());
+        Descriptors.FieldDescriptor neighborsField =
+            networkInterface.getDescriptorForType().findFieldByName("neighbors");
+        assertEquals("both set elements must round-trip", 2,
+            readBack.getRepeatedFieldCount(neighborsField));
+
+        // The hash key is functional: look up an element by addr within the set's scope.
+        com.netflix.hollow.api.objects.generic.GenericHollowObject niRecord =
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(
+                readStateEngine, "NetworkInterface", ordinal);
+        com.netflix.hollow.api.objects.generic.GenericHollowSet neighborSet =
+            (com.netflix.hollow.api.objects.generic.GenericHollowSet)
+                niRecord.getReferencedGenericRecord("neighbors");
+        assertNotNull("neighbors must be a Set on the read side", neighborSet);
+        com.netflix.hollow.api.objects.HollowRecord found = neighborSet.findElement("10.0.0.2");
+        assertNotNull("findElement by hash key (addr) must locate the neighbor", found);
+        assertEquals("10.0.0.2",
+            ((com.netflix.hollow.api.objects.generic.GenericHollowObject) found).getString("addr"));
     }
 
     @Test
@@ -1647,6 +1724,284 @@ public class HollowProtoAdapterTest {
         @SuppressWarnings("unchecked")
         java.util.List<Message> nestedEntries = (java.util.List<Message>) nestedStructRead.getField(fieldsField);
         assertEquals("nested struct must have 2 entries", 2, nestedEntries.size());
+    }
+
+    /**
+     * Scalar and repeated {@code bytes} fields must round-trip without data loss.
+     * The write path previously lacked a BYTES case in parseCollection and would throw
+     * for repeated bytes; this test guards both paths.
+     */
+    @Test
+    public void testBytesFieldRoundTrip() throws Exception {
+        // Build a minimal proto descriptor with scalar and repeated bytes fields.
+        DescriptorProtos.FileDescriptorProto fileProto = DescriptorProtos.FileDescriptorProto.newBuilder()
+            .setName("test_bytes.proto")
+            .setSyntax("proto3")
+            .addMessageType(DescriptorProtos.DescriptorProto.newBuilder()
+                .setName("BinaryData")
+                .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                    .setName("id").setNumber(1)
+                    .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT32)
+                    .setLabel(DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL))
+                .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                    .setName("data").setNumber(2)
+                    .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_BYTES)
+                    .setLabel(DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL))
+                .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                    .setName("chunks").setNumber(3)
+                    .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_BYTES)
+                    .setLabel(DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED)))
+            .build();
+        Descriptors.FileDescriptor fileDesc =
+            Descriptors.FileDescriptor.buildFrom(fileProto, new Descriptors.FileDescriptor[0]);
+        Descriptors.Descriptor descriptor = fileDesc.findMessageTypeByName("BinaryData");
+
+        ByteString scalarBytes = ByteString.copyFrom(new byte[]{0x01, 0x02, 0x03, (byte) 0xFF});
+        ByteString chunk0 = ByteString.copyFrom(new byte[]{0x0A, 0x0B});
+        ByteString chunk1 = ByteString.copyFrom(new byte[]{0x0C, 0x0D, 0x0E});
+
+        DynamicMessage message = DynamicMessage.newBuilder(descriptor)
+            .setField(descriptor.findFieldByName("id"), 1)
+            .setField(descriptor.findFieldByName("data"), scalarBytes)
+            .addRepeatedField(descriptor.findFieldByName("chunks"), chunk0)
+            .addRepeatedField(descriptor.findFieldByName("chunks"), chunk1)
+            .build();
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+        int ordinal = mapper.add(message);
+        assertTrue("Ordinal should be non-negative", ordinal >= 0);
+
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        // Verify schema uses BYTES, not STRING
+        HollowObjectSchema schema = (HollowObjectSchema) readStateEngine.getSchema("BinaryData");
+        assertEquals(HollowObjectSchema.FieldType.BYTES, schema.getFieldType(schema.getPosition("data")));
+
+        // Verify scalar bytes
+        HollowObjectTypeReadState readState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("BinaryData");
+        assertArrayEquals(scalarBytes.toByteArray(), readState.readBytes(ordinal, schema.getPosition("data")));
+
+        // Verify repeated bytes via round-trip read
+        Message reconstructed = mapper.readHollowRecord(
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(
+                (com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState) readStateEngine.getTypeState("BinaryData"),
+                ordinal),
+            descriptor);
+        Descriptors.FieldDescriptor chunksField = descriptor.findFieldByName("chunks");
+        assertEquals("repeated bytes must have 2 elements", 2, reconstructed.getRepeatedFieldCount(chunksField));
+        assertEquals(chunk0, reconstructed.getRepeatedField(chunksField, 0));
+        assertEquals(chunk1, reconstructed.getRepeatedField(chunksField, 1));
+    }
+
+    /**
+     * Three-way round-trip for an {@code google.protobuf.Int64Value} field:
+     *
+     * <ol>
+     *   <li>Absent (field never set) → reference ordinal is -1 → reconstructed message has no field
+     *   <li>Normal value (42) → survives intact
+     *   <li>{@code Long.MIN_VALUE} inside a present {@code Int64Value} → data corruption:
+     *       the inner LONG is the Hollow null sentinel so it is stored as null; the wrapper
+     *       reference itself is non-null (the Long record was written), so the field reads back
+     *       as a <em>present</em> {@code Int64Value} with value {@code 0} rather than the
+     *       original {@code Long.MIN_VALUE}.
+     * </ol>
+     */
+    @Test
+    public void testInt64ValueNullAndMinValueRoundTrip() throws Exception {
+        Descriptors.FileDescriptor wrappersFileDesc = Int64Value.getDescriptor().getFile();
+
+        DescriptorProtos.FileDescriptorProto fileProto = DescriptorProtos.FileDescriptorProto.newBuilder()
+            .setName("test_int64value.proto")
+            .setSyntax("proto3")
+            .addDependency("google/protobuf/wrappers.proto")
+            .addMessageType(DescriptorProtos.DescriptorProto.newBuilder()
+                .setName("ValueHolder")
+                .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                    .setName("id").setNumber(1)
+                    .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT32)
+                    .setLabel(DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL))
+                .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                    .setName("value").setNumber(2)
+                    .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE)
+                    .setTypeName(".google.protobuf.Int64Value")
+                    .setLabel(DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL)))
+            .build();
+
+        Descriptors.FileDescriptor fileDesc = Descriptors.FileDescriptor.buildFrom(
+            fileProto, new Descriptors.FileDescriptor[]{wrappersFileDesc});
+        Descriptors.Descriptor descriptor = fileDesc.findMessageTypeByName("ValueHolder");
+        Descriptors.FieldDescriptor idField    = descriptor.findFieldByName("id");
+        Descriptors.FieldDescriptor valueField = descriptor.findFieldByName("value");
+
+        // Case 1: absent — field never set on the message
+        DynamicMessage absentMsg = DynamicMessage.newBuilder(descriptor)
+            .setField(idField, 1)
+            .build();
+
+        // Case 2: normal value
+        DynamicMessage normalMsg = DynamicMessage.newBuilder(descriptor)
+            .setField(idField, 2)
+            .setField(valueField, Int64Value.of(42L))
+            .build();
+
+        // Case 3: Long.MIN_VALUE — the Hollow null sentinel inside a present wrapper
+        DynamicMessage minValueMsg = DynamicMessage.newBuilder(descriptor)
+            .setField(idField, 3)
+            .setField(valueField, Int64Value.of(Long.MIN_VALUE))
+            .build();
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+        int absentOrdinal   = mapper.add(absentMsg);
+        int normalOrdinal   = mapper.add(normalMsg);
+        int minValueOrdinal = mapper.add(minValueMsg);
+
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        HollowObjectTypeReadState readState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("ValueHolder");
+
+        com.netflix.hollow.api.objects.generic.GenericHollowObject absentRecord =
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(readState, absentOrdinal);
+        com.netflix.hollow.api.objects.generic.GenericHollowObject normalRecord =
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(readState, normalOrdinal);
+        com.netflix.hollow.api.objects.generic.GenericHollowObject minValueRecord =
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(readState, minValueOrdinal);
+
+        Message absentReconstructed   = mapper.readHollowRecord(absentRecord,   descriptor);
+        Message normalReconstructed   = mapper.readHollowRecord(normalRecord,   descriptor);
+        Message minValueReconstructed = mapper.readHollowRecord(minValueRecord, descriptor);
+
+        // Case 1: absent → field must not be set on the reconstructed message
+        assertFalse("Absent Int64Value must not appear in the reconstructed message",
+            absentReconstructed.hasField(valueField));
+
+        // Case 2: normal value → exact round-trip
+        assertTrue("Int64Value(42) must be present after round-trip",
+            normalReconstructed.hasField(valueField));
+        Message normalWrapped = (Message) normalReconstructed.getField(valueField);
+        assertEquals(42L, normalWrapped.getField(
+            normalWrapped.getDescriptorForType().findFieldByName("value")));
+
+        // Case 3: Long.MIN_VALUE → the Long wrapper record IS written (non-null reference),
+        // but its inner LONG value is the Hollow null sentinel so it reads back as 0.
+        // The field therefore appears present but with a corrupted value.
+        assertTrue("The Int64Value wrapper reference is present (the Long record was written)",
+            minValueReconstructed.hasField(valueField));
+        Message minValueWrapped = (Message) minValueReconstructed.getField(valueField);
+        assertEquals(
+            "Long.MIN_VALUE is the Hollow null sentinel: the inner value is stored as null "
+                + "and reads back as 0 rather than Long.MIN_VALUE",
+            0L,
+            minValueWrapped.getField(minValueWrapped.getDescriptorForType().findFieldByName("value")));
+    }
+
+    /**
+     * Hollow encodes {@code Long.MIN_VALUE} as the null sentinel for LONG fields.
+     * This means an {@code int64} proto field containing {@code Long.MIN_VALUE} is stored as null
+     * and reads back as 0 (the proto3 default). This is a known data-loss edge case.
+     */
+    @Test
+    public void testLongMinValueIsNullSentinel() throws Exception {
+        DescriptorProtos.FileDescriptorProto fileProto = DescriptorProtos.FileDescriptorProto.newBuilder()
+            .setName("test_long.proto")
+            .setSyntax("proto3")
+            .addMessageType(DescriptorProtos.DescriptorProto.newBuilder()
+                .setName("LongHolder")
+                .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                    .setName("value").setNumber(1)
+                    .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT64)
+                    .setLabel(DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL)))
+            .build();
+        Descriptors.FileDescriptor fileDesc =
+            Descriptors.FileDescriptor.buildFrom(fileProto, new Descriptors.FileDescriptor[0]);
+        Descriptors.Descriptor descriptor = fileDesc.findMessageTypeByName("LongHolder");
+
+        // Verify that a normal Long value survives the round-trip
+        DynamicMessage normalMessage = DynamicMessage.newBuilder(descriptor)
+            .setField(descriptor.findFieldByName("value"), 42L)
+            .build();
+
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+        HollowMessageMapper mapper = new HollowMessageMapper(writeStateEngine);
+        int normalOrdinal = mapper.add(normalMessage);
+
+        // Write a message with Long.MIN_VALUE — this is the Hollow null sentinel
+        DynamicMessage minValueMessage = DynamicMessage.newBuilder(descriptor)
+            .setField(descriptor.findFieldByName("value"), Long.MIN_VALUE)
+            .build();
+        int minValueOrdinal = mapper.add(minValueMessage);
+
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        // Normal value round-trips correctly
+        HollowObjectTypeReadState readState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("LongHolder");
+        assertEquals(42L, readState.readLong(normalOrdinal, 0));
+
+        // Long.MIN_VALUE is treated as null by Hollow's LONG encoding.
+        // The field is stored as null and reads back as Long.MIN_VALUE (Hollow's null representation),
+        // but the proto read path's isNull() guard skips setting it, so the proto field returns 0.
+        Message reconstructed = mapper.readHollowRecord(
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(
+                (com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState) readStateEngine.getTypeState("LongHolder"),
+                minValueOrdinal),
+            descriptor);
+        Descriptors.FieldDescriptor valueField = descriptor.findFieldByName("value");
+        assertEquals(
+            "Long.MIN_VALUE is the Hollow null sentinel: the field is stored as null "
+                + "and reads back as the proto3 default (0) rather than Long.MIN_VALUE",
+            0L,
+            reconstructed.getField(valueField));
+    }
+
+    /**
+     * A boxed {@code Long} wrapper type (the Hollow object schema that wraps a LONG field,
+     * used for nullable int64 references) also treats {@code Long.MIN_VALUE} as null.
+     * Writing a {@code Long} wrapper with {@code value = Long.MIN_VALUE} stores the value
+     * field as null; reading it back returns 0 instead of {@code Long.MIN_VALUE}.
+     */
+    @Test
+    public void testBoxedLongMinValueIsNullSentinel() throws Exception {
+        HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
+
+        // Manually create a "Long" box schema (mirrors what ensurePrimitiveWrapperSchema creates)
+        HollowObjectSchema longBoxSchema = new HollowObjectSchema("Long", 1);
+        longBoxSchema.addField("value", HollowObjectSchema.FieldType.LONG);
+        writeStateEngine.addTypeState(new HollowObjectTypeWriteState(longBoxSchema));
+
+        com.netflix.hollow.core.write.HollowObjectWriteRecord rec =
+            new com.netflix.hollow.core.write.HollowObjectWriteRecord(longBoxSchema);
+
+        // Write Long.MIN_VALUE — the Hollow null sentinel
+        rec.reset();
+        rec.setLong("value", Long.MIN_VALUE);
+        int minOrdinal = ((HollowObjectTypeWriteState) writeStateEngine.getTypeState("Long")).add(rec);
+
+        // Write a control value
+        rec.reset();
+        rec.setLong("value", -1L);
+        int negOneOrdinal = ((HollowObjectTypeWriteState) writeStateEngine.getTypeState("Long")).add(rec);
+
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        HollowObjectTypeReadState longReadState =
+            (HollowObjectTypeReadState) readStateEngine.getTypeState("Long");
+
+        // Control: -1 round-trips correctly
+        assertEquals(-1L, longReadState.readLong(negOneOrdinal, 0));
+
+        // Long.MIN_VALUE is stored as null; getLong on a null long field returns Long.MIN_VALUE
+        // but isNull() returns true — so callers that guard on isNull() will see null, not the value.
+        assertTrue("Long.MIN_VALUE is the Hollow null sentinel: the field is stored as null",
+            new com.netflix.hollow.api.objects.generic.GenericHollowObject(longReadState, minOrdinal)
+                .isNull("value"));
     }
 
     private Message buildPersonWithNonce(
