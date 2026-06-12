@@ -221,6 +221,23 @@ List<Integer> movieIds;
 
     No consumer schema changes are required — both models produce the same `MapOfSubTypeKeyToString` map schema with the same `SubTypeKey` key type.  Delete the wrapper POJO class once all producers have migrated.
 
+**Compatible vs. incompatible changes**
+
+Whether adding `@HollowCollectionTypeName` or `@HollowMapTypeName` needs any special handling depends on the field:
+
+* **Adding the annotation on a _new_ field is a compatible change.**  A new dedicated type state simply appears in the data model — exactly like adding any new type or field.  Producers restore and continue emitting deltas as usual, and consumers pick up the new type seamlessly.  No special deployment steps are required.
+* **Adding the annotation to an _already-deployed_ field is an incompatible change.**  The annotation re-points an existing `List`/`Set`/`Map` type's element/key/value reference from the shared pool (e.g. the global `String` type) to a new dedicated type (e.g. `SubTypeKey`).  That rewrites the schema of an existing collection type, and Hollow cannot bridge it with a delta: within a delta chain a collection type's schema must stay identical.  This is the same restriction that applies to _any_ incompatible Hollow schema change (for example, changing a field's type).
+
+**Deploying the annotation on an existing field**
+
+Because the change is incompatible, the producer that introduces the annotation **cannot restore from a pre-annotation version and continue the existing delta chain** — attempting to do so fails the producer's integrity check, because a collection type's schema must be identical on both sides of a delta.  Roll it out as follows:
+
+1. Deploy the producer carrying the annotation so that, for this one transition, it does **not** restore from a pre-annotation version — let it start a fresh snapshot instead of continuing the chain.  (Any producer's first cycle without a restore produces a snapshot automatically; you only need to ensure the auto-restore-on-startup is bypassed for this single deploy.)
+2. Consumers move onto the new snapshot via a _double snapshot_.  This is the default consumer behavior (`allowDoubleSnapshot()` returns `true`), so no consumer change is needed.
+3. After the transition, normal operation resumes: subsequent producer restarts restore from new-schema versions (the schemas now match), deltas continue, and only the single old → new boundary required a snapshot.
+
+If your data model only ever adds these annotations to _new_ fields, none of the above applies.
+
 ### Grouping Associated Fields
 
 Referencing fields can save space because the same field values do not have to be repeated for every record in which they occur.  Similarly, we can _group_ fields which have covarying values, and pull these out from larger objects as their own types.  For example, imagine we started with a `Movie` type which included the following fields:

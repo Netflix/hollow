@@ -358,10 +358,11 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         private final HollowHashKey hashKeyAnnotation;
         private final HollowShardLargeType numShardsAnnotation;
         private final boolean isInlinedField;
+
         private MappedField(Field f) {
             this(f, new HashSet<Type>());
         }
-
+        
         @SuppressWarnings("deprecation")
         private MappedField(Field f, Set<Type> visitedTypes) {
             this.fieldOffset = unsafe.objectFieldOffset(f);
@@ -441,9 +442,10 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 }
                 // guard recursion here
                 visitedTypes.add(this.type);
-                String elementTypeName = collectionTypeNameAnnotation != null ? resolveElementTypeName(collectionTypeNameAnnotation, this.type, this.fieldName) : null;
-                String keyTypeName = mapTypeNameAnnotation != null ? resolveKeyTypeName(mapTypeNameAnnotation, this.type, this.fieldName) : null;
-                String valueTypeName = mapTypeNameAnnotation != null ? resolveValueTypeName(mapTypeNameAnnotation, this.type, this.fieldName) : null;
+                // Field-type validity was already checked at the top of this constructor.
+                String elementTypeName = collectionTypeNameAnnotation != null ? nullIfEmpty(collectionTypeNameAnnotation.elementTypeName()) : null;
+                String keyTypeName = mapTypeNameAnnotation != null ? nullIfEmpty(mapTypeNameAnnotation.keyTypeName()) : null;
+                String valueTypeName = mapTypeNameAnnotation != null ? nullIfEmpty(mapTypeNameAnnotation.valueTypeName()) : null;
                 subTypeMapper = parentMapper.getTypeMapper(type,
                         typeNameAnnotation != null ? typeNameAnnotation.name() : null,
                         hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null,
@@ -483,30 +485,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             if(typeNameAnnotation != null)
                 return typeNameAnnotation.name();
             return subTypeMapper.getTypeName();
-        }
-
-        private String resolveElementTypeName(HollowCollectionTypeName annotation, Type fieldType, String fieldName) {
-            if (!isListOrSetType(fieldType)) {
-                throw new IllegalStateException("@HollowCollectionTypeName on field '" + fieldName +
-                        "' is only valid for List or Set fields");
-            }
-            return nullIfEmpty(annotation.elementTypeName());
-        }
-
-        private String resolveKeyTypeName(HollowMapTypeName annotation, Type fieldType, String fieldName) {
-            if (!isMapType(fieldType)) {
-                throw new IllegalStateException("@HollowMapTypeName on field '" + fieldName +
-                        "' is only valid for Map fields");
-            }
-            return nullIfEmpty(annotation.keyTypeName());
-        }
-
-        private String resolveValueTypeName(HollowMapTypeName ann, Type fieldType, String fieldName) {
-            if (!isMapType(fieldType)) {
-                throw new IllegalStateException("@HollowMapTypeName on field '" + fieldName +
-                        "' is only valid for Map fields");
-            }
-            return nullIfEmpty(ann.valueTypeName());
         }
 
         private boolean isListOrSetType(Type t) {

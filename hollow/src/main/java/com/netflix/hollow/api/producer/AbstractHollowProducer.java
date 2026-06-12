@@ -353,6 +353,7 @@ abstract class AbstractHollowProducer {
                 if (hashCodeFinder != null) {
                     newObjectMapper.doNotUseDefaultHashKeys();
                 }
+
                 restoreAction.accept(readStates.current().getStateEngine(), writeEngine);
 
                 status.versions(versionDesired, readState.getVersion())

@@ -163,13 +163,13 @@ public class HollowObjectMapper {
     }
 
     /**
-     * @param type
-     * @param declaredName
-     * @param hashKeyFieldPaths
-     * @param numShards
-     * @param visited
-     * @param elementOrKeyTypeName
-     * @param valueTypeName
+     * @param type the Java type (a {@link Class} or {@link ParameterizedType}) to resolve a mapper for
+     * @param declaredName explicit Hollow type name to use; when {@code null} the name is derived from {@code type}
+     * @param hashKeyFieldPaths hash-key field paths for Set element / Map key types, or {@code null}
+     * @param numShards requested shard count for the type, or {@code -1} to use the default
+     * @param visited types currently being resolved, used to detect circular references
+     * @param elementOrKeyTypeName custom element type name (List/Set) or key type name (Map); {@code null} if unspecified
+     * @param valueTypeName custom value type name (Map only; ignored for List/Set); {@code null} if unspecified
      * @param enforceTypeNameConflictCheck when {@code true}, the resolved type name must be unique to a single
      *        Java type: if it is already registered for a different Java type, an {@link IllegalStateException}
      *        is thrown. When {@code false}, no such check is performed — if the name is already registered, the
@@ -235,6 +235,8 @@ public class HollowObjectMapper {
 
             HollowTypeMapper existing = typeMappers.putIfAbsent(typeName, typeMapper);
             if (existing != null) {
+                // Belt-and-suspenders: another thread registered this type name between our earlier
+                // typeMappers.get() and this putIfAbsent. Re-check the conflict against the winning mapper.
                 if (enforceTypeNameConflictCheck && !existing.getJavaType().equals(typeMapper.getJavaType())) {
                     throw new IllegalStateException(
                             "Hollow type name '" + typeName + "' is already registered for Java type " +

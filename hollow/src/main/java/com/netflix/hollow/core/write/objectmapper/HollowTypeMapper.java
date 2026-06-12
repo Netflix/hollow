@@ -55,8 +55,15 @@ public abstract class HollowTypeMapper {
     /**
      * Returns the Java class this mapper was built from.
      * Used to detect type name conflicts across fields.
+     *
+     * <p>Defaults to {@code Object.class} so that custom subclasses outside this library remain
+     * source-compatible. The built-in mappers override it with their concrete Java type. A subclass
+     * that does not override this simply never matches the type-name conflict check, which is the
+     * safe (non-throwing) behavior.
      */
-    protected abstract Class<?> getJavaType();
+    protected Class<?> getJavaType() {
+        return Object.class;
+    }
 
     /**
      * Returns {@code null} if the string is null or empty, otherwise returns the string.
