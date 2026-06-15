@@ -48,7 +48,15 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
 
     public HollowSetTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, String[] hashKeyFieldPaths,
                                int numShards, HollowWriteStateEngine stateEngine, boolean useDefaultHashKeys, Set<Type> visited) {
-        this.elementMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], null, null, -1, visited);
+        this(parentMapper, type, declaredName, hashKeyFieldPaths, numShards, stateEngine, useDefaultHashKeys, visited, null);
+    }
+
+    public HollowSetTypeMapper(HollowObjectMapper parentMapper, ParameterizedType type, String declaredName, String[] hashKeyFieldPaths,
+                               int numShards, HollowWriteStateEngine stateEngine, boolean useDefaultHashKeys, Set<Type> visited,
+                               String elementTypeName) {
+        String resolvedElementTypeName = nullIfEmpty(elementTypeName);
+        this.elementMapper = parentMapper.getTypeMapper(type.getActualTypeArguments()[0], resolvedElementTypeName, null, -1, visited,
+                null, null, resolvedElementTypeName != null);
         String typeName = declaredName != null ? declaredName : getDefaultTypeName(type);
         
         if(hashKeyFieldPaths == null && useDefaultHashKeys && (elementMapper instanceof HollowObjectTypeMapper))
@@ -64,6 +72,11 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
     @Override
     protected String getTypeName() {
         return schema.getName();
+    }
+
+    @Override
+    protected Class<?> getJavaType() {
+        return Set.class;
     }
 
     @Override

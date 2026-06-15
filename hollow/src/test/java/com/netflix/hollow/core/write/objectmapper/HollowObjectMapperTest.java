@@ -565,4 +565,143 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     static class Child extends Parent {
         String myField1;
     }
+
+    // -------------------------------------------------------------------------
+    // getTypeMapper tests
+    // -------------------------------------------------------------------------
+
+    @Test
+    public void getTypeMapper_returnsMapperForSimpleClass() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.initializeTypeState(TypeA.class);
+
+        Assert.assertNotNull(writeStateEngine.getTypeState("TypeA"));
+    }
+
+    @Test
+    public void getTypeMapper_sameTypeMappedTwice_returnsSameMapper() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.initializeTypeState(TypeA.class);
+        // Second call must not throw and must not create a duplicate type state
+        mapper.initializeTypeState(TypeA.class);
+
+        Assert.assertNotNull(writeStateEngine.getTypeState("TypeA"));
+    }
+
+    @Test
+    public void getTypeMapper_declaredNameOverridesAutoName() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.initializeTypeState(TypeWithDeclaredName.class);
+
+        Assert.assertNotNull("Custom name 'CustomType' should exist",
+                writeStateEngine.getTypeState("CustomType"));
+        Assert.assertNull("Auto name 'TypeWithDeclaredName' should not exist",
+                writeStateEngine.getTypeState("TypeWithDeclaredName"));
+    }
+
+    @Test
+    public void getTypeMapper_listFieldCreatesListTypeState() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.initializeTypeState(TypeWithList.class);
+
+        Assert.assertNotNull(writeStateEngine.getTypeState("ListOfString"));
+        Assert.assertNotNull(writeStateEngine.getTypeState("String"));
+    }
+
+    @Test
+    public void getTypeMapper_setFieldCreatesSetTypeState() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.initializeTypeState(TypeWithSet.class);
+
+        Assert.assertNotNull(writeStateEngine.getTypeState("SetOfString"));
+        Assert.assertNotNull(writeStateEngine.getTypeState("String"));
+    }
+
+    @Test
+    public void getTypeMapper_mapFieldCreatesMapTypeState() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.initializeTypeState(TypeWithMap.class);
+
+        Assert.assertNotNull(writeStateEngine.getTypeState("MapOfStringToString"));
+        Assert.assertNotNull(writeStateEngine.getTypeState("String"));
+    }
+
+    @Test
+    public void getTypeMapper_conflictingDeclaredNameForDifferentJavaTypes_throws() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        try {
+            mapper.initializeTypeState(TypeWithConflictingCollectionNames.class);
+            Assert.fail("Expected IllegalStateException for conflicting type names");
+        } catch (IllegalStateException e) {
+            Assert.assertTrue(e.getMessage().contains("SharedName"));
+            Assert.assertTrue(e.getMessage().contains("@HollowCollectionTypeName"));
+        }
+    }
+
+    @Test
+    public void getTypeMapper_conflictingDeclaredNameSameJavaType_doesNotThrow() {
+        // Same name, same Java type → share one type state; no conflict
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.initializeTypeState(TypeWithTwoListsSameElementName.class);
+
+        Assert.assertNotNull(writeStateEngine.getTypeState("SharedId"));
+    }
+
+    @Test
+    public void getTypeMapper_sameHollowTypeNameDifferentJavaTypes_withoutNewAnnotations_doesNotThrow() {
+        // Regression guard: without @HollowCollectionTypeName / @HollowMapTypeName, the
+        // type-name conflict check must NOT fire. Pre-feature behavior was to silently reuse
+        // the first registered mapper when two different Java types share a @HollowTypeName,
+        // so initialization must not throw. The new conflict validation is scoped strictly to
+        // the collection-type-naming annotations.
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        mapper.initializeTypeState(TypeWithSharedHollowTypeName.class);
+
+        // The shared name resolves to a single, reused type state — the second Java type does
+        // not create a separate one, matching the legacy reuse behavior.
+        Assert.assertNotNull("First type registered under the shared name should exist",
+                writeStateEngine.getTypeState("Shared"));
+        Assert.assertEquals("Both fields must share one type state under the reused name",
+                1, writeStateEngine.getOrderedTypeStates().stream()
+                        .filter(ts -> ts.getSchema().getName().equals("Shared")).count());
+    }
+
+    @HollowTypeName(name = "CustomType")
+    static class TypeWithDeclaredName {
+        String value;
+    }
+
+    @HollowTypeName(name = "Shared")
+    static class SharedTypeA {
+        int value;
+    }
+
+    @HollowTypeName(name = "Shared")
+    static class SharedTypeB {
+        int value;
+    }
+
+    static class TypeWithSharedHollowTypeName {
+        @HollowTypeName(name = "Shared")
+        SharedTypeA first;
+
+        @HollowTypeName(name = "Shared")
+        SharedTypeB second;
+    }
+
+    static class TypeWithConflictingCollectionNames {
+        @HollowCollectionTypeName(elementTypeName = "SharedName")
+        List<Integer> intIds;
+
+        @HollowCollectionTypeName(elementTypeName = "SharedName")
+        List<String> strNames;
+    }
+
+    static class TypeWithTwoListsSameElementName {
+        @HollowCollectionTypeName(elementTypeName = "SharedId")
+        List<Integer> primaryIds;
+
+        @HollowCollectionTypeName(elementTypeName = "SharedId")
+        Set<Integer> secondaryIds;
+    }
 }
