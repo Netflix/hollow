@@ -500,6 +500,73 @@ public class DuplicateDataDetectionValidatorTests {
         }
     }
 
+    /**
+     * Regression for the production false positives on the incremental DDD circuit-breaker path: a
+     * cycle whose duplicate check PASSES can still fail because another validator trips. The producer
+     * then rolls the read state back via the reverse delta, and follow-mode re-runs the same version.
+     * The lagged index must NOT have advanced on the failed cycle, otherwise the retry's delta check
+     * flags every genuinely-new record as a duplicate. The data here never contains a real duplicate
+     * primary key, so any failure of the duplicate validator on the retry is a false positive.
+     */
+    @Test
+    public void deltaIndexNotAdvancedWhenAnotherValidatorFailsTheCycle() {
+        AtomicBoolean failOtherValidator = new AtomicBoolean(false);
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
+                // A second, unrelated validator tripped on demand to fail the cycle AFTER the duplicate
+                // check has already passed (mirrors e.g. a cardinality circuit breaker).
+                .withListener(new ValidatorListener() {
+                    @Override public String getName() { return "FailOnDemandValidator"; }
+                    @Override public ValidationResult onValidate(HollowProducer.ReadState readState) {
+                        return failOtherValidator.get()
+                                ? ValidationResult.from(this).failed("forced failure")
+                                : ValidationResult.from(this).passed();
+                    }
+                })
+                .build();
+
+        // Cycle 1 (snapshot baseline): unique records — passes.
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+        });
+
+        // Cycle 2 (delta): unique records — passes; lagged index advances to {1,2,3}.
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+            writeState.add(new TypeWithPrimaryKey(3, "C"));
+        });
+
+        // Cycle 3 (delta): adds key 4 (no real duplicate), but the OTHER validator trips and fails the
+        // cycle. The duplicate check passes here, so the broken version advanced the lagged index to
+        // {1,2,3,4}; the producer then rolls the read state back to {1,2,3}.
+        failOtherValidator.set(true);
+        try {
+            producer.runCycle(writeState -> {
+                writeState.add(new TypeWithPrimaryKey(1, "A"));
+                writeState.add(new TypeWithPrimaryKey(2, "B"));
+                writeState.add(new TypeWithPrimaryKey(3, "C"));
+                writeState.add(new TypeWithPrimaryKey(4, "D"));
+            });
+            Assert.fail("Expected the cycle to fail due to the other validator");
+        } catch (ValidationStatusException expected) {
+            // expected — failure comes from FailOnDemandValidator, not the duplicate validator
+        }
+
+        // Cycle 4 (retry of the same data): the other validator passes now. The duplicate validator
+        // must NOT report a false positive — there has never been a duplicate primary key. Before the
+        // fix the lagged index was a version ahead of the rolled-back read state and key 4 was flagged.
+        failOtherValidator.set(false);
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+            writeState.add(new TypeWithPrimaryKey(3, "C"));
+            writeState.add(new TypeWithPrimaryKey(4, "D"));
+        });
+    }
+
     @HollowPrimaryKey(fields = {"id"})
     static class TypeWithPrimaryKey {
         int id;

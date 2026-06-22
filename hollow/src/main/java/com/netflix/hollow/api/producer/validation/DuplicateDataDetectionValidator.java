@@ -19,6 +19,7 @@ package com.netflix.hollow.api.producer.validation;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.Status;
+import com.netflix.hollow.api.producer.listener.CycleListener;
 import com.netflix.hollow.api.producer.listener.RestoreListener;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex.DuplicateKeyInfo;
@@ -58,7 +59,7 @@ import java.util.stream.Collectors;
  * stage will be naturally de-duped resulting in just one record present.  Therefore a validator created for such a
  * record's type will never fail.
  */
-public class DuplicateDataDetectionValidator implements ValidatorListener, RestoreListener {
+public class DuplicateDataDetectionValidator implements ValidatorListener, RestoreListener, CycleListener {
     private static final Logger LOG = Logger.getLogger(DuplicateDataDetectionValidator.class.getName());
     private static final int MAX_DISPLAYED_DUPLICATE_KEYS = 100;
     private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT =
@@ -99,8 +100,12 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
      */
     private final Supplier<Boolean> incrementalEnabled;
 
-    /** Lagged index reflecting the last successful cycle; advanced via {@code endUpdate()} on pass. */
+    /** Lagged index reflecting the last committed cycle; advanced via {@code endUpdate()}. */
     private HollowPrimaryKeyIndex previousCycleIndex;
+
+    // What onValidate did this cycle; consumed by onCycleComplete to advance/reset previousCycleIndex.
+    private enum CycleAction { NONE, BUILT_BASELINE, RAN_DELTA }
+    private CycleAction cycleAction = CycleAction.NONE;
 
     /**
      * Creates a validator to detect duplicate records of the type that corresponds to the given data type class
@@ -241,6 +246,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
             // Incremental mode, first cycle (or after restore / kill-switch toggle): full snapshot,
             // and retain the index so subsequent cycles can run the delta path.
             previousCycleIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
+            cycleAction = CycleAction.BUILT_BASELINE;
             LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, snapshot baseline.",
                     dataTypeName));
 
@@ -253,6 +259,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
                 result = vrb.passed();
             }
         } else {
+            cycleAction = CycleAction.RAN_DELTA;
             HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
             PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
             BitSet populatedOrdinals = listener.getPopulatedOrdinals();
@@ -282,11 +289,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
             }
         }
 
-        // Advance index only on pass — failed cycles don't change published state
-        if (result.isPassed()) {
-            previousCycleIndex.endUpdate();
-        }
-
+        // Index is advanced in onCycleComplete, gated on cycle success — not on this check passing.
         return result;
     }
 
@@ -355,6 +358,35 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
 
     @Override
     public void onProducerRestoreComplete(Status status, long versionDesired, long versionReached, Duration elapsed) {
+        // no-op
+    }
+
+    @Override
+    public void onCycleStart(long version) {
+        cycleAction = CycleAction.NONE;
+    }
+
+    @Override
+    public void onCycleComplete(Status status, ReadState readState, long version, Duration elapsed) {
+        if (status.getType() == Status.StatusType.SUCCESS) {
+            // Advance a delta cycle's index to the committed state; a fresh baseline already reflects it.
+            if (cycleAction == CycleAction.RAN_DELTA && previousCycleIndex != null) {
+                previousCycleIndex.endUpdate();
+            }
+        } else if (cycleAction == CycleAction.BUILT_BASELINE) {
+            // Baseline built this cycle reflects a rolled-back state; drop it so the next cycle rebuilds.
+            previousCycleIndex = null;
+        }
+        cycleAction = CycleAction.NONE;
+    }
+
+    @Override
+    public void onNewDeltaChain(long version) {
+        // no-op
+    }
+
+    @Override
+    public void onCycleSkip(CycleListener.CycleSkipReason reason) {
         // no-op
     }
 
