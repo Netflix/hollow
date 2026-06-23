@@ -107,6 +107,9 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
     private enum CycleAction { NONE, BUILT_BASELINE, RAN_DELTA }
     private CycleAction cycleAction = CycleAction.NONE;
 
+    // The read-state engine previousCycleIndex is bound to; a change means the lagged index is stale.
+    private HollowReadStateEngine indexStateEngine;
+
     /**
      * Creates a validator to detect duplicate records of the type that corresponds to the given data type class
      * annotated with {@link HollowPrimaryKey}.
@@ -197,6 +200,12 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
         return NAME + "_" + dataTypeName;
     }
 
+    // Drop the retained lagged index (and its engine binding) so the next cycle rebuilds a baseline.
+    private void dropLaggedIndex() {
+        previousCycleIndex = null;
+        indexStateEngine = null;
+    }
+
     @Override
     public ValidationResult onValidate(ReadState readState) {
         ValidationResult.ValidationResultBuilder vrb = ValidationResult.from(this);
@@ -230,7 +239,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
         if (!useIncremental) {
             // Full-scan-per-cycle path. Drop any stale lagged index so a later flip back to
             // incremental rebuilds from a fresh baseline. The fresh index built here is discarded.
-            previousCycleIndex = null;
+            dropLaggedIndex();
             LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': full-scan mode.", dataTypeName));
             HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
             Collection<DuplicateKeyInfo> duplicateKeys = index.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
@@ -241,11 +250,18 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
             return vrb.passed();
         }
 
+        if (previousCycleIndex != null && stateEngine != indexStateEngine) {
+            // Read-state engine swapped (restore / reinit / schema change / snapshot) — the lagged
+            // index's ordinal space no longer matches it. Drop it so this cycle rebuilds a baseline.
+            dropLaggedIndex();
+        }
+
         ValidationResult result;
         if (previousCycleIndex == null) {
             // Incremental mode, first cycle (or after restore / kill-switch toggle): full snapshot,
             // and retain the index so subsequent cycles can run the delta path.
             previousCycleIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
+            indexStateEngine = stateEngine;
             cycleAction = CycleAction.BUILT_BASELINE;
             LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, snapshot baseline.",
                     dataTypeName));
@@ -289,7 +305,6 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
             }
         }
 
-        // Index is advanced in onCycleComplete, gated on cycle success — not on this check passing.
         return result;
     }
 
@@ -352,7 +367,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
             LOG.info(String.format(
                     "Incremental duplicate data detection for type '%s': dropping lagged index due to producer restore to version %d.",
                     dataTypeName, restoreVersion));
-            previousCycleIndex = null;
+            dropLaggedIndex();
         }
     }
 
@@ -374,8 +389,9 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
                 previousCycleIndex.endUpdate();
             }
         } else if (cycleAction == CycleAction.BUILT_BASELINE) {
-            // Baseline built this cycle reflects a rolled-back state; drop it so the next cycle rebuilds.
-            previousCycleIndex = null;
+            // the cycle did not succed and therefore we need to drop
+            // the now outdated index.
+            dropLaggedIndex();
         }
         cycleAction = CycleAction.NONE;
     }

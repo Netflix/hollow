@@ -567,6 +567,52 @@ public class DuplicateDataDetectionValidatorTests {
         });
     }
 
+    /**
+     * A retained validator reused across a producer reinit (new read-state engine, no restore event)
+     * must detect the engine change and rebuild a baseline rather than run a delta against the stale
+     * engine the lagged index was bound to. Asserts the snapshot (full-scan) path is taken.
+     */
+    @Test
+    public void producerReinitRebuildsBaselineViaEngineChange() {
+        DuplicateDataDetectionValidator validator =
+                new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true);
+
+        // Producer 1: baseline + delta, so the validator retains a lagged index bound to its engine.
+        HollowProducer producer1 = HollowProducer.withPublisher(new InMemoryBlobStore())
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(validator)
+                .build();
+        producer1.runCycle(ws -> {
+            ws.add(new TypeWithPrimaryKey(1, "A"));
+            ws.add(new TypeWithPrimaryKey(2, "B"));
+        });
+        producer1.runCycle(ws -> {
+            ws.add(new TypeWithPrimaryKey(1, "A"));
+            ws.add(new TypeWithPrimaryKey(2, "B"));
+            ws.add(new TypeWithPrimaryKey(3, "C"));
+        });
+
+        // Producer 2 reuses the SAME validator but has a brand-new read-state engine. The retained
+        // index is bound to producer 1's engine, so the validator must rebuild a baseline (snapshot
+        // path) instead of running a delta against the stale engine. A duplicate must be caught with
+        // snapshot-path (full count) semantics, proving the baseline was rebuilt.
+        HollowProducer producer2 = HollowProducer.withPublisher(new InMemoryBlobStore())
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(validator)
+                .build();
+        try {
+            producer2.runCycle(ws -> {
+                ws.add(new TypeWithPrimaryKey(1, "A"));
+                ws.add(new TypeWithPrimaryKey(1, "A_dup"));
+            });
+            Assert.fail("Expected ValidationStatusException");
+        } catch (ValidationStatusException expected) {
+            String message = expected.getValidationStatus().getResults().get(0).getMessage();
+            Assert.assertTrue("Engine change should force the snapshot path, not a stale delta",
+                    message.contains("distinct keys that each have duplicate records affecting"));
+        }
+    }
+
     @HollowPrimaryKey(fields = {"id"})
     static class TypeWithPrimaryKey {
         int id;
