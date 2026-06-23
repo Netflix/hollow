@@ -500,49 +500,28 @@ public class DuplicateDataDetectionValidatorTests {
         }
     }
 
-    /**
-     * Regression for the production false positives on the incremental DDD circuit-breaker path: a
-     * cycle whose duplicate check PASSES can still fail because another validator trips. The producer
-     * then rolls the read state back via the reverse delta, and follow-mode re-runs the same version.
-     * The lagged index must NOT have advanced on the failed cycle, otherwise the retry's delta check
-     * flags every genuinely-new record as a duplicate. The data here never contains a real duplicate
-     * primary key, so any failure of the duplicate validator on the retry is a false positive.
-     */
     @Test
     public void deltaIndexNotAdvancedWhenAnotherValidatorFailsTheCycle() {
-        AtomicBoolean failOtherValidator = new AtomicBoolean(false);
+        ToggleValidator otherValidator = new ToggleValidator();
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
                 .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true))
-                // A second, unrelated validator tripped on demand to fail the cycle AFTER the duplicate
-                // check has already passed (mirrors e.g. a cardinality circuit breaker).
-                .withListener(new ValidatorListener() {
-                    @Override public String getName() { return "FailOnDemandValidator"; }
-                    @Override public ValidationResult onValidate(HollowProducer.ReadState readState) {
-                        return failOtherValidator.get()
-                                ? ValidationResult.from(this).failed("forced failure")
-                                : ValidationResult.from(this).passed();
-                    }
-                })
+                .withListener(otherValidator)
                 .build();
 
-        // Cycle 1 (snapshot baseline): unique records — passes.
+        // Snapshot baseline, then a clean delta: the lagged index advances to {1,2,3}.
         producer.runCycle(writeState -> {
             writeState.add(new TypeWithPrimaryKey(1, "A"));
             writeState.add(new TypeWithPrimaryKey(2, "B"));
         });
-
-        // Cycle 2 (delta): unique records — passes; lagged index advances to {1,2,3}.
         producer.runCycle(writeState -> {
             writeState.add(new TypeWithPrimaryKey(1, "A"));
             writeState.add(new TypeWithPrimaryKey(2, "B"));
             writeState.add(new TypeWithPrimaryKey(3, "C"));
         });
 
-        // Cycle 3 (delta): adds key 4 (no real duplicate), but the OTHER validator trips and fails the
-        // cycle. The duplicate check passes here, so the broken version advanced the lagged index to
-        // {1,2,3,4}; the producer then rolls the read state back to {1,2,3}.
-        failOtherValidator.set(true);
+        // Delta adds key 4 (no duplicate); the duplicate check passes but the other validator fails the cycle.
+        otherValidator.fail.set(true);
         try {
             producer.runCycle(writeState -> {
                 writeState.add(new TypeWithPrimaryKey(1, "A"));
@@ -550,15 +529,13 @@ public class DuplicateDataDetectionValidatorTests {
                 writeState.add(new TypeWithPrimaryKey(3, "C"));
                 writeState.add(new TypeWithPrimaryKey(4, "D"));
             });
-            Assert.fail("Expected the cycle to fail due to the other validator");
+            Assert.fail("Expected ValidationStatusException");
         } catch (ValidationStatusException expected) {
-            // expected — failure comes from FailOnDemandValidator, not the duplicate validator
+            // the other validator failed, not the duplicate check
         }
 
-        // Cycle 4 (retry of the same data): the other validator passes now. The duplicate validator
-        // must NOT report a false positive — there has never been a duplicate primary key. Before the
-        // fix the lagged index was a version ahead of the rolled-back read state and key 4 was flagged.
-        failOtherValidator.set(false);
+        // Retry of the same data must not report a false duplicate.
+        otherValidator.fail.set(false);
         producer.runCycle(writeState -> {
             writeState.add(new TypeWithPrimaryKey(1, "A"));
             writeState.add(new TypeWithPrimaryKey(2, "B"));
@@ -567,49 +544,106 @@ public class DuplicateDataDetectionValidatorTests {
         });
     }
 
-    /**
-     * A retained validator reused across a producer reinit (new read-state engine, no restore event)
-     * must detect the engine change and rebuild a baseline rather than run a delta against the stale
-     * engine the lagged index was bound to. Asserts the snapshot (full-scan) path is taken.
-     */
+    @Test
+    public void baselineDroppedWhenAnotherValidatorFailsTheCycle() {
+        AtomicBoolean incremental = new AtomicBoolean(true);
+        ToggleValidator otherValidator = new ToggleValidator();
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, incremental::get))
+                .withListener(otherValidator)
+                .build();
+
+        // Incremental baseline, then a full-scan cycle that drops the retained index.
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+        });
+        incremental.set(false);
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+            writeState.add(new TypeWithPrimaryKey(3, "C"));
+        });
+
+        // Back to incremental: this cycle rebuilds the baseline, but the other validator fails the cycle.
+        incremental.set(true);
+        otherValidator.fail.set(true);
+        try {
+            producer.runCycle(writeState -> {
+                writeState.add(new TypeWithPrimaryKey(1, "A"));
+                writeState.add(new TypeWithPrimaryKey(2, "B"));
+                writeState.add(new TypeWithPrimaryKey(3, "C"));
+                writeState.add(new TypeWithPrimaryKey(4, "D"));
+            });
+            Assert.fail("Expected ValidationStatusException");
+        } catch (ValidationStatusException expected) {
+            // the other validator failed, not the duplicate check
+        }
+
+        // Retry of the same data must not report a false duplicate (the dropped baseline is rebuilt).
+        otherValidator.fail.set(false);
+        producer.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+            writeState.add(new TypeWithPrimaryKey(3, "C"));
+            writeState.add(new TypeWithPrimaryKey(4, "D"));
+        });
+    }
+
     @Test
     public void producerReinitRebuildsBaselineViaEngineChange() {
         DuplicateDataDetectionValidator validator =
                 new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class, () -> true);
 
-        // Producer 1: baseline + delta, so the validator retains a lagged index bound to its engine.
-        HollowProducer producer1 = HollowProducer.withPublisher(new InMemoryBlobStore())
+        // First producer: baseline + delta, so the validator retains an index bound to this engine.
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
                 .withListener(validator)
                 .build();
-        producer1.runCycle(ws -> {
-            ws.add(new TypeWithPrimaryKey(1, "A"));
-            ws.add(new TypeWithPrimaryKey(2, "B"));
+        producer1.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
         });
-        producer1.runCycle(ws -> {
-            ws.add(new TypeWithPrimaryKey(1, "A"));
-            ws.add(new TypeWithPrimaryKey(2, "B"));
-            ws.add(new TypeWithPrimaryKey(3, "C"));
+        producer1.runCycle(writeState -> {
+            writeState.add(new TypeWithPrimaryKey(1, "A"));
+            writeState.add(new TypeWithPrimaryKey(2, "B"));
+            writeState.add(new TypeWithPrimaryKey(3, "C"));
         });
 
-        // Producer 2 reuses the SAME validator but has a brand-new read-state engine. The retained
-        // index is bound to producer 1's engine, so the validator must rebuild a baseline (snapshot
-        // path) instead of running a delta against the stale engine. A duplicate must be caught with
-        // snapshot-path (full count) semantics, proving the baseline was rebuilt.
+        // A second producer reuses the same validator but has a new engine (reinit, not a restore).
+        // The stale index must be dropped and a baseline rebuilt, so a duplicate is caught on the
+        // snapshot path (exact counts) rather than missed by a delta against the old engine.
         HollowProducer producer2 = HollowProducer.withPublisher(new InMemoryBlobStore())
                 .withBlobStager(new HollowInMemoryBlobStager())
                 .withListener(validator)
                 .build();
         try {
-            producer2.runCycle(ws -> {
-                ws.add(new TypeWithPrimaryKey(1, "A"));
-                ws.add(new TypeWithPrimaryKey(1, "A_dup"));
+            producer2.runCycle(writeState -> {
+                writeState.add(new TypeWithPrimaryKey(1, "A"));
+                writeState.add(new TypeWithPrimaryKey(1, "A_dup"));
             });
             Assert.fail("Expected ValidationStatusException");
         } catch (ValidationStatusException expected) {
             String message = expected.getValidationStatus().getResults().get(0).getMessage();
-            Assert.assertTrue("Engine change should force the snapshot path, not a stale delta",
-                    message.contains("distinct keys that each have duplicate records affecting"));
+            Assert.assertTrue(message.contains("distinct keys that each have duplicate records affecting"));
+        }
+    }
+
+    // A second validator the test can switch on to fail a cycle after the duplicate check has passed.
+    private static final class ToggleValidator implements ValidatorListener {
+        final AtomicBoolean fail = new AtomicBoolean(false);
+
+        @Override
+        public String getName() {
+            return "ToggleValidator";
+        }
+
+        @Override
+        public ValidationResult onValidate(HollowProducer.ReadState readState) {
+            return fail.get()
+                    ? ValidationResult.from(this).failed("forced failure")
+                    : ValidationResult.from(this).passed();
         }
     }
 
