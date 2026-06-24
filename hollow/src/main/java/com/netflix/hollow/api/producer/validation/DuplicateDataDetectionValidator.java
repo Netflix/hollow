@@ -379,7 +379,15 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
         if (status.getType() == Status.StatusType.SUCCESS) {
             // Advance a delta cycle's index to the committed state; a fresh baseline already reflects it.
             if (cycleAction == CycleAction.RAN_DELTA && previousCycleIndex != null) {
-                previousCycleIndex.endUpdate();
+                try {
+                    previousCycleIndex.endUpdate();
+                } catch (RuntimeException e) {
+                    LOG.log(Level.WARNING, String.format(
+                            "Incremental duplicate data detection for type '%s': failed to advance lagged index "
+                                    + "to version %d; dropping it so the next cycle rebuilds from a snapshot baseline.",
+                            dataTypeName, version), e);
+                    dropLaggedIndex();
+                }
             }
         } else if (cycleAction == CycleAction.BUILT_BASELINE) {
             // A baseline built this cycle was rolled back; drop it so the next cycle rebuilds.
