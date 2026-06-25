@@ -19,6 +19,7 @@ package com.netflix.hollow.api.producer.validation;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.Status;
+import com.netflix.hollow.api.producer.listener.CycleListener;
 import com.netflix.hollow.api.producer.listener.RestoreListener;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex.DuplicateKeyInfo;
@@ -58,7 +59,7 @@ import java.util.stream.Collectors;
  * stage will be naturally de-duped resulting in just one record present.  Therefore a validator created for such a
  * record's type will never fail.
  */
-public class DuplicateDataDetectionValidator implements ValidatorListener, RestoreListener {
+public class DuplicateDataDetectionValidator implements ValidatorListener, RestoreListener, CycleListener {
     private static final Logger LOG = Logger.getLogger(DuplicateDataDetectionValidator.class.getName());
     private static final int MAX_DISPLAYED_DUPLICATE_KEYS = 100;
     private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT =
@@ -99,8 +100,15 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
      */
     private final Supplier<Boolean> incrementalEnabled;
 
-    /** Lagged index reflecting the last successful cycle; advanced via {@code endUpdate()} on pass. */
+    /** Lagged index reflecting the last committed cycle; advanced via {@code endUpdate()}. */
     private HollowPrimaryKeyIndex previousCycleIndex;
+
+    // What onValidate did this cycle; consumed by onCycleComplete to advance/reset previousCycleIndex.
+    private enum CycleAction { NONE, BUILT_BASELINE, RAN_DELTA }
+    private CycleAction cycleAction = CycleAction.NONE;
+
+    // The read-state engine previousCycleIndex is bound to; a change means the lagged index is stale.
+    private HollowReadStateEngine indexStateEngine;
 
     /**
      * Creates a validator to detect duplicate records of the type that corresponds to the given data type class
@@ -192,23 +200,28 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
         return NAME + "_" + dataTypeName;
     }
 
+    private void dropLaggedIndex() {
+        previousCycleIndex = null;
+        indexStateEngine = null;
+    }
+
     @Override
     public ValidationResult onValidate(ReadState readState) {
         ValidationResult.ValidationResultBuilder vrb = ValidationResult.from(this);
         vrb.detail(DATA_TYPE_NAME, dataTypeName);
 
+        HollowReadStateEngine stateEngine = readState.getStateEngine();
+
         PrimaryKey primaryKey;
         if (fieldPathNames == null) {
-            HollowSchema schema = readState.getStateEngine().getSchema(dataTypeName);
+            HollowSchema schema = stateEngine.getSchema(dataTypeName);
             if (schema == null) {
                 return vrb.failed(String.format(NO_SCHEMA_FOUND_MSG_FORMAT, dataTypeName));
             }
             if (schema.getSchemaType() != SchemaType.OBJECT) {
                 return vrb.failed(String.format(NOT_AN_OBJECT_ERROR_MSG_FORMAT, dataTypeName));
             }
-
-            HollowObjectSchema oSchema = (HollowObjectSchema) schema;
-            primaryKey = oSchema.getPrimaryKey();
+            primaryKey = ((HollowObjectSchema) schema).getPrimaryKey();
             if (primaryKey == null) {
                 return vrb.failed(String.format(NO_PRIMARY_KEY_ERROR_MSG_FORMAT, dataTypeName));
             }
@@ -219,75 +232,73 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
         String fieldPaths = Arrays.toString(primaryKey.getFieldPaths());
         vrb.detail(FIELD_PATH_NAME, fieldPaths);
 
-        HollowReadStateEngine stateEngine = readState.getStateEngine();
-        boolean useIncremental = Boolean.TRUE.equals(incrementalEnabled.get());
+        if (!Boolean.TRUE.equals(incrementalEnabled.get())) {
+            return validateFullScan(stateEngine, primaryKey, fieldPaths, vrb);
+        }
 
-        if (!useIncremental) {
-            // Full-scan-per-cycle path. Drop any stale lagged index so a later flip back to
-            // incremental rebuilds from a fresh baseline. The fresh index built here is discarded.
-            previousCycleIndex = null;
-            LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': full-scan mode.", dataTypeName));
-            HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
-            Collection<DuplicateKeyInfo> duplicateKeys = index.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
-            if (!duplicateKeys.isEmpty()) {
-                return vrb.failed(String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths,
-                        duplicateKeysToString(duplicateKeys)));
-            }
+        dropLaggedIndexIfEngineChanged(stateEngine);
+        return previousCycleIndex == null
+                ? validateSnapshotBaseline(stateEngine, primaryKey, fieldPaths, vrb)
+                : validateDelta(stateEngine, fieldPaths, vrb);
+    }
+
+    private ValidationResult validateFullScan(HollowReadStateEngine stateEngine, PrimaryKey primaryKey,
+                                              String fieldPaths, ValidationResult.ValidationResultBuilder vrb) {
+        dropLaggedIndex();
+        LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': full-scan mode.", dataTypeName));
+        return checkForDuplicates(new HollowPrimaryKeyIndex(stateEngine, primaryKey), fieldPaths, vrb);
+    }
+
+    private ValidationResult validateSnapshotBaseline(HollowReadStateEngine stateEngine, PrimaryKey primaryKey,
+                                                      String fieldPaths, ValidationResult.ValidationResultBuilder vrb) {
+        previousCycleIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
+        indexStateEngine = stateEngine;
+        cycleAction = CycleAction.BUILT_BASELINE;
+        LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, snapshot baseline.", dataTypeName));
+        return checkForDuplicates(previousCycleIndex, fieldPaths, vrb);
+    }
+
+    private ValidationResult checkForDuplicates(HollowPrimaryKeyIndex index, String fieldPaths,
+                                                ValidationResult.ValidationResultBuilder vrb) {
+        Collection<DuplicateKeyInfo> duplicateKeys = index.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
+        if (!duplicateKeys.isEmpty()) {
+            return vrb.failed(String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths,
+                    duplicateKeysToString(duplicateKeys)));
+        }
+        return vrb.passed();
+    }
+
+    private ValidationResult validateDelta(HollowReadStateEngine stateEngine, String fieldPaths,
+                                           ValidationResult.ValidationResultBuilder vrb) {
+        cycleAction = CycleAction.RAN_DELTA;
+        HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
+        PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
+        BitSet populatedOrdinals = listener.getPopulatedOrdinals();
+        BitSet previousOrdinals = listener.getPreviousOrdinals();
+
+        BitSet newOrdinals = new BitSet(Math.max(populatedOrdinals.size(), previousOrdinals.size()));
+        newOrdinals.or(populatedOrdinals);
+        newOrdinals.andNot(previousOrdinals);
+
+        LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, delta (%d total, %d new ordinals).",
+                dataTypeName, populatedOrdinals.cardinality(), newOrdinals.cardinality()));
+
+        if (newOrdinals.isEmpty()) {
             return vrb.passed();
         }
-
-        ValidationResult result;
-        if (previousCycleIndex == null) {
-            // Incremental mode, first cycle (or after restore / kill-switch toggle): full snapshot,
-            // and retain the index so subsequent cycles can run the delta path.
-            previousCycleIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey);
-            LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, snapshot baseline.",
-                    dataTypeName));
-
-            Collection<DuplicateKeyInfo> duplicateKeys = previousCycleIndex.getDuplicateKeys(MAX_DISPLAYED_DUPLICATE_KEYS);
-            if (!duplicateKeys.isEmpty()) {
-                String message = String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths,
-                        duplicateKeysToString(duplicateKeys));
-                result = vrb.failed(message);
-            } else {
-                result = vrb.passed();
-            }
-        } else {
-            HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
-            PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
-            BitSet populatedOrdinals = listener.getPopulatedOrdinals();
-            BitSet previousOrdinals = listener.getPreviousOrdinals();
-
-            // Pre-size to avoid resizing during the or/andNot below; BitSet.size() returns allocated
-            // bit capacity (a multiple of 64), which is what the BitSet(int) constructor expects.
-            BitSet newOrdinals = new BitSet(Math.max(populatedOrdinals.size(), previousOrdinals.size()));
-            newOrdinals.or(populatedOrdinals);
-            newOrdinals.andNot(previousOrdinals);
-
-            LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, delta (%d total, %d new ordinals).",
-                    dataTypeName, populatedOrdinals.cardinality(), newOrdinals.cardinality()));
-
-            if (!newOrdinals.isEmpty()) {
-                List<Object[]> duplicateKeys = findDuplicateKeysInDelta(
-                        previousCycleIndex, newOrdinals, populatedOrdinals);
-                if (!duplicateKeys.isEmpty()) {
-                    String message = String.format(DUPLICATE_KEYS_FOUND_DELTA_MSG_FORMAT, dataTypeName, fieldPaths,
-                            deltaDuplicateKeysToString(duplicateKeys));
-                    result = vrb.failed(message);
-                } else {
-                    result = vrb.passed();
-                }
-            } else {
-                result = vrb.passed();
-            }
+        List<Object[]> duplicateKeys = findDuplicateKeysInDelta(previousCycleIndex, newOrdinals, populatedOrdinals);
+        if (!duplicateKeys.isEmpty()) {
+            return vrb.failed(String.format(DUPLICATE_KEYS_FOUND_DELTA_MSG_FORMAT, dataTypeName, fieldPaths,
+                    deltaDuplicateKeysToString(duplicateKeys)));
         }
+        return vrb.passed();
+    }
 
-        // Advance index only on pass — failed cycles don't change published state
-        if (result.isPassed()) {
-            previousCycleIndex.endUpdate();
+    // A new engine instance (restore / reinit / schema change) leaves the lagged index's ordinals stale.
+    private void dropLaggedIndexIfEngineChanged(HollowReadStateEngine stateEngine) {
+        if (previousCycleIndex != null && stateEngine != indexStateEngine) {
+            dropLaggedIndex();
         }
-
-        return result;
     }
 
     /**
@@ -349,12 +360,51 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
             LOG.info(String.format(
                     "Incremental duplicate data detection for type '%s': dropping lagged index due to producer restore to version %d.",
                     dataTypeName, restoreVersion));
-            previousCycleIndex = null;
+            dropLaggedIndex();
         }
     }
 
     @Override
     public void onProducerRestoreComplete(Status status, long versionDesired, long versionReached, Duration elapsed) {
+        // no-op
+    }
+
+    @Override
+    public void onCycleStart(long version) {
+        cycleAction = CycleAction.NONE;
+    }
+
+    @Override
+    public void onCycleComplete(Status status, ReadState readState, long version, Duration elapsed) {
+        if (status.getType() == Status.StatusType.SUCCESS) {
+            // Advance a delta cycle's index to the committed state; a fresh baseline already reflects it.
+            if (cycleAction == CycleAction.RAN_DELTA && previousCycleIndex != null) {
+                try {
+                    previousCycleIndex.endUpdate();
+                } catch (RuntimeException e) {
+                    LOG.log(Level.WARNING, String.format(
+                            "Incremental duplicate data detection for type '%s': failed to advance lagged index "
+                                    + "to version %d; dropping it so the next cycle rebuilds from a snapshot baseline.",
+                            dataTypeName, version), e);
+                    dropLaggedIndex();
+                }
+            }
+        } else if (cycleAction == CycleAction.BUILT_BASELINE) {
+            // A baseline built this cycle was rolled back; drop it so the next cycle rebuilds.
+            dropLaggedIndex();
+        }
+        // A failed RAN_DELTA cycle needs no action: the producer rolls the delta back to the prior
+        // version, which previousCycleIndex still reflects (it was never advanced). cycleAction is
+        // reset by onCycleStart, which the producer guarantees runs before the next cycle.
+    }
+
+    @Override
+    public void onNewDeltaChain(long version) {
+        // no-op
+    }
+
+    @Override
+    public void onCycleSkip(CycleListener.CycleSkipReason reason) {
         // no-op
     }
 
