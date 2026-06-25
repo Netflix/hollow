@@ -39,6 +39,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,6 +70,8 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
     private final BitSet specificOrdinalsToIndex;
 
+    private final BooleanSupplier allowDeltaUpdate;
+
     private volatile PrimaryKeyIndexHashTable hashTableVolatile;
 
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, String type, String... fieldPaths) {
@@ -77,6 +80,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
         this(stateEngine, primaryKey, WastefulRecycler.DEFAULT_INSTANCE);
+    }
+
+    public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, BooleanSupplier allowDeltaUpdate) {
+        this(stateEngine, primaryKey, WastefulRecycler.DEFAULT_INSTANCE, null, allowDeltaUpdate);
     }
 
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, ArraySegmentRecycler memoryRecycler, String type, String... fieldPaths) {
@@ -96,11 +103,17 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * @param specificOrdinalsToIndex the bit set
      */
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler, BitSet specificOrdinalsToIndex) {
+        this(stateEngine, primaryKey, memoryRecycler, specificOrdinalsToIndex, DEFAULT_ALLOW_DELTA_UPDATE);
+    }
+
+    private HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler, BitSet specificOrdinalsToIndex, BooleanSupplier allowDeltaUpdate) {
         requireNonNull(primaryKey, "Hollow Primary Key Index creation failed because primaryKey was null");
         requireNonNull(stateEngine, "Hollow Primary Key Index creation for type [" + primaryKey.getType()
                 + "] failed because read state wasn't initialized");
+        requireNonNull(allowDeltaUpdate, "Hollow Primary Key Index creation failed because allowDeltaUpdate was null");
 
         this.primaryKey = primaryKey;
+        this.allowDeltaUpdate = allowDeltaUpdate;
         this.fieldPathIndexes = new int[primaryKey.numFields()][];
         this.fieldTypes = new FieldType[primaryKey.numFields()];
 
@@ -459,6 +472,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
     private static final boolean ALLOW_DELTA_UPDATE =
             Boolean.getBoolean("com.netflix.hollow.core.index.HollowPrimaryKeyIndex.allowDeltaUpdate");
+    private static final BooleanSupplier DEFAULT_ALLOW_DELTA_UPDATE = () -> ALLOW_DELTA_UPDATE;
 
     @Override
     public synchronized void endUpdate() {
@@ -472,7 +486,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         int bitsPerElement = (32 - Integer.numberOfLeadingZeros(typeState.maxOrdinal() + 1));
 
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
-        if(ALLOW_DELTA_UPDATE
+        if(allowDeltaUpdate.getAsBoolean()
                 && hashTableSize == hashTable.hashTableSize
                 && bitsPerElement == hashTable.bitsPerElement
                 && shouldPerformDeltaUpdate()) {
