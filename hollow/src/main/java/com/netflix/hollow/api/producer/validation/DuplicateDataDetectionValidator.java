@@ -393,7 +393,9 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
             // A baseline built this cycle was rolled back; drop it so the next cycle rebuilds.
             dropLaggedIndex();
         }
-        cycleAction = CycleAction.NONE;
+        // A failed RAN_DELTA cycle needs no action: the producer rolls the delta back to the prior
+        // version, which previousCycleIndex still reflects (it was never advanced). cycleAction is
+        // reset by onCycleStart, which the producer guarantees runs before the next cycle.
     }
 
     @Override
