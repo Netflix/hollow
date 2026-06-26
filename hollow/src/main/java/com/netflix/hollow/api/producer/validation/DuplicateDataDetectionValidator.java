@@ -251,8 +251,7 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
 
     private ValidationResult validateSnapshotBaseline(HollowReadStateEngine stateEngine, PrimaryKey primaryKey,
                                                       String fieldPaths, ValidationResult.ValidationResultBuilder vrb) {
-        previousCycleIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey,
-                () -> Boolean.TRUE.equals(incrementalEnabled.get()));
+        previousCycleIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey, incrementalEnabled);
         indexStateEngine = stateEngine;
         cycleAction = CycleAction.BUILT_BASELINE;
         LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, snapshot baseline.", dataTypeName));
