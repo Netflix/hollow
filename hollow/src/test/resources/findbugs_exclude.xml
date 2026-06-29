@@ -9,4 +9,10 @@
     <Field name="fieldNames" />
     <Bug pattern="MS_PKGPROTECT" />
   </Match>
+
+  <!-- Generated APIs for very large data models can exceed the size FindBugs is willing to
+       analyze; this is an informational "class too big" skip, not a real defect. -->
+  <Match>
+    <Bug pattern="SKIPPED_CLASS_TOO_BIG" />
+  </Match>
 </FindBugsFilter>
