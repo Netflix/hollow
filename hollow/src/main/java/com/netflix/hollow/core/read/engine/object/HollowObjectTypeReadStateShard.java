@@ -81,7 +81,9 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
     public long readLong(int ordinal, int fieldIndex) {
         long bitOffset = fieldOffset(ordinal, fieldIndex);
         int numBitsForField = dataElements.bitsPerField[fieldIndex];
-        return dataElements.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
+        return numBitsForField <= 56 ?
+                dataElements.fixedLengthData.getElementValue(bitOffset, numBitsForField)
+                : dataElements.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
     }
 
     public long readBoolean(int ordinal, int fieldIndex) {
