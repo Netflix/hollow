@@ -12,6 +12,7 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,6 +34,9 @@ import org.junit.Test;
  */
 public class HollowObjectTypeReadStateReadLongTest {
 
+    // Pinned to a single shard so that ordinals never span shards: bitsPerField is then uniform
+    // across the (only) shard, making the shard[0] path assertions below valid and deterministic.
+    @HollowShardLargeType(numShards = 1)
     public static class LongHolder {
         long value;
         LongHolder(long value) { this.value = value; }

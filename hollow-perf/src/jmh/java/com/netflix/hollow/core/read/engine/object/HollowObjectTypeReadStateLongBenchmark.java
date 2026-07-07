@@ -62,7 +62,10 @@ public class HollowObjectTypeReadStateLongBenchmark {
         Random r = new Random(42);
         // Zig-zag encoding roughly doubles magnitude, so cap at maxBits-1 raw to land around maxBits encoded.
         long bound = 1L << Math.max(1, maxBits - 1);
-        for (int i = 0; i < countRecordsDb; i++) {
+        // Pin the maximum magnitude so bitsPerField deterministically equals maxBits (and thus the
+        // intended readLong path is exercised), independent of record count / seed / sampling.
+        objectMapper.add(new LongHolder(bound - 1));
+        for (int i = 1; i < countRecordsDb; i++) {
             long v = (r.nextLong() & (bound - 1));
             objectMapper.add(new LongHolder(v));
         }
