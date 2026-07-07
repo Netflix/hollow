@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
  */
 public class DuplicateDataDetectionValidator implements ValidatorListener, RestoreListener, CycleListener {
     private static final Logger LOG = Logger.getLogger(DuplicateDataDetectionValidator.class.getName());
-    private static final int MAX_DISPLAYED_DUPLICATE_KEYS = 100;
+    private static final int MAX_DISPLAYED_DUPLICATE_KEYS = 10;
     private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT =
             "Duplicate keys found for type %s. Primarykey in schema is %s. "
                     + "Duplicate IDs are: %s";
