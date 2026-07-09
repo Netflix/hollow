@@ -291,26 +291,44 @@ abstract class AbstractHollowProducer {
      * @see #initializeDataModel(Class[])
      */
     public HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
-        return restore(new HollowConsumer.VersionInfo(versionDesired), blobRetriever,
-                (restoreFrom, restoreTo) -> restoreTo.restoreFrom(restoreFrom));
+        return restore(new HollowConsumer.VersionInfo(versionDesired), blobRetriever);
     }
 
     public HollowProducer.ReadState restore(HollowConsumer.VersionInfo versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
-        return restore(versionDesired, blobRetriever,
+        return restore(versionDesired.getVersion(),
+                () -> retrieveReadState(versionDesired, blobRetriever, this.updatePlanBlobVerifier),
                 (restoreFrom, restoreTo) -> restoreTo.restoreFrom(restoreFrom));
     }
 
+    public HollowProducer.ReadState restore(long readStateEngineVersion, HollowReadStateEngine readStateEngine) {
+        return restore(readStateEngineVersion,
+                () -> ReadStateHelper.newReadState(readStateEngineVersion, readStateEngine),
+                (restoreFrom, restoreTo) -> restoreTo.restoreFrom(restoreFrom));
+    }
+
+
     HollowProducer.ReadState hardRestore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
-        return restore(new HollowConsumer.VersionInfo(versionDesired), blobRetriever,
+        HollowConsumer.VersionInfo versionInfoDesired = new HollowConsumer.VersionInfo(versionDesired);
+        return restore(versionDesired,
+                () -> retrieveReadState(versionInfoDesired, blobRetriever, this.updatePlanBlobVerifier),
                 (restoreFrom, restoreTo) -> HollowWriteStateCreator.
                         populateUsingReadEngine(restoreTo, restoreFrom, false));
     }
 
-    private HollowProducer.ReadState restore(
-            HollowConsumer.VersionInfo versionInfoDesired, HollowConsumer.BlobRetriever blobRetriever,
-            BiConsumer<HollowReadStateEngine, HollowWriteStateEngine> restoreAction) {
-        long versionDesired = versionInfoDesired.getVersion();
+    private static HollowProducer.ReadState retrieveReadState(HollowConsumer.VersionInfo versionInfoDesired, HollowConsumer.BlobRetriever blobRetriever,
+                                                              HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
         Objects.requireNonNull(blobRetriever);
+        HollowConsumer client = HollowConsumer.withBlobRetriever(blobRetriever)
+                .withUpdatePlanVerifier(updatePlanBlobVerifier)
+                .build();
+        client.triggerRefreshTo(versionInfoDesired);
+        return ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
+    }
+
+    private HollowProducer.ReadState restore(
+            long versionDesired,Supplier<HollowProducer.ReadState> readStateSupplier,
+            BiConsumer<HollowReadStateEngine, HollowWriteStateEngine> restoreAction) {
+        Objects.requireNonNull(readStateSupplier);
         Objects.requireNonNull(restoreAction);
 
         if (!isInitialized) {
@@ -323,11 +341,7 @@ abstract class AbstractHollowProducer {
         Status.RestoreStageBuilder status = localListeners.fireProducerRestoreStart(versionDesired);
         try {
             if (versionDesired != HollowConstants.VERSION_NONE) {
-                HollowConsumer client = HollowConsumer.withBlobRetriever(blobRetriever)
-                        .withUpdatePlanVerifier(updatePlanBlobVerifier)
-                        .build();
-                client.triggerRefreshTo(versionInfoDesired);
-                readState = ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
+                readState = readStateSupplier.get();
                 readStates = ReadStateHelper.restored(readState);
 
                 // Need to restore data to new ObjectMapper since can't restore to non empty Write State Engine
