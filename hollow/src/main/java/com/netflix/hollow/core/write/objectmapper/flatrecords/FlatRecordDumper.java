@@ -71,12 +71,22 @@ public class FlatRecordDumper {
                 currentRecordOrdinal++;
             }
         } catch(RuntimeException e) {
-            throw new IllegalStateException(String.format(
-                    "Failed to dump FlatRecord while decoding record #%d (byte offset %d of record region [%d, %d)). "
-                            + "Records as decoded by this dumper (schemaId -> schema layout): [%s]. "
-                            + "Record-region bytes (hex): %s",
-                    currentRecordOrdinal, currentRecordPointer, record.dataStartByte, record.dataEndByte,
-                    describeRecordLayout(), hexDumpRecordRegion()), e);
+            /// The whole point of this catch is to explain the original failure, so assembling the diagnostic
+            /// must never mask it: if any of the (best-effort) diagnostic builders themselves throw, fall back
+            /// to a minimal message but always preserve the original cause.
+            String message;
+            try {
+                message = String.format(
+                        "Failed to dump FlatRecord while decoding record #%d (byte offset %d of record region [%d, %d)). "
+                                + "Records as decoded by this dumper (schemaId -> schema layout): [%s]. "
+                                + "Record-region bytes (hex): %s",
+                        currentRecordOrdinal, currentRecordPointer, record.dataStartByte, record.dataEndByte,
+                        describeRecordLayout(), hexDumpRecordRegion());
+            } catch(RuntimeException diagnosticFailure) {
+                message = "Failed to dump FlatRecord while decoding record #" + currentRecordOrdinal
+                        + " (diagnostic assembly also failed with " + diagnosticFailure + ")";
+            }
+            throw new IllegalStateException(message, e);
         }
     }
 
@@ -132,9 +142,15 @@ public class FlatRecordDumper {
     private String hexDumpRecordRegion() {
         int from = record.dataStartByte;
         int limit = Math.min(record.dataEndByte, from + MAX_DIAGNOSTIC_HEX_BYTES);
-        StringBuilder sb = new StringBuilder((limit - from) * 2 + 32);
-        for(int i=from;i<limit;i++)
-            sb.append(String.format("%02x", record.data.get(i) & 0xFF));
+        StringBuilder sb = new StringBuilder(Math.max(32, (limit - from) * 2 + 32));
+        int i = from;
+        try {
+            for(;i<limit;i++)
+                sb.append(String.format("%02x", record.data.get(i) & 0xFF));
+        } catch(RuntimeException re) {
+            sb.append(" <hex dump aborted at byte ").append(i).append(": ").append(re.getClass().getSimpleName()).append('>');
+            return sb.toString();
+        }
         if(limit < record.dataEndByte)
             sb.append("...(").append(record.dataEndByte - limit).append(" more bytes)");
         return sb.toString();
@@ -258,9 +274,8 @@ public class FlatRecordDumper {
         Integer mappedOrdinal = ordinalMapping.get(unmappedOrdinal);
         if(mappedOrdinal == null) {
             throw new IllegalStateException(String.format(
-                    "Malformed FlatRecord: %s in type '%s' references sub-record at ordinal %d, but no record "
-                            + "with that ordinal was written while dumping this FlatRecord. This indicates the "
-                            + "FlatRecord's byte layout does not match the schema it was decoded with.",
+                    "Could not resolve %s in type '%s': it references sub-record at ordinal %d, but no mapping "
+                            + "was recorded for that ordinal while dumping this FlatRecord.",
                     context, referrerSchema == null ? "?" : referrerSchema.getName(), unmappedOrdinal));
         }
         return mappedOrdinal;
