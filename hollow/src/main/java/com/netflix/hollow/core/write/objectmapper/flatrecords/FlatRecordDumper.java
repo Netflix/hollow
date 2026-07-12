@@ -34,12 +34,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FlatRecordDumper {
-    
+
+    /// Cap on how many bytes of a failed FlatRecord we hex-dump into the diagnostic message.
+    private static final int MAX_DIAGNOSTIC_HEX_BYTES = 512;
+
     private final Map<Integer, Integer> ordinalMapping;
     private final Map<String, HollowWriteRecord> writeRecords;
-    
+
     private final HollowWriteStateEngine stateEngine;
-    
+
     private FlatRecord record;
 
     public FlatRecordDumper(HollowWriteStateEngine dumpTo) {
@@ -54,17 +57,103 @@ public class FlatRecordDumper {
         
         int currentRecordPointer = record.dataStartByte;
         int currentRecordOrdinal = 0;
-        
-        while(currentRecordPointer < record.dataEndByte) {
-            int currentSchemaId = VarInt.readVInt(record.data, currentRecordPointer);
-            currentRecordPointer += VarInt.sizeOfVInt(currentSchemaId);
-            HollowSchema recordSchema = record.schemaIdMapper.getSchema(currentSchemaId);
-            HollowSchema engineSchema = stateEngine.getSchema(recordSchema.getName());
-            
-            /// copy this record, then map the ordinal
-            /// if corresponding state is not available in state engine, skip the record.
-            currentRecordPointer = copyRecord(recordSchema, engineSchema, currentRecordPointer, currentRecordOrdinal++);
+
+        try {
+            while(currentRecordPointer < record.dataEndByte) {
+                int currentSchemaId = VarInt.readVInt(record.data, currentRecordPointer);
+                currentRecordPointer += VarInt.sizeOfVInt(currentSchemaId);
+                HollowSchema recordSchema = record.schemaIdMapper.getSchema(currentSchemaId);
+                HollowSchema engineSchema = stateEngine.getSchema(recordSchema.getName());
+
+                /// copy this record, then map the ordinal
+                /// if corresponding state is not available in state engine, skip the record.
+                currentRecordPointer = copyRecord(recordSchema, engineSchema, currentRecordPointer, currentRecordOrdinal);
+                currentRecordOrdinal++;
+            }
+        } catch(RuntimeException e) {
+            /// The whole point of this catch is to explain the original failure, so assembling the diagnostic
+            /// must never mask it: if any of the (best-effort) diagnostic builders themselves throw, fall back
+            /// to a minimal message but always preserve the original cause.
+            String message;
+            try {
+                message = String.format(
+                        "Failed to dump FlatRecord while decoding record #%d (byte offset %d of record region [%d, %d)). "
+                                + "Records as decoded by this dumper (schemaId -> schema layout): [%s]. "
+                                + "Record-region bytes (hex): %s",
+                        currentRecordOrdinal, currentRecordPointer, record.dataStartByte, record.dataEndByte,
+                        describeRecordLayout(), hexDumpRecordRegion());
+            } catch(RuntimeException diagnosticFailure) {
+                message = "Failed to dump FlatRecord while decoding record #" + currentRecordOrdinal
+                        + " (diagnostic assembly also failed with " + diagnosticFailure + ")";
+            }
+            throw new IllegalStateException(message, e);
         }
+    }
+
+    /**
+     * Re-walk the records read-only (using {@link Sizing} for record sizes) and describe each one as
+     * {@code #ordinal@byteOffset schemaId=<id> <Name>{field:type,...}}, using the schema this dumper
+     * resolved each schemaId to. Comparing a record's schemaId and layout here against what the schema-id
+     * agreement says that id should be pinpoints a schemaId that resolves to the wrong schema. Best-effort:
+     * stops (rather than throws) at the first record it cannot decode.
+     */
+    private String describeRecordLayout() {
+        StringBuilder sb = new StringBuilder();
+        int pointer = record.dataStartByte;
+        int ordinal = 0;
+        try {
+            while(pointer < record.dataEndByte) {
+                int offset = pointer;
+                int schemaId = VarInt.readVInt(record.data, pointer);
+                pointer += VarInt.sizeOfVInt(schemaId);
+                HollowSchema schema = record.schemaIdMapper.getSchema(schemaId);
+
+                if(sb.length() > 0)
+                    sb.append(", ");
+                sb.append('#').append(ordinal).append('@').append(offset).append(" schemaId=").append(schemaId).append(' ');
+                if(schema == null) {
+                    sb.append("schema=<unknown> (cannot continue)");
+                    break;
+                }
+                sb.append(describeSchema(schema));
+                pointer += Sizing.sizeOfSchema(schema, record, pointer);
+                ordinal++;
+            }
+        } catch(RuntimeException re) {
+            sb.append(" <layout walk aborted at byte ").append(pointer).append(": ").append(re.getClass().getSimpleName()).append('>');
+        }
+        return sb.toString();
+    }
+
+    private static String describeSchema(HollowSchema schema) {
+        if(schema.getSchemaType() != HollowSchema.SchemaType.OBJECT)
+            return schema.getName() + "(" + schema.getSchemaType() + ")";
+
+        HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
+        StringBuilder sb = new StringBuilder(schema.getName()).append('{');
+        for(int i=0;i<objectSchema.numFields();i++) {
+            if(i > 0)
+                sb.append(',');
+            sb.append(objectSchema.getFieldName(i)).append(':').append(objectSchema.getFieldType(i));
+        }
+        return sb.append('}').toString();
+    }
+
+    private String hexDumpRecordRegion() {
+        int from = record.dataStartByte;
+        int limit = Math.min(record.dataEndByte, from + MAX_DIAGNOSTIC_HEX_BYTES);
+        StringBuilder sb = new StringBuilder(Math.max(32, (limit - from) * 2 + 32));
+        int i = from;
+        try {
+            for(;i<limit;i++)
+                sb.append(String.format("%02x", record.data.get(i) & 0xFF));
+        } catch(RuntimeException re) {
+            sb.append(" <hex dump aborted at byte ").append(i).append(": ").append(re.getClass().getSimpleName()).append('>');
+            return sb.toString();
+        }
+        if(limit < record.dataEndByte)
+            sb.append("...(").append(record.dataEndByte - limit).append(" more bytes)");
+        return sb.toString();
     }
     
     private int copyRecord(HollowSchema recordSchema, HollowSchema engineSchema, int currentRecordPointer, int currentRecordOrdinal) {
@@ -93,8 +182,7 @@ public class FlatRecordDumper {
             currentRecordPointer += VarInt.sizeOfVInt(unmappedElementOrdinal);
             
             if(rec != null) {
-                int mappedElementOrdinal = ordinalMapping.get(unmappedElementOrdinal);
-                rec.addElement(mappedElementOrdinal);
+                rec.addElement(resolveOrdinal(unmappedElementOrdinal, engineSchema, "element"));
             }
         }
         
@@ -120,8 +208,7 @@ public class FlatRecordDumper {
             unmappedOrdinal += unmappedOrdinalDelta;
             
             if(rec != null) {
-                int mappedOrdinal = ordinalMapping.get(unmappedOrdinal);
-                rec.addElement(mappedOrdinal);
+                rec.addElement(resolveOrdinal(unmappedOrdinal, engineSchema, "element"));
             }
         }
         
@@ -150,8 +237,8 @@ public class FlatRecordDumper {
             unmappedKeyOrdinal += unmappedKeyOrdinalDelta;
             
             if(rec != null) {
-                int mappedKeyOrdinal = ordinalMapping.get(unmappedKeyOrdinal);
-                int mappedValueOrdinal = ordinalMapping.get(unmappedValueOrdinal);
+                int mappedKeyOrdinal = resolveOrdinal(unmappedKeyOrdinal, engineSchema, "key");
+                int mappedValueOrdinal = resolveOrdinal(unmappedValueOrdinal, engineSchema, "value");
                 rec.addEntry(mappedKeyOrdinal, mappedValueOrdinal);
             }
         }
@@ -170,9 +257,9 @@ public class FlatRecordDumper {
         for(int i=0;i<recordSchema.numFields();i++) {
             String fieldName = recordSchema.getFieldName(i);
             FieldType fieldType = recordSchema.getFieldType(i);
-            boolean fieldExistsInEngine = engineSchema != null && engineSchema.getPosition(fieldName) != -1; 
-            
-            currentRecordPointer = copyObjectField(fieldExistsInEngine ? rec : null, fieldName, fieldType, currentRecordPointer);
+            boolean fieldExistsInEngine = engineSchema != null && engineSchema.getPosition(fieldName) != -1;
+
+            currentRecordPointer = copyObjectField(fieldExistsInEngine ? rec : null, engineSchema, fieldName, fieldType, currentRecordPointer);
         }
         
         if(engineSchema != null) {
@@ -183,7 +270,18 @@ public class FlatRecordDumper {
         return currentRecordPointer;
     }
     
-    private int copyObjectField(HollowObjectWriteRecord rec, String fieldName, FieldType fieldType, int currentRecordPointer) {
+    private int resolveOrdinal(int unmappedOrdinal, HollowSchema referrerSchema, String context) {
+        Integer mappedOrdinal = ordinalMapping.get(unmappedOrdinal);
+        if(mappedOrdinal == null) {
+            throw new IllegalStateException(String.format(
+                    "Could not resolve %s in type '%s': it references sub-record at ordinal %d, but no mapping "
+                            + "was recorded for that ordinal while dumping this FlatRecord.",
+                    context, referrerSchema == null ? "?" : referrerSchema.getName(), unmappedOrdinal));
+        }
+        return mappedOrdinal;
+    }
+
+    private int copyObjectField(HollowObjectWriteRecord rec, HollowObjectSchema referrerSchema, String fieldName, FieldType fieldType, int currentRecordPointer) {
         switch(fieldType) {
         case BOOLEAN:
             if(!VarInt.readVNull(record.data, currentRecordPointer)) {
@@ -272,8 +370,7 @@ public class FlatRecordDumper {
             int unmappedOrdinal = VarInt.readVInt(record.data, currentRecordPointer);
             
             if(rec != null) {
-                int mappedOrdinal = ordinalMapping.get(unmappedOrdinal);
-                rec.setReference(fieldName, mappedOrdinal);
+                rec.setReference(fieldName, resolveOrdinal(unmappedOrdinal, referrerSchema, "field '" + fieldName + "'"));
             }
             
             return currentRecordPointer + VarInt.sizeOfVInt(unmappedOrdinal);
