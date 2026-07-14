@@ -104,6 +104,11 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     @Override
     public void subscribeToUpdates(final HollowConsumer consumer) {
         subscribedConsumers.add(consumer);
+
+        // Trigger a refresh right away if a version is already known, so that a consumer
+        // does not sit on no data (or stale data) until the next change is announced.
+        if (latestVersion != NO_ANNOUNCEMENT_AVAILABLE)
+            consumer.triggerAsyncRefresh();
     }
 
     private long readLatestVersion() {
