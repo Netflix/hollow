@@ -380,8 +380,8 @@ final class Resolver {
     private final List<Rule> rules;
 
     private static void warnMissingReferencedType(String fromType, String missingType) {
-        LOG.warning("Type filter: \"" + fromType + "\" references type \"" + missingType
-                + "\" which is not present in the read state (e.g. a type with zero records); ");
+        LOG.warning("Type filter: " + fromType + " references type " + missingType
+                + " which is not present in the read state (e.g. a type with zero records). Skipping recursion for this reference.");
     }
 
     Resolver(List<Rule> rules, List<HollowSchema> schemas) {
@@ -424,7 +424,7 @@ final class Resolver {
                                 String refType = os.getReferencedType(i);
                                 HollowSchema refSchema = schemas.get(refType);
                                 if (refSchema == null) {
-                                    warnMissingReferencedType(type + " (field \"" + field + "\")", refType);
+                                    warnMissingReferencedType(type + " (field '" + field + "')", refType);
                                     return Stream.of(parent, child);
                                 }
                                 Stream<TypeActions> descendants = descendants((t,f) -> descendantAction, refSchema);
