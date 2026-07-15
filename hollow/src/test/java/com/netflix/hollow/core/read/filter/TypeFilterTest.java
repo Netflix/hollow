@@ -12,8 +12,10 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -286,6 +288,152 @@ public class TypeFilterTest {
     private static <T> List<T> l(T...items) {
         assert items.length > 0;
         return Arrays.asList(items);
+    }
+
+    /**
+     * A type with zero records is omitted from the read state, so a schema that a recursively-included
+     * type references can be absent from the schema set. The resolver must skip the missing subtree
+     * rather than dereference a null schema (which NPEs at {@link HollowSchema#getName()} in
+     * {@code Resolver.descendants}). The following tests cover every path that follows a reference
+     * during resolution: object reference fields (type- and field-recursive, include and exclude),
+     * collection elements, and map keys/values.
+     */
+    @Test
+    public void resolveToleratesMissingReferencedObjectType() {
+        // Alpha -> Beta -> Charlie; Charlie has no records, so its schema is absent.
+        List<HollowSchema> schemas = schemasWithout(l(Alpha.class), "Charlie");
+
+        TypeFilter subject = newTypeFilter()
+                .excludeAll()
+                .includeRecursive("Alpha")
+                .resolve(schemas);
+
+        assertThat(subject.includes("Alpha")).isTrue();
+        assertThat(subject.includes("Beta")).isTrue();
+        // The reference field to the missing type is still included -- identical to an unfiltered read,
+        // where wireTypeStatesToSchemas wires the field's target type state to null.
+        assertThat(subject.includes("Beta", "charlie")).isTrue();
+        // ...but the missing type itself is not included.
+        assertThat(subject.includes("Charlie")).isFalse();
+    }
+
+    @Test
+    public void resolveHaltsRecursionAtMissingIntermediateType() {
+        // Alpha -> Beta -> {Charlie, Long}; the intermediate Beta is absent. Types reachable ONLY
+        // through the missing Beta must not be pulled in (they would be empty in the read state too).
+        List<HollowSchema> schemas = schemasWithout(l(Alpha.class), "Beta");
+
+        TypeFilter subject = newTypeFilter()
+                .excludeAll()
+                .includeRecursive("Alpha")
+                .resolve(schemas);
+
+        assertThat(subject.includes("Alpha")).isTrue();
+        assertThat(subject.includes("Alpha", "beta")).isTrue();
+        assertThat(subject.includes("Charlie")).isFalse();
+        assertThat(subject.includes("Long")).isFalse();
+    }
+
+    @Test
+    public void resolveToleratesMissingReferencedTypeForFieldRecursiveInclude() {
+        // Field-recursive include drives the recursion from the field action (fa.recursive) rather
+        // than an inherited type action -- a distinct entry into the guarded reference lookup.
+        List<HollowSchema> schemas = schemasWithout(l(Beta.class), "Charlie");
+
+        TypeFilter subject = newTypeFilter()
+                .excludeAll()
+                .includeRecursive("Beta", "charlie")
+                .resolve(schemas);
+
+        assertThat(subject.includes("Beta")).isTrue();
+        assertThat(subject.includes("Beta", "charlie")).isTrue();
+        assertThat(subject.includes("Charlie")).isFalse();
+    }
+
+    @Test
+    public void resolveToleratesMissingReferencedTypeUnderExcludeRecursive() {
+        // The guard must also hold when the walk is driven by an exclude (not include) action.
+        // Echo is disjoint from Alpha's hierarchy and must remain included by the include-all base.
+        List<HollowSchema> schemas = schemasWithout(l(Alpha.class, Echo.class), "Charlie");
+
+        TypeFilter subject = newTypeFilter()
+                .excludeRecursive("Alpha")
+                .resolve(schemas);
+
+        assertThat(subject.includes("Echo")).isTrue();
+        assertThat(subject.includes("Alpha")).isFalse();
+        assertThat(subject.includes("Beta")).isFalse();
+    }
+
+    @Test
+    public void resolveToleratesMissingCollectionElementType() {
+        // Omega -> ListOfLE (element LE); LE is absent. LERef is reachable only through LE.
+        List<HollowSchema> schemas = schemasWithout(l(Omega.class), "LE");
+
+        TypeFilter subject = newTypeFilter()
+                .excludeAll()
+                .includeRecursive("Omega")
+                .resolve(schemas);
+
+        assertThat(subject.includes("Omega")).isTrue();
+        assertThat(subject.includes("ListOfLE")).isTrue();
+        assertThat(subject.includes("LERef")).isFalse();
+    }
+
+    @Test
+    public void resolveToleratesMissingMapValueTypeAndKeepsKeySubtree() {
+        // Omega -> MapOfKToV; value type V is absent. The key subtree (K, KRef) must survive because
+        // the two map guards are independent.
+        List<HollowSchema> schemas = schemasWithout(l(Omega.class), "V");
+
+        TypeFilter subject = newTypeFilter()
+                .excludeAll()
+                .includeRecursive("Omega")
+                .resolve(schemas);
+
+        assertThat(subject.includes("MapOfKToV")).isTrue();
+        assertThat(subject.includes("K")).isTrue();
+        assertThat(subject.includes("KRef")).isTrue();
+        assertThat(subject.includes("VRef")).isFalse(); // reachable only through the missing V
+    }
+
+    @Test
+    public void resolveToleratesMissingMapKeyTypeAndKeepsValueSubtree() {
+        // Mirror of the previous test: key type K is absent; the value subtree (V, VRef) must survive.
+        List<HollowSchema> schemas = schemasWithout(l(Omega.class), "K");
+
+        TypeFilter subject = newTypeFilter()
+                .excludeAll()
+                .includeRecursive("Omega")
+                .resolve(schemas);
+
+        assertThat(subject.includes("MapOfKToV")).isTrue();
+        assertThat(subject.includes("V")).isTrue();
+        assertThat(subject.includes("VRef")).isTrue();
+        assertThat(subject.includes("KRef")).isFalse(); // reachable only through the missing K
+    }
+
+    @Test
+    public void resolveToleratesMissingMapKeyAndValueTypes() {
+        // Both key and value absent -> exercises both guarded ternary branches at once.
+        List<HollowSchema> schemas = schemasWithout(l(Omega.class), "K", "V");
+
+        TypeFilter subject = newTypeFilter()
+                .excludeAll()
+                .includeRecursive("Omega")
+                .resolve(schemas);
+
+        assertThat(subject.includes("Omega")).isTrue();
+        assertThat(subject.includes("MapOfKToV")).isTrue();
+        assertThat(subject.includes("KRef")).isFalse();
+        assertThat(subject.includes("VRef")).isFalse();
+    }
+
+    private static List<HollowSchema> schemasWithout(List<Class<?>> models, String... missingTypes) {
+        Set<String> missing = new HashSet<>(asList(missingTypes));
+        List<HollowSchema> schemas = new ArrayList<>(generateSchema(models));
+        schemas.removeIf(s -> missing.contains(s.getName()));
+        return schemas;
     }
 
     private static List<HollowSchema> generateSchema(List<Class<?>> models) {
