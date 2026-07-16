@@ -17,4 +17,13 @@ tasks.withType(JavaCompile).configureEach {
 
 jmh {
   duplicateClassesStrategy = DuplicatesStrategy.WARN
+  if (project.hasProperty('jmhInclude')) {
+    includes = [ project.property('jmhInclude') ]
+  }
+  if (project.hasProperty('jmhJvm')) {
+    jvm = project.property('jmhJvm')
+  }
+  if (project.hasProperty('jmhProf')) {
+    profilers = [ project.property('jmhProf') ]
+  }
 }

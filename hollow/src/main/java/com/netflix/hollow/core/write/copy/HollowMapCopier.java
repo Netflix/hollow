@@ -21,7 +21,7 @@ import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavi
 
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
-import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIteratorImpl;
+import com.netflix.hollow.core.read.engine.map.HollowMapSnapshotEntryOrdinalIterator;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.tools.combine.OrdinalRemapper;
@@ -44,7 +44,7 @@ public class HollowMapCopier extends HollowRecordCopier {
         while(iter.next()) {
             int remappedKeyOrdinal = ordinalRemapper.getMappedOrdinal(keyType, iter.getKey());
             int remappedValueOrdinal = ordinalRemapper.getMappedOrdinal(valueType, iter.getValue());
-            int hashCode = preserveHashPositions ? ((HollowMapEntryOrdinalIteratorImpl)iter).getCurrentBucket() : remappedKeyOrdinal;
+            int hashCode = preserveHashPositions ? ((HollowMapSnapshotEntryOrdinalIterator)iter).getCurrentBucket() : remappedKeyOrdinal;
             rec.addEntry(remappedKeyOrdinal, remappedValueOrdinal, hashCode);
         }
 
