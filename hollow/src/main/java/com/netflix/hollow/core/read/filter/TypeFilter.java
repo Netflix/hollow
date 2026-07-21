@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -373,8 +374,15 @@ class UnresolvedTypeFilter implements TypeFilter {
 
 @com.netflix.hollow.Internal
 final class Resolver {
+    private static final Logger LOG = Logger.getLogger(Resolver.class.getName());
+
     private final Map<String,HollowSchema> schemas;
     private final List<Rule> rules;
+
+    private static void warnMissingReferencedType(String fromType, String missingType) {
+        LOG.warning("Type filter: " + fromType + " references type " + missingType
+                + " which is not present in the read state (e.g. a type with zero records). Skipping recursion for this reference.");
+    }
 
     Resolver(List<Rule> rules, List<HollowSchema> schemas) {
         assert !rules.isEmpty();
@@ -415,7 +423,10 @@ final class Resolver {
                             if (descendantAction.recursive && os.getFieldType(i) == REFERENCE) {
                                 String refType = os.getReferencedType(i);
                                 HollowSchema refSchema = schemas.get(refType);
-                                assert refSchema != null;
+                                if (refSchema == null) {
+                                    warnMissingReferencedType(type + " (field '" + field + "')", refType);
+                                    return Stream.of(parent, child);
+                                }
                                 Stream<TypeActions> descendants = descendants((t,f) -> descendantAction, refSchema);
                                 return Stream.concat(Stream.of(parent, child), descendants);
                             } else {
@@ -431,7 +442,10 @@ final class Resolver {
                     HollowCollectionSchema cs = (HollowCollectionSchema) schema;
 
                     HollowSchema elemSchema = schemas.get(cs.getElementType());
-                    assert elemSchema != null;
+                    if (elemSchema == null) {
+                        warnMissingReferencedType(type, cs.getElementType());
+                        return Stream.of(parent);
+                    }
 
                     Stream<TypeActions> descendants = descendants((t, f) -> action, elemSchema);
                     return Stream.concat(Stream.of(parent), descendants);
@@ -446,9 +460,11 @@ final class Resolver {
                     HollowMapSchema ms = (HollowMapSchema) schema;
                     HollowSchema kSchema = schemas.get(ms.getKeyType());
                     HollowSchema vSchema = schemas.get(ms.getValueType());
+                    if (kSchema == null) warnMissingReferencedType(type + " (map key)", ms.getKeyType());
+                    if (vSchema == null) warnMissingReferencedType(type + " (map value)", ms.getValueType());
                     Stream<TypeActions> descendants = Stream.concat(
-                            descendants((t, f) -> action, kSchema),
-                            descendants((t1, f1) -> action, vSchema));
+                            kSchema == null ? Stream.<TypeActions>empty() : descendants((t, f) -> action, kSchema),
+                            vSchema == null ? Stream.<TypeActions>empty() : descendants((t1, f1) -> action, vSchema));
                     return Stream.concat(Stream.of(parent), descendants);
                 } else {
                     return Stream.of(parent);
