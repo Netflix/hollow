@@ -141,7 +141,7 @@ public class HollowHistoricalSetDataAccess extends HollowHistoricalTypeDataAcces
     
     void buildKeyMatcher() {
         PrimaryKey hashKey = getSchema().getHashKey();
-        if(hashKey != null)
+        if(hashKey != null && getDataAccess().getSchema(hashKey.getType()) != null)
             this.keyMatcher = new HistoricalPrimaryKeyMatcher(getDataAccess(), hashKey);
     }
 

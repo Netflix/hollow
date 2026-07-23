@@ -70,18 +70,18 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
             String typeName = typeState.getSchema().getName();
 
             switch(typeState.getSchema().getSchemaType()) {
-            case OBJECT:
-                typeDataAccessMap.put(typeName, new HollowHistoricalObjectDataAccess(this, typeState));
-                break;
-            case LIST:
-                typeDataAccessMap.put(typeName, new HollowHistoricalListDataAccess(this, typeState));
-                break;
-            case SET:
-                typeDataAccessMap.put(typeName, new HollowHistoricalSetDataAccess(this, typeState));
-                break;
-            case MAP: 
-                typeDataAccessMap.put(typeName, new HollowHistoricalMapDataAccess(this, typeState));
-                break;
+                case OBJECT:
+                    typeDataAccessMap.put(typeName, new HollowHistoricalObjectDataAccess(this, typeState));
+                    break;
+                case LIST:
+                    typeDataAccessMap.put(typeName, new HollowHistoricalListDataAccess(this, typeState));
+                    break;
+                case SET:
+                    typeDataAccessMap.put(typeName, new HollowHistoricalSetDataAccess(this, typeState));
+                    break;
+                case MAP:
+                    typeDataAccessMap.put(typeName, new HollowHistoricalMapDataAccess(this, typeState));
+                    break;
             }
         }
 
@@ -90,13 +90,13 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
         for(Map.Entry<String, HollowHistoricalTypeDataAccess> entry : typeDataAccessMap.entrySet()) {
             HollowHistoricalTypeDataAccess typeDataAccess = entry.getValue();
             switch(typeDataAccess.getSchema().getSchemaType()) {
-            case MAP:
-                ((HollowHistoricalMapDataAccess)typeDataAccess).buildKeyMatcher();
-                break;
-            case SET:
-                ((HollowHistoricalSetDataAccess)typeDataAccess).buildKeyMatcher();
-                break;
-            default:
+                case MAP:
+                    ((HollowHistoricalMapDataAccess)typeDataAccess).buildKeyMatcher();
+                    break;
+                case SET:
+                    ((HollowHistoricalSetDataAccess)typeDataAccess).buildKeyMatcher();
+                    break;
+                default:
             }
         }
     }
@@ -145,7 +145,7 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
             state = historicalState.getNextState();
         }
 
-        return state.getTypeDataAccess(typeName);
+        return state == null ? null : state.getTypeDataAccess(typeName);
     }
 
     @Override
@@ -208,7 +208,8 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
     
     @Override
     public HollowSchema getSchema(String name) {
-        return getTypeDataAccess(name).getSchema();
+        HollowTypeDataAccess typeDataAccess = getTypeDataAccess(name);
+        return typeDataAccess == null ? null : typeDataAccess.getSchema();
     }
 
     @Override
