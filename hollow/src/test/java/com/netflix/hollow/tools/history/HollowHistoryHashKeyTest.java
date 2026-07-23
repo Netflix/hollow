@@ -16,14 +16,23 @@
  */
 package com.netflix.hollow.tools.history;
 
+import static com.netflix.hollow.core.read.filter.TypeFilter.newTypeFilter;
+
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
+import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
+import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowHashKey;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
+import com.netflix.hollow.tools.filter.FilteredHollowBlobWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -205,6 +214,44 @@ public class HollowHistoryHashKeyTest {
         value = (GenericHollowObject)obj.getMap("intMap").findValue(5);
         Assert.assertEquals(500, value.getInt("value"));
     }
+
+    /**
+     * Regression test for the NPE observed when the Hollow History Explorer builds a historical state for a
+     * namespace whose set type declares a hash key rooted at an element type that has no data.
+     */
+    @Test
+    public void buildsHistoricalStateWhenSetHashKeyElementTypeIsAbsent() throws IOException {
+        HollowReadStateEngine readEngine = readWithElementTypeAbsent();
+
+        // Precondition: the hash-keyed set type is present, but its element type is not.
+        Assert.assertNotNull(readEngine.getSchema("SetOfElement"));
+        Assert.assertNull(readEngine.getSchema("Element"));
+
+        // Building the historical state must not throw (it previously NPE'd in buildKeyMatcher).
+        new HollowHistoricalStateCreator().createBasedOnNewDelta(0, readEngine);
+    }
+
+    /** Produces a read state that has SetOfElement (with its hash key) but no Element type state. */
+    private static HollowReadStateEngine readWithElementTypeAbsent() throws IOException {
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+        mapper.add(new TopLevel(1, new Element(11), new Element(22)));
+
+        ByteArrayOutputStream snapshot = new ByteArrayOutputStream();
+        new HollowBlobWriter(writeEngine).writeSnapshot(snapshot);
+
+        // Drop the Element type from the snapshot.
+        HollowFilterConfig excludeElement = new HollowFilterConfig(true); // exclude filter
+        excludeElement.addType("Element");
+        ByteArrayOutputStream filtered = new ByteArrayOutputStream();
+        new FilteredHollowBlobWriter(excludeElement)
+                .filterSnapshot(new ByteArrayInputStream(snapshot.toByteArray()), filtered);
+
+        HollowReadStateEngine readEngine = new HollowReadStateEngine();
+        new HollowBlobReader(readEngine).readSnapshot(
+                HollowBlobInput.serial(filtered.toByteArray()));
+        return readEngine;
+    }
     
     
     @SuppressWarnings("unused")
@@ -262,6 +309,32 @@ public class HollowHistoryHashKeyTest {
             this.id = id;
             this.country = country;
             this.extraValue = extraValue;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TopLevel {
+        int id;
+
+        @HollowTypeName(name = "SetOfElement")
+        @HollowHashKey(fields = "id")
+        Set<Element> elements;
+
+        TopLevel(int id, Element... elements) {
+            this.id = id;
+            this.elements = new HashSet<Element>();
+            for (Element e : elements) {
+                this.elements.add(e);
+            }
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class Element {
+        int id;
+
+        Element(int id) {
+            this.id = id;
         }
     }
 
