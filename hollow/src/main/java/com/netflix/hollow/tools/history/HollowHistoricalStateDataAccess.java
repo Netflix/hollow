@@ -145,7 +145,10 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
             state = historicalState.getNextState();
         }
 
-        return state.getTypeDataAccess(typeName);
+        // state can be null when the next-state chain has not been linked yet (e.g. buildKeyMatcher runs
+        // from the constructor before setNextState) and the type is absent from every historical state's
+        // map, which happens for a type that has no data and therefore no type state to resolve against.
+        return state == null ? null : state.getTypeDataAccess(typeName);
     }
 
     @Override
@@ -208,7 +211,8 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
     
     @Override
     public HollowSchema getSchema(String name) {
-        return getTypeDataAccess(name).getSchema();
+        HollowTypeDataAccess typeDataAccess = getTypeDataAccess(name);
+        return typeDataAccess == null ? null : typeDataAccess.getSchema();
     }
 
     @Override
