@@ -141,8 +141,6 @@ public class HollowHistoricalSetDataAccess extends HollowHistoricalTypeDataAcces
     
     void buildKeyMatcher() {
         PrimaryKey hashKey = getSchema().getHashKey();
-        // The hash key is rooted at the set's element type. If that type has no data it has no type state to
-        // resolve the field path against, so there are no records to match on - skip building the matcher.
         if(hashKey != null && getDataAccess().getSchema(hashKey.getType()) != null)
             this.keyMatcher = new HistoricalPrimaryKeyMatcher(getDataAccess(), hashKey);
     }
