@@ -20,9 +20,13 @@ import static com.netflix.hollow.api.objects.provider.Util.memoize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.custom.HollowTypeAPI;
+import com.netflix.hollow.api.objects.HollowRecord;
+import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import java.util.function.Supplier;
@@ -120,9 +124,85 @@ public class HollowObjectCacheProviderTest {
         } catch (IllegalStateException expected) {}
     }
 
+    @Test
+    public void rotation_dropsRemovedOrdinal_byDefault() {
+        TypeA a0 = typeA(0);
+        TypeA a1 = typeA(1);
+        TypeA a2 = typeA(2);
+        prepopulate(a0, a1, a2);
+        HollowObjectCacheProvider<TypeA> previous =
+                new HollowObjectCacheProvider<>(typeReadState, typeAPI, factory);
+
+        // delta: ordinal 2 removed
+        removeOrdinals(2);
+
+        HollowObjectCacheProvider<TypeA> current =
+                new HollowObjectCacheProvider<>(typeReadState, typeAPI, factory, previous);
+
+        assertEquals(a0, current.getHollowObject(0));
+        assertEquals(a1, current.getHollowObject(1));
+        // removed-only ordinal is holed out on rotation, so the before image is lost
+        assertNull(current.getHollowObject(2));
+    }
+
+    @Test
+    public void rotation_retainsRemovedOrdinalForOneCycle_whenEnabled() {
+        TypeA a0 = typeA(0);
+        TypeA a1 = typeA(1);
+        TypeA a2 = typeA(2);
+        prepopulate(a0, a1, a2);
+        HollowObjectCacheProvider<TypeA> previous =
+                new HollowObjectCacheProvider<>(typeReadState, typeAPI, factory);
+
+        // delta: ordinal 2 removed
+        removeOrdinals(2);
+
+        HollowObjectCacheProvider<TypeA> current =
+                new HollowObjectCacheProvider<>(typeReadState, typeAPI, factory, previous, true);
+
+        assertEquals(a0, current.getHollowObject(0));
+        assertEquals(a1, current.getHollowObject(1));
+        // the before image of the removed record survives one cycle for change listeners
+        assertEquals(a2, current.getHollowObject(2));
+    }
+
+    @Test
+    public void rotation_repointsRetainedRemovedOrdinalToCurrentTypeApi() {
+        @SuppressWarnings("unchecked")
+        HollowFactory<HollowRecord> recordFactory = mock(HollowFactory.class);
+        HollowRecord record = mock(HollowRecord.class);
+        HollowCachedDelegate delegate = mock(HollowCachedDelegate.class);
+        when(record.getDelegate()).thenReturn(delegate);
+        when(recordFactory.newCachedHollowObject(typeReadState, typeAPI, 0)).thenReturn(record);
+
+        // previous cycle: ordinal 0 populated
+        populatedOrdinalListener.addedOrdinal(0);
+        HollowObjectCacheProvider<HollowRecord> previous =
+                new HollowObjectCacheProvider<>(typeReadState, typeAPI, recordFactory);
+
+        // delta: ordinal 0 removed
+        removeOrdinals(0);
+
+        // rotate onto a new type api; the retained before image must be repointed to it so
+        // that lazy reference fields resolve against the current read state
+        HollowTypeAPI newTypeAPI = mock(HollowTypeAPI.class);
+        HollowObjectCacheProvider<HollowRecord> current =
+                new HollowObjectCacheProvider<>(typeReadState, newTypeAPI, recordFactory, previous, true);
+
+        assertEquals(record, current.getHollowObject(0));
+        verify(delegate).updateTypeAPI(newTypeAPI);
+    }
+
     private void prepopulate(TypeA...population) {
         for (TypeA a : population)
             populatedOrdinalListener.addedOrdinal(a.ordinal);
+    }
+
+    private void removeOrdinals(int...removed) {
+        populatedOrdinalListener.beginUpdate();
+        for (int ordinal : removed)
+            populatedOrdinalListener.removedOrdinal(ordinal);
+        populatedOrdinalListener.endUpdate();
     }
 
     private void notifyAdded(TypeA...added) {

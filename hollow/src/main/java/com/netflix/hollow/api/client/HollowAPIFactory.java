@@ -60,14 +60,20 @@ public interface HollowAPIFactory {
 
         private final Class<T> generatedAPIClass;
         private final Set<String> cachedTypes;
-        
+        private final boolean retainRemovedOrdinals;
+
         public ForGeneratedAPI(Class<T> generatedAPIClass) {
             this(generatedAPIClass, new String[0]);
         }
-        
+
         public ForGeneratedAPI(Class<T> generatedAPIClass, String... cachedTypes) {
+            this(generatedAPIClass, false, cachedTypes);
+        }
+
+        public ForGeneratedAPI(Class<T> generatedAPIClass, boolean retainRemovedOrdinals, String... cachedTypes) {
             this.generatedAPIClass = generatedAPIClass;
             this.cachedTypes = new HashSet<String>(Arrays.asList(cachedTypes));
+            this.retainRemovedOrdinals = retainRemovedOrdinals;
         }
 
         
@@ -88,6 +94,21 @@ public interface HollowAPIFactory {
 
         @Override
         public T createAPI(HollowDataAccess dataAccess, HollowAPI previousCycleAPI) {
+            if (retainRemovedOrdinals) {
+                Constructor<T> constructor;
+                try {
+                    constructor = generatedAPIClass.getConstructor(HollowDataAccess.class, Set.class, Map.class, generatedAPIClass, boolean.class);
+                } catch (NoSuchMethodException e) {
+                    throw new IllegalStateException(generatedAPIClass.getName()
+                            + " was generated with a version of Hollow that does not support retainRemovedOrdinals;"
+                            + " regenerate the API with a newer Hollow version to retain before images in the object cache", e);
+                }
+                try {
+                    return constructor.newInstance(dataAccess, cachedTypes, Collections.emptyMap(), previousCycleAPI, true);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
             try {
                 Constructor<T> constructor = generatedAPIClass.getConstructor(HollowDataAccess.class, Set.class, Map.class, generatedAPIClass);
                 return constructor.newInstance(dataAccess, cachedTypes, Collections.emptyMap(), previousCycleAPI);

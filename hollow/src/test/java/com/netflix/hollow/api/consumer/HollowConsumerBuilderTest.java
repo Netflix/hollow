@@ -1,9 +1,12 @@
 package com.netflix.hollow.api.consumer;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.netflix.hollow.api.consumer.index.HashIndex;
+import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.test.HollowWriteStateEngineBuilder;
 import com.netflix.hollow.test.consumer.TestBlobRetriever;
 import com.netflix.hollow.test.consumer.TestHollowConsumer;
@@ -13,6 +16,8 @@ import com.netflix.hollow.test.generated.Movie;
 import com.netflix.hollow.test.generated.MoviePrimaryKeyIndex;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -56,6 +61,93 @@ public class HollowConsumerBuilderTest {
                 .withGeneratedAPIClass(AwardsAPI.class)
                 .build();
         testConsumerCache(false, false, consumer);
+    }
+
+    @Test
+    public void retainRemovedOrdinals_wiresFlagThroughToGeneratedApi() throws IOException {
+        TestHollowConsumer consumer = longevityBuilder()
+                .withGeneratedAPIClass(RetentionRecordingAPI.class, true, "Movie")
+                .build();
+
+        RetentionRecordingAPI api = refreshThroughDelta(consumer);
+
+        // the delta refresh builds the api via createAPI(dataAccess, previous), which must reach the 5-arg
+        // retain-aware constructor with the flag set
+        assertEquals(5, api.constructorArgCount);
+        assertTrue(api.retainRemovedOrdinalsReceived);
+    }
+
+    @Test
+    public void withoutRetainRemovedOrdinals_usesStandardConstructor() throws IOException {
+        TestHollowConsumer consumer = longevityBuilder()
+                .withGeneratedAPIClass(RetentionRecordingAPI.class, "Movie")
+                .build();
+
+        RetentionRecordingAPI api = refreshThroughDelta(consumer);
+
+        assertEquals(4, api.constructorArgCount);
+        assertFalse(api.retainRemovedOrdinalsReceived);
+    }
+
+    // Object longevity forces a fresh API instance per cycle via createAPI(dataAccess, previous) -- the rotation
+    // path that the retainRemovedOrdinals flag targets. Without it, deltas are applied in place and no new API is built.
+    private static TestHollowConsumer.Builder longevityBuilder() {
+        return new TestHollowConsumer.Builder()
+                .withBlobRetriever(new TestBlobRetriever())
+                .withObjectLongevityConfig(new HollowConsumer.ObjectLongevityConfig() {
+                    public long usageDetectionPeriodMillis() { return 1_000L; }
+                    public long gracePeriodMillis() { return 2L * 60 * 60 * 1000; }
+                    public boolean forceDropData() { return true; }
+                    public boolean enableLongLivedObjectSupport() { return true; }
+                    public boolean enableExpiredUsageStackTraces() { return false; }
+                    public boolean dropDataAutomatically() { return true; }
+                });
+    }
+
+    private RetentionRecordingAPI refreshThroughDelta(TestHollowConsumer consumer) throws IOException {
+        com.netflix.hollow.test.model.Movie m1 = new com.netflix.hollow.test.model.Movie(1, "test movie 1", 2023);
+        com.netflix.hollow.test.model.Award a1 = new com.netflix.hollow.test.model.Award(1, m1,
+                new HashSet<com.netflix.hollow.test.model.Movie>());
+
+        consumer.addSnapshot(1l, new HollowWriteStateEngineBuilder().add(a1).build());
+        consumer.triggerRefreshTo(1l);
+        consumer.addDelta(1l, 2l, new HollowWriteStateEngineBuilder().add(a1).build());
+        consumer.triggerRefreshTo(2l);
+
+        return (RetentionRecordingAPI) consumer.getAPI();
+    }
+
+    /** Stub generated API that records which constructor the factory invoked. */
+    public static class RetentionRecordingAPI extends HollowAPI {
+        final int constructorArgCount;
+        final boolean retainRemovedOrdinalsReceived;
+
+        public RetentionRecordingAPI(HollowDataAccess dataAccess) {
+            super(dataAccess);
+            this.constructorArgCount = 1;
+            this.retainRemovedOrdinalsReceived = false;
+        }
+
+        public RetentionRecordingAPI(HollowDataAccess dataAccess, Set<String> cachedTypes) {
+            super(dataAccess);
+            this.constructorArgCount = 2;
+            this.retainRemovedOrdinalsReceived = false;
+        }
+
+        public RetentionRecordingAPI(HollowDataAccess dataAccess, Set<String> cachedTypes,
+                Map<String, Object> factoryOverrides, RetentionRecordingAPI previousCycleAPI) {
+            super(dataAccess);
+            this.constructorArgCount = 4;
+            this.retainRemovedOrdinalsReceived = false;
+        }
+
+        public RetentionRecordingAPI(HollowDataAccess dataAccess, Set<String> cachedTypes,
+                Map<String, Object> factoryOverrides, RetentionRecordingAPI previousCycleAPI,
+                boolean retainRemovedOrdinals) {
+            super(dataAccess);
+            this.constructorArgCount = 5;
+            this.retainRemovedOrdinalsReceived = retainRemovedOrdinals;
+        }
     }
 
     private void testConsumerCache(boolean hasCache, boolean detachCache, TestHollowConsumer consumer) throws IOException {

@@ -153,6 +153,10 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
         builder.append("    }\n\n");
 
         builder.append("    public ").append(className).append("(HollowDataAccess dataAccess, Set<String> cachedTypes, Map<String, HollowFactory<?>> factoryOverrides, ").append(className).append(" previousCycleAPI) {\n");
+        builder.append("        this(dataAccess, cachedTypes, factoryOverrides, previousCycleAPI, false);\n");
+        builder.append("    }\n\n");
+
+        builder.append("    public ").append(className).append("(HollowDataAccess dataAccess, Set<String> cachedTypes, Map<String, HollowFactory<?>> factoryOverrides, ").append(className).append(" previousCycleAPI, boolean retainRemovedOrdinalsInCache) {\n");
         builder.append("        super(dataAccess);\n");
         builder.append("        HollowTypeDataAccess typeDataAccess;\n");
         builder.append("        HollowFactory factory;\n\n");
@@ -188,7 +192,7 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
             builder.append("            HollowObjectCacheProvider previousCacheProvider = null;\n");
             builder.append("            if(previousCycleAPI != null && (previousCycleAPI.").append(hollowObjectProviderName(schema.getName())).append(" instanceof HollowObjectCacheProvider))\n");
             builder.append("                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.").append(hollowObjectProviderName(schema.getName())).append(";\n");
-            builder.append("            ").append(hollowObjectProviderName(schema.getName())).append(" = new HollowObjectCacheProvider(typeDataAccess, ").append(lowercase(typeAPIClassname(schema.getName()))).append(", factory, previousCacheProvider);\n");
+            builder.append("            ").append(hollowObjectProviderName(schema.getName())).append(" = new HollowObjectCacheProvider(typeDataAccess, ").append(lowercase(typeAPIClassname(schema.getName()))).append(", factory, previousCacheProvider, retainRemovedOrdinalsInCache);\n");
             builder.append("        } else {\n");
             builder.append("            ").append(hollowObjectProviderName(schema.getName())).append(" = new HollowObjectFactoryProvider(typeDataAccess, ").append(lowercase(typeAPIClassname(schema.getName()))).append(", factory);\n");
             builder.append("        }\n\n");
