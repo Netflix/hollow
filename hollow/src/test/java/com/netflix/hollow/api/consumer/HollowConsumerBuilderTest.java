@@ -2,6 +2,8 @@ package com.netflix.hollow.api.consumer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.netflix.hollow.api.consumer.index.HashIndex;
@@ -87,6 +89,68 @@ public class HollowConsumerBuilderTest {
 
         assertEquals(4, api.constructorArgCount);
         assertFalse(api.retainRemovedOrdinalsReceived);
+    }
+
+    @Test
+    public void retainedBeforeImage_referenceTraversal_resolvesToBeforeImagesWithoutError() throws IOException {
+        TestHollowConsumer consumer = longevityBuilder()
+                .withGeneratedAPIClass(AwardsAPI.class, true, "Award", "Movie", "SetOfMovie")
+                .build();
+
+        com.netflix.hollow.test.model.Movie winner = new com.netflix.hollow.test.model.Movie(10, "winner", 2023);
+        com.netflix.hollow.test.model.Movie nominee = new com.netflix.hollow.test.model.Movie(20, "nominee", 2023);
+        com.netflix.hollow.test.model.Award a1 = new com.netflix.hollow.test.model.Award(1, winner,
+                new HashSet<com.netflix.hollow.test.model.Movie>() {{ add(nominee); }});
+
+        // v1: the award (ordinal 0) and its referenced movies are present
+        consumer.addSnapshot(1l, new HollowWriteStateEngineBuilder().add(a1).build());
+        consumer.triggerRefreshTo(1l);
+
+        // v2: the award and its movies are removed; a different award takes fresh ordinals (the one-cycle
+        // reuse gap keeps a1 at ordinal 0), so a1 becomes a removed-only "before image"
+        com.netflix.hollow.test.model.Movie w2 = new com.netflix.hollow.test.model.Movie(30, "w2", 2024);
+        com.netflix.hollow.test.model.Award a2 = new com.netflix.hollow.test.model.Award(2, w2,
+                new HashSet<com.netflix.hollow.test.model.Movie>());
+        consumer.addDelta(1l, 2l, new HollowWriteStateEngineBuilder().add(a2).build());
+        consumer.triggerRefreshTo(2l);
+
+        AwardsAPI api = (AwardsAPI) consumer.getAPI();
+
+        // the removed award is still queryable as a before image
+        Award beforeImage = api.getAward(0);
+        assertNotNull(beforeImage);
+        assertEquals(1L, beforeImage.getId());
+
+        // traversing its reference fields must not error and must resolve to the referenced before images
+        Movie beforeWinner = beforeImage.getWinner();
+        assertNotNull(beforeWinner);
+        assertEquals(10L, beforeWinner.getId());
+
+        assertEquals(1L, beforeImage.getNominees().stream().count());
+        assertEquals(20L, beforeImage.getNominees().stream().findFirst().get().getId());
+    }
+
+    @Test
+    public void withoutRetain_removedAwardBeforeImageIsHoledOut() throws IOException {
+        TestHollowConsumer consumer = longevityBuilder()
+                .withGeneratedAPIClass(AwardsAPI.class, "Award", "Movie", "SetOfMovie")
+                .build();
+
+        com.netflix.hollow.test.model.Movie winner = new com.netflix.hollow.test.model.Movie(10, "winner", 2023);
+        com.netflix.hollow.test.model.Award a1 = new com.netflix.hollow.test.model.Award(1, winner,
+                new HashSet<com.netflix.hollow.test.model.Movie>());
+        consumer.addSnapshot(1l, new HollowWriteStateEngineBuilder().add(a1).build());
+        consumer.triggerRefreshTo(1l);
+
+        com.netflix.hollow.test.model.Movie w2 = new com.netflix.hollow.test.model.Movie(30, "w2", 2024);
+        com.netflix.hollow.test.model.Award a2 = new com.netflix.hollow.test.model.Award(2, w2,
+                new HashSet<com.netflix.hollow.test.model.Movie>());
+        consumer.addDelta(1l, 2l, new HollowWriteStateEngineBuilder().add(a2).build());
+        consumer.triggerRefreshTo(2l);
+
+        AwardsAPI api = (AwardsAPI) consumer.getAPI();
+        // without the flag, the removed record's slot is holed out
+        assertNull(api.getAward(0));
     }
 
     // Object longevity forces a fresh API instance per cycle via createAPI(dataAccess, previous) -- the rotation
