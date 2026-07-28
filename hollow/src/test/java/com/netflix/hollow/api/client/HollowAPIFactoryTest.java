@@ -53,6 +53,19 @@ public class HollowAPIFactoryTest {
     }
 
     @Test
+    public void createAPI_firstCycleWithoutPrevious_ignoresRetainFlag() {
+        // the initial snapshot load has no previous api to retain from, so it must use the standard
+        // 2-arg constructor and never attempt (or require) the retain-aware constructor
+        ForGeneratedAPI<RetentionAwareAPI> factory =
+                new ForGeneratedAPI<>(RetentionAwareAPI.class, true, "TypeA");
+
+        RetentionAwareAPI api = factory.createAPI(null);
+
+        assertEquals(2, api.constructorArgCount);
+        assertFalse(api.retainRemovedOrdinalsReceived);
+    }
+
+    @Test
     public void createAPI_whenRetainRequestedButApiWasGeneratedWithoutSupport_throwsClearError() {
         ForGeneratedAPI<LegacyAPI> factory =
                 new ForGeneratedAPI<>(LegacyAPI.class, true, "TypeA");

@@ -18,6 +18,7 @@ package com.netflix.hollow.api.objects.provider;
 
 import static com.netflix.hollow.api.objects.provider.Util.memoize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -193,6 +194,68 @@ public class HollowObjectCacheProviderTest {
         verify(delegate).updateTypeAPI(newTypeAPI);
     }
 
+    @Test
+    public void rotation_retainedRemovedOrdinalIsDroppedAfterOneCycle() {
+        TypeA a0 = typeA(0);
+        TypeA a1 = typeA(1);
+        TypeA a2 = typeA(2);
+        TypeA a3 = typeA(3);
+        prepopulate(a0, a1, a2, a3);
+        HollowObjectCacheProvider<TypeA> v1 =
+                new HollowObjectCacheProvider<>(typeReadState, typeAPI, factory);
+
+        // cycle 1: ordinal 2 removed -> retained as the before image
+        removeOrdinals(2);
+        HollowObjectCacheProvider<TypeA> v2 =
+                new HollowObjectCacheProvider<>(typeReadState, typeAPI, factory, v1, true);
+        assertEquals(a2, v2.getHollowObject(2));
+
+        // cycle 2: ordinal 2 stays removed -> retention window has elapsed, before image is gone
+        // (ordinal 3 keeps the array sized so the slot is a hole rather than out of bounds)
+        advanceCycleWithNoChanges();
+        HollowObjectCacheProvider<TypeA> v3 =
+                new HollowObjectCacheProvider<>(typeReadState, typeAPI, factory, v2, true);
+        assertNull(v3.getHollowObject(2));
+    }
+
+    @Test
+    public void rotation_reusedOrdinalReturnsFreshRecordNotStaleBeforeImage() {
+        TypeA a0 = typeA(0);
+        TypeA a1 = typeA(1);
+        TypeA a2Old = typeA(2);
+        prepopulate(a0, a1, a2Old);
+        HollowObjectCacheProvider<TypeA> v1 =
+                new HollowObjectCacheProvider<>(typeReadState, typeAPI, factory);
+
+        // cycle 1: ordinal 2 removed -> retained as the before image
+        removeOrdinals(2);
+        HollowObjectCacheProvider<TypeA> v2 =
+                new HollowObjectCacheProvider<>(typeReadState, typeAPI, factory, v1, true);
+        assertEquals(a2Old, v2.getHollowObject(2));
+
+        // cycle 2: ordinal 2 is reused for a different record -> the fresh record wins, not the before image
+        TypeA a2New = typeA(2);
+        addOrdinals(2);
+        HollowObjectCacheProvider<TypeA> v3 =
+                new HollowObjectCacheProvider<>(typeReadState, typeAPI, factory, v2, true);
+
+        assertEquals(a2New, v3.getHollowObject(2));
+        assertNotSame(a2Old, v3.getHollowObject(2));
+    }
+
+    @Test
+    public void retainEnabled_withNoPreviousCache_behavesNormally() {
+        TypeA a0 = typeA(0);
+        TypeA a1 = typeA(1);
+        prepopulate(a0, a1);
+
+        HollowObjectCacheProvider<TypeA> provider =
+                new HollowObjectCacheProvider<>(typeReadState, typeAPI, factory, null, true);
+
+        assertEquals(a0, provider.getHollowObject(0));
+        assertEquals(a1, provider.getHollowObject(1));
+    }
+
     private void prepopulate(TypeA...population) {
         for (TypeA a : population)
             populatedOrdinalListener.addedOrdinal(a.ordinal);
@@ -202,6 +265,18 @@ public class HollowObjectCacheProviderTest {
         populatedOrdinalListener.beginUpdate();
         for (int ordinal : removed)
             populatedOrdinalListener.removedOrdinal(ordinal);
+        populatedOrdinalListener.endUpdate();
+    }
+
+    private void addOrdinals(int...added) {
+        populatedOrdinalListener.beginUpdate();
+        for (int ordinal : added)
+            populatedOrdinalListener.addedOrdinal(ordinal);
+        populatedOrdinalListener.endUpdate();
+    }
+
+    private void advanceCycleWithNoChanges() {
+        populatedOrdinalListener.beginUpdate();
         populatedOrdinalListener.endUpdate();
     }
 
