@@ -104,7 +104,7 @@ public interface HollowAPIFactory {
                             + " regenerate the API with a newer Hollow version to retain before images in the object cache", e);
                 }
                 try {
-                    return constructor.newInstance(dataAccess, cachedTypes, Collections.emptyMap(), previousCycleAPI, true);
+                    return constructor.newInstance(dataAccess, cachedTypes, Collections.emptyMap(), previousCycleAPI, retainRemovedOrdinals);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
