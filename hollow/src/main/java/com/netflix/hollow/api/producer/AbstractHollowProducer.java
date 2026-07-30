@@ -106,6 +106,9 @@ abstract class AbstractHollowProducer {
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
     private final Supplier<Boolean> ignoreSoftLimits;
     private final boolean partitionedOrdinalMap;
+    // Evaluated at the start of each cycle's validation stage; when it returns true the entire
+    // validation stage is skipped for that cycle (all ValidatorListeners are bypassed).
+    private final Supplier<Boolean> skipValidation;
 
     @Deprecated
     public AbstractHollowProducer(
@@ -116,7 +119,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null);
+                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, null);
     }
 
     // The only constructor should be that which accepts a builder
@@ -129,7 +132,8 @@ abstract class AbstractHollowProducer {
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
                 b.allowTypeResharding, b.forceCoverageOfTypeResharding, b.partitionedOrdinalMap,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
-                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits);
+                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits,
+                b.skipValidation);
     }
 
     private final HollowProducerListener producerMetricsListener;
@@ -156,7 +160,8 @@ abstract class AbstractHollowProducer {
             HollowObjectHashCodeFinder hashCodeFinder,
             boolean doIntegrityCheck,
             HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier,
-            Supplier<Boolean> ignoreSoftLimits) {
+            Supplier<Boolean> ignoreSoftLimits,
+            Supplier<Boolean> skipValidation) {
         this.publisher = publisher;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
@@ -172,6 +177,7 @@ abstract class AbstractHollowProducer {
         this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
         this.ignoreSoftLimits = ignoreSoftLimits;
         this.partitionedOrdinalMap = partitionedOrdinalMap;
+        this.skipValidation = skipValidation;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
                 ? new HollowWriteStateEngine()
@@ -968,6 +974,14 @@ abstract class AbstractHollowProducer {
 
         ValidationStatus status = null;
         try {
+            if (skipValidation != null && Boolean.TRUE.equals(skipValidation.get())) {
+                log.info("Skipping validation stage for this cycle; skipValidation supplier returned true. "
+                        + "All validators are bypassed for this cycle only.");
+                status = new ValidationStatus(Collections.emptyList());
+                psb.success();
+                return;
+            }
+
             // Stream over the concatenation of the old and new validators
             List<ValidationResult> results =
                     listeners.getListeners(ValidatorListener.class)
