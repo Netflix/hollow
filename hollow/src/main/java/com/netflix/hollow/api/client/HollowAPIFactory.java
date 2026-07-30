@@ -61,6 +61,7 @@ public interface HollowAPIFactory {
         private final Class<T> generatedAPIClass;
         private final Set<String> cachedTypes;
         private final boolean retainRemovedOrdinals;
+        private final Constructor<T> retainAwareConstructor;
 
         public ForGeneratedAPI(Class<T> generatedAPIClass) {
             this(generatedAPIClass, new String[0]);
@@ -72,11 +73,21 @@ public interface HollowAPIFactory {
 
         public ForGeneratedAPI(Class<T> generatedAPIClass, boolean retainRemovedOrdinals, String... cachedTypes) {
             this.generatedAPIClass = generatedAPIClass;
-            this.cachedTypes = new HashSet<String>(Arrays.asList(cachedTypes));
+            this.cachedTypes = new HashSet<>(Arrays.asList(cachedTypes));
             this.retainRemovedOrdinals = retainRemovedOrdinals;
+            this.retainAwareConstructor = retainRemovedOrdinals ? resolveRetainAwareConstructor(generatedAPIClass) : null;
         }
 
-        
+        private static <T> Constructor<T> resolveRetainAwareConstructor(Class<T> generatedAPIClass) {
+            try {
+                return generatedAPIClass.getConstructor(HollowDataAccess.class, Set.class, Map.class, generatedAPIClass, boolean.class);
+            } catch (NoSuchMethodException e) {
+                throw new IllegalStateException(generatedAPIClass.getName()
+                        + " was generated with a version of Hollow that does not support retainRemovedOrdinals;"
+                        + " regenerate the API with a newer Hollow version to retain before images in the object cache", e);
+            }
+        }
+
         @Override
         public T createAPI(HollowDataAccess dataAccess) {
             try {
@@ -95,16 +106,8 @@ public interface HollowAPIFactory {
         @Override
         public T createAPI(HollowDataAccess dataAccess, HollowAPI previousCycleAPI) {
             if (retainRemovedOrdinals) {
-                Constructor<T> constructor;
                 try {
-                    constructor = generatedAPIClass.getConstructor(HollowDataAccess.class, Set.class, Map.class, generatedAPIClass, boolean.class);
-                } catch (NoSuchMethodException e) {
-                    throw new IllegalStateException(generatedAPIClass.getName()
-                            + " was generated with a version of Hollow that does not support retainRemovedOrdinals;"
-                            + " regenerate the API with a newer Hollow version to retain before images in the object cache", e);
-                }
-                try {
-                    return constructor.newInstance(dataAccess, cachedTypes, Collections.emptyMap(), previousCycleAPI, retainRemovedOrdinals);
+                    return retainAwareConstructor.newInstance(dataAccess, cachedTypes, Collections.emptyMap(), previousCycleAPI, true);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

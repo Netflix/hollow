@@ -66,12 +66,9 @@ public class HollowAPIFactoryTest {
     }
 
     @Test
-    public void createAPI_whenRetainRequestedButApiWasGeneratedWithoutSupport_throwsClearError() {
-        ForGeneratedAPI<LegacyAPI> factory =
-                new ForGeneratedAPI<>(LegacyAPI.class, true, "TypeA");
-
+    public void construction_whenRetainRequestedButApiWasGeneratedWithoutSupport_failsFastWithClearError() {
         try {
-            factory.createAPI(null, null);
+            new ForGeneratedAPI<>(LegacyAPI.class, true, "TypeA");
             fail("expected IllegalStateException because the generated API has no retain-aware constructor");
         } catch (IllegalStateException expected) {
             assertTrue(expected.getMessage(), expected.getMessage().contains("retainRemovedOrdinals"));
