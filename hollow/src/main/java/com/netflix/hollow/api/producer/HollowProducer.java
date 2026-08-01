@@ -755,7 +755,6 @@ public class HollowProducer extends AbstractHollowProducer {
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
         Supplier<Boolean> ignoreSoftLimits = null;
-        // Defaults to a supplier that never skips; validation always runs unless overridden.
         Supplier<Boolean> skipValidation = () -> false;
 
         protected HollowProducerEventListener customProducerMetricsListener = null;
@@ -1002,18 +1001,17 @@ public class HollowProducer extends AbstractHollowProducer {
         }
 
         /**
-         * Register a supplier that decides, per cycle, whether to skip the producer's validation stage.
+         * Registers a supplier evaluated once at the start of each cycle's validation stage. When it
+         * returns {@code true}, no {@link com.netflix.hollow.api.producer.validation.ValidatorListener}
+         * runs for that cycle -- regardless of whether it was added via the builder or
+         * {@link HollowProducer#addListener} -- and validation is reported as passed. Re-evaluated every
+         * cycle, so the next cycle validates normally unless the supplier again returns {@code true}.
          * <p>
-         * The supplier is evaluated once at the start of each cycle's validation stage. When it returns
-         * {@code true}, that single cycle skips validation entirely: every registered
-         * {@link com.netflix.hollow.api.producer.validation.ValidatorListener} is bypassed, regardless of
-         * whether it was added via the builder or via {@link HollowProducer#addListener}. The skip lasts for
-         * one cycle only; the next cycle validates normally unless the supplier again returns {@code true}.
-         * <p>
-         * This is useful for one-shot operator overrides where the decision of <em>when</em> to skip lives
-         * outside the producer. When unset (the default), validation always runs.
+         * Useful for one-shot operator overrides where the decision of <em>when</em> to validate lives
+         * outside the producer. Defaults to always validating.
          *
-         * @param skipValidation supplier returning {@code true} to skip validation for the upcoming cycle
+         * @param skipValidation supplier returning {@code true} to report validation as passed without
+         *         running any validator for the upcoming cycle
          * @return this builder
          */
         public B withSkipValidation(Supplier<Boolean> skipValidation) {

@@ -106,8 +106,8 @@ abstract class AbstractHollowProducer {
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
     private final Supplier<Boolean> ignoreSoftLimits;
     private final boolean partitionedOrdinalMap;
-    // Evaluated at the start of each cycle's validation stage; when it returns true the entire
-    // validation stage is skipped for that cycle (all ValidatorListeners are bypassed).
+    // Evaluated at the start of each cycle's validation stage; when it returns true, no
+    // ValidatorListener runs for that cycle and validation is reported as passed.
     private final Supplier<Boolean> skipValidation;
 
     @Deprecated
@@ -119,7 +119,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, null);
+                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, () -> false);
     }
 
     // The only constructor should be that which accepts a builder
@@ -975,8 +975,11 @@ abstract class AbstractHollowProducer {
         ValidationStatus status = null;
         try {
             if (skipValidation != null && Boolean.TRUE.equals(skipValidation.get())) {
-                log.info("Skipping validation stage for this cycle; skipValidation supplier returned true. "
-                        + "All validators are bypassed for this cycle only.");
+                log.info("skipValidation supplier returned true; no ValidatorListener will run for this "
+                        + "cycle and validation is reported as passed.");
+                // status/psb.success() here plus the fireValidationComplete(psb, status) call in the
+                // finally block below make the beacon and cycle log look the same as a normal,
+                // fully-passing validation stage, so listener bookkeeping stays consistent.
                 status = new ValidationStatus(Collections.emptyList());
                 psb.success();
                 return;
