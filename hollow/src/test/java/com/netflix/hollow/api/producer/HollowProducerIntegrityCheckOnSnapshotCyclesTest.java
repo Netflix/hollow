@@ -120,8 +120,8 @@ public class HollowProducerIntegrityCheckOnSnapshotCyclesTest {
 
         // With numStatesBetweenSnapshots=2, snapshots fall on cycles 1 and 4.
         assertEquals(2, counters.integrityChecks.get());
-        assertEquals(counters.snapshotStages.get(), counters.integrityChecks.get());
-        assertEquals(counters.snapshotPublishes.get(), counters.snapshotStages.get());
+        assertEquals(counters.integrityChecks.get(), counters.snapshotStages.get());
+        assertEquals(counters.snapshotStages.get(), counters.snapshotPublishes.get());
         assertTrue(counters.integrityChecks.get() < cycles);
     }
 
@@ -262,15 +262,24 @@ public class HollowProducerIntegrityCheckOnSnapshotCyclesTest {
 
         long lastVersion = 0;
         int cycles = 6;
-        for (int i = 0; i < cycles; i++) {
-            final int id = i;
-            lastVersion = producer.runCycle(ws -> ws.add(new Rec(id, id)));
+        try {
+            for (int i = 0; i < cycles; i++) {
+                final int id = i;
+                lastVersion = producer.runCycle(ws -> ws.add(new Rec(id, id)));
+            }
+        } finally {
+            executor.shutdown();
+            try {
+                if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                executor.shutdownNow();
+            }
         }
 
-        executor.shutdown();
-        assertTrue(executor.awaitTermination(30, TimeUnit.SECONDS));
-
-        assertEquals(counters.snapshotStages.get(), counters.integrityChecks.get());
+        assertEquals(counters.integrityChecks.get(), counters.snapshotStages.get());
         assertTrue(counters.integrityChecks.get() < cycles);
 
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
