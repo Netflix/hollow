@@ -21,6 +21,7 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,6 +55,11 @@ public class ByteArrayOrdinalMap {
     /// ordinal's value space and forcing a broken delta chain.
     /// NOTE: not using final to allow value modification through reflection for test purpose.
     private static int SOFT_ORDINAL_LIMIT = 1 << (BITS_PER_ORDINAL - 1);
+
+    // Opt-in (default off): skip the compact sort+rehash when no ordinals are freed.
+    static boolean COMPACT_SKIP_WHEN_NO_FREES =
+            Boolean.getBoolean("com.netflix.hollow.core.memory.ByteArrayOrdinalMap.enableCompactSkip");
+    static final AtomicLong COMPACT_SKIP_COUNT = new AtomicLong();
 
     /// Thread safety:  We need volatile access semantics to the individual elements in the
     /// pointersAndOrdinals array.
@@ -463,13 +469,33 @@ public class ByteArrayOrdinalMap {
         long[] populatedReverseKeys = new long[size];
 
         int counter = 0;
+        boolean anyFreed = false;
         AtomicLongArray pao = pointersAndOrdinals;
 
         for (int i = 0; i < pao.length(); i++) {
             long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
                 populatedReverseKeys[counter++] = key << BITS_PER_ORDINAL | key >>> BITS_PER_POINTER;
+                if (COMPACT_SKIP_WHEN_NO_FREES && !anyFreed) {
+                    int ordinal = (int) (key >>> BITS_PER_POINTER);
+                    if (!usedGlobalOrdinals.get((ordinal << mapIndexBits) | mapIdx)) {
+                        anyFreed = true;
+                    }
+                }
             }
+        }
+
+        // Nothing freed => no holes to reclaim and the hash mapping is unchanged.
+        if (COMPACT_SKIP_WHEN_NO_FREES && !anyFreed) {
+            if (focusHoleFillInFewestShards && numShards > 1) {
+                freeOrdinalTracker.sort(numShards, mapIndexBits, mapIdx);
+            } else {
+                freeOrdinalTracker.sort();
+            }
+            pointersByOrdinal = null;
+            unusedPreviousOrdinals = null;
+            COMPACT_SKIP_COUNT.incrementAndGet();
+            return;
         }
 
         Arrays.sort(populatedReverseKeys);
