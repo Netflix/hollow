@@ -751,6 +751,7 @@ public class HollowProducer extends AbstractHollowProducer {
         SingleProducerEnforcer singleProducerEnforcer = new BasicSingleProducerEnforcer();
         HollowObjectHashCodeFinder hashCodeFinder = null;
         boolean doIntegrityCheck = true;
+        boolean integrityCheckOnSnapshotOnly = false;
         boolean partitionedOrdinalMap = false;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
@@ -968,6 +969,17 @@ public class HollowProducer extends AbstractHollowProducer {
         
         public B noIntegrityCheck() {
             this.doIntegrityCheck = false;
+            return (B) this;
+        }
+
+        /**
+         * Opt in to running the integrity check only on cycles that produce a snapshot, instead of every cycle.
+         * Requires the integrity check to be enabled (the default); has no effect when {@link #noIntegrityCheck()} is set.
+         *
+         * @return this builder
+         */
+        public B checkIntegrityOnSnapshotCyclesOnly() {
+            this.integrityCheckOnSnapshotOnly = true;
             return (B) this;
         }
 

@@ -94,6 +94,7 @@ abstract class AbstractHollowProducer {
     long lastSuccessfulCycle = 0;
     final HollowObjectHashCodeFinder hashCodeFinder;
     final boolean doIntegrityCheck;
+    final boolean integrityCheckOnSnapshotOnly;
     // Count to track number of cycles run by a primary producer. In the future, this can be useful in determining stickiness of a
     // producer instance.
     int cycleCountSincePrimaryStatus = 0;
@@ -116,7 +117,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null);
+                null, true, false, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null);
     }
 
     // The only constructor should be that which accepts a builder
@@ -129,7 +130,7 @@ abstract class AbstractHollowProducer {
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
                 b.allowTypeResharding, b.forceCoverageOfTypeResharding, b.partitionedOrdinalMap,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
-                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits);
+                b.hashCodeFinder, b.doIntegrityCheck, b.integrityCheckOnSnapshotOnly, b.updatePlanBlobVerifier, b.ignoreSoftLimits);
     }
 
     private final HollowProducerListener producerMetricsListener;
@@ -155,6 +156,7 @@ abstract class AbstractHollowProducer {
             SingleProducerEnforcer singleProducerEnforcer,
             HollowObjectHashCodeFinder hashCodeFinder,
             boolean doIntegrityCheck,
+            boolean integrityCheckOnSnapshotOnly,
             HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier,
             Supplier<Boolean> ignoreSoftLimits) {
         this.publisher = publisher;
@@ -166,6 +168,7 @@ abstract class AbstractHollowProducer {
         this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
         this.hashCodeFinder = hashCodeFinder;
         this.doIntegrityCheck = doIntegrityCheck;
+        this.integrityCheckOnSnapshotOnly = integrityCheckOnSnapshotOnly;
         this.targetMaxTypeShardSize = targetMaxTypeShardSize;
         this.allowTypeResharding = allowTypeResharding;
         this.forceCoverageOfTypeResharding = forceCoverageOfTypeResharding;
@@ -502,7 +505,8 @@ abstract class AbstractHollowProducer {
 
                 ReadStateHelper candidate = readStates.roundtrip(toVersion);
                 cycleStatus.readState(candidate.pending());
-                candidate = doIntegrityCheck ? 
+                boolean runIntegrityCheck = doIntegrityCheck && (!integrityCheckOnSnapshotOnly || artifacts.hasSnapshot());
+                candidate = runIntegrityCheck ?
                         checkIntegrity(listeners, candidate, artifacts, schemaChangedFromPriorVersion) :
                             noIntegrityCheck(candidate, artifacts);
 
@@ -701,7 +705,7 @@ abstract class AbstractHollowProducer {
         try {
             // We want a header to be created for all states.
             artifacts.header = blobStager.openHeader(toVersion);
-            if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
+            if(!readStates.hasCurrent() || (doIntegrityCheck && !integrityCheckOnSnapshotOnly) || numStatesUntilNextSnapshot <= 0)
                 artifacts.snapshot = stageBlob(listeners, blobStager.openSnapshot(toVersion));
 
             publishHeaderBlob(artifacts.header);
@@ -1076,6 +1080,10 @@ abstract class AbstractHollowProducer {
 
         boolean hasReverseDelta() {
             return reverseDelta != null;
+        }
+
+        boolean hasSnapshot() {
+            return snapshot != null;
         }
 
         boolean hasHeader() { return header != null; }
