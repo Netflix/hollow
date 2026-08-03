@@ -1001,17 +1001,21 @@ public class HollowProducer extends AbstractHollowProducer {
         }
 
         /**
-         * Registers a supplier evaluated once at the start of each cycle's validation stage. When it
-         * returns {@code true}, no {@link com.netflix.hollow.api.producer.validation.ValidatorListener}
-         * runs for that cycle -- regardless of whether it was added via the builder or
-         * {@link HollowProducer#addListener} -- and validation is reported as passed. Re-evaluated every
-         * cycle, so the next cycle validates normally unless the supplier again returns {@code true}.
+         * Registers a supplier evaluated once per cycle, before the validate stage would otherwise
+         * begin. When it returns {@code true}, the validate stage does not run at all for that cycle:
+         * no {@link com.netflix.hollow.api.producer.validation.ValidatorListener} runs -- regardless of
+         * whether it was added via the builder or {@link HollowProducer#addListener} -- and no Validate
+         * stage event is reported to {@link com.netflix.hollow.api.producer.listener.CycleListener}s or
+         * {@link com.netflix.hollow.api.producer.validation.ValidationStatusListener}s, so the stage is
+         * simply absent from that cycle's beacon/cycle log rather than reported as an empty pass.
+         * Re-evaluated every cycle, so the next cycle validates normally unless the supplier again
+         * returns {@code true}.
          * <p>
          * Useful for one-shot operator overrides where the decision of <em>when</em> to validate lives
          * outside the producer. Defaults to always validating.
          *
-         * @param skipValidation supplier returning {@code true} to report validation as passed without
-         *         running any validator for the upcoming cycle
+         * @param skipValidation supplier returning {@code true} to skip the validate stage entirely
+         *         (no validators run, no Validate stage is reported) for the upcoming cycle
          * @return this builder
          */
         public B withSkipValidation(Supplier<Boolean> skipValidation) {

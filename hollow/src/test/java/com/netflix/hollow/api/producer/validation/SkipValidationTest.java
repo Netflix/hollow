@@ -21,7 +21,9 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.test.InMemoryBlobStore;
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -124,6 +126,40 @@ public class SkipValidationTest {
         } catch (ValidationStatusException expected) {
             // validators ran, as expected
         }
+    }
+
+    @Test
+    public void skipTrue_reportsNoValidateStageEvent() {
+        AtomicInteger startCount = new AtomicInteger();
+        AtomicInteger completeCount = new AtomicInteger();
+        ValidationStatusListener counter = new ValidationStatusListener() {
+            @Override
+            public void onValidationStatusStart(long version) {
+                startCount.incrementAndGet();
+            }
+
+            @Override
+            public void onValidationStatusComplete(ValidationStatus status, long version, Duration elapsed) {
+                completeCount.incrementAndGet();
+            }
+        };
+
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(counter)
+                .withListener(new DuplicateDataDetectionValidator("TypeWithPrimaryKey"))
+                .withSkipValidation(() -> true)
+                .build();
+
+        // Skipped cycle: neither the ValidationStatusListener nor the (failing) ValidatorListener
+        // should observe any event -- the validate stage does not run at all, so tooling built on
+        // these events (e.g. beacon/cycle log) sees no Validate stage entry for this cycle.
+        producer.runCycle(newState -> {
+            newState.add(new TypeWithPrimaryKey(1, "a"));
+            newState.add(new TypeWithPrimaryKey(1, "b"));
+        });
+        Assert.assertEquals(0, startCount.get());
+        Assert.assertEquals(0, completeCount.get());
     }
 
     @HollowPrimaryKey(fields = {"id"})

@@ -106,8 +106,11 @@ abstract class AbstractHollowProducer {
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
     private final Supplier<Boolean> ignoreSoftLimits;
     private final boolean partitionedOrdinalMap;
-    // Evaluated at the start of each cycle's validation stage; when it returns true, no
-    // ValidatorListener runs for that cycle and validation is reported as passed.
+    // Evaluated at the start of each cycle, before the validate stage would otherwise begin; when it
+    // returns true the validate stage does not run at all for that cycle -- no ValidatorListener runs,
+    // and no Validate stage start/complete event is fired to CycleListeners/ValidationStatusListeners
+    // (so beacon/cycle log tooling shows no Validate stage entry for that cycle, rather than an
+    // artificial "passed with zero results" entry).
     private final Supplier<Boolean> skipValidation;
 
     @Deprecated
@@ -970,21 +973,21 @@ abstract class AbstractHollowProducer {
     }
 
     private void validate(ProducerListeners listeners, HollowProducer.ReadState readState) {
+        if (skipValidation != null && Boolean.TRUE.equals(skipValidation.get())) {
+            // Return before firing validation-start at all: no ValidatorListener runs, and no Validate
+            // stage start/complete event reaches CycleListeners/ValidationStatusListeners for this
+            // cycle. Beacon/cycle log tooling will show no Validate stage entry for this cycle, rather
+            // than a synthetic "passed with zero results" entry that reads the same as "zero
+            // validators configured".
+            log.info("skipValidation supplier returned true; the validate stage does not run for this "
+                    + "cycle (no ValidatorListener runs, and no Validate stage event is reported).");
+            return;
+        }
+
         Status.StageWithStateBuilder psb = listeners.fireValidationStart(readState);
 
         ValidationStatus status = null;
         try {
-            if (skipValidation != null && Boolean.TRUE.equals(skipValidation.get())) {
-                log.info("skipValidation supplier returned true; no ValidatorListener will run for this "
-                        + "cycle and validation is reported as passed.");
-                // status/psb.success() here plus the fireValidationComplete(psb, status) call in the
-                // finally block below make the beacon and cycle log look the same as a normal,
-                // fully-passing validation stage, so listener bookkeeping stays consistent.
-                status = new ValidationStatus(Collections.emptyList());
-                psb.success();
-                return;
-            }
-
             // Stream over the concatenation of the old and new validators
             List<ValidationResult> results =
                     listeners.getListeners(ValidatorListener.class)
