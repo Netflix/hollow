@@ -106,11 +106,10 @@ abstract class AbstractHollowProducer {
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
     private final Supplier<Boolean> ignoreSoftLimits;
     private final boolean partitionedOrdinalMap;
-    // Evaluated at the start of each cycle, before the validate stage would otherwise begin; when it
-    // returns true the validate stage does not run at all for that cycle -- no ValidatorListener runs,
-    // and no Validate stage start/complete event is fired to CycleListeners/ValidationStatusListeners
-    // (so beacon/cycle log tooling shows no Validate stage entry for that cycle, rather than an
-    // artificial "passed with zero results" entry).
+    // Evaluated at the start of the validate stage; when it returns true no ValidatorListener runs for
+    // that cycle and the stage is skipped entirely -- no validation event is fired to
+    // HollowProducerListeners or ValidationStatusListeners, so the validate stage is absent from the
+    // beacon/cycle log rather than reported as an empty pass.
     private final Supplier<Boolean> skipValidation;
 
     @Deprecated
@@ -974,13 +973,11 @@ abstract class AbstractHollowProducer {
 
     private void validate(ProducerListeners listeners, HollowProducer.ReadState readState) {
         if (skipValidation != null && Boolean.TRUE.equals(skipValidation.get())) {
-            // Return before firing validation-start at all: no ValidatorListener runs, and no Validate
-            // stage start/complete event reaches CycleListeners/ValidationStatusListeners for this
-            // cycle. Beacon/cycle log tooling will show no Validate stage entry for this cycle, rather
-            // than a synthetic "passed with zero results" entry that reads the same as "zero
-            // validators configured".
-            log.info("skipValidation supplier returned true; the validate stage does not run for this "
-                    + "cycle (no ValidatorListener runs, and no Validate stage event is reported).");
+            // Return before firing validation-start: no ValidatorListener runs and no validation event
+            // reaches HollowProducerListeners/ValidationStatusListeners, so the validate stage is absent
+            // from the beacon/cycle log rather than reported as an empty pass.
+            log.info("skipValidation returned true; skipping the validate stage for version "
+                    + readState.getVersion() + " (no validators run, no validation event reported).");
             return;
         }
 
