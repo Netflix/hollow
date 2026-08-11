@@ -755,6 +755,7 @@ public class HollowProducer extends AbstractHollowProducer {
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
         Supplier<Boolean> ignoreSoftLimits = null;
+        Supplier<Boolean> skipValidation = () -> false;
 
         protected HollowProducerEventListener customProducerMetricsListener = null;
 
@@ -996,6 +997,24 @@ public class HollowProducer extends AbstractHollowProducer {
          */
         public B withIgnoreSoftLimits(Supplier<Boolean> ignoreSoftLimits) {
             this.ignoreSoftLimits = ignoreSoftLimits;
+            return (B) this;
+        }
+
+        /**
+         * Registers a supplier evaluated at the start of each cycle's validate stage. When it returns
+         * {@code true}, no {@link com.netflix.hollow.api.producer.validation.ValidatorListener} runs for
+         * that cycle -- whether added via the builder or {@link HollowProducer#addListener} -- and the
+         * validate stage is skipped entirely: no validation event is fired to {@link HollowProducerListener}s
+         * or {@link com.netflix.hollow.api.producer.validation.ValidationStatusListener}s, so consumers of
+         * those events see no validate stage for that cycle rather than an empty, passing one. Re-evaluated
+         * every cycle. Defaults to always validating.
+         *
+         * @param skipValidation supplier returning {@code true} to skip the validate stage for the
+         *         upcoming cycle
+         * @return this builder
+         */
+        public B withSkipValidation(Supplier<Boolean> skipValidation) {
+            this.skipValidation = skipValidation;
             return (B) this;
         }
 
