@@ -152,8 +152,8 @@ public class SkipValidationTest {
                 .build();
 
         // Skipped cycle: neither the ValidationStatusListener nor the (failing) ValidatorListener
-        // should observe any event -- the validate stage does not run at all, so tooling built on
-        // these events (e.g. beacon/cycle log) sees no Validate stage entry for this cycle.
+        // should observe any event -- the validate stage does not run at all, so consumers of these
+        // events see no validate stage for this cycle.
         producer.runCycle(newState -> {
             newState.add(new TypeWithPrimaryKey(1, "a"));
             newState.add(new TypeWithPrimaryKey(1, "b"));

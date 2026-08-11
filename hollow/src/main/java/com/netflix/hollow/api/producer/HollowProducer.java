@@ -1005,8 +1005,8 @@ public class HollowProducer extends AbstractHollowProducer {
          * {@code true}, no {@link com.netflix.hollow.api.producer.validation.ValidatorListener} runs for
          * that cycle -- whether added via the builder or {@link HollowProducer#addListener} -- and the
          * validate stage is skipped entirely: no validation event is fired to {@link HollowProducerListener}s
-         * or {@link com.netflix.hollow.api.producer.validation.ValidationStatusListener}s, so the stage is
-         * absent from that cycle's beacon/cycle log rather than reported as an empty pass. Re-evaluated
+         * or {@link com.netflix.hollow.api.producer.validation.ValidationStatusListener}s, so consumers of
+         * those events see no validate stage for that cycle rather than an empty, passing one. Re-evaluated
          * every cycle. Defaults to always validating.
          *
          * @param skipValidation supplier returning {@code true} to skip the validate stage for the
