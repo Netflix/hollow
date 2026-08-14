@@ -106,6 +106,11 @@ abstract class AbstractHollowProducer {
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
     private final Supplier<Boolean> ignoreSoftLimits;
     private final boolean partitionedOrdinalMap;
+    // Evaluated at the start of the validate stage; when it returns true no ValidatorListener runs for
+    // that cycle and the stage is skipped entirely -- no validation event is fired to
+    // HollowProducerListeners or ValidationStatusListeners, so consumers of those events see no
+    // validate stage for that cycle rather than an empty, passing one.
+    private final Supplier<Boolean> skipValidation;
 
     @Deprecated
     public AbstractHollowProducer(
@@ -116,7 +121,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null);
+                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, () -> false);
     }
 
     // The only constructor should be that which accepts a builder
@@ -129,7 +134,8 @@ abstract class AbstractHollowProducer {
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize, b.focusHoleFillInFewestShards,
                 b.allowTypeResharding, b.forceCoverageOfTypeResharding, b.partitionedOrdinalMap,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
-                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits);
+                b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits,
+                b.skipValidation);
     }
 
     private final HollowProducerListener producerMetricsListener;
@@ -156,7 +162,8 @@ abstract class AbstractHollowProducer {
             HollowObjectHashCodeFinder hashCodeFinder,
             boolean doIntegrityCheck,
             HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier,
-            Supplier<Boolean> ignoreSoftLimits) {
+            Supplier<Boolean> ignoreSoftLimits,
+            Supplier<Boolean> skipValidation) {
         this.publisher = publisher;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
@@ -172,6 +179,7 @@ abstract class AbstractHollowProducer {
         this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
         this.ignoreSoftLimits = ignoreSoftLimits;
         this.partitionedOrdinalMap = partitionedOrdinalMap;
+        this.skipValidation = skipValidation;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
                 ? new HollowWriteStateEngine()
@@ -964,6 +972,15 @@ abstract class AbstractHollowProducer {
     }
 
     private void validate(ProducerListeners listeners, HollowProducer.ReadState readState) {
+        if (skipValidation != null && Boolean.TRUE.equals(skipValidation.get())) {
+            // Return before firing validation-start: no ValidatorListener runs and no validation event
+            // reaches HollowProducerListeners/ValidationStatusListeners, so consumers of those events
+            // see no validate stage for this cycle rather than an empty, passing one.
+            log.info("skipValidation returned true; skipping the validate stage for version "
+                    + readState.getVersion() + " (no validators run, no validation event reported).");
+            return;
+        }
+
         Status.StageWithStateBuilder psb = listeners.fireValidationStart(readState);
 
         ValidationStatus status = null;
