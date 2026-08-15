@@ -38,6 +38,14 @@ public interface HollowConstants {
     /**
      * The maximum number of buckets allowed in a Hollow hash table. Empty space is reserved (based on 70% load factor),
      * otherwise performance approaches O(n).
+     * <p>
+     * This value is part of the blob layout contract for SET and MAP types: producers and consumers both derive a
+     * collection's bucket count from its size, so it must not change.
      */
     int HASH_TABLE_MAX_SIZE = (int)((1L << 30) * 7 / 10);
+
+    /**
+     * The maximum number of elements allowed in an in-memory index hash table, i.e. 70% of 2^31 buckets.
+     */
+    long INDEX_HASH_TABLE_MAX_SIZE = (1L << 31) * 7 / 10;
 }

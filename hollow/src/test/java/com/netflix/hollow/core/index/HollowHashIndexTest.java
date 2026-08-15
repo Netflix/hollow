@@ -242,6 +242,29 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
     }
 
     @Test
+    public void testIndexingWhenTheIntermediateMatchTableGrows() throws Exception {
+        /// the intermediate match hash table is initially sized for one match per top-level record, so indexing many
+        /// more distinct match keys than there are records forces it to grow repeatedly.
+        int numRecords = 64;
+        int valuesPerRecord = 64;
+        for(int i=0;i<numRecords;i++) {
+            String[] data = new String[valuesPerRecord];
+            for(int j=0;j<valuesPerRecord;j++)
+                data[j] = "value-" + i + "-" + j;
+            mapper.add(new TypeList(data));
+        }
+        roundTripSnapshot();
+
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeList", "", "data.element.value");
+
+        for(int i=0;i<numRecords;i++)
+            for(int j=0;j<valuesPerRecord;j++)
+                assertIteratorContainsAll(index.findMatches("value-" + i + "-" + j).iterator(), i);
+
+        Assert.assertNull(index.findMatches("value-not-present"));
+    }
+
+    @Test
     public void testIndexingSetTypeField() throws Exception {
         mapper.add(new TypeSet("A", "B", "C", "D"));
         mapper.add(new TypeSet("B", "C", "D", "E"));
