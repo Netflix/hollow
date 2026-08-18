@@ -47,7 +47,7 @@ public class HollowProducerCompactSkipTest {
     }
 
     private static Field skipField() throws Exception {
-        Field f = ByteArrayOrdinalMap.class.getDeclaredField("COMPACT_SKIP_WHEN_NO_FREES");
+        Field f = ByteArrayOrdinalMap.class.getDeclaredField("OPPORTUNISTIC_COMPACT");
         f.setAccessible(true);
         return f;
     }

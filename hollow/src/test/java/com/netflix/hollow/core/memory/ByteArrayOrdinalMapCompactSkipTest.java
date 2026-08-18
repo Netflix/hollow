@@ -29,14 +29,14 @@ public class ByteArrayOrdinalMapCompactSkipTest {
 
     @Before
     public void setUp() {
-        originalSkip = ByteArrayOrdinalMap.COMPACT_SKIP_WHEN_NO_FREES;
-        ByteArrayOrdinalMap.COMPACT_SKIP_WHEN_NO_FREES = true;
-        ByteArrayOrdinalMap.COMPACT_SKIP_COUNT.set(0);
+        originalSkip = ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT;
+        ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT = true;
+        ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT_COUNT.set(0);
     }
 
     @After
     public void tearDown() {
-        ByteArrayOrdinalMap.COMPACT_SKIP_WHEN_NO_FREES = originalSkip;
+        ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT = originalSkip;
     }
 
     private static ThreadSafeBitSet used(int... globalOrdinals) {
@@ -65,7 +65,7 @@ public class ByteArrayOrdinalMapCompactSkipTest {
 
         m.compact(used(a, b, c), 1, false, 0, 0);
 
-        assertEquals(1, ByteArrayOrdinalMap.COMPACT_SKIP_COUNT.get());
+        assertEquals(1, ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT_COUNT.get());
         assertEquals(a, m.get(createBuffer("A")));
         assertEquals(b, m.get(createBuffer("B")));
         assertEquals(c, m.get(createBuffer("C")));
@@ -81,7 +81,7 @@ public class ByteArrayOrdinalMapCompactSkipTest {
 
         m.compact(used(a, c), 1, false, 0, 0); // drop B
 
-        assertEquals(0, ByteArrayOrdinalMap.COMPACT_SKIP_COUNT.get());
+        assertEquals(0, ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT_COUNT.get());
         assertEquals(a, m.get(createBuffer("A")));
         assertEquals(-1, m.get(createBuffer("B")));
         assertEquals(c, m.get(createBuffer("C")));
@@ -89,7 +89,7 @@ public class ByteArrayOrdinalMapCompactSkipTest {
 
     @Test
     public void skipDisabledFallsBackToFullCompact() {
-        ByteArrayOrdinalMap.COMPACT_SKIP_WHEN_NO_FREES = false;
+        ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT = false;
         ByteArrayOrdinalMap m = new ByteArrayOrdinalMap();
         int a = m.getOrAssignOrdinal(createBuffer("A"));
         int b = m.getOrAssignOrdinal(createBuffer("B"));
@@ -97,7 +97,7 @@ public class ByteArrayOrdinalMapCompactSkipTest {
 
         m.compact(used(a, b), 1, false, 0, 0);
 
-        assertEquals(0, ByteArrayOrdinalMap.COMPACT_SKIP_COUNT.get());
+        assertEquals(0, ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT_COUNT.get());
         assertEquals(a, m.get(createBuffer("A")));
         assertEquals(b, m.get(createBuffer("B")));
     }
@@ -112,9 +112,9 @@ public class ByteArrayOrdinalMapCompactSkipTest {
         fast.prepareForWrite();
         full.prepareForWrite();
 
-        ByteArrayOrdinalMap.COMPACT_SKIP_WHEN_NO_FREES = true;
+        ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT = true;
         fast.compact(used(a, b, c), 1, false, 0, 0);
-        ByteArrayOrdinalMap.COMPACT_SKIP_WHEN_NO_FREES = false;
+        ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT = false;
         full.compact(used(a, b, c), 1, false, 0, 0);
 
         fast.prepareForWrite();
@@ -137,11 +137,11 @@ public class ByteArrayOrdinalMapCompactSkipTest {
         m.prepareForWrite();
 
         m.compact(used((a << mapIndexBits) | mapIdx, (b << mapIndexBits) | mapIdx), 1, false, mapIdx, mapIndexBits);
-        assertEquals(1, ByteArrayOrdinalMap.COMPACT_SKIP_COUNT.get());
+        assertEquals(1, ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT_COUNT.get());
 
         m.prepareForWrite();
         m.compact(used((a << mapIndexBits) | mapIdx), 1, false, mapIdx, mapIndexBits); // drop B
-        assertEquals(1, ByteArrayOrdinalMap.COMPACT_SKIP_COUNT.get()); // full path, unchanged
+        assertEquals(1, ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT_COUNT.get()); // full path, unchanged
         assertEquals(a, m.get(createBuffer("A")));
         assertEquals(-1, m.get(createBuffer("B")));
     }
@@ -154,7 +154,7 @@ public class ByteArrayOrdinalMapCompactSkipTest {
         m.prepareForWrite();
 
         m.compact(used(a), 1, false, 0, 0); // free B via full compact
-        assertEquals(0, ByteArrayOrdinalMap.COMPACT_SKIP_COUNT.get());
+        assertEquals(0, ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT_COUNT.get());
         assertEquals(-1, m.get(createBuffer("B")));
 
         int d = m.getOrAssignOrdinal(createBuffer("D")); // reuses freed ordinal
@@ -162,9 +162,24 @@ public class ByteArrayOrdinalMapCompactSkipTest {
         m.prepareForWrite();
 
         m.compact(used(a, d), 1, false, 0, 0); // nothing freed -> skip
-        assertEquals(1, ByteArrayOrdinalMap.COMPACT_SKIP_COUNT.get());
+        assertEquals(1, ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT_COUNT.get());
         assertEquals(a, m.get(createBuffer("A")));
         assertEquals(d, m.get(createBuffer("D")));
         assertEquals(-1, m.get(createBuffer("B")));
+    }
+
+    @Test
+    public void getterReflectsOpportunisticCompactCount() {
+        assertEquals(0, ByteArrayOrdinalMap.getOpportunisticCompactCount());
+        ByteArrayOrdinalMap m = new ByteArrayOrdinalMap();
+        int a = m.getOrAssignOrdinal(createBuffer("A"));
+        int b = m.getOrAssignOrdinal(createBuffer("B"));
+        m.prepareForWrite();
+
+        m.compact(used(a, b), 1, false, 0, 0); // nothing freed -> fast path
+
+        assertEquals(1, ByteArrayOrdinalMap.getOpportunisticCompactCount());
+        assertEquals(ByteArrayOrdinalMap.OPPORTUNISTIC_COMPACT_COUNT.get(),
+                ByteArrayOrdinalMap.getOpportunisticCompactCount());
     }
 }

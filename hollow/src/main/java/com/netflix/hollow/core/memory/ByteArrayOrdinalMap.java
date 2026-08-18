@@ -56,10 +56,11 @@ public class ByteArrayOrdinalMap {
     /// NOTE: not using final to allow value modification through reflection for test purpose.
     private static int SOFT_ORDINAL_LIMIT = 1 << (BITS_PER_ORDINAL - 1);
 
-    // Opt-in (default off): skip the compact sort+rehash when no ordinals are freed.
-    static boolean COMPACT_SKIP_WHEN_NO_FREES =
-            Boolean.getBoolean("com.netflix.hollow.core.memory.ByteArrayOrdinalMap.enableCompactSkip");
-    static final AtomicLong COMPACT_SKIP_COUNT = new AtomicLong();
+    // Opt-in (default off): when a cycle frees no ordinals there are no holes to reclaim and the hash
+    // mapping is unchanged, so the sort+rehash portion of compact() can be skipped.
+    static boolean OPPORTUNISTIC_COMPACT =
+            Boolean.getBoolean("com.netflix.hollow.core.memory.ByteArrayOrdinalMap.opportunisticCompact");
+    static final AtomicLong OPPORTUNISTIC_COMPACT_COUNT = new AtomicLong();
 
     /// Thread safety:  We need volatile access semantics to the individual elements in the
     /// pointersAndOrdinals array.
@@ -476,7 +477,7 @@ public class ByteArrayOrdinalMap {
             long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
                 populatedReverseKeys[counter++] = key << BITS_PER_ORDINAL | key >>> BITS_PER_POINTER;
-                if (COMPACT_SKIP_WHEN_NO_FREES && !anyFreed) {
+                if (OPPORTUNISTIC_COMPACT && !anyFreed) {
                     int ordinal = (int) (key >>> BITS_PER_POINTER);
                     if (!usedGlobalOrdinals.get((ordinal << mapIndexBits) | mapIdx)) {
                         anyFreed = true;
@@ -485,16 +486,15 @@ public class ByteArrayOrdinalMap {
             }
         }
 
-        // Nothing freed => no holes to reclaim and the hash mapping is unchanged.
-        if (COMPACT_SKIP_WHEN_NO_FREES && !anyFreed) {
-            if (focusHoleFillInFewestShards && numShards > 1) {
-                freeOrdinalTracker.sort(numShards, mapIndexBits, mapIdx);
-            } else {
-                freeOrdinalTracker.sort();
-            }
+        // Nothing freed => no holes to reclaim and the hash mapping is unchanged, so skip the sort+rehash.
+        if (OPPORTUNISTIC_COMPACT && !anyFreed) {
+            sortFreeOrdinals(numShards, mapIndexBits, mapIdx, focusHoleFillInFewestShards);
             pointersByOrdinal = null;
             unusedPreviousOrdinals = null;
-            COMPACT_SKIP_COUNT.incrementAndGet();
+            long skippedCount = OPPORTUNISTIC_COMPACT_COUNT.incrementAndGet();
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Opportunistic compact fast path: no ordinals freed, skipped sort+rehash (count=" + skippedCount + ")");
+            }
             return;
         }
 
@@ -529,10 +529,7 @@ public class ByteArrayOrdinalMap {
 
         byteData.setPosition(currentCopyPointer);
 
-        if(focusHoleFillInFewestShards && numShards > 1)
-            freeOrdinalTracker.sort(numShards, mapIndexBits, mapIdx);
-        else
-            freeOrdinalTracker.sort();
+        sortFreeOrdinals(numShards, mapIndexBits, mapIdx, focusHoleFillInFewestShards);
 
         // Reset the array then fill with compacted values
         // Volatile store not required, could use plain store
@@ -545,6 +542,21 @@ public class ByteArrayOrdinalMap {
 
         pointersByOrdinal = null;
         unusedPreviousOrdinals = null;
+    }
+
+    private void sortFreeOrdinals(int numShards, int mapIndexBits, int mapIdx, boolean focusHoleFillInFewestShards) {
+        if (focusHoleFillInFewestShards && numShards > 1)
+            freeOrdinalTracker.sort(numShards, mapIndexBits, mapIdx);
+        else
+            freeOrdinalTracker.sort();
+    }
+
+    /**
+     * Number of {@link #compact} calls that took the opportunistic fast path — cycles in which no ordinals
+     * were freed, so the sort+rehash was skipped. Exposed for observability.
+     */
+    public static long getOpportunisticCompactCount() {
+        return OPPORTUNISTIC_COMPACT_COUNT.get();
     }
 
     public long getPointerForData(int ordinal) {
