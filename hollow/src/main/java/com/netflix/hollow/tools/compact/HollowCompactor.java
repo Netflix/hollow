@@ -70,7 +70,8 @@ public class HollowCompactor {
     private long minCandidateHoleCostInBytes;
     private int minCandidateHolePercentage;
     private long approxDeltaBytesPerCycle;
-    private Map<String, Integer> compactionPlan;
+    private Map<String, BitSet> compactionPlan;
+    private Map<String, BitSet> plannedChurn;
 
     /**
      * Provide the state engines on which to operate, and the criteria to identify when a compaction is necessary 
@@ -120,7 +121,7 @@ public class HollowCompactor {
      * @return {@code true} if compaction is necessary, otherwise {@code false}
      */
     public boolean needsCompaction() {
-        return !compactionPlan().isEmpty();
+        return !computeCompactionPlan().isEmpty();
     }
     
     /**
@@ -137,51 +138,48 @@ public class HollowCompactor {
      *   
      */
     public void compact() {
-        Map<String, Integer> plan = compactionPlan();
+        Map<String, BitSet> plan = computeCompactionPlan();
 
-        Map<String, BitSet> relocatedOrdinals = new HashMap<String, BitSet>();
+        /// the relocations plus the referencing dependents which must be re-pointed at the new ordinals
+        Map<String, BitSet> relocatedOrdinals = plannedChurn();
         PartialOrdinalRemapper remapper = new PartialOrdinalRemapper();
 
-        for(Map.Entry<String, Integer> plannedCompaction : plan.entrySet()) {
+        for(Map.Entry<String, BitSet> plannedCompaction : plan.entrySet()) {
             String compactionTarget = plannedCompaction.getKey();
-            int numRelocations = plannedCompaction.getValue();
+            BitSet ordinalsToRelocate = plannedCompaction.getValue();
 
             HollowTypeReadState typeState = readEngine.getTypeState(compactionTarget);
             HollowTypeWriteState writeState = writeEngine.getTypeState(compactionTarget);
             BitSet populatedOrdinals = populatedOrdinals(compactionTarget);
-            BitSet typeRelocatedOrdinals = new BitSet(populatedOrdinals.length());
 
             writeState.addAllObjectsFromPreviousCycle();
 
             HollowRecordCopier copier = HollowRecordCopier.createCopier(typeState);
-            IntMap remappedOrdinals = new IntMap(numRelocations);
+            IntMap remappedOrdinals = new IntMap(ordinalsToRelocate.cardinality());
 
-            int ordinalToRelocate = populatedOrdinals.length();
+            /// highest planned ordinal into the lowest hole, working downwards
+            int ordinalToRelocate = ordinalsToRelocate.length() - 1;
             int relocatePosition = -1;
-            
+
             try {
-                
-                for(int i=0;i<numRelocations;i++) {
-                    while(!populatedOrdinals.get(--ordinalToRelocate));
+
+                while(ordinalToRelocate >= 0) {
                     relocatePosition = populatedOrdinals.nextClearBit(relocatePosition + 1);
-                    typeRelocatedOrdinals.set(ordinalToRelocate);
                     writeState.removeOrdinalFromThisCycle(ordinalToRelocate);
                     HollowWriteRecord rec = copier.copy(ordinalToRelocate);
                     writeState.mapOrdinal(rec, relocatePosition, false, true);
                     remappedOrdinals.put(ordinalToRelocate, relocatePosition);
+
+                    ordinalToRelocate = ordinalsToRelocate.previousSetBit(ordinalToRelocate - 1);
                 }
-                
+
             } finally {
                 writeState.recalculateFreeOrdinals();
             }
-            
+
             remapper.addOrdinalRemapping(compactionTarget, remappedOrdinals);
-            relocatedOrdinals.put(compactionTarget, typeRelocatedOrdinals);
         }
-        
-        /// find the referencing dependents
-        TransitiveSetTraverser.addReferencingOutsideClosure(readEngine, relocatedOrdinals);
-        
+
         /// copy all forward except remapped and transitive dependents of remapped
         for(HollowSchema schema : HollowSchemaSorter.dependencyOrderedSchemaList(writeEngine.getSchemas())) {
             if(!plan.containsKey(schema.getName())) {
@@ -214,34 +212,70 @@ public class HollowCompactor {
     }
     
     /**
-     * The types to compact in this cycle, mapped to the number of records to relocate from each.  A type is omitted
-     * when the smallest batch it could produce (record + closure) > approxDeltaBytesPerCycle.
+     * The types to compact in this cycle, mapped to the exact ordinals to relocate from each.  This is the single
+     * source of truth for what moves -- {@link #compact()} relocates precisely these ordinals rather than re-deriving
+     * them, so the closure measured against the plan cannot drift from the work actually performed.  A budgeted type
+     * is omitted when the smallest batch it could produce (one record + its closure) > approxDeltaBytesPerCycle.
      */
-    private Map<String, Integer> compactionPlan() {
+    private Map<String, BitSet> computeCompactionPlan() {
         if(compactionPlan != null)
             return compactionPlan;
 
         Set<String> compactionTargets = findCompactionTargets();
+        Map<String, BitSet> plan = new HashMap<String, BitSet>();
 
-        if(approxDeltaBytesPerCycle != Long.MAX_VALUE)
-            compactionTargets = focusOnCostliestType(compactionTargets);
+        if(approxDeltaBytesPerCycle == Long.MAX_VALUE) {
+            for(String compactionTarget : compactionTargets) {
+                BitSet ordinalsToRelocate = misplacedOrdinals(populatedOrdinals(compactionTarget));
+                if(!ordinalsToRelocate.isEmpty())
+                    plan.put(compactionTarget, ordinalsToRelocate);
+            }
+        } else {
+            /// a budgeted cycle plans exactly one type, so the closure measured while sizing it is the whole plan's
+            String compactionTarget = costliestType(compactionTargets);
 
-        Map<String, Integer> plan = new HashMap<String, Integer>();
+            if(compactionTarget != null) {
+                BitSet populatedOrdinals = populatedOrdinals(compactionTarget);
+                BitSet ordinalsToRelocate = relocationsWithinDeltaBudget(compactionTarget, populatedOrdinals,
+                        misplacedOrdinals(populatedOrdinals));
 
-        for(String compactionTarget : compactionTargets) {
-            BitSet populatedOrdinals = populatedOrdinals(compactionTarget);
-            int numRelocations = numMisplacedOrdinals(populatedOrdinals);
-
-            /// relocating the highest ordinals
-            if(approxDeltaBytesPerCycle != Long.MAX_VALUE)
-                numRelocations = relocationsWithinDeltaBudget(compactionTarget, populatedOrdinals, numRelocations);
-
-            if(numRelocations > 0)
-                plan.put(compactionTarget, numRelocations);
+                if(ordinalsToRelocate.isEmpty())
+                    plannedChurn = null;
+                else
+                    plan.put(compactionTarget, ordinalsToRelocate);
+            }
         }
 
         compactionPlan = plan;
         return compactionPlan;
+    }
+
+    /**
+     * The planned relocations together with every record which transitively references one of them -- those must be
+     * rewritten to point at the new ordinals.  Sizing a budgeted batch already computes this, so it is reused rather
+     * than traversed a second time; the traversal is the most expensive part of planning a cycle.
+     */
+    private Map<String, BitSet> plannedChurn() {
+        if(plannedChurn == null)
+            plannedChurn = churnedOrdinals(computeCompactionPlan());
+
+        return plannedChurn;
+    }
+
+    /**
+     * Augment a set of to-be-relocated ordinals with the records which reference them.  The inputs are copied because
+     * the traversal writes into the map it is given, and for a self-referential schema that can include the very
+     * bitsets the plan is holding.
+     */
+    private Map<String, BitSet> churnedOrdinals(Map<String, BitSet> ordinalsToRelocate) {
+        Map<String, BitSet> churnedOrdinals = new HashMap<String, BitSet>();
+
+        for(Map.Entry<String, BitSet> entry : ordinalsToRelocate.entrySet())
+            churnedOrdinals.put(entry.getKey(), (BitSet)entry.getValue().clone());
+
+        TransitiveSetTraverser.addReferencingOutsideClosure(readEngine, churnedOrdinals);
+
+        return churnedOrdinals;
     }
 
     private BitSet populatedOrdinals(String type) {
@@ -249,18 +283,19 @@ public class HollowCompactor {
     }
 
     /**
-     * The populated ordinals sitting at or above the cardinality watermark
+     * The populated ordinals sitting at or above the cardinality watermark -- precisely those with a hole below them
+     * to move into, and precisely what an unbudgeted compaction relocates.
      */
-    private int numMisplacedOrdinals(BitSet populatedOrdinals) {
-        int numMisplaced = 0;
+    private BitSet misplacedOrdinals(BitSet populatedOrdinals) {
+        BitSet misplacedOrdinals = new BitSet(populatedOrdinals.length());
         int ordinal = populatedOrdinals.nextSetBit(populatedOrdinals.cardinality());
 
         while(ordinal != -1) {
-            numMisplaced++;
+            misplacedOrdinals.set(ordinal);
             ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
         }
 
-        return numMisplaced;
+        return misplacedOrdinals;
     }
 
     /**
@@ -282,9 +317,9 @@ public class HollowCompactor {
     }
 
     /**
-     * Narrow the compaction targets to the single type with the biggest hole footprint
+     * The compaction target with the biggest hole footprint, or null if there are none
      */
-    private Set<String> focusOnCostliestType(Set<String> compactionTargets) {
+    private String costliestType(Set<String> compactionTargets) {
         String costliestType = null;
         long costliestHoleCostInBytes = -1;
 
@@ -296,18 +331,30 @@ public class HollowCompactor {
             }
         }
 
-        return costliestType == null ? compactionTargets : Collections.singleton(costliestType);
+        return costliestType;
     }
 
     /**
      * Determine how many of the highest ordinals in the given type may be relocated within the delta size budget
      */
-    private int relocationsWithinDeltaBudget(String compactionTarget, BitSet populatedOrdinals, int numRelocations) {
-        long deltaBytes = approximateDeltaBytes(compactionTarget, highestPopulatedOrdinals(populatedOrdinals, numRelocations));
+    private BitSet relocationsWithinDeltaBudget(String compactionTarget, BitSet populatedOrdinals, BitSet ordinalsToRelocate) {
+        int numRelocations = ordinalsToRelocate.cardinality();
+        Map<String, BitSet> churnedOrdinals = churnedOrdinals(Collections.singletonMap(compactionTarget, ordinalsToRelocate));
+        long deltaBytes = approximateDeltaBytes(churnedOrdinals);
 
-        while(deltaBytes > approxDeltaBytesPerCycle && numRelocations > 1) {
-            numRelocations = (int)Math.max(1, Math.min(numRelocations - 1, numRelocations * approxDeltaBytesPerCycle / deltaBytes));
-            deltaBytes = approximateDeltaBytes(compactionTarget, highestPopulatedOrdinals(populatedOrdinals, numRelocations));
+        for(int pass = 0; deltaBytes > approxDeltaBytesPerCycle && numRelocations > 1; pass++) {
+            /// Scale the batch back by the observed overshoot.  That assumes closure weight is spread evenly across
+            /// the batch; where it isn't -- a few heavily referenced records sitting above a long tail of lightly
+            /// referenced ones -- the estimate barely moves and would inch down one record at a time, so from the
+            /// second pass on the batch must at least halve.  Exact where the assumption holds, log-bounded where it
+            /// does not.
+            long scaledToBudget = (long)(numRelocations * ((double)approxDeltaBytesPerCycle / deltaBytes));
+            int mustShedTo = pass == 0 ? numRelocations - 1 : numRelocations / 2;
+
+            numRelocations = (int)Math.max(1, Math.min(mustShedTo, scaledToBudget));
+            ordinalsToRelocate = highestPopulatedOrdinals(populatedOrdinals, numRelocations);
+            churnedOrdinals = churnedOrdinals(Collections.singletonMap(compactionTarget, ordinalsToRelocate));
+            deltaBytes = approximateDeltaBytes(churnedOrdinals);
         }
 
         if(deltaBytes > approxDeltaBytesPerCycle) {
@@ -315,18 +362,18 @@ public class HollowCompactor {
                     + " bytes to the delta, exceeding the configured approxDeltaBytesPerCycle of " + approxDeltaBytesPerCycle
                     + ".  " + compactionTarget + " will not be compacted; raise the budget to at least " + deltaBytes
                     + " bytes to reclaim its ordinal holes.");
-            return 0;
+            return new BitSet();
         }
 
-        return numRelocations;
+        /// the closure just measured is the one compact() needs, so hand it forward rather than traversing again
+        plannedChurn = churnedOrdinals;
+
+        return ordinalsToRelocate;
     }
 
-    private long approximateDeltaBytes(String compactionTarget, BitSet candidateRelocations) {
-        Map<String, BitSet> churnedOrdinals = new HashMap<String, BitSet>();
-        churnedOrdinals.put(compactionTarget, candidateRelocations);
-        TransitiveSetTraverser.addReferencingOutsideClosure(readEngine, churnedOrdinals);
-
+    private long approximateDeltaBytes(Map<String, BitSet> churnedOrdinals) {
         long deltaBytes = 0;
+
         for(Map.Entry<String, BitSet> entry : churnedOrdinals.entrySet())
             deltaBytes += (long)entry.getValue().cardinality() * approximateRecordSizeInBytes(entry.getKey());
 
