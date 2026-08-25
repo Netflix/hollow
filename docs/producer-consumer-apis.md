@@ -129,8 +129,14 @@ more optimal ordinal assignments.
 
 To run a _compaction cycle_, call `runCompactionCycle(config)` on the `HollowProducer`.  If this method returns a valid 
 version identifier, then a compaction cycle occurred and produced a new data state.  If it returns `Long.MIN_VALUE`, 
-then the compaction criteria specified in the `CompactionConfig` was not met and no action was taken.  See the 
-`HollowCompactor` javadoc for more details.
+then the compaction criteria specified in the `CompactionConfig` was not met and no action was taken.
+
+By default a compaction cycle relocates every misplaced record at once, which can produce a very large delta.  
+Supplying an `approxDeltaBytesPerCycle` to the `CompactionConfig` bounds this -- each cycle then compacts only the 
+single type with the largest hole footprint, and only as many of its records as fit within the budget, so compaction converges 
+over a series of smaller cycles. The budget also counts the records which reference a relocated record, since those 
+must be rewritten too. If it is too small to cover even one record, nothing is compacted and a warning is logged.  
+See the `HollowCompactor` javadoc for more details.
 
 ## The Incremental HollowProducer
 
