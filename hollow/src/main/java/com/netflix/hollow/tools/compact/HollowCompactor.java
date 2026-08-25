@@ -120,7 +120,7 @@ public class HollowCompactor {
      * @return {@code true} if compaction is necessary, otherwise {@code false}
      */
     public boolean needsCompaction() {
-        return !compactionPlan().isEmpty();
+        return !calculateCompactionPlan().isEmpty();
     }
     
     /**
@@ -137,7 +137,7 @@ public class HollowCompactor {
      *   
      */
     public void compact() {
-        Map<String, Integer> plan = compactionPlan();
+        Map<String, Integer> plan = calculateCompactionPlan();
 
         Map<String, BitSet> relocatedOrdinals = new HashMap<String, BitSet>();
         PartialOrdinalRemapper remapper = new PartialOrdinalRemapper();
@@ -217,7 +217,7 @@ public class HollowCompactor {
      * The types to compact in this cycle, mapped to the number of records to relocate from each.  A type is omitted
      * when the smallest batch it could produce (record + closure) > approxDeltaBytesPerCycle.
      */
-    private Map<String, Integer> compactionPlan() {
+    private Map<String, Integer> calculateCompactionPlan() {
         if(compactionPlan != null)
             return compactionPlan;
 
@@ -300,25 +300,27 @@ public class HollowCompactor {
     }
 
     /**
-     * Determine how many of the highest ordinals in the given type may be relocated within the delta size budget
+     * Determine how many of the highest ordinals in the given type may be relocated within the approx delta size budget
      */
     private int relocationsWithinDeltaBudget(String compactionTarget, BitSet populatedOrdinals, int numRelocations) {
         long deltaBytes = approximateDeltaBytes(compactionTarget, highestPopulatedOrdinals(populatedOrdinals, numRelocations));
 
-        while(deltaBytes > approxDeltaBytesPerCycle && numRelocations > 1) {
-            numRelocations = (int)Math.max(1, Math.min(numRelocations - 1, numRelocations * approxDeltaBytesPerCycle / deltaBytes));
-            deltaBytes = approximateDeltaBytes(compactionTarget, highestPopulatedOrdinals(populatedOrdinals, numRelocations));
-        }
+        if(deltaBytes <= approxDeltaBytesPerCycle)
+            return numRelocations;
 
-        if(deltaBytes > approxDeltaBytesPerCycle) {
-            log.warning("Relocating a single " + compactionTarget + " record is estimated to add " + deltaBytes
+        /// A record costs the delta its own bytes plus those of everything referencing it, so the per-record cost is
+        /// uneven and the scaled estimate below cannot be read as evidence that even one record fits
+        long singleRecordBytes = approximateDeltaBytes(compactionTarget, highestPopulatedOrdinals(populatedOrdinals, 1));
+
+        if(singleRecordBytes > approxDeltaBytesPerCycle) {
+            log.warning("Relocating a single " + compactionTarget + " record is estimated to add " + singleRecordBytes
                     + " bytes to the delta, exceeding the configured approxDeltaBytesPerCycle of " + approxDeltaBytesPerCycle
-                    + ".  " + compactionTarget + " will not be compacted; raise the budget to at least " + deltaBytes
+                    + ".  " + compactionTarget + " will not be compacted; raise the budget to at least " + singleRecordBytes
                     + " bytes to reclaim its ordinal holes.");
             return 0;
         }
 
-        return numRelocations;
+        return (int)Math.max(1, numRelocations * approxDeltaBytesPerCycle / deltaBytes);
     }
 
     private long approximateDeltaBytes(String compactionTarget, BitSet candidateRelocations) {
