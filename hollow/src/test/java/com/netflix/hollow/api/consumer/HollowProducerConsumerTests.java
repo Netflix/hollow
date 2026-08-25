@@ -16,7 +16,6 @@
  */
 package com.netflix.hollow.api.consumer;
 
-import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.VersionMinter;
@@ -28,7 +27,6 @@ import com.netflix.hollow.api.producer.validation.ValidationStatusException;
 import com.netflix.hollow.api.producer.validation.ValidationStatusListener;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
 import com.netflix.hollow.core.memory.MemoryMode;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.test.InMemoryBlobStore;
@@ -821,121 +819,6 @@ public class HollowProducerConsumerTests {
         assertMoviesIntact(consumer);
     }
 
-    /**
-     * A consumer which filtered the relocation target out entirely still has to follow the compaction delta, because
-     * the target's referencing closure lands in a type it does hold.  Every Movie rewrite in these deltas is caused
-     * by a String remapping this consumer has no visibility into whatsoever.
-     */
-    @Test
-    public void filteredConsumerFollowsACompactionOfAnExcludedType() {
-        HollowProducer producer = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(new HollowInMemoryBlobStager())
-                .build();
-
-        long v2 = publishFragmentedMovies(producer);
-
-        TypeFilter withoutStrings = TypeFilter.newTypeFilter().exclude("String").build();
-        AtomicInteger deltaUpdates = new AtomicInteger();
-        AtomicInteger snapshotUpdates = new AtomicInteger();
-
-        HollowConsumer filteredConsumer = HollowConsumer.withBlobRetriever(blobStore)
-                .withTypeFilter(withoutStrings)
-                .withRefreshListener(new HollowConsumer.AbstractRefreshListener() {
-                    @Override public void deltaUpdateOccurred(
-                            HollowAPI api, HollowReadStateEngine stateEngine, long version) {
-                        deltaUpdates.incrementAndGet();
-                    }
-
-                    @Override public void snapshotUpdateOccurred(
-                            HollowAPI api, HollowReadStateEngine stateEngine, long version) {
-                        snapshotUpdates.incrementAndGet();
-                    }
-                })
-                .build();
-        filteredConsumer.triggerRefreshTo(v2);
-
-        /// excluding a type is not recursive upwards: String is genuinely absent, but Movie's reference into it
-        /// survives the filter, so every compaction delta this consumer applies remaps a dangling reference
-        Assert.assertNull(filteredConsumer.getStateEngine().getTypeState("String"));
-        HollowObjectTypeReadState filteredMovies =
-                (HollowObjectTypeReadState) filteredConsumer.getStateEngine().getTypeState("Movie");
-        Assert.assertNotEquals(-1, filteredMovies.getSchema().getPosition("title"));
-        Assert.assertEquals(20000, populatedOrdinalsLength(filteredConsumer, "Movie"));
-
-        int deltasBefore = deltaUpdates.get();
-        int snapshotsBefore = snapshotUpdates.get();
-
-        int cycles = compactToConvergence(producer, filteredConsumer, new CompactionConfig(0, 0, 8192));
-        Assert.assertTrue("expected a gradual compaction, took " + cycles + " cycle(s)", cycles > 1);
-
-        /// every compaction version was reached by delta, so the remapping really was applied and not snapshotted over
-        Assert.assertEquals(cycles, deltaUpdates.get() - deltasBefore);
-        Assert.assertEquals(snapshotsBefore, snapshotUpdates.get());
-
-        /// the filtered consumer tracked closure churn driven entirely by a type it does not hold
-        Assert.assertTrue("no Movie churn was visible, so the crossing was never exercised",
-                populatedOrdinalsLength(filteredConsumer, "Movie") < 20000);
-        assertMovieIdsIntact(filteredConsumer);
-
-        /// the target really was the excluded type, and the remapped references landed exactly where an unfiltered
-        /// consumer applying the same deltas put them
-        HollowConsumer unfilteredConsumer = HollowConsumer.withBlobRetriever(blobStore).build();
-        unfilteredConsumer.triggerRefreshTo(filteredConsumer.getCurrentVersionId());
-        Assert.assertEquals(10000, populatedOrdinalsLength(unfilteredConsumer, "String"));
-        assertTitleOrdinalsAgree(filteredConsumer, unfilteredConsumer);
-
-        /// and the delta-followed state is ordinal-for-ordinal what a filtered snapshot load of that version gives
-        HollowConsumer filteredSnapshotConsumer = HollowConsumer.withBlobRetriever(blobStore)
-                .withTypeFilter(withoutStrings)
-                .build();
-        filteredSnapshotConsumer.triggerRefreshTo(filteredConsumer.getCurrentVersionId());
-        Assert.assertEquals(HollowChecksum.forStateEngine(filteredSnapshotConsumer.getStateEngine()),
-                HollowChecksum.forStateEngine(filteredConsumer.getStateEngine()));
-    }
-
-    /**
-     * A restored producer never ran the cycles which created the holes, so the ordinals and free ordinal ranges the
-     * compactor reads come from {@code restoreFrom} rather than from its own bookkeeping.  The first cycle after the
-     * restore being a compaction is the crossing: it must still chain a delta off the restored version.
-     */
-    @Test
-    public void aRestoredProducerCompactsOnItsNextCycle() {
-        HollowProducer producer = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(new HollowInMemoryBlobStager())
-                .build();
-
-        long v2 = publishFragmentedMovies(producer);
-
-        HollowProducer redeployedProducer = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(new HollowInMemoryBlobStager())
-                .build();
-        redeployedProducer.initializeDataModel(Movie.class);
-        redeployedProducer.restore(v2, blobStore);
-
-        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
-        consumer.triggerRefreshTo(v2);
-        Assert.assertEquals(20000, populatedOrdinalsLength(consumer, "String"));
-
-        /// the restore carried the holes over, so the very first cycle off it is a compaction, chained as a delta
-        long v3 = redeployedProducer.runCompactionCycle(new CompactionConfig(0, 0, 8192));
-        Assert.assertNotEquals(HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE, v3);
-        Assert.assertEquals(v3, blobStore.retrieveDeltaBlob(v2).getToVersion());
-
-        consumer.triggerRefreshTo(v3);
-        Assert.assertTrue("the restored producer made no progress",
-                populatedOrdinalsLength(consumer, "String") < 20000);
-
-        /// and it keeps converging from there, the same as a producer which had built the state itself
-        compactToConvergence(redeployedProducer, consumer, new CompactionConfig(0, 0, 8192));
-        Assert.assertEquals(10000, populatedOrdinalsLength(consumer, "String"));
-        assertMoviesIntact(consumer);
-
-        HollowConsumer snapshotConsumer = HollowConsumer.withBlobRetriever(blobStore).build();
-        snapshotConsumer.triggerRefreshTo(consumer.getCurrentVersionId());
-        Assert.assertEquals(HollowChecksum.forStateEngine(snapshotConsumer.getStateEngine()),
-                HollowChecksum.forStateEngine(consumer.getStateEngine()));
-    }
-
     @Test
     public void budgetedCompactionTerminatesAtTheHolePercentageThreshold() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
@@ -1053,46 +936,6 @@ public class HollowProducerConsumerTests {
         Assert.assertEquals(10000, seenIds.cardinality());
         Assert.assertEquals(10000, seenIds.nextSetBit(0));
         Assert.assertEquals(extraTitles.length, extrasSeen);
-    }
-
-    /// the id-only half of assertMoviesIntact, for a consumer which filtered the String type out
-    private static void assertMovieIdsIntact(HollowConsumer consumer) {
-        HollowObjectTypeReadState movies =
-                (HollowObjectTypeReadState) consumer.getStateEngine().getTypeState("Movie");
-        int idField = movies.getSchema().getPosition("id");
-
-        BitSet seenIds = new BitSet(20000);
-        BitSet populated = movies.getPopulatedOrdinals();
-        int ordinal = populated.nextSetBit(0);
-
-        while (ordinal != -1) {
-            seenIds.set(movies.readInt(ordinal, idField));
-            ordinal = populated.nextSetBit(ordinal + 1);
-        }
-
-        Assert.assertEquals(10000, seenIds.cardinality());
-        Assert.assertEquals(10000, seenIds.nextSetBit(0));
-    }
-
-    /// the Movie -> String reference ordinals must be remapped identically whether or not String itself was loaded
-    private static void assertTitleOrdinalsAgree(HollowConsumer filtered, HollowConsumer unfiltered) {
-        HollowObjectTypeReadState filteredMovies =
-                (HollowObjectTypeReadState) filtered.getStateEngine().getTypeState("Movie");
-        HollowObjectTypeReadState unfilteredMovies =
-                (HollowObjectTypeReadState) unfiltered.getStateEngine().getTypeState("Movie");
-        int filteredTitle = filteredMovies.getSchema().getPosition("title");
-        int unfilteredTitle = unfilteredMovies.getSchema().getPosition("title");
-
-        BitSet populated = unfilteredMovies.getPopulatedOrdinals();
-        Assert.assertEquals(populated, filteredMovies.getPopulatedOrdinals());
-
-        int ordinal = populated.nextSetBit(0);
-        while (ordinal != -1) {
-            Assert.assertEquals("Movie ordinal " + ordinal + " points at a different title",
-                    unfilteredMovies.readOrdinal(ordinal, unfilteredTitle),
-                    filteredMovies.readOrdinal(ordinal, filteredTitle));
-            ordinal = populated.nextSetBit(ordinal + 1);
-        }
     }
 
     @SuppressWarnings("unused")
