@@ -32,6 +32,7 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +42,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowHashIndexTest extends AbstractStateEngineTest {
+    private static final String DELTA_UPDATE_PROPERTY = "com.netflix.hollow.core.index.HollowHashIndex.allowDeltaUpdate";
+
     private HollowObjectMapper mapper;
 
     @Override
@@ -335,6 +338,122 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         Assert.assertNull("Original index subscribed using listenForDeltaUpdates not expected to refresh on " +
                 "deltas after incurring a double snapshot", index.findMatches(6));
     }
+
+    @Test
+    public void testDeltaUpdateRefreshesTraversingIndex() throws Exception {
+        withDeltaUpdatesEnabled(() -> {
+            mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+            mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+
+            roundTripSnapshot();
+
+            HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeA", "", "ab.element.b1.value");
+            index.listenForDeltaUpdates();
+
+            Assert.assertEquals(1, index.findMatches("one").numResults());
+            Assert.assertEquals(1, index.findMatches("two").numResults());
+
+            mapper.add(new TypeA(1, 1.1d, new TypeB("uno")));
+            mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+
+            roundTripDelta();
+
+            Assert.assertNull(index.findMatches("one"));
+            Assert.assertEquals(1, index.findMatches("uno").numResults());
+            Assert.assertEquals(1, index.findMatches("two").numResults());
+        });
+    }
+
+    @Test
+    public void testDeltaUpdateRetainsDuplicateSelectContribution() throws Exception {
+        withDeltaUpdatesEnabled(() -> {
+            mapper.add(new TypeA(1, 1.1d, new TypeB("dup"), new TypeB("dup")));
+
+            roundTripSnapshot();
+
+            HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeA", "", "ab.element.b1.value");
+            index.listenForDeltaUpdates();
+
+            Assert.assertEquals(1, index.findMatches("dup").numResults());
+
+            mapper.add(new TypeA(1, 1.1d, new TypeB("dup")));
+
+            roundTripDelta();
+
+            Assert.assertEquals(1, index.findMatches("dup").numResults());
+        });
+    }
+
+    @Test
+    public void testRootLocalIndexSkipsNoOpDeltaRebuild() throws Exception {
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeC(new TypeD("before")));
+
+        roundTripSnapshot();
+
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeA", "", "a1");
+        index.listenForDeltaUpdates();
+
+        Object initialState = getHashState(index);
+
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeC(new TypeD("after")));
+
+        roundTripDelta();
+
+        Assert.assertSame(initialState, getHashState(index));
+        assertIteratorContainsAll(index.findMatches(1).iterator(), 0);
+        assertIteratorContainsAll(index.findMatches(2).iterator(), 1);
+    }
+
+    @Test
+    public void testRootLocalIndexRebuildsWhenRootTypeChanges() throws Exception {
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+
+        roundTripSnapshot();
+
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeA", "", "a1");
+        index.listenForDeltaUpdates();
+
+        Object initialState = getHashState(index);
+
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three")));
+
+        roundTripDelta();
+
+        Assert.assertNotSame(initialState, getHashState(index));
+        assertIteratorContainsAll(index.findMatches(1).iterator(), 0);
+        Assert.assertNull(index.findMatches(2));
+        Assert.assertNotNull(index.findMatches(3));
+    }
+
+    @Test
+    public void testNonRootLocalIndexStillRebuildsOnUnrelatedDelta() throws Exception {
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeC(new TypeD("before")));
+
+        roundTripSnapshot();
+
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeA", "", "ab.element.b1.value");
+        index.listenForDeltaUpdates();
+
+        Object initialState = getHashState(index);
+
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two")));
+        mapper.add(new TypeC(new TypeD("after")));
+
+        roundTripDelta();
+
+        Assert.assertNotSame(initialState, getHashState(index));
+        assertIteratorContainsAll(index.findMatches("one").iterator(), 0);
+        assertIteratorContainsAll(index.findMatches("two").iterator(), 1);
+    }
     
     @Test
     public void testGettingPropertiesValues() throws Exception {
@@ -398,6 +517,31 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
 
         Set<Integer> expectedSet = IntStream.of(expectedOrdinals).boxed().collect(toSet());
         Assert.assertEquals(expectedSet, ordinalSet);
+    }
+
+    private Object getHashState(HollowHashIndex index) throws Exception {
+        Field hashStateField = HollowHashIndex.class.getDeclaredField("hashStateVolatile");
+        hashStateField.setAccessible(true);
+        return hashStateField.get(index);
+    }
+
+    private void withDeltaUpdatesEnabled(ThrowingRunnable runnable) throws Exception {
+        String original = System.getProperty(DELTA_UPDATE_PROPERTY);
+        System.setProperty(DELTA_UPDATE_PROPERTY, "true");
+        try {
+            runnable.run();
+        } finally {
+            if (original == null) {
+                System.clearProperty(DELTA_UPDATE_PROPERTY);
+            } else {
+                System.setProperty(DELTA_UPDATE_PROPERTY, original);
+            }
+        }
+    }
+
+    @FunctionalInterface
+    private interface ThrowingRunnable {
+        void run() throws Exception;
     }
 
     @SuppressWarnings({"unused", "FieldCanBeLocal"})
