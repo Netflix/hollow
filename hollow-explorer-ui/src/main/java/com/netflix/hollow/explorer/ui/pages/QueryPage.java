@@ -47,6 +47,7 @@ public class QueryPage extends HollowExplorerPage {
             type = null;
         
         String queryValue = req.getParameter("queryValue");
+        String removeField = req.getParameter("removeField");
         
         List<String> allTypes = new ArrayList<String>();
         for(HollowSchema schema : ui.getStateEngine().getSchemas())
@@ -54,9 +55,14 @@ public class QueryPage extends HollowExplorerPage {
         Collections.sort(allTypes);
         
         QueryResult result = (QueryResult) session.getAttribute("query-result");
-        if(result != null)
+        if(result != null) {
             result.recalculateIfNotCurrent(ui.getStateEngine());
-        
+
+            if(removeField != null) {
+                result.removeQueryClause(removeField);
+            }
+        }
+
         if(field != null && queryValue != null) {
             HollowReadStateEngine stateEngine = ui.getStateEngine();
 
