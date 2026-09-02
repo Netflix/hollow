@@ -31,7 +31,7 @@ import java.util.List;
 
 public class GapEncodedVariableLengthIntegerReader {
 
-    public static GapEncodedVariableLengthIntegerReader EMPTY_READER = new GapEncodedVariableLengthIntegerReader(null, 0) {
+    public static final GapEncodedVariableLengthIntegerReader EMPTY_READER = new GapEncodedVariableLengthIntegerReader(null, 0) {
         @Override
         public int nextElement() {
             return Integer.MAX_VALUE;

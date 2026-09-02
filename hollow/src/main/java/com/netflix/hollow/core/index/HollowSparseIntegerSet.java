@@ -35,8 +35,8 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
 
     protected volatile SparseBitSet sparseBitSetVolatile;
 
-    private Set<Integer> valuesToSet;
-    private Set<Integer> valuesToClear;
+    private final Set<Integer> valuesToSet;
+    private final Set<Integer> valuesToClear;
     private int maxValueToSet;
 
     public interface IndexPredicate {

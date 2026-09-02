@@ -24,7 +24,7 @@ package com.netflix.hollow.tools.combine;
  */
 public class IdentityOrdinalRemapper implements OrdinalRemapper {
 
-    public static IdentityOrdinalRemapper INSTANCE = new IdentityOrdinalRemapper();
+    public static final IdentityOrdinalRemapper INSTANCE = new IdentityOrdinalRemapper();
     
     private IdentityOrdinalRemapper() { }
     
