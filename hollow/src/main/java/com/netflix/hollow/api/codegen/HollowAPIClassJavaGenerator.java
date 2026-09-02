@@ -46,6 +46,7 @@ import com.netflix.hollow.core.read.dataaccess.missing.HollowSetMissingDataAcces
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchemaSorter;
 import com.netflix.hollow.core.util.AllHollowRecordCollection;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -61,6 +62,18 @@ import java.util.Set;
 public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator {
     public static final String SUB_PACKAGE_NAME = "";
 
+    /**
+     * When a data model has more than this many types, the per-type initialization that is normally
+     * inlined into the API constructor is instead split across {@code init_N(...)} helper methods.
+     * This avoids the JVM 64KB per-method bytecode limit ("code too large"), which the inlined
+     * constructor reaches somewhere past ~460 types. The threshold is set conservatively below that
+     * empirical limit; at or below it the generated source is byte-for-byte identical to before.
+     */
+    public static final int CONSTRUCTOR_CHUNKING_THRESHOLD = 250;
+
+    /** Number of types initialized per generated {@code init_N} / {@code detachCaches_N} helper. */
+    private static final int TYPES_PER_HELPER_METHOD = 50;
+
     private final boolean parameterizeClassNames;
 
     public HollowAPIClassJavaGenerator(String packageName, String apiClassname, HollowDataset dataset, boolean parameterizeClassNames, CodeGeneratorConfig config) {
@@ -72,6 +85,15 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
     @Override
     public String generate() {
         List<HollowSchema> schemaList = HollowSchemaSorter.dependencyOrderedSchemaList(dataset);
+
+        List<HollowSchema> includedSchemas = new ArrayList<HollowSchema>();
+        for (HollowSchema schema : schemaList) {
+            if (includeType(schema, dataset))
+                includedSchemas.add(schema);
+        }
+        // For very large data models, split the per-type initialization out of the constructor to
+        // stay under the JVM 64KB method size limit. Below the threshold, generate exactly as before.
+        boolean chunkInitialization = includedSchemas.size() > CONSTRUCTOR_CHUNKING_THRESHOLD;
 
         StringBuilder builder = new StringBuilder();
         appendPackageAndCommonImports(builder);
@@ -123,10 +145,14 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
 
         builder.append("    private final HollowObjectCreationSampler objectCreationSampler;\n\n");
 
+        // When initialization is chunked into helper methods, these fields can no longer be final
+        // (a final field must be assigned in the constructor itself, not in a helper method).
+        String fieldModifier = chunkInitialization ? "private " : "private final ";
+
         for (HollowSchema schema : schemaList) {
             if (!includeType(schema, dataset))
                 continue;
-            builder.append("    private final " + typeAPIClassname(schema.getName())).append(" ").append(lowercase(typeAPIClassname(schema.getName()))).append(";\n");
+            builder.append("    " + fieldModifier + typeAPIClassname(schema.getName())).append(" ").append(lowercase(typeAPIClassname(schema.getName()))).append(";\n");
         }
 
         builder.append("\n");
@@ -134,7 +160,7 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
         for(HollowSchema schema : schemaList) {
             if (!includeType(schema, dataset))
                 continue;
-            builder.append("    private final HollowObjectProvider ").append(hollowObjectProviderName(schema.getName())).append(";\n");
+            builder.append("    " + fieldModifier + "HollowObjectProvider ").append(hollowObjectProviderName(schema.getName())).append(";\n");
         }
 
         builder.append("\n");
@@ -154,58 +180,67 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
 
         builder.append("    public ").append(className).append("(HollowDataAccess dataAccess, Set<String> cachedTypes, Map<String, HollowFactory<?>> factoryOverrides, ").append(className).append(" previousCycleAPI) {\n");
         builder.append("        super(dataAccess);\n");
-        builder.append("        HollowTypeDataAccess typeDataAccess;\n");
-        builder.append("        HollowFactory factory;\n\n");
-        builder.append("        objectCreationSampler = new HollowObjectCreationSampler(");
-        for(int i=0;i<schemaList.size();i++) {
-            if (!includeType(schemaList.get(i), dataset))
-                continue;
-
-            builder.append("\"").append(schemaList.get(i).getName()).append("\"");
-            builder.append(",");
+        if (!chunkInitialization) {
+            builder.append("        HollowTypeDataAccess typeDataAccess;\n");
+            builder.append("        HollowFactory factory;\n\n");
         }
+        appendObjectCreationSampler(builder, schemaList);
 
-        if (builder.charAt(builder.length()-1) == ',') {
-            builder.deleteCharAt(builder.length()-1);
+        if (!chunkInitialization) {
+            for (HollowSchema schema : schemaList) {
+                if (!includeType(schema, dataset))
+                    continue;
+                appendTypeInitializer(builder, schema);
+            }
+            builder.append("    }\n\n");
+        } else {
+            int numInitMethods = (includedSchemas.size() + TYPES_PER_HELPER_METHOD - 1) / TYPES_PER_HELPER_METHOD;
+            for (int m = 0; m < numInitMethods; m++) {
+                builder.append("        init_").append(m).append("(dataAccess, cachedTypes, factoryOverrides, previousCycleAPI);\n");
+            }
+            builder.append("    }\n\n");
+
+            for (int m = 0; m < numInitMethods; m++) {
+                int from = m * TYPES_PER_HELPER_METHOD;
+                int to = Math.min(from + TYPES_PER_HELPER_METHOD, includedSchemas.size());
+                builder.append("    private void init_").append(m).append("(HollowDataAccess dataAccess, Set<String> cachedTypes, Map<String, HollowFactory<?>> factoryOverrides, ").append(className).append(" previousCycleAPI) {\n");
+                builder.append("        HollowTypeDataAccess typeDataAccess;\n");
+                builder.append("        HollowFactory factory;\n\n");
+                for (int i = from; i < to; i++) {
+                    appendTypeInitializer(builder, includedSchemas.get(i));
+                }
+                builder.append("    }\n\n");
+            }
         }
-
-        builder.append(");\n\n");
-
-        for (HollowSchema schema : schemaList) {
-            if (!includeType(schema, dataset))
-                continue;
-            builder.append("        typeDataAccess = dataAccess.getTypeDataAccess(\"").append(schema.getName()).append("\");\n");
-            builder.append("        if(typeDataAccess != null) {\n");
-            builder.append("            ").append(lowercase(typeAPIClassname(schema.getName()))).append(" = new ").append(typeAPIClassname(schema.getName())).append("(this, (Hollow").append(schemaType(schema)).append("TypeDataAccess)typeDataAccess);\n");
-            builder.append("        } else {\n");
-            builder.append("            ").append(lowercase(typeAPIClassname(schema.getName()))).append(" = new ").append(typeAPIClassname(schema.getName())).append("(this, new Hollow").append(schemaType(schema)).append("MissingDataAccess(dataAccess, \"").append(schema.getName()).append("\"));\n");
-            builder.append("        }\n");
-            builder.append("        addTypeAPI(").append(lowercase(typeAPIClassname(schema.getName()))).append(");\n");
-            builder.append("        factory = factoryOverrides.get(\"").append(schema.getName()).append("\");\n");
-            builder.append("        if(factory == null)\n");
-            builder.append("            factory = new ").append(hollowFactoryClassname(schema.getName())).append("();\n");
-            builder.append("        if(cachedTypes.contains(\"").append(schema.getName()).append("\")) {\n");
-            builder.append("            HollowObjectCacheProvider previousCacheProvider = null;\n");
-            builder.append("            if(previousCycleAPI != null && (previousCycleAPI.").append(hollowObjectProviderName(schema.getName())).append(" instanceof HollowObjectCacheProvider))\n");
-            builder.append("                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.").append(hollowObjectProviderName(schema.getName())).append(";\n");
-            builder.append("            ").append(hollowObjectProviderName(schema.getName())).append(" = new HollowObjectCacheProvider(typeDataAccess, ").append(lowercase(typeAPIClassname(schema.getName()))).append(", factory, previousCacheProvider);\n");
-            builder.append("        } else {\n");
-            builder.append("            ").append(hollowObjectProviderName(schema.getName())).append(" = new HollowObjectFactoryProvider(typeDataAccess, ").append(lowercase(typeAPIClassname(schema.getName()))).append(", factory);\n");
-            builder.append("        }\n\n");
-        }
-
-        builder.append("    }\n\n");
 
         builder.append("/*\n * Cached objects are no longer accessible after this method is called and an attempt to access them will cause an IllegalStateException.\n */\n");
 
-        builder.append("    public void detachCaches() {\n");
-        for(HollowSchema schema : schemaList) {
-            if (!includeType(schema, dataset))
-                continue;
-            builder.append("        if(").append(hollowObjectProviderName(schema.getName())).append(" instanceof HollowObjectCacheProvider)\n");
-            builder.append("            ((HollowObjectCacheProvider)").append(hollowObjectProviderName(schema.getName())).append(").detach();\n");
+        if (!chunkInitialization) {
+            builder.append("    public void detachCaches() {\n");
+            for(HollowSchema schema : schemaList) {
+                if (!includeType(schema, dataset))
+                    continue;
+                appendDetachCacheStatements(builder, schema);
+            }
+            builder.append("    }\n\n");
+        } else {
+            int numDetachMethods = (includedSchemas.size() + TYPES_PER_HELPER_METHOD - 1) / TYPES_PER_HELPER_METHOD;
+            builder.append("    public void detachCaches() {\n");
+            for (int m = 0; m < numDetachMethods; m++) {
+                builder.append("        detachCaches_").append(m).append("();\n");
+            }
+            builder.append("    }\n\n");
+
+            for (int m = 0; m < numDetachMethods; m++) {
+                int from = m * TYPES_PER_HELPER_METHOD;
+                int to = Math.min(from + TYPES_PER_HELPER_METHOD, includedSchemas.size());
+                builder.append("    private void detachCaches_").append(m).append("() {\n");
+                for (int i = from; i < to; i++) {
+                    appendDetachCacheStatements(builder, includedSchemas.get(i));
+                }
+                builder.append("    }\n\n");
+            }
         }
-        builder.append("    }\n\n");
 
 
         for (HollowSchema schema : schemaList) {
@@ -265,6 +300,49 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
         builder.append("}\n");
 
         return builder.toString();
+    }
+
+    private void appendObjectCreationSampler(StringBuilder builder, List<HollowSchema> schemaList) {
+        builder.append("        objectCreationSampler = new HollowObjectCreationSampler(");
+        for(int i=0;i<schemaList.size();i++) {
+            if (!includeType(schemaList.get(i), dataset))
+                continue;
+
+            builder.append("\"").append(schemaList.get(i).getName()).append("\"");
+            builder.append(",");
+        }
+
+        if (builder.charAt(builder.length()-1) == ',') {
+            builder.deleteCharAt(builder.length()-1);
+        }
+
+        builder.append(");\n\n");
+    }
+
+    private void appendTypeInitializer(StringBuilder builder, HollowSchema schema) {
+        builder.append("        typeDataAccess = dataAccess.getTypeDataAccess(\"").append(schema.getName()).append("\");\n");
+        builder.append("        if(typeDataAccess != null) {\n");
+        builder.append("            ").append(lowercase(typeAPIClassname(schema.getName()))).append(" = new ").append(typeAPIClassname(schema.getName())).append("(this, (Hollow").append(schemaType(schema)).append("TypeDataAccess)typeDataAccess);\n");
+        builder.append("        } else {\n");
+        builder.append("            ").append(lowercase(typeAPIClassname(schema.getName()))).append(" = new ").append(typeAPIClassname(schema.getName())).append("(this, new Hollow").append(schemaType(schema)).append("MissingDataAccess(dataAccess, \"").append(schema.getName()).append("\"));\n");
+        builder.append("        }\n");
+        builder.append("        addTypeAPI(").append(lowercase(typeAPIClassname(schema.getName()))).append(");\n");
+        builder.append("        factory = factoryOverrides.get(\"").append(schema.getName()).append("\");\n");
+        builder.append("        if(factory == null)\n");
+        builder.append("            factory = new ").append(hollowFactoryClassname(schema.getName())).append("();\n");
+        builder.append("        if(cachedTypes.contains(\"").append(schema.getName()).append("\")) {\n");
+        builder.append("            HollowObjectCacheProvider previousCacheProvider = null;\n");
+        builder.append("            if(previousCycleAPI != null && (previousCycleAPI.").append(hollowObjectProviderName(schema.getName())).append(" instanceof HollowObjectCacheProvider))\n");
+        builder.append("                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.").append(hollowObjectProviderName(schema.getName())).append(";\n");
+        builder.append("            ").append(hollowObjectProviderName(schema.getName())).append(" = new HollowObjectCacheProvider(typeDataAccess, ").append(lowercase(typeAPIClassname(schema.getName()))).append(", factory, previousCacheProvider);\n");
+        builder.append("        } else {\n");
+        builder.append("            ").append(hollowObjectProviderName(schema.getName())).append(" = new HollowObjectFactoryProvider(typeDataAccess, ").append(lowercase(typeAPIClassname(schema.getName()))).append(", factory);\n");
+        builder.append("        }\n\n");
+    }
+
+    private void appendDetachCacheStatements(StringBuilder builder, HollowSchema schema) {
+        builder.append("        if(").append(hollowObjectProviderName(schema.getName())).append(" instanceof HollowObjectCacheProvider)\n");
+        builder.append("            ((HollowObjectCacheProvider)").append(hollowObjectProviderName(schema.getName())).append(").detach();\n");
     }
 
     private String schemaType(HollowSchema schema) {
