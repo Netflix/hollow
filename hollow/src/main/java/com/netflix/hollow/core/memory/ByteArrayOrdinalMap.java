@@ -21,7 +21,6 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,12 +54,6 @@ public class ByteArrayOrdinalMap {
     /// ordinal's value space and forcing a broken delta chain.
     /// NOTE: not using final to allow value modification through reflection for test purpose.
     private static int SOFT_ORDINAL_LIMIT = 1 << (BITS_PER_ORDINAL - 1);
-
-    // Opt-in (default off): when a cycle frees no ordinals there are no holes to reclaim and the hash
-    // mapping is unchanged, so the sort+rehash portion of compact() can be skipped.
-    static boolean OPPORTUNISTIC_COMPACT =
-            Boolean.getBoolean("com.netflix.hollow.core.memory.ByteArrayOrdinalMap.opportunisticCompact");
-    static final AtomicLong OPPORTUNISTIC_COMPACT_COUNT = new AtomicLong();
 
     /// Thread safety:  We need volatile access semantics to the individual elements in the
     /// pointersAndOrdinals array.
@@ -466,36 +459,24 @@ public class ByteArrayOrdinalMap {
      *
      * @param usedGlobalOrdinals a bit set representing the ordinals which are currently referenced.
      */
-    public void compact(ThreadSafeBitSet usedGlobalOrdinals, int numShards, boolean focusHoleFillInFewestShards, int mapIdx, int mapIndexBits) {
-        long[] populatedReverseKeys = new long[size];
-
-        int counter = 0;
-        boolean anyFreed = false;
+    public boolean compact(ThreadSafeBitSet usedGlobalOrdinals, int numShards, boolean focusHoleFillInFewestShards, int mapIdx, int mapIndexBits, boolean opportunisticCompact) {
         AtomicLongArray pao = pointersAndOrdinals;
 
+        // No ordinals freed => no holes to reclaim and the hash mapping is unchanged, so skip the sort+rehash.
+        if (opportunisticCompact && !anyOrdinalFreed(pao, usedGlobalOrdinals, mapIdx, mapIndexBits)) {
+            sortFreeOrdinals(numShards, mapIndexBits, mapIdx, focusHoleFillInFewestShards);
+            pointersByOrdinal = null;
+            unusedPreviousOrdinals = null;
+            return true;
+        }
+
+        long[] populatedReverseKeys = new long[size];
+        int counter = 0;
         for (int i = 0; i < pao.length(); i++) {
             long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
                 populatedReverseKeys[counter++] = key << BITS_PER_ORDINAL | key >>> BITS_PER_POINTER;
-                if (OPPORTUNISTIC_COMPACT && !anyFreed) {
-                    int ordinal = (int) (key >>> BITS_PER_POINTER);
-                    if (!usedGlobalOrdinals.get((ordinal << mapIndexBits) | mapIdx)) {
-                        anyFreed = true;
-                    }
-                }
             }
-        }
-
-        // Nothing freed => no holes to reclaim and the hash mapping is unchanged, so skip the sort+rehash.
-        if (OPPORTUNISTIC_COMPACT && !anyFreed) {
-            sortFreeOrdinals(numShards, mapIndexBits, mapIdx, focusHoleFillInFewestShards);
-            pointersByOrdinal = null;
-            unusedPreviousOrdinals = null;
-            long skippedCount = OPPORTUNISTIC_COMPACT_COUNT.incrementAndGet();
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Opportunistic compact fast path: no ordinals freed, skipped sort+rehash (count=" + skippedCount + ")");
-            }
-            return;
         }
 
         Arrays.sort(populatedReverseKeys);
@@ -542,6 +523,19 @@ public class ByteArrayOrdinalMap {
 
         pointersByOrdinal = null;
         unusedPreviousOrdinals = null;
+        return false;
+    }
+
+    private boolean anyOrdinalFreed(AtomicLongArray pao, ThreadSafeBitSet usedGlobalOrdinals, int mapIdx, int mapIndexBits) {
+        for (int i = 0; i < pao.length(); i++) {
+            long key = pao.get(i);
+            if (key != EMPTY_BUCKET_VALUE) {
+                int ordinal = (int) (key >>> BITS_PER_POINTER);
+                if (!usedGlobalOrdinals.get((ordinal << mapIndexBits) | mapIdx))
+                    return true;
+            }
+        }
+        return false;
     }
 
     private void sortFreeOrdinals(int numShards, int mapIndexBits, int mapIdx, boolean focusHoleFillInFewestShards) {
@@ -549,14 +543,6 @@ public class ByteArrayOrdinalMap {
             freeOrdinalTracker.sort(numShards, mapIndexBits, mapIdx);
         else
             freeOrdinalTracker.sort();
-    }
-
-    /**
-     * Number of {@link #compact} calls that took the opportunistic fast path — cycles in which no ordinals
-     * were freed, so the sort+rehash was skipped. Exposed for observability.
-     */
-    public static long getOpportunisticCompactCount() {
-        return OPPORTUNISTIC_COMPACT_COUNT.get();
     }
 
     public long getPointerForData(int ordinal) {

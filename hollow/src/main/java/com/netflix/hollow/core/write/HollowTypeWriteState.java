@@ -240,7 +240,7 @@ public abstract class HollowTypeWriteState {
         if(restoredReadState == null) {
             currentCyclePopulated.clearAll();
             for (int i = 0; i < ordinalMapNum; i++) {
-                ordinalMaps[i].compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards(), i, ordinalMapIndexBits);
+                ordinalMaps[i].compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards(), i, ordinalMapIndexBits, stateEngine.isOpportunisticCompact());
                 ordinalMaps[i].setIgnoreSoftLimits(
                         ignoreSoftLimits == null || ignoreSoftLimits.get());
                 ordinalMaps[i].resetLogSoftLimitsBreach();
@@ -250,7 +250,7 @@ public abstract class HollowTypeWriteState {
             currentCyclePopulated.clearAll();
             previousCyclePopulated.clearAll();
             for (int i = 0; i < ordinalMapNum; i++) {
-                ordinalMaps[i].compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards(), i, ordinalMapIndexBits);
+                ordinalMaps[i].compact(previousCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards(), i, ordinalMapIndexBits, stateEngine.isOpportunisticCompact());
                 ordinalMaps[i].setIgnoreSoftLimits(
                         ignoreSoftLimits == null || ignoreSoftLimits.get());
                 ordinalMaps[i].resetLogSoftLimitsBreach();
@@ -387,7 +387,9 @@ public abstract class HollowTypeWriteState {
     public void prepareForNextCycle() {
         // Compact each ordinal map independently
         for (int i = 0; i < ordinalMapNum; i++) {
-            ordinalMaps[i].compact(currentCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards(), i, ordinalMapIndexBits);
+            boolean fastPath = ordinalMaps[i].compact(currentCyclePopulated, numShards, stateEngine.isFocusHoleFillInFewestShards(), i, ordinalMapIndexBits, stateEngine.isOpportunisticCompact());
+            if (fastPath && LOG.isLoggable(Level.FINE))
+                LOG.fine("Opportunistic compact fast path for type " + getSchema().getName() + " (ordinal map " + i + ")");
             ordinalMaps[i].setIgnoreSoftLimits(
                     ignoreSoftLimits == null || ignoreSoftLimits.get());
             ordinalMaps[i].resetLogSoftLimitsBreach();

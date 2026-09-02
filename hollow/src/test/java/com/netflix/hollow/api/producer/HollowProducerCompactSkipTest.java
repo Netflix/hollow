@@ -23,47 +23,17 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.test.InMemoryBlobStore;
-import java.lang.reflect.Field;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class HollowProducerCompactSkipTest {
 
-    private boolean originalSkip;
-
-    @Before
-    public void setUp() throws Exception {
-        originalSkip = getSkip();
-        setSkip(true);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        setSkip(originalSkip);
-    }
-
-    private static Field skipField() throws Exception {
-        Field f = ByteArrayOrdinalMap.class.getDeclaredField("OPPORTUNISTIC_COMPACT");
-        f.setAccessible(true);
-        return f;
-    }
-
-    private static boolean getSkip() throws Exception {
-        return skipField().getBoolean(null);
-    }
-
-    private static void setSkip(boolean v) throws Exception {
-        skipField().setBoolean(null, v);
-    }
-
-    private static HollowProducer producer(InMemoryBlobStore store, boolean partitionedOrdinalMap) {
+    private static HollowProducer producer(InMemoryBlobStore store, boolean partitionedOrdinalMap, boolean opportunisticCompact) {
         HollowProducer.Builder<?> b = HollowProducer.withPublisher(store)
                 .withBlobStager(new HollowInMemoryBlobStager())
-                .withAnnouncer((HollowProducer.Announcer) v -> {});
+                .withAnnouncer((HollowProducer.Announcer) v -> {})
+                .withOpportunisticCompact(opportunisticCompact);
         if (partitionedOrdinalMap) {
             b.withPartitionedOrdinalMap(true);
         }
@@ -85,7 +55,7 @@ public class HollowProducerCompactSkipTest {
     @Test
     public void addOnlyCyclesAreReadable() {
         InMemoryBlobStore store = new InMemoryBlobStore();
-        HollowProducer producer = producer(store, false);
+        HollowProducer producer = producer(store, false, true);
 
         long v1 = producer.runCycle(ws -> ws.add(new Rec(1, 1)));
         long v2 = producer.runCycle(ws -> { ws.add(new Rec(1, 1)); ws.add(new Rec(2, 2)); });
@@ -106,7 +76,7 @@ public class HollowProducerCompactSkipTest {
     @Test
     public void deleteAndReplaceCyclesAreCorrect() {
         InMemoryBlobStore store = new InMemoryBlobStore();
-        HollowProducer producer = producer(store, false);
+        HollowProducer producer = producer(store, false, true);
 
         producer.runCycle(ws -> { ws.add(new Rec(1, 10)); ws.add(new Rec(2, 20)); ws.add(new Rec(3, 30)); });
         long vDel = producer.runCycle(ws -> { ws.add(new Rec(1, 10)); ws.add(new Rec(3, 30)); });   // delete 2
@@ -127,7 +97,7 @@ public class HollowProducerCompactSkipTest {
     @Test
     public void noOpCyclesDoNotCorruptState() {
         InMemoryBlobStore store = new InMemoryBlobStore();
-        HollowProducer producer = producer(store, false);
+        HollowProducer producer = producer(store, false, true);
 
         long v1 = producer.runCycle(ws -> ws.add(new Rec(1, 1)));
         producer.runCycle(ws -> ws.add(new Rec(1, 1)));                          // no-op (unchanged)
@@ -144,7 +114,7 @@ public class HollowProducerCompactSkipTest {
     @Test
     public void partitionedOrdinalMapMixedChurnIsCorrect() {
         InMemoryBlobStore store = new InMemoryBlobStore();
-        HollowProducer producer = producer(store, true);
+        HollowProducer producer = producer(store, true, true);
 
         HollowProducer.Populator[] seq = mixedChurnSequence();
         long last = 0;
@@ -161,7 +131,7 @@ public class HollowProducerCompactSkipTest {
     }
 
     @Test
-    public void skipOnMatchesSkipOffAcrossMixedChurn() throws Exception {
+    public void skipOnMatchesSkipOffAcrossMixedChurn() {
         long[] vOn = runSequenceWithSkip(true);
         long[] vOff = runSequenceWithSkip(false);
         assertEquals(vOn.length, vOff.length);
@@ -178,15 +148,14 @@ public class HollowProducerCompactSkipTest {
     private InMemoryBlobStore onStore;
     private InMemoryBlobStore offStore;
 
-    private long[] runSequenceWithSkip(boolean skip) throws Exception {
-        setSkip(skip);
+    private long[] runSequenceWithSkip(boolean skip) {
         InMemoryBlobStore store = new InMemoryBlobStore();
         if (skip) {
             onStore = store;
         } else {
             offStore = store;
         }
-        HollowProducer producer = producer(store, false);
+        HollowProducer producer = producer(store, false, skip);
         HollowProducer.Populator[] seq = mixedChurnSequence();
         long[] versions = new long[seq.length];
         for (int i = 0; i < seq.length; i++) {

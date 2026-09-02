@@ -74,6 +74,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     private long targetMaxTypeShardSize = Long.MAX_VALUE;
     //// focus filling ordinal holes in as few shards as possible to make delta application more efficient for consumers
     private boolean focusHoleFillInFewestShards = false;
+    //// skip the compact sort+rehash for a type in cycles that free no ordinals
+    private boolean opportunisticCompact = false;
     //// adjust number of shards per type during the course of the delta chain to realize consumer-side delta applications at constant space overhead
     private boolean allowTypeResharding = false;
     //// supplier to determine whether to ignore ordinal threshold breaches (log instead of throwing exception)
@@ -476,6 +478,14 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
     boolean isFocusHoleFillInFewestShards() {
         return focusHoleFillInFewestShards;
+    }
+
+    public void setOpportunisticCompact(boolean opportunisticCompact) {
+        this.opportunisticCompact = opportunisticCompact;
+    }
+
+    boolean isOpportunisticCompact() {
+        return opportunisticCompact;
     }
 
     /**
