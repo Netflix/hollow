@@ -41,12 +41,18 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
     private volatile HollowFactory<T> factory;
     private volatile HollowTypeAPI typeAPI;
     private volatile HollowTypeReadState typeReadState;
+    private final boolean retainRemovedOrdinals;
 
     public HollowObjectCacheProvider(HollowTypeDataAccess typeDataAccess, HollowTypeAPI typeAPI, HollowFactory<T> factory) {
         this(typeDataAccess, typeAPI, factory, null);
     }
 
     public HollowObjectCacheProvider(HollowTypeDataAccess typeDataAccess, HollowTypeAPI typeAPI, HollowFactory<T> factory, HollowObjectCacheProvider<T> previous) {
+        this(typeDataAccess, typeAPI, factory, previous, false);
+    }
+
+    public HollowObjectCacheProvider(HollowTypeDataAccess typeDataAccess, HollowTypeAPI typeAPI, HollowFactory<T> factory, HollowObjectCacheProvider<T> previous, boolean retainRemovedOrdinals) {
+        this.retainRemovedOrdinals = retainRemovedOrdinals;
         if(typeDataAccess != null) {
             PopulatedOrdinalListener listener = typeDataAccess.getTypeState().getListener(PopulatedOrdinalListener.class);
             BitSet populatedOrdinals = listener.getPopulatedOrdinals();
@@ -59,12 +65,18 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
                 while(ordinal >= arr.size())
                     arr.add(null);
 
-                if(previous != null && previousOrdinals.get(ordinal) && populatedOrdinals.get(ordinal)) {
+                boolean previouslyPopulated = previous != null && previousOrdinals.get(ordinal);
+                boolean currentlyPopulated = populatedOrdinals.get(ordinal);
+                if(previouslyPopulated && (currentlyPopulated || retainRemovedOrdinals)) {
+                    // Reuse the previously cached object. When still populated the content is identical (changed
+                    // content is assigned a new ordinal); when removed-only this preserves the before image. Either
+                    // way the cached delegate must be re-pointed at the current type api so lazy reference fields
+                    // resolve against the current read state.
                     T cached = previous.getHollowObject(ordinal);
                     arr.set(ordinal, cached);
                     if(cached instanceof HollowRecord)
                         ((HollowCachedDelegate)((HollowRecord)cached).getDelegate()).updateTypeAPI(typeAPI);
-                } else if(populatedOrdinals.get(ordinal)){
+                } else if(currentlyPopulated){
                     arr.set(ordinal, instantiateCachedObject(factory, typeDataAccess, typeAPI, ordinal));
                 }
             }
