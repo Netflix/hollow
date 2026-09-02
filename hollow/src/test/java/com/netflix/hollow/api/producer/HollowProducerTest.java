@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -51,7 +52,9 @@ import com.netflix.hollow.api.producer.listener.VetoableListener;
 import com.netflix.hollow.api.producer.model.CustomReferenceType;
 import com.netflix.hollow.api.producer.model.HasAllTypeStates;
 import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowMapSchema;
@@ -312,6 +315,88 @@ public class HollowProducerTest {
         assertEquals(Status.SUCCESS, lastRestoreStatus.getStatus());
         assertEquals("Version should be the same", version, lastRestoreStatus.getDesiredVersion());
         assertEquals(producer.getCycleCountWithPrimaryStatus(), 1);
+    }
+
+    @Test
+    public void testRestoreFromReadStateEngine() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+
+        // A producer publishes an initial version.
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .build();
+        producer1.initializeDataModel(TestPojoV1.class);
+        long version = producer1.runCycle(ws -> {
+            for (int i = 1; i <= 3; i++) {
+                ws.add(new TestPojoV1(i, i * 10));
+            }
+        });
+
+        // A caller builds their own HollowConsumer and refreshes it to that version.
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(version);
+        assertEquals(version, consumer.getCurrentVersionId());
+
+        // A fresh producer restores directly from the consumer's read state engine
+        // rather than downloading blobs itself.
+        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(blobStager)
+                .build();
+        producer2.initializeDataModel(TestPojoV1.class);
+        HollowProducer.ReadState readState =
+                producer2.restore(consumer.getCurrentVersionId(), consumer.getStateEngine());
+
+        // The producer is restored to the expected version with the expected data.
+        Assert.assertNotNull(readState);
+        assertEquals(version, readState.getVersion());
+        HollowObjectTypeReadState typeState =
+                (HollowObjectTypeReadState) readState.getStateEngine().getTypeState("TestPojo");
+        BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
+        assertEquals(3, populatedOrdinals.cardinality());
+        int ordinal = populatedOrdinals.nextSetBit(0);
+        while (ordinal != -1) {
+            GenericHollowObject obj = new GenericHollowObject(new HollowObjectGenericDelegate(typeState), ordinal);
+            assertEquals("v1 should equal id * 10", obj.getInt("id") * 10, obj.getInt("v1"));
+            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+        }
+
+        // Restore -> next delta: the cycle after restore must chain off the restored version,
+        // so a consumer that loaded the restored version can move forward via a delta. If the
+        // delta's "from" did not match the restored version the transition below would fail with
+        // "Attempting to apply a delta to a state from which it was not originated!".
+        long nextVersion = producer2.runCycle(ws -> {
+            for (int i = 1; i <= 4; i++) {
+                ws.add(new TestPojoV1(i, i * 10));
+            }
+        });
+        Assert.assertNotEquals(version, nextVersion);
+
+        HollowConsumer follower = HollowConsumer.withBlobRetriever(blobStore).build();
+        follower.triggerRefreshTo(version);
+        assertEquals(version, follower.getCurrentVersionId());
+        follower.triggerRefreshTo(nextVersion);
+        assertEquals(nextVersion, follower.getCurrentVersionId());
+        assertEquals(4, follower.getStateEngine().getTypeState("TestPojo")
+                .getPopulatedOrdinals().cardinality());
+    }
+
+    @Test
+    public void testRestoreVersionNoneShortCircuits() {
+        HollowProducer producer = createProducer(tmpFolder, schema);
+
+        // BlobRetriever overload: a VERSION_NONE restore must short-circuit, returning null
+        // without ever building a consumer or touching the retriever.
+        HollowConsumer.BlobRetriever retriever = mock(HollowConsumer.BlobRetriever.class);
+        HollowProducer.ReadState readState = producer.restore(HollowConstants.VERSION_NONE, retriever);
+        Assert.assertNull("VERSION_NONE restore should return null", readState);
+        verifyZeroInteractions(retriever);
+
+        // ReadStateEngine overload: likewise returns null and never dereferences the engine,
+        // so a null engine is tolerated when the version is VERSION_NONE.
+        HollowProducer.ReadState readStateFromEngine =
+                producer.restore(HollowConstants.VERSION_NONE, (HollowReadStateEngine) null);
+        Assert.assertNull("VERSION_NONE restore should return null", readStateFromEngine);
     }
 
     @Test
