@@ -174,19 +174,10 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     protected abstract void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema);
 
     /**
-     * Computes the checksum of a single shard of this type in isolation. The returned checksum incorporates only the
-     * records that reside in the given shard (i.e. those whose ordinal maps to {@code shardNumber}). Combining the
-     * per-shard checksums for every shard in ascending shard order reproduces this type's contribution to the overall
-     * state-engine checksum, which lets the checksum of a type be computed one shard at a time and in parallel.
-     * <p>
-     * The caller must ensure the type's shard structure is not concurrently mutated (e.g. by a delta application that
-     * reshards) for the duration of the checksum: {@code numShards()} and the shards it walks are read independently,
-     * so a concurrent reshard could observe an inconsistent view. This holds for the producer's integrity check, where
-     * the engines being checksummed are quiescent.
+     * Computes the checksum of one shard, {@code shardNumber} in {@code [0, numShards())}. Folding every shard's
+     * checksum in ascending order (via {@link HollowChecksum#applyInt}) gives this type's contribution in per-shard
+     * mode; that value differs from {@link #getChecksum}, so never compare checksums across the two modes.
      *
-     * @param withSchema the (possibly narrower) common schema to compute the checksum against
-     * @param shardNumber the shard index, in {@code [0, numShards())}
-     * @return the partial checksum for the requested shard
      * @throws IllegalArgumentException if {@code shardNumber} is outside {@code [0, numShards())}
      */
     public HollowChecksum getShardChecksum(HollowSchema withSchema, int shardNumber) {
@@ -199,7 +190,13 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
         return cksum;
     }
 
-    protected abstract void applyShardToChecksum(HollowChecksum checksum, HollowSchema withSchema, int shardNumber);
+    /**
+     * Applies one shard's checksum contribution. The default is not sharded: it folds the whole type (via
+     * {@link #applyToChecksum}) for every shard, which is correct but redundant; override to isolate a single shard.
+     */
+    protected void applyShardToChecksum(HollowChecksum checksum, HollowSchema withSchema, int shardNumber) {
+        applyToChecksum(checksum, withSchema);
+    }
 
     @Override
     public HollowTypeReadState getTypeState() {
