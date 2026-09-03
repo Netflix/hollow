@@ -173,6 +173,34 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
 
     protected abstract void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema);
 
+    /**
+     * Computes the checksum of a single shard of this type in isolation. The returned checksum incorporates only the
+     * records that reside in the given shard (i.e. those whose ordinal maps to {@code shardNumber}). Combining the
+     * per-shard checksums for every shard in ascending shard order reproduces this type's contribution to the overall
+     * state-engine checksum, which lets the checksum of a type be computed one shard at a time and in parallel.
+     * <p>
+     * The caller must ensure the type's shard structure is not concurrently mutated (e.g. by a delta application that
+     * reshards) for the duration of the checksum: {@code numShards()} and the shards it walks are read independently,
+     * so a concurrent reshard could observe an inconsistent view. This holds for the producer's integrity check, where
+     * the engines being checksummed are quiescent.
+     *
+     * @param withSchema the (possibly narrower) common schema to compute the checksum against
+     * @param shardNumber the shard index, in {@code [0, numShards())}
+     * @return the partial checksum for the requested shard
+     * @throws IllegalArgumentException if {@code shardNumber} is outside {@code [0, numShards())}
+     */
+    public HollowChecksum getShardChecksum(HollowSchema withSchema, int shardNumber) {
+        int numShards = numShards();
+        if(shardNumber < 0 || shardNumber >= numShards)
+            throw new IllegalArgumentException("shardNumber " + shardNumber + " is out of range [0, " + numShards
+                    + ") for type " + getSchema().getName());
+        HollowChecksum cksum = new HollowChecksum();
+        applyShardToChecksum(cksum, withSchema, shardNumber);
+        return cksum;
+    }
+
+    protected abstract void applyShardToChecksum(HollowChecksum checksum, HollowSchema withSchema, int shardNumber);
+
     @Override
     public HollowTypeReadState getTypeState() {
         return this;
