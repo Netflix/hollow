@@ -58,7 +58,8 @@ public class SearchUtils {
                     key[i] = Float.parseFloat(fields[i]);
                     break;
                 case BYTES:
-                    throw new IllegalArgumentException("Primary key contains a field of type BYTES");
+                    key[i] = fields[i];
+                    break;
             }
         }
         return key;
