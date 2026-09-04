@@ -173,6 +173,31 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
 
     protected abstract void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema);
 
+    /**
+     * Computes the checksum of one shard, {@code shardNumber} in {@code [0, numShards())}. Folding every shard's
+     * checksum in ascending order (via {@link HollowChecksum#applyInt}) gives this type's contribution in per-shard
+     * mode; that value differs from {@link #getChecksum}, so never compare checksums across the two modes.
+     *
+     * @throws IllegalArgumentException if {@code shardNumber} is outside {@code [0, numShards())}
+     */
+    public HollowChecksum getShardChecksum(HollowSchema withSchema, int shardNumber) {
+        int numShards = numShards();
+        if(shardNumber < 0 || shardNumber >= numShards)
+            throw new IllegalArgumentException("shardNumber " + shardNumber + " is out of range [0, " + numShards
+                    + ") for type " + getSchema().getName());
+        HollowChecksum cksum = new HollowChecksum();
+        applyShardToChecksum(cksum, withSchema, shardNumber);
+        return cksum;
+    }
+
+    /**
+     * Applies one shard's checksum contribution. The default is not sharded: it folds the whole type (via
+     * {@link #applyToChecksum}) for every shard, which is correct but redundant; override to isolate a single shard.
+     */
+    protected void applyShardToChecksum(HollowChecksum checksum, HollowSchema withSchema, int shardNumber) {
+        applyToChecksum(checksum, withSchema);
+    }
+
     @Override
     public HollowTypeReadState getTypeState() {
         return this;

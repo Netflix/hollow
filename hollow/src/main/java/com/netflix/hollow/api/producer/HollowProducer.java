@@ -751,6 +751,7 @@ public class HollowProducer extends AbstractHollowProducer {
         SingleProducerEnforcer singleProducerEnforcer = new BasicSingleProducerEnforcer();
         HollowObjectHashCodeFinder hashCodeFinder = null;
         boolean doIntegrityCheck = true;
+        boolean parallelPerShardChecksum = false;
         boolean partitionedOrdinalMap = false;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
@@ -969,6 +970,18 @@ public class HollowProducer extends AbstractHollowProducer {
         
         public B noIntegrityCheck() {
             this.doIntegrityCheck = false;
+            return (B) this;
+        }
+
+        /**
+         * When enabled, the integrity checksum fans out one task per (type, shard) instead of per type,
+         * so a type dominated by a single large shard parallelizes across its shards. Useful only when type-sharding
+         * is enabled. Defaults to off (legacy per-type).
+         *
+         * @param parallelPerShardChecksum whether to compute the integrity checksum per (type, shard)
+         */
+        public B withParallelPerShardChecksum(boolean parallelPerShardChecksum) {
+            this.parallelPerShardChecksum = parallelPerShardChecksum;
             return (B) this;
         }
 
