@@ -115,7 +115,7 @@ public class RecyclingRecycler implements ArraySegmentRecycler {
         }
     }
 
-    private interface Creator<T> {
+    private interface Creator<T> extends Serializable {
         T create();
     }
 
