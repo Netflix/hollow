@@ -18,8 +18,12 @@ package com.netflix.hollow.api.producer.validation;
 
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
+import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.test.InMemoryBlobStore;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Assert;
 import org.junit.Before;
@@ -630,6 +634,115 @@ public class DuplicateDataDetectionValidatorTests {
         }
     }
 
+    @Test
+    public void schemaChangeOnRestoredChainStillCatchesDuplicatesViaSnapshot() {
+        // A schema-evolving redeploy: a second producer restores the same chain, then publishes with an
+        // added field. Restore drops the reused validator's lagged index, so the post-restore cycle runs
+        // the snapshot full-scan path and still catches an introduced duplicate with exact counts.
+        DuplicateDataDetectionValidator validator =
+                new DuplicateDataDetectionValidator(SchemaV1.class, () -> true);
+
+        HollowProducer producer1 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(validator)
+                .build();
+        producer1.initializeDataModel(SchemaV1.class);
+        long v1 = producer1.runCycle(writeState -> {
+            writeState.add(new SchemaV1(1, "A"));
+            writeState.add(new SchemaV1(2, "B"));
+        });
+        // Delta cycle so the validator retains a lagged index bound to producer1's engine.
+        producer1.runCycle(writeState -> {
+            writeState.add(new SchemaV1(1, "A"));
+            writeState.add(new SchemaV1(2, "B"));
+            writeState.add(new SchemaV1(3, "C"));
+        });
+
+        producer1.initializeDataModel(SchemaV2.class);
+
+        HollowProducer producer2 = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(validator)
+                .build();
+        producer2.initializeDataModel(SchemaV2.class);
+        producer2.restore(v1, blobStore);
+        try {
+            producer2.runCycle(writeState -> {
+                writeState.add(new SchemaV2(1, "A", "x"));
+                writeState.add(new SchemaV2(1, "A_dup", "y"));
+            });
+            Assert.fail("Expected ValidationStatusException");
+        } catch (ValidationStatusException expected) {
+            String message = expected.getValidationStatus().getResults().get(0).getMessage();
+            Assert.assertTrue("Schema change must fall back to the snapshot full-scan path (exact counts)",
+                    message.contains("distinct keys that each have duplicate records affecting"));
+            Assert.assertFalse("Must not run the delta path after a schema change",
+                    message.contains("delta check"));
+        }
+    }
+
+    @Test
+    public void schemaChangeFlipsReadStateEngineIdentity() {
+        // Guards the assumption behind dropLaggedIndexIfEngineChanged: a same-schema cycle reuses the
+        // restored read-state engine (delta swap), while a schema change publishes a snapshot and exposes
+        // a fresh engine (no-swap branch). Asserted via a capture listener, independent of the validator.
+        List<HollowReadStateEngine> seen = new ArrayList<>();
+        ValidatorListener capture = new ValidatorListener() {
+            @Override
+            public String getName() {
+                return "engineCapture";
+            }
+
+            @Override
+            public ValidationResult onValidate(HollowProducer.ReadState readState) {
+                seen.add(readState.getStateEngine());
+                return ValidationResult.from(this).passed();
+            }
+        };
+
+        // Seed the chain at v1 with the V1 schema.
+        HollowProducer seed = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .build();
+        seed.initializeDataModel(SchemaV1.class);
+        long v1 = seed.runCycle(writeState -> {
+            writeState.add(new SchemaV1(1, "A"));
+            writeState.add(new SchemaV1(2, "B"));
+        });
+
+        // Control: same schema + delta. The swap keeps the restored engine current, so validate() sees it.
+        HollowProducer control = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(capture)
+                .build();
+        control.initializeDataModel(SchemaV1.class);
+        HollowReadStateEngine controlRestored = control.restore(v1, blobStore).getStateEngine();
+        seen.clear();
+        control.runCycle(writeState -> {
+            writeState.add(new SchemaV1(1, "A"));
+            writeState.add(new SchemaV1(2, "B"));
+            writeState.add(new SchemaV1(3, "C"));
+        });
+        Assert.assertSame("A same-schema cycle should reuse the restored engine (delta swap)",
+                controlRestored, seen.get(0));
+
+        // Test: only the schema differs from the control. The change forces a snapshot, so validate() sees
+        // a fresh engine, not the one restored into. A separate blob store isolates it from the control.
+        HollowProducer test = HollowProducer.withPublisher(new InMemoryBlobStore())
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(capture)
+                .build();
+        test.initializeDataModel(SchemaV2.class);
+        HollowReadStateEngine testRestored = test.restore(v1, blobStore).getStateEngine();
+        seen.clear();
+        test.runCycle(writeState -> {
+            writeState.add(new SchemaV2(1, "A", "x"));
+            writeState.add(new SchemaV2(2, "B", "y"));
+        });
+        Assert.assertNotSame("A schema change must flip the read-state engine identity (no-swap branch)",
+                testRestored, seen.get(0));
+    }
+
     // A second validator the test can switch on to fail a cycle after the duplicate check has passed.
     private static final class ToggleValidator implements ValidatorListener {
         final AtomicBoolean fail = new AtomicBoolean(false);
@@ -655,6 +768,34 @@ public class DuplicateDataDetectionValidatorTests {
         TypeWithPrimaryKey(int id, String name) {
             this.id = id;
             this.name = name;
+        }
+    }
+
+    // SchemaV1 and SchemaV2 map to the same Hollow type name but differ by one field, so publishing
+    // SchemaV2 onto a chain built with SchemaV1 is a genuine mid-chain schema change.
+    @HollowTypeName(name = "SchemaEvolvingType")
+    @HollowPrimaryKey(fields = {"id"})
+    static class SchemaV1 {
+        int id;
+        String name;
+
+        SchemaV1(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    @HollowTypeName(name = "SchemaEvolvingType")
+    @HollowPrimaryKey(fields = {"id"})
+    static class SchemaV2 {
+        int id;
+        String name;
+        String extra;
+
+        SchemaV2(int id, String name, String extra) {
+            this.id = id;
+            this.name = name;
+            this.extra = extra;
         }
     }
 }

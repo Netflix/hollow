@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import java.util.Arrays;
 import java.util.Collections;
@@ -92,5 +93,22 @@ public class PrimaryKeyIndexDeltaIndexTest {
             Assert.assertEquals(upper, matches.length);
             Assert.assertFalse(index.containsDuplicates());
         }
+    }
+
+    @Test
+    public void isDeltaUpdateAllowedFollowsSupplierWhenPropertyUnset() {
+        InMemoryBlobStore blobStore = new InMemoryBlobStore();
+        HollowProducer p = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .build();
+        p.initializeDataModel(X.class);
+        long version = p.runCycle(ws -> ws.add(new X(1)));
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(version);
+
+        PrimaryKey pk = new PrimaryKey("X", "id");
+        Assert.assertTrue(new HollowPrimaryKeyIndex(consumer.getStateEngine(), pk, () -> true).isDeltaUpdateAllowed());
+        Assert.assertFalse(new HollowPrimaryKeyIndex(consumer.getStateEngine(), pk, () -> false).isDeltaUpdateAllowed());
     }
 }
