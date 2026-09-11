@@ -530,7 +530,7 @@ abstract class AbstractHollowProducer {
                 lastSuccessfulCycle = toVersion;
             } else {
                 // 3b. Nothing to do; reset the effects of Step 2
-                // Return the lastSucessfulCycle to the caller thereby
+                // Return the lastSuccessfulCycle to the caller thereby
                 // the callee can track that version against consumers
                 // without having to listen to events.
                 // Consistently report the version that would be used if
