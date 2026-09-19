@@ -118,8 +118,12 @@ class HollowDataHolder {
         // such as when a new delta is published.
         // Note that a refresh listener may also induce a failed transition, likely unknowingly,
         // by throwing an exception.
-        if (doubleSnapshotConfig.allowDoubleSnapshot() && failedTransitionTracker.anyTransitionWasFailed(updatePlan)) {
-            throw new RuntimeException("Update plan contains known failing transition!");
+        if (!doubleSnapshotConfig.allowDoubleSnapshot() && failedTransitionTracker.anyTransitionWasFailed(updatePlan)) {
+            if (System.getProperty("STRICT_TRANSITION_FAILURE_HANDLING", "false").equalsIgnoreCase("true")) {
+                throw new RuntimeException("Update plan contains known failing transition!");
+            } else {
+                LOG.warning("Update plan contains known failing transition! This may cause stale data.");
+            }
         }
 
         if (updatePlan.isSnapshotPlan()) {
