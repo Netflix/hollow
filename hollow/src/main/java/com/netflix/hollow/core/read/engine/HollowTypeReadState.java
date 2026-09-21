@@ -40,12 +40,20 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
 
     protected final HollowReadStateEngine stateEngine;
     protected final MemoryMode memoryMode;
+    protected final boolean shardsAreImmutable;
     protected final HollowSchema schema;
     protected HollowTypeStateListener[] stateListeners;
 
     public HollowTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSchema schema) {
         this.stateEngine = stateEngine;
         this.memoryMode = memoryMode;
+        // When retired on-heap segments are never reused, a shard captured from the volatile holder
+        // remains immutable and strongly reachable for the duration of the read. The initial volatile
+        // holder load is then sufficient to publish the shard and can serve as the read's linearization
+        // point; no trailing validation is required.
+        this.shardsAreImmutable = stateEngine != null
+                && memoryMode == MemoryMode.ON_HEAP
+                && !stateEngine.getMemoryRecycler().recyclesArrays();
         this.schema = schema;
         this.stateListeners = EMPTY_LISTENERS;
     }
