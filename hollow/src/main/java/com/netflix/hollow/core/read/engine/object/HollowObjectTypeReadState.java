@@ -449,6 +449,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     }
 
     private boolean readWasUnsafe(HollowObjectTypeShardsHolder shardsHolder, int ordinal, HollowObjectTypeReadStateShard shard) {
+        if(shardsAreImmutable)
+            return false;
+
         // Use a load (acquire) fence to constrain the compiler reordering prior plain loads so
         // that they cannot "float down" below the volatile load of shardsVolatile.
         // This ensures data is checked against current shard holder *after* optimistic calculations

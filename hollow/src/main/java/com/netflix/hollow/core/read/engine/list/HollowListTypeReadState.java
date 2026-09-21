@@ -231,6 +231,9 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     }
 
     private boolean readWasUnsafe(HollowListTypeShardsHolder shardsHolder, int ordinal, HollowListTypeReadStateShard shard) {
+        if(shardsAreImmutable)
+            return false;
+
         HollowUnsafeHandle.getUnsafe().loadFence();
         HollowListTypeShardsHolder currShardsHolder = shardsVolatile;
         return shardsHolder != currShardsHolder

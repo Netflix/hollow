@@ -48,4 +48,17 @@ public interface ArraySegmentRecycler {
 
     public void swap();
 
+    /**
+     * Returns whether an array passed to one of the recycle methods may later be returned by the
+     * corresponding allocation method.
+     * <p>
+     * The default is deliberately conservative so that custom recycler implementations retain
+     * the read-safety checks required when arrays are reused.
+     *
+     * @return {@code true} if retired arrays may be reused
+     */
+    default boolean recyclesArrays() {
+        return true;
+    }
+
 }
