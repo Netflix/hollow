@@ -23,6 +23,8 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HollowProducerMetrics extends HollowMetrics {
+    private long lastAnnouncedVersion = 0;
+
     private int cyclesCompleted = 0;
     private int cyclesSucceeded = 0;
     private int cycleFailed = 0;
@@ -65,7 +67,7 @@ public class HollowProducerMetrics extends HollowMetrics {
 
         if(readState != null) {
             HollowReadStateEngine hollowReadStateEngine = readState.getStateEngine();
-            super.update(hollowReadStateEngine, version);
+            update(hollowReadStateEngine, version);
         } else {
             super.update(version);
         }
@@ -137,5 +139,14 @@ public class HollowProducerMetrics extends HollowMetrics {
 
     public int getReverseDeltasFailed() {
         return reverseDeltasFailed;
+    }
+
+    public long getLastAnnouncedVersion() {
+        return lastAnnouncedVersion;
+    }
+
+    protected void update(HollowReadStateEngine hollowReadStateEngine, long version) {
+        lastAnnouncedVersion = version;
+        super.update(hollowReadStateEngine, version);
     }
 }
