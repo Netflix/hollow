@@ -95,6 +95,37 @@ public class FlatRecord {
         return data.length();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof FlatRecord)) {
+            return false;
+        }
+
+        FlatRecord other = (FlatRecord) obj;
+        if (data.length() != other.data.length()) {
+            return false;
+        }
+
+        for (long i = 0; i < data.length(); i++) {
+            if (data.get(i) != other.data.get(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        for (long i = 0; i < data.length(); i++) {
+            result = 31 * result + data.get(i);
+        }
+        return result;
+    }
+
     private Object readPrimaryKeyField(int location, FieldType fieldType) {
         if (VarInt.readVNull(data, location)) {
             return null;
