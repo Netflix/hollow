@@ -20,6 +20,7 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import sun.misc.Unsafe;
 
@@ -78,20 +79,29 @@ public class SegmentedByteArray implements VariableLengthData {
     }
 
     /**
-     * Read a series of variable-length integers as characters from an immutable range of this array.
-     * Segment references are loaded once per contiguous range rather than once per byte.
+     * Decode a String whose UTF-16 code units are encoded as variable-length integers in an
+     * immutable range of this array. Segment references are loaded once per contiguous range
+     * rather than once per encoded byte.
+     *
+     * <p>A contiguous ASCII range is passed directly to String's ISO-8859-1 constructor, allowing
+     * modern JDKs to use their compact-string copy path. Other content is decoded to UTF-16 code
+     * units and passed to String, which performs any Latin-1 compression using its JIT intrinsic.
      *
      * @param position the position of the first encoded byte
      * @param length the number of encoded bytes
-     * @param output a zero-filled array with capacity for at least {@code length} characters
-     * @return the number of decoded characters
+     * @param output scratch space with capacity for at least {@code length} characters
+     * @return the decoded String
      */
-    public int readVIntsInto(long position, int length, char[] output) {
+    public String readVIntString(long position, int length, char[] output) {
+        if(length == 0)
+            return "";
+
         byte[][] currentSegments = segments;
         int segmentSize = 1 << log2OfSegmentSize;
+        int firstSegmentIndex = (int)(position >>> log2OfSegmentSize);
+        int firstSegmentOffset = (int)(position & bitmask);
         int i = 0;
 
-        // Most strings contain only single-byte character encodings. Keep that path branch-light.
         ascii:
         while(i < length) {
             long currentPosition = position + i;
@@ -101,13 +111,21 @@ public class SegmentedByteArray implements VariableLengthData {
 
             while(i < end) {
                 int b = segment[segmentOffset++];
-                if((b & 0x80) != 0)
+                if(b < 0)
                     break ascii;
                 output[i++] = (char)b;
             }
         }
 
+        if(i == length) {
+            if(firstSegmentOffset + length <= segmentSize)
+                return new String(currentSegments[firstSegmentIndex], firstSegmentOffset, length,
+                        StandardCharsets.ISO_8859_1);
+            return new String(output, 0, length);
+        }
+
         int count = i;
+        int value = 0;
         while(i < length) {
             long currentPosition = position + i;
             int segmentOffset = (int)(currentPosition & bitmask);
@@ -116,13 +134,16 @@ public class SegmentedByteArray implements VariableLengthData {
 
             while(i < end) {
                 int b = segment[segmentOffset++];
-                output[count] = (char)((output[count] << 7) | (b & 0x7f));
-                count += (~b >> 7) & 0x1;
+                value = (value << 7) | (b & 0x7f);
                 i++;
+                if(b >= 0) {
+                    output[count++] = (char)value;
+                    value = 0;
+                }
             }
         }
 
-        return count;
+        return new String(output, 0, count);
     }
 
     @Override
