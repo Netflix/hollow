@@ -18,7 +18,7 @@ package com.netflix.hollow.core.read.engine.list;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.util.IntMap;
@@ -56,8 +56,14 @@ public class HollowListDeltaHistoricalStateCreator {
     public void populateHistory() {
         populateStats();
 
-        historicalDataElements.listPointerData = new FixedLengthElementArray(historicalDataElements.memoryRecycler, ((long)historicalDataElements.maxOrdinal + 1) * historicalDataElements.bitsPerListPointer);
-        historicalDataElements.elementData = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.totalNumberOfElements * historicalDataElements.bitsPerElement);
+        historicalDataElements.listPointerData = FixedLengthDataFactory.get(
+                ((long) historicalDataElements.maxOrdinal + 1) * historicalDataElements.bitsPerListPointer,
+                historicalDataElements.memoryMode,
+                historicalDataElements.memoryRecycler);
+        historicalDataElements.elementData = FixedLengthDataFactory.get(
+                historicalDataElements.totalNumberOfElements * historicalDataElements.bitsPerElement,
+                historicalDataElements.memoryMode,
+                historicalDataElements.memoryRecycler);
 
         iter.reset();
 
