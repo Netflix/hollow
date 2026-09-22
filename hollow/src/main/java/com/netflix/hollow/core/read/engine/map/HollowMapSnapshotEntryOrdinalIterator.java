@@ -16,7 +16,8 @@
  */
 package com.netflix.hollow.core.read.engine.map;
 
-import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
+import com.netflix.hollow.api.sampling.HollowMapSampler;
+import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIteratorImpl;
 
 /**
  * A key/value entry iterator over a map record backed by a single validated snapshot of its shard and bucket
@@ -29,13 +30,15 @@ import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
  * nothing.
  * <p>
  * Correctness mirrors the list/set snapshot iterators: {@code startBucket}/{@code endBucket} are validated
- * non-torn before use, so every relative bucket index in {@code [0, numBuckets)} maps to an in-bounds read of
- * the shard's bucket region (garbage-but-safe if recycled after a concurrent delta, never out-of-bounds). Each
- * {@link #next()} scans forward to the next occupied bucket reading from the snapshot, then re-validates shard
- * identity via the {@code loadFence} in {@link HollowMapTypeReadState#readWasUnsafe}; if the shard changed, the
- * scan is discarded and re-run against a freshly established snapshot before any entry is surfaced.
+ * before use, so every relative bucket index in {@code [0, numBuckets)} maps to an in-bounds read from the
+ * captured shard. Each {@link #next()} scans to the next occupied bucket, then re-validates shard identity. If
+ * an on-heap update or reshard replaced it, the scan is discarded and repeated against a fresh snapshot before
+ * an entry is returned.
+ * <p>
+ * When retired on-heap arrays are not recycled, the captured shard remains immutable and strongly reachable.
+ * In that case {@code readWasUnsafe} is a no-op, so the iterator retains its initial snapshot without fences.
  */
-public class HollowMapSnapshotEntryOrdinalIterator implements HollowMapEntryOrdinalIterator {
+final class HollowMapSnapshotEntryOrdinalIterator extends HollowMapEntryOrdinalIteratorImpl {
 
     private final HollowMapTypeReadState readState;
     private final int ordinal;
@@ -49,9 +52,11 @@ public class HollowMapSnapshotEntryOrdinalIterator implements HollowMapEntryOrdi
     private int key = -1;
     private int value = -1;
 
-    public HollowMapSnapshotEntryOrdinalIterator(int ordinal, HollowMapTypeReadState readState) {
+    HollowMapSnapshotEntryOrdinalIterator(
+            int ordinal, HollowMapTypeReadState readState, HollowMapSampler sampler) {
         this.readState = readState;
         this.ordinal = ordinal;
+        sampler.recordSize();
         snapshot();
     }
 
@@ -107,7 +112,7 @@ public class HollowMapSnapshotEntryOrdinalIterator implements HollowMapEntryOrdi
                 return true;
             }
 
-            // A delta or re-shard invalidated the snapshot mid-scan; re-establish and rescan from currentBucket.
+            // The snapshot changed mid-scan; re-establish it and rescan from currentBucket.
             snapshot();
         }
     }
@@ -126,6 +131,7 @@ public class HollowMapSnapshotEntryOrdinalIterator implements HollowMapEntryOrdi
      * @return the relative bucket position (within this map's bucket range) that the last entry returned by
      * {@link #next()} was retrieved from.
      */
+    @Override
     public int getCurrentBucket() {
         return currentBucket;
     }

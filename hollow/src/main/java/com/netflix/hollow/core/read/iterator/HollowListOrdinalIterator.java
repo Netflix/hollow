@@ -26,9 +26,17 @@ public class HollowListOrdinalIterator implements HollowOrdinalIterator {
     private int currentElement;
 
     public HollowListOrdinalIterator(int listOrdinal, HollowListTypeDataAccess dataAccess) {
+        this(listOrdinal, dataAccess, dataAccess.size(listOrdinal));
+    }
+
+    protected HollowListOrdinalIterator() {
+        this(-1, null, 0);
+    }
+
+    private HollowListOrdinalIterator(int listOrdinal, HollowListTypeDataAccess dataAccess, int size) {
         this.listOrdinal = listOrdinal;
         this.dataAccess = dataAccess;
-        this.size = dataAccess.size(listOrdinal);
+        this.size = size;
     }
 
     @Override

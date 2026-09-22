@@ -44,6 +44,7 @@ import com.netflix.hollow.core.read.engine.SnapshotPopulatedOrdinalsReader;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.iterator.EmptyOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.HollowSetOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
@@ -330,7 +331,9 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
         sampler.recordIterator();
         if(size(ordinal) == 0)
             return EmptyOrdinalIterator.INSTANCE;
-        return new HollowSetSnapshotOrdinalIterator(ordinal, this);
+        if(stateEngine == null || !stateEngine.isSnapshotCollectionIteratorsEnabled())
+            return new HollowSetOrdinalIterator(ordinal, this);
+        return new HollowSetSnapshotOrdinalIterator(ordinal, this, sampler);
     }
 
     boolean readWasUnsafe(HollowSetTypeShardsHolder shardsHolder, int ordinal, HollowSetTypeReadStateShard shard) {
