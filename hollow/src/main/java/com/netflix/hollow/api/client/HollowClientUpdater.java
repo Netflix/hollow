@@ -66,6 +66,7 @@ public class HollowClientUpdater {
     private boolean skipTypeShardUpdateWithNoAdditions;
     private ExperimentalFeature[] experimentalFeatures = new ExperimentalFeature[0];
     private MemoryRecyclingMode memoryRecyclingMode = MemoryRecyclingMode.AUTO;
+    private boolean snapshotCollectionIterators;
 
     private TypeFilter filter;
 
@@ -133,6 +134,13 @@ public class HollowClientUpdater {
         HollowDataHolder dataHolder = hollowDataHolderVolatile;
         if(dataHolder != null)
             dataHolder.getStateEngine().setSkipTypeShardUpdateWithNoAdditions(skipTypeShardUpdateWithNoAdditions);
+    }
+
+    public void setSnapshotCollectionIterators(boolean snapshotCollectionIterators) {
+        this.snapshotCollectionIterators = snapshotCollectionIterators;
+        HollowDataHolder dataHolder = hollowDataHolderVolatile;
+        if(dataHolder != null)
+            dataHolder.getStateEngine().setSnapshotCollectionIterators(snapshotCollectionIterators);
     }
 
     /**
@@ -349,14 +357,18 @@ public class HollowClientUpdater {
 
     private HollowReadStateEngine newStateEngine() {
         HollowDataHolder hollowDataHolderLocal = hollowDataHolderVolatile;
+        HollowReadStateEngine stateEngine;
         if (hollowDataHolderLocal != null) {
             ArraySegmentRecycler existingRecycler =
                     hollowDataHolderLocal.getStateEngine().getMemoryRecycler();
-            return new HollowReadStateEngine(hashCodeFinder, true,
+            stateEngine = new HollowReadStateEngine(hashCodeFinder, true,
                     new HollowReadConfiguration(memoryMode, existingRecycler, experimentalFeatures));
+        } else {
+            stateEngine = new HollowReadStateEngine(hashCodeFinder, true,
+                    new HollowReadConfiguration(memoryMode, memoryRecyclingMode.createRecycler(), experimentalFeatures));
         }
-        return new HollowReadStateEngine(hashCodeFinder, true,
-                new HollowReadConfiguration(memoryMode, memoryRecyclingMode.createRecycler(), experimentalFeatures));
+        stateEngine.setSnapshotCollectionIterators(snapshotCollectionIterators);
+        return stateEngine;
     }
 
     public StackTraceRecorder getStaleReferenceUsageStackTraceRecorder() {

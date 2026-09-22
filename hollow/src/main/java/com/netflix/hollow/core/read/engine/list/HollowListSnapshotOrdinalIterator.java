@@ -16,7 +16,8 @@
  */
 package com.netflix.hollow.core.read.engine.list;
 
-import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.api.sampling.HollowListSampler;
+import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
 
 /**
  * An ordinal iterator over a list record backed by a single validated snapshot of its shard and bounds.
@@ -28,19 +29,15 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
  * fence per {@link #next()}, i.e. {@code N+1} fences, while allocating nothing per element.
  * <p>
  * <b>Why holding the snapshot across {@code next()} calls is safe.</b> The bounds {@code startElement}/
- * {@code endElement} are validated non-torn before use, so every {@code listIndex < size} maps to a bit offset
- * within the shard's element region — an in-bounds, non-throwing read on-heap and within the buffer extent in
- * shared-memory mode. A concurrent delta or re-shard can only (a) publish a new shard (the captured reference is
- * untouched) and (b) later recycle the old shard's backing arrays, which are pooled but never truncated or
- * nulled — so a stale read yields garbage of the correct length, never an out-of-bounds access. The captured
- * {@code dataElements} reference also keeps that backing storage reachable for the life of the iterator. Each
- * {@link #next()} re-validates shard identity <em>after</em> reading (the {@code loadFence} in
- * {@link HollowListTypeReadState#readWasUnsafe} orders the element read before the re-read of
- * {@code shardsVolatile}); if the shard changed, the value read is discarded and the snapshot is re-established
- * against the newly observed version before the value is returned. Thus no torn value ever escapes, matching the
- * per-element validation semantics of the original iterator without its redundant second fence.
+ * {@code endElement} are validated before use, so every {@code listIndex < size} maps to an in-bounds read from
+ * the captured shard. During an on-heap update, the captured data remains strongly reachable and recycled arrays
+ * retain their fixed size. Each {@link #next()} re-validates shard identity <em>after</em> reading; if an update or
+ * reshard replaced it, the value is discarded and the snapshot is re-established before a value is returned.
+ * <p>
+ * When retired on-heap arrays are not recycled, the captured shard remains immutable and strongly reachable.
+ * In that case {@code readWasUnsafe} is a no-op, so the iterator retains its initial snapshot without fences.
  */
-class HollowListSnapshotOrdinalIterator implements HollowOrdinalIterator {
+class HollowListSnapshotOrdinalIterator extends HollowListOrdinalIterator {
 
     private final HollowListTypeReadState readState;
     private final int ordinal;
@@ -53,9 +50,11 @@ class HollowListSnapshotOrdinalIterator implements HollowOrdinalIterator {
 
     private int index;
 
-    HollowListSnapshotOrdinalIterator(int ordinal, HollowListTypeReadState readState) {
+    HollowListSnapshotOrdinalIterator(
+            int ordinal, HollowListTypeReadState readState, HollowListSampler sampler) {
         this.readState = readState;
         this.ordinal = ordinal;
+        sampler.recordSize();
         snapshot();
     }
 
@@ -100,10 +99,9 @@ class HollowListSnapshotOrdinalIterator implements HollowOrdinalIterator {
                 return elementOrdinal;
             }
 
-            // A delta or re-shard invalidated the snapshot mid-read; re-establish against the current version
-            // and retry this index. The discarded value is never returned.
+            // The snapshot changed mid-read; re-establish it and retry this index.
             snapshot();
-            if(listIndex >= size)   // the record shrank in the newly observed version
+            if(listIndex >= size)
                 return NO_MORE_ORDINALS;
         }
     }

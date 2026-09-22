@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIteratorImpl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,10 @@ public class HollowMapSnapshotEntryOrdinalIteratorTest extends AbstractHollowMap
         int numRecords = 200;
         int[][][] mapContents = generateMapContents(numRecords);
         HollowMapTypeReadState readState = populateTypeStateWith(mapContents);
+        readStateEngine.setSnapshotCollectionIterators(true);
+        HollowMapEntryOrdinalIterator iterator = readState.ordinalIterator(0);
+        assertTrue(iterator instanceof HollowMapSnapshotEntryOrdinalIterator);
+        assertTrue(iterator instanceof HollowMapEntryOrdinalIteratorImpl);
 
         boolean sawEntries = false;
         for (int ordinal = 0; ordinal <= readState.maxOrdinal(); ordinal++) {
@@ -56,6 +61,7 @@ public class HollowMapSnapshotEntryOrdinalIteratorTest extends AbstractHollowMap
         int numRecords = 500;
         int[][][] mapContents = generateMapContents(numRecords);
         final HollowMapTypeReadState readState = populateTypeStateWith(mapContents);
+        readStateEngine.setSnapshotCollectionIterators(true);
         final HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(readState);
 
         final int numReaders = 6;

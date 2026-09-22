@@ -19,8 +19,11 @@ package com.netflix.hollow.api.objects;
 import com.netflix.hollow.api.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowRecordDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import java.util.AbstractList;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * A HollowList provides an implementation of the {@link java.util.List} interface over
@@ -49,6 +52,33 @@ public abstract class HollowList<T> extends AbstractList<T> implements HollowRec
     @Override
     public final T get(int index) {
         return delegate.get(this, ordinal, index);
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        HollowOrdinalIterator ordinalIterator = delegate.iterator(ordinal);
+        return new Iterator<T>() {
+            private int nextOrdinal = HollowOrdinalIterator.NO_MORE_ORDINALS;
+            private boolean nextOrdinalLoaded;
+
+            @Override
+            public boolean hasNext() {
+                if(!nextOrdinalLoaded) {
+                    nextOrdinal = ordinalIterator.next();
+                    nextOrdinalLoaded = true;
+                }
+                return nextOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS;
+            }
+
+            @Override
+            public T next() {
+                if(!hasNext())
+                    throw new NoSuchElementException();
+                int currentOrdinal = nextOrdinal;
+                nextOrdinalLoaded = false;
+                return instantiateElement(currentOrdinal);
+            }
+        };
     }
 
     @Override

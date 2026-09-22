@@ -43,6 +43,7 @@ import com.netflix.hollow.core.read.engine.SnapshotPopulatedOrdinalsReader;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.iterator.EmptyMapOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIteratorImpl;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -368,7 +369,9 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
 
         if(size(ordinal) == 0)
             return EmptyMapOrdinalIterator.INSTANCE;
-        return new HollowMapSnapshotEntryOrdinalIterator(ordinal, this);
+        if(stateEngine == null || !stateEngine.isSnapshotCollectionIteratorsEnabled())
+            return new HollowMapEntryOrdinalIteratorImpl(ordinal, this);
+        return new HollowMapSnapshotEntryOrdinalIterator(ordinal, this, sampler);
     }
 
     @Override

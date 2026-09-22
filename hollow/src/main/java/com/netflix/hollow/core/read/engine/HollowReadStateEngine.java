@@ -59,6 +59,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     private final boolean listenToAllPopulatedOrdinals;
     private final HollowReadConfiguration readConfiguration;
     private boolean skipTypeShardUpdateWithNoAdditions;
+    private boolean snapshotCollectionIterators;
     private ArraySegmentRecycler memoryRecycler;
     private Map<String,String> headerTags;
     private Set<String> typesWithDefinedHashCodes = new HashSet<String>();
@@ -261,6 +262,17 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
 
     public boolean isSkipTypeShardUpdateWithNoAdditions() {
         return skipTypeShardUpdateWithNoAdditions;
+    }
+
+    /**
+     * Experimental: Select snapshot iterators for list, set, and map type read states.
+     */
+    public void setSnapshotCollectionIterators(boolean snapshotCollectionIterators) {
+        this.snapshotCollectionIterators = snapshotCollectionIterators;
+    }
+
+    public boolean isSnapshotCollectionIteratorsEnabled() {
+        return snapshotCollectionIterators;
     }
 
     @Override
