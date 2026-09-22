@@ -1,5 +1,8 @@
 package com.netflix.hollow.core.read.engine.list;
 
+import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
@@ -25,12 +28,11 @@ import org.openjdk.jmh.infra.Blackhole;
 
 /**
  * Compares list iteration cost of the per-element read path (the historical {@code HollowListOrdinalIterator}
- * pattern: {@code size()} + {@code getElementOrdinal(ordinal, i)} per element, i.e. 2N+1 {@code Unsafe.loadFence()}s)
- * against the single-snapshot path ({@code ordinalIterator()} backed by
- * {@code HollowListTypeReadState.readElementOrdinals}, i.e. 2 fences for the whole list).
- *
- * The gap should widen with list size, since the per-element path pays two fences per element while the snapshot
- * path pays two fences total.
+ * pattern: {@code size()} + {@code getElementOrdinal(ordinal, i)} per element, i.e. 2N+1
+ * {@code Unsafe.loadFence()}s when arrays can be recycled)
+ * against the single-snapshot path ({@code ordinalIterator()} backed by a shard cursor). With recycling, the
+ * cursor validates once per element; without recycling, its captured shard is immutable and requires no trailing
+ * validation.
  */
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
@@ -51,6 +53,9 @@ public class HollowListTypeReadStateIterationBenchmark {
     @Param({ "2000" })
     int numLists;
 
+    @Param({ "recycling", "wasteful" })
+    String recycler;
+
     HollowListTypeReadState listTypeState;
     int[] ordinals;
 
@@ -67,7 +72,11 @@ public class HollowListTypeReadStateIterationBenchmark {
             objectMapper.add(new ListHolder(vals));
         }
 
-        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        ArraySegmentRecycler memoryRecycler = recycler.equals("recycling")
+                ? new RecyclingRecycler()
+                : WastefulRecycler.DEFAULT_INSTANCE;
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine(memoryRecycler);
+        readStateEngine.setSnapshotCollectionIterators(true);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
 
         listTypeState = null;
@@ -89,7 +98,7 @@ public class HollowListTypeReadStateIterationBenchmark {
             ordinals[i] = populated.get(i);
     }
 
-    /** New path: one validated snapshot per list (2 fences), served from the materialized iterator. */
+    /** New path: one shard snapshot per list, validated per element only when arrays can be recycled. */
     @Benchmark
     public void iterateSnapshot(Blackhole bh) {
         for (int ordinal : ordinals) {
@@ -102,7 +111,7 @@ public class HollowListTypeReadStateIterationBenchmark {
         }
     }
 
-    /** Old path: size() then getElementOrdinal(ordinal, i) per element (2N+1 fences per list). */
+    /** Old path: size() then getElementOrdinal(ordinal, i) per element. */
     @Benchmark
     public void iteratePerElement(Blackhole bh) {
         for (int ordinal : ordinals) {

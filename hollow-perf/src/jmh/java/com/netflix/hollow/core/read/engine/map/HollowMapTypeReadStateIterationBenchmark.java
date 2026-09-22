@@ -1,6 +1,9 @@
 package com.netflix.hollow.core.read.engine.map;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
+import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
@@ -27,8 +30,9 @@ import org.openjdk.jmh.infra.Blackhole;
 /**
  * Compares map entry iteration cost of the per-bucket read path (the historical
  * {@code HollowMapEntryOrdinalIteratorImpl} pattern: {@code size()} + {@code relativeBucket(ordinal, bucket)}
- * over every hash bucket, i.e. two fences per bucket) against the single-snapshot entry iterator
- * ({@code ordinalIterator()}, one fence per surfaced entry).
+ * over every hash bucket, i.e. two fences per bucket when arrays can be recycled) against the single-snapshot
+ * entry iterator. With recycling, the cursor validates once per surfaced entry; without recycling, its captured
+ * shard is immutable and requires no trailing validation.
  */
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
@@ -49,6 +53,9 @@ public class HollowMapTypeReadStateIterationBenchmark {
     @Param({ "2000" })
     int numMaps;
 
+    @Param({ "recycling", "wasteful" })
+    String recycler;
+
     HollowMapTypeReadState mapTypeState;
     int[] ordinals;
 
@@ -65,7 +72,11 @@ public class HollowMapTypeReadStateIterationBenchmark {
             objectMapper.add(new MapHolder(vals));
         }
 
-        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        ArraySegmentRecycler memoryRecycler = recycler.equals("recycling")
+                ? new RecyclingRecycler()
+                : WastefulRecycler.DEFAULT_INSTANCE;
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine(memoryRecycler);
+        readStateEngine.setSnapshotCollectionIterators(true);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
 
         mapTypeState = null;
@@ -84,7 +95,7 @@ public class HollowMapTypeReadStateIterationBenchmark {
             ordinals[o] = o;
     }
 
-    /** New path: one validated snapshot per map, one fence per surfaced entry. */
+    /** New path: one shard snapshot per map, validated per entry only when arrays can be recycled. */
     @Benchmark
     public void iterateSnapshot(Blackhole bh) {
         for (int ordinal : ordinals) {
@@ -96,7 +107,7 @@ public class HollowMapTypeReadStateIterationBenchmark {
         }
     }
 
-    /** Old path: size() then relativeBucket(ordinal, bucket) over every hash bucket (2 fences per bucket). */
+    /** Old path: size() then relativeBucket(ordinal, bucket) over every hash bucket. */
     @Benchmark
     public void iteratePerBucket(Blackhole bh) {
         for (int ordinal : ordinals) {

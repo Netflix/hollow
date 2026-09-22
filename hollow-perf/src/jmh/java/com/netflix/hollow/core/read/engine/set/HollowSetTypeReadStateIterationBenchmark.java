@@ -3,6 +3,9 @@ package com.netflix.hollow.core.read.engine.set;
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
+import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
@@ -29,7 +32,9 @@ import org.openjdk.jmh.infra.Blackhole;
 /**
  * Compares set iteration cost of the per-bucket read path (the historical {@code HollowSetOrdinalIterator}
  * pattern: {@code size()} + {@code relativeBucketValue(ordinal, bucket)} over every hash bucket, i.e. two fences
- * per bucket) against the single-snapshot iterator ({@code ordinalIterator()}, one fence per surfaced element).
+ * per bucket when arrays can be recycled) against the single-snapshot iterator. With recycling, the cursor
+ * validates once per surfaced element; without recycling, its captured shard is immutable and requires no
+ * trailing validation.
  */
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
@@ -50,6 +55,9 @@ public class HollowSetTypeReadStateIterationBenchmark {
     @Param({ "2000" })
     int numSets;
 
+    @Param({ "recycling", "wasteful" })
+    String recycler;
+
     HollowSetTypeReadState setTypeState;
     int[] ordinals;
 
@@ -66,7 +74,11 @@ public class HollowSetTypeReadStateIterationBenchmark {
             objectMapper.add(new SetHolder(vals));
         }
 
-        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        ArraySegmentRecycler memoryRecycler = recycler.equals("recycling")
+                ? new RecyclingRecycler()
+                : WastefulRecycler.DEFAULT_INSTANCE;
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine(memoryRecycler);
+        readStateEngine.setSnapshotCollectionIterators(true);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
 
         setTypeState = null;
@@ -85,7 +97,7 @@ public class HollowSetTypeReadStateIterationBenchmark {
             ordinals[o] = o;
     }
 
-    /** New path: one validated snapshot per set, one fence per surfaced element. */
+    /** New path: one shard snapshot per set, validated per element only when arrays can be recycled. */
     @Benchmark
     public void iterateSnapshot(Blackhole bh) {
         for (int ordinal : ordinals) {
@@ -98,7 +110,7 @@ public class HollowSetTypeReadStateIterationBenchmark {
         }
     }
 
-    /** Old path: size() then relativeBucketValue(ordinal, bucket) over every hash bucket (2 fences per bucket). */
+    /** Old path: size() then relativeBucketValue(ordinal, bucket) over every hash bucket. */
     @Benchmark
     public void iteratePerBucket(Blackhole bh) {
         for (int ordinal : ordinals) {

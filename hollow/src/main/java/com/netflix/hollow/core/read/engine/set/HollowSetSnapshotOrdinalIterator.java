@@ -16,7 +16,8 @@
  */
 package com.netflix.hollow.core.read.engine.set;
 
-import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.api.sampling.HollowSetSampler;
+import com.netflix.hollow.core.read.iterator.HollowSetOrdinalIterator;
 
 /**
  * An ordinal iterator over a set record backed by a single validated snapshot of its shard and bucket range.
@@ -27,15 +28,16 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
  * at construction and then executes a single fence per {@link #next()} (one per returned element), allocating
  * nothing.
  * <p>
- * Correctness mirrors the list snapshot iterator: {@code startBucket}/{@code endBucket} are validated non-torn
- * before use, so every relative bucket index in {@code [0, numBuckets)} maps to an in-bounds read of the shard's
- * bucket region (garbage-but-safe if the shard's backing arrays were recycled after a concurrent delta, never
- * out-of-bounds). Each {@link #next()} scans forward to the next non-empty bucket reading from the snapshot,
- * then re-validates shard identity via the {@code loadFence} in
- * {@link HollowSetTypeReadState#readWasUnsafe}; if the shard changed, the scan is discarded and re-run against a
- * freshly established snapshot before any value is returned.
+ * Correctness mirrors the list snapshot iterator: {@code startBucket}/{@code endBucket} are validated before
+ * use, so every relative bucket index in {@code [0, numBuckets)} maps to an in-bounds read from the captured
+ * shard. Each {@link #next()} scans to the next non-empty bucket, then re-validates shard identity. If an on-heap
+ * update or reshard replaced it, the scan is discarded and repeated against a fresh snapshot before a value is
+ * returned.
+ * <p>
+ * When retired on-heap arrays are not recycled, the captured shard remains immutable and strongly reachable.
+ * In that case {@code readWasUnsafe} is a no-op, so the iterator retains its initial snapshot without fences.
  */
-public class HollowSetSnapshotOrdinalIterator implements HollowOrdinalIterator {
+final class HollowSetSnapshotOrdinalIterator extends HollowSetOrdinalIterator {
 
     private final HollowSetTypeReadState readState;
     private final int ordinal;
@@ -47,9 +49,11 @@ public class HollowSetSnapshotOrdinalIterator implements HollowOrdinalIterator {
 
     private int currentBucket = -1;
 
-    public HollowSetSnapshotOrdinalIterator(int ordinal, HollowSetTypeReadState readState) {
+    HollowSetSnapshotOrdinalIterator(
+            int ordinal, HollowSetTypeReadState readState, HollowSetSampler sampler) {
         this.readState = readState;
         this.ordinal = ordinal;
+        sampler.recordSize();
         snapshot();
     }
 
@@ -99,7 +103,7 @@ public class HollowSetSnapshotOrdinalIterator implements HollowOrdinalIterator {
                 return end ? NO_MORE_ORDINALS : bucketValue;
             }
 
-            // A delta or re-shard invalidated the snapshot mid-scan; re-establish and rescan from currentBucket.
+            // The snapshot changed mid-scan; re-establish it and rescan from currentBucket.
             snapshot();
         }
     }
@@ -108,6 +112,7 @@ public class HollowSetSnapshotOrdinalIterator implements HollowOrdinalIterator {
      * @return the relative bucket position (within this set's bucket range) that the last ordinal returned by
      * {@link #next()} was retrieved from.
      */
+    @Override
     public int getCurrentBucket() {
         return currentBucket;
     }

@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.HollowSetOrdinalIterator;
 import com.netflix.hollow.core.util.IntList;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +56,10 @@ public class HollowSetSnapshotOrdinalIteratorTest extends AbstractHollowSetTypeD
         int numRecords = 50;
         int[][] setContents = generateSetContents(numRecords);
         HollowSetTypeReadState readState = populateTypeStateWith(setContents);
+        readStateEngine.setSnapshotCollectionIterators(true);
+        HollowOrdinalIterator iterator = readState.ordinalIterator(0);
+        assertTrue(iterator instanceof HollowSetSnapshotOrdinalIterator);
+        assertTrue(iterator instanceof HollowSetOrdinalIterator);
 
         boolean sawSizeOne = false;
         boolean sawLarge = false;
@@ -73,6 +78,7 @@ public class HollowSetSnapshotOrdinalIteratorTest extends AbstractHollowSetTypeD
         int numRecords = 500;
         int[][] setContents = generateSetContents(numRecords);
         final HollowSetTypeReadState readState = populateTypeStateWith(setContents);
+        readStateEngine.setSnapshotCollectionIterators(true);
         final HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(readState);
 
         final int numReaders = 6;

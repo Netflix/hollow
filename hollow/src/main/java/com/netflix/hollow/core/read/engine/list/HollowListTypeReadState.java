@@ -36,6 +36,7 @@ import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.ShardsHolder;
 import com.netflix.hollow.core.read.engine.SnapshotPopulatedOrdinalsReader;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -228,7 +229,9 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     @Override
     public HollowOrdinalIterator ordinalIterator(int ordinal) {
         sampler.recordIterator();
-        return new HollowListSnapshotOrdinalIterator(ordinal, this);
+        if(stateEngine == null || !stateEngine.isSnapshotCollectionIteratorsEnabled())
+            return new HollowListOrdinalIterator(ordinal, this);
+        return new HollowListSnapshotOrdinalIterator(ordinal, this, sampler);
     }
 
     boolean readWasUnsafe(HollowListTypeShardsHolder shardsHolder, int ordinal, HollowListTypeReadStateShard shard) {
