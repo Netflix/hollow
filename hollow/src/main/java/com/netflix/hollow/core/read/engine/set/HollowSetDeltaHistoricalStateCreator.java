@@ -18,7 +18,7 @@ package com.netflix.hollow.core.read.engine.set;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -57,8 +57,15 @@ public class HollowSetDeltaHistoricalStateCreator {
     public void populateHistory() {
         populateStats();
 
-        historicalDataElements.setPointerAndSizeData = new FixedLengthElementArray(historicalDataElements.memoryRecycler, ((long)historicalDataElements.maxOrdinal + 1) * historicalDataElements.bitsPerFixedLengthSetPortion);
-        historicalDataElements.elementData = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.totalNumberOfBuckets * historicalDataElements.bitsPerElement);
+        historicalDataElements.setPointerAndSizeData = FixedLengthDataFactory.get(
+                ((long) historicalDataElements.maxOrdinal + 1)
+                        * historicalDataElements.bitsPerFixedLengthSetPortion,
+                historicalDataElements.memoryMode,
+                historicalDataElements.memoryRecycler);
+        historicalDataElements.elementData = FixedLengthDataFactory.get(
+                historicalDataElements.totalNumberOfBuckets * historicalDataElements.bitsPerElement,
+                historicalDataElements.memoryMode,
+                historicalDataElements.memoryRecycler);
 
         iter.reset();
 

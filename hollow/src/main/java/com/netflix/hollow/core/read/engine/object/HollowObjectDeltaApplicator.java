@@ -20,8 +20,8 @@ import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataEle
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.writeNullFixedLengthField;
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.writeNullVarLengthField;
 
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
@@ -83,7 +83,10 @@ class HollowObjectDeltaApplicator {
                 numMergeFields = i+1;
         }
 
-        target.fixedLengthData = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerRecord * (target.maxOrdinal + 1));
+        target.fixedLengthData = FixedLengthDataFactory.get(
+                (long) target.bitsPerRecord * (target.maxOrdinal + 1),
+                target.memoryMode,
+                target.memoryRecycler);
 
         for(int i=0;i<target.schema.numFields();i++) {
             if(target.schema.getFieldType(i) == FieldType.STRING || target.schema.getFieldType(i) == FieldType.BYTES) {
