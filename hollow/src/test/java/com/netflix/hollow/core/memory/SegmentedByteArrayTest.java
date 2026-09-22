@@ -28,9 +28,7 @@ public class SegmentedByteArrayTest {
                     data.set(start + i, encoded[i]);
 
                 char[] decoded = new char[encoded.length];
-                int count = data.readVIntsInto(start, encoded.length, decoded);
-
-                assertEquals(value, new String(decoded, 0, count));
+                assertEquals(value, data.readVIntString(start, encoded.length, decoded));
             }
         }
     }
