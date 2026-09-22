@@ -16,7 +16,7 @@
  */
 package com.netflix.hollow.core.read.engine.set;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 
 /**
@@ -66,8 +66,14 @@ class HollowSetDeltaApplicator {
         target.emptyBucketValue = delta.emptyBucketValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
-        target.setPointerAndSizeData = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion);
-        target.elementData = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfBuckets * target.bitsPerElement);
+        target.setPointerAndSizeData = FixedLengthDataFactory.get(
+                ((long) target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion,
+                target.memoryMode,
+                target.memoryRecycler);
+        target.elementData = FixedLengthDataFactory.get(
+                target.totalNumberOfBuckets * target.bitsPerElement,
+                target.memoryMode,
+                target.memoryRecycler);
 
         if(target.bitsPerSetPointer == from.bitsPerSetPointer
                 && target.bitsPerSetSizeValue == from.bitsPerSetSizeValue
