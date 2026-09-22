@@ -77,6 +77,54 @@ public class SegmentedByteArray implements VariableLengthData {
         return segments[(int)(index >>> log2OfSegmentSize)][(int)(index & bitmask)];
     }
 
+    /**
+     * Read a series of variable-length integers as characters from an immutable range of this array.
+     * Segment references are loaded once per contiguous range rather than once per byte.
+     *
+     * @param position the position of the first encoded byte
+     * @param length the number of encoded bytes
+     * @param output a zero-filled array with capacity for at least {@code length} characters
+     * @return the number of decoded characters
+     */
+    public int readVIntsInto(long position, int length, char[] output) {
+        byte[][] currentSegments = segments;
+        int segmentSize = 1 << log2OfSegmentSize;
+        int i = 0;
+
+        // Most strings contain only single-byte character encodings. Keep that path branch-light.
+        ascii:
+        while(i < length) {
+            long currentPosition = position + i;
+            int segmentOffset = (int)(currentPosition & bitmask);
+            int end = Math.min(length, i + segmentSize - segmentOffset);
+            byte[] segment = currentSegments[(int)(currentPosition >>> log2OfSegmentSize)];
+
+            while(i < end) {
+                int b = segment[segmentOffset++];
+                if((b & 0x80) != 0)
+                    break ascii;
+                output[i++] = (char)b;
+            }
+        }
+
+        int count = i;
+        while(i < length) {
+            long currentPosition = position + i;
+            int segmentOffset = (int)(currentPosition & bitmask);
+            int end = Math.min(length, i + segmentSize - segmentOffset);
+            byte[] segment = currentSegments[(int)(currentPosition >>> log2OfSegmentSize)];
+
+            while(i < end) {
+                int b = segment[segmentOffset++];
+                output[count] = (char)((output[count] << 7) | (b & 0x7f));
+                count += (~b >> 7) & 0x1;
+                i++;
+            }
+        }
+
+        return count;
+    }
+
     @Override
     public void copy(ByteData src, long srcPos, long destPos, long length) {
         for(long i=0;i<length;i++) {
