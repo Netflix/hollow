@@ -129,7 +129,13 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
         return readString(data, startByte, length, immutable);
     }
 
-    public boolean isStringFieldEqual(long startByte, long endByte, int numBitsForField, int fieldIndex, String testValue) {
+    public boolean isStringFieldEqual(long startByte, long endByte, int numBitsForField, int fieldIndex,
+                                      String testValue) {
+        return isStringFieldEqual(startByte, endByte, numBitsForField, fieldIndex, testValue, false);
+    }
+
+    public boolean isStringFieldEqual(long startByte, long endByte, int numBitsForField, int fieldIndex,
+                                      String testValue, boolean immutable) {
         if((endByte & (1L << numBitsForField - 1)) != 0)
             return testValue == null;
         if(testValue == null)
@@ -138,8 +144,11 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
         startByte &= (1L << numBitsForField - 1) - 1;
 
         int length = (int)(endByte - startByte);
+        ByteData data = dataElements.varLengthData[fieldIndex];
 
-        return testStringEquality(dataElements.varLengthData[fieldIndex], startByte, length, testValue);
+        if(immutable)
+            return ((SegmentedByteArray)data).isVIntStringEqual(startByte, length, testValue);
+        return testStringEquality(data, startByte, length, testValue);
     }
 
     public int findVarLengthFieldHashCode(long startByte, long endByte, int numBitsForField, int fieldIndex) {
