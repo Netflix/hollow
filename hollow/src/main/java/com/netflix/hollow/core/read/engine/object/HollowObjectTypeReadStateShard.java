@@ -107,8 +107,7 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
         int length = (int)(endByte - startByte);
 
         result = new byte[length];
-        for(int i=0;i<length;i++)
-            result[i] = dataElements.varLengthData[fieldIndex].get(startByte + i);
+        dataElements.varLengthData[fieldIndex].copyTo(startByte, result, 0, length);
 
         return result;
     }

@@ -283,33 +283,43 @@ public class SegmentedByteArray implements VariableLengthData {
     }
 
     /**
-     * copies exactly data.length bytes from this SegmentedByteArray into the provided byte array
+     * Copies bytes from this SegmentedByteArray into the provided byte array.
      *
-     * @param srcPos the position to begin copying from the source data
-     * @param data the source data
-     * @param destPos the position to begin writing in this array
+     * @param srcPos the position to begin copying from this array
+     * @param destination the destination array
+     * @param destPos the position to begin writing in the destination array
      * @param length the length of the data to copy
-     * @return the number of bytes copied
      */
-    public int copy(long srcPos, byte[] data, int destPos, int length) {
+    @Override
+    public void copyTo(long srcPos, byte[] destination, int destPos, int length) {
         int segmentSize = 1 << log2OfSegmentSize;
         int remainingBytesInSegment = (int)(segmentSize - (srcPos & bitmask));
-        int dataPosition = destPos;
 
         while(length > 0) {
             byte[] segment = segments[(int)(srcPos >>> log2OfSegmentSize)];
-
             int bytesToCopyFromSegment = Math.min(remainingBytesInSegment, length);
 
-            System.arraycopy(segment, (int)(srcPos & bitmask), data, dataPosition, bytesToCopyFromSegment);
+            System.arraycopy(segment, (int)(srcPos & bitmask), destination, destPos, bytesToCopyFromSegment);
 
-            dataPosition += bytesToCopyFromSegment;
+            destPos += bytesToCopyFromSegment;
             srcPos += bytesToCopyFromSegment;
             remainingBytesInSegment = segmentSize - (int)(srcPos & bitmask);
             length -= bytesToCopyFromSegment;
         }
+    }
 
-        return dataPosition - destPos;
+    /**
+     * Copies bytes from this SegmentedByteArray into the provided byte array.
+     *
+     * @param srcPos the position to begin copying from this array
+     * @param destination the destination array
+     * @param destPos the position to begin writing in the destination array
+     * @param length the length of the data to copy
+     * @return the number of bytes copied
+     */
+    public int copy(long srcPos, byte[] destination, int destPos, int length) {
+        copyTo(srcPos, destination, destPos, length);
+        return length;
     }
     
     /**

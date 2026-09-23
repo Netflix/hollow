@@ -54,6 +54,19 @@ public interface ByteData {
     }
 
     /**
+     * Copy a range of bytes into a destination array.
+     *
+     * @param srcPos the position of the first byte to copy
+     * @param destination the destination array
+     * @param destPos the first position in the destination array
+     * @param length the number of bytes to copy
+     */
+    default void copyTo(long srcPos, byte[] destination, int destPos, int length) {
+        for(int i = 0; i < length; i++)
+            destination[destPos + i] = get(srcPos + i);
+    }
+
+    /**
      * Get the value of the byte at the specified position.
      * @param index the position (in byte units)
      * @return the byte value

@@ -153,6 +153,36 @@ public final class BlobByteBuffer {
     }
 
     /**
+     * Copy bytes starting at the given index into a destination array. This method is thread safe.
+     *
+     * @param startByteIndex byte index at which to start reading
+     * @param destination destination array
+     * @param destPos first position in the destination array
+     * @param length number of bytes to copy
+     */
+    public void copyTo(long startByteIndex, byte[] destination, int destPos, int length) {
+        if(startByteIndex < 0 || length < 0 || startByteIndex > capacity - length)
+            throw new IndexOutOfBoundsException();
+        if(destPos < 0 || destPos > destination.length - length)
+            throw new IndexOutOfBoundsException();
+
+        int remaining = length;
+        while(remaining > 0) {
+            int spineIndex = (int)(startByteIndex >>> shift);
+            int bufferIndex = (int)(startByteIndex & mask);
+            ByteBuffer buffer = spine[spineIndex].duplicate();
+            int bytesToCopy = Math.min(remaining, buffer.capacity() - bufferIndex);
+
+            buffer.position(bufferIndex);
+            buffer.get(destination, destPos, bytesToCopy);
+
+            startByteIndex += bytesToCopy;
+            destPos += bytesToCopy;
+            remaining -= bytesToCopy;
+        }
+    }
+
+    /**
      * Return the long value starting from given byte index. This method is thread safe.
      * @param startByteIndex byte index (from offset 0 in the backing BlobByteBuffer) at which to start reading long value
      * @return long value
