@@ -1,6 +1,8 @@
 package com.netflix.hollow.core.read.engine.object;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
@@ -33,7 +35,10 @@ public class HollowObjectTypeReadStateStringTest {
 
         HollowObjectTypeDataAccess dataAccess =
                 (HollowObjectTypeDataAccess)readStateEngine.getTypeDataAccess("String", 0);
-        for(int i = 0; i < values.length; i++)
+        for(int i = 0; i < values.length; i++) {
             assertEquals(values[i], dataAccess.readString(ordinals[i], 0));
+            assertTrue(dataAccess.isStringFieldEqual(ordinals[i], 0, values[i]));
+            assertFalse(dataAccess.isStringFieldEqual(ordinals[i], 0, values[i] + "x"));
+        }
     }
 }

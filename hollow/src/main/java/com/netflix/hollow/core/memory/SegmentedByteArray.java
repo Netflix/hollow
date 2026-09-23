@@ -146,6 +146,50 @@ public class SegmentedByteArray implements VariableLengthData {
         return new String(output, 0, count);
     }
 
+    /**
+     * Compare a String with UTF-16 code units encoded as variable-length integers in an immutable
+     * range of this array. Segment references are loaded once per contiguous range rather than
+     * once per encoded character.
+     *
+     * @param position the position of the first encoded byte
+     * @param length the number of encoded bytes
+     * @param testValue the String to compare
+     * @return true if the encoded range is equal to the String
+     */
+    public boolean isVIntStringEqual(long position, int length, String testValue) {
+        int testLength = testValue.length();
+        if(length < testLength)
+            return false;
+
+        byte[][] currentSegments = segments;
+        int segmentSize = 1 << log2OfSegmentSize;
+        int i = 0;
+        int count = 0;
+        int value = 0;
+        boolean complete = true;
+
+        while(i < length) {
+            long currentPosition = position + i;
+            int segmentOffset = (int)(currentPosition & bitmask);
+            int end = Math.min(length, i + segmentSize - segmentOffset);
+            byte[] segment = currentSegments[(int)(currentPosition >>> log2OfSegmentSize)];
+
+            while(i < end) {
+                int b = segment[segmentOffset++];
+                value = (value << 7) | (b & 0x7f);
+                i++;
+                complete = b >= 0;
+                if(complete) {
+                    if(count == testLength || testValue.charAt(count++) != (char)value)
+                        return false;
+                    value = 0;
+                }
+            }
+        }
+
+        return complete && count == testLength;
+    }
+
     @Override
     public void copy(ByteData src, long srcPos, long destPos, long length) {
         for(long i=0;i<length;i++) {
