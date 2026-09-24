@@ -459,12 +459,19 @@ public class ByteArrayOrdinalMap {
      *
      * @param usedGlobalOrdinals a bit set representing the ordinals which are currently referenced.
      */
-    public void compact(ThreadSafeBitSet usedGlobalOrdinals, int numShards, boolean focusHoleFillInFewestShards, int mapIdx, int mapIndexBits) {
-        long[] populatedReverseKeys = new long[size];
-
-        int counter = 0;
+    public boolean compact(ThreadSafeBitSet usedGlobalOrdinals, int numShards, boolean focusHoleFillInFewestShards, int mapIdx, int mapIndexBits, boolean opportunisticCompact) {
         AtomicLongArray pao = pointersAndOrdinals;
 
+        // No ordinals freed => no holes to reclaim and the hash mapping is unchanged, so skip the sort+rehash.
+        if (opportunisticCompact && !anyOrdinalFreed(pao, usedGlobalOrdinals, mapIdx, mapIndexBits)) {
+            sortFreeOrdinals(numShards, mapIndexBits, mapIdx, focusHoleFillInFewestShards);
+            pointersByOrdinal = null;
+            unusedPreviousOrdinals = null;
+            return true;
+        }
+
+        long[] populatedReverseKeys = new long[size];
+        int counter = 0;
         for (int i = 0; i < pao.length(); i++) {
             long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
@@ -503,10 +510,7 @@ public class ByteArrayOrdinalMap {
 
         byteData.setPosition(currentCopyPointer);
 
-        if(focusHoleFillInFewestShards && numShards > 1)
-            freeOrdinalTracker.sort(numShards, mapIndexBits, mapIdx);
-        else
-            freeOrdinalTracker.sort();
+        sortFreeOrdinals(numShards, mapIndexBits, mapIdx, focusHoleFillInFewestShards);
 
         // Reset the array then fill with compacted values
         // Volatile store not required, could use plain store
@@ -519,6 +523,26 @@ public class ByteArrayOrdinalMap {
 
         pointersByOrdinal = null;
         unusedPreviousOrdinals = null;
+        return false;
+    }
+
+    private boolean anyOrdinalFreed(AtomicLongArray pao, ThreadSafeBitSet usedGlobalOrdinals, int mapIdx, int mapIndexBits) {
+        for (int i = 0; i < pao.length(); i++) {
+            long key = pao.get(i);
+            if (key != EMPTY_BUCKET_VALUE) {
+                int ordinal = (int) (key >>> BITS_PER_POINTER);
+                if (!usedGlobalOrdinals.get((ordinal << mapIndexBits) | mapIdx))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private void sortFreeOrdinals(int numShards, int mapIndexBits, int mapIdx, boolean focusHoleFillInFewestShards) {
+        if (focusHoleFillInFewestShards && numShards > 1)
+            freeOrdinalTracker.sort(numShards, mapIndexBits, mapIdx);
+        else
+            freeOrdinalTracker.sort();
     }
 
     public long getPointerForData(int ordinal) {
