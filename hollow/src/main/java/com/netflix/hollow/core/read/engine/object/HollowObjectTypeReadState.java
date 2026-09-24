@@ -559,6 +559,18 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         }
     }
 
+    @Override
+    protected void applyShardToChecksum(HollowChecksum checksum, HollowSchema withSchema, int shardNumber) {
+        final HollowObjectTypeShardsHolder shardsHolder = this.shardsVolatile;
+        final HollowObjectTypeReadStateShard[] shards = shardsHolder.shards;
+        int shardNumberMask = shardsHolder.shardNumberMask;
+        if(!(withSchema instanceof HollowObjectSchema))
+            throw new IllegalArgumentException("HollowObjectTypeReadState can only calculate checksum with a HollowObjectSchema: " + getSchema().getName());
+
+        BitSet populatedOrdinals = getPopulatedOrdinals();
+        shards[shardNumber].applyShardToChecksum(checksum, withSchema, populatedOrdinals, shardNumber, shardNumberMask);
+    }
+
 	@Override
 	public long getApproximateHeapFootprintInBytes() {
         final HollowObjectTypeReadStateShard[] shards = this.shardsVolatile.shards;

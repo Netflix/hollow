@@ -398,6 +398,17 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
             shards[i].applyShardToChecksum(checksum, populatedOrdinals, i, shards.length);
     }
 
+    @Override
+    protected void applyShardToChecksum(HollowChecksum checksum, HollowSchema withSchema, int shardNumber) {
+        final HollowSetTypeShardsHolder shardsHolder = this.shardsVolatile;
+        final HollowSetTypeReadStateShard[] shards = shardsHolder.shards;
+        if(!getSchema().equals(withSchema))
+            throw new IllegalArgumentException("HollowSetTypeReadState cannot calculate checksum with unequal schemas: " + getSchema().getName());
+
+        BitSet populatedOrdinals = getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
+        shards[shardNumber].applyShardToChecksum(checksum, populatedOrdinals, shardNumber, shards.length);
+    }
+
 	@Override
 	public long getApproximateHeapFootprintInBytes() {
         final HollowSetTypeReadStateShard[] shards = this.shardsVolatile.shards;

@@ -456,6 +456,16 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
 
     @Override
+    protected void applyShardToChecksum(HollowChecksum checksum, HollowSchema withSchema, int shardNumber) {
+        HollowMapTypeReadStateShard[] shards = this.shardsVolatile.shards;
+        if(!getSchema().equals(withSchema))
+            throw new IllegalArgumentException("HollowMapTypeReadState cannot calculate checksum with unequal schemas: " + getSchema().getName());
+
+        BitSet populatedOrdinals = getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
+        shards[shardNumber].applyShardToChecksum(checksum, populatedOrdinals, shardNumber, shards.length);
+    }
+
+    @Override
     public long getApproximateHeapFootprintInBytes() {
         HollowMapTypeReadStateShard[] shards = this.shardsVolatile.shards;
         long totalApproximateHeapFootprintInBytes = 0;
