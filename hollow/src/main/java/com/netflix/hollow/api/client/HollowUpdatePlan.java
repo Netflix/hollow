@@ -94,6 +94,40 @@ public class HollowUpdatePlan implements Iterable<HollowConsumer.Blob> {
         transitions.addAll(plan.transitions);
     }
 
+    /**
+     * Creates a new plan with an additional transition appended.
+     *
+     * @param transition the transition blob to append
+     * @return a new HollowUpdatePlan with the additional transition
+     */
+    public HollowUpdatePlan withAdditionalTransition(HollowConsumer.Blob transition) {
+        List<HollowConsumer.Blob> newTransitions = new ArrayList<>(this.transitions);
+        newTransitions.add(transition);
+        return new HollowUpdatePlan(newTransitions);
+    }
+
+    /**
+     * Checks if this plan contains a repair transition.
+     *
+     * @return true if a REPAIR transition exists in this plan
+     */
+    public boolean hasRepairTransition() {
+        return transitions.stream()
+            .anyMatch(blob -> blob.getBlobType() == HollowConsumer.Blob.BlobType.REPAIR);
+    }
+
+    /**
+     * Gets the first repair transition in this plan, if any.
+     *
+     * @return the repair transition blob, or null if none exists
+     */
+    public HollowConsumer.Blob getRepairTransition() {
+        return transitions.stream()
+            .filter(blob -> blob.getBlobType() == HollowConsumer.Blob.BlobType.REPAIR)
+            .findFirst()
+            .orElse(null);
+    }
+
     @Override
     public Iterator<HollowConsumer.Blob> iterator() {
         return transitions.iterator();
