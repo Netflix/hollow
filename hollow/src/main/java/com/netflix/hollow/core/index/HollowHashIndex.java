@@ -29,7 +29,12 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.Arrays;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,14 +48,20 @@ import java.util.logging.Logger;
  */
 public class HollowHashIndex implements HollowTypeStateListener {
     private static final Logger LOG = Logger.getLogger(HollowHashIndex.class.getName());
+    private static final String DELTA_UPDATE_PROPERTY = "com.netflix.hollow.core.index.HollowHashIndex.allowDeltaUpdate";
 
     private volatile HollowHashIndexState hashStateVolatile;
+    private volatile DeltaSnapshot deltaSnapshotVolatile;
 
     private final HollowDataAccess hollowDataAccess;
     private final HollowObjectTypeDataAccess typeState;
     private final String type;
     private final String selectField;
     private final String[] matchFields;
+    private final boolean supportsNoOpDeltaUpdateSkip;
+
+    private boolean deltaHadTypeChanges;
+    private DeltaUpdater deltaUpdater;
 
     /**
      * This constructor is for binary-compatibility for code compiled against
@@ -85,6 +96,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
         this.typeState = (HollowObjectTypeDataAccess) hollowDataAccess.getTypeDataAccess(type);
         this.selectField = selectField;
         this.matchFields = matchFields;
+        this.supportsNoOpDeltaUpdateSkip = canSkipNoOpDeltaUpdate();
 
         if (typeState == null) {
             LOG.log(Level.WARNING, "Index initialization for " + this + " failed because type "
@@ -92,6 +104,10 @@ public class HollowHashIndex implements HollowTypeStateListener {
             return;
         }
         reindexHashIndex();
+    }
+
+    private static boolean allowDeltaUpdate() {
+        return Boolean.getBoolean(DELTA_UPDATE_PROPERTY);
     }
 
     /**
@@ -117,6 +133,39 @@ public class HollowHashIndex implements HollowTypeStateListener {
         this.hashStateVolatile = new HollowHashIndexState(builder);
     }
 
+    private boolean canSkipNoOpDeltaUpdate() {
+        if (typeState == null || !"".equals(selectField)) {
+            return false;
+        }
+
+        for (String matchField : matchFields) {
+            if (!isRootLocalField(matchField)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean isRootLocalField(String fieldPath) {
+        try {
+            FieldPaths.FieldPath<FieldPaths.FieldSegment> path =
+                    FieldPaths.createFieldPathForHashIndex(hollowDataAccess, type, fieldPath);
+            if (path.getSegments().size() != 1) {
+                return false;
+            }
+
+            FieldPaths.FieldSegment segment = path.getSegments().get(0);
+            if (!(segment instanceof FieldPaths.ObjectFieldSegment)) {
+                return false;
+            }
+
+            return ((FieldPaths.ObjectFieldSegment) segment).getType() != FieldType.REFERENCE;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
 
     /**
      * Query the index.
@@ -126,6 +175,11 @@ public class HollowHashIndex implements HollowTypeStateListener {
      * found.
      */
     public HollowHashIndexResult findMatches(Object... query) {
+        DeltaSnapshot deltaSnapshot = deltaSnapshotVolatile;
+        if (deltaSnapshot != null) {
+            return deltaSnapshot.findMatches(query);
+        }
+
         if (hashStateVolatile == null) {
             throw new IllegalStateException(this + " wasn't initialized");
         }
@@ -238,6 +292,11 @@ public class HollowHashIndex implements HollowTypeStateListener {
         if (!(typeState instanceof HollowObjectTypeReadState))
             throw new IllegalStateException("Cannot listen for delta updates when objectTypeDataAccess is a " + typeState.getClass().getSimpleName() + ". Is this index participating in object longevity?");
 
+        if (allowDeltaUpdate() && deltaUpdater == null) {
+            deltaUpdater = new DeltaUpdater(hollowDataAccess, type, selectField, matchFields);
+            deltaSnapshotVolatile = deltaUpdater.rebuildSnapshot();
+        }
+
         ((HollowObjectTypeReadState) typeState).addListener(this);
     }
 
@@ -255,19 +314,42 @@ public class HollowHashIndex implements HollowTypeStateListener {
     }
 
     @Override
-    public void beginUpdate() { }
+    public void beginUpdate() {
+        deltaHadTypeChanges = false;
+    }
 
     @Override
-    public void addedOrdinal(int ordinal) { }
+    public void addedOrdinal(int ordinal) {
+        deltaHadTypeChanges = true;
+    }
 
     @Override
-    public void removedOrdinal(int ordinal) { }
+    public void removedOrdinal(int ordinal) {
+        deltaHadTypeChanges = true;
+    }
 
     @Override
     public void endUpdate() {
         if (hashStateVolatile == null) {
             return;
         }
+
+        if ((deltaSnapshotVolatile != null || supportsNoOpDeltaUpdateSkip) && !deltaHadTypeChanges) {
+            return;
+        }
+
+        if (deltaSnapshotVolatile != null) {
+            try {
+                HollowObjectTypeReadState objectTypeState = (HollowObjectTypeReadState) typeState;
+                deltaSnapshotVolatile = deltaUpdater.applyDelta(objectTypeState.getPreviousOrdinals(), objectTypeState.getPopulatedOrdinals());
+                return;
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Delta update of index failed. Falling back to a full rebuild.", e);
+                deltaSnapshotVolatile = null;
+                deltaUpdater = null;
+            }
+        }
+
         reindexHashIndex();
     }
 
@@ -297,6 +379,11 @@ public class HollowHashIndex implements HollowTypeStateListener {
     }
 
     public long approxHeapFootprintInBytes() {
+        DeltaSnapshot deltaSnapshot = deltaSnapshotVolatile;
+        if (deltaSnapshot != null) {
+            return deltaSnapshot.approxHeapFootprintInBytes;
+        }
+
         HollowHashIndexState hashState = hashStateVolatile;
         if (hashState == null) {
             return 0;
@@ -381,5 +468,193 @@ public class HollowHashIndex implements HollowTypeStateListener {
     @Override
     public String toString() {
         return "HollowHashIndex [type=" + type + ", selectField=" + selectField + ", matchFields=" + Arrays.toString(matchFields) + "]";
+    }
+
+    private static final class DeltaUpdater {
+        private final HollowPreindexer preindexer;
+        private final HollowHashIndexField[] matchFieldSpecs;
+        private final HollowHashIndexField selectFieldSpec;
+        private final Map<MatchKey, MutableMatchEntry> entries;
+
+        private DeltaUpdater(HollowDataAccess hollowDataAccess, String type, String selectField, String[] matchFields) {
+            this.preindexer = new HollowPreindexer(hollowDataAccess, type, selectField, matchFields);
+            this.preindexer.buildFieldSpecifications();
+            this.matchFieldSpecs = preindexer.getMatchFieldSpecs();
+            this.selectFieldSpec = preindexer.getSelectFieldSpec();
+            this.entries = new HashMap<>();
+        }
+
+        private DeltaSnapshot rebuildSnapshot() {
+            entries.clear();
+            BitSet ordinals = preindexer.getHollowTypeDataAccess().getTypeState().getPopulatedOrdinals();
+            int ordinal = ordinals.nextSetBit(0);
+            while (ordinal != HollowConstants.ORDINAL_NONE) {
+                applyRootOrdinal(ordinal, true);
+                ordinal = ordinals.nextSetBit(ordinal + 1);
+            }
+            return snapshot();
+        }
+
+        private DeltaSnapshot applyDelta(BitSet previousOrdinals, BitSet ordinals) {
+            int prevOrdinal = previousOrdinals.nextSetBit(0);
+            while (prevOrdinal != HollowConstants.ORDINAL_NONE) {
+                if (!ordinals.get(prevOrdinal)) {
+                    applyRootOrdinal(prevOrdinal, false);
+                }
+                prevOrdinal = previousOrdinals.nextSetBit(prevOrdinal + 1);
+            }
+
+            int ordinal = ordinals.nextSetBit(0);
+            while (ordinal != HollowConstants.ORDINAL_NONE) {
+                if (!previousOrdinals.get(ordinal)) {
+                    applyRootOrdinal(ordinal, true);
+                }
+                ordinal = ordinals.nextSetBit(ordinal + 1);
+            }
+
+            return snapshot();
+        }
+
+        private void applyRootOrdinal(int rootOrdinal, boolean add) {
+            preindexer.getTraverser().traverse(rootOrdinal);
+
+            for (int matchIdx = 0; matchIdx < preindexer.getTraverser().getNumMatches(); matchIdx++) {
+                MatchKey key = MatchKey.fromTraverser(matchFieldSpecs, preindexer.getTraverser(), matchIdx);
+                int selectOrdinal = preindexer.getTraverser().getMatchOrdinal(matchIdx, selectFieldSpec.getBaseIteratorFieldIdx());
+
+                if (add) {
+                    entries.computeIfAbsent(key, ignored -> new MutableMatchEntry()).increment(selectOrdinal);
+                } else {
+                    MutableMatchEntry entry = entries.get(key);
+                    if (entry == null) {
+                        throw new IllegalStateException("Attempted to remove a match key that was not indexed");
+                    }
+                    if (entry.decrement(selectOrdinal)) {
+                        entries.remove(key);
+                    }
+                }
+            }
+        }
+
+        private DeltaSnapshot snapshot() {
+            Map<MatchKey, int[]> snapshotMatches = new HashMap<>(entries.size());
+            long approxBytes = 0;
+
+            for (Map.Entry<MatchKey, MutableMatchEntry> entry : entries.entrySet()) {
+                int[] ordinals = entry.getValue().toOrdinals();
+                snapshotMatches.put(entry.getKey(), ordinals);
+                approxBytes += 16L + ((long) ordinals.length * Integer.BYTES);
+            }
+
+            return new DeltaSnapshot(snapshotMatches, approxBytes);
+        }
+    }
+
+    private static final class DeltaSnapshot {
+        private final Map<MatchKey, int[]> matches;
+        private final long approxHeapFootprintInBytes;
+
+        private DeltaSnapshot(Map<MatchKey, int[]> matches, long approxHeapFootprintInBytes) {
+            this.matches = matches;
+            this.approxHeapFootprintInBytes = approxHeapFootprintInBytes;
+        }
+
+        private HollowHashIndexResult findMatches(Object[] query) {
+            for (Object value : query) {
+                if (value == null) {
+                    throw new IllegalArgumentException("querying by null unsupported");
+                }
+            }
+
+            int[] ordinals = matches.get(new MatchKey(Arrays.copyOf(query, query.length)));
+            return ordinals == null ? null : new HollowHashIndexResult(ordinals);
+        }
+    }
+
+    private static final class MutableMatchEntry {
+        private final Map<Integer, Integer> selectOrdinalRefCounts = new LinkedHashMap<>();
+
+        private void increment(int selectOrdinal) {
+            selectOrdinalRefCounts.merge(selectOrdinal, 1, Integer::sum);
+        }
+
+        private boolean decrement(int selectOrdinal) {
+            Integer currentCount = selectOrdinalRefCounts.get(selectOrdinal);
+            if (currentCount == null) {
+                throw new IllegalStateException("Attempted to remove a select ordinal that was not indexed: " + selectOrdinal);
+            }
+
+            if (currentCount == 1) {
+                selectOrdinalRefCounts.remove(selectOrdinal);
+            } else {
+                selectOrdinalRefCounts.put(selectOrdinal, currentCount - 1);
+            }
+
+            return selectOrdinalRefCounts.isEmpty();
+        }
+
+        private int[] toOrdinals() {
+            int[] ordinals = new int[selectOrdinalRefCounts.size()];
+            int index = 0;
+            for (Integer ordinal : selectOrdinalRefCounts.keySet()) {
+                ordinals[index++] = ordinal;
+            }
+            return ordinals;
+        }
+    }
+
+    private static final class MatchKey {
+        private final Object[] values;
+        private final int hashCode;
+
+        private MatchKey(Object[] values) {
+            this.values = values;
+            this.hashCode = Arrays.deepHashCode(values);
+        }
+
+        private static MatchKey fromTraverser(HollowHashIndexField[] fields, com.netflix.hollow.core.index.traversal.HollowIndexerValueTraverser traverser, int matchIdx) {
+            Object[] values = new Object[fields.length];
+            for (int fieldIdx = 0; fieldIdx < fields.length; fieldIdx++) {
+                HollowHashIndexField field = fields[fieldIdx];
+                values[fieldIdx] = extractMatchValue(field, traverser.getMatchOrdinal(matchIdx, field.getBaseIteratorFieldIdx()));
+            }
+            return new MatchKey(values);
+        }
+
+        private static Object extractMatchValue(HollowHashIndexField field, int ordinal) {
+            FieldPathSegment[] fieldPath = field.getSchemaFieldPositionPath();
+
+            if (fieldPath.length == 0) {
+                return ordinal;
+            }
+
+            for (int pathIdx = 0; pathIdx < fieldPath.length - 1 && ordinal != HollowConstants.ORDINAL_NONE; pathIdx++) {
+                ordinal = fieldPath[pathIdx].getOrdinalForField(ordinal);
+            }
+
+            if (ordinal == HollowConstants.ORDINAL_NONE) {
+                return null;
+            }
+
+            FieldPathSegment lastPathElement = field.getLastFieldPositionPathElement();
+            return HollowReadFieldUtils.fieldValueObject(lastPathElement.getObjectTypeDataAccess(), ordinal, lastPathElement.getSegmentFieldPosition());
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (this == other) {
+                return true;
+            }
+            if (!(other instanceof MatchKey)) {
+                return false;
+            }
+            MatchKey matchKey = (MatchKey) other;
+            return Arrays.deepEquals(values, matchKey.values);
+        }
+
+        @Override
+        public int hashCode() {
+            return hashCode;
+        }
     }
 }
