@@ -58,6 +58,13 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
         this.stateListeners = EMPTY_LISTENERS;
     }
 
+    protected final void verifyRecyclerForImmutableShards(ArraySegmentRecycler recycler) {
+        // Public blob entry points may receive a recycler other than the engine's.
+        if (shardsAreImmutable && recycler.recyclesArrays()) {
+            throw new IllegalStateException("Immutable shards require a non-recycling recycler for " + schema.getName());
+        }
+    }
+
     /**
      * Add a {@link HollowTypeStateListener} to this type.
      * @param listener the listener to add
