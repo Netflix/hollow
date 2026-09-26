@@ -369,7 +369,9 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
 
         if(size(ordinal) == 0)
             return EmptyMapOrdinalIterator.INSTANCE;
-        return new HollowMapEntryOrdinalIteratorImpl(ordinal, this);
+        if(stateEngine == null || !stateEngine.isSnapshotCollectionIteratorsEnabled())
+            return new HollowMapEntryOrdinalIteratorImpl(ordinal, this);
+        return new HollowMapSnapshotEntryOrdinalIterator(ordinal, this, sampler);
     }
 
     @Override
@@ -392,7 +394,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         return bucketValue;
     }
 
-    private boolean readWasUnsafe(HollowMapTypeShardsHolder shardsHolder, int ordinal, HollowMapTypeReadStateShard shard) {
+    boolean readWasUnsafe(HollowMapTypeShardsHolder shardsHolder, int ordinal, HollowMapTypeReadStateShard shard) {
         if(shardsAreImmutable)
             return false;
 

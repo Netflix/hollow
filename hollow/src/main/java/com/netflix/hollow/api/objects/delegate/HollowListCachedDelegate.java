@@ -20,6 +20,7 @@ import com.netflix.hollow.api.custom.HollowListTypeAPI;
 import com.netflix.hollow.api.custom.HollowTypeAPI;
 import com.netflix.hollow.api.objects.HollowList;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 
 /**
@@ -83,6 +84,20 @@ public class HollowListCachedDelegate<T> implements HollowListDelegate<T>, Hollo
                 return i;
         }
         return -1;
+    }
+
+    @Override
+    public HollowOrdinalIterator iterator(int ordinal) {
+        return new HollowOrdinalIterator() {
+            private int index;
+
+            @Override
+            public int next() {
+                if(index == ordinals.length)
+                    return NO_MORE_ORDINALS;
+                return ordinals[index++];
+            }
+        };
     }
 
     @Override
