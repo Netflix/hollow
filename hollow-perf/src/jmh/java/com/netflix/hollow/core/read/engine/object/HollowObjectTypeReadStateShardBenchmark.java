@@ -1,5 +1,6 @@
 package com.netflix.hollow.core.read.engine.object;
 
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
@@ -41,6 +42,7 @@ public class HollowObjectTypeReadStateShardBenchmark {
     int countStringsDb;
 
     ArrayList<Integer> readOrder;
+    ArrayList<String> strings;
 
     @Param({ "5", "25", "50", "150", "1000" })
     int maxStringLength;
@@ -55,6 +57,7 @@ public class HollowObjectTypeReadStateShardBenchmark {
         objectMapper.initializeTypeState(String.class);
 
         Random r = new Random();
+        strings = new ArrayList<>(countStringsDb);
         for (int i = 0; i < countStringsDb; i++) {
             StringBuilder sb = new StringBuilder();
             sb.append("string_");
@@ -68,7 +71,9 @@ public class HollowObjectTypeReadStateShardBenchmark {
                     sb.append((char) (r.nextInt(26) + 'a'));
                 }
             }
-            objectMapper.add(sb.toString());
+            String value = sb.toString();
+            objectMapper.add(value);
+            strings.add(value);
         }
 
         readOrder = new ArrayList<>(countStrings);
@@ -76,7 +81,7 @@ public class HollowObjectTypeReadStateShardBenchmark {
             readOrder.add(r.nextInt(countStringsDb));
         }
 
-        readStateEngine = new HollowReadStateEngine();
+        readStateEngine = new HollowReadStateEngine(WastefulRecycler.DEFAULT_INSTANCE);
 
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
         dataAccess = (HollowObjectTypeDataAccess) readStateEngine.getTypeDataAccess("String", 0);
@@ -88,6 +93,13 @@ public class HollowObjectTypeReadStateShardBenchmark {
             String result = dataAccess.readString(j, 0);
             //System.out.println(result);
             bh.consume(result);
+        }
+    }
+
+    @Benchmark
+    public void testStringEquality(Blackhole bh) {
+        for (int j : readOrder) {
+            bh.consume(dataAccess.isStringFieldEqual(j, 0, strings.get(j)));
         }
     }
 }
