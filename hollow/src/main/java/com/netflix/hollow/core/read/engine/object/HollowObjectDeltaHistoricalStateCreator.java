@@ -20,8 +20,8 @@ import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.copyRecord;
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthSize;
 
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -57,7 +57,10 @@ public class HollowObjectDeltaHistoricalStateCreator {
     public void populateHistory() {
         populateStats();
 
-        historicalDataElements.fixedLengthData = new FixedLengthElementArray(historicalDataElements.memoryRecycler, (long)historicalDataElements.bitsPerRecord * (historicalDataElements.maxOrdinal + 1));
+        historicalDataElements.fixedLengthData = FixedLengthDataFactory.get(
+                (long) historicalDataElements.bitsPerRecord * (historicalDataElements.maxOrdinal + 1),
+                historicalDataElements.memoryMode,
+                historicalDataElements.memoryRecycler);
 
         for(int i=0;i<historicalDataElements.schema.numFields();i++) {
             if(isVarLengthField(typeState.getSchema().getFieldType(i))) {
