@@ -103,6 +103,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     @Override
     public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, int numShards) throws IOException {
+        verifyRecyclerForImmutableShards(memoryRecycler);
         if(numShards > 1)
             maxOrdinal = VarInt.readVInt(in);
 
@@ -123,6 +124,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema deltaSchema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
+        verifyRecyclerForImmutableShards(memoryRecycler);
         if(shardsVolatile.shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
@@ -449,6 +451,9 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     }
 
     private boolean readWasUnsafe(HollowObjectTypeShardsHolder shardsHolder, int ordinal, HollowObjectTypeReadStateShard shard) {
+        if(shardsAreImmutable)
+            return false;
+
         // Use a load (acquire) fence to constrain the compiler reordering prior plain loads so
         // that they cannot "float down" below the volatile load of shardsVolatile.
         // This ensures data is checked against current shard holder *after* optimistic calculations

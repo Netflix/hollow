@@ -91,6 +91,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
 
     @Override
     public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, int numShards) throws IOException {
+        verifyRecyclerForImmutableShards(memoryRecycler);
         if(numShards > 1)
             maxOrdinal = VarInt.readVInt(in);
 
@@ -111,6 +112,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
 
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
+        verifyRecyclerForImmutableShards(memoryRecycler);
         if(shardsVolatile.shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
@@ -231,6 +233,9 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     }
 
     private boolean readWasUnsafe(HollowListTypeShardsHolder shardsHolder, int ordinal, HollowListTypeReadStateShard shard) {
+        if(shardsAreImmutable)
+            return false;
+
         HollowUnsafeHandle.getUnsafe().loadFence();
         HollowListTypeShardsHolder currShardsHolder = shardsVolatile;
         return shardsHolder != currShardsHolder
