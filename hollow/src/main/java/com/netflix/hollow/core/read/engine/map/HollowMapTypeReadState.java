@@ -103,6 +103,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
 
     @Override
     public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, int numShards) throws IOException {
+        verifyRecyclerForImmutableShards(memoryRecycler);
         if(numShards > 1)
             maxOrdinal = VarInt.readVInt(in);
 
@@ -123,6 +124,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
 
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
+        verifyRecyclerForImmutableShards(memoryRecycler);
         if(shardsVolatile.shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
