@@ -252,13 +252,22 @@ public class SegmentedByteArray implements VariableLengthData {
         }
     }
 
+    /**
+     * Copies {@code length} bytes from {@code src} into {@code dest} and publishes them with release
+     * semantics: the trailing store fence orders every copied byte before any subsequent store, so a
+     * reader that later observes this data through its volatile publication (paired with a loadFence)
+     * is guaranteed to see the copied bytes. A single fence after the bulk copy is sufficient for this,
+     * and lets the JIT use the arraycopy intrinsic rather than an ordered per-byte write.
+     *
+     * @param src the source array
+     * @param srcPos the position to begin copying from the source array
+     * @param dest the destination array
+     * @param destPos the position to begin writing in the destination array
+     * @param length the number of bytes to copy
+     */
     private void orderedCopy(byte[] src, int srcPos, byte[] dest, int destPos, int length) {
-        int endSrcPos = srcPos + length;
-        destPos += Unsafe.ARRAY_BYTE_BASE_OFFSET;
-
-        while(srcPos < endSrcPos) {
-            unsafe.putByteVolatile(dest, destPos++, src[srcPos++]);
-        }
+        System.arraycopy(src, srcPos, dest, destPos, length);
+        unsafe.storeFence();
     }
 
     /**
