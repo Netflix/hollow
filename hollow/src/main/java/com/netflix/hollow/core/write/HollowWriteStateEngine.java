@@ -382,6 +382,11 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         headerTags.put(name, value);
     }
 
+    // Type states prepare concurrently, so the entire read, append, and write must be atomic.
+    void appendHeaderTag(String name, String value) {
+        headerTags.merge(name, value, (existing, appended) -> existing + " " + appended);
+    }
+
     public void addHeaderTags(Map<String,String> headerTags) {
         this.headerTags.putAll(headerTags);
     }
