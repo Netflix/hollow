@@ -19,6 +19,7 @@ package com.netflix.hollow.core.write;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.IGNORED_HASHES;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.UNMIXED_HASHES;
 
+import com.netflix.hollow.api.error.IncompatibleSchemaException;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMapStats;
@@ -74,6 +75,7 @@ public abstract class HollowTypeWriteState {
     protected HollowWriteStateEngine stateEngine;
 
     private boolean wroteData = false;
+    private volatile String incompatibleRecordMessage;
 
     private final boolean isNumShardsPinned;  // if numShards is pinned in data model
     protected int[] maxShardOrdinal;
@@ -237,6 +239,7 @@ public abstract class HollowTypeWriteState {
      */
     public void resetToLastPrepareForNextCycle() {
         numShards = resetToLastNumShards;
+        incompatibleRecordMessage = null;
         if(restoredReadState == null) {
             currentCyclePopulated.clearAll();
             for (int i = 0; i < ordinalMapNum; i++) {
@@ -404,11 +407,16 @@ public abstract class HollowTypeWriteState {
 
         restoredSchema = null;
         restoredReadState = null;
+        incompatibleRecordMessage = null;
 
         resetToLastNumShards = numShards; // -1 if first cycle else previous numShards. See {@code testNumShardsMaintainedWhenNoResharding}
     }
 
     public void prepareForWrite(boolean canReshard) {
+        if(incompatibleRecordMessage != null)
+            throw new IncompatibleSchemaException(schema.getName(),
+                    "Rejected an incompatible record earlier in this cycle: " + incompatibleRecordMessage);
+
         /// write all of the unused objects to the current ordinalMap, without updating the current cycle bitset,
         /// this way we can do a reverse delta.
         if(isRestored() && !wroteData) {
@@ -567,6 +575,25 @@ public abstract class HollowTypeWriteState {
         int mapIndex = ordinal & ordinalMapIndexMask;
         int localOrdinal = ordinal >>> ordinalMapIndexBits;
         return ordinalMaps[mapIndex].getPointerForData(localOrdinal);
+    }
+
+    protected long getPointerForLength(int ordinal) {
+        int mapIndex = ordinal & ordinalMapIndexMask;
+        int localOrdinal = ordinal >>> ordinalMapIndexBits;
+        return ordinalMaps[mapIndex].getPointerForLength(localOrdinal);
+    }
+
+    /**
+     * Returns an exception for a record that cannot be written to this type, and fails this cycle's
+     * {@link #prepareForWrite(boolean)} even if the caller swallows that exception.
+     *
+     * @param reason why the record cannot be written
+     * @return the exception to throw
+     */
+    public IncompatibleSchemaException rejectIncompatibleRecord(String reason) {
+        String message = "Cannot write type " + schema.getName() + ": " + reason;
+        incompatibleRecordMessage = message;
+        return new IncompatibleSchemaException(schema.getName(), message);
     }
 
     /**

@@ -54,6 +54,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     private final Class<?> clazz;
     private final HollowObjectSchema schema;
     private final HollowObjectTypeWriteState writeState;
+    private final String layoutDifference;
 
     private final boolean hasAssignedOrdinalField;
     private final long assignedOrdinalFieldOffset;
@@ -140,6 +141,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             int numShardsByAnnotation = getNumShardsByAnnotation(clazz);
             this.writeState = new HollowObjectTypeWriteState(schema, numShardsByAnnotation, parentMapper.getStateEngine().isPartitionedOrdinalMap(), parentMapper.getStateEngine().getIgnoreOrdinalLimitsSupplier());
         }
+        this.layoutDifference = layoutDifference(existingWriteState, schema);
 
         this.assignedOrdinalFieldOffset = assignedOrdinalFieldOffset;
         this.hasAssignedOrdinalField = hasAssignedOrdinalField;
@@ -173,6 +175,9 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
     @Override
     public int write(Object obj) {
+        if (layoutDifference != null)
+            throw incompatibleTypeState(layoutDifference);
+
         if (hasAssignedOrdinalField) {
             long assignedOrdinal = unsafe.getLong(obj, assignedOrdinalFieldOffset);
             if((assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())

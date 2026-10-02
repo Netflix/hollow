@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.api.error.IncompatibleSchemaException;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataArray;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -24,6 +25,7 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSchemaUtil;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -36,6 +38,8 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     /// statistics required for writing fixed length set data
     private FieldStatistics fieldStats;
+
+    private volatile HollowObjectSchema verifiedRecordSchema;
 
     /// data required for writing snapshot or delta
     private FixedLengthElementArray[] fixedLengthLongArray;
@@ -63,6 +67,31 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
     @Override
     public HollowObjectSchema getSchema() {
         return (HollowObjectSchema)schema;
+    }
+
+    @Override
+    public int add(HollowWriteRecord rec) {
+        verifyRecordSchema(rec);
+        return super.add(rec);
+    }
+
+    @Override
+    public void mapOrdinal(HollowWriteRecord rec, int newOrdinal, boolean markPreviousCycle, boolean markCurrentCycle) {
+        verifyRecordSchema(rec);
+        super.mapOrdinal(rec, newOrdinal, markPreviousCycle, markCurrentCycle);
+    }
+
+    private void verifyRecordSchema(HollowWriteRecord rec) {
+        if(!(rec instanceof HollowObjectWriteRecord))
+            return;
+        HollowObjectSchema recordSchema = ((HollowObjectWriteRecord)rec).getSchema();
+        if(recordSchema == schema || recordSchema == verifiedRecordSchema)
+            return;
+
+        String difference = HollowSchemaUtil.findLayoutDifference(schema, recordSchema);
+        if(difference != null)
+            throw rejectIncompatibleRecord("type schema vs record schema differ at " + difference);
+        verifiedRecordSchema = recordSchema;
     }
 
     /**
@@ -102,17 +131,27 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 
     private void discoverObjectFieldStatisticsForRecord(FieldStatistics fieldStats, int ordinal) {
         if(currentCyclePopulated.get(ordinal) || previousCyclePopulated.get(ordinal)) {
-            long pointer = getPointerForData(ordinal);
+            ByteData data = getByteDataForOrdinal(ordinal);
+            long lengthPointer = getPointerForLength(ordinal);
+            int length = VarInt.readVInt(data, lengthPointer);
+            long pointer = lengthPointer + VarInt.sizeOfVInt(length);
+            long end = pointer + length;
 
-            for(int fieldIndex=0; fieldIndex<((HollowObjectSchema)schema).numFields(); fieldIndex++) {
-                pointer = discoverObjectFieldStatisticsForField(fieldStats, pointer, fieldIndex, ordinal);
+            int numFields = ((HollowObjectSchema)schema).numFields();
+            int fieldIndex = 0;
+            for(; fieldIndex<numFields && pointer < end; fieldIndex++) {
+                pointer = discoverObjectFieldStatisticsForField(fieldStats, data, pointer, fieldIndex);
             }
+
+            // a record serialized with a different schema decodes to a different length
+            if(fieldIndex != numFields || pointer != end)
+                throw new IncompatibleSchemaException(schema.getName(), String.format(
+                        "Cannot write type %s: record at ordinal %d (%d bytes) does not match the type schema",
+                        schema.getName(), ordinal, length));
         }
     }
 
-    private long discoverObjectFieldStatisticsForField(FieldStatistics fieldStats, long pointer, int fieldIndex, int ordinal) {
-        ByteData data = getByteDataForOrdinal(ordinal);
-
+    private long discoverObjectFieldStatisticsForField(FieldStatistics fieldStats, ByteData data, long pointer, int fieldIndex) {
         switch(getSchema().getFieldType(fieldIndex)) {
         case BOOLEAN:
             addFixedLengthFieldRequiredBits(fieldStats, fieldIndex, 2);

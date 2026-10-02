@@ -41,6 +41,7 @@ public class HollowListTypeMapper extends HollowTypeMapper {
 
     private final HollowListSchema schema;
     private final HollowListTypeWriteState writeState;
+    private final String layoutDifference;
 
     private final ThreadLocal<IntList> intList = new ThreadLocal<IntList>();
     private final boolean ignoreListOrdering;
@@ -63,6 +64,7 @@ public class HollowListTypeMapper extends HollowTypeMapper {
 
         HollowListTypeWriteState existingTypeState = (HollowListTypeWriteState)parentMapper.getStateEngine().getTypeState(typeName);
         this.writeState = existingTypeState != null ? existingTypeState : new HollowListTypeWriteState(schema, numShards, parentMapper.getStateEngine().isPartitionedOrdinalMap(), parentMapper.getStateEngine().getIgnoreOrdinalLimitsSupplier());
+        this.layoutDifference = layoutDifference(existingTypeState, schema);
     }
 
     @Override
@@ -77,6 +79,9 @@ public class HollowListTypeMapper extends HollowTypeMapper {
 
     @Override
     public int write(Object obj) {
+        if(layoutDifference != null)
+            throw incompatibleTypeState(layoutDifference);
+
         if(obj instanceof MemoizedList) {
             long assignedOrdinal = ((MemoizedList<?>)obj).__assigned_ordinal;
 
