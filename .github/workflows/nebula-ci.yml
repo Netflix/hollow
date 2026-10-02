@@ -11,9 +11,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        java: [8, 21]
-    name: CI with Java ${{ matrix.java }}
+        include:
+          - java: 8
+            gc: default
+            testJvmArgs: ''
+          - java: 21
+            gc: default
+            testJvmArgs: ''
+          - java: 21
+            gc: ZGC
+            testJvmArgs: '-XX:+UseZGC'
+    name: CI with Java ${{ matrix.java }} (${{ matrix.gc }})
     steps:
       - uses: actions/checkout@v6
       - name: Setup git user
@@ -45,7 +55,7 @@ jobs:
           restore-keys: |
             - ${{ runner.os }}-gradlewrapper-
       - name: Build with Gradle
-        run: ./gradlew -Porg.gradle.java.installations.fromEnv=JAVA_HOME_8_X64 -PtestJavaVersion=${{ matrix.java }} --info --stacktrace build
+        run: ./gradlew -Porg.gradle.java.installations.fromEnv=JAVA_HOME_8_X64 -PtestJavaVersion=${{ matrix.java }} -PtestJvmArgs='${{ matrix.testJvmArgs }}' --info --stacktrace build
         env:
           CI_NAME: github_actions
           CI_BUILD_NUMBER: ${{ github.sha }}
