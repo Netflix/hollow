@@ -21,7 +21,6 @@ import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.VariableLengthData;
 import com.netflix.hollow.core.memory.VariableLengthDataFactory;
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
@@ -91,7 +90,8 @@ public class HollowObjectTypeDataElements extends HollowTypeDataElements {
     private void removeExcludedFieldsFromFixedLengthData() {
         if(bitsPerField.length < bitsPerUnfilteredField.length) {
             long numBitsRequired = (long)bitsPerRecord * (maxOrdinal + 1);
-            FixedLengthElementArray filteredData = new FixedLengthElementArray(memoryRecycler, numBitsRequired);
+            FixedLengthData filteredData = FixedLengthDataFactory.get(
+                    numBitsRequired, memoryMode, memoryRecycler);
 
             long currentReadBit = 0;
             long currentWriteBit = 0;
