@@ -76,11 +76,20 @@
         "junit:junit": {
             "locked": "4.11"
         },
+        "net.bytebuddy:byte-buddy": {
+            "locked": "1.14.18"
+        },
+        "net.bytebuddy:byte-buddy-agent": {
+            "locked": "1.14.18"
+        },
         "org.apache.velocity:velocity-engine-core": {
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
             "locked": "2.3"
+        },
+        "org.mockito:mockito-core": {
+            "locked": "4.11.0"
         }
     },
     "testRuntimeClasspath": {
@@ -114,6 +123,12 @@
         "junit:junit": {
             "locked": "4.11"
         },
+        "net.bytebuddy:byte-buddy": {
+            "locked": "1.14.18"
+        },
+        "net.bytebuddy:byte-buddy-agent": {
+            "locked": "1.14.18"
+        },
         "org.apache.commons:commons-text": {
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
@@ -125,6 +140,9 @@
                 "com.netflix.hollow:hollow-ui-tools"
             ],
             "locked": "2.3"
+        },
+        "org.mockito:mockito-core": {
+            "locked": "4.11.0"
         }
     },
     "toolsCompileClasspath": {
@@ -143,11 +161,20 @@
         "junit:junit": {
             "locked": "4.11"
         },
+        "net.bytebuddy:byte-buddy": {
+            "locked": "1.14.18"
+        },
+        "net.bytebuddy:byte-buddy-agent": {
+            "locked": "1.14.18"
+        },
         "org.apache.velocity:velocity-engine-core": {
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
             ],
             "locked": "2.3"
+        },
+        "org.mockito:mockito-core": {
+            "locked": "4.11.0"
         }
     },
     "toolsRuntimeClasspath": {
@@ -181,6 +208,12 @@
         "junit:junit": {
             "locked": "4.11"
         },
+        "net.bytebuddy:byte-buddy": {
+            "locked": "1.14.18"
+        },
+        "net.bytebuddy:byte-buddy-agent": {
+            "locked": "1.14.18"
+        },
         "org.apache.commons:commons-text": {
             "firstLevelTransitive": [
                 "com.netflix.hollow:hollow-ui-tools"
@@ -192,6 +225,9 @@
                 "com.netflix.hollow:hollow-ui-tools"
             ],
             "locked": "2.3"
+        },
+        "org.mockito:mockito-core": {
+            "locked": "4.11.0"
         }
     }
 }
