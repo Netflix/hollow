@@ -1,5 +1,6 @@
 package com.netflix.hollow.core.memory;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -9,6 +10,28 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import org.junit.Test;
 
 public class SegmentedByteArrayTest {
+
+    @Test
+    public void copiesToByteArrayBySegment() {
+        SegmentedByteArray data = new SegmentedByteArray(WastefulRecycler.SMALL_ARRAY_RECYCLER);
+        byte[] expected = new byte[96];
+        for(int i = 0; i < expected.length; i++) {
+            expected[i] = (byte)(i * 31);
+            data.set(i, expected[i]);
+        }
+
+        for(int start = 0; start < expected.length; start++) {
+            int length = expected.length - start;
+            byte[] destination = new byte[length + 4];
+            data.copyTo(start, destination, 2, length);
+
+            byte[] actual = new byte[length];
+            System.arraycopy(destination, 2, actual, 0, length);
+            byte[] expectedRange = new byte[length];
+            System.arraycopy(expected, start, expectedRange, 0, length);
+            assertArrayEquals(expectedRange, actual);
+        }
+    }
 
     @Test
     public void readsVIntsBySegment() {
