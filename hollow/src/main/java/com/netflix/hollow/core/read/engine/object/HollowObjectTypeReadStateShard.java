@@ -19,6 +19,7 @@ package com.netflix.hollow.core.read.engine.object;
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
 import com.netflix.hollow.core.memory.ByteData;
+import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
@@ -113,17 +114,28 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
     }
 
     public String readString(long startByte, long endByte, int numBitsForField, int fieldIndex) {
+        return readString(startByte, endByte, numBitsForField, fieldIndex, false);
+    }
+
+    public String readString(long startByte, long endByte, int numBitsForField, int fieldIndex, boolean immutable) {
         if((endByte & (1L << numBitsForField - 1)) != 0)
             return null;
 
         startByte &= (1L << numBitsForField - 1) - 1;
 
         int length = (int)(endByte - startByte);
+        ByteData data = dataElements.varLengthData[fieldIndex];
 
-        return readString(dataElements.varLengthData[fieldIndex], startByte, length);
+        return readString(data, startByte, length, immutable);
     }
 
-    public boolean isStringFieldEqual(long startByte, long endByte, int numBitsForField, int fieldIndex, String testValue) {
+    public boolean isStringFieldEqual(long startByte, long endByte, int numBitsForField, int fieldIndex,
+                                      String testValue) {
+        return isStringFieldEqual(startByte, endByte, numBitsForField, fieldIndex, testValue, false);
+    }
+
+    public boolean isStringFieldEqual(long startByte, long endByte, int numBitsForField, int fieldIndex,
+                                      String testValue, boolean immutable) {
         if((endByte & (1L << numBitsForField - 1)) != 0)
             return testValue == null;
         if(testValue == null)
@@ -132,8 +144,11 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
         startByte &= (1L << numBitsForField - 1) - 1;
 
         int length = (int)(endByte - startByte);
+        ByteData data = dataElements.varLengthData[fieldIndex];
 
-        return testStringEquality(dataElements.varLengthData[fieldIndex], startByte, length, testValue);
+        if(immutable)
+            return ((SegmentedByteArray)data).isVIntStringEqual(startByte, length, testValue);
+        return testStringEquality(data, startByte, length, testValue);
     }
 
     public int findVarLengthFieldHashCode(long startByte, long endByte, int numBitsForField, int fieldIndex) {
@@ -164,14 +179,15 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
      */
     private static final ThreadLocal<char[]> chararr = ThreadLocal.withInitial(() -> new char[100]);
 
-    private String readString(ByteData data, long position, int length) {
+    private String readString(ByteData data, long position, int length, boolean immutable) {
         char[] chararr = HollowObjectTypeReadStateShard.chararr.get();
-        if (length > chararr.length) {
+        if (length > chararr.length)
             chararr = new char[length];
-        } else {
-            Arrays.fill(chararr, 0, length, '\0');
-        }
 
+        if(immutable)
+            return ((SegmentedByteArray)data).readVIntString(position, length, chararr);
+
+        Arrays.fill(chararr, 0, length, '\0');
         int count = VarInt.readVIntsInto(data, position, length, chararr);
 
         // The number of chars may be fewer than the number of bytes in the serialized data
