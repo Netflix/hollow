@@ -1,7 +1,7 @@
 {
     "testCompileClasspath": {
         "com.github.spotbugs:spotbugs": {
-            "locked": "4.2.1"
+            "locked": "4.8.6"
         },
         "com.netflix.hollow:hollow-test": {
             "project": true
@@ -13,12 +13,12 @@
             "locked": "3.15.0"
         },
         "org.mockito:mockito-core": {
-            "locked": "2.15.0"
+            "locked": "4.11.0"
         }
     },
     "testRuntimeClasspath": {
         "com.github.spotbugs:spotbugs": {
-            "locked": "4.2.1"
+            "locked": "4.8.6"
         },
         "com.netflix.hollow:hollow": {
             "firstLevelTransitive": [
@@ -36,7 +36,7 @@
             "locked": "3.15.0"
         },
         "org.mockito:mockito-core": {
-            "locked": "2.15.0"
+            "locked": "4.11.0"
         }
     }
 }
