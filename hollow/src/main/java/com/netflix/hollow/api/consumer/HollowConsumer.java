@@ -1285,6 +1285,36 @@ public class HollowConsumer {
         public B withGeneratedAPIClass(Class<? extends HollowAPI> generatedAPIClass,
                                        String cachedType,
                                        String... additionalCachedTypes) {
+            return withGeneratedAPIClass(generatedAPIClass, false, cachedType, additionalCachedTypes);
+        }
+
+        /**
+         * As {@link #withGeneratedAPIClass(Class, String, String...)}, but additionally controls whether the object
+         * caches retain the "before image" of records removed in the latest cycle.
+         *
+         * <p>When {@code retainRemovedOrdinalsInCache} is {@code true}, a record removed in a cycle remains
+         * queryable from the cache for one more cycle, so change listeners can look up its prior value. This mirrors
+         * the behavior of {@code HollowPerfAPICache} and costs roughly one extra cycle of removed cached instances.
+         * Requires an API generated with a version of Hollow that supports it; otherwise consumer refresh fails with
+         * an {@link IllegalStateException}.
+         *
+         * <p>This only takes effect when object longevity is enabled (see {@link ObjectLongevityConfig}), which is
+         * the mode that rebuilds the API each cycle. Without it, deltas are applied to the cache in place and the
+         * flag has no effect.
+         *
+         * @param generatedAPIClass the code generated API class
+         * @param retainRemovedOrdinalsInCache whether removed records' before images are retained for one cycle
+         * @param cachedType the type to enable object caching on
+         * @param additionalCachedTypes more types to enable object caching on
+         *
+         * @return this builder
+         *
+         * @see <a href="https://hollow.how/advanced-topics/#caching">https://hollow.how/advanced-topics/#caching</a>
+         */
+        public B withGeneratedAPIClass(Class<? extends HollowAPI> generatedAPIClass,
+                                       boolean retainRemovedOrdinalsInCache,
+                                       String cachedType,
+                                       String... additionalCachedTypes) {
             if (HollowAPI.class.equals(generatedAPIClass))
                 throw new IllegalArgumentException("must provide a code generated API class");
             generatedAPIClass = Objects.requireNonNull(generatedAPIClass, "API class cannot be null");
@@ -1299,7 +1329,7 @@ public class HollowConsumer {
             }
             if (!nulls.isEmpty())
                 throw new NullPointerException("cached types cannot be null; argsWithNull=" + nulls.toString());
-            this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass, cachedTypes);
+            this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass, retainRemovedOrdinalsInCache, cachedTypes);
             return (B)this;
         }
 

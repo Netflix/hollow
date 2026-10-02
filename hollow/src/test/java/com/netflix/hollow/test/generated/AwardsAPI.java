@@ -53,6 +53,10 @@ public class AwardsAPI extends HollowAPI implements  HollowConsumerAPI.StringRet
     }
 
     public AwardsAPI(HollowDataAccess dataAccess, Set<String> cachedTypes, Map<String, HollowFactory<?>> factoryOverrides, AwardsAPI previousCycleAPI) {
+        this(dataAccess, cachedTypes, factoryOverrides, previousCycleAPI, false);
+    }
+
+    public AwardsAPI(HollowDataAccess dataAccess, Set<String> cachedTypes, Map<String, HollowFactory<?>> factoryOverrides, AwardsAPI previousCycleAPI, boolean retainRemovedOrdinalsInCache) {
         super(dataAccess);
         HollowTypeDataAccess typeDataAccess;
         HollowFactory factory;
@@ -73,7 +77,7 @@ public class AwardsAPI extends HollowAPI implements  HollowConsumerAPI.StringRet
             HollowObjectCacheProvider previousCacheProvider = null;
             if(previousCycleAPI != null && (previousCycleAPI.stringProvider instanceof HollowObjectCacheProvider))
                 previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.stringProvider;
-            stringProvider = new HollowObjectCacheProvider(typeDataAccess, stringTypeAPI, factory, previousCacheProvider);
+            stringProvider = new HollowObjectCacheProvider(typeDataAccess, stringTypeAPI, factory, previousCacheProvider, retainRemovedOrdinalsInCache);
         } else {
             stringProvider = new HollowObjectFactoryProvider(typeDataAccess, stringTypeAPI, factory);
         }
@@ -92,7 +96,7 @@ public class AwardsAPI extends HollowAPI implements  HollowConsumerAPI.StringRet
             HollowObjectCacheProvider previousCacheProvider = null;
             if(previousCycleAPI != null && (previousCycleAPI.movieProvider instanceof HollowObjectCacheProvider))
                 previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.movieProvider;
-            movieProvider = new HollowObjectCacheProvider(typeDataAccess, movieTypeAPI, factory, previousCacheProvider);
+            movieProvider = new HollowObjectCacheProvider(typeDataAccess, movieTypeAPI, factory, previousCacheProvider, retainRemovedOrdinalsInCache);
         } else {
             movieProvider = new HollowObjectFactoryProvider(typeDataAccess, movieTypeAPI, factory);
         }
@@ -111,7 +115,7 @@ public class AwardsAPI extends HollowAPI implements  HollowConsumerAPI.StringRet
             HollowObjectCacheProvider previousCacheProvider = null;
             if(previousCycleAPI != null && (previousCycleAPI.setOfMovieProvider instanceof HollowObjectCacheProvider))
                 previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.setOfMovieProvider;
-            setOfMovieProvider = new HollowObjectCacheProvider(typeDataAccess, setOfMovieTypeAPI, factory, previousCacheProvider);
+            setOfMovieProvider = new HollowObjectCacheProvider(typeDataAccess, setOfMovieTypeAPI, factory, previousCacheProvider, retainRemovedOrdinalsInCache);
         } else {
             setOfMovieProvider = new HollowObjectFactoryProvider(typeDataAccess, setOfMovieTypeAPI, factory);
         }
@@ -130,7 +134,7 @@ public class AwardsAPI extends HollowAPI implements  HollowConsumerAPI.StringRet
             HollowObjectCacheProvider previousCacheProvider = null;
             if(previousCycleAPI != null && (previousCycleAPI.awardProvider instanceof HollowObjectCacheProvider))
                 previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.awardProvider;
-            awardProvider = new HollowObjectCacheProvider(typeDataAccess, awardTypeAPI, factory, previousCacheProvider);
+            awardProvider = new HollowObjectCacheProvider(typeDataAccess, awardTypeAPI, factory, previousCacheProvider, retainRemovedOrdinalsInCache);
         } else {
             awardProvider = new HollowObjectFactoryProvider(typeDataAccess, awardTypeAPI, factory);
         }
