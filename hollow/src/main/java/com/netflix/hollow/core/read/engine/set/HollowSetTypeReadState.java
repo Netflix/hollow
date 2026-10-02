@@ -331,10 +331,12 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
         sampler.recordIterator();
         if(size(ordinal) == 0)
             return EmptyOrdinalIterator.INSTANCE;
-        return new HollowSetOrdinalIterator(ordinal, this);
+        if(stateEngine == null || !stateEngine.isSnapshotCollectionIteratorsEnabled())
+            return new HollowSetOrdinalIterator(ordinal, this);
+        return new HollowSetSnapshotOrdinalIterator(ordinal, this, sampler);
     }
 
-    private boolean readWasUnsafe(HollowSetTypeShardsHolder shardsHolder, int ordinal, HollowSetTypeReadStateShard shard) {
+    boolean readWasUnsafe(HollowSetTypeShardsHolder shardsHolder, int ordinal, HollowSetTypeReadStateShard shard) {
         if(shardsAreImmutable)
             return false;
 

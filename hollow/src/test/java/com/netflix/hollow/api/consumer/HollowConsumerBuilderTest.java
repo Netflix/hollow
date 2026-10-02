@@ -20,6 +20,29 @@ import org.junit.rules.ExpectedException;
 
 public class HollowConsumerBuilderTest {
     @Test
+    public void snapshotCollectionIteratorsAreOptIn() throws IOException {
+        TestBlobRetriever blobRetriever = new TestBlobRetriever();
+        TestHollowConsumer consumer = new TestHollowConsumer.Builder()
+                .withBlobRetriever(blobRetriever)
+                .build();
+        consumer.addSnapshot(1L, new HollowWriteStateEngineBuilder()
+                .add(new com.netflix.hollow.test.model.Movie(1, "movie", 2026))
+                .build());
+        consumer.triggerRefreshTo(1L);
+        assertFalse(consumer.getStateEngine().isSnapshotCollectionIteratorsEnabled());
+
+        TestHollowConsumer enabledConsumer = new TestHollowConsumer.Builder()
+                .withBlobRetriever(new TestBlobRetriever())
+                .withSnapshotCollectionIterators()
+                .build();
+        enabledConsumer.addSnapshot(1L, new HollowWriteStateEngineBuilder()
+                .add(new com.netflix.hollow.test.model.Movie(1, "movie", 2026))
+                .build());
+        enabledConsumer.triggerRefreshTo(1L);
+        assertTrue(enabledConsumer.getStateEngine().isSnapshotCollectionIteratorsEnabled());
+    }
+
+    @Test
     public void testCachedTypes() throws IOException {
         TestHollowConsumer consumer = new TestHollowConsumer.Builder()
                 .withBlobRetriever(new TestBlobRetriever())

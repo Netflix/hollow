@@ -60,6 +60,7 @@ public class HollowClientUpdater {
     private final HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
 
     private boolean skipTypeShardUpdateWithNoAdditions;
+    private boolean snapshotCollectionIterators;
 
     private TypeFilter filter;
 
@@ -112,6 +113,13 @@ public class HollowClientUpdater {
         HollowDataHolder dataHolder = hollowDataHolderVolatile;
         if(dataHolder != null)
             dataHolder.getStateEngine().setSkipTypeShardUpdateWithNoAdditions(skipTypeShardUpdateWithNoAdditions);
+    }
+
+    public void setSnapshotCollectionIterators(boolean snapshotCollectionIterators) {
+        this.snapshotCollectionIterators = snapshotCollectionIterators;
+        HollowDataHolder dataHolder = hollowDataHolderVolatile;
+        if(dataHolder != null)
+            dataHolder.getStateEngine().setSnapshotCollectionIterators(snapshotCollectionIterators);
     }
 
     /**
@@ -328,12 +336,16 @@ public class HollowClientUpdater {
 
     private HollowReadStateEngine newStateEngine() {
         HollowDataHolder hollowDataHolderLocal = hollowDataHolderVolatile;
+        HollowReadStateEngine stateEngine;
         if (hollowDataHolderLocal != null) {
             ArraySegmentRecycler existingRecycler =
                     hollowDataHolderLocal.getStateEngine().getMemoryRecycler();
-            return new HollowReadStateEngine(hashCodeFinder, true, existingRecycler);
+            stateEngine = new HollowReadStateEngine(hashCodeFinder, true, existingRecycler);
+        } else {
+            stateEngine = new HollowReadStateEngine(hashCodeFinder);
         }
-        return new HollowReadStateEngine(hashCodeFinder);
+        stateEngine.setSnapshotCollectionIterators(snapshotCollectionIterators);
+        return stateEngine;
     }
 
     public StackTraceRecorder getStaleReferenceUsageStackTraceRecorder() {
