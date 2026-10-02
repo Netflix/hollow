@@ -22,10 +22,12 @@ subprojects {
   }
 
   def testJavaVersion = providers.gradleProperty('testJavaVersion').orElse('8')
+  def testJvmArgs = providers.gradleProperty('testJvmArgs').orElse('')
   tasks.withType(Test).configureEach {
     javaLauncher = javaToolchains.launcherFor {
       languageVersion = JavaLanguageVersion.of(testJavaVersion.get().toInteger())
     }
+    jvmArgs(testJvmArgs.get().tokenize())
   }
 
   tasks.withType(Javadoc) {
