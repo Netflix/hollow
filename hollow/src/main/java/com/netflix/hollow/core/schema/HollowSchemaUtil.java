@@ -72,4 +72,63 @@ public class HollowSchemaUtil {
         }
         return refs;
     }
+
+    /**
+     * Describes the first difference that prevents records serialized with {@code other} from being read as
+     * {@code schema}, or returns null if there is none. Primary keys and hash keys are ignored.
+     *
+     * @param schema the schema records are read with
+     * @param other the schema records are serialized with
+     * @return the first difference, or null if the layouts match
+     */
+    public static String findLayoutDifference(HollowSchema schema, HollowSchema other) {
+        if (schema.getSchemaType() != other.getSchemaType())
+            return "schema type (" + schema.getSchemaType() + " vs " + other.getSchemaType() + ")";
+
+        switch (schema.getSchemaType()) {
+            case OBJECT:
+                HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
+                HollowObjectSchema otherObjectSchema = (HollowObjectSchema) other;
+                for (int i = 0; i < Math.max(objectSchema.numFields(), otherObjectSchema.numFields()); i++) {
+                    if (!sameField(objectSchema, otherObjectSchema, i))
+                        return "field " + i + " (" + describeField(objectSchema, i) + " vs " + describeField(otherObjectSchema, i) + ")";
+                }
+                return null;
+            case LIST:
+            case SET:
+                return typeDifference("element type",
+                        ((HollowCollectionSchema) schema).getElementType(), ((HollowCollectionSchema) other).getElementType());
+            case MAP:
+                HollowMapSchema mapSchema = (HollowMapSchema) schema;
+                HollowMapSchema otherMapSchema = (HollowMapSchema) other;
+                String keyDifference = typeDifference("key type", mapSchema.getKeyType(), otherMapSchema.getKeyType());
+                return keyDifference != null ? keyDifference
+                        : typeDifference("value type", mapSchema.getValueType(), otherMapSchema.getValueType());
+            default:
+                return "unsupported schema type (" + schema.getSchemaType() + ")";
+        }
+    }
+
+    private static boolean sameField(HollowObjectSchema schema, HollowObjectSchema other, int fieldIndex) {
+        if (fieldIndex >= schema.numFields() || fieldIndex >= other.numFields())
+            return false;
+        HollowObjectSchema.FieldType fieldType = schema.getFieldType(fieldIndex);
+        return fieldType == other.getFieldType(fieldIndex)
+                && schema.getFieldName(fieldIndex).equals(other.getFieldName(fieldIndex))
+                && (fieldType != HollowObjectSchema.FieldType.REFERENCE
+                        || schema.getReferencedType(fieldIndex).equals(other.getReferencedType(fieldIndex)));
+    }
+
+    private static String describeField(HollowObjectSchema schema, int fieldIndex) {
+        if (fieldIndex >= schema.numFields())
+            return "none";
+        HollowObjectSchema.FieldType fieldType = schema.getFieldType(fieldIndex);
+        return schema.getFieldName(fieldIndex) + " " + (fieldType == HollowObjectSchema.FieldType.REFERENCE
+                ? "REFERENCE(" + schema.getReferencedType(fieldIndex) + ")"
+                : fieldType.toString());
+    }
+
+    private static String typeDifference(String label, String type, String otherType) {
+        return type.equals(otherType) ? null : label + " (" + type + " vs " + otherType + ")";
+    }
 }

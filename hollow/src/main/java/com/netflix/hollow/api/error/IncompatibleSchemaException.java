@@ -35,6 +35,14 @@ public class IncompatibleSchemaException extends HollowException {
         this.otherType = otherType;
     }
 
+    public IncompatibleSchemaException(String typeName, String message) {
+        super(message);
+        this.typeName = typeName;
+        this.fieldName = null;
+        this.fieldType = null;
+        this.otherType = null;
+    }
+
     public String getTypeName() {
         return this.typeName;
     }

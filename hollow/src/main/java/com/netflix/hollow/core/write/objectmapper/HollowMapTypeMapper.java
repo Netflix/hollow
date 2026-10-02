@@ -45,6 +45,7 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
 
     private final HollowMapSchema schema;
     private final HollowMapTypeWriteState writeState;
+    private final String layoutDifference;
 
     private final HollowObjectHashCodeFinder hashCodeFinder;
     
@@ -75,6 +76,7 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
 
         HollowMapTypeWriteState typeState = (HollowMapTypeWriteState) parentMapper.getStateEngine().getTypeState(typeName);
         this.writeState = typeState != null ? typeState : new HollowMapTypeWriteState(schema, numShards, parentMapper.getStateEngine().isPartitionedOrdinalMap(), parentMapper.getStateEngine().getIgnoreOrdinalLimitsSupplier());
+        this.layoutDifference = layoutDifference(typeState, schema);
     }
 
     @Override
@@ -89,6 +91,9 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
 
     @Override
     protected int write(Object obj) {
+        if(layoutDifference != null)
+            throw incompatibleTypeState(layoutDifference);
+
         if(obj instanceof MemoizedMap) {
             long assignedOrdinal = ((MemoizedMap<?, ?>)obj).__assigned_ordinal;
             

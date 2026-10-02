@@ -526,6 +526,10 @@ public class ByteArrayOrdinalMap {
         return pointer + VarInt.nextVLongSize(byteData.getUnderlyingArray(), pointer);
     }
 
+    public long getPointerForLength(int ordinal) {
+        return pointersByOrdinal[ordinal] & POINTER_MASK;
+    }
+
     public boolean isReadyForWriting() {
         return pointersByOrdinal != null;
     }

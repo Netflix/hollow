@@ -16,8 +16,11 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
+import com.netflix.hollow.api.error.IncompatibleSchemaException;
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.core.memory.ByteDataArray;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchemaUtil;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -76,6 +79,14 @@ public abstract class HollowTypeMapper {
     protected void addTypeState(HollowWriteStateEngine stateEngine) {
         if(stateEngine.getTypeState(getTypeName()) == null)
             stateEngine.addTypeState(getTypeWriteState());
+    }
+
+    static String layoutDifference(HollowTypeWriteState existing, HollowSchema mapped) {
+        return existing == null ? null : HollowSchemaUtil.findLayoutDifference(existing.getSchema(), mapped);
+    }
+
+    protected IncompatibleSchemaException incompatibleTypeState(String layoutDifference) {
+        return getTypeWriteState().rejectIncompatibleRecord("existing schema vs mapped schema differ at " + layoutDifference);
     }
 
     protected HollowWriteRecord writeRecord() {
