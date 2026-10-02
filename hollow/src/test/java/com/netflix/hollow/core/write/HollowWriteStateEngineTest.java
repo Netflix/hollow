@@ -16,6 +16,7 @@ import com.netflix.hollow.test.InMemoryBlobStore;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.atomic.AtomicLong;
 import org.junit.Test;
 
 public class HollowWriteStateEngineTest {
@@ -79,10 +80,18 @@ public class HollowWriteStateEngineTest {
 
     @Test
     public void testHeaderTagsWhenResharding() {
+        for (int i = 0; i < 1000; i++) {
+            verifyHeaderTagsWhenResharding();
+        }
+    }
+
+    private void verifyHeaderTagsWhenResharding() {
         InMemoryBlobStore blobStore = new InMemoryBlobStore();
         HollowInMemoryBlobStager blobStager = new HollowInMemoryBlobStager();
+        AtomicLong version = new AtomicLong();
 
         HollowProducer producer = HollowProducer.withPublisher(blobStore).withBlobStager(blobStager)
+                .withVersionMinter(version::incrementAndGet)
                 .withTypeResharding(true).withTargetMaxTypeShardSize(32)
                 .build();
         long v1 = producer.runCycle(ws -> {
