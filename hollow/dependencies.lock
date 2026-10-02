@@ -9,12 +9,6 @@
         "junit:junit": {
             "locked": "4.11"
         },
-        "net.bytebuddy:byte-buddy": {
-            "locked": "1.14.18"
-        },
-        "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.14.18"
-        },
         "org.assertj:assertj-core": {
             "locked": "3.15.0"
         },
@@ -37,12 +31,6 @@
         },
         "junit:junit": {
             "locked": "4.11"
-        },
-        "net.bytebuddy:byte-buddy": {
-            "locked": "1.14.18"
-        },
-        "net.bytebuddy:byte-buddy-agent": {
-            "locked": "1.14.18"
         },
         "org.assertj:assertj-core": {
             "locked": "3.15.0"
