@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import java.util.Arrays;
 import org.junit.Test;
 
 public class SegmentedByteArrayTest {
@@ -44,6 +45,38 @@ public class SegmentedByteArrayTest {
                 }
             }
         }
+    }
+
+    @Test
+    public void readsContiguousAsciiAndMixedStrings() {
+        SegmentedByteArray data = new SegmentedByteArray(new WastefulRecycler(10, 4));
+        char[] characters = new char[256];
+        Arrays.fill(characters, 'a');
+        assertContiguousString(data, new String(characters));
+
+        int[] positions = {0, 1, 7, 15, 16, 31, 32, 63, 64, 127, 128, 255};
+        char[] nonAsciiCharacters = {'\u0080', '\u123e', '\uffff', '\ud83d', '\ude00'};
+        for(int position : positions) {
+            for(char character : nonAsciiCharacters) {
+                characters[position] = character;
+                assertContiguousString(data, new String(characters));
+            }
+            characters[position] = 'a';
+        }
+        assertContiguousString(data, "ascii \ud83d\ude00 suffix");
+    }
+
+    private void assertContiguousString(SegmentedByteArray data, String value) {
+        byte[] encoded = encode(value);
+        int start = 7;
+        for(int i = 0; i < encoded.length; i++)
+            data.set(start + i, encoded[i]);
+
+        char[] decoded = new char[encoded.length];
+        Arrays.fill(decoded, '\uffff');
+        assertEquals(value, data.readVIntString(start, encoded.length, decoded));
+        assertTrue(data.isVIntStringEqual(start, encoded.length, value));
+        assertFalse(data.isVIntStringEqual(start, encoded.length, value + "x"));
     }
 
     private static byte[] encode(String value) {
