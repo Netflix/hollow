@@ -18,15 +18,16 @@ package com.netflix.hollow.core.read.engine.set;
 
 import com.netflix.hollow.api.sampling.HollowSetSampler;
 import com.netflix.hollow.core.read.iterator.HollowSetOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.EmptyOrdinalIterator;
 
 /**
  * An ordinal iterator over a set record backed by a single validated snapshot of its shard and bucket range.
  * <p>
- * The historical per-bucket pattern re-reads {@code shardsVolatile} and executes {@code Unsafe.loadFence()}
- * twice for every bucket probed (via {@code relativeBucketValue}), plus a {@code size()} at construction — for a
- * set whose hash table has M buckets that is {@code 2M+1} fences. This iterator validates the bucket range once
- * at construction and then executes a single fence per {@link #next()} (one per returned element), allocating
- * nothing.
+ * When on-heap arrays can be recycled, per-bucket access re-reads {@code shardsVolatile} and executes
+ * {@code Unsafe.loadFence()} twice for every bucket probed via {@code relativeBucketValue}, in addition to
+ * size lookups at construction. This iterator validates the bucket range once at construction and then
+ * executes a single fence per {@link #next()}, allocating nothing per element.
  * <p>
  * Correctness mirrors the list snapshot iterator: {@code startBucket}/{@code endBucket} are validated before
  * use, so every relative bucket index in {@code [0, numBuckets)} maps to an in-bounds read from the captured
@@ -49,12 +50,41 @@ final class HollowSetSnapshotOrdinalIterator extends HollowSetOrdinalIterator {
 
     private int currentBucket = -1;
 
-    HollowSetSnapshotOrdinalIterator(
+    static HollowOrdinalIterator create(
             int ordinal, HollowSetTypeReadState readState, HollowSetSampler sampler) {
+        sampler.recordSize();
+        HollowSetTypeShardsHolder holder;
+        HollowSetTypeReadStateShard shard;
+        long start;
+        long end;
+        int size;
+        do {
+            holder = readState.shardsVolatile;
+            shard = holder.shards[ordinal & holder.shardNumberMask];
+            int shardOrdinal = ordinal >> shard.shardOrdinalShift;
+            size = shard.size(shardOrdinal);
+            if(size == 0) {
+                start = end = 0;
+            } else {
+                start = shard.dataElements.getStartBucket(shardOrdinal);
+                end = shard.dataElements.getEndBucket(shardOrdinal);
+            }
+        } while(readState.readWasUnsafe(holder, ordinal, shard));
+        if(size == 0)
+            return EmptyOrdinalIterator.INSTANCE;
+        // Preserve the size sample formerly recorded by the nonempty iterator's constructor.
+        sampler.recordSize();
+        return new HollowSetSnapshotOrdinalIterator(ordinal, readState, holder, shard, start, end);
+    }
+
+    private HollowSetSnapshotOrdinalIterator(int ordinal, HollowSetTypeReadState readState,
+            HollowSetTypeShardsHolder holder, HollowSetTypeReadStateShard shard, long start, long end) {
         this.readState = readState;
         this.ordinal = ordinal;
-        sampler.recordSize();
-        snapshot();
+        this.shardsHolder = holder;
+        this.shard = shard;
+        this.startBucket = start;
+        this.numBuckets = end - start;
     }
 
     private void snapshot() {

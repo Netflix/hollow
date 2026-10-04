@@ -19,11 +19,12 @@ package com.netflix.hollow.api.objects;
 import com.netflix.hollow.api.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowRecordDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
-import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import java.util.AbstractList;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.ListIterator;
+import java.util.Spliterator;
 
 /**
  * A HollowList provides an implementation of the {@link java.util.List} interface over
@@ -56,29 +57,27 @@ public abstract class HollowList<T> extends AbstractList<T> implements HollowRec
 
     @Override
     public Iterator<T> iterator() {
-        HollowOrdinalIterator ordinalIterator = delegate.iterator(ordinal);
-        return new Iterator<T>() {
-            private int nextOrdinal = HollowOrdinalIterator.NO_MORE_ORDINALS;
-            private boolean nextOrdinalLoaded;
+        if(!HollowListTraversal.isEnabled(delegate.getTypeDataAccess()))
+            return super.iterator();
+        return HollowListTraversal.iterator(delegate.iterator(ordinal), this::instantiateElement);
+    }
 
-            @Override
-            public boolean hasNext() {
-                if(!nextOrdinalLoaded) {
-                    nextOrdinal = ordinalIterator.next();
-                    nextOrdinalLoaded = true;
-                }
-                return nextOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS;
-            }
+    @Override
+    public ListIterator<T> listIterator(int index) {
+        if(!HollowListTraversal.isEnabled(delegate.getTypeDataAccess()))
+            return super.listIterator(index);
+        HollowListOrdinalIterator cursor = delegate.ordinalCursor(ordinal);
+        return cursor == null ? super.listIterator(index)
+                : HollowListTraversal.listIterator(cursor, index, this::instantiateElement);
+    }
 
-            @Override
-            public T next() {
-                if(!hasNext())
-                    throw new NoSuchElementException();
-                int currentOrdinal = nextOrdinal;
-                nextOrdinalLoaded = false;
-                return instantiateElement(currentOrdinal);
-            }
-        };
+    @Override
+    public Spliterator<T> spliterator() {
+        if(!HollowListTraversal.isEnabled(delegate.getTypeDataAccess()))
+            return super.spliterator();
+        HollowListOrdinalIterator cursor = delegate.ordinalCursor(ordinal);
+        return cursor == null ? super.spliterator()
+                : HollowListTraversal.spliterator(cursor, this::instantiateElement);
     }
 
     @Override

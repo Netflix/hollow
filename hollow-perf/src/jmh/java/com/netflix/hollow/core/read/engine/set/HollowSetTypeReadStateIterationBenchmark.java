@@ -30,7 +30,7 @@ import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
 /**
- * Compares set iteration cost of the per-bucket read path (the historical {@code HollowSetOrdinalIterator}
+ * Compares set iteration cost of the per-bucket read path (the generic {@code HollowSetOrdinalIterator}
  * pattern: {@code size()} + {@code relativeBucketValue(ordinal, bucket)} over every hash bucket, i.e. two fences
  * per bucket when arrays can be recycled) against the single-snapshot iterator. With recycling, the cursor
  * validates once per surfaced element; without recycling, its captured shard is immutable and requires no
@@ -78,7 +78,7 @@ public class HollowSetTypeReadStateIterationBenchmark {
                 ? new RecyclingRecycler()
                 : WastefulRecycler.DEFAULT_INSTANCE;
         HollowReadStateEngine readStateEngine = new HollowReadStateEngine(memoryRecycler);
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
 
         setTypeState = null;

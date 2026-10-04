@@ -40,7 +40,7 @@ public class HollowListTypeReadStateTest extends AbstractHollowListTypeDataEleme
         populateWriteStateEngineWithListRecords(new int[][] {{0, 1, 2}});
 
         readStateEngine = new HollowReadStateEngine(WastefulRecycler.DEFAULT_INSTANCE);
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
 
         HollowListTypeReadState typeState =
@@ -57,7 +57,7 @@ public class HollowListTypeReadStateTest extends AbstractHollowListTypeDataEleme
         populateWriteStateEngineWithListRecords(new int[][] {{0, 1, 2}});
 
         readStateEngine = new HollowReadStateEngine(WastefulRecycler.DEFAULT_INSTANCE);
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
 
         HollowListTypeReadState typeState =
@@ -79,7 +79,7 @@ public class HollowListTypeReadStateTest extends AbstractHollowListTypeDataEleme
         populateWriteStateEngine(3);
         populateWriteStateEngineWithListRecords(new int[][] {{0, 1, 2}, {0}});
         roundTripSnapshot();
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
 
         HollowListTypeReadState typeState =
                 (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
@@ -92,6 +92,28 @@ public class HollowListTypeReadStateTest extends AbstractHollowListTypeDataEleme
 
         assertEquals(1, iterator.next());
         assertEquals(2, iterator.next());
+        assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iterator.next());
+    }
+
+    @Test
+    public void recycledIteratorExhaustsWhenOrdinalIsReusedByShorterList() throws Exception {
+        populateWriteStateEngine(3);
+        populateWriteStateEngineWithListRecords(new int[][] {{0, 1, 2}});
+        roundTripSnapshot();
+        readStateEngine.setShardCursorIterators(true);
+        HollowListTypeReadState typeState = (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
+        HollowOrdinalIterator iterator = typeState.ordinalIterator(0);
+        assertEquals(0, iterator.next());
+
+        populateWriteStateEngine(writeStateEngine, schema, 3);
+        populateWriteStateEngineWithListRecords(new int[][] {{2}});
+        roundTripDelta();
+        populateWriteStateEngine(writeStateEngine, schema, 3);
+        populateWriteStateEngineWithListRecords(new int[][] {{1}});
+        roundTripDelta();
+        assertEquals(1, typeState.size(0));
+        assertEquals(1, typeState.getElementOrdinal(0, 0));
+        assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iterator.next());
         assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iterator.next());
     }
 

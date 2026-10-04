@@ -55,7 +55,7 @@ public class HollowListSnapshotOrdinalIteratorTest extends AbstractHollowListTyp
         int numRecords = 50;
         int[][] listContents = generateListContents(numRecords);
         HollowListTypeReadState readState = populateTypeStateWith(listContents);
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
 
         boolean sawSizeOne = false;
         boolean sawLarge = false;
@@ -72,7 +72,7 @@ public class HollowListSnapshotOrdinalIteratorTest extends AbstractHollowListTyp
     @Test
     public void iteratorExhaustsCleanlyAndRepeatsNoMoreOrdinals() throws IOException {
         HollowListTypeReadState readState = populateTypeStateWith(generateListContents(10));
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
         HollowOrdinalIterator iter = readState.ordinalIterator(0);
         int count = 0;
         while (iter.next() != HollowOrdinalIterator.NO_MORE_ORDINALS) {
@@ -87,7 +87,7 @@ public class HollowListSnapshotOrdinalIteratorTest extends AbstractHollowListTyp
     @Test
     public void iteratorMatchesPerElementReads() throws IOException {
         HollowListTypeReadState readState = populateTypeStateWith(generateListContents(100));
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
         for (int ordinal = 0; ordinal <= readState.maxOrdinal(); ordinal++) {
             int size = readState.size(ordinal);
             IntList iterated = drain(readState, ordinal);
@@ -104,7 +104,7 @@ public class HollowListSnapshotOrdinalIteratorTest extends AbstractHollowListTyp
         int numRecords = 1000;
         int[][] listContents = generateListContents(numRecords);
         final HollowListTypeReadState readState = populateTypeStateWith(listContents);
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
         final HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(readState);
 
         final int numReaders = 6;

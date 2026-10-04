@@ -66,7 +66,7 @@ public class HollowClientUpdater {
     private boolean skipTypeShardUpdateWithNoAdditions;
     private ExperimentalFeature[] experimentalFeatures = new ExperimentalFeature[0];
     private MemoryRecyclingMode memoryRecyclingMode = MemoryRecyclingMode.AUTO;
-    private boolean snapshotCollectionIterators;
+    private boolean shardCursorIterators;
 
     private TypeFilter filter;
 
@@ -136,11 +136,11 @@ public class HollowClientUpdater {
             dataHolder.getStateEngine().setSkipTypeShardUpdateWithNoAdditions(skipTypeShardUpdateWithNoAdditions);
     }
 
-    public void setSnapshotCollectionIterators(boolean snapshotCollectionIterators) {
-        this.snapshotCollectionIterators = snapshotCollectionIterators;
+    public void setShardCursorIterators(boolean shardCursorIterators) {
+        this.shardCursorIterators = shardCursorIterators;
         HollowDataHolder dataHolder = hollowDataHolderVolatile;
         if(dataHolder != null)
-            dataHolder.getStateEngine().setSnapshotCollectionIterators(snapshotCollectionIterators);
+            dataHolder.getStateEngine().setShardCursorIterators(shardCursorIterators);
     }
 
     /**
@@ -367,7 +367,7 @@ public class HollowClientUpdater {
             stateEngine = new HollowReadStateEngine(hashCodeFinder, true,
                     new HollowReadConfiguration(memoryMode, memoryRecyclingMode.createRecycler(), experimentalFeatures));
         }
-        stateEngine.setSnapshotCollectionIterators(snapshotCollectionIterators);
+        stateEngine.setShardCursorIterators(shardCursorIterators);
         return stateEngine;
     }
 

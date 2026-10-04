@@ -367,11 +367,11 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     public HollowMapEntryOrdinalIterator ordinalIterator(int ordinal) {
         sampler.recordIterator();
 
+        if(stateEngine != null && stateEngine.isShardCursorIteratorsEnabled())
+            return HollowMapSnapshotEntryOrdinalIterator.create(ordinal, this, sampler);
         if(size(ordinal) == 0)
             return EmptyMapOrdinalIterator.INSTANCE;
-        if(stateEngine == null || !stateEngine.isSnapshotCollectionIteratorsEnabled())
-            return new HollowMapEntryOrdinalIteratorImpl(ordinal, this);
-        return new HollowMapSnapshotEntryOrdinalIterator(ordinal, this, sampler);
+        return new HollowMapEntryOrdinalIteratorImpl(ordinal, this);
     }
 
     @Override
