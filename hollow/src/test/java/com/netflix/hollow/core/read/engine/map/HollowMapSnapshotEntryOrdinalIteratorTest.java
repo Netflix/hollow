@@ -1,8 +1,20 @@
 package com.netflix.hollow.core.read.engine.map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.junit.Assert.fail;
 
+import com.netflix.hollow.api.sampling.EnabledSamplingDirector;
+import com.netflix.hollow.api.sampling.SampleResult;
+import com.netflix.hollow.core.read.iterator.EmptyMapOrdinalIterator;
 import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIteratorImpl;
@@ -44,7 +56,7 @@ public class HollowMapSnapshotEntryOrdinalIteratorTest extends AbstractHollowMap
         int numRecords = 200;
         int[][][] mapContents = generateMapContents(numRecords);
         HollowMapTypeReadState readState = populateTypeStateWith(mapContents);
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
         HollowMapEntryOrdinalIterator iterator = readState.ordinalIterator(0);
         assertTrue(iterator instanceof HollowMapSnapshotEntryOrdinalIterator);
         assertTrue(iterator instanceof HollowMapEntryOrdinalIteratorImpl);
@@ -56,12 +68,37 @@ public class HollowMapSnapshotEntryOrdinalIteratorTest extends AbstractHollowMap
         assertTrue(sawEntries);
     }
 
+    @Test
+    public void capturesSizeAndBoundsTogetherAndPreservesSampling() throws IOException {
+        HollowMapTypeReadState readState = spy(populateTypeStateWith(
+                new int[][][] { {}, {{0, 1}} }));
+        readStateEngine.setShardCursorIterators(true);
+        readState.setSamplingDirector(new EnabledSamplingDirector());
+        HollowMapEntryOrdinalIterator empty = readState.ordinalIterator(0);
+        assertSame(EmptyMapOrdinalIterator.INSTANCE, empty);
+        assertFalse(empty.next());
+        HollowMapEntryOrdinalIterator nonempty = readState.ordinalIterator(1);
+        verify(readState, times(1)).readWasUnsafe(any(), eq(0), any());
+        verify(readState, times(1)).readWasUnsafe(any(), eq(1), any());
+        verify(readState, never()).size(0);
+        verify(readState, never()).size(1);
+        assertTrue(nonempty.next());
+        assertEquals(0, nonempty.getKey());
+        assertEquals(1, nonempty.getValue());
+        for (SampleResult result : readState.getSampler().getSampleResults()) {
+            if (result.getIdentifier().endsWith(".size()"))
+                assertEquals(3, result.getNumSamples());
+            if (result.getIdentifier().endsWith(".iterator()"))
+                assertEquals(2, result.getNumSamples());
+        }
+    }
+
     @Test(timeout = 60_000)
     public void iterateConcurrentlyWhileResharding() throws Exception {
         int numRecords = 500;
         int[][][] mapContents = generateMapContents(numRecords);
         final HollowMapTypeReadState readState = populateTypeStateWith(mapContents);
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
         final HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(readState);
 
         final int numReaders = 6;

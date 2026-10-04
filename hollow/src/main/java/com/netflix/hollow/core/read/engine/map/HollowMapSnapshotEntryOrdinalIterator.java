@@ -18,16 +18,17 @@ package com.netflix.hollow.core.read.engine.map;
 
 import com.netflix.hollow.api.sampling.HollowMapSampler;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIteratorImpl;
+import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.EmptyMapOrdinalIterator;
 
 /**
  * A key/value entry iterator over a map record backed by a single validated snapshot of its shard and bucket
  * range.
  * <p>
- * The historical per-bucket pattern re-reads {@code shardsVolatile} and executes {@code Unsafe.loadFence()}
- * twice for every bucket probed (via {@code relativeBucket}), plus a {@code size()} at construction — for a map
- * whose hash table has M buckets that is {@code 2M+1} fences. This iterator validates the bucket range once at
- * construction and then executes a single fence per {@link #next()} (one per surfaced entry), allocating
- * nothing.
+ * When on-heap arrays can be recycled, per-bucket access re-reads {@code shardsVolatile} and executes
+ * {@code Unsafe.loadFence()} twice for every bucket probed via {@code relativeBucket}, in addition to size
+ * lookups at construction. This iterator validates the bucket range once at construction and then executes
+ * a single fence per {@link #next()}, allocating nothing per entry.
  * <p>
  * Correctness mirrors the list/set snapshot iterators: {@code startBucket}/{@code endBucket} are validated
  * before use, so every relative bucket index in {@code [0, numBuckets)} maps to an in-bounds read from the
@@ -52,12 +53,41 @@ final class HollowMapSnapshotEntryOrdinalIterator extends HollowMapEntryOrdinalI
     private int key = -1;
     private int value = -1;
 
-    HollowMapSnapshotEntryOrdinalIterator(
+    static HollowMapEntryOrdinalIterator create(
             int ordinal, HollowMapTypeReadState readState, HollowMapSampler sampler) {
+        sampler.recordSize();
+        HollowMapTypeShardsHolder holder;
+        HollowMapTypeReadStateShard shard;
+        long start;
+        long end;
+        int size;
+        do {
+            holder = readState.shardsVolatile;
+            shard = holder.shards[ordinal & holder.shardNumberMask];
+            int shardOrdinal = ordinal >> shard.shardOrdinalShift;
+            size = shard.size(shardOrdinal);
+            if(size == 0) {
+                start = end = 0;
+            } else {
+                start = shard.dataElements.getStartBucket(shardOrdinal);
+                end = shard.dataElements.getEndBucket(shardOrdinal);
+            }
+        } while(readState.readWasUnsafe(holder, ordinal, shard));
+        if(size == 0)
+            return EmptyMapOrdinalIterator.INSTANCE;
+        // Preserve the size sample formerly recorded by the nonempty iterator's constructor.
+        sampler.recordSize();
+        return new HollowMapSnapshotEntryOrdinalIterator(ordinal, readState, holder, shard, start, end);
+    }
+
+    private HollowMapSnapshotEntryOrdinalIterator(int ordinal, HollowMapTypeReadState readState,
+            HollowMapTypeShardsHolder holder, HollowMapTypeReadStateShard shard, long start, long end) {
         this.readState = readState;
         this.ordinal = ordinal;
-        sampler.recordSize();
-        snapshot();
+        this.shardsHolder = holder;
+        this.shard = shard;
+        this.startBucket = start;
+        this.numBuckets = end - start;
     }
 
     private void snapshot() {

@@ -229,7 +229,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     @Override
     public HollowOrdinalIterator ordinalIterator(int ordinal) {
         sampler.recordIterator();
-        if(stateEngine == null || !stateEngine.isSnapshotCollectionIteratorsEnabled())
+        if(stateEngine == null || !stateEngine.isShardCursorIteratorsEnabled())
             return new HollowListOrdinalIterator(ordinal, this);
         return new HollowListSnapshotOrdinalIterator(ordinal, this, sampler);
     }

@@ -27,7 +27,7 @@ import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
 /**
- * Compares list iteration cost of the per-element read path (the historical {@code HollowListOrdinalIterator}
+ * Compares list iteration cost of the per-element read path (the generic {@code HollowListOrdinalIterator}
  * pattern: {@code size()} + {@code getElementOrdinal(ordinal, i)} per element, i.e. 2N+1
  * {@code Unsafe.loadFence()}s when arrays can be recycled)
  * against the single-snapshot path ({@code ordinalIterator()} backed by a shard cursor). With recycling, the
@@ -76,7 +76,7 @@ public class HollowListTypeReadStateIterationBenchmark {
                 ? new RecyclingRecycler()
                 : WastefulRecycler.DEFAULT_INSTANCE;
         HollowReadStateEngine readStateEngine = new HollowReadStateEngine(memoryRecycler);
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
 
         listTypeState = null;

@@ -16,11 +16,15 @@
  */
 package com.netflix.hollow.api.perfapi;
 
+import com.netflix.hollow.api.objects.HollowListTraversal;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import java.util.AbstractList;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.ListIterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.RandomAccess;
 
 public class HollowPerfBackedList<T> extends AbstractList<T> implements RandomAccess {
@@ -50,29 +54,38 @@ public class HollowPerfBackedList<T> extends AbstractList<T> implements RandomAc
 
     @Override
     public Iterator<T> iterator() {
-        HollowOrdinalIterator ordinalIterator = dataAccess.ordinalIterator(ordinal);
-        return new Iterator<T>() {
-            private int nextOrdinal = HollowOrdinalIterator.NO_MORE_ORDINALS;
-            private boolean nextOrdinalLoaded;
+        if(!HollowListTraversal.isEnabled(dataAccess))
+            return super.iterator();
+        return HollowListTraversal.iterator(dataAccess.ordinalIterator(ordinal), this::instantiateElement);
+    }
 
-            @Override
-            public boolean hasNext() {
-                if(!nextOrdinalLoaded) {
-                    nextOrdinal = ordinalIterator.next();
-                    nextOrdinalLoaded = true;
-                }
-                return nextOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS;
-            }
+    @Override
+    public ListIterator<T> listIterator(int index) {
+        // Subclasses may provide custom get() behavior instead of ordinal-based instantiation.
+        if(getClass() != HollowPerfBackedList.class || !HollowListTraversal.isEnabled(dataAccess))
+            return super.listIterator(index);
+        HollowOrdinalIterator cursor = dataAccess.ordinalIterator(ordinal);
+        return cursor instanceof HollowListOrdinalIterator
+                ? HollowListTraversal.listIterator((HollowListOrdinalIterator)cursor, index, this::instantiateElement)
+                : super.listIterator(index);
+    }
 
-            @Override
-            public T next() {
-                if(!hasNext())
-                    throw new NoSuchElementException();
-                int currentOrdinal = nextOrdinal;
-                nextOrdinalLoaded = false;
-                return instantiator.instantiate(elementMaskedTypeIdx | currentOrdinal);
-            }
-        };
+    @Override
+    public Spliterator<T> spliterator() {
+        if(!HollowListTraversal.isEnabled(dataAccess))
+            return super.spliterator();
+        if(getClass() != HollowPerfBackedList.class) {
+            // Java 8's default spliterator calls iterator(), which bypasses a subclass's get().
+            return Spliterators.spliterator(super.listIterator(0), size(), Spliterator.ORDERED);
+        }
+        HollowOrdinalIterator cursor = dataAccess.ordinalIterator(ordinal);
+        return cursor instanceof HollowListOrdinalIterator
+                ? HollowListTraversal.spliterator((HollowListOrdinalIterator)cursor, this::instantiateElement)
+                : super.spliterator();
+    }
+
+    private T instantiateElement(int elementOrdinal) {
+        return instantiator.instantiate(elementMaskedTypeIdx | elementOrdinal);
     }
 
 }

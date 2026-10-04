@@ -1,8 +1,19 @@
 package com.netflix.hollow.core.read.engine.set;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.junit.Assert.fail;
 
+import com.netflix.hollow.api.sampling.EnabledSamplingDirector;
+import com.netflix.hollow.api.sampling.SampleResult;
+import com.netflix.hollow.core.read.iterator.EmptyOrdinalIterator;
 import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowSetOrdinalIterator;
@@ -56,7 +67,7 @@ public class HollowSetSnapshotOrdinalIteratorTest extends AbstractHollowSetTypeD
         int numRecords = 50;
         int[][] setContents = generateSetContents(numRecords);
         HollowSetTypeReadState readState = populateTypeStateWith(setContents);
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
         HollowOrdinalIterator iterator = readState.ordinalIterator(0);
         assertTrue(iterator instanceof HollowSetSnapshotOrdinalIterator);
         assertTrue(iterator instanceof HollowSetOrdinalIterator);
@@ -73,12 +84,34 @@ public class HollowSetSnapshotOrdinalIteratorTest extends AbstractHollowSetTypeD
         assertTrue(sawLarge);
     }
 
+    @Test
+    public void capturesSizeAndBoundsTogetherAndPreservesSampling() throws IOException {
+        HollowSetTypeReadState readState = spy(populateTypeStateWith(new int[][] { {}, {0} }));
+        readStateEngine.setShardCursorIterators(true);
+        readState.setSamplingDirector(new EnabledSamplingDirector());
+        HollowOrdinalIterator empty = readState.ordinalIterator(0);
+        assertSame(EmptyOrdinalIterator.INSTANCE, empty);
+        assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, empty.next());
+        HollowOrdinalIterator nonempty = readState.ordinalIterator(1);
+        verify(readState, times(1)).readWasUnsafe(any(), eq(0), any());
+        verify(readState, times(1)).readWasUnsafe(any(), eq(1), any());
+        verify(readState, never()).size(0);
+        verify(readState, never()).size(1);
+        assertEquals(0, nonempty.next());
+        for (SampleResult result : readState.getSampler().getSampleResults()) {
+            if (result.getIdentifier().endsWith(".size()"))
+                assertEquals(3, result.getNumSamples());
+            if (result.getIdentifier().endsWith(".iterator()"))
+                assertEquals(2, result.getNumSamples());
+        }
+    }
+
     @Test(timeout = 60_000)
     public void iterateConcurrentlyWhileResharding() throws Exception {
         int numRecords = 500;
         int[][] setContents = generateSetContents(numRecords);
         final HollowSetTypeReadState readState = populateTypeStateWith(setContents);
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
         final HollowTypeReshardingStrategy reshardingStrategy = HollowTypeReshardingStrategy.getInstance(readState);
 
         final int numReaders = 6;

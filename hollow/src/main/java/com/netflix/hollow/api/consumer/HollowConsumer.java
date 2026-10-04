@@ -205,8 +205,8 @@ public class HollowConsumer {
         updater.setFilter(builder.typeFilter);
         if(builder.skipTypeShardUpdateWithNoAdditions)
             updater.setSkipShardUpdateWithNoAdditions(true);
-        if(builder.snapshotCollectionIterators)
-            updater.setSnapshotCollectionIterators(true);
+        if(builder.shardCursorIterators)
+            updater.setShardCursorIterators(true);
         this.announcementWatcher = builder.announcementWatcher;
         this.refreshExecutor = builder.refreshExecutor;
         this.refreshLock = new ReentrantReadWriteLock();
@@ -1160,7 +1160,7 @@ public class HollowConsumer {
         protected MemoryMode memoryMode = MemoryMode.ON_HEAP;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
         protected boolean skipTypeShardUpdateWithNoAdditions = false;
-        protected boolean snapshotCollectionIterators = false;
+        protected boolean shardCursorIterators = false;
 
         public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -1443,11 +1443,12 @@ public class HollowConsumer {
         }
 
         /**
-         * Experimental: Use snapshot iterators for collection types. Snapshot iterators capture a
-         * collection's shard and bounds once rather than resolving them for every element or bucket.
+         * Experimental. Enable shard cursor iterators for collection types and Java list traversal.
+         * Shard cursors capture a collection's shard and bounds once rather than resolving them for
+         * every element or bucket. Existing get-based Java list traversal remains the default.
          */
-        public B withSnapshotCollectionIterators() {
-            this.snapshotCollectionIterators = true;
+        public B withShardCursorIterators() {
+            this.shardCursorIterators = true;
             return (B)this;
         }
 

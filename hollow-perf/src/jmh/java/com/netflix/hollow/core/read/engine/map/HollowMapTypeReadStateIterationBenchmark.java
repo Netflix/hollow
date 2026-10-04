@@ -28,7 +28,7 @@ import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
 /**
- * Compares map entry iteration cost of the per-bucket read path (the historical
+ * Compares map entry iteration cost of the per-bucket read path (the generic
  * {@code HollowMapEntryOrdinalIteratorImpl} pattern: {@code size()} + {@code relativeBucket(ordinal, bucket)}
  * over every hash bucket, i.e. two fences per bucket when arrays can be recycled) against the single-snapshot
  * entry iterator. With recycling, the cursor validates once per surfaced entry; without recycling, its captured
@@ -76,7 +76,7 @@ public class HollowMapTypeReadStateIterationBenchmark {
                 ? new RecyclingRecycler()
                 : WastefulRecycler.DEFAULT_INSTANCE;
         HollowReadStateEngine readStateEngine = new HollowReadStateEngine(memoryRecycler);
-        readStateEngine.setSnapshotCollectionIterators(true);
+        readStateEngine.setShardCursorIterators(true);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
 
         mapTypeState = null;

@@ -22,8 +22,8 @@ import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
 /**
  * An ordinal iterator over a list record backed by a single validated snapshot of its shard and bounds.
  * <p>
- * The historical per-element pattern re-reads {@code shardsVolatile} and executes {@code Unsafe.loadFence()}
- * <em>twice</em> for every element (the inner loop validating {@code start}/{@code end} plus the trailing
+ * When on-heap arrays can be recycled, per-element access re-reads {@code shardsVolatile} and executes
+ * {@code Unsafe.loadFence()} <em>twice</em> for every element (the inner loop validating {@code start}/{@code end} plus the trailing
  * validation of the element read), i.e. {@code 2N+1} fences for a list of size N including the initial
  * {@code size()}. This iterator instead validates the bounds once at construction and then executes a single
  * fence per {@link #next()}, i.e. {@code N+1} fences, while allocating nothing per element.
@@ -37,7 +37,7 @@ import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
  * When retired on-heap arrays are not recycled, the captured shard remains immutable and strongly reachable.
  * In that case {@code readWasUnsafe} is a no-op, so the iterator retains its initial snapshot without fences.
  */
-class HollowListSnapshotOrdinalIterator extends HollowListOrdinalIterator {
+final class HollowListSnapshotOrdinalIterator extends HollowListOrdinalIterator {
 
     private final HollowListTypeReadState readState;
     private final int ordinal;
@@ -56,6 +56,27 @@ class HollowListSnapshotOrdinalIterator extends HollowListOrdinalIterator {
         this.ordinal = ordinal;
         sampler.recordSize();
         snapshot();
+    }
+
+    private HollowListSnapshotOrdinalIterator(HollowListSnapshotOrdinalIterator source) {
+        this.readState = source.readState;
+        this.ordinal = source.ordinal;
+        this.shardsHolder = source.shardsHolder;
+        this.shard = source.shard;
+        this.startElement = source.startElement;
+        this.endElement = source.endElement;
+        this.size = source.size;
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public HollowListOrdinalIterator copy() {
+        // Splits retain the captured range, but shard refreshes must remain local to each reader.
+        return new HollowListSnapshotOrdinalIterator(this);
     }
 
     /**
@@ -85,25 +106,31 @@ class HollowListSnapshotOrdinalIterator extends HollowListOrdinalIterator {
     }
 
     @Override
-    public int next() {
-        if(index >= size)
-            return NO_MORE_ORDINALS;
+    public int getElementOrdinal(int listIndex) {
+        int elementOrdinal = readElement(listIndex);
+        if(elementOrdinal == NO_MORE_ORDINALS)
+            throw new IndexOutOfBoundsException("Index: " + listIndex + ", size: " + size);
+        return elementOrdinal;
+    }
 
-        int listIndex = index;
+    private int readElement(int listIndex) {
         while(true) {
-            // Bounds were validated in snapshot(), so listIndex < size is an in-bounds, non-throwing read.
-            int elementOrdinal = shard.getElementOrdinal(startElement, endElement, listIndex);
-
-            if(!readState.readWasUnsafe(shardsHolder, ordinal, shard)) {
-                index++;
-                return elementOrdinal;
-            }
-
-            // The snapshot changed mid-read; re-establish it and retry this index.
-            snapshot();
-            if(listIndex >= size)
+            if(listIndex < 0 || listIndex >= size)
                 return NO_MORE_ORDINALS;
+            // The captured bounds keep the speculative read in bounds even during array recycling.
+            int elementOrdinal = shard.getElementOrdinal(startElement, endElement, listIndex);
+            if(!readState.readWasUnsafe(shardsHolder, ordinal, shard))
+                return elementOrdinal;
+            snapshot();
         }
+    }
+
+    @Override
+    public int next() {
+        int elementOrdinal = readElement(index);
+        if(elementOrdinal != NO_MORE_ORDINALS)
+            index++;
+        return elementOrdinal;
     }
 
 }
