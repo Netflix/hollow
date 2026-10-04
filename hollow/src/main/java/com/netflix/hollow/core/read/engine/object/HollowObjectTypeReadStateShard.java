@@ -124,6 +124,8 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
         startByte &= (1L << numBitsForField - 1) - 1;
 
         int length = (int)(endByte - startByte);
+        if(length == 0)
+            return "";
         ByteData data = dataElements.varLengthData[fieldIndex];
 
         return readString(data, startByte, length, immutable);
@@ -144,6 +146,8 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
         startByte &= (1L << numBitsForField - 1) - 1;
 
         int length = (int)(endByte - startByte);
+        if(length == 0)
+            return testValue.isEmpty();
         ByteData data = dataElements.varLengthData[fieldIndex];
 
         if(immutable)
