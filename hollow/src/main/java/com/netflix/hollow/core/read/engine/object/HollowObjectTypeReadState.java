@@ -382,7 +382,8 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 startByte = shardOrdinal != 0 ? shard.dataElements.fixedLengthData.getElementValue(currentBitOffset - shard.dataElements.bitsPerRecord, numBitsForField) : 0;
             } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
-            result = shard.readString(startByte, endByte, numBitsForField, fieldIndex, shardsAreImmutable);
+            result = shard.readString(startByte, endByte, numBitsForField, fieldIndex,
+                    shardsAreImmutable && memoryMode == MemoryMode.ON_HEAP);
         } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
         return result;
@@ -414,7 +415,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
             result = shard.isStringFieldEqual(startByte, endByte, numBitsForField, fieldIndex,
-                    testValue, shardsAreImmutable);
+                    testValue, shardsAreImmutable && memoryMode == MemoryMode.ON_HEAP);
         } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
         return result;
