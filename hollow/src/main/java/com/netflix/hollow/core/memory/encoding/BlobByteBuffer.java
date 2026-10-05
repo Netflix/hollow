@@ -3,6 +3,9 @@ package com.netflix.hollow.core.memory.encoding;
 import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -25,6 +28,22 @@ import java.nio.channels.FileChannel;
 public final class BlobByteBuffer {
 
     public static final int MAX_SINGLE_BUFFER_CAPACITY = 1 << 30;   // largest, positive power-of-two int
+
+    private static final MethodHandle ABSOLUTE_BULK_GET = findAbsoluteBulkGet();
+
+    private static MethodHandle findAbsoluteBulkGet() {
+        // JDK 13 added absolute bulk reads, avoiding a duplicate buffer for each copied chunk.
+        MethodType type = MethodType.methodType(ByteBuffer.class,
+                int.class, byte[].class, int.class, int.class);
+        try {
+            return MethodHandles.publicLookup().findVirtual(ByteBuffer.class, "get", type)
+                    .asType(type.insertParameterTypes(0, ByteBuffer.class).changeReturnType(void.class));
+        } catch(NoSuchMethodException e) {
+            return null;
+        } catch(IllegalAccessException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     private final ByteBuffer[] spine;   // array of MappedByteBuffers
     private final long capacity;        // in bytes
@@ -170,15 +189,31 @@ public final class BlobByteBuffer {
         while(remaining > 0) {
             int spineIndex = (int)(startByteIndex >>> shift);
             int bufferIndex = (int)(startByteIndex & mask);
-            ByteBuffer buffer = spine[spineIndex].duplicate();
+            ByteBuffer buffer = spine[spineIndex];
             int bytesToCopy = Math.min(remaining, buffer.capacity() - bufferIndex);
 
-            buffer.position(bufferIndex);
-            buffer.get(destination, destPos, bytesToCopy);
+            copyBytes(buffer, bufferIndex, destination, destPos, bytesToCopy);
 
             startByteIndex += bytesToCopy;
             destPos += bytesToCopy;
             remaining -= bytesToCopy;
+        }
+    }
+
+    private static void copyBytes(ByteBuffer buffer, int index, byte[] destination, int offset, int length) {
+        if(ABSOLUTE_BULK_GET == null) {
+            ByteBuffer view = buffer.duplicate();
+            view.position(index);
+            view.get(destination, offset, length);
+            return;
+        }
+
+        try {
+            ABSOLUTE_BULK_GET.invokeExact(buffer, index, destination, offset, length);
+        } catch(RuntimeException | Error e) {
+            throw e;
+        } catch(Throwable e) {
+            throw new AssertionError("Unexpected checked exception from ByteBuffer.get", e);
         }
     }
 
