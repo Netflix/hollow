@@ -51,13 +51,13 @@ public class HollowTypeReadStateTest {
     }
 
     @Test
-    public void sharedMemoryShardsAreNotImmutable() {
-        HollowReadStateEngine stateEngine = new HollowReadStateEngine(new WastefulRecycler(11, 8));
+    public void sharedMemoryShardsAreImmutableEvenWhenArraysAreRecycled() {
+        HollowReadStateEngine stateEngine = new HollowReadStateEngine(new RecyclingRecycler());
 
         HollowTypeReadState typeState = new HollowObjectTypeReadState(
                 stateEngine, MemoryMode.SHARED_MEMORY_LAZY, schema, schema);
 
-        assertFalse(typeState.shardsAreImmutable);
+        assertTrue(typeState.shardsAreImmutable);
     }
 
     @Test
