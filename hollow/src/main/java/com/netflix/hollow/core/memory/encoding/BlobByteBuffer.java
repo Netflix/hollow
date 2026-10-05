@@ -229,19 +229,11 @@ public final class BlobByteBuffer {
         int alignmentOffset = (int)((startByteIndex - this.position()) % Long.BYTES);
         long nextAlignedPos = startByteIndex - alignmentOffset + Long.BYTES;
 
-        byte[] bytes = new byte[Long.BYTES];
-        for (int i = 0; i < Long.BYTES; i ++ ) {
-            bytes[i] = getByte(bigEndian(startByteIndex + i, nextAlignedPos));
+        long value = 0;
+        for (int i = 0; i < Long.BYTES; i++) {
+            value |= (getByte(bigEndian(startByteIndex + i, nextAlignedPos)) & 0xffL) << (i * 8);
         }
-
-        return ((((long) (bytes[7]       )) << 56) |
-                (((long) (bytes[6] & 0xff)) << 48) |
-                (((long) (bytes[5] & 0xff)) << 40) |
-                (((long) (bytes[4] & 0xff)) << 32) |
-                (((long) (bytes[3] & 0xff)) << 24) |
-                (((long) (bytes[2] & 0xff)) << 16) |
-                (((long) (bytes[1] & 0xff)) <<  8) |
-                (((long) (bytes[0] & 0xff))      ));
+        return value;
     }
 
     /**
