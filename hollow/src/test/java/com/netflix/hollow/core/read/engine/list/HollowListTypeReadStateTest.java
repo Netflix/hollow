@@ -96,7 +96,7 @@ public class HollowListTypeReadStateTest extends AbstractHollowListTypeDataEleme
     }
 
     @Test
-    public void recycledIteratorExhaustsWhenOrdinalIsReusedByShorterList() throws Exception {
+    public void iteratorHandlesOrdinalReusedByShorterList() throws Exception {
         populateWriteStateEngine(3);
         populateWriteStateEngineWithListRecords(new int[][] {{0, 1, 2}});
         roundTripSnapshot();
@@ -113,6 +113,11 @@ public class HollowListTypeReadStateTest extends AbstractHollowListTypeDataEleme
         roundTripDelta();
         assertEquals(1, typeState.size(0));
         assertEquals(1, typeState.getElementOrdinal(0, 0));
+        if(!recycling) {
+            // Immutable cursors retain the original list even when its ordinal is reused.
+            assertEquals(1, iterator.next());
+            assertEquals(2, iterator.next());
+        }
         assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iterator.next());
         assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iterator.next());
     }
