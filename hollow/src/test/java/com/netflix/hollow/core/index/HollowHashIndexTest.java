@@ -389,7 +389,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         movieRec.setInt("releaseYear", 1999);
         writeEngine.add("Movie", movieRec);
 
-        HollowReadStateEngine readEngine = new HollowReadStateEngine();
+        HollowReadStateEngine readEngine = newReadStateEngine();
         StateEngineRoundTripper.roundTripSnapshot(writeEngine, readEngine);
 
         // invalid because root type doesn't exist

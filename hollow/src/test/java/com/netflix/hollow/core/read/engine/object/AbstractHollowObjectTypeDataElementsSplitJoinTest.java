@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.read.engine.AbstractHollowTypeDataElementsSplitJoinTest;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import java.io.IOException;
@@ -13,7 +12,7 @@ import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class AbstractHollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowTypeDataElementsSplitJoinTest {
+public abstract class AbstractHollowObjectTypeDataElementsSplitJoinTest extends AbstractHollowTypeDataElementsSplitJoinTest {
 
     @Mock
     protected HollowObjectTypeReadState mockObjectTypeState;
@@ -47,7 +46,7 @@ public class AbstractHollowObjectTypeDataElementsSplitJoinTest extends AbstractH
 
     protected HollowObjectTypeReadState populateTypeStateWithFilter(int numRecords) throws IOException {
         populateWriteStateEngine(numRecords);
-        readStateEngine = new HollowReadStateEngine();
+        readStateEngine = newReadStateEngine();
         HollowFilterConfig readFilter = new HollowFilterConfig(true);
         readFilter.addField("TestObject", "intField");
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, readFilter);

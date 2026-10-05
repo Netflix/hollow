@@ -16,14 +16,31 @@
  */
 package com.netflix.hollow.core;
 
+import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public abstract class AbstractStateEngineTest {
+
+    @Parameters(name = "recycling={0}")
+    public static Collection<Object[]> recyclerModes() {
+        return Arrays.asList(new Object[][] { { true }, { false } });
+    }
+
+    @Parameter
+    public boolean recycling;
 
     protected HollowWriteStateEngine writeStateEngine;
 
@@ -43,8 +60,13 @@ public abstract class AbstractStateEngineTest {
         initializeTypeStates();
     }
 
+    protected HollowReadStateEngine newReadStateEngine() {
+        return new HollowReadStateEngine(recycling
+                ? new RecyclingRecycler() : new WastefulRecycler(11, 8));
+    }
+
     protected void roundTripSnapshot() throws IOException {
-        readStateEngine = new HollowReadStateEngine();
+        readStateEngine = newReadStateEngine();
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, readFilter);
     }
 
