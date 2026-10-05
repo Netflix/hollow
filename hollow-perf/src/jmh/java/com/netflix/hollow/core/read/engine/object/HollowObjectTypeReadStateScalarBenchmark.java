@@ -60,6 +60,7 @@ public class HollowObjectTypeReadStateScalarBenchmark {
     private static final int READS = 65536;
     private static final int SMALL_LONG_FIELD = 4;
     private static final int LARGE_LONG_FIELD = 5;
+    private static final int BOOLEAN_FIELD = 6;
 
     @Param({ "65536", "1000000" })
     int records;
@@ -150,9 +151,20 @@ public class HollowObjectTypeReadStateScalarBenchmark {
                     : "segmented".equals(storage) ? data instanceof FixedLengthElementArray
                     : data instanceof ContiguousFixedLengthData;
             if(!expectedStorage || shard.dataElements.bitsPerField[SMALL_LONG_FIELD] > 56
-                    || shard.dataElements.bitsPerField[LARGE_LONG_FIELD] <= 56)
+                    || shard.dataElements.bitsPerField[LARGE_LONG_FIELD] <= 56
+                    || shard.dataElements.bitsPerField[BOOLEAN_FIELD] != 2)
                 throw new IllegalStateException("Unexpected storage or field width");
         }
+    }
+
+    @Benchmark
+    @OperationsPerInvocation(READS)
+    public int readBoolean() {
+        int count = 0;
+        HollowObjectTypeReadState data = dataAccess;
+        for(int ordinal : readOrder)
+            count += Boolean.TRUE.equals(data.readBoolean(ordinal, BOOLEAN_FIELD)) ? 1 : 0;
+        return count;
     }
 
     @Benchmark
