@@ -11,6 +11,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -100,6 +101,64 @@ public class BlobByteBufferTest {
         }
     }
 
+    @Test
+    public void readsLongsAtEveryAlignmentAcrossMappingsAndFinalPadding() throws Exception {
+        Random random = new Random(42);
+        for(int segmentSize : new int[] { 1, 2, 4, 8, 16, 32, 64, 128 }) {
+            for(int prefix = 0; prefix < 10; prefix++) {
+                // Fixed-length data is serialized as whole big-endian longs.
+                for(int length : new int[] { 8, 16, 24, 32, 40, 64, 72 }) {
+                    byte[] data = new byte[prefix + length];
+                    random.nextBytes(data);
+                    BlobByteBuffer buffer = map(data, segmentSize).position(prefix).duplicate();
+                    for(int index = 0; index < length; index++) {
+                        assertEquals("segment=" + segmentSize + " prefix=" + prefix
+                                        + " length=" + length + " index=" + index,
+                                expectedLong(data, prefix, index), buffer.getLong(prefix + index));
+                        assertEquals(prefix, buffer.position());
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void readsLongsConcurrentlyFromSharedMappedBuffers() throws Exception {
+        byte[] data = new byte[96];
+        new Random(42).nextBytes(data);
+        BlobByteBuffer buffer = map(data);
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        try {
+            List<Future<?>> reads = new ArrayList<>();
+            for(int thread = 0; thread < 4; thread++) {
+                final int prefix = thread;
+                reads.add(executor.submit(() -> {
+                    BlobByteBuffer view = buffer.duplicate().position(prefix);
+                    for(int i = 0; i < 1000; i++) {
+                        int index = (i + prefix) % (data.length - prefix - 16);
+                        assertEquals(expectedLong(data, prefix, index), view.getLong(prefix + index));
+                        assertEquals(prefix, view.position());
+                    }
+                }));
+            }
+            for(Future<?> read : reads)
+                read.get(10, TimeUnit.SECONDS);
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    private static long expectedLong(byte[] data, int prefix, int index) {
+        long value = 0;
+        for(int i = 0; i < Long.BYTES; i++) {
+            // Reverse byte order within each serialized word, independently of mapping boundaries.
+            int physicalIndex = prefix + ((index + i) ^ 7);
+            if(physicalIndex < data.length)
+                value |= (data[physicalIndex] & 0xffL) << (i * 8);
+        }
+        return value;
+    }
+
     private static void assertCopyOutOfBounds(BlobByteBuffer buffer, long start, int destPos, int length) {
         byte[] destination = new byte[10];
         Arrays.fill(destination, (byte)-1);
@@ -113,6 +172,10 @@ public class BlobByteBufferTest {
     }
 
     private static BlobByteBuffer map(byte[] data) throws Exception {
+        return map(data, 16);
+    }
+
+    private static BlobByteBuffer map(byte[] data, int segmentSize) throws Exception {
         File file = File.createTempFile("blob-byte-buffer", ".bin");
         file.deleteOnExit();
         try(FileOutputStream out = new FileOutputStream(file)) {
@@ -120,7 +183,7 @@ public class BlobByteBufferTest {
         }
         try(FileInputStream in = new FileInputStream(file);
             FileChannel channel = in.getChannel()) {
-            return BlobByteBuffer.mmapBlob(channel, 16);
+            return BlobByteBuffer.mmapBlob(channel, segmentSize);
         }
     }
 }
