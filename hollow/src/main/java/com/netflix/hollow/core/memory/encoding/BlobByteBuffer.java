@@ -225,10 +225,44 @@ public final class BlobByteBuffer {
      * @return long value
      */
     public long getLong(long startByteIndex) throws BufferUnderflowException {
+        // Serialized words are aligned to the view, not necessarily to mapping boundaries.
+        int offset = (int)((startByteIndex - this.position()) % Long.BYTES);
+        long nextAlignedPos = startByteIndex - offset + Long.BYTES;
+        if (!directReadIsSafe(offset, nextAlignedPos))
+            return getLongFromBytes(startByteIndex, nextAlignedPos);
+        return readPhysicalLongs(offset, nextAlignedPos);
+    }
 
-        int alignmentOffset = (int)((startByteIndex - this.position()) % Long.BYTES);
-        long nextAlignedPos = startByteIndex - alignmentOffset + Long.BYTES;
+    private boolean directReadIsSafe(int offset, long nextAlignedPos) {
+        return offset >= 0
+                && nextAlignedPos <= capacity - (offset == 0 ? 0 : Long.BYTES)
+                && canReadPhysicalLong(nextAlignedPos - Long.BYTES)
+                && (offset == 0 || canReadPhysicalLong(nextAlignedPos));
+    }
 
+    private long readPhysicalLongs(int offset, long nextAlignedPos) {
+        long first = getPhysicalLong(nextAlignedPos - Long.BYTES);
+        if (offset == 0)
+            return first;
+
+        long second = getPhysicalLong(nextAlignedPos);
+        return (first >>> (offset * Byte.SIZE))
+                | (second << ((Long.BYTES - offset) * Byte.SIZE));
+    }
+
+    private boolean canReadPhysicalLong(long index) {
+        int spineIndex = (int)(index >>> shift);
+        int bufferIndex = (int)(index & mask);
+        return bufferIndex <= spine[spineIndex].capacity() - Long.BYTES;
+    }
+
+    private long getPhysicalLong(long index) {
+        int spineIndex = (int)(index >>> shift);
+        int bufferIndex = (int)(index & mask);
+        return spine[spineIndex].getLong(bufferIndex);
+    }
+
+    private long getLongFromBytes(long startByteIndex, long nextAlignedPos) {
         long value = 0;
         for (int i = 0; i < Long.BYTES; i++) {
             value |= (getByte(bigEndian(startByteIndex + i, nextAlignedPos)) & 0xffL) << (i * 8);

@@ -123,6 +123,28 @@ public class BlobByteBufferTest {
     }
 
     @Test
+    public void readsLongsWithPartialFinalPhysicalWord() throws Exception {
+        Random random = new Random(42);
+        for(int segmentSize : new int[] { 1, 2, 4, 8, 16, 32, 64 }) {
+            for(int prefix = 0; prefix < 10; prefix++) {
+                for(int length = 1; length < 24; length++) {
+                    byte[] data = new byte[prefix + length];
+                    random.nextBytes(data);
+                    BlobByteBuffer buffer = map(data, segmentSize).position(prefix);
+                    // Unaligned reads within a truncated final word can exceed the permitted padding.
+                    int lastWordStart = (length - 1) & ~(Long.BYTES - 1);
+                    for(int index = 0; index <= lastWordStart; index++) {
+                        assertEquals("segment=" + segmentSize + " prefix=" + prefix
+                                        + " length=" + length + " index=" + index,
+                                expectedLong(data, prefix, index), buffer.getLong(prefix + index));
+                        assertEquals(prefix, buffer.position());
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     public void readsLongsConcurrentlyFromSharedMappedBuffers() throws Exception {
         byte[] data = new byte[96];
         new Random(42).nextBytes(data);
