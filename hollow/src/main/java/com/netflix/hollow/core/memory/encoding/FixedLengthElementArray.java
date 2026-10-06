@@ -131,19 +131,36 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
 
     @Override
     public long getLargeElementValue(long index, int bitsPerElement, long mask) {
+        // Preserve virtual get() behavior for subclasses.
+        if (getClass() != FixedLengthElementArray.class) {
+            return getLargeElementValueUsingGet(index, bitsPerElement, mask);
+        }
         long whichLong = index >>> 6;
         int whichBit = (int) (index & 0x3F);
 
-        long l = get(whichLong) >>> whichBit;
+        long[] segment = segments[(int) (whichLong >>> log2OfSegmentSize)];
+        int longInSegment = (int) (whichLong & bitmask);
+        long l = segment[longInSegment] >>> whichBit;
 
         int bitsRemaining = 64 - whichBit;
 
         if (bitsRemaining < bitsPerElement) {
-            whichLong++;
-            l |= get(whichLong) << bitsRemaining;
+            // The fencepost long duplicates the first long of the next segment.
+            l |= segment[longInSegment + 1] << bitsRemaining;
         }
 
         return l & mask;
+    }
+
+    private long getLargeElementValueUsingGet(long index, int bitsPerElement, long mask) {
+        long whichLong = index >>> 6;
+        int whichBit = (int) (index & 0x3F);
+        long value = get(whichLong) >>> whichBit;
+        int bitsRemaining = 64 - whichBit;
+        if (bitsRemaining < bitsPerElement) {
+            value |= get(whichLong + 1) << bitsRemaining;
+        }
+        return value & mask;
     }
 
     @Override
