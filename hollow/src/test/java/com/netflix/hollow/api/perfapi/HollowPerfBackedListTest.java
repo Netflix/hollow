@@ -91,8 +91,19 @@ public class HollowPerfBackedListTest {
                 return 99L;
             }
         };
+        java.util.List<Long> expected = Collections.singletonList(99L);
+        assertEquals(Long.valueOf(99), list.get(0));
         assertEquals(Long.valueOf(99), list.listIterator().next());
+        assertEquals(Long.valueOf(99), list.iterator().next());
         assertTrue(list.spliterator().tryAdvance(value -> assertEquals(Long.valueOf(99), value)));
+        assertEquals(expected, list.stream().collect(java.util.stream.Collectors.toList()));
+        assertEquals(expected, list.parallelStream().collect(java.util.stream.Collectors.toList()));
+        assertEquals(expected, new java.util.ArrayList<>(list));
+        assertEquals(expected, list);
+        assertEquals(list, expected);
+        assertEquals(expected.hashCode(), list.hashCode());
+        assertEquals(expected.toString(), list.toString());
+        verify(dataAccess, never()).ordinalIterator(7);
     }
 
     @Test

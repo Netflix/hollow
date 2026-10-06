@@ -59,7 +59,9 @@ public abstract class HollowList<T> extends AbstractList<T> implements HollowRec
     public Iterator<T> iterator() {
         if(!HollowListTraversal.isEnabled(delegate.getTypeDataAccess()))
             return super.iterator();
-        return HollowListTraversal.iterator(delegate.iterator(ordinal), this::instantiateElement);
+        HollowListOrdinalIterator cursor = delegate.ordinalCursor(ordinal);
+        return cursor == null ? super.iterator()
+                : HollowListTraversal.iterator(cursor, this::instantiateElement);
     }
 
     @Override

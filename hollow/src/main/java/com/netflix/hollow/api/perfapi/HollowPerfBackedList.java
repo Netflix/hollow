@@ -24,7 +24,6 @@ import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.RandomAccess;
 
 public class HollowPerfBackedList<T> extends AbstractList<T> implements RandomAccess {
@@ -54,7 +53,7 @@ public class HollowPerfBackedList<T> extends AbstractList<T> implements RandomAc
 
     @Override
     public Iterator<T> iterator() {
-        if(!HollowListTraversal.isEnabled(dataAccess))
+        if(getClass() != HollowPerfBackedList.class || !HollowListTraversal.isEnabled(dataAccess))
             return super.iterator();
         return HollowListTraversal.iterator(dataAccess.ordinalIterator(ordinal), this::instantiateElement);
     }
@@ -72,12 +71,8 @@ public class HollowPerfBackedList<T> extends AbstractList<T> implements RandomAc
 
     @Override
     public Spliterator<T> spliterator() {
-        if(!HollowListTraversal.isEnabled(dataAccess))
+        if(getClass() != HollowPerfBackedList.class || !HollowListTraversal.isEnabled(dataAccess))
             return super.spliterator();
-        if(getClass() != HollowPerfBackedList.class) {
-            // Java 8's default spliterator calls iterator(), which bypasses a subclass's get().
-            return Spliterators.spliterator(super.listIterator(0), size(), Spliterator.ORDERED);
-        }
         HollowOrdinalIterator cursor = dataAccess.ordinalIterator(ordinal);
         return cursor instanceof HollowListOrdinalIterator
                 ? HollowListTraversal.spliterator((HollowListOrdinalIterator)cursor, this::instantiateElement)

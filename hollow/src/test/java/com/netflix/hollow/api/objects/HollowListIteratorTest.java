@@ -55,11 +55,13 @@ public class HollowListIteratorTest {
     }
 
     @Test
-    public void iteratesUsingOrdinalIterator() {
+    public void iteratesUsingOrdinalCursor() {
         HollowListTypeDataAccess dataAccess = enabledDataAccess();
-        HollowOrdinalIterator ordinalIterator = mock(HollowOrdinalIterator.class);
+        HollowListOrdinalIterator ordinalIterator = mock(HollowListOrdinalIterator.class);
         when(dataAccess.ordinalIterator(7)).thenReturn(ordinalIterator);
-        when(ordinalIterator.next()).thenReturn(3, 5, HollowOrdinalIterator.NO_MORE_ORDINALS);
+        when(ordinalIterator.size()).thenReturn(2);
+        when(ordinalIterator.getElementOrdinal(0)).thenReturn(3);
+        when(ordinalIterator.getElementOrdinal(1)).thenReturn(5);
 
         HollowList<Integer> list = list(new HollowListLookupDelegate<>(dataAccess));
 
@@ -168,7 +170,7 @@ public class HollowListIteratorTest {
     }
 
     @Test
-    public void lookupSubclassRetainsItsGetBasedListIterator() {
+    public void lookupSubclassRetainsItsGetBasedTraversal() {
         HollowListTypeDataAccess dataAccess = enabledDataAccess();
         when(dataAccess.size(7)).thenReturn(1);
         when(dataAccess.getElementOrdinal(7, 0)).thenReturn(3);
@@ -180,7 +182,38 @@ public class HollowListIteratorTest {
                 return 99;
             }
         });
-        assertEquals(Integer.valueOf(99), list.listIterator().next());
+        assertTraversalMatchesGet(list, Collections.singletonList(99));
+        verify(dataAccess, never()).ordinalIterator(7);
+    }
+
+    @Test
+    public void cachedSubclassRetainsItsGetBasedTraversal() {
+        HollowListTypeDataAccess dataAccess = enabledDataAccess();
+        when(dataAccess.size(7)).thenReturn(1);
+        when(dataAccess.getElementOrdinal(7, 0)).thenReturn(3);
+        HollowList<Integer> list = list(new HollowListCachedDelegate<Integer>(dataAccess, 7) {
+            @Override
+            public Integer get(HollowList<Integer> list, int ordinal, int index) {
+                return 99;
+            }
+        });
+
+        assertTraversalMatchesGet(list, Collections.singletonList(99));
+        verify(dataAccess, never()).ordinalIterator(7);
+    }
+
+    @Test
+    public void retainsGetBasedTraversalWithoutIndexedCursor() {
+        HollowListTypeDataAccess dataAccess = enabledDataAccess();
+        when(dataAccess.size(7)).thenReturn(1);
+        when(dataAccess.getElementOrdinal(7, 0)).thenReturn(3);
+        HollowOrdinalIterator ordinalIterator = mock(HollowOrdinalIterator.class);
+        when(ordinalIterator.next()).thenReturn(99, HollowOrdinalIterator.NO_MORE_ORDINALS);
+        when(dataAccess.ordinalIterator(7)).thenReturn(ordinalIterator);
+        HollowList<Integer> list = list(new HollowListLookupDelegate<>(dataAccess));
+
+        assertTraversalMatchesGet(list, Collections.singletonList(3));
+        verify(ordinalIterator, never()).next();
     }
 
     @Test
@@ -250,6 +283,19 @@ public class HollowListIteratorTest {
         assertEquals(Integer.valueOf(3), list.iterator().next());
         assertEquals(Integer.valueOf(5), list.listIterator(2).previous());
         assertEquals(Arrays.asList(3, 5), list.stream().collect(java.util.stream.Collectors.toList()));
+    }
+
+    private void assertTraversalMatchesGet(List<Integer> list, List<Integer> expected) {
+        assertEquals(expected.get(0), list.get(0));
+        assertEquals(expected.get(0), list.listIterator().next());
+        assertEquals(expected.get(0), list.iterator().next());
+        assertEquals(expected, list.stream().collect(java.util.stream.Collectors.toList()));
+        assertEquals(expected, list.parallelStream().collect(java.util.stream.Collectors.toList()));
+        assertEquals(expected, new ArrayList<>(list));
+        assertEquals(expected, list);
+        assertEquals(list, expected);
+        assertEquals(expected.hashCode(), list.hashCode());
+        assertEquals(expected.toString(), list.toString());
     }
 
     private HollowListTypeDataAccess enabledDataAccess() {
