@@ -45,6 +45,8 @@ public final class BlobByteBuffer {
         }
     }
 
+    // These buffers are shared between readers. Use absolute reads on them; duplicate
+    // a buffer before changing its position/limit or using relative reads.
     private final ByteBuffer[] spine;   // array of MappedByteBuffers
     private final long capacity;        // in bytes
     private final int shift;

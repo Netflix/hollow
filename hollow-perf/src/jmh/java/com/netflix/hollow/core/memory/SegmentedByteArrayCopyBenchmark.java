@@ -13,7 +13,12 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.infra.Blackhole;
 
+/**
+ * The allocating methods match the allocate-and-fill shape of byte-field reads.
+ * The reusable methods isolate copying from destination allocation.
+ */
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -27,6 +32,7 @@ public class SegmentedByteArrayCopyBenchmark {
 
     SegmentedByteArray data;
     long start;
+    byte[] reusableResult;
 
     @Setup
     public void setUp() {
@@ -34,6 +40,7 @@ public class SegmentedByteArrayCopyBenchmark {
         start = (1 << WastefulRecycler.DEFAULT_INSTANCE.getLog2OfByteSegmentSize()) - 17;
         for(int i = 0; i < length; i++)
             data.set(start + i, (byte)(i * 31));
+        reusableResult = new byte[length];
     }
 
     @Benchmark
@@ -49,5 +56,18 @@ public class SegmentedByteArrayCopyBenchmark {
         for(int i = 0; i < length; i++)
             result[i] = data.get(start + i);
         return result;
+    }
+
+    @Benchmark
+    public void copyToReusable(Blackhole blackhole) {
+        data.copyTo(start, reusableResult, 0, length);
+        blackhole.consume(reusableResult);
+    }
+
+    @Benchmark
+    public void copyPerByteReusable(Blackhole blackhole) {
+        for(int i = 0; i < length; i++)
+            reusableResult[i] = data.get(start + i);
+        blackhole.consume(reusableResult);
     }
 }

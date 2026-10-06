@@ -32,7 +32,13 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.infra.Blackhole;
 
+/**
+ * The allocating methods match the allocate-and-fill shape of byte-field reads.
+ * The reusable methods isolate copying from destination allocation, making any
+ * temporary-buffer allocations visible with the GC profiler.
+ */
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -48,6 +54,7 @@ public class BlobByteBufferCopyBenchmark {
     int start;
 
     BlobByteBuffer data;
+    byte[] reusableResult;
 
     @Setup
     public void setUp() throws Exception {
@@ -64,6 +71,7 @@ public class BlobByteBufferCopyBenchmark {
             FileChannel channel = in.getChannel()) {
             data = BlobByteBuffer.mmapBlob(channel, 4096);
         }
+        reusableResult = new byte[length];
     }
 
     @Benchmark
@@ -79,5 +87,18 @@ public class BlobByteBufferCopyBenchmark {
         for(int i = 0; i < length; i++)
             result[i] = data.getByte(start + i);
         return result;
+    }
+
+    @Benchmark
+    public void copyToReusable(Blackhole blackhole) {
+        data.copyTo(start, reusableResult, 0, length);
+        blackhole.consume(reusableResult);
+    }
+
+    @Benchmark
+    public void copyPerByteReusable(Blackhole blackhole) {
+        for(int i = 0; i < length; i++)
+            reusableResult[i] = data.getByte(start + i);
+        blackhole.consume(reusableResult);
     }
 }
