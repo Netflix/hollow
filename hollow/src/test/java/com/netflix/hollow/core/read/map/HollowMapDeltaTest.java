@@ -211,10 +211,10 @@ public class HollowMapDeltaTest extends AbstractStateEngineTest {
         objectMapper1.add(pojoMap1); // ordinals {0,0}, {0,1}
         objectMapper2.add(pojoMap2); // ordinals {0,1}, {0,0}
 
-        HollowReadStateEngine readStateEngine1 = new HollowReadStateEngine();
+        HollowReadStateEngine readStateEngine1 = newReadStateEngine();
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine1, readStateEngine1);
 
-        HollowReadStateEngine readStateEngine2 = new HollowReadStateEngine();
+        HollowReadStateEngine readStateEngine2 = newReadStateEngine();
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine2, readStateEngine2);
 
         // serialization should sort those identically, i.e. on both key and value ordinal values

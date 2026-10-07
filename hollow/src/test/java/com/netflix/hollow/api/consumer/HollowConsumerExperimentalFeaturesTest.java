@@ -1,6 +1,7 @@
 package com.netflix.hollow.api.consumer;
 
 import static com.netflix.hollow.core.read.engine.ExperimentalFeature.SHARD_READ_FAST_PATHS;
+import static com.netflix.hollow.core.read.engine.ExperimentalFeature.DIRECT_SEGMENT_STRING_READS;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
@@ -87,6 +88,19 @@ public class HollowConsumerExperimentalFeaturesTest {
     @Test(expected = NullPointerException.class)
     public void rejectsNullRecyclerMode() {
         builder().withMemoryRecyclingMode(null);
+    }
+
+    @Test
+    public void stringAndShardOptInsAreIndependent() throws IOException {
+        TestHollowConsumer strings = builder().withExperimentalFeatures(DIRECT_SEGMENT_STRING_READS).build();
+        loadSnapshot(strings, 1L);
+        assertTrue(strings.getStateEngine().isExperimentalFeatureEnabled(DIRECT_SEGMENT_STRING_READS));
+        assertFalse(strings.getStateEngine().isExperimentalFeatureEnabled(SHARD_READ_FAST_PATHS));
+        TestHollowConsumer both = builder().withExperimentalFeatures(DIRECT_SEGMENT_STRING_READS)
+                .withExperimentalFeatures(SHARD_READ_FAST_PATHS).build();
+        loadSnapshot(both, 1L);
+        assertTrue(both.getStateEngine().isExperimentalFeatureEnabled(DIRECT_SEGMENT_STRING_READS));
+        assertTrue(both.getStateEngine().isExperimentalFeatureEnabled(SHARD_READ_FAST_PATHS));
     }
 
     @Test(expected = NullPointerException.class)

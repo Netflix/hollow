@@ -21,6 +21,9 @@ import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.SegmentedLongArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import java.io.IOException;
 import sun.misc.Unsafe;
 
@@ -63,12 +66,18 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
     private final int log2OfSegmentSizeInBytes;
     private final int byteBitmask;
     private final long sizeBits;
+    private final boolean useShardReadFastPaths;
 
     public FixedLengthElementArray(ArraySegmentRecycler memoryRecycler, long numBits) {
-        super(memoryRecycler, ((numBits - 1) >>> 6) + 1);
+        this(new HollowReadConfiguration(MemoryMode.ON_HEAP, memoryRecycler), numBits);
+    }
+
+    public FixedLengthElementArray(HollowReadConfiguration configuration, long numBits) {
+        super(configuration.getMemoryRecycler(), ((numBits - 1) >>> 6) + 1);
         this.log2OfSegmentSizeInBytes = log2OfSegmentSize + 3;
         this.byteBitmask = (1 << log2OfSegmentSizeInBytes) - 1;
         this.sizeBits = numBits;
+        this.useShardReadFastPaths = configuration.isExperimentalFeatureEnabled(ExperimentalFeature.SHARD_READ_FAST_PATHS);
     }
 
     public long approxHeapFootprintInBytes() {
@@ -131,19 +140,36 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
 
     @Override
     public long getLargeElementValue(long index, int bitsPerElement, long mask) {
+        // Preserve virtual get() behavior for subclasses.
+        if (!useShardReadFastPaths || getClass() != FixedLengthElementArray.class) {
+            return getLargeElementValueUsingGet(index, bitsPerElement, mask);
+        }
         long whichLong = index >>> 6;
         int whichBit = (int) (index & 0x3F);
 
-        long l = get(whichLong) >>> whichBit;
+        long[] segment = segments[(int) (whichLong >>> log2OfSegmentSize)];
+        int longInSegment = (int) (whichLong & bitmask);
+        long l = segment[longInSegment] >>> whichBit;
 
         int bitsRemaining = 64 - whichBit;
 
         if (bitsRemaining < bitsPerElement) {
-            whichLong++;
-            l |= get(whichLong) << bitsRemaining;
+            // The fencepost long duplicates the first long of the next segment.
+            l |= segment[longInSegment + 1] << bitsRemaining;
         }
 
         return l & mask;
+    }
+
+    private long getLargeElementValueUsingGet(long index, int bitsPerElement, long mask) {
+        long whichLong = index >>> 6;
+        int whichBit = (int) (index & 0x3F);
+        long value = get(whichLong) >>> whichBit;
+        int bitsRemaining = 64 - whichBit;
+        if (bitsRemaining < bitsPerElement) {
+            value |= get(whichLong + 1) << bitsRemaining;
+        }
+        return value & mask;
     }
 
     @Override
@@ -218,8 +244,13 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
     public static FixedLengthElementArray newFrom(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, long numLongs)
             throws IOException {
 
-        FixedLengthElementArray arr = new FixedLengthElementArray(memoryRecycler, numLongs * 64);
-        arr.readFrom(in, memoryRecycler, numLongs);
+        return newFrom(in, new HollowReadConfiguration(MemoryMode.ON_HEAP, memoryRecycler), numLongs);
+    }
+
+    public static FixedLengthElementArray newFrom(HollowBlobInput in, HollowReadConfiguration configuration,
+                                                  long numLongs) throws IOException {
+        FixedLengthElementArray arr = new FixedLengthElementArray(configuration, numLongs * 64);
+        arr.readFrom(in, configuration.getMemoryRecycler(), numLongs);
         return arr;
     }
 }

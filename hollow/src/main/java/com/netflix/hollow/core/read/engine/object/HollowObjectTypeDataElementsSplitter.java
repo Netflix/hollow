@@ -26,7 +26,7 @@ public class HollowObjectTypeDataElementsSplitter extends HollowTypeDataElements
     public void initToElements() {
         this.to = new HollowObjectTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
-            to[i] = new HollowObjectTypeDataElements(schema, from.memoryMode, from.memoryRecycler);
+            to[i] = new HollowObjectTypeDataElements(schema, from.readConfiguration);
         }
     }
 
@@ -68,7 +68,7 @@ public class HollowObjectTypeDataElementsSplitter extends HollowTypeDataElements
         final long[][] currentWriteVarLengthDataPointers = new long[to.length][from.schema.numFields()];
 
         for(int i=0;i<to.length;i++) {
-            to[i].fixedLengthData = FixedLengthDataFactory.get((long)to[i].bitsPerRecord * (to[i].maxOrdinal + 1), to[i].memoryMode, to[i].memoryRecycler);
+            to[i].fixedLengthData = FixedLengthDataFactory.get((long)to[i].bitsPerRecord * (to[i].maxOrdinal + 1), to[i].readConfiguration);
             for(int fieldIdx=0;fieldIdx<from.schema.numFields();fieldIdx++) {
                 if(from.varLengthData[fieldIdx] != null) {
                     to[i].varLengthData[fieldIdx] = VariableLengthDataFactory.get(from.memoryMode, from.memoryRecycler);

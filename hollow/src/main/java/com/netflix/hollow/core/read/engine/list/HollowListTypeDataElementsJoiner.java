@@ -18,7 +18,7 @@ class HollowListTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Holl
 
     @Override
     public void initToElements() {
-        this.to = new HollowListTypeDataElements(from[0].memoryMode, from[0].memoryRecycler);
+        this.to = new HollowListTypeDataElements(from[0].readConfiguration);
     }
 
     @Override
@@ -54,8 +54,8 @@ class HollowListTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Holl
     public void copyRecords() {
         long elementCounter = 0;
 
-        to.listPointerData = FixedLengthDataFactory.get((long)to.bitsPerListPointer * (to.maxOrdinal + 1), to.memoryMode, to.memoryRecycler);
-        to.elementData = FixedLengthDataFactory.get(to.bitsPerElement * to.totalNumberOfElements, to.memoryMode, to.memoryRecycler);
+        to.listPointerData = FixedLengthDataFactory.get((long)to.bitsPerListPointer * (to.maxOrdinal + 1), to.readConfiguration);
+        to.elementData = FixedLengthDataFactory.get(to.bitsPerElement * to.totalNumberOfElements, to.readConfiguration);
 
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;

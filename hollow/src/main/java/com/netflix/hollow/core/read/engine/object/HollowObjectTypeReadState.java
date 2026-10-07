@@ -30,6 +30,7 @@ import com.netflix.hollow.core.memory.encoding.ZigZag;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -49,6 +50,7 @@ import java.util.BitSet;
 public class HollowObjectTypeReadState extends HollowTypeReadState implements HollowObjectTypeDataAccess {
     private final HollowObjectSchema unfilteredSchema;
     private final HollowObjectSampler sampler;
+    private final boolean useDirectSegmentStringReads;
 
     private int maxOrdinal;
 
@@ -77,6 +79,8 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     public HollowObjectTypeReadState(HollowReadStateEngine fileEngine, MemoryMode memoryMode, HollowObjectSchema schema, HollowObjectSchema unfilteredSchema) {
         super(fileEngine, memoryMode, schema);
         this.sampler = new HollowObjectSampler(schema, DisabledSamplingDirector.INSTANCE);
+        this.useDirectSegmentStringReads = fileEngine != null
+                && fileEngine.isExperimentalFeatureEnabled(ExperimentalFeature.DIRECT_SEGMENT_STRING_READS);
         this.unfilteredSchema = unfilteredSchema;
         this.shardsVolatile = null;
     }
@@ -84,6 +88,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
     public HollowObjectTypeReadState(HollowObjectSchema schema, HollowObjectTypeDataElements dataElements) {
         super(null, MemoryMode.ON_HEAP, schema);
         this.sampler = new HollowObjectSampler(schema, DisabledSamplingDirector.INSTANCE);
+        this.useDirectSegmentStringReads = false;
         this.unfilteredSchema = schema;
 
         HollowObjectTypeReadStateShard newShard = new HollowObjectTypeReadStateShard(schema, dataElements, 0);
@@ -110,7 +115,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         HollowObjectTypeReadStateShard[] newShards = new HollowObjectTypeReadStateShard[numShards];
         int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
         for(int i=0; i<numShards; i++) {
-            HollowObjectTypeDataElements shardDataElements = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
+            HollowObjectTypeDataElements shardDataElements = new HollowObjectTypeDataElements(getSchema(), configurationFor(memoryRecycler));
             shardDataElements.readSnapshot(in, unfilteredSchema);
             newShards[i] = new HollowObjectTypeReadStateShard(getSchema(), shardDataElements, shardOrdinalShift);
         }
@@ -129,7 +134,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0; i<shardsVolatile.shards.length; i++) {
-            HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryMode, memoryRecycler);
+            HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, configurationFor(memoryRecycler));
             deltaData.readDelta(in);
             if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
 
@@ -151,7 +156,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
                 deltaData.encodedAdditions.destroy();
             } else {
-                HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
+                HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), configurationFor(memoryRecycler));
                 HollowObjectTypeDataElements oldData = shardsVolatile.shards[i].dataElements;
                 nextData.applyDelta(oldData, deltaData);
 
@@ -382,7 +387,8 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 startByte = shardOrdinal != 0 ? shard.dataElements.fixedLengthData.getElementValue(currentBitOffset - shard.dataElements.bitsPerRecord, numBitsForField) : 0;
             } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
-            result = shard.readString(startByte, endByte, numBitsForField, fieldIndex);
+            result = shard.readString(startByte, endByte, numBitsForField, fieldIndex,
+                    useDirectSegmentStringReads && shardsAreImmutable && memoryMode == MemoryMode.ON_HEAP);
         } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
         return result;
@@ -413,7 +419,8 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                 startByte = shardOrdinal != 0 ? shard.dataElements.fixedLengthData.getElementValue(currentBitOffset - shard.dataElements.bitsPerRecord, numBitsForField) : 0;
             } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
-            result = shard.isStringFieldEqual(startByte, endByte, numBitsForField, fieldIndex, testValue);
+            result = shard.isStringFieldEqual(startByte, endByte, numBitsForField, fieldIndex,
+                    testValue, useDirectSegmentStringReads && shardsAreImmutable && memoryMode == MemoryMode.ON_HEAP);
         } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
         return result;

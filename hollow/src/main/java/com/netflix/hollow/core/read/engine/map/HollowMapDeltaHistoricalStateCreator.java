@@ -18,7 +18,8 @@ package com.netflix.hollow.core.read.engine.map;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -48,7 +49,9 @@ public class HollowMapDeltaHistoricalStateCreator {
     public HollowMapDeltaHistoricalStateCreator(HollowMapTypeReadState typeState, boolean reverse) {
         this.typeState = typeState;
         this.stateEngineDataElements = typeState.currentDataElements();
-        this.historicalDataElements = new HollowMapTypeDataElements(WastefulRecycler.DEFAULT_INSTANCE);
+        this.historicalDataElements = new HollowMapTypeDataElements(
+                stateEngineDataElements[0].readConfiguration.withMemoryRecycler(WastefulRecycler.DEFAULT_INSTANCE)
+                        .withMemoryMode(MemoryMode.ON_HEAP));
         this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class), reverse);
         this.shardNumberMask = stateEngineDataElements.length - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(stateEngineDataElements.length);
@@ -57,8 +60,13 @@ public class HollowMapDeltaHistoricalStateCreator {
     public void populateHistory() {
         populateStats();
 
-        historicalDataElements.mapPointerAndSizeData = new FixedLengthElementArray(historicalDataElements.memoryRecycler, ((long)historicalDataElements.maxOrdinal + 1) * historicalDataElements.bitsPerFixedLengthMapPortion);
-        historicalDataElements.entryData = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.totalNumberOfBuckets * historicalDataElements.bitsPerMapEntry);
+        historicalDataElements.mapPointerAndSizeData = FixedLengthDataFactory.get(
+                ((long) historicalDataElements.maxOrdinal + 1)
+                        * historicalDataElements.bitsPerFixedLengthMapPortion,
+                historicalDataElements.readConfiguration);
+        historicalDataElements.entryData = FixedLengthDataFactory.get(
+                historicalDataElements.totalNumberOfBuckets * historicalDataElements.bitsPerMapEntry,
+                historicalDataElements.readConfiguration);
 
         iter.reset();
 

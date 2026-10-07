@@ -20,7 +20,7 @@ public class HollowMapTypeDataElementsSplitter extends HollowTypeDataElementsSpl
     public void initToElements() {
         this.to = new HollowMapTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
-            to[i] = new HollowMapTypeDataElements(from.memoryMode, from.memoryRecycler);
+            to[i] = new HollowMapTypeDataElements(from.readConfiguration);
         }
     }
 
@@ -67,8 +67,8 @@ public class HollowMapTypeDataElementsSplitter extends HollowTypeDataElementsSpl
 
         for(int toIndex=0;toIndex<numSplits;toIndex++) {
             HollowMapTypeDataElements target = to[toIndex];
-            target.mapPointerAndSizeData = FixedLengthDataFactory.get((long)(target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion, target.memoryMode, target.memoryRecycler);
-            target.entryData = FixedLengthDataFactory.get(target.totalNumberOfBuckets * target.bitsPerMapEntry, target.memoryMode, target.memoryRecycler);
+            target.mapPointerAndSizeData = FixedLengthDataFactory.get((long)(target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion, target.readConfiguration);
+            target.entryData = FixedLengthDataFactory.get(target.totalNumberOfBuckets * target.bitsPerMapEntry, target.readConfiguration);
         }
 
         for(int ordinal=0;ordinal<=from.maxOrdinal;ordinal++) {

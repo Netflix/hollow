@@ -20,6 +20,10 @@ import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import sun.misc.Unsafe;
 
@@ -43,6 +47,13 @@ import sun.misc.Unsafe;
 public class SegmentedByteArray implements VariableLengthData {
 
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
+    // JDK 19 changed String.decodeASCII to use the prefix-returning countPositives intrinsic.
+    private static final boolean asciiDecoderFastPath = javaMajorVersion() >= 19;
+
+    private static class AsciiDecoderHolder {
+        private static final ThreadLocal<CharsetDecoder> decoder =
+                ThreadLocal.withInitial(() -> StandardCharsets.US_ASCII.newDecoder());
+    }
 
     private byte[][] segments;
     private final int log2OfSegmentSize;
@@ -75,6 +86,166 @@ public class SegmentedByteArray implements VariableLengthData {
     @Override
     public byte get(long index) {
         return segments[(int)(index >>> log2OfSegmentSize)][(int)(index & bitmask)];
+    }
+
+    /**
+     * Decode a String whose UTF-16 code units are encoded as variable-length integers in an
+     * immutable range of this array. Segment references are loaded once per contiguous range
+     * rather than once per encoded byte.
+     *
+     * <p>On JDK 19 and later, a contiguous range is first passed through the intrinsic-backed
+     * ASCII decoder to identify and inflate its ASCII prefix in bulk. A fully ASCII range is passed
+     * directly to String's ISO-8859-1 constructor. Other content is decoded to UTF-16 code units
+     * and passed to String, which performs any Latin-1 compression using its JIT intrinsic.
+     *
+     * @param position the position of the first encoded byte
+     * @param length the number of encoded bytes
+     * @param output scratch space with capacity for at least {@code length} characters
+     * @return the decoded String
+     */
+    public String readVIntString(long position, int length, char[] output) {
+        if(length == 0)
+            return "";
+
+        byte[][] currentSegments = segments;
+        int segmentSize = 1 << log2OfSegmentSize;
+        int firstSegmentIndex = (int)(position >>> log2OfSegmentSize);
+        int firstSegmentOffset = (int)(position & bitmask);
+        if(asciiDecoderFastPath && firstSegmentOffset + length <= segmentSize)
+            return readContiguousVIntString(currentSegments[firstSegmentIndex], firstSegmentOffset, length, output);
+
+        int i = 0;
+
+        ascii:
+        while(i < length) {
+            long currentPosition = position + i;
+            int segmentOffset = (int)(currentPosition & bitmask);
+            int end = Math.min(length, i + segmentSize - segmentOffset);
+            byte[] segment = currentSegments[(int)(currentPosition >>> log2OfSegmentSize)];
+
+            while(i < end) {
+                int b = segment[segmentOffset++];
+                if(b < 0)
+                    break ascii;
+                output[i++] = (char)b;
+            }
+        }
+
+        if(i == length) {
+            if(firstSegmentOffset + length <= segmentSize)
+                return new String(currentSegments[firstSegmentIndex], firstSegmentOffset, length,
+                        StandardCharsets.ISO_8859_1);
+            return new String(output, 0, length);
+        }
+
+        int count = i;
+        int value = 0;
+        while(i < length) {
+            long currentPosition = position + i;
+            int segmentOffset = (int)(currentPosition & bitmask);
+            int end = Math.min(length, i + segmentSize - segmentOffset);
+            byte[] segment = currentSegments[(int)(currentPosition >>> log2OfSegmentSize)];
+
+            while(i < end) {
+                int b = segment[segmentOffset++];
+                value = (value << 7) | (b & 0x7f);
+                i++;
+                if(b >= 0) {
+                    output[count++] = (char)value;
+                    value = 0;
+                }
+            }
+        }
+
+        return new String(output, 0, count);
+    }
+
+    private static String readContiguousVIntString(byte[] data, int offset, int length, char[] output) {
+        ByteBuffer source = ByteBuffer.wrap(data, offset, length);
+        CharBuffer target = CharBuffer.wrap(output, 0, length);
+        CharsetDecoder decoder = AsciiDecoderHolder.decoder.get();
+        decoder.reset();
+        decoder.decode(source, target, true);
+
+        if(!source.hasRemaining())
+            return new String(data, offset, length, StandardCharsets.ISO_8859_1);
+
+        int value = 0;
+        byte b;
+        do {
+            b = source.get();
+            value = (value << 7) | (b & 0x7f);
+        } while(b < 0);
+        target.put((char)value);
+
+        int input = source.position();
+        int end = offset + length;
+        int count = target.position();
+        value = 0;
+        while(input < end) {
+            b = data[input++];
+            value = (value << 7) | (b & 0x7f);
+            if(b >= 0) {
+                output[count++] = (char)value;
+                value = 0;
+            }
+        }
+        return new String(output, 0, count);
+    }
+
+    private static int javaMajorVersion() {
+        String version = System.getProperty("java.specification.version", "1.8");
+        int start = version.startsWith("1.") ? 2 : 0;
+        int end = version.indexOf('.', start);
+        try {
+            return Integer.parseInt(end == -1 ? version.substring(start) : version.substring(start, end));
+        } catch(NumberFormatException ignored) {
+            return 8;
+        }
+    }
+
+    /**
+     * Compare a String with UTF-16 code units encoded as variable-length integers in an immutable
+     * range of this array. Segment references are loaded once per contiguous range rather than
+     * once per encoded character.
+     *
+     * @param position the position of the first encoded byte
+     * @param length the number of encoded bytes
+     * @param testValue the String to compare
+     * @return true if the encoded range is equal to the String
+     */
+    public boolean isVIntStringEqual(long position, int length, String testValue) {
+        int testLength = testValue.length();
+        if(length < testLength)
+            return false;
+
+        byte[][] currentSegments = segments;
+        int segmentSize = 1 << log2OfSegmentSize;
+        int i = 0;
+        int count = 0;
+        int value = 0;
+        boolean complete = true;
+
+        while(i < length) {
+            long currentPosition = position + i;
+            int segmentOffset = (int)(currentPosition & bitmask);
+            int end = Math.min(length, i + segmentSize - segmentOffset);
+            byte[] segment = currentSegments[(int)(currentPosition >>> log2OfSegmentSize)];
+
+            while(i < end) {
+                int b = segment[segmentOffset++];
+                value = (value << 7) | (b & 0x7f);
+                i++;
+                complete = b >= 0;
+                if(complete) {
+                    if(count == testLength || testValue.charAt(count++) != (char)value)
+                        return false;
+                    value = 0;
+                }
+            }
+        }
+
+        return complete && count == testLength;
     }
 
     @Override

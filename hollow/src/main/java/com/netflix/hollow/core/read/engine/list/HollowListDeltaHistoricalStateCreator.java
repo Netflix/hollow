@@ -18,7 +18,8 @@ package com.netflix.hollow.core.read.engine.list;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.util.IntMap;
@@ -47,7 +48,9 @@ public class HollowListDeltaHistoricalStateCreator {
     public HollowListDeltaHistoricalStateCreator(HollowListTypeReadState typeState, boolean reverse) {
         this.typeState = typeState;
         this.stateEngineDataElements = typeState.currentDataElements();
-        this.historicalDataElements = new HollowListTypeDataElements(WastefulRecycler.DEFAULT_INSTANCE);
+        this.historicalDataElements = new HollowListTypeDataElements(
+                stateEngineDataElements[0].readConfiguration.withMemoryRecycler(WastefulRecycler.DEFAULT_INSTANCE)
+                        .withMemoryMode(MemoryMode.ON_HEAP));
         this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class), reverse);
         this.shardNumberMask = stateEngineDataElements.length - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(stateEngineDataElements.length);
@@ -56,8 +59,12 @@ public class HollowListDeltaHistoricalStateCreator {
     public void populateHistory() {
         populateStats();
 
-        historicalDataElements.listPointerData = new FixedLengthElementArray(historicalDataElements.memoryRecycler, ((long)historicalDataElements.maxOrdinal + 1) * historicalDataElements.bitsPerListPointer);
-        historicalDataElements.elementData = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.totalNumberOfElements * historicalDataElements.bitsPerElement);
+        historicalDataElements.listPointerData = FixedLengthDataFactory.get(
+                ((long) historicalDataElements.maxOrdinal + 1) * historicalDataElements.bitsPerListPointer,
+                historicalDataElements.readConfiguration);
+        historicalDataElements.elementData = FixedLengthDataFactory.get(
+                historicalDataElements.totalNumberOfElements * historicalDataElements.bitsPerElement,
+                historicalDataElements.readConfiguration);
 
         iter.reset();
 
