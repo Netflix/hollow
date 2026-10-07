@@ -4,7 +4,14 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import java.io.File;
+import java.util.Collection;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
@@ -18,7 +25,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
+@RunWith(Parameterized.class)
 public class BlobByteBufferTest {
+    @Parameterized.Parameters(name = "fastPaths={0}")
+    public static Collection<Object[]> parameters() {
+        return Arrays.asList(new Object[][] { { false }, { true } });
+    }
+
+    @Parameterized.Parameter
+    public boolean fastPaths;
 
     @Test
     public void copiesAcrossMappedBufferBoundaries() throws Exception {
@@ -193,11 +208,11 @@ public class BlobByteBufferTest {
         }
     }
 
-    private static BlobByteBuffer map(byte[] data) throws Exception {
+    private BlobByteBuffer map(byte[] data) throws Exception {
         return map(data, 16);
     }
 
-    private static BlobByteBuffer map(byte[] data, int segmentSize) throws Exception {
+    private BlobByteBuffer map(byte[] data, int segmentSize) throws Exception {
         File file = File.createTempFile("blob-byte-buffer", ".bin");
         file.deleteOnExit();
         try(FileOutputStream out = new FileOutputStream(file)) {
@@ -205,7 +220,9 @@ public class BlobByteBufferTest {
         }
         try(FileInputStream in = new FileInputStream(file);
             FileChannel channel = in.getChannel()) {
-            return BlobByteBuffer.mmapBlob(channel, segmentSize);
+            BlobByteBuffer buffer = BlobByteBuffer.mmapBlob(channel, segmentSize);
+            return fastPaths ? buffer.withReadConfiguration(new HollowReadConfiguration(MemoryMode.SHARED_MEMORY_LAZY,
+                    WastefulRecycler.DEFAULT_INSTANCE, ExperimentalFeature.SHARD_READ_FAST_PATHS)) : buffer;
         }
     }
 }

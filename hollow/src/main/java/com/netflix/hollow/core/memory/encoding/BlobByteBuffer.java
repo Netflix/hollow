@@ -2,6 +2,8 @@ package com.netflix.hollow.core.memory.encoding;
 
 import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
 
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import java.io.IOException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -51,6 +53,7 @@ public final class BlobByteBuffer {
     private final long capacity;        // in bytes
     private final int shift;
     private final int mask;
+    private final boolean useShardReadFastPaths;
 
     private long position;              // within index 0 to capacity-1 in the underlying ByteBuffer
 
@@ -59,7 +62,11 @@ public final class BlobByteBuffer {
     }
 
     private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, long position) {
+        this(capacity, shift, mask, spine, position, false);
+    }
 
+    private BlobByteBuffer(long capacity, int shift, int mask, ByteBuffer[] spine, long position, boolean useShardReadFastPaths) {
+        this.useShardReadFastPaths = useShardReadFastPaths;
         if (!spine[0].order().equals(ByteOrder.BIG_ENDIAN)) {
             throw new UnsupportedOperationException("Little endian memory layout is not supported");
         }
@@ -81,7 +88,13 @@ public final class BlobByteBuffer {
      * @return a new {@code BlobByteBuffer} which is view on the current {@code BlobByteBuffer}
      */
     public BlobByteBuffer duplicate() {
-        return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position);
+        return new BlobByteBuffer(this.capacity, this.shift, this.mask, this.spine, this.position, this.useShardReadFastPaths);
+    }
+
+    /** Return a read view with the supplied implementation selection, without changing this view. */
+    public BlobByteBuffer withReadConfiguration(HollowReadConfiguration configuration) {
+        return new BlobByteBuffer(capacity, shift, mask, spine, position,
+                configuration.isExperimentalFeatureEnabled(ExperimentalFeature.SHARD_READ_FAST_PATHS));
     }
 
     /**
@@ -228,6 +241,16 @@ public final class BlobByteBuffer {
         // Serialized words are aligned to the view, not necessarily to mapping boundaries.
         int offset = (int)((startByteIndex - this.position()) % Long.BYTES);
         long nextAlignedPos = startByteIndex - offset + Long.BYTES;
+        if (!useShardReadFastPaths) {
+            byte[] bytes = new byte[Long.BYTES];
+            for (int i = 0; i < Long.BYTES; i++)
+                bytes[i] = getByte(bigEndian(startByteIndex + i, nextAlignedPos));
+            return (((long) bytes[7]) << 56)
+                    | ((bytes[6] & 0xffL) << 48) | ((bytes[5] & 0xffL) << 40)
+                    | ((bytes[4] & 0xffL) << 32) | ((bytes[3] & 0xffL) << 24)
+                    | ((bytes[2] & 0xffL) << 16) | ((bytes[1] & 0xffL) << 8)
+                    | (bytes[0] & 0xffL);
+        }
         if (!directReadIsSafe(offset, nextAlignedPos))
             return getLongFromBytes(startByteIndex, nextAlignedPos);
         return readPhysicalLongs(offset, nextAlignedPos);

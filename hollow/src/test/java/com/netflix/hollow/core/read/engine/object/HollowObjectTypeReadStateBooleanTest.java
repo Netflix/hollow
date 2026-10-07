@@ -18,8 +18,15 @@ package com.netflix.hollow.core.read.engine.object;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.AdditionalAnswers.delegatesTo;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
 import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.memory.encoding.ContiguousFixedLengthData;
 import com.netflix.hollow.core.memory.encoding.EncodedLongBuffer;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
@@ -27,6 +34,8 @@ import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -39,8 +48,8 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Arrays;
 import java.util.BitSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -55,28 +64,30 @@ public class HollowObjectTypeReadStateBooleanTest {
     private static final String[] BOOLEAN_FIELDS = { "first", "second", "third" };
     private static final int RECORDS = 64;
 
-    @Parameterized.Parameters(name = "{0}, recycling={1}, shards={2}")
+    @Parameterized.Parameters(name = "{0}, recycling={1}, shards={2}, fastPaths={3}")
     public static Collection<Object[]> parameters() {
-        return Arrays.asList(new Object[][] {
-                { MemoryMode.ON_HEAP, true, 1 },
-                { MemoryMode.ON_HEAP, true, 8 },
-                { MemoryMode.ON_HEAP, false, 1 },
-                { MemoryMode.ON_HEAP, false, 8 },
-                { MemoryMode.SHARED_MEMORY_LAZY, true, 1 },
-                { MemoryMode.SHARED_MEMORY_LAZY, true, 8 },
-                { MemoryMode.SHARED_MEMORY_LAZY, false, 1 },
-                { MemoryMode.SHARED_MEMORY_LAZY, false, 8 }
-        });
+        Collection<Object[]> parameters = new ArrayList<>();
+        for(MemoryMode mode : new MemoryMode[] { MemoryMode.ON_HEAP, MemoryMode.SHARED_MEMORY_LAZY }) {
+            for(boolean recycling : new boolean[] { false, true }) {
+                for(int shards : new int[] { 1, 8 }) {
+                    for(boolean fastPaths : new boolean[] { false, true })
+                        parameters.add(new Object[] { mode, recycling, shards, fastPaths });
+                }
+            }
+        }
+        return parameters;
     }
 
     private final MemoryMode memoryMode;
     private final boolean recycling;
     private final int shards;
+    private final boolean fastPaths;
 
-    public HollowObjectTypeReadStateBooleanTest(MemoryMode memoryMode, boolean recycling, int shards) {
+    public HollowObjectTypeReadStateBooleanTest(MemoryMode memoryMode, boolean recycling, int shards, boolean fastPaths) {
         this.memoryMode = memoryMode;
         this.recycling = recycling;
         this.shards = shards;
+        this.fastPaths = fastPaths;
     }
 
     @Test
@@ -100,6 +111,19 @@ public class HollowObjectTypeReadStateBooleanTest {
                 assertEquals(field, 64, offsets.cardinality());
             }
         }
+    }
+
+    @Test
+    public void selectsFixedWidthReadsOnlyWhenOptedIn() throws Exception {
+        HollowWriteStateEngine writer = newWriter();
+        addRecords(writer, 0, false);
+        HollowObjectTypeReadState state = (HollowObjectTypeReadState)readSnapshot(writer).getTypeState(TYPE);
+        HollowObjectTypeReadStateShard shard = state.shardsVolatile.shards[0];
+        FixedLengthData tracking = mock(FixedLengthData.class, delegatesTo(shard.dataElements.fixedLengthData));
+        shard.dataElements.fixedLengthData = tracking;
+        state.readBoolean(0, state.getSchema().getPosition("first"));
+        org.mockito.Mockito.verify(tracking, times(fastPaths ? 1 : 0)).getElementValue(anyLong(), eq(2), eq(3L));
+        org.mockito.Mockito.verify(tracking, times(fastPaths ? 0 : 1)).getElementValue(anyLong(), anyInt());
     }
 
     @Test
@@ -175,8 +199,9 @@ public class HollowObjectTypeReadStateBooleanTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         new HollowBlobWriter(writer).writeSnapshot(output);
         writer.prepareForNextCycle();
-        HollowReadStateEngine reader = new HollowReadStateEngine(recycling
-                ? new RecyclingRecycler() : WastefulRecycler.DEFAULT_INSTANCE);
+        HollowReadStateEngine reader = new HollowReadStateEngine(new HollowReadConfiguration(memoryMode, recycling
+                ? new RecyclingRecycler() : WastefulRecycler.DEFAULT_INSTANCE, fastPaths
+                ? new ExperimentalFeature[] { ExperimentalFeature.SHARD_READ_FAST_PATHS } : new ExperimentalFeature[0]));
         HollowBlobReader blobReader = new HollowBlobReader(reader, memoryMode);
         if(memoryMode == MemoryMode.SHARED_MEMORY_LAZY) {
             File snapshot = File.createTempFile("hollow-boolean-snapshot", ".bin");
@@ -201,7 +226,7 @@ public class HollowObjectTypeReadStateBooleanTest {
         for(HollowObjectTypeReadStateShard shard : state.shardsVolatile.shards) {
             if(memoryMode == MemoryMode.SHARED_MEMORY_LAZY) {
                 assertTrue(shard.dataElements.fixedLengthData instanceof EncodedLongBuffer);
-            } else if(recycling) {
+            } else if(recycling || !fastPaths) {
                 assertTrue(shard.dataElements.fixedLengthData instanceof FixedLengthElementArray);
             } else {
                 assertTrue(shard.dataElements.fixedLengthData instanceof ContiguousFixedLengthData);

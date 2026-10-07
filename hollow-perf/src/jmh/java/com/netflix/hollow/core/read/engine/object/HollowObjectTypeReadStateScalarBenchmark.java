@@ -23,6 +23,8 @@ import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
@@ -71,6 +73,9 @@ public class HollowObjectTypeReadStateScalarBenchmark {
     @Param({ "1", "8" })
     int shards;
 
+    @Param({ "false", "true" })
+    boolean shardReadFastPaths;
+
     HollowObjectTypeReadState dataAccess;
     int[] readOrder;
 
@@ -115,9 +120,12 @@ public class HollowObjectTypeReadStateScalarBenchmark {
 
         HollowReadStateEngine reader;
         if("segmented".equals(storage)) {
-            reader = new HollowReadStateEngine(new RecyclingRecycler());
+            reader = new HollowReadStateEngine(new HollowReadConfiguration(MemoryMode.ON_HEAP,
+                    new RecyclingRecycler(), features()));
         } else if("contiguous".equals(storage) || "mapped".equals(storage)) {
-            reader = new HollowReadStateEngine(WastefulRecycler.DEFAULT_INSTANCE);
+            reader = new HollowReadStateEngine(new HollowReadConfiguration("mapped".equals(storage)
+                    ? MemoryMode.SHARED_MEMORY_LAZY : MemoryMode.ON_HEAP,
+                    WastefulRecycler.DEFAULT_INSTANCE, features()));
         } else {
             throw new IllegalArgumentException("Unknown storage: " + storage);
         }
@@ -141,6 +149,10 @@ public class HollowObjectTypeReadStateScalarBenchmark {
             readOrder[i] = random.nextInt(records);
     }
 
+    private ExperimentalFeature[] features() {
+        return shardReadFastPaths ? new ExperimentalFeature[] { ExperimentalFeature.SHARD_READ_FAST_PATHS } : new ExperimentalFeature[0];
+    }
+
     private void verifyStorage() {
         HollowObjectTypeReadStateShard[] actualShards = dataAccess.shardsVolatile.shards;
         if(actualShards.length != shards)
@@ -148,7 +160,7 @@ public class HollowObjectTypeReadStateScalarBenchmark {
         for(HollowObjectTypeReadStateShard shard : actualShards) {
             Object data = shard.dataElements.fixedLengthData;
             boolean expectedStorage = "mapped".equals(storage) ? data instanceof EncodedLongBuffer
-                    : "segmented".equals(storage) ? data instanceof FixedLengthElementArray
+                    : "segmented".equals(storage) || !shardReadFastPaths ? data instanceof FixedLengthElementArray
                     : data instanceof ContiguousFixedLengthData;
             if(!expectedStorage || shard.dataElements.bitsPerField[SMALL_LONG_FIELD] > 56
                     || shard.dataElements.bitsPerField[LARGE_LONG_FIELD] <= 56
