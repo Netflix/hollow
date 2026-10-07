@@ -59,15 +59,17 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class HollowSharedMemoryReadStateTest {
 
-    @Parameters(name = "recycling={0}")
+    @Parameters(name = "recycling={0}, fastPaths={1}")
     public static Collection<Object[]> recyclerModes() {
-        return Arrays.asList(new Object[][] { { true }, { false } });
+        return Arrays.asList(new Object[][] { { true, true }, { true, false }, { false, true }, { false, false } });
     }
 
     private final boolean recycling;
+    private final boolean fastPaths;
 
-    public HollowSharedMemoryReadStateTest(boolean recycling) {
+    public HollowSharedMemoryReadStateTest(boolean recycling, boolean fastPaths) {
         this.recycling = recycling;
+        this.fastPaths = fastPaths;
     }
 
     @Test
@@ -136,8 +138,9 @@ public class HollowSharedMemoryReadStateTest {
         try(FileOutputStream out = new FileOutputStream(file)) {
             new HollowBlobWriter(writeEngine).writeSnapshot(out);
         }
-        HollowReadStateEngine stateEngine = new HollowReadStateEngine(recycling
-                ? new RecyclingRecycler(5, 2) : new WastefulRecycler(5, 2));
+        HollowReadStateEngine stateEngine = new HollowReadStateEngine(new HollowReadConfiguration(MemoryMode.SHARED_MEMORY_LAZY,
+                recycling ? new RecyclingRecycler(5, 2) : new WastefulRecycler(5, 2), fastPaths
+                ? new ExperimentalFeature[] { ExperimentalFeature.SHARD_READ_FAST_PATHS } : new ExperimentalFeature[0]));
         HollowBlobReader reader = new HollowBlobReader(stateEngine, MemoryMode.SHARED_MEMORY_LAZY);
         // Small mappings exercise reads across mapped-buffer boundaries.
         try(HollowBlobInput in = HollowBlobInput.randomAccess(file, 16)) {

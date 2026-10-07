@@ -25,6 +25,9 @@ import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.memory.pool.MemoryRecyclingMode;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
@@ -32,6 +35,7 @@ import com.netflix.hollow.core.schema.HollowSchemaHash;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
@@ -60,6 +64,8 @@ public class HollowClientUpdater {
     private final HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
 
     private boolean skipTypeShardUpdateWithNoAdditions;
+    private ExperimentalFeature[] experimentalFeatures = new ExperimentalFeature[0];
+    private MemoryRecyclingMode memoryRecyclingMode = MemoryRecyclingMode.AUTO;
 
     private TypeFilter filter;
 
@@ -105,6 +111,21 @@ public class HollowClientUpdater {
         this.metrics = metrics;
         this.metricsCollector = metricsCollector;
         this.initialLoad = new CompletableFuture<>();
+    }
+
+    public synchronized void setExperimentalFeatures(ExperimentalFeature... features) {
+        if(hollowDataHolderVolatile != null)
+            throw new IllegalStateException("Experimental features must be configured before loading data");
+        ExperimentalFeature[] copy = features.clone();
+        for(ExperimentalFeature feature : copy)
+            Objects.requireNonNull(feature);
+        this.experimentalFeatures = copy;
+    }
+
+    public synchronized void setMemoryRecyclingMode(MemoryRecyclingMode mode) {
+        if(hollowDataHolderVolatile != null)
+            throw new IllegalStateException("Memory recycling must be configured before loading data");
+        this.memoryRecyclingMode = Objects.requireNonNull(mode);
     }
 
     public void setSkipShardUpdateWithNoAdditions(boolean skipTypeShardUpdateWithNoAdditions) {
@@ -331,9 +352,11 @@ public class HollowClientUpdater {
         if (hollowDataHolderLocal != null) {
             ArraySegmentRecycler existingRecycler =
                     hollowDataHolderLocal.getStateEngine().getMemoryRecycler();
-            return new HollowReadStateEngine(hashCodeFinder, true, existingRecycler);
+            return new HollowReadStateEngine(hashCodeFinder, true,
+                    new HollowReadConfiguration(memoryMode, existingRecycler, experimentalFeatures));
         }
-        return new HollowReadStateEngine(hashCodeFinder);
+        return new HollowReadStateEngine(hashCodeFinder, true,
+                new HollowReadConfiguration(memoryMode, memoryRecyclingMode.createRecycler(), experimentalFeatures));
     }
 
     public StackTraceRecorder getStaleReferenceUsageStackTraceRecorder() {

@@ -393,7 +393,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     }
 
     private boolean readWasUnsafe(HollowMapTypeShardsHolder shardsHolder, int ordinal, HollowMapTypeReadStateShard shard) {
-        if(shardsAreImmutable)
+        if(useShardReadFastPaths && shardsAreImmutable)
             return false;
 
         HollowUnsafeHandle.getUnsafe().loadFence();

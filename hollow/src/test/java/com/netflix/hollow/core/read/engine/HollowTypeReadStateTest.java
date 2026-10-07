@@ -41,6 +41,26 @@ public class HollowTypeReadStateTest {
     }
 
     @Test
+    public void shardReadFastPathsAreIndependentOfImmutability() {
+        for(boolean enabled : new boolean[] { false, true }) {
+            for(boolean recycling : new boolean[] { false, true }) {
+                HollowReadStateEngine engine = new HollowReadStateEngine(new HollowReadConfiguration(MemoryMode.ON_HEAP,
+                        recycling ? new RecyclingRecycler() : new WastefulRecycler(11, 8), enabled
+                        ? new ExperimentalFeature[] { ExperimentalFeature.SHARD_READ_FAST_PATHS }
+                        : new ExperimentalFeature[0]));
+                for(HollowTypeReadState state : collectionStates(engine)) {
+                    assertEquals(enabled, state.useShardReadFastPaths);
+                    assertEquals(!recycling, state.shardsAreImmutable);
+                }
+                HollowTypeReadState mapped = new HollowObjectTypeReadState(
+                        engine, MemoryMode.SHARED_MEMORY_LAZY, schema, schema);
+                assertEquals(enabled, mapped.useShardReadFastPaths);
+                assertTrue(mapped.shardsAreImmutable);
+            }
+        }
+    }
+
+    @Test
     public void shardsAreNotImmutableWhenArraysAreRecycled() {
         HollowReadStateEngine stateEngine = new HollowReadStateEngine(new RecyclingRecycler());
 

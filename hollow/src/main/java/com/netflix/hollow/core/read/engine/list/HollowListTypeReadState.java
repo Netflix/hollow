@@ -233,7 +233,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     }
 
     private boolean readWasUnsafe(HollowListTypeShardsHolder shardsHolder, int ordinal, HollowListTypeReadStateShard shard) {
-        if(shardsAreImmutable)
+        if(useShardReadFastPaths && shardsAreImmutable)
             return false;
 
         HollowUnsafeHandle.getUnsafe().loadFence();
