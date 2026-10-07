@@ -40,14 +40,34 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
 
     protected final HollowReadStateEngine stateEngine;
     protected final MemoryMode memoryMode;
+    protected final HollowReadConfiguration readConfiguration;
+    protected final boolean shardsAreImmutable;
+    protected final boolean useShardReadFastPaths;
     protected final HollowSchema schema;
     protected HollowTypeStateListener[] stateListeners;
 
     public HollowTypeReadState(HollowReadStateEngine stateEngine, MemoryMode memoryMode, HollowSchema schema) {
         this.stateEngine = stateEngine;
         this.memoryMode = memoryMode;
+        this.readConfiguration = stateEngine == null ? null
+                : stateEngine.getReadConfiguration().withMemoryMode(memoryMode);
+        // A captured shard retains its non-recycled on-heap arrays or read-only mappings for the
+        // duration of the read. The initial volatile holder load publishes the shard and can serve
+        // as the read's linearization point; no trailing validation is required.
+        this.shardsAreImmutable = stateEngine != null
+                && (memoryMode == MemoryMode.SHARED_MEMORY_LAZY
+                    || (memoryMode == MemoryMode.ON_HEAP && !stateEngine.getMemoryRecycler().recyclesArrays()));
+        this.useShardReadFastPaths = stateEngine != null
+                && stateEngine.isExperimentalFeatureEnabled(ExperimentalFeature.SHARD_READ_FAST_PATHS);
         this.schema = schema;
         this.stateListeners = EMPTY_LISTENERS;
+    }
+
+    protected final void verifyRecyclerForImmutableShards(ArraySegmentRecycler recycler) {
+        // Public blob entry points may receive a recycler other than the engine's.
+        if (shardsAreImmutable && memoryMode == MemoryMode.ON_HEAP && recycler.recyclesArrays()) {
+            throw new IllegalStateException("Immutable on-heap shards require a non-recycling recycler for " + schema.getName());
+        }
     }
 
     /**

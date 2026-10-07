@@ -212,6 +212,23 @@ is encapsulated inside implementations.
 * `HollowMetricsCollector`: Implementing a [`HollowMetricsCollector`](tooling.md#metrics) allows to either store or 
 publish those metrics to your preferred provider, such as Prometheus.
 
+### Experimental reads and array recycling
+
+Experimental read implementations are explicit consumer opt-ins. `withExperimentalFeatures(...)` accepts named values from `com.netflix.hollow.core.read.engine.ExperimentalFeature`; repeated calls add opt-ins rather than replacing them. Unspecified features use the release default, which is currently off for all read experiments. There is no option to enable all present and future experiments.
+
+Array recycling is a separate policy, selected with `com.netflix.hollow.core.memory.pool.MemoryRecyclingMode`. `AUTO` preserves the existing garbage-collector-aware selection, `ENABLED` always reuses retired array segments, and `DISABLED` never reuses retired arrays. Choosing a recycler policy does not enable an experiment. For example, a G1 consumer can select non-recycling arrays without changing collectors:
+
+```java
+HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever)
+        .withMemoryRecyclingMode(MemoryRecyclingMode.DISABLED)
+        .withExperimentalFeatures(ExperimentalFeature.SHARD_READ_FAST_PATHS)
+        .build();
+```
+
+The opt-ins and recycler policy are captured at construction and retained across deltas and replacement snapshots. Each consumer owns its recycler. Enabling an experiment never bypasses its safety requirements: recycling on-heap arrays still require read validation even when shard fast paths are enabled.
+
+Configuration integrations should conditionally add an opt-in when their feature setting is true, and omit that call when false or unset. Omitting a call does not cancel an application-supplied opt-in. Experiments may become the release default; their identifiers will then be retained as deprecated, ineffective opt-ins. An opt-in is not a permanent opt-out or a live kill switch for an already-loaded consumer.
+
 Each time the identifier of the currently announced state changes, `triggerRefresh()` should be called on the 
 `HollowConsumer`.  This will bring the data up to date.
 

@@ -33,6 +33,8 @@ import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.OptionalBlobPartInput;
+import com.netflix.hollow.core.memory.pool.MemoryRecyclingMode;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.TypeFilter;
@@ -46,6 +48,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -203,6 +206,8 @@ public class HollowConsumer {
                 builder.metricsCollector,
                 builder.updatePlanBlobVerifier);
         updater.setFilter(builder.typeFilter);
+        updater.setExperimentalFeatures(builder.experimentalFeatures.toArray(new ExperimentalFeature[0]));
+        updater.setMemoryRecyclingMode(builder.memoryRecyclingMode);
         if(builder.skipTypeShardUpdateWithNoAdditions)
             updater.setSkipShardUpdateWithNoAdditions(true);
         this.announcementWatcher = builder.announcementWatcher;
@@ -1156,8 +1161,10 @@ public class HollowConsumer {
         protected Duration existingBlobMaxAge = Duration.ofSeconds(-1); // Disabled by default, no existing blob will be deleted.
         protected Executor refreshExecutor = null;
         protected MemoryMode memoryMode = MemoryMode.ON_HEAP;
+        protected MemoryRecyclingMode memoryRecyclingMode = MemoryRecyclingMode.AUTO;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
         protected boolean skipTypeShardUpdateWithNoAdditions = false;
+        protected final EnumSet<ExperimentalFeature> experimentalFeatures = EnumSet.noneOf(ExperimentalFeature.class);
 
         public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -1423,6 +1430,38 @@ public class HollowConsumer {
          */
         public B withMemoryMode(MemoryMode memoryMode) {
             this.memoryMode = memoryMode;
+            return (B)this;
+        }
+
+        /**
+         * Opt in to specific experimental implementations. Calls are additive, and opt-ins apply
+         * to both the initial load and replacement snapshots. Features not specified use the
+         * release default; opting in never enables unrelated experiments in later releases.
+         * <p>
+         * All current experiments default to off. This is a construction-time choice, not a
+         * live toggle or a permanent opt-out once an experiment becomes the default.
+         *
+         * @param features the experiments to enable
+         * @return this builder
+         */
+        public B withExperimentalFeatures(ExperimentalFeature... features) {
+            EnumSet<ExperimentalFeature> additions = EnumSet.noneOf(ExperimentalFeature.class);
+            Collections.addAll(additions, features);
+            this.experimentalFeatures.addAll(additions);
+            return (B)this;
+        }
+
+        /**
+         * Select array reuse independently of the garbage collector. AUTO preserves GC-aware
+         * selection; ENABLED always recycles, and DISABLED never reuses retired arrays.
+         * Each consumer owns its recycler and retains it across replacement snapshots.
+         * This does not enable experimental features and is not a live toggle.
+         *
+         * @param mode the recycler selection policy
+         * @return this builder
+         */
+        public B withMemoryRecyclingMode(MemoryRecyclingMode mode) {
+            this.memoryRecyclingMode = Objects.requireNonNull(mode);
             return (B)this;
         }
 
