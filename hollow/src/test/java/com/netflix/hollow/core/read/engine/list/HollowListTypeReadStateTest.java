@@ -113,8 +113,9 @@ public class HollowListTypeReadStateTest extends AbstractHollowListTypeDataEleme
         roundTripDelta();
         assertEquals(1, typeState.size(0));
         assertEquals(1, typeState.getElementOrdinal(0, 0));
-        if(!recycling) {
-            // Immutable cursors retain the original list even when its ordinal is reused.
+        if(!recycling && shardReadFastPaths) {
+            // Validation elision lets immutable cursors retain the list when its ordinal is reused.
+            // Without that opt-in, validation refreshes the cursor to the shorter live list.
             assertEquals(1, iterator.next());
             assertEquals(2, iterator.next());
         }

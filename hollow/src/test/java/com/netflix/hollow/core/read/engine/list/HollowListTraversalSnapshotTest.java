@@ -14,6 +14,9 @@ import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
 import com.netflix.hollow.api.perfapi.HollowListTypePerfAPI;
 import com.netflix.hollow.api.perfapi.HollowPerfBackedList;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
@@ -146,7 +149,8 @@ public class HollowListTraversalSnapshotTest extends AbstractHollowListTypeDataE
     private HollowListTypeReadState immutableState() throws Exception {
         populateWriteStateEngine(3);
         populateWriteStateEngineWithListRecords(new int[][] {{0, 1, 2}});
-        readStateEngine = new HollowReadStateEngine(WastefulRecycler.DEFAULT_INSTANCE);
+        readStateEngine = new HollowReadStateEngine(new HollowReadConfiguration(MemoryMode.ON_HEAP,
+                WastefulRecycler.DEFAULT_INSTANCE, ExperimentalFeature.SHARD_READ_FAST_PATHS));
         readStateEngine.setShardCursorIterators(true);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
         return (HollowListTypeReadState) readStateEngine.getTypeState("TestList");

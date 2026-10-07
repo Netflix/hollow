@@ -17,5 +17,8 @@ public enum ExperimentalFeature {
     SHARD_READ_FAST_PATHS,
 
     /** Direct decoding and equality checks against immutable on-heap byte segments. */
-    DIRECT_SEGMENT_STRING_READS
+    DIRECT_SEGMENT_STRING_READS,
+
+    /** Capture collection shard bounds once for ordinal cursors and Java list traversal. */
+    SHARD_CURSOR_ITERATORS
 }

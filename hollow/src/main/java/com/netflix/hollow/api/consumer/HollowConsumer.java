@@ -1488,7 +1488,7 @@ public class HollowConsumer {
          */
         public B withShardCursorIterators() {
             this.shardCursorIterators = true;
-            return (B)this;
+            return withExperimentalFeatures(ExperimentalFeature.SHARD_CURSOR_ITERATORS);
         }
 
         @Deprecated

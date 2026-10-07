@@ -106,6 +106,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
         this.listeners = new HashMap<String, List<HollowTypeStateListener>>();
         this.hashCodeFinder = hashCodeFinder;
         this.memoryRecycler = readConfiguration.getMemoryRecycler();
+        this.shardCursorIterators = readConfiguration.isExperimentalFeatureEnabled(ExperimentalFeature.SHARD_CURSOR_ITERATORS);
         this.listenToAllPopulatedOrdinals = listenToAllPopulatedOrdinals;
     }
 
@@ -242,7 +243,8 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     }
 
     public boolean isExperimentalFeatureEnabled(ExperimentalFeature feature) {
-        return readConfiguration.isExperimentalFeatureEnabled(feature);
+        return feature == ExperimentalFeature.SHARD_CURSOR_ITERATORS ? shardCursorIterators
+                : readConfiguration.isExperimentalFeatureEnabled(feature);
     }
 
     public ArraySegmentRecycler getMemoryRecycler() {
