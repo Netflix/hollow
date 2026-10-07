@@ -1,7 +1,10 @@
 package com.netflix.hollow.core.read.engine.object;
 
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -50,6 +53,9 @@ public class HollowObjectTypeReadStateShardBenchmark {
     @Param({ "10" })
     int probabilityUnicode;
 
+    @Param({ "false", "true" })
+    boolean directSegmentStrings;
+
     @Setup
     public void setUp() throws IOException {
         writeStateEngine = new HollowWriteStateEngine();
@@ -81,7 +87,10 @@ public class HollowObjectTypeReadStateShardBenchmark {
             readOrder.add(r.nextInt(countStringsDb));
         }
 
-        readStateEngine = new HollowReadStateEngine(WastefulRecycler.DEFAULT_INSTANCE);
+        readStateEngine = new HollowReadStateEngine(new HollowReadConfiguration(MemoryMode.ON_HEAP,
+                WastefulRecycler.DEFAULT_INSTANCE, directSegmentStrings
+                ? new ExperimentalFeature[] { ExperimentalFeature.SHARD_READ_FAST_PATHS, ExperimentalFeature.DIRECT_SEGMENT_STRING_READS }
+                : new ExperimentalFeature[] { ExperimentalFeature.SHARD_READ_FAST_PATHS }));
 
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
         dataAccess = (HollowObjectTypeDataAccess) readStateEngine.getTypeDataAccess("String", 0);

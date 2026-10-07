@@ -14,5 +14,8 @@ public enum ExperimentalFeature {
      * with contiguous fixed-length storage, bulk byte-field reads, and scalar fast paths.
      * Does not change recycler selection or permit validation elision for recycling arrays.
      */
-    SHARD_READ_FAST_PATHS
+    SHARD_READ_FAST_PATHS,
+
+    /** Direct decoding and equality checks against immutable on-heap byte segments. */
+    DIRECT_SEGMENT_STRING_READS
 }
