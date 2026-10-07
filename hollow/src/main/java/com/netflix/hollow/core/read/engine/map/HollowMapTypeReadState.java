@@ -110,7 +110,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         HollowMapTypeReadStateShard[] newShards = new HollowMapTypeReadStateShard[numShards];
         int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
         for(int i=0; i<numShards; i++) {
-            HollowMapTypeDataElements shardDataElements = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
+            HollowMapTypeDataElements shardDataElements = new HollowMapTypeDataElements(configurationFor(memoryRecycler));
             shardDataElements.readSnapshot(in);
             newShards[i] = new HollowMapTypeReadStateShard(shardDataElements, shardOrdinalShift);
         }
@@ -129,7 +129,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0; i<shardsVolatile.shards.length; i++) {
-            HollowMapTypeDataElements deltaData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
+            HollowMapTypeDataElements deltaData = new HollowMapTypeDataElements(configurationFor(memoryRecycler));
             deltaData.readDelta(in);
             if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
 
@@ -151,7 +151,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
 
                 deltaData.encodedAdditions.destroy();
             } else {
-                HollowMapTypeDataElements nextData = new HollowMapTypeDataElements(memoryMode, memoryRecycler);
+                HollowMapTypeDataElements nextData = new HollowMapTypeDataElements(configurationFor(memoryRecycler));
                 HollowMapTypeDataElements oldData = shardsVolatile.shards[i].dataElements;
                 nextData.applyDelta(oldData, deltaData);
 

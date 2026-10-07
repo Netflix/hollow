@@ -18,14 +18,29 @@ package com.netflix.hollow.core.memory.encoding;
 import static org.junit.Assert.assertEquals;
 
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Random;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class FixedLengthElementArrayLargeReadTest {
+    @Parameterized.Parameters(name = "fastPaths={0}")
+    public static Collection<Object[]> parameters() {
+        return Arrays.asList(new Object[][] { { false }, { true } });
+    }
+
+    @Parameterized.Parameter
+    public boolean fastPaths;
 
     @Test
     public void matchesBitOracleAcrossSegmentBoundariesAndUpdates() {
@@ -33,7 +48,7 @@ public class FixedLengthElementArrayLargeReadTest {
         for (int log2 : new int[] {1, 2, 5, 8}) {
             long[] words = new long[3 * (1 << log2) + 7];
             FixedLengthElementArray data = new FixedLengthElementArray(
-                    new WastefulRecycler(5, log2), words.length * 64L);
+                    configuration(new WastefulRecycler(5, log2)), words.length * 64L);
             for (int phase = 0; phase < 2; phase++) {
                 for (int i = 0; i < words.length; i++) {
                     words[i] = random.nextLong();
@@ -50,8 +65,8 @@ public class FixedLengthElementArrayLargeReadTest {
         for (int log2 : new int[] {1, 2, 5, 8}) {
             long[] sourceWords = new long[3 * (1 << log2) + 7];
             WastefulRecycler recycler = new WastefulRecycler(5, log2);
-            FixedLengthElementArray source = new FixedLengthElementArray(recycler, sourceWords.length * 64L);
-            FixedLengthElementArray copy = new FixedLengthElementArray(recycler, sourceWords.length * 64L);
+            FixedLengthElementArray source = new FixedLengthElementArray(configuration(recycler), sourceWords.length * 64L);
+            FixedLengthElementArray copy = new FixedLengthElementArray(configuration(recycler), sourceWords.length * 64L);
             for (int i = 0; i < sourceWords.length; i++) {
                 sourceWords[i] = random.nextLong();
                 source.set(i, sourceWords[i]);
@@ -86,7 +101,7 @@ public class FixedLengthElementArrayLargeReadTest {
                 }
             }
             try (HollowBlobInput in = HollowBlobInput.serial(bytes.toByteArray())) {
-                FixedLengthElementArray loaded = FixedLengthElementArray.newFrom(in, new WastefulRecycler(5, log2));
+                FixedLengthElementArray loaded = FixedLengthElementArray.newFrom(in, configuration(new WastefulRecycler(5, log2)), VarInt.readVLong(in));
                 assertLargeReadsMatch(loaded, words);
             }
         }
@@ -94,7 +109,7 @@ public class FixedLengthElementArrayLargeReadTest {
 
     @Test
     public void readsFencepostsAfterSetIncrementAndClear() {
-        FixedLengthElementArray data = new FixedLengthElementArray(new WastefulRecycler(5, 2), 512);
+        FixedLengthElementArray data = new FixedLengthElementArray(configuration(new WastefulRecycler(5, 2)), 512);
         long[] words = new long[8];
         int boundary = 4 * 64;
         int index = boundary - 3;
@@ -118,7 +133,7 @@ public class FixedLengthElementArrayLargeReadTest {
     @Test
     public void preservesOverriddenGet() {
         long transform = 0x9E3779B97F4A7C15L;
-        FixedLengthElementArray data = new FixedLengthElementArray(new WastefulRecycler(5, 2), 512) {
+        FixedLengthElementArray data = new FixedLengthElementArray(configuration(new WastefulRecycler(5, 2)), 512) {
             @Override
             public long get(long index) {
                 return super.get(index) ^ transform;
@@ -132,6 +147,11 @@ public class FixedLengthElementArrayLargeReadTest {
             words[i] = raw ^ transform;
         }
         assertLargeReadsMatch(data, words);
+    }
+
+    private HollowReadConfiguration configuration(WastefulRecycler recycler) {
+        return new HollowReadConfiguration(MemoryMode.ON_HEAP, recycler, fastPaths
+                ? new ExperimentalFeature[] { ExperimentalFeature.SHARD_READ_FAST_PATHS } : new ExperimentalFeature[0]);
     }
 
     private static void assertLargeReadsMatch(FixedLengthElementArray data, long[] words) {

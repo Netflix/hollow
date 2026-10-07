@@ -21,6 +21,9 @@ import static org.junit.Assert.assertTrue;
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -31,6 +34,9 @@ import java.util.Random;
 import org.junit.Test;
 
 public class ContiguousFixedLengthDataTest {
+    private static HollowReadConfiguration enabledConfiguration(ArraySegmentRecycler recycler) {
+        return new HollowReadConfiguration(MemoryMode.ON_HEAP, recycler, ExperimentalFeature.SHARD_READ_FAST_PATHS);
+    }
 
     @Test
     public void matchesSegmentedReadsAndWrites() {
@@ -95,13 +101,27 @@ public class ContiguousFixedLengthDataTest {
     }
 
     @Test
+    public void factoryDefaultsToSegmentedStorage() throws IOException {
+        assertTrue(FixedLengthDataFactory.get(1024, MemoryMode.ON_HEAP, WastefulRecycler.DEFAULT_INSTANCE)
+                instanceof FixedLengthElementArray);
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(bytes);
+        VarInt.writeVLong(out, 1);
+        out.writeLong(42L);
+        FixedLengthData loaded = FixedLengthDataFactory.get(HollowBlobInput.serial(bytes.toByteArray()),
+                MemoryMode.ON_HEAP, WastefulRecycler.DEFAULT_INSTANCE);
+        assertTrue(loaded instanceof FixedLengthElementArray);
+        assertEquals(42L, loaded.getLargeElementValue(0, 64));
+    }
+
+    @Test
     public void factoryUsesContiguousStorageOnlyWithoutRecycling() throws IOException {
         FixedLengthData allocated = FixedLengthDataFactory.get(
-                1024, MemoryMode.ON_HEAP, WastefulRecycler.DEFAULT_INSTANCE);
+                1024, enabledConfiguration(WastefulRecycler.DEFAULT_INSTANCE));
         assertTrue(allocated instanceof ContiguousFixedLengthData);
 
         FixedLengthData recycled = FixedLengthDataFactory.get(
-                1024, MemoryMode.ON_HEAP, new RecyclingRecycler());
+                1024, enabledConfiguration(new RecyclingRecycler()));
         assertTrue(recycled instanceof FixedLengthElementArray);
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -112,8 +132,7 @@ public class ContiguousFixedLengthDataTest {
 
         FixedLengthData loaded = FixedLengthDataFactory.get(
                 HollowBlobInput.serial(bytes.toByteArray()),
-                MemoryMode.ON_HEAP,
-                WastefulRecycler.DEFAULT_INSTANCE);
+                enabledConfiguration(WastefulRecycler.DEFAULT_INSTANCE));
         assertTrue(loaded instanceof ContiguousFixedLengthData);
         assertEquals(0x0123456789ABCDEFL, loaded.getLargeElementValue(0, 64));
         assertEquals(0x0FEDCBA987654321L, loaded.getLargeElementValue(64, 64));

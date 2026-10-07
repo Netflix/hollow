@@ -63,12 +63,10 @@ class HollowListDeltaApplicator {
 
         target.listPointerData = FixedLengthDataFactory.get(
                 ((long) target.maxOrdinal + 1) * target.bitsPerListPointer,
-                target.memoryMode,
-                target.memoryRecycler);
+                target.readConfiguration);
         target.elementData = FixedLengthDataFactory.get(
                 target.totalNumberOfElements * target.bitsPerElement,
-                target.memoryMode,
-                target.memoryRecycler);
+                target.readConfiguration);
 
         if(target.bitsPerListPointer == from.bitsPerListPointer
                 && target.bitsPerElement == from.bitsPerElement)

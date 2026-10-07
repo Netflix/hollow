@@ -68,12 +68,10 @@ class HollowSetDeltaApplicator {
 
         target.setPointerAndSizeData = FixedLengthDataFactory.get(
                 ((long) target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion,
-                target.memoryMode,
-                target.memoryRecycler);
+                target.readConfiguration);
         target.elementData = FixedLengthDataFactory.get(
                 target.totalNumberOfBuckets * target.bitsPerElement,
-                target.memoryMode,
-                target.memoryRecycler);
+                target.readConfiguration);
 
         if(target.bitsPerSetPointer == from.bitsPerSetPointer
                 && target.bitsPerSetSizeValue == from.bitsPerSetSizeValue

@@ -115,7 +115,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
         HollowObjectTypeReadStateShard[] newShards = new HollowObjectTypeReadStateShard[numShards];
         int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
         for(int i=0; i<numShards; i++) {
-            HollowObjectTypeDataElements shardDataElements = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
+            HollowObjectTypeDataElements shardDataElements = new HollowObjectTypeDataElements(getSchema(), configurationFor(memoryRecycler));
             shardDataElements.readSnapshot(in, unfilteredSchema);
             newShards[i] = new HollowObjectTypeReadStateShard(getSchema(), shardDataElements, shardOrdinalShift);
         }
@@ -134,7 +134,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0; i<shardsVolatile.shards.length; i++) {
-            HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, memoryMode, memoryRecycler);
+            HollowObjectTypeDataElements deltaData = new HollowObjectTypeDataElements((HollowObjectSchema)deltaSchema, configurationFor(memoryRecycler));
             deltaData.readDelta(in);
             if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
 
@@ -156,7 +156,7 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
                 deltaData.encodedAdditions.destroy();
             } else {
-                HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), memoryMode, memoryRecycler);
+                HollowObjectTypeDataElements nextData = new HollowObjectTypeDataElements(getSchema(), configurationFor(memoryRecycler));
                 HollowObjectTypeDataElements oldData = shardsVolatile.shards[i].dataElements;
                 nextData.applyDelta(oldData, deltaData);
 

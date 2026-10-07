@@ -11,6 +11,8 @@ import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -42,21 +44,23 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class HollowObjectTypeReadStateReadLongTest {
 
-    @Parameters(name = "{0}, recycling={1}")
+    @Parameters(name = "{0}, recycling={1}, fastPaths={2}")
     public static Collection<Object[]> memoryModes() {
         return Arrays.asList(new Object[][] {
-                { MemoryMode.ON_HEAP, true },
-                { MemoryMode.ON_HEAP, false },
-                { MemoryMode.SHARED_MEMORY_LAZY, false }
+                { MemoryMode.ON_HEAP, true, false }, { MemoryMode.ON_HEAP, true, true },
+                { MemoryMode.ON_HEAP, false, false }, { MemoryMode.ON_HEAP, false, true },
+                { MemoryMode.SHARED_MEMORY_LAZY, false, false }, { MemoryMode.SHARED_MEMORY_LAZY, false, true }
         });
     }
 
     private final MemoryMode memoryMode;
     private final boolean recycling;
+    private final boolean fastPaths;
 
-    public HollowObjectTypeReadStateReadLongTest(MemoryMode memoryMode, boolean recycling) {
+    public HollowObjectTypeReadStateReadLongTest(MemoryMode memoryMode, boolean recycling, boolean fastPaths) {
         this.memoryMode = memoryMode;
         this.recycling = recycling;
+        this.fastPaths = fastPaths;
     }
 
     // Pinned to a single shard so that ordinals never span shards: bitsPerField is then uniform
@@ -118,8 +122,8 @@ public class HollowObjectTypeReadStateReadLongTest {
     }
 
     private HollowReadStateEngine readOnHeap(byte[] snapshot) throws Exception {
-        HollowReadStateEngine readStateEngine = new HollowReadStateEngine(recycling
-                ? new RecyclingRecycler() : new WastefulRecycler(11, 8));
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine(new HollowReadConfiguration(memoryMode, recycling
+                ? new RecyclingRecycler() : new WastefulRecycler(11, 8), features()));
         HollowBlobReader reader = new HollowBlobReader(readStateEngine);
         try (HollowBlobInput in = HollowBlobInput.serial(new ByteArrayInputStream(snapshot))) {
             reader.readSnapshot(in);
@@ -127,13 +131,17 @@ public class HollowObjectTypeReadStateReadLongTest {
         return readStateEngine;
     }
 
-    private static HollowReadStateEngine readSharedMemory(byte[] snapshot) throws Exception {
+    private ExperimentalFeature[] features() {
+        return fastPaths ? new ExperimentalFeature[] { ExperimentalFeature.SHARD_READ_FAST_PATHS } : new ExperimentalFeature[0];
+    }
+
+    private HollowReadStateEngine readSharedMemory(byte[] snapshot) throws Exception {
         File blobFile = File.createTempFile("readlong-shm-snapshot", ".bin");
         blobFile.deleteOnExit();
         try (FileOutputStream fos = new FileOutputStream(blobFile)) {
             fos.write(snapshot);
         }
-        HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
+        HollowReadStateEngine readStateEngine = new HollowReadStateEngine(new HollowReadConfiguration(memoryMode, new RecyclingRecycler(), features()));
         HollowBlobReader reader = new HollowBlobReader(readStateEngine, MemoryMode.SHARED_MEMORY_LAZY);
         try (HollowBlobInput in = HollowBlobInput.randomAccess(blobFile)) {
             reader.readSnapshot(in);
@@ -154,7 +162,7 @@ public class HollowObjectTypeReadStateReadLongTest {
         if (memoryMode == MemoryMode.SHARED_MEMORY_LAZY) {
             assertTrue("expected EncodedLongBuffer in shared-memory mode",
                     shard.dataElements.fixedLengthData instanceof EncodedLongBuffer);
-        } else if (recycling) {
+        } else if (recycling || !fastPaths) {
             assertTrue("expected FixedLengthElementArray with recycling",
                     shard.dataElements.fixedLengthData instanceof FixedLengthElementArray);
         } else {

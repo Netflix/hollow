@@ -26,6 +26,7 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.io.IOException;
 
@@ -55,7 +56,11 @@ public class HollowObjectTypeDataElements extends HollowTypeDataElements {
     }
 
     public HollowObjectTypeDataElements(HollowObjectSchema schema, MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
-        super(memoryMode, memoryRecycler);
+        this(schema, new HollowReadConfiguration(memoryMode, memoryRecycler));
+    }
+
+    public HollowObjectTypeDataElements(HollowObjectSchema schema, HollowReadConfiguration readConfiguration) {
+        super(readConfiguration);
         varLengthData = new VariableLengthData[schema.numFields()];
         bitsPerField = new int[schema.numFields()];
         bitOffsetPerField = new int[schema.numFields()];
@@ -81,7 +86,7 @@ public class HollowObjectTypeDataElements extends HollowTypeDataElements {
 
         readFieldStatistics(in, unfilteredSchema);
 
-        fixedLengthData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
+        fixedLengthData = FixedLengthDataFactory.get(in, readConfiguration);
         removeExcludedFieldsFromFixedLengthData();
 
         readVarLengthData(in, unfilteredSchema);
@@ -91,7 +96,7 @@ public class HollowObjectTypeDataElements extends HollowTypeDataElements {
         if(bitsPerField.length < bitsPerUnfilteredField.length) {
             long numBitsRequired = (long)bitsPerRecord * (maxOrdinal + 1);
             FixedLengthData filteredData = FixedLengthDataFactory.get(
-                    numBitsRequired, memoryMode, memoryRecycler);
+                    numBitsRequired, readConfiguration);
 
             long currentReadBit = 0;
             long currentWriteBit = 0;

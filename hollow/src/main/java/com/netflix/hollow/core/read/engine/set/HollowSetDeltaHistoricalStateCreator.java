@@ -19,6 +19,7 @@ package com.netflix.hollow.core.read.engine.set;
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -48,7 +49,9 @@ public class HollowSetDeltaHistoricalStateCreator {
     public HollowSetDeltaHistoricalStateCreator(HollowSetTypeReadState typeState, boolean reverse) {
         this.typeState = typeState;
         this.stateEngineDataElements = typeState.currentDataElements();
-        this.historicalDataElements = new HollowSetTypeDataElements(WastefulRecycler.DEFAULT_INSTANCE);
+        this.historicalDataElements = new HollowSetTypeDataElements(
+                stateEngineDataElements[0].readConfiguration.withMemoryRecycler(WastefulRecycler.DEFAULT_INSTANCE)
+                        .withMemoryMode(MemoryMode.ON_HEAP));
         this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class), reverse);
         this.shardNumberMask = stateEngineDataElements.length - 1;
         this.shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(stateEngineDataElements.length);
@@ -60,12 +63,10 @@ public class HollowSetDeltaHistoricalStateCreator {
         historicalDataElements.setPointerAndSizeData = FixedLengthDataFactory.get(
                 ((long) historicalDataElements.maxOrdinal + 1)
                         * historicalDataElements.bitsPerFixedLengthSetPortion,
-                historicalDataElements.memoryMode,
-                historicalDataElements.memoryRecycler);
+                historicalDataElements.readConfiguration);
         historicalDataElements.elementData = FixedLengthDataFactory.get(
                 historicalDataElements.totalNumberOfBuckets * historicalDataElements.bitsPerElement,
-                historicalDataElements.memoryMode,
-                historicalDataElements.memoryRecycler);
+                historicalDataElements.readConfiguration);
 
         iter.reset();
 

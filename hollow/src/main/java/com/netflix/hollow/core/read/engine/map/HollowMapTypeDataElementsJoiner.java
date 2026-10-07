@@ -18,7 +18,7 @@ class HollowMapTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Hollo
 
     @Override
     public void initToElements() {
-        this.to = new HollowMapTypeDataElements(from[0].memoryMode, from[0].memoryRecycler);
+        this.to = new HollowMapTypeDataElements(from[0].readConfiguration);
     }
 
     @Override
@@ -68,8 +68,8 @@ class HollowMapTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Hollo
     public void copyRecords() {
         long bucketCounter = 0;
 
-        to.mapPointerAndSizeData = FixedLengthDataFactory.get((long)(to.maxOrdinal + 1) *  to.bitsPerFixedLengthMapPortion, to.memoryMode, to.memoryRecycler);
-        to.entryData = FixedLengthDataFactory.get(to.totalNumberOfBuckets * to.bitsPerMapEntry, to.memoryMode, to.memoryRecycler);
+        to.mapPointerAndSizeData = FixedLengthDataFactory.get((long)(to.maxOrdinal + 1) *  to.bitsPerFixedLengthMapPortion, to.readConfiguration);
+        to.entryData = FixedLengthDataFactory.get(to.totalNumberOfBuckets * to.bitsPerMapEntry, to.readConfiguration);
 
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;

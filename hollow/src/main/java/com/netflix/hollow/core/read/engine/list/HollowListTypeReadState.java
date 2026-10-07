@@ -98,7 +98,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
         HollowListTypeReadStateShard[] newShards = new HollowListTypeReadStateShard[numShards];
         int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
         for(int i=0; i<numShards; i++) {
-            HollowListTypeDataElements shardDataElements = new HollowListTypeDataElements(memoryMode, memoryRecycler);
+            HollowListTypeDataElements shardDataElements = new HollowListTypeDataElements(configurationFor(memoryRecycler));
             shardDataElements.readSnapshot(in);
             newShards[i] = new HollowListTypeReadStateShard(shardDataElements, shardOrdinalShift);
         }
@@ -117,7 +117,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0; i<shardsVolatile.shards.length; i++) {
-            HollowListTypeDataElements deltaData = new HollowListTypeDataElements(memoryMode, memoryRecycler);
+            HollowListTypeDataElements deltaData = new HollowListTypeDataElements(configurationFor(memoryRecycler));
             deltaData.readDelta(in);
             if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
 
@@ -139,7 +139,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
 
                 deltaData.encodedAdditions.destroy();
             } else {
-                HollowListTypeDataElements nextData = new HollowListTypeDataElements(memoryMode, memoryRecycler);
+                HollowListTypeDataElements nextData = new HollowListTypeDataElements(configurationFor(memoryRecycler));
                 HollowListTypeDataElements oldData = shardsVolatile.shards[i].dataElements;
                 nextData.applyDelta(oldData, deltaData);
 

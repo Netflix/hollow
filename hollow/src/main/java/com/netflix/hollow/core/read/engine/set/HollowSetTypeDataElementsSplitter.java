@@ -19,7 +19,7 @@ public class HollowSetTypeDataElementsSplitter extends HollowTypeDataElementsSpl
     public void initToElements() {
         this.to = new HollowSetTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
-            to[i] = new HollowSetTypeDataElements(from.memoryMode, from.memoryRecycler);
+            to[i] = new HollowSetTypeDataElements(from.readConfiguration);
         }
     }
 
@@ -64,8 +64,8 @@ public class HollowSetTypeDataElementsSplitter extends HollowTypeDataElementsSpl
 
         for(int toIndex=0;toIndex<numSplits;toIndex++) {
             HollowSetTypeDataElements target = to[toIndex];
-            target.setPointerAndSizeData = FixedLengthDataFactory.get(((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion, target.memoryMode, target.memoryRecycler);
-            target.elementData = FixedLengthDataFactory.get(target.totalNumberOfBuckets * target.bitsPerElement, target.memoryMode, target.memoryRecycler);
+            target.setPointerAndSizeData = FixedLengthDataFactory.get(((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion, target.readConfiguration);
+            target.elementData = FixedLengthDataFactory.get(target.totalNumberOfBuckets * target.bitsPerElement, target.readConfiguration);
         }
 
         // count elements per split

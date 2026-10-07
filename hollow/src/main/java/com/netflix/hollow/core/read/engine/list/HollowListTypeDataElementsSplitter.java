@@ -19,7 +19,7 @@ public class HollowListTypeDataElementsSplitter extends HollowTypeDataElementsSp
     public void initToElements() {
         this.to = new HollowListTypeDataElements[numSplits];
         for(int i=0;i<to.length;i++) {
-            to[i] = new HollowListTypeDataElements(from.memoryMode, from.memoryRecycler);
+            to[i] = new HollowListTypeDataElements(from.readConfiguration);
         }
     }
 
@@ -60,8 +60,8 @@ public class HollowListTypeDataElementsSplitter extends HollowTypeDataElementsSp
 
         for(int toIndex=0;toIndex<numSplits;toIndex++) {
             HollowListTypeDataElements target = to[toIndex];
-            target.listPointerData = FixedLengthDataFactory.get((long)target.bitsPerListPointer * (target.maxOrdinal + 1), target.memoryMode, target.memoryRecycler);
-            target.elementData = FixedLengthDataFactory.get(target.bitsPerElement * target.totalNumberOfElements, target.memoryMode, target.memoryRecycler);
+            target.listPointerData = FixedLengthDataFactory.get((long)target.bitsPerListPointer * (target.maxOrdinal + 1), target.readConfiguration);
+            target.elementData = FixedLengthDataFactory.get(target.bitsPerElement * target.totalNumberOfElements, target.readConfiguration);
         }
 
         // count elements per split

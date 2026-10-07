@@ -74,12 +74,10 @@ class HollowMapDeltaApplicator {
 
         target.mapPointerAndSizeData = FixedLengthDataFactory.get(
                 ((long) target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion,
-                target.memoryMode,
-                target.memoryRecycler);
+                target.readConfiguration);
         target.entryData = FixedLengthDataFactory.get(
                 target.totalNumberOfBuckets * target.bitsPerMapEntry,
-                target.memoryMode,
-                target.memoryRecycler);
+                target.readConfiguration);
 
         if(target.bitsPerMapPointer == from.bitsPerMapPointer
                 && target.bitsPerMapSizeValue == from.bitsPerMapSizeValue

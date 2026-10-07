@@ -21,6 +21,7 @@ import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataEle
 import static com.netflix.hollow.core.read.engine.object.HollowObjectTypeDataElements.varLengthSize;
 
 import com.netflix.hollow.core.memory.FixedLengthDataFactory;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -48,7 +49,9 @@ public class HollowObjectDeltaHistoricalStateCreator {
 
     public HollowObjectDeltaHistoricalStateCreator(HollowObjectTypeReadState typeState, boolean reverse) {
         this.typeState = typeState;
-        this.historicalDataElements = new HollowObjectTypeDataElements(typeState.getSchema(), WastefulRecycler.DEFAULT_INSTANCE);
+        this.historicalDataElements = new HollowObjectTypeDataElements(typeState.getSchema(),
+                typeState.shardsVolatile.shards[0].dataElements.readConfiguration.withMemoryRecycler(WastefulRecycler.DEFAULT_INSTANCE)
+                        .withMemoryMode(MemoryMode.ON_HEAP));
         this.iter = new RemovedOrdinalIterator(typeState.getListener(PopulatedOrdinalListener.class), reverse);
         this.currentWriteVarLengthDataPointers = new long[typeState.getSchema().numFields()];
         this.shardsHolder = typeState.shardsVolatile;
@@ -59,8 +62,7 @@ public class HollowObjectDeltaHistoricalStateCreator {
 
         historicalDataElements.fixedLengthData = FixedLengthDataFactory.get(
                 (long) historicalDataElements.bitsPerRecord * (historicalDataElements.maxOrdinal + 1),
-                historicalDataElements.memoryMode,
-                historicalDataElements.memoryRecycler);
+                historicalDataElements.readConfiguration);
 
         for(int i=0;i<historicalDataElements.schema.numFields();i++) {
             if(isVarLengthField(typeState.getSchema().getFieldType(i))) {

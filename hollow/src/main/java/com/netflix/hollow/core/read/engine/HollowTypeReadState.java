@@ -63,6 +63,11 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
         this.stateListeners = EMPTY_LISTENERS;
     }
 
+    protected final HollowReadConfiguration configurationFor(ArraySegmentRecycler recycler) {
+        return readConfiguration == null ? new HollowReadConfiguration(memoryMode, recycler)
+                : readConfiguration.withMemoryRecycler(recycler);
+    }
+
     protected final void verifyRecyclerForImmutableShards(ArraySegmentRecycler recycler) {
         // Public blob entry points may receive a recycler other than the engine's.
         if (shardsAreImmutable && memoryMode == MemoryMode.ON_HEAP && recycler.recyclesArrays()) {
