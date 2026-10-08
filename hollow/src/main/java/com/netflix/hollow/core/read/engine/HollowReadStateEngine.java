@@ -59,6 +59,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     private final boolean listenToAllPopulatedOrdinals;
     private final HollowReadConfiguration readConfiguration;
     private boolean skipTypeShardUpdateWithNoAdditions;
+    private boolean shardCursorIterators;
     private ArraySegmentRecycler memoryRecycler;
     private Map<String,String> headerTags;
     private Set<String> typesWithDefinedHashCodes = new HashSet<String>();
@@ -105,6 +106,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
         this.listeners = new HashMap<String, List<HollowTypeStateListener>>();
         this.hashCodeFinder = hashCodeFinder;
         this.memoryRecycler = readConfiguration.getMemoryRecycler();
+        this.shardCursorIterators = readConfiguration.isExperimentalFeatureEnabled(ExperimentalFeature.SHARD_CURSOR_ITERATORS);
         this.listenToAllPopulatedOrdinals = listenToAllPopulatedOrdinals;
     }
 
@@ -241,7 +243,8 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     }
 
     public boolean isExperimentalFeatureEnabled(ExperimentalFeature feature) {
-        return readConfiguration.isExperimentalFeatureEnabled(feature);
+        return feature == ExperimentalFeature.SHARD_CURSOR_ITERATORS ? shardCursorIterators
+                : readConfiguration.isExperimentalFeatureEnabled(feature);
     }
 
     public ArraySegmentRecycler getMemoryRecycler() {
@@ -261,6 +264,17 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
 
     public boolean isSkipTypeShardUpdateWithNoAdditions() {
         return skipTypeShardUpdateWithNoAdditions;
+    }
+
+    /**
+     * Experimental. Select shard cursor iterators for collection type read states and Java list traversal.
+     */
+    public void setShardCursorIterators(boolean shardCursorIterators) {
+        this.shardCursorIterators = shardCursorIterators;
+    }
+
+    public boolean isShardCursorIteratorsEnabled() {
+        return shardCursorIterators;
     }
 
     @Override

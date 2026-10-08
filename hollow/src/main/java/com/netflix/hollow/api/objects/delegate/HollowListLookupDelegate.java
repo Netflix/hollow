@@ -19,6 +19,8 @@ package com.netflix.hollow.api.objects.delegate;
 import com.netflix.hollow.api.custom.HollowListTypeAPI;
 import com.netflix.hollow.api.objects.HollowList;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 
 /**
@@ -80,6 +82,15 @@ public class HollowListLookupDelegate<T> implements HollowListDelegate<T> {
                 return i;
         }
         return -1;
+    }
+
+    @Override
+    public HollowListOrdinalIterator ordinalCursor(int ordinal) {
+        // Subclasses may override get() with behavior that an ordinal cursor cannot reproduce.
+        if(getClass() != HollowListLookupDelegate.class)
+            return null;
+        HollowOrdinalIterator iterator = iterator(ordinal);
+        return iterator instanceof HollowListOrdinalIterator ? (HollowListOrdinalIterator)iterator : null;
     }
 
     @Override

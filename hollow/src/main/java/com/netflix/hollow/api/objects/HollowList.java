@@ -19,8 +19,12 @@ package com.netflix.hollow.api.objects;
 import com.netflix.hollow.api.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowRecordDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import java.util.AbstractList;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Spliterator;
 
 /**
  * A HollowList provides an implementation of the {@link java.util.List} interface over
@@ -49,6 +53,33 @@ public abstract class HollowList<T> extends AbstractList<T> implements HollowRec
     @Override
     public final T get(int index) {
         return delegate.get(this, ordinal, index);
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        if(!HollowListTraversal.isEnabled(delegate.getTypeDataAccess()))
+            return super.iterator();
+        HollowListOrdinalIterator cursor = delegate.ordinalCursor(ordinal);
+        return cursor == null ? super.iterator()
+                : HollowListTraversal.iterator(cursor, this::instantiateElement);
+    }
+
+    @Override
+    public ListIterator<T> listIterator(int index) {
+        if(!HollowListTraversal.isEnabled(delegate.getTypeDataAccess()))
+            return super.listIterator(index);
+        HollowListOrdinalIterator cursor = delegate.ordinalCursor(ordinal);
+        return cursor == null ? super.listIterator(index)
+                : HollowListTraversal.listIterator(cursor, index, this::instantiateElement);
+    }
+
+    @Override
+    public Spliterator<T> spliterator() {
+        if(!HollowListTraversal.isEnabled(delegate.getTypeDataAccess()))
+            return super.spliterator();
+        HollowListOrdinalIterator cursor = delegate.ordinalCursor(ordinal);
+        return cursor == null ? super.spliterator()
+                : HollowListTraversal.spliterator(cursor, this::instantiateElement);
     }
 
     @Override
