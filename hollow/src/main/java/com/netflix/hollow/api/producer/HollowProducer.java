@@ -743,6 +743,7 @@ public class HollowProducer extends AbstractHollowProducer {
         Executor snapshotPublishExecutor = null;
         int numStatesBetweenSnapshots = 0;
         boolean focusHoleFillInFewestShards = false;
+        boolean opportunisticCompact = false;
         boolean allowTypeResharding = false;
         boolean forceCoverageOfTypeResharding = false;
         long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
@@ -911,6 +912,14 @@ public class HollowProducer extends AbstractHollowProducer {
          */
         public B withFocusHoleFillInFewestShards(boolean focusHoleFillInFewestShards) {
             this.focusHoleFillInFewestShards = focusHoleFillInFewestShards;
+            return (B) this;
+        }
+
+        /**
+         * Opt-in: when a cycle frees no ordinals for a type, skip the compact sort+rehash for that type.
+         */
+        public B withOpportunisticCompact(boolean opportunisticCompact) {
+            this.opportunisticCompact = opportunisticCompact;
             return (B) this;
         }
 

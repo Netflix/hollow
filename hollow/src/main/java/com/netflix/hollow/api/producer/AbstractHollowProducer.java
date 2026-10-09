@@ -102,6 +102,7 @@ abstract class AbstractHollowProducer {
 
     private final long targetMaxTypeShardSize;
     private final boolean focusHoleFillInFewestShards;
+    private final boolean opportunisticCompact;
     private final boolean allowTypeResharding;
     private final boolean forceCoverageOfTypeResharding;   // exercise re-sharding often (for testing)
     private final Supplier<Boolean> ignoreSoftLimits;
@@ -121,7 +122,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, () -> false);
+                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, () -> false, false);
     }
 
     // The only constructor should be that which accepts a builder
@@ -135,7 +136,7 @@ abstract class AbstractHollowProducer {
                 b.allowTypeResharding, b.forceCoverageOfTypeResharding, b.partitionedOrdinalMap,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
                 b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits,
-                b.skipValidation);
+                b.skipValidation, b.opportunisticCompact);
     }
 
     private final HollowProducerListener producerMetricsListener;
@@ -163,7 +164,8 @@ abstract class AbstractHollowProducer {
             boolean doIntegrityCheck,
             HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier,
             Supplier<Boolean> ignoreSoftLimits,
-            Supplier<Boolean> skipValidation) {
+            Supplier<Boolean> skipValidation,
+            boolean opportunisticCompact) {
         this.publisher = publisher;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
@@ -180,6 +182,7 @@ abstract class AbstractHollowProducer {
         this.ignoreSoftLimits = ignoreSoftLimits;
         this.partitionedOrdinalMap = partitionedOrdinalMap;
         this.skipValidation = skipValidation;
+        this.opportunisticCompact = opportunisticCompact;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
                 ? new HollowWriteStateEngine()
@@ -189,6 +192,7 @@ abstract class AbstractHollowProducer {
         writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
         writeEngine.setIgnoreOrdinalLimits(ignoreSoftLimits);
         writeEngine.setPartitionedOrdinalMap(partitionedOrdinalMap);
+        writeEngine.setOpportunisticCompact(opportunisticCompact);
 
         this.objectMapper = new HollowObjectMapper(writeEngine);
         if (hashCodeFinder != null) {
@@ -356,6 +360,7 @@ abstract class AbstractHollowProducer {
                 writeEngine.setFocusHoleFillInFewestShards(focusHoleFillInFewestShards);
                 writeEngine.setIgnoreOrdinalLimits(ignoreSoftLimits);
                 writeEngine.setPartitionedOrdinalMap(partitionedOrdinalMap);
+                writeEngine.setOpportunisticCompact(opportunisticCompact);
                 HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, schemas);
                 HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);
                 if (hashCodeFinder != null) {
