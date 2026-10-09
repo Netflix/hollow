@@ -208,4 +208,36 @@ public class ThreadSafeBitSetTest {
         Assert.assertEquals(andNot_tsbSet, result);
         Assert.assertEquals(andNot_bSet, result.toBitSet());
     }
+
+    @Test
+    public void testConcurrentSetOfSharedAndRepeatedBits() throws Exception {
+        final int numThreads = 16;
+        final int numBits = 4096;
+        final int repetitions = 200;
+        ThreadSafeBitSet tsb = new ThreadSafeBitSet();
+        java.util.concurrent.CountDownLatch start = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.ExecutorService ex = java.util.concurrent.Executors.newFixedThreadPool(numThreads);
+        java.util.List<java.util.concurrent.Future<?>> futures = new java.util.ArrayList<>();
+        for (int t = 0; t < numThreads; t++) {
+            final int offset = t;
+            futures.add(ex.submit(() -> {
+                start.await();
+                // every thread repeatedly sets every bit, starting at a different offset, so threads
+                // race both to set fresh bits in shared words and to re-set bits that are already set.
+                for (int r = 0; r < repetitions; r++)
+                    for (int i = 0; i < numBits; i++)
+                        tsb.set((i + offset * 37) % numBits);
+                return null;
+            }));
+        }
+        start.countDown();
+        for (java.util.concurrent.Future<?> f : futures)
+            f.get();
+        ex.shutdown();
+
+        Assert.assertEquals(numBits, tsb.cardinality());
+        for (int i = 0; i < numBits; i++)
+            Assert.assertTrue(tsb.get(i));
+        Assert.assertFalse(tsb.get(numBits));
+    }
 }
