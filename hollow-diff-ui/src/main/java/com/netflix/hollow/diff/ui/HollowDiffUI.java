@@ -32,6 +32,8 @@ import com.netflix.hollow.diffview.effigy.HollowRecordDiffUI;
 import com.netflix.hollow.diffview.effigy.pairer.exact.DiffExactRecordMatcher;
 import com.netflix.hollow.diffview.effigy.pairer.exact.ExactRecordMatcher;
 import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.report.HollowDiffReportMetadata;
+import com.netflix.hollow.tools.diff.report.HollowDiffReportOptions;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,7 +62,17 @@ public class HollowDiffUI implements HollowRecordDiffUI {
     private final Map<String, CustomHollowEffigyFactory> customHollowEffigyFactories;
     private final ExactRecordMatcher exactRecordMatcher;
 
-    HollowDiffUI(String baseURLPath, String diffUIPath, HollowDiff diff, String fromBlobName, String toBlobName, VelocityEngine ve) {
+    private String diffJson;
+
+    HollowDiffUI(
+            String baseURLPath,
+            String diffUIPath,
+            HollowDiff diff,
+            String fromBlobName,
+            String toBlobName,
+            VelocityEngine ve,
+            HollowDiffReportMetadata metadata,
+            HollowDiffReportOptions options) {
         this.baseURLPath = baseURLPath;
         this.diffUIPath = (diffUIPath == null || diffUIPath.length() == 0) ? baseURLPath : baseURLPath + "/" + diffUIPath;
         this.diff = diff;
@@ -76,6 +88,7 @@ public class HollowDiffUI implements HollowRecordDiffUI {
         this.customHollowEffigyFactories = new HashMap<String, CustomHollowEffigyFactory>();
         this.matchHints = new HashMap<String, PrimaryKey>();
         this.exactRecordMatcher = new DiffExactRecordMatcher(diff.getEqualityMapping());
+        this.diffJson = HollowDiffJsonSerializer.toJson(diff, metadata, options);
     }
     
     public boolean serveRequest(String pageName, HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -84,6 +97,10 @@ public class HollowDiffUI implements HollowRecordDiffUI {
             return true;
         } else if("collapsediffrow".equals(pageName)) {
             diffViewOutputGenerator.collapseRow(req, resp);
+            return true;
+        } else if("json".equals(pageName)) {
+            resp.setContentType("application/json; charset=utf-8");
+            resp.getWriter().write(diffJson);
             return true;
         }
 
