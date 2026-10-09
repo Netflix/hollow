@@ -221,6 +221,11 @@ public class HollowProducer extends AbstractHollowProducer {
     }
 
     @Override
+    public HollowProducer.ReadState restore(long readStateEngineVersion, HollowReadStateEngine readStateEngine) {
+        return super.restore(readStateEngineVersion, readStateEngine);
+    }
+
+    @Override
     public HollowWriteStateEngine getWriteEngine() {
         return super.getWriteEngine();
     }
