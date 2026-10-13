@@ -29,6 +29,7 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,6 +52,9 @@ public class HollowHashIndex implements HollowTypeStateListener {
     private final String type;
     private final String selectField;
     private final String[] matchFields;
+    private final boolean supportsNoOpDeltaUpdateSkip;
+
+    private boolean deltaHadTypeChanges;
 
     /**
      * This constructor is for binary-compatibility for code compiled against
@@ -85,6 +89,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
         this.typeState = (HollowObjectTypeDataAccess) hollowDataAccess.getTypeDataAccess(type);
         this.selectField = selectField;
         this.matchFields = matchFields;
+        this.supportsNoOpDeltaUpdateSkip = canSkipNoOpDeltaUpdate();
 
         if (typeState == null) {
             LOG.log(Level.WARNING, "Index initialization for " + this + " failed because type "
@@ -115,6 +120,39 @@ public class HollowHashIndex implements HollowTypeStateListener {
 
         builder.buildIndex();
         this.hashStateVolatile = new HollowHashIndexState(builder);
+    }
+
+    private boolean canSkipNoOpDeltaUpdate() {
+        if (typeState == null || !"".equals(selectField)) {
+            return false;
+        }
+
+        for (String matchField : matchFields) {
+            if (!isRootLocalField(matchField)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean isRootLocalField(String fieldPath) {
+        try {
+            FieldPaths.FieldPath<FieldPaths.FieldSegment> path =
+                    FieldPaths.createFieldPathForHashIndex(hollowDataAccess, type, fieldPath);
+            if (path.getSegments().size() != 1) {
+                return false;
+            }
+
+            FieldPaths.FieldSegment segment = path.getSegments().get(0);
+            if (!(segment instanceof FieldPaths.ObjectFieldSegment)) {
+                return false;
+            }
+
+            return ((FieldPaths.ObjectFieldSegment) segment).getType() != FieldType.REFERENCE;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
 
@@ -255,19 +293,30 @@ public class HollowHashIndex implements HollowTypeStateListener {
     }
 
     @Override
-    public void beginUpdate() { }
+    public void beginUpdate() {
+        deltaHadTypeChanges = false;
+    }
 
     @Override
-    public void addedOrdinal(int ordinal) { }
+    public void addedOrdinal(int ordinal) {
+        deltaHadTypeChanges = true;
+    }
 
     @Override
-    public void removedOrdinal(int ordinal) { }
+    public void removedOrdinal(int ordinal) {
+        deltaHadTypeChanges = true;
+    }
 
     @Override
     public void endUpdate() {
         if (hashStateVolatile == null) {
             return;
         }
+
+        if (supportsNoOpDeltaUpdateSkip && !deltaHadTypeChanges) {
+            return;
+        }
+
         reindexHashIndex();
     }
 
