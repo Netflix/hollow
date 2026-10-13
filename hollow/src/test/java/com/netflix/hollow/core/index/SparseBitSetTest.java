@@ -295,4 +295,77 @@ public class SparseBitSetTest {
         Assert.assertTrue(resizedSparsedBitSet.get(4095));
         Assert.assertTrue(resizedSparsedBitSet.get(512));
     }
+
+    @Test
+    public void testSetAndClearAreIdempotent() {
+        sparseBitSet = new HollowSparseIntegerSet.SparseBitSet(8192);
+
+        // bits 0 and 1 share a long, bit 64 is in the next long of the same bucket
+        sparseBitSet.set(0);
+        sparseBitSet.set(0);
+        sparseBitSet.set(1);
+        sparseBitSet.set(64);
+        sparseBitSet.set(64);
+        Assert.assertTrue(sparseBitSet.get(0));
+        Assert.assertTrue(sparseBitSet.get(1));
+        Assert.assertTrue(sparseBitSet.get(64));
+        Assert.assertEquals(3, sparseBitSet.cardinality());
+
+        // clearing a bit that is not set, in an initialized long, leaves the others intact
+        sparseBitSet.clear(2);
+        sparseBitSet.clear(65);
+        Assert.assertEquals(3, sparseBitSet.cardinality());
+
+        sparseBitSet.clear(0);
+        sparseBitSet.clear(0);
+        Assert.assertFalse(sparseBitSet.get(0));
+        Assert.assertTrue(sparseBitSet.get(1));
+        Assert.assertTrue(sparseBitSet.get(64));
+        Assert.assertEquals(2, sparseBitSet.cardinality());
+
+        sparseBitSet.clear(1);
+        sparseBitSet.clear(64);
+        sparseBitSet.clear(64);
+        Assert.assertEquals(0, sparseBitSet.cardinality());
+        Assert.assertEquals(-1, sparseBitSet.findMaxValue());
+    }
+
+    @Test
+    public void testRepeatedSetAndClearMultipleThread() {
+        int maxValue = 8192;
+        int repetitions = 50;
+        sparseBitSet = new HollowSparseIntegerSet.SparseBitSet(maxValue);
+
+        // every thread repeatedly sets every value starting at a different offset, so threads race both to
+        // set fresh bits in shared buckets and to re-set bits that are already set.
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "test");
+        int parallelism = executor.getMaximumPoolSize();
+        for (int t = 0; t < parallelism; t++) {
+            int offset = t * 37;
+            executor.execute(() -> {
+                for (int r = 0; r < repetitions; r++)
+                    for (int i = 0; i <= maxValue; i++)
+                        sparseBitSet.set((i + offset) % (maxValue + 1));
+            });
+        }
+        executor.awaitUninterruptibly();
+        Assert.assertEquals(maxValue + 1, sparseBitSet.cardinality());
+
+        // likewise for clearing every odd value.
+        executor = new SimultaneousExecutor(getClass(), "test");
+        for (int t = 0; t < parallelism; t++) {
+            int offset = t * 19;
+            int numOdd = (maxValue + 1) / 2;
+            executor.execute(() -> {
+                for (int r = 0; r < repetitions; r++)
+                    for (int k = 0; k < numOdd; k++)
+                        sparseBitSet.clear(2 * ((k + offset) % numOdd) + 1);
+            });
+        }
+        executor.awaitUninterruptibly();
+
+        Assert.assertEquals(maxValue / 2 + 1, sparseBitSet.cardinality());
+        for (int i = 0; i <= maxValue; i++)
+            Assert.assertEquals(i % 2 == 0, sparseBitSet.get(i));
+    }
 }
