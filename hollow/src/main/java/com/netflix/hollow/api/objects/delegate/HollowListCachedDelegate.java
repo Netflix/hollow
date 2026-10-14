@@ -20,6 +20,8 @@ import com.netflix.hollow.api.custom.HollowListTypeAPI;
 import com.netflix.hollow.api.custom.HollowTypeAPI;
 import com.netflix.hollow.api.objects.HollowList;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 
 /**
@@ -83,6 +85,38 @@ public class HollowListCachedDelegate<T> implements HollowListDelegate<T>, Hollo
                 return i;
         }
         return -1;
+    }
+
+    @Override
+    public HollowOrdinalIterator iterator(int ordinal) {
+        return cachedCursor();
+    }
+
+    @Override
+    public HollowListOrdinalIterator ordinalCursor(int ordinal) {
+        // Preserve get-based list traversal for subclasses with custom element behavior.
+        return getClass() == HollowListCachedDelegate.class ? cachedCursor() : null;
+    }
+
+    private HollowListOrdinalIterator cachedCursor() {
+        return new HollowListOrdinalIterator() {
+            @Override
+            public int size() {
+                return ordinals.length;
+            }
+
+            @Override
+            public int getElementOrdinal(int index) {
+                if(index < 0 || index >= ordinals.length)
+                    throw new IndexOutOfBoundsException("Index: " + index + ", size: " + ordinals.length);
+                return ordinals[index];
+            }
+
+            @Override
+            public HollowListOrdinalIterator copy() {
+                return cachedCursor();
+            }
+        };
     }
 
     @Override

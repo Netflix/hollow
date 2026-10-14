@@ -30,6 +30,34 @@ import org.junit.rules.ExpectedException;
 
 public class HollowConsumerBuilderTest {
     @Test
+    public void shardCursorIteratorsAreOptIn() throws IOException {
+        TestBlobRetriever blobRetriever = new TestBlobRetriever();
+        TestHollowConsumer consumer = new TestHollowConsumer.Builder()
+                .withBlobRetriever(blobRetriever)
+                .build();
+        consumer.addSnapshot(1L, new HollowWriteStateEngineBuilder()
+                .add(new com.netflix.hollow.test.model.Movie(1, "movie", 2026))
+                .build());
+        consumer.triggerRefreshTo(1L);
+        assertFalse(consumer.getStateEngine().isShardCursorIteratorsEnabled());
+
+        TestHollowConsumer enabledConsumer = new TestHollowConsumer.Builder()
+                .withBlobRetriever(new TestBlobRetriever())
+                .withShardCursorIterators()
+                .build();
+        enabledConsumer.addSnapshot(1L, new HollowWriteStateEngineBuilder()
+                .add(new com.netflix.hollow.test.model.Movie(1, "movie", 2026))
+                .build());
+        enabledConsumer.triggerRefreshTo(1L);
+        assertTrue(enabledConsumer.getStateEngine().isShardCursorIteratorsEnabled());
+        enabledConsumer.addSnapshot(2L, new HollowWriteStateEngineBuilder()
+                .add(new com.netflix.hollow.test.model.Movie(2, "replacement", 2026))
+                .build());
+        enabledConsumer.triggerRefreshTo(2L);
+        assertTrue(enabledConsumer.getStateEngine().isShardCursorIteratorsEnabled());
+    }
+
+    @Test
     public void testCachedTypes() throws IOException {
         TestHollowConsumer consumer = new TestHollowConsumer.Builder()
                 .withBlobRetriever(new TestBlobRetriever())

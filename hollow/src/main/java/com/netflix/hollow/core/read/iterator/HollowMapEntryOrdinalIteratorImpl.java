@@ -30,9 +30,18 @@ public class HollowMapEntryOrdinalIteratorImpl implements HollowMapEntryOrdinalI
     private int value;
 
     public HollowMapEntryOrdinalIteratorImpl(int mapOrdinal, HollowMapTypeDataAccess dataAccess) {
+        this(mapOrdinal, dataAccess, HashCodes.hashTableSize(dataAccess.size(mapOrdinal)));
+    }
+
+    protected HollowMapEntryOrdinalIteratorImpl() {
+        this(-1, null, 0);
+    }
+
+    private HollowMapEntryOrdinalIteratorImpl(
+            int mapOrdinal, HollowMapTypeDataAccess dataAccess, int numBuckets) {
         this.mapOrdinal = mapOrdinal;
         this.dataAccess = dataAccess;
-        this.numBuckets = HashCodes.hashTableSize(dataAccess.size(mapOrdinal));
+        this.numBuckets = numBuckets;
     }
 
     @Override
