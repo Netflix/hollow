@@ -221,12 +221,13 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
             didSomeWork = true;
         }
 
-        // when applying delta, check for duplicates, increment counts if duplicate values are found else set them
+        // a modified record arrives as a removed and an added ordinal with the same value, so don't clear what is being set
+        valuesToClear.removeAll(valuesToSet);
+
         for (int value : valuesToSet) {
             updated.set(value);
         }
 
-        // first clear all the values that are meant to be cleared
         for (int value : valuesToClear) {
             updated.clear(value);
         }
