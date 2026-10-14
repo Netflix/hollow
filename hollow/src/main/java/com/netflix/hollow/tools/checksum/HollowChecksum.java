@@ -21,7 +21,9 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 
@@ -86,8 +88,29 @@ public class HollowChecksum {
     public static HollowChecksum forStateEngine(HollowReadStateEngine stateEngine) {
         return forStateEngineWithCommonSchemas(stateEngine, stateEngine);
     }
-    
+
+    public static HollowChecksum forStateEngine(HollowReadStateEngine stateEngine, boolean parallelPerShard) {
+        return forStateEngineWithCommonSchemas(stateEngine, stateEngine, parallelPerShard);
+    }
+
     public static HollowChecksum forStateEngineWithCommonSchemas(HollowReadStateEngine stateEngine, HollowReadStateEngine commonSchemasWithState) {
+        return forStateEngineWithCommonSchemas(stateEngine, commonSchemasWithState, false);
+    }
+
+    /**
+     * Overload that takes the per-shard mode explicitly. When {@code true}, the checksum fans out one task per
+     * (type, shard) and combines the per-shard partials, so a type dominated by a single large shard parallelizes
+     * across its shards.
+     *
+     * @param parallelPerShard {@code true} to fan out per (type, shard); {@code false} for the legacy per-type path
+     */
+    public static HollowChecksum forStateEngineWithCommonSchemas(HollowReadStateEngine stateEngine, HollowReadStateEngine commonSchemasWithState, boolean parallelPerShard) {
+        if(parallelPerShard)
+            return forStateEngineParallelPerShard(stateEngine, commonSchemasWithState);
+        return forStateEngineParallelPerType(stateEngine, commonSchemasWithState);
+    }
+
+    private static HollowChecksum forStateEngineParallelPerType(HollowReadStateEngine stateEngine, HollowReadStateEngine commonSchemasWithState) {
         final Vector<TypeChecksum> typeChecksums = new Vector<TypeChecksum>();
         SimultaneousExecutor executor = new SimultaneousExecutor(HollowChecksum.class, "checksum-common-schemas");
 
@@ -118,6 +141,67 @@ public class HollowChecksum {
         }
 
         return totalChecksum;
+    }
+
+    private static HollowChecksum forStateEngineParallelPerShard(HollowReadStateEngine stateEngine, HollowReadStateEngine commonSchemasWithState) {
+        SimultaneousExecutor executor = new SimultaneousExecutor(HollowChecksum.class, "checksum-common-schemas");
+
+        // Fan out one task per (type, shard) rather than per type. Types that are dominated by a single large
+        // type-shard therefore parallelize across their shards instead of running the whole type on one thread.
+        // Each shard's partial checksum is stored by shard index so it can be combined deterministically (in
+        // ascending shard order) regardless of the order in which the tasks happen to complete.
+        final List<TypeShardChecksums> allTypeChecksums = new ArrayList<TypeShardChecksums>();
+        for(final HollowTypeReadState typeState : stateEngine.getTypeStates()) {
+            HollowTypeReadState commonSchemasWithType = commonSchemasWithState.getTypeState(typeState.getSchema().getName());
+            if(commonSchemasWithType != null) {
+                final HollowSchema commonSchemasWith = commonSchemasWithType.getSchema();
+                final int[] shardChecksums = new int[typeState.numShards()];
+                allTypeChecksums.add(new TypeShardChecksums(typeState.getSchema().getName(), shardChecksums));
+                for(int shard = 0; shard < shardChecksums.length; shard++) {
+                    final int shardNumber = shard;
+                    executor.execute(new Runnable() {
+                        public void run() {
+                            shardChecksums[shardNumber] = typeState.getShardChecksum(commonSchemasWith, shardNumber).intValue();
+                        }
+                    });
+                }
+            }
+        }
+
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // Combine each type's per-shard partials in ascending shard order into a per-type checksum, then combine
+        // the per-type checksums in sorted type-name order into the total (as before).
+        Vector<TypeChecksum> typeChecksums = new Vector<TypeChecksum>();
+        for(TypeShardChecksums typeShardChecksums : allTypeChecksums) {
+            HollowChecksum typeChecksum = new HollowChecksum();
+            for(int shardChecksum : typeShardChecksums.shardChecksums)
+                typeChecksum.applyInt(shardChecksum);
+            typeChecksums.addElement(new TypeChecksum(typeShardChecksums.typeName, typeChecksum));
+        }
+
+        Collections.sort(typeChecksums);
+
+        HollowChecksum totalChecksum = new HollowChecksum();
+        for(TypeChecksum cksum : typeChecksums) {
+            totalChecksum.applyType(cksum);
+        }
+
+        return totalChecksum;
+    }
+
+    private static final class TypeShardChecksums {
+        private final String typeName;
+        private final int[] shardChecksums;
+
+        private TypeShardChecksums(String typeName, int[] shardChecksums) {
+            this.typeName = typeName;
+            this.shardChecksums = shardChecksums;
+        }
     }
 
 

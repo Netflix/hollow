@@ -94,6 +94,7 @@ abstract class AbstractHollowProducer {
     long lastSuccessfulCycle = 0;
     final HollowObjectHashCodeFinder hashCodeFinder;
     final boolean doIntegrityCheck;
+    final boolean parallelPerShardChecksum;
     // Count to track number of cycles run by a primary producer. In the future, this can be useful in determining stickiness of a
     // producer instance.
     int cycleCountSincePrimaryStatus = 0;
@@ -121,7 +122,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, () -> false);
+                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, () -> false, false);
     }
 
     // The only constructor should be that which accepts a builder
@@ -135,7 +136,7 @@ abstract class AbstractHollowProducer {
                 b.allowTypeResharding, b.forceCoverageOfTypeResharding, b.partitionedOrdinalMap,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
                 b.hashCodeFinder, b.doIntegrityCheck, b.updatePlanBlobVerifier, b.ignoreSoftLimits,
-                b.skipValidation);
+                b.skipValidation, b.parallelPerShardChecksum);
     }
 
     private final HollowProducerListener producerMetricsListener;
@@ -163,7 +164,8 @@ abstract class AbstractHollowProducer {
             boolean doIntegrityCheck,
             HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier,
             Supplier<Boolean> ignoreSoftLimits,
-            Supplier<Boolean> skipValidation) {
+            Supplier<Boolean> skipValidation,
+            boolean parallelPerShardChecksum) {
         this.publisher = publisher;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
@@ -180,6 +182,7 @@ abstract class AbstractHollowProducer {
         this.ignoreSoftLimits = ignoreSoftLimits;
         this.partitionedOrdinalMap = partitionedOrdinalMap;
         this.skipValidation = skipValidation;
+        this.parallelPerShardChecksum = parallelPerShardChecksum;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
                 ? new HollowWriteStateEngine()
@@ -888,10 +891,11 @@ abstract class AbstractHollowProducer {
                 HollowReadStateEngine current = readStates.current().getStateEngine();
 
                 log.info("CHECKSUMS");
-                HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
+                // Use the same producer-configured checksum mode (HollowProducer.Builder.withParallelPerShardChecksum) across all blob types.
+                HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending, parallelPerShardChecksum);
                 log.info("  CUR        " + currentChecksum);
 
-                HollowChecksum pendingChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
+                HollowChecksum pendingChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current, parallelPerShardChecksum);
                 log.info("         PND " + pendingChecksum);
 
                 if (artifacts.hasDelta()) {
@@ -901,14 +905,14 @@ abstract class AbstractHollowProducer {
 
                     // FIXME: timt: future cycles will fail unless both deltas validate
                     applyDelta(artifacts.delta, current);
-                    HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
+                    HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending, parallelPerShardChecksum);
                     //out.format("  CUR => PND %s\n", forwardChecksum);
                     if (!forwardChecksum.equals(pendingChecksum)) {
                         throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.DELTA, forwardChecksum, pendingChecksum);
                     }
 
                     applyDelta(artifacts.reverseDelta, pending);
-                    HollowChecksum reverseChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
+                    HollowChecksum reverseChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current, parallelPerShardChecksum);
                     //out.format("  CUR <= PND %s\n", reverseChecksum);
                     if (!reverseChecksum.equals(currentChecksum)) {
                         throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.REVERSE_DELTA, reverseChecksum, currentChecksum);
