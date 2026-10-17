@@ -49,6 +49,8 @@ public class ObjectInternPool {
                 return getLong(pointer);
             case STRING:
                 return getString(pointer);
+            case BYTES:
+                return getBytes(pointer);
             default:
                 throw new IllegalArgumentException("Unknown type " + type);
         }
@@ -82,13 +84,17 @@ public class ObjectInternPool {
     }
 
     public String getString(long pointer) {
+        return new String(getBytes(pointer));
+    }
+
+    public byte[] getBytes(long pointer) {
         ByteData byteData = ordinalMap.getByteData().getUnderlyingArray();
         int length = VarInt.readVInt(byteData, pointer);
         byte[] bytes = new byte[length];
         for(int i=0;i<length;i++) {
             bytes[i] = byteData.get(pointer+1+i);
         }
-        return new String(bytes);
+        return bytes;
     }
 
     public int writeAndGetOrdinal(Object objectToIntern) {
@@ -113,6 +119,11 @@ public class ObjectInternPool {
         } else if(objectToIntern instanceof String) {
             VarInt.writeVInt(buf, ((String) objectToIntern).length());
             for (byte b : ((String) objectToIntern).getBytes()) {
+                buf.write(b);
+            }
+        } else if(objectToIntern instanceof byte[]) {
+            VarInt.writeVInt(buf, ((byte[]) objectToIntern).length);
+            for (byte b : ((byte[]) objectToIntern)) {
                 buf.write(b);
             }
         } else if(objectToIntern instanceof Boolean) {
