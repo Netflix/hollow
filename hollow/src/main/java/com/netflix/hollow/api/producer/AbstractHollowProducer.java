@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
 import static com.netflix.hollow.api.producer.ProducerListenerSupport.ProducerListeners;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_DELTA_CHAIN_VERSION_COUNTER;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED;
@@ -51,6 +52,7 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
+import com.netflix.hollow.tools.compact.HollowCompactor;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -437,6 +439,18 @@ abstract class AbstractHollowProducer {
             singleProducerEnforcer.disable();
         }
         return (singleProducerEnforcer.isPrimary() == doEnable);
+    }
+
+    public long runCompactionCycle(HollowCompactor.CompactionConfig config) {
+        if (config != null && readStates.hasCurrent()) {
+            final HollowCompactor compactor = new HollowCompactor(getWriteEngine(),
+                    readStates.current().getStateEngine(), config);
+            if (compactor.needsCompaction()) {
+                return runCycle(null, newState -> compactor.compact());
+            }
+        }
+
+        return NO_ANNOUNCEMENT_AVAILABLE;
     }
 
     long runCycle(HollowProducer.Incremental.IncrementalPopulator incrementalPopulator, HollowProducer.Populator populator) {
