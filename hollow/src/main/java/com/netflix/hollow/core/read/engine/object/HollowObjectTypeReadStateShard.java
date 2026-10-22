@@ -239,7 +239,8 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
             fieldIndexes[i] = schema.getPosition(commonFieldNames.get(i));
         }
 
-        int ordinal = populatedOrdinals.nextSetBit(0);
+        int numShards = shardNumberMask + 1;
+        int ordinal = populatedOrdinals.nextSetBit(shardNumber);
         while(ordinal != ORDINAL_NONE) {
             if((ordinal & shardNumberMask) == shardNumber) {
                 int shardOrdinal = ordinal >> shardOrdinalShift;
@@ -263,9 +264,14 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
                         checksum.applyInt(findVarLengthFieldHashCode(startByte, endByte, numBitsForField, fieldIdx));
                     }
                 }
-            }
 
-            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+                ordinal = ordinal + numShards;
+            } else {
+                // Round up ordinal
+                int r = (ordinal & -numShards) + shardNumber;
+                ordinal = (r <= ordinal) ? r + numShards : r;
+            }
+            ordinal = populatedOrdinals.nextSetBit(ordinal);
         }
     }
 

@@ -24,6 +24,7 @@ import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.IOException;
+import java.util.function.IntPredicate;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +58,39 @@ public class HollowChecksumTest {
         Assert.assertEquals(cksum1, cksum2);
     }
 
-    
+    @Test
+    public void shardedObjectChecksumIsUnchanged() throws IOException {
+        HollowObjectSchema schema = new HollowObjectSchema("TypeA", 2);
+        schema.addField("a1", FieldType.INT);
+        schema.addField("a2", FieldType.STRING);
+
+        HollowWriteStateEngine writeState = new HollowWriteStateEngine();
+        writeState.addTypeState(new HollowObjectTypeWriteState(schema, 8));
+
+        addRecords(writeState, schema, i -> true);
+        HollowReadStateEngine readState = StateEngineRoundTripper.roundTripSnapshot(writeState);
+
+        // Remove records via a delta so the populated ordinals have holes
+        writeState.prepareForNextCycle();
+        addRecords(writeState, schema, i -> i % 7 != 3 && (i < 200 || i > 260));
+        StateEngineRoundTripper.roundTripDelta(writeState, readState);
+
+        // Value produced by the pre-stride loop; the per-shard ordinal visit order must not change
+        Assert.assertEquals(-1157511013, HollowChecksum.forStateEngine(readState).intValue());
+    }
+
+    private void addRecords(HollowWriteStateEngine writeState, HollowObjectSchema schema, IntPredicate include) {
+        HollowObjectWriteRecord rec = new HollowObjectWriteRecord(schema);
+        for(int i=0;i<1000;i++) {
+            if(!include.test(i))
+                continue;
+            rec.reset();
+            rec.setInt("a1", i);
+            rec.setString("a2", "v" + i);
+            writeState.add(schema.getName(), rec);
+        }
+    }
+
     private HollowReadStateEngine createStateEngine(HollowObjectSchema schema) throws IOException {
         HollowWriteStateEngine writeState = new HollowWriteStateEngine();
         writeState.addTypeState(new HollowObjectTypeWriteState(schema));
