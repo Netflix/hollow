@@ -66,6 +66,64 @@ public class SegmentedByteArrayTest {
         assertContiguousString(data, "ascii \ud83d\ude00 suffix");
     }
 
+    // SMALL_ARRAY_RECYCLER uses 2^5 == 32 byte segments, so copies longer than 32 bytes and
+    // non-segment-aligned offsets exercise the segment-boundary handling in orderedCopy.
+    private static final WastefulRecycler RECYCLER = WastefulRecycler.SMALL_ARRAY_RECYCLER;
+
+    @Test
+    public void orderedCopyReproducesSourceAcrossSegmentBoundaries() {
+        int length = 100; // spans multiple 32-byte segments in both source and destination
+        SegmentedByteArray src = new SegmentedByteArray(RECYCLER);
+        for (int i = 0; i < length; i++) {
+            src.set(i, (byte) (i & 0xFF));
+        }
+
+        // Start writing at a non-zero, non-aligned destination position so the destination write
+        // offsets straddle segment boundaries differently than the source read offsets.
+        long destPos = 20;
+        SegmentedByteArray dest = new SegmentedByteArray(RECYCLER);
+        dest.orderedCopy(src, 0, destPos, length);
+
+        for (int i = 0; i < length; i++) {
+            assertEquals("mismatch at offset " + i, (byte) (i & 0xFF), dest.get(destPos + i));
+        }
+    }
+
+    @Test
+    public void orderedCopyHandlesNonAlignedSourceAndDestination() {
+        int total = 80;
+        SegmentedByteArray src = new SegmentedByteArray(RECYCLER);
+        for (int i = 0; i < total; i++) {
+            src.set(i, (byte) (i + 1));
+        }
+
+        long srcPos = 13;  // non-aligned source start (mid first segment)
+        long destPos = 7;  // non-aligned destination start
+        int length = 50;   // crosses multiple segment boundaries on both sides
+        SegmentedByteArray dest = new SegmentedByteArray(RECYCLER);
+        dest.orderedCopy(src, srcPos, destPos, length);
+
+        for (int i = 0; i < length; i++) {
+            assertEquals("mismatch at offset " + i, src.get(srcPos + i), dest.get(destPos + i));
+        }
+    }
+
+    @Test
+    public void orderedCopyExactSegmentMultipleFromSegmentStart() {
+        int length = 64; // exactly two full 32-byte segments, aligned to segment start
+        SegmentedByteArray src = new SegmentedByteArray(RECYCLER);
+        for (int i = 0; i < length; i++) {
+            src.set(i, (byte) (255 - i));
+        }
+
+        SegmentedByteArray dest = new SegmentedByteArray(RECYCLER);
+        dest.orderedCopy(src, 0, 0, length);
+
+        for (int i = 0; i < length; i++) {
+            assertEquals("mismatch at offset " + i, (byte) (255 - i), dest.get(i));
+        }
+    }
+
     private void assertContiguousString(SegmentedByteArray data, String value) {
         byte[] encoded = encode(value);
         int start = 7;
