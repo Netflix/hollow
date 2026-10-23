@@ -18,6 +18,9 @@ package com.netflix.hollow.diff.ui.jetty;
 
 import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.report.HollowDiffReportMetadata;
+import com.netflix.hollow.tools.diff.report.HollowDiffReportOptions;
+
 /**
  * @deprecated use {@link com.netflix.hollow.diff.ui.HollowDiffUIServer}. This is deprecated because package name
  * contains "jetty" but jetty-server dep is no longer required. Instead, this class lives on as an adapter
@@ -44,6 +47,14 @@ public class HollowDiffUIServer {
         return server.addDiff(diffPath, diff, fromBlobName, toBlobName);
     }
 
+    public HollowDiffUI addDiff(
+            String diffPath,
+            HollowDiff diff,
+            HollowDiffReportMetadata metadata,
+            HollowDiffReportOptions options) {
+        return server.addDiff(diffPath, diff, metadata, options);
+    }
+
     public HollowDiffUIServer start() throws Exception {
         server.start();
         return this;
@@ -57,5 +68,4 @@ public class HollowDiffUIServer {
     public void stop() throws Exception {
         server.stop();
     }
-
 }
