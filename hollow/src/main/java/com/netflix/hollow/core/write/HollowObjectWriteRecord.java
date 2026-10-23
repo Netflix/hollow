@@ -91,9 +91,11 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
      * that causes it to incorrectly serialize variable-length fields (e.g. STRING, BYTES) that
      * have been set to null using this method. These fields are written out as a byte array of
      * `[1, 0x80]` instead of the expected `[0x80]`. In non-null values, the leading byte
-     * indicates the length of the field. It is incorrectly written as `1` for null values. This
-     * only affects use case that copy HollowObjectWriteRecord data to another buffer, it DOES NOT
-     * affect typical Hollow Producer based mechanisms.
+     * indicates the length of the field. It is incorrectly written as `1` for null values. When
+     * such a record is added to a HollowWriteStateEngine (including via a Hollow Producer), the
+     * field is stored as the single byte `0x80` rather than as null, and reads back as a non-null
+     * value (an empty String, or the byte array `[0x80]`). For variable-length fields, prefer
+     * leaving the field unset over calling this method to write a null value.
      */
     public void setNull(String fieldName) {
         int fieldIndex = getSchema().getPosition(fieldName);
@@ -191,6 +193,27 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
 
         for(int i=0;i<value.length();i++) {
             VarInt.writeVInt(buf, value.charAt(i));
+        }
+    }
+
+    /**
+     * Set a STRING field from its already-encoded form (a sequence of VarInt-encoded chars, as stored in a read state),
+     * copying the bytes verbatim. Used to copy records without altering their serialized representation.
+     *
+     * @param fieldName the STRING field name
+     * @param encodedValue the encoded string bytes, or null to leave the field null
+     */
+    public void setEncodedString(String fieldName, byte[] encodedValue) {
+        if(encodedValue == null)  return;
+
+        int fieldIndex = getSchema().getPosition(fieldName);
+
+        validateFieldType(fieldIndex, fieldName, FieldType.STRING);
+
+        ByteDataArray buf = getFieldBuffer(fieldIndex);
+
+        for (int i = 0; i < encodedValue.length; i++) {
+            buf.write(encodedValue[i]);
         }
     }
 

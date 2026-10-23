@@ -59,9 +59,14 @@ public class HollowObjectCopier extends HollowRecordCopier {
                         rec.setBytes(fieldName, bytes);
                     break;
                 case STRING:
-                    String str = objectReadState.readString(ordinal, readFieldIndex);
-                    if(str != null)
-                        rec.setString(fieldName, str);
+                    // copy the encoded bytes rather than decoding and re-encoding the String, so that the copy is
+                    // byte-identical to the source record even if its encoding is not canonical (e.g. [0x80], written
+                    // by HollowObjectWriteRecord.setNull on a STRING field, which decodes to ""). Otherwise a restored
+                    // record does not match the record the producer re-adds, and the reverse delta rebuilt from it
+                    // fails the producer integrity check.
+                    byte[] encodedStr = objectReadState.readBytes(ordinal, readFieldIndex);
+                    if(encodedStr != null)
+                        rec.setEncodedString(fieldName, encodedStr);
                     break;
                 case DOUBLE:
                     double doubleVal = objectReadState.readDouble(ordinal, readFieldIndex);
