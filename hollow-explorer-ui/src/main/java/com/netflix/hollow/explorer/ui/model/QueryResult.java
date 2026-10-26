@@ -116,6 +116,10 @@ public class QueryResult {
         
         return list;
     }
+
+    public void removeQueryClause(String fieldName) {
+        queryClauses.removeIf(clause -> clause.getField().equals(fieldName));
+    }
     
     public static class QueryClause {
         private final String type;
