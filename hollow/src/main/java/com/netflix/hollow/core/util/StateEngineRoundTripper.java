@@ -19,7 +19,7 @@ package com.netflix.hollow.core.util;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.ByteArrayInputStream;
@@ -57,14 +57,14 @@ public class StateEngineRoundTripper {
     /**
      * Populate the provided {@link HollowReadStateEngine} with the dataset currently in the provided {@link HollowWriteStateEngine}.
      * <p>
-     * Apply the provided {@link HollowFilterConfig}.
+     * Apply the provided {@link TypeFilter}.
      *
      * @param writeEngine the write state engine
      * @param readEngine the read state engine
      * @param filter the filter configuration
      * @throws IOException if the round trip from write to read state failed
      */
-    public static void roundTripSnapshot(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine, HollowFilterConfig filter) throws IOException {
+    public static void roundTripSnapshot(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine, TypeFilter filter) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
         writer.writeSnapshot(baos);
