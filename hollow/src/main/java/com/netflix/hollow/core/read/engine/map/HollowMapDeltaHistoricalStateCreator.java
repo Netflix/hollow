@@ -122,10 +122,9 @@ public class HollowMapDeltaHistoricalStateCreator {
             if (stateEngineDataElements[i].bitsPerValueElement > historicalDataElements.bitsPerValueElement) {
                 historicalDataElements.bitsPerValueElement = stateEngineDataElements[i].bitsPerValueElement;
             }
-            if (stateEngineDataElements[i].bitsPerMapEntry > historicalDataElements.bitsPerMapEntry) {
-                historicalDataElements.bitsPerMapEntry = stateEngineDataElements[i].bitsPerMapEntry;
-            }
         }
+        // key and value widths can peak in different shards, so derive the entry width rather than taking a per-shard max
+        historicalDataElements.bitsPerMapEntry = historicalDataElements.bitsPerKeyElement + historicalDataElements.bitsPerValueElement;
         historicalDataElements.totalNumberOfBuckets = totalBucketCount;
 
         ordinalMapping = new IntMap(removedEntryCount);
@@ -135,7 +134,6 @@ public class HollowMapDeltaHistoricalStateCreator {
         int shard = ordinal & shardNumberMask;
         int shardOrdinal = ordinal >> shardOrdinalShift; 
 
-        long bitsPerBucket = historicalDataElements.bitsPerMapEntry;
         long size = typeState.size(ordinal);
 
         long fromStartBucket = stateEngineDataElements[shard].getStartBucket(shardOrdinal);
@@ -145,7 +143,8 @@ public class HollowMapDeltaHistoricalStateCreator {
         historicalDataElements.mapPointerAndSizeData.setElementValue((long)nextOrdinal * historicalDataElements.bitsPerFixedLengthMapPortion, historicalDataElements.bitsPerMapPointer, nextStartBucket + numBuckets);
         historicalDataElements.mapPointerAndSizeData.setElementValue(((long)nextOrdinal * historicalDataElements.bitsPerFixedLengthMapPortion) + historicalDataElements.bitsPerMapPointer, historicalDataElements.bitsPerMapSizeValue, size);
 
-        historicalDataElements.entryData.copyBits(stateEngineDataElements[shard].entryData, fromStartBucket * bitsPerBucket, nextStartBucket * bitsPerBucket, numBuckets * bitsPerBucket);
+        // source shard can be narrower than the historical state, e.g. for consumers that skip type shards with no additions
+        historicalDataElements.copyBucketsFrom(nextStartBucket, stateEngineDataElements[shard], fromStartBucket, fromEndBucket);
 
         nextOrdinal++;
         nextStartBucket += numBuckets;

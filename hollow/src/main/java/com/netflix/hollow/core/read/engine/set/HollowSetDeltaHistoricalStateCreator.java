@@ -129,7 +129,6 @@ public class HollowSetDeltaHistoricalStateCreator {
         int shard = ordinal & shardNumberMask;
         int shardOrdinal = ordinal >> shardOrdinalShift; 
         
-        long bitsPerBucket = historicalDataElements.bitsPerElement;
         long size = typeState.size(ordinal);
 
         long fromStartBucket = stateEngineDataElements[shard].getStartBucket(shardOrdinal);
@@ -139,7 +138,8 @@ public class HollowSetDeltaHistoricalStateCreator {
         historicalDataElements.setPointerAndSizeData.setElementValue((long)nextOrdinal * historicalDataElements.bitsPerFixedLengthSetPortion, historicalDataElements.bitsPerSetPointer, nextStartBucket + numBuckets);
         historicalDataElements.setPointerAndSizeData.setElementValue((long)(nextOrdinal * historicalDataElements.bitsPerFixedLengthSetPortion) + historicalDataElements.bitsPerSetPointer, historicalDataElements.bitsPerSetSizeValue, size);
 
-        historicalDataElements.elementData.copyBits(stateEngineDataElements[shard].elementData, fromStartBucket * bitsPerBucket, nextStartBucket * bitsPerBucket, numBuckets * bitsPerBucket);
+        // source shard can be narrower than the historical state, e.g. for consumers that skip type shards with no additions
+        historicalDataElements.copyBucketsFrom(nextStartBucket, stateEngineDataElements[shard], fromStartBucket, fromEndBucket);
 
         nextOrdinal++;
         nextStartBucket += numBuckets;
