@@ -118,12 +118,12 @@ public class HollowListDeltaHistoricalStateCreator {
         int shard = ordinal & shardNumberMask;
         int shardOrdinal = ordinal >> shardOrdinalShift; 
         
-        long bitsPerElement = stateEngineDataElements[shard].bitsPerElement;
         long fromStartElement = stateEngineDataElements[shard].getStartElement(shardOrdinal);
         long fromEndElement = stateEngineDataElements[shard].getEndElement(shardOrdinal);
         long size = fromEndElement - fromStartElement;
 
-        historicalDataElements.elementData.copyBits(stateEngineDataElements[shard].elementData, fromStartElement * bitsPerElement, nextStartElement * bitsPerElement, size * bitsPerElement);
+        // source shard can be narrower than the historical state, e.g. for consumers that skip type shards with no additions
+        historicalDataElements.copyElementsFrom(nextStartElement, stateEngineDataElements[shard], fromStartElement, fromEndElement);
         historicalDataElements.listPointerData.setElementValue((long)nextOrdinal * historicalDataElements.bitsPerListPointer, historicalDataElements.bitsPerListPointer, nextStartElement + size);
 
         ordinalMapping.put(ordinal, nextOrdinal);
