@@ -46,7 +46,14 @@ public class SegmentedLongArray {
 
     public SegmentedLongArray(ArraySegmentRecycler memoryRecycler, long numLongs) {
         this.log2OfSegmentSize = memoryRecycler.getLog2OfLongSegmentSize();
-        int numSegments = (int)((numLongs - 1) >>> log2OfSegmentSize) + 1;
+        if(numLongs < 0) {
+            throw new IllegalArgumentException("numLongs cannot be negative: " + numLongs);
+        }
+        long numSegmentsLong = numLongs == 0 ? 0 : ((numLongs - 1) >>> log2OfSegmentSize) + 1;
+        if(numSegmentsLong > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Number of segments exceeds maximum supported capacity: " + numSegmentsLong);
+        }
+        int numSegments = (int) numSegmentsLong;
         long[][] segments = new long[numSegments][];
         this.bitmask = (1 << log2OfSegmentSize) - 1;
 
