@@ -20,6 +20,7 @@ import static java.lang.Math.ceil;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.read.HollowBlobInput;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import java.io.IOException;
 
 /**
@@ -72,6 +73,13 @@ public class EncodedLongBuffer implements FixedLengthData {
         EncodedLongBuffer buf = new EncodedLongBuffer();
         buf.loadFrom(in, numLongs);
         return buf;
+    }
+
+    public static EncodedLongBuffer newFrom(HollowBlobInput in, HollowReadConfiguration configuration) throws IOException {
+        EncodedLongBuffer buffer = newFrom(in);
+        if(buffer.bufferView != null)
+            buffer.bufferView = buffer.bufferView.withReadConfiguration(configuration);
+        return buffer;
     }
 
     private void loadFrom(HollowBlobInput in, long numLongs) throws IOException {
