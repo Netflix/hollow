@@ -1,8 +1,15 @@
 package com.netflix.hollow.core.read.engine.list;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReshardingStrategy;
+import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -10,6 +17,111 @@ import java.util.Random;
 import org.junit.Test;
 
 public class HollowListTypeReadStateTest extends AbstractHollowListTypeDataElementsSplitJoinTest {
+
+    @Test
+    public void usesExistingIteratorByDefault() throws Exception {
+        populateWriteStateEngine(3);
+        populateWriteStateEngineWithListRecords(new int[][] {{0, 1, 2}});
+
+        readStateEngine = new HollowReadStateEngine(WastefulRecycler.DEFAULT_INSTANCE);
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
+
+        HollowListTypeReadState typeState =
+                (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
+        HollowOrdinalIterator iterator = typeState.ordinalIterator(0);
+
+        assertTrue(iterator instanceof HollowListOrdinalIterator);
+        assertFalse(iterator instanceof HollowListSnapshotOrdinalIterator);
+    }
+
+    @Test
+    public void usesCompatibleSnapshotIteratorWhenEnabled() throws Exception {
+        populateWriteStateEngine(3);
+        populateWriteStateEngineWithListRecords(new int[][] {{0, 1, 2}});
+
+        readStateEngine = new HollowReadStateEngine(WastefulRecycler.DEFAULT_INSTANCE);
+        readStateEngine.setShardCursorIterators(true);
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
+
+        HollowListTypeReadState typeState =
+                (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
+        HollowOrdinalIterator iterator = typeState.ordinalIterator(0);
+
+        assertTrue(iterator instanceof HollowListSnapshotOrdinalIterator);
+        assertTrue(iterator instanceof HollowListOrdinalIterator);
+    }
+
+    @Test
+    public void iteratorRetainsImmutableShardAcrossRefresh() throws Exception {
+        populateWriteStateEngine(3);
+        populateWriteStateEngineWithListRecords(new int[][] {{0, 1, 2}});
+
+        readStateEngine = new HollowReadStateEngine(WastefulRecycler.DEFAULT_INSTANCE);
+        readStateEngine.setShardCursorIterators(true);
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
+
+        HollowListTypeReadState typeState =
+                (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
+        HollowOrdinalIterator iterator = typeState.ordinalIterator(0);
+        assertEquals(0, iterator.next());
+
+        populateWriteStateEngine(writeStateEngine, schema, 3);
+        populateWriteStateEngineWithListRecords(new int[][] {{2}});
+        roundTripDelta();
+
+        assertEquals(1, iterator.next());
+        assertEquals(2, iterator.next());
+        assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iterator.next());
+    }
+
+    @Test
+    public void iteratorRefreshesRecycledShardAcrossRefresh() throws Exception {
+        populateWriteStateEngine(3);
+        populateWriteStateEngineWithListRecords(new int[][] {{0, 1, 2}, {0}});
+        roundTripSnapshot();
+        readStateEngine.setShardCursorIterators(true);
+
+        HollowListTypeReadState typeState =
+                (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
+        HollowOrdinalIterator iterator = typeState.ordinalIterator(0);
+        assertEquals(0, iterator.next());
+
+        populateWriteStateEngine(writeStateEngine, schema, 3);
+        populateWriteStateEngineWithListRecords(new int[][] {{0, 1, 2}, {1}});
+        roundTripDelta();
+
+        assertEquals(1, iterator.next());
+        assertEquals(2, iterator.next());
+        assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iterator.next());
+    }
+
+    @Test
+    public void iteratorHandlesOrdinalReusedByShorterList() throws Exception {
+        populateWriteStateEngine(3);
+        populateWriteStateEngineWithListRecords(new int[][] {{0, 1, 2}});
+        roundTripSnapshot();
+        readStateEngine.setShardCursorIterators(true);
+        HollowListTypeReadState typeState = (HollowListTypeReadState) readStateEngine.getTypeState("TestList");
+        HollowOrdinalIterator iterator = typeState.ordinalIterator(0);
+        assertEquals(0, iterator.next());
+
+        populateWriteStateEngine(writeStateEngine, schema, 3);
+        populateWriteStateEngineWithListRecords(new int[][] {{2}});
+        roundTripDelta();
+        populateWriteStateEngine(writeStateEngine, schema, 3);
+        populateWriteStateEngineWithListRecords(new int[][] {{1}});
+        roundTripDelta();
+        assertEquals(1, typeState.size(0));
+        assertEquals(1, typeState.getElementOrdinal(0, 0));
+        if(!recycling && shardReadFastPaths) {
+            // Validation elision lets immutable cursors retain the list when its ordinal is reused.
+            // Without that opt-in, validation refreshes the cursor to the shorter live list.
+            assertEquals(1, iterator.next());
+            assertEquals(2, iterator.next());
+        }
+        assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iterator.next());
+        assertEquals(HollowOrdinalIterator.NO_MORE_ORDINALS, iterator.next());
+    }
 
     @Test
     public void testApproximateHoleCostWithShards() throws Exception {

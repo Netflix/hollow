@@ -26,17 +26,49 @@ public class HollowListOrdinalIterator implements HollowOrdinalIterator {
     private int currentElement;
 
     public HollowListOrdinalIterator(int listOrdinal, HollowListTypeDataAccess dataAccess) {
+        this(listOrdinal, dataAccess, dataAccess.size(listOrdinal));
+    }
+
+    protected HollowListOrdinalIterator() {
+        this(-1, null, 0);
+    }
+
+    private HollowListOrdinalIterator(int listOrdinal, HollowListTypeDataAccess dataAccess, int size) {
         this.listOrdinal = listOrdinal;
         this.dataAccess = dataAccess;
-        this.size = dataAccess.size(listOrdinal);
+        this.size = size;
+    }
+
+    /**
+     * Returns the size captured by this cursor, without another data access lookup.
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Reads an element using this cursor's captured bounds without changing its forward position.
+     */
+    public int getElementOrdinal(int index) {
+        if(index < 0 || index >= size())
+            throw new IndexOutOfBoundsException("Index: " + index + ", size: " + size());
+        return dataAccess.getElementOrdinal(listOrdinal, index);
+    }
+
+    /**
+     * Copies the captured bounds with an independent traversal and validation state.
+     * The copy starts at index zero and does not perform another size lookup.
+     */
+    public HollowListOrdinalIterator copy() {
+        return new HollowListOrdinalIterator(listOrdinal, dataAccess, size);
     }
 
     @Override
     public int next() {
-        if(currentElement == size)
+        if(currentElement >= size())
             return NO_MORE_ORDINALS;
 
-        return dataAccess.getElementOrdinal(listOrdinal, currentElement++);
+        return getElementOrdinal(currentElement++);
     }
 
 }
