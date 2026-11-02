@@ -42,6 +42,13 @@ public class EncodedByteBuffer implements VariableLengthData {
         return retVal;
     }
 
+    @Override
+    public void copyTo(long srcPos, byte[] destination, int destPos, int length) {
+        if(srcPos < 0 || length < 0 || srcPos > size - length)
+            throw new IndexOutOfBoundsException();
+        bufferView.copyTo(bufferView.position() + srcPos, destination, destPos, length);
+    }
+
     /**
      * {@inheritDoc}
      * This is achieved by initializing a {@code BlobByteBuffer} that is a view on the underlying {@code BlobByteBuffer}
