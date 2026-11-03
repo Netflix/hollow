@@ -20,17 +20,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.HollowConsumer.HeldVersionsConfig;
 import com.netflix.hollow.api.consumer.HollowConsumer.ObjectLongevity;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
+import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
+import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
+import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.write.objectmapper.HollowHashKey;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.test.InMemoryBlobStore;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,10 +62,7 @@ final class HeldVersionsFixture {
     final InMemoryBlobStore blobStore = new InMemoryBlobStore();
 
     private final AtomicLong lastVersion = new AtomicLong();
-    private final HollowProducer producer = HollowProducer.withPublisher(blobStore)
-            .withBlobStager(new HollowInMemoryBlobStager())
-            .withVersionMinter(() -> lastVersion.addAndGet(10)) // gaps, so versions between them exist in no transition
-            .build();
+    private final HollowProducer producer;
     private final Random random = new Random(17);
     private final Map<Long, Movie> catalog = new TreeMap<>();
     private final Map<Long, HollowReadStateEngine> references = new ConcurrentHashMap<>();
@@ -64,20 +71,32 @@ final class HeldVersionsFixture {
     private int cycle;
 
     HeldVersionsFixture() {
+        this(0);
+    }
+
+    /** @param targetMaxTypeShardSize the producer's target shard size in bytes, small to shard every type, or 0 */
+    HeldVersionsFixture(long targetMaxTypeShardSize) {
+        HollowProducer.Builder<?> builder = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withVersionMinter(() -> lastVersion.addAndGet(10)); // gaps: versions between them are in no transition
+        if (targetMaxTypeShardSize > 0)
+            builder.withTargetMaxTypeShardSize(targetMaxTypeShardSize);
+        producer = builder.build();
         for (int i = 0; i < 12; i++)
             add();
     }
 
     /**
-     * Publishes the next version: one record changes its title, another its tags and ratings, one is removed and one
-     * is added.
+     * Publishes the next version: one record changes its title, another its tags, ratings and credits, one is removed
+     * and one is added.
      */
     long cycle() {
         cycle++;
         Movie retitled = pick();
-        catalog.put(retitled.id, new Movie(retitled.id, "title " + retitled.id + "@" + cycle, retitled.tags, retitled.ratings));
+        catalog.put(retitled.id, new Movie(retitled.id, "title " + retitled.id + "@" + cycle, retitled.tags,
+                retitled.ratings, retitled.credits));
         Movie retagged = pick();
-        catalog.put(retagged.id, new Movie(retagged.id, retagged.title, tags(), ratings()));
+        catalog.put(retagged.id, new Movie(retagged.id, retagged.title, tags(), ratings(), credits()));
         catalog.remove(pick().id);
         add();
         return producer.runCycle(ws -> catalog.values().forEach(ws::add));
@@ -113,15 +132,74 @@ final class HeldVersionsFixture {
         return consumer().withObjectLongevity(ObjectLongevity.held()).build();
     }
 
-    /** Asserts that every record of {@code version} reads the same through {@code dataAccess}, at the same ordinal. */
+    HollowConsumer heldConsumer(HeldVersionsConfig config) {
+        return consumer().withObjectLongevity(ObjectLongevity.held(config)).build();
+    }
+
+    /**
+     * Asserts that every record of {@code version} reads the same through {@code dataAccess}, at the same ordinal, and
+     * that keyed lookups in its sets and maps find the same elements.
+     */
     void assertReads(long version, HollowDataAccess dataAccess) {
         HollowReadStateEngine expected = reference(version);
+        assertReads("in " + version, records(version), dataAccess);
+        assertKeyedLookups(version, expected, dataAccess);
+    }
+
+    /** Asserts that every record of {@code expected}, by type and ordinal, reads the same through a data access. */
+    static void assertReads(String context, Map<String, Map<Integer, String>> expected, HollowDataAccess dataAccess) {
+        for (Map.Entry<String, Map<Integer, String>> type : expected.entrySet()) {
+            for (Map.Entry<Integer, String> record : type.getValue().entrySet()) {
+                assertEquals(type.getKey() + " " + record.getKey() + " " + context, record.getValue(),
+                        STRINGIFIER.stringify(dataAccess, type.getKey(), record.getKey()));
+            }
+        }
+    }
+
+    /** Every record of {@code engine}, by type and ordinal. */
+    static Map<String, Map<Integer, String>> recordsOf(HollowReadStateEngine engine) {
+        Map<String, Map<Integer, String>> byType = new HashMap<>();
+        for (HollowTypeReadState typeState : engine.getTypeStates()) {
+            String type = typeState.getSchema().getName();
+            Map<Integer, String> byOrdinal = new HashMap<>();
+            typeState.getPopulatedOrdinals().stream()
+                    .forEach(ordinal -> byOrdinal.put(ordinal, STRINGIFIER.stringify(engine, type, ordinal)));
+            byType.put(type, byOrdinal);
+        }
+        return byType;
+    }
+
+    /** Looks up each key of every set and map of {@code version}, and one absent key, through both data accesses. */
+    private static void assertKeyedLookups(long version, HollowReadStateEngine expected, HollowDataAccess dataAccess) {
+        HollowObjectTypeReadState strings = (HollowObjectTypeReadState) expected.getTypeState("String");
         for (HollowTypeReadState typeState : expected.getTypeStates()) {
             String type = typeState.getSchema().getName();
             BitSet populated = typeState.getPopulatedOrdinals();
             for (int ordinal = populated.nextSetBit(0); ordinal >= 0; ordinal = populated.nextSetBit(ordinal + 1)) {
-                assertEquals(type + " " + ordinal + " in " + version,
-                        STRINGIFIER.stringify(expected, type, ordinal), STRINGIFIER.stringify(dataAccess, type, ordinal));
+                List<String> keys = new ArrayList<>(Collections.singletonList("absent"));
+                if (typeState instanceof HollowSetTypeReadState) {
+                    HollowSetTypeReadState set = (HollowSetTypeReadState) typeState;
+                    HollowOrdinalIterator elements = set.ordinalIterator(ordinal);
+                    for (int e = elements.next(); e != HollowOrdinalIterator.NO_MORE_ORDINALS; e = elements.next())
+                        keys.add(strings.readString(e, 0));
+                    HollowSetTypeDataAccess held = (HollowSetTypeDataAccess) dataAccess.getTypeDataAccess(type);
+                    for (String key : keys) {
+                        assertEquals(type + " " + ordinal + " " + key + " in " + version,
+                                set.findElement(ordinal, key), held.findElement(ordinal, key));
+                    }
+                } else if (typeState instanceof HollowMapTypeReadState) {
+                    HollowMapTypeReadState map = (HollowMapTypeReadState) typeState;
+                    HollowMapEntryOrdinalIterator entries = map.ordinalIterator(ordinal);
+                    while (entries.next())
+                        keys.add(strings.readString(entries.getKey(), 0));
+                    HollowMapTypeDataAccess held = (HollowMapTypeDataAccess) dataAccess.getTypeDataAccess(type);
+                    for (String key : keys) {
+                        String context = type + " " + ordinal + " " + key + " in " + version;
+                        assertEquals(context, map.findKey(ordinal, key), held.findKey(ordinal, key));
+                        assertEquals(context, map.findValue(ordinal, key), held.findValue(ordinal, key));
+                        assertEquals(context, map.findEntry(ordinal, key), held.findEntry(ordinal, key));
+                    }
+                }
             }
         }
     }
@@ -219,23 +297,12 @@ final class HeldVersionsFixture {
 
     /** Every record of {@code version}, by type and ordinal. */
     private Map<String, Map<Integer, String>> records(long version) {
-        return records.computeIfAbsent(version, v -> {
-            HollowReadStateEngine engine = reference(v);
-            Map<String, Map<Integer, String>> byType = new HashMap<>();
-            for (HollowTypeReadState typeState : engine.getTypeStates()) {
-                String type = typeState.getSchema().getName();
-                Map<Integer, String> byOrdinal = new HashMap<>();
-                typeState.getPopulatedOrdinals().stream()
-                        .forEach(ordinal -> byOrdinal.put(ordinal, STRINGIFIER.stringify(engine, type, ordinal)));
-                byType.put(type, byOrdinal);
-            }
-            return byType;
-        });
+        return records.computeIfAbsent(version, v -> recordsOf(reference(v)));
     }
 
     private void add() {
         long id = nextId++;
-        catalog.put(id, new Movie(id, "title " + id, tags(), ratings()));
+        catalog.put(id, new Movie(id, "title " + id, tags(), ratings(), credits()));
     }
 
     private Movie pick() {
@@ -257,18 +324,29 @@ final class HeldVersionsFixture {
         return ratings;
     }
 
+    private List<String> credits() {
+        List<String> credits = new ArrayList<>();
+        for (int i = random.nextInt(3); i > 0; i--)
+            credits.add("person " + random.nextInt(6));
+        return credits;
+    }
+
     @HollowPrimaryKey(fields = "id")
     static final class Movie {
         final long id;
         final String title;
+        @HollowHashKey(fields = "value")
         final Set<String> tags;
+        @HollowHashKey(fields = "value")
         final Map<String, Long> ratings;
+        final List<String> credits;
 
-        Movie(long id, String title, Set<String> tags, Map<String, Long> ratings) {
+        Movie(long id, String title, Set<String> tags, Map<String, Long> ratings, List<String> credits) {
             this.id = id;
             this.title = title;
             this.tags = tags;
             this.ratings = ratings;
+            this.credits = credits;
         }
     }
 }
