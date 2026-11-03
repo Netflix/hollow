@@ -19,6 +19,8 @@ package com.netflix.hollow.api.client;
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_SCHEMA_HASH;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.longevity.HollowVersionHold;
+import com.netflix.hollow.api.consumer.longevity.VersionNotReachableException;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
@@ -58,7 +60,7 @@ public class HollowClientUpdater {
     private final HollowAPIFactory apiFactory;
     private final HollowObjectHashCodeFinder hashCodeFinder;
     private final MemoryMode memoryMode;
-    private final HollowConsumer.ObjectLongevityConfig objectLongevityConfig;
+    private final HollowConsumer.ObjectLongevity objectLongevity;
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
     private final HollowConsumerMetrics metrics;
     private final HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
@@ -96,9 +98,26 @@ public class HollowClientUpdater {
                                HollowConsumerMetrics metrics,
                                HollowMetricsCollector<HollowConsumerMetrics> metricsCollector,
                                HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
+        this(transitionCreator, refreshListeners, apiFactory, doubleSnapshotConfig, hashCodeFinder, memoryMode,
+                HollowConsumer.ObjectLongevity.expiring(objectLongevityConfig), objectLongevityDetector, metrics,
+                metricsCollector, updatePlanBlobVerifier);
+    }
+
+    public HollowClientUpdater(HollowConsumer.BlobRetriever transitionCreator,
+                               List<HollowConsumer.RefreshListener> refreshListeners,
+                               HollowAPIFactory apiFactory,
+                               HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
+                               HollowObjectHashCodeFinder hashCodeFinder,
+                               MemoryMode memoryMode,
+                               HollowConsumer.ObjectLongevity objectLongevity,
+                               HollowConsumer.ObjectLongevityDetector objectLongevityDetector,
+                               HollowConsumerMetrics metrics,
+                               HollowMetricsCollector<HollowConsumerMetrics> metricsCollector,
+                               HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier) {
         this.planner = new HollowUpdatePlanner(transitionCreator, doubleSnapshotConfig, updatePlanBlobVerifier);
         this.failedTransitionTracker = new FailedTransitionTracker();
-        this.staleReferenceDetector = new StaleHollowReferenceDetector(objectLongevityConfig, objectLongevityDetector);
+        this.staleReferenceDetector = new StaleHollowReferenceDetector(objectLongevity.getObjectLongevityConfig(),
+                objectLongevityDetector);
         // Create a copy of the listeners, removing any duplicates
         this.refreshListeners = new CopyOnWriteArrayList<>(
                 refreshListeners.stream().distinct().toArray(HollowConsumer.RefreshListener[]::new));
@@ -106,7 +125,7 @@ public class HollowClientUpdater {
         this.hashCodeFinder = hashCodeFinder;
         this.memoryMode = memoryMode;
         this.doubleSnapshotConfig = doubleSnapshotConfig;
-        this.objectLongevityConfig = objectLongevityConfig;
+        this.objectLongevity = objectLongevity;
         this.staleReferenceDetector.startMonitoring();
         this.metrics = metrics;
         this.metricsCollector = metricsCollector;
@@ -265,6 +284,38 @@ public class HollowClientUpdater {
         }
     }
 
+    /**
+     * Holds {@code version}, refreshing to it first, under Hollow's normal plan, if it is neither the current version
+     * nor one applied since the oldest open hold.
+     *
+     * @param version the version to hold
+     * @return the hold
+     * @throws IllegalStateException if the consumer is not in held mode
+     * @throws VersionNotReachableException if no transition lands on the version
+     * @throws Throwable if the refresh failed
+     */
+    public synchronized HollowVersionHold holdVersion(long version) throws Throwable {
+        if (objectLongevity.getMode() != HollowConsumer.ObjectLongevity.Mode.HELD)
+            throw new IllegalStateException("Version holds need held mode: withObjectLongevity(ObjectLongevity.held())");
+        if (version == HollowConstants.VERSION_NONE || version == HollowConstants.VERSION_LATEST)
+            throw new IllegalArgumentException("Not a version: " + version);
+
+        HollowVersionHold hold = tryHold(version);
+        if (hold == null) {
+            updateTo(new HollowConsumer.VersionInfo(version));
+            hold = tryHold(version);
+            if (hold == null)
+                throw new VersionNotReachableException("Cannot hold version " + version
+                        + ": no transition lands on it, and the consumer is at " + getCurrentVersionId());
+        }
+        return hold;
+    }
+
+    private HollowVersionHold tryHold(long version) {
+        HollowDataHolder dataHolder = hollowDataHolderVolatile;
+        return dataHolder == null ? null : dataHolder.getHeldVersions().hold(version);
+    }
+
     public synchronized void addRefreshListener(HollowConsumer.RefreshListener refreshListener,
             HollowConsumer c) {
         if (refreshListener instanceof HollowConsumer.RefreshRegistrationListener) {
@@ -342,7 +393,7 @@ public class HollowClientUpdater {
     private HollowDataHolder newHollowDataHolder() {
         return new HollowDataHolder(newStateEngine(), apiFactory, memoryMode,
                 doubleSnapshotConfig, failedTransitionTracker,
-                staleReferenceDetector, objectLongevityConfig)
+                staleReferenceDetector, objectLongevity)
                 .setFilter(filter)
                 .setSkipTypeShardUpdateWithNoAdditions(skipTypeShardUpdateWithNoAdditions);
     }
