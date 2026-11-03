@@ -341,7 +341,8 @@ public class HollowConsumer {
      *
      * @param version the version to hold
      * @return the hold, which the caller must close
-     * @throws IllegalStateException if the consumer is not in held mode
+     * @throws IllegalStateException if the consumer is not in held mode, or if called while a delta is applied, as
+     * from a refresh listener's blobLoaded or a type state listener
      * @throws IllegalArgumentException if the version is {@code VERSION_NONE} or {@code VERSION_LATEST}
      * @throws VersionNotReachableException if no transition lands on the version
      */

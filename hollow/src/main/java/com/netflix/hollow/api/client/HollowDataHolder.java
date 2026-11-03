@@ -225,14 +225,13 @@ class HollowDataHolder {
 
         try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, blob);
              OptionalBlobPartInput optionalPartIn = blob.getOptionalBlobPartInputs()) {
-            if (heldVersions != null)
-                heldVersions.beforeDelta();
-            applyStateEngineTransition(in, optionalPartIn, blob, refreshListeners);
+            if (heldVersions != null) // getAPI() stays the engine's own API, as with object longevity off
+                heldVersions.applyDelta(blob.getToVersion(),
+                        () -> applyStateEngineTransition(in, optionalPartIn, blob, refreshListeners));
+            else
+                applyStateEngineTransition(in, optionalPartIn, blob, refreshListeners);
 
-            if (heldVersions != null) {
-                // getAPI() stays the engine's own API, as with object longevity off
-                heldVersions.afterDelta(blob.getToVersion());
-            } else if(objLongevityConfig.enableLongLivedObjectSupport()) {
+            if(objLongevityConfig.enableLongLivedObjectSupport()) {
                 HollowDataAccess previousDataAccess = currentAPI.getDataAccess();
                 HollowHistoricalStateDataAccess priorState = new HollowHistoricalStateCreator(null).createBasedOnNewDelta(currentVersion, stateEngine);
                 HollowProxyDataAccess newDataAccess = new HollowProxyDataAccess();
