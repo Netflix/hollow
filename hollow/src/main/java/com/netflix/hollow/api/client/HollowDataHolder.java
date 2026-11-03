@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.api.client;
 
+import com.netflix.hollow.api.client.longevity.HeldVersions;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.TransitionAwareRefreshListener;
 import com.netflix.hollow.api.custom.HollowAPI;
@@ -75,7 +76,7 @@ class HollowDataHolder {
         this.staleReferenceDetector = staleReferenceDetector;
         this.objLongevityConfig = objLongevity.getObjectLongevityConfig();
         this.heldVersions = objLongevity.getMode() == HollowConsumer.ObjectLongevity.Mode.HELD
-                ? new HeldVersions(stateEngine, doubleSnapshotConfig) : null;
+                ? new HeldVersions(stateEngine, doubleSnapshotConfig, objLongevity.getHeldVersionsConfig()) : null;
     }
 
     HollowReadStateEngine getStateEngine() {

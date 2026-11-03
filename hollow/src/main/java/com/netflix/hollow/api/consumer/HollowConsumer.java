@@ -990,6 +990,20 @@ public class HollowConsumer {
      */
     public interface HeldVersionsConfig {
         HeldVersionsConfig DEFAULT = new HeldVersionsConfig() {};
+
+        /**
+         * Whether held versions are read through direct lookup: a record unchanged since a held version is read from
+         * the state engine after one bit test, and a changed one from its copy after one map lookup. Off, held
+         * versions read through the chain of copies, one per delta since their version.
+         * <p>
+         * Hollow reads this at every refresh, including one that applies nothing. Turned off, every held version goes
+         * back to the chain; turned on, it applies to the state engine's version at that refresh and later ones.
+         *
+         * @return true by default
+         */
+        default boolean enableDirectLookup() {
+            return true;
+        }
     }
 
     /**
