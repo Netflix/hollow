@@ -18,6 +18,7 @@ package com.netflix.hollow.api.consumer.longevity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -26,19 +27,25 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.ObjectLongevity;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.HollowConstants;
+import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.test.generated.AwardsAPI;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -182,6 +189,113 @@ public class HollowVersionHoldTest {
         fixture.assertReads(versions.get(4), passed.getDataAccess());
         fixture.assertReads(versions.get(2), oldest.getDataAccess());
         fixture.assertReads(versions.get(0), rollback.getDataAccess());
+    }
+
+    @Test
+    public void everyHoldReportsItsVersionsPopulatedOrdinalsAfterEveryDelta() {
+        List<Long> versions = fixture.cycles(10);
+        HollowConsumer consumer = fixture.heldConsumer();
+        List<HollowVersionHold> holds = new ArrayList<>();
+        Map<HollowVersionHold, BitSet> firstReads = new HashMap<>();
+
+        for (int i : HeldVersionsFixture.forwardBackForward(versions.size(), 3)) {
+            consumer.triggerRefreshTo(versions.get(i));
+            holds.add(consumer.holdVersion(versions.get(i)));
+            holds.add(consumer.holdVersion(versions.get(Math.max(0, i - 2)))); // behind the engine, from copies
+            for (HollowVersionHold hold : holds) {
+                fixture.assertPopulated(hold);
+                firstReads.putIfAbsent(hold, hold.getPopulatedOrdinals("Movie"));
+                assertEquals(fixture.reference(hold.getVersion()).getTypeState("Movie").getPopulatedOrdinals(),
+                        firstReads.get(hold)); // never changes as the engine moves
+            }
+        }
+        assertNull(holds.get(0).getPopulatedOrdinals("NoSuchType"));
+    }
+
+    @Test
+    public void everyHoldHasItsVersionsHeaderTags() {
+        List<Long> versions = fixture.cycles(10);
+        HollowConsumer consumer = fixture.heldConsumer();
+        List<HollowVersionHold> holds = new ArrayList<>();
+
+        for (int i : HeldVersionsFixture.forwardBackForward(versions.size(), 3)) {
+            consumer.triggerRefreshTo(versions.get(i));
+            holds.add(consumer.holdVersion(versions.get(i)));
+            holds.add(consumer.holdVersion(versions.get(Math.max(0, i - 2))));
+            for (HollowVersionHold hold : holds) {
+                assertEquals(fixture.reference(hold.getVersion()).getHeaderTags(), hold.getHeaderTags());
+                assertEquals(String.valueOf(hold.getVersion()),
+                        hold.getHeaderTags().get(HollowStateEngine.HEADER_TAG_PRODUCER_TO_VERSION));
+            }
+        }
+        try {
+            holds.get(0).getHeaderTags().put("tag", "value");
+            fail();
+        } catch (UnsupportedOperationException expected) {
+        }
+    }
+
+    @Test
+    public void aClosedHoldHasNoPopulatedOrdinals() {
+        long v1 = fixture.cycle();
+        HollowConsumer consumer = fixture.heldConsumer();
+        HollowVersionHold hold = consumer.holdVersion(v1);
+        Map<String, String> headerTags = hold.getHeaderTags();
+
+        hold.close();
+
+        try {
+            hold.getPopulatedOrdinals("Movie");
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+        assertEquals(headerTags, hold.getHeaderTags());
+    }
+
+    @Test
+    public void holdsAndPopulatedOrdinalsFailInsideADelta() {
+        List<Long> versions = fixture.cycles(3);
+        HollowConsumer consumer = fixture.heldConsumer();
+        consumer.triggerRefreshTo(versions.get(0));
+        HollowVersionHold served = consumer.holdVersion(versions.get(0));
+        List<Throwable> thrown = new ArrayList<>();
+        Runnable callInside = () -> { // the engine has moved, and the delta isn't recorded yet
+            thrown.add(thrownBy(() -> consumer.holdVersion(versions.get(0))));
+            thrown.add(thrownBy(() -> served.getPopulatedOrdinals("Movie")));
+        };
+        consumer.addRefreshListener(new HollowConsumer.AbstractRefreshListener() {
+            @Override
+            public void blobLoaded(HollowConsumer.Blob transition) {
+                callInside.run();
+            }
+        });
+        consumer.getStateEngine().getTypeState("Movie").addListener(new HollowTypeStateListener() {
+            @Override
+            public void beginUpdate() {
+            }
+
+            @Override
+            public void addedOrdinal(int ordinal) {
+            }
+
+            @Override
+            public void removedOrdinal(int ordinal) {
+            }
+
+            @Override
+            public void endUpdate() {
+                callInside.run();
+            }
+        });
+
+        consumer.triggerRefreshTo(versions.get(2));
+
+        assertEquals(8, thrown.size()); // both calls from both listeners, in each of two deltas
+        for (Throwable t : thrown)
+            assertTrue(String.valueOf(t), t instanceof IllegalStateException);
+        fixture.assertPopulated(served); // nothing computed inside was kept
+        fixture.assertReads(versions.get(0), served.getDataAccess());
+        fixture.assertPopulated(consumer.holdVersion(versions.get(1)));
     }
 
     @Test
@@ -397,9 +511,10 @@ public class HollowVersionHoldTest {
         AtomicLongArray passes = new AtomicLongArray(readerCount);
         ConcurrentLinkedQueue<String> failures = new ConcurrentLinkedQueue<>();
         ExecutorService threads = Executors.newFixedThreadPool(readerCount + 1);
+        List<Future<?>> tasks = new ArrayList<>();
         for (int r = 0; r < readerCount; r++) {
             int reader = r;
-            threads.submit(() -> {
+            tasks.add(threads.submit(() -> {
                 while (!done.get()) {
                     for (HollowVersionHold hold : readable) {
                         if (fixture.mismatches(hold.getVersion(), hold.getDataAccess(), transitionEvents) > 0)
@@ -407,18 +522,26 @@ public class HollowVersionHoldTest {
                     }
                     passes.incrementAndGet(reader);
                 }
-            });
+            }));
         }
-        threads.submit(() -> { // holds and releases versions at random, refreshing when one isn't retained
+        tasks.add(threads.submit(() -> { // holds and releases versions at random, refreshing when one isn't retained
             Random random = new Random(3);
             while (!done.get()) {
                 long version = versions.get(random.nextInt(versions.size()));
-                try (HollowVersionHold hold = consumer.holdVersion(version)) {
+                try (HollowVersionHold hold = consumer.holdVersion(version);
+                     HollowVersionHold other = consumer.holdVersion(versions.get(random.nextInt(versions.size())))) {
                     if (fixture.mismatches(version, hold.getDataAccess(), transitionEvents) > 0)
                         failures.add("holder read " + version);
+                    try { // exact even while deltas are applied and pruned
+                        fixture.assertPopulated(hold);
+                        fixture.assertDiffConnects(hold, other);
+                        fixture.assertDiffConnects(other, hold);
+                    } catch (AssertionError e) {
+                        failures.add("holder " + e.getMessage());
+                    }
                 }
             }
-        });
+        }));
 
         List<Integer> path = new ArrayList<>(); // forward, back by reverse deltas, and forward again
         for (int round = 0; round < 3; round++) {
@@ -438,6 +561,8 @@ public class HollowVersionHoldTest {
         done.set(true);
         threads.shutdown();
         assertTrue(threads.awaitTermination(60, TimeUnit.SECONDS));
+        for (Future<?> task : tasks)
+            task.get(); // rethrows what a task threw
         assertTrue(failures.toString(), failures.isEmpty());
     }
 
@@ -507,6 +632,15 @@ public class HollowVersionHoldTest {
             consumer.triggerRefreshTo(version);
             fail("refresh to " + version);
         } catch (RuntimeException expected) {
+        }
+    }
+
+    private static Throwable thrownBy(Runnable call) {
+        try {
+            call.run();
+            return null;
+        } catch (RuntimeException e) {
+            return e;
         }
     }
 

@@ -17,6 +17,7 @@
 package com.netflix.hollow.api.consumer.longevity;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.ObjectLongevity;
@@ -37,6 +38,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -57,6 +59,7 @@ final class HeldVersionsFixture {
     private final Random random = new Random(17);
     private final Map<Long, Movie> catalog = new TreeMap<>();
     private final Map<Long, HollowReadStateEngine> references = new ConcurrentHashMap<>();
+    private final Map<Long, Map<String, Map<Integer, String>>> records = new ConcurrentHashMap<>();
     private long nextId = 1;
     private int cycle;
 
@@ -87,6 +90,21 @@ final class HeldVersionsFixture {
         return versions;
     }
 
+    /**
+     * Indexes of {@code count} versions in the order a consumer applies them: forward through all of them, back by
+     * reverse deltas to {@code backTo}, and forward again.
+     */
+    static List<Integer> forwardBackForward(int count, int backTo) {
+        List<Integer> path = new ArrayList<>();
+        for (int i = 0; i < count; i++)
+            path.add(i);
+        for (int i = count - 2; i >= backTo; i--)
+            path.add(i);
+        for (int i = backTo + 1; i < count; i++)
+            path.add(i);
+        return path;
+    }
+
     HollowConsumer.Builder<?> consumer() {
         return HollowConsumer.withBlobRetriever(blobStore);
     }
@@ -105,6 +123,66 @@ final class HeldVersionsFixture {
                 assertEquals(type + " " + ordinal + " in " + version,
                         STRINGIFIER.stringify(expected, type, ordinal), STRINGIFIER.stringify(dataAccess, type, ordinal));
             }
+        }
+    }
+
+    /** Asserts that {@code hold} reports exactly the populated ordinals of its version, for every type. */
+    void assertPopulated(HollowVersionHold hold) {
+        HollowReadStateEngine expected = reference(hold.getVersion());
+        for (HollowTypeReadState typeState : expected.getTypeStates()) {
+            String type = typeState.getSchema().getName();
+            assertEquals(type + " in " + hold.getVersion(), typeState.getPopulatedOrdinals(), hold.getPopulatedOrdinals(type));
+        }
+    }
+
+    /**
+     * Asserts that {@code diff} is exact for the versions the consumer applied between its holds, listed from the
+     * older hold's to the newer one's: an ordinal with the same record in all of them is neither removed nor added, and
+     * any other ordinal is removed if the first version has it and added if the last one does.
+     */
+    void assertDiff(List<Long> between, HollowVersionDiff diff) {
+        long from = between.get(0);
+        long to = between.get(between.size() - 1);
+        assertEquals(from, diff.getFromVersion());
+        assertEquals(to, diff.getToVersion());
+        assertTrue(diff.isIncremental());
+        assertEquals(between.size() - 1, diff.getDeltaCount());
+        Set<String> changed = new HashSet<>();
+        for (String type : records(from).keySet()) {
+            BitSet removed = diff.getRemovedOrdinals(type);
+            BitSet added = diff.getAddedOrdinals(type);
+            Set<Integer> ordinals = new TreeSet<>();
+            for (long version : between)
+                ordinals.addAll(records(version).get(type).keySet());
+            removed.stream().forEach(ordinals::add);
+            added.stream().forEach(ordinals::add);
+            for (int ordinal : ordinals) {
+                String first = records(from).get(type).get(ordinal);
+                boolean same = first != null
+                        && between.stream().allMatch(v -> first.equals(records(v).get(type).get(ordinal)));
+                String context = type + " " + ordinal + " from " + from + " to " + to;
+                assertEquals(context, !same && first != null, removed.get(ordinal));
+                assertEquals(context, !same && records(to).get(type).containsKey(ordinal), added.get(ordinal));
+            }
+            if (!removed.isEmpty() || !added.isEmpty())
+                changed.add(type);
+        }
+        assertEquals(changed, diff.getChangedTypes());
+    }
+
+    /** Asserts that the diff between two holds turns the older version's populated ordinals into the newer one's. */
+    void assertDiffConnects(HollowVersionHold older, HollowVersionHold newer) {
+        HollowVersionDiff diff = newer.diffFrom(older);
+        if (!diff.isIncremental())
+            return;
+        for (HollowTypeReadState typeState : reference(newer.getVersion()).getTypeStates()) {
+            String type = typeState.getSchema().getName();
+            BitSet populated = new BitSet();
+            populated.or(reference(older.getVersion()).getTypeState(type).getPopulatedOrdinals());
+            populated.andNot(diff.getRemovedOrdinals(type));
+            populated.or(diff.getAddedOrdinals(type));
+            assertEquals(type + " from " + older.getVersion() + " to " + newer.getVersion(),
+                    typeState.getPopulatedOrdinals(), populated);
         }
     }
 
@@ -136,6 +214,22 @@ final class HeldVersionsFixture {
             HollowConsumer reference = consumer().build();
             reference.triggerRefreshTo(v);
             return reference.getStateEngine();
+        });
+    }
+
+    /** Every record of {@code version}, by type and ordinal. */
+    private Map<String, Map<Integer, String>> records(long version) {
+        return records.computeIfAbsent(version, v -> {
+            HollowReadStateEngine engine = reference(v);
+            Map<String, Map<Integer, String>> byType = new HashMap<>();
+            for (HollowTypeReadState typeState : engine.getTypeStates()) {
+                String type = typeState.getSchema().getName();
+                Map<Integer, String> byOrdinal = new HashMap<>();
+                typeState.getPopulatedOrdinals().stream()
+                        .forEach(ordinal -> byOrdinal.put(ordinal, STRINGIFIER.stringify(engine, type, ordinal)));
+                byType.put(type, byOrdinal);
+            }
+            return byType;
         });
     }
 

@@ -290,7 +290,7 @@ public class HollowClientUpdater {
      *
      * @param version the version to hold
      * @return the hold
-     * @throws IllegalStateException if the consumer is not in held mode
+     * @throws IllegalStateException if the consumer is not in held mode, or if called while a delta is applied
      * @throws VersionNotReachableException if no transition lands on the version
      * @throws Throwable if the refresh failed
      */

@@ -19,6 +19,8 @@ package com.netflix.hollow.api.consumer.longevity;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
+import java.util.BitSet;
+import java.util.Map;
 
 /**
  * A version of a held-mode consumer's data that stays readable, exactly, while the consumer's state engine moves on.
@@ -34,6 +36,11 @@ public interface HollowVersionHold extends AutoCloseable {
     long getVersion();
 
     /**
+     * @return this version's own header tags, read-only
+     */
+    Map<String, String> getHeaderTags();
+
+    /**
      * Returns an API of the given class that reads exactly this version. It is created once per class and never uses
      * cached types, whose caches follow the state engine.
      *
@@ -47,6 +54,28 @@ public interface HollowVersionHold extends AutoCloseable {
      * @return a data access that reads exactly this version, by ordinal
      */
     HollowDataAccess getDataAccess();
+
+    /**
+     * Returns the ordinals of a type populated in this version: the state engine's, with each later delta undone,
+     * without transitions. The first call for a type waits for a delta being applied; later calls return the same set.
+     *
+     * @param type the type name
+     * @return the populated ordinals, read-only, or null if this version has no such type
+     * @throws IllegalStateException if the hold is closed, or if called while a delta is applied, as from a refresh
+     * listener's blobLoaded or a type state listener
+     */
+    BitSet getPopulatedOrdinals(String type);
+
+    /**
+     * Returns the changes from an older hold's version to this one, combined from the deltas the consumer applied
+     * between them, without transitions. Diff before closing either hold: removed records are read through the older one.
+     *
+     * @param older the hold to diff from
+     * @return the diff, not incremental if the two holds read different state engines: across a snapshot, or of
+     * different consumers
+     * @throws IllegalStateException if either hold is closed
+     */
+    HollowVersionDiff diffFrom(HollowVersionHold older);
 
     /**
      * Releases the version. The release takes effect at the next delta, without tracking readers: everything read
