@@ -44,6 +44,16 @@ public class SegmentedLongArray {
     protected final int log2OfSegmentSize;
     protected final int bitmask;
 
+    /**
+     * Constructs a new {@code SegmentedLongArray} sized for the specified number of longs.
+     * <p>
+     * Note that 0-length instances contain no segments and must not be accessed via
+     * {@link #get(long)} or {@link #set(long, long)}.
+     *
+     * @param memoryRecycler the recycler providing array segments
+     * @param numLongs the number of longs to allocate capacity for
+     * @throws IllegalArgumentException if {@code numLongs} is negative or exceeds the maximum supported capacity
+     */
     public SegmentedLongArray(ArraySegmentRecycler memoryRecycler, long numLongs) {
         this.log2OfSegmentSize = memoryRecycler.getLog2OfLongSegmentSize();
         if(numLongs < 0) {
@@ -77,6 +87,9 @@ public class SegmentedLongArray {
      * @param value the long value
      */
     public void set(long index, long value) {
+        if(segments.length == 0) {
+            throw new IndexOutOfBoundsException("Cannot set element on 0-length SegmentedLongArray; index: " + index);
+        }
         int segmentIndex = (int)(index >> log2OfSegmentSize);
         int longInSegment = (int)(index & bitmask);
         unsafe.putLong(segments[segmentIndex], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longInSegment), value);
@@ -94,6 +107,9 @@ public class SegmentedLongArray {
      * @return the long value
      */
     public long get(long index) {
+        if(segments.length == 0) {
+            throw new IndexOutOfBoundsException("Cannot get element from 0-length SegmentedLongArray; index: " + index);
+        }
         int segmentIndex = (int)(index >>> log2OfSegmentSize);
         long ret = segments[segmentIndex][(int)(index & bitmask)];
 

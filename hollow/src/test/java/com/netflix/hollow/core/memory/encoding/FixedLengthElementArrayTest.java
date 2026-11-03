@@ -332,4 +332,23 @@ public class FixedLengthElementArrayTest {
     public void testNegativeLongsThrowsIllegalArgumentException() {
         new SegmentedLongArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, -1);
     }
+
+    @Test
+    public void testZeroLongsInitializationAndLifecycle() {
+        SegmentedLongArray arr = new SegmentedLongArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 0);
+        arr.fill(42L);
+        arr.destroy(WastefulRecycler.SMALL_ARRAY_RECYCLER);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testZeroLongsGetThrowsIndexOutOfBoundsException() {
+        SegmentedLongArray arr = new SegmentedLongArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 0);
+        arr.get(0);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testZeroLongsSetThrowsIndexOutOfBoundsException() {
+        SegmentedLongArray arr = new SegmentedLongArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 0);
+        arr.set(0, 100L);
+    }
 }
