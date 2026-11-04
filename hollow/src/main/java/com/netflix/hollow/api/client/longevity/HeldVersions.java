@@ -24,7 +24,6 @@ import com.netflix.hollow.api.consumer.longevity.HollowVersionHold;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
-import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -233,9 +232,8 @@ public final class HeldVersions {
         long at = positionOf(version);
         if (at < 0)
             return null;
-        HollowProxyDataAccess dataAccess = new HollowProxyDataAccess();
-        dataAccess.setDataAccess(at == position ? stateEngine : behind(at));
-        Hold hold = new Hold(this, version, at, headerTagsAt(at), dataAccess);
+        Hold hold = new Hold(this, version, at, headerTagsAt(at));
+        hold.dataAccess.setDataAccess(at == position ? stateEngine : behind(at));
         holds.add(hold);
         return hold;
     }
@@ -480,19 +478,18 @@ public final class HeldVersions {
         private final long version;
         private final long position;
         private final Map<String, String> headerTags;
-        private final HollowProxyDataAccess dataAccess;
+        private final HeldDataAccess dataAccess;
         private final ConcurrentHashMap<Class<?>, HollowAPI> apis = new ConcurrentHashMap<>();
         private final ConcurrentHashMap<String, BitSet> populated = new ConcurrentHashMap<>();
         private volatile boolean closed;
         private long releasedAt = -1;
 
-        private Hold(HeldVersions owner, long version, long position, Map<String, String> headerTags,
-                HollowProxyDataAccess dataAccess) {
+        private Hold(HeldVersions owner, long version, long position, Map<String, String> headerTags) {
             this.owner = owner;
             this.version = version;
             this.position = position;
             this.headerTags = headerTags;
-            this.dataAccess = dataAccess;
+            this.dataAccess = new HeldDataAccess(this);
         }
 
         @Override

@@ -60,9 +60,9 @@ import java.util.logging.Logger;
  * as long as object longevity is enabled. The primary difference between these two classes is the use of data accessors
  * vs. state engines.
  *
- * <b>WARNING: The HollowUniqueKeyIndex must be created from the <i>current</i> version. It cannot be created from an
- * a data accessor of an outdated version. This limitation is caused by the getPopulatedOrdinals method that does not
- * work against old versions.</b>
+ * <b>WARNING: The HollowUniqueKeyIndex must be created from the <i>current</i> version, or from a data access that knows
+ * its own version's populated ordinals, such as a version hold's. It cannot be created from another data access of an
+ * outdated version, because the type state's populated ordinals are the current version's.</b>
  */
 @SuppressWarnings("override")
 public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUniqueKeyIndex {
@@ -559,19 +559,14 @@ public class HollowUniqueKeyIndex implements HollowTypeStateListener, TestableUn
             hashTable.hashTable.destroy(memoryRecycler);
         }
 
-        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) this.objectTypeDataAccess.getTypeState();
-
         BitSet ordinals = specificOrdinalsToIndex;
         if (ordinals == null) {
-            //Note: this call is what makes it impossible to create an index against a non-current client.
-            //This works even when object longevity it turned on *ONLY* if it is created against the
-            //current version. Otherwise, this will return a bit set that does not match the HollowAPI's
-            //historic version. (This method gets called upon construction)
-            ordinals = typeState.getPopulatedOrdinals();
+            // the version the data access reads: a type state's, or a version hold's
+            ordinals = objectTypeDataAccess.getPopulatedOrdinals();
         }
 
         long hashTableSize = HashCodes.indexHashTableSize(ordinals.cardinality());
-        int bitsPerElement = (32 - Integer.numberOfLeadingZeros(typeState.maxOrdinal() + 1));
+        int bitsPerElement = (32 - Integer.numberOfLeadingZeros(objectTypeDataAccess.getMaxOrdinal() + 1));
 
         FixedLengthElementArray hashedArray = new FixedLengthElementArray(memoryRecycler, hashTableSize * (long) bitsPerElement);
 
