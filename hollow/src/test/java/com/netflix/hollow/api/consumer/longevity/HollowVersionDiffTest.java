@@ -57,8 +57,7 @@ public class HollowVersionDiffTest {
         consumer.triggerRefreshTo(versions.get(0));
         HollowVersionHold before = consumer.holdVersion(versions.get(0));
         consumer.forceDoubleSnapshotNextUpdate();
-        consumer.triggerRefreshTo(versions.get(2));
-        HollowVersionHold after = consumer.holdVersion(versions.get(2));
+        HollowVersionHold after = consumer.holdVersion(versions.get(2)); // a hold takes the double snapshot
 
         HollowVersionDiff diff = after.diffFrom(before);
 

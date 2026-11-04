@@ -474,12 +474,14 @@ public class HollowVersionHoldTest {
         breakCopies(consumer);
         assertRefreshFails(consumer, versions.get(1));
         assertStuckLoggedOnce(Level.WARNING, "next double snapshot");
+        assertRefreshFails(consumer, versions.get(2)); // a background refresh leaves the double snapshot to the hold
+        assertEquals((long) versions.get(1), consumer.getCurrentVersionId());
 
-        consumer.triggerRefreshTo(versions.get(2));
+        HollowVersionHold next = consumer.holdVersion(versions.get(2));
 
         assertEquals((long) versions.get(2), consumer.getCurrentVersionId());
         fixture.assertReads(versions.get(0), hold.getDataAccess());
-        fixture.assertReads(versions.get(2), consumer.holdVersion(versions.get(2)).getDataAccess());
+        fixture.assertReads(versions.get(2), next.getDataAccess());
     }
 
     @Test(timeout = 120_000)

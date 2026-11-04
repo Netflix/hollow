@@ -174,6 +174,15 @@ public class HollowClientUpdater {
         return updateTo(new HollowConsumer.VersionInfo(requestedVersion));
     }
     public synchronized boolean updateTo(HollowConsumer.VersionInfo requestedVersionInfo) throws Throwable {
+        return updateTo(requestedVersionInfo, false);
+    }
+
+    /*
+     * In held mode, while a hold is open, a refresh other than a hold's is a background refresh. It never applies a
+     * snapshot: it leaves one to the next hold, as a forced double snapshot. One that fails before applying anything,
+     * such as when an announcement arrives before its delta is visible, forces nothing, so the next refresh retries.
+     */
+    private boolean updateTo(HollowConsumer.VersionInfo requestedVersionInfo, boolean holdRequest) throws Throwable {
         HollowDataHolder held = hollowDataHolderVolatile;
         if (held != null && held.getHeldVersions() != null)
             held.getHeldVersions().readDirectLookupGuard(); // at every refresh, even one that applies nothing
@@ -199,6 +208,10 @@ public class HollowClientUpdater {
         }
 
         long beforeVersion = getCurrentVersionId();
+        boolean background = !holdRequest && held != null && held.getHeldVersions() != null
+                && held.getHeldVersions().hasOpenHolds();
+        boolean allowSnapshot = !background && doubleSnapshotConfig.allowDoubleSnapshot();
+        boolean applying = false;
 
         for (HollowConsumer.RefreshListener listener : localListeners) {
             listener.refreshStarted(beforeVersion, requestedVersion);
@@ -208,7 +221,7 @@ public class HollowClientUpdater {
             HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan(requestedVersionInfo)
                 ? planner.planInitializingUpdate(requestedVersionInfo)
                 : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersionInfo,
-                        doubleSnapshotConfig.allowDoubleSnapshot());
+                        allowSnapshot);
             LOG.info(String.format("Hollow update plan: beforeVersion=%s, requestedVersion=%s, updatePlan={%s}", beforeVersion, requestedVersion, updatePlan));
 
             for (HollowConsumer.RefreshListener listener : localListeners)
@@ -236,7 +249,7 @@ public class HollowClientUpdater {
 
             if (updatePlan.isSnapshotPlan()) {  // 1 snapshot and 0+ delta transitions
                 HollowDataHolder oldDh = hollowDataHolderVolatile;
-                if (oldDh == null || doubleSnapshotConfig.allowDoubleSnapshot()) {
+                if (oldDh == null || allowSnapshot) {
                     HollowDataHolder newDh = newHollowDataHolder();
                     try {
                         /* We need to assign the volatile field after API init since it may be
@@ -256,8 +269,13 @@ public class HollowClientUpdater {
                         throw t;
                     }
                     forceDoubleSnapshot = false;
+                } else if (background) { // forced so a hold, carrying no announcement metadata, takes a schema change
+                    forceDoubleSnapshot = true;
+                    throw new IllegalStateException("Hollow refresh to version " + requestedVersion + " needs a "
+                            + "double snapshot, which, while a version hold is open, the next version hold takes");
                 }
             } else {    // 0 snapshot and 1+ delta transitions
+                applying = true;
                 hollowDataHolderVolatile.update(updatePlan, localListeners, () -> {});
             }
 
@@ -272,7 +290,8 @@ public class HollowClientUpdater {
             metrics.setLastRefreshEndNs(System.nanoTime());
             return getCurrentVersionId() == requestedVersion;
         } catch(Throwable th) {
-            forceDoubleSnapshotNextUpdate();
+            if (!background || applying) // a background refresh that applied nothing left the engine as it was
+                forceDoubleSnapshotNextUpdate();
             metrics.updateRefreshFailed();
             if(metricsCollector != null)
                 metricsCollector.collect(metrics);
@@ -305,7 +324,7 @@ public class HollowClientUpdater {
 
         HollowVersionHold hold = tryHold(version);
         if (hold == null) {
-            updateTo(new HollowConsumer.VersionInfo(version));
+            updateTo(new HollowConsumer.VersionInfo(version), true);
             hold = tryHold(version);
             if (hold == null)
                 throw new VersionNotReachableException("Cannot hold version " + version

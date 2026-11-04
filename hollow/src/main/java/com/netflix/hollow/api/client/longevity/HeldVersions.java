@@ -106,6 +106,15 @@ public final class HeldVersions {
         }
     }
 
+    /** @return whether a hold is open, which makes every refresh other than a hold's a background refresh */
+    public boolean hasOpenHolds() {
+        for (Hold hold : holds) {
+            if (!hold.closed)
+                return true;
+        }
+        return false;
+    }
+
     public void snapshotLoaded(long version) {
         this.version = version;
     }

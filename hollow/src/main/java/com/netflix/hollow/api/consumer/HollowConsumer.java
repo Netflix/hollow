@@ -950,6 +950,11 @@ public class HollowConsumer {
         /**
          * Version holds: {@link HollowConsumer#holdVersion(long)} keeps a version readable, exactly, until the hold is closed.
          * {@link HollowConsumer#getAPI()} is the state engine's own API, valid until the next refresh, as with {@link #off()}.
+         * <p>
+         * While a hold is open, every other refresh moves the state engine under Hollow's normal plan, ahead of the
+         * holds or back, but never applies a snapshot: a refresh that needs one fails, and the next hold that needs a
+         * refresh takes it. A refresh that fails before applying anything, such as when an announcement arrives before
+         * its delta is visible, forces no double snapshot, so the next refresh retries the delta.
          *
          * @param config held mode's settings
          * @return held mode
