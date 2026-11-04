@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.util;
 
+import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 
@@ -23,5 +24,12 @@ public abstract class AllHollowRecordCollection<T> extends HollowRecordCollectio
 
     public AllHollowRecordCollection(HollowTypeReadState typeState) {
         super(typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals());
+    }
+
+    /**
+     * @param typeDataAccess the type, whose populated ordinals are those of the version it reads, as for a version hold
+     */
+    public AllHollowRecordCollection(HollowTypeDataAccess typeDataAccess) {
+        super(typeDataAccess.getPopulatedOrdinals());
     }
 }

@@ -227,7 +227,7 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
             if(parameterizeClassNames) {
                 builder.append("    public <T> Collection<T> getAll").append(hollowImplClassname(schema.getName())).append("() {\n");
                 builder.append("        HollowTypeDataAccess tda = Objects.requireNonNull(getDataAccess().getTypeDataAccess(\"").append(schema.getName()).append("\"), \"type not loaded or does not exist in dataset; type=").append(schema.getName()).append("\");\n");
-                builder.append("        return new AllHollowRecordCollection<T>(tda.getTypeState()) {\n");
+                builder.append("        return new AllHollowRecordCollection<T>(tda) {\n");
                 builder.append("            protected T getForOrdinal(int ordinal) {\n");
                 builder.append("                return get").append(hollowImplClassname(schema.getName())).append("(ordinal);\n");
                 builder.append("            }\n");
@@ -243,7 +243,7 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
 
                 builder.append("    public Collection<"+hollowImplClassname+"> getAll").append(hollowImplClassname).append("() {\n");
                 builder.append("        HollowTypeDataAccess tda = Objects.requireNonNull(getDataAccess().getTypeDataAccess(\"").append(schema.getName()).append("\"), \"type not loaded or does not exist in dataset; type=").append(schema.getName()).append("\");\n");
-                builder.append("        return new AllHollowRecordCollection<"+hollowImplClassname+">(tda.getTypeState()) {\n");
+                builder.append("        return new AllHollowRecordCollection<"+hollowImplClassname+">(tda) {\n");
                 builder.append("            protected "+hollowImplClassname+" getForOrdinal(int ordinal) {\n");
                 builder.append("                return get").append(hollowImplClassname).append("(ordinal);\n");
                 builder.append("            }\n");
