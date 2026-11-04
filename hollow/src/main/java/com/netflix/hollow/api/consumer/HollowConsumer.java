@@ -954,7 +954,8 @@ public class HollowConsumer {
          * While a hold is open, every other refresh moves the state engine under Hollow's normal plan, ahead of the
          * holds or back, but never applies a snapshot: a refresh that needs one fails, and the next hold that needs a
          * refresh takes it. A refresh that fails before applying anything, such as when an announcement arrives before
-         * its delta is visible, forces no double snapshot, so the next refresh retries the delta.
+         * its delta is visible, forces no double snapshot, so the next refresh retries the delta. These refreshes stop
+         * {@link HeldVersionsConfig#maxDeltasPastOldestHold()} deltas past the oldest open hold.
          *
          * @param config held mode's settings
          * @return held mode
@@ -1008,6 +1009,23 @@ public class HollowConsumer {
          */
         default boolean enableDirectLookup() {
             return true;
+        }
+
+        /**
+         * How far background refreshes run the state engine past the oldest open hold, in deltas applied, forward or
+         * reverse. Once the engine is this far past it, a background refresh returns without applying anything or
+         * calling refresh listeners, until the hold is closed or the limit is raised. Hold requests ignore it.
+         * <p>
+         * The limit is soft: it is checked before each background refresh, and a refresh applies up to
+         * {@link DoubleSnapshotConfig#maxDeltasBeforeDoubleSnapshot()} deltas, so the engine can end up to that many
+         * minus one deltas past the limit, 31 with the default double snapshot config.
+         * <p>
+         * Hollow reads this before every background refresh.
+         *
+         * @return 120 by default
+         */
+        default int maxDeltasPastOldestHold() {
+            return 120;
         }
     }
 

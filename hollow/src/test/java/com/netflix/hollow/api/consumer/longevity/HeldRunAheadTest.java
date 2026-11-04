@@ -40,12 +40,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 
 /**
  * Background refreshes: in held mode with a hold open, every refresh that isn't a hold request runs under Hollow's
  * normal plan, except that it never applies a snapshot, which it leaves to the next hold, and forces none when it fails
- * before applying anything.
+ * before applying anything. It stops at the lead limit.
  */
 public class HeldRunAheadTest {
 
@@ -367,6 +368,116 @@ public class HeldRunAheadTest {
         fixture.assertReads(forked, next.getDataAccess());
     }
 
+    @Test
+    public void backgroundRefreshesStop120DeltasPastTheOldestHoldByDefault() {
+        long[] v = cycles(122);
+        HollowConsumer consumer = consumer().build();
+        serve(consumer, v[0]);
+
+        for (int i = 1; i <= 121; i++)
+            consumer.triggerRefreshTo(v[i]);
+
+        assertEquals(v[120], consumer.getCurrentVersionId());
+    }
+
+    @Test
+    public void aRefreshHeldBackAtTheLeadLimitCallsNoListener() {
+        long[] v = cycles(4);
+        HollowConsumer consumer = consumer(new AtomicInteger(2)).build();
+        serve(consumer, v[0]);
+        consumer.triggerRefreshTo(v[2]);
+        callbacks.events.clear();
+
+        consumer.triggerRefreshTo(v[3]);
+        consumer.triggerRefreshTo(v[1]); // behind the engine too
+
+        assertEquals(v[2], consumer.getCurrentVersionId());
+        callbacks.assertEvents(); // the engine didn't move: listeners hear at the refresh that moves it
+    }
+
+    @Test
+    public void aRefreshThatStartsUnderTheLeadLimitAppliesItsWholePlan() {
+        long[] v = cycles(6);
+        HollowConsumer consumer = consumer(new AtomicInteger(2)).build();
+        serve(consumer, v[0]);
+        consumer.triggerRefreshTo(v[1]);
+
+        consumer.triggerRefreshTo(v[4]); // one under the limit, so it ends two past it
+
+        assertEquals(v[4], consumer.getCurrentVersionId());
+        consumer.triggerRefreshTo(v[5]);
+        assertEquals(v[4], consumer.getCurrentVersionId());
+    }
+
+    @Test
+    public void closingTheOldestHoldResumesBackgroundRefreshes() {
+        long[] v = cycles(4);
+        HollowConsumer consumer = consumer(new AtomicInteger(2)).build();
+        HollowVersionHold served = serve(consumer, v[0]);
+        consumer.triggerRefreshTo(v[2]);
+        HollowVersionHold next = consumer.holdVersion(v[1]); // from copies
+        consumer.triggerRefreshTo(v[3]);
+        assertEquals(v[2], consumer.getCurrentVersionId());
+
+        served.close();
+        callbacks.events.clear();
+        consumer.triggerRefreshTo(v[3]);
+
+        assertEquals(v[3], consumer.getCurrentVersionId());
+        callbacks.assertEvents("detected " + v[3], "started " + v[2] + " " + v[3],
+                "successful " + v[2] + " " + v[3] + " " + v[3]);
+        fixture.assertReads(v[1], next.getDataAccess());
+    }
+
+    @Test
+    public void theLeadLimitIsReadBeforeEveryBackgroundRefresh() {
+        long[] v = cycles(5);
+        AtomicInteger limit = new AtomicInteger(10);
+        HollowConsumer consumer = consumer(limit).build();
+        serve(consumer, v[0]);
+        consumer.triggerRefreshTo(v[3]);
+
+        limit.set(2); // below the lead: run-ahead pauses where it is
+        consumer.triggerRefreshTo(v[4]);
+        assertEquals(v[3], consumer.getCurrentVersionId());
+
+        limit.set(10);
+        consumer.triggerRefreshTo(v[4]);
+        assertEquals(v[4], consumer.getCurrentVersionId());
+    }
+
+    @Test
+    public void holdRequestsIgnoreTheLeadLimit() {
+        long[] v = cycles(4);
+        HollowConsumer consumer = consumer(new AtomicInteger(1)).build();
+        serve(consumer, v[0]);
+        consumer.triggerRefreshTo(v[1]);
+        consumer.triggerRefreshTo(v[3]);
+        assertEquals(v[1], consumer.getCurrentVersionId());
+
+        HollowVersionHold next = consumer.holdVersion(v[3]);
+
+        assertEquals(v[3], consumer.getCurrentVersionId());
+        fixture.assertReads(v[3], next.getDataAccess());
+    }
+
+    @Test
+    public void refreshesWithNoHoldOpenIgnoreTheLeadLimit() {
+        long[] v = cycles(4);
+        HollowConsumer consumer = consumer(new AtomicInteger(0)).build();
+        consumer.triggerRefreshTo(v[0]);
+        consumer.triggerRefreshTo(v[1]);
+        assertEquals(v[1], consumer.getCurrentVersionId());
+
+        HollowVersionHold hold = consumer.holdVersion(v[1]);
+        consumer.triggerRefreshTo(v[2]); // a limit of 0 stops every background refresh
+        assertEquals(v[1], consumer.getCurrentVersionId());
+
+        hold.close();
+        consumer.triggerRefreshTo(v[3]);
+        assertEquals(v[3], consumer.getCurrentVersionId());
+    }
+
     private long[] cycles(int count) {
         return fixture.cycles(count).stream().mapToLong(Long::longValue).toArray();
     }
@@ -375,6 +486,15 @@ public class HeldRunAheadTest {
         return HollowConsumer.withBlobRetriever(blobs)
                 .withObjectLongevity(ObjectLongevity.held())
                 .withRefreshListener(callbacks);
+    }
+
+    private HollowConsumer.Builder<?> consumer(AtomicInteger leadLimit) {
+        return consumer().withObjectLongevity(ObjectLongevity.held(new HollowConsumer.HeldVersionsConfig() {
+            @Override
+            public int maxDeltasPastOldestHold() {
+                return leadLimit.get();
+            }
+        }));
     }
 
     /** Refreshes to {@code version} and holds it, so the refreshes after it are background refreshes. */

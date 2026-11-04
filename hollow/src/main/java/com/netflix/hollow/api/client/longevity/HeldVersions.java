@@ -115,6 +115,19 @@ public final class HeldVersions {
         return false;
     }
 
+    /**
+     * @return whether the engine is {@link HollowConsumer.HeldVersionsConfig#maxDeltasPastOldestHold()} or more deltas
+     * past the oldest open hold, which stops background refreshes; the limit is read at every call
+     */
+    public boolean atLeadLimit() {
+        long oldest = Long.MAX_VALUE;
+        for (Hold hold : holds) {
+            if (!hold.closed)
+                oldest = Math.min(oldest, hold.position);
+        }
+        return oldest != Long.MAX_VALUE && position - oldest >= config.maxDeltasPastOldestHold();
+    }
+
     public void snapshotLoaded(long version) {
         this.version = version;
     }

@@ -102,6 +102,34 @@ public class HeldDirectLookupTest {
     }
 
     @Test
+    public void aRefreshHeldBackAtTheLeadLimitStillReadsTheGuard() {
+        HeldVersionsFixture fixture = new HeldVersionsFixture();
+        List<Long> versions = fixture.cycles(3);
+        HollowConsumer consumer = fixture.heldConsumer(new HeldVersionsConfig() {
+            @Override
+            public boolean enableDirectLookup() {
+                return directLookup.get();
+            }
+
+            @Override
+            public int maxDeltasPastOldestHold() {
+                return 1;
+            }
+        });
+        consumer.triggerRefreshTo(versions.get(0));
+        HollowVersionHold first = consumer.holdVersion(versions.get(0));
+        consumer.triggerRefreshTo(versions.get(1));
+        assertDirect(first);
+
+        directLookup.set(false);
+        consumer.triggerRefreshTo(versions.get(2)); // held back at the limit
+
+        assertEquals((long) versions.get(1), consumer.getCurrentVersionId());
+        assertChain(first);
+        assertReads(fixture, first);
+    }
+
+    @Test
     public void turnedOnDirectLookupAppliesToVersionsFromTheFlip() {
         HeldVersionsFixture fixture = new HeldVersionsFixture();
         List<Long> versions = fixture.cycles(4);
