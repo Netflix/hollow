@@ -102,6 +102,13 @@ final class HeldVersionsFixture {
         return producer.runCycle(ws -> catalog.values().forEach(ws::add));
     }
 
+    /** Restores the producer to {@code version} and publishes the next version from it, forking the delta chain. */
+    long forkFrom(long version) {
+        producer.initializeDataModel(Movie.class);
+        producer.restore(version, blobStore);
+        return cycle();
+    }
+
     List<Long> cycles(int count) {
         List<Long> versions = new ArrayList<>();
         for (int i = 0; i < count; i++)

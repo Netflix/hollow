@@ -96,6 +96,7 @@ public class HeldDirectLookupTest {
         assertChain(first, second);
         assertReads(fixture, first, second);
         consumer.triggerRefreshTo(versions.get(3));
+        assertEquals((long) versions.get(3), consumer.getCurrentVersionId()); // run-ahead goes on with the guard off
         assertChain(first, second);
         assertReads(fixture, first, second);
     }
