@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.api.client;
 
+import com.netflix.hollow.api.client.longevity.HeldVersions;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.TransitionAwareRefreshListener;
 import com.netflix.hollow.api.custom.HollowAPI;
@@ -49,6 +50,7 @@ class HollowDataHolder {
     private final FailedTransitionTracker failedTransitionTracker;
     private final StaleHollowReferenceDetector staleReferenceDetector;
     private final HollowConsumer.ObjectLongevityConfig objLongevityConfig;
+    private final HeldVersions heldVersions;
 
     private TypeFilter filter;
 
@@ -63,8 +65,9 @@ class HollowDataHolder {
                             MemoryMode memoryMode,
                             HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
                             FailedTransitionTracker failedTransitionTracker, 
-                            StaleHollowReferenceDetector staleReferenceDetector, 
-                            HollowConsumer.ObjectLongevityConfig objLongevityConfig) {
+                            StaleHollowReferenceDetector staleReferenceDetector,
+                            HollowConsumer.ObjectLongevity objLongevity,
+                            HeldVersions.Counts heldCounts) {
         this.stateEngine = stateEngine;
         this.apiFactory = apiFactory;
         this.memoryMode = memoryMode;
@@ -72,7 +75,10 @@ class HollowDataHolder {
         this.doubleSnapshotConfig = doubleSnapshotConfig;
         this.failedTransitionTracker = failedTransitionTracker;
         this.staleReferenceDetector = staleReferenceDetector;
-        this.objLongevityConfig = objLongevityConfig;
+        this.objLongevityConfig = objLongevity.getObjectLongevityConfig();
+        this.heldVersions = objLongevity.getMode() == HollowConsumer.ObjectLongevity.Mode.HELD
+                ? new HeldVersions(stateEngine, doubleSnapshotConfig, objLongevity.getHeldVersionsConfig(), heldCounts)
+                : null;
     }
 
     HollowReadStateEngine getStateEngine() {
@@ -85,6 +91,13 @@ class HollowDataHolder {
 
     long getCurrentVersion() {
         return currentVersion;
+    }
+
+    /**
+     * @return the holds on this holder's state engine, or null outside held mode
+     */
+    HeldVersions getHeldVersions() {
+        return heldVersions;
     }
 
     HollowDataHolder setFilter(HollowFilterConfig filter) {
@@ -153,6 +166,8 @@ class HollowDataHolder {
         try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, snapshotBlob);
              OptionalBlobPartInput optionalPartIn = snapshotBlob.getOptionalBlobPartInputs()) {
             applyStateEngineTransition(in, optionalPartIn, snapshotBlob, refreshListeners);
+            if (heldVersions != null)
+                heldVersions.snapshotLoaded(snapshotBlob.getToVersion());
             initializeAPI(apiInitCallback);
 
             for (HollowConsumer.RefreshListener refreshListener : refreshListeners) {
@@ -213,7 +228,11 @@ class HollowDataHolder {
 
         try (HollowBlobInput in = HollowBlobInput.modeBasedSelector(memoryMode, blob);
              OptionalBlobPartInput optionalPartIn = blob.getOptionalBlobPartInputs()) {
-            applyStateEngineTransition(in, optionalPartIn, blob, refreshListeners);
+            if (heldVersions != null) // getAPI() stays the engine's own API, as with object longevity off
+                heldVersions.applyDelta(blob.getToVersion(),
+                        () -> applyStateEngineTransition(in, optionalPartIn, blob, refreshListeners));
+            else
+                applyStateEngineTransition(in, optionalPartIn, blob, refreshListeners);
 
             if(objLongevityConfig.enableLongLivedObjectSupport()) {
                 HollowDataAccess previousDataAccess = currentAPI.getDataAccess();
