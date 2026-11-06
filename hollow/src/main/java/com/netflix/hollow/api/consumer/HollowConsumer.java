@@ -28,6 +28,7 @@ import com.netflix.hollow.api.client.StaleHollowReferenceDetector;
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.consumer.longevity.HollowVersionHold;
+import com.netflix.hollow.api.consumer.longevity.LongevityStats;
 import com.netflix.hollow.api.consumer.longevity.VersionNotReachableException;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
@@ -356,6 +357,18 @@ public class HollowConsumer {
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
+    }
+
+    /**
+     * Returns held mode's stats: the open holds, the lead past the oldest, the copies kept for them and reads through
+     * released holds. Reading them takes no lock, so a refresh listener can read them after every refresh, background
+     * ones included, and a metrics poller at any time.
+     *
+     * @return the stats, as of this call
+     * @throws IllegalStateException if the consumer is not in held mode
+     */
+    public LongevityStats getLongevityStats() {
+        return updater.getLongevityStats();
     }
 
     /**

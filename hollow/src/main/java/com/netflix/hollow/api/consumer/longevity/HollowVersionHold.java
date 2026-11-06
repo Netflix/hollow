@@ -88,9 +88,22 @@ public interface HollowVersionHold extends AutoCloseable {
     HollowVersionDiff diffFrom(HollowVersionHold older);
 
     /**
+     * @return the deltas, forward and reverse, that the state engine this hold reads has applied past its version. A
+     * state engine that a double snapshot replaced applies no more, so its holds' counts stay where they are.
+     */
+    int getDeltasBehindEngine();
+
+    /**
+     * @return the transitions that {@link HollowConsumer#holdVersion(long)} applied to reach this version: 0 if it held
+     * the version without a refresh, and a snapshot and the deltas after it if it took one
+     */
+    int getTransitionsApplied();
+
+    /**
      * Releases the version. The release takes effect at the next delta, without tracking readers: everything read
      * through the hold, including objects created after the close, stays correct until the second delta after the
-     * close. Later reads go to the state engine and are logged as errors. A state engine that a double snapshot
+     * close. Later reads go to the state engine, are logged as errors and are counted in
+     * {@link LongevityStats#getReadsAfterRelease()}. A state engine that a double snapshot
      * replaced applies no more deltas, so reads through its holds stay correct. Closing more than once has no further
      * effect.
      */

@@ -66,7 +66,8 @@ class HollowDataHolder {
                             HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
                             FailedTransitionTracker failedTransitionTracker, 
                             StaleHollowReferenceDetector staleReferenceDetector,
-                            HollowConsumer.ObjectLongevity objLongevity) {
+                            HollowConsumer.ObjectLongevity objLongevity,
+                            HeldVersions.Counts heldCounts) {
         this.stateEngine = stateEngine;
         this.apiFactory = apiFactory;
         this.memoryMode = memoryMode;
@@ -76,7 +77,8 @@ class HollowDataHolder {
         this.staleReferenceDetector = staleReferenceDetector;
         this.objLongevityConfig = objLongevity.getObjectLongevityConfig();
         this.heldVersions = objLongevity.getMode() == HollowConsumer.ObjectLongevity.Mode.HELD
-                ? new HeldVersions(stateEngine, doubleSnapshotConfig, objLongevity.getHeldVersionsConfig()) : null;
+                ? new HeldVersions(stateEngine, doubleSnapshotConfig, objLongevity.getHeldVersionsConfig(), heldCounts)
+                : null;
     }
 
     HollowReadStateEngine getStateEngine() {
