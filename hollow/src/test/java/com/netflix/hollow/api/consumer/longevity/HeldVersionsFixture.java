@@ -273,9 +273,10 @@ final class HeldVersionsFixture {
 
     /**
      * Counts the records of {@code version} that read differently through {@code dataAccess}, for readers racing
-     * refreshes. A read that overlapped two of the {@code transitionEvents}, which count each transition as it starts
-     * and again once holds read its copies, is skipped: a read stalled from before one transition's copies are read
-     * until after the next transition can miss a removed record, which the engine keeps for one transition only.
+     * refreshes. The {@code transitionEvents} count each transition as it starts and again once holds read its copies,
+     * so they are odd while a transition is applied. A read from before one transition's copies are read until after
+     * the next transition starts is skipped, also if it throws: it can read a removed record whose ordinal the next
+     * delta reused, since the engine keeps a removed record for one transition only.
      */
     int mismatches(long version, HollowDataAccess dataAccess, AtomicLong transitionEvents) {
         HollowReadStateEngine expected = reference(version);
@@ -286,12 +287,24 @@ final class HeldVersionsFixture {
             for (int ordinal = populated.nextSetBit(0); ordinal >= 0; ordinal = populated.nextSetBit(ordinal + 1)) {
                 String record = STRINGIFIER.stringify(expected, type, ordinal);
                 long before = transitionEvents.get();
-                String read = STRINGIFIER.stringify(dataAccess, type, ordinal);
-                if (transitionEvents.get() - before <= 1 && !read.equals(record))
+                String read;
+                try {
+                    read = STRINGIFIER.stringify(dataAccess, type, ordinal);
+                } catch (RuntimeException e) {
+                    if (spansTwoTransitions(before, transitionEvents.get()))
+                        continue;
+                    throw e;
+                }
+                if (!spansTwoTransitions(before, transitionEvents.get()) && !read.equals(record))
                     mismatches++;
             }
         }
         return mismatches;
+    }
+
+    /** Whether a read began before one transition's copies were read and ended after the next transition started. */
+    private static boolean spansTwoTransitions(long eventsBefore, long eventsAfter) {
+        return eventsAfter - eventsBefore >= (eventsBefore % 2 == 0 ? 3 : 2);
     }
 
     HollowReadStateEngine reference(long version) {

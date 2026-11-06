@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -551,17 +552,20 @@ public class HollowVersionHoldTest {
                 path.add(round % 2 == 0 ? i : versions.size() - 1 - i);
         }
         Random random = new Random(5);
-        for (int step = 0; step < path.size(); step++) {
-            consumer.triggerRefreshTo(versions.get(path.get(step)));
-            readable.add(consumer.holdVersion(versions.get(path.get(Math.max(0, step - random.nextInt(3))))));
-            if (readable.size() > 3) {
-                HollowVersionHold released = readable.remove(random.nextInt(readable.size()));
-                awaitFullPasses(passes, done);
-                released.close();
+        try {
+            for (int step = 0; step < path.size(); step++) {
+                consumer.triggerRefreshTo(versions.get(path.get(step)));
+                readable.add(consumer.holdVersion(versions.get(path.get(Math.max(0, step - random.nextInt(3))))));
+                if (readable.size() > 3) {
+                    HollowVersionHold released = readable.remove(random.nextInt(readable.size()));
+                    awaitFullPasses(passes, done, tasks);
+                    released.close();
+                }
             }
+        } finally {
+            done.set(true); // also when the test fails or times out, so no thread outlives it
+            threads.shutdown();
         }
-        done.set(true);
-        threads.shutdown();
         assertTrue(threads.awaitTermination(60, TimeUnit.SECONDS));
         for (Future<?> task : tasks)
             task.get(); // rethrows what a task threw
@@ -646,14 +650,21 @@ public class HollowVersionHoldTest {
         }
     }
 
-    /** Waits until every reader has finished the pass it was in, so none still reads a hold removed before the call. */
-    private static void awaitFullPasses(AtomicLongArray passes, AtomicBoolean done) throws InterruptedException {
+    /**
+     * Waits until every reader has finished the pass it was in, so none still reads a hold removed before the call, and
+     * rethrows what a reader threw, since its passes stop.
+     */
+    private static void awaitFullPasses(AtomicLongArray passes, AtomicBoolean done, List<Future<?>> readers)
+            throws InterruptedException, ExecutionException {
         long[] started = new long[passes.length()];
         for (int i = 0; i < started.length; i++)
             started[i] = passes.get(i);
         for (int i = 0; i < started.length; i++) {
-            while (passes.get(i) <= started[i] && !done.get())
+            while (passes.get(i) <= started[i] && !done.get()) {
+                if (readers.get(i).isDone())
+                    readers.get(i).get();
                 Thread.sleep(1);
+            }
         }
     }
 
