@@ -27,6 +27,10 @@ import java.util.Map;
  * <p>
  * A hold is not tracked by the stale-reference detector and does not depend on garbage collection: it keeps its version
  * until {@link #close()}. Obtain one with {@link HollowConsumer#holdVersion(long)}.
+ * <p>
+ * A hold reads the state engine it was taken on. A double snapshot loads the data into a new state engine, and holds
+ * taken before it keep reading the old one, which applies no more deltas and stays in memory while any of them is
+ * referenced.
  */
 public interface HollowVersionHold extends AutoCloseable {
 
@@ -86,7 +90,9 @@ public interface HollowVersionHold extends AutoCloseable {
     /**
      * Releases the version. The release takes effect at the next delta, without tracking readers: everything read
      * through the hold, including objects created after the close, stays correct until the second delta after the
-     * close. Later reads go to the state engine and are logged as errors. Closing more than once has no further effect.
+     * close. Later reads go to the state engine and are logged as errors. A state engine that a double snapshot
+     * replaced applies no more deltas, so reads through its holds stay correct. Closing more than once has no further
+     * effect.
      */
     @Override
     void close();

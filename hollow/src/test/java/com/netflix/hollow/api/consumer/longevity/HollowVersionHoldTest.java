@@ -18,6 +18,7 @@ package com.netflix.hollow.api.consumer.longevity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -35,7 +36,9 @@ import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.test.generated.AwardsAPI;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
@@ -483,6 +486,64 @@ public class HollowVersionHoldTest {
         assertEquals((long) versions.get(2), consumer.getCurrentVersionId());
         fixture.assertReads(versions.get(0), hold.getDataAccess());
         fixture.assertReads(versions.get(2), next.getDataAccess());
+    }
+
+    @Test
+    public void holdsKeepTheirStateEngineAcrossADoubleSnapshot() {
+        List<Long> versions = fixture.cycles(10);
+        HollowConsumer consumer = fixture.heldConsumer();
+        consumer.triggerRefreshTo(versions.get(0));
+        HollowVersionHold behind = consumer.holdVersion(versions.get(0));
+        consumer.triggerRefreshTo(versions.get(2));
+        HollowVersionHold atEngine = consumer.holdVersion(versions.get(2));
+        HollowReadStateEngine engine = consumer.getStateEngine();
+        consumer.forceDoubleSnapshotNextUpdate();
+
+        HollowVersionHold next = consumer.holdVersion(versions.get(4)); // takes the double snapshot
+        consumer.triggerRefreshTo(versions.get(7)); // the new engine runs ahead
+
+        assertNotSame(engine, consumer.getStateEngine());
+        fixture.assertReads(versions.get(2), engine); // which applies no more deltas
+        for (HollowVersionHold hold : Arrays.asList(behind, atEngine, next)) {
+            fixture.assertReads(hold.getVersion(), hold.getDataAccess());
+            fixture.assertPopulated(hold);
+            assertEquals(fixture.reference(hold.getVersion()).getHeaderTags(), hold.getHeaderTags());
+        }
+        fixture.assertDiff(versions.subList(0, 3), atEngine.diffFrom(behind));
+
+        behind.close();
+        atEngine.close();
+        consumer.triggerRefreshTo(versions.get(9)); // two deltas, of another engine
+
+        fixture.assertReads(versions.get(0), behind.getDataAccess());
+        fixture.assertReads(versions.get(2), atEngine.getDataAccess());
+        assertTrue(problems.isEmpty());
+        fixture.assertReads(versions.get(4), next.getDataAccess());
+    }
+
+    @Test
+    public void aReplacedStateEngineStaysOnlyWhileItsHoldsAreReferenced() throws InterruptedException {
+        List<Long> versions = fixture.cycles(2);
+        HollowConsumer consumer = fixture.heldConsumer();
+        consumer.triggerRefreshTo(versions.get(0));
+        HollowVersionHold served = consumer.holdVersion(versions.get(0));
+        WeakReference<HollowReadStateEngine> engine = new WeakReference<>(consumer.getStateEngine());
+        consumer.forceDoubleSnapshotNextUpdate();
+        HollowVersionHold next = consumer.holdVersion(versions.get(1));
+
+        System.gc();
+        assertNotNull(engine.get());
+        fixture.assertReads(versions.get(0), served.getDataAccess());
+
+        served.close();
+        served = null;
+        for (int i = 0; i < 50 && engine.get() != null; i++) {
+            System.gc();
+            Thread.sleep(10);
+        }
+
+        assertNull("nothing else keeps the replaced engine", engine.get());
+        fixture.assertReads(versions.get(1), next.getDataAccess());
     }
 
     @Test(timeout = 120_000)

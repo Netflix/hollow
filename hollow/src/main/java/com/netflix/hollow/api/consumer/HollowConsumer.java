@@ -334,8 +334,10 @@ public class HollowConsumer {
      * <p>
      * The current version, and any version the state engine applied since the oldest open hold, is held at once,
      * without transitions. Any other version is refreshed to first, on the calling thread, under the normal update
-     * plan: deltas, or a double snapshot when the deltas are too many or missing. A hold takes only a version, so a
-     * pinned version is held like any other.
+     * plan: deltas, or a double snapshot when the deltas are too many or missing, after which holds taken before it
+     * keep reading the state engine it replaced. If no transition lands on the version, that refresh still applies;
+     * after a double snapshot the new state engine then has no hold, and until the next one its refreshes behave as
+     * before the first hold.
      * <p>
      * This is a blocking call when it refreshes.
      *
@@ -951,11 +953,11 @@ public class HollowConsumer {
          * Version holds: {@link HollowConsumer#holdVersion(long)} keeps a version readable, exactly, until the hold is closed.
          * {@link HollowConsumer#getAPI()} is the state engine's own API, valid until the next refresh, as with {@link #off()}.
          * <p>
-         * While a hold is open, every other refresh moves the state engine under Hollow's normal plan, ahead of the
-         * holds or back, but never applies a snapshot: a refresh that needs one fails, and the next hold that needs a
-         * refresh takes it. A refresh that fails before applying anything, such as when an announcement arrives before
-         * its delta is visible, forces no double snapshot, so the next refresh retries the delta. These refreshes stop
-         * {@link HeldVersionsConfig#maxDeltasPastOldestHold()} deltas past the oldest open hold.
+         * While the state engine has an open hold, every other refresh moves it under Hollow's normal plan, ahead of
+         * the holds or back, but never applies a snapshot: a refresh that needs one fails, and the next hold that needs
+         * a refresh takes it. A refresh that fails before applying anything, such as when an announcement arrives
+         * before its delta is visible, forces no double snapshot, so the next refresh retries the delta. These
+         * refreshes stop {@link HeldVersionsConfig#maxDeltasPastOldestHold()} deltas past the oldest open hold.
          *
          * @param config held mode's settings
          * @return held mode

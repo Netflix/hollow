@@ -50,8 +50,9 @@ import java.util.logging.Logger;
 
 /**
  * Held mode's bookkeeping for one state engine: its holds, and for each delta applied since the oldest of them, copies
- * of the records it removed, its added and removed ordinals and its version's header tags. Public only for the
- * consumer's data holder and updater; not an API.
+ * of the records it removed, its added and removed ordinals and its version's header tags. A double snapshot starts
+ * new bookkeeping for the new engine; the replaced engine's holds keep this one, which records no more deltas. Public
+ * only for the consumer's data holder and updater; not an API.
  * <p>
  * A position counts the deltas the engine has applied since its snapshot, so it follows apply order, which a reverse
  * delta does not reverse. A hold at a position reads the copies of every later delta, in apply order, and then the
