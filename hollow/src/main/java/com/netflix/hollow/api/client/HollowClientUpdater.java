@@ -178,10 +178,10 @@ public class HollowClientUpdater {
     }
 
     /*
-     * In held mode, while a hold is open, a refresh other than a hold's is a background refresh. It never applies a
-     * snapshot: it leaves one to the next hold, as a forced double snapshot. One that fails before applying anything,
-     * such as when an announcement arrives before its delta is visible, forces nothing, so the next refresh retries.
-     * At the lead limit it does nothing.
+     * In held mode, while the state engine has an open hold, a refresh other than a hold's is a background refresh. It
+     * never applies a snapshot: it leaves one to the next hold, as a forced double snapshot. One that fails before
+     * applying anything, such as when an announcement arrives before its delta is visible, forces nothing, so the next
+     * refresh retries. At the lead limit it does nothing.
      */
     private boolean updateTo(HollowConsumer.VersionInfo requestedVersionInfo, boolean holdRequest) throws Throwable {
         HollowDataHolder held = hollowDataHolderVolatile;
