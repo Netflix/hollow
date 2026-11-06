@@ -21,9 +21,11 @@ import com.netflix.hollow.api.client.StackTraceRecorder;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.longevity.HollowVersionDiff;
 import com.netflix.hollow.api.consumer.longevity.HollowVersionHold;
+import com.netflix.hollow.api.consumer.longevity.LongevityStats;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
+import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -32,6 +34,7 @@ import com.netflix.hollow.core.util.IntMap;
 import com.netflix.hollow.core.util.RemovedOrdinalIterator;
 import com.netflix.hollow.tools.history.HollowHistoricalStateCreator;
 import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
+import com.netflix.hollow.tools.history.HollowHistoricalTypeDataAccess;
 import com.netflix.hollow.tools.history.IntMapOrdinalRemapper;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,12 +42,14 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,7 +66,7 @@ import java.util.logging.Logger;
  * <p>
  * Holds and deltas change under the {@link com.netflix.hollow.api.client.HollowClientUpdater}'s lock, and each delta is applied under this object's
  * monitor too. A hold's populated ordinals are computed under the monitor, diffs read {@link #published}, and reads
- * take no lock.
+ * and {@link #stats()} take no lock.
  */
 public final class HeldVersions {
     private static final Logger LOG = Logger.getLogger(HeldVersions.class.getName());
@@ -70,21 +75,25 @@ public final class HeldVersions {
     private final HollowReadStateEngine stateEngine;
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
     private final HollowConsumer.HeldVersionsConfig config;
-    private final List<Hold> holds = new ArrayList<>(); // open, and closed ones whose reads are still exact
+    private final Counts counts;
+    private final List<Hold> holds = new CopyOnWriteArrayList<>(); // open, and closed ones whose reads are still exact
     private final List<Delta> deltas = new ArrayList<>(); // in apply order, every delta after the earliest hold
     private volatile List<Delta> published = Collections.emptyList(); // a copy of deltas, for diffs
-    private long position;
+    private volatile long position;
     private long version = HollowConstants.VERSION_NONE;
     private boolean copyNextDelta;
     private boolean copiesFailed;
     private boolean applying; // the engine may have moved past what this records
-    private DirectLookup lookup; // null while direct lookup is off
+    private volatile DirectLookup lookup; // null while direct lookup is off
+    private volatile long retainedCopyBytes;
+    private volatile int directLookupOrdinals;
 
     public HeldVersions(HollowReadStateEngine stateEngine, HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
-            HollowConsumer.HeldVersionsConfig config) {
+            HollowConsumer.HeldVersionsConfig config, Counts counts) {
         this.stateEngine = stateEngine;
         this.doubleSnapshotConfig = doubleSnapshotConfig;
         this.config = config;
+        this.counts = counts;
         readDirectLookupGuard();
     }
 
@@ -104,6 +113,7 @@ public final class HeldVersions {
                     hold.dataAccess.setDataAccess(deltaAt(hold.position + 1).copy);
             }
         }
+        directLookupOrdinals = lookup == null ? 0 : lookup.ordinals();
     }
 
     /** @return whether a hold is open, which makes every refresh other than a hold's a background refresh */
@@ -120,12 +130,37 @@ public final class HeldVersions {
      * past the oldest open hold, which stops background refreshes; the limit is read at every call
      */
     public boolean atLeadLimit() {
-        long oldest = Long.MAX_VALUE;
+        Hold oldest = oldestOpenHold();
+        return oldest != null && position - oldest.position >= config.maxDeltasPastOldestHold();
+    }
+
+    /** @return the deltas, forward and reverse, the state engine has applied since its snapshot */
+    public long getPosition() {
+        return position;
+    }
+
+    /** @return this state engine's holds and copies, with the consumer's counts; takes no lock */
+    public LongevityStats stats() {
+        Hold oldest = oldestOpenHold();
+        return new Stats(retainedCopyBytes, directLookupOrdinals, counts.openHolds.get(),
+                oldest == null ? HollowConstants.VERSION_NONE : oldest.version,
+                oldest == null ? 0 : (int) (position - oldest.position), lookup != null,
+                counts.readsAfterRelease.sum());
+    }
+
+    /** @return the stats of a held-mode consumer that has no state engine yet */
+    public static LongevityStats unloaded(Counts counts) {
+        return new Stats(0, 0, counts.openHolds.get(), HollowConstants.VERSION_NONE, 0, false,
+                counts.readsAfterRelease.sum());
+    }
+
+    private Hold oldestOpenHold() {
+        Hold oldest = null;
         for (Hold hold : holds) {
-            if (!hold.closed)
-                oldest = Math.min(oldest, hold.position);
+            if (!hold.closed && (oldest == null || hold.position < oldest.position))
+                oldest = hold;
         }
-        return oldest != Long.MAX_VALUE && position - oldest >= config.maxDeltasPastOldestHold();
+        return oldest;
     }
 
     public void snapshotLoaded(long version) {
@@ -184,6 +219,7 @@ public final class HeldVersions {
                 delta = new Delta(position, toVersion, stateEngine);
                 deltas.add(delta); // even if copying fails: holds that read the engine still need its records
                 delta.copy = new HollowHistoricalStateCreator(null).createBasedOnNewDelta(toVersion, stateEngine);
+                delta.copyBytes = footprint(delta.copy);
                 if (lookup != null)
                     lookup.index(position, delta.copy, delta.removed);
             } catch (RuntimeException | Error e) {
@@ -198,15 +234,16 @@ public final class HeldVersions {
                 last.copy.setNextState(delta.copy);
         }
 
-        for (Iterator<Hold> it = holds.iterator(); it.hasNext(); ) {
-            Hold hold = it.next();
+        List<Hold> released = new ArrayList<>();
+        for (Hold hold : holds) {
             if (hold.releasedAt >= 0 && hold.releasedAt < position) {
                 hold.dataAccess.setDataAccess(releasedView(hold.version));
-                it.remove();
+                released.add(hold);
             } else if (delta != null && hold.position == previous) {
                 hold.dataAccess.setDataAccess(behind(previous));
             }
         }
+        holds.removeAll(released);
         long earliest = Long.MAX_VALUE;
         for (Hold hold : holds)
             earliest = Math.min(earliest, hold.position);
@@ -216,6 +253,24 @@ public final class HeldVersions {
                 lookup.prune(pruned.position, pruned.removed);
         }
         published = new ArrayList<>(deltas);
+        long bytes = 0;
+        for (Delta kept : deltas)
+            bytes += kept.copyBytes;
+        retainedCopyBytes = bytes;
+        directLookupOrdinals = lookup == null ? 0 : lookup.ordinals();
+    }
+
+    /** The approximate heap footprint of a delta's copies. */
+    private static long footprint(HollowHistoricalStateDataAccess copy) {
+        long bytes = 0;
+        for (String type : copy.getAllTypes()) {
+            HollowTypeDataAccess copied = copy.getTypeDataAccess(type);
+            if (copied instanceof HollowHistoricalTypeDataAccess) {
+                HollowTypeReadState records = ((HollowHistoricalTypeDataAccess) copied).getRemovedRecords();
+                bytes += records.getApproximateHeapFootprintInBytes();
+            }
+        }
+        return bytes;
     }
 
     /** What a hold behind the engine reads: direct lookup if it indexed every later delta, else the chain of copies. */
@@ -226,16 +281,18 @@ public final class HeldVersions {
     /**
      * Holds {@code version} if it is the engine's, or the engine applied it since the oldest open hold.
      *
+     * @param transitionsApplied the transitions the hold request applied to reach the version
      * @return the hold, or null if holding the version needs a refresh
      */
-    public HollowVersionHold hold(long version) {
+    public HollowVersionHold hold(long version, int transitionsApplied) {
         requireNoDeltaApplying();
         long at = positionOf(version);
         if (at < 0)
             return null;
-        Hold hold = new Hold(this, version, at, headerTagsAt(at));
+        Hold hold = new Hold(this, version, at, headerTagsAt(at), transitionsApplied);
         hold.dataAccess.setDataAccess(at == position ? stateEngine : behind(at));
         holds.add(hold);
+        counts.openHolds.incrementAndGet();
         return hold;
     }
 
@@ -327,11 +384,7 @@ public final class HeldVersions {
             return position;
         if (copiesFailed)
             return -1;
-        Hold oldest = null;
-        for (Hold hold : holds) {
-            if (!hold.closed && (oldest == null || hold.position < oldest.position))
-                oldest = hold;
-        }
+        Hold oldest = oldestOpenHold();
         if (oldest == null)
             return -1;
         for (int i = deltas.size() - 1; i >= 0 && deltas.get(i).position > oldest.position; i--) {
@@ -367,7 +420,7 @@ public final class HeldVersions {
         HollowHistoricalStateDataAccess view = new HollowHistoricalStateDataAccess(null, version, stateEngine,
                 stateEngine.getTypeStates(), nothingCopied, Collections.emptyMap());
         view.setNextState(stateEngine);
-        view.setStackTraceRecorder(new ReadsAfterRelease(version));
+        view.setStackTraceRecorder(new ReadsAfterRelease(version, counts.readsAfterRelease));
         return view;
     }
 
@@ -384,6 +437,7 @@ public final class HeldVersions {
         final Map<String, int[]> removed = new HashMap<>(); // ascending, for each type the delta changed
         final Map<String, int[]> added = new HashMap<>();
         HollowHistoricalStateDataAccess copy; // null only if copying failed: the engine applies no more deltas
+        long copyBytes;
 
         Delta(long position, long toVersion, HollowReadStateEngine stateEngine) {
             this.position = position;
@@ -482,14 +536,17 @@ public final class HeldVersions {
         private final HeldDataAccess dataAccess;
         private final ConcurrentHashMap<Class<?>, HollowAPI> apis = new ConcurrentHashMap<>();
         private final ConcurrentHashMap<String, BitSet> populated = new ConcurrentHashMap<>();
+        private final int transitionsApplied;
         private volatile boolean closed;
         private long releasedAt = -1;
 
-        private Hold(HeldVersions owner, long version, long position, Map<String, String> headerTags) {
+        private Hold(HeldVersions owner, long version, long position, Map<String, String> headerTags,
+                int transitionsApplied) {
             this.owner = owner;
             this.version = version;
             this.position = position;
             this.headerTags = headerTags;
+            this.transitionsApplied = transitionsApplied;
             this.dataAccess = new HeldDataAccess(this);
         }
 
@@ -546,27 +603,113 @@ public final class HeldVersions {
         }
 
         @Override
-        public void close() {
-            closed = true;
+        public int getDeltasBehindEngine() {
+            return (int) (owner.position - position);
+        }
+
+        @Override
+        public int getTransitionsApplied() {
+            return transitionsApplied;
+        }
+
+        @Override
+        public synchronized void close() {
+            if (!closed) {
+                closed = true;
+                owner.counts.openHolds.decrementAndGet();
+            }
         }
     }
 
-    /** Logs the first read through a released hold, with its stack trace. */
+    /** Counts the reads through a released hold, and logs the first with its stack trace. */
     private static final class ReadsAfterRelease extends StackTraceRecorder {
         private final long version;
+        private final LongAdder reads;
         private final AtomicBoolean logged = new AtomicBoolean();
 
-        ReadsAfterRelease(long version) {
+        ReadsAfterRelease(long version, LongAdder reads) {
             super(0);
             this.version = version;
+            this.reads = reads;
         }
 
         @Override
         public void recordStackTrace(int omitFirstNFrames) {
+            reads.increment();
             if (logged.compareAndSet(false, true)) {
                 LOG.log(Level.SEVERE, "Read through the hold of version " + version + " after its release: it reads " +
                         "the engine's current version instead", new IllegalStateException("read after release"));
             }
+        }
+    }
+
+    /** What a consumer counts across its state engines, since holds outlive one that a double snapshot replaces. */
+    public static final class Counts {
+        private final AtomicInteger openHolds = new AtomicInteger();
+        private final LongAdder readsAfterRelease = new LongAdder();
+    }
+
+    private static final class Stats implements LongevityStats {
+        private final long retainedCopyBytes;
+        private final int directLookupOrdinals;
+        private final int openHolds;
+        private final long oldestHoldVersion;
+        private final int deltasPastOldestHold;
+        private final boolean directLookupActive;
+        private final long readsAfterRelease;
+
+        Stats(long retainedCopyBytes, int directLookupOrdinals, int openHolds, long oldestHoldVersion,
+                int deltasPastOldestHold, boolean directLookupActive, long readsAfterRelease) {
+            this.retainedCopyBytes = retainedCopyBytes;
+            this.directLookupOrdinals = directLookupOrdinals;
+            this.openHolds = openHolds;
+            this.oldestHoldVersion = oldestHoldVersion;
+            this.deltasPastOldestHold = deltasPastOldestHold;
+            this.directLookupActive = directLookupActive;
+            this.readsAfterRelease = readsAfterRelease;
+        }
+
+        @Override
+        public long getRetainedCopyBytes() {
+            return retainedCopyBytes;
+        }
+
+        @Override
+        public int getDirectLookupOrdinals() {
+            return directLookupOrdinals;
+        }
+
+        @Override
+        public int getOpenHolds() {
+            return openHolds;
+        }
+
+        @Override
+        public long getOldestHoldVersion() {
+            return oldestHoldVersion;
+        }
+
+        @Override
+        public int getDeltasPastOldestHold() {
+            return deltasPastOldestHold;
+        }
+
+        @Override
+        public boolean isDirectLookupActive() {
+            return directLookupActive;
+        }
+
+        @Override
+        public long getReadsAfterRelease() {
+            return readsAfterRelease;
+        }
+
+        @Override
+        public String toString() {
+            return "LongevityStats{retainedCopyBytes=" + retainedCopyBytes + ", directLookupOrdinals="
+                    + directLookupOrdinals + ", openHolds=" + openHolds + ", oldestHoldVersion=" + oldestHoldVersion
+                    + ", deltasPastOldestHold=" + deltasPastOldestHold + ", directLookupActive=" + directLookupActive
+                    + ", readsAfterRelease=" + readsAfterRelease + "}";
         }
     }
 }

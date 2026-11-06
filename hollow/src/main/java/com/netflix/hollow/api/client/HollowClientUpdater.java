@@ -18,8 +18,10 @@ package com.netflix.hollow.api.client;
 
 import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_SCHEMA_HASH;
 
+import com.netflix.hollow.api.client.longevity.HeldVersions;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.longevity.HollowVersionHold;
+import com.netflix.hollow.api.consumer.longevity.LongevityStats;
 import com.netflix.hollow.api.consumer.longevity.VersionNotReachableException;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
@@ -61,6 +63,7 @@ public class HollowClientUpdater {
     private final HollowObjectHashCodeFinder hashCodeFinder;
     private final MemoryMode memoryMode;
     private final HollowConsumer.ObjectLongevity objectLongevity;
+    private final HeldVersions.Counts heldCounts = new HeldVersions.Counts(); // across state engines
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
     private final HollowConsumerMetrics metrics;
     private final HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
@@ -320,15 +323,20 @@ public class HollowClientUpdater {
      * @throws Throwable if the refresh failed
      */
     public synchronized HollowVersionHold holdVersion(long version) throws Throwable {
-        if (objectLongevity.getMode() != HollowConsumer.ObjectLongevity.Mode.HELD)
-            throw new IllegalStateException("Version holds need held mode: withObjectLongevity(ObjectLongevity.held())");
+        requireHeldMode("Version holds");
         if (version == HollowConstants.VERSION_NONE || version == HollowConstants.VERSION_LATEST)
             throw new IllegalArgumentException("Not a version: " + version);
 
-        HollowVersionHold hold = tryHold(version);
+        HollowVersionHold hold = tryHold(version, 0);
         if (hold == null) {
+            HollowDataHolder before = hollowDataHolderVolatile;
+            long positionBefore = before == null ? 0 : before.getHeldVersions().getPosition();
             updateTo(new HollowConsumer.VersionInfo(version), true);
-            hold = tryHold(version);
+            HollowDataHolder after = hollowDataHolderVolatile;
+            long applied = after == null ? 0 : after == before // deltas, or a snapshot and the deltas after it
+                    ? after.getHeldVersions().getPosition() - positionBefore
+                    : 1 + after.getHeldVersions().getPosition();
+            hold = tryHold(version, (int) applied);
             if (hold == null)
                 throw new VersionNotReachableException("Cannot hold version " + version
                         + ": no transition lands on it, and the consumer is at " + getCurrentVersionId());
@@ -336,9 +344,24 @@ public class HollowClientUpdater {
         return hold;
     }
 
-    private HollowVersionHold tryHold(long version) {
+    private HollowVersionHold tryHold(long version, int transitionsApplied) {
         HollowDataHolder dataHolder = hollowDataHolderVolatile;
-        return dataHolder == null ? null : dataHolder.getHeldVersions().hold(version);
+        return dataHolder == null ? null : dataHolder.getHeldVersions().hold(version, transitionsApplied);
+    }
+
+    /**
+     * @return held mode's stats, read without the refresh lock
+     * @throws IllegalStateException if the consumer is not in held mode
+     */
+    public LongevityStats getLongevityStats() {
+        requireHeldMode("Longevity stats");
+        HollowDataHolder dataHolder = hollowDataHolderVolatile;
+        return dataHolder == null ? HeldVersions.unloaded(heldCounts) : dataHolder.getHeldVersions().stats();
+    }
+
+    private void requireHeldMode(String what) {
+        if (objectLongevity.getMode() != HollowConsumer.ObjectLongevity.Mode.HELD)
+            throw new IllegalStateException(what + " need held mode: withObjectLongevity(ObjectLongevity.held())");
     }
 
     public synchronized void addRefreshListener(HollowConsumer.RefreshListener refreshListener,
@@ -418,7 +441,7 @@ public class HollowClientUpdater {
     private HollowDataHolder newHollowDataHolder() {
         return new HollowDataHolder(newStateEngine(), apiFactory, memoryMode,
                 doubleSnapshotConfig, failedTransitionTracker,
-                staleReferenceDetector, objectLongevity)
+                staleReferenceDetector, objectLongevity, heldCounts)
                 .setFilter(filter)
                 .setSkipTypeShardUpdateWithNoAdditions(skipTypeShardUpdateWithNoAdditions);
     }

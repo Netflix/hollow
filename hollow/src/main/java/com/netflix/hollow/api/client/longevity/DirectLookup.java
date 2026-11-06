@@ -120,6 +120,14 @@ final class DirectLookup {
         return stateEngine;
     }
 
+    /** @return the ordinals, across types, that map to copies; read on the indexing thread */
+    int ordinals() {
+        int ordinals = 0;
+        for (TypeLookup lookup : types.values())
+            ordinals += lookup.size();
+        return ordinals;
+    }
+
     TypeLookup type(String type) {
         return types.computeIfAbsent(type, t -> new TypeLookup(stateEngine.getTypeState(t)));
     }
