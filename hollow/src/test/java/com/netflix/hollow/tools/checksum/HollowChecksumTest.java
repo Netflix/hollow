@@ -17,13 +17,26 @@
 package com.netflix.hollow.tools.checksum;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
+import com.netflix.hollow.core.write.HollowListTypeWriteState;
+import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowSetTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.IntPredicate;
 import org.junit.Assert;
 import org.junit.Before;
@@ -77,6 +90,45 @@ public class HollowChecksumTest {
 
         // Value produced by the pre-stride loop; the per-shard ordinal visit order must not change
         Assert.assertEquals(-1157511013, HollowChecksum.forStateEngine(readState).intValue());
+    }
+
+    @Test
+    public void shardedCollectionChecksumIsUnchanged() throws IOException {
+        HollowWriteStateEngine writeState = new HollowWriteStateEngine();
+        writeState.addTypeState(new HollowListTypeWriteState(new HollowListSchema("ListOfInteger", "Integer"), 8));
+        writeState.addTypeState(new HollowSetTypeWriteState(new HollowSetSchema("SetOfInteger", "Integer"), 8));
+        writeState.addTypeState(new HollowMapTypeWriteState(new HollowMapSchema("MapOfIntegerToInteger", "Integer", "Integer"), 8));
+        HollowObjectMapper mapper = new HollowObjectMapper(writeState);
+
+        addCollections(mapper, i -> true);
+        HollowReadStateEngine readState = StateEngineRoundTripper.roundTripSnapshot(writeState);
+
+        // Remove records via a delta so the populated ordinals have holes
+        writeState.prepareForNextCycle();
+        addCollections(mapper, i -> i % 7 != 3 && (i < 200 || i > 260));
+        StateEngineRoundTripper.roundTripDelta(writeState, readState);
+
+        // The per-shard ordinal visit order must not change
+        Assert.assertEquals(972248073, HollowChecksum.forStateEngine(readState).intValue());
+    }
+
+    private void addCollections(HollowObjectMapper mapper, IntPredicate include) {
+        for(int i=0;i<1000;i++) {
+            if(include.test(i))
+                mapper.add(new CollectionHolder(i));
+        }
+    }
+
+    static class CollectionHolder {
+        List<Integer> list;
+        Set<Integer> set;
+        Map<Integer, Integer> map;
+
+        CollectionHolder(int i) {
+            list = Arrays.asList(i, i + 1, i + 2);
+            set = new HashSet<>(Arrays.asList(i, i + 1));
+            map = Collections.singletonMap(i, i + 1);
+        }
     }
 
     private void addRecords(HollowWriteStateEngine writeState, HollowObjectSchema schema, IntPredicate include) {
