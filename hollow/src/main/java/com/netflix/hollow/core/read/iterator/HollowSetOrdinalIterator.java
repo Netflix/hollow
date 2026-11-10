@@ -30,9 +30,17 @@ public class HollowSetOrdinalIterator implements HollowOrdinalIterator {
     private int currentBucket = -1;
 
     public HollowSetOrdinalIterator(int setOrdinal, HollowSetTypeDataAccess dataAccess) {
+        this(setOrdinal, dataAccess, HashCodes.hashTableSize(dataAccess.size(setOrdinal)));
+    }
+
+    protected HollowSetOrdinalIterator() {
+        this(-1, null, 0);
+    }
+
+    private HollowSetOrdinalIterator(int setOrdinal, HollowSetTypeDataAccess dataAccess, int numBuckets) {
         this.setOrdinal = setOrdinal;
         this.dataAccess = dataAccess;
-        this.numBuckets = HashCodes.hashTableSize(dataAccess.size(setOrdinal));
+        this.numBuckets = numBuckets;
     }
 
     @Override
