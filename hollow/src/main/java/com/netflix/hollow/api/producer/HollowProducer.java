@@ -16,8 +16,6 @@
  */
 package com.netflix.hollow.api.producer;
 
-import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
-
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.api.metrics.HollowProducerMetrics;
@@ -264,16 +262,9 @@ public class HollowProducer extends AbstractHollowProducer {
      * @param config specifies what criteria to use to determine whether a compaction is necessary
      * @return the version identifier of the produced state, or AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE if compaction was unnecessary.
      */
+    @Override
     public long runCompactionCycle(HollowCompactor.CompactionConfig config) {
-        if (config != null && readStates.hasCurrent()) {
-            final HollowCompactor compactor = new HollowCompactor(getWriteEngine(),
-                    readStates.current().getStateEngine(), config);
-            if (compactor.needsCompaction()) {
-                return runCycle(newState -> compactor.compact());
-            }
-        }
-
-        return NO_ANNOUNCEMENT_AVAILABLE;
+        return super.runCompactionCycle(config);
     }
 
     /**
@@ -1151,6 +1142,19 @@ public class HollowProducer extends AbstractHollowProducer {
         // @@@ Should this be marked as synchronized?
         public long runIncrementalCycle(Incremental.IncrementalPopulator task) {
             return runCycle(task, null);
+        }
+
+        /**
+         * Run a compaction cycle, will produce a data state with exactly the same data as currently, but
+         * reorganized so that ordinal holes are filled.  This may need to be run multiple times to arrive
+         * at an optimal state.
+         *
+         * @param config specifies what criteria to use to determine whether a compaction is necessary
+         * @return the version identifier of the produced state, or AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE if compaction was unnecessary.
+         */
+        @Override
+        public long runCompactionCycle(HollowCompactor.CompactionConfig config) {
+            return super.runCompactionCycle(config);
         }
 
         /**
