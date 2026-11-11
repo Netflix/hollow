@@ -14,5 +14,5 @@ dependencies {
     implementation "javax.servlet:javax.servlet-api:4.0.1"
 
     testImplementation 'junit:junit:4.11'
-    testImplementation 'org.mockito:mockito-core:2.15.0'
+    testImplementation 'org.mockito:mockito-core:4.11.0'
 }

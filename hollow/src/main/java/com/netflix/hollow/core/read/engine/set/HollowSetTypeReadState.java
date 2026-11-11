@@ -104,13 +104,14 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     @Override
     public void readSnapshot(HollowBlobInput in, ArraySegmentRecycler memoryRecycler, int numShards) throws IOException {
+        verifyRecyclerForImmutableShards(memoryRecycler);
         if(numShards > 1)
             maxOrdinal = VarInt.readVInt(in);
 
         HollowSetTypeReadStateShard[] newShards = new HollowSetTypeReadStateShard[numShards];
         int shardOrdinalShift = 31 - Integer.numberOfLeadingZeros(numShards);
         for(int i=0; i<numShards; i++) {
-            HollowSetTypeDataElements shardDataElements = new HollowSetTypeDataElements(memoryMode, memoryRecycler);
+            HollowSetTypeDataElements shardDataElements = new HollowSetTypeDataElements(configurationFor(memoryRecycler));
             shardDataElements.readSnapshot(in);
             newShards[i] = new HollowSetTypeReadStateShard(shardDataElements, shardOrdinalShift);
         }
@@ -124,11 +125,12 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
     @Override
     public void applyDelta(HollowBlobInput in, HollowSchema schema, ArraySegmentRecycler memoryRecycler, int deltaNumShards) throws IOException {
+        verifyRecyclerForImmutableShards(memoryRecycler);
         if(shardsVolatile.shards.length > 1)
             maxOrdinal = VarInt.readVInt(in);
 
         for(int i=0;i<shardsVolatile.shards.length;i++) {
-            HollowSetTypeDataElements deltaData = new HollowSetTypeDataElements(memoryMode, memoryRecycler);
+            HollowSetTypeDataElements deltaData = new HollowSetTypeDataElements(configurationFor(memoryRecycler));
             deltaData.readDelta(in);
             if(stateEngine.isSkipTypeShardUpdateWithNoAdditions() && deltaData.encodedAdditions.isEmpty()) {
 
@@ -150,7 +152,7 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
 
                 deltaData.encodedAdditions.destroy();
             } else {
-                HollowSetTypeDataElements nextData = new HollowSetTypeDataElements(memoryMode, memoryRecycler);
+                HollowSetTypeDataElements nextData = new HollowSetTypeDataElements(configurationFor(memoryRecycler));
                 HollowSetTypeDataElements oldData = shardsVolatile.shards[i].dataElements;
                 nextData.applyDelta(oldData, deltaData);
 
@@ -333,6 +335,9 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
     }
 
     private boolean readWasUnsafe(HollowSetTypeShardsHolder shardsHolder, int ordinal, HollowSetTypeReadStateShard shard) {
+        if(useShardReadFastPaths && shardsAreImmutable)
+            return false;
+
         HollowUnsafeHandle.getUnsafe().loadFence();
         HollowSetTypeShardsHolder currShardsHolder = shardsVolatile;
         return shardsHolder != currShardsHolder

@@ -1,6 +1,10 @@
 package com.netflix.hollow.core.read.engine.object;
 
+import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.read.engine.ExperimentalFeature;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -41,12 +45,16 @@ public class HollowObjectTypeReadStateShardBenchmark {
     int countStringsDb;
 
     ArrayList<Integer> readOrder;
+    ArrayList<String> strings;
 
     @Param({ "5", "25", "50", "150", "1000" })
     int maxStringLength;
 
     @Param({ "10" })
     int probabilityUnicode;
+
+    @Param({ "false", "true" })
+    boolean directSegmentStrings;
 
     @Setup
     public void setUp() throws IOException {
@@ -55,6 +63,7 @@ public class HollowObjectTypeReadStateShardBenchmark {
         objectMapper.initializeTypeState(String.class);
 
         Random r = new Random();
+        strings = new ArrayList<>(countStringsDb);
         for (int i = 0; i < countStringsDb; i++) {
             StringBuilder sb = new StringBuilder();
             sb.append("string_");
@@ -68,7 +77,9 @@ public class HollowObjectTypeReadStateShardBenchmark {
                     sb.append((char) (r.nextInt(26) + 'a'));
                 }
             }
-            objectMapper.add(sb.toString());
+            String value = sb.toString();
+            objectMapper.add(value);
+            strings.add(value);
         }
 
         readOrder = new ArrayList<>(countStrings);
@@ -76,7 +87,10 @@ public class HollowObjectTypeReadStateShardBenchmark {
             readOrder.add(r.nextInt(countStringsDb));
         }
 
-        readStateEngine = new HollowReadStateEngine();
+        readStateEngine = new HollowReadStateEngine(new HollowReadConfiguration(MemoryMode.ON_HEAP,
+                WastefulRecycler.DEFAULT_INSTANCE, directSegmentStrings
+                ? new ExperimentalFeature[] { ExperimentalFeature.SHARD_READ_FAST_PATHS, ExperimentalFeature.DIRECT_SEGMENT_STRING_READS }
+                : new ExperimentalFeature[] { ExperimentalFeature.SHARD_READ_FAST_PATHS }));
 
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine, null);
         dataAccess = (HollowObjectTypeDataAccess) readStateEngine.getTypeDataAccess("String", 0);
@@ -88,6 +102,13 @@ public class HollowObjectTypeReadStateShardBenchmark {
             String result = dataAccess.readString(j, 0);
             //System.out.println(result);
             bh.consume(result);
+        }
+    }
+
+    @Benchmark
+    public void testStringEquality(Blackhole bh) {
+        for (int j : readOrder) {
+            bh.consume(dataAccess.isStringFieldEqual(j, 0, strings.get(j)));
         }
     }
 }

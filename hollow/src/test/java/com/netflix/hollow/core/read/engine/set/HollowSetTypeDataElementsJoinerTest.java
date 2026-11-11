@@ -150,7 +150,7 @@ public class HollowSetTypeDataElementsJoinerTest extends AbstractHollowSetTypeDa
         assertEquals(2, c.getStateEngine().getTypeState("TestSet").numShards()); // ghost records accounted for in shard size, shards not joined yet
 
         // v2 snapshot was also serialized with same numShards as delta
-        HollowReadStateEngine testSnapshot = new HollowReadStateEngine();
+        HollowReadStateEngine testSnapshot = newReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(testSnapshot);
         reader.readSnapshot(blobStore.retrieveSnapshotBlob(v2).getInputStream());
         assertEquals(c.getStateEngine().getTypeState("TestSet").numShards(), testSnapshot.getTypeState("TestSet").numShards());

@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class AbstractHollowMapTypeDataElementsSplitJoinTest extends AbstractHollowTypeDataElementsSplitJoinTest {
+public abstract class AbstractHollowMapTypeDataElementsSplitJoinTest extends AbstractHollowTypeDataElementsSplitJoinTest {
     protected HollowMapSchema mapSchema;
 
     @Mock

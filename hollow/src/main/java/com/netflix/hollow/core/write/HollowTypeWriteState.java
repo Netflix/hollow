@@ -671,11 +671,7 @@ public abstract class HollowTypeWriteState {
      * For e.g. Movie:(2,4) Actor:(8,4)
      */
     protected void addReshardingHeader(int prevNumShards, int newNumShards) {
-        String existing = stateEngine.getHeaderTag(HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED);
-        String appendTo = "";
-        if (existing != null) {
-            appendTo = existing + " ";
-        }
-        stateEngine.addHeaderTag(HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED, appendTo + schema.getName() + ":(" + prevNumShards + "," + newNumShards + ")");
+        stateEngine.appendHeaderTag(HollowStateEngine.HEADER_TAG_TYPE_RESHARDING_INVOKED,
+                schema.getName() + ":(" + prevNumShards + "," + newNumShards + ")");
     }
 }

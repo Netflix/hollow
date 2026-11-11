@@ -27,7 +27,7 @@ public class HollowObjectTypeDataElementsJoiner extends HollowTypeDataElementsJo
 
     @Override
     public void initToElements() {
-        this.to = new HollowObjectTypeDataElements(schema, from[0].memoryMode, from[0].memoryRecycler);
+        this.to = new HollowObjectTypeDataElements(schema, from[0].readConfiguration);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class HollowObjectTypeDataElementsJoiner extends HollowTypeDataElementsJo
     public void copyRecords() {
         long[] currentWriteVarLengthDataPointers = new long[from[0].schema.numFields()];
 
-        to.fixedLengthData = FixedLengthDataFactory.get((long)to.bitsPerRecord * (to.maxOrdinal + 1), to.memoryMode, to.memoryRecycler);
+        to.fixedLengthData = FixedLengthDataFactory.get((long)to.bitsPerRecord * (to.maxOrdinal + 1), to.readConfiguration);
 
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;

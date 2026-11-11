@@ -18,6 +18,7 @@ package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.HollowStateEngine;
+import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.memory.pool.GarbageCollectorAwareRecycler;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
@@ -40,6 +41,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -55,6 +57,7 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     private final Map<String, List<HollowTypeStateListener>> listeners;
     private final HollowObjectHashCodeFinder hashCodeFinder;
     private final boolean listenToAllPopulatedOrdinals;
+    private final HollowReadConfiguration readConfiguration;
     private boolean skipTypeShardUpdateWithNoAdditions;
     private ArraySegmentRecycler memoryRecycler;
     private Map<String,String> headerTags;
@@ -77,6 +80,10 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
         this(DefaultHashCodeFinder.INSTANCE, true, recycler);
     }
 
+    public HollowReadStateEngine(HollowReadConfiguration readConfiguration) {
+        this(DefaultHashCodeFinder.INSTANCE, true, readConfiguration);
+    }
+
     public HollowReadStateEngine(boolean listenToAllPopulatedOrdinals, ArraySegmentRecycler recycler) {
         this(DefaultHashCodeFinder.INSTANCE, listenToAllPopulatedOrdinals, recycler);
     }
@@ -88,10 +95,16 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
 
     @Deprecated
     public HollowReadStateEngine(HollowObjectHashCodeFinder hashCodeFinder, boolean listenToAllPopulatedOrdinals, ArraySegmentRecycler recycler) {
+        this(hashCodeFinder, listenToAllPopulatedOrdinals, new HollowReadConfiguration(MemoryMode.ON_HEAP, recycler));
+    }
+
+    public HollowReadStateEngine(HollowObjectHashCodeFinder hashCodeFinder, boolean listenToAllPopulatedOrdinals,
+                                 HollowReadConfiguration readConfiguration) {
+        this.readConfiguration = Objects.requireNonNull(readConfiguration);
         this.typeStates = new HashMap<String, HollowTypeReadState>();
         this.listeners = new HashMap<String, List<HollowTypeStateListener>>();
         this.hashCodeFinder = hashCodeFinder;
-        this.memoryRecycler = recycler;
+        this.memoryRecycler = readConfiguration.getMemoryRecycler();
         this.listenToAllPopulatedOrdinals = listenToAllPopulatedOrdinals;
     }
 
@@ -221,6 +234,14 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
 
     public Collection<HollowTypeReadState> getTypeStates() {
         return typeStates.values();
+    }
+
+    public HollowReadConfiguration getReadConfiguration() {
+        return readConfiguration;
+    }
+
+    public boolean isExperimentalFeatureEnabled(ExperimentalFeature feature) {
+        return readConfiguration.isExperimentalFeatureEnabled(feature);
     }
 
     public ArraySegmentRecycler getMemoryRecycler() {

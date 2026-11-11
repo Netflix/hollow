@@ -77,6 +77,13 @@ public class ThreadSafeBitSet {
         while(true) {
             // determine what the new long value will be after we set the appropriate bit.
             long currentLongValue = segment.get(longPosition);
+
+            // if the bit is already set there is nothing to do. Skipping the CAS here avoids taking the
+            // cache line exclusive when many threads repeatedly set the same bits, e.g. the populated-ordinals
+            // bitset of a small, frequently referenced type.
+            if((currentLongValue & mask) != 0)
+                return;
+
             long newLongValue = currentLongValue | mask;
 
             // if no other thread has modified the value since we read it, we won the race and we are done.
@@ -98,6 +105,11 @@ public class ThreadSafeBitSet {
         while(true) {
             // determine what the new long value will be after we set the appropriate bit.
             long currentLongValue = segment.get(longPosition);
+
+            // if the bit is already clear there is nothing to do; skip the CAS for the same reason as in set().
+            if((currentLongValue & ~mask) == 0)
+                return;
+
             long newLongValue = currentLongValue & mask;
 
             // if no other thread has modified the value since we read it, we won the race and we are done.

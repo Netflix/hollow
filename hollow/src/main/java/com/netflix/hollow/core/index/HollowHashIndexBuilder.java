@@ -52,11 +52,11 @@ public class HollowHashIndexBuilder {
 
     private GrowingSegmentedLongArray matchIndexHashAndSizeArray;
     private FixedLengthElementArray intermediateMatchHashTable;
-    private int intermediateMatchHashTableSize;
+    private long intermediateMatchHashTableSize;
     private int bitsPerIntermediateListIdentifier;
     private int bitsPerIntermediateMatchHashEntry;
-    private int intermediateMatchHashMask;
-    private int intermediateMatchHashTableSizeBeforeGrow;
+    private long intermediateMatchHashMask;
+    private long intermediateMatchHashTableSizeBeforeGrow;
     private int matchCount;
 
 
@@ -110,16 +110,16 @@ public class HollowHashIndexBuilder {
 
         /// an initial guess at how big this table might be -- one match per top-level element.
         int guessNumberOfMatches = populatedOrdinals.cardinality();
-        intermediateMatchHashTableSize = HashCodes.hashTableSize(guessNumberOfMatches);
+        intermediateMatchHashTableSize = HashCodes.indexHashTableSize(guessNumberOfMatches);
         bitsPerIntermediateListIdentifier =  bitsRequiredToRepresentValue(intermediateMatchHashTableSize - 1);
         bitsPerIntermediateMatchHashEntry = bitsPerMatchHashKey + bitsPerIntermediateListIdentifier;
 
         intermediateMatchHashMask = intermediateMatchHashTableSize - 1;
-        intermediateMatchHashTableSizeBeforeGrow = intermediateMatchHashTableSize * 7 / 10;
+        intermediateMatchHashTableSizeBeforeGrow = sizeBeforeGrow(intermediateMatchHashTableSize);
         matchCount = 0;
 
         /// a data structure which keeps canonical matches for comparison (the matchHashTable)
-        intermediateMatchHashTable = new FixedLengthElementArray(memoryRecycler, (long)intermediateMatchHashTableSize * bitsPerIntermediateMatchHashEntry);
+        intermediateMatchHashTable = new FixedLengthElementArray(memoryRecycler, intermediateMatchHashTableSize * bitsPerIntermediateMatchHashEntry);
 
         /// a data structure which tracks lists of matches under canonical matches.
         MultiLinkedElementArray intermediateSelectLists = new MultiLinkedElementArray(memoryRecycler);
@@ -182,7 +182,7 @@ public class HollowHashIndexBuilder {
         /// turn those data structures into a compact one optimized for hash lookup
         long totalNumberOfSelectBucketsAndBitsRequiredForSelectTableSize = calculateDedupedSizesAndTotalNumberOfSelectBuckets(intermediateSelectLists, matchIndexHashAndSizeArray);
         long totalNumberOfSelectBuckets = totalNumberOfSelectBucketsAndBitsRequiredForSelectTableSize & 0xFFFFFFFFFFFFFFL;
-        long totalNumberOfMatchBuckets = HashCodes.hashTableSize(matchCount);
+        long totalNumberOfMatchBuckets = HashCodes.indexHashTableSize(matchCount);
 
         int bitsPerFinalSelectBucketPointer = bitsRequiredToRepresentValue(totalNumberOfSelectBuckets);
         int bitsPerSelectTableSize = (int)(totalNumberOfSelectBucketsAndBitsRequiredForSelectTableSize >>> 56);
@@ -255,12 +255,24 @@ public class HollowHashIndexBuilder {
         this.finalMatchHashMask = finalMatchHashMask;
     }
 
+    static long sizeBeforeGrow(long hashTableSize) {
+        return hashTableSize * 7 / 10;
+    }
+
+    static long grownTableSize(long hashTableSize) {
+        if(hashTableSize > HollowConstants.INDEX_HASH_TABLE_MAX_SIZE) {
+            throw new IllegalStateException("cannot grow the intermediate match hash table beyond " + hashTableSize
+                    + " buckets; a hash index supports at most " + HollowConstants.INDEX_HASH_TABLE_MAX_SIZE + " matches");
+        }
+        return hashTableSize * 2;
+    }
+
     private void growIntermediateHashTable() {
-        int newMatchHashTableSize = intermediateMatchHashTableSize * 2;
-        int newMatchHashMask = newMatchHashTableSize - 1;
+        long newMatchHashTableSize = grownTableSize(intermediateMatchHashTableSize);
+        long newMatchHashMask = newMatchHashTableSize - 1;
         int newBitsForListIdentifier = bitsRequiredToRepresentValue(newMatchHashTableSize - 1);
         int newBitsPerMatchHashEntry = bitsPerMatchHashKey + newBitsForListIdentifier;
-        FixedLengthElementArray newMatchHashTable = new FixedLengthElementArray(memoryRecycler, (long)newMatchHashTableSize * newBitsPerMatchHashEntry);
+        FixedLengthElementArray newMatchHashTable = new FixedLengthElementArray(memoryRecycler, newMatchHashTableSize * newBitsPerMatchHashEntry);
 
         for(int j=0;j<matchCount;j++) {
             int rehashCode = (int)matchIndexHashAndSizeArray.get(j);
@@ -297,7 +309,7 @@ public class HollowHashIndexBuilder {
 
         intermediateMatchHashTable = newMatchHashTable;
         intermediateMatchHashTableSize = newMatchHashTableSize;
-        intermediateMatchHashTableSizeBeforeGrow = intermediateMatchHashTableSize * 7 / 10;
+        intermediateMatchHashTableSizeBeforeGrow = sizeBeforeGrow(intermediateMatchHashTableSize);
         bitsPerIntermediateListIdentifier = newBitsForListIdentifier;
         bitsPerIntermediateMatchHashEntry = newBitsPerMatchHashEntry;
         intermediateMatchHashMask = newMatchHashMask;

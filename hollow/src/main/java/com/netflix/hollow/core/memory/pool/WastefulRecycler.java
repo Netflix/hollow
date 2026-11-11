@@ -68,4 +68,9 @@ public class WastefulRecycler implements ArraySegmentRecycler {
         // do nothing
     }
 
+    @Override
+    public boolean recyclesArrays() {
+        return false;
+    }
+
 }

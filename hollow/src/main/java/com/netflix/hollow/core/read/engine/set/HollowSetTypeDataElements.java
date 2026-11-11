@@ -24,6 +24,7 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
 import com.netflix.hollow.core.read.engine.HollowTypeDataElements;
+import com.netflix.hollow.core.read.engine.HollowReadConfiguration;
 import java.io.IOException;
 
 /**
@@ -50,7 +51,11 @@ public class HollowSetTypeDataElements extends HollowTypeDataElements {
     }
 
     public HollowSetTypeDataElements(MemoryMode memoryMode, ArraySegmentRecycler memoryRecycler) {
-        super(memoryMode, memoryRecycler);
+        this(new HollowReadConfiguration(memoryMode, memoryRecycler));
+    }
+
+    public HollowSetTypeDataElements(HollowReadConfiguration readConfiguration) {
+        super(readConfiguration);
     }
 
     void readSnapshot(HollowBlobInput in) throws IOException {
@@ -76,8 +81,8 @@ public class HollowSetTypeDataElements extends HollowTypeDataElements {
         emptyBucketValue = (1 << bitsPerElement) - 1;
         totalNumberOfBuckets = VarInt.readVLong(in);
 
-        setPointerAndSizeData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
-        elementData = FixedLengthDataFactory.get(in, memoryMode, memoryRecycler);
+        setPointerAndSizeData = FixedLengthDataFactory.get(in, readConfiguration);
+        elementData = FixedLengthDataFactory.get(in, readConfiguration);
     }
 
     static void discardFromStream(HollowBlobInput in, int numShards, boolean isDelta) throws IOException {

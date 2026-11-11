@@ -16,7 +16,7 @@
  */
 package com.netflix.hollow.core.read.engine.list;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.FixedLengthDataFactory;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 
 /**
@@ -61,8 +61,12 @@ class HollowListDeltaApplicator {
         target.bitsPerListPointer = delta.bitsPerListPointer;
         target.bitsPerElement = delta.bitsPerElement;
 
-        target.listPointerData = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerListPointer);
-        target.elementData = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfElements * target.bitsPerElement);
+        target.listPointerData = FixedLengthDataFactory.get(
+                ((long) target.maxOrdinal + 1) * target.bitsPerListPointer,
+                target.readConfiguration);
+        target.elementData = FixedLengthDataFactory.get(
+                target.totalNumberOfElements * target.bitsPerElement,
+                target.readConfiguration);
 
         if(target.bitsPerListPointer == from.bitsPerListPointer
                 && target.bitsPerElement == from.bitsPerElement)

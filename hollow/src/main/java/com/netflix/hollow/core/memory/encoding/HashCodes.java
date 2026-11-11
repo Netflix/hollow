@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import static com.netflix.hollow.core.HollowConstants.HASH_TABLE_MAX_SIZE;
+import static com.netflix.hollow.core.HollowConstants.INDEX_HASH_TABLE_MAX_SIZE;
 
 import com.netflix.hollow.core.memory.ArrayByteData;
 import com.netflix.hollow.core.memory.ByteData;
@@ -197,5 +198,33 @@ public class HashCodes {
         int sizeAfterLoadFactor = (int)((long)numElements * 10 / 7);
         int bits = 32 - Integer.numberOfLeadingZeros(sizeAfterLoadFactor - 1);
         return 1 << bits;
+    }
+
+    /**
+     * Determine the size of an in-memory index hash table capable of storing the specified number of elements with a
+     * load factor applied.Allows upto 2^31 buckets vs. {@link #hashTableSize(int)}'s 2^30. {@link #hashTableSize(int)} is
+     * retained for backwards compatibility of bucket layout for serialized SET and MAP records with existing consumers.
+     *
+     * @param numElements number of elements to be stored in the table
+     * @return size of hash table, always a power of 2
+     * @throws IllegalArgumentException when numElements is negative or exceeds
+     *                                  {@link com.netflix.hollow.core.HollowConstants#INDEX_HASH_TABLE_MAX_SIZE}
+     */
+    public static long indexHashTableSize(long numElements) throws IllegalArgumentException {
+        if (numElements < 0) {
+            throw new IllegalArgumentException("cannot be negative; numElements="+numElements);
+        } else if (numElements > INDEX_HASH_TABLE_MAX_SIZE) {
+            throw new IllegalArgumentException("exceeds maximum number of buckets; numElements="+numElements);
+        }
+
+        if (numElements == 0)
+            return 1;
+        if (numElements < 3)
+            return numElements * 2;
+
+        // Apply load factor to number of elements and determine next largest power of 2
+        long sizeAfterLoadFactor = numElements * 10 / 7;
+        int bits = 64 - Long.numberOfLeadingZeros(sizeAfterLoadFactor - 1);
+        return 1L << bits;
     }
 }

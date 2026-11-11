@@ -11,17 +11,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        # test against JDK 8
-        java: [ 8 ]
-    name: CI with Java ${{ matrix.java }}
+        include:
+          - java: 8
+            gc: default
+            testJvmArgs: ''
+          - java: 21
+            gc: default
+            testJvmArgs: ''
+          - java: 21
+            gc: ZGC
+            testJvmArgs: '-XX:+UseZGC'
+    name: CI with Java ${{ matrix.java }} (${{ matrix.gc }})
     steps:
       - uses: actions/checkout@v6
       - name: Setup git user
         run: |
           git config --global user.name "Netflix OSS Maintainers"
           git config --global user.email "netflixoss@netflix.com"
-      - name: Setup jdk
+      - name: Set up JDK 8 for compilation
+        uses: actions/setup-java@v5
+        with:
+          java-version: 8
+          distribution: 'zulu'
+      - name: Set up JDK ${{ matrix.java }} for Gradle and tests
         uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
@@ -41,7 +55,7 @@ jobs:
           restore-keys: |
             - ${{ runner.os }}-gradlewrapper-
       - name: Build with Gradle
-        run: ./gradlew --info --stacktrace build
+        run: ./gradlew -Porg.gradle.java.installations.fromEnv=JAVA_HOME_8_X64 -PtestJavaVersion=${{ matrix.java }} -PtestJvmArgs='${{ matrix.testJvmArgs }}' --info --stacktrace build
         env:
           CI_NAME: github_actions
           CI_BUILD_NUMBER: ${{ github.sha }}

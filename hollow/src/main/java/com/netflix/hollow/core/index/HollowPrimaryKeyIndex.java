@@ -217,7 +217,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
         do {
             hashTable = this.hashTableVolatile;
-            int bucket = hashCode & hashTable.hashMask;
+            long bucket = hashCode & hashTable.hashMask;
             ordinal = readOrdinal(hashTable, bucket);
             while(ordinal != -1) {
                 if(keyDeriver.keyMatches(key, ordinal, 0))
@@ -257,7 +257,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
         do {
             hashTable = this.hashTableVolatile;
-            int bucket = hashCode & hashTable.hashMask;
+            long bucket = hashCode & hashTable.hashMask;
             ordinal = readOrdinal(hashTable, bucket);
             while(ordinal != -1) {
                 if(keyDeriver.keyMatches(key1, ordinal, 0) && keyDeriver.keyMatches(key2, ordinal, 1))
@@ -299,7 +299,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
         do {
             hashTable = this.hashTableVolatile;
-            int bucket = hashCode & hashTable.hashMask;
+            long bucket = hashCode & hashTable.hashMask;
             ordinal = readOrdinal(hashTable, bucket);
             while(ordinal != -1) {
                 if(keyDeriver.keyMatches(key1, ordinal, 0) && keyDeriver.keyMatches(key2, ordinal, 1) && keyDeriver.keyMatches(key3, ordinal, 2))
@@ -339,7 +339,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
         do {
             hashTable = this.hashTableVolatile;
-            int bucket = hashCode & hashTable.hashMask;
+            long bucket = hashCode & hashTable.hashMask;
             ordinal = readOrdinal(hashTable, bucket);
             while(ordinal != -1) {
                 if(keyDeriver.keyMatches(ordinal, keys))
@@ -354,8 +354,8 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         return ordinal;
     }
 
-    private int readOrdinal(PrimaryKeyIndexHashTable hashTable, int bucket) {
-        return (int)hashTable.hashTable.getElementValue((long)hashTable.bitsPerElement * (long)bucket, hashTable.bitsPerElement) - 1;
+    private int readOrdinal(PrimaryKeyIndexHashTable hashTable, long bucket) {
+        return (int)hashTable.hashTable.getElementValue((long)hashTable.bitsPerElement * bucket, hashTable.bitsPerElement) - 1;
     }
 
     private int keyHashCode(Object key, int fieldIdx) {
@@ -402,18 +402,18 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
         List<Object[]> duplicateKeys = new ArrayList<Object[]>();
 
-        for(int i=0;i<hashTable.hashTableSize;i++) {
-            int ordinal = (int)hashTable.hashTable.getElementValue((long)i * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+        for(long i=0;i<hashTable.hashTableSize;i++) {
+            int ordinal = (int)hashTable.hashTable.getElementValue(i * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
 
             if(ordinal != -1) {
-                int compareBucket = (i+1) & hashTable.hashMask;
-                int compareOrdinal = (int)hashTable.hashTable.getElementValue((long)compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+                long compareBucket = (i+1) & hashTable.hashMask;
+                int compareOrdinal = (int)hashTable.hashTable.getElementValue(compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
                 while(compareOrdinal != -1) {
                     if(recordsHaveEqualKeys(ordinal, compareOrdinal))
                         duplicateKeys.add(keyDeriver.getRecordKey(ordinal));
 
                     compareBucket = (compareBucket + 1) & hashTable.hashMask;
-                    compareOrdinal = (int)hashTable.hashTable.getElementValue((long)compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+                    compareOrdinal = (int)hashTable.hashTable.getElementValue(compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
                 }
             }
         }
@@ -433,15 +433,15 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         BitSet counted = new BitSet();
         List<DuplicateKeyInfo> duplicateKeys = new ArrayList<>();
 
-        for(int i=0;i<hashTable.hashTableSize && duplicateKeys.size() < maxDuplicateKeys;i++) {
-            int ordinal = (int)hashTable.hashTable.getElementValue((long)i * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+        for(long i=0;i<hashTable.hashTableSize && duplicateKeys.size() < maxDuplicateKeys;i++) {
+            int ordinal = (int)hashTable.hashTable.getElementValue(i * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
 
             if(ordinal != -1 && !counted.get(ordinal)) {
                 long count = 1;
                 counted.set(ordinal);
 
-                int compareBucket = (i+1) & hashTable.hashMask;
-                int compareOrdinal = (int)hashTable.hashTable.getElementValue((long)compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+                long compareBucket = (i+1) & hashTable.hashMask;
+                int compareOrdinal = (int)hashTable.hashTable.getElementValue(compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
                 while(compareOrdinal != -1) {
                     if(recordsHaveEqualKeys(ordinal, compareOrdinal)) {
                         count++;
@@ -449,7 +449,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
                     }
 
                     compareBucket = (compareBucket + 1) & hashTable.hashMask;
-                    compareOrdinal = (int)hashTable.hashTable.getElementValue((long)compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
+                    compareOrdinal = (int)hashTable.hashTable.getElementValue(compareBucket * (long)hashTable.bitsPerElement, hashTable.bitsPerElement) - 1;
                 }
 
                 if (count > 1) {
@@ -482,7 +482,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
         BitSet ordinals = typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
-        int hashTableSize = HashCodes.hashTableSize(ordinals.cardinality());
+        long hashTableSize = HashCodes.indexHashTableSize(ordinals.cardinality());
         int bitsPerElement = (32 - Integer.numberOfLeadingZeros(typeState.maxOrdinal() + 1));
 
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
@@ -542,22 +542,22 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
             ordinals = listener.getPopulatedOrdinals();
         }
 
-        int hashTableSize = HashCodes.hashTableSize(ordinals.cardinality());
+        long hashTableSize = HashCodes.indexHashTableSize(ordinals.cardinality());
         int bitsPerElement = (32 - Integer.numberOfLeadingZeros(typeState.maxOrdinal() + 1));
 
-        FixedLengthElementArray hashedArray = new FixedLengthElementArray(memoryRecycler, (long)hashTableSize * (long)bitsPerElement);
+        FixedLengthElementArray hashedArray = new FixedLengthElementArray(memoryRecycler, hashTableSize * (long)bitsPerElement);
 
-        int hashMask = hashTableSize - 1;
+        long hashMask = hashTableSize - 1;
 
         int ordinal = ordinals.nextSetBit(0);
         while(ordinal != ORDINAL_NONE) {
             int hashCode = recordHash(ordinal);
-            int bucket = hashCode & hashMask;
+            long bucket = hashCode & hashMask;
 
-            while(hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) != 0)
+            while(hashedArray.getElementValue(bucket * (long)bitsPerElement, bitsPerElement) != 0)
                 bucket = (bucket + 1) & hashMask;
 
-            hashedArray.setElementValue((long)bucket * (long)bitsPerElement, bitsPerElement, ordinal + 1);
+            hashedArray.setElementValue(bucket * (long)bitsPerElement, bitsPerElement, ordinal + 1);
 
             ordinal = ordinals.nextSetBit(ordinal + 1);
         }
@@ -567,7 +567,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         memoryRecycler.swap();
     }
 
-    private void deltaUpdate(int hashTableSize, int bitsPerElement) {
+    private void deltaUpdate(long hashTableSize, int bitsPerElement) {
         // For a delta update hashTableVolatile cannot be null
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         hashTable.hashTable.destroy(memoryRecycler);
@@ -576,37 +576,37 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         BitSet prevOrdinals = listener.getPreviousOrdinals();
         BitSet ordinals = listener.getPopulatedOrdinals();
 
-        long totalBitsInHashTable = (long)hashTableSize * (long)bitsPerElement;
+        long totalBitsInHashTable = hashTableSize * (long)bitsPerElement;
         FixedLengthElementArray hashedArray = new FixedLengthElementArray(memoryRecycler, totalBitsInHashTable);
         hashedArray.copyBits(hashTable.hashTable, 0, 0, totalBitsInHashTable);
 
-        int hashMask = hashTableSize - 1;
+        long hashMask = hashTableSize - 1;
 
         int prevOrdinal = prevOrdinals.nextSetBit(0);
         while(prevOrdinal != ORDINAL_NONE) {
             if(!ordinals.get(prevOrdinal)) {
                 /// find and remove this ordinal
                 int hashCode = recordHash(prevOrdinal);
-                int bucket = findOrdinalBucket(bitsPerElement, hashedArray, hashCode, hashMask, prevOrdinal);
+                long bucket = findOrdinalBucket(bitsPerElement, hashedArray, hashCode, hashMask, prevOrdinal);
 
-                hashedArray.clearElementValue((long)bucket * (long)bitsPerElement, bitsPerElement);
-                int emptyBucket = bucket;
+                hashedArray.clearElementValue(bucket * (long)bitsPerElement, bitsPerElement);
+                long emptyBucket = bucket;
                 bucket = (bucket + 1) & hashMask;
-                int moveOrdinal = (int)hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) - 1;
+                int moveOrdinal = (int)hashedArray.getElementValue(bucket * (long)bitsPerElement, bitsPerElement) - 1;
 
                 while(moveOrdinal != ORDINAL_NONE) {
                     int naturalHash = recordHash(moveOrdinal);
-                    int naturalBucket = naturalHash & hashMask;
+                    long naturalBucket = naturalHash & hashMask;
 
                     if(!bucketInRange(emptyBucket, bucket, naturalBucket)) {
-                        hashedArray.setElementValue((long)emptyBucket * (long)bitsPerElement, bitsPerElement, moveOrdinal + 1);
-                        hashedArray.clearElementValue((long)bucket * (long)bitsPerElement, bitsPerElement);
+                        hashedArray.setElementValue(emptyBucket * (long)bitsPerElement, bitsPerElement, moveOrdinal + 1);
+                        hashedArray.clearElementValue(bucket * (long)bitsPerElement, bitsPerElement);
                         emptyBucket = bucket;
                     }
 
 
                     bucket = (bucket + 1) & hashMask;
-                    moveOrdinal = (int)hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) - 1;
+                    moveOrdinal = (int)hashedArray.getElementValue(bucket * (long)bitsPerElement, bitsPerElement) - 1;
                 }
 
             }
@@ -619,13 +619,13 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         while(ordinal != ORDINAL_NONE) {
             if(!prevOrdinals.get(ordinal)) {
                 int hashCode = recordHash(ordinal);
-                int bucket = hashCode & hashMask;
+                long bucket = hashCode & hashMask;
 
-                while(hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) != 0) {
+                while(hashedArray.getElementValue(bucket * (long)bitsPerElement, bitsPerElement) != 0) {
                     bucket = (bucket + 1) & hashMask;
                 }
 
-                hashedArray.setElementValue((long)bucket * (long)bitsPerElement, bitsPerElement, ordinal + 1);
+                hashedArray.setElementValue(bucket * (long)bitsPerElement, bitsPerElement, ordinal + 1);
             }
 
             ordinal = ordinals.nextSetBit(ordinal + 1);
@@ -636,12 +636,12 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         memoryRecycler.swap();
     }
 
-    private int findOrdinalBucket(int bitsPerElement, FixedLengthElementArray hashedArray, int hashCode, int hashMask, int prevOrdinal) {
-        int startBucket = hashCode & hashMask;
-        int bucket = startBucket;
+    private long findOrdinalBucket(int bitsPerElement, FixedLengthElementArray hashedArray, int hashCode, long hashMask, int prevOrdinal) {
+        long startBucket = hashCode & hashMask;
+        long bucket = startBucket;
         long value;
         do {
-            value = hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement);
+            value = hashedArray.getElementValue(bucket * (long)bitsPerElement, bitsPerElement);
             if (prevOrdinal + 1 == value) {
                 return bucket;
             }
@@ -657,7 +657,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         }
     }
 
-    private boolean bucketInRange(int fromBucket, int toBucket, int testBucket) {
+    private boolean bucketInRange(long fromBucket, long toBucket, long testBucket) {
         if(toBucket > fromBucket) {
             return testBucket > fromBucket && testBucket <= toBucket;
         } else {
@@ -795,11 +795,11 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
     static class PrimaryKeyIndexHashTable {
         final FixedLengthElementArray hashTable;
-        final int hashTableSize;
-        final int hashMask;
+        final long hashTableSize;
+        final long hashMask;
         final int bitsPerElement;
 
-        public PrimaryKeyIndexHashTable(FixedLengthElementArray hashTable, int hashTableSize, int hashMask, int bitsPerElement) {
+        public PrimaryKeyIndexHashTable(FixedLengthElementArray hashTable, long hashTableSize, long hashMask, int bitsPerElement) {
             this.hashTable = hashTable;
             this.hashTableSize = hashTableSize;
             this.hashMask = hashMask;

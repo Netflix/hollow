@@ -52,7 +52,8 @@ public class HollowHistoryRehashTest extends AbstractStateEngineTest {
 
     @Test
     public void correctlyRehashesKeys_beforeAndAfterSnapshot() throws IOException {
-        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
+        HollowReadStateEngine readEngine = newReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readEngine);
         HollowHistory history = new HollowHistory(readEngine, 1L, 1);
         HollowHistoryKeyIndex keyIdx = new HollowHistoryKeyIndex(history);
         keyIdx.addTypeIndex("A", "id", "bRef.id");
@@ -84,7 +85,8 @@ public class HollowHistoryRehashTest extends AbstractStateEngineTest {
 
     @Test
     public void correctlyRehashesKeys_beforeAndAfterDelta() throws IOException {
-        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
+        HollowReadStateEngine readEngine = newReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readEngine);
         HollowHistory history = new HollowHistory(readEngine, 1L, 1);
         HollowHistoryKeyIndex keyIdx = new HollowHistoryKeyIndex(history);
         keyIdx.addTypeIndex("A", "id", "bRef.id");

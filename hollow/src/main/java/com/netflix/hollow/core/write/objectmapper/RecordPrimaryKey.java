@@ -37,14 +37,14 @@ public class RecordPrimaryKey {
 
     @Override
     public int hashCode() {
-        return 31 * type.hashCode() + Arrays.hashCode(key);
+        return 31 * type.hashCode() + Arrays.deepHashCode(key);
     }
 
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof RecordPrimaryKey) {
             return type.equals(((RecordPrimaryKey) obj).type) 
-                    && Arrays.equals(key, ((RecordPrimaryKey) obj).key);
+                    && Arrays.deepEquals(key, ((RecordPrimaryKey) obj).key);
         }
         return false;
     }

@@ -53,7 +53,8 @@ public class HollowHistoryKeyIndexTest extends AbstractStateEngineTest {
 
     @Test
     public void extractsAndIndexesKeyRecords() throws IOException {
-        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
+        HollowReadStateEngine readEngine = newReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readEngine);
         HollowHistory history = new HollowHistory(readEngine, 1L, 1);
         HollowHistoryKeyIndex keyIdx = new HollowHistoryKeyIndex(history);
         keyIdx.addTypeIndex("A", "id", "bRef.id");
@@ -139,7 +140,8 @@ public class HollowHistoryKeyIndexTest extends AbstractStateEngineTest {
         // When a key value contains ':', the UI requires the user to type '\:'.
         // The escaped form must be unescaped before hash-index lookup, otherwise the
         // hash of "Video\:1234" != hash of stored "Video:1234" and no match is found.
-        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeStateEngine);
+        HollowReadStateEngine readEngine = newReadStateEngine();
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readEngine);
         HollowHistory history = new HollowHistory(readEngine, 1L, 1);
         HollowHistoryKeyIndex keyIdx = new HollowHistoryKeyIndex(history);
         keyIdx.addTypeIndex("A", "id", "bRef.id");

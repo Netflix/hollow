@@ -349,7 +349,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                 Bucket currentBucket = buckets.get(index);
                 if (currentBucket != null) {
                     longAtIndex = currentBucket.idx;
-                    longs = currentBucket.longs.clone();
+                    longs = currentBucket.longs;
                 }
 
                 boolean isLongInitialized = (longAtIndex & bitInIndex) != 0;
@@ -357,6 +357,12 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
 
                     // if a long value is set, the find the correct offset to determine which long in longs to use.
                     int offset = getOffset(longAtIndex, bitInIndex);
+
+                    // if the bit is already set there is nothing to do, skip the clone and the CAS.
+                    if ((longs[offset] & whichBitInLong) != 0) return;
+
+                    // published longs are never mutated, so copy before updating.
+                    longs = longs.clone();
                     longs[offset] |= whichBitInLong;// or preserves previous set operations in this long.
 
                 } else if (longAtIndex == 0) {
@@ -413,7 +419,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                 Bucket currentBucket = buckets.get(index);
                 if (currentBucket == null) return;
                 long longAtIndex = currentBucket.idx;
-                long[] longs = currentBucket.longs.clone();
+                long[] longs = currentBucket.longs;
 
                 // find which bit in index will point to the long in bb
                 long whichLong = i >>> LONG_SHIFT;
@@ -426,11 +432,16 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                 int offset = getOffset(longAtIndex, bitInIndex);
                 long value = longs[offset];
 
+                // if the bit is already clear there is nothing to do, skip the clone and the CAS.
+                if ((value & whichBitInLong) == 0) return;
+
                 // unset whichBitInIndex in value
                 // to clear 3rd bit (00100 whichBitInLong) in 00101(value), & with 11011 to get 00001
                 long updatedValue = value & ~whichBitInLong;
                 boolean isBucketEmpty = false;
                 if (updatedValue != 0) {
+                    // published longs are never mutated, so copy before updating.
+                    longs = longs.clone();
                     longs[offset] = updatedValue;
                 } else {
 

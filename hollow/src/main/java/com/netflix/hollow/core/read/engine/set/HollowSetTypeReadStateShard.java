@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.read.engine.set;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.hollow.core.read.engine.HollowTypeReadStateShard.nextOrdinalInShard;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.engine.HollowTypeReadStateShard;
@@ -83,9 +84,7 @@ class HollowSetTypeReadStateShard implements HollowTypeReadStateShard {
                 }
                 ordinal = ordinal + numShards;
             } else {
-                // Round up ordinal
-                int r = (ordinal & -numShards) + shardNumber;
-                ordinal = (r <= ordinal) ? r + numShards : r;
+                ordinal = nextOrdinalInShard(ordinal, shardNumber, numShards);
             }
             ordinal = populatedOrdinals.nextSetBit(ordinal);
         }

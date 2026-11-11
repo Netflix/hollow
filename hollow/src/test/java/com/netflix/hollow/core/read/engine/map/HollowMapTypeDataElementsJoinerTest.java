@@ -177,7 +177,7 @@ public class HollowMapTypeDataElementsJoinerTest extends AbstractHollowMapTypeDa
         assertEquals(2, c.getStateEngine().getTypeState("TestMap").numShards());
 
         // v2 snapshot was also serialized with same numShards as delta
-        HollowReadStateEngine testSnapshot = new HollowReadStateEngine();
+        HollowReadStateEngine testSnapshot = newReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(testSnapshot);
         reader.readSnapshot(blobStore.retrieveSnapshotBlob(v2).getInputStream());
         assertEquals(2, testSnapshot.getTypeState("TestMap").numShards());

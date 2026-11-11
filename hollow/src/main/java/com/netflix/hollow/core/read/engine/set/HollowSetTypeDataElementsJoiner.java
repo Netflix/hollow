@@ -18,7 +18,7 @@ class HollowSetTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Hollo
 
     @Override
     public void initToElements() {
-        this.to = new HollowSetTypeDataElements(from[0].memoryMode, from[0].memoryRecycler);
+        this.to = new HollowSetTypeDataElements(from[0].readConfiguration);
         to.bitsPerElement = 0;
     }
 
@@ -64,8 +64,8 @@ class HollowSetTypeDataElementsJoiner extends HollowTypeDataElementsJoiner<Hollo
     public void copyRecords() {
         long bucketCounter = 0;
 
-        to.setPointerAndSizeData = FixedLengthDataFactory.get(((long)to.maxOrdinal + 1) * to.bitsPerFixedLengthSetPortion, to.memoryMode, to.memoryRecycler);
-        to.elementData = FixedLengthDataFactory.get(to.totalNumberOfBuckets * to.bitsPerElement, to.memoryMode, to.memoryRecycler);
+        to.setPointerAndSizeData = FixedLengthDataFactory.get(((long)to.maxOrdinal + 1) * to.bitsPerFixedLengthSetPortion, to.readConfiguration);
+        to.elementData = FixedLengthDataFactory.get(to.totalNumberOfBuckets * to.bitsPerElement, to.readConfiguration);
 
         for(int ordinal=0;ordinal<=to.maxOrdinal;ordinal++) {
             int fromIndex = ordinal & fromMask;

@@ -65,4 +65,9 @@ public class GarbageCollectorAwareRecycler implements ArraySegmentRecycler {
     public void swap() {
         delegate.swap();
     }
+
+    @Override
+    public boolean recyclesArrays() {
+        return delegate.recyclesArrays();
+    }
 }
