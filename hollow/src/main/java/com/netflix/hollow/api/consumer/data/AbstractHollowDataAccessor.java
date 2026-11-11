@@ -35,6 +35,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Reads a type's records from a state engine's current version, and their changes from its last delta, so it can't be
+ * built over a version hold ({@link com.netflix.hollow.api.consumer.longevity.HollowVersionHold}). Between two holds, use {@link com.netflix.hollow.api.consumer.longevity.HollowVersionHold#diffFrom}.
+ */
 public abstract class AbstractHollowDataAccessor<T> {
     protected final String type;
     protected final PrimaryKey primaryKey;

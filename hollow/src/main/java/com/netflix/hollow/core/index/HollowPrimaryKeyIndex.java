@@ -55,6 +55,9 @@ import java.util.logging.Logger;
  *
  * If you need an index that will survive 2 or more deltas (without being updated), then use {@link HollowUniqueKeyIndex}
  * or {@link HollowHashIndex}.
+ * <p>
+ * It reads a state engine's type states, so it can't index a version hold ({@link com.netflix.hollow.api.consumer.longevity.HollowVersionHold}): over a hold,
+ * build a {@link HollowUniqueKeyIndex} with the hold's data access and read the matching records through the hold's API.
  */
 @SuppressWarnings("override")
 public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableUniqueKeyIndex {

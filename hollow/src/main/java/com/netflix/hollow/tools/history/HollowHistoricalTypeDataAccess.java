@@ -93,7 +93,10 @@ public abstract class HollowHistoricalTypeDataAccess implements HollowTypeDataAc
             recorder.recordStackTrace(2);
     }
 
-    HollowTypeReadState getRemovedRecords() {
+    /**
+     * @return the records this state copied, at their ordinals in the copy
+     */
+    public HollowTypeReadState getRemovedRecords() {
         return removedRecords;
     }
 
