@@ -124,7 +124,6 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
             setNull(fieldName);
         } else {
             int fieldIndex = getSchema().getPosition(fieldName);
-
             validateFieldType(fieldIndex, fieldName, FieldType.LONG);
 
             ByteDataArray buf = getFieldBuffer(fieldIndex);
