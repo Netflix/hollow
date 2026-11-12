@@ -22,6 +22,8 @@ import static com.netflix.hollow.core.HollowStateEngine.HEADER_TAG_SCHEMA_HASH;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -35,6 +37,7 @@ import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.MemoryMode;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.filter.TypeFilter;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchemaHash;
 import com.netflix.hollow.core.write.HollowBlobWriter;
@@ -48,6 +51,7 @@ import com.netflix.hollow.test.consumer.TestHollowConsumer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -388,6 +392,47 @@ public class HollowClientUpdaterTest {
         assertTrue("Warning should be logged", logHandler.isContains());
     }
 
+    @Test
+    public void testDoubleSnapshotOnSchemaChange_filteredConsumer_appliesDeltaWithoutSchemaChange() throws Exception {
+        HollowWriteStateEngine stateEngine = new HollowWriteStateEngine();
+        TestBlobRetriever blobRetriever = new TestBlobRetriever();
+        UpdateCounter updates = new UpdateCounter();
+        TestHollowConsumer consumer = filteredSchemaChangeSubject(stateEngine, blobRetriever, updates);
+
+        stateEngine.prepareForNextCycle();
+        addMovie(stateEngine, 2);
+        addActor(stateEngine, 2);
+        consumer.triggerRefreshTo(new HollowConsumer.VersionInfo(2, Optional.of(writeVersion2(stateEngine, blobRetriever)), Optional.empty()));
+
+        assertEquals(2, consumer.getCurrentVersionId());
+        assertEquals(1, updates.snapshots);
+        assertEquals(1, updates.deltas);
+    }
+
+    @Test
+    public void testDoubleSnapshotOnSchemaChange_filteredConsumer_doubleSnapshotsOnSchemaChange() throws Exception {
+        HollowWriteStateEngine stateEngine = new HollowWriteStateEngine();
+        TestBlobRetriever blobRetriever = new TestBlobRetriever();
+        UpdateCounter updates = new UpdateCounter();
+        TestHollowConsumer consumer = filteredSchemaChangeSubject(stateEngine, blobRetriever, updates);
+
+        stateEngine.prepareForNextCycle();
+        HollowObjectSchema awardSchema = new HollowObjectSchema("Award", 1, "id");
+        awardSchema.addField("id", HollowObjectSchema.FieldType.INT);
+        stateEngine.addTypeState(new HollowObjectTypeWriteState(awardSchema));
+        HollowObjectWriteRecord award = new HollowObjectWriteRecord(awardSchema);
+        award.setInt("id", 1);
+        stateEngine.add("Award", award);
+        addMovie(stateEngine, 2);
+        consumer.triggerRefreshTo(new HollowConsumer.VersionInfo(2, Optional.of(writeVersion2(stateEngine, blobRetriever)), Optional.empty()));
+
+        assertEquals(2, consumer.getCurrentVersionId());
+        assertEquals(2, updates.snapshots);
+        assertEquals(0, updates.deltas);
+        assertNotNull(consumer.getStateEngine().getTypeState("Award"));
+        assertNull(consumer.getStateEngine().getTypeState("Actor"));
+    }
+
     private static void addMovie(HollowWriteStateEngine stateEngine, int id) {
         HollowObjectWriteRecord rec = new HollowObjectWriteRecord((HollowObjectSchema) stateEngine.getSchema("Movie"));
         rec.setInt("id", id);
@@ -473,6 +518,83 @@ public class HollowClientUpdaterTest {
         testBlobRetriever.addReverseDelta(2, new TestBlob(2, 1, new ByteArrayInputStream(baos_v2_to_v1.toByteArray())));
 
         return testHollowConsumer;
+    }
+
+    /**
+     * Returns a consumer at version 1 that excludes the Actor type. Like a producer, every version records its schema
+     * hash in a header tag.
+     */
+    private TestHollowConsumer filteredSchemaChangeSubject(HollowWriteStateEngine stateEngine,
+            TestBlobRetriever blobRetriever, UpdateCounter updates) throws Exception {
+        HollowConsumer.DoubleSnapshotConfig supportsSchemaChange = new HollowConsumer.DoubleSnapshotConfig() {
+            @Override
+            public boolean allowDoubleSnapshot() {
+                return true;
+            }
+            @Override
+            public int maxDeltasBeforeDoubleSnapshot() {
+                return 32;
+            }
+            @Override
+            public boolean doubleSnapshotOnSchemaChange() {
+                return true;
+            }
+        };
+        HollowObjectSchema movieSchema = new HollowObjectSchema("Movie", 1, "id");
+        movieSchema.addField("id", HollowObjectSchema.FieldType.INT);
+        HollowObjectSchema actorSchema = new HollowObjectSchema("Actor", 1, "id");
+        actorSchema.addField("id", HollowObjectSchema.FieldType.INT);
+        stateEngine.addTypeState(new HollowObjectTypeWriteState(movieSchema));
+        stateEngine.addTypeState(new HollowObjectTypeWriteState(actorSchema));
+        addMovie(stateEngine, 1);
+        addActor(stateEngine, 1);
+        stateEngine.addHeaderTag(HEADER_TAG_SCHEMA_HASH, new HollowSchemaHash(stateEngine).getHash());
+        stateEngine.prepareForWrite();
+        ByteArrayOutputStream snapshot = new ByteArrayOutputStream();
+        new HollowBlobWriter(stateEngine).writeSnapshot(snapshot);
+        blobRetriever.addSnapshot(1, new TestBlob(1, new ByteArrayInputStream(snapshot.toByteArray())));
+
+        TestHollowConsumer consumer = new TestHollowConsumer.Builder()
+                .withBlobRetriever(blobRetriever)
+                .withDoubleSnapshotConfig(supportsSchemaChange)
+                .withTypeFilter(TypeFilter.newTypeFilter().exclude("Actor").build())
+                .withRefreshListener(updates)
+                .build();
+        consumer.triggerRefreshTo(1);
+        return consumer;
+    }
+
+    /**
+     * Writes the snapshot and delta for version 2, and returns its announcement metadata.
+     */
+    private static Map<String, String> writeVersion2(HollowWriteStateEngine stateEngine,
+            TestBlobRetriever blobRetriever) throws IOException {
+        String schemaHash = new HollowSchemaHash(stateEngine).getHash();
+        stateEngine.addHeaderTag(HEADER_TAG_SCHEMA_HASH, schemaHash);
+        stateEngine.prepareForWrite();
+        HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
+        ByteArrayOutputStream snapshot = new ByteArrayOutputStream();
+        ByteArrayOutputStream delta = new ByteArrayOutputStream();
+        writer.writeSnapshot(snapshot);
+        writer.writeDelta(delta);
+        blobRetriever.addSnapshot(2, new TestBlob(2, new ByteArrayInputStream(snapshot.toByteArray())));
+        blobRetriever.addDelta(1, new TestBlob(1, 2, new ByteArrayInputStream(delta.toByteArray())));
+        return Collections.singletonMap(HEADER_TAG_SCHEMA_HASH, schemaHash);
+    }
+
+    private static class UpdateCounter extends HollowConsumer.AbstractRefreshListener {
+        private int snapshots;
+        private int deltas;
+
+        @Override
+        public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
+            snapshots++;
+        }
+
+        @Override
+        public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
+            deltas++;
+        }
     }
 
     private Handler configureLogger(String classLogger, Level level, String msg) {

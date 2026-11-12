@@ -331,7 +331,12 @@ public class HollowClientUpdater {
             }
 
             String incoming = metadata.get(HEADER_TAG_SCHEMA_HASH);
-            String current = (new HollowSchemaHash(getStateEngine().getSchemas())).getHash();
+            // A filtered consumer only loads some of the producer's schemas, which never hash to the incoming value,
+            // so compare against the producer's hash recorded in the header of the last blob applied instead
+            String current = filter == null ? null : getStateEngine().getHeaderTag(HEADER_TAG_SCHEMA_HASH);
+            if (current == null) {
+                current = (new HollowSchemaHash(getStateEngine().getSchemas())).getHash();
+            }
             if (!current.equals(incoming)) {
                 return true;
             }
