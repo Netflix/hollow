@@ -43,10 +43,19 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.test.InMemoryBlobStore;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -239,7 +248,7 @@ public class HollowChecksumShardedTest {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
                 .withTypeResharding(true)
-                .withParallelPerShardChecksum(true)
+                .withParallelPerShardChecksum(() -> true)
                 .withTargetMaxTypeShardSize(2048)
                 .build();
         producer.initializeDataModel(E2EPojo.class);
@@ -260,6 +269,72 @@ public class HollowChecksumShardedTest {
         assertConsumerHasIds(consumer, 8000);
         consumer.triggerRefreshTo(v3);
         assertConsumerHasIds(consumer, 8000);
+    }
+
+    /**
+     * The checksum-mode supplier (e.g. backed by a dynamic property) can change at any time. It must be read once per
+     * integrity check so that all four checksums in that check use the same mode: the two modes produce different
+     * values, so mixing them within one check would fail the cycle with a {@code ChecksumValidationException}.
+     */
+    @Test
+    public void checksumModeSupplierFlippingOnEveryReadDoesNotFailIntegrityCheck() {
+        AtomicInteger reads = new AtomicInteger();
+        Supplier<Boolean> flipsOnEveryRead = () -> reads.getAndIncrement() % 2 == 0;
+        HollowProducer producer = HollowProducer.withPublisher(new InMemoryBlobStore())
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withParallelPerShardChecksum(flipsOnEveryRead)
+                .withTargetMaxTypeShardSize(2048)
+                .build();
+        producer.initializeDataModel(E2EPojo.class);
+
+        long v1 = producer.runCycle(ws -> addE2ERecords(ws, 4000)); // no current state yet; no checksums
+        long v2 = producer.runCycle(ws -> addE2ERecords(ws, 4001)); // delta; integrity check runs (per-shard)
+        long v3 = producer.runCycle(ws -> addE2ERecords(ws, 4002)); // delta; integrity check runs (per-type)
+
+        Assert.assertTrue("versions must advance (integrity passed each cycle)", v1 < v2 && v2 < v3);
+        Assert.assertEquals("supplier must be read once per integrity check", 2, reads.get());
+    }
+
+    /**
+     * A change to the checksum-mode supplier takes effect on the next cycle's integrity check, which logs the mode
+     * it used.
+     */
+    @Test
+    public void checksumModeSupplierIsReEvaluatedEachCycle() {
+        AtomicBoolean perShard = new AtomicBoolean(false);
+        HollowProducer producer = HollowProducer.withPublisher(new InMemoryBlobStore())
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withParallelPerShardChecksum(perShard::get)
+                .withTargetMaxTypeShardSize(2048)
+                .build();
+        producer.initializeDataModel(E2EPojo.class);
+
+        List<String> checksumLogLines = new ArrayList<>();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                if (record.getMessage() != null && record.getMessage().startsWith("CHECKSUMS"))
+                    checksumLogLines.add(record.getMessage());
+            }
+            @Override public void flush() { }
+            @Override public void close() { }
+        };
+        Logger producerLogger = Logger.getLogger("com.netflix.hollow.api.producer.AbstractHollowProducer");
+        producerLogger.addHandler(handler);
+        try {
+            producer.runCycle(ws -> addE2ERecords(ws, 4000));
+            producer.runCycle(ws -> addE2ERecords(ws, 4001));
+            perShard.set(true);
+            producer.runCycle(ws -> addE2ERecords(ws, 4002));
+            perShard.set(false);
+            producer.runCycle(ws -> addE2ERecords(ws, 4003));
+        } finally {
+            producerLogger.removeHandler(handler);
+        }
+
+        Assert.assertEquals(
+                Arrays.asList("CHECKSUMS (per-type)", "CHECKSUMS (per-shard)", "CHECKSUMS (per-type)"),
+                checksumLogLines);
     }
 
     /**

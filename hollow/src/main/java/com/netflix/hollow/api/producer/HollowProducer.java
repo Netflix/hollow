@@ -751,7 +751,7 @@ public class HollowProducer extends AbstractHollowProducer {
         SingleProducerEnforcer singleProducerEnforcer = new BasicSingleProducerEnforcer();
         HollowObjectHashCodeFinder hashCodeFinder = null;
         boolean doIntegrityCheck = true;
-        boolean parallelPerShardChecksum = false;
+        Supplier<Boolean> parallelPerShardChecksum = () -> false;
         boolean partitionedOrdinalMap = false;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
@@ -974,13 +974,18 @@ public class HollowProducer extends AbstractHollowProducer {
         }
 
         /**
-         * When enabled, the integrity checksum fans out one task per (type, shard) instead of per type,
-         * so a type dominated by a single large shard parallelizes across its shards. Useful only when type-sharding
-         * is enabled. Defaults to off (legacy per-type).
+         * When the supplier returns {@code true}, the integrity checksum fans out one task per (type, shard) instead
+         * of per type, so a type dominated by a single large shard parallelizes across its shards. Only helps types
+         * with more than one shard. Defaults to off (legacy per-type).
+         * <p>
+         * Evaluated once per integrity check, so all checksums within a check use the same mode; a change (for
+         * example from a dynamic property) takes effect on the next cycle. A {@code null} result means off.
          *
-         * @param parallelPerShardChecksum whether to compute the integrity checksum per (type, shard)
+         * @param parallelPerShardChecksum supplier returning whether to compute the integrity checksum per
+         *         (type, shard)
+         * @return this builder
          */
-        public B withParallelPerShardChecksum(boolean parallelPerShardChecksum) {
+        public B withParallelPerShardChecksum(Supplier<Boolean> parallelPerShardChecksum) {
             this.parallelPerShardChecksum = parallelPerShardChecksum;
             return (B) this;
         }
