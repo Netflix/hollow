@@ -122,7 +122,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, false, false, false, false, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, () -> false, () -> false);
+                null, true, HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE, null, () -> false, () -> true);
     }
 
     // The only constructor should be that which accepts a builder
@@ -891,9 +891,10 @@ abstract class AbstractHollowProducer {
                 HollowReadStateEngine current = readStates.current().getStateEngine();
 
                 // Read the mode once so all four checksums in this check use it: the two modes produce
-                // values that cannot be compared, and the supplier may change between reads.
-                final boolean perShard = parallelPerShardChecksum != null
-                        && Boolean.TRUE.equals(parallelPerShardChecksum.get());
+                // values that cannot be compared, and the supplier may change between reads. Only an
+                // explicit false selects per-type; null means the per-shard default.
+                final boolean perShard = parallelPerShardChecksum == null
+                        || !Boolean.FALSE.equals(parallelPerShardChecksum.get());
                 log.info("CHECKSUMS (" + (perShard ? "per-shard" : "per-type") + ")");
                 HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending, perShard);
                 log.info("  CUR        " + currentChecksum);

@@ -67,9 +67,9 @@ import org.junit.Test;
 public class HollowChecksumShardedTest {
 
     /**
-     * The per-shard parallel checksum is opt-in (via {@code HollowProducer.Builder.withParallelPerShardChecksum}).
-     * The no-arg / default path must be computed exactly as before: one partial per type (the serial per-type fold),
-     * combined in sorted type-name order. This preserves the historical checksum value for callers that don't opt in.
+     * The {@code HollowChecksum} overloads that don't take a mode must be computed exactly as before: one partial per
+     * type (the serial per-type fold), combined in sorted type-name order. This preserves the historical checksum value
+     * for direct callers. (Only the producer's integrity check defaults to per-shard.)
      */
     @Test
     public void defaultChecksumUsesPerTypeComputation() throws IOException {
@@ -309,6 +309,76 @@ public class HollowChecksumShardedTest {
                 .build();
         producer.initializeDataModel(E2EPojo.class);
 
+        List<String> checksumLogLines = captureChecksumLogLines(() -> {
+            producer.runCycle(ws -> addE2ERecords(ws, 4000));
+            producer.runCycle(ws -> addE2ERecords(ws, 4001));
+            perShard.set(true);
+            producer.runCycle(ws -> addE2ERecords(ws, 4002));
+            perShard.set(false);
+            producer.runCycle(ws -> addE2ERecords(ws, 4003));
+        });
+
+        Assert.assertEquals(
+                Arrays.asList("CHECKSUMS (per-type)", "CHECKSUMS (per-shard)", "CHECKSUMS (per-type)"),
+                checksumLogLines);
+    }
+
+    /**
+     * A producer that doesn't configure the checksum mode uses per-shard.
+     */
+    @Test
+    public void integrityCheckUsesPerShardChecksumByDefault() {
+        HollowProducer producer = HollowProducer.withPublisher(new InMemoryBlobStore())
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withTargetMaxTypeShardSize(2048)
+                .build();
+
+        Assert.assertEquals(Arrays.asList("CHECKSUMS (per-shard)"), checksumModesOverTwoCycles(producer));
+    }
+
+    /**
+     * A supplier returning {@code null} (for example an unset dynamic property) means the default, per-shard.
+     */
+    @Test
+    public void checksumModeSupplierReturningNullUsesPerShardDefault() {
+        HollowProducer producer = HollowProducer.withPublisher(new InMemoryBlobStore())
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withParallelPerShardChecksum(() -> null)
+                .withTargetMaxTypeShardSize(2048)
+                .build();
+
+        Assert.assertEquals(Arrays.asList("CHECKSUMS (per-shard)"), checksumModesOverTwoCycles(producer));
+    }
+
+    /**
+     * Opting out with a supplier returning {@code false} uses per-type.
+     */
+    @Test
+    public void checksumModeSupplierReturningFalseUsesPerType() {
+        HollowProducer producer = HollowProducer.withPublisher(new InMemoryBlobStore())
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withParallelPerShardChecksum(() -> false)
+                .withTargetMaxTypeShardSize(2048)
+                .build();
+
+        Assert.assertEquals(Arrays.asList("CHECKSUMS (per-type)"), checksumModesOverTwoCycles(producer));
+    }
+
+    /**
+     * Runs two cycles (the second is the first with an integrity check) and returns the checksum-mode log lines.
+     */
+    private List<String> checksumModesOverTwoCycles(HollowProducer producer) {
+        producer.initializeDataModel(E2EPojo.class);
+        return captureChecksumLogLines(() -> {
+            producer.runCycle(ws -> addE2ERecords(ws, 4000));
+            producer.runCycle(ws -> addE2ERecords(ws, 4001));
+        });
+    }
+
+    /**
+     * Runs {@code body} and returns the "CHECKSUMS (mode)" lines the producer logged during it.
+     */
+    private static List<String> captureChecksumLogLines(Runnable body) {
         List<String> checksumLogLines = new ArrayList<>();
         Handler handler = new Handler() {
             @Override
@@ -322,19 +392,11 @@ public class HollowChecksumShardedTest {
         Logger producerLogger = Logger.getLogger("com.netflix.hollow.api.producer.AbstractHollowProducer");
         producerLogger.addHandler(handler);
         try {
-            producer.runCycle(ws -> addE2ERecords(ws, 4000));
-            producer.runCycle(ws -> addE2ERecords(ws, 4001));
-            perShard.set(true);
-            producer.runCycle(ws -> addE2ERecords(ws, 4002));
-            perShard.set(false);
-            producer.runCycle(ws -> addE2ERecords(ws, 4003));
+            body.run();
         } finally {
             producerLogger.removeHandler(handler);
         }
-
-        Assert.assertEquals(
-                Arrays.asList("CHECKSUMS (per-type)", "CHECKSUMS (per-shard)", "CHECKSUMS (per-type)"),
-                checksumLogLines);
+        return checksumLogLines;
     }
 
     /**
