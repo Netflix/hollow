@@ -751,6 +751,7 @@ public class HollowProducer extends AbstractHollowProducer {
         SingleProducerEnforcer singleProducerEnforcer = new BasicSingleProducerEnforcer();
         HollowObjectHashCodeFinder hashCodeFinder = null;
         boolean doIntegrityCheck = true;
+        Supplier<Boolean> parallelPerShardChecksum = () -> true;
         boolean partitionedOrdinalMap = false;
         ProducerOptionalBlobPartConfig optionalPartConfig = null;
         HollowConsumer.UpdatePlanBlobVerifier updatePlanBlobVerifier = HollowConsumer.UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
@@ -969,6 +970,24 @@ public class HollowProducer extends AbstractHollowProducer {
         
         public B noIntegrityCheck() {
             this.doIntegrityCheck = false;
+            return (B) this;
+        }
+
+        /**
+         * Chooses how the integrity checksum is parallelized. By default (and when the supplier returns {@code true}
+         * or {@code null}) it runs one task per (type, shard), so the shards of a large type are checksummed in
+         * parallel. When the supplier returns {@code false} it runs one task per type (the legacy mode), so each type
+         * is checksummed on a single thread; use this to limit CPU bursts during the integrity check.
+         * <p>
+         * Evaluated once per integrity check, so all checksums within a check use the same mode; a change (for
+         * example from a dynamic property) takes effect on the next cycle.
+         *
+         * @param parallelPerShardChecksum supplier returning whether to compute the integrity checksum per
+         *         (type, shard)
+         * @return this builder
+         */
+        public B withParallelPerShardChecksum(Supplier<Boolean> parallelPerShardChecksum) {
+            this.parallelPerShardChecksum = parallelPerShardChecksum;
             return (B) this;
         }
 
