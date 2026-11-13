@@ -19,10 +19,8 @@ package com.netflix.hollow.core.memory;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.HollowBlobInput;
-import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import sun.misc.Unsafe;
 
 /**
@@ -128,18 +126,11 @@ public class SegmentedLongArray {
         if(numLongs == 0)
             return;
 
-        byte[] bytes = new byte[(int) Math.min(segmentSize, numLongs) * Long.BYTES];
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        DataInput input = (DataInput) in.getInput();
+        BulkLongReader reader = new BulkLongReader(in, (int) Math.min(segmentSize, numLongs));
 
         while(numLongs > 0) {
             int longsToCopy = (int) Math.min(segmentSize, numLongs);
-            input.readFully(bytes, 0, longsToCopy * Long.BYTES);
-
-            for(int i=0;i<longsToCopy;i++) {
-                unsafe.putLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (long) Long.BYTES * i,
-                        buffer.getLong(i * Long.BYTES));
-            }
+            reader.readFully(segments[segment], 0, longsToCopy);
 
             // Duplicate the first value in the previous segment's padding for cross-boundary reads.
             if(segment > 0) {
