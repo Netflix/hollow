@@ -73,11 +73,18 @@ public class FixedLengthElementArray extends SegmentedLongArray implements Fixed
     }
 
     public FixedLengthElementArray(HollowReadConfiguration configuration, long numBits) {
-        super(configuration.getMemoryRecycler(), ((numBits - 1) >>> 6) + 1);
+        super(configuration.getMemoryRecycler(), bitsToNumLongs(numBits));
         this.log2OfSegmentSizeInBytes = log2OfSegmentSize + 3;
         this.byteBitmask = (1 << log2OfSegmentSizeInBytes) - 1;
         this.sizeBits = numBits;
         this.useShardReadFastPaths = configuration.isExperimentalFeatureEnabled(ExperimentalFeature.SHARD_READ_FAST_PATHS);
+    }
+
+    private static long bitsToNumLongs(long numBits) {
+        if(numBits < 0) {
+            throw new IllegalArgumentException("numBits cannot be negative: " + numBits);
+        }
+        return numBits == 0 ? 0 : ((numBits - 1) >>> 6) + 1;
     }
 
     public long approxHeapFootprintInBytes() {
