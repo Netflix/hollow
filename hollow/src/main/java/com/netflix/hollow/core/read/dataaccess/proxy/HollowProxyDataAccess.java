@@ -61,21 +61,31 @@ public class HollowProxyDataAccess implements HollowDataAccess {
             HollowTypeProxyDataAccess proxyDataAccess = typeDataAccessMap.get(type);
 
             if(proxyDataAccess == null) {
-                if(typeDataAccess instanceof HollowObjectTypeDataAccess) {
-                    proxyDataAccess = new HollowObjectProxyDataAccess(this);
-                } else if(typeDataAccess instanceof HollowListTypeDataAccess) {
-                    proxyDataAccess = new HollowListProxyDataAccess(this);
-                } else if(typeDataAccess instanceof HollowSetTypeDataAccess) {
-                    proxyDataAccess = new HollowSetProxyDataAccess(this);
-                } else if(typeDataAccess instanceof HollowMapTypeDataAccess) {
-                    proxyDataAccess = new HollowMapProxyDataAccess(this);
-                }
-
+                proxyDataAccess = newTypeProxy(typeDataAccess);
                 typeDataAccessMap.put(type, proxyDataAccess);
             }
 
             proxyDataAccess.setCurrentDataAccess(typeDataAccess);
         }
+    }
+
+    /**
+     * Creates a type's proxy, the first time a data access with the type is set.
+     *
+     * @param typeDataAccess the type's data access
+     * @return an object, list, set or map proxy, as the type's data access is, whose data access is this
+     */
+    protected HollowTypeProxyDataAccess newTypeProxy(HollowTypeDataAccess typeDataAccess) {
+        if(typeDataAccess instanceof HollowObjectTypeDataAccess) {
+            return new HollowObjectProxyDataAccess(this);
+        } else if(typeDataAccess instanceof HollowListTypeDataAccess) {
+            return new HollowListProxyDataAccess(this);
+        } else if(typeDataAccess instanceof HollowSetTypeDataAccess) {
+            return new HollowSetProxyDataAccess(this);
+        } else if(typeDataAccess instanceof HollowMapTypeDataAccess) {
+            return new HollowMapProxyDataAccess(this);
+        }
+        return null;
     }
 
     public void disableDataAccess() {

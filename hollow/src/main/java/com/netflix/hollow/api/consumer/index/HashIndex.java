@@ -31,6 +31,10 @@ import java.util.Objects;
  * (performed after such updates).  When a registered index is no longer needed it should be
  * {@link HollowConsumer#removeRefreshListener(HollowConsumer.RefreshListener) deregistered} to avoid unnecessary
  * index recalculation and to ensure the index is reclaimed by the garbage collector.
+ * <p>
+ * It indexes the consumer's state engine, so it can't index a version hold ({@link com.netflix.hollow.api.consumer.longevity.HollowVersionHold}): over a hold, build a
+ * {@link com.netflix.hollow.core.index.HollowHashIndex} with the hold's data access and read the matching records
+ * through the hold's API.
  *
  * @param <T> the root, select, and result type
  * @param <Q> the query type

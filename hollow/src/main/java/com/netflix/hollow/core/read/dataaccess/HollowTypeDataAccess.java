@@ -21,6 +21,7 @@ import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.schema.HollowSchema;
+import java.util.BitSet;
 
 /**
  * A handle for all of the records of a specific type in a Hollow dataset.  The most common type of {@link HollowTypeDataAccess}
@@ -51,5 +52,25 @@ public interface HollowTypeDataAccess {
      * @return the read state
      */
     HollowTypeReadState getTypeState();
+
+    /**
+     * Returns the ordinals populated in the version this data access reads, which is what indexes and
+     * {@code getAll…} collections built over it iterate. By default, those of {@link #getTypeState()}.
+     * <p>
+     * WARNING: Do not modify the returned BitSet.
+     *
+     * @return the populated ordinals
+     */
+    default BitSet getPopulatedOrdinals() {
+        return getTypeState().getPopulatedOrdinals();
+    }
+
+    /**
+     * @return the largest ordinal of the version this data access reads, at least that of any populated ordinal; by
+     * default, that of {@link #getTypeState()}
+     */
+    default int getMaxOrdinal() {
+        return getTypeState().maxOrdinal();
+    }
 
 }

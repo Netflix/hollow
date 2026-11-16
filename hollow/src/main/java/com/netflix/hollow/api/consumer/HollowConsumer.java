@@ -27,6 +27,9 @@ import com.netflix.hollow.api.client.HollowClientUpdater;
 import com.netflix.hollow.api.client.StaleHollowReferenceDetector;
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
+import com.netflix.hollow.api.consumer.longevity.HollowVersionHold;
+import com.netflix.hollow.api.consumer.longevity.LongevityStats;
+import com.netflix.hollow.api.consumer.longevity.VersionNotReachableException;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
@@ -107,10 +110,11 @@ import java.util.logging.Logger;
  * A double snapshot will allow your consumer to update in case of a broken delta chain, but will also result in a doubling of
  * the heap footprint while the double snapshot is occurring.</dd>
  *
- * <dt>{@link HollowConsumer.ObjectLongevityConfig}</dt>
- * <dd>Object longevity is used to guarantee that Hollow objects which are backed by removed records will remain usable and
- * consistent until old references are discarded.  This behavior is turned off by default.  Implementations of this config
- * can be used to enable and configure this behavior.</dd>
+ * <dt>{@link HollowConsumer.ObjectLongevity}</dt>
+ * <dd>Object longevity keeps Hollow objects backed by removed records readable.  It is off by default.  In expiring mode,
+ * configured by an {@link HollowConsumer.ObjectLongevityConfig}, objects stay usable and consistent until old references
+ * are discarded.  In held mode, configured by a {@link HollowConsumer.HeldVersionsConfig}, versions chosen with
+ * {@link #holdVersion(long)} stay readable until they are released.</dd>
  *
  * <dt>{@link HollowConsumer.ObjectLongevityDetector}</dt>
  * <dd>Implementations of this config will be notified when usage of expired Hollow object references is attempted.</dd>
@@ -177,10 +181,11 @@ public class HollowConsumer {
                 doubleSnapshotConfig,
                 hashCodeFinder,
                 memoryMode,
-                objectLongevityConfig,
+                ObjectLongevity.expiring(objectLongevityConfig),
                 objectLongevityDetector,
                 metrics,
-                metricsCollector);
+                metricsCollector,
+                UpdatePlanBlobVerifier.DEFAULT_INSTANCE);
         updater.setFilter(dataFilter);
         this.announcementWatcher = announcementWatcher;
         this.refreshExecutor = refreshExecutor;
@@ -200,7 +205,7 @@ public class HollowConsumer {
                 builder.doubleSnapshotConfig,
                 builder.hashCodeFinder,
                 builder.memoryMode,
-                builder.objectLongevityConfig,
+                builder.objectLongevity(),
                 builder.objectLongevityDetector,
                 metrics,
                 builder.metricsCollector,
@@ -321,6 +326,49 @@ public class HollowConsumer {
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
+    }
+
+    /**
+     * Holds a version, which stays readable exactly until the returned hold is closed, however far the state engine
+     * moves on. Requires held mode, {@link Builder#withObjectLongevity(ObjectLongevity)} with
+     * {@link ObjectLongevity#held()}.
+     * <p>
+     * The current version, and any version the state engine applied since the oldest open hold, is held at once,
+     * without transitions. Any other version is refreshed to first, on the calling thread, under the normal update
+     * plan: deltas, or a double snapshot when the deltas are too many or missing, after which holds taken before it
+     * keep reading the state engine it replaced. If no transition lands on the version, that refresh still applies;
+     * after a double snapshot the new state engine then has no hold, and until the next one its refreshes behave as
+     * before the first hold.
+     * <p>
+     * This is a blocking call when it refreshes.
+     *
+     * @param version the version to hold
+     * @return the hold, which the caller must close
+     * @throws IllegalStateException if the consumer is not in held mode, or if called while a delta is applied, as
+     * from a refresh listener's blobLoaded or a type state listener
+     * @throws IllegalArgumentException if the version is {@code VERSION_NONE} or {@code VERSION_LATEST}
+     * @throws VersionNotReachableException if no transition lands on the version
+     */
+    public HollowVersionHold holdVersion(long version) {
+        try {
+            return updater.holdVersion(version);
+        } catch (Error | RuntimeException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    /**
+     * Returns held mode's stats: the open holds, the lead past the oldest, the copies kept for them and reads through
+     * released holds. Reading them takes no lock, so a refresh listener can read them after every refresh, background
+     * ones included, and a metrics poller at any time.
+     *
+     * @return the stats, as of this call
+     * @throws IllegalStateException if the consumer is not in held mode
+     */
+    public LongevityStats getLongevityStats() {
+        return updater.getLongevityStats();
     }
 
     /**
@@ -870,6 +918,133 @@ public class HollowConsumer {
     }
 
     /**
+     * How a consumer keeps Hollow objects backed by removed records readable, chosen when the consumer is built and fixed
+     * for its life.
+     * <p>
+     * In every mode the state engine has the newest version, and older versions stay readable from copies of the
+     * records each delta removed. The mode decides who keeps an old version: in expiring mode each {@link HollowConsumer#getAPI()}
+     * handle keeps its own until garbage collection or the stale-reference detector drops it; in held mode only
+     * {@link HollowVersionHold}s keep versions, each until it is closed.
+     */
+    public static final class ObjectLongevity {
+        public enum Mode { OFF, EXPIRING, HELD }
+
+        private static final ObjectLongevity OFF = new ObjectLongevity(Mode.OFF, ObjectLongevityConfig.DEFAULT_CONFIG, null);
+
+        private final Mode mode;
+        private final ObjectLongevityConfig objectLongevityConfig;
+        private final HeldVersionsConfig heldVersionsConfig;
+
+        private ObjectLongevity(Mode mode, ObjectLongevityConfig objectLongevityConfig, HeldVersionsConfig heldVersionsConfig) {
+            this.mode = mode;
+            this.objectLongevityConfig = objectLongevityConfig;
+            this.heldVersionsConfig = heldVersionsConfig;
+        }
+
+        /**
+         * The default: objects are valid until the next refresh.
+         *
+         * @return off mode
+         */
+        public static ObjectLongevity off() {
+            return OFF;
+        }
+
+        /**
+         * Long-lived objects: each {@link HollowConsumer#getAPI()} handle keeps the version it was handed out at until garbage
+         * collection or the stale-reference detector drops it, while the state engine follows every refresh.
+         * {@link ObjectLongevityConfig#enableLongLivedObjectSupport()} still turns this off and on at runtime.
+         *
+         * @param config the long-lived object settings
+         * @return expiring mode
+         */
+        public static ObjectLongevity expiring(ObjectLongevityConfig config) {
+            return new ObjectLongevity(Mode.EXPIRING, Objects.requireNonNull(config), null);
+        }
+
+        /**
+         * Version holds: {@link HollowConsumer#holdVersion(long)} keeps a version readable, exactly, until the hold is closed.
+         * {@link HollowConsumer#getAPI()} is the state engine's own API, valid until the next refresh, as with {@link #off()}.
+         * <p>
+         * While the state engine has an open hold, every other refresh moves it under Hollow's normal plan, ahead of
+         * the holds or back, but never applies a snapshot: a refresh that needs one fails, and the next hold that needs
+         * a refresh takes it. A refresh that fails before applying anything, such as when an announcement arrives
+         * before its delta is visible, forces no double snapshot, so the next refresh retries the delta. These
+         * refreshes stop {@link HeldVersionsConfig#maxDeltasPastOldestHold()} deltas past the oldest open hold.
+         *
+         * @param config held mode's settings
+         * @return held mode
+         */
+        public static ObjectLongevity held(HeldVersionsConfig config) {
+            return new ObjectLongevity(Mode.HELD, ObjectLongevityConfig.DEFAULT_CONFIG, Objects.requireNonNull(config));
+        }
+
+        /**
+         * @return held mode with {@link HeldVersionsConfig#DEFAULT}
+         */
+        public static ObjectLongevity held() {
+            return held(HeldVersionsConfig.DEFAULT);
+        }
+
+        public Mode getMode() {
+            return mode;
+        }
+
+        /**
+         * @return expiring mode's config; {@link ObjectLongevityConfig#DEFAULT_CONFIG}, which keeps no long-lived
+         * objects, in the other modes
+         */
+        public ObjectLongevityConfig getObjectLongevityConfig() {
+            return objectLongevityConfig;
+        }
+
+        /**
+         * @return held mode's config; null in the other modes
+         */
+        public HeldVersionsConfig getHeldVersionsConfig() {
+            return heldVersionsConfig;
+        }
+    }
+
+    /**
+     * The settings of held mode, {@link ObjectLongevity#held(HeldVersionsConfig)}.
+     */
+    public interface HeldVersionsConfig {
+        HeldVersionsConfig DEFAULT = new HeldVersionsConfig() {};
+
+        /**
+         * Whether held versions are read through direct lookup: a record unchanged since a held version is read from
+         * the state engine after one bit test, and a changed one from its copy after one map lookup. Off, held
+         * versions read through the chain of copies, one per delta since their version.
+         * <p>
+         * Hollow reads this at every refresh, including one that applies nothing. Turned off, every held version goes
+         * back to the chain; turned on, it applies to the state engine's version at that refresh and later ones.
+         *
+         * @return true by default
+         */
+        default boolean enableDirectLookup() {
+            return true;
+        }
+
+        /**
+         * How far background refreshes run the state engine past the oldest open hold, in deltas applied, forward or
+         * reverse. Once the engine is this far past it, a background refresh returns without applying anything or
+         * calling refresh listeners, until the hold is closed or the limit is raised. Hold requests ignore it.
+         * <p>
+         * The limit is soft: it is checked before each background refresh, and a refresh applies up to
+         * {@link DoubleSnapshotConfig#maxDeltasBeforeDoubleSnapshot()} deltas, so the engine can end up to that many
+         * minus one deltas past the limit, 31 with the default double snapshot config.
+         * <p>
+         * Hollow reads this before every background refresh.
+         *
+         * @return 120 by default
+         */
+        default int maxDeltasPastOldestHold() {
+            return 120;
+        }
+    }
+
+    /**
      * Listens for stale Hollow object usage
      */
     public interface ObjectLongevityDetector {
@@ -1154,7 +1329,12 @@ public class HollowConsumer {
         protected HollowObjectHashCodeFinder hashCodeFinder = new DefaultHashCodeFinder();
         protected HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = DoubleSnapshotConfig.DEFAULT_CONFIG;
         protected UpdatePlanBlobVerifier updatePlanBlobVerifier = UpdatePlanBlobVerifier.DEFAULT_INSTANCE;
+        /**
+         * Expiring mode's config, {@link ObjectLongevityConfig#DEFAULT_CONFIG} in the other modes. Setting it directly
+         * chooses expiring mode.
+         */
         protected HollowConsumer.ObjectLongevityConfig objectLongevityConfig = ObjectLongevityConfig.DEFAULT_CONFIG;
+        protected HollowConsumer.ObjectLongevity objectLongevity = ObjectLongevity.off();
         protected HollowConsumer.ObjectLongevityDetector objectLongevityDetector = ObjectLongevityDetector.DEFAULT_DETECTOR;
         protected File localBlobStoreDir = null;
         protected boolean useExistingStaleSnapshot;
@@ -1435,9 +1615,36 @@ public class HollowConsumer {
             return (B)this;
         }
 
-        public B withObjectLongevityConfig(HollowConsumer.ObjectLongevityConfig objectLongevityConfig) {
-            this.objectLongevityConfig = objectLongevityConfig;
+        /**
+         * Chooses how the consumer keeps objects backed by removed records readable: {@link ObjectLongevity#off()}, the
+         * default, {@link ObjectLongevity#expiring(ObjectLongevityConfig)} or {@link ObjectLongevity#held()}. The last
+         * call to this method or {@link #withObjectLongevityConfig(ObjectLongevityConfig)} wins.
+         *
+         * @param objectLongevity the mode
+         * @return this builder
+         */
+        public B withObjectLongevity(HollowConsumer.ObjectLongevity objectLongevity) {
+            this.objectLongevity = Objects.requireNonNull(objectLongevity);
+            this.objectLongevityConfig = objectLongevity.getObjectLongevityConfig();
             return (B)this;
+        }
+
+        /**
+         * Same as {@code withObjectLongevity(ObjectLongevity.expiring(objectLongevityConfig))}.
+         *
+         * @param objectLongevityConfig the long-lived object settings
+         * @return this builder
+         */
+        public B withObjectLongevityConfig(HollowConsumer.ObjectLongevityConfig objectLongevityConfig) {
+            return withObjectLongevity(ObjectLongevity.expiring(objectLongevityConfig));
+        }
+
+        /**
+         * @return the chosen mode; expiring with {@code objectLongevityConfig} if a subclass set that field directly
+         */
+        protected HollowConsumer.ObjectLongevity objectLongevity() {
+            return objectLongevity.getObjectLongevityConfig() == objectLongevityConfig
+                    ? objectLongevity : ObjectLongevity.expiring(objectLongevityConfig);
         }
 
         public B withObjectLongevityDetector(HollowConsumer.ObjectLongevityDetector objectLongevityDetector) {
