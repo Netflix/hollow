@@ -106,9 +106,9 @@ public class HollowPrimaryKeyValueDeriver {
             case BYTES:
                 return Arrays.equals(dataAccess.readBytes(ordinal, lastFieldIdx), (byte[])key);
             case DOUBLE:
-                return dataAccess.readDouble(ordinal, lastFieldIdx) == ((Double)key).doubleValue();
+                return Double.doubleToLongBits(dataAccess.readDouble(ordinal, lastFieldIdx)) == Double.doubleToLongBits(((Double)key).doubleValue());
             case FLOAT:
-                return dataAccess.readFloat(ordinal, lastFieldIdx) == ((Float)key).floatValue();
+                return Float.floatToIntBits(dataAccess.readFloat(ordinal, lastFieldIdx)) == Float.floatToIntBits(((Float)key).floatValue());
             case INT:
                 return dataAccess.readInt(ordinal, lastFieldIdx) == ((Integer)key).intValue();
             case LONG:

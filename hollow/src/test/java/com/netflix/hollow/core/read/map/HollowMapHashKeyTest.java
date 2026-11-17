@@ -28,6 +28,7 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
@@ -203,6 +204,40 @@ public class HollowMapHashKeyTest {
         Assert.assertEquals(500, value.getInt("value"));
     }
     
+    @Test
+    public void testNegativeZeroDoubleHashKey() throws IOException {
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+        mapper.useDefaultHashKeys();
+
+        Map<Double, String> doubleMap = new LinkedHashMap<Double, String>();
+        doubleMap.put(0.0d, "zero");
+        doubleMap.put(51.0d, "fifty-one");
+        doubleMap.put(52.0d, "fifty-two");
+        doubleMap.put(-0.0d, "negative zero");
+        mapper.add(new DoubleMapObject(doubleMap));
+
+        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
+
+        GenericHollowObject obj = new GenericHollowObject(readEngine, "DoubleMapObject", 0);
+        Assert.assertEquals(doubleMap.size(), obj.getMap("doubleMap").size());
+
+        for(Map.Entry<Double, String> entry : doubleMap.entrySet()) {
+            GenericHollowObject value = (GenericHollowObject) obj.getMap("doubleMap").findValue(entry.getKey());
+            Assert.assertNotNull("no value found for " + entry.getKey(), value);
+            Assert.assertEquals(entry.getValue(), value.getString("value"));
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class DoubleMapObject {
+        Map<Double, String> doubleMap;
+
+        public DoubleMapObject(Map<Double, String> doubleMap) {
+            this.doubleMap = doubleMap;
+        }
+    }
+
     @SuppressWarnings("unused")
     private static class TestTopLevelObject {
         int id;
