@@ -429,6 +429,24 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         } catch (NullPointerException e) {}
     }
 
+    @Test
+    public void testNegativeZeroDoubleKey() throws IOException {
+        double[] keys = { 0.0d, 51.0d, 52.0d, -0.0d };
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        for (double key : keys) {
+            mapper.add(new TypeDoubleKey(key));
+        }
+        roundTripSnapshot();
+
+        TestableUniqueKeyIndex idx = createIndex("TypeDoubleKey", "key");
+        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("TypeDoubleKey");
+        for (double key : keys) {
+            int ordinal = idx.getMatchingOrdinal(key);
+            Assert.assertNotEquals("no record found for key " + key, -1, ordinal);
+            Assert.assertEquals(Double.valueOf(key), Double.valueOf(typeState.readDouble(ordinal, 0)));
+        }
+    }
+
     private static void addDataForDupTesting(HollowWriteStateEngine writeStateEngine, int a1Start, double a2, int size) {
         TypeB typeB = new TypeB("commonTypeB");
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
@@ -471,6 +489,15 @@ public class HollowPrimaryKeyIndexTest extends AbstractStateEngineTest {
         public TypeB(String b1, boolean isDuplicate) {
             this.b1 = b1;
             this.isDuplicate = isDuplicate;
+        }
+    }
+
+    @HollowPrimaryKey(fields = {"key"})
+    private static class TypeDoubleKey {
+        private final double key;
+
+        public TypeDoubleKey(double key) {
+            this.key = key;
         }
     }
 

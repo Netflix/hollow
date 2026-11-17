@@ -25,6 +25,7 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
@@ -78,6 +79,39 @@ public class HollowSetHashKeyTest {
     }
     
     
+    @Test
+    public void testNegativeZeroFloatHashKey() throws IOException {
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+        mapper.useDefaultHashKeys();
+
+        float[] values = { 0.0f, 49.0f, 50.0f, -0.0f };
+        Set<Float> floatSet = new LinkedHashSet<Float>();
+        for(float value : values)
+            floatSet.add(value);
+        mapper.add(new FloatSetObject(floatSet));
+
+        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
+
+        GenericHollowObject obj = new GenericHollowObject(readEngine, "FloatSetObject", 0);
+        Assert.assertEquals(values.length, obj.getSet("floatSet").size());
+
+        for(float value : values) {
+            GenericHollowObject element = (GenericHollowObject) obj.getSet("floatSet").findElement(value);
+            Assert.assertNotNull("no element found for " + value, element);
+            Assert.assertEquals(Float.valueOf(value), Float.valueOf(element.getFloat("value")));
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class FloatSetObject {
+        Set<Float> floatSet;
+
+        public FloatSetObject(Set<Float> floatSet) {
+            this.floatSet = floatSet;
+        }
+    }
+
     @SuppressWarnings("unused")
     private static class TestTopLevelObject {
         int id;
