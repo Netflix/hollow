@@ -73,7 +73,7 @@ public class HollowPerfAPICache<T> {
     }
     
     public Object[] getCachedItems() {
-        return Arrays.copyOf(cachedItems, cachedItems.length);
+        return cachedItems.clone();
     }
 
 }

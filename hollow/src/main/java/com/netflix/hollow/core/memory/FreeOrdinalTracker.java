@@ -101,7 +101,7 @@ public class FreeOrdinalTracker {
             shards[freeGlobalOrdinal & shardNumberMask].freeOrdinalCount++;
         }
 
-        Shard orderedShards[] = Arrays.copyOf(shards, shards.length);
+        Shard orderedShards[] = shards.clone();
         Arrays.sort(orderedShards, (s1, s2) -> s2.freeOrdinalCount - s1.freeOrdinalCount);
 
         for(int i=1;i<numShards;i++)
