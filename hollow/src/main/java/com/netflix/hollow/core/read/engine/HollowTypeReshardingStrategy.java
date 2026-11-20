@@ -96,7 +96,7 @@ public abstract class HollowTypeReshardingStrategy {
                 shardOrdinalShifts = new int[typeState.getShardsVolatile().getShards().length];
                 copyShardDataElements(typeState.getShardsVolatile(), newDataElements, shardOrdinalShifts);
 
-                HollowTypeReadStateShard[] newShards = Arrays.copyOfRange(typeState.getShardsVolatile().getShards(), 0, newNumShards);
+                HollowTypeReadStateShard[] newShards = Arrays.copyOf(typeState.getShardsVolatile().getShards(), newNumShards);
                 typeState.updateShardsVolatile(newShards);
 
                 // Re-sharding done.
@@ -160,7 +160,7 @@ public abstract class HollowTypeReshardingStrategy {
         HollowTypeDataElementsJoiner joiner = createDataElementsJoiner(joinCandidates);
         HollowTypeDataElements joined = joiner.join();
 
-        HollowTypeReadStateShard[] newShards = Arrays.copyOf(shardsHolder.getShards(), shardsHolder.getShards().length);
+        HollowTypeReadStateShard[] newShards = shardsHolder.getShards().clone();
         for (int i=0; i<shardingFactor; i++) {
             newShards[currentIndex + (newNumShards*i)] = typeState.createTypeReadStateShard(typeState.getSchema(), joined, newShardOrdinalShift);
         }
@@ -190,7 +190,7 @@ public abstract class HollowTypeReshardingStrategy {
         HollowTypeDataElementsSplitter splitter = createDataElementsSplitter(dataElementsToSplit, shardingFactor);
         HollowTypeDataElements[] splits = splitter.split();
 
-        HollowTypeReadStateShard[] newShards = Arrays.copyOf(shardsHolder.getShards(), shardsHolder.getShards().length);
+        HollowTypeReadStateShard[] newShards = shardsHolder.getShards().clone();
         for (int i = 0; i < shardingFactor; i ++) {
             newShards[currentIndex + (prevNumShards*i)] = typeState.createTypeReadStateShard(typeState.getSchema(), splits[i], newShardOrdinalShift);
         }
