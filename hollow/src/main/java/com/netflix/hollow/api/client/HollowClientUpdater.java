@@ -236,6 +236,12 @@ public class HollowClientUpdater {
 
             if (updatePlan.destinationVersion() == HollowConstants.VERSION_NONE
                     && requestedVersion != HollowConstants.VERSION_LATEST) {
+                if (holdRequest && beforeVersion != HollowConstants.VERSION_NONE) {
+                    // nothing gets closer to the version, as when the engine already stopped below it: the consumer
+                    // stays, nothing is forced, and holdVersion reports the version unreachable
+                    metrics.setLastRefreshEndNs(System.nanoTime());
+                    return false;
+                }
                 String msg = String.format("Could not create an update plan for version %s, because "
                         + "that version or any qualifying previous versions could not be retrieved.", requestedVersion);
                 if (beforeVersion != HollowConstants.VERSION_NONE) {

@@ -426,6 +426,27 @@ public class HollowVersionHoldTest {
     }
 
     @Test
+    public void aVersionNoTransitionLandsOnStaysUnreachableWhereTheRefreshStoppedAndForcesNothing() {
+        List<Long> versions = fixture.cycles(3);
+        HollowConsumer consumer = fixture.heldConsumer();
+        consumer.triggerRefreshTo(versions.get(0));
+        long between = versions.get(2) - 1;
+        for (int attempt = 0; attempt < 2; attempt++) { // the second plans from where the first stopped
+            try {
+                consumer.holdVersion(between);
+                fail();
+            } catch (VersionNotReachableException expected) {
+            }
+            assertEquals((long) versions.get(1), consumer.getCurrentVersionId());
+        }
+
+        HollowReadStateEngine engine = consumer.getStateEngine();
+        HollowVersionHold hold = consumer.holdVersion(versions.get(2));
+        assertSame("a delta, not a forced double snapshot", engine, consumer.getStateEngine());
+        assertEquals(1, hold.getTransitionsApplied());
+    }
+
+    @Test
     public void theFirstHoldMayLoadTheConsumer() {
         long v1 = fixture.cycle();
         HollowConsumer consumer = fixture.heldConsumer();
