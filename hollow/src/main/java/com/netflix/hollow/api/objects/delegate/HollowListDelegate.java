@@ -19,6 +19,8 @@ package com.netflix.hollow.api.objects.delegate;
 import com.netflix.hollow.api.custom.HollowListTypeAPI;
 import com.netflix.hollow.api.objects.HollowList;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 
 /**
@@ -41,6 +43,17 @@ public interface HollowListDelegate<T> extends HollowRecordDelegate {
     public HollowListSchema getSchema();
 
     public HollowListTypeDataAccess getTypeDataAccess();
+
+    default HollowOrdinalIterator iterator(int ordinal) {
+        return getTypeDataAccess().ordinalIterator(ordinal);
+    }
+
+    /**
+     * An indexed ordinal cursor, or {@code null} to retain get-based traversal for custom delegates.
+     */
+    default HollowListOrdinalIterator ordinalCursor(int ordinal) {
+        return null;
+    }
 
     public HollowListTypeAPI getTypeAPI();
 

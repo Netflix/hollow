@@ -25,7 +25,8 @@ public class HollowConsumerExperimentalFeaturesTest {
     public void featuresDefaultToOff() throws IOException {
         TestHollowConsumer consumer = builder().build();
         loadSnapshot(consumer, 1L);
-        assertFalse(consumer.getStateEngine().isExperimentalFeatureEnabled(SHARD_READ_FAST_PATHS));
+        for(ExperimentalFeature feature : ExperimentalFeature.values())
+            assertFalse(consumer.getStateEngine().isExperimentalFeatureEnabled(feature));
     }
 
     @Test
@@ -101,6 +102,34 @@ public class HollowConsumerExperimentalFeaturesTest {
         loadSnapshot(both, 1L);
         assertTrue(both.getStateEngine().isExperimentalFeatureEnabled(DIRECT_SEGMENT_STRING_READS));
         assertTrue(both.getStateEngine().isExperimentalFeatureEnabled(SHARD_READ_FAST_PATHS));
+    }
+
+    @Test
+    public void allFeatureCombinationsSurviveReplacementSnapshots() throws IOException {
+        ExperimentalFeature[] features = ExperimentalFeature.values();
+        for(int mask = 0; mask < (1 << features.length); mask++) {
+            TestHollowConsumer.Builder builder = builder();
+            for(int i = 0; i < features.length; i++) {
+                if((mask & (1 << i)) != 0)
+                    builder.withExperimentalFeatures(features[i]);
+            }
+            TestHollowConsumer consumer = builder.build();
+            loadSnapshot(consumer, 1L);
+            loadSnapshot(consumer, 2L);
+            for(int i = 0; i < features.length; i++)
+                assertEquals((mask & (1 << i)) != 0, consumer.getStateEngine().isExperimentalFeatureEnabled(features[i]));
+            assertEquals((mask & (1 << ExperimentalFeature.SHARD_CURSOR_ITERATORS.ordinal())) != 0,
+                    consumer.getStateEngine().isShardCursorIteratorsEnabled());
+        }
+    }
+
+    @Test
+    public void iteratorConvenienceMethodOnlyOptsInToIterators() throws IOException {
+        TestHollowConsumer consumer = builder().withShardCursorIterators().build();
+        loadSnapshot(consumer, 1L);
+        assertTrue(consumer.getStateEngine().isExperimentalFeatureEnabled(ExperimentalFeature.SHARD_CURSOR_ITERATORS));
+        assertFalse(consumer.getStateEngine().isExperimentalFeatureEnabled(SHARD_READ_FAST_PATHS));
+        assertFalse(consumer.getStateEngine().isExperimentalFeatureEnabled(DIRECT_SEGMENT_STRING_READS));
     }
 
     @Test(expected = NullPointerException.class)

@@ -16,8 +16,14 @@
  */
 package com.netflix.hollow.api.perfapi;
 
+import com.netflix.hollow.api.objects.HollowListTraversal;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import java.util.AbstractList;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Spliterator;
 import java.util.RandomAccess;
 
 public class HollowPerfBackedList<T> extends AbstractList<T> implements RandomAccess {
@@ -43,6 +49,38 @@ public class HollowPerfBackedList<T> extends AbstractList<T> implements RandomAc
     @Override
     public int size() {
         return dataAccess.size(ordinal);
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        if(getClass() != HollowPerfBackedList.class || !HollowListTraversal.isEnabled(dataAccess))
+            return super.iterator();
+        return HollowListTraversal.iterator(dataAccess.ordinalIterator(ordinal), this::instantiateElement);
+    }
+
+    @Override
+    public ListIterator<T> listIterator(int index) {
+        // Subclasses may provide custom get() behavior instead of ordinal-based instantiation.
+        if(getClass() != HollowPerfBackedList.class || !HollowListTraversal.isEnabled(dataAccess))
+            return super.listIterator(index);
+        HollowOrdinalIterator cursor = dataAccess.ordinalIterator(ordinal);
+        return cursor instanceof HollowListOrdinalIterator
+                ? HollowListTraversal.listIterator((HollowListOrdinalIterator)cursor, index, this::instantiateElement)
+                : super.listIterator(index);
+    }
+
+    @Override
+    public Spliterator<T> spliterator() {
+        if(getClass() != HollowPerfBackedList.class || !HollowListTraversal.isEnabled(dataAccess))
+            return super.spliterator();
+        HollowOrdinalIterator cursor = dataAccess.ordinalIterator(ordinal);
+        return cursor instanceof HollowListOrdinalIterator
+                ? HollowListTraversal.spliterator((HollowListOrdinalIterator)cursor, this::instantiateElement)
+                : super.spliterator();
+    }
+
+    private T instantiateElement(int elementOrdinal) {
+        return instantiator.instantiate(elementMaskedTypeIdx | elementOrdinal);
     }
 
 }
