@@ -27,7 +27,7 @@ public class FixedLengthDataFactory {
                 return ContiguousFixedLengthData.newFrom(in, numLongs);
             return FixedLengthElementArray.newFrom(in, configuration, numLongs);
         } else if(mode == MemoryMode.SHARED_MEMORY_LAZY) {
-            return EncodedLongBuffer.newFrom(in);
+            return EncodedLongBuffer.newFrom(in, configuration);
         }
         throw new UnsupportedOperationException("Memory mode " + mode.name() + " not supported");
     }
