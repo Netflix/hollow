@@ -103,7 +103,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
      * @param specificOrdinalsToIndex the bit set
      */
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler, BitSet specificOrdinalsToIndex) {
-        this(stateEngine, primaryKey, memoryRecycler, specificOrdinalsToIndex, SYSTEM_ALLOW_DELTA_UPDATE);
+        this(stateEngine, primaryKey, memoryRecycler, specificOrdinalsToIndex, DEFAULT_ALLOW_DELTA_UPDATE);
     }
 
     private HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler, BitSet specificOrdinalsToIndex, Supplier<Boolean> allowDeltaUpdate) {
@@ -472,7 +472,12 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
 
     private static final boolean ALLOW_DELTA_UPDATE =
             Boolean.getBoolean("com.netflix.hollow.core.index.HollowPrimaryKeyIndex.allowDeltaUpdate");
-    private static final Supplier<Boolean> SYSTEM_ALLOW_DELTA_UPDATE = () -> ALLOW_DELTA_UPDATE;
+    private static final Supplier<Boolean> DEFAULT_ALLOW_DELTA_UPDATE = () -> false;
+
+    // The property force-enables delta updates; otherwise the per-index supplier decides.
+    boolean isDeltaUpdateAllowed() {
+        return ALLOW_DELTA_UPDATE || Boolean.TRUE.equals(allowDeltaUpdate.get());
+    }
 
     @Override
     public synchronized void endUpdate() {
@@ -486,7 +491,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener, TestableU
         int bitsPerElement = (32 - Integer.numberOfLeadingZeros(typeState.maxOrdinal() + 1));
 
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
-        if(Boolean.TRUE.equals(allowDeltaUpdate.get())
+        if(isDeltaUpdateAllowed()
                 && hashTableSize == hashTable.hashTableSize
                 && bitsPerElement == hashTable.bitsPerElement
                 && shouldPerformDeltaUpdate()) {

@@ -201,6 +201,9 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
     }
 
     private void dropLaggedIndex() {
+        if (previousCycleIndex != null) {
+            previousCycleIndex.destroy();
+        }
         previousCycleIndex = null;
         indexStateEngine = null;
     }
@@ -254,7 +257,9 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
         previousCycleIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey, incrementalEnabled);
         indexStateEngine = stateEngine;
         cycleAction = CycleAction.BUILT_BASELINE;
-        LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, snapshot baseline.", dataTypeName));
+        LOG.log(Level.FINE, String.format(
+                "Duplicate detection for type '%s': incremental mode, snapshot baseline (lagged index ~%d bytes).",
+                dataTypeName, previousCycleIndex.approxHeapFootprintInBytes()));
         return checkForDuplicates(previousCycleIndex, fieldPaths, vrb);
     }
 
@@ -280,8 +285,10 @@ public class DuplicateDataDetectionValidator implements ValidatorListener, Resto
         newOrdinals.or(populatedOrdinals);
         newOrdinals.andNot(previousOrdinals);
 
-        LOG.log(Level.FINE, String.format("Duplicate detection for type '%s': incremental mode, delta (%d total, %d new ordinals).",
-                dataTypeName, populatedOrdinals.cardinality(), newOrdinals.cardinality()));
+        LOG.log(Level.FINE, String.format(
+                "Duplicate detection for type '%s': incremental mode, delta (%d total, %d new ordinals, lagged index ~%d bytes).",
+                dataTypeName, populatedOrdinals.cardinality(), newOrdinals.cardinality(),
+                previousCycleIndex.approxHeapFootprintInBytes()));
 
         if (newOrdinals.isEmpty()) {
             return vrb.passed();
