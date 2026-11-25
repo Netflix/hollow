@@ -104,6 +104,32 @@ public class HollowSparseIntegerSetTest {
         Assert.assertFalse(hollowIntSet.get(512));
     }
 
+    @Test
+    public void testDeltaKeepsValuesOfModifiedRecords() throws Exception {
+        List<Movie> movies = getMovies();
+        for (Movie movie : movies)
+            objectMapper.add(movie);
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        HollowSparseIntegerSet hollowIntSet = new HollowSparseIntegerSet(readStateEngine, "Movie", "id.value", getPredicate());
+        hollowIntSet.listenForDeltaUpdates();
+        Assert.assertTrue(hollowIntSet.get(512));
+        Assert.assertFalse(hollowIntSet.get(1));
+
+        // rename Avatar, it is still released in 2009 so it should stay in the index
+        movies.get(5).name = "Avatar (Extended Edition)";
+        // The Matrix is now released in 2009 so it should be added to the index
+        movies.get(0).releaseYear = 2009;
+
+        for (Movie m : movies)
+            objectMapper.add(m);
+        StateEngineRoundTripper.roundTripDelta(writeStateEngine, readStateEngine);
+
+        Assert.assertTrue(hollowIntSet.get(512));
+        Assert.assertTrue(hollowIntSet.get(1));
+        Assert.assertEquals(11, hollowIntSet.cardinality());
+    }
+
     // this predicate only indexes movie released in 2009
     private HollowSparseIntegerSet.IndexPredicate getPredicate() {
         return new HollowSparseIntegerSet.IndexPredicate() {
