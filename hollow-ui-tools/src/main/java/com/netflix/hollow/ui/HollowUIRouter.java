@@ -121,9 +121,9 @@ public abstract class HollowUIRouter extends HttpServlet {
                 resp.setContentType("image/png");
             }
 
-            InputStream is = this.getClass().getResourceAsStream("/" + resourceName);
-
-            IOUtils.copy(is, resp.getOutputStream());
+            try (InputStream is = this.getClass().getResourceAsStream("/" + resourceName)) {
+                IOUtils.copy(is, resp.getOutputStream());
+            }
             return true;
         } catch(Exception e){
             return false;
