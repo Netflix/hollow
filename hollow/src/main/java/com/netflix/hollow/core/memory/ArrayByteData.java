@@ -36,6 +36,13 @@ public class ArrayByteData implements ByteData {
     }
 
     @Override
+    public void copyTo(long srcPos, byte[] destination, int destPos, int length) {
+        if(srcPos < 0 || length < 0 || srcPos > data.length - length)
+            throw new IndexOutOfBoundsException();
+        System.arraycopy(data, (int)srcPos, destination, destPos, length);
+    }
+
+    @Override
     public long length() {
         return data.length;
     }
