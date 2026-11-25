@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.read.dataaccess.proxy;
 
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.memory.HollowStringValue;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
@@ -88,6 +89,11 @@ public class HollowObjectProxyDataAccess extends HollowTypeProxyDataAccess imple
     @Override
     public boolean isStringFieldEqual(int ordinal, int fieldIndex, String testValue) {
         return ((HollowObjectTypeDataAccess) currentDataAccess).isStringFieldEqual(ordinal, fieldIndex, testValue);
+    }
+
+    @Override
+    public boolean isStringFieldEqualTo(int ordinal, int fieldIndex, HollowStringValue value) {
+        return ((HollowObjectTypeDataAccess)currentDataAccess).isStringFieldEqualTo(ordinal, fieldIndex, value);
     }
 
     @Override

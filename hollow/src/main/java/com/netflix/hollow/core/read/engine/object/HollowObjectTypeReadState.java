@@ -24,6 +24,7 @@ import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.MemoryMode;
+import com.netflix.hollow.core.memory.HollowStringValue;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.encoding.ZigZag;
@@ -423,6 +424,33 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
                     testValue, useDirectSegmentStringReads && shardsAreImmutable && memoryMode == MemoryMode.ON_HEAP);
         } while(readWasUnsafe(shardsHolder, ordinal, shard));
 
+        return result;
+    }
+
+    @Override
+    public boolean isStringFieldEqualTo(int ordinal, int fieldIndex, HollowStringValue value) {
+        if(!value.isAscii() || !shardsAreImmutable || memoryMode != MemoryMode.ON_HEAP)
+            return value.getValue().equals(readString(ordinal, fieldIndex));
+        sampler.recordFieldAccess(fieldIndex);
+        HollowObjectTypeShardsHolder holder;
+        HollowObjectTypeReadStateShard shard;
+        boolean result;
+        do {
+            int numBits;
+            long start;
+            long end;
+            do {
+                holder = shardsVolatile;
+                shard = holder.shards[ordinal & holder.shardNumberMask];
+                int shardOrdinal = ordinal >> shard.shardOrdinalShift;
+                numBits = shard.dataElements.bitsPerField[fieldIndex];
+                long bitOffset = shard.fieldOffset(shardOrdinal, fieldIndex);
+                end = shard.dataElements.fixedLengthData.getElementValue(bitOffset, numBits);
+                start = shardOrdinal == 0 ? 0 : shard.dataElements.fixedLengthData.getElementValue(
+                        bitOffset - shard.dataElements.bitsPerRecord, numBits);
+            } while(readWasUnsafe(holder, ordinal, shard));
+            result = shard.isStringFieldEqualTo(start, end, numBits, fieldIndex, value);
+        } while(readWasUnsafe(holder, ordinal, shard));
         return result;
     }
 

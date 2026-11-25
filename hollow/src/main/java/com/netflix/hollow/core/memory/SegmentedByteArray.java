@@ -248,6 +248,26 @@ public class SegmentedByteArray implements VariableLengthData {
         return complete && count == testLength;
     }
 
+    /** Compare an immutable encoded range against a previously prepared ASCII value. */
+    public boolean isVIntStringEqualTo(long position, int length, HollowStringValue value) {
+        if(!value.isAscii())
+            return isVIntStringEqual(position, length, value.getValue());
+        if(length != value.asciiLength())
+            return false;
+        byte[][] currentSegments = segments;
+        int consumed = 0;
+        while(consumed < length) {
+            long currentPosition = position + consumed;
+            int offset = (int)(currentPosition & bitmask);
+            int count = Math.min(length - consumed, (1 << log2OfSegmentSize) - offset);
+            byte[] segment = currentSegments[(int)(currentPosition >>> log2OfSegmentSize)];
+            if(!value.matchesAsciiSegment(segment, offset, consumed, count))
+                return false;
+            consumed += count;
+        }
+        return true;
+    }
+
     @Override
     public void copy(ByteData src, long srcPos, long destPos, long length) {
         for(long i=0;i<length;i++) {

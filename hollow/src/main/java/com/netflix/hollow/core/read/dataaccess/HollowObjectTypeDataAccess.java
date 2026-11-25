@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.read.dataaccess;
 
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.memory.HollowStringValue;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
@@ -107,5 +108,14 @@ public interface HollowObjectTypeDataAccess extends HollowTypeDataAccess {
      * @return a hashCode for the {@link FieldType#BYTES} or {@link FieldType#STRING} field's value at the specified fieldIndex for the specified ordinal.
      */
     int findVarLengthFieldHashCode(int ordinal, int fieldIndex);
+
+    /**
+     * Compare a STRING field with a prepared, non-null value. Implementations may compare ASCII
+     * directly against immutable encoded storage. Other readers retain String equality semantics.
+     * Prepare and reuse the value across calls to amortize its additional retained ASCII bytes.
+     */
+    default boolean isStringFieldEqualTo(int ordinal, int fieldIndex, HollowStringValue value) {
+        return value.getValue().equals(readString(ordinal, fieldIndex));
+    }
 
 }
