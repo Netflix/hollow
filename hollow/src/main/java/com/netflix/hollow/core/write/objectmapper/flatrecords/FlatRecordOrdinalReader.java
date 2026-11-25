@@ -330,14 +330,14 @@ public class FlatRecordOrdinalReader {
     return offset;
   }
 
-  private int sizeOfOrdinal(int ordinal) {
-    int offset = getOrdinalOffset(ordinal);
+    private int sizeOfOrdinal(int ordinal) {
+        int offset = getOrdinalOffset(ordinal);
 
-    int schemaId = VarInt.readVInt(record.data, offset);
-    int schemaIdSize = VarInt.sizeOfVInt(schemaId);
-    offset += schemaIdSize;
-    HollowSchema schema = record.schemaIdMapper.getSchema(schemaId);
+        int schemaId = VarInt.readVInt(record.data, offset);
+        int schemaIdSize = VarInt.sizeOfVInt(schemaId);
+        offset += schemaIdSize;
+        HollowSchema schema = record.schemaIdMapper.getSchema(schemaId);
 
-    return schemaIdSize + Sizing.sizeOfSchema(schema, record, offset);
-  }
+        return schemaIdSize + Sizing.sizeOfSchema(schema, record, offset);
+    }
 }

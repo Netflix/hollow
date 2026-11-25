@@ -101,6 +101,6 @@ public class HollowObjectMapperPrimaryKeyExtractionTests {
             this.name = name;
         }
     }
-    
+
 
 }
