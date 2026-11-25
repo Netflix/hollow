@@ -20,6 +20,7 @@ import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 import static com.netflix.hollow.core.read.engine.HollowTypeReadStateShard.nextOrdinalInShard;
 
 import com.netflix.hollow.core.memory.ByteData;
+import com.netflix.hollow.core.memory.HollowStringValue;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
@@ -154,6 +155,18 @@ class HollowObjectTypeReadStateShard implements HollowTypeReadStateShard {
         if(immutable)
             return ((SegmentedByteArray)data).isVIntStringEqual(startByte, length, testValue);
         return testStringEquality(data, startByte, length, testValue);
+    }
+
+    public boolean isStringFieldEqualTo(long startByte, long endByte, int numBitsForField,
+                                        int fieldIndex, HollowStringValue value) {
+        if((endByte & (1L << numBitsForField - 1)) != 0)
+            return false;
+        startByte &= (1L << numBitsForField - 1) - 1;
+        int length = (int)(endByte - startByte);
+        if(length == 0)
+            return value.getValue().isEmpty();
+        return ((SegmentedByteArray)dataElements.varLengthData[fieldIndex])
+                .isVIntStringEqualTo(startByte, length, value);
     }
 
     public int findVarLengthFieldHashCode(long startByte, long endByte, int numBitsForField, int fieldIndex) {
