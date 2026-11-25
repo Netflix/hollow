@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class HollowUpdatePlan implements Iterable<HollowConsumer.Blob> {
 
-    public static HollowUpdatePlan DO_NOTHING = new HollowUpdatePlan(Collections.emptyList());
+    public static final HollowUpdatePlan DO_NOTHING = new HollowUpdatePlan(Collections.emptyList());
 
     private final List<HollowConsumer.Blob> transitions;
 
@@ -39,7 +39,7 @@ public class HollowUpdatePlan implements Iterable<HollowConsumer.Blob> {
     }
 
     public HollowUpdatePlan() {
-        this.transitions = new ArrayList();
+        this.transitions = new ArrayList<>();
     }
 
     public boolean isSnapshotPlan() {
