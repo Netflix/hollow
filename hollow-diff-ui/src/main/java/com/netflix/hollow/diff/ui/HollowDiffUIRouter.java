@@ -17,6 +17,8 @@
 package com.netflix.hollow.diff.ui;
 
 import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.report.HollowDiffReportMetadata;
+import com.netflix.hollow.tools.diff.report.HollowDiffReportOptions;
 import com.netflix.hollow.ui.HollowUIRouter;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -65,8 +67,15 @@ public class HollowDiffUIRouter extends HollowUIRouter {
         return diffUIs;
     }
 
-    public HollowDiffUI addDiff(String diffPath, HollowDiff diff, String fromBlobName, String toBlobName) {
-        HollowDiffUI diffUI = new HollowDiffUI(baseUrlPath, diffPath, diff, fromBlobName, toBlobName, velocityEngine);
+    public HollowDiffUI addDiff(
+            String diffPath,
+            HollowDiff diff,
+            String fromBlobName,
+            String toBlobName,
+            HollowDiffReportMetadata metadata,
+            HollowDiffReportOptions options) {
+        HollowDiffUI diffUI = new HollowDiffUI(
+                baseUrlPath, diffPath, diff, fromBlobName, toBlobName, velocityEngine, metadata, options);
         diffUIs.put(diffPath, diffUI);
         return diffUI;
     }

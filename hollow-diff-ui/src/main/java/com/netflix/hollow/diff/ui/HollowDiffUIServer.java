@@ -17,8 +17,13 @@
 package com.netflix.hollow.diff.ui;
 
 import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.report.HollowDiffReportMetadata;
+import com.netflix.hollow.tools.diff.report.HollowDiffReportOptions;
 
 public class HollowDiffUIServer {
+
+    static final String DEFAULT_FROM_LABEL = "FROM";
+    static final String DEFAULT_TO_LABEL = "TO";
 
     private final DiffUIServer server;
 
@@ -31,11 +36,25 @@ public class HollowDiffUIServer {
     }
 
     public HollowDiffUI addDiff(String diffPath, HollowDiff diff) {
-        return addDiff(diffPath, diff, "FROM", "TO");
+        return addDiff(diffPath, diff, DEFAULT_FROM_LABEL, DEFAULT_TO_LABEL);
     }
 
     public HollowDiffUI addDiff(String diffPath, HollowDiff diff, String fromBlobName, String toBlobName) {
-        return server.addDiff(diffPath, diff, fromBlobName, toBlobName);
+        return server.addDiff(diffPath, diff, fromBlobName, toBlobName, null, null);
+    }
+
+    public HollowDiffUI addDiff(
+            String diffPath,
+            HollowDiff diff,
+            HollowDiffReportMetadata metadata,
+            HollowDiffReportOptions options) {
+        return server.addDiff(
+                diffPath,
+                diff,
+                blobLabel(metadata != null ? metadata.getFromNamespace() : null, DEFAULT_FROM_LABEL),
+                blobLabel(metadata != null ? metadata.getToNamespace() : null, DEFAULT_TO_LABEL),
+                metadata,
+                options);
     }
 
     public HollowDiffUIServer start() throws Exception {
@@ -52,4 +71,7 @@ public class HollowDiffUIServer {
         server.stop();
     }
 
+    private static String blobLabel(String namespace, String defaultLabel) {
+        return namespace != null ? namespace : defaultLabel;
+    }
 }

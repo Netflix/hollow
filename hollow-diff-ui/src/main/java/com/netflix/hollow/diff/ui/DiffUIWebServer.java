@@ -1,6 +1,8 @@
 package com.netflix.hollow.diff.ui;
 
 import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.report.HollowDiffReportMetadata;
+import com.netflix.hollow.tools.diff.report.HollowDiffReportOptions;
 import com.netflix.hollow.ui.HollowUIWebServer;
 import com.netflix.hollow.ui.HttpHandlerWithServletSupport;
 
@@ -12,7 +14,14 @@ class DiffUIWebServer extends HollowUIWebServer implements DiffUIServer {
         this.router = router;
     }
 
-    public HollowDiffUI addDiff(String diffPath, HollowDiff diff, String fromBlobName, String toBlobName) {
-        return this.router.addDiff(diffPath, diff, fromBlobName, toBlobName);
+    @Override
+    public HollowDiffUI addDiff(
+            String diffPath,
+            HollowDiff diff,
+            String fromBlobName,
+            String toBlobName,
+            HollowDiffReportMetadata metadata,
+            HollowDiffReportOptions options) {
+        return router.addDiff(diffPath, diff, fromBlobName, toBlobName, metadata, options);
     }
 }
