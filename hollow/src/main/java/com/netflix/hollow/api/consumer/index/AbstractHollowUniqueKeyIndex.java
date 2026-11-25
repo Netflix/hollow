@@ -22,6 +22,9 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 /**
  * Intended for internal use only - used by API code generator
+ * <p>
+ * It indexes the consumer's state engine, so a generated index can't index a version hold ({@link com.netflix.hollow.api.consumer.longevity.HollowVersionHold}): over a
+ * hold, build a {@link com.netflix.hollow.core.index.HollowUniqueKeyIndex} with the hold's data access.
  *,
  * @author dsu
  */

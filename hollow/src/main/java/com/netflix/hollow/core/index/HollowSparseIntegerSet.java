@@ -25,6 +25,8 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  * Create hollow integer set for sparse non-negative {@literal &} unique integer values referenced by fieldPath in a type based on a predicate.
+ * <p>
+ * It reads a state engine's type states, so it can't be built over a version hold ({@link com.netflix.hollow.api.consumer.longevity.HollowVersionHold}).
  */
 public class HollowSparseIntegerSet implements HollowTypeStateListener {
 

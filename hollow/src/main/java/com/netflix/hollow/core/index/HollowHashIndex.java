@@ -40,6 +40,9 @@ import java.util.logging.Logger;
  * The field definitions in a hash key may be hierarchical (traverse multiple record types) via dot-notation.  For example,
  * the field definition <i>actors.element.actorId</i> may be used to traverse a child <b>LIST</b> or <b>SET</b> type record referenced by the field
  * <i>actors</i>, each elements contained therein, and finally each actors <i>actorId</i> field.
+ * <p>
+ * Built with a version hold's data access ({@link com.netflix.hollow.api.consumer.longevity.HollowVersionHold#getDataAccess()}), it indexes the held version and never
+ * follows refreshes; {@link #listenForDeltaUpdates()} needs a state engine.
  */
 public class HollowHashIndex implements HollowTypeStateListener {
     private static final Logger LOG = Logger.getLogger(HollowHashIndex.class.getName());

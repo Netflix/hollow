@@ -92,7 +92,7 @@ public class HollowHashIndexBuilder {
 
         int bitsPerMatchHashKey = 0;
         for(int i=0;i<traverser.getNumFieldPaths();i++) {
-            int maxOrdinalForTypeState = traverser.getFieldTypeDataAccess(i).getTypeState().maxOrdinal();
+            int maxOrdinalForTypeState = traverser.getFieldTypeDataAccess(i).getMaxOrdinal();
             bitsPerTraverserField[i] = bitsRequiredToRepresentValue(maxOrdinalForTypeState + 1);
             offsetPerTraverserField[i] = bitsPerMatchHashKey;
             if(i < preindexer.getNumMatchTraverserFields())
@@ -106,7 +106,7 @@ public class HollowHashIndexBuilder {
     public void buildIndex() {
         matchIndexHashAndSizeArray = new GrowingSegmentedLongArray(memoryRecycler);
 
-        BitSet populatedOrdinals = preindexer.getHollowTypeDataAccess().getTypeState().getPopulatedOrdinals();
+        BitSet populatedOrdinals = preindexer.getHollowTypeDataAccess().getPopulatedOrdinals();
 
         /// an initial guess at how big this table might be -- one match per top-level element.
         int guessNumberOfMatches = populatedOrdinals.cardinality();

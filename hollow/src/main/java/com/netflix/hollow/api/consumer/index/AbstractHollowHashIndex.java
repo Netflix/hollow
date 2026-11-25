@@ -22,6 +22,9 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 /**
  * Intended for internal use only - used by API code generator
+ * <p>
+ * It indexes the consumer's state engine, so a generated hash index can't index a version hold ({@link com.netflix.hollow.api.consumer.longevity.HollowVersionHold}): over
+ * a hold, build a {@link com.netflix.hollow.core.index.HollowHashIndex} with the hold's data access.
  * @deprecated see {@link HashIndex}
  */
 // TODO(timt): how to move to `API extends HollowAPI` without binary incompatiblity of access to the `api`
