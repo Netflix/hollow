@@ -2,10 +2,10 @@
 
 # Hollow
 
-[![Build Status](https://travis-ci.com/Netflix/hollow.svg?branch=master)](https://travis-ci.com/Netflix/hollow)
+[![Build Status](https://github.com/Netflix/hollow/actions/workflows/nebula-ci.yml/badge.svg)](https://github.com/Netflix/hollow/actions/workflows/nebula-ci.yml)
 [![Join the chat at https://gitter.im/Netflix/hollow](https://badges.gitter.im/Netflix/hollow.svg)](https://gitter.im/Netflix/hollow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/Netflix/hollow.svg)](#)
-[ ![Download](https://api.bintray.com/packages/netflixoss/maven/hollow/images/download.svg) ](https://bintray.com/netflixoss/maven/hollow/_latestVersion)
+[![Maven Central](https://img.shields.io/maven-central/v/com.netflix.hollow/hollow.svg)](https://central.sonatype.com/artifact/com.netflix.hollow/hollow)
 
 Hollow is a java library and toolset for disseminating in-memory datasets from a single producer to many consumers for high performance read-only access. [Read more](http://techblog.netflix.com/2016/12/netflixoss-announcing-hollow.html).
 
@@ -17,11 +17,11 @@ We recommend jumping into the [quick start guide](http://hollow.how/quick-start)
 
 ## Get Hollow
 
-Release binaries are available from Maven Central and jCenter.
+Release binaries are available from Maven Central.
 
 |GroupID/Org|ArtifactID/Name|Latest Stable Version|
 |-----------|---------------|---------------------|
-|com.netflix.hollow|hollow|5.1.3|
+|com.netflix.hollow|hollow|7.15.3|
 
 In a Maven `.pom` file:
 ```xml
@@ -29,7 +29,7 @@ In a Maven `.pom` file:
         <dependency>
                 <groupId>com.netflix.hollow</groupId>
                 <artifactId>hollow</artifactId>
-                <version>5.1.3</version>
+                <version>7.15.3</version>
         </dependency>
         ...
 ```
@@ -37,7 +37,7 @@ In a Maven `.pom` file:
 In a Gradle `build.gradle` file:
 ```gradle
         ...
-        compile 'com.netflix.hollow:hollow:5.1.3'
+        implementation 'com.netflix.hollow:hollow:7.15.3'
         ...
 ```
         
