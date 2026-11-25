@@ -35,6 +35,7 @@ import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.test.InMemoryBlobStore;
+import com.netflix.hollow.tools.compact.HollowCompactor.CompactionConfig;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -571,6 +572,27 @@ public class HollowProducerIncrementalTest {
             Assert.assertEquals("runIncrementalCycle failed", e.getMessage());
         }
 
+    }
+
+    @Test
+    public void incrementalProducerCompacts() {
+        HollowProducer.Incremental producer = createInMemoryIncrementalProducer();
+        producer.runIncrementalCycle(iws -> {
+            for (int i = 0; i < 100; i++) {
+                iws.addOrModify(new TypeA(i, "id" + i, i));
+            }
+        });
+        producer.runIncrementalCycle(iws -> {
+            for (int i = 0; i < 50; i++) {
+                iws.delete(new RecordPrimaryKey("TypeA", new Object[] {i, "id" + i}));
+            }
+        });
+
+        long v3 = producer.runCompactionCycle(new CompactionConfig(0, 20));
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(v3);
+        assertEquals(50, consumer.getStateEngine().getTypeState("TypeA").getPopulatedOrdinals().length());
     }
 
     private HollowProducer.Incremental createInMemoryIncrementalProducer() {
