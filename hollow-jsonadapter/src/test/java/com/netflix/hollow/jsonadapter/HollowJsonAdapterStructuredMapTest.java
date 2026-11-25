@@ -82,6 +82,11 @@ public class HollowJsonAdapterStructuredMapTest {
     }
 
     @Test
+    public void entriesGivenAsArraysAreRejected() {
+        assertRejected("{\"id\":\"a1\",\"scopes\":[[\"REGION\",[\"r1\"]]]}", "MapOfScopeTypeToSetOfString");
+    }
+
+    @Test
     public void scalarsForOtherTypesAreRejected() {
         assertRejected("{\"id\":\"a1\",\"labels\":[{\"key\":\"1\",\"value\":\"x\"}]}", "Pair");
         assertRejected("{\"id\":\"a1\",\"scopes\":[{\"key\":\"REGION\",\"value\":\"r1\"}]}", "SetOfString");

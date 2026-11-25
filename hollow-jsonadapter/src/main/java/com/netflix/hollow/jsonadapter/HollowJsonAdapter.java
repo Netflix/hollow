@@ -409,6 +409,8 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
                     throw new IOException("Expecting each entry of " + mapTypeName + " to have a non-null \"key\" and \"value\"");
 
                 mapRec.addEntry(keyOrdinal, valueOrdinal);
+            } else if(token == JsonToken.START_ARRAY) {
+                throw new IOException("Expecting each entry of " + mapTypeName + " to be a JSON object with a \"key\" and a \"value\" but instead found a JSON array");
             }
 
             token = parser.nextToken();
