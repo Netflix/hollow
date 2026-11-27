@@ -387,18 +387,13 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                     // if current longs length is greater than offset, then insert long 0 -> (offset - 1), new long, offset to (length -1)
                     if (offset >= oldLongsLen) {
                         // append new long at end
-                        int it;
-                        for (it = 0; it < oldLongsLen; it++)
-                            newLongs[it] = longs[it];
-                        newLongs[it] = whichBitInLong;
+                        System.arraycopy(longs, 0, newLongs, 0, oldLongsLen);
+                        newLongs[oldLongsLen] = whichBitInLong;
                     } else {
                         // insert new long in between
-                        int it;
-                        for (it = 0; it < offset; it++)
-                            newLongs[it] = longs[it];
+                        System.arraycopy(longs, 0, newLongs, 0, offset);
                         newLongs[offset] = whichBitInLong;
-                        for (it = offset; it < oldLongsLen; it++)
-                            newLongs[it + 1] = longs[it];
+                        System.arraycopy(longs, offset, newLongs, offset + 1, oldLongsLen - offset);
                     }
                     longs = newLongs;
                 }
@@ -457,14 +452,8 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
 
                         long[] newLongs = new long[oldLongsLen - 1];
 
-                        int it;
-                        for (it = 0; it < offset; it++)
-                            newLongs[it] = longs[it];
-                        it++;
-                        while (it < oldLongsLen) {
-                            newLongs[it - 1] = longs[it];
-                            it++;
-                        }
+                        System.arraycopy(longs, 0, newLongs, 0, offset);
+                        System.arraycopy(longs, offset + 1, newLongs, offset, oldLongsLen - offset - 1);
 
                         longs = newLongs;
                         longAtIndex &= ~bitInIndex;
