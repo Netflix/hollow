@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.FixedLengthData;
+import com.netflix.hollow.core.memory.SegmentedLongArray;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import java.util.Random;
 import org.junit.Assert;
@@ -315,4 +316,39 @@ public class FixedLengthElementArrayTest {
         Assert.assertEquals(63, FixedLengthData.bitsRequiredToRepresentValue(Long.MAX_VALUE));
     }
 
+
+    @Test
+    public void testZeroBitsInitialization() {
+        FixedLengthElementArray arr = new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 0);
+        Assert.assertEquals(0, arr.approxHeapFootprintInBytes());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNegativeBitsThrowsIllegalArgumentException() {
+        new FixedLengthElementArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, -1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNegativeLongsThrowsIllegalArgumentException() {
+        new SegmentedLongArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, -1);
+    }
+
+    @Test
+    public void testZeroLongsInitializationAndLifecycle() {
+        SegmentedLongArray arr = new SegmentedLongArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 0);
+        arr.fill(42L);
+        arr.destroy(WastefulRecycler.SMALL_ARRAY_RECYCLER);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testZeroLongsGetThrowsIndexOutOfBoundsException() {
+        SegmentedLongArray arr = new SegmentedLongArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 0);
+        arr.get(0);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testZeroLongsSetThrowsIndexOutOfBoundsException() {
+        SegmentedLongArray arr = new SegmentedLongArray(WastefulRecycler.SMALL_ARRAY_RECYCLER, 0);
+        arr.set(0, 100L);
+    }
 }
