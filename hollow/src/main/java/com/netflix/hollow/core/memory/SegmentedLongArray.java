@@ -126,27 +126,19 @@ public class SegmentedLongArray {
         if(numLongs == 0)
             return;
 
-        long fencepostLong = in.readLong();
+        BulkLongReader reader = new BulkLongReader(in, (int) Math.min(segmentSize, numLongs));
 
         while(numLongs > 0) {
-            long longsToCopy = Math.min(segmentSize, numLongs);
+            int longsToCopy = (int) Math.min(segmentSize, numLongs);
+            reader.readFully(segments[segment], 0, longsToCopy);
 
-            unsafe.putLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET, fencepostLong);
-
-            int longsCopied = 1;
-
-            while(longsCopied < longsToCopy) {
-                long l = in.readLong();
-                unsafe.putLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied++), l);
-            }
-
-            if(numLongs > longsCopied) {
-                unsafe.putLong(segments[segment], (long) Unsafe.ARRAY_LONG_BASE_OFFSET + (8 * longsCopied), in.readLong());
-                fencepostLong = segments[segment][longsCopied];
+            // Duplicate the first value in the previous segment's padding for cross-boundary reads.
+            if(segment > 0) {
+                segments[segment - 1][segmentSize] = segments[segment][0];
             }
 
             segment++;
-            numLongs -= longsCopied;
+            numLongs -= longsToCopy;
         }
     }
 }

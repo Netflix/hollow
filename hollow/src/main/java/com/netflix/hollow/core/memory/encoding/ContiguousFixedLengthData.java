@@ -15,6 +15,7 @@
  */
 package com.netflix.hollow.core.memory.encoding;
 
+import com.netflix.hollow.core.memory.BulkLongReader;
 import com.netflix.hollow.core.memory.FixedLengthData;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.read.HollowBlobInput;
@@ -61,9 +62,11 @@ public final class ContiguousFixedLengthData implements FixedLengthData {
             throws IOException {
         ContiguousFixedLengthData data = new ContiguousFixedLengthData(numLongs * 64, numLongs);
         int dataLongs = (int) numLongs;
-        for (int i = 0; i < dataLongs; i++) {
-            data.data[i] = in.readLong();
+        if (dataLongs == 0) {
+            return data;
         }
+        BulkLongReader reader = new BulkLongReader(in, Math.min(256, dataLongs));
+        reader.readFully(data.data, 0, dataLongs);
         return data;
     }
 
