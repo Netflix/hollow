@@ -14,7 +14,7 @@
  *     limitations under the License.
 *#
 
-#if($queryResult)
+#if($queryResult && !$queryResult.getQueryClauses().isEmpty())
 	<b>Augment Current Query:</b>
 #else
 	<b>Search:</b>
@@ -46,9 +46,9 @@
 	
 </form>
 
-#if($queryResult)
+#if($queryResult && !$queryResult.getQueryClauses().isEmpty())
 
-Current Query: <span style="font-family: monospace;">$esc.html($queryResult.getQueryDisplayString())</span> <a href="$basePath/query?clear=true">clear</a>
+Current Query: #set($clauseIndex = 0)#foreach($clause in $queryResult.getQueryClauses())#if($clauseIndex > 0) AND #end<span style="font-family: monospace;">$esc.html($clause.toString())</span> [<a href="$basePath/query?removeClause=$clauseIndex">remove</a>]#set($clauseIndex = $clauseIndex + 1)#end <a href="$basePath/query?clear=true">clear</a>
 
 <p/>
 

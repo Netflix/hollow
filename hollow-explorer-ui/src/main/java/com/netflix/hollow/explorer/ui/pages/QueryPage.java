@@ -56,6 +56,17 @@ public class QueryPage extends HollowExplorerPage {
         QueryResult result = (QueryResult) session.getAttribute("query-result");
         if(result != null)
             result.recalculateIfNotCurrent(ui.getStateEngine());
+
+        if(req.getParameter("removeClause") != null && result != null) {
+            try {
+                int clauseIndex = Integer.parseInt(req.getParameter("removeClause"));
+                result.removeClause(clauseIndex, ui.getStateEngine());
+                if(result.getQueryClauses().isEmpty()) {
+                    session.clearAttribute("query-result");
+                    result = null;
+                }
+            } catch(NumberFormatException ignored) {}
+        }
         
         if(field != null && queryValue != null) {
             HollowReadStateEngine stateEngine = ui.getStateEngine();

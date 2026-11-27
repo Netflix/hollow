@@ -62,14 +62,31 @@ public class QueryResult {
     
     public void recalculateIfNotCurrent(HollowReadStateEngine stateEngine) {
         if(stateEngine.getCurrentRandomizedTag() != randomizedStateTag) {        
-            queryMatches.clear();
-            List<QueryClause> requeryClauses = new ArrayList<QueryClause>(this.queryClauses);
-            this.queryClauses.clear();
+            recalculate(stateEngine);
+        }
+    }
     
-            for(QueryClause clause : requeryClauses)
-                augmentQuery(clause, stateEngine);
-        
-            randomizedStateTag = stateEngine.getCurrentRandomizedTag();
+    public void recalculate(HollowReadStateEngine stateEngine) {
+        queryMatches.clear();
+        List<QueryClause> requeryClauses = new ArrayList<QueryClause>(this.queryClauses);
+        this.queryClauses.clear();
+
+        for(QueryClause clause : requeryClauses)
+            augmentQuery(clause, stateEngine);
+    
+        randomizedStateTag = stateEngine.getCurrentRandomizedTag();
+    }
+
+    public void removeClause(int index, HollowReadStateEngine stateEngine) {
+        if(index >= 0 && index < queryClauses.size()) {
+            queryClauses.remove(index);
+            recalculate(stateEngine);
+        }
+    }
+
+    public void removeClause(QueryClause clause, HollowReadStateEngine stateEngine) {
+        if(queryClauses.remove(clause)) {
+            recalculate(stateEngine);
         }
     }
     
@@ -148,6 +165,24 @@ public class QueryResult {
             builder.append(field).append("=\"").append(value).append("\"");
             
             return builder.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            QueryClause that = (QueryClause) o;
+            if (type != null ? !type.equals(that.type) : that.type != null) return false;
+            if (field != null ? !field.equals(that.field) : that.field != null) return false;
+            return value != null ? value.equals(that.value) : that.value == null;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = type != null ? type.hashCode() : 0;
+            result = 31 * result + (field != null ? field.hashCode() : 0);
+            result = 31 * result + (value != null ? value.hashCode() : 0);
+            return result;
         }
     }
 
